@@ -47,12 +47,12 @@ public static class DeviceHelper
             return null;
 
         // Try to find the MMC in the props
-        if (Data.CurrentADBDevice.MmcProp is string mmcId)
+        if (Data.DevicesObject.Current.Device.MmcProp is string mmcId)
         {
             return drives.FirstOrDefault(d => d.ID == mmcId);
         }
         // If OTG exists, but no MMC ID - there is no MMC
-        else if (Data.CurrentADBDevice.OtgProp is not null)
+        else if (Data.DevicesObject.Current.Device.OtgProp is not null)
             return null;
 
         var externalDrives = drives.Where(d => d.Type is AbstractDrive.DriveType.Unknown);
@@ -648,15 +648,15 @@ public static class DeviceHelper
 
     public static void SetAndroidVersion()
     {
-        var versionTask = Task.Run(Data.CurrentADBDevice.GetAndroidVersion);
-        versionTask.ContinueWith(t =>
+        var versionTask = Data.DevicesObject.Current.Device.GetAndroidVersion();
+        versionTask?.ContinueWith(t =>
         {
             if (t.IsCanceled)
                 return;
 
             App.Current.Dispatcher.Invoke(() =>
             {
-                Data.DevicesObject.Current.SetAndroidVersion(t.Result);
+                Data.DevicesObject.Current.SetAndroidVersion();
             });
         });
     }

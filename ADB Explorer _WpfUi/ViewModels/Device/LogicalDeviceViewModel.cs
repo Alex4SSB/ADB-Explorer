@@ -10,7 +10,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
     #region Full properties
 
     private LogicalDevice device;
-    protected new LogicalDevice Device
+    public new LogicalDevice Device
     {
         get => device;
         set => Set(ref device, value);
@@ -38,12 +38,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     public DeviceData DeviceData => Device.DeviceData;
 
-    private byte? androidVersion;
-    public byte? AndroidVersion
-    {
-        get => androidVersion;
-        private set => Set(ref androidVersion, value);
-    }
+    public byte? AndroidVersion => Device.AndroidVersion;
 
     private bool useIdForName;
     public bool UseIdForName
@@ -177,13 +172,12 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     #region Setter functions
 
-    public void SetAndroidVersion(string version)
+    public void SetAndroidVersion()
     {
         if (!IsOpen)
             return;
 
-        if (byte.TryParse(version.Split('.')[0], out byte ver))
-            AndroidVersion = ver;
+        OnPropertyChanged(nameof(AndroidVersion));
     }
 
     public void UpdateDevice(LogicalDeviceViewModel other) => UpdateDevice(other.Device);
@@ -218,6 +212,8 @@ public class LogicalDeviceViewModel : DeviceViewModel
     }
 
     public void UpdateBattery() => Device.UpdateBattery();
+
+    public void UpdateName() => OnPropertyChanged(nameof(Name));
 
     public Task<bool> UpdateDrives(IEnumerable<Drive> drives, Dispatcher dispatcher, bool asyncClassify = false) => Device.UpdateDrives(drives, dispatcher, asyncClassify);
 

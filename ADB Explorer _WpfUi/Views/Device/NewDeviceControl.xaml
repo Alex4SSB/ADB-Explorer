@@ -116,8 +116,9 @@
                             Glyph="&#xE177;"
                             ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_PORT}}" />
                         <ui:FontIcon
+                            Margin="0,4,-6,0"
                             Glyph="&#xEA21;"
-                            Style="{StaticResource NewDevicePairingPortAsteriskStyle}"
+                            Style="{StaticResource GlyphFont}"
                             ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_PORT}}" />
                     </Grid>
                     <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePairingPortBoxStyle}" />

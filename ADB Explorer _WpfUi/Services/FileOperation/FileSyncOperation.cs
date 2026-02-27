@@ -124,7 +124,7 @@ public class FileSyncOperation : FileOperation
             {
                 MaxDegreeOfParallelism = Data.Settings.AllowMultiOp ? -1 : 1
             };
-            bool useV2 = Device.AndroidVersion >= 11;
+            bool useV2 = Device.Device.AndroidVersion >= 11;
 
             Parallel.ForEach(Files.Where(f => !f.IsDirectory), options, (item) =>
             {

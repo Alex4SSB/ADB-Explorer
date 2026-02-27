@@ -163,6 +163,7 @@ public class Devices : AbstractDevice
         OnPropertyChanged(nameof(Count));
 
         UpdateLogicalIp();
+        UpdateBrandNames();
         UpdateHistoryNames();
 
         return result;
@@ -254,6 +255,14 @@ public class Devices : AbstractDevice
         }
 
         return result;
+    }
+
+    public async void UpdateBrandNames()
+    {
+        await Task.Run(() =>
+            UIList.OfType<LogicalDeviceViewModel>().ForEach(d => _ = d.Device.BrandName));
+
+        App.Current.Dispatcher.Invoke(() => UIList.OfType<LogicalDeviceViewModel>().ForEach(d => d.UpdateName()));
     }
 
     public async void UpdateLogicalIp()

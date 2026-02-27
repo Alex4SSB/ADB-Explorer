@@ -9,11 +9,13 @@ public partial class ADBService
 {
     public static readonly char[] LINE_SEPARATORS = ['\n', '\r'];
 
-    private const string GET_PROP = "getprop";
-    private const string ANDROID_VERSION = "ro.build.version.release";
-    private const string BATTERY = "dumpsys battery";
-    private const string MMC_PROP = "vold.microsd.uuid";
-    private const string OTG_PROP = "vold.otgstorage.uuid";
+    public const string GET_PROP = "getprop";
+    public const string ANDROID_VERSION = "ro.build.version.release";
+    public const string BATTERY = "dumpsys battery";
+    public const string MMC_PROP = "vold.microsd.uuid";
+    public const string OTG_PROP = "vold.otgstorage.uuid";
+
+    public const string BRAND_NAME = "ro.product.brand_device_name";
 
     // First partition of MMC block device 0 / 1
     private static readonly string[] MMC_BLOCK_DEVICES = ["/dev/block/mmcblk0p1", "/dev/block/mmcblk1p1"];
@@ -270,43 +272,6 @@ public partial class ADBService
 
             return re.Matches(stdout).Select(m => new LogicalDrive(m.Groups, isEmulator: Type is DeviceType.Emulator, forcePath: args[0] == "/" ? "/" : ""));
         }
-
-        private Dictionary<string, string> props;
-        public Dictionary<string, string> Props
-        {
-            get
-            {
-                if (props is null)
-                {
-                    int exitCode = ExecuteDeviceAdbShellCommand(ID, GET_PROP, out string stdout, out string stderr, CancellationToken.None);
-                    if (exitCode == 0)
-                    {
-                        props = stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Where(
-                            l => l[0] == '[' && l[^1] == ']').TryToDictionary(
-                                line => line.Split(':')[0].Trim('[', ']', ' '),
-                                line => line.Split(':')[1].Trim('[', ']', ' '));
-                    }
-                    else
-                        props = [];
-
-                }
-
-                return props;
-            }
-        }
-
-        public string MmcProp => Props.GetValueOrDefault(MMC_PROP);
-        public string OtgProp => Props.GetValueOrDefault(OTG_PROP);
-
-        public byte? AndroidVersion;
-
-        public Task<string> GetAndroidVersion() => Task.Run(() =>
-        {
-            var version = Props.GetValueOrDefault(ANDROID_VERSION, "");
-            AndroidVersion = byte.TryParse(version.Split('.')[0], out byte ver) ? ver : null;
-
-            return version;
-        });
 
         public static Dictionary<string, string> GetBatteryInfo(LogicalDevice device)
         {

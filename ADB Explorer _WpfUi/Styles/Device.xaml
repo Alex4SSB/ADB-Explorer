@@ -278,17 +278,6 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style
-        x:Key="NewDevicePairingPortAsteriskStyle"
-        BasedOn="{StaticResource GlyphFont}"
-        TargetType="ui:FontIcon">
-        <Setter Property="Margin" Value="0,4,0,0" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=HideForceFluent}" Value="True">
-                <Setter Property="Margin" Value="10,8,-10,0" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
     <DataTemplate x:Key="LogicalDeviceTemplate">
         <views:LogicalDeviceControl />
     </DataTemplate>

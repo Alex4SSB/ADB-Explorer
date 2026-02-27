@@ -95,6 +95,84 @@ public class LogicalDevice : Device
         Battery.Update(ADBService.AdbDevice.GetBatteryInfo(this));
     }
 
+    private Dictionary<string, string> props;
+    public Dictionary<string, string> Props
+    {
+        get
+        {
+            if (props is null)
+            {
+                int exitCode = ADBService.ExecuteDeviceAdbShellCommand(ID, ADBService.GET_PROP, out string stdout, out string stderr, CancellationToken.None);
+                if (exitCode == 0)
+                {
+                    props = stdout.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries).Where(
+                        l => l[0] == '[' && l[^1] == ']').TryToDictionary(
+                            line => line.Split(':')[0].Trim('[', ']', ' '),
+                            line => line.Split(':')[1].Trim('[', ']', ' '));
+                }
+                else
+                    props = [];
+
+            }
+
+            return props;
+        }
+    }
+
+    public string? BrandName
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(field))
+            {
+                field = Props.GetValueOrDefault(ADBService.BRAND_NAME);
+                if (field is not null)
+                    Name = field;
+            }
+            return field; 
+        }
+    } = null;
+
+    public string? MmcProp
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(field))
+            {
+                field = Props.GetValueOrDefault(ADBService.MMC_PROP);
+            }
+            return field;
+        }
+    } = null;
+
+    public string? OtgProp
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(field))
+            {
+                field = Props.GetValueOrDefault(ADBService.OTG_PROP);
+            }
+            return field;
+        }
+    } = null;
+
+    public string? AndroidVersionString
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(field))
+            {
+                field = Props.GetValueOrDefault(ADBService.ANDROID_VERSION, "");
+            }
+            return field;
+        }
+    } = "";
+
+    public byte? AndroidVersion => byte.TryParse(AndroidVersionString?.Split('.')[0], out byte ver) ? ver : null;
+
+    public Task<string?> GetAndroidVersion() => Task.Run(() => AndroidVersionString);
+
     #region Drive handling
 
     private void InitDeviceDrives()
