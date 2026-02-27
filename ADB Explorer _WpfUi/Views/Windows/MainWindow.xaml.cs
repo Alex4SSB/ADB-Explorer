@@ -88,6 +88,15 @@ namespace ADB_Explorer.Views.Windows
             }
         } = null;
 
+        private TerminalPageHeader TerminalPageHeader
+        {
+            get
+            {
+                field ??= new() { DataContext = App.Services.GetService<TerminalViewModel>() };
+                return field;
+            }
+        } = null;
+
         private void RootNavigation_Navigated(NavigationView sender, NavigatedEventArgs args)
         {
             PageHeader.Content = args.Page switch
@@ -95,6 +104,7 @@ namespace ADB_Explorer.Views.Windows
                 Pages.SettingsPage => SettingsPageHeader,
                 Pages.DevicesPage => DevicesPageHeader,
                 Pages.ExplorerPage => ExplorerPageHeader,
+                Pages.TerminalPage => TerminalPageHeader,
                 _ => null
             };
 

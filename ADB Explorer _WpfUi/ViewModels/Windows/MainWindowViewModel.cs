@@ -24,6 +24,13 @@ public partial class MainWindowViewModel : ObservableObject
             TargetPageType = typeof(Views.Pages.DevicesPage),
             ToolTip = Strings.Resources.S_BUTTON_DEVICES
         },
+        new NavigationViewItem()
+        {
+            Content = new Wpf.Ui.Controls.TextBlock() { FontSize = 12, Text = Strings.Resources.S_TERMINAL, TextTrimming = TextTrimming.CharacterEllipsis },
+            Icon = new FontIcon { Glyph = "\uE756" },
+            TargetPageType = typeof(Views.Pages.TerminalPage),
+            ToolTip = Strings.Resources.S_TERMINAL
+        }
     ];
 
     [ObservableProperty]

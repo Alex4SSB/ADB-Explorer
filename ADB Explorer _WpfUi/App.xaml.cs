@@ -50,12 +50,17 @@ public partial class App
 
             services.AddSingleton<ExplorerPage>();
             services.AddSingleton<ExplorerViewModel>();
+
             services.AddSingleton<DevicesPage>();
             services.AddSingleton<DevicesViewModel>();
 
             services.AddSingleton<SettingsService>();
+
             services.AddSingleton<SettingsPage>();
             services.AddSingleton<SettingsViewModel>();
+
+            services.AddSingleton<TerminalPage>();
+            services.AddSingleton<TerminalViewModel>();
         }).Build();
 
     //private static string SettingsFilePath;

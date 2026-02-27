@@ -96,7 +96,8 @@
                     Height="24"
                     Margin="2,0"
                     Padding="8,0"
-                    Command="{Binding Action.Command.Command}">
+                    Command="{Binding Action.Command.Command}"
+                    FlowDirection="LeftToRight">
                     <ui:Button.Content>
                         <Grid>
                             <emoji:TextBlock Text="{Binding Action.Description}" TextOptions.TextFormattingMode="Display">

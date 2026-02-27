@@ -33,7 +33,10 @@
                             Glyph="{Binding StatusIcon}" />
                     </Grid>
                 </Grid>
-                <TextBlock Grid.Column="1" Margin="4">
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="4"
+                    FlowDirection="LeftToRight">
                     <TextBlock.Style>
                         <Style BasedOn="{StaticResource DeviceNameTextBlockStyle}" TargetType="TextBlock">
                             <Setter Property="Text" Value="{Binding Name}" />

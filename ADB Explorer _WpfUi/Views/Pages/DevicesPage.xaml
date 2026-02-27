@@ -11,6 +11,4 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     ScrollViewer.CanContentScroll="False"
-    mc:Ignorable="d">
-    <Grid />
-</Page>
+    mc:Ignorable="d" />
