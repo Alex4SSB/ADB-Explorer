@@ -46,7 +46,7 @@
         </Style.Triggers>-->
     </Style>
     <Style x:Key="FluentProgressRingStyle" TargetType="ui:ProgressRing">
-        <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
+        <!--<Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight2Brush}" />
@@ -58,7 +58,7 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark1Brush}" />
             </MultiDataTrigger>
-        </Style.Triggers>
+        </Style.Triggers>-->
     </Style>
     <Style x:Key="MenuStyle" TargetType="Menu">
         <Setter Property="Background" Value="Transparent" />
