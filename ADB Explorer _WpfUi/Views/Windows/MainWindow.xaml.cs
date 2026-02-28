@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Controls;
+﻿using ADB_Explorer.Controls.Pages;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
@@ -97,6 +97,15 @@ namespace ADB_Explorer.Views.Windows
             }
         } = null;
 
+        private LogPageHeader LogPageHeader
+        {
+            get
+            {
+                field ??= new() { DataContext = App.Services.GetService<LogViewModel>() };
+                return field;
+            }
+        } = null;
+
         private void RootNavigation_Navigated(NavigationView sender, NavigatedEventArgs args)
         {
             PageHeader.Content = args.Page switch
@@ -105,6 +114,7 @@ namespace ADB_Explorer.Views.Windows
                 Pages.DevicesPage => DevicesPageHeader,
                 Pages.ExplorerPage => ExplorerPageHeader,
                 Pages.TerminalPage => TerminalPageHeader,
+                Pages.LogPage => LogPageHeader,
                 _ => null
             };
 

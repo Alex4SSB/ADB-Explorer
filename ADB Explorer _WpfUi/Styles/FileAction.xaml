@@ -396,19 +396,8 @@
         TargetType="controls:AdbMenu">
         <Setter Property="ItemsControl.ItemsSource" Value="{Binding Source={x:Static Member=services:LogControls.List}}" />
         <Setter Property="ItemsPanel" Value="{StaticResource VerticalItemsPanel}" />
-        <Setter Property="HorizontalAlignment" Value="Right" />
-        <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="helpers:MenuHelper.ItemMargin" Value="3" />
         <Setter Property="helpers:MenuHelper.ItemPadding" Value="9,7" />
         <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
-    </Style>
-    <Style
-        x:Key="LogToggleStyle"
-        BasedOn="{StaticResource AdbToolBarStyle}"
-        TargetType="controls:AdbMenu">
-        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:LogToggle.List}}" />
-        <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
-        <Setter Property="helpers:MenuHelper.ItemPadding" Value="0" />
-        <Setter Property="helpers:MenuHelper.ItemMargin" Value="2,0" />
     </Style>
 </ResourceDictionary>

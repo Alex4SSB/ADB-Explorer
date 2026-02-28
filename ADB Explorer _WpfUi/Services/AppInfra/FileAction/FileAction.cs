@@ -51,6 +51,7 @@ public static class AppActions
         { FileActionType.Home, "\uE80F" },
         { FileActionType.Refresh, "\uE72C" },
         { FileActionType.CopyItemPath, "\uE62F" },
+        { FileActionType.FileOpStop, "\uE768" },
     };
 
     public static List<ToggleMenu> ToggleActions { get; } =
@@ -65,27 +66,17 @@ public static class AppActions
         new(FileActionType.FileOpStop,
             () => true,
             Strings.Resources.S_ENABLE_AUTO_PLAY,
-            "\uE768",
+            Icons[FileActionType.FileOpStop],
             FileActionLogic.ToggleFileOpQ,
             Strings.Resources.S_AUTO_PLAY_DISABLE,
             Icons[FileActionType.PauseLogs]),
         new(FileActionType.PauseLogs,
             () => true,
             Strings.Resources.S_LOG_UPDATES_PAUSE,
-            Icons[FileActionType.PauseLogs],
+            Icons[FileActionType.FileOpStop],
             () => Data.RuntimeSettings.IsLogPaused ^= true,
-            Strings.Resources.S_LOG_UPDATES_ALT),
-        new(FileActionType.LogToggle,
-            () => true,
-            Strings.Resources.S_BUTTON_LOG,
-            "\uE9A4",
-            () => Data.RuntimeSettings.IsLogOpen ^= true,
-            isVisible: Data.FileActions.IsLogToggleVisible),
-        new(FileActionType.TerminalToggle,
-            () => true,
-            Strings.Resources.S_TERMINAL,
-            "\uE756",
-            () => Data.RuntimeSettings.IsTerminalOpen ^= true),
+            Strings.Resources.S_LOG_UPDATES_ALT,
+            Icons[FileActionType.PauseLogs]),
     ];
 
     public static List<FileAction> List { get; } =
@@ -380,7 +371,6 @@ public static class AppActions
             () => !Data.FileOpQ.IsActive && Data.FileOpQ.Operations.Count > 0,
             FileActionLogic.RemoveFileOps,
             Data.FileActions.RemoveFileOpDescription),
-        ToggleActions.Find(a => a.FileAction.Name is FileActionType.LogToggle).FileAction,
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.PauseLogs).FileAction,
         new(FileActionType.ClearLogs,
             () => Data.CommandLog.Count > 0,
@@ -493,14 +483,12 @@ public class FileAction : ViewModelBase
         FileOpRemove,
         PauseLogs,
         ClearLogs,
-        LogToggle,
         FileOpValidate,
         FileOpFilter,
         FollowLink,
         PasteLink,
         SearchApkOnWeb,
         NavHistory,
-        TerminalToggle,
         OpenPackageLocation,
     }
 

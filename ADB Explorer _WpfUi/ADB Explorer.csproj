@@ -57,6 +57,9 @@
     <Compile Update="Controls\MaskedTextBox.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Controls\Pages\LogPageHeader.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Properties\AppGlobal.Designer.cs">
       <DependentUpon>AppGlobal.resx</DependentUpon>
       <DesignTime>True</DesignTime>

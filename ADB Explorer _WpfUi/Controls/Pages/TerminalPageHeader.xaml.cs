@@ -2,7 +2,7 @@
 using ADB_Explorer.ViewModels;
 using ADB_Explorer.ViewModels.Pages;
 
-namespace ADB_Explorer.Controls;
+namespace ADB_Explorer.Controls.Pages;
 
 /// <summary>
 /// Interaction logic for TerminalPageHeader.xaml

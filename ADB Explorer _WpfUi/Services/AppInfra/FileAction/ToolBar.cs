@@ -320,15 +320,6 @@ internal static class LogControls
     ];
 }
 
-internal static class LogToggle
-{
-    public static ObservableList<IMenuItem> List { get; } =
-    [
-        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.TerminalToggle).Button,
-        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.LogToggle).Button,
-    ];
-}
-
 internal static class PeekDetailed
 {
     public static BaseAction Action { get; } = new(

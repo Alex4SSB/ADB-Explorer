@@ -546,24 +546,6 @@
         <Setter Property="MenuPadding" Value="4" />
         <Setter Property="Height" Value="32" />
     </Style>
-    <Style
-        x:Key="LogTextBoxStyle"
-        BasedOn="{StaticResource TextBoxFluentStyle}"
-        TargetType="TextBox">
-        <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
-        <Setter Property="IsReadOnly" Value="True" />
-        <Setter Property="FontSize" Value="18" />
-        <Setter Property="TextWrapping" Value="Wrap" />
-        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
-    </Style>
-    <Style x:Key="LogGridStyle" TargetType="Grid">
-        <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsLogOpen}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
 
 
 

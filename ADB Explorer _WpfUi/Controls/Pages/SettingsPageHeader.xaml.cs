@@ -2,7 +2,7 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 
-namespace ADB_Explorer.Controls;
+namespace ADB_Explorer.Controls.Pages;
 
 /// <summary>
 /// Interaction logic for SettingsPageHeader.xaml

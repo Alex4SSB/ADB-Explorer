@@ -10,7 +10,7 @@ using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.Data;
 using static ADB_Explorer.Services.FileAction;
 
-namespace ADB_Explorer.Controls;
+namespace ADB_Explorer.Controls.Pages;
 
 /// <summary>
 /// Interaction logic for ExplorerPageHeader.xaml

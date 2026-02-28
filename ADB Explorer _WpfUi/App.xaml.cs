@@ -61,6 +61,9 @@ public partial class App
 
             services.AddSingleton<TerminalPage>();
             services.AddSingleton<TerminalViewModel>();
+
+            services.AddSingleton<LogPage>();
+            services.AddSingleton<LogViewModel>();
         }).Build();
 
     //private static string SettingsFilePath;
