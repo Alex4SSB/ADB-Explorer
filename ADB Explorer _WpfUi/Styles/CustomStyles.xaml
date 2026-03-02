@@ -456,7 +456,7 @@
         </Style.Triggers>
     </Style>
     <Style x:Key="SearchBoxStyle" TargetType="controls:SearchBox">
-        <!--<Setter Property="PlaceholderText" Value="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_FILTER}}" />-->
+        <Setter Property="PlaceholderText" Value="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_FILTER}}" />
         <Setter Property="DefaultControlWidth" Value="{Binding Source={x:Static Member=models:AdbExplorerConst.DEFAULT_SEARCH_WIDTH}}" />
         <Setter Property="Icon" Value="&#xE71C;" />
         <Setter Property="IsActive" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=IsActive, Mode=OneWay}" />

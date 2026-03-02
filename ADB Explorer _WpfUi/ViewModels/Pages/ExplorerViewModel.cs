@@ -90,6 +90,10 @@ public partial class ExplorerViewModel : ObservableObject
                 UpdateDriveView();
                 break;
 
+            case nameof(FileActionsEnable.ExplorerFilter):
+                UpdateExplorerView();
+                break;
+
             default:
                 break;
         }
