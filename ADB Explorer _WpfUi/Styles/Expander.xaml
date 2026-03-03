@@ -220,7 +220,6 @@
                             CornerRadius="{TemplateBinding Border.CornerRadius}">
                             <ToggleButton
                                 x:Name="ExpanderToggleButton"
-                                Margin="0"
                                 Padding="{TemplateBinding Padding}"
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -232,7 +231,8 @@
                                 IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                 IsEnabled="{TemplateBinding IsEnabled}"
                                 OverridesDefaultStyle="True"
-                                Template="{StaticResource DefaultExpanderToggleButtonStyle}" />
+                                Template="{StaticResource DefaultExpanderToggleButtonStyle}"
+                                ToolTip="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.HeaderTooltip)}" />
                         </Border>
 
                         <!--  Collapsed content to expand  -->

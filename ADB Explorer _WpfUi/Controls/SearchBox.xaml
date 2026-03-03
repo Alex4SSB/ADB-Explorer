@@ -28,10 +28,13 @@
         <Expander
             x:Name="Expander"
             Grid.Column="1"
-            Height="36"
+            Height="38"
             helpers:ExpanderHelper.ExpanderArrow="None"
+            helpers:ExpanderHelper.HeaderTooltip="{Binding PlaceholderText}"
             helpers:ExpanderHelper.IsHeaderToggleExternal="True"
             ExpandDirection="Left"
+            Expanded="Expander_Expanded"
+            FocusVisualStyle="{x:Null}"
             IsExpanded="{Binding IsExpanded}">
             <Expander.Style>
                 <Style BasedOn="{StaticResource AdbExpanderStyle}" TargetType="Expander">
@@ -144,7 +147,6 @@
             </Expander.Style>
             <Expander.Header>
                 <ui:FontIcon Margin="10" Glyph="{Binding Icon}">
-                    <!--  ToolTip="{Binding (ui:ControlHelper.PlaceholderText)}"  -->
                     <ui:FontIcon.Style>
                         <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
 
@@ -154,31 +156,31 @@
                             <Style.Triggers>
                                 <!--  FOREGROUND: Unchecked  -->
                                 <!--<DataTrigger Binding="{Binding IsFiltered}" Value="False">
-                                    <Setter Property="Foreground" Value="{DynamicResource SystemControlBackgroundBaseHighBrush}" />
-                                </DataTrigger>-->
+                <Setter Property="Foreground" Value="{DynamicResource SystemControlBackgroundBaseHighBrush}" />
+            </DataTrigger>-->
 
                                 <!--  FOREGROUND: Unchecked, Pressed  -->
                                 <!--<DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.IsHeaderPressed)}" Value="True">
-                                    <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
-                                </DataTrigger>-->
+                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+            </DataTrigger>-->
 
                                 <!--  FOREGROUND: Checked, Pressed  -->
                                 <!--<MultiDataTrigger>
-                                    <MultiDataTrigger.Conditions>
-                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.IsHeaderPressed)}" Value="True" />
-                                        <Condition Binding="{Binding IsFiltered}" Value="True" />
-                                    </MultiDataTrigger.Conditions>
-                                    <Setter Property="Foreground">
-                                        <Setter.Value>
-                                            <SolidColorBrush Opacity="{StaticResource AccentButtonForegroundPressedOrDisabledOpacity}" Color="{ui:ThemeResource SystemAltHighColor}" />
-                                        </Setter.Value>
-                                    </Setter>
-                                </MultiDataTrigger>-->
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.IsHeaderPressed)}" Value="True" />
+                    <Condition Binding="{Binding IsFiltered}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Foreground">
+                    <Setter.Value>
+                        <SolidColorBrush Opacity="{StaticResource AccentButtonForegroundPressedOrDisabledOpacity}" Color="{ui:ThemeResource SystemAltHighColor}" />
+                    </Setter.Value>
+                </Setter>
+            </MultiDataTrigger>-->
 
                                 <!--  FOREGROUND: Disabled  -->
                                 <!--<Trigger Property="IsEnabled" Value="False">
-                                    <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
-                                </Trigger>-->
+                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+            </Trigger>-->
                             </Style.Triggers>
 
                         </Style>
@@ -188,21 +190,12 @@
             <ui:TextBox
                 x:Name="ContentBox"
                 Margin="0,1,-3,1"
+                FocusVisualStyle="{x:Null}"
                 KeyDown="ContentBox_KeyDown"
                 Loaded="ContentBox_Loaded"
                 PlaceholderText="{Binding PlaceholderText}"
                 Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"
-                TextChanged="ContentBox_TextChanged">
-                <ui:TextBox.Style>
-                    <Style BasedOn="{StaticResource DefaultUiTextBoxStyle}" TargetType="ui:TextBox">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding ElementName=Expander, Path=(helpers:ExpanderHelper.IsContentCollapsed)}" Value="False">
-                                <Setter Property="FocusManager.FocusedElement" Value="{Binding RelativeSource={RelativeSource Self}}" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ui:TextBox.Style>
-            </ui:TextBox>
+                TextChanged="ContentBox_TextChanged" />
         </Expander>
     </Grid>
 </UserControl>

@@ -164,4 +164,17 @@ public static class ExpanderHelper
             typeof(bool),
             typeof(ExpanderHelper),
             null);
+
+    public static object GetHeaderTooltip(Control control) =>
+        control.GetValue(HeaderTooltipProperty);
+
+    public static void SetHeaderTooltip(Control control, object value) =>
+        control.SetValue(HeaderTooltipProperty, value);
+
+    public static readonly DependencyProperty HeaderTooltipProperty =
+        DependencyProperty.RegisterAttached(
+            "HeaderTooltip",
+            typeof(object),
+            typeof(ExpanderHelper),
+            null);
 }

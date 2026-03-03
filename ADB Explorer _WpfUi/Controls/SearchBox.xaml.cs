@@ -48,7 +48,7 @@ public partial class SearchBox : UserControl
 
     public bool IsExpanded
     {
-        get => (bool)GetValue(IsExpandedProperty);
+        get => (bool)GetValue(IsExpandedProperty); 
         set => SetValue(IsExpandedProperty, value);
     }
 
@@ -142,5 +142,14 @@ public partial class SearchBox : UserControl
     private void ContentBox_Loaded(object sender, RoutedEventArgs e)
     {
         ContentBox.Width = DefaultControlWidth;
+    }
+
+    private void Expander_Expanded(object sender, RoutedEventArgs e)
+    {
+        Dispatcher.InvokeAsync(() =>
+        {
+            ContentBox.Focus();
+            Keyboard.Focus(ContentBox);
+        }, DispatcherPriority.Input);
     }
 }
