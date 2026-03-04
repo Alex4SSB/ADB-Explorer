@@ -99,7 +99,7 @@ internal static class FileActionLogic
         {
             try
             {
-                return AdbHelper.ReadFile(Data.CurrentADBDevice, Data.FileActions.EditorAndroidPath.FullPath);
+                return AdbHelper.ReadFileAsText(Data.CurrentADBDevice, Data.FileActions.EditorAndroidPath.FullPath);
             }
             catch (Exception e)
             {
@@ -156,7 +156,7 @@ internal static class FileActionLogic
 
         var restoreTask = Task.Run(() =>
         {
-            existingItems = ADBService.FindFiles(Data.CurrentADBDevice.ID, restoreItems.Select(file => file.TrashIndex.OriginalPath));
+            existingItems = ADBService.PathsExist(Data.CurrentADBDevice.ID, restoreItems.Select(file => file.TrashIndex.OriginalPath));
             if (existingItems?.Length > 0)
             {
                 if (restoreItems.Any(item => item.IsDirectory && existingItems.Contains(item.TrashIndex.OriginalPath)))

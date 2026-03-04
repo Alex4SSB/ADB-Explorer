@@ -382,9 +382,23 @@ public partial class ADBService
         return stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries);
     }
 
-    public static string[] FindFiles(string deviceID, IEnumerable<string> paths)
+    /// <summary>
+    /// Determines which of the specified file paths exist on a device identified by the given device ID.
+    /// </summary>
+    /// <remarks>This method executes a shell command on the device to check for the existence of the provided
+    /// paths. Any errors encountered during command execution are ignored.</remarks>
+    /// <param name="deviceID">The unique identifier of the device on which to check the existence of the file paths.</param>
+    /// <param name="paths">An enumerable collection of file paths to verify for existence on the specified device.</param>
+    /// <returns>An array of strings containing the paths that exist on the device. The array is empty if none of the specified
+    /// paths exist.</returns>
+    public static string[] PathsExist(string deviceID, IEnumerable<string> paths)
     {
-        ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, CancellationToken.None, paths.Select(item => EscapeAdbShellString(item)).Append(@"2>/dev/null").ToArray());
+        ExecuteDeviceAdbShellCommand(deviceID,
+                                     "find",
+                                     out string stdout,
+                                     out _,
+                                     CancellationToken.None,
+                                     [.. paths.Select(item => EscapeAdbShellString(item)), "-maxdepth 0", @"2>/dev/null"]);
 
         return stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries);
     }

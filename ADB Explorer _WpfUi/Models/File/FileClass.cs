@@ -7,7 +7,7 @@ using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Models;
 
-public class FileClass : FilePath, IFileStat, IBrowserItem
+public partial class FileClass : FilePath, IFileStat, IBrowserItem
 {
     #region Notify Properties
 
@@ -70,19 +70,14 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
 
     public double? UnixTime => ModifiedTime.ToUnixTime();
 
-    private BitmapSource icon = null;
-    public BitmapSource Icon
-    {
-        get => icon;
-        private set => Set(ref icon, value);
-    }
+    [ObservableProperty]
+    private BitmapSource _icon = null;
 
-    private BitmapSource iconOverlay = null;
-    public BitmapSource IconOverlay
-    {
-        get => iconOverlay;
-        private set => Set(ref iconOverlay, value);
-    }
+    [ObservableProperty]
+    private BitmapSource _iconOverlay = null;
+
+    [ObservableProperty]
+    private BitmapSource _thumbnail = null;
 
     private DragDropEffects cutState = DragDropEffects.None;
     public DragDropEffects CutState
@@ -455,8 +450,10 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
 
     public void GetIcon()
     {
+        UpdateThumb();
+
         var icons = FileToIconConverter.GetImage(this, true).ToArray();
-        
+
         if (icons.Length > 0 && icons[0] is BitmapSource icon)
             Icon = icon;
         else
@@ -466,6 +463,32 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
             IconOverlay = icon2;
         else
             IconOverlay = null;
+    }
+
+    private void UpdateThumb()
+    {
+        if (!Extension.Equals(".jpg", StringComparison.CurrentCultureIgnoreCase) || Thumbnail is not null)
+            return;
+
+        var thumbPath = ThumbnailHelper.GetThumbnailPath(Data.CurrentADBDevice.ID, this);
+        if (thumbPath is null)
+            return;
+
+        var thumbStream = AdbHelper.ReadFileAsStream(Data.CurrentADBDevice, thumbPath);
+        if (thumbStream is null)
+            return;
+
+        try
+        {
+            BitmapImage bitmap = new();
+            bitmap.BeginInit();
+            bitmap.StreamSource = thumbStream;
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.EndInit();
+            bitmap.Freeze();
+            Thumbnail = bitmap;
+        }
+        catch { }
     }
 
     public override string ToString()

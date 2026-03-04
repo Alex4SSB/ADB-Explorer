@@ -46,7 +46,7 @@
             <Grid HorizontalAlignment="Left">
                 <Image
                     x:Name="DragImage"
-                    Width="128"
+                    
                     Height="128"
                     IsHitTestVisible="False"
                     Opacity="0.8"

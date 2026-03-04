@@ -966,7 +966,10 @@ public partial class ExplorerPageHeader : UserControl
         CopyPaste.CurrentDropEffect = e.Effects;
 
         if (CopyPaste.CurrentFiles.Any())
-            RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(CopyPaste.CurrentFiles.First());
+        {
+            var file = CopyPaste.CurrentFiles.First();
+            RuntimeSettings.DragBitmap = file.Thumbnail ?? FileToIconConverter.GetBitmapSource(file);
+        }
 
         e.Handled = true;
     }
@@ -1086,7 +1089,8 @@ public partial class ExplorerPageHeader : UserControl
                 if (vfdo is not null)
                 {
                     CopyPaste.UpdateSelfVFDO(true);
-                    RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(selectedItems.First());
+                    var file = selectedItems.First();
+                    RuntimeSettings.DragBitmap = file.Thumbnail ?? FileToIconConverter.GetBitmapSource(file);
 
                     vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, cell, vfdo.PreferredDropEffect.Value);
                 }
