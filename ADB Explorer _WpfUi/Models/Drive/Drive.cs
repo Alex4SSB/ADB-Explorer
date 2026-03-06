@@ -64,7 +64,6 @@ public class Drive : AbstractDrive
     /// </summary>
     public virtual bool IsFUSE { get; }
 
-
     public Drive(string path = "")
     {
         Path = path;
@@ -75,5 +74,11 @@ public class Drive : AbstractDrive
             if (Type is DriveType.Internal)
                 Path = "/sdcard";
         }
+    }
+
+    public void UpdatePath(string newPath)
+    {
+        Path = newPath;
+        OnPropertyChanged(nameof(Path));
     }
 }

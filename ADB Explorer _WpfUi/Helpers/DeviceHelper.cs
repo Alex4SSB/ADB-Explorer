@@ -622,6 +622,10 @@ public static class DeviceHelper
     public static void InitDevice()
     {
         SetAndroidVersion();
+
+        Data.DevicesObject.Current.Device.Drives.First(d => d.Type is AbstractDrive.DriveType.Internal).Drive
+                                                .UpdatePath(ADBService.GetInternalStorage(Data.CurrentADBDevice.ID));
+
         FileActionLogic.RefreshDrives(true);
 
         FolderHelper.CombineDisplayNames();

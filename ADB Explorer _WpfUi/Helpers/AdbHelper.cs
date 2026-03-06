@@ -67,20 +67,30 @@ internal static class AdbHelper
         }
     });
 
-    public static string ReadFileAsText(ADBService.AdbDevice device, string path)
+    public static string? ReadFileAsText(ADBService.AdbDevice device, string path)
     {
         var stream = ReadFileAsStream(device, path);
+        if (stream is null)
+            return null;
+
         using var reader = new StreamReader(stream);
 
         return reader.ReadToEnd();
     }
 
-    public static MemoryStream ReadFileAsStream(ADBService.AdbDevice device, string path)
+    public static MemoryStream? ReadFileAsStream(ADBService.AdbDevice device, string path)
     {
         MemoryStream stream = new();
         using (SyncService service = new(device.Device.DeviceData))
         {
-            service.Pull(path, stream);
+            try
+            {
+                service.Pull(path, stream);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         stream.Position = 0;

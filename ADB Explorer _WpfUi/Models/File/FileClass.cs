@@ -76,8 +76,25 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     [ObservableProperty]
     private BitmapSource _iconOverlay = null;
 
-    [ObservableProperty]
-    private BitmapSource _thumbnail = null;
+    private BitmapSource? _thumbnail = null;
+    public BitmapSource Thumbnail
+    {
+        get
+        {
+            if (_thumbnail is null
+                && SpecialType is SpecialFileType.Regular 
+                && ParentPath != ThumbnailHelper.DeviceThumbsDir(Data.CurrentADBDevice.ID))
+            {
+                _thumbnail = ThumbnailHelper.LoadThumbnail(Data.CurrentADBDevice, FullPath);
+            }
+
+            // General icons are not cached per file
+            if (_thumbnail is null)
+                return FileToIconConverter.GetBitmapSource(this);
+
+            return _thumbnail; 
+        }
+    }
 
     private DragDropEffects cutState = DragDropEffects.None;
     public DragDropEffects CutState
@@ -171,7 +188,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         TypeName = GetTypeName();
         IsTemp = isTemp;
         
-        SortName = new(fileName);
+        SortName = new(FullName);
 
         // Use a weak event pattern to prevent Settings from rooting this object
         WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(
@@ -450,8 +467,6 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     public void GetIcon()
     {
-        UpdateThumb();
-
         var icons = FileToIconConverter.GetImage(this, true).ToArray();
 
         if (icons.Length > 0 && icons[0] is BitmapSource icon)
@@ -463,32 +478,6 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             IconOverlay = icon2;
         else
             IconOverlay = null;
-    }
-
-    private void UpdateThumb()
-    {
-        if (!Extension.Equals(".jpg", StringComparison.CurrentCultureIgnoreCase) || Thumbnail is not null)
-            return;
-
-        var thumbPath = ThumbnailHelper.GetThumbnailPath(Data.CurrentADBDevice.ID, this);
-        if (thumbPath is null)
-            return;
-
-        var thumbStream = AdbHelper.ReadFileAsStream(Data.CurrentADBDevice, thumbPath);
-        if (thumbStream is null)
-            return;
-
-        try
-        {
-            BitmapImage bitmap = new();
-            bitmap.BeginInit();
-            bitmap.StreamSource = thumbStream;
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.EndInit();
-            bitmap.Freeze();
-            Thumbnail = bitmap;
-        }
-        catch { }
     }
 
     public override string ToString()

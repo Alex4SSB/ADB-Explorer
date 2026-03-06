@@ -112,6 +112,9 @@ internal static class FileActionLogic
 
         readTask.ContinueWith((t) => App.Current.Dispatcher.Invoke(() =>
         {
+            if (t.Result is null)
+                return;
+
             Data.FileActions.EditorText =
             Data.FileActions.OriginalEditorText = t.Result;
         }));
@@ -1147,28 +1150,40 @@ internal static class FileActionLogic
         {
             App.Current.Dispatcher.Invoke(() => Data.FileOpQ.AddOperations(GeneratePullOps(path, pullItems, notify)));
         });
-        
-        static IEnumerable<FileSyncOperation> GeneratePullOps(ShellItem path, IEnumerable<FileClass> pullItems, bool notify)
+    }
+
+    public static void SilentPullFiles(ADBService.AdbDevice device, ShellItem path, params IEnumerable<FileClass> pullItems)
+    {
+        Task.Run(() =>
         {
-            foreach (var item in pullItems.Select(f => f.GetSyncFile()))
+            foreach (var op in GeneratePullOps(path, pullItems, false, device))
             {
-                var target = SyncFile.MergeToWindowsPath(item, path);
-                var fileOp = FileSyncOperation.PullFile(item, target, Data.CurrentADBDevice, App.Current.Dispatcher);
-
-                if (notify)
-                    fileOp.PropertyChanged += PullOperation_PropertyChanged;
-
-                yield return fileOp;
+                op.Start();
             }
+        });
+    }
+
+    private static IEnumerable<FileSyncOperation> GeneratePullOps(ShellItem path, IEnumerable<FileClass> pullItems, bool notify, ADBService.AdbDevice? device = null)
+    {
+        device ??= Data.CurrentADBDevice;
+
+        foreach (var item in pullItems.Select(f => f.GetSyncFile()))
+        {
+            var target = SyncFile.MergeToWindowsPath(item, path);
+            var fileOp = FileSyncOperation.PullFile(item, target, device, App.Current.Dispatcher);
+
+            if (notify)
+                fileOp.PropertyChanged += PullOperation_PropertyChanged;
+
+            yield return fileOp;
         }
     }
 
-    private static void PullOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private static void PullOperation_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName != nameof(FileOperation.Status))
+        if (e.PropertyName != nameof(FileOperation.Status) || sender is not FileSyncOperation op)
             return;
 
-        var op = sender as FileSyncOperation;
         if (op.Status is FileOperation.OperationStatus.Completed)
             NativeMethods.RefreshExplorerDirectory(op.TargetPath.ParentPath);
     }

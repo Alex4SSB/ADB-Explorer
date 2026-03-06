@@ -391,7 +391,7 @@ public partial class ADBService
     /// <param name="paths">An enumerable collection of file paths to verify for existence on the specified device.</param>
     /// <returns>An array of strings containing the paths that exist on the device. The array is empty if none of the specified
     /// paths exist.</returns>
-    public static string[] PathsExist(string deviceID, IEnumerable<string> paths)
+    public static string[] PathsExist(string deviceID, params IEnumerable<string> paths)
     {
         ExecuteDeviceAdbShellCommand(deviceID,
                                      "find",
@@ -519,5 +519,26 @@ public partial class ADBService
         string version = match.Groups["version"].Value;
         if (!string.IsNullOrEmpty(version))
             RuntimeSettings.AdbVersion = new(version);
+    }
+
+    public static string GetInternalStorage(string deviceId)
+    {
+        // readlink -f `echo $EXTERNAL_STORAGE`
+        var result = ExecuteDeviceAdbShellCommand(deviceId,
+                                                            "readlink",
+                                                            out string stdout,
+                                                            out string stderr,
+                                                            CancellationToken.None,
+                                                            "-fe",
+                                                            "`echo $EXTERNAL_STORAGE`");
+
+        if (result == 0)
+        {
+            var path = stdout.Trim();
+            if (!string.IsNullOrEmpty(path))
+                return path;
+        }
+
+        return DRIVE_TYPES.First(d => d.Value is AbstractDrive.DriveType.Internal).Key;
     }
 }

@@ -1,125 +1,180 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.Services.AppInfra;
+using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Helpers;
 
 public static partial class ThumbnailHelper
 {
-    private const string DCIM_THUMBNAILS    = "/sdcard/DCIM/.thumbnails";
+    private const string DCIM_THUMBNAILS     = "/sdcard/DCIM/.thumbnails";
     private const string PICTURES_THUMBNAILS = "/sdcard/Pictures/.thumbnails";
 
-    // Keyed by device serial — cleared when device disconnects
-    private static readonly Dictionary<string, string> _thumbnailDirCache = [];
+    private static readonly Mutex _mutex = new(false);
 
-    [GeneratedRegex(@"(?<!\w)_id=(?<id>\d+)")]
-    private static partial Regex IdPattern();
+    private static readonly List<DeviceThumbnailInfo> _deviceInfoCache = [];
 
-    [GeneratedRegex(@"_display_name=(?<name>.+?)(?=,\s+\w+=|[\r\n]|$)")]
-    private static partial Regex DisplayNamePattern();
+    private struct DeviceThumbnailInfo
+    {
+        public string DeviceId { get; init; }
+        public string DeviceThumbnailDir { get; init; }
+        public string LocalThumbnailDir { get; set; }
+        public Dictionary<string, string> ThumbnailPathCache { get; set; }
+    }
+
+    [GeneratedRegex(@"Row: \d+ _id=(?<ID>\d+), _data=(?<Path>.+)", RegexOptions.Multiline)]
+    private static partial Regex RE_THUMBNAIL_PATH();
 
     /// <summary>
     /// Detects and caches which thumbnail directory the device uses.
     /// Returns null if neither candidate exists.
     /// </summary>
-    public static string? GetThumbnailDir(string deviceId)
+    private static DeviceThumbnailInfo? GetThumbnailDir(string deviceId)
     {
-        if (_thumbnailDirCache.TryGetValue(deviceId, out var cached))
-            return cached;
+        // Ensure only one thread is probing the device at a time to avoid redundant ADB calls.
+        _mutex.WaitOne();
 
-        var existingDirs = ADBService.PathsExist(deviceId, [DCIM_THUMBNAILS, PICTURES_THUMBNAILS]);
+        if (_deviceInfoCache.FirstOrDefault(d => d.DeviceId == deviceId) is DeviceThumbnailInfo info && !string.IsNullOrEmpty(info.DeviceId))
+        {
+            _mutex.ReleaseMutex();
+            return info;
+        }
+
+        var existingDirs = ADBService.PathsExist(deviceId, DCIM_THUMBNAILS, PICTURES_THUMBNAILS);
         if (existingDirs.Length == 0)
         {
+            _mutex.ReleaseMutex();
             return null;
         }
 
-        _thumbnailDirCache.Add(deviceId, existingDirs[0]);
-        return existingDirs[0];
+        string result = existingDirs[0].TrimEnd('/');
+
+        DeviceThumbnailInfo item = new() { DeviceId = deviceId, DeviceThumbnailDir = result };
+        _deviceInfoCache.Add(item);
+
+        _mutex.ReleaseMutex();
+        return item;
     }
 
+    public static string? DeviceThumbsDir(string deviceId)
+        => GetThumbnailDir(deviceId)?.DeviceThumbnailDir;
+
     public static void InvalidateThumbnailDirCache(string deviceId)
-        => _thumbnailDirCache.Remove(deviceId);
+        => _deviceInfoCache.RemoveAll(d => d.DeviceId == deviceId);
 
-    // Keyed by device serial, then by file path
-    private static readonly Dictionary<string, Dictionary<string, string>> _thumbnailPathCache = [];
-
-    public static string? GetThumbnailPath(string deviceId, FileClass file)
+    public static bool ForceLoad(ADBService.AdbDevice device)
     {
-        if (!_thumbnailPathCache.TryGetValue(deviceId, out var deviceCache))
-        {
-            deviceCache = [];
-            _thumbnailPathCache.Add(deviceId, deviceCache);
-        }
+        GetThumbnailName(device.ID, "");
 
-        if (!deviceCache.ContainsKey(file.ParentPath))
+        return GetLocalThumbPath(device) is not null;
+    }
+
+    public static BitmapSource? LoadThumbnail(ADBService.AdbDevice device, string filePath)
+    {
+        if (GetThumbnailName(device.ID, filePath) is not string thumbnailName)
+            return null;
+
+        if (GetLocalThumbPath(device) is not string localThumbnailDir)
+            return null;
+
+        try
         {
-            var thumbnailMap = GetThumbnailMap(deviceId, file.ParentPath, CancellationToken.None).Append(new(file.ParentPath, null));
-            if (_thumbnailPathCache[deviceId] is var dict && dict.Count > 0)
-                _thumbnailPathCache[deviceId] = dict.AppendRange(thumbnailMap).ToDictionary();
+            var fullPath = Path.Combine(localThumbnailDir, thumbnailName);
+            if (!File.Exists(fullPath))
+                return null;
+
+            using var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var decoder = BitmapDecoder.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+            return decoder.Frames[0];
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static string? GetThumbnailName(string deviceId, string filePath)
+    {
+        if (GetThumbnailDir(deviceId) is not DeviceThumbnailInfo deviceInfo)
+            return null;
+
+        // Ensure only one thread is accessing/modifying the thumbnail path cache at a time to avoid redundant ADB calls.
+        _mutex.WaitOne();
+
+        if (deviceInfo.ThumbnailPathCache is null || deviceInfo.ThumbnailPathCache.Count == 0)
+        {
+            deviceInfo.ThumbnailPathCache = [];
+            var stdout = GetThumbsFromDevice(deviceId, CancellationToken.None);
+            var thumbnailMap = ParseThumbnailMap(stdout);
+
+            if (thumbnailMap is null || !thumbnailMap.Any())
+                // Cache an almost empty dictionary to avoid repeated ADB calls
+                deviceInfo.ThumbnailPathCache = new([new KeyValuePair<string, string>("", "")]);
             else
-                _thumbnailPathCache[deviceId] = thumbnailMap.ToDictionary();
+                deviceInfo.ThumbnailPathCache = thumbnailMap.ToDictionary();
+
+            _deviceInfoCache.RemoveAll(d => d.DeviceId == deviceId);
+            _deviceInfoCache.Add(deviceInfo);
         }
 
-        _thumbnailPathCache[deviceId].TryGetValue(file.FullPath, out var thumbnailPath);
+        _mutex.ReleaseMutex();
+
+        deviceInfo.ThumbnailPathCache.TryGetValue(filePath, out var thumbnailPath);
         return thumbnailPath;
     }
 
-    /// <summary>
-    /// Returns a map of display_name → thumbnail path for all visible files in a folder.
-    /// Executes exactly one ADB call regardless of the number of visible files.
-    /// </summary>
-    /// <param name="deviceId">ADB device serial.</param>
-    /// <param name="deviceFolderPath">Current folder on the device, e.g. /sdcard/DCIM/Camera/</param>
-    public static IEnumerable<KeyValuePair<string, string>> GetThumbnailMap(
-        string deviceId,
-        string deviceFolderPath,
-        CancellationToken cancellationToken)
+    private static string? GetLocalThumbPath(ADBService.AdbDevice device)
     {
-        var relativePath = ToMediaStoreRelativePath(deviceFolderPath);
-        if (relativePath is null)
-            yield break;
+        if (GetThumbnailDir(device.ID) is not DeviceThumbnailInfo deviceInfo)
+            return null;
 
-        var thumbnailDir = GetThumbnailDir(deviceId);
-        if (thumbnailDir is null)
-            yield break;
+        _mutex.WaitOne();
 
-        ADBService.ExecuteDeviceAdbShellCommand(
-            deviceId, "content",
-            out string stdout, out _,
-            cancellationToken,
-            "query",
-            "--uri", "content://media/external/images/media",
-            "--projection", "_id:_display_name",
-            "--where", $"relative_path=\\'{relativePath}\\'"
-        );
-
-        foreach (var line in stdout.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        if (!string.IsNullOrEmpty(deviceInfo.LocalThumbnailDir))
         {
-            if (!line.StartsWith("Row:"))
+            _mutex.ReleaseMutex();
+            return deviceInfo.LocalThumbnailDir;
+        }
+
+        FileClass file = new("", deviceInfo.DeviceThumbnailDir, AbstractFile.FileType.Folder);
+        var deviceDir = Directory.CreateDirectory(Path.Combine(Data.AppDataPath, device.ID)).FullName;
+
+        FileActionLogic.SilentPullFiles(device, ShellItem.Open(deviceDir), file);
+
+        deviceDir = Path.Combine(deviceDir, Path.GetFileName(deviceInfo.DeviceThumbnailDir));
+        deviceInfo.LocalThumbnailDir = deviceDir;
+
+        _deviceInfoCache.RemoveAll(d => d.DeviceId == device.ID);
+        _deviceInfoCache.Add(deviceInfo);
+
+        _mutex.ReleaseMutex();
+
+        return deviceDir;
+    }
+
+    private static IEnumerable<KeyValuePair<string, string>> ParseThumbnailMap(string stdout)
+    {
+        foreach (Match match in RE_THUMBNAIL_PATH().Matches(stdout))
+        {
+            if (!match.Success)
                 continue;
 
-            var idMatch   = IdPattern().Match(line);
-            var nameMatch = DisplayNamePattern().Match(line);
-
-            if (!idMatch.Success || !nameMatch.Success)
-                continue;
-
-            var displayName = nameMatch.Groups["name"].Value.Trim();
-
-            yield return new(FileHelper.ConcatPaths(deviceFolderPath, displayName), FileHelper.ConcatPaths(thumbnailDir, idMatch.Groups["id"].Value + ".jpg"));
+            var path = match.Groups["Path"].Value.TrimEnd();
+            yield return new(path, $"{match.Groups["ID"].Value}.jpg");
         }
     }
 
-    /// <summary>
-    /// Strips the internal storage root prefix from a device path to produce
-    /// a MediaStore-compatible relative_path (with trailing slash).
-    /// e.g. /sdcard/DCIM/Camera/ → DCIM/Camera/
-    /// </summary>
-    private static string ToMediaStoreRelativePath(string devicePath)
+    private static string GetThumbsFromDevice(string deviceId, CancellationToken cancellationToken)
     {
-        var currentDrive = DriveHelper.GetCurrentDrive(devicePath);
-        if (currentDrive.Type is not AbstractDrive.DriveType.Internal and not AbstractDrive.DriveType.External)
-            return null; // Not on internal storage — no MediaStore thumbnails
+        ADBService.ExecuteDeviceAdbShellCommand(
+                    deviceId, "content",
+                    out string stdout, out _,
+                    cancellationToken,
+                    "query",
+                    "--uri", "content://media/external/images/media",
+                    "--projection", "_id:_data"
+                );
 
-        return devicePath[currentDrive.Path.Length..].Trim('/') + '/';
+        return stdout;
     }
 }

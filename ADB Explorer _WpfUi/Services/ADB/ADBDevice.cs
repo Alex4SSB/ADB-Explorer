@@ -229,6 +229,8 @@ public partial class ADBService
         {
             List<LogicalDrive> drives = [];
 
+            // unified df doesn't seem to shorten execution time
+
             var root = ReadDrives(AdbRegEx.RE_EMULATED_STORAGE_SINGLE(), "/");
             if (root is null)
                 return null;
