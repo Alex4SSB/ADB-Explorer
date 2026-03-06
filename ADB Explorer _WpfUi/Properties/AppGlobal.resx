@@ -121,6 +121,9 @@
   <data name="APK_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Assets\APK_format_icon_2014-2019_.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="APK_icon_256px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Assets\APK_icon_256px_vecteezy.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="AppDisplayName" xml:space="preserve">
     <value>ADB Explorer</value>
   </data>

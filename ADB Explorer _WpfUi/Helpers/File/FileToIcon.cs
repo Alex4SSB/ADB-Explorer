@@ -386,7 +386,7 @@ public class FileToIconConverter
         var specialType = file.SpecialType;
         if (specialType.HasFlag(AbstractFile.SpecialFileType.Apk))
         {
-            Icon apkIcon = new(Properties.AppGlobal.APK_icon, IconToSize(IconSize.Jumbo));
+            Icon apkIcon = new(Properties.AppGlobal.APK_icon_256px, IconToSize(IconSize.Jumbo));
 
             return AddToDictionary<T>(apkIcon, IconSize.Jumbo, AbstractFile.SpecialFileType.Apk);
         }

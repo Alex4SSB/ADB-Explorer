@@ -133,13 +133,16 @@ public static class UISettings
             [
                 new BoolSetting(() => Settings.PollDrives, Strings.Resources.S_SETTINGS_POLL_DRIVES, icon: "\uEBC4"),
                 new BoolSetting(() => Settings.EnableRecycle, Strings.Resources.S_DRIVE_TRASH, icon: "\uE74D"),
-                new BoolSetting(() => Settings.EnableApk, Strings.Resources.S_SETTINGS_APK, icon: "\uE7B8"),
             ], "\uE8CE"),
+            new SettingsGroup("APK",
+            [
+                new BoolSetting(() => Settings.EnableApk, Strings.Resources.S_SETTINGS_APK, icon: "\uE7B8"),
+                new BoolSetting(() => Settings.ShowSystemPackages, Strings.Resources.S_SETTINGS_SYSTEM_APPS, visibleProp: () => Settings.EnableApk, icon: "\uE835"),
+            ], "\uE7B8"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_EXPLORER,
             [
                 new BoolSetting(() => Settings.ShowExtensions, Strings.Resources.S_SETTINGS_SHOW_EXTENSIONS, icon: "\uE8AC"),
                 new BoolSetting(() => Settings.ShowHiddenItems, Strings.Resources.S_SETTINGS_HIDDEN_ITEMS, icon: "\uE8FF"),
-                new BoolSetting(() => Settings.ShowSystemPackages, Strings.Resources.S_SETTINGS_SYSTEM_APPS, visibleProp: () => Settings.EnableApk, icon: "\uE835"),
                 new DoubleClickSetting(() => Settings.DoubleClick, Strings.Resources.S_SETTINGS_GROUP_DOUBLE_CLICK, [
                     new(AppSettings.DoubleClickAction.None, Strings.Resources.S_SETTINGS_DOUBLE_CLICK_NONE),
                     new(AppSettings.DoubleClickAction.Pull, Strings.Resources.S_SETTINGS_DOUBLE_CLICK_PULL, AbstractSetting.ExtractPropertyInfo(() => Settings.DefaultFolder)),
@@ -204,6 +207,7 @@ public static class UISettings
                     new("WindowsAPICodePack", Resources.Links.API_CODEPACK),
                     new("Newtonsoft.Json", Resources.Links.JSON),
                     new("Icons8", Resources.Links.ICONS8),
+                    new("Vecteezy", Resources.Links.VECTEEZY),
                     new("LGPL v3", Resources.Links.LGPL3),
                     new("Apache", Resources.Links.L_APACHE_LIC),
                     new(Strings.Resources.S_CC_NAME, Resources.Links.L_CC_LIC),

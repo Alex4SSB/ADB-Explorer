@@ -332,8 +332,16 @@ internal static class FileActionLogic
             Data.FileActions.PasteDescription.Value = stringFormat;
         }
 
-        Data.FileActions.PasteEnabled = EnableUiPaste();
-        Data.FileActions.IsKeyboardPasteEnabled = EnableKeyboardPaste();
+        if (Data.FileActions.IsAppDrive)
+        {
+            Data.FileActions.PasteEnabled = FileHelper.AllFilesAreApks(Data.CopyPaste.Files);
+            Data.FileActions.IsKeyboardPasteEnabled = false;
+        }
+        else
+        {
+            Data.FileActions.PasteEnabled = EnableUiPaste();
+            Data.FileActions.IsKeyboardPasteEnabled = EnableKeyboardPaste();
+        }
     }
 
     public static bool EnableUiPaste()
