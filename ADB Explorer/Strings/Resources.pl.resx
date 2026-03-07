@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -833,12 +833,6 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_HOURS_SHORT" xml:space="preserve">
     <value>{0}h</value>
   </data>
-  <data name="S_MDNS_OFF" xml:space="preserve">
-    <value>&lt;Span&gt;• Statystyki usług są WYŁĄCZONE&lt;LineBreak /&gt;• Serwer &lt;Italic&gt;może&lt;/Italic&gt; być WŁĄCZONY&lt;/Span&gt;</value>
-  </data>
-  <data name="S_ENABLE_MDNS" xml:space="preserve">
-    <value>Kliknij, aby włączyć serwer i statystyki</value>
-  </data>
   <data name="S_MDNS_ON" xml:space="preserve">
     <value>Serwer jest uruchomiony i działa</value>
   </data>
@@ -1431,5 +1425,11 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   </data>
   <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
     <value>Wyłącz</value>
+  </data>
+  <data name="S_MDNS_OFF" xml:space="preserve">
+    <value>&lt;Span&gt;• Statystyki usług są WYŁĄCZONE&lt;LineBreak /&gt;• Serwer &lt;Italic&gt;może&lt;/Italic&gt; być WŁĄCZONY&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ENABLE_MDNS" xml:space="preserve">
+    <value>Kliknij, aby włączyć serwer i statystyki</value>
   </data>
 </root>

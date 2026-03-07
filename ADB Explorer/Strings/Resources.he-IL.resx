@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -833,12 +833,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_HOURS_SHORT" xml:space="preserve">
     <value>­{0}שע'</value>
   </data>
-  <data name="S_MDNS_OFF" xml:space="preserve">
-    <value>&lt;Span&gt;• הסריקה אחר שירותי mDNS מבוטלת&lt;LineBreak /&gt;• השרת &lt;Italic&gt;עלול&lt;/Italic&gt; להיות פעיל&lt;/Span&gt;</value>
-  </data>
-  <data name="S_ENABLE_MDNS" xml:space="preserve">
-    <value>לחצו כדי לאפשר את השרת והסריקה</value>
-  </data>
   <data name="S_MDNS_ON" xml:space="preserve">
     <value>שרת ה-mDNS פועל</value>
   </data>
@@ -1434,5 +1428,11 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
     <value>בודק את מצב שרת ה-mDNS…</value>
+  </data>
+  <data name="S_MDNS_OFF" xml:space="preserve">
+    <value>&lt;Span&gt;• הסריקה אחר שירותי mDNS מבוטלת&lt;LineBreak /&gt;• השרת &lt;Italic&gt;עלול&lt;/Italic&gt; להיות פעיל&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ENABLE_MDNS" xml:space="preserve">
+    <value>לחצו כדי לאפשר את השרת והסריקה</value>
   </data>
 </root>
