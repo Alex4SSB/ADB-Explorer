@@ -69,6 +69,12 @@ public static partial class ThumbnailHelper
         return GetLocalThumbPath(device) is not null;
     }
 
+    public static bool IsInitialized(string deviceId)
+    {
+        return _deviceInfoCache.FirstOrDefault(d => d.DeviceId == deviceId) is DeviceThumbnailInfo info
+            && !string.IsNullOrEmpty(info.LocalThumbnailDir);
+    }
+
     public static BitmapSource? LoadThumbnail(ADBService.AdbDevice device, string filePath)
     {
         if (GetThumbnailName(device.ID, filePath) is not string thumbnailName)
@@ -139,7 +145,7 @@ public static partial class ThumbnailHelper
         FileClass file = new("", deviceInfo.DeviceThumbnailDir, AbstractFile.FileType.Folder);
         var deviceDir = Directory.CreateDirectory(Path.Combine(Data.AppDataPath, device.ID)).FullName;
 
-        FileActionLogic.SilentPullFiles(device, ShellItem.Open(deviceDir), file);
+        FileActionLogic.SilentPullFiles(device, ShellItem.Open(deviceDir), Data.Settings.LimitThumbsPullSpeed, file);
 
         deviceDir = Path.Combine(deviceDir, Path.GetFileName(deviceInfo.DeviceThumbnailDir));
         deviceInfo.LocalThumbnailDir = deviceDir;

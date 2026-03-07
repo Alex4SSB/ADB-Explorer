@@ -39,6 +39,8 @@ public class FileSyncOperation : FileOperation
     public DateTime TransferStart { get; private set; }
     public DateTime TransferEnd { get; private set; }
 
+    public int? MaxThreads { get; set; }
+
     IEnumerable<SyncFile> Files => [FilePath, .. FilePath.AllChildren()];
     private long? TotalBytes => Files.Sum(f => f.Size);
     private IEnumerable<SyncFile> ActiveFiles => Files.Where(f => f.CurrentPercentage is > 0 and < 100);
@@ -120,9 +122,11 @@ public class FileSyncOperation : FileOperation
                 }
             }
 
+            MaxThreads ??= Data.Settings.AllowMultiOp ? -1 : 1;
+
             ParallelOptions options = new()
             {
-                MaxDegreeOfParallelism = Data.Settings.AllowMultiOp ? -1 : 1
+                MaxDegreeOfParallelism = MaxThreads.Value
             };
             bool useV2 = Device.Device.AndroidVersion >= 11;
 

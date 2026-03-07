@@ -422,15 +422,26 @@ public partial class ExplorerPageHeader : UserControl
             case nameof(DirectoryLister.IsLinkListingFinished) when ExplorerGrid.Items.Count < 1 || !DirList.IsLinkListingFinished:
                 return;
 
-            //case nameof(DirectoryLister.IsLinkListingFinished) when bfNavigation
-            //    && !string.IsNullOrEmpty(prevPath) && DirList.FileList.FirstOrDefault(item => item.FullPath == prevPath) is var prevItem and not null:
-            //    FileActions.ItemToSelect = prevItem;
-            //    break;
+            case nameof(DirectoryLister.IsLinkListingFinished) when bfNavigation
+                && !string.IsNullOrEmpty(prevPath) && DirList.FileList.FirstOrDefault(item => item.FullPath == prevPath) is var prevItem and not null:
+                FileActions.ItemToSelect = prevItem;
+
+                break;
 
             case nameof(DirectoryLister.IsLinkListingFinished):
                 {
                     if (ExplorerGrid.Items.Count > 0)
+                    {
                         ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
+
+                        if (Settings.ThumbsMode is AppSettings.ThumbnailMode.OnPhotoDir
+                            && !ThumbnailHelper.IsInitialized(CurrentADBDevice.ID)
+                            && FileHelper.IsPhotoDir())
+                        {
+                            Task.Run(() => ThumbnailHelper.ForceLoad(CurrentADBDevice));
+                        }
+                    }
+
                     break;
                 }
         }
@@ -967,7 +978,7 @@ public partial class ExplorerPageHeader : UserControl
 
         if (CopyPaste.CurrentFiles.Any())
         {
-            RuntimeSettings.DragBitmap = CopyPaste.CurrentFiles.First().Thumbnail;
+            RuntimeSettings.DragBitmap = CopyPaste.CurrentFiles.First().DragImage;
         }
 
         e.Handled = true;
@@ -1088,7 +1099,7 @@ public partial class ExplorerPageHeader : UserControl
                 if (vfdo is not null)
                 {
                     CopyPaste.UpdateSelfVFDO(true);
-                    RuntimeSettings.DragBitmap = selectedItems.First().Thumbnail;
+                    RuntimeSettings.DragBitmap = selectedItems.First().DragImage;
 
                     vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, cell, vfdo.PreferredDropEffect.Value);
                 }

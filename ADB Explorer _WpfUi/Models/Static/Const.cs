@@ -118,4 +118,7 @@ public static class AdbExplorerConst
     public static readonly Point DRAG_OFFSET_DEFAULT = new(48, 89);
 
     public static readonly Key[] NAVIGATION_KEYS = [Key.Enter, Key.Up, Key.Down, Key.Left, Key.Right, Key.Escape, Key.Home, Key.End];
+
+    public static readonly string[] COMMON_PHOTO_EXT = [".jpg", ".jpeg", ".png", ".bmp", ".gif", ".webp"];
+    public const float PHOTO_DIR_THRESHOLD = 0.8f;
 }

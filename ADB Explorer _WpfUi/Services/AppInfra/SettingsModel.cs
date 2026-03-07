@@ -149,6 +149,18 @@ public static class UISettings
                     new(AppSettings.DoubleClickAction.Edit, Strings.Resources.S_SETTINGS_DOUBLE_CLICK_OPEN) ],
                     icon: "\uE7C9"),
             ], "\uEC50"),
+            new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_ICONS,
+            [
+                new ThumbsModeSetting(() => Settings.ThumbsMode, Strings.Resources.S_SETTINGS_THUMBNAIL_MODE, [
+                    new(AppSettings.ThumbnailMode.Off, Strings.Resources.S_SETTINGS_INACTIVE),
+                    new(AppSettings.ThumbnailMode.IconViewOnly, Strings.Resources.S_SETTINGS_THUMBS_ICON_VIEW),
+                    new(AppSettings.ThumbnailMode.OnPhotoDir, Strings.Resources.S_SETTINGS_THUMBS_PHOTO_DIR),
+                    new(AppSettings.ThumbnailMode.OnConnect, Strings.Resources.S_SETTINGS_THUMBS_CONNECT) ],
+                icon: "\uE15A"),
+                new BoolSetting(() => Settings.PersistThumbs, Strings.Resources.S_SETTINGS_PERSIST_THUMBS, icon: "\uE78C"),
+                new BoolSetting(() => Settings.LimitThumbsPullSpeed, Strings.Resources.S_SETTINGS_THUMBS_THROTTLE, icon: "\uEC48"),
+                new BoolSetting(() => Settings.SpecialFolderIcons, Strings.Resources.S_SETTINGS_SPECIAL_DIR_ICONS, icon: "\uEC25"),
+            ], "\uE8B9"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_WORK_DIRS,
             [
                 new TextboxSetting(() => Settings.DefaultFolder,
@@ -525,7 +537,6 @@ public class ThemeSetting : EnumSetting
     public ThemeSetting(Expression<Func<AppSettings.AppTheme>> propertyExpr, string description, Dictionary<AppSettings.AppTheme, string> enumNames, PropertyInfo visibleProp = null, string icon = null, params BaseAction[] commands)
         : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
     {
-        var sourceProp = ExtractPropertyInfo(propertyExpr);
         Buttons.AddRange(enumNames.Select(val =>
         {
             return new EnumComboboxItem(val.Key, val.Value);
@@ -544,7 +555,21 @@ public class DoubleClickSetting : EnumSetting
     public DoubleClickSetting(Expression<Func<AppSettings.DoubleClickAction>> propertyExpr, string description, IEnumerable<EnumComboboxItem> enumNames, PropertyInfo visibleProp = null, string icon = null, params BaseAction[] commands)
         : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
     {
-        var sourceProp = ExtractPropertyInfo(propertyExpr);
+        Buttons = [.. enumNames];
+    }
+}
+
+public class ThumbsModeSetting : EnumSetting
+{
+    public AppSettings.ThumbnailMode Value
+    {
+        get => (AppSettings.ThumbnailMode)valueProp.GetValue(Settings);
+        set => valueProp.SetValue(Settings, value);
+    }
+
+    public ThumbsModeSetting(Expression<Func<AppSettings.ThumbnailMode>> propertyExpr, string description, IEnumerable<EnumComboboxItem> enumNames, PropertyInfo visibleProp = null, string icon = null, params BaseAction[] commands)
+        : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
+    {
         Buttons = [.. enumNames];
     }
 }

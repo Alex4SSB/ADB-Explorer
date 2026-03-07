@@ -376,13 +376,13 @@
                             <Setter TargetName="ExpanderToggleButton" Property="Foreground" Value="{DynamicResource ExpanderHeaderDisabledForeground}" />
                             <Setter TargetName="ExpanderToggleButton" Property="BorderBrush" Value="{DynamicResource ExpanderHeaderDisabledBorderBrush}" />
                         </Trigger>
-                        <DataTrigger Binding="{Binding ElementName=ExpanderToggleButton, Path=IsMouseOver}" Value="True">
+                        <Trigger SourceName="ExpanderToggleButton" Property="IsMouseOver" Value="True">
                             <Setter Property="Background">
                                 <Setter.Value>
                                     <SolidColorBrush Opacity="{DynamicResource AccentButtonBackgroundMouseOverOpacity}" Color="{DynamicResource CardBackgroundFillColorDefault}" />
                                 </Setter.Value>
                             </Setter>
-                        </DataTrigger>
+                        </Trigger>
                         <Trigger SourceName="ExpanderToggleButton" Property="IsPressed" Value="True">
                             <Setter Property="Background">
                                 <Setter.Value>

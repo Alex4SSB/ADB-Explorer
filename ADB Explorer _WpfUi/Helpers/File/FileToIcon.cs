@@ -306,7 +306,8 @@ public class FileToIconConverter
     {
         if (specialType is AbstractFile.SpecialFileType.Folder)
         {
-            if (AdbExplorerConst.DRIVE_TYPES.TryGetValue(Data.CurrentPath, out var driveType) && driveType is AbstractDrive.DriveType.Internal)
+            if (Data.Settings.SpecialFolderIcons
+                && DriveHelper.GetCurrentDrive(Data.CurrentPath).Type is AbstractDrive.DriveType.Internal)
             {
                 return fileName switch
                 {

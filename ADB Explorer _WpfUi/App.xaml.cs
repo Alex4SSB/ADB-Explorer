@@ -66,9 +66,6 @@ public partial class App
             services.AddSingleton<LogViewModel>();
         }).Build();
 
-    //private static string SettingsFilePath;
-    //private static readonly JsonSerializerSettings JsonSettings = new() { TypeNameHandling = TypeNameHandling.Objects };
-
     /// <summary>
     /// Gets services.
     /// </summary>
@@ -108,51 +105,20 @@ public partial class App
         var settings = Services.GetRequiredService<SettingsService>();
         settings.Load(settingsPath);
 
-        try
+        if (!Data.Settings.UICulture.Equals(CultureInfo.InvariantCulture))
         {
-            if (!Data.Settings.UICulture.Equals(CultureInfo.InvariantCulture))
-            {
-                Thread.CurrentThread.CurrentUICulture =
-                Thread.CurrentThread.CurrentCulture = Data.Settings.UICulture;
-            }
+            Thread.CurrentThread.CurrentUICulture =
+            Thread.CurrentThread.CurrentCulture = Data.Settings.UICulture;
+        }
 
 #if !DEPLOY
-            if (!File.Exists(ADB_Explorer.Properties.AppGlobal.DragDropLogPath))
-            {
-                File.WriteAllText(ADB_Explorer.Properties.AppGlobal.DragDropLogPath, "");
-            }
+        if (!File.Exists(ADB_Explorer.Properties.AppGlobal.DragDropLogPath))
+        {
+            File.WriteAllText(ADB_Explorer.Properties.AppGlobal.DragDropLogPath, "");
+        }
 #endif
 
-        }
-        catch
-        {
-            // in any case of failing to read the settings, try to write them instead
-            // will happen on first ever launch, or after resetting app settings
-
-            //WriteSettings();
-        }
-
-        //void ReadSettingsFile(StreamReader reader)
-        //{
-        //    while (!reader.EndOfStream)
-        //    {
-        //        string[] keyValue = reader.ReadLine().TrimEnd(';').Split(':', 2);
-        //        try
-        //        {
-        //            var jObj = JsonConvert.DeserializeObject(keyValue[1], JsonSettings);
-        //            if (jObj is JArray jArr)
-        //                Properties[keyValue[0]] = jArr.Values<string>().ToArray();
-        //            else
-        //                Properties[keyValue[0]] = jObj;
-        //        }
-        //        catch (Exception)
-        //        {
-        //            Properties[keyValue[0]] = keyValue[1];
-        //        }
-        //    }
-        //}
-
-        ClearDrag();
+        ClearFoldersInAppData();
 
         await _host.StartAsync();
     }
@@ -163,21 +129,24 @@ public partial class App
     private async void OnExit(object sender, ExitEventArgs e)
     {
         Data.FileOpQ?.Stop();
-        //WriteSettings();
+        
         Services.GetService<SettingsService>().Save();
 
         if (Data.Settings.UnrootOnDisconnect is true)
             ADBService.Unroot(Data.CurrentADBDevice);
 
-        App.Current.Dispatcher.Invoke(ClearDrag);
+        App.Current.Dispatcher.Invoke(ClearFoldersInAppData);
 
         await _host.StopAsync();
 
         _host.Dispose();
     }
 
-    private static void ClearDrag()
+    private static void ClearFoldersInAppData()
     {
+        if (Data.Settings.PersistThumbs)
+            return;
+
         try
         {
             Directory.GetDirectories(Data.AppDataPath).ForEach(dir => Directory.Delete(dir, true));
@@ -185,35 +154,6 @@ public partial class App
         catch
         { }
     }
-
-    //private void WriteSettings()
-    //{
-    //    if (Data.RuntimeSettings.ResetAppSettings)
-    //    {
-    //        try
-    //        {
-    //            File.Delete(SettingsFilePath);
-    //        }
-    //        catch
-    //        { }
-
-    //        return;
-    //    }
-
-    //    try
-    //    {
-    //        using StreamWriter writer = new(SettingsFilePath);
-
-    //        foreach (string key in from string key in Properties.Keys
-    //                               orderby key
-    //                               select key)
-    //        {
-    //            writer.WriteLine($"{key}:{JsonConvert.SerializeObject(Properties[key], JsonSettings)};");
-    //        }
-    //    }
-    //    catch (Exception)
-    //    { }
-    //}
 
     /// <summary>
     /// Occurs when an exception is thrown by an application but not handled.

@@ -1160,12 +1160,15 @@ internal static class FileActionLogic
         });
     }
 
-    public static void SilentPullFiles(ADBService.AdbDevice device, ShellItem path, params IEnumerable<FileClass> pullItems)
+    public static void SilentPullFiles(ADBService.AdbDevice device, ShellItem path, bool disableParallel, params IEnumerable<FileClass> pullItems)
     {
         Task.Run(() =>
         {
             foreach (var op in GeneratePullOps(path, pullItems, false, device))
             {
+                if (disableParallel)
+                    op.MaxThreads = 1;
+
                 op.Start();
             }
         });

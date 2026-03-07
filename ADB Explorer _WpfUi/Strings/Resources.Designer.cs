@@ -3367,6 +3367,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Icons.
+        /// </summary>
+        public static string S_SETTINGS_GROUP_ICONS {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_GROUP_ICONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Theme.
         /// </summary>
         public static string S_SETTINGS_GROUP_THEME {
@@ -3448,6 +3457,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Persist Thumbnails Between Sessions.
+        /// </summary>
+        public static string S_SETTINGS_PERSIST_THUMBS {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_PERSIST_THUMBS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Polling For Battery Status.
         /// </summary>
         public static string S_SETTINGS_POLL_BATTERY {
@@ -3489,6 +3507,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_SHOW_EXTENSIONS {
             get {
                 return ResourceManager.GetString("S_SETTINGS_SHOW_EXTENSIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Icons For Special Folders.
+        /// </summary>
+        public static string S_SETTINGS_SPECIAL_DIR_ICONS {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_SPECIAL_DIR_ICONS", resourceCulture);
             }
         }
         
@@ -3543,6 +3570,51 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_THEME_LIGHT {
             get {
                 return ResourceManager.GetString("S_SETTINGS_THEME_LIGHT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pull &amp; Display Thumbnails.
+        /// </summary>
+        public static string S_SETTINGS_THUMBNAIL_MODE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THUMBNAIL_MODE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upon Connection.
+        /// </summary>
+        public static string S_SETTINGS_THUMBS_CONNECT {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THUMBS_CONNECT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only in Icon View.
+        /// </summary>
+        public static string S_SETTINGS_THUMBS_ICON_VIEW {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THUMBS_ICON_VIEW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only in Photo Directories.
+        /// </summary>
+        public static string S_SETTINGS_THUMBS_PHOTO_DIR {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THUMBS_PHOTO_DIR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Limit Thumbnails Pull Speed.
+        /// </summary>
+        public static string S_SETTINGS_THUMBS_THROTTLE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THUMBS_THROTTLE", resourceCulture);
             }
         }
         

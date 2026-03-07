@@ -409,4 +409,12 @@ public static class FileHelper
 
         return (size, modifiedTime);
     }
+
+    public static bool IsPhotoDir()
+    {
+        float photos = Data.DirList.FileList.Count(f => 
+            AdbExplorerConst.COMMON_PHOTO_EXT.Contains(f.Extension, StringComparer.InvariantCultureIgnoreCase));
+
+        return photos / Data.DirList.FileList.Count > AdbExplorerConst.PHOTO_DIR_THRESHOLD;
+    }
 }

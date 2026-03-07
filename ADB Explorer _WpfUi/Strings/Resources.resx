@@ -1762,4 +1762,36 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Checking mDNS server status…</value>
     <comment>The notification displayed when waiting for a status response from the server</comment>
   </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value>Icons</value>
+    <comment>The title of the group for settings related to icons</comment>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>Pull &amp; Display Thumbnails</value>
+    <comment>The title of the setting that controls thumbnail behavior</comment>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>Only in Icon View</value>
+    <comment>Thumbnails mode setting: icon view mode</comment>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>Only in Photo Directories</value>
+    <comment>Thumbnails mode setting: photo directories mode</comment>
+  </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value>Upon Connection</value>
+    <comment>Thumbnails mode setting: on connection mode</comment>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>Persist Thumbnails Between Sessions</value>
+    <comment>The setting used allow saving thumbnails locally from one app session to another</comment>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>Limit Thumbnails Pull Speed</value>
+    <comment>The setting used to limit the speed at which thumbnails are pulled in bulk from the device</comment>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>Show Icons For Special Folders</value>
+    <comment>The setting used to allow displaying Windows icons for Windows special folders (Downloads, Documents, etc.)</comment>
+  </data>
 </root>

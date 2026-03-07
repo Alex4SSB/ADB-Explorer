@@ -76,23 +76,33 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     [ObservableProperty]
     private BitmapSource _iconOverlay = null;
 
-    private BitmapSource? _thumbnail = null;
-    public BitmapSource Thumbnail
+    public BitmapSource DragImage
     {
         get
         {
-            if (_thumbnail is null
+            return Data.Settings.ThumbsMode > AppSettings.ThumbnailMode.IconViewOnly
+                ? LargeIcon
+                : LargeFileIcon;
+        }
+    }
+
+    public BitmapSource LargeIcon => CacheThumbnail ?? LargeFileIcon;
+
+    private BitmapSource LargeFileIcon => FileToIconConverter.GetBitmapSource(this);
+
+    private BitmapSource? _cacheThumbnail = null;
+    private BitmapSource? CacheThumbnail
+    {
+        get
+        {
+            if (_cacheThumbnail is null
                 && SpecialType is SpecialFileType.Regular 
                 && ParentPath != ThumbnailHelper.DeviceThumbsDir(Data.CurrentADBDevice.ID))
             {
-                _thumbnail = ThumbnailHelper.LoadThumbnail(Data.CurrentADBDevice, FullPath);
+                _cacheThumbnail = ThumbnailHelper.LoadThumbnail(Data.CurrentADBDevice, FullPath);
             }
 
-            // General icons are not cached per file
-            if (_thumbnail is null)
-                return FileToIconConverter.GetBitmapSource(this);
-
-            return _thumbnail; 
+            return _cacheThumbnail;
         }
     }
 

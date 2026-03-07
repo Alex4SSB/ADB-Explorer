@@ -1,5 +1,4 @@
 ﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
 
 namespace ADB_Explorer.Services;
 
@@ -26,8 +25,28 @@ public partial class AppSettings : ObservableObject
         None,
     }
 
+    public enum ThumbnailMode
+    {
+        Off,
+        IconViewOnly,
+        OnPhotoDir,
+        OnConnect,
+    }
+
     #region paths
 
+
+    [ObservableProperty]
+    private ThumbnailMode thumbsMode = ThumbnailMode.Off;
+
+    [ObservableProperty]
+    private bool persistThumbs = true;
+
+    [ObservableProperty]
+    private bool limitThumbsPullSpeed = true;
+
+    [ObservableProperty]
+    private bool specialFolderIcons = true;
 
     private string defaultFolder = "";
     /// <summary>
