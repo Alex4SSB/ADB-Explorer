@@ -763,6 +763,11 @@ Examples:
         existing_versions = {entry.get("version") for entry in official_entries if entry.get("version")}
         release_dates = fetch_release_dates()
         google_versions = set(release_dates.keys())
+        repo_releases = get_available_releases(platform=args.platform)
+        for entry in repo_releases:
+            version = entry.get("version")
+            if version:
+                google_versions.add(version)
         new_versions = sorted(
             [version for version in google_versions if version not in existing_versions],
             key=parse_version_key,
