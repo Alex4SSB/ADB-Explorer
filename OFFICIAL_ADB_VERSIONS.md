@@ -10,6 +10,14 @@ This document lists all official Android Debug Bridge (ADB) platform-tools versi
 
 ### Latest Stable Release
 
+#### Platform-Tools 37.0.0 (Unknown date)
+**Windows:**
+- URL: https://dl.google.com/android/repository/platform-tools_r37.0.0-win.zip
+- ZIP SHA-256: 6faad2492081882bc8597c012125fa95d614accd7bfaf1fc8f248be91c0d08cf
+- EXE SHA-256: 7035cf5ec7f99f7b5662a9f5395f9dccfc3b6fe42583d0b9550124a0c3496606
+
+---
+
 #### Platform-Tools 36.0.2 (Sep 2025)
 **Windows:**
 - URL: https://dl.google.com/android/repository/platform-tools_r36.0.2-win.zip

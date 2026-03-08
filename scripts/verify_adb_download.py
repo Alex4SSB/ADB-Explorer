@@ -790,7 +790,7 @@ Examples:
         official_entries = []
         if not args.sync_official_list:
             official_entries = read_official_entries(official_list)
-        existing_sha256 = {entry["url"]: entry.get("sha256") for entry in official_entries if entry.get("url")}
+        existing_sha256 = {entry["url"]: entry.get("zip_sha256") for entry in official_entries if entry.get("url")}
         known_urls = set(existing_sha256.keys())
         releases = get_available_releases(platform=args.platform)
 
@@ -805,8 +805,10 @@ Examples:
                 current["url"] = entry["url"]
             if entry.get("date") and not current.get("date"):
                 current["date"] = entry["date"]
-            if entry.get("sha256") and not current.get("sha256"):
-                current["sha256"] = entry["sha256"]
+            if entry.get("zip_sha256") and not current.get("zip_sha256"):
+                current["zip_sha256"] = entry["zip_sha256"]
+            if entry.get("exe_sha256") and not current.get("exe_sha256"):
+                current["exe_sha256"] = entry["exe_sha256"]
             releases_by_version[version] = current
 
         for entry in official_entries:
@@ -843,7 +845,7 @@ Examples:
                     release["url"] = candidates[0]
                     url = candidates[0]
             if url:
-                current_sha = existing_sha256.get(url) or release.get("sha256")
+                current_sha = existing_sha256.get(url) or release.get("zip_sha256")
                 if not current_sha:
                     missing.append(release)
             else:
@@ -926,7 +928,8 @@ Examples:
                     continue
                 if entry_url not in known_urls:
                     entry_copy = dict(entry)
-                    entry_copy["sha256"] = updates.get(entry_url)
+                    entry_copy["zip_sha256"] = updates.get(entry_url)
+                    entry_copy["exe_sha256"] = exe_updates.get(entry_url)
                     if not entry_copy.get("date") and entry_copy.get("version"):
                         entry_copy["date"] = release_dates.get(entry_copy["version"])
                     new_entries.append(entry_copy)
