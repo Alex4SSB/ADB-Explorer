@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1434,5 +1434,29 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_ENABLE_MDNS" xml:space="preserve">
     <value>点击以启用服务器和轮询</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value>图标</value>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>拉取和展示缩略图</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>仅在图标视图下</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>仅在照片目录中</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value>连接时</value>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>会话</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>限制缩略图拉取速度</value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>显示特殊文件夹图标</value>
   </data>
 </root>
