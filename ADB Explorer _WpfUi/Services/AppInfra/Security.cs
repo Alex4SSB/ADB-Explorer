@@ -2,11 +2,36 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
+using System.Security.Cryptography.X509Certificates;
 
 namespace ADB_Explorer.Services;
 
 public static class Security
 {
+    /// <summary>
+    /// Verifies that the specified file has a valid Authenticode signature issued to Google LLC.
+    /// </summary>
+    /// <remarks>
+    /// Uses WinVerifyTrust to check signature integrity, certificate chain trust (offline, no revocation check),
+    /// and the certificate's owner.
+    /// </remarks>
+    public static bool VerifyAuthenticode(string filePath, string owner)
+    {
+        try
+        {
+            if (!NativeMethods.WinTrust.VerifyEmbeddedSignature(filePath))
+                return false;
+
+            using var cert = X509Certificate2.CreateFromSignedFile(filePath);
+
+            return cert.Subject.Contains($"O={owner}", StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public static string CalculateWindowsFileHash(string path, bool useSHA = false)
     {
         try

@@ -417,4 +417,45 @@ public static class FileHelper
 
         return photos / Data.DirList.FileList.Count > AdbExplorerConst.PHOTO_DIR_THRESHOLD;
     }
+
+    public record struct FolderTree(string Name, long? Size, double? Date)
+    { }
+
+    /// <summary>
+    /// Resolves an executable name (e.g. "adb") to its full path by searching the system PATH directories.
+    /// </summary>
+    /// <returns>The full path to the executable if found; otherwise, <see langword="null"/>.</returns>
+    public static string ResolveExecutableFromPath(string fileName)
+    {
+        var pathEnv = Environment.GetEnvironmentVariable("PATH");
+        if (string.IsNullOrEmpty(pathEnv))
+            return null;
+
+        // PATHEXT defines executable extensions to try (e.g. ".EXE;.CMD")
+        var extensions = (Environment.GetEnvironmentVariable("PATHEXT") ?? ".EXE")
+            .Split(';', StringSplitOptions.RemoveEmptyEntries);
+
+        bool hasExtension = Path.HasExtension(fileName);
+
+        foreach (var dir in pathEnv.Split(';', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (hasExtension)
+            {
+                var candidate = Path.Combine(dir, fileName);
+                if (File.Exists(candidate))
+                    return Path.GetFullPath(candidate);
+            }
+            else
+            {
+                foreach (var ext in extensions)
+                {
+                    var candidate = Path.Combine(dir, fileName + ext);
+                    if (File.Exists(candidate))
+                        return Path.GetFullPath(candidate);
+                }
+            }
+        }
+
+        return null;
+    }
 }

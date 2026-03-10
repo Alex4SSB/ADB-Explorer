@@ -468,28 +468,37 @@ public partial class ADBService
     /// </remarks>
     public static void VerifyAdbVersion(string adbPath)
     {
-        string trimmedPath = adbPath.Trim('"');
-
-        if (string.IsNullOrEmpty(trimmedPath)
-            || trimmedPath.StartsWith(@"\\")    // Forbid UNC paths for security reasons
-            || !File.Exists(trimmedPath))
+        if (string.IsNullOrEmpty(adbPath) || adbPath.StartsWith(@"\\"))   // Forbid UNC paths for security reasons
         {
             RuntimeSettings.AdbVersion = null;
             return;
         }
 
+        // If the path is not a direct file reference, try to resolve it from the system PATH
+        if (!File.Exists(adbPath))
+        {
+            adbPath = FileHelper.ResolveExecutableFromPath(adbPath);
+            if (adbPath is null)
+            {
+                RuntimeSettings.AdbVersion = null;
+                return;
+            }
+        }
+
         bool isHashValid = false;
-        var adbSHA = Security.CalculateWindowsFileHash(trimmedPath, true);
+        var adbSHA = Security.CalculateWindowsFileHash(adbPath, true);
         if (adbSHA is not null)
         {
             // First check against the hardcoded list of known ADB versions
             isHashValid = AdbVersions.HashList.Contains(adbSHA);
 
+            // If not found, verify the certificate is valid and is from Google. ADB is signed since 34.0.5
             if (!isHashValid)
-            {
-                // If not found, check against the list retrieved from the repository (which is updated more frequently)
+                isHashValid = Security.VerifyAuthenticode(adbPath, "Google LLC");
+
+            // As a last resort, check against the list retrieved from the repository (which is updated more frequently)
+            if (!isHashValid)
                 isHashValid = RepoHashList.Contains(adbSHA);
-            }
         }
 
         if (!isHashValid)
@@ -502,7 +511,7 @@ public partial class ADBService
         string stdout = "";
         try
         {
-            exitCode = ExecuteCommand(adbPath, "version", out stdout, out _, Encoding.UTF8, CancellationToken.None);
+            exitCode = ExecuteCommand($"\"{adbPath}\"", "version", out stdout, out _, Encoding.UTF8, CancellationToken.None);
         }
         catch { }
 

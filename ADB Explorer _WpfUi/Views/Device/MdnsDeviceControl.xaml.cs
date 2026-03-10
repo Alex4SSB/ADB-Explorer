@@ -13,10 +13,18 @@ public partial class MdnsDeviceControl : UserControl
     {
         Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
 
-        Data.MdnsService = new();
-        AdbHelper.EnableMdns();
-        
+        InitMdns();
+
         InitializeComponent();
+    }
+
+    private static void InitMdns()
+    {
+        if (Data.RuntimeSettings.AdbVersion is not null && Data.RuntimeSettings.AdbVersion.Major > 0)
+        {
+            Data.MdnsService = new();
+            AdbHelper.EnableMdns();
+        }
     }
 
     private void RuntimeSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -25,6 +33,11 @@ public partial class MdnsDeviceControl : UserControl
         {
             case nameof(AppRuntimeSettings.RefreshQrImage):
                 PairingQrImage?.Source = Data.MdnsService?.QrClass?.Image;
+
+                break;
+            case nameof(AppRuntimeSettings.AdbVersion):
+                InitMdns();
+
                 break;
             default:
                 break;

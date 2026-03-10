@@ -10,7 +10,7 @@ internal static class AdbHelper
     {
         string adbPath = string.IsNullOrEmpty(Data.Settings.ManualAdbPath)
             ? AdbExplorerConst.ADB_PROCESS
-            : $"\"{Data.Settings.ManualAdbPath}\"";
+            : Data.Settings.ManualAdbPath;
 
         ADBService.VerifyAdbVersion(adbPath);
 

@@ -1,6 +1,4 @@
-﻿using ADB_Explorer.Models;
-
-namespace ADB_Explorer.Services;
+﻿namespace ADB_Explorer.Services;
 
 public static partial class NativeMethods
 {

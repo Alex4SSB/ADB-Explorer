@@ -19,8 +19,12 @@ public class DevicePollingService : BackgroundService
         {
             try
             {
-                if (!Data.RuntimeSettings.IsPollingStopped)
+                if (!Data.RuntimeSettings.IsPollingStopped
+                    && Data.RuntimeSettings.AdbVersion is not null
+                    && Data.RuntimeSettings.AdbVersion.Major > 0)
+                {
                     await PollAsync(stoppingToken);
+                }
 
                 await Task.Delay(AdbExplorerConst.CONNECT_TIMER_INTERVAL, stoppingToken);
             }
