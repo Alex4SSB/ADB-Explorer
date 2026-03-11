@@ -775,6 +775,44 @@ public class CopyPasteService : ViewModelBase
                   masterPid: masterPid);
     }
 
+    public static SyncFile MergeFolderTree(FileClass folder, ShellFolder targetFolder)
+    {
+        StringComparer comparer = StringComparer.InvariantCultureIgnoreCase;
+
+        var targetPath = targetFolder.ParsingName;
+        var children = folder.Children;
+
+        var existingPaths = Collect(targetFolder);
+
+        var parent = folder.ParentPath;
+
+        var remote = existingPaths.Select(f => FileHelper.ConcatPaths(parent, FileHelper.ExtractRelativePath(f, targetPath)));
+        var tree = children.Where(c => !remote.Contains(c.Name, comparer));
+
+        return new(folder, tree);
+
+        static IEnumerable<string> Collect(ShellFolder folder)
+        {
+            foreach (var item in folder)
+            {
+                var itemPath = item.ParsingName;
+                var isFolder = item.IsFolder;
+                item.Dispose();
+
+                if (isFolder)
+                {
+                    using ShellFolder sub = new(itemPath);
+                    foreach (var subItem in Collect(sub))
+                    {
+                        yield return subItem;
+                    }
+                }
+                else
+                    yield return itemPath;
+            }
+        }
+    }
+
     /// <summary>
     /// Check for existing top level items in the target location. <br />
     /// Ask the user whether to abort, continue, or exclude the conflicting items.

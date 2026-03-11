@@ -117,8 +117,9 @@ public class FileToIconConverter
         //Memory Leak fixes, for more info : http://social.msdn.microsoft.com/forums/en-US/wpf/thread/edcf2482-b931-4939-9415-15b3515ddac6/
         try
         {
-            return Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty,
-               BitmapSizeOptions.FromEmptyOptions());
+            var bmpSource = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            bmpSource.Freeze();
+            return bmpSource;
         }
         finally
         {
@@ -307,7 +308,7 @@ public class FileToIconConverter
         if (specialType is AbstractFile.SpecialFileType.Folder)
         {
             if (Data.Settings.SpecialFolderIcons
-                && DriveHelper.GetCurrentDrive(Data.CurrentPath).Type is AbstractDrive.DriveType.Internal)
+                && DriveHelper.GetCurrentDrive(Data.CurrentPath)?.Type is AbstractDrive.DriveType.Internal)
             {
                 return fileName switch
                 {

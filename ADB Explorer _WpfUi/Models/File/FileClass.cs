@@ -96,10 +96,16 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         get
         {
             if (_cacheThumbnail is null
-                && SpecialType is SpecialFileType.Regular 
-                && ParentPath != ThumbnailHelper.DeviceThumbsDir(Data.CurrentADBDevice.ID))
+                && SpecialType is SpecialFileType.Regular)
             {
-                _cacheThumbnail = ThumbnailHelper.LoadThumbnail(Data.CurrentADBDevice, FullPath);
+                if (!ThumbnailHelper.IsInitialized(Data.CurrentADBDevice.ID))
+                {
+                    Task.Run(() => ThumbnailHelper.ForceLoad(Data.CurrentADBDevice));
+                }
+                else if (ParentPath != ThumbnailHelper.DeviceThumbsDir(Data.CurrentADBDevice.ID))
+                {
+                    _cacheThumbnail = ThumbnailHelper.LoadThumbnail(Data.CurrentADBDevice, FullPath);
+                }
             }
 
             return _cacheThumbnail;
@@ -145,7 +151,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     public FileNameSort SortName { get; private set; }
 
-    public (string, long?, double?)[] Children => !IsDirectory
+    public FolderTree[]? Children => !IsDirectory
         ? null 
         : FileHelper.GetFolderTree([FullPath]);
 
@@ -178,6 +184,14 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     public string SizeString => IsDirectory ? "" : Size?.BytesToSize(true);
 
     #endregion
+
+    public FileClass(FolderTree treeItem)
+        : this("",
+               treeItem.Name,
+               treeItem.IsFolder ? FileType.Folder : FileType.File,
+               size: treeItem.Size,
+               modifiedTime: treeItem.Date.FromUnixTime())
+    { }
 
     public FileClass(
         string fileName,
@@ -365,7 +379,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         fileOp.PropertyChanged += PullOperation_PropertyChanged;
         fileOp.VFDO = vfdo;
 
-        (string, long?, double?)[] items = [(name, Size, UnixTime)];
+        FolderTree[] items = [new(name, Size, UnixTime)];
         if (includeContent && children is not null)
         {
             items = [.. items, .. children];
@@ -373,11 +387,11 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
         Descriptors = items.Select(item => new FileDescriptor
         {
-            Name = FileHelper.ExtractRelativePath(item.Item1, ParentPath),
+            Name = FileHelper.ExtractRelativePath(item.Name, ParentPath),
             SourcePath = FullPath,
-            IsDirectory = item.Item2 is null,
-            Length = item.Item2,
-            ChangeTimeUtc = item.Item3.FromUnixTime(),
+            IsDirectory = item.IsFolder,
+            Length = item.Size,
+            ChangeTimeUtc = item.Date.FromUnixTime(),
             Stream = () =>
             {
                 var isActive = App.Current.Dispatcher.Invoke(() => App.Current.MainWindow.IsActive);
@@ -407,7 +421,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
                     Thread.Sleep(100);
                 }
 
-                var file = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, FileHelper.ExtractRelativePath(item.Item1, ParentPath), '\\');
+                var file = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, FileHelper.ExtractRelativePath(item.Name, ParentPath), '\\');
 
                 // Try 10 times to read from the file and write to the stream,
                 // in case the file is still in use by ADB or hasn't appeared yet

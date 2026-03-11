@@ -1160,12 +1160,20 @@ internal static class FileActionLogic
         });
     }
 
-    public static void SilentPullFiles(ADBService.AdbDevice device, ShellItem path, bool disableParallel, params IEnumerable<FileClass> pullItems)
+    public static void SilentPullFiles(ADBService.AdbDevice device, string target, bool disableParallel, params IEnumerable<FileClass> pullItems)
     {
         Task.Run(() =>
         {
-            foreach (var op in GeneratePullOps(path, pullItems, false, device))
+            using ShellFolder targetPath = new(target);
+            foreach (var item in pullItems)
             {
+                var syncFile = CopyPasteService.MergeFolderTree(item, targetPath);
+
+                if (syncFile.Children.Count == 0)
+                    continue;
+
+                var op = GeneratePullOp(targetPath, syncFile, false, device);
+
                 if (disableParallel)
                     op.MaxThreads = 1;
 
@@ -1180,14 +1188,19 @@ internal static class FileActionLogic
 
         foreach (var item in pullItems.Select(f => f.GetSyncFile()))
         {
-            var target = SyncFile.MergeToWindowsPath(item, path);
-            var fileOp = FileSyncOperation.PullFile(item, target, device, App.Current.Dispatcher);
-
-            if (notify)
-                fileOp.PropertyChanged += PullOperation_PropertyChanged;
-
-            yield return fileOp;
+            yield return GeneratePullOp(path, item, notify, device);
         }
+    }
+
+    private static FileSyncOperation GeneratePullOp(ShellItem path, SyncFile item, bool notify, ADBService.AdbDevice device)
+    {
+        var target = SyncFile.MergeToWindowsPath(item, path);
+        var fileOp = FileSyncOperation.PullFile(item, target, device, App.Current.Dispatcher);
+
+        if (notify)
+            fileOp.PropertyChanged += PullOperation_PropertyChanged;
+
+        return fileOp;
     }
 
     private static void PullOperation_PropertyChanged(object? sender, PropertyChangedEventArgs e)

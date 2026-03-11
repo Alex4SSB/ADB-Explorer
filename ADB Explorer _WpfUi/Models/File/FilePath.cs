@@ -55,6 +55,11 @@ public abstract class AbstractFile : ViewModelBase
         FileType.BrokenLink => Strings.Resources.S_FILE_BROKEN_LINK,
         _ => Strings.Resources.S_FILE_UNKNOWN,
     };
+
+    public record struct FolderTree(string Name, long? Size, double? Date)
+    {
+        public readonly bool IsFolder => Size is null;
+    }
 }
 
 public class FilePath : AbstractFile, IBaseFile

@@ -331,11 +331,9 @@ public static class FileHelper
         return RelationType.Unrelated;
     }
 
-    public static IEnumerable<FileClass> GetFilesFromTree((string, long?, double?)[] tree) => 
-        tree.Select(t => new FileClass(GetFullName(t.Item1), t.Item1, t.Item2 is null ? FileType.Folder : FileType.File, size: t.Item2)
-        { ModifiedTime = t.Item3.FromUnixTime() });
+    public static IEnumerable<FileClass> GetFilesFromTree(FolderTree[] tree) => tree.Select(t => new FileClass(t));
 
-    public static (string, long?, double?)[] GetFolderTree(IEnumerable<string> paths, bool isFolder = true)
+    public static FolderTree[] GetFolderTree(IEnumerable<string> paths, bool isFolder = true)
     {
         string stdout = "";
         var files = string.Join(" ", paths.Select(p => ADBService.EscapeAdbShellString(p)));
@@ -376,11 +374,11 @@ public static class FileHelper
 
         return [.. matches.Where(m => m.Success)
                 .Select(m =>
-                (
-                    m.Groups["Name"].Value,
-                    m.Groups["Size"].Value == "d" ? (long?)null : long.Parse(m.Groups["Size"].Value, CultureInfo.InvariantCulture),
-                    m.Groups["Date"].Value == "d" ? (double?)null : double.Parse(m.Groups["Date"].Value, CultureInfo.InvariantCulture)
-                ))];
+                new FolderTree{
+                    Name = m.Groups["Name"].Value,
+                    Size = m.Groups["Size"].Value == "d" ? null : long.Parse(m.Groups["Size"].Value, CultureInfo.InvariantCulture),
+                    Date = m.Groups["Date"].Value == "d" ? null : double.Parse(m.Groups["Date"].Value, CultureInfo.InvariantCulture)
+                })];
     }
 
     public static (long? Size, DateTime? ModifiedTime) GetShellSizeDate(ShellItem shellItem, bool isDirectory)
@@ -417,9 +415,6 @@ public static class FileHelper
 
         return photos / Data.DirList.FileList.Count > AdbExplorerConst.PHOTO_DIR_THRESHOLD;
     }
-
-    public record struct FolderTree(string Name, long? Size, double? Date)
-    { }
 
     /// <summary>
     /// Resolves an executable name (e.g. "adb") to its full path by searching the system PATH directories.

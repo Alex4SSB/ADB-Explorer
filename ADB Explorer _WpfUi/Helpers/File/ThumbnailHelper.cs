@@ -145,7 +145,7 @@ public static partial class ThumbnailHelper
         FileClass file = new("", deviceInfo.DeviceThumbnailDir, AbstractFile.FileType.Folder);
         var deviceDir = Directory.CreateDirectory(Path.Combine(Data.AppDataPath, device.ID)).FullName;
 
-        FileActionLogic.SilentPullFiles(device, ShellItem.Open(deviceDir), Data.Settings.LimitThumbsPullSpeed, file);
+        FileActionLogic.SilentPullFiles(device, deviceDir, Data.Settings.LimitThumbsPullSpeed, file);
 
         deviceDir = Path.Combine(deviceDir, Path.GetFileName(deviceInfo.DeviceThumbnailDir));
         deviceInfo.LocalThumbnailDir = deviceDir;

@@ -723,11 +723,19 @@ public static partial class NativeMethods
 
             // Get the System IImageList object from the Shell:
             Guid iidImageList = new("46EB5926-582E-4017-9FDF-E8998DAA0950");
-            _ = SHGetImageList(
+
+            try
+            {
+                _ = SHGetImageList(
                 (int)size,
                 ref iidImageList,
                 ref iImageList
                 );
+            }
+            catch
+            {
+                iImageList = null;
+            }
 
             // the image list handle is the IUnknown pointer, but 
             // using Marshal.GetIUnknownForObject doesn't return

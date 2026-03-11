@@ -32,6 +32,8 @@ public partial class ExplorerPageHeader : UserControl
     private Point MouseDownPoint;
     private FileToIconConverter FileToIcon;
 
+    private Dispatcher Dispatcher => App.Current.Dispatcher;
+
     private static Point NullPoint => new(-1, -1);
     private double? RowHeight { get; set; }
     private double ColumnHeaderHeight => (double)FindResource("DataGridColumnHeaderHeight") + ScrollContentPresenterMargin;
@@ -392,14 +394,16 @@ public partial class ExplorerPageHeader : UserControl
 
     private void DirectoryLister_PropertyChanged(object sender, PropertyChangedEventArgs e) => Dispatcher.Invoke(() =>
     {
-        switch (e.PropertyName)
+        App.Current.Dispatcher.Invoke(() =>
         {
-            case nameof(DirectoryLister.IsProgressVisible):
-                UnfinishedBlock.Visible(DirList.IsProgressVisible);
-                NavigationBox.IsLoadingProgressVisible = DirList.IsProgressVisible;
-                break;
+            switch (e.PropertyName)
+            {
+                case nameof(DirectoryLister.IsProgressVisible):
+                    UnfinishedBlock.Visible(DirList.IsProgressVisible);
+                    NavigationBox.IsLoadingProgressVisible = DirList.IsProgressVisible;
+                    break;
 
-            case nameof(DirectoryLister.InProgress):
+                case nameof(DirectoryLister.InProgress):
                 {
                     Task.Run(() =>
                     {
@@ -419,16 +423,16 @@ public partial class ExplorerPageHeader : UserControl
 
                     break;
                 }
-            case nameof(DirectoryLister.IsLinkListingFinished) when ExplorerGrid.Items.Count < 1 || !DirList.IsLinkListingFinished:
-                return;
+                case nameof(DirectoryLister.IsLinkListingFinished) when ExplorerGrid.Items.Count < 1 || !DirList.IsLinkListingFinished:
+                    return;
 
-            case nameof(DirectoryLister.IsLinkListingFinished) when bfNavigation
-                && !string.IsNullOrEmpty(prevPath) && DirList.FileList.FirstOrDefault(item => item.FullPath == prevPath) is var prevItem and not null:
-                FileActions.ItemToSelect = prevItem;
+                case nameof(DirectoryLister.IsLinkListingFinished) when bfNavigation
+                    && !string.IsNullOrEmpty(prevPath) && DirList.FileList.FirstOrDefault(item => item.FullPath == prevPath) is var prevItem and not null:
+                    FileActions.ItemToSelect = prevItem;
 
-                break;
+                    break;
 
-            case nameof(DirectoryLister.IsLinkListingFinished):
+                case nameof(DirectoryLister.IsLinkListingFinished):
                 {
                     if (ExplorerGrid.Items.Count > 0)
                     {
@@ -444,7 +448,8 @@ public partial class ExplorerPageHeader : UserControl
 
                     break;
                 }
-        }
+            }
+        });
     });
 
     private bool InitNavigation(string path = "")
