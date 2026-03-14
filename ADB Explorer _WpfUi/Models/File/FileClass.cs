@@ -74,7 +74,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     private BitmapSource _icon = null;
 
     [ObservableProperty]
-    private BitmapSource _iconOverlay = null;
+    private BitmapSource? _iconOverlay = null;
 
     public BitmapSource DragImage
     {
@@ -116,17 +116,26 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     {
         get
         {
-            var icons = FileToIconConverter.GetImage(this, 48);
-
-            if (CacheThumbnail is null || CacheThumbnail?.Type is not ThumbnailHelper.MediaType.video)
+            if (IconOverlay is not null)
             {
+                var icons = FileToIconConverter.GetImage(this, 64);
                 if (icons.Count() > 1 && icons.ElementAt(1) is BitmapSource icon2)
                     return icon2;
+            }
+            return null;
+        }
+    }
 
+    public BitmapSource? VideoIconOverlay
+    {
+        get
+        {
+            if (CacheThumbnail is null || CacheThumbnail?.Type is not ThumbnailHelper.MediaType.video)
+            {
                 return null;
             }
 
-            return icons.FirstOrDefault();
+            return FileToIconConverter.GetImage(this, 32).FirstOrDefault();
         }
     }
 

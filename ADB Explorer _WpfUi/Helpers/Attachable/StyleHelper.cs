@@ -1,4 +1,6 @@
-﻿namespace ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Models;
+
+namespace ADB_Explorer.Helpers;
 
 public static class StyleHelper
 {
@@ -218,4 +220,20 @@ public static class StyleHelper
 
     public static bool IsFontIcon(string icon) =>
         icon is null || (icon.Length == 1 && char.GetUnicodeCategory(icon, 0) is UnicodeCategory.PrivateUse);
+
+    public static void ItemScroll(object sender, MouseWheelEventArgs e)
+    {
+        if (sender is not ItemsControl control || FindDescendant<ScrollViewer>(control) is not ScrollViewer scrollViewer)
+            return;
+
+        if (control.ItemContainerGenerator.ContainerFromIndex(0) is not ListViewItem item || item.ActualHeight <= 0)
+            return;
+
+        var dpiOffset = Data.RuntimeSettings.MainWindowScalingFactor * -2 + 2;
+
+        double itemHeight = item.ActualHeight + 10 - dpiOffset;
+        var offset = scrollViewer.VerticalOffset - Math.Sign(e.Delta) * itemHeight;
+        scrollViewer.ScrollToVerticalOffset(Math.Floor(offset / itemHeight) * itemHeight);
+        e.Handled = true;
+    }
 }

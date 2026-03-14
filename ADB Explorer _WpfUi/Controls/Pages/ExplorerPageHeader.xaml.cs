@@ -30,7 +30,6 @@ public partial class ExplorerPageHeader : UserControl
     private bool WasEditing;
     private bool WasDragging;
     private Point MouseDownPoint;
-    private FileToIconConverter FileToIcon;
 
     private Dispatcher Dispatcher => App.Current.Dispatcher;
 
@@ -91,9 +90,6 @@ public partial class ExplorerPageHeader : UserControl
 
     private void MainWindow_PreviewTextInput(object sender, TextCompositionEventArgs e)
     {
-        //RuntimeSettings.IsDevicesPaneOpen
-        //    || RuntimeSettings.IsSettingsPaneOpen
-        //    ||
         if (SearchBox.IsFocused
             || NavigationBox.Mode is NavigationBox.ViewMode.Path
             || FileActions.IsExplorerEditing)
@@ -126,9 +122,6 @@ public partial class ExplorerPageHeader : UserControl
 
     private void OnButtonKeyDown(object sender, KeyEventArgs e)
     {
-        //if (RuntimeSettings.IsSettingsPaneOpen || RuntimeSettings.IsDevicesPaneOpen)
-        //    return;
-
         if (Keyboard.Modifiers.HasFlag(ModifierKeys.Alt)
             || !NAVIGATION_KEYS.Contains(e.Key))
             return;
@@ -149,7 +142,7 @@ public partial class ExplorerPageHeader : UserControl
 
     private bool DriveViewKeyNavigation(Key key)
     {
-        if (DriveList.Items.Count == 0) // || RuntimeSettings.IsSettingsPaneOpen || RuntimeSettings.IsDevicesPaneOpen
+        if (DriveList.Items.Count == 0)
             return false;
 
         if (DriveList.SelectedItems.Count == 0)
@@ -189,7 +182,7 @@ public partial class ExplorerPageHeader : UserControl
 
     private bool ExplorerGridKeyNavigation(Key key)
     {
-        if (ExplorerGrid.Items.Count < 1) // || RuntimeSettings.IsSettingsPaneOpen || RuntimeSettings.IsDevicesPaneOpen
+        if (ExplorerGrid.Items.Count < 1)
             return false;
 
         switch (key)
@@ -1374,4 +1367,6 @@ public partial class ExplorerPageHeader : UserControl
     }
 
     private void EmptyNonRootTextBlock_Loaded(object sender, RoutedEventArgs e) => TextHelper.BuildLocalizedInlines(sender, e);
+
+    private void IconView_PreviewMouseWheel(object sender, MouseWheelEventArgs e) => StyleHelper.ItemScroll(sender, e);
 }

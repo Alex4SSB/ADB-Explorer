@@ -20,6 +20,9 @@ public partial class ExplorerViewModel : ObservableObject
     [ObservableProperty]
     private ListSortDirection? _packageTypeColumnSortDirection;
 
+    [ObservableProperty]
+    private bool _isIconView = false;
+
     public string SelectedFilesTotalSize => (Data.SelectedFiles is not null && FileHelper.TotalSize(Data.SelectedFiles) is long size and > 0) ? size.BytesToSize() : "";
     public string SelectedFilesCount => $"{(Data.FileActions.IsAppDrive ? Data.SelectedPackages.Count() : Data.SelectedFiles.Count())}";
 

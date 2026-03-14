@@ -920,4 +920,13 @@
         <Setter Property="IsSelected" Value="{Binding DriveSelected, Mode=TwoWay}" />
         <Setter Property="IsEnabled" Value="{Binding DriveEnabled}" />
     </Style>
+    <Style x:Key="IconFileContainerStyle" TargetType="ui:ListViewItem">
+        <Setter Property="Margin" Value="5" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Top" />
+        <!--<Setter Property="IsSelected" Value="{Binding DriveSelected, Mode=TwoWay}" />
+        <Setter Property="IsEnabled" Value="{Binding DriveEnabled}" />-->
+    </Style>
 </ResourceDictionary>
