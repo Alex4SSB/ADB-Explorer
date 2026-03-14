@@ -405,6 +405,8 @@ public static partial class NativeMethods
     public enum WindowMessages
     {
         WM_COPYDATA = 0x004A,
+        WM_DISPLAYCHANGE = 0x007E,
+        WM_DPICHANGED = 0x02E0,
     }
 
     [StructLayout(LayoutKind.Sequential)]

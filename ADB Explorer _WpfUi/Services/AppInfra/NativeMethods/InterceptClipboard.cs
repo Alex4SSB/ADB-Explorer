@@ -6,14 +6,16 @@ public static partial class NativeMethods
     {
         private static Action _externalClipAction;
         private static Action<string> _externalIpcAction;
+        private static Action<float> _externalScalingAction;
         private static HwndSource _hwndSource;
 
         public static HANDLE MainWindowHandle { get; private set; } = IntPtr.Zero;
 
-        public static void Init(Window window, Action clipboardAction, Action<string> ipcAction)
+        public static void Init(Window window, Action clipboardAction, Action<string> ipcAction, Action<float> scalingAction)
         {
             _externalClipAction = clipboardAction;
             _externalIpcAction = ipcAction;
+            _externalScalingAction = scalingAction;
             RoutedEventHandler windowLoadedHandler = null;
 
             if (window.IsLoaded)
@@ -40,6 +42,8 @@ public static partial class NativeMethods
                 _hwndSource.AddHook(WndProc);
 
                 AddClipboardFormatListener(MainWindowHandle);
+
+                _externalScalingAction(MonitorInfo.GetScalingFromWindow(MainWindowHandle));
             }
         }
 
@@ -58,10 +62,18 @@ public static partial class NativeMethods
                 handled = true;
             }
             else if ((WindowMessages)msg is WindowMessages.WM_COPYDATA)
-            // Since we already have a hook for MainWindow, we'll use it for IPC as well
             {
                 var cds = Marshal.PtrToStructure<COPYDATASTRUCT>(lParam);
                 _externalIpcAction(cds.lpData);
+            }
+            // The HIWORD of the wParam contains the Y-axis value of the new dpi of the window.
+            // The LOWORD of the wParam contains the X-axis value of the new DPI of the window.
+            // For example, 96, 120, 144, or 192.
+            // The values of the X-axis and the Y-axis are identical for Windows apps.
+            else if ((WindowMessages)msg is WindowMessages.WM_DPICHANGED)
+            {
+                var point = (UInt16)wParam;
+                _externalScalingAction(MonitorInfo.DpiToScalingFactor(point));
             }
 
             return IntPtr.Zero;

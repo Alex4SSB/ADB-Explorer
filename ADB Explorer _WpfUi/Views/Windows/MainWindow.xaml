@@ -43,12 +43,12 @@
             Padding="42,0,42,10"
             FooterMenuItemsSource="{Binding ViewModel.FooterMenuItems, Mode=OneWay}"
             FrameMargin="0"
-            PreviewMouseDown="RootNavigation_PreviewMouseDown"
-            PreviewKeyDown="RootNavigation_PreviewKeyDown"
             IsBackButtonVisible="Collapsed"
             IsPaneToggleVisible="False"
             MenuItemsSource="{Binding ViewModel.MenuItems, Mode=OneWay}"
-            PaneDisplayMode="LeftFluent">
+            PaneDisplayMode="LeftFluent"
+            PreviewKeyDown="RootNavigation_PreviewKeyDown"
+            PreviewMouseDown="RootNavigation_PreviewMouseDown">
             <ui:NavigationView.Header>
                 <ContentPresenter x:Name="PageHeader" Height="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ui:NavigationView}, Path=ActualHeight}" />
             </ui:NavigationView.Header>

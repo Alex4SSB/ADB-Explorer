@@ -8,58 +8,61 @@ public static partial class NativeMethods
     {
         private enum MonitorType
         {
-            Primary = 0x00000001,
-            Nearest = 0x00000002,
+            Primary = 1,
+            Nearest = 2,
         }
 
-        private static HANDLE? mainWinHandle;
-        private static HANDLE primaryMonitor => PrimaryMonitor();
-
-        public static void Init(Window window)
+        private enum MonitorDpiType
         {
-            mainWinHandle ??= new WindowInteropHelper(window).EnsureHandle();
+            MDT_EFFECTIVE_DPI = 0,
+            MDT_ANGULAR_DPI = 1,
+            MDT_RAW_DPI = 2,
         }
-
-        public static bool? IsPrimaryMonitor(Window window)
-        {
-            Init(window);
-            return IsPrimaryMonitor();
-        }
-
-        public static bool? IsPrimaryMonitor()
-        {
-            if (mainWinHandle is null)
-                return null;
-
-            var current = NearestMonitor(mainWinHandle.Value);
-
-            return current == primaryMonitor;
-        }
-
-        public static HANDLE NearestMonitor(HANDLE handle) => MonitorFromWindow(handle, MonitorType.Nearest);
 
         public static HANDLE PrimaryMonitor() => MonitorFromWindow(IntPtr.Zero, MonitorType.Primary);
 
-        public static POINT MousePositionToDpi(POINT mousePosition, HANDLE hWnd)
+        /// <summary>
+        /// Converts a mouse position from device-independent pixels (DIPs) to device pixels using the specified scaling
+        /// factor.
+        /// </summary>
+        /// <remarks>Use this method when translating coordinates from logical (DIP) space to physical
+        /// device pixels, such as when handling high-DPI displays.</remarks>
+        /// <param name="mousePosition">The mouse position in device-independent pixels (DIPs) to convert.</param>
+        /// <param name="scalingFactor">The scaling factor, where 1 = 100%, 0.8 = 125%, etc.</param>
+        /// <returns>A POINT structure representing the mouse position in device pixels after applying the scaling factor.</returns>
+        public static POINT MousePositionToDpi(POINT mousePosition, float scalingFactor) => new(
+            (int)(mousePosition.X * scalingFactor),
+            (int)(mousePosition.Y * scalingFactor));
+
+        /// <summary>
+        /// Calculates the scaling factor for a specified window based on its DPI setting.
+        /// </summary>
+        /// <remarks>If the window handle is invalid or the DPI cannot be determined, the method assumes a
+        /// default DPI of 96.</remarks>
+        /// <param name="hWnd">A handle to the window for which to retrieve the scaling factor.</param>
+        /// <returns>The scaling factor as a floating-point value. A value of 1.0 indicates 100% scaling; values less than 1.0
+        /// indicate higher DPI (scaled down), and values greater than 1.0 indicate lower DPI (scaled up).</returns>
+        public static float GetScalingFromWindow(HANDLE hWnd) 
+            => DpiToScalingFactor(GetDpiForWindow(hWnd));
+
+        public static uint PrimaryMonitorDpi()
         {
-            // Get the DPI for this window
-            var dpi = GetDpiForWindow(hWnd);
-            if (dpi == 0) // fallback to default DPI if window not found
-                dpi = 96;
-
-            // Calculate the scaling factor (96 is the default DPI)
-            Data.RuntimeSettings.DpiScalingFactor = 96f / dpi;
-
-            // Convert the coordinates
-            return new(
-                (int)(mousePosition.X * Data.RuntimeSettings.DpiScalingFactor),
-                (int)(mousePosition.Y * Data.RuntimeSettings.DpiScalingFactor));
+            var result = GetDpiForMonitor(PrimaryMonitor(), MonitorDpiType.MDT_EFFECTIVE_DPI, out var dpiX, out _);
+            return result == HResult.Ok ? dpiX : 96u;
         }
+
+        public static float DpiToScalingFactor(uint dpi) => 
+            dpi == 0
+            ? 1 
+            : 96f / dpi;
 
         [DllImport("User32.dll")]
         private static extern HANDLE MonitorFromWindow(HANDLE hwnd, MonitorType dwFlags);
 
         [DllImport("User32.dll")]
         static extern uint GetDpiForWindow(HANDLE hwnd);
+
+        [DllImport("SHCore.dll")]
+        private static extern HResult GetDpiForMonitor(HANDLE hmonitor, MonitorDpiType dpiType, out uint dpiX, out uint dpiY);
     }
 }

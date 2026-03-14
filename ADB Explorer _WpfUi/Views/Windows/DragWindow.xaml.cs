@@ -1,11 +1,11 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels.Windows;
 using System.Windows.Documents;
-using System.Windows.Interop;
 using static ADB_Explorer.Services.NativeMethods;
 
-namespace ADB_Explorer;
+namespace ADB_Explorer.Views.Windows;
 
 /// <summary>
 /// Interaction logic for DragWindow.xaml
@@ -18,7 +18,7 @@ public partial class DragWindow : INotifyPropertyChanged
 #if RELEASE
     private const int VERTICAL_OFFSET = 10;
 #else
-    private const int VERTICAL_OFFSET = 2;
+    private const int VERTICAL_OFFSET = 5;
 #endif
 
     private int HORIZONTAL_OFFSET = 2;
@@ -26,6 +26,14 @@ public partial class DragWindow : INotifyPropertyChanged
     private readonly DispatcherTimer DragTimer = new() { Interval = TimeSpan.FromMilliseconds(200) };
 
     private HANDLE dragWindowHandle;
+
+    /// <summary>
+    /// The scaling factor of the primary monitor when the window is loaded. 
+    /// Used to calculate the offset of the drag image from the mouse cursor.
+    /// </summary>
+    private float startingScaling;
+
+    public DragWindowViewModel ViewModel { get; } = new();
 
     public DragWindow()
     {
@@ -243,6 +251,8 @@ public partial class DragWindow : INotifyPropertyChanged
             Services.WindowStyle.SetWindowHidden(dragWindowHandle);
         }
 
+        startingScaling = MonitorInfo.DpiToScalingFactor(MonitorInfo.PrimaryMonitorDpi());
+
 #if DEBUG
         MouseWithinApp = true;
 #else
@@ -259,14 +269,15 @@ public partial class DragWindow : INotifyPropertyChanged
         if (Data.RuntimeSettings.DragBitmap is null)
             return;
 
-        var actualPoint = MonitorInfo.MousePositionToDpi(point, dragWindowHandle);
+        ViewModel.DragImageHeight = 96 * (1 / MonitorInfo.GetScalingFromWindow(dragWindowHandle));
+        var actualPoint = MonitorInfo.MousePositionToDpi(point, startingScaling);
 
         imageEmpty = DragImage.ActualHeight < 1;
         if (!imageEmpty)
         {
             VerticalOffset = actualPoint.Y - DragImage.ActualHeight - VERTICAL_OFFSET;
-            
-            base.HorizontalOffset = actualPoint.X - DragImage.ActualWidth / HORIZONTAL_OFFSET;
+
+            HorizontalOffset = actualPoint.X - DragImage.ActualWidth / HORIZONTAL_OFFSET;
         }
 
         hwndUnderMouse = InterceptMouse.GetWindowUnderMouse();
