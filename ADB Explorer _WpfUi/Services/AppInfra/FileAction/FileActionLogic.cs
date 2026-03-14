@@ -1087,13 +1087,8 @@ internal static class FileActionLogic
         Data.RuntimeSettings.IsPathBoxFocused = false;
 
         var pullItems = Data.SelectedFiles;
-        ShellItem path;
 
-        if (!string.IsNullOrEmpty(targetPath))
-        {
-            path = ShellItem.Open(targetPath);
-        }
-        else
+        if (string.IsNullOrEmpty(targetPath))
         {
             var dialog = new CommonOpenFileDialog()
             {
@@ -1107,19 +1102,19 @@ internal static class FileActionLogic
 
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
                 return;
-            
-            path = ShellItem.Open(dialog.FileName);
+
+            targetPath = dialog.FileName;
         }
 
-        PullFiles(path, pullItems, true);
+        PullFiles(targetPath, pullItems, true);
     }
 
-    public static async void PullFiles(ShellItem path, IEnumerable<FileClass> pullItems, bool notify = false)
+    public static async void PullFiles(string targetPath, IEnumerable<FileClass> pullItems, bool notify = false)
     {
         if (pullItems is null || !pullItems.Any())
             return;
 
-        var match = AdbRegEx.RE_WINDOWS_DRIVE_ROOT().Match(path.ParsingName);
+        var match = AdbRegEx.RE_WINDOWS_DRIVE_ROOT().Match(targetPath);
         var invalidFiles = pullItems.Where(f => AdbExplorerConst.INVALID_WINDOWS_ROOT_PATHS.Contains(f.FullName));
 
         if (match.Success && invalidFiles.Any())
@@ -1135,11 +1130,11 @@ internal static class FileActionLogic
             pullItems = pullItems.Except(invalidFiles);
         }
 
-        if (!Directory.Exists(path.ParsingName))
+        if (!Directory.Exists(targetPath))
         {
             try
             {
-                Directory.CreateDirectory(path.ParsingName);
+                Directory.CreateDirectory(targetPath);
             }
             catch (Exception e)
             {
@@ -1148,7 +1143,7 @@ internal static class FileActionLogic
             }
         }
 
-        var files = await CopyPasteService.MergeFiles(pullItems.Select(f => f.FullPath), path.ParsingName);
+        var files = await CopyPasteService.MergeFiles(pullItems.Select(f => f.FullPath), targetPath);
         if (files.Count() < pullItems.Count())
         {
             pullItems = pullItems.Where(f => files.Contains(f.FullPath));
@@ -1156,7 +1151,7 @@ internal static class FileActionLogic
 
         await Task.Run(() =>
         {
-            App.Current.Dispatcher.Invoke(() => Data.FileOpQ.AddOperations(GeneratePullOps(path, pullItems, notify)));
+            App.Current.Dispatcher.Invoke(() => Data.FileOpQ.AddOperations(GeneratePullOps(targetPath, pullItems, notify)));
         });
     }
 
@@ -1164,16 +1159,16 @@ internal static class FileActionLogic
     {
         Task.Run(() =>
         {
-            using ShellFolder targetPath = new(target);
             foreach (var item in pullItems)
             {
-                var syncFile = CopyPasteService.MergeFolderTree(item, targetPath);
+                if (item.Type is not FileType.Folder)
+                    continue;
 
+                var syncFile = CopyPasteService.MergeFolderTree(item, target);
                 if (syncFile.Children.Count == 0)
                     continue;
 
-                var op = GeneratePullOp(targetPath, syncFile, false, device);
-
+                var op = GeneratePullOp(target, syncFile, false, device);
                 if (disableParallel)
                     op.MaxThreads = 1;
 
@@ -1182,19 +1177,19 @@ internal static class FileActionLogic
         });
     }
 
-    private static IEnumerable<FileSyncOperation> GeneratePullOps(ShellItem path, IEnumerable<FileClass> pullItems, bool notify, ADBService.AdbDevice? device = null)
+    private static IEnumerable<FileSyncOperation> GeneratePullOps(string targetPath, IEnumerable<FileClass> pullItems, bool notify, ADBService.AdbDevice? device = null)
     {
         device ??= Data.CurrentADBDevice;
 
         foreach (var item in pullItems.Select(f => f.GetSyncFile()))
         {
-            yield return GeneratePullOp(path, item, notify, device);
+            yield return GeneratePullOp(targetPath, item, notify, device);
         }
     }
 
-    private static FileSyncOperation GeneratePullOp(ShellItem path, SyncFile item, bool notify, ADBService.AdbDevice device)
+    private static FileSyncOperation GeneratePullOp(string targetPath, SyncFile item, bool notify, ADBService.AdbDevice device)
     {
-        var target = SyncFile.MergeToWindowsPath(item, path);
+        var target = SyncFile.MergeToWindowsPath(item, targetPath);
         var fileOp = FileSyncOperation.PullFile(item, target, device, App.Current.Dispatcher);
 
         if (notify)

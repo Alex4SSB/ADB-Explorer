@@ -137,7 +137,7 @@ public static class UISettings
             new SettingsGroup("APK",
             [
                 new BoolSetting(() => Settings.EnableApk, Strings.Resources.S_SETTINGS_APK, icon: "\uE7B8"),
-                new BoolSetting(() => Settings.ShowSystemPackages, Strings.Resources.S_SETTINGS_SYSTEM_APPS, visibleProp: () => Settings.EnableApk, icon: "\uE835"),
+                new BoolSetting(() => Settings.ShowSystemPackages, Strings.Resources.S_SETTINGS_SYSTEM_APPS, visibleProp: AbstractSetting.ExtractPropertyInfo(() => Settings.EnableApk), icon: "\uE835"),
             ], "\uE7B8"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_EXPLORER,
             [
@@ -157,8 +157,9 @@ public static class UISettings
                     new(AppSettings.ThumbnailMode.OnPhotoDir, Strings.Resources.S_SETTINGS_THUMBS_PHOTO_DIR),
                     new(AppSettings.ThumbnailMode.OnConnect, Strings.Resources.S_SETTINGS_THUMBS_CONNECT) ],
                 icon: "\uE15A"),
-                new BoolSetting(() => Settings.PersistThumbs, Strings.Resources.S_SETTINGS_PERSIST_THUMBS, icon: "\uE78C"),
-                new BoolSetting(() => Settings.LimitThumbsPullSpeed, Strings.Resources.S_SETTINGS_THUMBS_THROTTLE, icon: "\uEC48"),
+                new BoolSetting(() => Settings.MovieThumbsEnabled, Strings.Resources.S_SETTINGS_VIDEO_THUMBNAILS, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uE8B2"),
+                new BoolSetting(() => Settings.PersistThumbs, Strings.Resources.S_SETTINGS_PERSIST_THUMBS, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uE78C"),
+                new BoolSetting(() => Settings.LimitThumbsPullSpeed, Strings.Resources.S_SETTINGS_THUMBS_THROTTLE, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uEC48"),
                 new BoolSetting(() => Settings.SpecialFolderIcons, Strings.Resources.S_SETTINGS_SPECIAL_DIR_ICONS, icon: "\uEC25"),
             ], "\uE8B9"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_WORK_DIRS,
@@ -285,8 +286,27 @@ public abstract class AbstractSetting : SettingsBase
     public string Icon { get; set; }
     public TextAlignment HeaderAlignment { get; protected set; }
 
-    public Visibility Visibility => visibleProp is null || (bool)visibleProp.GetValue(visibleProp.DeclaringType.Name is nameof(AppSettings) ? Settings : RuntimeSettings) ? Visibility.Visible : Visibility.Collapsed;
-    
+    public Visibility Visibility
+    {
+        get
+        {
+            if (visibleProp is null)
+                return Visibility.Visible;
+
+            var value = visibleProp.GetValue(Settings);
+            if (value is bool boolValue)
+            {
+                return boolValue ? Visibility.Visible : Visibility.Collapsed;
+            }
+            else if (value is Enum enumVal)
+            {
+                return Convert.ToInt32(enumVal) != 0 ? Visibility.Visible : Visibility.Collapsed;
+            }
+
+            return visibleProp is null || (bool)visibleProp.GetValue(Settings) ? Visibility.Visible : Visibility.Collapsed;
+        }
+    }
+
     protected AbstractSetting(PropertyInfo valueProp, string description, PropertyInfo visibleProp = null, string icon = null, params BaseAction[] commands)
     {
         this.visibleProp = visibleProp;
@@ -296,7 +316,6 @@ public abstract class AbstractSetting : SettingsBase
         Icon = icon;
 
         Settings.PropertyChanged += Settings_PropertyChanged;
-        RuntimeSettings.PropertyChanged += Settings_PropertyChanged;
     }
 
     protected virtual void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -430,8 +449,8 @@ public class BoolSetting : AbstractSetting
 
     public string Label => Value ? Strings.Resources.S_SETTINGS_ACTIVE : Strings.Resources.S_SETTINGS_INACTIVE;
 
-    public BoolSetting(Expression<Func<bool>> propertyExpr, string description, Expression<Func<bool>> visibleProp = null, string icon = null, params BaseAction[] commands)
-        : base(ExtractPropertyInfo(propertyExpr), description, ExtractPropertyInfo(visibleProp), icon, commands)
+    public BoolSetting(Expression<Func<bool>> propertyExpr, string description, PropertyInfo visibleProp = null, string icon = null, params BaseAction[] commands)
+        : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
     { }
 
     protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -588,7 +607,7 @@ public class EnumComboboxItem : ViewModelBase
             if (visibleProp == null)
                 return true;
 
-            object? value = visibleProp.GetValue(visibleProp.DeclaringType.Name is nameof(AppSettings) ? Settings : RuntimeSettings);
+            object? value = visibleProp.GetValue(Settings);
             if (value is bool val)
                 return val;
             if (value is string str)

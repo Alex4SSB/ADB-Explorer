@@ -190,11 +190,11 @@ public class SyncFile : FilePath
         }
     }
 
-    public static SyncFile MergeToWindowsPath(SyncFile syncFile, ShellItem windowsPath)
+    public static SyncFile MergeToWindowsPath(SyncFile syncFile, string windowsPath)
     {
         SyncFile copy = new(syncFile);
 
-        copy.UpdatePath(FileHelper.ConcatPaths(windowsPath.ParsingName, syncFile.FullName, '\\'));
+        copy.UpdatePath(FileHelper.ConcatPaths(windowsPath, syncFile.FullName, '\\'));
         copy.PathType = FilePathType.Windows;
 
         return copy;

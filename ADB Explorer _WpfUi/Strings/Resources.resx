@@ -1794,4 +1794,8 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Show Icons For Special Folders</value>
     <comment>The setting used to allow displaying Windows icons for Windows special folders (Downloads, Documents, etc.)</comment>
   </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>Include Video Thumbnails</value>
+    <comment>The setting to enable video thumbnails (pull &amp; display)</comment>
+  </data>
 </root>

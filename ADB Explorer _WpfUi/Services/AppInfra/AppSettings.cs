@@ -40,6 +40,9 @@ public partial class AppSettings : ObservableObject
     private ThumbnailMode thumbsMode = ThumbnailMode.Off;
 
     [ObservableProperty]
+    private bool movieThumbsEnabled = false;
+
+    [ObservableProperty]
     private bool persistThumbs = true;
 
     [ObservableProperty]

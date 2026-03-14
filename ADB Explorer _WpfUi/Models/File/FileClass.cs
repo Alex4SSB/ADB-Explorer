@@ -86,12 +86,12 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         }
     }
 
-    public BitmapSource LargeIcon => CacheThumbnail ?? LargeFileIcon;
+    public BitmapSource LargeIcon => CacheThumbnail?.Image ?? LargeFileIcon;
 
-    private BitmapSource LargeFileIcon => FileToIconConverter.GetBitmapSource(this);
+    private BitmapSource LargeFileIcon => FileToIconConverter.GetImage(this, 120).First();
 
-    private BitmapSource? _cacheThumbnail = null;
-    private BitmapSource? CacheThumbnail
+    private ThumbnailHelper.Thumbnail? _cacheThumbnail = null;
+    private ThumbnailHelper.Thumbnail? CacheThumbnail
     {
         get
         {
@@ -109,6 +109,24 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             }
 
             return _cacheThumbnail;
+        }
+    }
+
+    public BitmapSource? LargeIconOverlay
+    {
+        get
+        {
+            var icons = FileToIconConverter.GetImage(this, 48);
+
+            if (CacheThumbnail is null || CacheThumbnail?.Type is not ThumbnailHelper.MediaType.video)
+            {
+                if (icons.Count() > 1 && icons.ElementAt(1) is BitmapSource icon2)
+                    return icon2;
+
+                return null;
+            }
+
+            return icons.FirstOrDefault();
         }
     }
 
@@ -491,7 +509,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     public void GetIcon()
     {
-        var icons = FileToIconConverter.GetImage(this, true).ToArray();
+        var icons = FileToIconConverter.GetImage(this, 16).ToArray();
 
         if (icons.Length > 0 && icons[0] is BitmapSource icon)
             Icon = icon;

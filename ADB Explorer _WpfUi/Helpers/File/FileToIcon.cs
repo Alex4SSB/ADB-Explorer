@@ -344,21 +344,19 @@ public class FileToIconConverter
     };
 
     public static BitmapSource GetImage(string fileName, int iconSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.Regular)
-    {
-        IconSize size = iconSize switch
-        {
-            <= 16 => IconSize.Small,
-            <= 32 => IconSize.Large,
-            <= 48 => IconSize.ExtraLarge,
-            _ => IconSize.Jumbo,
-        };
+        => AddToDictionary<BitmapSource>(fileName, SizeToIconSize(iconSize), iconSize, specialType);
 
-        return AddToDictionary<BitmapSource>(fileName, size, iconSize, specialType);
-    }
-
-    public static IEnumerable<BitmapSource> GetImage(FilePath file, bool smallIcon = true)
+    private static IconSize SizeToIconSize(int iconSize) => iconSize switch
     {
-        var size = smallIcon ? IconSize.Small : IconSize.Jumbo;
+        <= 16 => IconSize.Small,
+        <= 32 => IconSize.Large,
+        <= 48 => IconSize.ExtraLarge,
+        _ => IconSize.Jumbo,
+    };
+
+    public static IEnumerable<BitmapSource> GetImage(FilePath file, int iconSize = 16)
+    {
+        var size = SizeToIconSize(iconSize);
         var specialType = file.SpecialType;
 
         if (specialType is 0)
@@ -373,13 +371,13 @@ public class FileToIconConverter
         else
         {
             // Get icon without link overlay
-            yield return AddToDictionary<BitmapSource>(file.FullName, size, smallIcon ? 16 : 96, specialType & ~AbstractFile.SpecialFileType.LinkOverlay);
+            yield return AddToDictionary<BitmapSource>(file.FullName, size, iconSize, specialType & ~AbstractFile.SpecialFileType.LinkOverlay);
         }
 
         if (specialType.HasFlag(AbstractFile.SpecialFileType.LinkOverlay))
         {
             // Get link overlay if required
-            yield return AddToDictionary<BitmapSource>(file.FullName, size, smallIcon ? 16 : 96, AbstractFile.SpecialFileType.LinkOverlay);
+            yield return AddToDictionary<BitmapSource>(file.FullName, size, iconSize, AbstractFile.SpecialFileType.LinkOverlay);
         }
     }
 

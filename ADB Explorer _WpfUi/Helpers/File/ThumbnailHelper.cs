@@ -1,14 +1,24 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
-using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Helpers;
 
 public static partial class ThumbnailHelper
 {
+    public enum MediaType
+    {
+        images,
+        video,
+    }
+
+    private record struct ThumbnailEntry(string Id, MediaType Type);
+
+    public record struct Thumbnail(BitmapSource Image, MediaType Type);
+
     private const string DCIM_THUMBNAILS     = "/sdcard/DCIM/.thumbnails";
     private const string PICTURES_THUMBNAILS = "/sdcard/Pictures/.thumbnails";
+    private const string MOVIES_THUMBNAILS   = "/sdcard/Movies/.thumbnails";
 
     private static readonly Mutex _mutex = new(false);
 
@@ -17,9 +27,10 @@ public static partial class ThumbnailHelper
     private struct DeviceThumbnailInfo
     {
         public string DeviceId { get; init; }
-        public string DeviceThumbnailDir { get; init; }
+        public string DevicePicturesThumbnailDir { get; init; }
+        public string? DeviceMoviesThumbnailDir { get; init; }
         public string LocalThumbnailDir { get; set; }
-        public Dictionary<string, string> ThumbnailPathCache { get; set; }
+        public Dictionary<string, ThumbnailEntry> ThumbnailPathCache { get; set; }
     }
 
     [GeneratedRegex(@"Row: \d+ _id=(?<ID>\d+), _data=(?<Path>.+)", RegexOptions.Multiline)]
@@ -40,16 +51,25 @@ public static partial class ThumbnailHelper
             return info;
         }
 
-        var existingDirs = ADBService.PathsExist(deviceId, DCIM_THUMBNAILS, PICTURES_THUMBNAILS);
+        var existingDirs = ADBService.PathsExist(deviceId, DCIM_THUMBNAILS, PICTURES_THUMBNAILS, MOVIES_THUMBNAILS);
         if (existingDirs.Length == 0)
         {
             _mutex.ReleaseMutex();
             return null;
         }
 
-        string result = existingDirs[0].TrimEnd('/');
+        var pics = existingDirs[0].TrimEnd('/');
+        var movies = Data.Settings.MovieThumbsEnabled && existingDirs.Length > 1
+            ? existingDirs[1].TrimEnd('/')
+            : null;
 
-        DeviceThumbnailInfo item = new() { DeviceId = deviceId, DeviceThumbnailDir = result };
+        DeviceThumbnailInfo item = new()
+        { 
+            DeviceId = deviceId, 
+            DevicePicturesThumbnailDir = pics,
+            DeviceMoviesThumbnailDir = movies,
+        };
+
         _deviceInfoCache.Add(item);
 
         _mutex.ReleaseMutex();
@@ -57,7 +77,7 @@ public static partial class ThumbnailHelper
     }
 
     public static string? DeviceThumbsDir(string deviceId)
-        => GetThumbnailDir(deviceId)?.DeviceThumbnailDir;
+        => GetThumbnailDir(deviceId)?.DevicePicturesThumbnailDir;
 
     public static void InvalidateThumbnailDirCache(string deviceId)
         => _deviceInfoCache.RemoveAll(d => d.DeviceId == deviceId);
@@ -75,9 +95,9 @@ public static partial class ThumbnailHelper
             && !string.IsNullOrEmpty(info.LocalThumbnailDir);
     }
 
-    public static BitmapSource? LoadThumbnail(ADBService.AdbDevice device, string filePath)
+    public static Thumbnail? LoadThumbnail(ADBService.AdbDevice device, string filePath)
     {
-        if (GetThumbnailName(device.ID, filePath) is not string thumbnailName)
+        if (GetThumbnailName(device.ID, filePath) is not ThumbnailEntry entry)
             return null;
 
         if (GetLocalThumbPath(device) is not string localThumbnailDir)
@@ -85,13 +105,13 @@ public static partial class ThumbnailHelper
 
         try
         {
-            var fullPath = Path.Combine(localThumbnailDir, thumbnailName);
+            var fullPath = Path.Combine(localThumbnailDir, entry.Id);
             if (!File.Exists(fullPath))
                 return null;
 
             using var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
             var decoder = BitmapDecoder.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
-            return decoder.Frames[0];
+            return new(decoder.Frames[0], entry.Type);
         }
         catch
         {
@@ -99,7 +119,7 @@ public static partial class ThumbnailHelper
         }
     }
 
-    private static string? GetThumbnailName(string deviceId, string filePath)
+    private static ThumbnailEntry? GetThumbnailName(string deviceId, string filePath)
     {
         if (GetThumbnailDir(deviceId) is not DeviceThumbnailInfo deviceInfo)
             return null;
@@ -110,14 +130,23 @@ public static partial class ThumbnailHelper
         if (deviceInfo.ThumbnailPathCache is null || deviceInfo.ThumbnailPathCache.Count == 0)
         {
             deviceInfo.ThumbnailPathCache = [];
-            var stdout = GetThumbsFromDevice(deviceId, CancellationToken.None);
-            var thumbnailMap = ParseThumbnailMap(stdout);
+            var picsResponse = GetThumbsFromDevice(deviceId, MediaType.images, CancellationToken.None);
+            var thumbnailMap = ParseThumbnailMap(picsResponse, MediaType.images);
+
+            string moviesResponse = Data.Settings.MovieThumbsEnabled
+                ? GetThumbsFromDevice(deviceId, MediaType.video, CancellationToken.None)
+                : "";
+
+            var moviesThumbnailMap = ParseThumbnailMap(moviesResponse, MediaType.video);
 
             if (thumbnailMap is null || !thumbnailMap.Any())
                 // Cache an almost empty dictionary to avoid repeated ADB calls
-                deviceInfo.ThumbnailPathCache = new([new KeyValuePair<string, string>("", "")]);
+                deviceInfo.ThumbnailPathCache = new([new KeyValuePair<string, ThumbnailEntry>("", new())]);
             else
-                deviceInfo.ThumbnailPathCache = thumbnailMap.ToDictionary();
+            {
+                IEnumerable<KeyValuePair<string, ThumbnailEntry>> combined = [.. thumbnailMap, .. moviesThumbnailMap];
+                deviceInfo.ThumbnailPathCache = combined.ToDictionary();
+            }
 
             _deviceInfoCache.RemoveAll(d => d.DeviceId == deviceId);
             _deviceInfoCache.Add(deviceInfo);
@@ -142,12 +171,17 @@ public static partial class ThumbnailHelper
             return deviceInfo.LocalThumbnailDir;
         }
 
-        FileClass file = new("", deviceInfo.DeviceThumbnailDir, AbstractFile.FileType.Folder);
+        FileClass pics = new ("", deviceInfo.DevicePicturesThumbnailDir, AbstractFile.FileType.Folder);
+
+        FileClass movies = deviceInfo.DeviceMoviesThumbnailDir is null
+            ? new("", "", AbstractFile.FileType.Unknown)
+            : new("", deviceInfo.DeviceMoviesThumbnailDir, AbstractFile.FileType.Folder);
+
         var deviceDir = Directory.CreateDirectory(Path.Combine(Data.AppDataPath, device.ID)).FullName;
 
-        FileActionLogic.SilentPullFiles(device, deviceDir, Data.Settings.LimitThumbsPullSpeed, file);
+        FileActionLogic.SilentPullFiles(device, deviceDir, Data.Settings.LimitThumbsPullSpeed, pics, movies);
 
-        deviceDir = Path.Combine(deviceDir, Path.GetFileName(deviceInfo.DeviceThumbnailDir));
+        deviceDir = Path.Combine(deviceDir, Path.GetFileName(deviceInfo.DevicePicturesThumbnailDir));
         deviceInfo.LocalThumbnailDir = deviceDir;
 
         _deviceInfoCache.RemoveAll(d => d.DeviceId == device.ID);
@@ -158,7 +192,7 @@ public static partial class ThumbnailHelper
         return deviceDir;
     }
 
-    private static IEnumerable<KeyValuePair<string, string>> ParseThumbnailMap(string stdout)
+    private static IEnumerable<KeyValuePair<string, ThumbnailEntry>> ParseThumbnailMap(string stdout, MediaType type)
     {
         foreach (Match match in RE_THUMBNAIL_PATH().Matches(stdout))
         {
@@ -166,18 +200,18 @@ public static partial class ThumbnailHelper
                 continue;
 
             var path = match.Groups["Path"].Value.TrimEnd();
-            yield return new(path, $"{match.Groups["ID"].Value}.jpg");
+            yield return new(path, new($"{match.Groups["ID"].Value}.jpg", type));
         }
     }
 
-    private static string GetThumbsFromDevice(string deviceId, CancellationToken cancellationToken)
+    private static string GetThumbsFromDevice(string deviceId, MediaType media, CancellationToken cancellationToken)
     {
         ADBService.ExecuteDeviceAdbShellCommand(
                     deviceId, "content",
                     out string stdout, out _,
                     cancellationToken,
                     "query",
-                    "--uri", "content://media/external/images/media",
+                    "--uri", $"content://media/external/{media}/media",
                     "--projection", "_id:_data"
                 );
 

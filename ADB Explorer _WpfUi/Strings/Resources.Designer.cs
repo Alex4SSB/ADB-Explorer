@@ -3637,6 +3637,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Include Video Thumbnails.
+        /// </summary>
+        public static string S_SETTINGS_VIDEO_THUMBNAILS {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_VIDEO_THUMBNAILS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select ROM for sideload.
         /// </summary>
         public static string S_SIDELOAD_ROM_TITLE {
