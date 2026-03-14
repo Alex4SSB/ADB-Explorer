@@ -112,32 +112,9 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         }
     }
 
-    public BitmapSource? LargeIconOverlay
-    {
-        get
-        {
-            if (IconOverlay is not null)
-            {
-                var icons = FileToIconConverter.GetImage(this, 64);
-                if (icons.Count() > 1 && icons.ElementAt(1) is BitmapSource icon2)
-                    return icon2;
-            }
-            return null;
-        }
-    }
-
-    public BitmapSource? VideoIconOverlay
-    {
-        get
-        {
-            if (CacheThumbnail is null || CacheThumbnail?.Type is not ThumbnailHelper.MediaType.video)
-            {
-                return null;
-            }
-
-            return FileToIconConverter.GetImage(this, 32).FirstOrDefault();
-        }
-    }
+    private ViewModels.FileIconViewModel? _iconViewModel;
+    public ViewModels.FileIconViewModel IconViewModel 
+        => _iconViewModel ??= new ViewModels.FileIconViewModel(this);
 
     private DragDropEffects cutState = DragDropEffects.None;
     public DragDropEffects CutState

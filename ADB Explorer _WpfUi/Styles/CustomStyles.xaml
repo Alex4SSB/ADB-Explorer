@@ -922,11 +922,43 @@
     </Style>
     <Style x:Key="IconFileContainerStyle" TargetType="ui:ListViewItem">
         <Setter Property="Margin" Value="5" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
         <!--<Setter Property="IsSelected" Value="{Binding DriveSelected, Mode=TwoWay}" />
         <Setter Property="IsEnabled" Value="{Binding DriveEnabled}" />-->
+        <Setter Property="Template">
+            <!--  Template copied for modification from WPF UI  -->
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ui:ListViewItem}">
+                    <Border
+                        x:Name="SelectionBorder"
+                        BorderThickness="3"
+                        CornerRadius="4">
+                        <Border
+                            x:Name="Border"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="3">
+                            <ContentPresenter Margin="{TemplateBinding Padding}" />
+                        </Border>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsEnabled" Value="True" />
+                                <Condition Property="IsMouseOver" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource ListViewItemBackgroundPointerOver}" />
+                        </MultiTrigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="SelectionBorder" Property="BorderBrush" Value="{DynamicResource ListViewItemPillFillBrush}" />
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource ListViewItemBackgroundPointerOver}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 </ResourceDictionary>

@@ -1367,6 +1367,4 @@ public partial class ExplorerPageHeader : UserControl
     }
 
     private void EmptyNonRootTextBlock_Loaded(object sender, RoutedEventArgs e) => TextHelper.BuildLocalizedInlines(sender, e);
-
-    private void IconView_PreviewMouseWheel(object sender, MouseWheelEventArgs e) => StyleHelper.ItemScroll(sender, e);
 }

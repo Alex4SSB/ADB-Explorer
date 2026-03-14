@@ -12,9 +12,9 @@ public static partial class ThumbnailHelper
         video,
     }
 
-    private record struct ThumbnailEntry(string Id, MediaType Type);
+    public record struct ThumbnailInfo(string Id, MediaType Type, Size? Resolution, TimeSpan? Duration);
 
-    public record struct Thumbnail(BitmapSource Image, MediaType Type);
+    public record struct Thumbnail(BitmapSource Image, ThumbnailInfo Info);
 
     private const string DCIM_THUMBNAILS     = "/sdcard/DCIM/.thumbnails";
     private const string PICTURES_THUMBNAILS = "/sdcard/Pictures/.thumbnails";
@@ -30,10 +30,10 @@ public static partial class ThumbnailHelper
         public string DevicePicturesThumbnailDir { get; init; }
         public string? DeviceMoviesThumbnailDir { get; init; }
         public string LocalThumbnailDir { get; set; }
-        public Dictionary<string, ThumbnailEntry> ThumbnailPathCache { get; set; }
+        public Dictionary<string, ThumbnailInfo> ThumbnailPathCache { get; set; }
     }
 
-    [GeneratedRegex(@"Row: \d+ _id=(?<ID>\d+), _data=(?<Path>.+)", RegexOptions.Multiline)]
+    [GeneratedRegex(@"Row: \d+ _id=(?<ID>\d+), _data=(?<Path>.+), resolution=(?:(?<ResX>\d+).(?<ResY>\d+))?, duration=(?<Dur>\d+)?", RegexOptions.Multiline)]
     private static partial Regex RE_THUMBNAIL_PATH();
 
     /// <summary>
@@ -97,7 +97,7 @@ public static partial class ThumbnailHelper
 
     public static Thumbnail? LoadThumbnail(ADBService.AdbDevice device, string filePath)
     {
-        if (GetThumbnailName(device.ID, filePath) is not ThumbnailEntry entry)
+        if (GetThumbnailName(device.ID, filePath) is not ThumbnailInfo entry)
             return null;
 
         if (GetLocalThumbPath(device) is not string localThumbnailDir)
@@ -111,7 +111,7 @@ public static partial class ThumbnailHelper
 
             using var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
             var decoder = BitmapDecoder.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
-            return new(decoder.Frames[0], entry.Type);
+            return new(decoder.Frames[0], entry);
         }
         catch
         {
@@ -119,7 +119,7 @@ public static partial class ThumbnailHelper
         }
     }
 
-    private static ThumbnailEntry? GetThumbnailName(string deviceId, string filePath)
+    private static ThumbnailInfo? GetThumbnailName(string deviceId, string filePath)
     {
         if (GetThumbnailDir(deviceId) is not DeviceThumbnailInfo deviceInfo)
             return null;
@@ -131,7 +131,7 @@ public static partial class ThumbnailHelper
         {
             deviceInfo.ThumbnailPathCache = [];
             var picsResponse = GetThumbsFromDevice(deviceId, MediaType.images, CancellationToken.None);
-            var thumbnailMap = ParseThumbnailMap(picsResponse, MediaType.images);
+            var thumbnailMap = ParseThumbnailMap(picsResponse, MediaType.images).ToList();
 
             string moviesResponse = Data.Settings.MovieThumbsEnabled
                 ? GetThumbsFromDevice(deviceId, MediaType.video, CancellationToken.None)
@@ -141,10 +141,10 @@ public static partial class ThumbnailHelper
 
             if (thumbnailMap is null || !thumbnailMap.Any())
                 // Cache an almost empty dictionary to avoid repeated ADB calls
-                deviceInfo.ThumbnailPathCache = new([new KeyValuePair<string, ThumbnailEntry>("", new())]);
+                deviceInfo.ThumbnailPathCache = new([new KeyValuePair<string, ThumbnailInfo>("", new())]);
             else
             {
-                IEnumerable<KeyValuePair<string, ThumbnailEntry>> combined = [.. thumbnailMap, .. moviesThumbnailMap];
+                IEnumerable<KeyValuePair<string, ThumbnailInfo>> combined = [.. thumbnailMap, .. moviesThumbnailMap];
                 deviceInfo.ThumbnailPathCache = combined.ToDictionary();
             }
 
@@ -192,7 +192,7 @@ public static partial class ThumbnailHelper
         return deviceDir;
     }
 
-    private static IEnumerable<KeyValuePair<string, ThumbnailEntry>> ParseThumbnailMap(string stdout, MediaType type)
+    private static IEnumerable<KeyValuePair<string, ThumbnailInfo>> ParseThumbnailMap(string stdout, MediaType type)
     {
         foreach (Match match in RE_THUMBNAIL_PATH().Matches(stdout))
         {
@@ -200,7 +200,21 @@ public static partial class ThumbnailHelper
                 continue;
 
             var path = match.Groups["Path"].Value.TrimEnd();
-            yield return new(path, new($"{match.Groups["ID"].Value}.jpg", type));
+            var resX = match.Groups["ResX"];
+            var resY = match.Groups["ResY"];
+
+            Size? resolution = null;
+            if (resX.Success && resY.Success)
+            {
+                resolution = new(double.Parse(resX.Value), double.Parse(resY.Value));
+            }
+
+            var dur = match.Groups["Dur"]?.Value;
+            TimeSpan? duration = string.IsNullOrEmpty(dur)
+                ? null
+                : TimeSpan.FromMilliseconds(int.Parse(dur));
+
+            yield return new(path, new($"{match.Groups["ID"].Value}.jpg", type, resolution, duration));
         }
     }
 
@@ -212,7 +226,7 @@ public static partial class ThumbnailHelper
                     cancellationToken,
                     "query",
                     "--uri", $"content://media/external/{media}/media",
-                    "--projection", "_id:_data"
+                    "--projection", "_id:_data:resolution:duration"
                 );
 
         return stdout;

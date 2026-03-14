@@ -67,57 +67,24 @@
             <Setter Property="ItemTemplateSelector" Value="{StaticResource DriveTemplateSelector}" />
             <Setter Property="ItemContainerStyle" Value="{StaticResource DriveContainerStyle}" />
         </Style>
+        <views:FileIconView x:Key="FileIconView" />
         <Style
             x:Key="IconViewStyle"
             BasedOn="{StaticResource ListViewStyle}"
-            TargetType="ui:ListView">
+            TargetType="local:AdbListView">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsIconView}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+            <Setter Property="SnapsToDevicePixels" Value="False" />
             <Setter Property="SelectionMode" Value="Multiple" />
+            <Setter Property="IsItemScrolling" Value="True" />
             <Setter Property="ItemContainerStyle" Value="{StaticResource IconFileContainerStyle}" />
             <Setter Property="ItemTemplate">
                 <Setter.Value>
-                    <DataTemplate DataType="models:FileClass">
-                        <Grid
-                            Width="140"
-                            Height="140"
-                            Margin="4"
-                            SnapsToDevicePixels="False">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-                                <Grid HorizontalAlignment="Center">
-                                    <Image
-                                        MaxWidth="120"
-                                        MaxHeight="120"
-                                        HorizontalAlignment="Center"
-                                        Source="{Binding LargeIcon}" />
-                                    <Image
-                                        Width="32"
-                                        Height="32"
-                                        Margin="0,0,-16,0"
-                                        HorizontalAlignment="Right"
-                                        VerticalAlignment="Bottom"
-                                        Source="{Binding VideoIconOverlay}" />
-                                    <Image
-                                        Width="64"
-                                        Height="64"
-                                        Margin="0,0,0,14"
-                                        HorizontalAlignment="Left"
-                                        VerticalAlignment="Bottom"
-                                        Source="{Binding LargeIconOverlay}" />
-                                </Grid>
-                                <emoji:TextBlock
-                                    Grid.Row="1"
-                                    MaxHeight="60"
-                                    Margin="0,4,0,0"
-                                    HorizontalAlignment="Center"
-                                    Style="{StaticResource DirectoryGridCellStyle}"
-                                    Text="{Binding DisplayName}"
-                                    TextAlignment="Center"
-                                    TextWrapping="Wrap" />
-                            </Grid>
-                        </Grid>
+                    <DataTemplate>
+                        <views:FileIconView />
                     </DataTemplate>
                 </Setter.Value>
             </Setter>
@@ -225,27 +192,22 @@
                         </Expander>
                     </StackPanel>
                 </ScrollViewer>
-                <ui:ListView
+                <local:AdbListView
                     x:Name="IconView"
                     HorizontalAlignment="Stretch"
                     ItemsSource="{Binding ExplorerItemsSource}"
-                    PreviewMouseWheel="IconView_PreviewMouseWheel"
-                    SnapsToDevicePixels="False">
-                    <ui:ListView.ItemsPanel>
+                    Style="{StaticResource IconViewStyle}">
+                    <local:AdbListView.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel Width="{Binding RelativeSource={RelativeSource AncestorType=ui:ListView}, Path=ActualWidth}" />
+                            <ui:VirtualizingWrapPanel
+                                Width="{Binding RelativeSource={RelativeSource AncestorType=local:AdbListView}, Path=ActualWidth}"
+                                CacheLength="2,2"
+                                CacheLengthUnit="Page"
+                                IsVirtualizing="True"
+                                VirtualizationMode="Recycling" />
                         </ItemsPanelTemplate>
-                    </ui:ListView.ItemsPanel>
-                    <ui:ListView.Style>
-                        <Style BasedOn="{StaticResource IconViewStyle}" TargetType="ui:ListView">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsIconView}" Value="False">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ui:ListView.Style>
-                </ui:ListView>
+                    </local:AdbListView.ItemsPanel>
+                </local:AdbListView>
                 <Grid>
                     <Grid.Style>
                         <Style TargetType="Grid">

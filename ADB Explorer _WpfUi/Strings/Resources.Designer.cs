@@ -2545,6 +2545,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dimensions.
+        /// </summary>
+        public static string S_PICTURE_DIMENSIONS {
+            get {
+                return ResourceManager.GetString("S_PICTURE_DIMENSIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to IP Address / Host Name.
         /// </summary>
         public static string S_PLACEHOLDER_HOST {
@@ -3840,6 +3849,15 @@ namespace ADB_Explorer.Strings {
         public static string S_VALIDATION_ERROR {
             get {
                 return ResourceManager.GetString("S_VALIDATION_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Length.
+        /// </summary>
+        public static string S_VIDEO_DURATION {
+            get {
+                return ResourceManager.GetString("S_VIDEO_DURATION", resourceCulture);
             }
         }
         
