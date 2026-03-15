@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1434,5 +1434,29 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   </data>
   <data name="S_ENABLE_MDNS" xml:space="preserve">
     <value>Cliquez pour activer le serveur et l'interrogation</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value>Icônes</value>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>Tirer et afficher vignettes</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>Uniquement en vue icône</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>Uniquement dans répertoires photos</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value>Lors de la connexion</value>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>Persistance vignettes entre sessions</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>Limiter vitesse tirage vignettes</value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>Afficher icônes pour dossiers spéciaux</value>
   </data>
 </root>
