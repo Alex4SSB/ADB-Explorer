@@ -1459,4 +1459,13 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>显示特殊文件夹图标</value>
   </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>包含视频缩略图</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>长度</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>分辨率</value>
+  </data>
 </root>
