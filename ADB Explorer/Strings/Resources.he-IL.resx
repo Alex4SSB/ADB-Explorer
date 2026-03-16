@@ -1459,4 +1459,13 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>הצגת סמלים לתיקיות מיוחדות</value>
   </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>כולל תצוגה מקדימה של סרטונים</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>אורך</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>ממדים</value>
+  </data>
 </root>
