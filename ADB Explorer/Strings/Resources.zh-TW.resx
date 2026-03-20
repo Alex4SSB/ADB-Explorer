@@ -1062,34 +1062,34 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>遵循 Windows 驅動器根目錄命名規則</value>
   </data>
   <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
-    <value>當前文件夾内已有同名文件或當前路徑下唯一</value>
+    <value>目前位置有或無同名檔</value>
   </data>
   <data name="S_POPUP_WARNING" xml:space="preserve">
     <value>警告</value>
   </data>
   <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
-    <value>選中的文件違反了 Windows 命名規則</value>
+    <value>一個所選檔違背了 Windows 命名規則</value>
   </data>
   <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
-    <value>選中的文件違反了 Windows 驅動器命名規則</value>
+    <value>一個所選檔違背了 Windows 磁碟機根目錄的命名規則</value>
   </data>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
-    <value>某些選中的文件在 FUSE / Windows 上具有衝突的名稱</value>
+    <value>一些所選檔在 FUSE/Windows 上有彼此衝突的名稱</value>
   </data>
   <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>所選文件違反了 FUSE 命名規則</value>
+    <value>一個所選檔違背了 FUSE 命名規則</value>
   </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
-    <value>一些複製的文件在 FUSE 上有衝突的名稱</value>
+    <value>一些複製的檔案在 FUSE 上有衝突的名稱</value>
   </data>
   <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>複製的文件違反了 FUSE 命名規則</value>
+    <value>複製的檔案違背了 FUSE 命名規則</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
-    <value>選中的對象不是文件/文件夾</value>
+    <value>一個所選項目不是檔案/資料夾</value>
   </data>
   <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
-    <value>可以通過重置應用設置來撤銷，或者手動在設置文件中進行</value>
+    <value>可以通過重設應用程式設定來撤銷，或者手動在設定檔中撤銷</value>
   </data>
   <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
     <value>直到下次應用啓動</value>
