@@ -2437,6 +2437,42 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to One Day.
+        /// </summary>
+        public static string S_ONE_DAY {
+            get {
+                return ResourceManager.GetString("S_ONE_DAY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One Hour.
+        /// </summary>
+        public static string S_ONE_HOUR {
+            get {
+                return ResourceManager.GetString("S_ONE_HOUR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One Month.
+        /// </summary>
+        public static string S_ONE_MONTH {
+            get {
+                return ResourceManager.GetString("S_ONE_MONTH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One Week.
+        /// </summary>
+        public static string S_ONE_WEEK {
+            get {
+                return ResourceManager.GetString("S_ONE_WEEK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select ADB Executable.
         /// </summary>
         public static string S_OVERRIDE_ADB_BROWSE {
@@ -3588,6 +3624,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_THUMBNAIL_MODE {
             get {
                 return ResourceManager.GetString("S_SETTINGS_THUMBNAIL_MODE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Local Thumbnails Refresh Time.
+        /// </summary>
+        public static string S_SETTINGS_THUMBS_AGE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THUMBS_AGE", resourceCulture);
             }
         }
         
