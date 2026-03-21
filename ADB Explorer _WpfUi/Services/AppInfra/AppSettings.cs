@@ -33,8 +33,16 @@ public partial class AppSettings : ObservableObject
         OnConnect,
     }
 
-    #region paths
+    public enum ThumbnailAge
+    {
+        OneMonth,
+        OneWeek,
+        OneDay,
+        OneHour,
+    }
 
+    [ObservableProperty]
+    private ThumbnailAge thumbsAge = ThumbnailAge.OneMonth;
 
     [ObservableProperty]
     private ThumbnailMode thumbsMode = ThumbnailMode.Off;
@@ -50,6 +58,8 @@ public partial class AppSettings : ObservableObject
 
     [ObservableProperty]
     private bool specialFolderIcons = true;
+
+    #region paths
 
     private string defaultFolder = "";
     /// <summary>

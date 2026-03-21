@@ -1806,4 +1806,20 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Dimensions</value>
     <comment>Part of the tooltip of a picture file (dimensions = resolution)</comment>
   </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>One Month</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>One Week</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>One Day</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>One Hour</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>Local Thumbnails Refresh Time</value>
+    <comment>The setting used to control how long local persistent thumbnails should be used before updating them</comment>
+  </data>
 </root>

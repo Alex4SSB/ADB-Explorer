@@ -156,9 +156,15 @@ public static class UISettings
                     new(AppSettings.ThumbnailMode.IconViewOnly, Strings.Resources.S_SETTINGS_THUMBS_ICON_VIEW),
                     new(AppSettings.ThumbnailMode.OnPhotoDir, Strings.Resources.S_SETTINGS_THUMBS_PHOTO_DIR),
                     new(AppSettings.ThumbnailMode.OnConnect, Strings.Resources.S_SETTINGS_THUMBS_CONNECT) ],
-                icon: "\uE15A"),
+                    icon: "\uE15A"),
                 new BoolSetting(() => Settings.MovieThumbsEnabled, Strings.Resources.S_SETTINGS_VIDEO_THUMBNAILS, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uE8B2"),
                 new BoolSetting(() => Settings.PersistThumbs, Strings.Resources.S_SETTINGS_PERSIST_THUMBS, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uE78C"),
+                new ThumbsAgeSetting(() => Settings.ThumbsAge, Strings.Resources.S_SETTINGS_THUMBS_AGE, [
+                    new(AppSettings.ThumbnailAge.OneMonth, Strings.Resources.S_ONE_MONTH),
+                    new(AppSettings.ThumbnailAge.OneWeek, Strings.Resources.S_ONE_WEEK),
+                    new(AppSettings.ThumbnailAge.OneDay, Strings.Resources.S_ONE_DAY),
+                    new(AppSettings.ThumbnailAge.OneHour, Strings.Resources.S_ONE_HOUR)],
+                    icon: "\uE823"),
                 new BoolSetting(() => Settings.LimitThumbsPullSpeed, Strings.Resources.S_SETTINGS_THUMBS_THROTTLE, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uEC48"),
                 new BoolSetting(() => Settings.SpecialFolderIcons, Strings.Resources.S_SETTINGS_SPECIAL_DIR_ICONS, icon: "\uEC25"),
             ], "\uE8B9"),
@@ -587,6 +593,20 @@ public class ThumbsModeSetting : EnumSetting
     }
 
     public ThumbsModeSetting(Expression<Func<AppSettings.ThumbnailMode>> propertyExpr, string description, IEnumerable<EnumComboboxItem> enumNames, PropertyInfo visibleProp = null, string icon = null, params BaseAction[] commands)
+        : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
+    {
+        Buttons = [.. enumNames];
+    }
+}
+
+public class ThumbsAgeSetting : EnumSetting
+{
+    public AppSettings.ThumbnailAge Value
+    {
+        get => (AppSettings.ThumbnailAge)valueProp.GetValue(Settings);
+        set => valueProp.SetValue(Settings, value);
+    }
+    public ThumbsAgeSetting(Expression<Func<AppSettings.ThumbnailAge>> propertyExpr, string description, IEnumerable<EnumComboboxItem> enumNames, PropertyInfo visibleProp = null, string icon = null, params BaseAction[] commands)
         : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
     {
         Buttons = [.. enumNames];

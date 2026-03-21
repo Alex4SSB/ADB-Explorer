@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -819,7 +819,7 @@ Anuluj wszystkie uruchomione</value>
     <value>Zrestartuj ADB</value>
   </data>
   <data name="S_SERVER_DOWN" xml:space="preserve">
-    <value>Serwer jest wyłączony</value>
+    <value>Serwer mDNS jest wyłączony</value>
   </data>
   <data name="S_AWAITING_RESPONSE" xml:space="preserve">
     <value>Oczekiwanie na odpowiedź: {0}</value>
@@ -834,7 +834,7 @@ Anuluj wszystkie uruchomione</value>
     <value>{0}h</value>
   </data>
   <data name="S_MDNS_ON" xml:space="preserve">
-    <value>Serwer jest uruchomiony i działa</value>
+    <value>Serwer mDNS jest uruchomiony i działa</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Ograniczone wsparcie</value>
@@ -1038,10 +1038,10 @@ Anuluj wszystkie uruchomione</value>
     <value>Nie dotyczy</value>
   </data>
   <data name="S_PATH_INVALID" xml:space="preserve">
-    <value>Podana ścieżka nie istnieje.</value>
+    <value>Argument musi określać pełną ścieżkę nowego lub istniejącego pliku ustawień.</value>
   </data>
   <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
-    <value>Niestandardowa ścieżka danych aplikacji</value>
+    <value>Ścieżka niestandardowych ustawień aplikacji</value>
   </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Menu jest puste</value>
@@ -1431,5 +1431,41 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   </data>
   <data name="S_ENABLE_MDNS" xml:space="preserve">
     <value>Kliknij, aby włączyć serwer i statystyki</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>Sprawdzam status serwera mDNS…</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value>Ikony</value>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>Pociągnij i wyświetl miniatury</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>Tylko w widoku ikon</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>Tylko w katalogach zdjęć</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value>Po podłączeniu</value>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>Utrzymuj miniatury między sesjami</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>Ogranicz prędkość pobierania miniatur</value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>Pokaż ikony dla specjalnych folderów</value>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>Dołącz miniatury filmów</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>Długość</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>Wymiary</value>
   </data>
 </root>
