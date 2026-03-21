@@ -1459,4 +1459,28 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>Symbole für spezielle Ordner anzeigen</value>
   </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>Videominiaturansichten mit einbeziehen</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>Länge</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>Abmessungen</value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>Ein Monat</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>Eine Woche</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>Ein Tag</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>Eine Stunde</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>Auffrischungszeit für lokale Miniaturansichten</value>
+  </data>
 </root>
