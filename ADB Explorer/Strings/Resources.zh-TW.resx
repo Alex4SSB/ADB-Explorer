@@ -184,7 +184,7 @@
     <value>無法在所選設備上啓用 Root 權限。</value>
   </data>
   <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
-    <value>Root 權限</value>
+    <value>Root 存取權限</value>
   </data>
   <data name="S_DEL_CONF_TITLE" xml:space="preserve">
     <value>確認刪除</value>
@@ -193,10 +193,10 @@
     <value>永久刪除</value>
   </data>
   <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
-    <value>創建錯誤</value>
+    <value>新增時出錯</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>創建錯誤</value>
+    <value>還原時的衝突</value>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>確認解除安裝</value>
@@ -220,28 +220,28 @@
     <value>安裝套件</value>
   </data>
   <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
-    <value>配對並連接 WiFi 設備（不使用 mDNS）</value>
+    <value>配對且/或連接 WiFi 裝置 (不使用 mDNS)</value>
   </data>
   <data name="S_RESTART_APP" xml:space="preserve">
-    <value>重啓應用以使更改生效</value>
+    <value>重新啓侗應用程式，使變更生效</value>
   </data>
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
-    <value>檔案讀取錯誤</value>
+    <value>讀取檔案時出錯</value>
   </data>
   <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>無法拉取檔案以讀取内容。</value>
+    <value>無法複製檔案進來讀。</value>
   </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
-    <value>檔案寫入錯誤</value>
+    <value>寫入檔案時出錯</value>
   </data>
   <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>無法將檔案推送回設備。</value>
+    <value>無法複製檔案回裝置。</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>需要重啓 ADB 服務以禁用 mDNS。</value>
+    <value>需要重啓 ADB 服務以停用 mDNS。</value>
   </data>
   <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>禁用 mDNS</value>
+    <value>停用 mDNS</value>
   </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
     <value>在後臺啓動 WSA</value>
@@ -527,10 +527,10 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>强制 Fluent 風格</value>
   </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
-    <value>禁用硬件加速</value>
+    <value>停用硬體加速</value>
   </data>
   <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
-    <value>禁用動畫</value>
+    <value>停用動畫</value>
   </data>
   <data name="S_SETTINGS_SPLASH" xml:space="preserve">
     <value>顯示啓動畫面</value>
