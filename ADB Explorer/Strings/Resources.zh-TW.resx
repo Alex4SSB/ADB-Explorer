@@ -223,7 +223,7 @@
     <value>配對且/或連接 WiFi 裝置 (不使用 mDNS)</value>
   </data>
   <data name="S_RESTART_APP" xml:space="preserve">
-    <value>重新啓侗應用程式，使變更生效</value>
+    <value>重新啓動應用程式，使變更生效</value>
   </data>
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>讀取檔案時出錯</value>
@@ -247,39 +247,39 @@
     <value>在後臺啓動 WSA</value>
   </data>
   <data name="S_PULL_ACTION" xml:space="preserve">
-    <value>拉取文件</value>
+    <value>複製進來</value>
   </data>
   <data name="S_PULL_ACTION_LINK" xml:space="preserve">
-    <value>拉取 (Link Target)</value>
+    <value>複製進來 (符號連結的目標)</value>
   </data>
   <data name="S_RESTORE_ACTION" xml:space="preserve">
-    <value>恢復</value>
+    <value>還原</value>
   </data>
   <data name="S_REDIRECTION" xml:space="preserve">
-    <value>進度重置</value>
+    <value>進度輸出轉向</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>目錄列表錯誤</value>
+    <value>列出目錄清單出錯</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
-    <value>拉取到 Windows 驅動器根目錄</value>
+    <value>複製到 Windows 掛載點根目錄</value>
   </data>
   <data name="S_NEW_VERSION_MSG" xml:space="preserve">
-    <value>歡迎來到 ADB Explorer 的新版本！
-發行説明已在 Github 上發佈。</value>
+    <value>歡迎使用 ADB Explorer 的新版本！
+發行説明見 Github。</value>
   </data>
   <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSE 驅動器。
+    <value>FUSE 檔案系統磁碟機。
 • 不支援符號連結
 • 檔名不能包含 " * / : &lt; &gt; ? \ |
 • 檔名不區分大小寫
 • 不支援安裝 APK</value>
   </data>
   <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>應用程式啟用了流暢設計中的多種動畫效果。
-當應用程式視窗在副螢幕上最大化時，側邊檢視動畫將始終停用。
+    <value>應用程式啟用了Fluent 樣式中的多種動畫效果。
+若應用程式視窗在副螢幕上最大化，就停用側邊檢視動畫。
 
-• 勾選此設定將停用所有動畫效果（進度條、進度環和磁碟機使用狀態列除外）。</value>
+• 勾選此設定，將停用所有動畫效果（進度條、進度環和磁碟機使用狀態列除外）。</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>關閉應用程式後，所有設定將被重設。
