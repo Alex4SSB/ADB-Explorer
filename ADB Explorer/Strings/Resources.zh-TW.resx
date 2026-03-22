@@ -121,7 +121,7 @@
     <value>Android 機器人圖示</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
-    <value>Android 機器人是由 Google 建立和分享的作品重製或修改而成，並遵循《創用 CC 3.0 姓名標示授權》中的條款使用。</value>
+    <value>Android 機器人是由 Google 建立和分享的作品重製或修改而成，並遵循《創用 CC 3.0 授權》中的條款使用。</value>
   </data>
   <data name="S_ANIMATION_TITLE" xml:space="preserve">
     <value>應用程式動畫</value>
