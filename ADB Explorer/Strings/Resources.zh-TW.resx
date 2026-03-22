@@ -290,7 +290,7 @@
 如需授權 ADB，請開啟 WSA 進階設定。</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
-    <value>無法在 Windows 磁碟機根目錄下創建 {0} 個所選檔案。</value>
+    <value>無法在 Windows 磁碟機根目錄下建立 {0} 個所選檔案。</value>
   </data>
   <data name="S_ADB_LEARN_MORE" xml:space="preserve">
     <value>瞭解更多有關 ADB 的資訊</value>
@@ -768,7 +768,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>目標路徑</value>
   </data>
   <data name="S_COLUMN_ADDED" xml:space="preserve">
-    <value>創建時間</value>
+    <value>建立時間</value>
   </data>
   <data name="S_COLUMN_ICON" xml:space="preserve">
     <value>圖示</value>
@@ -1280,16 +1280,16 @@ ADB 包含在 Android SDK Platform Tools 中。
 請到 Weblate 幫助我們本地化此應用程式的語言。</value>
   </data>
   <data name="S_GOTO_WEBLATE" xml:space="preserve">
-    <value>開啟我們在 Weblate 專案的連結鈕內容</value>
+    <value>跳至 Weblate</value>
   </data>
   <data name="S_FILE_SOCKET" xml:space="preserve">
     <value>通訊端點 (Unix 檔案類型)</value>
   </data>
   <data name="S_FILE_BLOCK" xml:space="preserve">
-    <value>區塊式存取裝置</value>
+    <value>區塊式存取的裝置</value>
   </data>
   <data name="S_FILE_CHAR" xml:space="preserve">
-    <value>字元存取式裝置</value>
+    <value>字元式存取的裝置</value>
   </data>
   <data name="S_FILE_FIFO" xml:space="preserve">
     <value>FIFO (先送先讀)(Unix 檔案類型)</value>
@@ -1343,19 +1343,19 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>{0} B</value>
   </data>
   <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>複製 {0} 個</value>
+    <value>複製 {0} 項</value>
   </data>
   <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>複製 {0} 個到 {1}</value>
+    <value>複製 {0} 項到 {1}</value>
   </data>
   <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>移動 {0} 個到 {1}</value>
+    <value>移動 {0} 項到 {1}</value>
   </data>
   <data name="S_DRAGDROP_LINK" xml:space="preserve">
     <value>於 {0} 新增連結</value>
   </data>
   <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>移動 {0} 個</value>
+    <value>移動 {0} 項</value>
   </data>
   <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
     <value>貼上一個剪下項</value>
@@ -1376,16 +1376,16 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>完成 {0} 個，共 {1} 個</value>
   </data>
   <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
-    <value>複製 {0} 個</value>
+    <value>複製 {0} 項</value>
   </data>
   <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
-    <value>複製 {0} 個到 {1}</value>
+    <value>複製 {0} 項到 {1}</value>
   </data>
   <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
-    <value>移動 {0} 個</value>
+    <value>移動 {0} 項</value>
   </data>
   <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
-    <value>移動 {0} 個到 {1}</value>
+    <value>移動 {0} 項到 {1}</value>
   </data>
   <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
     <value>未找到檔案</value>
@@ -1394,10 +1394,10 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>未確認而離開了</value>
   </data>
   <data name="S_VALIDATION_ERROR" xml:space="preserve">
-    <value>操作錯誤: {0}</value>
+    <value>檔案有效性出錯: {0}</value>
   </data>
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
-    <value>檢查中…</value>
+    <value>檔案有效性檢查中…</value>
   </data>
   <data name="S_FILES_PLURAL" xml:space="preserve">
     <value>{0} 個檔案</value>
@@ -1439,10 +1439,10 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>圖示</value>
   </data>
   <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
-    <value>拉過來 &amp; 顯示縮圖</value>
+    <value>複製進來 &amp; 顯示縮圖</value>
   </data>
   <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
-    <value>僅在圖式檢視</value>
+    <value>僅以圖示檢視</value>
   </data>
   <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
     <value>僅在相片目錄</value>
@@ -1452,5 +1452,35 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>儲存各工作態的圖示</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>限制縮圖複製進來的速度</value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>顯示特殊資料夾的圖示</value>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>包括影音縮圖</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>長度</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>解析度</value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>一個月</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>一週</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>一天</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>一小時</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>本機縮圖重整時間</value>
   </data>
 </root>
