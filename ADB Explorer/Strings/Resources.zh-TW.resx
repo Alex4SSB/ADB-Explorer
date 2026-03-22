@@ -181,7 +181,7 @@
     <value>配對錯誤</value>
   </data>
   <data name="S_ROOT_FORBID" xml:space="preserve">
-    <value>無法在所選設備上啓用 Root 權限。</value>
+    <value>無法在所選裝置上啓用 Root 存取權限。</value>
   </data>
   <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
     <value>Root 存取權限</value>
@@ -211,7 +211,7 @@
     <value>刪除設備</value>
   </data>
   <data name="S_REM_DEV" xml:space="preserve">
-    <value>斷開設備連接</value>
+    <value>斷開裝置連接</value>
   </data>
   <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
     <value>檔案操作</value>
@@ -244,7 +244,7 @@
     <value>停用 mDNS</value>
   </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
-    <value>在後臺啓動 WSA</value>
+    <value>在背景啓動 WSA</value>
   </data>
   <data name="S_PULL_ACTION" xml:space="preserve">
     <value>複製進來</value>
@@ -276,14 +276,14 @@
 • 不支援安裝 APK</value>
   </data>
   <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>應用程式啟用了Fluent 樣式中的多種動畫效果。
+    <value>應用程式啟用了Fluent 風格中的多種動畫效果。
 若應用程式視窗在副螢幕上最大化，就停用側邊檢視動畫。
 
 • 勾選此設定，將停用所有動畫效果（進度條、進度環和磁碟機使用狀態列除外）。</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>關閉應用程式後，所有設定將被重設。
-此操作無法復原，您確定嗎？</value>
+此操作無法還原，您確定嗎？</value>
   </data>
   <data name="S_WSA_LAUNCH" xml:space="preserve">
     <value>若 ADB 已在 WSA 中授權，請直接點擊啟動。
@@ -299,10 +299,10 @@
     <value>下載 ADB</value>
   </data>
   <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>指定 ADB（至少 v{0}）：</value>
+    <value>找到 ADB (至少 v{0}):</value>
   </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
-    <value>更改</value>
+    <value>變更</value>
   </data>
   <data name="S_SELECT_ADB_PATH" xml:space="preserve">
     <value>選擇 ADB 路徑</value>
@@ -314,10 +314,10 @@
     <value>更多資訊</value>
   </data>
   <data name="S_ENABLED" xml:space="preserve">
-    <value>啓用</value>
+    <value>已啓用</value>
   </data>
   <data name="S_DISABLED" xml:space="preserve">
-    <value>禁止</value>
+    <value>已停用</value>
   </data>
   <data name="S_NEW_VERSION" xml:space="preserve">
     <value>{0} 有新版本 {1} 可用</value>
@@ -335,20 +335,20 @@
     <value>ADB 可執行檔</value>
   </data>
   <data name="S_HELP_ON_ADB" xml:space="preserve">
-    <value>本應用程式是 ADB - Android Debug Bridge（Android 偵錯橋接器）的圖形化介面工具。
+    <value>本應用程式是 ADB - Android Debug Bridge (Android 偵錯橋接器) 的圖形化介面工具。
 使用前，請確認您的電腦已安裝 ADB。
 ADB 包含在 Android SDK Platform Tools 中。
 您可透過下方連結下載 SDK Platform Tools。
 由於授權限制，我們無法隨應用程式直接提供 ADB。</value>
   </data>
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
-    <value>ADB 幫助</value>
+    <value>ADB 說明</value>
   </data>
   <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>立即重啓 ADB</value>
+    <value>立即重新啓動 ADB</value>
   </data>
   <data name="S_RESTART_LATER" xml:space="preserve">
-    <value>稍後重啓</value>
+    <value>稍後重新啓動</value>
   </data>
   <data name="S_ITEM_DESTINATION" xml:space="preserve">
     <value>為 {0} 選擇目標資料夾</value>
@@ -357,11 +357,11 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>為多個項目選擇目標資料夾</value>
   </data>
   <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>以下内容將被刪除：
+    <value>以下内容將被刪除:
 {0}</value>
   </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
-    <value>以下内容將被永久刪除：
+    <value>以下内容將被永久刪除:
 {0}</value>
   </data>
   <data name="S_NEW_ITEM" xml:space="preserve">
@@ -371,7 +371,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>新增資料夾</value>
   </data>
   <data name="S_CC_NAME" xml:space="preserve">
-    <value>知識共享</value>
+    <value>Creative Commons</value>
   </data>
   <data name="S_LS_ERROR" xml:space="preserve">
     <value>嘗試列出此資料夾內容時發生錯誤。
@@ -393,7 +393,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>終止 {0}</value>
   </data>
   <data name="S_REM_APK" xml:space="preserve">
-    <value>以下内容將被刪除：
+    <value>以下内容將被刪除:
 {0}</value>
   </data>
   <data name="S_REM_APK_PLURAL" xml:space="preserve">
@@ -401,7 +401,7 @@ ADB 包含在 Android SDK Platform Tools 中。
 {0} 套件</value>
   </data>
   <data name="S_UNINSTALL" xml:space="preserve">
-    <value>卸載</value>
+    <value>解除安裝</value>
   </data>
   <data name="S_CANCEL" xml:space="preserve">
     <value>取消</value>
@@ -413,34 +413,34 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>跳過</value>
   </data>
   <data name="S_REPLACE" xml:space="preserve">
-    <value>替換</value>
+    <value>取代</value>
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
-    <value>合并或替換</value>
+    <value>合併或取代</value>
   </data>
   <data name="S_CONFLICT_ITEMS" xml:space="preserve">
     <value>有一個衝突</value>
   </data>
   <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>{0} 個中有一個衝突</value>
+    <value>於 {0} 有一個衝突</value>
   </data>
   <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
     <value>有 {0} 個衝突</value>
   </data>
   <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value>{1} 中有 {0} 個衝突</value>
+    <value>於 {1} 有 {0} 個衝突</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>粘貼衝突</value>
+    <value>貼上時衝突</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
-    <value>選擇要推送的資料夾</value>
+    <value>選擇要複製過去的資料夾</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
-    <value>選擇要推送至 {0} 的資料夾</value>
+    <value>選擇要複製 {0} 過去的資料夾</value>
   </data>
   <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
-    <value>選擇要推送的檔案</value>
+    <value>選擇要複製過去的檔案</value>
   </data>
   <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
     <value>選擇要推送至 {0} 的檔案</value>
@@ -452,31 +452,31 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>開關 mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
-    <value>對設備輪詢</value>
+    <value>對裝置輪詢</value>
   </data>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
     <value>對電池狀態輪詢</value>
   </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
-    <value>自動啓用 Root 權限</value>
+    <value>自動啓用 Root 存取權限</value>
   </data>
   <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
-    <value>儲存手動連接的設備</value>
+    <value>儲存手動連接的裝置</value>
   </data>
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
-    <value>自動打開以進行瀏覽</value>
+    <value>自動開啟以瀏覽</value>
   </data>
   <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>啓用緊凑檢視</value>
+    <value>緊凑檢視</value>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
-    <value>停止 Push / Pull 輪詢</value>
+    <value>停止 複製進來 / 複製過去 時的輪詢</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
     <value>允許在不同裝置同時操作</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
-    <value>在 Push 時强制媒體重新掃描</value>
+    <value>在複製過去時强制媒體重新掃描</value>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
     <value>對裝置輪詢</value>
@@ -488,10 +488,10 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>顯示檔案副檔名</value>
   </data>
   <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
-    <value>顯示隱藏的對象</value>
+    <value>顯示隱藏的項目</value>
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
-    <value>顯示系統應用</value>
+    <value>顯示系統應用程式</value>
   </data>
   <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
     <value>雙擊檔案</value>
@@ -500,7 +500,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>無</value>
   </data>
   <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
-    <value>拉取到預設資料夾</value>
+    <value>複製進到預設資料夾</value>
   </data>
   <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
     <value>在編輯器中打開</value>
@@ -518,7 +518,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>深色</value>
   </data>
   <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
-    <value>跟隨 Windows 默認主題</value>
+    <value>Windows 預設主題</value>
   </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>主題</value>
@@ -548,10 +548,10 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>檔案管理器</value>
   </data>
   <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
-    <value>驅動程序和功能</value>
+    <value>磁碟機 &amp; 功能</value>
   </data>
   <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
-    <value>設備</value>
+    <value>裝置</value>
   </data>
   <data name="S_DONATE" xml:space="preserve">
     <value>捐贈或資助</value>
@@ -560,7 +560,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>應用程式資料的資料夾</value>
   </data>
   <data name="S_GITHUB_REPO" xml:space="preserve">
-    <value>GitHub 倉庫</value>
+    <value>GitHub 儲存庫</value>
   </data>
   <data name="S_PRIVACY_POLICY" xml:space="preserve">
     <value>隱私政策</value>
@@ -572,25 +572,25 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>查看條款</value>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
-    <value>[未設置]</value>
+    <value>[未設定]</value>
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
-    <value>搜索設置</value>
+    <value>搜尋設定</value>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
-    <value>退出搜索</value>
+    <value>退出搜尋</value>
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
-    <value>搜索視圖</value>
+    <value>搜尋檢視</value>
   </data>
   <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>全部摺叠</value>
+    <value>全部收合</value>
   </data>
   <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>展開所有</value>
+    <value>展開全部</value>
   </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
-    <value>設置</value>
+    <value>設定</value>
   </data>
   <data name="S_ACTION_HIDE" xml:space="preserve">
     <value>隱藏</value>
@@ -605,23 +605,23 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>篩選檔案操作</value>
   </data>
   <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
-    <value>應用自動處理</value>
+    <value>啟用自動播放</value>
   </data>
   <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
-    <value>禁用自動處理
-取消所有正在運行的任務</value>
+    <value>停用自動播放
+取消所有正在運行的工作</value>
   </data>
   <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
-    <value>日志更新操作已暫停</value>
+    <value>異動紀錄更新已暫停</value>
   </data>
   <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
-    <value>暫停日志更新</value>
+    <value>暫停異動紀錄更新</value>
   </data>
   <data name="S_BUTTON_LOG" xml:space="preserve">
-    <value>命令日志</value>
+    <value>命令異動紀錄</value>
   </data>
   <data name="S_BUTTON_DRIVES" xml:space="preserve">
-    <value>設備驅動</value>
+    <value>裝置磁碟機</value>
   </data>
   <data name="S_BUTTON_BACK" xml:space="preserve">
     <value>後退</value>
@@ -630,16 +630,16 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>前進</value>
   </data>
   <data name="S_BUTTON_UP" xml:space="preserve">
-    <value>上一級</value>
+    <value>上一層</value>
   </data>
   <data name="S_BUTTON_FILTER" xml:space="preserve">
-    <value>篩選</value>
+    <value>篩選器</value>
   </data>
   <data name="S_BUTTON_DEVICES" xml:space="preserve">
-    <value>設備</value>
+    <value>裝置</value>
   </data>
   <data name="S_BUTTON_PUSH" xml:space="preserve">
-    <value>推送</value>
+    <value>複製出去</value>
   </data>
   <data name="S_MENU_FOLDERS" xml:space="preserve">
     <value>資料夾</value>
@@ -648,7 +648,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>檔案</value>
   </data>
   <data name="S_MENU_REFRESH" xml:space="preserve">
-    <value>刷新</value>
+    <value>充新整理</value>
   </data>
   <data name="S_MENU_COPY" xml:space="preserve">
     <value>複製</value>
@@ -660,7 +660,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>編輯</value>
   </data>
   <data name="S_MENU_NEW" xml:space="preserve">
-    <value>新建</value>
+    <value>新增</value>
   </data>
   <data name="S_MENU_FOLDER" xml:space="preserve">
     <value>資料夾</value>
@@ -672,13 +672,13 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>全選</value>
   </data>
   <data name="S_MENU_CUT" xml:space="preserve">
-    <value>剪切</value>
+    <value>剪下</value>
   </data>
   <data name="S_MENU_PASTE_LINK" xml:space="preserve">
-    <value>粘貼鏈接</value>
+    <value>貼上連結</value>
   </data>
   <data name="S_MENU_RENAME" xml:space="preserve">
-    <value>重命名</value>
+    <value>重新命名</value>
   </data>
   <data name="S_MENU_PACKAGE" xml:space="preserve">
     <value>套件</value>
@@ -699,28 +699,28 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>複製到臨時目錄</value>
   </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
-    <value>清除命令日志</value>
+    <value>清除命令異動紀錄</value>
   </data>
   <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
     <value>打開項目所在位置</value>
   </data>
   <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
-    <value>在瀏覽器中搜索</value>
+    <value>在瀏覽器中搜尋</value>
   </data>
   <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
-    <value>複製到剪切板</value>
+    <value>複製到剪貼簿</value>
   </data>
   <data name="S_ADB_DISK_USAGE" xml:space="preserve">
-    <value>ADB 磁盤使用情況</value>
+    <value>ADB 磁碟使用情況</value>
   </data>
   <data name="S_DISK_USAGE_READ" xml:space="preserve">
-    <value>讀取速度：{0}</value>
+    <value>讀取速度: {0}</value>
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
-    <value>寫入速度：{0}</value>
+    <value>寫入速度: {0}</value>
   </data>
   <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
-    <value>其它速度：{0}</value>
+    <value>其他速度: {0}</value>
   </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>每次啓動時檢查更新</value>
@@ -729,28 +729,28 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>關於</value>
   </data>
   <data name="S_BROWSER_ITEMS" xml:space="preserve">
-    <value>對象</value>
+    <value>項目</value>
   </data>
   <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
-    <value>對象</value>
+    <value>項目</value>
   </data>
   <data name="S_FOLDER_EMPTY" xml:space="preserve">
     <value>此資料夾爲空。</value>
   </data>
   <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
-    <value>無法獲取列表。</value>
+    <value>無法獲取清單。</value>
   </data>
   <data name="S_EMPTY_FILTER" xml:space="preserve">
-    <value>沒有對象符合當前篩選條件。</value>
+    <value>沒有符合當前篩選條件的項目。</value>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
     <value>&lt;Span&gt;此資料夾&lt;Italic&gt;看來&lt;/Italic&gt;爲空&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;...對肉眼來説&lt;/Span&gt;&lt;/Span&gt;</value>
   </data>
   <data name="S_ITEMS_SELECTED" xml:space="preserve">
-    <value>選中的對象</value>
+    <value>選定的項目</value>
   </data>
   <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
-    <value>選中的對象</value>
+    <value>選定的項目</value>
   </data>
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
     <value>操作類型</value>
@@ -762,10 +762,10 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>進度</value>
   </data>
   <data name="S_COLUMN_SOURCE" xml:space="preserve">
-    <value>源路徑</value>
+    <value>來源徑名</value>
   </data>
   <data name="S_COLUMN_DESTINATION" xml:space="preserve">
-    <value>目標路徑</value>
+    <value>目標徑名</value>
   </data>
   <data name="S_COLUMN_ADDED" xml:space="preserve">
     <value>建立時間</value>
@@ -798,40 +798,40 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>版本</value>
   </data>
   <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
-    <value>ADB 服務器無響應</value>
+    <value>ADB 伺服器無回應</value>
   </data>
   <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
-    <value>服務器最近響應時間</value>
+    <value>伺服器上次回應時間</value>
   </data>
   <data name="S_SECONDS_SHORT" xml:space="preserve">
-    <value>{0}秒</value>
+    <value>{0} 秒</value>
   </data>
   <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>關閉服務器</value>
+    <value>終止服務器</value>
   </data>
   <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>關閉進程</value>
+    <value>終止進程</value>
   </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
-    <value>刷新設備</value>
+    <value>重整裝置</value>
   </data>
   <data name="S_RESTART_ADB" xml:space="preserve">
-    <value>重啓 ADB</value>
+    <value>重新啓動 ADB</value>
   </data>
   <data name="S_SERVER_DOWN" xml:space="preserve">
     <value>mDNS 伺服器停運</value>
   </data>
   <data name="S_AWAITING_RESPONSE" xml:space="preserve">
-    <value>等待回復：{0}</value>
+    <value>等待回覆: {0}</value>
   </data>
   <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
-    <value>{0}毫秒</value>
+    <value>{0} 毫秒</value>
   </data>
   <data name="S_MINUTES_SHORT" xml:space="preserve">
-    <value>{0}分</value>
+    <value>{0} 分</value>
   </data>
   <data name="S_HOURS_SHORT" xml:space="preserve">
-    <value>{0}時</value>
+    <value>{0} 時</value>
   </data>
   <data name="S_MDNS_ON" xml:space="preserve">
     <value>mDNS 伺服器正常運作中</value>
@@ -843,22 +843,22 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>某些操作失敗了</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
-    <value>啓用 Root 權限</value>
+    <value>已啓用 Root 存取權限</value>
   </data>
   <data name="S_ROOT_POSSIBLE" xml:space="preserve">
-    <value>Root 權限可以被啓用</value>
+    <value>Root 存取權限可以被啓用</value>
   </data>
   <data name="S_RECOVERY_MODE" xml:space="preserve">
-    <value>恢復模式</value>
+    <value>還原模式</value>
   </data>
   <data name="S_BAT_VOLT" xml:space="preserve">
-    <value>電壓：{0}v</value>
+    <value>電壓: {0} v</value>
   </data>
   <data name="S_BAT_TEMP" xml:space="preserve">
-    <value>溫度：{0}°C</value>
+    <value>溫度: {0}°C</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>剩餘電量：{0}A</value>
+    <value>剩餘電量: {0}A</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>重啓到特定模式</value>
@@ -870,19 +870,19 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>Bootloader</value>
   </data>
   <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
-    <value>側載</value>
+    <value>非官方載入</value>
   </data>
   <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
-    <value>側載（自動重啓）</value>
+    <value>非官方載入 (自動重新啟動)</value>
   </data>
   <data name="S_STATUS_OFFLINE" xml:space="preserve">
-    <value>{0} - 離綫</value>
+    <value>{0} - 離線</value>
   </data>
   <data name="S_STATUS_UNAUTH" xml:space="preserve">
     <value>{0} - 未授權</value>
   </data>
   <data name="S_TYPE_EMULATOR" xml:space="preserve">
-    <value>虛擬設備</value>
+    <value>安卓裝置模擬器</value>
   </data>
   <data name="S_TYPE_SERVICE" xml:space="preserve">
     <value>mDNS 服務</value>
@@ -903,7 +903,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>{0}%，充電中</value>
   </data>
   <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
-    <value>無綫</value>
+    <value>無線</value>
   </data>
   <data name="S_BAT_SOURCE_AC" xml:space="preserve">
     <value>AC</value>
@@ -915,22 +915,22 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>未知</value>
   </data>
   <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
-    <value>正在充電</value>
+    <value>充電中</value>
   </data>
   <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
-    <value>使用電池</value>
+    <value>放電</value>
   </data>
   <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
-    <value>未充電</value>
+    <value>非充電</value>
   </data>
   <data name="S_BAT_STATE_FULL" xml:space="preserve">
     <value>充電完成</value>
   </data>
   <data name="S_BAT_STATUS" xml:space="preserve">
-    <value>狀態：{0}</value>
+    <value>狀態: {0}</value>
   </data>
   <data name="S_BAT_HEALTH" xml:space="preserve">
-    <value>健康：{0}</value>
+    <value>健康: {0}</value>
   </data>
   <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
     <value>優秀</value>
@@ -954,13 +954,13 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>啓動 WSA</value>
   </data>
   <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
-    <value>WSA 啓動器</value>
+    <value>WSA 啓動</value>
   </data>
   <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
     <value>不再顯示此消息。</value>
   </data>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
-    <value>關於</value>
+    <value>中斷</value>
   </data>
   <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
     <value>發送到 Shell</value>
@@ -969,10 +969,10 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>{0} 衝突</value>
   </data>
   <data name="S_PASTE" xml:space="preserve">
-    <value>粘貼</value>
+    <value>貼上</value>
   </data>
   <data name="S_DROP" xml:space="preserve">
-    <value>拖拽</value>
+    <value>拖放</value>
   </data>
   <data name="S_ACTION_OPERATION" xml:space="preserve">
     <value>操作</value>
@@ -981,13 +981,13 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>操作</value>
   </data>
   <data name="S_ACTION_VALIDATE" xml:space="preserve">
-    <value>驗證 {0}</value>
+    <value>檢查 {0} 的有效性</value>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
-    <value>鏈接</value>
+    <value>連結</value>
   </data>
   <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
-    <value>{0}（鏈接）</value>
+    <value>{0} (連結)</value>
   </data>
   <data name="S_FILE_TYPE_APK" xml:space="preserve">
     <value>安卓應用程式套件</value>
@@ -1011,13 +1011,13 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>已安裝應用</value>
   </data>
   <data name="S_DRIVE_SD" xml:space="preserve">
-    <value>MicroSD卡</value>
+    <value>MicroSD 卡</value>
   </data>
   <data name="S_DRIVE_OTG" xml:space="preserve">
-    <value>OTG 存儲設備</value>
+    <value>OTG 磁碟機</value>
   </data>
   <data name="S_DRIVE_EMULATED" xml:space="preserve">
-    <value>虛擬驅動器</value>
+    <value>模擬器上的磁碟機</value>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>臨時目錄</value>
@@ -1026,7 +1026,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>{0} 檔名在目標檔案系統上無效</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
-    <value>内容不匹配</value>
+    <value>内容不符合</value>
   </data>
   <data name="S_VALIDATE_MISSING" xml:space="preserve">
     <value>缺失目標位置</value>
@@ -1038,10 +1038,10 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>N/A</value>
   </data>
   <data name="S_PATH_INVALID" xml:space="preserve">
-    <value>該參數必須指定新建立或現有設定檔的完整路徑。</value>
+    <value>一定得為參元指定現有或新設定檔的完整路徑。</value>
   </data>
   <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
-    <value>自定義應用程式設定檔路徑</value>
+    <value>自訂應用程式設定檔路徑</value>
   </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>選單爲空</value>
@@ -1050,7 +1050,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>複製對象 - {0}</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
-    <value>遵循 Unix 命名規則（通過 ADB）</value>
+    <value>遵循 Unix 命名規則 (通過 ADB)</value>
   </data>
   <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
     <value>遵循 FUSE 命名規則</value>
@@ -1059,10 +1059,10 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>遵循 Windows 命名規則</value>
   </data>
   <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
-    <value>遵循 Windows 驅動器根目錄命名規則</value>
+    <value>遵循 Windows 磁碟機根目錄命名規則</value>
   </data>
   <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
-    <value>目前位置有或無同名檔</value>
+    <value>目前位置必須無同名檔</value>
   </data>
   <data name="S_POPUP_WARNING" xml:space="preserve">
     <value>警告</value>
@@ -1101,7 +1101,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>WSA 應用程式</value>
   </data>
   <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
-    <value>Root 狀態：{0}</value>
+    <value>Root 狀態: {0}</value>
   </data>
   <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
     <value>未檢查</value>
@@ -1110,10 +1110,10 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>禁止</value>
   </data>
   <data name="S_BUTTON_ENABLE" xml:space="preserve">
-    <value>切換鈕 - 啟用</value>
+    <value>啟用</value>
   </data>
   <data name="S_BUTTON_DISABLE" xml:space="preserve">
-    <value>切換鈕 - 停用</value>
+    <value>停用</value>
   </data>
   <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
     <value>配對碼</value>
@@ -1125,10 +1125,10 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>端埠</value>
   </data>
   <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
-    <value>配對端埠</value>
+    <value>端埠配對</value>
   </data>
   <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
-    <value>配對 &amp; 連線</value>
+    <value>配對 &amp; 連接</value>
   </data>
   <data name="S_DEVICE_SAVED" xml:space="preserve">
     <value>已儲存的裝置</value>
@@ -1158,7 +1158,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>瀏覽</value>
   </data>
   <data name="S_BUTTON_CONNECT" xml:space="preserve">
-    <value>連線</value>
+    <value>連接</value>
   </data>
   <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
     <value>{1}，剩餘 {0}</value>
@@ -1179,7 +1179,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>錯誤: {0}</value>
   </data>
   <data name="S_FILEOP_VALIDATED" xml:space="preserve">
-    <value>完成操作與驗證</value>
+    <value>完成有效性檢查</value>
   </data>
   <data name="S_FILEOP_COMPLETED" xml:space="preserve">
     <value>已完成</value>
@@ -1197,7 +1197,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>執行中</value>
   </data>
   <data name="S_FILEOP_WAITING" xml:space="preserve">
-    <value>等待中</value>
+    <value>佇列等待中</value>
   </data>
   <data name="S_FILEOP_FAILED" xml:space="preserve">
     <value>失敗</value>
@@ -1448,7 +1448,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>僅在相片目錄</value>
   </data>
   <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
-    <value>於連線時</value>
+    <value>於連接時</value>
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>儲存各工作態的圖示</value>
