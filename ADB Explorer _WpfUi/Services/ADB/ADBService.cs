@@ -468,7 +468,9 @@ public partial class ADBService
     /// </remarks>
     public static void VerifyAdbVersion(string adbPath)
     {
-        if (string.IsNullOrEmpty(adbPath) || adbPath.StartsWith(@"\\"))   // Forbid UNC paths for security reasons
+        if (string.IsNullOrEmpty(adbPath) 
+            || adbPath.StartsWith(@"\\")                                                // Forbid UNC paths for security reasons
+            || new FileInfo(adbPath).Attributes.HasFlag(FileAttributes.ReparsePoint))   // Forbid symlinks  for security reasons
         {
             RuntimeSettings.AdbVersion = null;
             return;
@@ -484,7 +486,7 @@ public partial class ADBService
                 return;
             }
         }
-
+        
         bool isHashValid = false;
         var adbSHA = Security.CalculateWindowsFileHash(adbPath, true);
         if (adbSHA is not null)
