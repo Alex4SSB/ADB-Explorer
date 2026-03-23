@@ -869,10 +869,10 @@ Desafortunadamente, no podemos proporcionar ADB son la app debido a restriccione
     <value>Creative Commons</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
-    <value>Los ajustes utilizado para alternar el sondeo para dispositivos</value>
+    <value>Encuestas Para Dispositivos</value>
   </data>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
-    <value>Consulta del estado de la batería</value>
+    <value>Encuesta Para Estado de Batería</value>
   </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>Habilitar el acceso root automáticamente</value>
@@ -887,7 +887,7 @@ Desafortunadamente, no podemos proporcionar ADB son la app debido a restriccione
     <value>Vista Compacta</value>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
-    <value>Detener Sondeo en Importar/Exportar</value>
+    <value>Detener Encuesta en Importar/Exportar</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
     <value>Operaciones Simultáneas</value>
@@ -896,13 +896,13 @@ Desafortunadamente, no podemos proporcionar ADB son la app debido a restriccione
     <value>Forzar Re–análisis de Medios al Exportar</value>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
-    <value>Descargar para Unidades</value>
+    <value>Encuestas para campañas electorales</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
     <value>Asistencia APK</value>
   </data>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
-    <value>Mostrar Extensiones de Nombre de Archivo</value>
+    <value>Mostrar Extensiones del Nombre de Archivo</value>
   </data>
   <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
     <value>Mostrar Elementos Ocultos</value>
@@ -1323,7 +1323,7 @@ Cancelar Todas las Activas</value>
     <value>App WSA</value>
   </data>
   <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
-    <value>Estado de Raíz: {0}</value>
+    <value>Estado de raíz: {0}</value>
   </data>
   <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
     <value>Emparejando Código</value>
