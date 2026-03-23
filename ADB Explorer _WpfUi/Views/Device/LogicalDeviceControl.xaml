@@ -246,7 +246,11 @@
                             </Style>
                         </controls:AdbMenuItem.Style>
                         <controls:AdbMenuItem.Header>
-                            <ui:FontIcon Glyph="&#xE711;" />
+                            <ui:FontIcon
+                                Margin="-4,-5,-6,-5"
+                                FontSize="18"
+                                Glyph="&#xE711;"
+                                Style="{StaticResource GlyphFont}" />
                         </controls:AdbMenuItem.Header>
                     </controls:AdbMenuItem>
                     <controls:AdbMenuItem Command="{Binding SideloadCommand.Command}" ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_REBOOT_SIDELOAD}}">
@@ -260,7 +264,11 @@
                             </Style>
                         </controls:AdbMenuItem.Style>
                         <controls:AdbMenuItem.Header>
-                            <ui:FontIcon Glyph="&#xE67A;" />
+                            <ui:FontIcon
+                                Margin="-8"
+                                FontSize="18"
+                                Glyph="&#xE67A;"
+                                Style="{StaticResource GlyphFont}" />
                         </controls:AdbMenuItem.Header>
                     </controls:AdbMenuItem>
                 </controls:AdbMenu>
