@@ -90,21 +90,22 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     private BitmapSource LargeFileIcon => FileToIconConverter.GetImage(this, 120).First();
 
-    private ThumbnailHelper.Thumbnail? _cacheThumbnail = null;
-    private ThumbnailHelper.Thumbnail? CacheThumbnail
+    private ThumbnailService.Thumbnail? _cacheThumbnail = null;
+    private ThumbnailService.Thumbnail? CacheThumbnail
     {
         get
         {
-            if (_cacheThumbnail is null
-                && SpecialType is SpecialFileType.Regular)
+            if (_cacheThumbnail is null && Data.CurrentADBDevice.Type 
+                is AbstractDevice.DeviceType.Local 
+                or AbstractDevice.DeviceType.Remote)
             {
-                if (!ThumbnailHelper.IsInitialized(Data.CurrentADBDevice.ID))
+                if (!ThumbnailService.IsInitialized(Data.CurrentADBDevice.Device.LogicalID))
                 {
-                    Task.Run(() => ThumbnailHelper.ForceLoad(Data.CurrentADBDevice));
+                    Task.Run(() => ThumbnailService.ForceLoad(Data.CurrentADBDevice));
                 }
-                else if (ParentPath != ThumbnailHelper.DeviceThumbsDir(Data.CurrentADBDevice.ID))
+                else
                 {
-                    _cacheThumbnail = ThumbnailHelper.LoadThumbnail(Data.CurrentADBDevice, FullPath);
+                    _cacheThumbnail = ThumbnailService.LoadThumbnail(Data.CurrentADBDevice, FullPath);
                 }
             }
 

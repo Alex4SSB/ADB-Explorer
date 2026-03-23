@@ -1,0 +1,450 @@
+using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
+using ADB_Explorer.Services.AppInfra;
+
+namespace ADB_Explorer.Services;
+
+public static partial class ThumbnailService
+{
+    private const string DCIM_THUMBNAILS = "/sdcard/DCIM/.thumbnails";
+    private const string PICTURES_THUMBNAILS = "/sdcard/Pictures/.thumbnails";
+    private const string MOVIES_THUMBNAILS = "/sdcard/Movies/.thumbnails";
+    private const string CSV_CACHE_FILE = "thumbnailInfo.csv";
+    
+    static readonly TimeSpan MONTH = TimeSpan.FromDays(30);
+    static readonly TimeSpan WEEK = TimeSpan.FromDays(7);
+    static readonly TimeSpan DAY = TimeSpan.FromDays(1);
+    static readonly TimeSpan HOUR = TimeSpan.FromHours(1);
+
+    static readonly Encoding CsvEncoding = new UTF8Encoding(true);
+
+    public enum MediaType
+    {
+        images,
+        video,
+    }
+
+    public record struct ThumbnailInfo(string Id, MediaType Type, Size? Resolution, TimeSpan? Duration, DateTime LastUpdate)
+    {
+        const string CsvDateFormat = "yyyy-MM-dd_HH:mm";
+
+        public readonly string ToCsv() => $"{Id}|{Type}|{Resolution?.Width}|{Resolution?.Height}|{Duration?.TotalMilliseconds}|{(LastUpdate == DateTime.MinValue ? null : LastUpdate.ToString(CsvDateFormat))}";
+
+        public static ThumbnailInfo? FromCsv(string csv)
+        {
+            var parts = csv.Split('|');
+            if (parts.Length != 6)
+                return null;
+
+            string id = parts[0];
+            MediaType type = Enum.Parse<MediaType>(parts[1]);
+            Size? resolution = (double.TryParse(parts[2], out double width) && double.TryParse(parts[3], out double height))
+                ? new Size(width, height)
+                : null;
+
+            TimeSpan? duration = double.TryParse(parts[4], out double ms)
+                ? TimeSpan.FromMilliseconds(ms)
+                : null;
+
+            DateTime lastUpdate = DateTime.TryParseExact(parts[5], CsvDateFormat, null, DateTimeStyles.None, out DateTime parsedDate)
+                ? parsedDate
+                : DateTime.MinValue;
+
+            return new(id, type, resolution, duration, lastUpdate);
+        }
+
+        public readonly bool IsOverdue
+        {
+            get
+            {
+                var age = DateTime.Now - LastUpdate;
+                
+                return Data.Settings.ThumbsAge switch
+                {
+                    AppSettings.ThumbnailAge.OneHour => age > HOUR,
+                    AppSettings.ThumbnailAge.OneDay => age > DAY,
+                    AppSettings.ThumbnailAge.OneWeek => age > WEEK,
+                    _ => age > MONTH,
+                };
+            }
+        }
+    }
+
+    public static event Action<string, string>? ThumbnailUpdated;
+
+    private static readonly Mutex _mutex = new(false);
+    private static readonly Mutex _listMutex = new(false);
+
+    private static readonly List<DeviceThumbnailInfo> _deviceInfoCache = [];
+
+    public record struct Thumbnail(BitmapSource Image, ThumbnailInfo Info);
+
+    private record struct DeviceThumbnailInfo
+    {
+        public DeviceThumbnailInfo(string deviceId)
+        {
+            DeviceId = deviceId;
+
+            PhysicalId = Data.DevicesObject.LogicalDeviceViewModels.FirstOrDefault(d => d.LogicalID == deviceId)?.ID ?? deviceId;
+        }
+
+        /// <summary>
+        /// Physical Device ID used for ADB commands.
+        /// </summary>
+        public string PhysicalId { get; }
+
+        /// <summary>
+        /// Logical Device ID, mDNS identifier is omitted. <br />
+        /// Might still not match USB ID.
+        /// </summary>
+        public string DeviceId { get; init; }
+        public string DevicePicturesThumbnailDir { get; set; }
+        public string? DeviceMoviesThumbnailDir { get; set; }
+        public string LocalThumbnailDir { get; set; }
+
+        /// <summary>
+        /// Key: Original file path on the device, Value: Thumbnail info (including thumbnail ID which corresponds to the local thumbnail file name)
+        /// </summary>
+        public Dictionary<string, ThumbnailInfo> ThumbnailPathCache { get; set; }
+    }
+
+    [GeneratedRegex(@"Row: \d+ _id=(?<ID>\d+), _data=(?<Path>.+), resolution=(?:(?<ResX>\d+).(?<ResY>\d+))?, duration=(?<Dur>\d+)?", RegexOptions.Multiline)]
+    private static partial Regex RE_THUMBNAIL_PATH();
+
+    private static DeviceThumbnailInfo? GetDeviceThumbsInfo(string logicalDeviceId)
+    {
+        if (_deviceInfoCache.FirstOrDefault(d => d.DeviceId == logicalDeviceId) is DeviceThumbnailInfo info && !string.IsNullOrEmpty(info.DeviceId))
+        {
+            return info;
+        }
+
+        info = new(logicalDeviceId);
+
+        var existingDirs = ADBService.PathsExist(info.PhysicalId, DCIM_THUMBNAILS, PICTURES_THUMBNAILS, MOVIES_THUMBNAILS);
+        if (existingDirs.Length == 0)
+        {
+            return null;
+        }
+
+        info.DevicePicturesThumbnailDir = existingDirs[0].TrimEnd('/');
+        if (Data.Settings.MovieThumbsEnabled && existingDirs.Length > 1)
+            info.DeviceMoviesThumbnailDir = existingDirs[1].TrimEnd('/');
+        
+        _deviceInfoCache.Add(info);
+
+        return info;
+    }
+
+    public static void InvalidateThumbnailDirCache(string logicalDeviceId)
+        => _deviceInfoCache.RemoveAll(d => d.DeviceId == logicalDeviceId);
+
+    public static bool ForceLoad(ADBService.AdbDevice device)
+    {
+        if (!_mutex.WaitOne(0))
+            return false;
+
+        GetThumbnailName(device.Device.LogicalID, "");
+        var localPath = GetLocalThumbPath(device);
+
+        _mutex.ReleaseMutex();
+
+        return localPath is not null;
+    }
+
+    public static bool IsInitialized(string logicalDeviceId)
+    {
+        return _deviceInfoCache.FirstOrDefault(d => d.DeviceId == logicalDeviceId) is DeviceThumbnailInfo info
+            && !string.IsNullOrEmpty(info.LocalThumbnailDir);
+    }
+
+    public static Thumbnail? LoadThumbnail(ADBService.AdbDevice device, string filePath)
+    {
+        _mutex.WaitOne();
+        _mutex.ReleaseMutex();
+
+        if (GetThumbnailName(device.Device.LogicalID, filePath) is not ThumbnailInfo entry)
+            return null;
+
+        if (GetLocalThumbPath(device) is not string localThumbnailDir)
+            return null;
+
+        try
+        {
+            var fullPath = Path.Combine(localThumbnailDir, entry.Id);
+            if (!File.Exists(fullPath))
+                return null;
+
+            using var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var decoder = BitmapDecoder.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+            return new(decoder.Frames[0], entry);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static void DeviceThumbsToCsv(DeviceThumbnailInfo? deviceInfo)
+    {
+        if (deviceInfo is not DeviceThumbnailInfo info || info.ThumbnailPathCache is null || info.ThumbnailPathCache.Count == 0)
+            return;
+
+        var deviceDir = Path.Combine(Data.AppDataPath, info.DeviceId);
+        if (!Directory.Exists(deviceDir))
+            Directory.CreateDirectory(deviceDir);
+
+        var csvLines = info.ThumbnailPathCache.Select(kvp => $"{kvp.Key}|{kvp.Value.ToCsv()}");
+        var csvContent = string.Join(Environment.NewLine, csvLines);
+        var savePath = Path.Combine(deviceDir, CSV_CACHE_FILE);
+
+        File.WriteAllText(savePath, csvContent, CsvEncoding);
+    }
+
+    private static ThumbnailInfo? GetThumbnailName(string logicalDeviceId, string filePath)
+    {
+        if (GetDeviceThumbsInfo(logicalDeviceId) is not DeviceThumbnailInfo deviceInfo)
+            return null;
+
+        UpdateDeviceCache(deviceInfo);
+
+        _deviceInfoCache.First(d => d.DeviceId == logicalDeviceId).ThumbnailPathCache.TryGetValue(filePath, out var thumbnailPath);
+
+        return thumbnailPath;
+    }
+
+    private static void UpdateDeviceCache(DeviceThumbnailInfo deviceInfo)
+    {
+        if (deviceInfo.ThumbnailPathCache is null || deviceInfo.ThumbnailPathCache.Count == 0)
+        {
+            var cache = GetThumbsCacheFromCsv(deviceInfo);
+            
+            if (cache.Count == 0)
+            {
+                deviceInfo.ThumbnailPathCache = GetThumbsCacheFromDevice(deviceInfo);
+                DeviceThumbsToCsv(deviceInfo);
+            }
+            else
+            {
+                deviceInfo.ThumbnailPathCache = cache;
+                Task.Run(() => MergeDeviceWithLocalCache(deviceInfo));
+            }
+
+            UpdateCache(deviceInfo);
+        }
+    }
+
+    private static void MergeDeviceWithLocalCache(DeviceThumbnailInfo deviceInfo)
+    {
+        var deviceCache = GetThumbsCacheFromDevice(deviceInfo);
+        bool hasUpdates = false;
+
+        foreach (var kvp in deviceCache)
+        {
+            if (deviceInfo.ThumbnailPathCache.TryAdd(kvp.Key, kvp.Value))
+                hasUpdates = true;
+        }
+
+        if (!hasUpdates)
+            return;
+
+        UpdateCache(deviceInfo);
+        PullThumbnails(deviceInfo);
+    }
+
+    private static void UpdateCache(DeviceThumbnailInfo deviceInfo)
+    {
+        _listMutex.WaitOne();
+
+        _deviceInfoCache.RemoveAll(d => d.DeviceId == deviceInfo.DeviceId);
+        _deviceInfoCache.Add(deviceInfo);
+
+        _listMutex.ReleaseMutex();
+    }
+
+    private static Dictionary<string, ThumbnailInfo> GetThumbsCacheFromCsv(DeviceThumbnailInfo deviceInfo)
+    {
+        var cache = new Dictionary<string, ThumbnailInfo>();
+        var csvPath = Path.Combine(Data.AppDataPath, deviceInfo.DeviceId, CSV_CACHE_FILE);
+        if (!File.Exists(csvPath))
+            return [];
+
+        var lines = File.ReadAllLines(csvPath, CsvEncoding);
+
+        foreach (var line in lines)
+        {
+            var parts = line.Split('|', 2);
+            if (parts.Length != 2)
+                continue;
+
+            var path = parts[0];
+            var infoCsv = parts[1];
+            if (ThumbnailInfo.FromCsv(infoCsv) is ThumbnailInfo info)
+            {
+                cache.TryAdd(path, info);
+            }
+        }
+
+        return cache;
+    }
+
+    private static Dictionary<string, ThumbnailInfo> GetThumbsCacheFromDevice(DeviceThumbnailInfo deviceInfo)
+    {
+        var picsResponse = GetThumbsFromDevice(deviceInfo, MediaType.images, CancellationToken.None);
+        var thumbnailMap = ParseThumbnailMap(picsResponse, MediaType.images).ToList();
+
+        string moviesResponse = Data.Settings.MovieThumbsEnabled
+            ? GetThumbsFromDevice(deviceInfo, MediaType.video, CancellationToken.None)
+            : "";
+
+        var moviesThumbnailMap = ParseThumbnailMap(moviesResponse, MediaType.video);
+
+        if (thumbnailMap is null || thumbnailMap.Count == 0)
+            // Cache an almost empty dictionary to avoid repeated ADB calls
+            return new([new KeyValuePair<string, ThumbnailInfo>("", new())]);
+        
+        IEnumerable<KeyValuePair<string, ThumbnailInfo>> combined = [.. thumbnailMap, .. moviesThumbnailMap];
+        return combined.ToDictionary();
+    }
+
+    private static void UpdateThumbnailInfo(string logicalDeviceId, string id)
+    {
+        if (GetDeviceThumbsInfo(logicalDeviceId) is not DeviceThumbnailInfo deviceInfo)
+            return;
+    
+        var thumbnailPathCache = deviceInfo.ThumbnailPathCache;
+        var existingEntry = thumbnailPathCache?.FirstOrDefault(kvp => kvp.Value.Id == id);
+        string? updatedFilePath = null;
+        if (existingEntry.HasValue)
+        {
+            var updatedEntry = existingEntry.Value.Value with { LastUpdate = DateTime.Now };
+            deviceInfo.ThumbnailPathCache[existingEntry.Value.Key] = updatedEntry;
+            updatedFilePath = existingEntry.Value.Key;
+        }
+
+        UpdateCache(deviceInfo);
+
+        if (updatedFilePath is not null)
+            ThumbnailUpdated?.Invoke(logicalDeviceId, updatedFilePath);
+    }
+
+    private static string? GetLocalThumbPath(ADBService.AdbDevice device)
+    {
+        if (GetDeviceThumbsInfo(device.Device.LogicalID) is not DeviceThumbnailInfo deviceInfo)
+            return null;
+
+        if (!string.IsNullOrEmpty(deviceInfo.LocalThumbnailDir))
+        {
+            return deviceInfo.LocalThumbnailDir;
+        }
+
+        var deviceDir = Path.Combine(Data.AppDataPath, deviceInfo.DeviceId);
+        deviceInfo.LocalThumbnailDir = Path.Combine(deviceDir, Path.GetFileName(deviceInfo.DevicePicturesThumbnailDir));
+
+        UpdateCache(deviceInfo);
+        PullThumbnails(deviceInfo);
+
+        return deviceInfo.LocalThumbnailDir;
+    }
+
+    private static void PullThumbnails(DeviceThumbnailInfo deviceInfo)
+    {
+        IEnumerable<string> filesToReplace = [];
+
+        if (Directory.Exists(deviceInfo.LocalThumbnailDir) && deviceInfo.ThumbnailPathCache.Count > 1)
+        {
+            var parent = FileHelper.GetParentPath(deviceInfo.LocalThumbnailDir);
+            filesToReplace = deviceInfo.ThumbnailPathCache.Where(kvp => kvp.Value.LastUpdate != DateTime.MinValue && kvp.Value.IsOverdue).Select(thumb => Path.Combine(parent, thumb.Value.Id));
+        }
+        else
+        {
+            Directory.CreateDirectory(deviceInfo.LocalThumbnailDir);
+        }
+
+        FileClass pics = new("", deviceInfo.DevicePicturesThumbnailDir, AbstractFile.FileType.Folder);
+
+        FileClass movies = deviceInfo.DeviceMoviesThumbnailDir is null
+            ? new("", "", AbstractFile.FileType.Unknown)
+            : new("", deviceInfo.DeviceMoviesThumbnailDir, AbstractFile.FileType.Folder);
+
+        var deviceDir = FileHelper.GetParentPath(deviceInfo.LocalThumbnailDir);
+        var device = Data.CurrentADBDevice;
+        if (device.Device.LogicalID != deviceInfo.DeviceId)
+        {
+            throw new ArgumentException("Device mismatch!\nIf this happens - it is time to implement multi AdbDevice");
+        }
+
+        Task.Run(() =>
+        {
+            var ops = FileActionLogic.SilentPullFiles(device, deviceDir, Data.Settings.LimitThumbsPullSpeed, filesToReplace, pics, movies);
+            foreach (var operation in ops)
+            {
+                SyncFile filePath = operation.FilePath;
+
+                NotifyCollectionChangedEventHandler collectionChangedHandler = null;
+                PropertyChangedEventHandler propertyChangedHandler = null;
+
+                collectionChangedHandler = (sender, e) =>
+                {
+                    e.NewItems?.Cast<FileOpProgressInfo>().ForEach(update =>
+                    {
+                        UpdateThumbnailInfo(deviceInfo.DeviceId, FileHelper.GetFullName(update.AndroidPath));
+                    });
+                };
+
+                propertyChangedHandler = (sender, e) =>
+                {
+                    if (e.PropertyName == nameof(FileOperation.Status) && operation.Status is FileOperation.OperationStatus.Completed)
+                    {
+                        filePath.ProgressUpdates.CollectionChanged -= collectionChangedHandler;
+                        operation.PropertyChanged -= propertyChangedHandler;
+                    }
+                };
+
+                filePath.ProgressUpdates.CollectionChanged += collectionChangedHandler;
+                operation.PropertyChanged += propertyChangedHandler;
+            }
+
+            DeviceThumbsToCsv(GetDeviceThumbsInfo(deviceInfo.DeviceId));
+        });
+    }
+
+    private static IEnumerable<KeyValuePair<string, ThumbnailInfo>> ParseThumbnailMap(string stdout, MediaType type)
+    {
+        foreach (Match match in RE_THUMBNAIL_PATH().Matches(stdout))
+        {
+            if (!match.Success)
+                continue;
+
+            var path = match.Groups["Path"].Value.TrimEnd();
+            var resX = match.Groups["ResX"];
+            var resY = match.Groups["ResY"];
+
+            Size? resolution = null;
+            if (resX.Success && resY.Success)
+            {
+                resolution = new(double.Parse(resX.Value), double.Parse(resY.Value));
+            }
+
+            var dur = match.Groups["Dur"]?.Value;
+            TimeSpan? duration = string.IsNullOrEmpty(dur)
+                ? null
+                : TimeSpan.FromMilliseconds(int.Parse(dur));
+
+            yield return new(path, new($"{match.Groups["ID"].Value}.jpg", type, resolution, duration, DateTime.MinValue));
+        }
+    }
+
+    private static string GetThumbsFromDevice(DeviceThumbnailInfo info, MediaType media, CancellationToken cancellationToken)
+    {
+        ADBService.ExecuteDeviceAdbShellCommand(
+                    info.PhysicalId, "content",
+                    out string stdout, out _,
+                    cancellationToken,
+                    "query",
+                    "--uri", $"content://media/external/{media}/media",
+                    "--projection", "_id:_data:resolution:duration"
+                );
+
+        return stdout;
+    }
+}

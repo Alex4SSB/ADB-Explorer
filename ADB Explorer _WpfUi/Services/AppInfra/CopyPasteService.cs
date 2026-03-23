@@ -775,7 +775,7 @@ public class CopyPasteService : ViewModelBase
                   masterPid: masterPid);
     }
 
-    public static SyncFile MergeFolderTree(FileClass folder, string targetPath)
+    public static SyncFile MergeFolderTree(FileClass folder, string targetPath, IEnumerable<string> filesToReplace)
     {
         StringComparer comparer = StringComparer.InvariantCultureIgnoreCase;
 
@@ -788,7 +788,7 @@ public class CopyPasteService : ViewModelBase
         var parent = folder.ParentPath;
 
         var remote = existingPaths.Select(f => FileHelper.ConcatPaths(parent, FileHelper.ExtractRelativePath(f, targetPath)));
-        var tree = children.Where(c => !remote.Contains(c.Name, comparer));
+        var tree = children.Where(c => !remote.Contains(c.Name, comparer) || filesToReplace.Contains(c.Name, comparer));
 
         return new(folder, tree);
     }

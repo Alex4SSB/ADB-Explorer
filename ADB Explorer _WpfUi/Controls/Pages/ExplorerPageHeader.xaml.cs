@@ -432,10 +432,10 @@ public partial class ExplorerPageHeader : UserControl
                         ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
 
                         if (Settings.ThumbsMode is AppSettings.ThumbnailMode.OnPhotoDir
-                            && !ThumbnailHelper.IsInitialized(CurrentADBDevice.ID)
+                            && !ThumbnailService.IsInitialized(CurrentADBDevice.Device.LogicalID)
                             && FileHelper.IsPhotoDir())
                         {
-                            Task.Run(() => ThumbnailHelper.ForceLoad(CurrentADBDevice));
+                            Task.Run(() => ThumbnailService.ForceLoad(CurrentADBDevice));
                         }
                     }
 

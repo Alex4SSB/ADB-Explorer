@@ -1155,26 +1155,24 @@ internal static class FileActionLogic
         });
     }
 
-    public static void SilentPullFiles(ADBService.AdbDevice device, string target, bool disableParallel, params IEnumerable<FileClass> pullItems)
+    public static IEnumerable<FileSyncOperation> SilentPullFiles(ADBService.AdbDevice device, string target, bool disableParallel, IEnumerable<string> filesToReplace, params IEnumerable<FileClass> pullItems)
     {
-        Task.Run(() =>
+        foreach (var item in pullItems)
         {
-            foreach (var item in pullItems)
-            {
-                if (item.Type is not FileType.Folder)
-                    continue;
+            if (item.Type is not FileType.Folder)
+                continue;
 
-                var syncFile = CopyPasteService.MergeFolderTree(item, target);
-                if (syncFile.Children.Count == 0)
-                    continue;
+            var syncFile = CopyPasteService.MergeFolderTree(item, target, filesToReplace);
+            if (syncFile.Children.Count == 0)
+                continue;
 
-                var op = GeneratePullOp(target, syncFile, false, device);
-                if (disableParallel)
-                    op.MaxThreads = 1;
+            var op = GeneratePullOp(target, syncFile, false, device);
+            if (disableParallel)
+                op.MaxThreads = 1;
 
-                op.Start();
-            }
-        });
+            op.Start();
+            yield return op;
+        }
     }
 
     private static IEnumerable<FileSyncOperation> GeneratePullOps(string targetPath, IEnumerable<FileClass> pullItems, bool notify, ADBService.AdbDevice? device = null)

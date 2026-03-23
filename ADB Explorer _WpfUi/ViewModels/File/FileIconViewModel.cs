@@ -8,6 +8,7 @@ public partial class FileIconViewModel : ObservableObject
 {
     private readonly FileClass _file;
     private CancellationTokenSource? _cts;
+    private Action<string, string>? _thumbnailUpdatedHandler;
 
     private bool _isLoaded;
 
@@ -63,7 +64,7 @@ public partial class FileIconViewModel : ObservableObject
             || Data.CurrentADBDevice is null)
             return;
 
-        var deviceId = Data.CurrentADBDevice.ID;
+        var logicalDeviceId = Data.CurrentADBDevice.Device.LogicalID;
 
         _cts?.Cancel();
         _cts = new CancellationTokenSource();
@@ -74,13 +75,13 @@ public partial class FileIconViewModel : ObservableObject
             if (token.IsCancellationRequested)
                 return;
 
-            if (!ThumbnailHelper.IsInitialized(deviceId))
-                ThumbnailHelper.ForceLoad(Data.CurrentADBDevice);
+            if (!ThumbnailService.IsInitialized(logicalDeviceId))
+                ThumbnailService.ForceLoad(Data.CurrentADBDevice);
 
             if (token.IsCancellationRequested)
                 return;
 
-            var thumbnail = ThumbnailHelper.LoadThumbnail(Data.CurrentADBDevice, _file.FullPath);
+            var thumbnail = ThumbnailService.LoadThumbnail(Data.CurrentADBDevice, _file.FullPath);
 
             if (token.IsCancellationRequested)
                 return;
@@ -90,7 +91,7 @@ public partial class FileIconViewModel : ObservableObject
                 if (token.IsCancellationRequested)
                     return;
 
-                if (thumbnail is ThumbnailHelper.Thumbnail thumb)
+                if (thumbnail is ThumbnailService.Thumbnail thumb)
                 {
                     LargeIcon = thumb.Image;
                     UpdateVideoOverlay(thumb);
@@ -102,17 +103,45 @@ public partial class FileIconViewModel : ObservableObject
                 }
             });
         }, token);
+
+        _thumbnailUpdatedHandler = (updatedDeviceId, updatedFilePath) =>
+        {
+            if (updatedDeviceId != logicalDeviceId || updatedFilePath != _file.FullPath)
+                return;
+
+            Task.Run(() =>
+            {
+                if (token.IsCancellationRequested)
+                    return;
+
+                var thumbnail = ThumbnailService.LoadThumbnail(Data.CurrentADBDevice, _file.FullPath);
+                if (thumbnail is not ThumbnailService.Thumbnail thumb)
+                    return;
+
+                App.Current?.Dispatcher.BeginInvoke(() =>
+                {
+                    if (token.IsCancellationRequested)
+                        return;
+
+                    LargeIcon = thumb.Image;
+                    UpdateVideoOverlay(thumb);
+                    UpdateTooltip(thumb);
+                });
+            }, token);
+        };
+
+        ThumbnailService.ThumbnailUpdated += _thumbnailUpdatedHandler;
     }
 
-    private void UpdateVideoOverlay(ThumbnailHelper.Thumbnail thumb)
+    private void UpdateVideoOverlay(ThumbnailService.Thumbnail thumb)
     {
-        if (thumb.Info.Type is ThumbnailHelper.MediaType.video)
+        if (thumb.Info.Type is ThumbnailService.MediaType.video)
         {
             VideoIconOverlay = FileToIconConverter.GetImage(_file, 32).FirstOrDefault();
         }
     }
 
-    private void UpdateTooltip(ThumbnailHelper.Thumbnail thumb)
+    private void UpdateTooltip(ThumbnailService.Thumbnail thumb)
     {
         List<string> result = [];
         string typeRow = Data.RuntimeSettings.IsRTL && !_file.TypeIsRtl
@@ -121,14 +150,14 @@ public partial class FileIconViewModel : ObservableObject
         
         result.Add(typeRow);
 
-        if (thumb.Info.Type is ThumbnailHelper.MediaType.video)
+        if (thumb.Info.Type is ThumbnailService.MediaType.video)
         {
             result.Add($"{Strings.Resources.S_COLUMN_SIZE}: {_file.SizeString}");
 
             if (thumb.Info.Duration is TimeSpan duration)
                 result.Add($"{Strings.Resources.S_VIDEO_DURATION}: {duration.Hours:D2}:{duration.Minutes:D2}:{duration.Seconds:D2}");
         }
-        else if (thumb.Info.Type is ThumbnailHelper.MediaType.images)
+        else if (thumb.Info.Type is ThumbnailService.MediaType.images)
         {
             if (thumb.Info.Resolution is Size res)
                 result.Add($"{Strings.Resources.S_PICTURE_DIMENSIONS}: {$"{res.Width} × {res.Height}"}");
@@ -182,6 +211,12 @@ public partial class FileIconViewModel : ObservableObject
 
     public void CancelLoading()
     {
+        if (_thumbnailUpdatedHandler is not null)
+        {
+            ThumbnailService.ThumbnailUpdated -= _thumbnailUpdatedHandler;
+            _thumbnailUpdatedHandler = null;
+        }
+
         _cts?.Cancel();
         _cts?.Dispose();
         _cts = null;

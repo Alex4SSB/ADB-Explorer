@@ -53,6 +53,7 @@
                 MaxHeight="60"
                 Margin="0,4,0,0"
                 HorizontalAlignment="Center"
+                FlowDirection="{Binding NameFlowDirection}"
                 Style="{StaticResource DirectoryGridCellStyle}"
                 Text="{Binding DisplayName}"
                 TextAlignment="Center"

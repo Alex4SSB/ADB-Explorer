@@ -633,7 +633,7 @@ public static class DeviceHelper
         NavHistory.Navigate(Navigation.SpecialLocation.DriveView);
 
         if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.OnConnect)
-            Task.Run(() => ThumbnailHelper.ForceLoad(Data.CurrentADBDevice));
+            Task.Run(() => ThumbnailService.ForceLoad(Data.CurrentADBDevice));
 
         Data.CopyPaste.GetClipboardPasteItems();
         Data.RuntimeSettings.FilterDrives = true;
