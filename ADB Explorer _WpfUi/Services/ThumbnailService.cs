@@ -184,6 +184,14 @@ public static partial class ThumbnailService
         }
     }
 
+    public static void SaveAllThumbsToCsv()
+    {
+        foreach (var item in _deviceInfoCache)
+        {
+            DeviceThumbsToCsv(item);
+        }
+    }
+
     private static void DeviceThumbsToCsv(DeviceThumbnailInfo? deviceInfo)
     {
         if (deviceInfo is not DeviceThumbnailInfo info || info.ThumbnailPathCache is null || info.ThumbnailPathCache.Count == 0)
@@ -385,7 +393,7 @@ public static partial class ThumbnailService
 
                 collectionChangedHandler = (sender, e) =>
                 {
-                    e.NewItems?.Cast<FileOpProgressInfo>().ForEach(update =>
+                    e.NewItems?.OfType<AdbSyncProgressInfo>().Where(u => u.CurrentFilePercentage == 100).ForEach(update =>
                     {
                         UpdateThumbnailInfo(deviceInfo.DeviceId, FileHelper.GetFullName(update.AndroidPath));
                     });
@@ -400,7 +408,7 @@ public static partial class ThumbnailService
                     }
                 };
 
-                filePath.ProgressUpdates.CollectionChanged += collectionChangedHandler;
+                operation.ProgressUpdates.CollectionChanged += collectionChangedHandler;
                 operation.PropertyChanged += propertyChangedHandler;
             }
 

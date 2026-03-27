@@ -128,6 +128,8 @@ public partial class App
     /// </summary>
     private async void OnExit(object sender, ExitEventArgs e)
     {
+        ThumbnailService.SaveAllThumbsToCsv();
+
         Data.FileOpQ?.Stop();
         
         Services.GetService<SettingsService>().Save();

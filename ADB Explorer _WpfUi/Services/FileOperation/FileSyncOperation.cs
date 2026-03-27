@@ -11,7 +11,7 @@ namespace ADB_Explorer.Services;
 public class FileSyncOperation : FileOperation
 {
     private CancellationTokenSource cancelTokenSource;
-    private ObservableList<FileOpProgressInfo> progressUpdates;
+    public ObservableList<FileOpProgressInfo> ProgressUpdates;
 
     public override SyncFile FilePath { get; }
 
@@ -82,8 +82,8 @@ public class FileSyncOperation : FileOperation
         StatusInfo = new InProgSyncProgressViewModel();
         cancelTokenSource = new CancellationTokenSource();
 
-        progressUpdates = [];
-        progressUpdates.CollectionChanged += ProgressUpdates_CollectionChanged;
+        ProgressUpdates = [];
+        ProgressUpdates.CollectionChanged += ProgressUpdates_CollectionChanged;
 
         if (OperationName is OperationType.Push &&
             !File.Exists(FilePath.FullPath) && !Directory.Exists(FilePath.FullPath))
@@ -184,7 +184,7 @@ public class FileSyncOperation : FileOperation
 
         task.ContinueWith((t) =>
         {
-            progressUpdates.CollectionChanged -= ProgressUpdates_CollectionChanged;
+            ProgressUpdates.CollectionChanged -= ProgressUpdates_CollectionChanged;
         });
 
         task.ContinueWith((t) =>
@@ -202,7 +202,7 @@ public class FileSyncOperation : FileOperation
             {
                 string message = FilePath.LastUpdate is SyncErrorInfo errorInfo
                     ? errorInfo.Message
-                    : progressUpdates.OfType<SyncErrorInfo>().Last().Message;
+                    : ProgressUpdates.OfType<SyncErrorInfo>().Last().Message;
 
                 Status = OperationStatus.Failed;
                 StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(typeof(SyncErrorInfo), message: message, total: true));
@@ -234,7 +234,7 @@ public class FileSyncOperation : FileOperation
         task.ContinueWith((t) =>
         {
             string message = string.IsNullOrEmpty(t.Exception.InnerException.Message)
-                ? progressUpdates.OfType<SyncErrorInfo>().Last().Message
+                ? ProgressUpdates.OfType<SyncErrorInfo>().Last().Message
                 : t.Exception.InnerException.Message;
 
             Status = OperationStatus.Failed;
@@ -249,7 +249,7 @@ public class FileSyncOperation : FileOperation
         item.Size ??= (long)eventArgs.TotalBytesToReceive;
 
         mutex.WaitOne();
-        progressUpdates.Add(new AdbSyncProgressInfo(item.FullPath, null, eventArgs.ProgressPercentage, (long)eventArgs.ReceivedBytesSize));
+        ProgressUpdates.Add(new AdbSyncProgressInfo(item.FullPath, null, eventArgs.ProgressPercentage, (long)eventArgs.ReceivedBytesSize));
         mutex.ReleaseMutex();
 
         TransferEnd = DateTime.Now;
@@ -262,7 +262,7 @@ public class FileSyncOperation : FileOperation
 
         AddUpdates(e.NewItems.Cast<FileOpProgressInfo>());
 
-        if (progressUpdates.LastOrDefault() is AdbSyncProgressInfo currProgress and not null)
+        if (ProgressUpdates.LastOrDefault() is AdbSyncProgressInfo currProgress and not null)
         {
             var total = (double)Files.Sum(f => f.BytesTransferred) / TotalBytes;
             currProgress.TotalPercentage = total * 100;
@@ -298,7 +298,7 @@ public class FileSyncOperation : FileOperation
     public override void ClearChildren()
     {
         FilePath.ClearAll();
-        progressUpdates?.Clear();
+        ProgressUpdates?.Clear();
     }
 
     private void ReleaseTransferResources()
@@ -324,7 +324,7 @@ public class FileSyncOperation : FileOperation
             FilePath.ClearAll();
         }
 
-        progressUpdates?.Clear();
+        ProgressUpdates?.Clear();
 
         if (OriginalShellItem is IDisposable disposable)
         {
