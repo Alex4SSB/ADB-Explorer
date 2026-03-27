@@ -278,6 +278,8 @@ public partial class ExplorerPageHeader : UserControl
                     if (RuntimeSettings.LocationToNavigate is null)
                         return;
 
+                    DisposeFileIcons();
+
                     switch (RuntimeSettings.LocationToNavigate.Location)
                     {
                         case Navigation.SpecialLocation.Back:
@@ -531,6 +533,23 @@ public partial class ExplorerPageHeader : UserControl
         RuntimeSettings.ExplorerSource = DirList.FileList;
         FileActionLogic.UpdateFileActions();
         return true;
+    }
+
+    private static void DisposeFileIcons()
+    {
+        if (DirList?.FileList is not { } files)
+            return;
+
+        foreach (var file in files)
+        {
+            file.DisposeIconViewModel();
+        }
+
+        Task.Run(static () =>
+        {
+            GC.Collect(2, GCCollectionMode.Aggressive, true, true);
+            GC.WaitForPendingFinalizers();
+        });
     }
 
     private void NavigateToLocation(AdbLocation location)

@@ -117,6 +117,13 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     public ViewModels.FileIconViewModel IconViewModel 
         => _iconViewModel ??= new ViewModels.FileIconViewModel(this);
 
+    public void DisposeIconViewModel()
+    {
+        _iconViewModel?.Dispose();
+        _iconViewModel = null;
+        _cacheThumbnail = null;
+    }
+
     private DragDropEffects cutState = DragDropEffects.None;
     public DragDropEffects CutState
     {

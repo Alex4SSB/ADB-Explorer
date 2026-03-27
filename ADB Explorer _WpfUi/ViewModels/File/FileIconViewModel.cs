@@ -221,4 +221,14 @@ public partial class FileIconViewModel : ObservableObject
         _cts?.Dispose();
         _cts = null;
     }
+
+    public void Dispose()
+    {
+        CancelLoading();
+
+        LargeIcon = null;
+        LargeIconOverlay = null;
+        VideoIconOverlay = null;
+        IconViewTooltip = null;
+    }
 }
