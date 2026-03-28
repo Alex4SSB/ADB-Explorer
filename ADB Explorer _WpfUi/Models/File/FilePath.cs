@@ -117,6 +117,13 @@ public class FilePath : AbstractFile, IBaseFile
 
     public bool IsHidden => FullName.StartsWith('.');
 
+    private bool isSelected;
+    public bool IsSelected
+    {
+        get => isSelected;
+        set => Set(ref isSelected, value);
+    }
+
     /// <summary>
     /// Returns the extension (including the period ".").<br />
     /// Returns an empty string if file has no extension.

@@ -41,6 +41,7 @@
             x:Key="RowStyle"
             BasedOn="{StaticResource BaseRowStyle}"
             TargetType="DataGridRow">
+            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
             <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
             <EventSetter Event="MouseDown" Handler="DataGridRow_MouseDown" />
             <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
@@ -77,6 +78,7 @@
                     <Setter Property="Visibility" Value="Collapsed" />
                 </DataTrigger>
             </Style.Triggers>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Setter Property="SnapsToDevicePixels" Value="False" />
             <Setter Property="SelectionMode" Value="Multiple" />
             <Setter Property="IsItemScrolling" Value="True" />
@@ -195,7 +197,10 @@
                 <local:AdbListView
                     x:Name="IconView"
                     HorizontalAlignment="Stretch"
+                    helpers:SelectionHelper.CurrentSelectedIndex="-1"
+                    helpers:SelectionHelper.FirstSelectedIndex="-1"
                     ItemsSource="{Binding ExplorerItemsSource}"
+                    SelectionChanged="IconView_SelectionChanged"
                     Style="{StaticResource IconViewStyle}">
                     <local:AdbListView.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -471,18 +476,18 @@
                         Style="{StaticResource UnfinishedTextblockStyle}"
                         Text=" *" />
                 </StackPanel>
-                <Separator Style="{StaticResource StatusBarSeparatorStyle}" Visibility="{Binding ElementName=SelectedItemsCountContainer, Path=Visibility}" />
+                <Separator Style="{StaticResource StatusBarSeparatorStyle}" Visibility="{Binding SelectedItemsCountVisibility}" />
                 <StackPanel
                     x:Name="SelectedItemsCountContainer"
                     Orientation="Horizontal"
-                    Style="{StaticResource SelectedItemsCountContainerStyle}">
+                    Visibility="{Binding SelectedItemsCountVisibility}">
                     <TextBlock x:Name="SelectedItemsBlock" Style="{StaticResource SelectedItemsStyle}" />
                     <TextBlock Text=" " />
                     <TextBlock Style="{StaticResource SelectedItemsSuffixStyle}" />
                     <TextBlock
                         Margin="6,4,0,4"
-                        Style="{StaticResource TotalSizeStyle}"
-                        Text="{Binding SelectedFilesTotalSize}" />
+                        Text="{Binding SelectedFilesTotalSize}"
+                        Visibility="{Binding SelectedFilesTotalSizeVisibility}" />
                 </StackPanel>
             </StackPanel>
             <StackPanel

@@ -178,4 +178,82 @@ public static class SelectionHelper
 
     public static System.Windows.Controls.ListViewItem GetListViewItemContainer(System.Windows.Controls.ListView listView, int index = -1) =>
         listView.ItemContainerGenerator.ContainerFromIndex(index < 0 ? listView.SelectedIndex : index) as System.Windows.Controls.ListViewItem;
+
+    public static void SingleSelect(this ListView listView, Key key, int step = 1)
+    {
+        if (listView.Items.Count == 0)
+            return;
+
+        if (listView.Items.Count == 1 && listView.SelectedIndex == -1)
+        {
+            listView.SelectedIndex = 0;
+            SetCurrentSelectedIndex(listView, 0);
+            SetFirstSelectedIndex(listView, 0);
+            return;
+        }
+
+        listView.SelectedIndex = GetCurrentSelectedIndex(listView);
+
+        if (key is Key.Up or Key.Left)
+        {
+            if (listView.SelectedIndex > -1)
+                listView.SelectedIndex = Math.Clamp(listView.SelectedIndex - step, -1, listView.Items.Count);
+            else
+                listView.SelectedIndex = listView.Items.Count - 1;
+        }
+        else if (key is Key.Down or Key.Right)
+        {
+            if (listView.SelectedIndex < 0 || listView.SelectedIndex < listView.Items.Count - 1)
+                listView.SelectedIndex = Math.Min(listView.SelectedIndex + step, listView.Items.Count - 1);
+            else
+                listView.SelectedIndex = -1;
+        }
+        else if (key == Key.Home)
+        {
+            listView.SelectedIndex = 0;
+        }
+        else if (key == Key.End)
+        {
+            listView.SelectedIndex = listView.Items.Count - 1;
+        }
+
+        SetCurrentSelectedIndex(listView, listView.SelectedIndex);
+        SetFirstSelectedIndex(listView, listView.SelectedIndex);
+        if (listView.SelectedIndex > -1)
+            listView.ScrollIntoView(listView.Items[listView.SelectedIndex]);
+    }
+
+    public static void MultiSelect(this ListView listView, Key key, int step = 1)
+    {
+        var firstIndex = GetFirstSelectedIndex(listView);
+        var currentIndex = GetCurrentSelectedIndex(listView);
+
+        if (key is Key.Up or Key.Left)
+            currentIndex = Math.Max(0, currentIndex - step);
+        else if (key is Key.Down or Key.Right)
+            currentIndex = Math.Min(listView.Items.Count - 1, currentIndex + step);
+        else if (key == Key.Home)
+            currentIndex = 0;
+        else if (key == Key.End)
+            currentIndex = listView.Items.Count - 1;
+
+        listView.UnselectAll();
+
+        var index1 = Math.Min(firstIndex, currentIndex);
+        var index2 = Math.Max(firstIndex, currentIndex);
+
+        for (int i = index1; i <= index2; i++)
+        {
+            if (i < 0 || i >= listView.Items.Count)
+                continue;
+
+            listView.SelectedItems.Add(listView.Items[i]);
+        }
+
+        if (currentIndex >= 0 && currentIndex < listView.Items.Count)
+            listView.ScrollIntoView(listView.Items[currentIndex]);
+
+        if (currentIndex >= 0 && currentIndex < listView.Items.Count)
+            SetCurrentSelectedIndex(listView, currentIndex);
+    }
 }

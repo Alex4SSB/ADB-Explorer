@@ -23,8 +23,12 @@ public partial class ExplorerViewModel : ObservableObject
     [ObservableProperty]
     private bool _isIconView = false;
 
-    public string SelectedFilesTotalSize => (Data.SelectedFiles is not null && FileHelper.TotalSize(Data.SelectedFiles) is long size and > 0) ? size.BytesToSize() : "";
+    public string SelectedFilesTotalSize => (Data.SelectedFiles is not null && FileHelper.TotalSize(Data.SelectedFiles) is long size and > 0) ? size.BytesToSize(true) : "";
     public string SelectedFilesCount => $"{(Data.FileActions.IsAppDrive ? Data.SelectedPackages.Count() : Data.SelectedFiles.Count())}";
+
+    public Visibility SelectedItemsCountVisibility => SelectedFilesCount == "0" ? Visibility.Hidden : Visibility.Visible;
+
+    public Visibility SelectedFilesTotalSizeVisibility => string.IsNullOrEmpty(SelectedFilesTotalSize) ? Visibility.Collapsed : Visibility.Visible;
 
     public Visibility FolderColumnVisibility
         => Data.FileActions.IsAppDrive ? Visibility.Collapsed : Visibility.Visible;
@@ -34,6 +38,12 @@ public partial class ExplorerViewModel : ObservableObject
 
     public Visibility PackageColumnVisibility
         => Data.FileActions.IsAppDrive ? Visibility.Visible : Visibility.Collapsed;
+
+    public void NotifySelectedFilesTotalSize()
+    {
+        OnPropertyChanged(nameof(SelectedFilesTotalSize));
+        OnPropertyChanged(nameof(SelectedFilesTotalSizeVisibility));
+    }
 
     public ExplorerViewModel()
     {
@@ -78,8 +88,8 @@ public partial class ExplorerViewModel : ObservableObject
         switch (e.PropertyName)
         {
             case nameof(FileActionsEnable.SelectedItemsCount):
-                OnPropertyChanged(nameof(SelectedFilesTotalSize));
                 OnPropertyChanged(nameof(SelectedFilesCount));
+                OnPropertyChanged(nameof(SelectedItemsCountVisibility));
                 break;
 
             case nameof(FileActionsEnable.IsAppDrive):

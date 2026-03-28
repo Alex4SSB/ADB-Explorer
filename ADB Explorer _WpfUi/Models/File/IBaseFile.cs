@@ -32,4 +32,6 @@ public interface IBaseFile
 public interface IBrowserItem
 {
     public string DisplayName { get; }
+
+    public bool IsSelected { get; set; }
 }

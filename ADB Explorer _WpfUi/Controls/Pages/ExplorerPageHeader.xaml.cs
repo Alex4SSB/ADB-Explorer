@@ -4,6 +4,7 @@ using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
+using ADB_Explorer.ViewModels.Pages;
 using static ADB_Explorer.Helpers.VisibilityHelper;
 using static ADB_Explorer.Models.AbstractFile;
 using static ADB_Explorer.Models.AdbExplorerConst;
@@ -33,6 +34,44 @@ public partial class ExplorerPageHeader : UserControl
 
     private Dispatcher Dispatcher => App.Current.Dispatcher;
 
+    private ExplorerViewModel ViewModel => (ExplorerViewModel)DataContext;
+
+    /// <summary>
+    /// Returns the currently active items view (either <see cref="IconView"/> or <see cref="ExplorerGrid"/>).
+    /// </summary>
+    private Selector ActiveView => ViewModel.IsIconView ? IconView : ExplorerGrid;
+
+    /// <summary>
+    /// Returns the selected items from the currently active view.
+    /// </summary>
+    private System.Collections.IList ActiveSelectedItems => ViewModel.IsIconView
+        ? IconView.SelectedItems
+        : ExplorerGrid.SelectedItems;
+
+    private void ActiveUnselectAll()
+    {
+        if (ViewModel.IsIconView)
+            IconView.UnselectAll();
+        else
+            ExplorerGrid.UnselectAll();
+    }
+
+    private void ActiveSelectAll()
+    {
+        if (ViewModel.IsIconView)
+            IconView.SelectAll();
+        else
+            ExplorerGrid.SelectAll();
+    }
+
+    private void ActiveScrollIntoView(object item)
+    {
+        if (ViewModel.IsIconView)
+            IconView.ScrollIntoView(item);
+        else
+            ExplorerGrid.ScrollIntoView(item);
+    }
+
     private static Point NullPoint => new(-1, -1);
     private double? RowHeight { get; set; }
     private double ColumnHeaderHeight => (double)FindResource("DataGridColumnHeaderHeight") + ScrollContentPresenterMargin;
@@ -46,7 +85,7 @@ public partial class ExplorerPageHeader : UserControl
         {
             if (FileActions.IsAppDrive || !ExplorerGrid.SelectedCells.Any())
                 return false;
-
+            
             var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
             return cell switch
             {
@@ -83,6 +122,7 @@ public partial class ExplorerPageHeader : UserControl
         {
             InputBindings.Add(binding);
             ExplorerGrid.InputBindings.Add(binding);
+            IconView.InputBindings.Add(binding);
         });
 
         SelectionTimer.Tick += SelectionTimer_Tick;
@@ -95,13 +135,13 @@ public partial class ExplorerPageHeader : UserControl
             || FileActions.IsExplorerEditing)
             return;
 
-        var selected = ExplorerGrid.SelectedItems.Count;
-        var selectedIndex = ExplorerGrid.SelectedIndex;
+        var selected = ActiveSelectedItems.Count;
+        var selectedIndex = ActiveView.SelectedIndex;
         object altItem = null;
 
-        for (int i = 0; i < ExplorerGrid.Items.Count; i++)
+        for (int i = 0; i < ActiveView.Items.Count; i++)
         {
-            var item = ExplorerGrid.Items[i];
+            var item = ActiveView.Items[i];
             var name = item.ToString();
 
             if (name.StartsWith(e.Text, StringComparison.OrdinalIgnoreCase))
@@ -116,7 +156,7 @@ public partial class ExplorerPageHeader : UserControl
             }
         }
 
-        if (selectedIndex == ExplorerGrid.SelectedIndex && altItem is not null)
+        if (selectedIndex == ActiveView.SelectedIndex && altItem is not null)
             FileActions.ItemToSelect = altItem;
     }
 
@@ -182,34 +222,53 @@ public partial class ExplorerPageHeader : UserControl
 
     private bool ExplorerGridKeyNavigation(Key key)
     {
-        if (ExplorerGrid.Items.Count < 1)
+        if (ActiveView.Items.Count < 1)
             return false;
 
         switch (key)
         {
             case Key.Escape:
-                ExplorerGrid.UnselectAll();
+                ActiveUnselectAll();
                 break;
 
-            case Key.Down or Key.Up or Key.Home or Key.End:
+            case Key.Left or Key.Right when !ViewModel.IsIconView:
+                return false;
+
+            case Key.Down or Key.Up or Key.Left or Key.Right or Key.Home or Key.End:
                 if (bfNavigation)
                 {
-                    SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, ExplorerGrid.SelectedIndex);
+                    SelectionHelper.SetCurrentSelectedIndex(ActiveView, ActiveView.SelectedIndex);
                     bfNavigation = false;
                 }
 
-                if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
-                    ExplorerGrid.MultiSelect(key);
+                if (ViewModel.IsIconView)
+                {
+                    var navKey = key;
+                    if (RuntimeSettings.IsRTL && navKey is Key.Left or Key.Right)
+                        navKey = navKey == Key.Left ? Key.Right : Key.Left;
+
+                    var step = navKey is Key.Left or Key.Right ? 1 : IconView.ItemsPerRow;
+
+                    if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+                        IconView.MultiSelect(navKey, step);
+                    else
+                        IconView.SingleSelect(navKey, step);
+                }
                 else
-                    ExplorerGrid.SingleSelect(key);
+                {
+                    if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+                        ExplorerGrid.MultiSelect(key);
+                    else
+                        ExplorerGrid.SingleSelect(key);
+                }
                 break;
 
             case Key.Enter:
                 if (ExplorerGrid.SelectedCells.Count < 1 || IsInEditMode)
                     return false;
 
-                if (ExplorerGrid.SelectedItems.Count == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
-                    DoubleClick(ExplorerGrid.SelectedItem);
+                if (ActiveSelectedItems.Count == 1 && ((FilePath)ActiveView.SelectedItem).IsDirectory)
+                    DoubleClick(ActiveView.SelectedItem);
                 break;
 
             case Key.Apps:
@@ -225,9 +284,11 @@ public partial class ExplorerPageHeader : UserControl
 
     private void SelectionTimer_Tick(object sender, EventArgs e)
     {
-        SelectedFiles = FileActions.IsAppDrive ? [] : ExplorerGrid.SelectedItems.OfType<FileClass>();
-        SelectedPackages = FileActions.IsAppDrive ? ExplorerGrid.SelectedItems.OfType<Package>() : [];
+        SelectedFiles = FileActions.IsAppDrive ? [] : ActiveSelectedItems.OfType<FileClass>();
+        SelectedPackages = FileActions.IsAppDrive ? ActiveSelectedItems.OfType<Package>() : [];
         FileActions.SelectedItemsCount = FileActions.IsAppDrive ? SelectedPackages.Count() : SelectedFiles.Count();
+
+        ViewModel.NotifySelectedFilesTotalSize();
 
         FileActionLogic.UpdateFileActions();
         //MainToolBar.Items?.Refresh();
@@ -327,10 +388,10 @@ public partial class ExplorerPageHeader : UserControl
                     break;
 
                 case nameof(AppRuntimeSettings.SelectAll):
-                    if (ExplorerGrid.Items.Count == ExplorerGrid.SelectedItems.Count)
-                        ExplorerGrid.UnselectAll();
+                    if (ActiveView.Items.Count == ActiveSelectedItems.Count)
+                        ActiveUnselectAll();
                     else
-                        ExplorerGrid.SelectAll();
+                        ActiveSelectAll();
                     break;
 
                 default:
@@ -356,7 +417,7 @@ public partial class ExplorerPageHeader : UserControl
             if (NavigationBox.Mode is NavigationBox.ViewMode.None)
                 return;
 
-            NavigationBox.UnfocusTarget = ExplorerGrid;
+            NavigationBox.UnfocusTarget = ActiveView;
             NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
         }
     }
@@ -419,7 +480,7 @@ public partial class ExplorerPageHeader : UserControl
 
                     break;
                 }
-                case nameof(DirectoryLister.IsLinkListingFinished) when ExplorerGrid.Items.Count < 1 || !DirList.IsLinkListingFinished:
+                case nameof(DirectoryLister.IsLinkListingFinished) when ActiveView.Items.Count < 1 || !DirList.IsLinkListingFinished:
                     return;
 
                 case nameof(DirectoryLister.IsLinkListingFinished) when bfNavigation
@@ -430,9 +491,9 @@ public partial class ExplorerPageHeader : UserControl
 
                 case nameof(DirectoryLister.IsLinkListingFinished):
                 {
-                    if (ExplorerGrid.Items.Count > 0)
+                    if (ActiveView.Items.Count > 0)
                     {
-                        ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
+                        ActiveScrollIntoView(ActiveView.Items[0]);
 
                         if (Settings.ThumbsMode is AppSettings.ThumbnailMode.OnPhotoDir
                             && !ThumbnailService.IsInitialized(CurrentADBDevice.Device.LogicalID)
@@ -477,10 +538,10 @@ public partial class ExplorerPageHeader : UserControl
         FileActions.ExplorerFilter = "";
         NavHistory.Navigate(realPath);
 
-        SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, -1);
-        SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, -1);
+        SelectionHelper.SetFirstSelectedIndex(ActiveView, -1);
+        SelectionHelper.SetCurrentSelectedIndex(ActiveView, -1);
 
-        ExplorerGrid.Focus();
+        ActiveView.Focus();
         CurrentPath = realPath;
 
         NavigationBox.Path = realPath == RECYCLE_PATH ? AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin) : realPath;
@@ -1221,6 +1282,18 @@ public partial class ExplorerPageHeader : UserControl
             {
                 SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, ExplorerGrid.Items.IndexOf(e.AddedItems[0]));
             }
+        }
+
+        SelectionTimer.Stop();
+        SelectionTimer.Start();
+    }
+
+    private void IconView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (IconView.SelectedItems.Count > 0 && !RuntimeSettings.IsExplorerLoaded)
+        {
+            IconView.UnselectAll();
+            return;
         }
 
         SelectionTimer.Stop();

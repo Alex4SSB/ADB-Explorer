@@ -257,26 +257,11 @@
             </MultiDataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="SelectedItemsCountContainerStyle" TargetType="StackPanel">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="0">
-                <Setter Property="Visibility" Value="Hidden" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
     <Style
         x:Key="SelectedItemsStyle"
         BasedOn="{StaticResource MarginedTextBlockStyle}"
         TargetType="TextBlock">
         <Setter Property="Text" Value="{Binding SelectedFilesCount}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
-                <Setter Property="Text" Value="0" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="">
-                <Setter Property="Text" Value="0" />
-            </DataTrigger>
-        </Style.Triggers>
     </Style>
     <Style
         x:Key="SelectedItemsSuffixStyle"
@@ -284,21 +269,8 @@
         TargetType="TextBlock">
         <Setter Property="Text" Value="{Binding Source={x:Static strings:Resources.S_ITEMS_SELECTED_PLURAL}}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="1">
+            <DataTrigger Binding="{Binding SelectedFilesCount}" Value="1">
                 <Setter Property="Text" Value="{Binding Source={x:Static strings:Resources.S_ITEMS_SELECTED}}" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="TotalSizeStyle" TargetType="TextBlock">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding SelectedFilesTotalSize}" Value="0">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding SelectedFilesTotalSize}" Value="">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
-                <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -921,14 +893,13 @@
         <Setter Property="IsEnabled" Value="{Binding DriveEnabled}" />
     </Style>
     <Style x:Key="IconFileContainerStyle" TargetType="ui:ListViewItem">
+        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
         <Setter Property="Margin" Value="5" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
-        <!--<Setter Property="IsSelected" Value="{Binding DriveSelected, Mode=TwoWay}" />
-        <Setter Property="IsEnabled" Value="{Binding DriveEnabled}" />-->
         <Setter Property="Template">
             <!--  Template copied for modification from WPF UI  -->
             <Setter.Value>

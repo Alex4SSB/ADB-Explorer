@@ -1,51 +1,32 @@
-﻿using ADB_Explorer.ViewModels;
+﻿namespace ADB_Explorer.Models;
 
-namespace ADB_Explorer.Models;
-
-public class Package : ViewModelBase, IBrowserItem
+public partial class Package : ObservableObject, IBrowserItem
 {
     public enum PackageType
     {
         System,
         User,
     }
-    
-    private string name;
-    public string Name
-    {
-        get => name;
-        private set => Set(ref name, value);
-    }
 
-    private string path;
-    public string Path
-    {
-        get => path;
-        private set => Set(ref path, value);
-    }
+    [ObservableProperty]
+    private string _name;
+
+    [ObservableProperty]
+    private string _path;
 
     public string DisplayName => Name;
 
-    private PackageType type;
-    public PackageType Type
-    {
-        get => type;
-        private set => Set(ref type, value);
-    }
+    [ObservableProperty]
+    private PackageType _type;
 
-    private long? uid = null;
-    public long? Uid
-    {
-        get => uid;
-        private set => Set(ref uid, value);
-    }
+    [ObservableProperty]
+    private long? _uid = null;
 
-    private long? version = null;
-    public long? Version
-    {
-        get => version;
-        private set => Set(ref version, value);
-    }
+    [ObservableProperty]
+    private long? _version = null;
+
+    [ObservableProperty]
+    private bool isSelected;
 
     public static Package New(string package, PackageType type)
     {

@@ -57,6 +57,22 @@ public class AdbListView : Wpf.Ui.Controls.ListView
         }
     }
 
+    private int _itemsPerRow = 1;
+    public int ItemsPerRow
+    {
+        get
+        {
+            // Update whenever possible
+            if (ItemContainerGenerator.ContainerFromIndex(0) is FrameworkElement item && item.ActualWidth > 0)
+            {
+                var itemWidth = item.ActualWidth + item.Margin.Left + item.Margin.Right;
+                _itemsPerRow = Math.Max(1, (int)(ActualWidth / itemWidth));
+            }
+
+            return _itemsPerRow;
+        }
+    }
+
     private void GridListView_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
         var dpiOffset = Data.RuntimeSettings.MainWindowScalingFactor * -2 + 2;
