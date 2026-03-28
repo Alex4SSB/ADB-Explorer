@@ -89,7 +89,7 @@ public partial class ADBService
             S_IFSOCK = 0xC000,
         }
 
-        private static FileStat CreateFile(string path, string stdoutLine)
+        private static FileStat? CreateFile(string path, string stdoutLine)
         {
             var match = AdbRegEx.RE_LS_FILE_ENTRY().Match(stdoutLine);
             if (!match.Success)
@@ -101,7 +101,7 @@ public partial class ADBService
             long? size = long.Parse(match.Groups["Size"].Value, NumberStyles.HexNumber);
             var time = long.Parse(match.Groups["Time"].Value, NumberStyles.HexNumber);
             var mode = (UnixFileMode)UInt32.Parse(match.Groups["Mode"].Value, NumberStyles.HexNumber);
-
+            
             if (SPECIAL_DIRS.Contains(name))
                 return null;
 
@@ -112,12 +112,12 @@ public partial class ADBService
             }
 
             return new(
-                fileName: name,
-                path: FileHelper.ConcatPaths(path, name),
-                type: type,
-                size: size,
-                modifiedTime: (time > 0) ? DateTimeOffset.FromUnixTimeSeconds(time).DateTime.ToLocalTime() : null,
-                isLink: mode.HasFlag(UnixFileMode.S_IFLNK));
+                FullName: name,
+                FullPath: FileHelper.ConcatPaths(path, name),
+                Type: type,
+                IsLink: mode.HasFlag(UnixFileMode.S_IFLNK),
+                Size: size,
+                ModifiedTime: (time > 0) ? DateTimeOffset.FromUnixTimeSeconds(time).DateTime.ToLocalTime() : null);
         }
 
         private static FileType ParseFileMode(UnixFileMode mode)
@@ -191,7 +191,7 @@ public partial class ADBService
                     if (item is null)
                         continue;
 
-                    output.Enqueue(item);
+                    output.Enqueue(item.Value);
                 }
             }
             catch (Exception e)
