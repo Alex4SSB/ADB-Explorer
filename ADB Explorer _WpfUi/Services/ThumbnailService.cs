@@ -77,6 +77,13 @@ public static partial class ThumbnailService
 
     private static readonly List<DeviceThumbnailInfo> _deviceInfoCache = [];
 
+    private const int THUMBNAIL_BASE_DIPS = 140;
+
+    private static int ThumbnailDecodeWidth => 
+        Data.RuntimeSettings.MainWindowScalingFactor > 0
+            ? (int)Math.Ceiling(THUMBNAIL_BASE_DIPS / Data.RuntimeSettings.MainWindowScalingFactor)
+            : THUMBNAIL_BASE_DIPS * 2;
+
     public record struct Thumbnail(BitmapSource Image, ThumbnailInfo Info);
 
     private record struct DeviceThumbnailInfo
@@ -162,7 +169,7 @@ public static partial class ThumbnailService
         _mutex.WaitOne();
         _mutex.ReleaseMutex();
 
-        if (GetThumbnailName(device.Device.LogicalID, filePath) is not ThumbnailInfo entry)
+        if (GetThumbnailName(device.Device.LogicalID, filePath) is not ThumbnailInfo info)
             return null;
 
         if (GetLocalThumbPath(device) is not string localThumbnailDir)
@@ -170,13 +177,19 @@ public static partial class ThumbnailService
 
         try
         {
-            var fullPath = Path.Combine(localThumbnailDir, entry.Id);
+            var fullPath = Path.Combine(localThumbnailDir, info.Id);
             if (!File.Exists(fullPath))
                 return null;
 
             using var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            var decoder = BitmapDecoder.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
-            return new(decoder.Frames[0], entry);
+            var bitmapImage = new BitmapImage();
+            bitmapImage.BeginInit();
+            bitmapImage.StreamSource = stream;
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            bitmapImage.DecodePixelWidth = ThumbnailDecodeWidth;
+            bitmapImage.EndInit();
+            bitmapImage.Freeze();
+            return new(bitmapImage, info);
         }
         catch
         {
@@ -234,6 +247,8 @@ public static partial class ThumbnailService
             else
             {
                 deviceInfo.ThumbnailPathCache = cache;
+                deviceInfo = SetDeviceLocalDir(deviceInfo);
+
                 Task.Run(() => MergeDeviceWithLocalCache(deviceInfo));
             }
 
@@ -345,13 +360,20 @@ public static partial class ThumbnailService
             return deviceInfo.LocalThumbnailDir;
         }
 
-        var deviceDir = Path.Combine(Data.AppDataPath, deviceInfo.DeviceId);
-        deviceInfo.LocalThumbnailDir = Path.Combine(deviceDir, Path.GetFileName(deviceInfo.DevicePicturesThumbnailDir));
+        deviceInfo = SetDeviceLocalDir(deviceInfo);
 
         UpdateCache(deviceInfo);
         PullThumbnails(deviceInfo);
 
         return deviceInfo.LocalThumbnailDir;
+    }
+
+    private static DeviceThumbnailInfo SetDeviceLocalDir(DeviceThumbnailInfo deviceInfo)
+    {
+        var deviceDir = Path.Combine(Data.AppDataPath, deviceInfo.DeviceId);
+        deviceInfo.LocalThumbnailDir = Path.Combine(deviceDir, Path.GetFileName(deviceInfo.DevicePicturesThumbnailDir));
+
+        return deviceInfo;
     }
 
     private static void PullThumbnails(DeviceThumbnailInfo deviceInfo)
