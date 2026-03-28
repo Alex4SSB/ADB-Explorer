@@ -1459,4 +1459,28 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>Afficher icônes pour dossiers spéciaux</value>
   </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>Le réglage pour permettre l'affichage des miniatures de vidéos (recherche et affichage)</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>Élément de l’aperçu détaillé d'un fichier vidéo (longueur = durée)</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>Élément de l'aperçu détaillé d'un fichier vidéo (dimensions = résolution)</value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>Un mois</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>Une semaine</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>Un jour</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>Une heure</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>Heure d'actualisation de la vignette locale</value>
+  </data>
 </root>

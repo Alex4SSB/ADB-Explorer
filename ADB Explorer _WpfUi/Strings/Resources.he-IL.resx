@@ -1468,4 +1468,19 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
     <value>ממדים</value>
   </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>חודש אחד</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>שבוע אחד</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>יום אחד</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>שעה אחת</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>זמן שמירת תמונות תצוגה מקדימה לפני עדכון</value>
+  </data>
 </root>

@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -293,5 +293,1188 @@ Para aprobar ADB, abra la configuración avanzada de WSA.</value>
   </data>
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
     <value>Ayuda con ADB</value>
+  </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>Exportar (Enlace de destino)</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>Unidad FUSE.
+• No se admiten enlaces simbólicos
+• Los nombres de archivo no pueden contener " * / : &lt; &gt; ? \ |
+• Los nombres de archivo no distinguen entre mayúsculas y minúsculas
+• No se admite la instalación de APK</value>
+  </data>
+  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
+    <value>La aplicación incluye numerosas animaciones que forman parte de su diseño fluido.
+La animación de las vistas laterales se desactiva automáticamente cuando la ventana de la aplicación se maximiza en una pantalla secundaria.
+
+• Al activar esta opción, se desactivan todas las animaciones de la aplicación, excepto las barras de progreso, los anillos de progreso y las barras de uso de la unidad.</value>
+  </data>
+  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
+    <value>Localizar ADB (v{0} como mínimo):</value>
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value>Cambiar</value>
+  </data>
+  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
+    <value>Seleccionar Ruta ADB</value>
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value>Habilitado</value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value>Inhabilitado</value>
+  </data>
+  <data name="S_NEW_VERSION" xml:space="preserve">
+    <value>Está disponible un {0} nuevo, versión {1},</value>
+  </data>
+  <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
+    <value>Ir a página de versión</value>
+  </data>
+  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
+    <value>Ir a notas de lanzamiento</value>
+  </data>
+  <data name="S_ADB_EXECUTABLE" xml:space="preserve">
+    <value>ADB ejecutable</value>
+  </data>
+  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
+    <value>Quitar {0}</value>
+  </data>
+  <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
+    <value>Matar {0}</value>
+  </data>
+  <data name="S_SKIP" xml:space="preserve">
+    <value>Omitir</value>
+  </data>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value>Sustituir</value>
+  </data>
+  <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
+    <value>Fusionar o Remplazar</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
+    <value>Hay un elemento en conflicto</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
+    <value>Hay un elemento en conflicto en {0}</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
+    <value>Hay {0} elementos en conflicto</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
+    <value>Hay {0} elementos en conflicto en {1}</value>
+  </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value>Reiniciar ADB Ahora</value>
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value>Reiniciar Más Tarde</value>
+  </data>
+  <data name="S_ITEM_DESTINATION" xml:space="preserve">
+    <value>Seleccionar destino para {0}</value>
+  </data>
+  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
+    <value>Seleccionar destino para múltiples elementos</value>
+  </data>
+  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
+    <value>Lo siguiente será eliminado:
+{0}</value>
+  </data>
+  <data name="S_DELETE_PERMANENT" xml:space="preserve">
+    <value>Lo siguiente será eliminado permanentemente:
+{0}</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>Nuevo Archivo</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>Nueva Carpeta</value>
+  </data>
+  <data name="S_LS_ERROR" xml:space="preserve">
+    <value>Ha sucedido un error mientras intentaba listar el contenido de esta carpeta.
+El contenido visible puede estar incompleto.</value>
+  </data>
+  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
+    <value>{0} es un antecesor de la carpeta de destino.</value>
+  </data>
+  <data name="S_KILL_EMULATOR" xml:space="preserve">
+    <value>¿Seguro que desea mater este emulador?</value>
+  </data>
+  <data name="S_REM_DEVICE" xml:space="preserve">
+    <value>¿Seguro que desea eliminar este dispositivo?</value>
+  </data>
+  <data name="S_REM_APK" xml:space="preserve">
+    <value>Lo siguiente será extraído:
+{0}</value>
+  </data>
+  <data name="S_REM_APK_PLURAL" xml:space="preserve">
+    <value>Lo siguiente será extraído:
+{0} paquetes</value>
+  </data>
+  <data name="S_UNINSTALL" xml:space="preserve">
+    <value>Desinstalar</value>
+  </data>
+  <data name="S_CANCEL" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="S_CONFIRM" xml:space="preserve">
+    <value>Confirmar</value>
+  </data>
+  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
+    <value>Pegar conflictos</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
+    <value>Seleccionar carpetas para importar</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
+    <value>Seleccionar carpetas para importar en {0}</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
+    <value>Seleccionar archivos a importar</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
+    <value>Seleccionar archivos a importar en {0}</value>
+  </data>
+  <data name="S_BUTTON_CLEAR" xml:space="preserve">
+    <value>Vaciar</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
+    <value>mDNS</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
+    <value>Oscuro</value>
+  </data>
+  <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
+    <value>Claro</value>
+  </data>
+  <data name="S_SETTINGS_TITLE" xml:space="preserve">
+    <value>Ajustes</value>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value>Carpeta</value>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value>Archivo</value>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value>Seleccionar todo</value>
+  </data>
+  <data name="S_MENU_CUT" xml:space="preserve">
+    <value>Cortar</value>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value>Pegar enlace</value>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value>Renombrar</value>
+  </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value>Paquete</value>
+  </data>
+  <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
+    <value>Actualizar tiempo modificado</value>
+  </data>
+  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
+    <value>Cerrar Editor</value>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>Guardar Cambios</value>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>Instalar</value>
+  </data>
+  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
+    <value>Copiar al temporal</value>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>Vaciar bitácora de instrucción</value>
+  </data>
+  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
+    <value>Abrir lugar del elemento</value>
+  </data>
+  <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
+    <value>Buscar en el explorador</value>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value>Copiar el portapapeles</value>
+  </data>
+  <data name="S_ADB_DISK_USAGE" xml:space="preserve">
+    <value>Empleo de Disco ADB</value>
+  </data>
+  <data name="S_DISK_USAGE_READ" xml:space="preserve">
+    <value>Lectura: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
+    <value>Escritura: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
+    <value>Otro: {0}</value>
+  </data>
+  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
+    <value>Comprueba las actualizaciones en cada lanzamiento</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
+    <value>Acerca de…</value>
+  </data>
+  <data name="S_BROWSER_ITEMS" xml:space="preserve">
+    <value>elemento</value>
+  </data>
+  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
+    <value>elementos</value>
+  </data>
+  <data name="S_FOLDER_EMPTY" xml:space="preserve">
+    <value>Esta carpeta está vacía.</value>
+  </data>
+  <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
+    <value>No es capaz de obtener el listado.</value>
+  </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0}ms</value>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0}m</value>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value>{0}h</value>
+  </data>
+  <data name="S_BAT_STATE_FULL" xml:space="preserve">
+    <value>Lleno</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>Estado: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH" xml:space="preserve">
+    <value>Salud: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
+    <value>Buena</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
+    <value>Sobrecargada</value>
+  </data>
+  <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
+    <value>Muerta</value>
+  </data>
+  <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
+    <value>Fallo sin especificar</value>
+  </data>
+  <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
+    <value>Frío</value>
+  </data>
+  <data name="S_BUTTON_LAUNCH" xml:space="preserve">
+    <value>Lanzar</value>
+  </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value>Lanzar WSA</value>
+  </data>
+  <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
+    <value>No mostrar esto de nuevo.</value>
+  </data>
+  <data name="S_BUTTON_ABORT" xml:space="preserve">
+    <value>Interrumpir</value>
+  </data>
+  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
+    <value>Enviando a la consola</value>
+  </data>
+  <data name="S_PASTE_CONFLICT" xml:space="preserve">
+    <value>{0} en conflicto</value>
+  </data>
+  <data name="S_PASTE" xml:space="preserve">
+    <value>Pegar</value>
+  </data>
+  <data name="S_DROP" xml:space="preserve">
+    <value>Soltar</value>
+  </data>
+  <data name="S_ACTION_OPERATION" xml:space="preserve">
+    <value>Operación</value>
+  </data>
+  <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
+    <value>Operaciones</value>
+  </data>
+  <data name="S_ACTION_VALIDATE" xml:space="preserve">
+    <value>Validar {0}</value>
+  </data>
+  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
+    <value>Enlace</value>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} (Enlace)</value>
+  </data>
+  <data name="S_FILE_TYPE_APK" xml:space="preserve">
+    <value>Paquete de Aplicación Android</value>
+  </data>
+  <data name="S_DRIVE_TRASH" xml:space="preserve">
+    <value>Papelera de reciclaje</value>
+  </data>
+  <data name="S_BUTTON_YES" xml:space="preserve">
+    <value>Sí</value>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>Raíz</value>
+  </data>
+  <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
+    <value>Almacén Interno</value>
+  </data>
+  <data name="S_DRIVE_APPS" xml:space="preserve">
+    <value>Aplicaciones Instaladas</value>
+  </data>
+  <data name="S_DRIVE_SD" xml:space="preserve">
+    <value>Tarjeta µSD</value>
+  </data>
+  <data name="S_DRIVE_OTG" xml:space="preserve">
+    <value>Unidad OTG</value>
+  </data>
+  <data name="S_DRIVE_EMULATED" xml:space="preserve">
+    <value>Unidad Emulada</value>
+  </data>
+  <data name="S_DRIVE_TEMP" xml:space="preserve">
+    <value>Temporal</value>
+  </data>
+  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
+    <value>Nombre de archivo ilegal en el sistema de archivo destino: {0}</value>
+  </data>
+  <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
+    <value>El contenido no coincide</value>
+  </data>
+  <data name="S_BUTTON_DISABLE" xml:space="preserve">
+    <value>Inhabilitar</value>
+  </data>
+  <data name="S_BUTTON_ENABLE" xml:space="preserve">
+    <value>Habilitar</value>
+  </data>
+  <data name="S_CLEAR_ALL" xml:space="preserve">
+    <value>Vaciar todo</value>
+  </data>
+  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
+    <value>Añadir Dispositivo Nuevo</value>
+  </data>
+  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
+    <value>[No Autorizado]</value>
+  </data>
+  <data name="S_SERVICE_NONAME" xml:space="preserve">
+    <value>[Servicio]</value>
+  </data>
+  <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
+    <value>Desmarcado</value>
+  </data>
+  <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
+    <value>Prohibido</value>
+  </data>
+  <data name="S_FILEOP_ERROR" xml:space="preserve">
+    <value>Error: {0}</value>
+  </data>
+  <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
+    <value>Puerto</value>
+  </data>
+  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
+    <value>Paquetes</value>
+  </data>
+  <data name="S_FILEOP_WAITING" xml:space="preserve">
+    <value>Encolado</value>
+  </data>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>Fallado</value>
+  </data>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value>Cancelado</value>
+  </data>
+  <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
+    <value>Previo</value>
+  </data>
+  <data name="S_ACTION_MOVE" xml:space="preserve">
+    <value>Mover</value>
+  </data>
+  <data name="S_ACTION_RECYCLE" xml:space="preserve">
+    <value>Reciclar</value>
+  </data>
+  <data name="S_ACTION_UPDATE" xml:space="preserve">
+    <value>Actualizar</value>
+  </data>
+  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
+    <value>{0}% Utilizado</value>
+  </data>
+  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
+    <value>Arrastrar Aquí</value>
+  </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
+  </data>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>Desconocido</value>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>Enlace Roto</value>
+  </data>
+  <data name="S_NAV_HISTORY" xml:space="preserve">
+    <value>Historial de Navegación</value>
+  </data>
+  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
+    <value>Añadir Lugar Actual</value>
+  </data>
+  <data name="S_REMOVE" xml:space="preserve">
+    <value>Quitar</value>
+  </data>
+  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
+    <value>Lugares Guardados</value>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} KB</value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} MB</value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} GB</value>
+  </data>
+  <data name="TERA" xml:space="preserve">
+    <value>{0} TB</value>
+  </data>
+  <data name="PETA" xml:space="preserve">
+    <value>{0} PB</value>
+  </data>
+  <data name="EXA" xml:space="preserve">
+    <value>{0} EB</value>
+  </data>
+  <data name="MILLI" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="MICRO" xml:space="preserve">
+    <value>u</value>
+  </data>
+  <data name="NANO" xml:space="preserve">
+    <value>n</value>
+  </data>
+  <data name="BYTES" xml:space="preserve">
+    <value>{0} B</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Copiar {0} elementos</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
+    <value>Copiar {0} elementos a {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
+    <value>Mover {0} elementos a {1}</value>
+  </data>
+  <data name="S_DRAGDROP_LINK" xml:space="preserve">
+    <value>Crear enlace en {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>Mover {0} elementos</value>
+  </data>
+  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
+    <value>Pegar 1 Elemento de Corte</value>
+  </data>
+  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
+    <value>Pegar 1 Elemento Copiado</value>
+  </data>
+  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
+    <value>Pegar {0} Elementos Copiados</value>
+  </data>
+  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
+    <value>Pegar {0} Elementos Copiados</value>
+  </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{0} en {1} ({2})</value>
+  </data>
+  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
+    <value>{0} de {1}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
+    <value>Copiar {0}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
+    <value>Copiar {0} a {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
+    <value>Mover {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>Mover {0} a {1}</value>
+  </data>
+  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
+    <value>Archivo no encontrado</value>
+  </data>
+  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
+    <value>Finalizado sin ninguna confirmación</value>
+  </data>
+  <data name="S_VALIDATION_ERROR" xml:space="preserve">
+    <value>Error de validación: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATING" xml:space="preserve">
+    <value>Validando…</value>
+  </data>
+  <data name="S_FILES_PLURAL" xml:space="preserve">
+    <value>{0} archivos</value>
+  </data>
+  <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
+    <value>Seleccione la ROM para carga lateral</value>
+  </data>
+  <data name="S_ROM_FILE" xml:space="preserve">
+    <value>Archivo ROM</value>
+  </data>
+  <data name="S_TERMINAL" xml:space="preserve">
+    <value>Terminal</value>
+  </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>Conservar Fecha de Archivo Modificado</value>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>Instalar {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>Instalar {0} APK</value>
+  </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value>Encender</value>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value>Apagar</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>Comprobando estado del servidor mDNS…</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value>Iconos</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>Longitud</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>Dimensiones</value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>Un Mes</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>Una Semana</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>Un Día</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>Una Hora</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>Tiempo de Refresco de Miniaturas Locales</value>
+  </data>
+  <data name="S_HELP_ON_ADB" xml:space="preserve">
+    <value>Esta app es un IU para ADB – Android Debug Bridge.
+Para utilizar la app, necesita tener ADB en tu PC.
+ADB está disponible como parte de Android SDK Platform Tools.
+Puede utilizar el enlace del proveedor para descargar las SDK Platform Tools.
+Desafortunadamente, no podemos proporcionar ADB son la app debido a restricciones de licencia.</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>Creative Commons</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
+    <value>Encuestas Para Dispositivos</value>
+  </data>
+  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
+    <value>Encuesta Para Estado de Batería</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
+    <value>Habilitar el acceso root automáticamente</value>
+  </data>
+  <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
+    <value>Guardar Dispositivos Conectados Manualmente</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
+    <value>Abierto Automáticamente para Navegar</value>
+  </data>
+  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
+    <value>Vista Compacta</value>
+  </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value>Detener Encuesta en Importar/Exportar</value>
+  </data>
+  <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
+    <value>Operaciones Simultáneas</value>
+  </data>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value>Forzar Re–análisis de Medios al Exportar</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
+    <value>Encuestas para campañas electorales</value>
+  </data>
+  <data name="S_SETTINGS_APK" xml:space="preserve">
+    <value>Asistencia APK</value>
+  </data>
+  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
+    <value>Mostrar Extensiones del Nombre de Archivo</value>
+  </data>
+  <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
+    <value>Mostrar Elementos Ocultos</value>
+  </data>
+  <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
+    <value>Mostrar Apps del Sistema</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
+    <value>Archivo de Pulsación Doble</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
+    <value>Ninguno</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
+    <value>Exportar a Carpeta Predeterminada</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
+    <value>Abrir en Editor</value>
+  </data>
+  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
+    <value>Anular Ruta ADB</value>
+  </data>
+  <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
+    <value>Carpeta Por Defecto</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
+    <value>Ventanas Por Defecto</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
+    <value>Tema</value>
+  </data>
+  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
+    <value>Forzar Clientes Fluent</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
+    <value>Inhabilitar Aceleración de Hardware</value>
+  </data>
+  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
+    <value>Inhabilita Animaciones</value>
+  </data>
+  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
+    <value>Pantalla de Inicio</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES" xml:space="preserve">
+    <value>Comprobar Actualizaciones</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
+    <value>Gráficos</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
+    <value>Directorios de Trabajo</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
+    <value>Explorador</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
+    <value>Dispositivos y Características</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
+    <value>Dispositivo</value>
+  </data>
+  <data name="S_DONATE" xml:space="preserve">
+    <value>Donar o Patrocinar</value>
+  </data>
+  <data name="S_APP_DATA_FOLDER" xml:space="preserve">
+    <value>Carpeta de los Datos de App</value>
+  </data>
+  <data name="S_GITHUB_REPO" xml:space="preserve">
+    <value>Repo de GitHub</value>
+  </data>
+  <data name="S_PRIVACY_POLICY" xml:space="preserve">
+    <value>Normativa de Privacidad</value>
+  </data>
+  <data name="S_ATTRIBUTIONS" xml:space="preserve">
+    <value>Atributos y Licencias de Terceros</value>
+  </data>
+  <data name="S_SEE_TERMS" xml:space="preserve">
+    <value>Ver los términos</value>
+  </data>
+  <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
+    <value>[no fijado]</value>
+  </data>
+  <data name="S_SEARCH_SETTINGS" xml:space="preserve">
+    <value>Búsqueda de Ajustes</value>
+  </data>
+  <data name="S_EXIT_SEARCH" xml:space="preserve">
+    <value>Salir de Búsqueda</value>
+  </data>
+  <data name="S_SEARCH_VIEW" xml:space="preserve">
+    <value>Buscar Vista</value>
+  </data>
+  <data name="S_COLLAPSE_ALL" xml:space="preserve">
+    <value>Colapsar Todo</value>
+  </data>
+  <data name="S_EXPAND_ALL" xml:space="preserve">
+    <value>Expandir Todo</value>
+  </data>
+  <data name="S_ACTION_HIDE" xml:space="preserve">
+    <value>Ocultar</value>
+  </data>
+  <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
+    <value>Idioma</value>
+  </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>Aceptar</value>
+  </data>
+  <data name="S_FILTER_FILE_OPS" xml:space="preserve">
+    <value>Operaciones del Archivo del Filtro</value>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>Habilitar Auto-reproducción</value>
+  </data>
+  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
+    <value>Inhabilitar Auto-reproducción
+Cancelar Todas las Activas</value>
+  </data>
+  <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
+    <value>Actualizaciones de Bitácora Pausadas</value>
+  </data>
+  <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
+    <value>Pausar Actualizaciones de Bitácoras</value>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>Bitácora de Comando</value>
+  </data>
+  <data name="S_BUTTON_DRIVES" xml:space="preserve">
+    <value>Unidades del Dispositivo</value>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value>Atrás</value>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value>Avanzar</value>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>Subir</value>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>Filtro</value>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>Dispositivos</value>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>Cargar</value>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>Carpetas</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>Archivos</value>
+  </data>
+  <data name="S_MENU_REFRESH" xml:space="preserve">
+    <value>Recargar</value>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>Copiar</value>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>Más</value>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>Editar</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>Nuevo</value>
+  </data>
+  <data name="S_EMPTY_FILTER" xml:space="preserve">
+    <value>Ningún ítem coincide con el filtro actual.</value>
+  </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value>&lt;Span&gt;Esta carpeta &lt;Italic&gt;parece&lt;/Italic&gt; vacía&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… a simple vista&lt;/Span&gt;&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ITEMS_SELECTED" xml:space="preserve">
+    <value>ítem seleccionado</value>
+  </data>
+  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
+    <value>elementos seleccionados</value>
+  </data>
+  <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
+    <value>Tipo de Operación</value>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>Nombre de Archivo</value>
+  </data>
+  <data name="S_COLUMN_PROGRESS" xml:space="preserve">
+    <value>Progreso</value>
+  </data>
+  <data name="S_COLUMN_SOURCE" xml:space="preserve">
+    <value>Origen</value>
+  </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value>Destino</value>
+  </data>
+  <data name="S_COLUMN_ADDED" xml:space="preserve">
+    <value>Añadido</value>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>Icono</value>
+  </data>
+  <data name="S_COLUMN_NAME" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
+    <value>Lugar Origen</value>
+  </data>
+  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
+    <value>Fecha Modificada</value>
+  </data>
+  <data name="S_COLUMN_TYPE" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="S_COLUMN_SIZE" xml:space="preserve">
+    <value>Tamaño</value>
+  </data>
+  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
+    <value>Fecha Eliminada</value>
+  </data>
+  <data name="S_COLUMN_USER_ID" xml:space="preserve">
+    <value>ID de Usuario</value>
+  </data>
+  <data name="S_COLUMN_VERSION" xml:space="preserve">
+    <value>Versión</value>
+  </data>
+  <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
+    <value>Servidor ADB Ausente</value>
+  </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value>Tiempo desde la última respuesta del servidor</value>
+  </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}s</value>
+  </data>
+  <data name="S_KILL_SERVER" xml:space="preserve">
+    <value>Matar Servidor</value>
+  </data>
+  <data name="S_KILL_PROCESS" xml:space="preserve">
+    <value>Matar Proceso</value>
+  </data>
+  <data name="S_REFRESH_DEVICES" xml:space="preserve">
+    <value>Refrescar Dispositivos</value>
+  </data>
+  <data name="S_RESTART_ADB" xml:space="preserve">
+    <value>Reiniciar ADB</value>
+  </data>
+  <data name="S_SERVER_DOWN" xml:space="preserve">
+    <value>Servidor mDNS caído</value>
+  </data>
+  <data name="S_AWAITING_RESPONSE" xml:space="preserve">
+    <value>Esperando respuesta: {0}</value>
+  </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>Servidor mDNS está activo y en ejecución</value>
+  </data>
+  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
+    <value>Mantenimiento Limitado</value>
+  </data>
+  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
+    <value>Algunas operaciones han fallado</value>
+  </data>
+  <data name="S_ROOT_ENABLED" xml:space="preserve">
+    <value>Acceso Root Habilitado</value>
+  </data>
+  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
+    <value>Root Puede Ser Habilitado</value>
+  </data>
+  <data name="S_RECOVERY_MODE" xml:space="preserve">
+    <value>Recuperación</value>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value>Voltage: {0}v</value>
+  </data>
+  <data name="S_BAT_TEMP" xml:space="preserve">
+    <value>Temperatura: {0}°C</value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>Balance Actual: {0}A</value>
+  </data>
+  <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
+    <value>Rearranque en</value>
+  </data>
+  <data name="S_REBOOT_SYSTEM" xml:space="preserve">
+    <value>Imagen del sistema</value>
+  </data>
+  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
+    <value>Cargador de arranque</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
+    <value>Carga lateral</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
+    <value>Instalación lateral (reinicio automático)</value>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} – Desconectado</value>
+  </data>
+  <data name="S_STATUS_UNAUTH" xml:space="preserve">
+    <value>{0} – Desautorizado</value>
+  </data>
+  <data name="S_TYPE_EMULATOR" xml:space="preserve">
+    <value>Emulador</value>
+  </data>
+  <data name="S_TYPE_SERVICE" xml:space="preserve">
+    <value>Servicio mDNS</value>
+  </data>
+  <data name="S_TYPE_USB" xml:space="preserve">
+    <value>USB</value>
+  </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value>WiFi</value>
+  </data>
+  <data name="S_TYPE_WSA" xml:space="preserve">
+    <value>WSA</value>
+  </data>
+  <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
+    <value>Estado de Batería Desconocido</value>
+  </data>
+  <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
+    <value>{0}%, Enchufado</value>
+  </data>
+  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
+    <value>Sin cable</value>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>CA</value>
+  </data>
+  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
+    <value>Ninguno</value>
+  </data>
+  <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
+    <value>Desconocido</value>
+  </data>
+  <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
+    <value>Cargando</value>
+  </data>
+  <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
+    <value>Descargando</value>
+  </data>
+  <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
+    <value>Sin Carga</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
+    <value>Sobretensión</value>
+  </data>
+  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
+    <value>Windows Ejecutable</value>
+  </data>
+  <data name="S_VALIDATE_MISSING" xml:space="preserve">
+    <value>Ausente desde lugar destinatario</value>
+  </data>
+  <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
+    <value>Borrado Permanente</value>
+  </data>
+  <data name="S_LOCATION_NA" xml:space="preserve">
+    <value>N/D</value>
+  </data>
+  <data name="S_PATH_INVALID" xml:space="preserve">
+    <value>Argumento debe especificar ruta completa de un nuevo o existente archivo de ajustes.</value>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>Ruta de Ajustes de App Adaptada</value>
+  </data>
+  <data name="S_MENU_EMPTY" xml:space="preserve">
+    <value>El Menú Está Vacío</value>
+  </data>
+  <data name="S_ITEM_COPY" xml:space="preserve">
+    <value>{0} – Copia</value>
+  </data>
+  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
+    <value>Adhiere a reglas de nombrado Unix (vía ADB)</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>Adhiere a reglas de nombrado FUSE</value>
+  </data>
+  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
+    <value>Adhiere a reglas de nombrado de Windows</value>
+  </data>
+  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
+    <value>Adhiere a reglas de nombrado de raíz de unidad de Windows</value>
+  </data>
+  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
+    <value>Único en lugar actual</value>
+  </data>
+  <data name="S_POPUP_WARNING" xml:space="preserve">
+    <value>Avisos</value>
+  </data>
+  <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
+    <value>Un archivo seleccionado viola las reglas de nombrado de Windows</value>
+  </data>
+  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
+    <value>Un archivo seleccionado viola las reglas de nombrado de unidad raíz de Windows</value>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>Algunos archivos seleccionados tienen conflicto con nombres en FUSE / Windows</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>Un archivo seleccionado viola las reglas de nombrado FUSE</value>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>Algunos archivos copiados tienen un conflicto con los nombres en FUSE</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>Un archivo copiado viola las reglas de nombrado de FUSE</value>
+  </data>
+  <data name="S_POPUP_NON_FILE" xml:space="preserve">
+    <value>Un ítem seleccionado no es un archivo / carpeta</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
+    <value>Puede ser deshecho utilizando Ajustes de App Restablecida, o manualmente en ajustes de archivo</value>
+  </data>
+  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
+    <value>Hasta el lanzado de la app siguiente</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
+    <value>Nunca Mostrar De Nuevo</value>
+  </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value>App WSA</value>
+  </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>Estado de raíz: {0}</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>Emparejando Código</value>
+  </data>
+  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
+    <value>Dirección IP / Nombre de Host</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
+    <value>Emparejando Puerto</value>
+  </data>
+  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
+    <value>Emparejar y Conectar</value>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value>Dispositivo Guardado</value>
+  </data>
+  <data name="S_DEVICE_QR" xml:space="preserve">
+    <value>Emparejado de QR</value>
+  </data>
+  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
+    <value>Preparado para Emparejar</value>
+  </data>
+  <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
+    <value>Actualmente Examinando</value>
+  </data>
+  <data name="S_BUTTON_BROWSE" xml:space="preserve">
+    <value>Explorar</value>
+  </data>
+  <data name="S_BUTTON_CONNECT" xml:space="preserve">
+    <value>Conectar</value>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value>{0} libre de {1}</value>
+  </data>
+  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
+    <value>Vacío</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
+    <value>Instalador de APK</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
+    <value>Instaladores de APK</value>
+  </data>
+  <data name="S_FILEOP_VALIDATED" xml:space="preserve">
+    <value>Validado</value>
+  </data>
+  <data name="S_FILEOP_COMPLETED" xml:space="preserve">
+    <value>Completado</value>
+  </data>
+  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
+    <value>{0} Incorrecto</value>
+  </data>
+  <data name="S_FILEOP_TOTAL" xml:space="preserve">
+    <value>Total:</value>
+  </data>
+  <data name="S_FILEOP_PREV" xml:space="preserve">
+    <value>Operación Previa</value>
+  </data>
+  <data name="S_FILEOP_RUNNING" xml:space="preserve">
+    <value>Ejecutando</value>
+  </data>
+  <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
+    <value>Cima</value>
+  </data>
+  <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
+    <value>Suelo</value>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>Avanzar Página</value>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>Retroceder Página</value>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>Arrastrar Arriba</value>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>Arrastrar Abajo</value>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>Borde Izquierdo</value>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>Borde Derecho</value>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>Página Izquierda</value>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>Página Derecha</value>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>Arrastre Izquierdo</value>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>Arrastre Derecho</value>
+  </data>
+  <data name="S_MENU_UNDO" xml:space="preserve">
+    <value>Deshacer</value>
+  </data>
+  <data name="S_MENU_REDO" xml:space="preserve">
+    <value>Rehacer</value>
+  </data>
+  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
+    <value>Notificaciones</value>
+  </data>
+  <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
+    <value>Pulse para exhibir más info</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
+    <value>Idioma de App</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION" xml:space="preserve">
+    <value>Seleccione su idioma de all de elección en los ajustes.
+El progreso de traducción está exhibido para el idioma seleccionado.
+Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
+  </data>
+  <data name="S_GOTO_WEBLATE" xml:space="preserve">
+    <value>Ir a Weblate</value>
+  </data>
+  <data name="S_FILE_SOCKET" xml:space="preserve">
+    <value>Zócalo</value>
+  </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>Bloquear Dispositivo</value>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>Carácter de Dispositivo</value>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>Exportar y Exhibir Miniaturas</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>Solo en Vista de Icono</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>Solo en Directorios de Foto</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value>Hasta Conexión</value>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>Miniaturas Persistentes Entre Sesiones</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>Velocidad Limite de Subida de Miniaturas</value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>Mostrar Iconos Para Carpetas Especiales</value>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>Incluir Miniaturas de Vídeo</value>
   </data>
 </root>
