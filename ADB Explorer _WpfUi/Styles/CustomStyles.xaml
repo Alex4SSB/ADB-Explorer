@@ -146,7 +146,7 @@
         BasedOn="{StaticResource ExplorerGridCellStyle}"
         TargetType="TextBlock">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
+            <DataTrigger Binding="{Binding FolderViewModel.ExtensionIsGlyph}" Value="True">
                 <Setter Property="FontFamily" Value="Segoe UI Symbol" />
             </DataTrigger>
             <DataTrigger Binding="{Binding CutState}" Value="Move">
@@ -386,8 +386,8 @@
                         <Style.Triggers>
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding ExtensionIsGlyph}" Value="False" />
-                                    <Condition Binding="{Binding ExtensionIsFontIcon}" Value="False" />
+                                    <Condition Binding="{Binding FolderViewModel.ExtensionIsGlyph}" Value="False" />
+                                    <Condition Binding="{Binding FolderViewModel.ExtensionIsFontIcon}" Value="False" />
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Visibility" Value="Visible" />
                             </MultiDataTrigger>
@@ -411,17 +411,17 @@
             <emoji:TextBlock
                 HorizontalAlignment="Center"
                 FontSize="16"
-                Text="{Binding ShortExtension}">
+                Text="{Binding FolderViewModel.ShortExtension}">
                 <emoji:TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Setter Property="Visibility" Value="Collapsed" />
                         <Setter Property="Opacity" Value="1" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
+                            <DataTrigger Binding="{Binding FolderViewModel.ExtensionIsGlyph}" Value="True">
                                 <Setter Property="FontFamily" Value="Segoe UI Symbol" />
                                 <Setter Property="Visibility" Value="Visible" />
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding ExtensionIsFontIcon}" Value="True">
+                            <DataTrigger Binding="{Binding FolderViewModel.ExtensionIsFontIcon}" Value="True">
                                 <Setter Property="Visibility" Value="Visible" />
                                 <Setter Property="Margin" Value="0,-2,0,0" />
                             </DataTrigger>

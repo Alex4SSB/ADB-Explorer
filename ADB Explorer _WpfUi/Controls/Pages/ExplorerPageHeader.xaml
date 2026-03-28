@@ -313,7 +313,7 @@
                                 <DataGridTextColumn.ElementStyle>
                                     <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
                                         <Setter Property="Visibility" Value="Collapsed" />
-                                        <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
+                                        <Setter Property="Text" Value="{Binding FolderViewModel.ModifiedTimeString}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Type}" Value="File">
                                                 <Setter Property="Visibility" Value="Visible" />
@@ -330,15 +330,15 @@
                                 Width="150"
                                 Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_TYPE}}"
                                 IsReadOnly="True"
-                                SortMemberPath="TypeName"
+                                SortMemberPath="FolderViewModel.TypeName"
                                 Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <emoji:TextBlock
-                                            FlowDirection="{Binding TypeFlowDirection}"
+                                            FlowDirection="{Binding FolderViewModel.TypeFlowDirection}"
                                             FontSize="{Binding Source={StaticResource FontSize}}"
                                             Style="{StaticResource DirectoryGridCellStyle}"
-                                            Text="{Binding TypeName}" />
+                                            Text="{Binding FolderViewModel.TypeName}" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -352,7 +352,7 @@
                                 Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
-                                        <Setter Property="Text" Value="{Binding SizeString}" />
+                                        <Setter Property="Text" Value="{Binding FolderViewModel.SizeString}" />
                                         <Setter Property="HorizontalAlignment" Value="Right" />
                                         <Setter Property="Visibility" Value="Collapsed" />
                                         <Style.Triggers>

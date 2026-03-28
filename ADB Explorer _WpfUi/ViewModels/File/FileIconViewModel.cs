@@ -4,9 +4,8 @@ using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
 
-public partial class FileIconViewModel : ObservableObject
+public partial class FileIconViewModel : FileViewModelBase
 {
-    private readonly FileClass _file;
     private CancellationTokenSource? _cts;
     private Action<string, string>? _thumbnailUpdatedHandler;
 
@@ -34,9 +33,8 @@ public partial class FileIconViewModel : ObservableObject
     [ObservableProperty]
     private string? _iconViewTooltip;
 
-    public FileIconViewModel(FileClass file)
+    public FileIconViewModel(FileClass file) : base(file)
     {
-        _file = file;
         _largeIcon = GetLargeFileIcon();
         UpdateOverlays();
     }
@@ -144,15 +142,12 @@ public partial class FileIconViewModel : ObservableObject
     private void UpdateTooltip(ThumbnailService.Thumbnail thumb)
     {
         List<string> result = [];
-        string typeRow = Data.RuntimeSettings.IsRTL && !_file.TypeIsRtl
-            ? $"{TextHelper.LTR_MARK}{Strings.Resources.S_COLUMN_TYPE}: {TextHelper.RTL_MARK}{_file.TypeName}{TextHelper.LTR_MARK}"
-            : $"{Strings.Resources.S_COLUMN_TYPE}: {_file.TypeName}";
-        
-        result.Add(typeRow);
+
+        result.Add(IconViewTypeString());
 
         if (thumb.Info.Type is ThumbnailService.MediaType.video)
         {
-            result.Add($"{Strings.Resources.S_COLUMN_SIZE}: {_file.SizeString}");
+            result.Add($"{Strings.Resources.S_COLUMN_SIZE}: {SizeString}");
 
             if (thumb.Info.Duration is TimeSpan duration)
                 result.Add($"{Strings.Resources.S_VIDEO_DURATION}: {duration.Hours:D2}:{duration.Minutes:D2}:{duration.Seconds:D2}");
@@ -162,7 +157,7 @@ public partial class FileIconViewModel : ObservableObject
             if (thumb.Info.Resolution is Size res)
                 result.Add($"{Strings.Resources.S_PICTURE_DIMENSIONS}: {$"{res.Width} × {res.Height}"}");
 
-            result.Add($"{Strings.Resources.S_COLUMN_SIZE}: {_file.SizeString}");
+            result.Add($"{Strings.Resources.S_COLUMN_SIZE}: {SizeString}");
         }
 
         IconViewTooltip = result.Count == 0 ? null : string.Join('\n', result);
@@ -186,27 +181,30 @@ public partial class FileIconViewModel : ObservableObject
         else if (_file.Type is AbstractFile.FileType.Folder)
         {
             if (_file.ModifiedTime is not null)
-                result.Add($"{Strings.Resources.S_COLUMN_DATE_MODIFIED}: {_file.ModifiedTimeString}");
+                result.Add($"{Strings.Resources.S_COLUMN_DATE_MODIFIED}: {ModifiedTimeString}");
         }
         else
         {
             if (_file.Type is not AbstractFile.FileType.Unknown)
             {
-                string typeName = _file.TypeName;
-                if (Data.RuntimeSettings.IsRTL && !_file.TypeIsRtl)
-                    typeName = TextHelper.LTR_MARK + typeName;
-
-                result.Add($"{Strings.Resources.S_COLUMN_TYPE}: {typeName}");
+                result.Add(IconViewTypeString());
             }
 
             if (_file.Size is not null)
-                result.Add($"{Strings.Resources.S_COLUMN_SIZE}: {_file.SizeString}");
+                result.Add($"{Strings.Resources.S_COLUMN_SIZE}: {SizeString}");
 
             if (_file.ModifiedTime is not null)
-                result.Add($"{Strings.Resources.S_COLUMN_DATE_MODIFIED}: {_file.ModifiedTimeString}");
+                result.Add($"{Strings.Resources.S_COLUMN_DATE_MODIFIED}: {ModifiedTimeString}");
         }
 
         IconViewTooltip = result.Count == 0 ? null : string.Join('\n', result);
+    }
+
+    private string IconViewTypeString()
+    {
+        return Data.RuntimeSettings.IsRTL && !TypeIsRtl
+            ? $"{TextHelper.LTR_MARK}{Strings.Resources.S_COLUMN_TYPE}: {TextHelper.RTL_MARK}{TypeName}{TextHelper.LTR_MARK}"
+            : $"{Strings.Resources.S_COLUMN_TYPE}: {TypeName}";
     }
 
     public void CancelLoading()
@@ -222,7 +220,7 @@ public partial class FileIconViewModel : ObservableObject
         _cts = null;
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
         CancelLoading();
 
@@ -230,5 +228,7 @@ public partial class FileIconViewModel : ObservableObject
         LargeIconOverlay = null;
         VideoIconOverlay = null;
         IconViewTooltip = null;
+
+        base.Dispose();
     }
 }

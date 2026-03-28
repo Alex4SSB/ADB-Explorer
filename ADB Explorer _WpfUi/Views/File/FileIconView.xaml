@@ -18,13 +18,13 @@
                         <DataTrigger Binding="{Binding IconViewModel.IconViewTooltip}" Value="{x:Null}">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
+                        <DataTrigger Binding="{Binding IsLink}" Value="True">
+                            <Setter Property="FlowDirection" Value="LeftToRight" />
+                        </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </ToolTip.Style>
-            <TextBlock
-                FlowDirection="LeftToRight"
-                Text="{Binding IconViewModel.IconViewTooltip}"
-                TextWrapping="Wrap" />
+            <TextBlock Text="{Binding IconViewModel.IconViewTooltip}" TextWrapping="Wrap" />
         </ToolTip>
     </UserControl.Resources>
     <Grid
@@ -38,6 +38,15 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid HorizontalAlignment="Center" FlowDirection="LeftToRight">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CutState}" Value="Move">
+                                <Setter Property="Opacity" Value="0.5" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
                 <Image
                     MaxWidth="140"
                     MaxHeight="120"
@@ -71,11 +80,25 @@
                 Margin="0,4,0,0"
                 HorizontalAlignment="Center"
                 FlowDirection="{Binding NameFlowDirection}"
-                Style="{StaticResource DirectoryGridCellStyle}"
                 Text="{Binding DisplayName}"
                 TextAlignment="Center"
+                TextTrimming="CharacterEllipsis"
                 TextWrapping="Wrap"
-                ToolTip="{x:Null}" />
+                ToolTip="{x:Null}">
+                <emoji:TextBlock.Style>
+                    <Style TargetType="emoji:TextBlock">
+                        <Setter Property="Opacity" Value="1" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CutState}" Value="Move">
+                                <Setter Property="Opacity" Value="0.5" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding CutState}" Value="Copy">
+                                <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </emoji:TextBlock.Style>
+            </emoji:TextBlock>
         </Grid>
     </Grid>
 </UserControl>

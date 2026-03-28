@@ -278,6 +278,7 @@ public partial class ExplorerPageHeader : UserControl
                     if (RuntimeSettings.LocationToNavigate is null)
                         return;
 
+                    DirList?.Stop();
                     DisposeFileIcons();
 
                     switch (RuntimeSettings.LocationToNavigate.Location)

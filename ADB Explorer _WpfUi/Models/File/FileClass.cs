@@ -2,6 +2,7 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
+using ADB_Explorer.ViewModels;
 using Vanara.PInvoke;
 using Vanara.Windows.Shell;
 
@@ -11,11 +12,13 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 {
     #region Notify Properties
 
-    private long? size;
-    public long? Size
+    [ObservableProperty]
+    private long? _size;
+
+    partial void OnSizeChanged(long? value)
     {
-        get => size;
-        set => Set(ref size, value);
+        _folderViewModel?.OnSizeChanged();
+        _iconViewModel?.OnSizeChanged();
     }
 
     private bool isLink;
@@ -29,12 +32,8 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         }
     }
 
-    private string linkTarget = "";
-    public string LinkTarget
-    {
-        get => linkTarget;
-        set => Set(ref linkTarget, value);
-    }
+    [ObservableProperty]
+    private string _linkTarget = "";
 
     private FileType type;
     public FileType Type
@@ -47,16 +46,6 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         }
     }
 
-    private string typeName;
-    public string TypeName
-    {
-        get => typeName;
-        private set => Set(ref typeName, value);
-    }
-
-    public bool TypeIsRtl => TextHelper.ContainsRtl(TypeName);
-    public FlowDirection TypeFlowDirection => TypeIsRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
-
     private DateTime? modifiedTime;
     public DateTime? ModifiedTime
     {
@@ -64,14 +53,26 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         set
         {
             if (Set(ref modifiedTime, value))
-                OnPropertyChanged(nameof(ModifiedTimeString));
+            {
+                _folderViewModel?.OnModifiedTimeChanged();
+                _iconViewModel?.OnModifiedTimeChanged();
+            }
         }
     }
 
     public double? UnixTime => ModifiedTime.ToUnixTime();
 
-    [ObservableProperty]
-    private BitmapSource _icon = null;
+    private BitmapSource? _icon = null;
+    public BitmapSource Icon
+    {
+        get
+        {
+            if (_icon is null)
+                GetIcon();
+
+            return _icon;
+        }
+    }
 
     [ObservableProperty]
     private BitmapSource? _iconOverlay = null;
@@ -113,15 +114,25 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         }
     }
 
-    private ViewModels.FileIconViewModel? _iconViewModel;
-    public ViewModels.FileIconViewModel IconViewModel 
-        => _iconViewModel ??= new ViewModels.FileIconViewModel(this);
+    private FileIconViewModel? _iconViewModel;
+    public FileIconViewModel IconViewModel 
+        => _iconViewModel ??= new FileIconViewModel(this);
 
     public void DisposeIconViewModel()
     {
         _iconViewModel?.Dispose();
         _iconViewModel = null;
         _cacheThumbnail = null;
+    }
+
+    private FolderViewModel? _folderViewModel;
+    public FolderViewModel FolderViewModel
+        => _folderViewModel ??= new FolderViewModel(this);
+
+    public void DisposeFolderViewModel()
+    {
+        _folderViewModel?.Dispose();
+        _folderViewModel = null;
     }
 
     private DragDropEffects cutState = DragDropEffects.None;
@@ -145,20 +156,6 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     #endregion
 
-    private bool extensionIsGlyph = false;
-    public bool ExtensionIsGlyph
-    {
-        get => extensionIsGlyph;
-        set => Set(ref extensionIsGlyph, value);
-    }
-
-    private bool extensionIsFontIcon = false;
-    public bool ExtensionIsFontIcon
-    {
-        get => extensionIsFontIcon;
-        set => Set(ref extensionIsFontIcon, value);
-    }
-
     public bool IsTemp { get; set; }
 
     public FileNameSort SortName { get; private set; }
@@ -180,20 +177,6 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     /// Returns an empty string if file has no extension, or is not a regular file.
     /// </summary>
     public override string Extension => Type is FileType.File ? base.Extension : "";
-
-    public string ShortExtension
-    {
-        get
-        {
-            return (Extension.Length > 1 && Array.IndexOf(AdbExplorerConst.UNICODE_ICONS, char.GetUnicodeCategory(Extension[1])) > -1)
-                ? Extension[1..]
-                : "";
-        }
-    }
-
-    public string ModifiedTimeString => TabularDateFormatter.Format(ModifiedTime, Thread.CurrentThread.CurrentCulture);
-
-    public string SizeString => IsDirectory ? "" : Size?.BytesToSize(true);
 
     #endregion
 
@@ -219,9 +202,6 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         Size = size;
         ModifiedTime = modifiedTime;
         IsLink = isLink;
-
-        GetIcon();
-        TypeName = GetTypeName();
         IsTemp = isTemp;
         
         SortName = new(FullName);
@@ -255,9 +235,6 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         Size = IsDirectory ? null : windowsPath.FileInfo.Length;
         ModifiedTime = windowsPath.FileInfo?.LastWriteTime;
         IsLink = windowsPath.IsLink;
-
-        GetIcon();
-        TypeName = GetTypeName();
 
         SortName = new(FullName);
     }
@@ -297,10 +274,11 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     public void UpdateType()
     {
-        TypeName = GetTypeName();
+        _folderViewModel?.UpdateType();
+
+        _iconViewModel?.UpdateType();
+
         GetIcon();
-        OnPropertyChanged(nameof(ExtensionIsGlyph));
-        OnPropertyChanged(nameof(ExtensionIsFontIcon));
     }
 
     public void UpdateSpecialType()
@@ -318,60 +296,6 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
         if (IsLink && Type is not FileType.BrokenLink)
             SpecialType |= SpecialFileType.LinkOverlay;
-    }
-
-    private string GetTypeName()
-    {
-        var type = Type switch
-        {
-            FileType.File => GetTypeName(FullName),
-            FileType.Folder => Strings.Resources.S_MENU_FOLDER,
-            FileType.Unknown => "",
-            _ => GetFileTypeName(Type),
-        };
-
-        if (IsLink && Type is not FileType.BrokenLink)
-            type = string.IsNullOrEmpty(type)
-                ? Strings.Resources.S_FILE_TYPE_LINK
-                : string.Format(Strings.Resources.S_KNOWN_TYPE_LINK, type);
-
-        return type;
-    }
-
-    public string GetTypeName(string fileName)
-    {
-        if (IsApk)
-            return Strings.Resources.S_FILE_TYPE_APK;
-
-        if (string.IsNullOrEmpty(fileName) || (IsHidden && FullName.Count(c => c == '.') == 1))
-            return Strings.Resources.S_MENU_FILE;
-
-        if (Extension.Equals(".exe", StringComparison.CurrentCultureIgnoreCase))
-            return Strings.Resources.S_FILE_TYPE_EXE;
-
-        if (!Ascii.IsValid(Extension))
-        {
-            if (ShortExtension.Length == 1)
-                ExtensionIsGlyph = true;
-            else if (ShortExtension.Length > 1)
-                ExtensionIsFontIcon = true;
-            else
-            {
-                ExtensionIsGlyph =
-                ExtensionIsFontIcon = false;
-
-                return $"{Extension[1..]} {Strings.Resources.S_MENU_FILE}";
-            }
-
-            return $"{ShortExtension} {Strings.Resources.S_MENU_FILE}";
-        }
-        else
-        {
-            ExtensionIsGlyph =
-            ExtensionIsFontIcon = false;
-
-            return NativeMethods.GetShellFileType(fileName);
-        }
     }
 
     public SyncFile GetSyncFile() => new(this, Children);
@@ -506,9 +430,11 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         var icons = FileToIconConverter.GetImage(this, 16).ToArray();
 
         if (icons.Length > 0 && icons[0] is BitmapSource icon)
-            Icon = icon;
+            _icon = icon;
         else
-            Icon = null;
+            _icon = null;
+
+        OnPropertyChanged(nameof(Icon));
 
         if (icons.Length > 1 && icons[1] is BitmapSource icon2)
             IconOverlay = icon2;
@@ -518,13 +444,17 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     public override string ToString()
     {
+        var timeStr = TabularDateFormatter.Format(ModifiedTime, Thread.CurrentThread.CurrentCulture);
+        var sizeStr = IsDirectory ? "" : Size?.BytesToSize(true);
+        var typeStr = _folderViewModel?.TypeName ?? $"{Type}";
+
         if (TrashIndex is null)
         {
-            return $"{DisplayName} \n{ModifiedTimeString} \n{TypeName} \n{SizeString}";
+            return $"{DisplayName} \n{timeStr} \n{typeStr} \n{sizeStr}";
         }
         else
         {
-            return $"{DisplayName} \n{TrashIndex.OriginalPath} \n{TrashIndex.ModifiedTimeString} \n{TypeName} \n{SizeString} \n{ModifiedTimeString}";
+            return $"{DisplayName} \n{TrashIndex.OriginalPath} \n{TrashIndex.ModifiedTimeString} \n{typeStr} \n{sizeStr} \n{timeStr}";
         }
     }
 
