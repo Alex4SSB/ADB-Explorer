@@ -49,6 +49,9 @@
             <EventSetter Event="Drop" Handler="DataGridRow_Drop" />
             <EventSetter Event="MouseUp" Handler="DataGridCell_MouseUp" />
             <EventSetter Event="DragOver" Handler="ExplorerGrid_DragOver" />
+            <EventSetter Event="PreviewDragEnter" Handler="Row_PreviewDragEnter" />
+            <EventSetter Event="PreviewDragLeave" Handler="Row_PreviewDragLeave" />
+            <EventSetter Event="MouseLeave" Handler="Row_MouseLeave" />
         </Style>
         <DataTemplate x:Key="LogicalDriveTemplate">
             <views:LogicalDriveControl />
@@ -70,6 +73,25 @@
         </Style>
         <views:FileIconView x:Key="FileIconView" />
         <Style
+            x:Key="IconFileContainerWithContextMenuStyle"
+            BasedOn="{StaticResource IconFileContainerStyle}"
+            TargetType="ui:ListViewItem">
+            <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
+            <EventSetter Event="PreviewDragEnter" Handler="Row_PreviewDragEnter" />
+            <EventSetter Event="PreviewDragLeave" Handler="Row_PreviewDragLeave" />
+            <EventSetter Event="MouseLeave" Handler="Row_MouseLeave" />
+            <EventSetter Event="Drop" Handler="DataGridRow_Drop" />
+            <EventSetter Event="DragOver" Handler="ExplorerGrid_DragOver" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="False">
+                    <Setter Property="AllowDrop" Value="{Binding IsDirectory}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
+                    <Setter Property="AllowDrop" Value="True" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style
             x:Key="IconViewStyle"
             BasedOn="{StaticResource ListViewStyle}"
             TargetType="local:AdbListView">
@@ -80,9 +102,9 @@
             </Style.Triggers>
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Setter Property="SnapsToDevicePixels" Value="False" />
-            <Setter Property="SelectionMode" Value="Multiple" />
+            <Setter Property="SelectionMode" Value="Extended" />
             <Setter Property="IsItemScrolling" Value="True" />
-            <Setter Property="ItemContainerStyle" Value="{StaticResource IconFileContainerStyle}" />
+            <Setter Property="ItemContainerStyle" Value="{StaticResource IconFileContainerWithContextMenuStyle}" />
             <Setter Property="ItemTemplate">
                 <Setter.Value>
                     <DataTemplate>
@@ -197,8 +219,9 @@
                 <local:AdbListView
                     x:Name="IconView"
                     HorizontalAlignment="Stretch"
-                    helpers:SelectionHelper.CurrentSelectedIndex="-1"
-                    helpers:SelectionHelper.FirstSelectedIndex="-1"
+                    ContextMenu="{StaticResource RowContextMenu}"
+                    ContextMenuClosing="ExplorerGrid_ContextMenuClosing"
+                    ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
                     ItemsSource="{Binding ExplorerItemsSource}"
                     SelectionChanged="IconView_SelectionChanged"
                     Style="{StaticResource IconViewStyle}">
@@ -225,9 +248,6 @@
                     </Grid.Style>
                     <ui:DataGrid
                         x:Name="ExplorerGrid"
-                        helpers:SelectionHelper.CurrentSelectedIndex="-1"
-                        helpers:SelectionHelper.FirstSelectedIndex="-1"
-                        helpers:SelectionHelper.SelectionInProgress="False"
                         AutoGenerateColumns="False"
                         Background="Transparent"
                         CanUserResizeRows="False"

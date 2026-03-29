@@ -237,7 +237,7 @@ public partial class ExplorerPageHeader : UserControl
             case Key.Down or Key.Up or Key.Left or Key.Right or Key.Home or Key.End:
                 if (bfNavigation)
                 {
-                    SelectionHelper.SetCurrentSelectedIndex(ActiveView, ActiveView.SelectedIndex);
+                    ViewModel.CurrentSelectedIndex = ActiveView.SelectedIndex;
                     bfNavigation = false;
                 }
 
@@ -250,16 +250,16 @@ public partial class ExplorerPageHeader : UserControl
                     var step = navKey is Key.Left or Key.Right ? 1 : IconView.ItemsPerRow;
 
                     if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
-                        IconView.MultiSelect(navKey, step);
+                        IconView.MultiSelect(navKey, step, ViewModel);
                     else
-                        IconView.SingleSelect(navKey, step);
+                        IconView.SingleSelect(navKey, step, ViewModel);
                 }
                 else
                 {
                     if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
-                        ExplorerGrid.MultiSelect(key);
+                        ExplorerGrid.MultiSelect(key, ViewModel);
                     else
-                        ExplorerGrid.SingleSelect(key);
+                        ExplorerGrid.SingleSelect(key, ViewModel);
                 }
                 break;
 
@@ -272,7 +272,7 @@ public partial class ExplorerPageHeader : UserControl
                 break;
 
             case Key.Apps:
-                ExplorerGrid.ContextMenu.IsOpen = true;
+                ActiveView.ContextMenu.IsOpen = true;
                 break;
 
             default:
@@ -426,7 +426,7 @@ public partial class ExplorerPageHeader : UserControl
 
     private void FilterExplorerContextMenu() => Dispatcher.Invoke(() =>
     {
-        var collectionView = CollectionViewSource.GetDefaultView(ExplorerGrid.ContextMenu.ItemsSource);
+        var collectionView = CollectionViewSource.GetDefaultView(ActiveView.ContextMenu.ItemsSource);
         if (collectionView is null)
             return;
 
@@ -538,8 +538,8 @@ public partial class ExplorerPageHeader : UserControl
         FileActions.ExplorerFilter = "";
         NavHistory.Navigate(realPath);
 
-        SelectionHelper.SetFirstSelectedIndex(ActiveView, -1);
-        SelectionHelper.SetCurrentSelectedIndex(ActiveView, -1);
+        ViewModel.FirstSelectedIndex = -1;
+        ViewModel.CurrentSelectedIndex = -1;
 
         ActiveView.Focus();
         CurrentPath = realPath;
@@ -616,7 +616,7 @@ public partial class ExplorerPageHeader : UserControl
 
     private void NavigateToLocation(AdbLocation location)
     {
-        SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, false);
+        ViewModel.IsMenuOpen = false;
 
         if (location.Location is Navigation.SpecialLocation.DriveView)
         {
@@ -765,10 +765,10 @@ public partial class ExplorerPageHeader : UserControl
             row.IsSelected = true;
         }
 
-        SelectionHelper.SetNextSelectedIndex(ExplorerGrid, current);
-        SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, current);
+        ViewModel.NextSelectedIndex = current;
+        ViewModel.CurrentSelectedIndex = current;
         if (ExplorerGrid.SelectedItems.Count < 1)
-            SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, current);
+            ViewModel.FirstSelectedIndex = current;
     }
 
     private void DoubleClick(object source)
@@ -853,15 +853,15 @@ public partial class ExplorerPageHeader : UserControl
         }
 
         var current = row.GetIndex();
-        SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, current);
+        ViewModel.CurrentSelectedIndex = current;
 
         if (MultiRowSelect(row))
             return true;
 
-        if (SelectionHelper.GetFirstSelectedIndex(ExplorerGrid) < 0
+        if (ViewModel.FirstSelectedIndex < 0
             || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
         {
-            SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, current);
+            ViewModel.FirstSelectedIndex = current;
         }
 
         if (!row.IsSelected || ExplorerGrid.SelectedItems?.Count != 1)
@@ -921,7 +921,7 @@ public partial class ExplorerPageHeader : UserControl
         {
             ExplorerGrid.UnselectAll();
 
-            var firstSelected = SelectionHelper.GetFirstSelectedIndex(ExplorerGrid);
+            var firstSelected = ViewModel.FirstSelectedIndex;
             int firstUnselected = firstSelected, lastUnselected = current + 1;
             if (current < firstSelected)
             {
@@ -964,7 +964,7 @@ public partial class ExplorerPageHeader : UserControl
             ? CopyPasteService.DragState.Pending
             : CopyPasteService.DragState.None;
 
-        SelectionHelper.SetIndexSingle(ExplorerGrid, row.GetIndex());
+        ViewModel.SetIndexSingle(row.GetIndex());
     }
 
     private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -998,11 +998,11 @@ public partial class ExplorerPageHeader : UserControl
                 break;
 
             case Key.Up or Key.Down when Keyboard.Modifiers.HasFlag(ModifierKeys.Shift):
-                ExplorerGrid.MultiSelect(key);
+                ExplorerGrid.MultiSelect(key, ViewModel);
                 break;
 
             case Key.Up or Key.Down:
-                ExplorerGrid.SingleSelect(key);
+                ExplorerGrid.SingleSelect(key, ViewModel);
                 break;
 
             case Key.F2:
@@ -1020,6 +1020,24 @@ public partial class ExplorerPageHeader : UserControl
     {
         CopyPaste.AcceptDataObject(e, (FrameworkElement)sender);
         e.Handled = true;
+    }
+
+    private void Row_PreviewDragEnter(object sender, DragEventArgs e)
+    {
+        if (((FrameworkElement)sender).DataContext is FileClass file)
+            file.FolderViewModel.IsDragOver = true;
+    }
+
+    private void Row_PreviewDragLeave(object sender, DragEventArgs e)
+    {
+        if (((FrameworkElement)sender).DataContext is FileClass file)
+            file.FolderViewModel.IsDragOver = false;
+    }
+
+    private void Row_MouseLeave(object sender, MouseEventArgs e)
+    {
+        if (((FrameworkElement)sender).DataContext is FileClass file)
+            file.FolderViewModel.IsDragOver = false;
     }
 
     private void ExplorerGrid_DragOver(object sender, DragEventArgs e)
@@ -1065,22 +1083,33 @@ public partial class ExplorerPageHeader : UserControl
 
     private void ExplorerGrid_ContextMenuClosing(object sender, ContextMenuEventArgs e)
     {
-        SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, false);
+        ViewModel.IsMenuOpen = false;
     }
 
     private void ExplorerGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        var point = Mouse.GetPosition(ExplorerGrid);
-        if (point.Y < ColumnHeaderHeight || WasDragging)
+        if (!ViewModel.IsIconView)
+        {
+            var point = Mouse.GetPosition(ExplorerGrid);
+            if (point.Y < ColumnHeaderHeight || WasDragging)
+            {
+                WasDragging = false;
+
+                ViewModel.IsMenuOpen = false;
+                e.Handled = true;
+                return;
+            }
+        }
+        else if (WasDragging)
         {
             WasDragging = false;
 
-            SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, false);
+            ViewModel.IsMenuOpen = false;
             e.Handled = true;
             return;
         }
 
-        SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, true);
+        ViewModel.IsMenuOpen = true;
         FileActionLogic.UpdateFileActions();
     }
 
@@ -1122,12 +1151,12 @@ public partial class ExplorerPageHeader : UserControl
             }
         }
 
-        SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, selectionIndex);
+        ViewModel.CurrentSelectedIndex = selectionIndex;
 
-        if (SelectionHelper.GetFirstSelectedIndex(ExplorerGrid) < 0
+        if (ViewModel.FirstSelectedIndex < 0
             || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
         {
-            SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, selectionIndex);
+            ViewModel.FirstSelectedIndex = selectionIndex;
         }
     }
 
@@ -1151,7 +1180,7 @@ public partial class ExplorerPageHeader : UserControl
             || !RuntimeSettings.IsExplorerLoaded
             || MouseDownPoint == NullPoint
             || withinEditingCell
-            || SelectionHelper.GetIsMenuOpen(ExplorerGrid.ContextMenu);
+            || ViewModel.IsMenuOpen;
 
         if (CopyPaste.DragStatus is CopyPasteService.DragState.Pending && (MouseDownPoint - point).LengthSquared >= 25)
         {
@@ -1248,14 +1277,14 @@ public partial class ExplorerPageHeader : UserControl
 
             rowRect.Inflate(double.PositiveInfinity, 0);
             if (rowRect.Contains(mousePosition))
-                SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, row.GetIndex());
+                ViewModel.CurrentSelectedIndex = row.GetIndex();
         }
 
         if (ExplorerGrid.SelectedItems.Count == 1
-            && (SelectionHelper.GetFirstSelectedIndex(ExplorerGrid) < 0
+            && (ViewModel.FirstSelectedIndex < 0
             || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift))
         {
-            SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, ExplorerGrid.SelectedIndex);
+            ViewModel.FirstSelectedIndex = ExplorerGrid.SelectedIndex;
         }
     }
 
@@ -1267,20 +1296,20 @@ public partial class ExplorerPageHeader : UserControl
             return;
         }
 
-        if (!SelectionHelper.GetSelectionInProgress(ExplorerGrid))
+        if (!ViewModel.SelectionInProgress)
         {
             if (ExplorerGrid.SelectedItems.Count == 1)
             {
-                SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, ExplorerGrid.SelectedIndex);
-                if (SelectionHelper.GetFirstSelectedIndex(ExplorerGrid) < 0
+                ViewModel.CurrentSelectedIndex = ExplorerGrid.SelectedIndex;
+                if (ViewModel.FirstSelectedIndex < 0
                     || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
                 {
-                    SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, ExplorerGrid.SelectedIndex);
+                    ViewModel.FirstSelectedIndex = ExplorerGrid.SelectedIndex;
                 }
             }
             else if (ExplorerGrid.SelectedItems.Count > 1 && e.AddedItems.Count == 1)
             {
-                SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, ExplorerGrid.Items.IndexOf(e.AddedItems[0]));
+                ViewModel.CurrentSelectedIndex = ExplorerGrid.Items.IndexOf(e.AddedItems[0]);
             }
         }
 
@@ -1397,10 +1426,10 @@ public partial class ExplorerPageHeader : UserControl
     {
         SelectionRect.Visibility = Visibility.Collapsed;
 
-        if (SelectionHelper.GetFirstSelectedIndex(ExplorerGrid) < 0
+        if (ViewModel.FirstSelectedIndex < 0
             || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
         {
-            SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, SelectionHelper.GetNextSelectedIndex(ExplorerGrid));
+            ViewModel.FirstSelectedIndex = ViewModel.NextSelectedIndex;
         }
     }
 

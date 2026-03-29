@@ -40,6 +40,9 @@ public partial class FileViewModelBase : ObservableObject
         }
     }
 
+    [ObservableProperty]
+    private bool _isDragOver;
+
     protected FileViewModelBase(FileClass file)
     {
         _file = file;

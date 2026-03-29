@@ -23,6 +23,26 @@ public partial class ExplorerViewModel : ObservableObject
     [ObservableProperty]
     private bool _isIconView = false;
 
+    public int FirstSelectedIndex { get; set; } = -1;
+
+    public int CurrentSelectedIndex { get; set; } = -1;
+
+    public int NextSelectedIndex { get; set; }
+
+    public bool IsMenuOpen { get; set; }
+
+    public bool SelectionInProgress { get; set; }
+
+    /// <summary>
+    /// Sets index to First, Current, and Next
+    /// </summary>
+    public void SetIndexSingle(int value)
+    {
+        FirstSelectedIndex = value;
+        CurrentSelectedIndex = value;
+        NextSelectedIndex = value;
+    }
+
     public string SelectedFilesTotalSize => (Data.SelectedFiles is not null && FileHelper.TotalSize(Data.SelectedFiles) is long size and > 0) ? size.BytesToSize(true) : "";
     public string SelectedFilesCount => $"{(Data.FileActions.IsAppDrive ? Data.SelectedPackages.Count() : Data.SelectedFiles.Count())}";
 

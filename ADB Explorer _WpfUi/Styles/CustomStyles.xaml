@@ -916,6 +916,9 @@
                         </Border>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding FolderViewModel.IsDragOver}" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource ListViewItemBackgroundPointerOver}" />
+                        </DataTrigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsEnabled" Value="True" />
