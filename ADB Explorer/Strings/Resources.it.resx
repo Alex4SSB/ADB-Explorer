@@ -849,7 +849,7 @@ Annulla tutte le operazioni in corso</value>
     <value>L'accesso root può essere attivato</value>
   </data>
   <data name="S_RECOVERY_MODE" xml:space="preserve">
-    <value>Recovery</value>
+    <value>Recupera</value>
   </data>
   <data name="S_BAT_VOLT" xml:space="preserve">
     <value>Voltaggio: {0}v</value>
@@ -990,7 +990,7 @@ Annulla tutte le operazioni in corso</value>
     <value>{0} (collegamento)</value>
   </data>
   <data name="S_FILE_TYPE_APK" xml:space="preserve">
-    <value>Pacchetto di applicazioni Android (APK)</value>
+    <value>Pacchetto di applicazioni Android</value>
   </data>
   <data name="S_FILE_TYPE_EXE" xml:space="preserve">
     <value>Eseguibile di Windows</value>
@@ -1467,5 +1467,20 @@ Aiutaci a localizzare l'app nella vostra lingua su Weblate.</value>
   </data>
   <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
     <value>Dimensioni</value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>Un mese</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>Una settimana</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>Un giorno</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>Un'ora</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>Orario aggiornamento delle miniature locali</value>
   </data>
 </root>
