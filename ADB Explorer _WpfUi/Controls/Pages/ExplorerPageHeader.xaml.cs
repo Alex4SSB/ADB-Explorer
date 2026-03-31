@@ -31,6 +31,7 @@ public partial class ExplorerPageHeader : UserControl
     private bool WasEditing;
     private bool WasDragging;
     private Point MouseDownPoint;
+    private HashSet<object> _preRectSelectedItems = [];
 
     private Dispatcher Dispatcher => App.Current.Dispatcher;
 
@@ -83,24 +84,23 @@ public partial class ExplorerPageHeader : UserControl
     {
         get
         {
-            if (FileActions.IsAppDrive || !ExplorerGrid.SelectedCells.Any())
+            if (FileActions.IsAppDrive)
                 return false;
-            
-            var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
-            return cell switch
-            {
-                null => false,
-                _ => cell.IsEditing
-            };
+
+            if (ActiveView.SelectedItem is not FileClass file)
+                return false;
+
+            var vm = ViewModel.IsIconView ? (FileViewModelBase)file.IconViewModel : file.FolderViewModel;
+            return vm.IsInEditMode;
         }
         set
         {
-            var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
-            if (cell is not null)
-            {
-                cell.IsEditing = value;
-                FileActions.IsExplorerEditing = value;
-            }
+            if (ActiveView.SelectedItem is not FileClass file)
+                return;
+
+            var vm = ViewModel.IsIconView ? (FileViewModelBase)file.IconViewModel : file.FolderViewModel;
+            vm.IsInEditMode = value;
+            FileActions.IsExplorerEditing = value;
         }
     }
 
@@ -379,6 +379,18 @@ public partial class ExplorerPageHeader : UserControl
                     });
                     break;
 
+                case nameof(AppRuntimeSettings.NewFolder):
+                    NewItem(true);
+                    break;
+
+                case nameof(AppRuntimeSettings.NewFile):
+                    NewItem(false);
+                    break;
+
+                case nameof(AppRuntimeSettings.Rename):
+                    IsInEditMode ^= true;
+                    break;
+
                 case nameof(AppRuntimeSettings.IsPathBoxFocused):
                     IsPathBoxFocused(RuntimeSettings.IsPathBoxFocused
                                      ?? NavigationBox.Mode
@@ -442,6 +454,23 @@ public partial class ExplorerPageHeader : UserControl
 
         collectionView.Filter = predicate;
     });
+
+    private void NewItem(bool isFolder)
+    {
+        var fileName = FileHelper.DuplicateFile(DirList.FileList, isFolder
+            ? Strings.Resources.S_NEW_FOLDER
+            : Strings.Resources.S_NEW_ITEM);
+
+        FileClass newItem = new(fileName, FileHelper.ConcatPaths(CurrentPath, fileName), isFolder ? FileType.Folder : FileType.File, isTemp: true);
+        DirList.FileList.Insert(0, newItem);
+
+        ActiveScrollIntoView(newItem);
+        ActiveView.SelectedItem = newItem;
+
+        IsInEditMode = true;
+        if (!IsInEditMode) // in case the editing element was not acquired
+            FileActionLogic.CreateNewItem(newItem);
+    }
 
     private void InitLister()
     {
@@ -723,7 +752,7 @@ public partial class ExplorerPageHeader : UserControl
         WasDragging = false;
 
         var cell = sender as DataGridCell;
-        WasEditing = cell.IsEditing;
+        WasEditing = cell.DataContext is FileClass clickedFile && clickedFile.FolderViewModel.IsInEditMode;
 
         if (WasEditing)
             return;
@@ -840,7 +869,7 @@ public partial class ExplorerPageHeader : UserControl
                     cell = c;
                     row = DataGridRow.GetRowContainingElement(cell);
 
-                    if (cell.IsEditing)
+                    if (cell.DataContext is FileClass clickedFile && clickedFile.FolderViewModel.IsInEditMode)
                         return false;
                     break;
                 }
@@ -879,12 +908,12 @@ public partial class ExplorerPageHeader : UserControl
 
     private void MouseUpOnName(DataGridCell cell)
     {
-        if (cell.IsReadOnly
-            || (DevicesObject.Current.Root is not AbstractDevice.RootStatus.Enabled
-                && ((FileClass)cell.DataContext).Type is not (FileType.File or FileType.Folder)))
+        if (DevicesObject.Current.Root is not AbstractDevice.RootStatus.Enabled
+            && ((FileClass)cell.DataContext).Type is not (FileType.File or FileType.Folder))
             return;
 
-        var path = ((FileClass)ExplorerGrid.SelectedItem).FullPath;
+        var file = (FileClass)ExplorerGrid.SelectedItem;
+        var path = file.FullPath;
 
         if (ExplorerGrid.SelectedItems.Count == 1 && WasSelected && !WasEditing)
         {
@@ -906,7 +935,7 @@ public partial class ExplorerPageHeader : UserControl
 
                 Dispatcher.Invoke(() =>
                 {
-                    cell.IsEditing = true;
+                    file.FolderViewModel.IsInEditMode = true;
                     FileActions.IsExplorerEditing = true;
                 });
             });
@@ -967,10 +996,10 @@ public partial class ExplorerPageHeader : UserControl
         ViewModel.SetIndexSingle(row.GetIndex());
     }
 
-    private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    private void ItemContainer_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         if (e.ChangedButton == MouseButton.Left && !FileActions.IsAppDrive && SelectedFiles.Count() == 1 && !IsInEditMode)
-            DoubleClick(ExplorerGrid.SelectedItem);
+            DoubleClick(ActiveView.SelectedItem);
     }
 
     private void DataGridRow_KeyDown(object sender, KeyEventArgs e)
@@ -1188,29 +1217,7 @@ public partial class ExplorerPageHeader : UserControl
                 && ExplorerGrid.SelectedItems[0] is FileClass or Package
                 && !abortDrag)
             {
-                CopyPaste.DragStatus = CopyPasteService.DragState.Active;
-                WasDragging = true;
-
-                IEnumerable<FileClass> selectedItems;
-                VirtualFileDataObject vfdo;
-                if (FileActions.IsAppDrive)
-                {
-                    vfdo = VirtualFileDataObject.PrepareTransfer(ExplorerGrid.SelectedItems.Cast<Package>());
-                    selectedItems = VirtualFileDataObject.SelfFiles;
-                }
-                else
-                {
-                    selectedItems = ExplorerGrid.SelectedItems.Cast<FileClass>();
-                    vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems, DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
-                }
-
-                if (vfdo is not null)
-                {
-                    CopyPaste.UpdateSelfVFDO(true);
-                    RuntimeSettings.DragBitmap = selectedItems.First().DragImage;
-
-                    vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, cell, vfdo.PreferredDropEffect.Value);
-                }
+                InitiateDrag(cell);
             }
             else
                 CopyPaste.DragStatus = CopyPasteService.DragState.None;
@@ -1221,7 +1228,42 @@ public partial class ExplorerPageHeader : UserControl
             SelectionRect.Visibility = Visibility.Collapsed;
             return;
         }
-        var scroller = StyleHelper.FindDescendant<ScrollViewer>(ExplorerGrid);
+
+        UpdateSelectionRect(point, StyleHelper.FindDescendant<ScrollViewer>(ExplorerGrid));
+    }
+
+    private void InitiateDrag(DependencyObject dragSource)
+    {
+        CopyPaste.DragStatus = CopyPasteService.DragState.Active;
+        WasDragging = true;
+
+        IEnumerable<FileClass> selectedItems;
+        VirtualFileDataObject vfdo;
+        if (FileActions.IsAppDrive)
+        {
+            vfdo = VirtualFileDataObject.PrepareTransfer(ActiveSelectedItems.Cast<Package>());
+            selectedItems = VirtualFileDataObject.SelfFiles;
+        }
+        else
+        {
+            selectedItems = ActiveSelectedItems.Cast<FileClass>();
+            vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems, DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
+        }
+
+        if (vfdo is not null)
+        {
+            CopyPaste.UpdateSelfVFDO(true);
+            RuntimeSettings.DragBitmap = selectedItems.First().DragImage;
+
+            vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, dragSource, vfdo.PreferredDropEffect.Value);
+        }
+    }
+
+    private void UpdateSelectionRect(Point point, ScrollViewer scroller)
+    {
+        if (scroller is null)
+            return;
+
         var horizontal = scroller.ComputedHorizontalScrollBarVisibility is Visibility.Visible ? 1 : 0;
         var vertical = scroller.ComputedVerticalScrollBarVisibility is Visibility.Visible ? 1 : 0;
 
@@ -1235,6 +1277,9 @@ public partial class ExplorerPageHeader : UserControl
         if (MouseDownPoint.Y > ExplorerCanvas.ActualHeight - SystemParameters.HorizontalScrollBarHeight * horizontal
             || MouseDownPoint.X > ExplorerCanvas.ActualWidth - SystemParameters.VerticalScrollBarWidth * vertical)
             return;
+
+        if (!SelectionRect.IsVisible)
+            _preRectSelectedItems = [.. ActiveSelectedItems.Cast<object>()];
 
         SelectionRect.Visibility = Visibility.Visible;
         if (point.Y > MouseDownPoint.Y)
@@ -1257,34 +1302,51 @@ public partial class ExplorerPageHeader : UserControl
         SelectionRect.Height = Math.Abs(MouseDownPoint.Y - point.Y);
         SelectionRect.Width = Math.Abs(MouseDownPoint.X - point.X);
 
-        SelectRows(point);
+        SelectItemsByRect(point);
     }
 
-    private void SelectRows(Point mousePosition)
+    private void SelectItemsByRect(Point mousePosition)
     {
         Rect selection = new(Canvas.GetLeft(SelectionRect),
                              Canvas.GetTop(SelectionRect),
                              SelectionRect.Width,
                              SelectionRect.Height);
 
-        for (int i = 0; i < ExplorerGrid.ItemContainerGenerator.Items.Count; i++)
+        var view = ActiveView;
+        for (int i = 0; i < view.ItemContainerGenerator.Items.Count; i++)
         {
-            if (ExplorerGrid.ItemContainerGenerator.ContainerFromIndex(i) is not DataGridRow row)
+            if (view.ItemContainerGenerator.ContainerFromIndex(i) is not FrameworkElement container)
                 continue;
 
-            Rect rowRect = new(row.TranslatePoint(new(), ExplorerGrid), row.DesiredSize);
-            row.IsSelected = rowRect.IntersectsWith(selection);
+            Size size = container is DataGridRow ? container.DesiredSize : container.RenderSize;
+            Rect itemRect = new(container.TranslatePoint(new(), ExplorerCanvas), size);
 
-            rowRect.Inflate(double.PositiveInfinity, 0);
-            if (rowRect.Contains(mousePosition))
-                ViewModel.CurrentSelectedIndex = row.GetIndex();
+            bool intersects = itemRect.IntersectsWith(selection);
+            bool wasPreSelected = _preRectSelectedItems.Contains(view.Items[i]);
+            bool isSelected = Keyboard.Modifiers.HasFlag(ModifierKeys.Control)
+                ? wasPreSelected ^ intersects
+                : wasPreSelected || intersects;
+
+            switch (container)
+            {
+                case DataGridRow row:
+                    row.IsSelected = isSelected;
+                    itemRect.Inflate(double.PositiveInfinity, 0);
+                    break;
+                case ListViewItem item:
+                    item.IsSelected = isSelected;
+                    break;
+            }
+
+            if (itemRect.Contains(mousePosition))
+                ViewModel.CurrentSelectedIndex = i;
         }
 
-        if (ExplorerGrid.SelectedItems.Count == 1
+        if (ActiveSelectedItems.Count == 1
             && (ViewModel.FirstSelectedIndex < 0
             || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift))
         {
-            ViewModel.FirstSelectedIndex = ExplorerGrid.SelectedIndex;
+            ViewModel.FirstSelectedIndex = ActiveView.SelectedIndex;
         }
     }
 
@@ -1352,7 +1414,9 @@ public partial class ExplorerPageHeader : UserControl
 
     private void NameColumnEdit_KeyDown(object sender, KeyEventArgs e)
     {
-        var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
+        if (ExplorerGrid.SelectedItem is not FileClass file)
+            return;
+
         var textBox = sender as TextBox;
 
         if (e.Key is Key.Escape or Key.F2)
@@ -1360,42 +1424,47 @@ public partial class ExplorerPageHeader : UserControl
             var name = FileHelper.DisplayName(textBox);
             if (string.IsNullOrEmpty(name))
             {
-                DirList.FileList.Remove(ExplorerGrid.SelectedItem as FileClass);
+                DirList.FileList.Remove(file);
             }
             else
             {
-                textBox.Text = FileHelper.DisplayName(sender as TextBox);
+                textBox.Text = FileHelper.DisplayName(textBox);
             }
 
-            AppActions.List.First(action => action.Name is FileActionType.Rename).Command.Execute();
+            file.FolderViewModel.IsInEditMode = false;
+            FileActions.IsExplorerEditing = false;
         }
-        else if (e.Key is not Key.Enter)
+        else if (e.Key is Key.Enter)
+        {
+            file.FolderViewModel.IsInEditMode = false;
+            FileActions.IsExplorerEditing = false;
+        }
+        else
             return;
 
         e.Handled = true;
-
-        if (ExplorerGrid.SelectedCells.Count > 0)
-        {
-            cell.IsEditing = false;
-            FileActions.IsExplorerEditing = false;
-        }
     }
 
-    private void NameColumnEdit_Loaded(object sender, RoutedEventArgs e)
+    private void NameColumnEdit_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
+        if (e.NewValue is not true)
+            return;
+
         var textBox = sender as TextBox;
         textBox.Focus();
-
-        var editPoint = textBox.TranslatePoint(new(), ExplorerCanvas);
-        //Canvas.SetTop(RenameTooltip, editPoint.Y - RenameTooltip.ActualHeight - 4);
-        //Canvas.SetLeft(RenameTooltip, editPoint.X + 4);
-        //RenameTooltip.Visibility = Visibility.Visible;
+        textBox.SelectAll();
     }
 
     private void NameColumnEdit_LostFocus(object sender, RoutedEventArgs e)
     {
-        FileActionLogic.Rename(sender as TextBox);
-        //RenameTooltip.Visibility = Visibility.Hidden;
+        var textBox = sender as TextBox;
+        if (textBox.DataContext is not FileClass file || !file.FolderViewModel.IsInEditMode)
+            return;
+
+        FileActionLogic.Rename(textBox);
+
+        file.FolderViewModel.IsInEditMode = false;
+        FileActions.IsExplorerEditing = false;
     }
 
     private void NameColumnEdit_TextChanged(object sender, TextChangedEventArgs e)
@@ -1431,6 +1500,14 @@ public partial class ExplorerPageHeader : UserControl
         {
             ViewModel.FirstSelectedIndex = ViewModel.NextSelectedIndex;
         }
+    }
+
+    private void SelectionRect_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (ViewModel.IsIconView)
+            IconView_MouseMove(sender, e);
+        else
+            ExplorerGrid_MouseMove(sender, e);
     }
 
     private void GridBackgroundBlock_MouseDown(object sender, MouseButtonEventArgs e)
@@ -1486,6 +1563,102 @@ public partial class ExplorerPageHeader : UserControl
     {
         if (e.EscapePressed)
             RuntimeSettings.DragBitmap = null;
+    }
+
+    private void IconView_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton is not MouseButton.Left and not MouseButton.Right)
+            return;
+
+        WasDragging = false;
+        MouseDownPoint = e.GetPosition(ExplorerCanvas);
+
+        // Walk up from the original source to determine if the click is on an item or empty space
+        var source = e.OriginalSource as DependencyObject;
+        var hitItem = source is not null
+            ? ItemsControl.ContainerFromElement(IconView, source) as ListViewItem
+            : null;
+
+        CopyPaste.DragStatus = hitItem is not null && (e.OriginalSource is TextBlock or Image || hitItem.IsSelected)
+                     ? CopyPasteService.DragState.Pending
+                     : CopyPasteService.DragState.None;
+
+        int selectionIndex = IconView.SelectedIndex;
+
+        if (hitItem is null)
+        {
+            // Ignore clicks on scrollbars
+            for (var dep = source; dep is not null and not ListView; dep = VisualTreeHelper.GetParent(dep))
+            {
+                if (dep is System.Windows.Controls.Primitives.ScrollBar)
+                    return;
+            }
+
+            if (IconView.SelectedItems.Count > 0 && IsInEditMode)
+                IsInEditMode = false;
+
+            if (Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
+            {
+                IconView.UnselectAll();
+                selectionIndex = -1;
+            }
+        }
+
+        ViewModel.CurrentSelectedIndex = selectionIndex;
+
+        if (ViewModel.FirstSelectedIndex < 0
+            || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
+        {
+            ViewModel.FirstSelectedIndex = selectionIndex;
+        }
+    }
+
+    private void IconView_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (Mouse.LeftButton is MouseButtonState.Released)
+            CopyPaste.ClearDrag();
+
+        var point = e.GetPosition(ExplorerCanvas);
+
+        var abortDrag = e.LeftButton == MouseButtonState.Released
+            || !RuntimeSettings.IsExplorerLoaded
+            || MouseDownPoint == NullPoint
+            || ViewModel.IsMenuOpen;
+
+        if (CopyPaste.DragStatus is CopyPasteService.DragState.Pending && (MouseDownPoint - point).LengthSquared >= 25)
+        {
+            if (IconView.SelectedItems.Count > 0
+                && IconView.SelectedItems[0] is FileClass or Package
+                && !abortDrag)
+            {
+                var dragSource = IconView.ItemContainerGenerator.ContainerFromItem(IconView.SelectedItems[0]) as DependencyObject ?? IconView;
+                InitiateDrag(dragSource);
+            }
+            else
+                CopyPaste.DragStatus = CopyPasteService.DragState.None;
+        }
+
+        if (abortDrag || CopyPaste.DragStatus is not CopyPasteService.DragState.None || WasDragging)
+        {
+            SelectionRect.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        UpdateSelectionRect(point, IconView.ScrollViewer);
+    }
+
+    private void IconViewToggle_Toggled(object sender, RoutedEventArgs e)
+    {
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (ActiveSelectedItems.Count > 0)
+                ActiveScrollIntoView(ActiveSelectedItems[0]);
+            else
+            {
+                var viewer = StyleHelper.FindDescendant<ScrollViewer>(ActiveView);
+                viewer?.ScrollToTop();
+            }
+        }, DispatcherPriority.Loaded);
     }
 
     private void EmptyNonRootTextBlock_Loaded(object sender, RoutedEventArgs e) => TextHelper.BuildLocalizedInlines(sender, e);

@@ -44,7 +44,7 @@
             <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
             <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
             <EventSetter Event="MouseDown" Handler="DataGridRow_MouseDown" />
-            <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
+            <EventSetter Event="MouseDoubleClick" Handler="ItemContainer_MouseDoubleClick" />
             <EventSetter Event="KeyDown" Handler="DataGridRow_KeyDown" />
             <EventSetter Event="Drop" Handler="DataGridRow_Drop" />
             <EventSetter Event="MouseUp" Handler="DataGridCell_MouseUp" />
@@ -77,6 +77,7 @@
             BasedOn="{StaticResource IconFileContainerStyle}"
             TargetType="ui:ListViewItem">
             <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
+            <EventSetter Event="MouseDoubleClick" Handler="ItemContainer_MouseDoubleClick" />
             <EventSetter Event="PreviewDragEnter" Handler="Row_PreviewDragEnter" />
             <EventSetter Event="PreviewDragLeave" Handler="Row_PreviewDragLeave" />
             <EventSetter Event="MouseLeave" Handler="Row_MouseLeave" />
@@ -99,7 +100,11 @@
                 <DataTrigger Binding="{Binding IsIconView}" Value="False">
                     <Setter Property="Visibility" Value="Collapsed" />
                 </DataTrigger>
+                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRecycleBin}" Value="False">
+                    <Setter Property="AllowDrop" Value="True" />
+                </DataTrigger>
             </Style.Triggers>
+            <Setter Property="Background" Value="Transparent" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Setter Property="SnapsToDevicePixels" Value="False" />
             <Setter Property="SelectionMode" Value="Extended" />
@@ -167,6 +172,8 @@
             <local:AdbMenu x:Name="MainToolBar" Style="{StaticResource MainToolBarStyle}" />
             <ui:ToggleSwitch
                 Grid.Column="1"
+                Checked="IconViewToggle_Toggled"
+                Unchecked="IconViewToggle_Toggled"
                 IsChecked="{Binding IsIconView, Mode=TwoWay}"
                 OffContent="Details View"
                 OnContent="Icons View" />
@@ -222,7 +229,11 @@
                     ContextMenu="{StaticResource RowContextMenu}"
                     ContextMenuClosing="ExplorerGrid_ContextMenuClosing"
                     ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
+                    DragOver="ExplorerGrid_DragOver"
+                    Drop="DataGridRow_Drop"
                     ItemsSource="{Binding ExplorerItemsSource}"
+                    PreviewMouseDown="IconView_PreviewMouseDown"
+                    MouseMove="IconView_MouseMove"
                     SelectionChanged="IconView_SelectionChanged"
                     Style="{StaticResource IconViewStyle}">
                     <local:AdbListView.ItemsPanel>
@@ -289,27 +300,43 @@
                                 x:Name="NameColumn"
                                 Width="300"
                                 Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_NAME}}"
-                                IsReadOnly="{Binding Source={x:Static Member=models:Data.FileActions}, Path=NameReadOnly}"
+                                IsReadOnly="True"
                                 SortDirection="{Binding Source={StaticResource ViewModelProxy}, Path=Data.NameColumnSortDirection}"
                                 SortMemberPath="FullName"
                                 Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
-                                <DataGridTemplateColumn.CellEditingTemplate>
-                                    <DataTemplate>
-                                        <ui:TextBox
-                                            FlowDirection="{Binding NameFlowDirection}"
-                                            KeyDown="NameColumnEdit_KeyDown"
-                                            Loaded="NameColumnEdit_Loaded"
-                                            LostFocus="NameColumnEdit_LostFocus"
-                                            Style="{StaticResource FileNameEditingElementStyle}"
-                                            TextChanged="NameColumnEdit_TextChanged" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellEditingTemplate>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <emoji:TextBlock
-                                            FlowDirection="{Binding NameFlowDirection}"
-                                            Style="{StaticResource DirectoryGridCellStyle}"
-                                            Text="{Binding DisplayName}" />
+                                        <Grid>
+                                            <ui:TextBox
+                                                FlowDirection="{Binding NameFlowDirection}"
+                                                IsVisibleChanged="NameColumnEdit_IsVisibleChanged"
+                                                KeyDown="NameColumnEdit_KeyDown"
+                                                LostFocus="NameColumnEdit_LostFocus"
+                                                TextChanged="NameColumnEdit_TextChanged">
+                                                <ui:TextBox.Style>
+                                                    <Style BasedOn="{StaticResource FileNameEditingElementStyle}" TargetType="ui:TextBox">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding FolderViewModel.IsInEditMode}" Value="False">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ui:TextBox.Style>
+                                            </ui:TextBox>
+                                            <emoji:TextBlock
+                                                FlowDirection="{Binding NameFlowDirection}"
+                                                Text="{Binding DisplayName}">
+                                                <emoji:TextBlock.Style>
+                                                    <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding FolderViewModel.IsInEditMode}" Value="True">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </emoji:TextBlock.Style>
+                                            </emoji:TextBlock>
+                                        </Grid>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -447,7 +474,7 @@
                 <Canvas x:Name="ExplorerCanvas" PreviewMouseUp="ExplorerCanvas_PreviewMouseUp">
                     <Border
                         x:Name="SelectionRect"
-                        MouseMove="ExplorerGrid_MouseMove"
+                        MouseMove="SelectionRect_MouseMove"
                         Visibility="Collapsed">
                         <Border.Style>
                             <Style TargetType="Border">

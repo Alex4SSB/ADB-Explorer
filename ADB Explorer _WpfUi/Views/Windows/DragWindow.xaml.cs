@@ -110,7 +110,7 @@ public partial class DragWindow : INotifyPropertyChanged
                     return;
                 }
 
-                target = FileHelper.GetFullName(Data.CopyPaste.DropTarget);
+                target = Data.CopyPaste.DropTargetName;
             }
 
             var format = "";

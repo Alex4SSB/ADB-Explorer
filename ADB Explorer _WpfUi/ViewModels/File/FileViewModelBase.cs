@@ -43,6 +43,9 @@ public partial class FileViewModelBase : ObservableObject
     [ObservableProperty]
     private bool _isDragOver;
 
+    [ObservableProperty]
+    private bool _isInEditMode;
+
     protected FileViewModelBase(FileClass file)
     {
         _file = file;

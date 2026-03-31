@@ -53,6 +53,18 @@ public class CopyPasteService : ViewModelBase
         set => Set(ref dropTarget, value);
     }
 
+    public string DropTargetName
+    {
+        get
+        {
+            string destination = FileHelper.GetFullName(DropTarget);
+            if (Data.CurrentDisplayNames.TryGetValue(DropTarget, out var drive))
+                destination = drive;
+
+            return destination;
+        }
+    }
+
     private DataSource pasteSource = DataSource.None;
     public DataSource PasteSource
     {
@@ -63,7 +75,7 @@ public class CopyPasteService : ViewModelBase
                 && pasteSource.HasFlag(DataSource.None)
                 && value is not DataSource.None)
             {
-                // Remove the none flag when settings something else
+                // Remove the none flag when setting something else
                 pasteSource &= ~DataSource.None;
             }
         }
@@ -359,9 +371,9 @@ public class CopyPasteService : ViewModelBase
             if (FileHelper.AllFilesAreApks(DragFiles))
                 return DragDropEffects.Copy;
         }
-        else if (dataContext is null || file?.IsDirectory is true)
+        else if (file is null || file.IsDirectory)
         {
-            Data.CopyPaste.DropTarget = dataContext is null
+            Data.CopyPaste.DropTarget = file is null
                 ? Data.CurrentPath
                 : file.FullPath;
 

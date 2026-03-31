@@ -410,6 +410,7 @@
         x:Key="FileNameEditingElementStyle"
         BasedOn="{StaticResource DefaultUiTextBoxStyle}"
         TargetType="ui:TextBox">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Text" Value="{Binding DisplayName, Mode=OneWay}" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Style.Triggers>

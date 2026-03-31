@@ -7,6 +7,7 @@
     xmlns:local="clr-namespace:ADB_Explorer.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     d:DataContext="{d:DesignInstance Type=models:FileClass}"
     mc:Ignorable="d">
@@ -26,6 +27,19 @@
             </ToolTip.Style>
             <TextBlock Text="{Binding IconViewModel.IconViewTooltip}" TextWrapping="Wrap" />
         </ToolTip>
+        <DataTemplate x:Key="IconViewEditTemplate">
+            <ui:TextBox
+                Width="140"
+                FlowDirection="{Binding NameFlowDirection}"
+                KeyDown="IconViewNameEdit_KeyDown"
+                Loaded="IconViewNameEdit_Loaded"
+                LostFocus="IconViewNameEdit_LostFocus"
+                MaxLines="3"
+                Style="{StaticResource FileNameEditingElementStyle}"
+                TextChanged="IconViewNameEdit_TextChanged"
+                TextWrapping="Wrap" />
+        </DataTemplate>
+        <DataTemplate x:Key="IconViewEmptyTemplate" />
     </UserControl.Resources>
     <Grid
         Width="140"
@@ -74,31 +88,50 @@
                         Source="{Binding IconViewModel.LargeIconOverlay}" />
                 </Grid>
             </Grid>
-            <emoji:TextBlock
+            <Grid
                 Grid.Row="1"
-                MaxHeight="60"
                 Margin="0,4,0,0"
-                HorizontalAlignment="Center"
-                FlowDirection="{Binding NameFlowDirection}"
-                Text="{Binding DisplayName}"
-                TextAlignment="Center"
-                TextTrimming="CharacterEllipsis"
-                TextWrapping="Wrap"
-                ToolTip="{x:Null}">
-                <emoji:TextBlock.Style>
-                    <Style TargetType="emoji:TextBlock">
-                        <Setter Property="Opacity" Value="1" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding CutState}" Value="Move">
-                                <Setter Property="Opacity" Value="0.5" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding CutState}" Value="Copy">
-                                <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </emoji:TextBlock.Style>
-            </emoji:TextBlock>
+                HorizontalAlignment="Center">
+                <ContentControl Content="{Binding}">
+                    <ContentControl.Style>
+                        <Style TargetType="ContentControl">
+                            <Setter Property="ContentTemplate" Value="{StaticResource IconViewEmptyTemplate}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IconViewModel.IsInEditMode}" Value="True">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource IconViewEditTemplate}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
+                <emoji:TextBlock
+                    MaxHeight="60"
+                    FlowDirection="{Binding NameFlowDirection}"
+                    PreviewMouseDown="IconViewNameTextBlock_PreviewMouseDown"
+                    PreviewMouseUp="IconViewNameTextBlock_PreviewMouseUp"
+                    Text="{Binding DisplayName}"
+                    TextAlignment="Center"
+                    TextTrimming="CharacterEllipsis"
+                    TextWrapping="Wrap"
+                    ToolTip="{x:Null}">
+                    <emoji:TextBlock.Style>
+                        <Style TargetType="emoji:TextBlock">
+                            <Setter Property="Opacity" Value="1" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IconViewModel.IsInEditMode}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CutState}" Value="Move">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CutState}" Value="Copy">
+                                    <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </emoji:TextBlock.Style>
+                </emoji:TextBlock>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>
