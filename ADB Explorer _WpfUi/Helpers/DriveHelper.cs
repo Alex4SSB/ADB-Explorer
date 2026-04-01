@@ -13,7 +13,7 @@ internal class DriveHelper
 
     public static void ClearDrives()
     {
-        App.Current.Dispatcher.Invoke(() => Data.DevicesObject.Current?.Drives.Clear());
+        App.SafeInvoke(() => Data.DevicesObject.Current?.Drives.Clear());
         Data.FileActions.IsDriveViewVisible = false;
     }
 

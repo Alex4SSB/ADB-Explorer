@@ -17,6 +17,17 @@ namespace ADB_Explorer;
 /// </summary>
 public partial class App
 {
+    /// <summary>
+    /// Cached dispatcher reference that remains valid after <see cref="Application.Current"/> becomes null during shutdown.
+    /// </summary>
+    public static Dispatcher AppDispatcher { get; private set; }
+
+    /// <summary>
+    /// Indicates whether the application has begun shutting down. Check this before dispatching work
+    /// that should not execute during shutdown.
+    /// </summary>
+    public static bool IsShuttingDown { get; private set; }
+
     // The.NET Generic Host provides dependency injection, configuration, logging, and other services.
     // https://docs.microsoft.com/dotnet/core/extensions/generic-host
     // https://docs.microsoft.com/dotnet/core/extensions/dependency-injection
@@ -79,6 +90,8 @@ public partial class App
     /// </summary>
     private async void OnStartup(object sender, StartupEventArgs e)
     {
+        AppDispatcher = Current.Dispatcher;
+
         // Read to force it to be set to Windows' culture
         _ = Data.Settings.OriginalCulture;
 
@@ -128,16 +141,18 @@ public partial class App
     /// </summary>
     private async void OnExit(object sender, ExitEventArgs e)
     {
+        IsShuttingDown = true;
+
         ThumbnailService.SaveAllThumbsToCsv();
 
         Data.FileOpQ?.Stop();
-        
+
         Services.GetService<SettingsService>().Save();
 
         if (Data.Settings.UnrootOnDisconnect is true)
             ADBService.Unroot(Data.CurrentADBDevice);
 
-        App.Current.Dispatcher.Invoke(ClearFoldersInAppData);
+        ClearFoldersInAppData();
 
         await _host.StopAsync();
 
@@ -167,7 +182,36 @@ public partial class App
             e.Handled = true;
 
         // If application shutdown has started, do not throw exceptions
-        if (App.Current is null || App.Current.Dispatcher is null)
+        if (IsShuttingDown || App.Current is null || App.Current.Dispatcher is null)
             e.Handled = true;
+    }
+
+    /// <summary>
+    /// Safely invokes an action on the UI dispatcher. No-ops if the application is shutting down
+    /// or the dispatcher is unavailable.
+    /// </summary>
+    public static void SafeInvoke(Action action)
+    {
+        var dispatcher = AppDispatcher;
+        if (dispatcher is null || IsShuttingDown || dispatcher.HasShutdownStarted)
+            return;
+
+        if (dispatcher.CheckAccess())
+            action();
+        else
+            dispatcher.Invoke(action);
+    }
+
+    /// <summary>
+    /// Safely begins an asynchronous invoke on the UI dispatcher. No-ops if the application is
+    /// shutting down or the dispatcher is unavailable.
+    /// </summary>
+    public static void SafeBeginInvoke(Action action, DispatcherPriority priority = DispatcherPriority.Normal)
+    {
+        var dispatcher = AppDispatcher;
+        if (dispatcher is null || IsShuttingDown || dispatcher.HasShutdownStarted)
+            return;
+
+        dispatcher.BeginInvoke(action, priority);
     }
 }

@@ -61,12 +61,12 @@ public partial class FileIconView : UserControl
                 if (DateTime.Now - start > RENAME_CLICK_DELAY)
                     break;
 
-                var currentPath = App.Current.Dispatcher.Invoke(() => (DataContext as FileClass)?.FullPath);
+                var currentPath = App.AppDispatcher?.Invoke(() => (DataContext as FileClass)?.FullPath);
                 if (_clickCount > 1 || currentPath != path)
                     return;
             }
 
-            App.Current.Dispatcher.Invoke(() =>
+            App.SafeInvoke(() =>
             {
                 if (DataContext is FileClass currentFile && currentFile.FullPath == path && !currentFile.IconViewModel.IsInEditMode)
                 {

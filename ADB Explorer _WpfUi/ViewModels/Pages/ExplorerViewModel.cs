@@ -134,7 +134,7 @@ public partial class ExplorerViewModel : ObservableObject
 
     private void UpdateExplorerView()
     {
-        App.Current.Dispatcher.Invoke(() =>
+        App.SafeInvoke(() =>
         {
             if (!Data.FileActions.IsExplorerVisible)
                 return;

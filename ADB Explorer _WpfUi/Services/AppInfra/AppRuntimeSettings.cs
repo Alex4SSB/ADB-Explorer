@@ -90,20 +90,12 @@ public partial class AppRuntimeSettings : ViewModelBase
         {
             lastServerResponse = value;
 
-            try
+            App.SafeInvoke(() =>
             {
-                App.Current?.Dispatcher.Invoke(() =>
-                {
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(TimeFromLastResponse));
-                    OnPropertyChanged(nameof(ServerUnresponsive));
-                });
-            }
-            catch
-            {
-                if (App.Current?.Dispatcher is not null)
-                    throw;
-            }
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(TimeFromLastResponse));
+                OnPropertyChanged(nameof(ServerUnresponsive));
+            });
         }
     }
 
@@ -396,7 +388,6 @@ public partial class AppRuntimeSettings : ViewModelBase
     public bool RefreshExplorerSorting { get => false; set => OnPropertyChanged(); }
     public bool FinalizeSplash { get => false; set => OnPropertyChanged(); }
     public bool RefreshBreadcrumbs { get => false; set => OnPropertyChanged(); }
-    public bool RefreshQrImage { get => false; set => OnPropertyChanged(); }
 
     #endregion
 }

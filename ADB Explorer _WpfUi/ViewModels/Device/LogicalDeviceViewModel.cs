@@ -141,7 +141,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
         ToggleRootCommand = DeviceHelper.ToggleRootDeviceCommand(this);
 
-        App.Current.Dispatcher.Invoke(() =>
+        App.SafeInvoke(() =>
         {
             Thread.CurrentThread.CurrentCulture =
             Thread.CurrentThread.CurrentUICulture = Data.Settings.UICulture;

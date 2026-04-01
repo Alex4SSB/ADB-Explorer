@@ -48,7 +48,7 @@ public class FileSyncOperation : FileOperation
     private bool isCanceled = false;
 
     public FileSyncOperation(OperationType operationName, FileDescriptor sourcePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, FailedOpProgressViewModel status)
-        : base(new FileClass(sourcePath), adbDevice, App.Current.Dispatcher)
+        : base(new FileClass(sourcePath), adbDevice, App.AppDispatcher)
     {
         OperationName = operationName;
         FilePath = new(new FileClass(sourcePath));

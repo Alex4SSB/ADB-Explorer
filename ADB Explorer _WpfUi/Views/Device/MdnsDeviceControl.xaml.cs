@@ -11,43 +11,29 @@ public partial class MdnsDeviceControl : UserControl
 {
     public MdnsDeviceControl()
     {
+        InitializeComponent();
+
         Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
 
         InitMdns();
-
-        InitializeComponent();
     }
 
     private static void InitMdns()
     {
         if (Data.RuntimeSettings.AdbVersion is not null && Data.RuntimeSettings.AdbVersion.Major > 0)
         {
-            Data.MdnsService = new();
             AdbHelper.EnableMdns();
         }
     }
 
-    private void RuntimeSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private static void RuntimeSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        switch (e.PropertyName)
-        {
-            case nameof(AppRuntimeSettings.RefreshQrImage):
-                PairingQrImage?.Source = Data.MdnsService?.QrClass?.Image;
-
-                break;
-            case nameof(AppRuntimeSettings.AdbVersion):
-                InitMdns();
-
-                break;
-            default:
-                break;
-        }
+        if (e.PropertyName == nameof(AppRuntimeSettings.AdbVersion))
+            InitMdns();
     }
 
     private void RestartAdbButton_Click(object sender, RoutedEventArgs e)
     {
-        ADBService.KillAdbServer();
-        Data.MdnsService.State = MDNS.MdnsState.Disabled;
-        AdbHelper.EnableMdns();
+        Data.MdnsService.Restart();
     }
 }

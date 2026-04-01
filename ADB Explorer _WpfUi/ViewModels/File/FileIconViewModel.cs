@@ -84,7 +84,7 @@ public partial class FileIconViewModel : FileViewModelBase
             if (token.IsCancellationRequested)
                 return;
 
-            App.Current?.Dispatcher.BeginInvoke(() =>
+            App.SafeBeginInvoke(() =>
             {
                 if (token.IsCancellationRequested)
                     return;
@@ -116,7 +116,7 @@ public partial class FileIconViewModel : FileViewModelBase
                 if (thumbnail is not ThumbnailService.Thumbnail thumb)
                     return;
 
-                App.Current?.Dispatcher.BeginInvoke(() =>
+                App.SafeBeginInvoke(() =>
                 {
                     if (token.IsCancellationRequested)
                         return;

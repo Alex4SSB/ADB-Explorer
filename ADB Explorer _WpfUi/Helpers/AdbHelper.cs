@@ -17,53 +17,25 @@ internal static class AdbHelper
         return Data.RuntimeSettings.AdbVersion >= AdbExplorerConst.MIN_ADB_VERSION;
     });
 
-    private static void UpdateQrClass() => Data.RuntimeSettings.RefreshQrImage = true;
-
-    public static void MdnsCheck()
-    {
-        Task.Run(() => Data.MdnsService.State = ADBService.CheckMDNS() ? MDNS.MdnsState.Running : MDNS.MdnsState.NotRunning);
-        Task.Run(async () =>
-        {
-            while (Data.MdnsService.State is MDNS.MdnsState.InProgress)
-            {
-                App.Current.Dispatcher.Invoke(() => Data.MdnsService.UpdateProgress());
-
-                await Task.Delay(AdbExplorerConst.MDNS_STATUS_UPDATE_INTERVAL);
-            }
-        });
-    }
-
-    public static void EnableMdns() => App.Current.Dispatcher.Invoke(async () =>
+    public static void EnableMdns() => App.SafeInvoke(async () =>
     {
         ADBService.IsMdnsEnabled = Data.Settings.EnableMdns;
         if (Data.Settings.EnableMdns)
         {
-            if (Data.MdnsService?.State is MDNS.MdnsState.Disabled)
-            {
-                Data.MdnsService.State = MDNS.MdnsState.InProgress;
-                
-                Data.MdnsService.QrClass = new();
-                MdnsCheck();
-                UpdateQrClass();
-            }
+            Data.MdnsService.Enable();
         }
-        else
+        else if (Data.MdnsService.State is MDNS.MdnsState.Running)
         {
-            if (Data.MdnsService?.State is MDNS.MdnsState.Running)
-            {
-                var result = await DialogService.ShowConfirmation(Strings.Resources.S_DISABLE_MDNS,
-                                                                  Strings.Resources.S_DISABLE_MDNS_TITLE,
-                                                                  Strings.Resources.S_RESTART_ADB_NOW,
-                                                                  cancelText: Strings.Resources.S_RESTART_LATER,
-                                                                  icon: DialogService.DialogIcon.Informational);
+            var result = await DialogService.ShowConfirmation(Strings.Resources.S_DISABLE_MDNS,
+                                                              Strings.Resources.S_DISABLE_MDNS_TITLE,
+                                                              Strings.Resources.S_RESTART_ADB_NOW,
+                                                              cancelText: Strings.Resources.S_RESTART_LATER,
+                                                              icon: DialogService.DialogIcon.Informational);
 
-                if (result.Item1 is Wpf.Ui.Controls.ContentDialogResult.Primary)
-                    ADBService.KillAdbServer();
+            if (result.Item1 is Wpf.Ui.Controls.ContentDialogResult.Primary)
+                ADBService.KillAdbServer();
 
-                Data.MdnsService.QrClass = null;
-                Data.MdnsService.State = MDNS.MdnsState.Disabled;
-                UpdateQrClass();
-            }
+            Data.MdnsService.Disable();
         }
     });
 

@@ -198,7 +198,7 @@ public class FileOperationQueue : ViewModelBase
         }
         IsActive = false;
         
-        if (isPush && !App.Current.Dispatcher.HasShutdownStarted)
+        if (isPush && !App.IsShuttingDown)
             Data.RuntimeSettings.Refresh = true;
     }
 

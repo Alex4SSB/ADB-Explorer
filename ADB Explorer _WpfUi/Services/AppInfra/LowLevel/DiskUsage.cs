@@ -168,7 +168,7 @@ internal static class DiskUsageHelper
         {
             var totalUsage = newUsage.Subtract(prevUsage);
 
-            App.Current.Dispatcher.Invoke(() =>
+            App.SafeInvoke(() =>
             {
                 Data.RuntimeSettings.AdbReadRate = totalUsage.ReadString;
                 Data.RuntimeSettings.AdbWriteRate = totalUsage.WriteString;

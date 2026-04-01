@@ -311,7 +311,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
         var children = Children;
 
-        var fileOp = FileSyncOperation.PullFile(new(this, children), target, Data.CurrentADBDevice, App.Current.Dispatcher);
+        var fileOp = FileSyncOperation.PullFile(new(this, children), target, Data.CurrentADBDevice, App.AppDispatcher);
         fileOp.PropertyChanged += PullOperation_PropertyChanged;
         fileOp.VFDO = vfdo;
 
@@ -330,7 +330,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             ChangeTimeUtc = item.Date.FromUnixTime(),
             Stream = () =>
             {
-                var isActive = App.Current.Dispatcher.Invoke(() => App.Current.MainWindow.IsActive);
+                var isActive = App.AppDispatcher?.Invoke(() => App.Current?.MainWindow?.IsActive == true) == true;
                 var operations = vfdo.Operations.Where(op => op.Status is FileOperation.OperationStatus.None);
 
                 // When a VFDO that does not contain folders is sent to the clipboard, the shell immediately requests the file contents.
@@ -348,7 +348,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
                 // For all consecutive files this list will be empty.
                 foreach (var op in operations)
                 {
-                    App.Current.Dispatcher.Invoke(() => Data.FileOpQ.AddOperation(op));
+                    App.SafeInvoke(() => Data.FileOpQ.AddOperation(op));
                 }
 
                 // Wait for the operation to complete

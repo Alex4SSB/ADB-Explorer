@@ -40,14 +40,14 @@ internal static class FileActionLogic
             return files.Select(item => ShellFileOperation.GetPackageName(Data.CurrentADBDevice, item.FullPath));
         });
 
-        ShellFileOperation.UninstallPackages(Data.CurrentADBDevice, packageTask, App.Current.Dispatcher);
+        ShellFileOperation.UninstallPackages(Data.CurrentADBDevice, packageTask, App.AppDispatcher);
     }
 
     public static void InstallPackages()
     {
         var packages = Data.SelectedFiles;
 
-        ShellFileOperation.InstallPackages(Data.CurrentADBDevice, packages, App.Current.Dispatcher);
+        ShellFileOperation.InstallPackages(Data.CurrentADBDevice, packages, App.AppDispatcher);
     }
 
     public static void CopyToTemp()
@@ -56,7 +56,7 @@ internal static class FileActionLogic
             DragDropEffects.Copy,
             AdbExplorerConst.TEMP_PATH,
             Data.SelectedFiles,
-            App.Current.Dispatcher,
+            App.AppDispatcher,
             Data.CurrentADBDevice,
             Data.CurrentPath);
     }
@@ -76,12 +76,12 @@ internal static class FileActionLogic
             return;
 
         var shItems = dialog.FileNames.Select(ShellItem.Open);
-        ShellFileOperation.PushPackages(Data.CurrentADBDevice, shItems, App.Current.Dispatcher);
+        ShellFileOperation.PushPackages(Data.CurrentADBDevice, shItems, App.AppDispatcher);
     }
 
     public static void UpdateModifiedDates()
     {
-        ShellFileOperation.ChangeDateFromName(Data.CurrentADBDevice, Data.SelectedFiles, App.Current.Dispatcher);
+        ShellFileOperation.ChangeDateFromName(Data.CurrentADBDevice, Data.SelectedFiles, App.AppDispatcher);
     }
 
     public static void OpenEditor()
@@ -103,14 +103,14 @@ internal static class FileActionLogic
             }
             catch (Exception e)
             {
-                App.Current.Dispatcher.Invoke(() =>
+                App.SafeInvoke(() =>
                     DialogService.ShowMessage(e.Message, Strings.Resources.S_READ_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true));
 
                 return "";
             }
         });
 
-        readTask.ContinueWith((t) => App.Current.Dispatcher.Invoke(() =>
+        readTask.ContinueWith((t) => App.SafeInvoke(() =>
         {
             if (t.Result is null)
                 return;
@@ -131,14 +131,14 @@ internal static class FileActionLogic
             }
             catch (Exception e)
             {
-                App.Current.Dispatcher.Invoke(() =>
+                App.SafeInvoke(() =>
                     DialogService.ShowMessage(e.Message, Strings.Resources.S_WRITE_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true));
 
                 return false;
             }
         });
 
-        writeTask.ContinueWith((t) => App.Current.Dispatcher.Invoke(() =>
+        writeTask.ContinueWith((t) => App.SafeInvoke(() =>
         {
             if (!t.Result)
                 return;
@@ -185,7 +185,7 @@ internal static class FileActionLogic
 
         restoreTask.ContinueWith((t) =>
         {
-            App.Current.Dispatcher.BeginInvoke(async () =>
+            App.SafeBeginInvoke(async () =>
             {
                 if (existingItems.Length is int count and > 0)
                 {
@@ -219,7 +219,7 @@ internal static class FileActionLogic
                                          targetPath: null,
                                          currentPath: Data.CurrentPath,
                                          fileList: Data.DirList.FileList,
-                                         dispatcher: App.Current.Dispatcher);
+                                         dispatcher: App.AppDispatcher);
 
                 var remainingItems = Data.DirList.FileList.Except(restoreItems);
                 TrashHelper.EnableRecycleButtons(remainingItems);
@@ -668,11 +668,11 @@ internal static class FileActionLogic
                                          AdbExplorerConst.RECYCLE_PATH,
                                          Data.CurrentPath,
                                          Data.DirList.FileList,
-                                         App.Current.Dispatcher);
+                                         App.AppDispatcher);
         }
         else
         {
-            ShellFileOperation.DeleteItems(Data.CurrentADBDevice, itemsToDelete, App.Current.Dispatcher);
+            ShellFileOperation.DeleteItems(Data.CurrentADBDevice, itemsToDelete, App.AppDispatcher);
 
             if (Data.FileActions.IsRecycleBin)
             {
@@ -729,9 +729,9 @@ internal static class FileActionLogic
             if (t.IsCanceled || t.Result is null)
                 return;
 
-            App.Current?.Dispatcher.Invoke(async () =>
+            App.SafeInvoke(async () =>
             {
-                if (await Data.DevicesObject.Current?.UpdateDrives(await t, App.Current.Dispatcher, asyncClassify))
+                if (App.AppDispatcher is not null && await Data.DevicesObject.Current?.UpdateDrives(await t, App.AppDispatcher, asyncClassify))
                 {
                     Data.RuntimeSettings.FilterDrives = true;
                     FolderHelper.CombineDisplayNames();
@@ -743,7 +743,7 @@ internal static class FileActionLogic
     public static void UpdateInstallersCount()
     {
         var countTask = Task.Run(() => ADBService.CountPackages(Data.DevicesObject.Current.ID));
-        countTask.ContinueWith((t) => App.Current?.Dispatcher.Invoke(() =>
+        countTask.ContinueWith((t) => App.SafeInvoke(() =>
         {
             if (!t.IsCanceled && Data.DevicesObject.Current is not null)
             {
@@ -762,7 +762,7 @@ internal static class FileActionLogic
             if (t.IsCanceled || t.Result is null || Data.DevicesObject.Current is null)
                 return;
 
-            App.Current.Dispatcher.Invoke(() =>
+            App.SafeInvoke(() =>
             {
                 var package = Data.DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Package);
                 ((VirtualDriveViewModel)package)?.SetItemsCount((int?)t.Result);
@@ -782,7 +782,7 @@ internal static class FileActionLogic
             if (t.IsCanceled)
                 return;
 
-            App.Current.Dispatcher.Invoke(() =>
+            App.SafeInvoke(() =>
             {
                 Data.Packages = t.Result;
                 if (updateExplorer)
@@ -801,7 +801,7 @@ internal static class FileActionLogic
 
     public static void ClearExplorer(bool clearDevice = true)
     {
-        App.Current.Dispatcher.Invoke(() =>
+        App.SafeInvoke(() =>
         {
             Data.DirList?.FileList?.Clear();
             Data.Packages.Clear();
@@ -1016,9 +1016,9 @@ internal static class FileActionLogic
             source.IsDirectory ? FileType.Folder : FileType.File)
             { Size = source.Size };
 
-        App.Current.Dispatcher.Invoke(() =>
+        App.SafeInvoke(() =>
         {
-            pushOperation = FileSyncOperation.PushFile(source, target, Data.CurrentADBDevice, App.Current.Dispatcher);
+            pushOperation = FileSyncOperation.PushFile(source, target, Data.CurrentADBDevice, App.AppDispatcher);
             pushOperation.DropEffects = dropEffects;
             pushOperation.OriginalShellItem = originalShellItem;
             pushOperation.PropertyChanged += PushOperation_PropertyChanged;
@@ -1151,7 +1151,7 @@ internal static class FileActionLogic
 
         await Task.Run(() =>
         {
-            App.Current.Dispatcher.Invoke(() => Data.FileOpQ.AddOperations(GeneratePullOps(targetPath, pullItems, notify)));
+            App.SafeInvoke(() => Data.FileOpQ.AddOperations(GeneratePullOps(targetPath, pullItems, notify)));
         });
     }
 
@@ -1188,7 +1188,7 @@ internal static class FileActionLogic
     private static FileSyncOperation GeneratePullOp(string targetPath, SyncFile item, bool notify, ADBService.AdbDevice device)
     {
         var target = SyncFile.MergeToWindowsPath(item, targetPath);
-        var fileOp = FileSyncOperation.PullFile(item, target, device, App.Current.Dispatcher);
+        var fileOp = FileSyncOperation.PullFile(item, target, device, App.AppDispatcher);
 
         if (notify)
             fileOp.PropertyChanged += PullOperation_PropertyChanged;
@@ -1221,7 +1221,7 @@ internal static class FileActionLogic
 
     public static void UpdateFileOpControls()
     {
-        App.Current.Dispatcher.Invoke(() =>
+        App.SafeInvoke(() =>
         {
             FileOpControlsMutex.WaitOne(0);
 

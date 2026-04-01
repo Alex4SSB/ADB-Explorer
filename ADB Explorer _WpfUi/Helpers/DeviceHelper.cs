@@ -203,7 +203,7 @@ public static class DeviceHelper
 
         if (device.Root is RootStatus.Forbidden)
         {
-            App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(Strings.Resources.S_ROOT_FORBID, Strings.Resources.S_ROOT_FORBID_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
+            App.SafeInvoke(() => DialogService.ShowMessage(Strings.Resources.S_ROOT_FORBID, Strings.Resources.S_ROOT_FORBID_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
         }
     }
 
@@ -407,7 +407,7 @@ public static class DeviceHelper
             }
             catch (Exception ex)
             {
-                App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
+                App.SafeInvoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
                 return false;
             }
 
@@ -422,9 +422,9 @@ public static class DeviceHelper
         {
             bool root = ADBService.WhoAmI(device.ID);
             bool rootDisabled = Data.DevicesObject.RootDevices.Contains(device.ID);
-            App.Current?.Dispatcher?.Invoke(() =>
+            App.SafeInvoke(() =>
             {
-                return device.SetRootStatus(root ? RootStatus.Enabled
+                device.SetRootStatus(root ? RootStatus.Enabled
                     : rootDisabled ? RootStatus.Disabled
                         : RootStatus.Unchecked);
             });
@@ -443,7 +443,7 @@ public static class DeviceHelper
             }
             catch (Exception ex)
             {
-                App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
+                App.SafeInvoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
                 return false;
             }
         }).ContinueWith(t =>
@@ -451,7 +451,7 @@ public static class DeviceHelper
             if (t.IsCanceled)
                 return;
 
-            App.Current.Dispatcher.Invoke(() =>
+            App.SafeInvoke(() =>
             {
                 if (t.Result)
                     ConnectNewDevice();
@@ -483,7 +483,7 @@ public static class DeviceHelper
                     Data.DevicesObject.CurrentNewDevice.EnablePairing();
                 }
                 else
-                    App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_FAILED_CONN_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
+                    App.SafeInvoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_FAILED_CONN_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
 
                 return false;
             }
@@ -492,7 +492,7 @@ public static class DeviceHelper
             if (t.IsCanceled)
                 return;
 
-            App.Current.Dispatcher.Invoke(() =>
+            App.SafeInvoke(() =>
             {
                 if (t.Result)
                 {
@@ -540,7 +540,7 @@ public static class DeviceHelper
 
     public static void DeviceListSetup(string selectedAddress = "")
     {
-        Task.Run(ADBService.GetDevices).ContinueWith((t) => App.Current.Dispatcher.Invoke(() => DeviceListSetup(t.Result.Select(l => new LogicalDeviceViewModel(l)), selectedAddress)));
+        Task.Run(ADBService.GetDevices).ContinueWith((t) => App.SafeInvoke(() => DeviceListSetup(t.Result.Select(l => new LogicalDeviceViewModel(l)), selectedAddress)));
     }
 
     public static void DeviceListSetup(IEnumerable<LogicalDeviceViewModel> devices, string selectedAddress = "")
@@ -560,7 +560,7 @@ public static class DeviceHelper
 
         Devices.SetOpenDevice(null);
 
-        App.Current.Dispatcher.Invoke(Data.CopyPaste.GetClipboardPasteItems);
+        App.SafeInvoke(Data.CopyPaste.GetClipboardPasteItems);
 
         FileActionLogic.ClearExplorer();
         Data.FileActions.IsExplorerVisible = false;
@@ -608,7 +608,7 @@ public static class DeviceHelper
                 Thread.Sleep(500);
             }
             return true;
-        }).ContinueWith(t => App.Current.Dispatcher.Invoke(() =>
+        }).ContinueWith(t => App.SafeInvoke(() =>
         {
             if (!t.Result)
                 return;
@@ -661,7 +661,7 @@ public static class DeviceHelper
             if (t.IsCanceled)
                 return;
 
-            App.Current.Dispatcher.Invoke(() =>
+            App.SafeInvoke(() =>
             {
                 Data.DevicesObject.Current.SetAndroidVersion();
             });
@@ -810,7 +810,7 @@ public static class DeviceHelper
 
         if (newStatus != oldStatus)
         {
-            App.Current.Dispatcher.Invoke(() => wsa.SetStatus(newStatus));
+            App.SafeInvoke(() => wsa.SetStatus(newStatus));
             Data.RuntimeSettings.FilterDevices = true;
         }
     }

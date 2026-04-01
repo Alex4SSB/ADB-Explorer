@@ -8,7 +8,7 @@ public class MDNS : ViewModelBase
 {
     public MDNS()
     {
-        State = MdnsState.Disabled;
+        state = MdnsState.Disabled;
     }
 
     public enum MdnsState
@@ -23,7 +23,7 @@ public class MDNS : ViewModelBase
     public MdnsState State
     {
         get => state;
-        set
+        private set
         {
             if (Set(ref state, value))
             {
@@ -39,7 +39,7 @@ public class MDNS : ViewModelBase
     public double Progress
     {
         get => progress;
-        set
+        private set
         {
             if (Set(ref progress, value))
                 OnPropertyChanged(nameof(TimePassedString));
@@ -52,7 +52,7 @@ public class MDNS : ViewModelBase
 
     public string TimePassedString => timePassed == TimeSpan.MinValue ? "" : Converters.UnitConverter.ToTime(timePassed.TotalSeconds, useMilli: false, digits: 0);
 
-    public void UpdateProgress()
+    private void UpdateProgress()
     {
         timePassed = DateTime.Now.Subtract(checkStart);
 
@@ -61,7 +61,52 @@ public class MDNS : ViewModelBase
             : 100;
     }
 
-    public PairingQrClass? QrClass { get; set; }
+    private PairingQrClass? qrClass;
+    public PairingQrClass? QrClass
+    {
+        get => qrClass;
+        private set => Set(ref qrClass, value);
+    }
+
+    public void Enable()
+    {
+        if (State is not MdnsState.Disabled)
+            return;
+
+        State = MdnsState.InProgress;
+        QrClass = new();
+        Check();
+    }
+
+    public void Disable()
+    {
+        QrClass = null;
+        State = MdnsState.Disabled;
+    }
+
+    public void Restart()
+    {
+        ADBService.KillAdbServer();
+        State = MdnsState.Disabled;
+        Enable();
+    }
+
+    private void Check()
+    {
+        Task.Run(() =>
+        {
+            var newState = ADBService.CheckMDNS() ? MdnsState.Running : MdnsState.NotRunning;
+            App.SafeInvoke(() => State = newState);
+        });
+        Task.Run(async () =>
+        {
+            while (State is MdnsState.InProgress)
+            {
+                App.SafeInvoke(UpdateProgress);
+                await Task.Delay(AdbExplorerConst.MDNS_STATUS_UPDATE_INTERVAL);
+            }
+        });
+    }
 
     public class PairingQrClass
     {

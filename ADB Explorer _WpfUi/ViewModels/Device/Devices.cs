@@ -159,7 +159,9 @@ public class Devices : AbstractDevice
 
     public bool UpdateDevices(IEnumerable<LogicalDeviceViewModel> other)
     {
-        var result = App.Current.Dispatcher.Invoke(() => UpdateDevices(UIList, other));
+        var result = App.AppDispatcher is not null
+            ? App.AppDispatcher.Invoke(() => UpdateDevices(UIList, other))
+            : UpdateDevices(UIList, other);
         OnPropertyChanged(nameof(Count));
 
         UpdateLogicalIp();
@@ -193,8 +195,8 @@ public class Devices : AbstractDevice
 
                 device.UpdateDevice(item);
 
-                if (device.Drives.Count != item.Drives.Count)
-                    device.UpdateDrives(item, App.Current.Dispatcher, true);
+                if (device.Drives.Count != item.Drives.Count && App.AppDispatcher is not null)
+                    device.UpdateDrives(item, App.AppDispatcher, true);
             }
             else
             {
@@ -262,7 +264,7 @@ public class Devices : AbstractDevice
         await Task.Run(() =>
             UIList.OfType<LogicalDeviceViewModel>().ForEach(d => _ = d.Device.BrandName));
 
-        App.Current.Dispatcher.Invoke(() => UIList.OfType<LogicalDeviceViewModel>().ForEach(d => d.UpdateName()));
+        App.SafeInvoke(() => UIList.OfType<LogicalDeviceViewModel>().ForEach(d => d.UpdateName()));
     }
 
     public async void UpdateLogicalIp()

@@ -234,7 +234,7 @@
                     ItemsSource="{Binding ExplorerItemsSource}"
                     PreviewMouseDown="IconView_PreviewMouseDown"
                     MouseMove="IconView_MouseMove"
-                    SelectionChanged="IconView_SelectionChanged"
+                    SelectionChanged="ExplorerGrid_SelectionChanged"
                     Style="{StaticResource IconViewStyle}">
                     <local:AdbListView.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -471,21 +471,10 @@
                         </ui:DataGrid.Columns>
                     </ui:DataGrid>
                 </Grid>
-                <Canvas x:Name="ExplorerCanvas" PreviewMouseUp="ExplorerCanvas_PreviewMouseUp">
-                    <Border
-                        x:Name="SelectionRect"
-                        MouseMove="SelectionRect_MouseMove"
-                        Visibility="Collapsed">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="BorderBrush" Value="{StaticResource SelectionRectangleBorderBrush}" />
-                                <Setter Property="Background" Value="{StaticResource SelectionRectangleFill}" />
-                                <Setter Property="BorderThickness" Value="1" />
-                            </Style>
-                        </Border.Style>
-                    </Border>
-                    <!--<local:RenameTooltip x:Name="RenameTooltip" Visibility="Hidden" />-->
-                </Canvas>
+                <local:SelectionRectangle
+                    x:Name="SelectionRect"
+                    PreviewMouseUp="SelectionRect_PreviewMouseUp"
+                    RectMouseMove="SelectionRect_MouseMove" />
                 <Grid Margin="0,40" Style="{StaticResource EmptyFolderGridStyle}">
                     <StackPanel Style="{StaticResource NonRootEmptyFolderStyle}">
                         <TextBlock

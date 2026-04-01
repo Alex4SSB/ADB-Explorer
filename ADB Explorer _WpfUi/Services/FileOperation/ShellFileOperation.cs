@@ -87,7 +87,7 @@ public static class ShellFileOperation
 
     public static void Rename(FileClass item, string targetPath, ADBService.AdbDevice device)
     {
-        var fileOp = new FileRenameOperation(item, targetPath, device, App.Current.Dispatcher);
+        var fileOp = new FileRenameOperation(item, targetPath, device, App.AppDispatcher);
         fileOp.PropertyChanged += RenameFileOp_PropertyChanged;
 
         Data.FileOpQ.AddOperation(fileOp);

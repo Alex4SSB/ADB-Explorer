@@ -57,13 +57,13 @@ public partial class TerminalViewModel : ObservableObject, INavigationAware
             foreach (DeviceViewModel item in e.OldItems)
                 item.PropertyChanged -= DeviceItem_PropertyChanged;
 
-        App.Current.Dispatcher.Invoke(RefreshDeviceList);
+        App.SafeInvoke(RefreshDeviceList);
     }
 
     private void DeviceItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(DeviceViewModel.Status))
-            App.Current.Dispatcher.Invoke(RefreshDeviceList);
+            App.SafeInvoke(RefreshDeviceList);
     }
 
     private void RefreshDeviceList()

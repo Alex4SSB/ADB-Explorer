@@ -87,7 +87,7 @@ public partial class DragWindow : INotifyPropertyChanged
         }
         lastUpdate = DateTime.Now;
 
-        App.Current.Dispatcher.Invoke(() =>
+        App.SafeInvoke(() =>
         {
             DragTooltip.Inlines.Clear();
             if (Data.CopyPaste.DragFiles.Length == 0 || Data.CopyPaste.CurrentDropEffect is DragDropEffects.None)

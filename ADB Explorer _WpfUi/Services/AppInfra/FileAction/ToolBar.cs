@@ -158,7 +158,7 @@ internal static class ExplorerContextMenu
         var list = List.ToArray();
         var separators = list.OfType<SubMenuSeparator>().Select(separator => (separator, List.IndexOf(separator))).ToList();
 
-        App.Current.Dispatcher.Invoke(() =>
+        App.SafeInvoke(() =>
         {
             for (int i = 0; i < separators.Count; i++)
             {

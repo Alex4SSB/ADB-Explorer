@@ -52,7 +52,7 @@ public partial class DevicesPageHeader : UserControl
 
     private void FilterDevices()
     {
-        App.Current.Dispatcher.Invoke(() =>
+        App.SafeInvoke(() =>
         {
             Thread.CurrentThread.CurrentCulture =
             Thread.CurrentThread.CurrentUICulture = Data.Settings.UICulture;

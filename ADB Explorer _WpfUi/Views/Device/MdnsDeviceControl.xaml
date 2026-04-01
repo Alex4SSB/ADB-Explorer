@@ -26,13 +26,13 @@
             </Style>
         </ui:CardControl.Style>
         <helpers:ExpanderHelper.HeaderBottomContent>
-            <ProgressBar Padding="0">
+                <ProgressBar Padding="0">
                 <ProgressBar.Style>
                     <Style BasedOn="{StaticResource ExpanderHeaderProgressBarStyle}" TargetType="ProgressBar">
+                        <Setter Property="Value" Value="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=Progress, Mode=OneWay}" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="InProgress">
                                 <Setter Property="Visibility" Value="Visible" />
-                                <Setter Property="Value" Value="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=Progress}" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=Progress}" Value="100">
                                 <Setter Property="IsIndeterminate" Value="True" />
@@ -131,7 +131,6 @@
                     </Style>
                 </Border.Style>
                 <Image
-                    x:Name="PairingQrImage"
                     Margin="6"
                     RenderOptions.EdgeMode="Aliased"
                     Source="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=QrClass.Image}" />

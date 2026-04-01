@@ -593,7 +593,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
                 return files.Select(f => f.PrepareDescriptors(vfdo)).ToList();
             }).ContinueWith(t =>
             {
-                App.Current.Dispatcher.Invoke(() =>
+                App.SafeInvoke(() =>
                 {
                     vfdo.SetFileDescriptors(files.SelectMany(f => f.Descriptors));
                     Data.RuntimeSettings.MainCursor = Cursors.Arrow;

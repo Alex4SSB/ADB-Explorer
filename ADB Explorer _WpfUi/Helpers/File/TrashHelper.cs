@@ -28,7 +28,7 @@ internal static class TrashHelper
                 count = FolderHelper.FolderExists(AdbExplorerConst.RECYCLE_PATH) is null ? -1 : 0;
 
             var trash = Data.DevicesObject.Current?.Drives.Find(d => d.Type is AbstractDrive.DriveType.Trash);
-            App.Current.Dispatcher.Invoke(() => ((VirtualDriveViewModel)trash)?.SetItemsCount(count));
+            App.SafeInvoke(() => ((VirtualDriveViewModel)trash)?.SetItemsCount(count));
         });
     }
 
