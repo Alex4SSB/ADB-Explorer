@@ -133,6 +133,8 @@ public static class UISettings
             [
                 new BoolSetting(() => Settings.PollDrives, Strings.Resources.S_SETTINGS_POLL_DRIVES, icon: "\uEBC4"),
                 new BoolSetting(() => Settings.EnableRecycle, Strings.Resources.S_DRIVE_TRASH, icon: "\uE74D"),
+                new BoolSetting(() => Settings.EnableBusyBox, Strings.Resources.S_SETTINGS_BUSYBOX, icon: "\uF133"),
+                new BoolSetting(() => Settings.EnableWsa, Strings.Resources.S_SETTINGS_WSA, icon: "\uE78A"),
             ], "\uE8CE"),
             new SettingsGroup("APK",
             [

@@ -1822,4 +1822,12 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Local Thumbnails Refresh Time</value>
     <comment>The setting used to control how long local persistent thumbnails should be used before updating them</comment>
   </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>Use BusyBox If Available</value>
+    <comment>The setting used to enable checking connected devices for busybox and which shell commands it supports</comment>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>Auto Connect WSA If Available</value>
+    <comment>The setting used to enable checking for installed WSA, launching it, and connecting to it automatically</comment>
+  </data>
 </root>

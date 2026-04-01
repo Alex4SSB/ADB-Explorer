@@ -16,7 +16,6 @@ public static class Data
     public static Dictionary<string, string> CurrentDisplayNames { get; set; } = [];
 
     public static AppSettings Settings { get; set; } = new();
-    public static SettingsService SettingsService { get; set; } = new();
 
     public static AppRuntimeSettings RuntimeSettings { get; set; } = new();
 

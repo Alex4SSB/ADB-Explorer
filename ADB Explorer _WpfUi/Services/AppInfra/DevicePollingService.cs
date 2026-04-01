@@ -64,7 +64,8 @@ public class DevicePollingService : BackgroundService
     {
         ListDevices(ADBService.GetDevices());
 
-        DeviceHelper.ConnectWsaDevice();
+        if (Data.Settings.EnableWsa)
+            DeviceHelper.ConnectWsaDevice();
 
         if (!Data.RuntimeSettings.IsDevicesView)
             return;

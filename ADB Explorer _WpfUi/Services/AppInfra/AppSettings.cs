@@ -59,6 +59,12 @@ public partial class AppSettings : ObservableObject
     [ObservableProperty]
     private bool specialFolderIcons = true;
 
+    [ObservableProperty]
+    private bool enableBusyBox = false;
+
+    [ObservableProperty]
+    private bool enableWsa = false;
+
     #region paths
 
     private string defaultFolder = "";

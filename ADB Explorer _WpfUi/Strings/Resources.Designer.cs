@@ -3286,6 +3286,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Use BusyBox If Available.
+        /// </summary>
+        public static string S_SETTINGS_BUSYBOX {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_BUSYBOX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Compact View.
         /// </summary>
         public static string S_SETTINGS_COMPACT_VIEW {
@@ -3696,6 +3705,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_VIDEO_THUMBNAILS {
             get {
                 return ResourceManager.GetString("S_SETTINGS_VIDEO_THUMBNAILS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Auto Connect WSA If Available.
+        /// </summary>
+        public static string S_SETTINGS_WSA {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_WSA", resourceCulture);
             }
         }
         
