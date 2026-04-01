@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Converters;
+using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
@@ -475,7 +475,7 @@ public partial class ExplorerPageHeader : UserControl
 
     private void InitLister()
     {
-        DirList = new(App.AppDispatcher, CurrentADBDevice, FileHelper.ListerFileManipulator);
+        DirList = new(App.AppDispatcher, DevicesObject.Current, FileHelper.ListerFileManipulator);
         DirList.PropertyChanged += DirectoryLister_PropertyChanged;
     }
 
@@ -524,10 +524,10 @@ public partial class ExplorerPageHeader : UserControl
                         ActiveScrollIntoView(ActiveView.Items[0]);
 
                         if (Settings.ThumbsMode is AppSettings.ThumbnailMode.OnPhotoDir
-                            && !ThumbnailService.IsInitialized(CurrentADBDevice.Device.LogicalID)
+                            && !ThumbnailService.IsInitialized(DevicesObject.Current.LogicalID)
                             && FileHelper.IsPhotoDir())
                         {
-                            Task.Run(() => ThumbnailService.ForceLoad(CurrentADBDevice));
+                            Task.Run(() => ThumbnailService.ForceLoad(DevicesObject.Current));
                         }
                     }
 
@@ -582,10 +582,10 @@ public partial class ExplorerPageHeader : UserControl
 
         FileActionLogic.IsPasteEnabled();
 
-        if (!RuntimeSettings.IsRootActive && DevicesObject.Current.Root is AbstractDevice.RootStatus.Enabled)
+        if (!RuntimeSettings.IsRootActive && DevicesObject.Current.Root is RootStatus.Enabled)
             RuntimeSettings.IsRootActive = true;
 
-        FileActions.PushPackageEnabled = Settings.EnableApk && DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;
+        FileActions.PushPackageEnabled = Settings.EnableApk && DevicesObject?.Current?.Type is not DeviceType.Recovery;
         FileActions.UninstallPackageEnabled = false;
 
         FileActions.ContextPushPackagesEnabled =
@@ -906,7 +906,7 @@ public partial class ExplorerPageHeader : UserControl
 
     private void MouseUpOnName(DataGridCell cell)
     {
-        if (DevicesObject.Current.Root is not AbstractDevice.RootStatus.Enabled
+        if (DevicesObject.Current.Root is not RootStatus.Enabled
             && ((FileClass)cell.DataContext).Type is not (FileType.File or FileType.Folder))
             return;
 

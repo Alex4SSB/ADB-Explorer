@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
@@ -75,22 +75,22 @@ public class DevicePollingService : BackgroundService
             DeviceHelper.ListServices(WiFiPairingService.GetServices());
     }
 
-    private static void ListDevices(IEnumerable<LogicalDevice> devices)
+    private static void ListDevices(IEnumerable<DeviceSnapshot> snapshots)
     {
-        if (devices is null)
+        if (snapshots is null)
             return;
 
-        var deviceVMs = devices.Select(d => new LogicalDeviceViewModel(d));
-
-        if (!Data.DevicesObject.DevicesChanged(deviceVMs))
+        if (!Data.DevicesObject.DevicesChanged(snapshots))
             return;
+
+        var deviceVMs = snapshots.Select(s => new LogicalDeviceViewModel(LogicalDevice.From(s)));
 
         DeviceHelper.DeviceListSetup(deviceVMs);
 
         if (!Data.Settings.AutoRoot)
             return;
 
-        foreach (var item in Data.DevicesObject.LogicalDeviceViewModels.Where(device => device.Root is AbstractDevice.RootStatus.Unchecked))
+        foreach (var item in Data.DevicesObject.LogicalDeviceViewModels.Where(device => device.Root is RootStatus.Unchecked))
         {
             item.EnableRoot(true);
         }

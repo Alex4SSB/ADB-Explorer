@@ -1,4 +1,4 @@
-using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 
@@ -59,10 +59,10 @@ public partial class FileIconViewModel : FileViewModelBase
         _isLoaded = true;
 
         if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.Off
-            || Data.CurrentADBDevice is null)
+            || Data.DevicesObject.Current is null)
             return;
 
-        var logicalDeviceId = Data.CurrentADBDevice.Device.LogicalID;
+        var logicalDeviceId = Data.DevicesObject.Current.LogicalID;
 
         _cts?.Cancel();
         _cts = new CancellationTokenSource();
@@ -74,12 +74,12 @@ public partial class FileIconViewModel : FileViewModelBase
                 return;
 
             if (!ThumbnailService.IsInitialized(logicalDeviceId))
-                ThumbnailService.ForceLoad(Data.CurrentADBDevice);
+                ThumbnailService.ForceLoad(Data.DevicesObject.Current);
 
             if (token.IsCancellationRequested)
                 return;
 
-            var thumbnail = ThumbnailService.LoadThumbnail(Data.CurrentADBDevice, _file.FullPath);
+            var thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file.FullPath);
 
             if (token.IsCancellationRequested)
                 return;
@@ -112,7 +112,7 @@ public partial class FileIconViewModel : FileViewModelBase
                 if (token.IsCancellationRequested)
                     return;
 
-                var thumbnail = ThumbnailService.LoadThumbnail(Data.CurrentADBDevice, _file.FullPath);
+                var thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file.FullPath);
                 if (thumbnail is not ThumbnailService.Thumbnail thumb)
                     return;
 
@@ -155,7 +155,7 @@ public partial class FileIconViewModel : FileViewModelBase
         else if (thumb.Info.Type is ThumbnailService.MediaType.images)
         {
             if (thumb.Info.Resolution is Size res)
-                result.Add($"{Strings.Resources.S_PICTURE_DIMENSIONS}: {$"{res.Width} × {res.Height}"}");
+                result.Add($"{Strings.Resources.S_PICTURE_DIMENSIONS}: {$"{res.Width} Ã— {res.Height}"}");
 
             result.Add($"{Strings.Resources.S_COLUMN_SIZE}: {SizeString}");
         }
@@ -175,7 +175,7 @@ public partial class FileIconViewModel : FileViewModelBase
                     ? Strings.Resources.S_FILE_BROKEN_LINK
                     : Strings.Resources.S_FILE_TYPE_LINK;
 
-                result.Add($"{type} → {_file.LinkTarget}");
+                result.Add($"{type} â†’ {_file.LinkTarget}");
             }
         }
         else if (_file.Type is AbstractFile.FileType.Folder)

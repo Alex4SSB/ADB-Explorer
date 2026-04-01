@@ -1,10 +1,10 @@
-﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
 
-public class Devices : AbstractDevice
+public class Devices : ViewModelBase
 {
     #region Full properties
 
@@ -210,11 +210,20 @@ public class Devices : AbstractDevice
         return isCurrentTypeUpdated;
     }
 
-    public bool DevicesChanged(IEnumerable<LogicalDeviceViewModel> other)
+    public bool DevicesChanged(IEnumerable<DeviceSnapshot> snapshots)
     {
-        return other is not null
-            && !LogicalDeviceViewModels.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(
-                other.OrderBy(otherDevice => otherDevice.ID), new LogicalDeviceViewModelEqualityComparer());
+        if (snapshots is null)
+            return false;
+
+        var existing = LogicalDeviceViewModels.OrderBy(d => d.ID).ToList();
+        var incoming = snapshots.OrderBy(s => s.ID).ToList();
+
+        return existing.Count != incoming.Count
+            || existing.Zip(incoming).Any(p =>
+                p.First.ID != p.Second.ID
+                || p.First.Type != p.Second.Type
+                || p.First.Status != p.Second.Status
+                || p.First.DeviceData != p.Second.DeviceData);
     }
 
     #endregion
@@ -262,7 +271,7 @@ public class Devices : AbstractDevice
     public async void UpdateBrandNames()
     {
         await Task.Run(() =>
-            UIList.OfType<LogicalDeviceViewModel>().ForEach(d => _ = d.Device.BrandName));
+            UIList.OfType<LogicalDeviceViewModel>().ForEach(d => _ = d.BrandName));
 
         App.SafeInvoke(() => UIList.OfType<LogicalDeviceViewModel>().ForEach(d => d.UpdateName()));
     }
@@ -289,7 +298,7 @@ public class Devices : AbstractDevice
                 }
             }
 
-            await Task.Run(() => result |= ADBService.AdbDevice.GetDeviceIp(item));
+            await Task.Run(() => result |= ADBService.GetDeviceIp(item));
         }
 
         return result;

@@ -6,8 +6,6 @@ namespace ADB_Explorer.Models;
 
 public static class Data
 {
-    public static ADBService.AdbDevice CurrentADBDevice { get; set; } = null;
-
     public static string CurrentPath { get; set; }
     public static string ParentPath { get; set; }
 

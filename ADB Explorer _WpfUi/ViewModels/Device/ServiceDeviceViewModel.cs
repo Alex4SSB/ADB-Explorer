@@ -51,8 +51,17 @@ public abstract class ServiceDeviceViewModel : PairingDeviceViewModel
     {
         Device = service;
 
+        UpdateServiceStatus();
+
         PairCommand = new(() => IsPairingCodeValid && device.Status is DeviceStatus.Unauthorized,
                           () => _ = DeviceHelper.PairService(this));
+    }
+
+    private void UpdateServiceStatus()
+    {
+        Device.Status = Device.MdnsType is ServiceDevice.ServiceType.QrCode ? DeviceStatus.Ok : DeviceStatus.Unauthorized;
+        OnPropertyChanged(nameof(Status));
+        OnPropertyChanged(nameof(StatusIcon));
     }
 
     /// <summary>
@@ -61,7 +70,17 @@ public abstract class ServiceDeviceViewModel : PairingDeviceViewModel
     /// <param name="other">The service with the new port.</param>
     public bool UpdateService(ServiceDeviceViewModel other)
     {
-        return SetPairingPort(other.PairingPort);
+        bool changed = SetPairingPort(other.PairingPort);
+
+        if (Device.MdnsType != other.Device.MdnsType)
+        {
+            Device.MdnsType = other.Device.MdnsType;
+            OnPropertyChanged(nameof(MdnsType));
+            UpdateServiceStatus();
+            changed = true;
+        }
+
+        return changed;
     }
 
     public static ServiceDeviceViewModel New(ServiceDevice device)

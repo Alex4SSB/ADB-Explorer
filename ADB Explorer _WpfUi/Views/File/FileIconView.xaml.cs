@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services.AppInfra;
 using static ADB_Explorer.Models.AdbExplorerConst;
@@ -44,7 +44,7 @@ public partial class FileIconView : UserControl
         if (!_wasSelectedOnMouseDown || _wasEditingOnMouseDown || _clickCount > 1)
             return;
 
-        if (DevicesObject.Current.Root is not AbstractDevice.RootStatus.Enabled
+        if (DevicesObject.Current.Root is not RootStatus.Enabled
             && file.Type is not (AbstractFile.FileType.File or AbstractFile.FileType.Folder))
             return;
 

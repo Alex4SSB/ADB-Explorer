@@ -19,10 +19,10 @@ public class PackageInstallOperation : AbstractShellFileOperation
     public override FrameworkElement OpIcon => new(); // IsUninstall ? new UninstallIcon() : new InstallIcon();
 
     public PackageInstallOperation(Dispatcher dispatcher,
-                                   ADBService.AdbDevice adbDevice,
+                                   LogicalDeviceViewModel device,
                                    FileClass path = null,
                                    string packageName = null,
-                                   bool pushPackage = false) : base(path, adbDevice, dispatcher)
+                                   bool pushPackage = false) : base(path, device, dispatcher)
     {
         OperationName = OperationType.Install;
         PackageName = packageName;

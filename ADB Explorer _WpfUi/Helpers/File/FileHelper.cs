@@ -69,7 +69,7 @@ public static class FileHelper
         if (!Data.Settings.ShowExtensions)
             newPath += file.Extension;
 
-        ShellFileOperation.Rename(file, newPath, Data.CurrentADBDevice);
+        ShellFileOperation.Rename(file, newPath, Data.DevicesObject.Current);
     }
 
     public static string DisplayName(TextBox textBox) => DisplayName(textBox.DataContext as FilePath);
@@ -352,7 +352,7 @@ public static class FileHelper
                 "2>&1"
             ];
 
-            ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "find", out stdout, out _, CancellationToken.None, args);
+            ADBService.ExecuteDeviceAdbShellCommand(Data.DevicesObject.Current.ID, "find", out stdout, out _, CancellationToken.None, args);
         }
         else // when find does not support -printf
         {
@@ -368,7 +368,7 @@ public static class FileHelper
                 """fi; done;"""
             ];
 
-            ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "find", out stdout, out _, CancellationToken.None, args);
+            ADBService.ExecuteDeviceAdbShellCommand(Data.DevicesObject.Current.ID, "find", out stdout, out _, CancellationToken.None, args);
         }
         var matches = AdbRegEx.RE_FIND_TREE().Matches(stdout);
 

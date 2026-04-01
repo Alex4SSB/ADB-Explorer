@@ -2,12 +2,7 @@
 
 public class HistoryDevice : NewDevice
 {
-    private string deviceName = null;
-    public string DeviceName
-    {
-        get => deviceName;
-        set => Set(ref deviceName, value);
-    }
+    public string DeviceName { get; set; }
 
     public HistoryDevice()
     {

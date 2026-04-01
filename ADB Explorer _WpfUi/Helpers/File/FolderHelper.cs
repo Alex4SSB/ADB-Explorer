@@ -11,8 +11,8 @@ public static class FolderHelper
     {
         var driveView = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
         string name = Data.DevicesObject.Current.Name;
-        if (!string.IsNullOrEmpty(Data.DevicesObject.Current.Device.BrandName))
-            name = Data.DevicesObject.Current.Device.BrandName;
+        if (!string.IsNullOrEmpty(Data.DevicesObject.Current.BrandName))
+            name = Data.DevicesObject.Current.BrandName;
 
         if (!Data.CurrentDisplayNames.TryAdd(driveView, name))
             Data.CurrentDisplayNames[driveView] = name;
@@ -54,7 +54,7 @@ public static class FolderHelper
 
         try
         {
-            return Data.CurrentADBDevice.TranslateDevicePath(path);
+            return ADBService.TranslateDevicePath(Data.DevicesObject.Current.ID, path);
         }
         catch (Exception e)
         {

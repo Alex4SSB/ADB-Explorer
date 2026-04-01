@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 
@@ -279,7 +279,7 @@ public class FileOperationQueue : ViewModelBase
     private void CheckForRescan(FileOperation fileOp)
     {
         var target = fileOp.TargetPath.ParentPath;
-        if (fileOp.Device.Device.AndroidVersion < AdbExplorerConst.MIN_MEDIA_SCAN_ANDROID_VER
+        if (fileOp.Device.AndroidVersion < AdbExplorerConst.MIN_MEDIA_SCAN_ANDROID_VER
             || Operations.Any(op =>
                 op.TypeOnDevice == fileOp.TypeOnDevice
                 && op.TargetPath.ParentPath == target
@@ -288,7 +288,7 @@ public class FileOperationQueue : ViewModelBase
             return;
         }
 
-        ADBService.AdbDevice.ForceMediaScan(fileOp.Device.Device);
+        ADBService.ForceMediaScan(fileOp.Device);
     }
 
     private void CurrentOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)

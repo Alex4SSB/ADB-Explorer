@@ -41,8 +41,8 @@ public static class ShellCommands
     public static string TranslateCommand(string cmd)
     {
         if (Enum.TryParse<ShellCmd>(cmd, out var enumCmd)
-            && Data.CurrentADBDevice is not null
-            && DeviceCommands.TryGetValue(Data.CurrentADBDevice.ID, out var dict)
+            && Data.DevicesObject.Current is not null
+            && DeviceCommands.TryGetValue(Data.DevicesObject.Current.ID, out var dict)
             && dict.TryGetValue(enumCmd, out var deviceCmd))
             return deviceCmd;
 

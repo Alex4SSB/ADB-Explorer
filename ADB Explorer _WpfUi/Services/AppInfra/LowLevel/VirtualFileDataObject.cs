@@ -383,7 +383,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             UpdateData(AdbDataFormats.FileContents, group.DataStreams);
     }
 
-    public void SetAdbDrag(IEnumerable<FileClass> files, ADBService.AdbDevice device)
+    public void SetAdbDrag(IEnumerable<FileClass> files, LogicalDeviceViewModel device)
     {
         SelfFiles = [.. files];
         NativeMethods.ADBDRAGLIST adbDrag = new(device, files);
@@ -561,7 +561,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         var files = FileHelper.GetFilesFromTree(FileHelper.GetFolderTree(packages.Select(p => p.Path), false)).ToList();
         vfdo.Operations = [.. files.Select(f => f.PrepareDescriptors(vfdo))];
         vfdo.SetFileDescriptors(files.SelectMany(f => f.Descriptors));
-        vfdo.SetAdbDrag(files, Data.CurrentADBDevice);
+        vfdo.SetAdbDrag(files, Data.DevicesObject.Current);
 
         return vfdo;
     }
@@ -620,7 +620,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         }
 
         // Finally we provide the ADB drag data, which only we recongize
-        vfdo.SetAdbDrag(files, Data.CurrentADBDevice);
+        vfdo.SetAdbDrag(files, Data.DevicesObject.Current);
 
         return vfdo;
     }

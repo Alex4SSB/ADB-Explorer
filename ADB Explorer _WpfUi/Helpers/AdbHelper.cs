@@ -1,5 +1,6 @@
-﻿using ADB_Explorer.Models;
+using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels;
 using AdvancedSharpAdbClient;
 
 namespace ADB_Explorer.Helpers;
@@ -39,7 +40,7 @@ internal static class AdbHelper
         }
     });
 
-    public static string? ReadFileAsText(ADBService.AdbDevice device, string path)
+    public static string? ReadFileAsText(LogicalDeviceViewModel device, string path)
     {
         var stream = ReadFileAsStream(device, path);
         if (stream is null)
@@ -50,7 +51,7 @@ internal static class AdbHelper
         return reader.ReadToEnd();
     }
 
-    public static MemoryStream? ReadFileAsStream(ADBService.AdbDevice device, string path)
+    public static MemoryStream? ReadFileAsStream(LogicalDeviceViewModel device, string path)
     {
         MemoryStream stream = new();
         using (SyncService service = new(device.Device.DeviceData))
@@ -69,7 +70,7 @@ internal static class AdbHelper
         return stream;
     }
 
-    public static void WriteFile(ADBService.AdbDevice device, string path, string content)
+    public static void WriteFile(LogicalDeviceViewModel device, string path, string content)
     {
         using MemoryStream stream = new();
         using StreamWriter writer = new(stream);

@@ -3,7 +3,7 @@ using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
 
-public abstract class DeviceViewModel : AbstractDevice
+public abstract class DeviceViewModel : ViewModelBase
 {
     #region Full properties
 
@@ -117,6 +117,9 @@ public abstract class DeviceViewModel : AbstractDevice
 
             OnPropertyChanged(nameof(Status));
             OnPropertyChanged(nameof(StatusIcon));
+
+            if (Data.FileOpQ?.Operations.Any(op => op.Device.ID == ID) is true)
+                Data.RuntimeSettings.SortFileOps = true;
 
             if (this is LogicalDeviceViewModel)
             {

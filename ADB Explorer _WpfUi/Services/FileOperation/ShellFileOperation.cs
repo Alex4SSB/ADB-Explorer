@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services.AppInfra;
+using ADB_Explorer.ViewModels;
 using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Services;
@@ -11,8 +12,8 @@ public abstract class AbstractShellFileOperation : FileOperation
 
     public override SyncFile AndroidPath => TargetPath;
 
-    protected AbstractShellFileOperation(FileClass filePath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
-        : base(filePath, adbDevice, dispatcher)
+    protected AbstractShellFileOperation(FileClass filePath, LogicalDeviceViewModel device, Dispatcher dispatcher)
+        : base(filePath, device, dispatcher)
     {
         if (filePath is not null)
         {
@@ -36,16 +37,16 @@ public abstract class AbstractShellFileOperation : FileOperation
 
 public static class ShellFileOperation
 {
-    public static void SilentDelete(ADBService.AdbDevice device, IEnumerable<FilePath> items)
+    public static void SilentDelete(LogicalDeviceViewModel device, IEnumerable<FilePath> items)
         => SilentDelete(device, items.Select(item => item.FullPath).ToArray());
 
-    public static void SilentDelete(ADBService.AdbDevice device, params string[] items)
+    public static void SilentDelete(LogicalDeviceViewModel device, params string[] items)
     {
         string[] args = ["-rf", .. items.Select(item => ADBService.EscapeAdbShellString(item))];
         ADBService.ExecuteDeviceAdbShellCommand(device.ID, "rm", out _, out _, CancellationToken.None, args);
     }
 
-    public static void DeleteItems(ADBService.AdbDevice device, IEnumerable<FileClass> items, Dispatcher dispatcher)
+    public static void DeleteItems(LogicalDeviceViewModel device, IEnumerable<FileClass> items, Dispatcher dispatcher)
     {
         foreach (var item in items)
         {
@@ -68,7 +69,7 @@ public static class ShellFileOperation
         if (op.FilePath.TrashIndex is TrashIndexer indexer)
             SilentDelete(op.Device, indexer.IndexerPath);
 
-        if (op.Device.ID == Data.CurrentADBDevice.ID)
+        if (op.Device.ID == Data.DevicesObject.Current.ID)
         {
             // remove file from cut items and clear its trash indexer if current device
             op.FilePath.CutState = DragDropEffects.None;
@@ -85,7 +86,7 @@ public static class ShellFileOperation
         op.PropertyChanged -= DeleteFileOp_PropertyChanged;
     }
 
-    public static void Rename(FileClass item, string targetPath, ADBService.AdbDevice device)
+    public static void Rename(FileClass item, string targetPath, LogicalDeviceViewModel device)
     {
         var fileOp = new FileRenameOperation(item, targetPath, device, App.AppDispatcher);
         fileOp.PropertyChanged += RenameFileOp_PropertyChanged;
@@ -101,7 +102,7 @@ public static class ShellFileOperation
         if (e.PropertyName is not nameof(FileOperation.Status) || op.Status is not FileOperation.OperationStatus.Completed)
             return;
 
-        if (op.Device.ID == Data.CurrentADBDevice.ID
+        if (op.Device.ID == Data.DevicesObject.Current.ID
             && op.FilePath.ParentPath == Data.CurrentPath)
         {
             var file = Data.DirList.FileList.Find(f => f.FullPath == op.FilePath.FullPath);
@@ -120,9 +121,9 @@ public static class ShellFileOperation
         op.PropertyChanged -= RenameFileOp_PropertyChanged;
     }
 
-    public static bool SilentMove(ADBService.AdbDevice device, FilePath item, string targetPath) => SilentMove(device, item.FullPath, targetPath);
+    public static bool SilentMove(LogicalDeviceViewModel device, FilePath item, string targetPath) => SilentMove(device, item.FullPath, targetPath);
 
-    public static bool SilentMove(ADBService.AdbDevice device, string fullPath, string targetPath, bool throwOnError = true)
+    public static bool SilentMove(LogicalDeviceViewModel device, string fullPath, string targetPath, bool throwOnError = true)
     {
         var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
                                                                "mv",
@@ -140,7 +141,7 @@ public static class ShellFileOperation
         return exitCode == 0;
     }
 
-    public static void MoveItems(ADBService.AdbDevice device,
+    public static void MoveItems(LogicalDeviceViewModel device,
                                  IEnumerable<FileClass> items,
                                  string targetPath,
                                  string currentPath,
@@ -155,7 +156,7 @@ public static class ShellFileOperation
                      dispatcher,
                      cutType);
 
-    public static void MoveItems(ADBService.AdbDevice device,
+    public static void MoveItems(LogicalDeviceViewModel device,
                                  IEnumerable<FileClass> items,
                                  string targetPath,
                                  string currentPath,
@@ -256,7 +257,7 @@ public static class ShellFileOperation
             // remove file from cut items
             op.FilePath.CutState = DragDropEffects.None;
 
-            if (op.Device.ID == Data.CurrentADBDevice.ID)
+            if (op.Device.ID == Data.DevicesObject.Current.ID)
             {
                 // notify master process of completion
                 if (op.MasterPid > 0 && op.OperationName is not FileOperation.OperationType.Copy)
@@ -313,7 +314,7 @@ public static class ShellFileOperation
         }
     }
 
-    public static async void MakeDir(ADBService.AdbDevice device, string fullPath)
+    public static async void MakeDir(LogicalDeviceViewModel device, string fullPath)
     {
         var result = await ADBService.ExecuteVoidShellCommand(device.ID,
                                                               CancellationToken.None,
@@ -326,7 +327,7 @@ public static class ShellFileOperation
         }
     }
 
-    public static async void MakeDirs(ADBService.AdbDevice device, IEnumerable<string> paths)
+    public static async void MakeDirs(LogicalDeviceViewModel device, IEnumerable<string> paths)
     {
         var result = await ADBService.ExecuteVoidShellCommand(device.ID,
                                                               CancellationToken.None,
@@ -338,7 +339,7 @@ public static class ShellFileOperation
         }
     }
 
-    public static async void MakeFile(ADBService.AdbDevice device, string fullPath)
+    public static async void MakeFile(LogicalDeviceViewModel device, string fullPath)
     {
         var result = await ADBService.ExecuteVoidShellCommand(device.ID,
                                                               CancellationToken.None,
@@ -351,7 +352,7 @@ public static class ShellFileOperation
         }
     }
 
-    public static async void WriteLine(ADBService.AdbDevice device, string fullPath, string newLine)
+    public static async void WriteLine(LogicalDeviceViewModel device, string fullPath, string newLine)
     {
         var result = await ADBService.ExecuteVoidShellCommand(device.ID,
                                                               CancellationToken.None,
@@ -364,7 +365,7 @@ public static class ShellFileOperation
         }
     }
 
-    public static string ReadAllText(ADBService.AdbDevice device, params string[] paths)
+    public static string ReadAllText(LogicalDeviceViewModel device, params string[] paths)
     {
         var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
                                                                "cat",
@@ -378,7 +379,7 @@ public static class ShellFileOperation
         return stdout;
     }
 
-    public static string GetPackageName(ADBService.AdbDevice device, string fullPath)
+    public static string GetPackageName(LogicalDeviceViewModel device, string fullPath)
     {
         ADBService.ExecuteDeviceAdbShellCommand(device.ID,
                                                 "pm",
@@ -395,7 +396,7 @@ public static class ShellFileOperation
         return match.Success ? match.Groups["package"].Value : fullPath[..fullPath.LastIndexOf('.')][(fullPath.LastIndexOf('/') + 1)..];
     }
 
-    public static void InstallPackages(ADBService.AdbDevice device, IEnumerable<FileClass> items, Dispatcher dispatcher)
+    public static void InstallPackages(LogicalDeviceViewModel device, IEnumerable<FileClass> items, Dispatcher dispatcher)
     {
         foreach (var item in items)
         {
@@ -406,7 +407,7 @@ public static class ShellFileOperation
         }
     }
 
-    public static void PushPackages(ADBService.AdbDevice device, IEnumerable<ShellItem> items, Dispatcher dispatcher)
+    public static void PushPackages(LogicalDeviceViewModel device, IEnumerable<ShellItem> items, Dispatcher dispatcher)
     {
         foreach (var item in items.Select(file => new FilePath(file)))
         {
@@ -417,7 +418,7 @@ public static class ShellFileOperation
         }
     }
 
-    public static void UninstallPackages(ADBService.AdbDevice device, IEnumerable<string> packages, Dispatcher dispatcher)
+    public static void UninstallPackages(LogicalDeviceViewModel device, IEnumerable<string> packages, Dispatcher dispatcher)
     {
         foreach (var item in packages)
         {
@@ -436,7 +437,7 @@ public static class ShellFileOperation
         if (e.PropertyName is not nameof(FileOperation.Status) || op.Status is not FileOperation.OperationStatus.Completed)
             return;
 
-        if (op.Device.ID == Data.CurrentADBDevice.ID
+        if (op.Device.ID == Data.DevicesObject.Current.ID
             && Data.FileActions.IsAppDrive)
         {
             // update UI when on current device and current path
@@ -449,7 +450,7 @@ public static class ShellFileOperation
         op.PropertyChanged -= InstallOp_PropertyChanged;
     }
 
-    public static ulong? GetPackagesCount(ADBService.AdbDevice device)
+    public static ulong? GetPackagesCount(LogicalDeviceViewModel device)
     {
         var result = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out string stdout, out _, CancellationToken.None, ["list", "packages", "|", "wc", "-l"]);
         if (result != 0 || !ulong.TryParse(stdout, out ulong value))
@@ -458,7 +459,7 @@ public static class ShellFileOperation
         return value;
     }
 
-    public static ObservableList<Package> GetPackages(ADBService.AdbDevice device, bool includeSystem = true, bool optionalParams = true)
+    public static ObservableList<Package> GetPackages(LogicalDeviceViewModel device, bool includeSystem = true, bool optionalParams = true)
     {
         // More package-specific info can be acquired using dumpsys package [package_name]
 
@@ -487,7 +488,7 @@ public static class ShellFileOperation
         return packages;
     }
 
-    public static void ChangeDateFromName(ADBService.AdbDevice device, IEnumerable<FileClass> items, Dispatcher dispatcher)
+    public static void ChangeDateFromName(LogicalDeviceViewModel device, IEnumerable<FileClass> items, Dispatcher dispatcher)
     {
         List<FileOperation> operations = [];
 
@@ -533,7 +534,7 @@ public static class ShellFileOperation
         if (e.PropertyName is not nameof(FileOperation.Status) || op.Status is not FileOperation.OperationStatus.Completed)
             return;
 
-        if (op.Device.ID == Data.CurrentADBDevice.ID
+        if (op.Device.ID == Data.DevicesObject.Current.ID
             && op.FilePath.ParentPath == Data.CurrentPath)
         {
             // update UI when on current device and current path

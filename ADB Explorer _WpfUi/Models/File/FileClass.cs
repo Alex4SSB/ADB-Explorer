@@ -96,17 +96,17 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     {
         get
         {
-            if (_cacheThumbnail is null && Data.CurrentADBDevice.Type 
-                is AbstractDevice.DeviceType.Local 
-                or AbstractDevice.DeviceType.Remote)
+            if (_cacheThumbnail is null && Data.DevicesObject.Current.Type 
+                is DeviceType.Local 
+                or DeviceType.Remote)
             {
-                if (!ThumbnailService.IsInitialized(Data.CurrentADBDevice.Device.LogicalID))
+                if (!ThumbnailService.IsInitialized(Data.DevicesObject.Current.LogicalID))
                 {
-                    Task.Run(() => ThumbnailService.ForceLoad(Data.CurrentADBDevice));
+                    Task.Run(() => ThumbnailService.ForceLoad(Data.DevicesObject.Current));
                 }
                 else
                 {
-                    _cacheThumbnail = ThumbnailService.LoadThumbnail(Data.CurrentADBDevice, FullPath);
+                    _cacheThumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, FullPath);
                 }
             }
 
@@ -311,7 +311,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
         var children = Children;
 
-        var fileOp = FileSyncOperation.PullFile(new(this, children), target, Data.CurrentADBDevice, App.AppDispatcher);
+        var fileOp = FileSyncOperation.PullFile(new(this, children), target, Data.DevicesObject.Current, App.AppDispatcher);
         fileOp.PropertyChanged += PullOperation_PropertyChanged;
         fileOp.VFDO = vfdo;
 
@@ -405,7 +405,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
                 ShellFileOperation.SilentDelete(op.Device, op.FilePath.FullPath);
 
                 // Remove file in UI if present
-                if (op.Device.ID == Data.CurrentADBDevice.ID
+                if (op.Device.ID == Data.DevicesObject.Current.ID
                     && op.FilePath.ParentPath == Data.CurrentPath)
                 {
                     op.Dispatcher.Invoke(() =>

@@ -2,19 +2,9 @@
 
 public class NewDevice : PairingDevice
 {
-    private string connectPort;
-    public string ConnectPort
-    {
-        get => connectPort;
-        set => Set(ref connectPort, value);
-    }
+    public string ConnectPort { get; set; }
 
-    private string hostName;
-    public string HostName
-    {
-        get => hostName;
-        set => Set(ref hostName, value);
-    }
+    public string HostName { get; set; }
 
     public NewDevice()
     {

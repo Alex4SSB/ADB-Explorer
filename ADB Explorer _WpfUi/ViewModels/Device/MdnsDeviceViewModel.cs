@@ -11,8 +11,3 @@ public class MdnsDeviceViewModel : DeviceViewModel
         Device = device;
     }
 }
-
-public class MdnsDevice : Device
-{
-    
-}

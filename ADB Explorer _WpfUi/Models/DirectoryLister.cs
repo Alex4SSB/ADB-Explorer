@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Models.AbstractFile;
@@ -6,9 +6,9 @@ using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Models;
 
-public class DirectoryLister(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, Func<FileClass, FileClass> fileManipulator = null) : ViewModelBase
+public class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewModel device, Func<FileClass, FileClass> fileManipulator = null) : ViewModelBase
 {
-    public ADBService.AdbDevice Device { get; } = adbDevice;
+    public LogicalDeviceViewModel Device { get; } = device;
     public ObservableList<FileClass> FileList { get; } = [];
 
     private string currentPath;
@@ -81,7 +81,7 @@ public class DirectoryLister(Dispatcher dispatcher, ADBService.AdbDevice adbDevi
         LinkListCancellation = new();
         currentFileQueue = new ConcurrentQueue<FileStat>();
 
-        ReadTask = Task.Run(() => Device.ListDirectory(CurrentPath, ref currentFileQueue, Dispatcher, CurrentCancellationToken.Token), CurrentCancellationToken.Token);
+        ReadTask = Task.Run(() => ADBService.ListDirectory(Device.ID, CurrentPath, ref currentFileQueue, Dispatcher, CurrentCancellationToken.Token), CurrentCancellationToken.Token);
         ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(() => StopDirectoryList()), CurrentCancellationToken.Token);
 
         Task.Delay(DIR_LIST_VISIBLE_PROGRESS_DELAY).ContinueWith((t) => Dispatcher.BeginInvoke(() => IsProgressVisible = InProgress), CurrentCancellationToken.Token);
@@ -192,7 +192,7 @@ public class DirectoryLister(Dispatcher dispatcher, ADBService.AdbDevice adbDevi
         List<(string, FileType)> result = null;
         try
         {
-            result = [.. Device.GetLinkType(items.Select(f => f.FullPath), LinkListCancellation.Token)];
+            result = [.. ADBService.GetLinkType(Device.ID, items.Select(f => f.FullPath), LinkListCancellation.Token)];
         }
         catch (AggregateException e) when (e.InnerException is TaskCanceledException)
         { }

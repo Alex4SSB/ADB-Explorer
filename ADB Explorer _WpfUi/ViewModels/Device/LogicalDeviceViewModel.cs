@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using AdvancedSharpAdbClient.Models;
@@ -28,7 +28,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
             if (Set(ref isOpen, value) && Root is RootStatus.Enabled)
             {
                 if (!value && Data.Settings.UnrootOnDisconnect is true)
-                    ADBService.Unroot(Device);
+                    ADBService.Unroot(Device.ID);
 
                 if (value)
                     Data.RuntimeSettings.IsRootActive = true;
@@ -38,13 +38,20 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     public DeviceData DeviceData => Device.DeviceData;
 
-    public byte? AndroidVersion => Device.AndroidVersion;
+    public byte? AndroidVersion => byte.TryParse(AndroidVersionString?.Split('.')[0], out byte ver) ? ver : null;
 
     private bool useIdForName;
     public bool UseIdForName
     {
         get => useIdForName;
         set => Set(ref useIdForName, value);
+    }
+
+    private ObservableList<DriveViewModel> drives = [];
+    public ObservableList<DriveViewModel> Drives
+    {
+        get => drives;
+        set => Set(ref drives, value);
     }
 
     #endregion
@@ -110,9 +117,88 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     public Battery Battery => Device.Battery;
 
-    public ObservableList<DriveViewModel> Drives => Device.Drives;
+    #endregion
+
+    #region Device properties (lazy-loaded from ADB)
+
+    private Dictionary<string, string> props;
+    public Dictionary<string, string> Props
+    {
+        get
+        {
+            if (props is null)
+            {
+                int exitCode = ADBService.ExecuteDeviceAdbShellCommand(ID, ADBService.GET_PROP, out string stdout, out string stderr, CancellationToken.None);
+                if (exitCode == 0)
+                {
+                    props = stdout.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries).Where(
+                        l => l[0] == '[' && l[^1] == ']').TryToDictionary(
+                            line => line.Split(':')[0].Trim('[', ']', ' '),
+                            line => line.Split(':')[1].Trim('[', ']', ' '));
+                }
+                else
+                    props = [];
+            }
+
+            return props;
+        }
+    }
+
+    public string? BrandName
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(field))
+            {
+                field = Props.GetValueOrDefault(ADBService.BRAND_NAME);
+                if (field is not null)
+                    Device.Name = field;
+            }
+            return field;
+        }
+    } = null;
+
+    public string? MmcProp
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(field))
+            {
+                field = Props.GetValueOrDefault(ADBService.MMC_PROP);
+            }
+            return field;
+        }
+    } = null;
+
+    public string? OtgProp
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(field))
+            {
+                field = Props.GetValueOrDefault(ADBService.OTG_PROP);
+            }
+            return field;
+        }
+    } = null;
+
+    public string? AndroidVersionString
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(field))
+            {
+                field = Props.GetValueOrDefault(ADBService.ANDROID_VERSION, "");
+            }
+            return field;
+        }
+    } = "";
+
+    public Task<string?> GetAndroidVersion() => Task.Run(() => AndroidVersionString);
 
     #endregion
+
+    public static implicit operator string(LogicalDeviceViewModel vm) => vm?.ID;
 
     public DateTime DiscoverTime { get; }
 
@@ -133,6 +219,8 @@ public class LogicalDeviceViewModel : DeviceViewModel
         Device = device;
         if (Device.Type is DeviceType.Emulator)
             UseIdForName = true;
+
+        InitDeviceDrives();
 
         BrowseCommand = new(() => !IsOpen && device.Status is DeviceStatus.Ok && device.Type is not DeviceType.Sideload,
                             () => DeviceHelper.BrowseDeviceAction(this));
@@ -190,7 +278,13 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     public void EnableRoot(bool enable)
     {
-        Device.EnableRoot(enable);
+        Device.Root = enable
+            ? ADBService.Root(Device.ID) ? RootStatus.Enabled : RootStatus.Forbidden
+            : ADBService.Unroot(Device.ID) ? RootStatus.Disabled : RootStatus.Unchecked;
+
+        if (Data.DevicesObject.Current.ID == ID)
+            Data.RuntimeSettings.IsRootActive = Root is RootStatus.Enabled;
+
         OnPropertyChanged(nameof(Root));
     }
 
@@ -211,14 +305,161 @@ public class LogicalDeviceViewModel : DeviceViewModel
         return false;
     }
 
-    public void UpdateBattery() => Device.UpdateBattery();
+    public void UpdateBattery()
+    {
+        Device.Battery.Update(ADBService.GetBatteryInfo(this));
+    }
 
     public void UpdateName() => OnPropertyChanged(nameof(Name));
 
-    public Task<bool> UpdateDrives(IEnumerable<Drive> drives, Dispatcher dispatcher, bool asyncClassify = false) => Device.UpdateDrives(drives, dispatcher, asyncClassify);
+    #endregion
+
+    #region Drive handling
+
+    private void InitDeviceDrives()
+    {
+        Drives.Add(new LogicalDriveViewModel(new(path: AdbExplorerConst.DRIVE_TYPES.First(d => d.Value is AbstractDrive.DriveType.Root).Key)));
+        Drives.Add(new LogicalDriveViewModel(new(path: AdbExplorerConst.DRIVE_TYPES.First(d => d.Value is AbstractDrive.DriveType.Internal).Key)));
+
+        Drives.Add(new VirtualDriveViewModel(new(path: AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin), -1)));
+        Drives.Add(new VirtualDriveViewModel(new(path: AdbExplorerConst.TEMP_PATH)));
+        Drives.Add(new VirtualDriveViewModel(new(path: AdbLocation.StringFromLocation(Navigation.SpecialLocation.PackageDrive))));
+    }
+
+    /// <summary>
+    /// Update device with new drives
+    /// </summary>
+    /// <param name="drives">The new drives to be assigned</param>
+    /// <param name="asyncClassify"><see langword="true"/> to update only after fully acquiring all information</param>
+    public async Task<bool> UpdateDrives(IEnumerable<Drive> drives, Dispatcher dispatcher, bool asyncClassify = false)
+    {
+        bool collectionChanged;
+
+        // MMC and OTG drives are searched for and only then UI is updated with all changes
+        if (asyncClassify)
+        {
+            collectionChanged = await UpdateExtensionDrivesAsync(drives, dispatcher);
+        }
+        // All drives are first updated in UI, and only then MMC and OTG drives are searched for
+        else
+        {
+            collectionChanged = SetDrives(drives);
+            UpdateExtensionDrives(drives, dispatcher);
+        }
+
+        return collectionChanged;
+    }
 
     public Task<bool> UpdateDrives(LogicalDeviceViewModel other, Dispatcher dispatcher, bool asyncClassify = false)
-        => UpdateDrives(other.Device.Drives.Select(d => d.Drive), dispatcher, asyncClassify);
+        => UpdateDrives(other.Drives.Select(d => d.Drive), dispatcher, asyncClassify);
+
+    private void UpdateExtensionDrives(IEnumerable<Drive> drives, Dispatcher dispatcher)
+    {
+        var mmcTask = Task.Run(() => DeviceHelper.GetMmcDrive(drives.OfType<LogicalDrive>(), ID));
+        mmcTask.ContinueWith((t) =>
+        {
+            if (t.IsCanceled)
+                return;
+
+            dispatcher.BeginInvoke(() =>
+            {
+                SetMmcDrive(t.Result);
+                SetExternalDrives();
+            });
+        });
+    }
+
+    private async Task<bool> UpdateExtensionDrivesAsync(IEnumerable<Drive> drives, Dispatcher dispatcher)
+    {
+        await Task.Run(() =>
+        {
+            if (DeviceHelper.GetMmcDrive(drives.OfType<LogicalDrive>(), ID) is LogicalDrive mmc)
+                mmc.Type = AbstractDrive.DriveType.Expansion;
+
+            DeviceHelper.SetExternalDrives(drives.OfType<LogicalDrive>());
+        });
+
+        var result = false;
+        await dispatcher.BeginInvoke(() => result = SetDrives(drives));
+
+        return result;
+    }
+
+    /// <summary>
+    /// Update drive parameters, add new drives, remove non-existent drives
+    /// </summary>
+    /// <returns><see langword="true"/> if drives have been added or removed</returns>
+    private bool SetDrives(IEnumerable<Drive> drives)
+    {
+        if (drives is null)
+            return false;
+
+        bool added = false;
+
+        foreach (var other in drives)
+        {
+            // Accommodate for changing the path to /sdcard
+            var selfQ = Drives.Where(d => d.Path == other.Path || (other.Type is AbstractDrive.DriveType.Internal && d.Type is AbstractDrive.DriveType.Internal));
+            if (selfQ.Any())
+            {
+                // Update the drive if it exists
+                var self = selfQ.First();
+
+                switch (self)
+                {
+                    case LogicalDriveViewModel logical:
+                        logical.UpdateDrive((LogicalDrive)other);
+                        if (other.Type is not AbstractDrive.DriveType.Unknown)
+                            logical.SetType(other.Type);
+                        break;
+                    case VirtualDriveViewModel virt:
+                        virt.SetItemsCount(((VirtualDrive)other).ItemsCount);
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+            // Create a new drive if it doesn't exist
+            else if (other is LogicalDrive logical)
+            {
+                Drives.Add(new LogicalDriveViewModel(logical));
+                added = true;
+            }
+            else if (other is VirtualDrive virt && !Drives.Any(d => d.Type == virt.Type))
+            {
+                Drives.Add(new VirtualDriveViewModel(virt));
+                added = true;
+            }
+            else
+                throw new NotSupportedException();
+        }
+
+        // Remove all drives that were not discovered in the last update
+        var removed = Drives.RemoveAll(self => self is LogicalDriveViewModel
+                                                && !drives.Any(other => other.Path == self.Path
+                                                     || (other.Type is AbstractDrive.DriveType.Internal && self.Type is AbstractDrive.DriveType.Internal)));
+
+        return added || removed;
+    }
+
+    public void SetMmcDrive(LogicalDrive mmcDrive)
+    {
+        if (mmcDrive is null)
+            return;
+
+        ((LogicalDriveViewModel)Drives.FirstOrDefault(d => d.Path == mmcDrive.Path))?.SetExtension();
+    }
+
+    /// <summary>
+    /// Sets type of all <see cref="DriveViewModel"/> with unknown type as external.
+    /// </summary>
+    public void SetExternalDrives()
+    {
+        foreach (var item in Drives.Where(d => d.Type == AbstractDrive.DriveType.Unknown))
+        {
+            ((LogicalDriveViewModel)item).SetExtension(false);
+        }
+    }
 
     #endregion
 }

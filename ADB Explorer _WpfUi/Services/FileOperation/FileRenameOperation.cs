@@ -5,8 +5,8 @@ namespace ADB_Explorer.Services;
 
 public class FileRenameOperation : AbstractShellFileOperation
 {
-    public FileRenameOperation(FileClass filePath, string targetPath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
-        : base(new(filePath), adbDevice, dispatcher)
+    public FileRenameOperation(FileClass filePath, string targetPath, LogicalDeviceViewModel device, Dispatcher dispatcher)
+        : base(new(filePath), device, dispatcher)
     {
         OperationName = OperationType.Rename;
 

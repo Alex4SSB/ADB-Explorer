@@ -5,7 +5,6 @@ using ADB_Explorer.ViewModels;
 using ADB_Explorer.Views.Pages;
 using Windows.Management.Deployment;
 using Wpf.Ui;
-using static ADB_Explorer.Models.AbstractDevice;
 
 namespace ADB_Explorer.Helpers;
 
@@ -47,12 +46,12 @@ public static class DeviceHelper
             return null;
 
         // Try to find the MMC in the props
-        if (Data.DevicesObject.Current.Device.MmcProp is string mmcId)
+        if (Data.DevicesObject.Current.MmcProp is string mmcId)
         {
             return drives.FirstOrDefault(d => d.ID == mmcId);
         }
         // If OTG exists, but no MMC ID - there is no MMC
-        else if (Data.DevicesObject.Current.Device.OtgProp is not null)
+        else if (Data.DevicesObject.Current.OtgProp is not null)
             return null;
 
         var externalDrives = drives.Where(d => d.Type is AbstractDrive.DriveType.Unknown);
@@ -530,17 +529,17 @@ public static class DeviceHelper
         var pastOps = Data.FileOpQ.Operations.Where(op => op.IsPastOp);
 
         // get the newly acquired devices with similar IDs to devices of the past file ops [the objects of] which also do not exist in the devices UI list
-        var exceptDevices = devices.Where(d => pastOps.Any(op => op.Device.ID == d.ID && !Data.DevicesObject.UIList.Contains(op.Device.Device)));
+        var exceptDevices = devices.Where(d => pastOps.Any(op => op.Device.ID == d.ID && !Data.DevicesObject.UIList.Contains(op.Device)));
 
         // get the corresponding file op devices
-        var fileOpDevices = pastOps.Select(op => op.Device.Device).Where(d => exceptDevices.Any(e => e.ID == d.ID));
+        var fileOpDevices = pastOps.Select(op => op.Device).Where(d => exceptDevices.Any(e => e.ID == d.ID));
 
         return devices.Except(exceptDevices, new LogicalDeviceViewModelEqualityComparer()).AppendRange(fileOpDevices.Distinct());
     }
 
     public static void DeviceListSetup(string selectedAddress = "")
     {
-        Task.Run(ADBService.GetDevices).ContinueWith((t) => App.SafeInvoke(() => DeviceListSetup(t.Result.Select(l => new LogicalDeviceViewModel(l)), selectedAddress)));
+        Task.Run(ADBService.GetDevices).ContinueWith((t) => App.SafeInvoke(() => DeviceListSetup(t.Result.Select(s => new LogicalDeviceViewModel(LogicalDevice.From(s))), selectedAddress)));
     }
 
     public static void DeviceListSetup(IEnumerable<LogicalDeviceViewModel> devices, string selectedAddress = "")
@@ -614,7 +613,6 @@ public static class DeviceHelper
                 return;
 
             Devices.SetOpenDevice(device);
-            Data.CurrentADBDevice = new(Data.DevicesObject.Current);
             Data.RuntimeSettings.InitLister = true;
         }));
     }
@@ -623,8 +621,8 @@ public static class DeviceHelper
     {
         SetAndroidVersion();
 
-        Data.DevicesObject.Current.Device.Drives.First(d => d.Type is AbstractDrive.DriveType.Internal).Drive
-                                                .UpdatePath(ADBService.GetInternalStorage(Data.CurrentADBDevice.ID));
+        Data.DevicesObject.Current.Drives.First(d => d.Type is AbstractDrive.DriveType.Internal).Drive
+                                                .UpdatePath(ADBService.GetInternalStorage(Data.DevicesObject.Current.ID));
 
         FileActionLogic.RefreshDrives(true);
 
@@ -633,7 +631,7 @@ public static class DeviceHelper
         NavHistory.Navigate(Navigation.SpecialLocation.DriveView);
 
         if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.OnConnect)
-            Task.Run(() => ThumbnailService.ForceLoad(Data.CurrentADBDevice));
+            Task.Run(() => ThumbnailService.ForceLoad(Data.DevicesObject.Current));
 
         Data.CopyPaste.GetClipboardPasteItems();
         Data.RuntimeSettings.FilterDrives = true;
@@ -655,7 +653,7 @@ public static class DeviceHelper
 
     public static void SetAndroidVersion()
     {
-        var versionTask = Data.DevicesObject.Current.Device.GetAndroidVersion();
+        var versionTask = Data.DevicesObject.Current.GetAndroidVersion();
         versionTask?.ContinueWith(t =>
         {
             if (t.IsCanceled)
@@ -690,7 +688,6 @@ public static class DeviceHelper
                     FileActionLogic.ClearExplorer();
                     NavHistory.Reset();
                     Data.FileActions.IsExplorerVisible = false;
-                    Data.CurrentADBDevice = null;
                     Data.DirList = null;
                     Data.RuntimeSettings.DeviceToOpen = null;
                 }
@@ -709,7 +706,6 @@ public static class DeviceHelper
 
     public static void OpenDevice(LogicalDeviceViewModel device)
     {
-        Data.CurrentADBDevice = new(device);
         Devices.SetOpenDevice(device);
 
         App.Services.GetService<INavigationService>()?.Navigate(typeof(ExplorerPage));

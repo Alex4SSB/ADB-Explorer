@@ -6,8 +6,8 @@ namespace ADB_Explorer.Services;
 
 public class FileDeleteOperation : AbstractShellFileOperation
 {
-    public FileDeleteOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FileClass path)
-        : base(path, adbDevice, dispatcher)
+    public FileDeleteOperation(Dispatcher dispatcher, LogicalDeviceViewModel device, FileClass path)
+        : base(path, device, dispatcher)
     {
         OperationName = OperationType.Delete;
         AltTarget = new(Navigation.SpecialLocation.devNull);

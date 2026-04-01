@@ -1,6 +1,7 @@
-using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services.AppInfra;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
@@ -145,12 +146,12 @@ public static partial class ThumbnailService
     public static void InvalidateThumbnailDirCache(string logicalDeviceId)
         => _deviceInfoCache.RemoveAll(d => d.DeviceId == logicalDeviceId);
 
-    public static bool ForceLoad(ADBService.AdbDevice device)
+    public static bool ForceLoad(LogicalDeviceViewModel device)
     {
         if (!_mutex.WaitOne(0))
             return false;
 
-        GetThumbnailName(device.Device.LogicalID, "");
+        GetThumbnailName(device.LogicalID, "");
         var localPath = GetLocalThumbPath(device);
 
         _mutex.ReleaseMutex();
@@ -164,12 +165,12 @@ public static partial class ThumbnailService
             && !string.IsNullOrEmpty(info.LocalThumbnailDir);
     }
 
-    public static Thumbnail? LoadThumbnail(ADBService.AdbDevice device, string filePath)
+    public static Thumbnail? LoadThumbnail(LogicalDeviceViewModel device, string filePath)
     {
         _mutex.WaitOne();
         _mutex.ReleaseMutex();
 
-        if (GetThumbnailName(device.Device.LogicalID, filePath) is not ThumbnailInfo info)
+        if (GetThumbnailName(device.LogicalID, filePath) is not ThumbnailInfo info)
             return null;
 
         if (GetLocalThumbPath(device) is not string localThumbnailDir)
@@ -350,9 +351,9 @@ public static partial class ThumbnailService
             ThumbnailUpdated?.Invoke(logicalDeviceId, updatedFilePath);
     }
 
-    private static string? GetLocalThumbPath(ADBService.AdbDevice device)
+    private static string? GetLocalThumbPath(LogicalDeviceViewModel device)
     {
-        if (GetDeviceThumbsInfo(device.Device.LogicalID) is not DeviceThumbnailInfo deviceInfo)
+        if (GetDeviceThumbsInfo(device.LogicalID) is not DeviceThumbnailInfo deviceInfo)
             return null;
 
         if (!string.IsNullOrEmpty(deviceInfo.LocalThumbnailDir))
@@ -397,8 +398,8 @@ public static partial class ThumbnailService
             : new("", deviceInfo.DeviceMoviesThumbnailDir, AbstractFile.FileType.Folder);
 
         var deviceDir = FileHelper.GetParentPath(deviceInfo.LocalThumbnailDir);
-        var device = Data.CurrentADBDevice;
-        if (device.Device.LogicalID != deviceInfo.DeviceId)
+        var device = Data.DevicesObject.Current;
+        if (device.LogicalID != deviceInfo.DeviceId)
         {
             throw new ArgumentException("Device mismatch!\nIf this happens - it is time to implement multi AdbDevice");
         }

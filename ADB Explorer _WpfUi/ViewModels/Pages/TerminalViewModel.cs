@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Models;
+using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 using Wpf.Ui.Abstractions.Controls;
 
@@ -32,7 +32,7 @@ public partial class TerminalViewModel : ObservableObject, INavigationAware
         if (Data.DevicesObject?.UIList is not null)
         {
             foreach (var device in Data.DevicesObject.UIList.OfType<LogicalDeviceViewModel>()
-                         .Where(d => d.Status is AbstractDevice.DeviceStatus.Ok))
+                         .Where(d => d.Status is DeviceStatus.Ok))
                 DevicesView.Add(device);
 
             foreach (var item in Data.DevicesObject.UIList)
@@ -70,7 +70,7 @@ public partial class TerminalViewModel : ObservableObject, INavigationAware
     {
         var activeDevices = Data.DevicesObject.UIList
             .OfType<LogicalDeviceViewModel>()
-            .Where(d => d.Status is AbstractDevice.DeviceStatus.Ok)
+            .Where(d => d.Status is DeviceStatus.Ok)
             .ToList();
 
         for (int i = DevicesView.Count - 1; i >= 0; i--)
@@ -82,7 +82,7 @@ public partial class TerminalViewModel : ObservableObject, INavigationAware
         foreach (var device in activeDevices.Where(d => !DevicesView.Contains(d)))
             DevicesView.Add(device);
 
-        if (SelectedDevice is not LogicalDeviceViewModel { Status: AbstractDevice.DeviceStatus.Ok })
+        if (SelectedDevice is not LogicalDeviceViewModel { Status: DeviceStatus.Ok })
         {
             SelectedDevice = DevicesView.OfType<LogicalDeviceViewModel>().FirstOrDefault();
             SelectedDevice ??= AdbEntry;

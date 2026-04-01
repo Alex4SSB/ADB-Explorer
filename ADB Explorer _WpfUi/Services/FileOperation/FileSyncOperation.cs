@@ -47,8 +47,8 @@ public class FileSyncOperation : FileOperation
 
     private bool isCanceled = false;
 
-    public FileSyncOperation(OperationType operationName, FileDescriptor sourcePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, FailedOpProgressViewModel status)
-        : base(new FileClass(sourcePath), adbDevice, App.AppDispatcher)
+    public FileSyncOperation(OperationType operationName, FileDescriptor sourcePath, SyncFile targetPath, LogicalDeviceViewModel device, FailedOpProgressViewModel status)
+        : base(new FileClass(sourcePath), device, App.AppDispatcher)
     {
         OperationName = operationName;
         FilePath = new(new FileClass(sourcePath));
@@ -63,8 +63,8 @@ public class FileSyncOperation : FileOperation
         OperationType operationName,
         SyncFile sourcePath,
         SyncFile targetPath,
-        ADBService.AdbDevice adbDevice,
-        Dispatcher dispatcher) : base(sourcePath, adbDevice, dispatcher)
+        LogicalDeviceViewModel device,
+        Dispatcher dispatcher) : base(sourcePath, device, dispatcher)
     {
         OperationName = operationName;
         FilePath = sourcePath;
@@ -128,7 +128,7 @@ public class FileSyncOperation : FileOperation
             {
                 MaxDegreeOfParallelism = MaxThreads.Value
             };
-            bool useV2 = Device.Device.AndroidVersion >= 11;
+            bool useV2 = Device.AndroidVersion >= 11;
 
             Parallel.ForEach(Files.Where(f => !f.IsDirectory), options, (item) =>
             {
@@ -136,7 +136,7 @@ public class FileSyncOperation : FileOperation
 
                 // Open a new connection for each file to allow parallel transfers, maximizing throughput of the medium.
                 // Connecting by both USB and WiFi at the same time causes instability and doesn't seem to improve the speed further.
-                using SyncService service = new(Device.Device.DeviceData);
+                using SyncService service = new(Device.DeviceData);
                 var targetPath = FilePath.IsDirectory
                         ? FileHelper.ConcatPaths(TargetPath, FileHelper.ExtractRelativePath(item.FullPath, FilePath.FullPath))
                         : TargetPath.FullPath;
@@ -339,9 +339,9 @@ public class FileSyncOperation : FileOperation
     public override void AddUpdates(params FileOpProgressInfo[] newUpdates)
         => FilePath.AddUpdates(newUpdates, this);
 
-    public static FileSyncOperation PullFile(SyncFile sourcePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
-        => new(OperationType.Pull, sourcePath, targetPath, adbDevice, dispatcher);
+    public static FileSyncOperation PullFile(SyncFile sourcePath, SyncFile targetPath, LogicalDeviceViewModel device, Dispatcher dispatcher)
+        => new(OperationType.Pull, sourcePath, targetPath, device, dispatcher);
 
-    public static FileSyncOperation PushFile(SyncFile sourcePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
-        => new(OperationType.Push, sourcePath, targetPath, adbDevice, dispatcher);
+    public static FileSyncOperation PushFile(SyncFile sourcePath, SyncFile targetPath, LogicalDeviceViewModel device, Dispatcher dispatcher)
+        => new(OperationType.Push, sourcePath, targetPath, device, dispatcher);
 }

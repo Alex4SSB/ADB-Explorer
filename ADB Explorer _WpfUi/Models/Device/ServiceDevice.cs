@@ -11,16 +11,7 @@ public abstract class ServiceDevice : PairingDevice
         PairingCode
     }
 
-    #region Full properties
-
-    private ServiceType mdnsType;
-    public ServiceType MdnsType
-    {
-        get => mdnsType;
-        set => Set(ref mdnsType, value);
-    }
-
-    #endregion
+    public ServiceType MdnsType { get; set; }
 
     public ServiceDevice()
     {
@@ -29,24 +20,9 @@ public abstract class ServiceDevice : PairingDevice
 
     public ServiceDevice(string id, string ipAddress, string port = "") : this()
     {
-        PropertyChanged += ServiceDevice_PropertyChanged;
-
         ID = id;
         IpAddress = ipAddress;
         PairingPort = port;
-    }
-
-    private void ServiceDevice_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(PairingPort) or nameof(MdnsType))
-        {
-            UpdateStatus();
-        }
-    }
-
-    private void UpdateStatus()
-    {
-        Status = MdnsType is ServiceType.QrCode ? DeviceStatus.Ok : DeviceStatus.Unauthorized;
     }
 }
 

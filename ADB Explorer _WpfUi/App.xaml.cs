@@ -150,7 +150,7 @@ public partial class App
         Services.GetService<SettingsService>().Save();
 
         if (Data.Settings.UnrootOnDisconnect is true)
-            ADBService.Unroot(Data.CurrentADBDevice);
+            ADBService.Unroot(Data.DevicesObject.Current.ID);
 
         ClearFoldersInAppData();
 
