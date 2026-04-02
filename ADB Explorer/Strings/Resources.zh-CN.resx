@@ -1489,4 +1489,7 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SETTINGS_WSA" xml:space="preserve">
     <value>如果可用自动连接 Windows 安卓子系统</value>
   </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>粘贴</value>
+  </data>
 </root>
