@@ -1489,4 +1489,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_SETTINGS_WSA" xml:space="preserve">
     <value>התחברות אוטומטית ל-WSA אם זמין</value>
   </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>הדבק</value>
+  </data>
 </root>
