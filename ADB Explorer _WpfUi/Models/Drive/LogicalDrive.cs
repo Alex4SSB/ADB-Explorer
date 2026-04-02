@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Converters;
+﻿using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Models;
 
@@ -86,15 +86,20 @@ public class LogicalDrive : Drive
         FileSystem = fileSystem;
     }
 
-    public LogicalDrive(GroupCollection match, bool isMMC = false, bool isEmulator = false, string forcePath = "")
-        : this(
-              (long.Parse(match["size_kB"].Value) * 1024).BytesToSize(true, 1, 0),
-              (long.Parse(match["used_kB"].Value) * 1024).BytesToSize(true, 1, 0),
-              (long.Parse(match["available_kB"].Value) * 1024).BytesToSize(true, 1, 0),
-              sbyte.Parse(match["usage_P"].Value),
-              string.IsNullOrEmpty(forcePath) ? match["path"].Value : forcePath,
-              isMMC,
-              isEmulator,
-              match["FileSystem"].Value)
-    { }
+    public static LogicalDrive From(DriveSnapshot snapshot)
+    {
+        var drive = new LogicalDrive(
+            size: snapshot.Size,
+            used: snapshot.Used,
+            available: snapshot.Available,
+            usageP: snapshot.UsageP,
+            path: snapshot.Path,
+            isEmulator: snapshot.IsEmulator,
+            fileSystem: snapshot.FileSystem);
+
+        if (snapshot.Type is not DriveType.Unknown && drive.Type != snapshot.Type)
+            drive.Type = snapshot.Type;
+
+        return drive;
+    }
 }

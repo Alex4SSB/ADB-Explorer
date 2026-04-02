@@ -71,6 +71,30 @@ public static class DeviceHelper
         }
     }
 
+    public static DriveSnapshot? GetMmcDrive(IEnumerable<DriveSnapshot> snapshots, string deviceID)
+    {
+        if (snapshots is null)
+            return null;
+
+        if (Data.DevicesObject.Current.MmcProp is string mmcId)
+            return snapshots.Where(d => d.ID == mmcId).Select(d => (DriveSnapshot?)d).FirstOrDefault();
+        else if (Data.DevicesObject.Current.OtgProp is not null)
+            return null;
+
+        var externalDrives = snapshots.Where(d => d.Type is AbstractDrive.DriveType.Unknown).ToList();
+
+        switch (externalDrives.Count)
+        {
+            case > 1:
+                var mmc = ADBService.GetMmcId(deviceID);
+                return snapshots.Where(d => d.ID == mmc).Select(d => (DriveSnapshot?)d).FirstOrDefault();
+            case 1:
+                return ADBService.MmcExists(deviceID) ? externalDrives.First() : null;
+            default:
+                return null;
+        }
+    }
+
     /// <summary>
     /// Sets type of all drives with unknown type as external. Changes the <see cref="Drive"/> object itself.
     /// </summary>
@@ -291,7 +315,7 @@ public static class DeviceHelper
         if (device is ServiceDeviceViewModel service)
         {
             // connect services are always hidden
-            if (service is ConnectServiceViewModel)
+            if (service.ConnectionKind is ServiceConnectionKind.Connect)
                 return false;
 
             // if there's any online logical device with the IP of a pairing service - hide the pairing service
@@ -299,8 +323,8 @@ public static class DeviceHelper
                 return false;
 
             // if there's any QR service with the IP of a code pairing service - hide the code pairing service
-            if (service.MdnsType is ServiceDevice.ServiceType.PairingCode
-                && Data.DevicesObject.ServiceDeviceViewModels.Any(qr => qr.MdnsType is ServiceDevice.ServiceType.QrCode
+            if (service.MdnsType is ServiceDevice.PairingMode.PairingCode
+                && Data.DevicesObject.ServiceDeviceViewModels.Any(qr => qr.MdnsType is ServiceDevice.PairingMode.QrCode
                                                           && qr.IpAddress == service.IpAddress))
                 return false;
         }
@@ -363,15 +387,15 @@ public static class DeviceHelper
         Data.DevicesObject.LastUpdate = DateTime.Now;
     }
 
-    public static async void ListServices(IEnumerable<ServiceDevice> services)
+    public static async void ListServices(IEnumerable<ServiceSnapshot> snapshots)
     {
-        if (services is null)
+        if (snapshots is null)
             return;
 
-        var viewModels = services.Select(ServiceDeviceViewModel.New);
-
-        if (!Data.DevicesObject.ServicesChanged(viewModels))
+        if (!Data.DevicesObject.ServicesChanged(snapshots))
             return;
+
+        var viewModels = snapshots.Select(s => new ServiceDeviceViewModel(ServiceDevice.From(s)));
 
         Data.DevicesObject.UpdateServices(viewModels);
 
@@ -380,7 +404,7 @@ public static class DeviceHelper
             return;
 
         var qrServices = Data.DevicesObject.ServiceDeviceViewModels.Where(service =>
-            service.MdnsType == ServiceDevice.ServiceType.QrCode
+            service.MdnsType == ServiceDevice.PairingMode.QrCode
             && service.ID == qrClass.ServiceName);
 
         if (qrServices.Any())
@@ -391,7 +415,7 @@ public static class DeviceHelper
 
     public static async Task<bool> PairService(ServiceDeviceViewModel service)
     {
-        var code = service.MdnsType == ServiceDevice.ServiceType.QrCode
+        var code = service.MdnsType == ServiceDevice.PairingMode.QrCode
             ? Data.MdnsService?.QrClass?.Password
             : service.PairingCode;
 
@@ -647,7 +671,7 @@ public static class DeviceHelper
     {
         //ConnectTimer.IsEnabled = false;
 
-        //DevicesObject.UpdateServices(new List<ServiceDevice>() { new PairingService("sdfsdfdsf_adb-tls-pairing._tcp.", "192.168.1.20", "5555") { MdnsType = ServiceDevice.ServiceType.PairingCode } });
+        //DevicesObject.UpdateServices(new List<ServiceDevice>() { new ServiceDevice("sdfsdfdsf_adb-tls-pairing._tcp.", "192.168.1.20", "5555", ServiceConnectionKind.Pairing) { MdnsType = ServiceDevice.ServiceType.PairingCode } });
         //DevicesObject.UpdateDevices(new List<LogicalDevice>() { LogicalDevice.New("Test", "test.ID", "device") });
     }
 

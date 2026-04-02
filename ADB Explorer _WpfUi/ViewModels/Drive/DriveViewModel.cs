@@ -35,7 +35,7 @@ public class DriveViewModel : AbstractDrive
 
     public string Path => Drive.Path;
     public new DriveType Type => Drive.Type;
-    public bool IsFUSE => Drive.IsFUSE;
+    public virtual bool IsFUSE => Drive.IsFUSE;
 
     public new string DisplayName => Drive.DisplayName;
 

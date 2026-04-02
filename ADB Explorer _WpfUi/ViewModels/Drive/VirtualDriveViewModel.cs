@@ -13,6 +13,10 @@ class VirtualDriveViewModel : DriveViewModel
 
     public long? ItemsCount => Drive.ItemsCount;
 
+    // Temp drive is under the root filesystem
+    public override bool IsFUSE => Drive.Type is DriveType.Temp
+        && Data.DevicesObject.Current?.Drives?.Find(d => d.Type is DriveType.Root)?.IsFUSE is true;
+
     
     public VirtualDriveViewModel(VirtualDrive drive) : base(drive)
     {

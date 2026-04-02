@@ -136,21 +136,26 @@ public class Devices : ViewModelBase
         }
     }
 
-    public bool ServicesChanged(IEnumerable<ServiceDeviceViewModel> other)
+    public bool ServicesChanged(IEnumerable<ServiceSnapshot> snapshots)
     {
         // if the list is null, we're probably not ready to update
-        if (other is null)
+        if (snapshots is null)
             return false;
 
         // if the list is empty, we need to update (and remove all items)
-        if (!other.Any())
+        if (!snapshots.Any())
             return ServiceDeviceViewModels.Any();
 
-        var pairing = other.OfType<PairingServiceViewModel>();
+        var pairing = snapshots.Where(s => s.ConnectionKind is ServiceConnectionKind.Pairing).OrderBy(s => s.ID).ToList();
+        var existing = ServiceDeviceViewModels.OrderBy(d => d.ID).ToList();
+
         // if there's any service whose ID is not found in any logical device,
         // AND an ordering of both new and old lists doesn't match up all IDs
-        return pairing.Any(service => !LogicalDeviceViewModels.Any(device => device.Status == DeviceStatus.Ok && device.BaseID == service.ID || device.IpAddress == service.IpAddress))
-               && !ServiceDeviceViewModels.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(pairing.OrderBy(otherDevice => otherDevice.ID), new ServiceDeviceViewModelEqualityComparer());
+        return pairing.Any(s => !LogicalDeviceViewModels.Any(d => d.Status == DeviceStatus.Ok && d.BaseID == s.ID || d.IpAddress == s.IpAddress))
+            && (existing.Count != pairing.Count
+                || existing.Zip(pairing).Any(p =>
+                    p.First.ID != p.Second.ID
+                    || string.IsNullOrEmpty(p.First.PairingPort) != string.IsNullOrEmpty(p.Second.Port)));
     }
 
     #endregion
@@ -194,9 +199,6 @@ public class Devices : ViewModelBase
                     isCurrentTypeUpdated = true;
 
                 device.UpdateDevice(item);
-
-                if (device.Drives.Count != item.Drives.Count && App.AppDispatcher is not null)
-                    device.UpdateDrives(item, App.AppDispatcher, true);
             }
             else
             {

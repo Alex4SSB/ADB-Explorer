@@ -5,16 +5,12 @@ using AdvancedSharpAdbClient.Models;
 
 namespace ADB_Explorer.ViewModels;
 
-public class LogicalDeviceViewModel : DeviceViewModel
+public partial class LogicalDeviceViewModel : DeviceViewModel
 {
     #region Full properties
 
-    private LogicalDevice device;
-    public new LogicalDevice Device
-    {
-        get => device;
-        set => Set(ref device, value);
-    }
+    [ObservableProperty]
+    public new partial LogicalDevice Device { get; set; }
 
     private bool isOpen;
     /// <summary>
@@ -40,19 +36,11 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     public byte? AndroidVersion => byte.TryParse(AndroidVersionString?.Split('.')[0], out byte ver) ? ver : null;
 
-    private bool useIdForName;
-    public bool UseIdForName
-    {
-        get => useIdForName;
-        set => Set(ref useIdForName, value);
-    }
+    [ObservableProperty]
+    public partial bool UseIdForName { get; set; }
 
-    private ObservableList<DriveViewModel> drives = [];
-    public ObservableList<DriveViewModel> Drives
-    {
-        get => drives;
-        set => Set(ref drives, value);
-    }
+    [ObservableProperty]
+    public partial ObservableList<DriveViewModel> Drives { get; set; } = [];
 
     #endregion
 
@@ -121,26 +109,25 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     #region Device properties (lazy-loaded from ADB)
 
-    private Dictionary<string, string> props;
     public Dictionary<string, string> Props
     {
         get
         {
-            if (props is null)
+            if (field is null)
             {
                 int exitCode = ADBService.ExecuteDeviceAdbShellCommand(ID, ADBService.GET_PROP, out string stdout, out string stderr, CancellationToken.None);
                 if (exitCode == 0)
                 {
-                    props = stdout.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries).Where(
+                    field = stdout.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries).Where(
                         l => l[0] == '[' && l[^1] == ']').TryToDictionary(
                             line => line.Split(':')[0].Trim('[', ']', ' '),
                             line => line.Split(':')[1].Trim('[', ']', ' '));
                 }
                 else
-                    props = [];
+                    field = [];
             }
 
-            return props;
+            return field;
         }
     }
 
@@ -326,37 +313,27 @@ public class LogicalDeviceViewModel : DeviceViewModel
         Drives.Add(new VirtualDriveViewModel(new(path: AdbLocation.StringFromLocation(Navigation.SpecialLocation.PackageDrive))));
     }
 
-    /// <summary>
-    /// Update device with new drives
-    /// </summary>
-    /// <param name="drives">The new drives to be assigned</param>
-    /// <param name="asyncClassify"><see langword="true"/> to update only after fully acquiring all information</param>
-    public async Task<bool> UpdateDrives(IEnumerable<Drive> drives, Dispatcher dispatcher, bool asyncClassify = false)
+    public async Task<bool> UpdateDrives(IEnumerable<DriveSnapshot> snapshots, Dispatcher dispatcher, bool asyncClassify = false)
     {
         bool collectionChanged;
 
-        // MMC and OTG drives are searched for and only then UI is updated with all changes
         if (asyncClassify)
         {
-            collectionChanged = await UpdateExtensionDrivesAsync(drives, dispatcher);
+            collectionChanged = await UpdateExtensionDrivesAsync(snapshots, dispatcher);
         }
-        // All drives are first updated in UI, and only then MMC and OTG drives are searched for
         else
         {
-            collectionChanged = SetDrives(drives);
-            UpdateExtensionDrives(drives, dispatcher);
+            collectionChanged = SetDrives(snapshots);
+            UpdateExtensionDrives(snapshots, dispatcher);
         }
 
         return collectionChanged;
     }
 
-    public Task<bool> UpdateDrives(LogicalDeviceViewModel other, Dispatcher dispatcher, bool asyncClassify = false)
-        => UpdateDrives(other.Drives.Select(d => d.Drive), dispatcher, asyncClassify);
-
-    private void UpdateExtensionDrives(IEnumerable<Drive> drives, Dispatcher dispatcher)
+    private void UpdateExtensionDrives(IEnumerable<DriveSnapshot> snapshots, Dispatcher dispatcher)
     {
-        var mmcTask = Task.Run(() => DeviceHelper.GetMmcDrive(drives.OfType<LogicalDrive>(), ID));
-        mmcTask.ContinueWith((t) =>
+        var mmcTask = Task.Run(() => DeviceHelper.GetMmcDrive(snapshots, ID));
+        mmcTask.ContinueWith(t =>
         {
             if (t.IsCanceled)
                 return;
@@ -369,20 +346,71 @@ public class LogicalDeviceViewModel : DeviceViewModel
         });
     }
 
-    private async Task<bool> UpdateExtensionDrivesAsync(IEnumerable<Drive> drives, Dispatcher dispatcher)
+    private async Task<bool> UpdateExtensionDrivesAsync(IEnumerable<DriveSnapshot> snapshots, Dispatcher dispatcher)
     {
+        var list = snapshots.ToList();
+
         await Task.Run(() =>
         {
-            if (DeviceHelper.GetMmcDrive(drives.OfType<LogicalDrive>(), ID) is LogicalDrive mmc)
-                mmc.Type = AbstractDrive.DriveType.Expansion;
+            if (DeviceHelper.GetMmcDrive(list, ID) is { } mmc)
+            {
+                var idx = list.IndexOf(mmc);
+                list[idx] = mmc with { Type = AbstractDrive.DriveType.Expansion };
+            }
 
-            DeviceHelper.SetExternalDrives(drives.OfType<LogicalDrive>());
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i].Type is AbstractDrive.DriveType.Unknown)
+                    list[i] = list[i] with { Type = AbstractDrive.DriveType.External };
+            }
         });
 
         var result = false;
-        await dispatcher.BeginInvoke(() => result = SetDrives(drives));
-
+        await dispatcher.BeginInvoke(() => result = SetDrives(list));
         return result;
+    }
+
+    private bool SetDrives(IEnumerable<DriveSnapshot> snapshots)
+    {
+        if (snapshots is null)
+            return false;
+
+        bool added = false;
+
+        foreach (var snapshot in snapshots)
+        {
+            var selfQ = Drives.Where(d => d.Path == snapshot.Path
+                || (snapshot.Type is AbstractDrive.DriveType.Internal && d.Type is AbstractDrive.DriveType.Internal));
+
+            if (selfQ.Any())
+            {
+                var self = selfQ.First() as LogicalDriveViewModel
+                    ?? throw new NotSupportedException();
+
+                self.UpdateDrive(snapshot);
+                if (snapshot.Type is not AbstractDrive.DriveType.Unknown)
+                    self.SetType(snapshot.Type);
+            }
+            else
+            {
+                Drives.Add(new LogicalDriveViewModel(LogicalDrive.From(snapshot)));
+                added = true;
+            }
+        }
+
+        var removed = Drives.RemoveAll(self => self is LogicalDriveViewModel
+            && !snapshots.Any(s => s.Path == self.Path
+                || (s.Type is AbstractDrive.DriveType.Internal && self.Type is AbstractDrive.DriveType.Internal)));
+
+        return added || removed;
+    }
+
+    public void SetMmcDrive(DriveSnapshot? mmc)
+    {
+        if (mmc is not { } mmcDrive)
+            return;
+
+        ((LogicalDriveViewModel)Drives.FirstOrDefault(d => d.Path == mmcDrive.Path))?.SetExtension();
     }
 
     /// <summary>

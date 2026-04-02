@@ -22,7 +22,7 @@ public class LogicalDevice : Device
         ID = id;
     }
 
-    public static LogicalDevice From(DeviceSnapshot snapshot) => new LogicalDevice(snapshot.Name, snapshot.ID)
+    public static LogicalDevice From(DeviceSnapshot snapshot) => new(snapshot.Name, snapshot.ID)
     {
         Type = snapshot.Type,
         Status = snapshot.Status,

@@ -1,39 +1,39 @@
-﻿namespace ADB_Explorer.Models;
+﻿using ADB_Explorer.Services;
+
+namespace ADB_Explorer.Models;
+
+public enum ServiceConnectionKind { Pairing, Connect }
 
 /// <summary>
 /// Represents all services acquired by <code>mdns services</code>
 /// </summary>
-public abstract class ServiceDevice : PairingDevice
+public class ServiceDevice : PairingDevice
 {
-    public enum ServiceType
+    public enum PairingMode
     {
         QrCode,
         PairingCode
     }
 
-    public ServiceType MdnsType { get; set; }
+    public PairingMode MdnsType { get; set; }
+
+    public ServiceConnectionKind ConnectionKind { get; set; }
 
     public ServiceDevice()
     {
         Type = DeviceType.Service;
     }
 
-    public ServiceDevice(string id, string ipAddress, string port = "") : this()
+    public ServiceDevice(string id, string ipAddress, string port, ServiceConnectionKind kind) : this()
     {
         ID = id;
         IpAddress = ipAddress;
         PairingPort = port;
+        ConnectionKind = kind;
     }
-}
 
-public class PairingService : ServiceDevice
-{
-    public PairingService(string id, string ipAddress, string port) : base(id, ipAddress, port)
-    { }
-}
-
-public class ConnectService : ServiceDevice
-{
-    public ConnectService(string id, string ipAddress, string port) : base(id, ipAddress, port)
-    { }
+    public static ServiceDevice From(ServiceSnapshot snapshot) => new(snapshot.ID, snapshot.IpAddress, snapshot.Port, snapshot.ConnectionKind)
+    {
+        MdnsType = snapshot.MdnsType
+    };
 }

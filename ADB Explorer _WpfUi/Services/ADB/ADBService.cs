@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Converters;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 using AdvancedSharpAdbClient.Models;
@@ -764,9 +765,9 @@ public partial class ADBService
         return stdout.TrimEnd(LINE_SEPARATORS);
     }
 
-    public static List<LogicalDrive> GetDrives(string deviceId, DeviceType deviceType)
+    public static List<DriveSnapshot> GetDrives(string deviceId, DeviceType deviceType)
     {
-        List<LogicalDrive> drives = [];
+        List<DriveSnapshot> drives = [];
 
         // unified df doesn't seem to shorten execution time
 
@@ -786,32 +787,28 @@ public partial class ADBService
         if (extStorage is null)
             return drives;
 
-        Func<LogicalDrive, bool> predicate = drives.Any(drive => drive.Type is AbstractDrive.DriveType.Internal)
+        Func<DriveSnapshot, bool> predicate = drives.Any(d => d.Type is AbstractDrive.DriveType.Internal)
             ? d => d.Type is not AbstractDrive.DriveType.Internal and not AbstractDrive.DriveType.Root
             : d => d.Type is not AbstractDrive.DriveType.Root;
 
         drives.AddRange(extStorage.Where(predicate));
 
         if (drives.All(d => d.Type != AbstractDrive.DriveType.Internal))
-        {
-            drives.Insert(0, new(path: DEFAULT_PATH));
-        }
+            drives.Insert(0, new(Path: "/sdcard", Type: AbstractDrive.DriveType.Internal, Size: "", Used: "", Available: "", UsageP: -1, FileSystem: "", IsEmulator: false));
 
         if (drives.All(d => d.Type != AbstractDrive.DriveType.Root))
-        {
-            drives.Insert(0, new(path: "/"));
-        }
+            drives.Insert(0, new(Path: "/", Type: AbstractDrive.DriveType.Root, Size: "", Used: "", Available: "", UsageP: -1, FileSystem: "", IsEmulator: false));
 
         return drives;
     }
 
-    private static IEnumerable<LogicalDrive> ReadDrives(string deviceId, DeviceType deviceType, Regex re, params string[] args)
+    private static IEnumerable<DriveSnapshot> ReadDrives(string deviceId, DeviceType deviceType, Regex re, params string[] args)
     {
         int exitCode = ExecuteDeviceAdbShellCommand(deviceId, "df", out string stdout, out string stderr, CancellationToken.None, args);
         if (exitCode != 0)
             return null;
 
-        return re.Matches(stdout).Select(m => new LogicalDrive(m.Groups, isEmulator: deviceType is DeviceType.Emulator, forcePath: args[0] == "/" ? "/" : ""));
+        return re.Matches(stdout).Select(m => DriveSnapshot.Parse(m.Groups, isEmulator: deviceType is DeviceType.Emulator, forcePath: args[0] == "/" ? "/" : ""));
     }
 
     public static Dictionary<string, string> GetBatteryInfo(string deviceId)
@@ -892,4 +889,54 @@ public readonly record struct DeviceSnapshot(
     }
 
     public static implicit operator bool(DeviceSnapshot s) => !string.IsNullOrEmpty(s.ID);
+}
+
+public readonly record struct DriveSnapshot(
+    string Path,
+    AbstractDrive.DriveType Type,
+    string Size,
+    string Used,
+    string Available,
+    sbyte UsageP,
+    string FileSystem,
+    bool IsEmulator)
+{
+    public string ID => Path.Count(c => c == '/') > 1 ? Path[(Path.LastIndexOf('/') + 1)..] : Path;
+
+    public bool IsFUSE => FileSystem.Contains("fuse");
+
+    public static DriveSnapshot Parse(GroupCollection groups, bool isEmulator, string forcePath)
+    {
+        var path = string.IsNullOrEmpty(forcePath) ? groups["path"].Value : forcePath;
+        var type = AbstractDrive.DriveType.Unknown;
+
+        // Replicate Drive base ctor: DRIVE_TYPES exact match
+        if (DRIVE_TYPES.TryGetValue(path, out var baseType))
+        {
+            type = baseType;
+            if (type is AbstractDrive.DriveType.Internal)
+                path = "/sdcard";
+        }
+
+        // Replicate LogicalDrive ctor type overrides
+        if (path == "/")
+            type = AbstractDrive.DriveType.Root;
+        else if (DRIVE_TYPES.Where(kv => kv.Value is AbstractDrive.DriveType.Internal).Any(kv => kv.Key.Contains(path)))
+        {
+            type = AbstractDrive.DriveType.Internal;
+            path = "/sdcard";
+        }
+        else if (isEmulator && type is AbstractDrive.DriveType.Unknown)
+            type = AbstractDrive.DriveType.Emulated;
+
+        return new(
+            Path: path,
+            Type: type,
+            Size: (long.Parse(groups["size_kB"].Value) * 1024).BytesToSize(true, 1, 0),
+            Used: (long.Parse(groups["used_kB"].Value) * 1024).BytesToSize(true, 1, 0),
+            Available: (long.Parse(groups["available_kB"].Value) * 1024).BytesToSize(true, 1, 0),
+            UsageP: sbyte.Parse(groups["usage_P"].Value),
+            FileSystem: groups["FileSystem"].Value,
+            IsEmulator: isEmulator);
+    }
 }

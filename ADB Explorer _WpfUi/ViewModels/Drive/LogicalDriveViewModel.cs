@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Models;
+using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
 
@@ -74,6 +75,39 @@ class LogicalDriveViewModel : DriveViewModel
         if (Drive.FileSystem != other.FileSystem)
         {
             Drive.FileSystem = other.FileSystem;
+            OnPropertyChanged(nameof(IsFUSE));
+        }
+    }
+
+    public void UpdateDrive(DriveSnapshot snapshot)
+    {
+        if (Drive.Size != snapshot.Size)
+        {
+            Drive.Size = snapshot.Size;
+            OnPropertyChanged(nameof(Size));
+        }
+
+        if (Drive.Used != snapshot.Used)
+        {
+            Drive.Used = snapshot.Used;
+            OnPropertyChanged(nameof(Used));
+        }
+
+        if (Drive.Available != snapshot.Available)
+        {
+            Drive.Available = snapshot.Available;
+            OnPropertyChanged(nameof(Available));
+        }
+
+        if (Drive.UsageP != snapshot.UsageP)
+        {
+            Drive.UsageP = snapshot.UsageP;
+            OnPropertyChanged(nameof(UsageP));
+        }
+
+        if (Drive.FileSystem != snapshot.FileSystem)
+        {
+            Drive.FileSystem = snapshot.FileSystem;
             OnPropertyChanged(nameof(IsFUSE));
         }
     }
