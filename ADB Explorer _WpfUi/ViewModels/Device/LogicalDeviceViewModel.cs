@@ -195,7 +195,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     public DeviceAction RemoveCommand { get; }
     public DeviceAction ToggleRootCommand { get; }
     public DeviceAction SideloadCommand { get; }
-    public List<object> RebootCommands { get; } = [];
+    public List<RebootCommand> RebootCommands { get; } = [];
 
     #endregion
 
@@ -221,13 +221,8 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
             Thread.CurrentThread.CurrentCulture =
             Thread.CurrentThread.CurrentUICulture = Data.Settings.UICulture;
 
-            foreach (RebootCommand.RebootType item in Enum.GetValues<RebootCommand.RebootType>())
-            {
-                RebootCommands.Add(new RebootCommand(this, item));
-
-                if (item is RebootCommand.RebootType.Title)
-                    RebootCommands.Add(new Separator() { Margin = new(-11, 0, -11, 0) });
-            }
+            foreach (RebootCommand.RebootType type in Enum.GetValues<RebootCommand.RebootType>())
+                RebootCommands.Add(new RebootCommand(this, type));
         });
 
         SideloadCommand = new(() => Device.Type is DeviceType.Sideload or DeviceType.Recovery && device.Status is DeviceStatus.Ok,
@@ -411,63 +406,6 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
             return;
 
         ((LogicalDriveViewModel)Drives.FirstOrDefault(d => d.Path == mmcDrive.Path))?.SetExtension();
-    }
-
-    /// <summary>
-    /// Update drive parameters, add new drives, remove non-existent drives
-    /// </summary>
-    /// <returns><see langword="true"/> if drives have been added or removed</returns>
-    private bool SetDrives(IEnumerable<Drive> drives)
-    {
-        if (drives is null)
-            return false;
-
-        bool added = false;
-
-        foreach (var other in drives)
-        {
-            // Accommodate for changing the path to /sdcard
-            var selfQ = Drives.Where(d => d.Path == other.Path || (other.Type is AbstractDrive.DriveType.Internal && d.Type is AbstractDrive.DriveType.Internal));
-            if (selfQ.Any())
-            {
-                // Update the drive if it exists
-                var self = selfQ.First();
-
-                switch (self)
-                {
-                    case LogicalDriveViewModel logical:
-                        logical.UpdateDrive((LogicalDrive)other);
-                        if (other.Type is not AbstractDrive.DriveType.Unknown)
-                            logical.SetType(other.Type);
-                        break;
-                    case VirtualDriveViewModel virt:
-                        virt.SetItemsCount(((VirtualDrive)other).ItemsCount);
-                        break;
-                    default:
-                        throw new NotSupportedException();
-                }
-            }
-            // Create a new drive if it doesn't exist
-            else if (other is LogicalDrive logical)
-            {
-                Drives.Add(new LogicalDriveViewModel(logical));
-                added = true;
-            }
-            else if (other is VirtualDrive virt && !Drives.Any(d => d.Type == virt.Type))
-            {
-                Drives.Add(new VirtualDriveViewModel(virt));
-                added = true;
-            }
-            else
-                throw new NotSupportedException();
-        }
-
-        // Remove all drives that were not discovered in the last update
-        var removed = Drives.RemoveAll(self => self is LogicalDriveViewModel
-                                                && !drives.Any(other => other.Path == self.Path
-                                                     || (other.Type is AbstractDrive.DriveType.Internal && self.Type is AbstractDrive.DriveType.Internal)));
-
-        return added || removed;
     }
 
     public void SetMmcDrive(LogicalDrive mmcDrive)

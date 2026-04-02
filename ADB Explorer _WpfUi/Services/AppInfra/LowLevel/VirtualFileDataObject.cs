@@ -587,15 +587,16 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         if (includeContent)
         {
             Data.RuntimeSettings.MainCursor = Cursors.AppStarting;
+            var fileSnapshot = files.ToList();
             Task.Run(() =>
             {
                 // Prepare file ops recursively for folders
-                return files.Select(f => f.PrepareDescriptors(vfdo)).ToList();
+                return fileSnapshot.Select(f => f.PrepareDescriptors(vfdo)).ToList();
             }).ContinueWith(t =>
             {
                 App.SafeInvoke(() =>
                 {
-                    vfdo.SetFileDescriptors(files.SelectMany(f => f.Descriptors));
+                    vfdo.SetFileDescriptors(fileSnapshot.SelectMany(f => f.Descriptors));
                     Data.RuntimeSettings.MainCursor = Cursors.Arrow;
                 });
 

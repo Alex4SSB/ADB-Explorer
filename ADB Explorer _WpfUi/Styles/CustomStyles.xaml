@@ -66,7 +66,7 @@
     </Style>
     <Style
         x:Key="NumericTextBoxStyle"
-        BasedOn="{StaticResource DefaultUiTextBoxStyle}"
+        BasedOn="{StaticResource AdbTextBoxStyle}"
         TargetType="ui:TextBox">
         <Style.Triggers>
             <Trigger Property="Text" Value="">
@@ -101,7 +101,7 @@
     </Style>
     <Style
         x:Key="TooltipTextBoxFluentStyle"
-        BasedOn="{StaticResource DefaultUiTextBoxStyle}"
+        BasedOn="{StaticResource AdbTextBoxStyle}"
         TargetType="ui:TextBox">
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" />
@@ -408,7 +408,7 @@
     </DataTemplate>
     <Style
         x:Key="FileNameEditingElementStyle"
-        BasedOn="{StaticResource DefaultUiTextBoxStyle}"
+        BasedOn="{StaticResource AdbTextBoxStyle}"
         TargetType="ui:TextBox">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Text" Value="{Binding DisplayName, Mode=OneWay}" />

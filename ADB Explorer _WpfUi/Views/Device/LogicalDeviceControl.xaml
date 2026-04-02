@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:ADB_Explorer.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
@@ -176,7 +177,6 @@
                         <Separator IsEnabled="False">
                             <Separator.Style>
                                 <Style BasedOn="{StaticResource {x:Static MenuItem.SeparatorStyleKey}}" TargetType="Separator">
-                                    <Setter Property="Margin" Value="-11,0" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Root}" Value="Forbidden">
                                             <Setter Property="Visibility" Value="Collapsed" />
@@ -219,9 +219,18 @@
                     </controls:AdbMenuItem>
                     <controls:AdbMenuItem
                         Height="38"
-                        ItemsSource="{Binding RebootCommands}"
                         Style="{StaticResource DeviceActionsMenuItemStyle}"
                         ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_DEVICE_REBOOT_TITLE}}">
+                        <controls:AdbMenuItem.Resources>
+                            <helpers:BindingProxy x:Key="DeviceProxy" Data="{Binding}" />
+                        </controls:AdbMenuItem.Resources>
+                        <controls:AdbMenuItem.ItemsSource>
+                            <CompositeCollection>
+                                <controls:AdbMenuItem Header="{x:Static strings:Resources.S_DEVICE_REBOOT_TITLE}" IsEnabled="False" />
+                                <Separator />
+                                <CollectionContainer Collection="{Binding Data.RebootCommands, Source={StaticResource DeviceProxy}}" />
+                            </CompositeCollection>
+                        </controls:AdbMenuItem.ItemsSource>
                         <controls:AdbMenuItem.ItemContainerStyle>
                             <Style TargetType="MenuItem">
                                 <Setter Property="Command" Value="{Binding Command}" />

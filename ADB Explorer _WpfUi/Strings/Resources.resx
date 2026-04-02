@@ -1155,7 +1155,7 @@ Cancel All Running</value>
   </data>
   <data name="S_PASTE" xml:space="preserve">
     <value>Paste</value>
-    <comment>The file paste operation</comment>
+    <comment>As in "Paste Conflict" (a file conflict while pasting)</comment>
   </data>
   <data name="S_DROP" xml:space="preserve">
     <value>Drop</value>
@@ -1829,5 +1829,9 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_SETTINGS_WSA" xml:space="preserve">
     <value>Auto Connect WSA If Available</value>
     <comment>The setting used to enable checking for installed WSA, launching it, and connecting to it automatically</comment>
+  </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>Paste</value>
+    <comment>As in "Paste the copied string"</comment>
   </data>
 </root>

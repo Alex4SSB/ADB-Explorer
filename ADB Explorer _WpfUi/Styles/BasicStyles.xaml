@@ -150,7 +150,7 @@
             Command="ScrollBar.ScrollHereCommand"
             CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
             Header="{Binding Source={x:Static Member=strings:Resources.ScrollBar_ScrollHereCommand}}" />
-        <Separator Margin="-8,0" />
+        <Separator />
         <MenuItem
             Command="ScrollBar.ScrollToTopCommand"
             CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
@@ -159,7 +159,7 @@
             Command="ScrollBar.ScrollToBottomCommand"
             CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
             Header="{Binding Source={x:Static Member=strings:Resources.ScrollBar_ScrollToBottomCommand}}" />
-        <Separator Margin="-8,0" />
+        <Separator />
         <MenuItem
             Command="ScrollBar.PageUpCommand"
             CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
@@ -168,7 +168,7 @@
             Command="ScrollBar.PageDownCommand"
             CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
             Header="{Binding Source={x:Static Member=strings:Resources.ScrollBar_PageDownCommand}}" />
-        <Separator Margin="-8,0" />
+        <Separator />
         <MenuItem
             Command="ScrollBar.LineUpCommand"
             CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
@@ -183,7 +183,7 @@
             Command="ScrollBar.ScrollHereCommand"
             CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
             Header="{Binding Source={x:Static Member=strings:Resources.ScrollBar_ScrollHereCommand}}" />
-        <Separator Margin="-8,0" />
+        <Separator />
         <MenuItem
             Command="ScrollBar.ScrollToLeftEndCommand"
             CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
@@ -192,7 +192,7 @@
             Command="ScrollBar.ScrollToRightEndCommand"
             CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
             Header="{Binding Source={x:Static Member=strings:Resources.ScrollBar_ScrollToRightEndCommand}}" />
-        <Separator Margin="-8,0" />
+        <Separator />
         <MenuItem
             Command="ScrollBar.PageLeftCommand"
             CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
@@ -201,7 +201,7 @@
             Command="ScrollBar.PageRightCommand"
             CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
             Header="{Binding Source={x:Static Member=strings:Resources.ScrollBar_PageRightCommand}}" />
-        <Separator Margin="-8,0" />
+        <Separator />
         <MenuItem
             Command="ScrollBar.LineLeftCommand"
             CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
@@ -211,7 +211,24 @@
             CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
             Header="{Binding Source={x:Static Member=strings:Resources.ScrollBar_LineRightCommand}}" />
     </ContextMenu>
-    <!--<Style BasedOn="{StaticResource DefaultScrollBarStyle}" TargetType="ScrollBar">
+    <ContextMenu x:Key="TextBoxContextMenu" x:Shared="true">
+        <ContextMenu.Resources>
+            <Style BasedOn="{StaticResource {x:Type MenuItem}}" TargetType="MenuItem">
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </ContextMenu.Resources>
+        <MenuItem Command="ApplicationCommands.Cut" Header="{Binding Source={x:Static Member=strings:Resources.S_MENU_CUT}}" />
+        <MenuItem Command="ApplicationCommands.Copy" Header="{Binding Source={x:Static Member=strings:Resources.S_MENU_COPY}}" />
+        <MenuItem Command="ApplicationCommands.Paste" Header="{Binding Source={x:Static Member=strings:Resources.S_STRING_PASTE}}" />
+        <MenuItem Command="ApplicationCommands.Undo" Header="{Binding Source={x:Static Member=strings:Resources.S_MENU_UNDO}}" />
+        <MenuItem Command="ApplicationCommands.Redo" Header="{Binding Source={x:Static Member=strings:Resources.S_MENU_REDO}}" />
+        <MenuItem Command="ApplicationCommands.SelectAll" Header="{Binding Source={x:Static Member=strings:Resources.S_MENU_SELECT_ALL}}" />
+    </ContextMenu>
+    <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="ScrollBar">
         <Style.Triggers>
             <Trigger Property="Orientation" Value="Vertical">
                 <Setter Property="ContextMenu" Value="{StaticResource VScrollBarContextMenu}" />
@@ -220,21 +237,7 @@
                 <Setter Property="ContextMenu" Value="{StaticResource HScrollBarContextMenu}" />
             </Trigger>
         </Style.Triggers>
-    </Style>-->
-    <!--<Style
-        x:Key="ScrollViewerStyle"
-        BasedOn="{StaticResource DefaultScrollViewerStyle}"
-        TargetType="ScrollViewer">
-    -->
-    <!--<Setter Property="ui:ScrollViewerHelper.AutoHideScrollBars" Value="True" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="False">
-                <Setter Property="ui:ScrollViewerHelper.AutoHideScrollBars" Value="False" />
-            </DataTrigger>
-        </Style.Triggers>-->
-    <!--
-    </Style>-->
-    <!--<Style BasedOn="{StaticResource ScrollViewerStyle}" TargetType="ScrollViewer" />-->
+    </Style>
     <Style BasedOn="{StaticResource DefaultUiHyperlinkButtonStyle}" TargetType="ui:HyperlinkButton">
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Setter Property="Foreground" Value="{DynamicResource HyperLinkBrush}" />
@@ -270,6 +273,14 @@
         x:Key="AdbMenuStyle"
         BasedOn="{StaticResource DefaultMenuStyle}"
         TargetType="controls:AdbMenu" />
+    <Style
+        x:Key="AdbTextBoxStyle"
+        BasedOn="{StaticResource DefaultUiTextBoxStyle}"
+        TargetType="ui:TextBox">
+        <Setter Property="ContextMenu" Value="{StaticResource TextBoxContextMenu}" />
+        <Setter Property="helpers:ContextMenuHelper.EnableAutoClose" Value="True" />
+    </Style>
+    <Style BasedOn="{StaticResource AdbTextBoxStyle}" TargetType="ui:TextBox" />
     <Style
         x:Key="AdbCardControl"
         BasedOn="{StaticResource DefaultUiCardControlStyle}"
@@ -483,5 +494,25 @@
                 <Setter Property="Background" Value="{DynamicResource SelectedMouseOverInactiveBackground}" />
             </MultiDataTrigger>
         </Style.Triggers>
+    </Style>
+
+    <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="{x:Type Separator}">
+        <Setter Property="BorderBrush" Value="{DynamicResource MenuBarItemBorderBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Margin" Value="0,1" />
+        <Setter Property="BorderThickness" Value="1,1,0,0" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Separator}">
+                    <Border
+                        Margin="{TemplateBinding Margin}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 </ResourceDictionary>

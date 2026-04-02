@@ -54,13 +54,16 @@ public abstract class ActionBase : ViewModelBase, IMenuItem
 
     public bool AnimateOnClick => ActionAnimationSource is AnimationSource.Click;
 
+    public bool MirrorInRTL { get; }
+
     protected ActionBase(FileAction action,
                          string icon,
                          int iconSize,
                          StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                          AnimationSource animationSource = AnimationSource.Command,
                          FileAction altAction = null,
-                         ObservableProperty<bool> isVisible = null)
+                         ObservableProperty<bool> isVisible = null,
+                         bool mirrorInRTL = false)
     {
         if (!string.IsNullOrEmpty(icon))
             StyleHelper.VerifyIcon(icon);
@@ -71,6 +74,7 @@ public abstract class ActionBase : ViewModelBase, IMenuItem
         Animation = animation;
         ActionAnimationSource = animationSource;
         AltAction = altAction;
+        MirrorInRTL = mirrorInRTL;
 
         if (animationSource is AnimationSource.Command)
         {
@@ -117,8 +121,9 @@ public abstract class ActionMenu : ActionBase
                          int iconSize = 18,
                          AnimationSource animationSource = AnimationSource.Command,
                          FileAction altAction = null,
-                         ObservableProperty<bool> isVisible = null)
-        : base(fileAction, icon, iconSize, animation, animationSource, altAction, isVisible)
+                         ObservableProperty<bool> isVisible = null,
+                         bool mirrorInRTL = false)
+        : base(fileAction, icon, iconSize, animation, animationSource, altAction, isVisible, mirrorInRTL)
     {
         Children = children;
     }
@@ -229,8 +234,9 @@ public class IconMenu : ActionMenu
                     ObservableProperty<bool> selectionBar = null,
                     IEnumerable<SubMenu> children = null,
                     FileAction altAction = null,
-                    ObservableProperty<bool> isVisible = null)
-        : base(fileAction, icon, children, animation, iconSize: iconSize, altAction: altAction, isVisible: isVisible)
+                    ObservableProperty<bool> isVisible = null,
+                    bool mirrorInRTL = false)
+        : base(fileAction, icon, children, animation, iconSize: iconSize, altAction: altAction, isVisible: isVisible, mirrorInRTL: mirrorInRTL)
     {
         if (selectionBar is not null)
         {
@@ -286,6 +292,10 @@ public class CompoundIconMenu : ActionMenu
 public class TextMenu : ActionMenu
 {
     public bool IsLast { get; set; } = false;
+
+    public FlowDirection FlowDirection => TextHelper.ContainsRtl(Action.Description)
+        ? FlowDirection.RightToLeft
+        : FlowDirection.LeftToRight;
 
     public TextMenu(FileAction fileAction)
         : base(fileAction, null)

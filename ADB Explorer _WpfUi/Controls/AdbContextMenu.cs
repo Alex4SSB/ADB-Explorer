@@ -6,5 +6,5 @@ public class AdbContextMenu : ContextMenu
         => new AdbMenuItem();
 
     protected override bool IsItemItsOwnContainerOverride(object item)
-        => item is AdbMenuItem;
+        => item is AdbMenuItem or Separator;
 }

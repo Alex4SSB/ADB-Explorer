@@ -3772,6 +3772,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Paste.
+        /// </summary>
+        public static string S_STRING_PASTE {
+            get {
+                return ResourceManager.GetString("S_STRING_PASTE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File not found.
         /// </summary>
         public static string S_SYNC_FILE_NOT_FOUND {

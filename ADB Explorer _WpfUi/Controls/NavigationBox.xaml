@@ -100,7 +100,10 @@
                     FlowDirection="LeftToRight">
                     <ui:Button.Content>
                         <Grid>
-                            <emoji:TextBlock Text="{Binding Action.Description}" TextOptions.TextFormattingMode="Display">
+                            <emoji:TextBlock
+                                FlowDirection="{Binding FlowDirection}"
+                                Text="{Binding Action.Description}"
+                                TextOptions.TextFormattingMode="Display">
                                 <emoji:TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Visibility" Value="Collapsed" />
@@ -189,7 +192,7 @@
             KeyDown="PathBox_KeyDown"
             LostFocus="PathBox_LostFocus">
             <ui:TextBox.Style>
-                <Style BasedOn="{StaticResource DefaultUiTextBoxStyle}" TargetType="ui:TextBox">
+                <Style BasedOn="{StaticResource AdbTextBoxStyle}" TargetType="ui:TextBox">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Mode}" Value="None">
                             <Setter Property="IsEnabled" Value="False" />

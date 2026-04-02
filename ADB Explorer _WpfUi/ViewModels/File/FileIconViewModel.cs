@@ -175,7 +175,8 @@ public partial class FileIconViewModel : FileViewModelBase
                     ? Strings.Resources.S_FILE_BROKEN_LINK
                     : Strings.Resources.S_FILE_TYPE_LINK;
 
-                result.Add($"{type} â†’ {_file.LinkTarget}");
+                // explicit hexcode to avoid saving file as unicode
+                result.Add($"{type} \u2192 {_file.LinkTarget}");
             }
         }
         else if (_file.Type is AbstractFile.FileType.Folder)

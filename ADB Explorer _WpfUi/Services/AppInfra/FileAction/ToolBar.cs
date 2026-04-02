@@ -15,8 +15,9 @@ internal static class NavigationToolBar
             altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardHome)),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Back),
-            Data.RuntimeSettings.IsRTL ? "\uE72A" : "\uE72B",
-            StyleHelper.ContentAnimation.LeftMarquee),
+            "\uE72B",
+            StyleHelper.ContentAnimation.LeftMarquee,
+            mirrorInRTL: true),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.NavHistory),
             "\uE70D",
@@ -25,8 +26,9 @@ internal static class NavigationToolBar
             NavHistory.MenuHistory),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Forward),
-            Data.RuntimeSettings.IsRTL ? "\uE72B" : "\uE72A",
-            StyleHelper.ContentAnimation.RightMarquee),
+            "\uE72A",
+            StyleHelper.ContentAnimation.RightMarquee,
+            mirrorInRTL: true),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Up),
             "\uE197",
@@ -34,7 +36,8 @@ internal static class NavigationToolBar
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Refresh),
             AppActions.Icons[FileAction.FileActionType.Refresh],
-            StyleHelper.ContentAnimation.RotateCW),
+            StyleHelper.ContentAnimation.RotateCW,
+            mirrorInRTL: true),
         ];
 
 }

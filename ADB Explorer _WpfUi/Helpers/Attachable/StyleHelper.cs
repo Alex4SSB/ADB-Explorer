@@ -69,6 +69,19 @@ public static class StyleHelper
             typeof(StyleHelper),
             null);
 
+    public static bool GetMirrorContentInRTL(Control control) =>
+        (bool)control.GetValue(MirrorContentInRTLProperty);
+
+    public static void SetMirrorContentInRTL(Control control, bool value) =>
+        control.SetValue(MirrorContentInRTLProperty, value);
+
+    public static readonly DependencyProperty MirrorContentInRTLProperty =
+        DependencyProperty.RegisterAttached(
+            "MirrorContentInRTL",
+            typeof(bool),
+            typeof(StyleHelper),
+            null);
+
     public static bool GetIsUnchecked(ToggleButton control) =>
         (bool)control.GetValue(IsUncheckedProperty);
 
