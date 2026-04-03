@@ -1483,4 +1483,13 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
     <value>Heure d'actualisation de la vignette locale</value>
   </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>Utilisez BusyBox si disponible</value>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>Connecter automatiquement en WSA si disponible</value>
+  </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>Coller</value>
+  </data>
 </root>
