@@ -1,6 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
 
@@ -60,7 +59,6 @@ public class DriveViewModel : AbstractDrive
     #region Commands
 
     public BaseAction BrowseCommand { get; private set; }
-    public BaseAction SelectCommand { get; private set; }
     
     #endregion
 
@@ -69,17 +67,6 @@ public class DriveViewModel : AbstractDrive
         Drive = drive;
 
         BrowseCommand = new(() => true, () => Data.RuntimeSettings.BrowseDrive = this);
-        SelectCommand = new(() => true, () => DriveSelected = true);
-
-        Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
-    }
-
-    private void RuntimeSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(AppRuntimeSettings.CollapseDrives) && Data.RuntimeSettings.CollapseDrives)
-        {
-            DriveSelected = false;
-        }
     }
 
     public void SetType(DriveType type)

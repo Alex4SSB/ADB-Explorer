@@ -173,10 +173,10 @@
             <ui:ToggleSwitch
                 Grid.Column="1"
                 Checked="IconViewToggle_Toggled"
-                Unchecked="IconViewToggle_Toggled"
                 IsChecked="{Binding IsIconView, Mode=TwoWay}"
                 OffContent="Details View"
-                OnContent="Icons View" />
+                OnContent="Icons View"
+                Unchecked="IconViewToggle_Toggled" />
             <Border
                 Grid.Column="2"
                 Background="Transparent"
@@ -193,7 +193,7 @@
         <Border Grid.Row="2" MouseDown="GridBackgroundBlock_MouseDown">
             <Grid>
                 <!--  Background="{DynamicResource ApplicationBackgroundBrush}"  -->
-                <ScrollViewer Style="{StaticResource DriveViewScrollViewerStyle}">
+                <ScrollViewer PreviewMouseDown="DriveList_PreviewMouseDown" Style="{StaticResource DriveViewScrollViewerStyle}">
                     <StackPanel>
                         <Expander
                             Margin="4"
@@ -213,6 +213,7 @@
                                 x:Name="DriveList"
                                 HorizontalAlignment="Stretch"
                                 ItemsSource="{Binding DriveItemsSource}"
+                                PreviewMouseDown="DriveList_PreviewMouseDown"
                                 Style="{StaticResource DriveListViewStyle}">
                                 <ui:ListView.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -232,8 +233,8 @@
                     DragOver="ExplorerGrid_DragOver"
                     Drop="DataGridRow_Drop"
                     ItemsSource="{Binding ExplorerItemsSource}"
-                    PreviewMouseDown="IconView_PreviewMouseDown"
                     MouseMove="IconView_MouseMove"
+                    PreviewMouseDown="IconView_PreviewMouseDown"
                     SelectionChanged="ExplorerGrid_SelectionChanged"
                     Style="{StaticResource IconViewStyle}">
                     <local:AdbListView.ItemsPanel>
@@ -323,9 +324,7 @@
                                                     </Style>
                                                 </ui:TextBox.Style>
                                             </ui:TextBox>
-                                            <emoji:TextBlock
-                                                FlowDirection="{Binding NameFlowDirection}"
-                                                Text="{Binding DisplayName}">
+                                            <emoji:TextBlock FlowDirection="{Binding NameFlowDirection}" Text="{Binding DisplayName}">
                                                 <emoji:TextBlock.Style>
                                                     <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
                                                         <Style.Triggers>

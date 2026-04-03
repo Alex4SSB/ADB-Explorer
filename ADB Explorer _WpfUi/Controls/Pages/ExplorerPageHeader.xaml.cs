@@ -1567,4 +1567,12 @@ public partial class ExplorerPageHeader : UserControl
     }
 
     private void EmptyNonRootTextBlock_Loaded(object sender, RoutedEventArgs e) => TextHelper.BuildLocalizedInlines(sender, e);
+
+    private void DriveList_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        foreach (var item in DriveList.Items)
+        {
+            (item as DriveViewModel)?.DriveSelected = false;
+        }
+    }
 }

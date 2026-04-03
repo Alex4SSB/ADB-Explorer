@@ -4,26 +4,6 @@ namespace ADB_Explorer.Helpers;
 
 public static class SelectionHelper
 {
-    public enum MenuType
-    {
-        Context,
-        Submenu,
-        Menubar,
-    }
-
-    public static MenuType GetMenuType(UIElement control) =>
-        (MenuType)control.GetValue(MenuTypeProperty);
-
-    public static void SetMenuType(UIElement control, MenuType value) =>
-        control.SetValue(MenuTypeProperty, value);
-
-    public static readonly DependencyProperty MenuTypeProperty =
-        DependencyProperty.RegisterAttached(
-            "MenuType",
-            typeof(MenuType),
-            typeof(SelectionHelper),
-            null);
-
     public static void MultiSelect(this DataGrid dataGrid, Key key, ExplorerViewModel vm)
     {
         vm.SelectionInProgress = true;

@@ -641,27 +641,47 @@ public static class DeviceHelper
         }));
     }
 
-    public static void InitDevice()
+    public static async void InitDevice()
     {
-        SetAndroidVersion();
+        var device = Data.DevicesObject.Current;
+        var internalDrive = device.Drives.First(d => d.Type is AbstractDrive.DriveType.Internal).Drive;
 
-        Data.DevicesObject.Current.Drives.First(d => d.Type is AbstractDrive.DriveType.Internal).Drive
-                                                .UpdatePath(ADBService.GetInternalStorage(Data.DevicesObject.Current.ID));
+        // Run both ADB calls concurrently on background threads instead of blocking the UI thread.
+        // Props (getprop) is needed by CombineDisplayNames (BrandName) and SetAndroidVersion.
+        // GetInternalStorage (readlink) is independent and updates the internal drive path.
+        var propsTask = Task.Run(() => device.Props);
+        var storageTask = Task.Run(() => ADBService.GetInternalStorage(device.ID));
 
+        storageTask.ContinueWith(t =>
+        {
+            if (!t.IsFaulted && !t.IsCanceled && Data.DevicesObject.Current == device)
+                App.SafeInvoke(() => internalDrive.UpdatePath(t.Result));
+        });
+
+        // Start drive enumeration immediately — it is independent of Props
         FileActionLogic.RefreshDrives(true);
 
+        // Suspend until Props is loaded without blocking the UI thread.
+        // CombineDisplayNames and DriveViewNav must run after Props so that
+        // BrandName and CurrentDisplayNames are populated before breadcrumbs render.
+        await propsTask;
+
+        if (Data.DevicesObject.Current != device)
+            return;
+
+        device.SetAndroidVersion();
         FolderHelper.CombineDisplayNames();
         Data.RuntimeSettings.DriveViewNav = true;
         NavHistory.Navigate(Navigation.SpecialLocation.DriveView);
 
         if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.OnConnect)
-            Task.Run(() => ThumbnailService.ForceLoad(Data.DevicesObject.Current));
+            Task.Run(() => ThumbnailService.ForceLoad(device));
 
         Data.CopyPaste.GetClipboardPasteItems();
         Data.RuntimeSettings.FilterDrives = true;
 
-        Data.RuntimeSettings.CurrentDevice = Data.DevicesObject.Current;
-        Data.FileActions.PushPackageEnabled = Data.Settings.EnableApk && Data.DevicesObject?.Current?.Type is not DeviceType.Recovery;
+        Data.RuntimeSettings.CurrentDevice = device;
+        Data.FileActions.PushPackageEnabled = Data.Settings.EnableApk && device?.Type is not DeviceType.Recovery;
 
         Data.FileOpQ.MoveOperationsToPast();
         FileActionLogic.UpdateFileActions();
@@ -794,6 +814,9 @@ public static class DeviceHelper
 
     public static void UpdateWsaPkgStatus()
     {
+        if (!Data.Settings.EnableWsa)
+            return;
+
         var wsa = Data.DevicesObject.UIList.OfType<WsaPkgDeviceViewModel>().FirstOrDefault();
         if (wsa is null)
             return;

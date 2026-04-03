@@ -43,19 +43,6 @@ public static class StyleHelper
             typeof(StyleHelper),
             null);
 
-    public static bool GetUseFluentStyles(Control control) =>
-        (bool)control.GetValue(UseFluentStylesProperty);
-
-    public static void SetUseFluentStyles(Control control, bool value) =>
-        control.SetValue(UseFluentStylesProperty, value);
-
-    public static readonly DependencyProperty UseFluentStylesProperty =
-        DependencyProperty.RegisterAttached(
-            "UseFluentStyles",
-            typeof(bool),
-            typeof(StyleHelper),
-            null);
-
     public static bool GetAnimateOnClick(Control control) =>
     (bool)control.GetValue(AnimateOnClickProperty);
 
@@ -78,32 +65,6 @@ public static class StyleHelper
     public static readonly DependencyProperty MirrorContentInRTLProperty =
         DependencyProperty.RegisterAttached(
             "MirrorContentInRTL",
-            typeof(bool),
-            typeof(StyleHelper),
-            null);
-
-    public static bool GetIsUnchecked(ToggleButton control) =>
-        (bool)control.GetValue(IsUncheckedProperty);
-
-    public static void SetIsUnchecked(ToggleButton control, bool value) =>
-        control.SetValue(IsUncheckedProperty, value);
-
-    public static readonly DependencyProperty IsUncheckedProperty =
-        DependencyProperty.RegisterAttached(
-            "IsUnchecked",
-            typeof(bool),
-            typeof(StyleHelper),
-            null);
-
-    public static bool GetBeginAnimation(Control control) =>
-        (bool)control.GetValue(BeginAnimationProperty);
-
-    public static void SetBeginAnimation(Control control, bool value) =>
-        control.SetValue(BeginAnimationProperty, value);
-
-    public static readonly DependencyProperty BeginAnimationProperty =
-        DependencyProperty.RegisterAttached(
-            "BeginAnimation",
             typeof(bool),
             typeof(StyleHelper),
             null);
@@ -134,45 +95,44 @@ public static class StyleHelper
             typeof(StyleHelper),
             null);
 
-    public static string GetThreeStateGlyph(CheckBox control) =>
-        (string)control.GetValue(ThreeStateGlyphProperty);
+    public static bool GetIsSelected(UIElement control) =>
+        (bool)control.GetValue(IsSelectedProperty);
 
-    public static void SetThreeStateGlyph(CheckBox control, string value) =>
-        control.SetValue(ThreeStateGlyphProperty, value);
+    public static void SetIsSelected(UIElement control, bool value) =>
+        control.SetValue(IsSelectedProperty, value);
 
-    public static readonly DependencyProperty ThreeStateGlyphProperty =
+    public static readonly DependencyProperty IsSelectedProperty =
         DependencyProperty.RegisterAttached(
-            "ThreeStateGlyph",
-            typeof(string),
+            "IsSelected",
+            typeof(bool),
             typeof(StyleHelper),
             null);
 
-    public static UIElement GetPopupPlacementTarget(DependencyObject control) =>
-        (UIElement)control.GetValue(PopupPlacementTargetProperty);
+    public static bool GetEnableSelection(UIElement control) =>
+        (bool)control.GetValue(EnableSelectionProperty);
 
-    public static void SetPopupPlacementTarget(DependencyObject control, UIElement value) =>
-        control.SetValue(PopupPlacementTargetProperty, value);
+    public static void SetEnableSelection(UIElement control, bool value) =>
+        control.SetValue(EnableSelectionProperty, value);
 
-    public static readonly DependencyProperty PopupPlacementTargetProperty =
+    public static readonly DependencyProperty EnableSelectionProperty =
         DependencyProperty.RegisterAttached(
-            "PopupPlacementTarget",
-            typeof(UIElement),
+            "EnableSelection",
+            typeof(bool),
             typeof(StyleHelper),
             null);
 
-    public static PlacementMode GetPopupPlacement(DependencyObject control) =>
-        (PlacementMode)control.GetValue(PopupPlacementProperty);
+    public static bool GetShowAltBorderWhenDeselected(UIElement control) =>
+        (bool)control.GetValue(ShowAltBorderWhenDeselectedProperty);
 
-    public static void SetPopupPlacement(DependencyObject control, PlacementMode value) =>
-        control.SetValue(PopupPlacementProperty, value);
+    public static void SetShowAltBorderWhenDeselected(UIElement control, bool value) =>
+        control.SetValue(ShowAltBorderWhenDeselectedProperty, value);
 
-    public static readonly DependencyProperty PopupPlacementProperty =
+    public static readonly DependencyProperty ShowAltBorderWhenDeselectedProperty =
         DependencyProperty.RegisterAttached(
-            "PopupPlacement",
-            typeof(PlacementMode),
+            "ShowAltBorderWhenDeselected",
+            typeof(bool),
             typeof(StyleHelper),
             null);
-
 
     private static readonly Dictionary<string, DependencyProperty> ChildrenProperties = [];
 

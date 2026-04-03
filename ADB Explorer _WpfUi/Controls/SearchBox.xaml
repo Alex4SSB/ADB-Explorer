@@ -29,163 +29,20 @@
             x:Name="Expander"
             Grid.Column="1"
             Height="38"
+            Padding="-1"
             helpers:ExpanderHelper.ExpanderArrow="None"
             helpers:ExpanderHelper.HeaderTooltip="{Binding PlaceholderText}"
             helpers:ExpanderHelper.IsHeaderToggleExternal="True"
             ExpandDirection="Left"
             Expanded="Expander_Expanded"
             FocusVisualStyle="{x:Null}"
-            IsExpanded="{Binding IsExpanded}">
-            <Expander.Style>
-                <Style BasedOn="{StaticResource AdbExpanderStyle}" TargetType="Expander">
-
-                    <!--  PADDING: Fluent Style  -->
-                    <Setter Property="Padding" Value="-1" />
-                    <Style.Triggers>
-
-
-                        <!--  PADDING, MARGIN: Non-Fluent Style  -->
-
-                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="False">
-                            <Setter Property="Margin" Value="0,-1,0,0" />
-                            <Setter Property="Padding" Value="0,0,-1,-1" />
-                        </DataTrigger>
-
-
-                        <!--  BACKGROUND, BORDER: Non-Fluent Style, Checked  -->
-
-                        <!--<DataTrigger Binding="{Binding IsFiltered}" Value="True">
-                            <Setter Property="Background" Value="{StaticResource SystemControlHighlightAccentBrush}" />
-                            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlBackgroundBaseHighBrush}" />
-                        </DataTrigger>-->
-
-
-                        <!--  BACKGROUND, BORDER: Dark Theme, Checked  -->
-
-                        <!--<MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="Background" Value="{DynamicResource SystemAccentColorLight2Brush}" />
-                            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColorLight2Brush}" />
-                        </MultiDataTrigger>-->
-
-
-                        <!--  BACKGROUND, BORDER: Light Theme, Checked  -->
-
-                        <!--<MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
-                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="Background" Value="{DynamicResource SystemAccentColorDark1Brush}" />
-                            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColorDark1Brush}" />
-                        </MultiDataTrigger>-->
-
-
-                        <!--  BORDER: Dark Theme, Unchecked. BACKGROUND: Unchecked  -->
-
-                        <!--<MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
-                                <Condition Binding="{Binding IsFiltered}" Value="False" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="Background" Value="{DynamicResource AdbButtonBackgroundNormal}" />
-                            <Setter Property="BorderBrush" Value="{StaticResource DarkFluentButtonBorderBrush}" />
-                        </MultiDataTrigger>-->
-
-
-                        <!--  BORDER: Light Theme, Unchecked  -->
-
-                        <!--<MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
-                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
-                                <Condition Binding="{Binding IsFiltered}" Value="False" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="BorderBrush" Value="{StaticResource LightFluentButtonBorderBrush}" />
-                        </MultiDataTrigger>-->
-
-
-                        <!--  BACKGORUND: Unchecked, Mouse Over  -->
-
-                        <!--<MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
-                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsHeaderMouseOver)}" Value="True" />
-                                <Condition Binding="{Binding IsFiltered}" Value="False" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="Background" Value="{DynamicResource AdbButtonBackgroundMouseOver}" />
-                        </MultiDataTrigger>-->
-
-
-                        <!--  Unchecked, Pressed  -->
-
-                        <!--<MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
-                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsHeaderPressed)}" Value="True" />
-                                <Condition Binding="{Binding IsFiltered}" Value="False" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="Background" Value="{DynamicResource AdbButtonBackgroundPressed}" />
-                            <Setter Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressed}" />
-                        </MultiDataTrigger>-->
-
-
-                        <!--  BORDER, BACKGROUND: Disabled  -->
-
-                        <!--<MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
-                                <Condition Binding="{Binding IsEnabled}" Value="False" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="Background" Value="{DynamicResource AdbButtonBackgroundDisabled}" />
-                            <Setter Property="BorderBrush" Value="{DynamicResource AdbButtonBorderDisabled}" />
-                        </MultiDataTrigger>-->
-                    </Style.Triggers>
-                </Style>
-            </Expander.Style>
+            IsExpanded="{Binding IsExpanded}"
+            Style="{StaticResource AdbExpanderStyle}">
             <Expander.Header>
-                <ui:FontIcon Margin="10" Glyph="{Binding Icon}">
-                    <ui:FontIcon.Style>
-                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-
-                            <!--  FOREGROUND: Checked  -->
-                            <!--<Setter Property="Foreground" Value="{ui:ThemeResource SystemControlBackgroundAltHighBrush}" />-->
-
-                            <Style.Triggers>
-                                <!--  FOREGROUND: Unchecked  -->
-                                <!--<DataTrigger Binding="{Binding IsFiltered}" Value="False">
-                <Setter Property="Foreground" Value="{DynamicResource SystemControlBackgroundBaseHighBrush}" />
-            </DataTrigger>-->
-
-                                <!--  FOREGROUND: Unchecked, Pressed  -->
-                                <!--<DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.IsHeaderPressed)}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
-            </DataTrigger>-->
-
-                                <!--  FOREGROUND: Checked, Pressed  -->
-                                <!--<MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.IsHeaderPressed)}" Value="True" />
-                    <Condition Binding="{Binding IsFiltered}" Value="True" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Foreground">
-                    <Setter.Value>
-                        <SolidColorBrush Opacity="{StaticResource AccentButtonForegroundPressedOrDisabledOpacity}" Color="{ui:ThemeResource SystemAltHighColor}" />
-                    </Setter.Value>
-                </Setter>
-            </MultiDataTrigger>-->
-
-                                <!--  FOREGROUND: Disabled  -->
-                                <!--<Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
-            </Trigger>-->
-                            </Style.Triggers>
-
-                        </Style>
-                    </ui:FontIcon.Style>
-                </ui:FontIcon>
+                <ui:FontIcon
+                    Margin="10"
+                    Glyph="{Binding Icon}"
+                    Style="{StaticResource GlyphFont}" />
             </Expander.Header>
             <ui:TextBox
                 x:Name="ContentBox"

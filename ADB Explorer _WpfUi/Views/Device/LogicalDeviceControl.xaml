@@ -129,13 +129,10 @@
                     <controls:AdbMenu.Style>
                         <Style BasedOn="{StaticResource AdbMenuStyle}" TargetType="controls:AdbMenu">
                             <Setter Property="IsEnabled" Value="False" />
-                            <Setter Property="Height" Value="30" />
+                            <Setter Property="Height" Value="32" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Status}" Value="Ok">
                                     <Setter Property="IsEnabled" Value="True" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
-                                    <Setter Property="Height" Value="32" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

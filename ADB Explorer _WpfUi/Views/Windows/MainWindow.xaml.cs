@@ -57,7 +57,7 @@ public partial class MainWindow : INavigationWindow
                                               IpcService.AcceptIpcMessage,
                                               scale => Data.RuntimeSettings.MainWindowScalingFactor = scale);
 
-        //DeviceHelper.UpdateWsaPkgStatus();
+        DeviceHelper.UpdateWsaPkgStatus();
 
         dw.Show();
 

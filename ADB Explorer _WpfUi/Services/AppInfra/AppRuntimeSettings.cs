@@ -364,8 +364,6 @@ public partial class AppRuntimeSettings : ViewModelBase
 
     public bool Is22H2 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_22H2;
 
-    public bool UseFluentStyles => true;
-
     public bool IsRTL => Thread.CurrentThread.CurrentUICulture.TextInfo.IsRightToLeft;
 
     #region Event-only properties

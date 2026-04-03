@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>Ícono(s) de Android</value>
+    <value>Icono(s) de Android</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>El robot de Android se reproduce o modifica a partir del trabajo generado y compartido por Google, y se usa conforme a lo descrito en la Licencia de Atribución de Creative Commons 3.0.</value>
@@ -772,7 +772,7 @@ El contenido visible puede estar incompleto.</value>
     <value>Pegar {0} Elementos Copiados</value>
   </data>
   <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
-    <value>Pegar {0} Elementos Copiados</value>
+    <value>Pegar {0} Elementos Cortados</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} en {1} ({2})</value>

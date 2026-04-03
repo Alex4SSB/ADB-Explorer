@@ -515,4 +515,106 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style
+        x:Key="AdbCardActionStyle"
+        BasedOn="{StaticResource DefaultUiCardActionStyle}"
+        TargetType="{x:Type ui:CardAction}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ui:CardAction}">
+                    <Grid>
+                        <Border
+                            x:Name="ContentBorder"
+                            Width="{TemplateBinding Width}"
+                            Height="{TemplateBinding Height}"
+                            MinWidth="{TemplateBinding MinWidth}"
+                            MinHeight="{TemplateBinding MinHeight}"
+                            Padding="{TemplateBinding Padding}"
+                            HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding Border.CornerRadius}">
+                            <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <ContentControl
+                                    x:Name="ControlIcon"
+                                    Grid.Column="0"
+                                    Margin="0,0,14,0"
+                                    VerticalAlignment="Center"
+                                    Content="{TemplateBinding Icon}"
+                                    Focusable="False"
+                                    Foreground="{TemplateBinding Foreground}"
+                                    KeyboardNavigation.IsTabStop="False" />
+
+                                <ContentPresenter
+                                    x:Name="ContentPresenter"
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Content="{TemplateBinding Content}"
+                                    TextElement.Foreground="{TemplateBinding Foreground}" />
+
+                            </Grid>
+                        </Border>
+                        <Border
+                            x:Name="AltBorder"
+                            BorderBrush="{TemplateBinding helpers:StyleHelper.AltBorderBrush}"
+                            BorderThickness="0,0,0,2"
+                            CornerRadius="4" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource CardBackgroundPointerOver}" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}" />
+                            <Setter Property="Foreground" Value="{DynamicResource CardForegroundPointerOver}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Background" Value="{DynamicResource CardBackgroundDisabled}" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrushDisabled}" />
+                            <Setter Property="Foreground" Value="{DynamicResource CardForegroundDisabled}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource CardBackgroundPressed}" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrushPressed}" />
+                            <Setter Property="Foreground" Value="{DynamicResource CardForegroundPressed}" />
+                        </Trigger>
+                        <Trigger Property="Content" Value="{x:Null}">
+                            <Setter TargetName="ControlIcon" Property="Margin" Value="0" />
+                        </Trigger>
+                        <Trigger Property="Content" Value="">
+                            <Setter TargetName="ControlIcon" Property="Margin" Value="0" />
+                        </Trigger>
+                        <Trigger Property="Icon" Value="{x:Null}">
+                            <Setter TargetName="ControlIcon" Property="Margin" Value="0" />
+                            <Setter TargetName="ControlIcon" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="helpers:StyleHelper.ShowAltBorderWhenDeselected" Value="False">
+                            <Setter TargetName="AltBorder" Property="BorderThickness" Value="0,0,0,0" />
+                        </Trigger>
+                        <Trigger Property="helpers:StyleHelper.EnableSelection" Value="True">
+                            <Setter TargetName="AltBorder" Property="Margin" Value="0" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="helpers:StyleHelper.EnableSelection" Value="True" />
+                                <Condition Property="helpers:StyleHelper.AltBorderBrush" Value="{x:Null}" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="AltBorder" Property="BorderBrush" Value="{DynamicResource SystemAccentColorBrush}" />
+                        </MultiTrigger>
+                        <Trigger Property="helpers:StyleHelper.IsSelected" Value="True">
+                            <Setter TargetName="AltBorder" Property="BorderThickness" Value="2,2,2,2" />
+                            <Setter TargetName="AltBorder" Property="Margin" Value="0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

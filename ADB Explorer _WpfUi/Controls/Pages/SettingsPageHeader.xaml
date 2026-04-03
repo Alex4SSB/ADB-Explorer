@@ -272,7 +272,6 @@
                         <ComboBox
                             Grid.Column="1"
                             VerticalContentAlignment="Center"
-                            helpers:StyleHelper.PopupPlacement="Center"
                             ContextMenu="{x:Null}"
                             ItemsSource="{Binding Options}"
                             MaxDropDownHeight="287"

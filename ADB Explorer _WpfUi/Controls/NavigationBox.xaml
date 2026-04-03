@@ -210,7 +210,7 @@
         <ProgressBar
             x:Name="LoadingProgressBar"
             Height="35"
-            Margin="0,0,0,0"
+            Margin="0"
             VerticalAlignment="Stretch"
             Background="Transparent"
             BorderBrush="Transparent"
@@ -219,11 +219,7 @@
             <ProgressBar.Style>
                 <Style BasedOn="{StaticResource FluentProgressBarStyle}" TargetType="ProgressBar">
                     <Setter Property="IsIndeterminate" Value="False" />
-                    <!--<Setter Property="CornerRadius" Value="4,4,2,2" />-->
                     <Style.Triggers>
-                        <!--<DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="False">
-                            <Setter Property="CornerRadius" Value="0" />
-                        </DataTrigger>-->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding Mode}" Value="Breadcrumbs" />

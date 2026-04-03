@@ -1483,4 +1483,13 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
     <value>זמן שמירת תמונות תצוגה מקדימה לפני עדכון</value>
   </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>שימוש ב- BusyBox אם זמין</value>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>התחברות אוטומטית ל-WSA אם זמין</value>
+  </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>הדבק</value>
+  </data>
 </root>
