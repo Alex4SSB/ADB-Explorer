@@ -1432,4 +1432,58 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
   <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
     <value>ikon</value>
   </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>Ambil &amp; Tampilkan Thumbnail</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>Hanya di Tampilan Ikon</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>Hanya di Direktori Foto</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value>Saat Terhubung</value>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>Simpan Thumbnail Antar Sesi</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>Batasi Kecepatan Pengambilan Thumbnail</value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>Tampilkan Ikon untuk Folder Khusus</value>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>Sertakan Thumbnail Video</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>Durasi</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>Dimensi</value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>Satu Bulan</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>Satu Minggu</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>Satu Hari</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>Satu Jam</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>Waktu Penyegaran Thumbnail Lokal</value>
+  </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>Gunakan BusyBox Jika Tersedia</value>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>Hubungkan WSA Otomatis Jika Tersedia</value>
+  </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>Tempel</value>
+  </data>
 </root>
