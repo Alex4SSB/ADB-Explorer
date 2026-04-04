@@ -1483,4 +1483,7 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
     <value>Auffrischungszeit für lokale Miniaturansichten</value>
   </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>Einfügen</value>
+  </data>
 </root>
