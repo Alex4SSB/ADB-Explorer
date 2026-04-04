@@ -3808,6 +3808,42 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Checking for thumbnail updates.
+        /// </summary>
+        public static string S_THUMB_SNACKBAR_CHECKING {
+            get {
+                return ResourceManager.GetString("S_THUMB_SNACKBAR_CHECKING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pulling thumbnails.
+        /// </summary>
+        public static string S_THUMB_SNACKBAR_PULLING {
+            get {
+                return ResourceManager.GetString("S_THUMB_SNACKBAR_PULLING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reading thumbnail locations and media database.
+        /// </summary>
+        public static string S_THUMB_SNACKBAR_READING {
+            get {
+                return ResourceManager.GetString("S_THUMB_SNACKBAR_READING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Thumbnails.
+        /// </summary>
+        public static string S_THUMB_SNACKBAR_TITLE {
+            get {
+                return ResourceManager.GetString("S_THUMB_SNACKBAR_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Currently Browsing.
         /// </summary>
         public static string S_TOOLTIP_BROWSING {

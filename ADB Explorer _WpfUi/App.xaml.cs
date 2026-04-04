@@ -42,6 +42,8 @@ public partial class App
 
             services.AddHostedService<ApplicationHostService>();
 
+            services.AddHostedService<ThumbnailSnackbarService>();
+
             services.AddHostedService<DevicePollingService>();
 
             // Theme manipulation
@@ -54,6 +56,8 @@ public partial class App
             services.AddSingleton<INavigationService, NavigationService>();
 
             services.AddSingleton<IContentDialogService, ContentDialogService>();
+
+            services.AddSingleton<ISnackbarService, SnackbarService>();
 
             // Main window with navigation
             services.AddSingleton<INavigationWindow, MainWindow>();

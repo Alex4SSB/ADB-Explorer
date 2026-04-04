@@ -772,7 +772,7 @@
         </Setter>
         <Style.Triggers>
             <DataTrigger Binding="{Binding UsageWarning}" Value="True">
-                <Setter Property="Foreground" Value="{StaticResource RedStripedBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCriticalBrush}" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

@@ -95,17 +95,6 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-    <LinearGradientBrush x:Key="RedStripedBrush" SpreadMethod="Repeat" StartPoint="0,0" EndPoint="0.15,0">
-        <LinearGradientBrush.RelativeTransform>
-            <TransformGroup>
-                <ScaleTransform CenterX="0.5" CenterY="0.5" />
-                <SkewTransform CenterX="0.5" CenterY="0.5" />
-                <RotateTransform Angle="1" CenterX="0.5" CenterY="0.5" />
-            </TransformGroup>
-        </LinearGradientBrush.RelativeTransform>
-        <GradientStop Offset="0.4" Color="Transparent" />
-        <GradientStop Offset="0.4" Color="#FFC50500" />
-    </LinearGradientBrush>
     <LinearGradientBrush x:Key="LightFluentAccentButtonBorderBrush" ColorInterpolationMode="SRgbLinearInterpolation" MappingMode="Absolute" Opacity="1" SpreadMethod="Pad" EndPoint="0,3">
         <GradientStopCollection>
             <GradientStop Offset="0.33" Color="{DynamicResource LightFluentAccentButtonBorderGradient1}" />
@@ -611,6 +600,177 @@
                         <Trigger Property="helpers:StyleHelper.IsSelected" Value="True">
                             <Setter TargetName="AltBorder" Property="BorderThickness" Value="2,2,2,2" />
                             <Setter TargetName="AltBorder" Property="Margin" Value="0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style BasedOn="{StaticResource {x:Type ui:Snackbar}}" TargetType="controls:AdbSnackbar">
+        <Setter Property="ProgressForeground" Value="{DynamicResource SystemFillColorCautionBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:AdbSnackbar}">
+                    <Grid
+                        x:Name="CardBorderContainer"
+                        Margin="0,0,0,-200"
+                        ClipToBounds="False"
+                        Opacity="0">
+                        <Border
+                            x:Name="CardBorder"
+                            MinHeight="{TemplateBinding MinHeight}"
+                            VerticalAlignment="Bottom"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            RenderTransform="{TemplateBinding SlideTransform}"
+                            Visibility="{TemplateBinding Visibility}">
+                            <Border.Effect>
+                                <DropShadowEffect
+                                    BlurRadius="30"
+                                    Direction="0"
+                                    Opacity="0.4"
+                                    ShadowDepth="0"
+                                    Color="#202020" />
+                            </Border.Effect>
+                            <Grid>
+                                <Grid Margin="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition x:Name="ChevronColumn" Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <ContentPresenter
+                                        x:Name="CardIcon"
+                                        Grid.Column="0"
+                                        Margin="0,0,12,0"
+                                        VerticalAlignment="Center"
+                                        Content="{TemplateBinding Icon}"
+                                        TextElement.FontSize="28"
+                                        TextElement.Foreground="{TemplateBinding Foreground}" />
+
+                                    <Grid Grid.Column="1">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+
+                                        <ContentPresenter
+                                            x:Name="TitleContentPresenter"
+                                            Grid.Row="0"
+                                            Margin="0"
+                                            Content="{TemplateBinding Title}"
+                                            ContentTemplate="{TemplateBinding TitleTemplate}"
+                                            TextElement.FontSize="16"
+                                            TextElement.FontWeight="SemiBold"
+                                            TextElement.Foreground="{TemplateBinding Foreground}">
+                                            <ContentPresenter.Resources>
+                                                <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
+                                                    <Setter Property="TextWrapping" Value="WrapWithOverflow" />
+                                                </Style>
+                                            </ContentPresenter.Resources>
+                                        </ContentPresenter>
+
+                                        <ContentPresenter
+                                            Grid.Row="1"
+                                            Content="{TemplateBinding Content}"
+                                            ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                                            ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                            TextElement.FontSize="14"
+                                            TextElement.FontWeight="Regular"
+                                            TextElement.Foreground="{TemplateBinding ContentForeground}">
+                                            <ContentPresenter.Resources>
+                                                <Style BasedOn="{StaticResource {x:Type TextBlock}}" TargetType="{x:Type TextBlock}">
+                                                    <Setter Property="TextWrapping" Value="WrapWithOverflow" />
+                                                </Style>
+                                            </ContentPresenter.Resources>
+                                        </ContentPresenter>
+                                    </Grid>
+
+                                    <ui:Button
+                                        x:Name="CloseButton"
+                                        Grid.Column="2"
+                                        Margin="12,0,0,0"
+                                        Padding="6"
+                                        Appearance="{TemplateBinding Appearance}"
+                                        Command="{Binding Path=TemplateButtonCommand, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                        Foreground="{TemplateBinding Foreground}">
+                                        <ui:Button.Icon>
+                                            <ui:SymbolIcon Symbol="Dismiss48" />
+                                        </ui:Button.Icon>
+                                    </ui:Button>
+                                </Grid>
+                                <ProgressBar
+                                    x:Name="SnackProgressBar"
+                                    VerticalAlignment="Bottom"
+                                    Maximum="{TemplateBinding ProgressMaximum}"
+                                    Foreground="{TemplateBinding ProgressForeground}"
+                                    Value="{TemplateBinding ProgressValue}" />
+                                <Border
+                                    BorderBrush="{DynamicResource ToolTipBackground}"
+                                    BorderThickness="1"
+                                    CornerRadius="4,4,3,3" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Icon" Value="{x:Null}">
+                            <Setter TargetName="CardIcon" Property="Margin" Value="0" />
+                        </Trigger>
+                        <Trigger Property="IsCloseButtonEnabled" Value="False">
+                            <Setter TargetName="CloseButton" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="CloseButton" Property="Margin" Value="0" />
+                        </Trigger>
+                        <Trigger Property="ProgressMode" Value="Off">
+                            <Setter TargetName="SnackProgressBar" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="ProgressMode" Value="Indeterminate">
+                            <Setter TargetName="SnackProgressBar" Property="IsIndeterminate" Value="True" />
+                        </Trigger>
+                        <Trigger Property="IsShown" Value="True">
+                            <Setter Property="Focusable" Value="True" />
+                            <Setter Property="KeyboardNavigation.IsTabStop" Value="True" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ThicknessAnimationUsingKeyFrames
+                                            BeginTime="00:00:00"
+                                            Storyboard.TargetName="CardBorderContainer"
+                                            Storyboard.TargetProperty="Margin">
+                                            <SplineThicknessKeyFrame KeyTime="00:00:00" Value="0,0,0,-200" />
+                                            <SplineThicknessKeyFrame KeyTime="00:00:.26" Value="0,0,0,0" />
+                                        </ThicknessAnimationUsingKeyFrames>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="CardBorderContainer"
+                                            Storyboard.TargetProperty="(Grid.Opacity)"
+                                            From="0"
+                                            To="1"
+                                            Duration="0:0:.26" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ThicknessAnimationUsingKeyFrames
+                                            BeginTime="00:00:00"
+                                            Storyboard.TargetName="CardBorderContainer"
+                                            Storyboard.TargetProperty="Margin">
+                                            <SplineThicknessKeyFrame KeyTime="00:00:00" Value="0,0,0,0" />
+                                            <SplineThicknessKeyFrame KeyTime="00:00:.32" Value="0,0,0,-200" />
+                                        </ThicknessAnimationUsingKeyFrames>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="CardBorderContainer"
+                                            Storyboard.TargetProperty="(Grid.Opacity)"
+                                            From="1"
+                                            To="0"
+                                            Duration="0:0:.32" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

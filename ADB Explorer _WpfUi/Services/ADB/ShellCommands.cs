@@ -34,9 +34,9 @@ public static class ShellCommands
 
     public static Dictionary<string, Dictionary<ShellCmd, string>> DeviceCommands { get; set; } = [];
 
-    public static bool BusyBoxExists { get; private set; }
+    public static bool BusyBoxExists { get; private set; } = false;
 
-    public static bool FindPrintf { get; private set; }
+    public static bool FindPrintf { get; private set; } = true;
 
     public static string TranslateCommand(string cmd)
     {

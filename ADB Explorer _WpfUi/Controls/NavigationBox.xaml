@@ -83,10 +83,6 @@
             </local:AdbMenuItem>
         </DataTemplate>
         <ItemsControl
-            x:Key="OverflowItemsControl"
-            x:Name="OverflowItemsControl"
-            ItemTemplate="{StaticResource BreadcrumbFlyoutItemTemplate}" />
-        <ItemsControl
             x:Key="SavedItemsControl"
             x:Name="SavedItemsControl"
             ItemTemplate="{StaticResource SavedItemTemplate}" />
@@ -96,6 +92,7 @@
                     Height="24"
                     Margin="2,0"
                     Padding="8,0"
+                    Click="BreadcrumbButton_Click"
                     Command="{Binding Action.Command.Command}"
                     FlowDirection="LeftToRight">
                     <ui:Button.Content>
@@ -329,5 +326,29 @@
                 </ui:Button.Style>
             </ui:Button>
         </Grid>
+        <Popup
+            x:Name="OverflowPopup"
+            AllowsTransparency="True"
+            Placement="Bottom"
+            StaysOpen="False">
+            <Border
+                Padding="0,3"
+                Background="{DynamicResource FlyoutBackground}"
+                BorderBrush="{DynamicResource FlyoutBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Border.Effect>
+                    <DropShadowEffect
+                        BlurRadius="20"
+                        Direction="270"
+                        Opacity="0.135"
+                        ShadowDepth="10"
+                        Color="#202020" />
+                </Border.Effect>
+                <ItemsControl
+                    x:Name="OverflowItemsControl"
+                    ItemTemplate="{StaticResource BreadcrumbFlyoutItemTemplate}" />
+            </Border>
+        </Popup>
     </Grid>
 </UserControl>

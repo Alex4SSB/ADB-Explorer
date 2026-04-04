@@ -1834,4 +1834,20 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Paste</value>
     <comment>As in "Paste the copied string"</comment>
   </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>Checking for thumbnail updates</value>
+    <comment>A hint displayed for a short time in the snackbar</comment>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>Pulling thumbnails</value>
+    <comment>A hint displayed for a short time in the snackbar</comment>
+  </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>Reading thumbnail locations and media database</value>
+    <comment>A hint displayed for a short time in the snackbar</comment>
+  </data>
+  <data name="S_THUMB_SNACKBAR_TITLE" xml:space="preserve">
+    <value>{0} Thumbnails</value>
+    <comment>0 - device name. example: Pixel 9 Thumbnails</comment>
+  </data>
 </root>

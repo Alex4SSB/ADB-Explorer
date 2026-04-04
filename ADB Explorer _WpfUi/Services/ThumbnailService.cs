@@ -71,6 +71,25 @@ public static partial class ThumbnailService
         }
     }
 
+    public enum ThumbnailStep
+    {
+        ReadingDatabase,
+        CheckingUpdates,
+        Pulling,
+    }
+
+    /// <summary>
+    /// Raised when a thumbnail acquisition step starts or completes.
+    /// The bool parameter is <see langword="true"/> when the step starts and <see langword="false"/> when it ends.
+    /// </summary>
+    public static event Action<ThumbnailStep, bool>? ThumbnailProgressChanged;
+
+    /// <summary>
+    /// Raised during the Pulling step to report per-file progress.
+    /// Parameters are (completedFiles, totalFiles).
+    /// </summary>
+    public static event Action<int, int>? ThumbnailPullingProgressUpdated;
+
     public static event Action<string, string>? ThumbnailUpdated;
 
     private static readonly Mutex _mutex = new(false);
@@ -268,8 +287,16 @@ public static partial class ThumbnailService
                 hasUpdates = true;
         }
 
-        if (!hasUpdates)
-            return;
+        //if (!hasUpdates)
+        //    return;
+
+        //if (!hasUpdates)
+        //{
+        //    if (!Directory.Exists(deviceInfo.LocalThumbnailDir) ||
+        //        !Directory.EnumerateFiles(deviceInfo.LocalThumbnailDir).Any())
+        //        PullThumbnails(deviceInfo);
+        //    return;
+        //}
 
         UpdateCache(deviceInfo);
         PullThumbnails(deviceInfo);
@@ -313,6 +340,8 @@ public static partial class ThumbnailService
 
     private static Dictionary<string, ThumbnailInfo> GetThumbsCacheFromDevice(DeviceThumbnailInfo deviceInfo)
     {
+        ThumbnailProgressChanged?.Invoke(ThumbnailStep.ReadingDatabase, true);
+
         var picsResponse = GetThumbsFromDevice(deviceInfo, MediaType.images, CancellationToken.None);
         var thumbnailMap = ParseThumbnailMap(picsResponse, MediaType.images).ToList();
 
@@ -321,6 +350,8 @@ public static partial class ThumbnailService
             : "";
 
         var moviesThumbnailMap = ParseThumbnailMap(moviesResponse, MediaType.video);
+
+        ThumbnailProgressChanged?.Invoke(ThumbnailStep.ReadingDatabase, false);
 
         if (thumbnailMap is null || thumbnailMap.Count == 0)
             // Cache an almost empty dictionary to avoid repeated ADB calls
@@ -379,6 +410,8 @@ public static partial class ThumbnailService
 
     private static void PullThumbnails(DeviceThumbnailInfo deviceInfo)
     {
+        ThumbnailProgressChanged?.Invoke(ThumbnailStep.CheckingUpdates, true);
+
         IEnumerable<string> filesToReplace = [];
 
         if (Directory.Exists(deviceInfo.LocalThumbnailDir) && deviceInfo.ThumbnailPathCache.Count > 1)
@@ -398,16 +431,27 @@ public static partial class ThumbnailService
             : new("", deviceInfo.DeviceMoviesThumbnailDir, AbstractFile.FileType.Folder);
 
         var deviceDir = FileHelper.GetParentPath(deviceInfo.LocalThumbnailDir);
-        var device = Data.DevicesObject.Current;
-        if (device.LogicalID != deviceInfo.DeviceId)
-        {
-            throw new ArgumentException("Device mismatch!\nIf this happens - it is time to implement multi AdbDevice");
-        }
-
+        var device = Data.DevicesObject.LogicalDeviceViewModels.First(d => d.LogicalID == deviceInfo.DeviceId);
+        
         Task.Run(() =>
         {
-            var ops = FileActionLogic.SilentPullFiles(device, deviceDir, Data.Settings.LimitThumbsPullSpeed, filesToReplace, pics, movies);
-            foreach (var operation in ops)
+            var opsList = FileActionLogic.SilentPullFiles(device, deviceDir, Data.Settings.LimitThumbsPullSpeed, filesToReplace, pics, movies).ToList();
+
+            ThumbnailProgressChanged?.Invoke(ThumbnailStep.CheckingUpdates, false);
+
+            if (opsList.Count == 0)
+                return;
+
+            ThumbnailProgressChanged?.Invoke(ThumbnailStep.Pulling, true);
+
+            int totalFiles = opsList.Sum(op => op.FilePath.Children.Count);
+            int completedFiles = 0;
+            int completedOps = 0;
+            int totalOps = opsList.Count;
+
+            ThumbnailPullingProgressUpdated?.Invoke(0, totalFiles);
+
+            foreach (var operation in opsList)
             {
                 SyncFile filePath = operation.FilePath;
 
@@ -419,6 +463,8 @@ public static partial class ThumbnailService
                     e.NewItems?.OfType<AdbSyncProgressInfo>().Where(u => u.CurrentFilePercentage == 100).ForEach(update =>
                     {
                         UpdateThumbnailInfo(deviceInfo.DeviceId, FileHelper.GetFullName(update.AndroidPath));
+                        int newCompleted = Interlocked.Increment(ref completedFiles);
+                        ThumbnailPullingProgressUpdated?.Invoke(newCompleted, totalFiles);
                     });
                 };
 
@@ -428,14 +474,18 @@ public static partial class ThumbnailService
                     {
                         filePath.ProgressUpdates.CollectionChanged -= collectionChangedHandler;
                         operation.PropertyChanged -= propertyChangedHandler;
+
+                        if (Interlocked.Increment(ref completedOps) == totalOps)
+                        {
+                            DeviceThumbsToCsv(GetDeviceThumbsInfo(deviceInfo.DeviceId));
+                            ThumbnailProgressChanged?.Invoke(ThumbnailStep.Pulling, false);
+                        }
                     }
                 };
 
                 operation.ProgressUpdates.CollectionChanged += collectionChangedHandler;
                 operation.PropertyChanged += propertyChangedHandler;
             }
-
-            DeviceThumbsToCsv(GetDeviceThumbsInfo(deviceInfo.DeviceId));
         });
     }
 

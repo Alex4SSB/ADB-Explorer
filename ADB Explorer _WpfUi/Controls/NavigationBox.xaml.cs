@@ -33,6 +33,7 @@ public partial class NavigationBox : UserControl
             if (args.PropertyName == nameof(AppRuntimeSettings.LocationToNavigate))
             {
                 //FlyoutService.GetFlyout(SavedItemsButton).Hide();
+                OverflowPopup.IsOpen = false;
             }
             else if (args.PropertyName == nameof(AppRuntimeSettings.SavedLocations))
             {
@@ -291,7 +292,7 @@ public partial class NavigationBox : UserControl
                 Children = locations.ToList()[1..(lastHiddenIndex + 1)].Select(item => item.ExcessSubMenu)
             };
 
-            var itemsControl = (ItemsControl)Resources["OverflowItemsControl"];
+            var itemsControl = OverflowItemsControl;
             itemsControl.ItemsSource = excessButton.Children;
 
             Items = [breadcrumbs[0], excessButton, .. breadcrumbs[(lastHiddenIndex + 1)..]];
@@ -337,6 +338,15 @@ public partial class NavigationBox : UserControl
     private void PathBox_LostFocus(object sender, RoutedEventArgs e)
     {
         Mode = ViewMode.Breadcrumbs;
+    }
+
+    private void BreadcrumbButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.DataContext is TextMenu { Children: not null })
+        {
+            OverflowPopup.PlacementTarget = fe;
+            OverflowPopup.IsOpen = true;
+        }
     }
 
     private void FuseIcon_Click(object sender, RoutedEventArgs e)
