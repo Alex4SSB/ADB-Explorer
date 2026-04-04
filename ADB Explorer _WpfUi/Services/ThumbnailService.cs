@@ -287,17 +287,6 @@ public static partial class ThumbnailService
                 hasUpdates = true;
         }
 
-        //if (!hasUpdates)
-        //    return;
-
-        //if (!hasUpdates)
-        //{
-        //    if (!Directory.Exists(deviceInfo.LocalThumbnailDir) ||
-        //        !Directory.EnumerateFiles(deviceInfo.LocalThumbnailDir).Any())
-        //        PullThumbnails(deviceInfo);
-        //    return;
-        //}
-
         UpdateCache(deviceInfo);
         PullThumbnails(deviceInfo);
     }
@@ -477,7 +466,6 @@ public static partial class ThumbnailService
 
                         if (Interlocked.Increment(ref completedOps) == totalOps)
                         {
-                            DeviceThumbsToCsv(GetDeviceThumbsInfo(deviceInfo.DeviceId));
                             ThumbnailProgressChanged?.Invoke(ThumbnailStep.Pulling, false);
                         }
                     }
@@ -486,6 +474,8 @@ public static partial class ThumbnailService
                 operation.ProgressUpdates.CollectionChanged += collectionChangedHandler;
                 operation.PropertyChanged += propertyChangedHandler;
             }
+
+            DeviceThumbsToCsv(GetDeviceThumbsInfo(deviceInfo.DeviceId));
         });
     }
 
