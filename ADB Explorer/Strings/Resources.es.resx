@@ -1477,4 +1477,13 @@ Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
   <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
     <value>Incluir Miniaturas de Vídeo</value>
   </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>Utilizar BusyBox si está disponible</value>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>Auto-conextar WSA si está disponible</value>
+  </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>Pegar</value>
+  </data>
 </root>
