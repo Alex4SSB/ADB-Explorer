@@ -14,7 +14,7 @@
     mc:Ignorable="d">
     <UserControl.Resources>
         <converters:ThumbnailSizeConverter x:Key="ThumbnailSizeConverter" />
-        <ToolTip x:Key="IconViewTooltip">
+        <ToolTip x:Key="IconViewTooltip" MaxWidth="400">
             <ToolTip.Style>
                 <Style BasedOn="{StaticResource FluentTooltipStyle}" TargetType="ToolTip">
                     <Style.Triggers>
@@ -65,9 +65,9 @@
                             VerticalAlignment="Bottom"
                             Source="{Binding IconViewModel.VideoIconOverlay}" />
                         <Image
-                            Width="64"
-                            Height="64"
-                            Margin="0,0,0,14"
+                            Width="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=LinkWidth}"
+                            Height="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=LinkWidth}"
+                            Margin="-4,0,0,8"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Bottom"
                             Source="{Binding IconViewModel.LargeIconOverlay}" />

@@ -100,6 +100,9 @@
                 <DataTrigger Binding="{Binding IsIconView}" Value="False">
                     <Setter Property="Visibility" Value="Collapsed" />
                 </DataTrigger>
+                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsDriveViewVisible}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
                 <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRecycleBin}" Value="False">
                     <Setter Property="AllowDrop" Value="True" />
                 </DataTrigger>

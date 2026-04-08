@@ -6,13 +6,13 @@ namespace ADB_Explorer.Models;
 public partial class TrashIndexer : ObservableObject
 {
     [ObservableProperty]
-    private string _recycleName;
+    public partial string RecycleName { get; set; }
 
     [ObservableProperty]
-    private string originalPath;
+    public partial string OriginalPath { get; set; }
 
     [ObservableProperty]
-    private DateTime? _dateModified;
+    public partial DateTime? DateModified { get; set; }
 
     public string ModifiedTimeString => TabularDateFormatter.Format(DateModified, Thread.CurrentThread.CurrentCulture);
 

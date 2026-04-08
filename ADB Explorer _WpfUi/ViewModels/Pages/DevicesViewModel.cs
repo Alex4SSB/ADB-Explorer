@@ -9,10 +9,10 @@ public partial class DevicesViewModel : ObservableObject, INavigationAware
     private bool _isInitialized = false;
 
     [ObservableProperty]
-    private ICollectionView _primaryDevicesView;
+    public partial ICollectionView PrimaryDevicesView { get; set; }
 
     [ObservableProperty]
-    private ICollectionView _secondaryDevicesView;
+    public partial ICollectionView SecondaryDevicesView { get; set; }
 
     public Task OnNavigatedToAsync()
     {

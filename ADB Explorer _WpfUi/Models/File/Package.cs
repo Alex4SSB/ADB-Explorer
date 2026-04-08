@@ -9,24 +9,24 @@ public partial class Package : ObservableObject, IBrowserItem
     }
 
     [ObservableProperty]
-    private string _name;
+    public partial string Name { get; set; }
 
     [ObservableProperty]
-    private string _path;
+    public partial string Path { get; set; }
 
     public string DisplayName => Name;
 
     [ObservableProperty]
-    private PackageType _type;
+    public partial PackageType Type { get; set; }
 
     [ObservableProperty]
-    private long? _uid = null;
+    public partial long? Uid { get; set; } = null;
 
     [ObservableProperty]
-    private long? _version = null;
+    public partial long? Version { get; set; } = null;
 
     [ObservableProperty]
-    private bool isSelected;
+    public partial bool IsSelected { get; set; }
 
     public static Package New(string package, PackageType type)
     {

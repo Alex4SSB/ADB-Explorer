@@ -13,7 +13,7 @@ public partial class FileIconViewModel : FileViewModelBase
     private ThumbnailService.ThumbnailSize _cachedSize;
     private ThumbnailService.ThumbnailSize _currentlyLoadingSize;
 
-    private BitmapSource LargeFileIcon => FileToIconConverter.GetImage(_file, (int)Data.Settings.ThumbsSize).First();
+    private BitmapSource LargeFileIcon => FileToIconConverter.GetImage(_file, (int)((int)Data.Settings.ThumbsSize / Data.RuntimeSettings.MainWindowScalingFactor)).First();
     public BitmapSource? LargeIcon
     {
         get
@@ -30,13 +30,13 @@ public partial class FileIconViewModel : FileViewModelBase
     }
 
     [ObservableProperty]
-    private BitmapSource? _largeIconOverlay;
+    public partial BitmapSource? LargeIconOverlay { get; set; }
 
     [ObservableProperty]
-    private BitmapSource? _videoIconOverlay;
+    public partial BitmapSource? VideoIconOverlay { get; set; }
 
     [ObservableProperty]
-    private string? _iconViewTooltip;
+    public partial string? IconViewTooltip { get; set; }
 
     public FileIconViewModel(FileClass file) : base(file)
     {
@@ -45,11 +45,14 @@ public partial class FileIconViewModel : FileViewModelBase
 
     private void UpdateOverlays()
     {
-        if (_file.IconOverlay is not null)
+        if (_file.SpecialType.HasFlag(AbstractFile.SpecialFileType.LinkOverlay))
         {
             var icons = FileToIconConverter.GetImage(_file, 64);
-            if (icons.Count() > 1 && icons.ElementAt(1) is BitmapSource icon2)
-                LargeIconOverlay = icon2;
+            LargeIconOverlay = icons.Skip(1).FirstOrDefault();
+        }
+        else
+        {
+            LargeIconOverlay = null;
         }
     }
 
@@ -146,6 +149,8 @@ public partial class FileIconViewModel : FileViewModelBase
     {
         List<string> result = [];
 
+        result.Add(_file.DisplayName);
+
         result.Add(IconViewTypeString());
 
         if (thumb.Info.Type is ThumbnailService.MediaType.video)
@@ -169,7 +174,9 @@ public partial class FileIconViewModel : FileViewModelBase
     private void UpdateTooltipNoThumbnail()
     {
         List<string> result = [];
-        
+
+        result.Add(_file.DisplayName);
+
         if (_file.IsLink)
         {
             if (!string.IsNullOrEmpty(_file.LinkTarget))
@@ -209,6 +216,13 @@ public partial class FileIconViewModel : FileViewModelBase
         return Data.RuntimeSettings.IsRTL && !TypeIsRtl
             ? $"{TextHelper.LTR_MARK}{Strings.Resources.S_COLUMN_TYPE}: {TextHelper.RTL_MARK}{TypeName}{TextHelper.LTR_MARK}"
             : $"{Strings.Resources.S_COLUMN_TYPE}: {TypeName}";
+    }
+
+    public override void UpdateType()
+    {
+        base.UpdateType();
+        UpdateOverlays();
+        OnPropertyChanged(nameof(LargeIcon));
     }
 
     public void InvalidateThumbnail()

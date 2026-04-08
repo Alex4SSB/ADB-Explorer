@@ -5,10 +5,10 @@ namespace ADB_Explorer.ViewModels;
 public partial class FolderViewModel(FileClass file) : FileViewModelBase(file)
 {
     [ObservableProperty]
-    private bool _extensionIsGlyph;
+    public partial bool ExtensionIsGlyph { get; set; }
 
     [ObservableProperty]
-    private bool _extensionIsFontIcon;
+    public partial bool ExtensionIsFontIcon { get; set; }
 
     public override void UpdateType()
     {

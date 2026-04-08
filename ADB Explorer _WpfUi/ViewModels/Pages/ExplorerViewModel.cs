@@ -9,20 +9,19 @@ public partial class ExplorerViewModel : ObservableObject
 {
 
     [ObservableProperty]
-    private ICollectionView _explorerItemsSource;
+    public partial ICollectionView ExplorerItemsSource { get; set; }
 
     [ObservableProperty]
-    private ICollectionView _driveItemsSource;
+    public partial ICollectionView DriveItemsSource { get; set; }
 
     [ObservableProperty]
-    private ListSortDirection? _nameColumnSortDirection;
+    public partial ListSortDirection? NameColumnSortDirection { get; set; }
 
     [ObservableProperty]
-    private ListSortDirection? _packageTypeColumnSortDirection;
+    public partial ListSortDirection? PackageTypeColumnSortDirection { get; set; }
 
     [ObservableProperty]
-    private bool _isIconView = false;
-
+    public partial bool IsIconView { get; set; } = false;
     public int FirstSelectedIndex { get; set; } = -1;
 
     public int CurrentSelectedIndex { get; set; } = -1;
@@ -67,7 +66,7 @@ public partial class ExplorerViewModel : ObservableObject
 
     public ExplorerViewModel()
     {
-        _isIconView = Data.Settings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
+        IsIconView = Data.Settings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
 
         Data.FileActions.PropertyChanged += FileActions_PropertyChanged;
         Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
@@ -79,7 +78,7 @@ public partial class ExplorerViewModel : ObservableObject
         switch (e.PropertyName)
         {
             case nameof(AppSettings.ThumbsSize):
-                IsIconView = Data.Settings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
+                IsIconView = !Data.FileActions.IsAppDrive && Data.Settings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
                 break;
 
             case nameof(AppSettings.EnableApk):
@@ -119,6 +118,12 @@ public partial class ExplorerViewModel : ObservableObject
                 break;
 
             case nameof(FileActionsEnable.IsAppDrive):
+                IsIconView = !Data.FileActions.IsAppDrive && Data.Settings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
+                OnPropertyChanged(nameof(FolderColumnVisibility));
+                OnPropertyChanged(nameof(RecycleBinColumnVisibility));
+                OnPropertyChanged(nameof(PackageColumnVisibility));
+                break;
+
             case nameof(FileActionsEnable.IsRecycleBin):
                 OnPropertyChanged(nameof(FolderColumnVisibility));
                 OnPropertyChanged(nameof(RecycleBinColumnVisibility));

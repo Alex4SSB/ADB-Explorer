@@ -11,13 +11,13 @@ namespace ADB_Explorer.Controls;
 public partial class AdbContentDialog : UserControl
 {
     [ObservableProperty]
-    private string messageToCopy = "";
+    public partial string MessageToCopy { get; set; } = "";
 
     [ObservableProperty]
-    private string checkBoxContent = "";
+    public partial string CheckBoxContent { get; set; } = "";
 
     [ObservableProperty]
-    public bool isChecked = false;
+    public partial bool IsChecked { get; set; } = false;
 
     public BaseAction CopyCommand => new(() => true, () =>
     {

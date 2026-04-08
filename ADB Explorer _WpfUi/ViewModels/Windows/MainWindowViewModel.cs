@@ -6,7 +6,7 @@ namespace ADB_Explorer.ViewModels.Windows;
 public partial class MainWindowViewModel : ObservableObject
 {
     [ObservableProperty]
-    private string _applicationTitle = Properties.AppGlobal.AppDisplayName;
+    public partial string ApplicationTitle { get; set; } = Properties.AppGlobal.AppDisplayName;
 
     private readonly NavigationViewItem _logItem = new()
     {
@@ -18,7 +18,7 @@ public partial class MainWindowViewModel : ObservableObject
     };
 
     [ObservableProperty]
-    private ObservableCollection<NavigationViewItem> _menuItems =
+    public partial ObservableCollection<NavigationViewItem> MenuItems { get; set; } =
     [
         new NavigationViewItem()
         {
@@ -44,7 +44,7 @@ public partial class MainWindowViewModel : ObservableObject
     ];
 
     [ObservableProperty]
-    private ObservableCollection<NavigationViewItem> _footerMenuItems =
+    public partial ObservableCollection<NavigationViewItem> FooterMenuItems { get; set; } =
     [
         new NavigationViewItem()
         {

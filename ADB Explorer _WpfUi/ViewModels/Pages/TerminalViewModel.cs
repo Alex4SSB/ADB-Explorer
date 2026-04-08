@@ -13,7 +13,7 @@ public partial class TerminalViewModel : ObservableObject, INavigationAware
     public ObservableCollection<object> DevicesView { get; } = [];
 
     [ObservableProperty]
-    private DeviceViewModel _selectedDevice;
+    public partial DeviceViewModel SelectedDevice { get; set; }
 
     public Task OnNavigatedToAsync()
     {

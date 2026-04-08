@@ -9,19 +9,19 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
     private bool _isInitialized = false;
 
     [ObservableProperty]
-    private ICollectionView _settingsList;
+    public partial ICollectionView SettingsList { get; set; }
 
     [ObservableProperty]
-    private SettingsGroup _selectedGroup;
+    public partial SettingsGroup SelectedGroup { get; set; }
 
     [ObservableProperty]
-    private ICollectionView _groupContent;
+    public partial ICollectionView GroupContent { get; set; }
 
     [ObservableProperty]
-    private ICollectionView _sortedSettings;
+    public partial ICollectionView SortedSettings { get; set; }
 
     [ObservableProperty]
-    private string _searchText = "";
+    public partial string SearchText { get; set; } = "";
 
     Predicate<object> SettingsFilterPredicate => sett =>
         ((AbstractSetting)sett).Description.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
@@ -83,7 +83,7 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
     }
 
     [ObservableProperty]
-    private bool _sortedView;
+    public partial bool SortedView { get; set; }
 
     [RelayCommand]
     private void SortSettings()

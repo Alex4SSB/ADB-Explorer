@@ -3,7 +3,7 @@
 public partial class DragWindowViewModel : ObservableObject
 {
     [ObservableProperty]
-    double _dragImageHeight = 96;
+    public partial double DragImageHeight { get; set; } = 96;
 
     public DragWindowViewModel()
     {

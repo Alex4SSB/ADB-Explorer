@@ -11,7 +11,7 @@ public partial class AppRuntimeSettings : ViewModelBase
     public bool ResetAppSettings { get; set; } = false;
 
     [ObservableProperty]
-    private bool _isDevicesView;
+    public partial bool IsDevicesView { get; set; }
 
     private bool isOperationsViewOpen = false;
     public bool IsOperationsViewOpen

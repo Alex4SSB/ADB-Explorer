@@ -57,6 +57,12 @@ public class ThumbnailSizeConverter : IValueConverter
                 ThumbnailService.ThumbnailSize.Large => 80d,
                 _ => 160d,
             },
+            "LinkWidth" => size switch
+            {
+                ThumbnailService.ThumbnailSize.Medium => 48d,
+                ThumbnailService.ThumbnailSize.Large => 48d,
+                _ => 64d,
+            },
             _ => DependencyProperty.UnsetValue,
         };
     }

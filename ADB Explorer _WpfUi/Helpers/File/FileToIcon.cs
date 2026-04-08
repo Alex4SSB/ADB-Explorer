@@ -68,7 +68,7 @@ public class FileToIconConverter
     {
         const int spacing = 1;
 
-        if (sourceRect.Width > desiredSize * 0.75 || sourceRect.Height > desiredSize * 0.75)
+        if (sourceRect.Width * sourceRect.Height > desiredSize * desiredSize * 0.6)
         {
             return imgToResize;
         }
@@ -93,21 +93,24 @@ public class FileToIconConverter
         g.Clear(System.Drawing.Color.Transparent);
         g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
 
-        using var pen = new System.Drawing.Pen(Gray232);
-        int r = 4;
-        int x = spacing;
-        int y = spacing;
-        int w = desiredSize - spacing * 2 - 1;
-        int h = desiredSize - spacing * 2 - 1;
+        if (sourceRect.Width < desiredSize * 0.5 && sourceRect.Height < desiredSize * 0.5)
+        {
+            using var pen = new System.Drawing.Pen(Gray232);
+            int r = 4;
+            int x = spacing;
+            int y = spacing;
+            int w = desiredSize - spacing * 2 - 1;
+            int h = desiredSize - spacing * 2 - 1;
 
-        using var path = new System.Drawing.Drawing2D.GraphicsPath();
-        path.AddArc(x, y, r * 2, r * 2, 180, 90);
-        path.AddArc(x + w - r * 2, y, r * 2, r * 2, 270, 90);
-        path.AddArc(x + w - r * 2, y + h - r * 2, r * 2, r * 2, 0, 90);
-        path.AddArc(x, y + h - r * 2, r * 2, r * 2, 90, 90);
-        path.CloseFigure();
+            using var path = new System.Drawing.Drawing2D.GraphicsPath();
+            path.AddArc(x, y, r * 2, r * 2, 180, 90);
+            path.AddArc(x + w - r * 2, y, r * 2, r * 2, 270, 90);
+            path.AddArc(x + w - r * 2, y + h - r * 2, r * 2, r * 2, 0, 90);
+            path.AddArc(x, y + h - r * 2, r * 2, r * 2, 90, 90);
+            path.CloseFigure();
 
-        g.DrawPath(pen, path);
+            g.DrawPath(pen, path);
+        }
 
         g.DrawImage(imgToResize, new Rectangle(leftOffset, topOffset, renderedWidth, renderedHeight), sourceRect, GraphicsUnit.Pixel);
 
@@ -209,7 +212,7 @@ public class FileToIconConverter
 
     private static BitmapSource AddToDictionary(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.Regular)
     {
-        if (size is IconSize.Jumbo or IconSize.Thumbnail)
+        if (size > IconSize.ExtraLarge && specialType is not AbstractFile.SpecialFileType.LinkOverlay)
         {
             var iconId = ComputeIconId(fileName, specialType);
             var canonicalKey = new IconCacheKey(iconId, size, 0);
@@ -236,7 +239,7 @@ public class FileToIconConverter
             bool wasUnmodified = bitmap.Width != desiredSize || bitmap.Height != desiredSize;
             var storeKey = wasUnmodified ? canonicalKey : sizedKey;
             BitmapSource value = LoadBitmap(bitmap);
-
+            
             lock (iconDic)
                 iconDic.TryAdd(storeKey, value);
 

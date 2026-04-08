@@ -107,6 +107,7 @@ public partial class ExplorerPageHeader : UserControl
     }
 
     private readonly DispatcherTimer SelectionTimer = new() { Interval = SELECTION_CHANGED_DELAY };
+    private bool _isSyncingSelection = false;
 
     public ExplorerPageHeader()
     {
@@ -295,8 +296,8 @@ public partial class ExplorerPageHeader : UserControl
 
     private void ApplySelectionEffects()
     {
-        SelectedFiles = FileActions.IsAppDrive ? [] : ActiveSelectedItems.OfType<FileClass>();
-        SelectedPackages = FileActions.IsAppDrive ? ActiveSelectedItems.OfType<Package>() : [];
+        SelectedFiles = FileActions.IsAppDrive ? [] : (DirList?.FileList?.Where(f => f.IsSelected) ?? []);
+        SelectedPackages = FileActions.IsAppDrive ? ExplorerGrid.Items.OfType<Package>().Where(p => p.IsSelected) : [];
         FileActions.SelectedItemsCount = FileActions.IsAppDrive ? SelectedPackages.Count() : SelectedFiles.Count();
 
         ViewModel.NotifySelectedFilesTotalSize();
@@ -1276,6 +1277,9 @@ public partial class ExplorerPageHeader : UserControl
 
     private void ExplorerGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        if (_isSyncingSelection)
+            return;
+
         if (ActiveSelectedItems.Count > 0 && !RuntimeSettings.IsExplorerLoaded)
         {
             ActiveUnselectAll();
@@ -1299,6 +1303,8 @@ public partial class ExplorerPageHeader : UserControl
             }
         }
 
+        SyncSelectionToOtherView(sender, e);
+
         bool isOngoingMultiSelection = SelectionRect.IsActive
                 || Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
 
@@ -1310,6 +1316,50 @@ public partial class ExplorerPageHeader : UserControl
         else if (!SelectionTimer.IsEnabled)
         {
             SelectionTimer.Start();
+        }
+    }
+
+    private void SyncSelectionToOtherView(object sender, SelectionChangedEventArgs e)
+    {
+        if (FileActions.IsAppDrive)
+            return;
+
+        _isSyncingSelection = true;
+        try
+        {
+            var sourceItems = (sender == ExplorerGrid
+                ? ExplorerGrid.SelectedItems
+                : IconView.SelectedItems).Cast<object>().ToList();
+
+            System.Collections.IList targetItems = sender == ExplorerGrid
+                ? IconView.SelectedItems
+                : ExplorerGrid.SelectedItems;
+
+            var toRemove = targetItems.Cast<object>()
+                .Where(item => !sourceItems.Contains(item))
+                .ToList();
+            foreach (var item in toRemove)
+                targetItems.Remove(item);
+
+            foreach (var item in sourceItems)
+            {
+                if (!targetItems.Contains(item))
+                    targetItems.Add(item);
+            }
+
+            // Fix IsSelected on underlying data items for virtualized containers
+            // that had no container when UnselectAll() was called, and were therefore
+            // skipped by the TwoWay binding propagation.
+            var sourceSet = new HashSet<object>(sourceItems);
+            foreach (var item in ExplorerGrid.Items)
+            {
+                if (item is FilePath fp && fp.IsSelected != sourceSet.Contains(item))
+                    fp.IsSelected = !fp.IsSelected;
+            }
+        }
+        finally
+        {
+            _isSyncingSelection = false;
         }
     }
 
@@ -1571,7 +1621,7 @@ public partial class ExplorerPageHeader : UserControl
 
     private void InitThumbsSizeUI()
     {
-        var size = Data.Settings.ThumbsSize;
+        var size = Settings.ThumbsSize;
         UpdateThumbsSizeIcon(size);
         UpdateThumbsSizeRadio(size);
     }
@@ -1584,7 +1634,7 @@ public partial class ExplorerPageHeader : UserControl
 
     private void OnThumbsSizeChanged()
     {
-        var size = Data.Settings.ThumbsSize;
+        var size = Settings.ThumbsSize;
 
         UpdateThumbsSizeIcon(size);
         UpdateThumbsSizeRadio(size);
@@ -1592,16 +1642,16 @@ public partial class ExplorerPageHeader : UserControl
         if (size != ThumbnailService.ThumbnailSize.Disabled)
             InvalidateFileIcons();
 
-        //App.SafeBeginInvoke(() =>
-        //{
-        //    if (ActiveSelectedItems.Count > 0)
-        //        ActiveScrollIntoView(ActiveSelectedItems[0]);
-        //    else
-        //    {
-        //        var viewer = StyleHelper.FindDescendant<ScrollViewer>(ActiveView);
-        //        viewer?.ScrollToTop();
-        //    }
-        //}, DispatcherPriority.Loaded);
+        App.SafeBeginInvoke(() =>
+        {
+            if (ActiveSelectedItems.Count > 0)
+                ActiveScrollIntoView(ActiveSelectedItems[0]);
+            else
+            {
+                var viewer = StyleHelper.FindDescendant<ScrollViewer>(ActiveView);
+                viewer?.ScrollToTop();
+            }
+        }, DispatcherPriority.Loaded);
     }
 
     private void UpdateThumbsSizeIcon(ThumbnailService.ThumbnailSize size)

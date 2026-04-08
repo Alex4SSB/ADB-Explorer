@@ -13,7 +13,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     #region Notify Properties
 
     [ObservableProperty]
-    private long? _size;
+    public partial long? Size { get; set; }
 
     partial void OnSizeChanged(long? value)
     {
@@ -33,7 +33,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     }
 
     [ObservableProperty]
-    private string _linkTarget = "";
+    public partial string LinkTarget { get; set; } = "";
 
     private bool _isIconPlaceholder;
     public bool IsIconPlaceholder
@@ -82,7 +82,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     }
 
     [ObservableProperty]
-    private BitmapSource? _iconOverlay = null;
+    public partial BitmapSource? IconOverlay { get; set; } = null;
 
     public BitmapSource DragImage
     {

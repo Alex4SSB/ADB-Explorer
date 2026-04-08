@@ -42,31 +42,31 @@ public partial class AppSettings : ObservableObject
     }
 
     [ObservableProperty]
-    private ThumbnailAge thumbsAge = ThumbnailAge.OneMonth;
+    public partial ThumbnailAge ThumbsAge { get; set; } = ThumbnailAge.OneMonth;
 
     [ObservableProperty]
-    private ThumbnailMode thumbsMode = ThumbnailMode.Off;
+    public partial ThumbnailMode ThumbsMode { get; set; } = ThumbnailMode.Off;
 
     [ObservableProperty]
-    private bool movieThumbsEnabled = false;
+    public partial bool MovieThumbsEnabled { get; set; } = false;
 
     [ObservableProperty]
-    private bool persistThumbs = true;
+    public partial bool PersistThumbs { get; set; } = true;
 
     [ObservableProperty]
-    private bool limitThumbsPullSpeed = true;
+    public partial bool LimitThumbsPullSpeed { get; set; } = true;
 
     [ObservableProperty]
-    private ThumbnailService.ThumbnailSize thumbsSize = ThumbnailService.ThumbnailSize.Disabled;
+    public partial ThumbnailService.ThumbnailSize ThumbsSize { get; set; } = ThumbnailService.ThumbnailSize.Disabled;
 
     [ObservableProperty]
-    private bool specialFolderIcons = true;
+    public partial bool SpecialFolderIcons { get; set; } = true;
 
     [ObservableProperty]
-    private bool enableBusyBox = false;
+    public partial bool EnableBusyBox { get; set; } = false;
 
     [ObservableProperty]
-    private bool enableWsa = false;
+    public partial bool EnableWsa { get; set; } = false;
 
     #region paths
 
@@ -88,62 +88,62 @@ public partial class AppSettings : ObservableObject
     public bool IsPullOnDoubleClickEnabled => !string.IsNullOrEmpty(DefaultFolder);
 
     [ObservableProperty]
-    private string manualAdbPath = "";
+    public partial string ManualAdbPath { get; set; } = "";
 
     #endregion
 
     #region File Behavior
 
     [ObservableProperty]
-    private bool showExtensions = true;
+    public partial bool ShowExtensions { get; set; } = true;
 
     [ObservableProperty]
-    private bool showSystemPackages = true;
+    public partial bool ShowSystemPackages { get; set; } = true;
 
     [ObservableProperty]
-    private bool showHiddenItems = true;
+    public partial bool ShowHiddenItems { get; set; } = true;
 
     #endregion
 
     #region Double Click
 
     [ObservableProperty]
-    private DoubleClickAction doubleClick = DoubleClickAction.None;
+    public partial DoubleClickAction DoubleClick { get; set; } = DoubleClickAction.None;
 
     #endregion
 
     #region device
 
     [ObservableProperty]
-    private bool saveDevices = true;
+    public partial bool SaveDevices { get; set; } = true;
 
     /// <summary>
     /// Automatically Open Device For Browsing
     /// </summary>
     [ObservableProperty]
-    private bool autoOpen = false;
+    public partial bool AutoOpen { get; set; } = false;
 
     /// <summary>
     /// Automatically Try To Open Devices Using Root Privileges
     /// </summary>
     [ObservableProperty]
-    private bool autoRoot = false;
+    public partial bool AutoRoot { get; set; } = false;
 
     #endregion
 
     #region Drives & Features
 
     [ObservableProperty]
-    private bool pollDrives = true;
+    public partial bool PollDrives { get; set; } = true;
 
     /// <summary>
     /// Enable moving deleted items to a special folder, instead of permanently deleting them
     /// </summary>
     [ObservableProperty]
-    private bool enableRecycle = false;
+    public partial bool EnableRecycle { get; set; } = false;
 
     [ObservableProperty]
-    private bool enableApk = false;
+    public partial bool EnableApk { get; set; } = false;
 
     #endregion
 
@@ -153,44 +153,44 @@ public partial class AppSettings : ObservableObject
     /// Runs ADB server with mDNS enabled, polling for services is enabled in the connection expander
     /// </summary>
     [ObservableProperty]
-    private bool enableMdns = true;
+    public partial bool EnableMdns { get; set; } = true;
 
     /// <summary>
     /// <see langword="false"/> - disables polling for both ADB devices and mDNS services. Enables manual refresh button
     /// </summary>
-    [ObservableProperty] 
-    private bool pollDevices = true;
+    [ObservableProperty]
+    public partial bool PollDevices { get; set; } = true;
 
     /// <summary>
     /// Enables battery information for all devices (polling and displaying)
     /// </summary>
-    [ObservableProperty] 
-    private bool pollBattery = true;
+    [ObservableProperty]
+    public partial bool PollBattery { get; set; } = true;
 
     /// <summary>
     /// <see langword="false"/> - disables logging of commands and command log button
     /// </summary>
-    [ObservableProperty] 
-    private bool enableLog = false;
+    [ObservableProperty]
+    public partial bool EnableLog { get; set; } = false;
 
     #endregion
 
     #region File Ops
 
-    [ObservableProperty] 
-    private bool enableCompactView = false;
+    [ObservableProperty]
+    public partial bool EnableCompactView { get; set; } = false;
 
     [ObservableProperty]
-    private bool stopPollingOnSync = false;
+    public partial bool StopPollingOnSync { get; set; } = false;
 
     [ObservableProperty]
-    private bool allowMultiOp = true;
+    public partial bool AllowMultiOp { get; set; } = true;
 
     [ObservableProperty]
-    private bool rescanOnPush = true;
+    public partial bool RescanOnPush { get; set; } = true;
 
     [ObservableProperty]
-    private bool keepDateModified = true;
+    public partial bool KeepDateModified { get; set; } = true;
 
     #endregion
 
@@ -200,7 +200,7 @@ public partial class AppSettings : ObservableObject
     /// GET releases on GitHub repo on each launch
     /// </summary>
     [ObservableProperty]
-    private bool checkForUpdates = true;
+    public partial bool CheckForUpdates { get; set; } = true;
 
     #endregion
 
@@ -210,11 +210,11 @@ public partial class AppSettings : ObservableObject
     /// Disables HW acceleration
     /// </summary>
     [ObservableProperty]
-    private bool swRender = false;
+    public partial bool SwRender { get; set; } = false;
 
-    [JsonIgnore]
+    [field: JsonIgnore]
     [ObservableProperty]
-    private bool isAnimated = true;
+    public partial bool IsAnimated { get; set; } = true;
 
     //private bool disableAnimation = false;
     /// <summary>
@@ -235,21 +235,19 @@ public partial class AppSettings : ObservableObject
     }
 
     [ObservableProperty]
-    private bool enableSplash = true;
+    public partial bool EnableSplash { get; set; } = true;
 
     #endregion
 
     [ObservableProperty]
-    private AppTheme theme = AppTheme.WindowsDefault;
+    public partial AppTheme Theme { get; set; } = AppTheme.WindowsDefault;
 
     [ObservableProperty]
-    private bool hidePasteNamingInfo = false;
-
+    public partial bool HidePasteNamingInfo { get; set; } = false;
     public string LastVersion { get; set; } = "0.0.0";
 
     [ObservableProperty]
-    private bool showLaunchWsaMessage = true;
-
+    public partial bool ShowLaunchWsaMessage { get; set; } = true;
     public long EditorMaxFileSize { get; set; } = 300_000;
 
     public bool? UnrootOnDisconnect { get; set; } = null;
@@ -302,7 +300,7 @@ public partial class AppSettings : ObservableObject
     public ObservableProperty<string> CultureTranslationProgress { get; private set; } = new() { Value = null };
 
     [ObservableProperty]
-    private string uILanguage = "";
+    public partial string UILanguage { get; set; } = "";
 
     [JsonIgnore]
     private CultureInfo? originalCulture = null;
@@ -325,8 +323,8 @@ public partial class AppSettings : ObservableObject
     }
 
     [ObservableProperty]
-    private bool showLanguageNotification = true;
+    public partial bool ShowLanguageNotification { get; set; } = true;
 
     [ObservableProperty]
-    private bool homeLocationsExpanded = false;
+    public partial bool HomeLocationsExpanded { get; set; } = false;
 }

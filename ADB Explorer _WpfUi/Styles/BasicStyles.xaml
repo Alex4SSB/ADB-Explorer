@@ -706,8 +706,8 @@
                                 <ProgressBar
                                     x:Name="SnackProgressBar"
                                     VerticalAlignment="Bottom"
-                                    Maximum="{TemplateBinding ProgressMaximum}"
                                     Foreground="{TemplateBinding ProgressForeground}"
+                                    Maximum="{TemplateBinding ProgressMaximum}"
                                     Value="{TemplateBinding ProgressValue}" />
                                 <Border
                                     BorderBrush="{DynamicResource ToolTipBackground}"
