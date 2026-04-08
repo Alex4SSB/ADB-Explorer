@@ -9,19 +9,24 @@ public partial class FileIconViewModel : FileViewModelBase
     private CancellationTokenSource? _cts;
     private Action<string, string>? _thumbnailUpdatedHandler;
 
-    private bool _isLoaded;
+    private BitmapSource? _cachedThumbnail;
+    private ThumbnailService.ThumbnailSize _cachedSize;
+    private ThumbnailService.ThumbnailSize _currentlyLoadingSize;
 
-    private BitmapSource? _largeIcon;
+    private BitmapSource LargeFileIcon => FileToIconConverter.GetImage(_file, (int)Data.Settings.ThumbsSize).First();
     public BitmapSource? LargeIcon
     {
         get
         {
-            if (!_isLoaded)
-                BeginLoadThumbnail();
+            var size = Data.Settings.ThumbsSize;
+            if (_cachedThumbnail is not null && _cachedSize >= size)
+                return _cachedThumbnail;
 
-            return _largeIcon;
+            if (_currentlyLoadingSize < size)
+                BeginLoadThumbnail(size);
+
+            return _cachedThumbnail ?? LargeFileIcon;
         }
-        private set => SetProperty(ref _largeIcon, value);
     }
 
     [ObservableProperty]
@@ -35,13 +40,7 @@ public partial class FileIconViewModel : FileViewModelBase
 
     public FileIconViewModel(FileClass file) : base(file)
     {
-        _largeIcon = GetLargeFileIcon();
         UpdateOverlays();
-    }
-
-    private BitmapSource GetLargeFileIcon()
-    {
-        return FileToIconConverter.GetImage(_file, 120).First();
     }
 
     private void UpdateOverlays()
@@ -54,17 +53,16 @@ public partial class FileIconViewModel : FileViewModelBase
         }
     }
 
-    private void BeginLoadThumbnail()
+    private void BeginLoadThumbnail(ThumbnailService.ThumbnailSize size)
     {
-        _isLoaded = true;
+        CancelLoading();
+        _currentlyLoadingSize = size;
 
         if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.Off
             || Data.DevicesObject.Current is null)
             return;
 
         var logicalDeviceId = Data.DevicesObject.Current.LogicalID;
-
-        _cts?.Cancel();
         _cts = new CancellationTokenSource();
         var token = _cts.Token;
 
@@ -79,7 +77,7 @@ public partial class FileIconViewModel : FileViewModelBase
             if (token.IsCancellationRequested)
                 return;
 
-            var thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file.FullPath);
+            var thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file.FullPath, size);
 
             if (token.IsCancellationRequested)
                 return;
@@ -91,15 +89,18 @@ public partial class FileIconViewModel : FileViewModelBase
 
                 if (thumbnail is ThumbnailService.Thumbnail thumb)
                 {
-                    LargeIcon = thumb.Image;
+                    _cachedThumbnail = thumb.Image;
+                    _cachedSize = size;
+                    OnPropertyChanged(nameof(LargeIcon));
                     UpdateVideoOverlay(thumb);
                     UpdateTooltip(thumb);
                 }
                 else
                 {
+                    _currentlyLoadingSize = _cachedSize;
                     UpdateTooltipNoThumbnail();
                 }
-            });
+            }, DispatcherPriority.Background);
         }, token);
 
         _thumbnailUpdatedHandler = (updatedDeviceId, updatedFilePath) =>
@@ -112,7 +113,7 @@ public partial class FileIconViewModel : FileViewModelBase
                 if (token.IsCancellationRequested)
                     return;
 
-                var thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file.FullPath);
+                var thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file.FullPath, size);
                 if (thumbnail is not ThumbnailService.Thumbnail thumb)
                     return;
 
@@ -121,10 +122,12 @@ public partial class FileIconViewModel : FileViewModelBase
                     if (token.IsCancellationRequested)
                         return;
 
-                    LargeIcon = thumb.Image;
+                    _cachedThumbnail = thumb.Image;
+                    _cachedSize = size;
+                    OnPropertyChanged(nameof(LargeIcon));
                     UpdateVideoOverlay(thumb);
                     UpdateTooltip(thumb);
-                });
+                }, DispatcherPriority.Background);
             }, token);
         };
 
@@ -155,7 +158,7 @@ public partial class FileIconViewModel : FileViewModelBase
         else if (thumb.Info.Type is ThumbnailService.MediaType.images)
         {
             if (thumb.Info.Resolution is Size res)
-                result.Add($"{Strings.Resources.S_PICTURE_DIMENSIONS}: {$"{res.Width} Ã— {res.Height}"}");
+                result.Add($"{Strings.Resources.S_PICTURE_DIMENSIONS}: {$"{res.Width} \u00D7 {res.Height}"}");
 
             result.Add($"{Strings.Resources.S_COLUMN_SIZE}: {SizeString}");
         }
@@ -208,6 +211,12 @@ public partial class FileIconViewModel : FileViewModelBase
             : $"{Strings.Resources.S_COLUMN_TYPE}: {TypeName}";
     }
 
+    public void InvalidateThumbnail()
+    {
+        _currentlyLoadingSize = _cachedSize;
+        OnPropertyChanged(nameof(LargeIcon));
+    }
+
     public void CancelLoading()
     {
         if (_thumbnailUpdatedHandler is not null)
@@ -219,13 +228,15 @@ public partial class FileIconViewModel : FileViewModelBase
         _cts?.Cancel();
         _cts?.Dispose();
         _cts = null;
+
+        _currentlyLoadingSize = _cachedSize;
     }
 
     public override void Dispose()
     {
         CancelLoading();
 
-        LargeIcon = null;
+        _cachedThumbnail = null;
         LargeIconOverlay = null;
         VideoIconOverlay = null;
         IconViewTooltip = null;

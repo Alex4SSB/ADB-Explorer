@@ -48,10 +48,15 @@ public partial class ExplorerPageHeader : UserControl
 
     private void ActiveUnselectAll()
     {
-        if (ViewModel.IsIconView)
-            IconView.UnselectAll();
-        else
-            ExplorerGrid.UnselectAll();
+        try
+        {
+            if (ViewModel.IsIconView)
+                IconView.UnselectAll();
+            else
+                ExplorerGrid.UnselectAll();
+        }
+        catch
+        { }
     }
 
     private void ActiveSelectAll()
@@ -109,8 +114,11 @@ public partial class ExplorerPageHeader : UserControl
         Thread.CurrentThread.CurrentUICulture = Settings.UICulture;
 
         RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
+        Data.Settings.PropertyChanged += Settings_PropertyChanged;
 
         InitializeComponent();
+
+        InitThumbsSizeUI();
 
         KeyDown += new KeyEventHandler(OnButtonKeyDown);
         PreviewTextInput += new TextCompositionEventHandler(MainWindow_PreviewTextInput);
@@ -622,6 +630,15 @@ public partial class ExplorerPageHeader : UserControl
         RuntimeSettings.ExplorerSource = DirList.FileList;
         FileActionLogic.UpdateFileActions();
         return true;
+    }
+
+    private static void InvalidateFileIcons()
+    {
+        if (DirList?.FileList is not { } files)
+            return;
+
+        foreach (var file in files)
+            file.InvalidateIconViewModelThumbnail();
     }
 
     private static void DisposeFileIcons()
@@ -1552,18 +1569,75 @@ public partial class ExplorerPageHeader : UserControl
         SelectionRect.Update(point, MouseDownPoint, IconView.ScrollViewer, ActiveView, ActiveSelectedItems, ViewModel);
     }
 
-    private void IconViewToggle_Toggled(object sender, RoutedEventArgs e)
+    private void InitThumbsSizeUI()
     {
-        App.SafeBeginInvoke(() =>
+        var size = Data.Settings.ThumbsSize;
+        UpdateThumbsSizeIcon(size);
+        UpdateThumbsSizeRadio(size);
+    }
+
+    private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(AppSettings.ThumbsSize))
+            OnThumbsSizeChanged();
+    }
+
+    private void OnThumbsSizeChanged()
+    {
+        var size = Data.Settings.ThumbsSize;
+
+        UpdateThumbsSizeIcon(size);
+        UpdateThumbsSizeRadio(size);
+
+        if (size != ThumbnailService.ThumbnailSize.Disabled)
+            InvalidateFileIcons();
+
+        //App.SafeBeginInvoke(() =>
+        //{
+        //    if (ActiveSelectedItems.Count > 0)
+        //        ActiveScrollIntoView(ActiveSelectedItems[0]);
+        //    else
+        //    {
+        //        var viewer = StyleHelper.FindDescendant<ScrollViewer>(ActiveView);
+        //        viewer?.ScrollToTop();
+        //    }
+        //}, DispatcherPriority.Loaded);
+    }
+
+    private void UpdateThumbsSizeIcon(ThumbnailService.ThumbnailSize size)
+    {
+        ThumbsSizeIcon.Glyph = size switch
         {
-            if (ActiveSelectedItems.Count > 0)
-                ActiveScrollIntoView(ActiveSelectedItems[0]);
-            else
-            {
-                var viewer = StyleHelper.FindDescendant<ScrollViewer>(ActiveView);
-                viewer?.ScrollToTop();
-            }
-        }, DispatcherPriority.Loaded);
+            ThumbnailService.ThumbnailSize.Medium => "\uE14C",
+            ThumbnailService.ThumbnailSize.Large => "\uF0E2",
+            ThumbnailService.ThumbnailSize.ExtraLarge => "\uE8A9",
+            _ => "\uE8FD",
+        };
+    }
+
+    private void UpdateThumbsSizeRadio(ThumbnailService.ThumbnailSize size)
+    {
+        SetMenuItemChecked(ThumbsDisabledItem, size == ThumbnailService.ThumbnailSize.Disabled);
+        SetMenuItemChecked(ThumbsMediumItem, size == ThumbnailService.ThumbnailSize.Medium);
+        SetMenuItemChecked(ThumbsLargeItem, size == ThumbnailService.ThumbnailSize.Large);
+        SetMenuItemChecked(ThumbsExtraLargeItem, size == ThumbnailService.ThumbnailSize.ExtraLarge);
+    }
+
+    private static void SetMenuItemChecked(MenuItem item, bool isChecked)
+    {
+        item.IsChecked = isChecked;
+        if (item.Icon is UIElement icon)
+            icon.Visibility = isChecked ? Visibility.Visible : Visibility.Hidden;
+    }
+
+    private void ThumbsSize_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is MenuItem item
+            && item.Tag is string tagStr
+            && Enum.TryParse<ThumbnailService.ThumbnailSize>(tagStr, out var size))
+        {
+            Data.Settings.ThumbsSize = size;
+        }
     }
 
     private void EmptyNonRootTextBlock_Loaded(object sender, RoutedEventArgs e) => TextHelper.BuildLocalizedInlines(sender, e);

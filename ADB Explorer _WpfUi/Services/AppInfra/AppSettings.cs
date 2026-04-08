@@ -57,6 +57,9 @@ public partial class AppSettings : ObservableObject
     private bool limitThumbsPullSpeed = true;
 
     [ObservableProperty]
+    private ThumbnailService.ThumbnailSize thumbsSize = ThumbnailService.ThumbnailSize.Disabled;
+
+    [ObservableProperty]
     private bool specialFolderIcons = true;
 
     [ObservableProperty]

@@ -2,6 +2,7 @@
     x:Class="ADB_Explorer.Views.FileIconView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
     xmlns:local="clr-namespace:ADB_Explorer.Views"
@@ -12,6 +13,7 @@
     d:DataContext="{d:DesignInstance Type=models:FileClass}"
     mc:Ignorable="d">
     <UserControl.Resources>
+        <converters:ThumbnailSizeConverter x:Key="ThumbnailSizeConverter" />
         <ToolTip x:Key="IconViewTooltip">
             <ToolTip.Style>
                 <Style BasedOn="{StaticResource FluentTooltipStyle}" TargetType="ToolTip">
@@ -27,111 +29,127 @@
             </ToolTip.Style>
             <TextBlock Text="{Binding IconViewModel.IconViewTooltip}" TextWrapping="Wrap" />
         </ToolTip>
-        <DataTemplate x:Key="IconViewEditTemplate">
-            <ui:TextBox
-                Width="140"
-                FlowDirection="{Binding NameFlowDirection}"
-                KeyDown="IconViewNameEdit_KeyDown"
-                Loaded="IconViewNameEdit_Loaded"
-                LostFocus="IconViewNameEdit_LostFocus"
-                MaxLines="3"
-                Style="{StaticResource FileNameEditingElementStyle}"
-                TextChanged="IconViewNameEdit_TextChanged"
-                TextWrapping="Wrap" />
-        </DataTemplate>
-        <DataTemplate x:Key="IconViewEmptyTemplate" />
-    </UserControl.Resources>
-    <Grid
-        Width="140"
-        Height="140"
-        Margin="4"
-        SnapsToDevicePixels="False">
-        <Grid ToolTip="{StaticResource IconViewTooltip}">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid HorizontalAlignment="Center" FlowDirection="LeftToRight">
-                <Grid.Style>
-                    <Style TargetType="Grid">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding CutState}" Value="Move">
-                                <Setter Property="Opacity" Value="0.5" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
-                <Image
-                    MaxWidth="140"
-                    MaxHeight="120"
-                    HorizontalAlignment="Center"
-                    d:Height="120"
-                    d:Width="120"
-                    Source="{Binding IconViewModel.LargeIcon}" />
-                <Grid
-                    MaxWidth="120"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Bottom">
-                    <Image
-                        Width="32"
-                        Height="32"
-                        Margin="0,0,-13,-2"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Bottom"
-                        Source="{Binding IconViewModel.VideoIconOverlay}" />
-                    <Image
-                        Width="64"
-                        Height="64"
-                        Margin="0,0,0,14"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Bottom"
-                        Source="{Binding IconViewModel.LargeIconOverlay}" />
-                </Grid>
-            </Grid>
-            <Grid
-                Grid.Row="1"
-                Margin="0,4,0,0"
-                HorizontalAlignment="Center">
-                <ContentControl Content="{Binding}">
-                    <ContentControl.Style>
-                        <Style TargetType="ContentControl">
-                            <Setter Property="ContentTemplate" Value="{StaticResource IconViewEmptyTemplate}" />
+        <DataTemplate x:Key="IconViewPlaceholderTemplate" />
+        <DataTemplate x:Key="IconViewRealTemplate">
+            <Grid ToolTip="{StaticResource IconViewTooltip}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=ImageMaxHeight}" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid HorizontalAlignment="Center" FlowDirection="LeftToRight">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IconViewModel.IsInEditMode}" Value="True">
-                                    <Setter Property="ContentTemplate" Value="{StaticResource IconViewEditTemplate}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ContentControl.Style>
-                </ContentControl>
-                <emoji:TextBlock
-                    MaxHeight="60"
-                    FlowDirection="{Binding NameFlowDirection}"
-                    PreviewMouseDown="IconViewNameTextBlock_PreviewMouseDown"
-                    PreviewMouseUp="IconViewNameTextBlock_PreviewMouseUp"
-                    Text="{Binding DisplayName}"
-                    TextAlignment="Center"
-                    TextTrimming="CharacterEllipsis"
-                    TextWrapping="Wrap"
-                    ToolTip="{x:Null}">
-                    <emoji:TextBlock.Style>
-                        <Style TargetType="emoji:TextBlock">
-                            <Setter Property="Opacity" Value="1" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IconViewModel.IsInEditMode}" Value="True">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
                                 <DataTrigger Binding="{Binding CutState}" Value="Move">
                                     <Setter Property="Opacity" Value="0.5" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding CutState}" Value="Copy">
-                                    <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
-                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </emoji:TextBlock.Style>
-                </emoji:TextBlock>
+                    </Grid.Style>
+                    <Image
+                        MaxWidth="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=ImageMaxWidth}"
+                        MaxHeight="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=ImageMaxHeight}"
+                        HorizontalAlignment="Center"
+                        d:Height="120"
+                        d:Width="120"
+                        Source="{Binding IconViewModel.LargeIcon}" />
+                    <Grid
+                        MaxWidth="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=OverlayMaxWidth}"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Bottom">
+                        <Image
+                            Width="32"
+                            Height="32"
+                            Margin="0,0,-13,-2"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Source="{Binding IconViewModel.VideoIconOverlay}" />
+                        <Image
+                            Width="64"
+                            Height="64"
+                            Margin="0,0,0,14"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Bottom"
+                            Source="{Binding IconViewModel.LargeIconOverlay}" />
+                    </Grid>
+                </Grid>
+                <Grid
+                    x:Name="LabelGrid"
+                    Grid.Row="1"
+                    MinWidth="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=EditWidth}"
+                    Margin="0,4,0,0"
+                    HorizontalAlignment="Center">
+                    <Popup
+                        AllowsTransparency="True"
+                        IsOpen="{Binding IconViewModel.IsInEditMode}"
+                        Placement="Relative"
+                        PlacementTarget="{Binding ElementName=LabelGrid}"
+                        StaysOpen="False">
+                        <Popup.Resources>
+                            <converters:ThumbnailSizeConverter x:Key="ThumbnailSizeConverter" />
+                        </Popup.Resources>
+                        <Border Background="{DynamicResource CardStrokeColorDefaultSolidBrush}" CornerRadius="4">
+                            <ui:TextBox
+                                Width="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=EditWidth}"
+                                Padding="1"
+                                ClearButtonEnabled="False"
+                                FlowDirection="{Binding NameFlowDirection}"
+                                FontSize="14"
+                                KeyDown="IconViewNameEdit_KeyDown"
+                                Loaded="IconViewNameEdit_Loaded"
+                                LostFocus="IconViewNameEdit_LostFocus"
+                                Style="{StaticResource FileNameEditingElementStyle}"
+                                TextChanged="IconViewNameEdit_TextChanged"
+                                TextWrapping="Wrap" />
+                        </Border>
+                    </Popup>
+                    <emoji:TextBlock
+                        MaxHeight="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=LabelMaxHeight}"
+                        FlowDirection="{Binding NameFlowDirection}"
+                        PreviewMouseDown="IconViewNameTextBlock_PreviewMouseDown"
+                        PreviewMouseUp="IconViewNameTextBlock_PreviewMouseUp"
+                        Text="{Binding DisplayName}"
+                        TextAlignment="Center"
+                        TextTrimming="CharacterEllipsis"
+                        TextWrapping="Wrap"
+                        ToolTip="{x:Null}">
+                        <emoji:TextBlock.Style>
+                            <Style TargetType="emoji:TextBlock">
+                                <Setter Property="Opacity" Value="1" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IconViewModel.IsInEditMode}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding CutState}" Value="Move">
+                                        <Setter Property="Opacity" Value="0.5" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding CutState}" Value="Copy">
+                                        <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </emoji:TextBlock.Style>
+                    </emoji:TextBlock>
+                </Grid>
             </Grid>
-        </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid
+        Width="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=ContainerWidth}"
+        Height="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=ContainerHeight}"
+        Margin="4"
+        SnapsToDevicePixels="False">
+        <ContentControl Content="{Binding}">
+            <ContentControl.Style>
+                <Style TargetType="ContentControl">
+                    <Setter Property="ContentTemplate" Value="{StaticResource IconViewRealTemplate}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsIconPlaceholder}" Value="True">
+                            <Setter Property="ContentTemplate" Value="{StaticResource IconViewPlaceholderTemplate}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
     </Grid>
 </UserControl>

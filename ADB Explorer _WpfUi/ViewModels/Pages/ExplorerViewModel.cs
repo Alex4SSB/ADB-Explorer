@@ -67,6 +67,8 @@ public partial class ExplorerViewModel : ObservableObject
 
     public ExplorerViewModel()
     {
+        _isIconView = Data.Settings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
+
         Data.FileActions.PropertyChanged += FileActions_PropertyChanged;
         Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
         Data.Settings.PropertyChanged += Settings_PropertyChanged;
@@ -76,6 +78,10 @@ public partial class ExplorerViewModel : ObservableObject
     {
         switch (e.PropertyName)
         {
+            case nameof(AppSettings.ThumbsSize):
+                IsIconView = Data.Settings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
+                break;
+
             case nameof(AppSettings.EnableApk):
             case nameof(AppSettings.EnableRecycle):
                 UpdateDriveView();

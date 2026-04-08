@@ -170,13 +170,76 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <local:AdbMenu x:Name="MainToolBar" Style="{StaticResource MainToolBarStyle}" />
-            <ui:ToggleSwitch
+            <ui:SplitButton
+                x:Name="ThumbsSizeButton"
                 Grid.Column="1"
-                Checked="IconViewToggle_Toggled"
-                IsChecked="{Binding IsIconView, Mode=TwoWay}"
-                OffContent="Details View"
-                OnContent="Icons View"
-                Unchecked="IconViewToggle_Toggled" />
+                Padding="8,6"
+                VerticalAlignment="Center">
+                <ui:SplitButton.Resources>
+                    <ui:FontIcon
+                        x:Key="ThumbsMenuIcon"
+                        Margin="14,0"
+                        x:Shared="False"
+                        FontSize="6"
+                        Glyph="&#xF137;" />
+                </ui:SplitButton.Resources>
+                <ui:FontIcon
+                    x:Name="ThumbsSizeIcon"
+                    FontSize="16"
+                    Glyph="&#xE8FD;" />
+                <ui:SplitButton.Flyout>
+                    <ContextMenu x:Name="ThumbsSizeMenu">
+                        <MenuItem
+                            x:Name="ThumbsDisabledItem"
+                            Click="ThumbsSize_Click"
+                            Icon="{StaticResource ThumbsMenuIcon}"
+                            Tag="Disabled">
+                            <MenuItem.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:FontIcon FontSize="16" Glyph="&#xF2C7;" />
+                                    <TextBlock Margin="8,0,0,0" Text="Details View" />
+                                </StackPanel>
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem
+                            x:Name="ThumbsMediumItem"
+                            Click="ThumbsSize_Click"
+                            Icon="{StaticResource ThumbsMenuIcon}"
+                            Tag="Medium">
+                            <MenuItem.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:FontIcon FontSize="16" Glyph="&#xE138;" />
+                                    <TextBlock Margin="8,0,0,0" Text="Medium Icons" />
+                                </StackPanel>
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem
+                            x:Name="ThumbsLargeItem"
+                            Click="ThumbsSize_Click"
+                            Icon="{StaticResource ThumbsMenuIcon}"
+                            Tag="Large">
+                            <MenuItem.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <local:LargeThumbsIcon SubFontSize="8" />
+                                    <TextBlock Margin="8,0,0,0" Text="Large Icons" />
+                                </StackPanel>
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem
+                            x:Name="ThumbsExtraLargeItem"
+                            Click="ThumbsSize_Click"
+                            Icon="{StaticResource ThumbsMenuIcon}"
+                            Tag="ExtraLarge">
+                            <MenuItem.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:FontIcon FontSize="16" Glyph="&#xE15A;" />
+                                    <TextBlock Margin="8,0,0,0" Text="Extra Large Icons" />
+                                </StackPanel>
+                            </MenuItem.Header>
+                        </MenuItem>
+                    </ContextMenu>
+                </ui:SplitButton.Flyout>
+            </ui:SplitButton>
             <Border
                 Grid.Column="2"
                 Background="Transparent"
@@ -239,7 +302,7 @@
                     Style="{StaticResource IconViewStyle}">
                     <local:AdbListView.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <ui:VirtualizingWrapPanel
+                            <local:AdbVirtualizingWrapPanel
                                 Width="{Binding RelativeSource={RelativeSource AncestorType=local:AdbListView}, Path=ActualWidth}"
                                 CacheLength="2,2"
                                 CacheLengthUnit="Page"

@@ -1,5 +1,4 @@
 ﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
 
 namespace ADB_Explorer.Controls;
 
@@ -34,52 +33,34 @@ public class AdbListView : Wpf.Ui.Controls.ListView
         PreviewMouseWheel += GridListView_PreviewMouseWheel;
     }
 
-    private ScrollViewer? _scrollViewer;
     public ScrollViewer ScrollViewer
     {
         get
         {
-            _scrollViewer ??= StyleHelper.FindDescendant<ScrollViewer>(this);
-            return _scrollViewer;
+            field ??= StyleHelper.FindDescendant<ScrollViewer>(this);
+            return field;
         }
     }
 
-    private double _itemHeight = 0;
-    public double ItemHeight
+    public AdbVirtualizingWrapPanel WrapPanel
     {
         get
         {
-            // Update whenever possible
-            if (ItemContainerGenerator.ContainerFromIndex(0) is ListViewItem item && item.ActualHeight > 0)
-                _itemHeight = item.ActualHeight;
-
-            return _itemHeight;
+            field ??= StyleHelper.FindDescendant<AdbVirtualizingWrapPanel>(ScrollViewer);
+            return field;
         }
     }
 
-    private int _itemsPerRow = 1;
-    public int ItemsPerRow
-    {
-        get
-        {
-            // Update whenever possible
-            if (ItemContainerGenerator.ContainerFromIndex(0) is FrameworkElement item && item.ActualWidth > 0)
-            {
-                var itemWidth = item.ActualWidth + item.Margin.Left + item.Margin.Right;
-                _itemsPerRow = Math.Max(1, (int)(ActualWidth / itemWidth));
-            }
+    public int ItemsPerRow => WrapPanel.ItemsPerRowCount;
 
-            return _itemsPerRow;
-        }
-    }
+    public double ItemHeight => WrapPanel.ChildSize.Height;
+
+    public int ItemsInView => WrapPanel?.ItemsInView ?? 0;
 
     private void GridListView_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
-        var dpiOffset = Data.RuntimeSettings.MainWindowScalingFactor * -2 + 2;
-
-        double itemHeight = ItemHeight + 10 - dpiOffset;
-        var offset = ScrollViewer.VerticalOffset - Math.Sign(e.Delta) * itemHeight;
-        ScrollViewer.ScrollToVerticalOffset(Math.Floor(offset / itemHeight) * itemHeight);
+        var offset = ScrollViewer.VerticalOffset - Math.Sign(e.Delta) * ItemHeight;
+        ScrollViewer.ScrollToVerticalOffset(offset);
         e.Handled = true;
     }
 }

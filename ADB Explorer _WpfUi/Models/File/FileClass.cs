@@ -35,6 +35,13 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     [ObservableProperty]
     private string _linkTarget = "";
 
+    private bool _isIconPlaceholder;
+    public bool IsIconPlaceholder
+    {
+        get => _isIconPlaceholder;
+        set => Set(ref _isIconPlaceholder, value);
+    }
+
     private FileType type;
     public FileType Type
     {
@@ -106,7 +113,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
                 }
                 else
                 {
-                    _cacheThumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, FullPath);
+                    _cacheThumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, FullPath, ThumbnailService.ThumbnailSize.Drag, false);
                 }
             }
 
@@ -124,6 +131,8 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         _iconViewModel = null;
         _cacheThumbnail = null;
     }
+
+    public void InvalidateIconViewModelThumbnail() => _iconViewModel?.InvalidateThumbnail();
 
     private FolderViewModel? _folderViewModel;
     public FolderViewModel FolderViewModel

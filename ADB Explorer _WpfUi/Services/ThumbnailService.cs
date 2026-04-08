@@ -78,6 +78,15 @@ public static partial class ThumbnailService
         Pulling,
     }
 
+    public enum ThumbnailSize
+    {
+        Disabled = 0,
+        Medium = 48,
+        Large = 96,
+        Drag = 120,
+        ExtraLarge = 192,
+    }
+
     /// <summary>
     /// Raised when a thumbnail acquisition step starts or completes.
     /// The bool parameter is <see langword="true"/> when the step starts and <see langword="false"/> when it ends.
@@ -96,13 +105,6 @@ public static partial class ThumbnailService
     private static readonly Mutex _listMutex = new(false);
 
     private static readonly List<DeviceThumbnailInfo> _deviceInfoCache = [];
-
-    private const int THUMBNAIL_BASE_DIPS = 140;
-
-    private static int ThumbnailDecodeWidth => 
-        Data.RuntimeSettings.MainWindowScalingFactor > 0
-            ? (int)Math.Ceiling(THUMBNAIL_BASE_DIPS / Data.RuntimeSettings.MainWindowScalingFactor)
-            : THUMBNAIL_BASE_DIPS * 2;
 
     public record struct Thumbnail(BitmapSource Image, ThumbnailInfo Info);
 
@@ -184,7 +186,7 @@ public static partial class ThumbnailService
             && !string.IsNullOrEmpty(info.LocalThumbnailDir);
     }
 
-    public static Thumbnail? LoadThumbnail(LogicalDeviceViewModel device, string filePath)
+    public static Thumbnail? LoadThumbnail(LogicalDeviceViewModel device, string filePath, ThumbnailSize size, bool scaleWithDpi = true)
     {
         _mutex.WaitOne();
         _mutex.ReleaseMutex();
@@ -201,12 +203,16 @@ public static partial class ThumbnailService
             if (!File.Exists(fullPath))
                 return null;
 
+            var decodePixelWidth = Data.RuntimeSettings.MainWindowScalingFactor > 0
+                ? (int)Math.Ceiling((int)size / Data.RuntimeSettings.MainWindowScalingFactor)
+                : (int)size * 2;
+
             using var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
             var bitmapImage = new BitmapImage();
             bitmapImage.BeginInit();
             bitmapImage.StreamSource = stream;
             bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapImage.DecodePixelWidth = ThumbnailDecodeWidth;
+            bitmapImage.DecodePixelWidth = scaleWithDpi ? decodePixelWidth : (int)size;
             bitmapImage.EndInit();
             bitmapImage.Freeze();
             return new(bitmapImage, info);
