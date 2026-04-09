@@ -17,7 +17,13 @@
         FlowDirection="LeftToRight"
         Orientation="Horizontal"
         Spacing="0.5">
-        <ui:FontIcon FontSize="{Binding SubFontSize}" Glyph="&#xE71A;" />
-        <ui:FontIcon FontSize="{Binding SubFontSize}" Glyph="&#xE71A;" />
+        <ui:FontIcon
+            FontSize="{Binding SubFontSize}"
+            FontWeight="Bold"
+            Glyph="&#xE71A;" />
+        <ui:FontIcon
+            FontSize="{Binding SubFontSize}"
+            FontWeight="Bold"
+            Glyph="&#xE71A;" />
     </controls:SimpleStackPanel>
 </UserControl>

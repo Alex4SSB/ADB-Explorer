@@ -3844,6 +3844,60 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Details.
+        /// </summary>
+        public static string S_THUMBSIZE_DETAILS {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_DETAILS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Large Icons.
+        /// </summary>
+        public static string S_THUMBSIZE_LARGE {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_LARGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Medium Icons.
+        /// </summary>
+        public static string S_THUMBSIZE_MEDIUM {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_MEDIUM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View.
+        /// </summary>
+        public static string S_THUMBSIZE_TITLE {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Layout and view options.
+        /// </summary>
+        public static string S_THUMBSIZE_TOOLTIP {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extra Large Icons.
+        /// </summary>
+        public static string S_THUMBSIZE_XL {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_XL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Currently Browsing.
         /// </summary>
         public static string S_TOOLTIP_BROWSING {

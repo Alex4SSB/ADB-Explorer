@@ -1850,4 +1850,28 @@ Please help us localize the app to your language on Weblate.</value>
     <value>{0} Thumbnails</value>
     <comment>0 - device name. example: Pixel 9 Thumbnails</comment>
   </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value>Details</value>
+    <comment>Thumbnail size selector - disabled (details view)</comment>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value>View</value>
+    <comment>The title of the thumbnail size selector menu</comment>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>Medium Icons</value>
+    <comment>Thumbnail size selector - medium icons</comment>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>Large Icons</value>
+    <comment>Thumbnail size selector - large icons</comment>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>Extra Large Icons</value>
+    <comment>Thumbnail size selector - extra large icons</comment>
+  </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value>Layout and view options</value>
+    <comment>The tooltip of the thumbnail size selector. view = icon view / details view</comment>
+  </data>
 </root>

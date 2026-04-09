@@ -140,90 +140,34 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <local:AdbMenu x:Name="MainToolBar" Style="{StaticResource MainToolBarStyle}" />
-            <ui:SplitButton
-                x:Name="ThumbsSizeButton"
-                Grid.Column="1"
-                Padding="8,6"
-                VerticalAlignment="Center">
-                <ui:SplitButton.Resources>
-                    <ui:FontIcon
-                        x:Key="ThumbsMenuIcon"
-                        Margin="14,0"
-                        x:Shared="False"
-                        FontSize="6"
-                        Glyph="&#xF137;" />
-                </ui:SplitButton.Resources>
-                <ui:FontIcon
-                    x:Name="ThumbsSizeIcon"
-                    FontSize="16"
-                    Glyph="&#xE8FD;" />
-                <ui:SplitButton.Flyout>
-                    <ContextMenu x:Name="ThumbsSizeMenu">
-                        <MenuItem
-                            x:Name="ThumbsDisabledItem"
-                            Click="ThumbsSize_Click"
-                            Icon="{StaticResource ThumbsMenuIcon}"
-                            Tag="Disabled">
-                            <MenuItem.Header>
-                                <StackPanel Orientation="Horizontal">
-                                    <ui:FontIcon FontSize="16" Glyph="&#xF2C7;" />
-                                    <TextBlock Margin="8,0,0,0" Text="Details View" />
-                                </StackPanel>
-                            </MenuItem.Header>
-                        </MenuItem>
-                        <MenuItem
-                            x:Name="ThumbsMediumItem"
-                            Click="ThumbsSize_Click"
-                            Icon="{StaticResource ThumbsMenuIcon}"
-                            Tag="Medium">
-                            <MenuItem.Header>
-                                <StackPanel Orientation="Horizontal">
-                                    <ui:FontIcon FontSize="16" Glyph="&#xE138;" />
-                                    <TextBlock Margin="8,0,0,0" Text="Medium Icons" />
-                                </StackPanel>
-                            </MenuItem.Header>
-                        </MenuItem>
-                        <MenuItem
-                            x:Name="ThumbsLargeItem"
-                            Click="ThumbsSize_Click"
-                            Icon="{StaticResource ThumbsMenuIcon}"
-                            Tag="Large">
-                            <MenuItem.Header>
-                                <StackPanel Orientation="Horizontal">
-                                    <local:LargeThumbsIcon SubFontSize="8" />
-                                    <TextBlock Margin="8,0,0,0" Text="Large Icons" />
-                                </StackPanel>
-                            </MenuItem.Header>
-                        </MenuItem>
-                        <MenuItem
-                            x:Name="ThumbsExtraLargeItem"
-                            Click="ThumbsSize_Click"
-                            Icon="{StaticResource ThumbsMenuIcon}"
-                            Tag="ExtraLarge">
-                            <MenuItem.Header>
-                                <StackPanel Orientation="Horizontal">
-                                    <ui:FontIcon FontSize="16" Glyph="&#xE15A;" />
-                                    <TextBlock Margin="8,0,0,0" Text="Extra Large Icons" />
-                                </StackPanel>
-                            </MenuItem.Header>
-                        </MenuItem>
-                    </ContextMenu>
-                </ui:SplitButton.Flyout>
-            </ui:SplitButton>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <Separator Margin="0,2" />
+                <local:ThumbsSizeSelector />
+            </StackPanel>
             <Border
-                Grid.Column="2"
+                Grid.Column="3"
                 Background="Transparent"
                 MouseDown="Window_MouseDown" />
-            <StackPanel
+            <!--<StackPanel
                 Grid.Column="3"
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
-                <!--<local:AdbMenu Style="{StaticResource FileOpMenuStyle}" />
+            -->
+            <!--<local:AdbMenu Style="{StaticResource FileOpMenuStyle}" />
                 <local:AdbMenu Style="{StaticResource SettingsMenuStyle}" />-->
-            </StackPanel>
+            <!--
+            </StackPanel>-->
             <Separator Grid.ColumnSpan="3" VerticalAlignment="Bottom" />
         </Grid>
         <Border Grid.Row="2" MouseDown="GridBackgroundBlock_MouseDown">

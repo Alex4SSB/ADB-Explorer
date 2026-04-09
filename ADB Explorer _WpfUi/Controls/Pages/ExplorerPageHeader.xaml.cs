@@ -119,8 +119,6 @@ public partial class ExplorerPageHeader : UserControl
 
         InitializeComponent();
 
-        InitThumbsSizeUI();
-
         KeyDown += new KeyEventHandler(OnButtonKeyDown);
         PreviewTextInput += new TextCompositionEventHandler(MainWindow_PreviewTextInput);
 
@@ -1500,6 +1498,8 @@ public partial class ExplorerPageHeader : UserControl
 
     private void Window_MouseUp(object sender, MouseButtonEventArgs e)
     {
+        MouseDownPoint = NullPoint;
+
         if (FileActions.ListingInProgress && e.ChangedButton is MouseButton.XButton1 or MouseButton.XButton2)
         {
             e.Handled = true;
@@ -1619,13 +1619,6 @@ public partial class ExplorerPageHeader : UserControl
         SelectionRect.Update(point, MouseDownPoint, IconView.ScrollViewer, ActiveView, ActiveSelectedItems, ViewModel);
     }
 
-    private void InitThumbsSizeUI()
-    {
-        var size = Settings.ThumbsSize;
-        UpdateThumbsSizeIcon(size);
-        UpdateThumbsSizeRadio(size);
-    }
-
     private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(AppSettings.ThumbsSize))
@@ -1635,10 +1628,6 @@ public partial class ExplorerPageHeader : UserControl
     private void OnThumbsSizeChanged()
     {
         var size = Settings.ThumbsSize;
-
-        UpdateThumbsSizeIcon(size);
-        UpdateThumbsSizeRadio(size);
-
         if (size != ThumbnailService.ThumbnailSize.Disabled)
             InvalidateFileIcons();
 
@@ -1652,42 +1641,6 @@ public partial class ExplorerPageHeader : UserControl
                 viewer?.ScrollToTop();
             }
         }, DispatcherPriority.Loaded);
-    }
-
-    private void UpdateThumbsSizeIcon(ThumbnailService.ThumbnailSize size)
-    {
-        ThumbsSizeIcon.Glyph = size switch
-        {
-            ThumbnailService.ThumbnailSize.Medium => "\uE14C",
-            ThumbnailService.ThumbnailSize.Large => "\uF0E2",
-            ThumbnailService.ThumbnailSize.ExtraLarge => "\uE8A9",
-            _ => "\uE8FD",
-        };
-    }
-
-    private void UpdateThumbsSizeRadio(ThumbnailService.ThumbnailSize size)
-    {
-        SetMenuItemChecked(ThumbsDisabledItem, size == ThumbnailService.ThumbnailSize.Disabled);
-        SetMenuItemChecked(ThumbsMediumItem, size == ThumbnailService.ThumbnailSize.Medium);
-        SetMenuItemChecked(ThumbsLargeItem, size == ThumbnailService.ThumbnailSize.Large);
-        SetMenuItemChecked(ThumbsExtraLargeItem, size == ThumbnailService.ThumbnailSize.ExtraLarge);
-    }
-
-    private static void SetMenuItemChecked(MenuItem item, bool isChecked)
-    {
-        item.IsChecked = isChecked;
-        if (item.Icon is UIElement icon)
-            icon.Visibility = isChecked ? Visibility.Visible : Visibility.Hidden;
-    }
-
-    private void ThumbsSize_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is MenuItem item
-            && item.Tag is string tagStr
-            && Enum.TryParse<ThumbnailService.ThumbnailSize>(tagStr, out var size))
-        {
-            Data.Settings.ThumbsSize = size;
-        }
     }
 
     private void EmptyNonRootTextBlock_Loaded(object sender, RoutedEventArgs e) => TextHelper.BuildLocalizedInlines(sender, e);
