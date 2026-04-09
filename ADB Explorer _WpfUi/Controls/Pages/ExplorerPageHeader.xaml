@@ -71,7 +71,6 @@
             <Setter Property="ItemTemplateSelector" Value="{StaticResource DriveTemplateSelector}" />
             <Setter Property="ItemContainerStyle" Value="{StaticResource DriveContainerStyle}" />
         </Style>
-        <views:FileIconView x:Key="FileIconView" />
         <Style
             x:Key="IconFileContainerWithContextMenuStyle"
             BasedOn="{StaticResource IconFileContainerStyle}"
@@ -91,35 +90,6 @@
                     <Setter Property="AllowDrop" Value="True" />
                 </DataTrigger>
             </Style.Triggers>
-        </Style>
-        <Style
-            x:Key="IconViewStyle"
-            BasedOn="{StaticResource ListViewStyle}"
-            TargetType="local:AdbListView">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsIconView}" Value="False">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsDriveViewVisible}" Value="True">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRecycleBin}" Value="False">
-                    <Setter Property="AllowDrop" Value="True" />
-                </DataTrigger>
-            </Style.Triggers>
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-            <Setter Property="SnapsToDevicePixels" Value="False" />
-            <Setter Property="SelectionMode" Value="Extended" />
-            <Setter Property="IsItemScrolling" Value="True" />
-            <Setter Property="ItemContainerStyle" Value="{StaticResource IconFileContainerWithContextMenuStyle}" />
-            <Setter Property="ItemTemplate">
-                <Setter.Value>
-                    <DataTemplate>
-                        <views:FileIconView />
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
         </Style>
     </UserControl.Resources>
     <Grid>
@@ -301,8 +271,12 @@
                     ItemsSource="{Binding ExplorerItemsSource}"
                     MouseMove="IconView_MouseMove"
                     PreviewMouseDown="IconView_PreviewMouseDown"
-                    SelectionChanged="ExplorerGrid_SelectionChanged"
-                    Style="{StaticResource IconViewStyle}">
+                    SelectionChanged="ExplorerGrid_SelectionChanged">
+                    <local:AdbListView.Resources>
+                        <DataTemplate x:Key="FileIconViewTemplate">
+                            <views:FileIconView />
+                        </DataTemplate>
+                    </local:AdbListView.Resources>
                     <local:AdbListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <local:AdbVirtualizingWrapPanel
@@ -313,6 +287,28 @@
                                 VirtualizationMode="Recycling" />
                         </ItemsPanelTemplate>
                     </local:AdbListView.ItemsPanel>
+                    <local:AdbListView.Style>
+                        <Style BasedOn="{StaticResource ListViewStyle}" TargetType="local:AdbListView">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsIconView}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsDriveViewVisible}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRecycleBin}" Value="False">
+                                    <Setter Property="AllowDrop" Value="True" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                            <Setter Property="SnapsToDevicePixels" Value="False" />
+                            <Setter Property="SelectionMode" Value="Extended" />
+                            <Setter Property="IsItemScrolling" Value="True" />
+                            <Setter Property="ItemContainerStyle" Value="{StaticResource IconFileContainerWithContextMenuStyle}" />
+                            <Setter Property="ItemTemplate" Value="{StaticResource FileIconViewTemplate}" />
+                        </Style>
+                    </local:AdbListView.Style>
                 </local:AdbListView>
                 <Grid>
                     <Grid.Style>

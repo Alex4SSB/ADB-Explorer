@@ -65,16 +65,9 @@ public partial class SelectionRectangle : UserControl
         var horizontal = scroller.ComputedHorizontalScrollBarVisibility is Visibility.Visible ? 1 : 0;
         var vertical = scroller.ComputedVerticalScrollBarVisibility is Visibility.Visible ? 1 : 0;
 
-        if (!Rect.IsVisible
-            && ((mousePosition.Y > ActualHeight - SystemParameters.HorizontalScrollBarHeight * horizontal)
-            || (mousePosition.X > ActualWidth - SystemParameters.VerticalScrollBarWidth * vertical)))
-        {
-            origin = mousePosition;
-            _mouseDownPoint = origin;
-        }
-
-        if (origin.Y > ActualHeight - SystemParameters.HorizontalScrollBarHeight * horizontal
-            || origin.X > ActualWidth - SystemParameters.VerticalScrollBarWidth * vertical)
+        if (mousePosition.X < 0 || mousePosition.Y < 0
+            || mousePosition.X > ActualWidth - SystemParameters.VerticalScrollBarWidth * vertical
+            || mousePosition.Y > ActualHeight - SystemParameters.HorizontalScrollBarHeight * horizontal)
             return;
 
         if (!Rect.IsVisible)

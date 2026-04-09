@@ -15,5 +15,5 @@ public partial class LargeThumbsIcon : UserControl
 
     public static readonly DependencyProperty SubFontSizeProperty =
         DependencyProperty.Register("SubFontSize", typeof(int),
-          typeof(LargeThumbsIcon), new PropertyMetadata(default(int)));
+          typeof(LargeThumbsIcon), new PropertyMetadata(7));
 }

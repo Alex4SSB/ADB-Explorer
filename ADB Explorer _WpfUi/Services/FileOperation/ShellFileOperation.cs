@@ -367,11 +367,14 @@ public static class ShellFileOperation
 
     public static string ReadAllText(LogicalDeviceViewModel device, params string[] paths)
     {
+        if (paths.Length == 0)
+            return string.Empty;
+
         var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
                                                                "cat",
                                                                out string stdout,
                                                                out string stderr,
-                                                               CancellationToken.None, paths.Select(path => ADBService.EscapeAdbShellString(path)).ToArray());
+                                                               CancellationToken.None, [.. paths.Select(path => ADBService.EscapeAdbShellString(path))]);
 
         if (exitCode != 0)
             throw new Exception(stderr);
