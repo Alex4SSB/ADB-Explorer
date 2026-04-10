@@ -1,4 +1,5 @@
 using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using Microsoft.Extensions.Hosting;
 using Wpf.Ui;
@@ -68,9 +69,13 @@ public class ThumbnailSnackbarService(ISnackbarService snackbarService) : IHoste
                     };
                     if (presenter is not null)
                     {
+                        string deviceName = Data.RuntimeSettings.IsRTL
+                        ? $"{TextHelper.RTL_MARK}{Data.DevicesObject.Current.Name}{TextHelper.LTR_MARK}"
+                        : Data.DevicesObject.Current.Name;
+
                         var snackbar = new AdbSnackbar(presenter)
                         {
-                            Title = string.Format(Strings.Resources.S_THUMB_SNACKBAR_TITLE, Data.DevicesObject.Current.Name),
+                            Title = string.Format(Strings.Resources.S_THUMB_SNACKBAR_TITLE, deviceName),
                             Content = new ThumbnailSnackbarContent { Text = message },
                             Appearance = ControlAppearance.Secondary,
                             Timeout = TimeSpan.MaxValue,

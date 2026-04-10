@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using Wpf.Ui.Controls;
 
@@ -24,7 +25,7 @@ public partial class ThumbsSizeSelector : UserControl
 
     static Dictionary<ThumbnailService.ThumbnailSize, UIElement> Icons => new()
     {
-        { ThumbnailService.ThumbnailSize.Disabled, new FontIcon() { Glyph = "\uF2C7", FontSize = 16 } },
+        { ThumbnailService.ThumbnailSize.Disabled, new FontIcon() { Glyph = Data.RuntimeSettings.IsRTL ? "\uF2C8" : "\uF2C7", FontSize = 16 } },
         { ThumbnailService.ThumbnailSize.Medium, new FontIcon() { Glyph = "\uE138", FontSize = 16 } },
         { ThumbnailService.ThumbnailSize.Large, new LargeThumbsIcon() { SubFontSize = 8 } },
         { ThumbnailService.ThumbnailSize.ExtraLarge, new FontIcon() { Glyph = "\uE15A", FontSize = 16 } },

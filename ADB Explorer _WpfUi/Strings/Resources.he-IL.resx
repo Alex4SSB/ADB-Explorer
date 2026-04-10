@@ -1492,4 +1492,37 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_STRING_PASTE" xml:space="preserve">
     <value>הדבק</value>
   </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>בודק אחר עדכונים לתמונות</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>מוריד תמונות</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>קורא מיקומי תמונות ומסד נתונים</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_TITLE" xml:space="preserve">
+    <value>תמונות תצוגה מקדימה ל {0}</value>
+  </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value>פרטים</value>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value>תצוגה</value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>סמלים בינוניים</value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>סמלים גדולים</value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>סמלים גדולים מאוד</value>
+  </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value>גודל תצוגה מקדימה נשמר לכל מיקום</value>
+  </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value>אפשרויות פריסה ותצוגה</value>
+  </data>
 </root>

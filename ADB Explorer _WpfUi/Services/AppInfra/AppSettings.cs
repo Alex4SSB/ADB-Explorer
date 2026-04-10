@@ -85,6 +85,12 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
             LocationThumbSize = dict;
         }
         catch { }
+
+        try
+        {
+            SavedLocations = [.. _savedLocations];
+        }
+        catch { }
     }
 
     void IJsonOnSerializing.OnSerializing()
@@ -92,7 +98,15 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
         _mediumThumbLocations = [.. LocationThumbSize.Where(kv => kv.Value == ThumbnailService.ThumbnailSize.Medium).Select(kv => kv.Key)];
         _largeThumbLocations = [.. LocationThumbSize.Where(kv => kv.Value == ThumbnailService.ThumbnailSize.Large).Select(kv => kv.Key)];
         _xlThumbLocations = [.. LocationThumbSize.Where(kv => kv.Value == ThumbnailService.ThumbnailSize.ExtraLarge).Select(kv => kv.Key)];
+
+        _savedLocations = [.. SavedLocations];
     }
+
+    public string[] _savedLocations { get; set; } = [];
+
+    [JsonIgnore]
+    [ObservableProperty]
+    public partial ObservableCollection<string> SavedLocations { get; set; } = [];
 
     [ObservableProperty]
     public partial bool SpecialFolderIcons { get; set; } = true;

@@ -271,12 +271,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <ItemsPanelTemplate x:Key="HorizontalListViewPanelTemplate">
-        <WrapPanel
-            Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollContentPresenter}, Path=(FrameworkElement.ActualWidth)}"
-            ItemHeight="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}, Path=(ListView.View).ItemHeight}"
-            ItemWidth="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}, Path=(ListView.View).ItemWidth}" />
-    </ItemsPanelTemplate>
     <Style x:Key="BlueDotTextBlockStyle" TargetType="TextBlock">
         <Setter Property="Text" Value="•" />
         <Setter Property="FontSize" Value="20" />
@@ -685,7 +679,6 @@
         BasedOn="{StaticResource ListViewStyle}"
         TargetType="ui:ListView">
         <Setter Property="SelectionMode" Value="Single" />
-        <Setter Property="ItemsPanel" Value="{StaticResource HorizontalListViewPanelTemplate}" />
         <Setter Property="ItemContainerStyle">
             <Setter.Value>
                 <Style BasedOn="{StaticResource ListViewItemContainerStyle}" TargetType="ui:ListViewItem">
@@ -701,7 +694,15 @@
                         Background="Transparent"
                         Command="{Binding NavigateAction.Command}"
                         Style="{StaticResource HomeViewItemStyle}">
-                        <emoji:TextBlock Style="{StaticResource TooltipTextBlockStyle}" Text="{Binding Path}" />
+                        <ui:Button.ToolTip>
+                            <ToolTip MaxWidth="600">
+                                <ui:TextBlock FlowDirection="LeftToRight" Text="{Binding Path}" />
+                            </ToolTip>
+                        </ui:Button.ToolTip>
+                        <emoji:TextBlock
+                            FlowDirection="LeftToRight"
+                            Text="{Binding Path}"
+                            TextTrimming="CharacterEllipsis" />
                     </ui:Button>
                 </DataTemplate>
             </Setter.Value>

@@ -32,14 +32,11 @@ public partial class NavigationBox : UserControl
         {
             if (args.PropertyName == nameof(AppRuntimeSettings.LocationToNavigate))
             {
-                //FlyoutService.GetFlyout(SavedItemsButton).Hide();
                 OverflowPopup.IsOpen = false;
             }
-            else if (args.PropertyName == nameof(AppRuntimeSettings.SavedLocations))
-            {
-                UpdateSavedItems();
-            }
         };
+
+        Data.Settings.SavedLocations.CollectionChanged += (sender, args) => UpdateSavedItems();
     }
 
     #region Dependency Properties
@@ -193,16 +190,14 @@ public partial class NavigationBox : UserControl
 
     private void UpdateSavedItems()
     {
-        SavedItems = Data.RuntimeSettings.SavedLocations is null
+        SavedItems = Data.Settings.SavedLocations is null
             ? []
-            : [.. Data.RuntimeSettings.SavedLocations.Select(p => new SavedLocation(p))];
+            : [.. Data.Settings.SavedLocations.Select(p => new SavedLocation(p))];
 
         IsCurrentSaved = SavedItems.Any(i => i.Path == Path);
 
         if (AdbLocation.LocationFromString(Path) is Navigation.SpecialLocation.None && !IsCurrentSaved)
             SavedItems.Insert(0, new SavedLocation());
-
-        ((ItemsControl)Resources["SavedItemsControl"]).ItemsSource = SavedItems;
     }
 
     public void Refresh() => AddDevice(Path);

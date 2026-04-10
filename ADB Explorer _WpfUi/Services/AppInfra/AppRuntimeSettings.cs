@@ -330,25 +330,6 @@ public partial class AppRuntimeSettings : ViewModelBase
         }
     }
 
-    private List<string> savedLocations = null;
-    public List<string> SavedLocations
-    {
-        get
-        {
-            if (savedLocations is null)
-            {
-                var storage = Storage.RetrieveValue(nameof(SavedLocations));
-                if (storage is not null && storage is string[] locations)
-                {
-                    savedLocations = [.. locations];
-                }
-            }
-            return savedLocations;
-        }
-
-        set => Set(ref savedLocations, value);
-    }
-
     public string DefaultBrowserPath { get; set; }
 
     public string AdbPath { get; set; }
@@ -363,7 +344,7 @@ public partial class AppRuntimeSettings : ViewModelBase
         }
     } = null;
 
-    public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
+    public bool IsAppDeployed => Environment.CurrentDirectory.Equals(@"C:\WINDOWS\SYSTEM32", StringComparison.InvariantCultureIgnoreCase);
 
     public bool Is22H2 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_22H2;
 

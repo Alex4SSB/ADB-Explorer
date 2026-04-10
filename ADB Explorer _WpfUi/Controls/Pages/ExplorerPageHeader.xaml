@@ -181,7 +181,13 @@
                             Header="{Binding Source={x:Static Member=strings:Resources.S_SAVED_LOCATIONS}}"
                             IsExpanded="{Binding Source={x:Static Member=models:Data.Settings}, Path=HomeLocationsExpanded, Mode=TwoWay}"
                             Style="{StaticResource AdbExpanderStyle}">
-                            <ui:ListView x:Name="HomeSavedLocationsList" Style="{StaticResource HomeSavedLocationsListStyle}" />
+                            <ui:ListView x:Name="HomeSavedLocationsList" Style="{StaticResource HomeSavedLocationsListStyle}">
+                                <ui:ListView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Width="{Binding RelativeSource={RelativeSource AncestorType=ui:ListView}, Path=ActualWidth}" />
+                                    </ItemsPanelTemplate>
+                                </ui:ListView.ItemsPanel>
+                            </ui:ListView>
                         </Expander>
                         <Expander
                             Margin="4"
