@@ -3628,6 +3628,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Thumbnail Size Saved For Each Location.
+        /// </summary>
+        public static string S_SETTINGS_THUMB_SIZE_PER_LOCATION {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THUMB_SIZE_PER_LOCATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pull &amp; Display Thumbnails.
         /// </summary>
         public static string S_SETTINGS_THUMBNAIL_MODE {
@@ -3804,6 +3813,96 @@ namespace ADB_Explorer.Strings {
         public static string S_TERMINAL {
             get {
                 return ResourceManager.GetString("S_TERMINAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Checking for thumbnail updates.
+        /// </summary>
+        public static string S_THUMB_SNACKBAR_CHECKING {
+            get {
+                return ResourceManager.GetString("S_THUMB_SNACKBAR_CHECKING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pulling thumbnails.
+        /// </summary>
+        public static string S_THUMB_SNACKBAR_PULLING {
+            get {
+                return ResourceManager.GetString("S_THUMB_SNACKBAR_PULLING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reading thumbnail locations and media database.
+        /// </summary>
+        public static string S_THUMB_SNACKBAR_READING {
+            get {
+                return ResourceManager.GetString("S_THUMB_SNACKBAR_READING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Thumbnails.
+        /// </summary>
+        public static string S_THUMB_SNACKBAR_TITLE {
+            get {
+                return ResourceManager.GetString("S_THUMB_SNACKBAR_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Details.
+        /// </summary>
+        public static string S_THUMBSIZE_DETAILS {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_DETAILS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Large Icons.
+        /// </summary>
+        public static string S_THUMBSIZE_LARGE {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_LARGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Medium Icons.
+        /// </summary>
+        public static string S_THUMBSIZE_MEDIUM {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_MEDIUM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View.
+        /// </summary>
+        public static string S_THUMBSIZE_TITLE {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Layout and view options.
+        /// </summary>
+        public static string S_THUMBSIZE_TOOLTIP {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extra Large Icons.
+        /// </summary>
+        public static string S_THUMBSIZE_XL {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_XL", resourceCulture);
             }
         }
         
