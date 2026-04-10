@@ -1,5 +1,10 @@
 # Security Policy
 
+### Important notice:
+The following will result in a **block** (and possibly a report):
+* Spamming reports - reporting multiple vulnerabilities in a short period without receiving a response
+* AI-imagined vulnerabilities, or consecutive reports with non feasible attack scenarios
+
 ## Supported Versions
 
 We take the security of ADB Explorer seriously. Security updates are provided for the following versions:
