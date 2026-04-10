@@ -3628,6 +3628,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Thumbnail Size Saved For Each Location.
+        /// </summary>
+        public static string S_SETTINGS_THUMB_SIZE_PER_LOCATION {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THUMB_SIZE_PER_LOCATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pull &amp; Display Thumbnails.
         /// </summary>
         public static string S_SETTINGS_THUMBNAIL_MODE {

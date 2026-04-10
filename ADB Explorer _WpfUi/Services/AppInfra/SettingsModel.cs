@@ -160,6 +160,7 @@ public static class UISettings
                     new(AppSettings.ThumbnailMode.OnConnect, Strings.Resources.S_SETTINGS_THUMBS_CONNECT) ],
                     icon: "\uE15A"),
                 new BoolSetting(() => Settings.MovieThumbsEnabled, Strings.Resources.S_SETTINGS_VIDEO_THUMBNAILS, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uE8B2"),
+                new BoolSetting(() => Settings.ThumbSizePerLocation, Strings.Resources.S_SETTINGS_THUMB_SIZE_PER_LOCATION, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uEFFF"),
                 new BoolSetting(() => Settings.PersistThumbs, Strings.Resources.S_SETTINGS_PERSIST_THUMBS, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uE78C"),
                 new ThumbsAgeSetting(() => Settings.ThumbsAge, Strings.Resources.S_SETTINGS_THUMBS_AGE, [
                     new(AppSettings.ThumbnailAge.OneMonth, Strings.Resources.S_ONE_MONTH),

@@ -1874,4 +1874,8 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Layout and view options</value>
     <comment>The tooltip of the thumbnail size selector. view = icon view / details view</comment>
   </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value>Thumbnail Size Saved For Each Location</value>
+    <comment>The setting that enables keeping track of the last thumbnail size selected for each location / folder</comment>
+  </data>
 </root>

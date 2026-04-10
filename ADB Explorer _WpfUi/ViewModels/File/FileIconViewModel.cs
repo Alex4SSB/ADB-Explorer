@@ -13,12 +13,12 @@ public partial class FileIconViewModel : FileViewModelBase
     private ThumbnailService.ThumbnailSize _cachedSize;
     private ThumbnailService.ThumbnailSize _currentlyLoadingSize;
 
-    private BitmapSource LargeFileIcon => FileToIconConverter.GetImage(_file, (int)((int)Data.Settings.ThumbsSize / Data.RuntimeSettings.MainWindowScalingFactor)).First();
+    private BitmapSource LargeFileIcon => FileToIconConverter.GetImage(_file, (int)((int)Data.RuntimeSettings.ThumbsSize / Data.RuntimeSettings.MainWindowScalingFactor)).First();
     public BitmapSource? LargeIcon
     {
         get
         {
-            var size = Data.Settings.ThumbsSize;
+            var size = Data.RuntimeSettings.ThumbsSize;
             if (_cachedThumbnail is not null && _cachedSize >= size)
                 return _cachedThumbnail;
 

@@ -33,7 +33,7 @@
         <DataTemplate x:Key="IconViewRealTemplate">
             <Grid ToolTip="{StaticResource IconViewTooltip}">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=ImageMaxHeight}" />
+                    <RowDefinition Height="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=ImageMaxHeight}" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid HorizontalAlignment="Center" FlowDirection="LeftToRight">
@@ -47,14 +47,14 @@
                         </Style>
                     </Grid.Style>
                     <Image
-                        MaxWidth="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=ImageMaxWidth}"
-                        MaxHeight="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=ImageMaxHeight}"
+                        MaxWidth="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=ImageMaxWidth}"
+                        MaxHeight="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=ImageMaxHeight}"
                         HorizontalAlignment="Center"
                         d:Height="120"
                         d:Width="120"
                         Source="{Binding IconViewModel.LargeIcon}" />
                     <Grid
-                        MaxWidth="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=OverlayMaxWidth}"
+                        MaxWidth="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=OverlayMaxWidth}"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Bottom">
                         <Image
@@ -65,8 +65,8 @@
                             VerticalAlignment="Bottom"
                             Source="{Binding IconViewModel.VideoIconOverlay}" />
                         <Image
-                            Width="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=LinkWidth}"
-                            Height="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=LinkWidth}"
+                            Width="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=LinkWidth}"
+                            Height="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=LinkWidth}"
                             Margin="-4,0,0,8"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Bottom"
@@ -76,7 +76,7 @@
                 <Grid
                     x:Name="LabelGrid"
                     Grid.Row="1"
-                    MinWidth="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=EditWidth}"
+                    MinWidth="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=EditWidth}"
                     Margin="0,4,0,0"
                     HorizontalAlignment="Center">
                     <Popup
@@ -90,7 +90,7 @@
                         </Popup.Resources>
                         <Border Background="{DynamicResource CardStrokeColorDefaultSolidBrush}" CornerRadius="4">
                             <ui:TextBox
-                                Width="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=EditWidth}"
+                                Width="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=EditWidth}"
                                 Padding="1"
                                 ClearButtonEnabled="False"
                                 FlowDirection="{Binding NameFlowDirection}"
@@ -104,7 +104,7 @@
                         </Border>
                     </Popup>
                     <emoji:TextBlock
-                        MaxHeight="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=LabelMaxHeight}"
+                        MaxHeight="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=LabelMaxHeight}"
                         FlowDirection="{Binding NameFlowDirection}"
                         PreviewMouseDown="IconViewNameTextBlock_PreviewMouseDown"
                         PreviewMouseUp="IconViewNameTextBlock_PreviewMouseUp"
@@ -135,8 +135,8 @@
         </DataTemplate>
     </UserControl.Resources>
     <Grid
-        Width="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=ContainerWidth}"
-        Height="{Binding ThumbsSize, Source={x:Static models:Data.Settings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=ContainerHeight}"
+        Width="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=ContainerWidth}"
+        Height="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=ContainerHeight}"
         Margin="4"
         SnapsToDevicePixels="False">
         <ContentControl Content="{Binding}">

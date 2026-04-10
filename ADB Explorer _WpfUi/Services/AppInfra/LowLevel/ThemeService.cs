@@ -27,8 +27,6 @@ internal class AdbThemeService
                 break;
         }
 
-        Data.RuntimeSettings.ActualTheme = actualTheme;
-
         var dictionaries = Application.Current.Resources.MergedDictionaries;
 
         // Find the current theme dictionary

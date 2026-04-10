@@ -276,7 +276,8 @@ public partial class NavigationBox : UserControl
         int lastHiddenIndex = -1;
         for (var i = 1; i < breadcrumbs.Count; i++)
         {
-            if (125 + itemWidths[0] + itemWidths[i..].Sum() > PathBox.ActualWidth)
+            var width = PathItemsControl.ActualWidth;
+            if (125 + itemWidths[0] + itemWidths[i..].Sum() > PathItemsControl.ActualWidth)
             {
                 lastHiddenIndex = i;
             }

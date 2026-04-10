@@ -2,7 +2,7 @@
 
 namespace ADB_Explorer.Services;
 
-public partial class AppSettings : ObservableObject
+public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonOnSerializing
 {
     public enum SystemVals
     {
@@ -57,7 +57,42 @@ public partial class AppSettings : ObservableObject
     public partial bool LimitThumbsPullSpeed { get; set; } = true;
 
     [ObservableProperty]
-    public partial ThumbnailService.ThumbnailSize ThumbsSize { get; set; } = ThumbnailService.ThumbnailSize.Disabled;
+    public partial bool ThumbSizePerLocation { get; set; } = true;
+
+    [JsonIgnore]
+    [ObservableProperty]
+    public partial Dictionary<string, ThumbnailService.ThumbnailSize> LocationThumbSize { get; set; } = [];
+
+    public string[] _mediumThumbLocations { get; set; } = [];
+    public string[] _largeThumbLocations { get; set; } = [];
+    public string[] _xlThumbLocations { get; set; } = [];
+
+    void IJsonOnDeserialized.OnDeserialized()
+    {
+        try
+        {
+            Dictionary<string, ThumbnailService.ThumbnailSize> dict = [];
+
+            foreach (var loc in _mediumThumbLocations)
+                dict[loc] = ThumbnailService.ThumbnailSize.Medium;
+
+            foreach (var loc in _largeThumbLocations)
+                dict[loc] = ThumbnailService.ThumbnailSize.Large;
+
+            foreach (var loc in _xlThumbLocations)
+                dict[loc] = ThumbnailService.ThumbnailSize.ExtraLarge;
+
+            LocationThumbSize = dict;
+        }
+        catch { }
+    }
+
+    void IJsonOnSerializing.OnSerializing()
+    {
+        _mediumThumbLocations = [.. LocationThumbSize.Where(kv => kv.Value == ThumbnailService.ThumbnailSize.Medium).Select(kv => kv.Key)];
+        _largeThumbLocations = [.. LocationThumbSize.Where(kv => kv.Value == ThumbnailService.ThumbnailSize.Large).Select(kv => kv.Key)];
+        _xlThumbLocations = [.. LocationThumbSize.Where(kv => kv.Value == ThumbnailService.ThumbnailSize.ExtraLarge).Select(kv => kv.Key)];
+    }
 
     [ObservableProperty]
     public partial bool SpecialFolderIcons { get; set; } = true;

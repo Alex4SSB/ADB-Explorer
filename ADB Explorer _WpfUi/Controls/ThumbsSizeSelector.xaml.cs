@@ -1,5 +1,4 @@
 ﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using Wpf.Ui.Controls;
 
@@ -13,59 +12,48 @@ public partial class ThumbsSizeSelector : UserControl
 {
     public ThumbsSizeSelector()
     {
+        Items = [
+            new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_DETAILS, ThumbnailService.ThumbnailSize.Disabled, this),
+            new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_MEDIUM, ThumbnailService.ThumbnailSize.Medium, this),
+            new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_LARGE, ThumbnailService.ThumbnailSize.Large, this),
+            new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_XL, ThumbnailService.ThumbnailSize.ExtraLarge, this),
+        ];
+
         InitializeComponent();
-
-        Data.Settings.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == nameof(Data.Settings.ThumbsSize))
-            {
-                OnPropertyChanged(nameof(SelectedIcon));
-            }
-        };
-
-        Data.FileActions.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == nameof(Data.FileActions.IsAppDrive))
-            {
-                OnPropertyChanged(nameof(SelectedIcon));
-            }
-        };
     }
 
-    static UIElement[] Icons =>
-        [
-        new FontIcon() { Glyph = "\uF2C7", FontSize = 16 },
-        new FontIcon() { Glyph = "\uE138", FontSize = 16 },
-        new LargeThumbsIcon() { SubFontSize = 8 },
-        new FontIcon() { Glyph = "\uE15A", FontSize = 16 },
-    ];
-
-    public ICollection<ThumbSizeItem> Items { get; } =
-    [
-        new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_DETAILS, Icons[0], ThumbnailService.ThumbnailSize.Disabled),
-        new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_MEDIUM, Icons[1], ThumbnailService.ThumbnailSize.Medium),
-        new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_LARGE, Icons[2], ThumbnailService.ThumbnailSize.Large),
-        new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_XL, Icons[3], ThumbnailService.ThumbnailSize.ExtraLarge),
-    ];
-
-    public UIElement SelectedIcon
+    static Dictionary<ThumbnailService.ThumbnailSize, UIElement> Icons => new()
     {
-        get
-        {
-            if (Data.FileActions.IsAppDrive)
-            {
-                return Icons[0];
-            }
+        { ThumbnailService.ThumbnailSize.Disabled, new FontIcon() { Glyph = "\uF2C7", FontSize = 16 } },
+        { ThumbnailService.ThumbnailSize.Medium, new FontIcon() { Glyph = "\uE138", FontSize = 16 } },
+        { ThumbnailService.ThumbnailSize.Large, new LargeThumbsIcon() { SubFontSize = 8 } },
+        { ThumbnailService.ThumbnailSize.ExtraLarge, new FontIcon() { Glyph = "\uE15A", FontSize = 16 } },
+    };
+    
+    public ICollection<ThumbSizeItem> Items { get; }
 
-            return Data.Settings.ThumbsSize switch
-            {
-                ThumbnailService.ThumbnailSize.Disabled => Icons[0],
-                ThumbnailService.ThumbnailSize.Medium => Icons[1],
-                ThumbnailService.ThumbnailSize.Large => Icons[2],
-                ThumbnailService.ThumbnailSize.ExtraLarge => Icons[3],
-                _ => null,
-            };
-        }
+    public UIElement SelectedIcon => Icons[ThumbnailSize];
+
+    public void SetThumbnailSize(ThumbnailService.ThumbnailSize size)
+    {
+        ThumbnailSize = size;
+    }
+
+    public ThumbnailService.ThumbnailSize ThumbnailSize
+    {
+        get => (ThumbnailService.ThumbnailSize)GetValue(ThumbnailSizeProperty);
+        set => SetValue(ThumbnailSizeProperty, value);
+    }
+
+    public static readonly DependencyProperty ThumbnailSizeProperty =
+        DependencyProperty.Register(nameof(ThumbnailSize), typeof(ThumbnailService.ThumbnailSize),
+          typeof(ThumbsSizeSelector), new PropertyMetadata(ThumbnailService.ThumbnailSize.Disabled, OnThumbnailSizePropertyChanged));
+
+    private static void OnThumbnailSizePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var selector = (ThumbsSizeSelector)d;
+        selector.OnPropertyChanged(nameof(SelectedIcon));
+        selector.OnPropertyChanged(nameof(ThumbnailSize));
     }
 
     public partial class ThumbSizeItem : ObservableObject
@@ -78,21 +66,20 @@ public partial class ThumbsSizeSelector : UserControl
 
         public BaseAction Action { get; set; }
 
-        public ThumbSizeItem(string name, UIElement icon, ThumbnailService.ThumbnailSize size)
+        public ThumbSizeItem(string name, ThumbnailService.ThumbnailSize size, ThumbsSizeSelector selector)
         {
             Name = name;
-            Icon = icon;
-            Action = new(() => true, () => Data.Settings.ThumbsSize = size);
-
-            Data.Settings.PropertyChanged += (_, e) =>
+            Icon = Icons[size];
+            Action = new(() => true, () => selector.SetThumbnailSize(size));
+            selector.PropertyChanged += (_, e) =>
             {
-                if (e.PropertyName == nameof(Data.Settings.ThumbsSize))
+                if (e.PropertyName == nameof(ThumbnailSize))
                 {
-                    IsChecked = Data.Settings.ThumbsSize == size;
+                    IsChecked = selector.ThumbnailSize == size;
                 }
             };
 
-            IsChecked = Data.Settings.ThumbsSize == size;
+            IsChecked = selector.ThumbnailSize == size;
         }
     }
 }

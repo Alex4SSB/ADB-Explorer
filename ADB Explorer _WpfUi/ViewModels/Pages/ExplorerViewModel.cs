@@ -22,6 +22,32 @@ public partial class ExplorerViewModel : ObservableObject
 
     [ObservableProperty]
     public partial bool IsIconView { get; set; } = false;
+
+    [ObservableProperty]
+    public partial ThumbnailService.ThumbnailSize CurrentThumbsSize { get; set; }
+    
+    partial void OnCurrentThumbsSizeChanged(ThumbnailService.ThumbnailSize value)
+    {
+        IsIconView = value is not ThumbnailService.ThumbnailSize.Disabled;
+
+        if (!Data.FileActions.IsAppDrive)
+        {
+            if (Data.Settings.ThumbSizePerLocation)
+            {
+                if (Data.Settings.LocationThumbSize.ContainsKey(Data.CurrentPath))
+                {
+                    Data.Settings.LocationThumbSize[Data.CurrentPath] = value;
+                }
+                else
+                {
+                    Data.Settings.LocationThumbSize.Add(Data.CurrentPath, value);
+                }
+            }
+
+            Data.RuntimeSettings.ThumbsSize = value;
+        }
+    }
+
     public int FirstSelectedIndex { get; set; } = -1;
 
     public int CurrentSelectedIndex { get; set; } = -1;
@@ -66,7 +92,7 @@ public partial class ExplorerViewModel : ObservableObject
 
     public ExplorerViewModel()
     {
-        IsIconView = Data.Settings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
+        IsIconView = Data.RuntimeSettings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
 
         Data.FileActions.PropertyChanged += FileActions_PropertyChanged;
         Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
@@ -77,10 +103,6 @@ public partial class ExplorerViewModel : ObservableObject
     {
         switch (e.PropertyName)
         {
-            case nameof(AppSettings.ThumbsSize):
-                IsIconView = !Data.FileActions.IsAppDrive && Data.Settings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
-                break;
-
             case nameof(AppSettings.EnableApk):
             case nameof(AppSettings.EnableRecycle):
                 UpdateDriveView();
@@ -103,6 +125,10 @@ public partial class ExplorerViewModel : ObservableObject
                 UpdateDriveView();
                 break;
 
+            case nameof(AppRuntimeSettings.ThumbsSize):
+                IsIconView = !Data.FileActions.IsAppDrive && Data.RuntimeSettings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
+                break;
+
             default:
                 break;
         }
@@ -118,7 +144,6 @@ public partial class ExplorerViewModel : ObservableObject
                 break;
 
             case nameof(FileActionsEnable.IsAppDrive):
-                IsIconView = !Data.FileActions.IsAppDrive && Data.Settings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
                 OnPropertyChanged(nameof(FolderColumnVisibility));
                 OnPropertyChanged(nameof(RecycleBinColumnVisibility));
                 OnPropertyChanged(nameof(PackageColumnVisibility));

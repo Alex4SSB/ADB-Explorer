@@ -153,7 +153,7 @@
                     </Style>
                 </StackPanel.Style>
                 <Separator Margin="0,2" />
-                <local:ThumbsSizeSelector />
+                <local:ThumbsSizeSelector ThumbnailSize="{Binding CurrentThumbsSize, Mode=TwoWay}" />
             </StackPanel>
             <Border
                 Grid.Column="3"

@@ -115,7 +115,6 @@ public partial class ExplorerPageHeader : UserControl
         Thread.CurrentThread.CurrentUICulture = Settings.UICulture;
 
         RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
-        Data.Settings.PropertyChanged += Settings_PropertyChanged;
 
         InitializeComponent();
 
@@ -414,6 +413,10 @@ public partial class ExplorerPageHeader : UserControl
                         ActiveSelectAll();
                     break;
 
+                case nameof(AppRuntimeSettings.ThumbsSize):
+                    OnThumbsSizeChanged();
+                    break;
+
                 default:
                     break;
             }
@@ -604,6 +607,19 @@ public partial class ExplorerPageHeader : UserControl
         FileActions.NewEnabled = !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
 
         FileActions.CopyPathDescription.Value = FileActions.IsAppDrive ? Strings.Resources.S_COPY_APK_NAME : Strings.Resources.S_COPY_PATH;
+
+        if (Settings.ThumbSizePerLocation)
+        {
+            ThumbnailService.ThumbnailSize size = ThumbnailService.ThumbnailSize.Disabled;
+            Settings.LocationThumbSize.TryGetValue(CurrentPath, out size);
+            ViewModel.CurrentThumbsSize = size;
+        }
+        else
+        {
+            ViewModel.CurrentThumbsSize = FileActions.IsAppDrive
+                ? ThumbnailService.ThumbnailSize.Disabled
+                : RuntimeSettings.ThumbsSize;
+        }
 
         if (FileActions.IsRecycleBin)
         {
@@ -1619,15 +1635,9 @@ public partial class ExplorerPageHeader : UserControl
         SelectionRect.Update(point, MouseDownPoint, IconView.ScrollViewer, ActiveView, ActiveSelectedItems, ViewModel);
     }
 
-    private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(AppSettings.ThumbsSize))
-            OnThumbsSizeChanged();
-    }
-
     private void OnThumbsSizeChanged()
     {
-        var size = Settings.ThumbsSize;
+        var size = RuntimeSettings.ThumbsSize;
         if (size != ThumbnailService.ThumbnailSize.Disabled)
             InvalidateFileIcons();
 

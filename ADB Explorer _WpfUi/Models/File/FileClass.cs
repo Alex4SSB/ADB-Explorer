@@ -35,13 +35,9 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     [ObservableProperty]
     public partial string LinkTarget { get; set; } = "";
 
-    private bool _isIconPlaceholder;
-    public bool IsIconPlaceholder
-    {
-        get => _isIconPlaceholder;
-        set => Set(ref _isIconPlaceholder, value);
-    }
-
+    [ObservableProperty]
+    public partial bool IsIconPlaceholder { get; set; }
+    
     private FileType type;
     public FileType Type
     {
@@ -144,12 +140,8 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         _folderViewModel = null;
     }
 
-    private DragDropEffects cutState = DragDropEffects.None;
-    public DragDropEffects CutState
-    {
-        get => cutState;
-        set => Set(ref cutState, value);
-    }
+    [ObservableProperty]
+    public partial DragDropEffects CutState { get; set; }
 
     private TrashIndexer trashIndex;
     public TrashIndexer TrashIndex

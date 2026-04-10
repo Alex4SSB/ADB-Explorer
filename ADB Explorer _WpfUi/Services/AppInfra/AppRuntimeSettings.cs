@@ -319,11 +319,15 @@ public partial class AppRuntimeSettings : ViewModelBase
         set => Set(ref dragWithinSlave, value);
     }
 
-    private SystemTheme actualTheme = SystemTheme.Light;
-    public SystemTheme ActualTheme
+    private ThumbnailService.ThumbnailSize thumbsSize = ThumbnailService.ThumbnailSize.Disabled;
+    public ThumbnailService.ThumbnailSize ThumbsSize
     {
-        get => actualTheme;
-        set => Set(ref actualTheme, value);
+        get => thumbsSize;
+        set
+        {
+            thumbsSize = value;
+            OnPropertyChanged();
+        }
     }
 
     private List<string> savedLocations = null;
@@ -349,16 +353,15 @@ public partial class AppRuntimeSettings : ViewModelBase
 
     public string AdbPath { get; set; }
 
-    private string tempDragPath = null;
     public string TempDragPath
     {
         get
         {
-            tempDragPath ??= Directory.CreateTempSubdirectory().FullName;
+            field ??= Directory.CreateTempSubdirectory().FullName;
 
-            return tempDragPath;
+            return field;
         }
-    }
+    } = null;
 
     public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
 
