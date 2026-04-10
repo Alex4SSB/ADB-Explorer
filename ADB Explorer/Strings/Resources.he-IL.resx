@@ -1522,4 +1522,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
     <value>גודל תצוגה מקדימה נשמר לכל מיקום</value>
   </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value>אפשרויות פריסה ותצוגה</value>
+  </data>
 </root>
