@@ -33,6 +33,9 @@ public class ThumbnailSnackbarService(ISnackbarService snackbarService) : IHoste
         App.SafeInvoke(() =>
         {
             var presenter = snackbarService.GetSnackbarPresenter();
+            string deviceName = Data.RuntimeSettings.IsRTL
+                                ? $"{TextHelper.RTL_MARK}{Data.DevicesObject.Current.Name}{TextHelper.LTR_MARK}"
+                                : Data.DevicesObject.Current.Name;
 
             if (isStarting)
             {
@@ -47,7 +50,7 @@ public class ThumbnailSnackbarService(ISnackbarService snackbarService) : IHoste
                         };
                         var snackbar = new AdbSnackbar(presenter)
                         {
-                            Title = string.Format(Strings.Resources.S_THUMB_SNACKBAR_TITLE, Data.DevicesObject.Current.Name),
+                            Title = string.Format(Strings.Resources.S_THUMB_SNACKBAR_TITLE, deviceName),
                             Content = _thumbnailPullContent,
                             Appearance = ControlAppearance.Secondary,
                             Timeout = TimeSpan.MaxValue,
@@ -69,10 +72,6 @@ public class ThumbnailSnackbarService(ISnackbarService snackbarService) : IHoste
                     };
                     if (presenter is not null)
                     {
-                        string deviceName = Data.RuntimeSettings.IsRTL
-                        ? $"{TextHelper.RTL_MARK}{Data.DevicesObject.Current.Name}{TextHelper.LTR_MARK}"
-                        : Data.DevicesObject.Current.Name;
-
                         var snackbar = new AdbSnackbar(presenter)
                         {
                             Title = string.Format(Strings.Resources.S_THUMB_SNACKBAR_TITLE, deviceName),

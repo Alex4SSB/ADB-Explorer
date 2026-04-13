@@ -2,7 +2,6 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 using System.Collections;
-using Wpf.Ui.Appearance;
 
 namespace ADB_Explorer.Services;
 

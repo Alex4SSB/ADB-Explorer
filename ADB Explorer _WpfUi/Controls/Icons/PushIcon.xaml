@@ -12,13 +12,23 @@
         <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon" />
     </UserControl.Resources>
     <controls:SimpleStackPanel
-        Margin="-5,0,-6,0"
+        Margin="-7,0,-5,0"
         d:Spacing="-5"
         DataContext="{Binding ElementName=Icon}"
         FlowDirection="LeftToRight"
         Orientation="Horizontal"
         Spacing="{Binding Spacing}">
         <ui:FontIcon FontSize="18" Glyph="&#xE8EA;" />
-        <ui:FontIcon FontSize="14" Glyph="&#xE973;" />
+        <ui:FontIcon FontSize="14" Glyph="&#xE973;">
+            <ui:FontIcon.Style>
+                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                    <Style.Triggers>
+                        <Trigger Property="IsEnabled" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ui:FontIcon.Style>
+        </ui:FontIcon>
     </controls:SimpleStackPanel>
 </UserControl>

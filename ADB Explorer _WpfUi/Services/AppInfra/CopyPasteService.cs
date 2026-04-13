@@ -441,7 +441,20 @@ public class CopyPasteService : ViewModelBase
         // Shell ID List - the only format Microsoft supports for anything added after Windows XP (non-ZIP archives, UNC paths, etc.)
         else if (dataObject.GetDataPresent(AdbDataFormats.ShellidList))
         {
-            var shItems = ShellItemArray.FromDataObject((System.Runtime.InteropServices.ComTypes.IDataObject)dataObject);
+            var ido = (System.Runtime.InteropServices.ComTypes.IDataObject)dataObject;
+            ShellItemArray? shItems = null;
+
+            try
+            {
+                shItems = ShellItemArray.FromDataObject(ido);
+            }
+            catch (Exception e) // E_ACCESS_DENIED may be thrown if the data object has already been disposed by the source, but not from the clipboard
+            {
+#if !DEPLOY
+                DebugLog.PrintLine($"Failed to get ShellItemArray from IDataObject: {e}");
+#endif
+            }
+
             if (shItems is not null)
             {
                 Descriptors = [.. shItems.Select(sh => new FileDescriptor(sh))];
