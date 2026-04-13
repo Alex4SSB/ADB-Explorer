@@ -1525,4 +1525,16 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
     <value>אפשרויות פריסה ותצוגה</value>
   </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value>מיין</value>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value>סדר עולה</value>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value>סדר יורד</value>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>הגדרות מיון נשמרות לכל מיקום</value>
+  </data>
 </root>
