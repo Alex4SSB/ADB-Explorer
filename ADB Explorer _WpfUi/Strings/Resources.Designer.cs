@@ -3565,6 +3565,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sorting column &amp; order saved for each location.
+        /// </summary>
+        public static string S_SETTINGS_SORTING_PER_LOCATION {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_SORTING_PER_LOCATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show Icons For Special Folders.
         /// </summary>
         public static string S_SETTINGS_SPECIAL_DIR_ICONS {
@@ -3741,6 +3750,33 @@ namespace ADB_Explorer.Strings {
         public static string S_SKIP {
             get {
                 return ResourceManager.GetString("S_SKIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sort.
+        /// </summary>
+        public static string S_SORT {
+            get {
+                return ResourceManager.GetString("S_SORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ascending.
+        /// </summary>
+        public static string S_SORT_ASCENDING {
+            get {
+                return ResourceManager.GetString("S_SORT_ASCENDING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Descending.
+        /// </summary>
+        public static string S_SORT_DESCENDING {
+            get {
+                return ResourceManager.GetString("S_SORT_DESCENDING", resourceCulture);
             }
         }
         

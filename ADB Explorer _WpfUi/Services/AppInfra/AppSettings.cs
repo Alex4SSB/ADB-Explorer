@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 
 namespace ADB_Explorer.Services;
 
@@ -41,6 +42,18 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
         OneHour,
     }
 
+    void IJsonOnDeserialized.OnDeserialized()
+    {
+        LocationThumbSize = _locationThumbSize;
+        LocationSorting = _locationSorting;
+    }
+
+    void IJsonOnSerializing.OnSerializing()
+    {
+        _locationThumbSize = LocationThumbSize.Where(kv => kv.Value is not ThumbnailService.ThumbnailSize.Disabled).ToDictionary();
+        _locationSorting = LocationSorting.Where(kv => kv.Value.Property != SortingSelector.SortingProperty.Name || kv.Value.Direction != ListSortDirection.Ascending).ToDictionary();
+    }
+
     [ObservableProperty]
     public partial ThumbnailAge ThumbsAge { get; set; } = ThumbnailAge.OneMonth;
 
@@ -63,48 +76,17 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     [ObservableProperty]
     public partial Dictionary<string, ThumbnailService.ThumbnailSize> LocationThumbSize { get; set; } = [];
 
-    public string[] _mediumThumbLocations { get; set; } = [];
-    public string[] _largeThumbLocations { get; set; } = [];
-    public string[] _xlThumbLocations { get; set; } = [];
+    public Dictionary<string, ThumbnailService.ThumbnailSize> _locationThumbSize { get; set; } = [];
 
-    void IJsonOnDeserialized.OnDeserialized()
-    {
-        try
-        {
-            Dictionary<string, ThumbnailService.ThumbnailSize> dict = [];
-
-            foreach (var loc in _mediumThumbLocations)
-                dict[loc] = ThumbnailService.ThumbnailSize.Medium;
-
-            foreach (var loc in _largeThumbLocations)
-                dict[loc] = ThumbnailService.ThumbnailSize.Large;
-
-            foreach (var loc in _xlThumbLocations)
-                dict[loc] = ThumbnailService.ThumbnailSize.ExtraLarge;
-
-            LocationThumbSize = dict;
-        }
-        catch { }
-
-        try
-        {
-            SavedLocations = [.. _savedLocations];
-        }
-        catch { }
-    }
-
-    void IJsonOnSerializing.OnSerializing()
-    {
-        _mediumThumbLocations = [.. LocationThumbSize.Where(kv => kv.Value == ThumbnailService.ThumbnailSize.Medium).Select(kv => kv.Key)];
-        _largeThumbLocations = [.. LocationThumbSize.Where(kv => kv.Value == ThumbnailService.ThumbnailSize.Large).Select(kv => kv.Key)];
-        _xlThumbLocations = [.. LocationThumbSize.Where(kv => kv.Value == ThumbnailService.ThumbnailSize.ExtraLarge).Select(kv => kv.Key)];
-
-        _savedLocations = [.. SavedLocations];
-    }
-
-    public string[] _savedLocations { get; set; } = [];
+    [ObservableProperty]
+    public partial bool SortingPerLocation { get; set; } = true;
 
     [JsonIgnore]
+    [ObservableProperty]
+    public partial Dictionary<string, SortingSelector.DirSortingOption> LocationSorting { get; set; } = [];
+
+    public Dictionary<string, SortingSelector.DirSortingOption> _locationSorting { get; set; } = [];
+
     [ObservableProperty]
     public partial ObservableCollection<string> SavedLocations { get; set; } = [];
 

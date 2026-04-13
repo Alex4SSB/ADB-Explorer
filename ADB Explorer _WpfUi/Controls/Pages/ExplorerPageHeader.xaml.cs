@@ -621,6 +621,15 @@ public partial class ExplorerPageHeader : UserControl
                 : RuntimeSettings.ThumbsSize;
         }
 
+        if (Settings.SortingPerLocation && Settings.LocationSorting.TryGetValue(CurrentPath, out var sort))
+        {
+            ViewModel.SetSort(sort);
+        }
+        else
+        {
+            ViewModel.SetSort(SortingSelector.SortingProperty.Name, ListSortDirection.Ascending);
+        }
+
         if (FileActions.IsRecycleBin)
         {
             TrashHelper.ParseIndexersAsync().ContinueWith(_ => DirList.Navigate(realPath));
@@ -1382,19 +1391,19 @@ public partial class ExplorerPageHeader : UserControl
         if (FileActions.IsAppDrive)
             return;
 
-        var collectionView = CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource);
-        var sortDirection = ListHelper.Invert(e.Column.SortDirection);
-        e.Column.SortDirection = sortDirection;
+        var sortedColumn = e.Column switch
+        {
+            var c when c == DateColumn => SortingSelector.SortingProperty.Date,
+            var c when c == TypeColumn => SortingSelector.SortingProperty.Type,
+            var c when c == SizeColumn => SortingSelector.SortingProperty.Size,
+            _ => SortingSelector.SortingProperty.Name
+        };
 
-        collectionView.SortDescriptions.Clear();
-        collectionView.SortDescriptions.Add(new(nameof(FileClass.IsTemp), ListSortDirection.Descending));
-        collectionView.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListHelper.Invert(sortDirection)));
+        var currentDirection = sortedColumn == ViewModel.SortedColumn ? ViewModel.SortDirection : null;
+        var direction = ListHelper.Invert(currentDirection);
+        ViewModel.SetSort(sortedColumn, direction);
 
-        if (e.Column.SortMemberPath != nameof(FileClass.FullName))
-            collectionView.SortDescriptions.Add(new(e.Column.SortMemberPath, sortDirection));
-
-        collectionView.SortDescriptions.Add(new(nameof(FileClass.SortName), sortDirection));
-
+        e.Column.SortDirection = direction;
         e.Handled = true;
     }
 

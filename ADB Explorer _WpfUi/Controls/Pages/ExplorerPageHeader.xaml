@@ -28,6 +28,7 @@
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
         <local:AdbContextMenu x:Key="RowContextMenu" Style="{StaticResource ExplorerContextMenuStyle}" />
         <converters:StringFormatConverter x:Key="StringFormatConverter" />
+        <converters:ColumnSortDirectionConverter x:Key="ColumnSortDirectionConverter" />
         <helpers:BindingProxy x:Key="ViewModelProxy" Data="{Binding}" />
         <Style
             x:Key="DataGridCellStyle"
@@ -154,6 +155,9 @@
                 </StackPanel.Style>
                 <Separator Margin="0,2" />
                 <local:ThumbsSizeSelector ThumbnailSize="{Binding CurrentThumbsSize, Mode=TwoWay}" />
+                <local:SortingSelector
+                    SortDirection="{Binding SortDirection, Mode=TwoWay}"
+                    SortOption="{Binding SortedColumn, Mode=TwoWay}" />
             </StackPanel>
             <Border
                 Grid.Column="3"
@@ -314,9 +318,14 @@
                                 Width="300"
                                 Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_NAME}}"
                                 IsReadOnly="True"
-                                SortDirection="{Binding Source={StaticResource ViewModelProxy}, Path=Data.NameColumnSortDirection}"
                                 SortMemberPath="FullName"
                                 Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
+                                <DataGridTemplateColumn.SortDirection>
+                                    <MultiBinding Converter="{StaticResource ColumnSortDirectionConverter}" ConverterParameter="Name">
+                                        <Binding Path="Data.SortDirection" Source="{StaticResource ViewModelProxy}" />
+                                        <Binding Path="Data.SortedColumn" Source="{StaticResource ViewModelProxy}" />
+                                    </MultiBinding>
+                                </DataGridTemplateColumn.SortDirection>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Grid>
@@ -373,6 +382,12 @@
                                 IsReadOnly="True"
                                 SortMemberPath="ModifiedTime"
                                 Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
+                                <DataGridTextColumn.SortDirection>
+                                    <MultiBinding Converter="{StaticResource ColumnSortDirectionConverter}" ConverterParameter="Date">
+                                        <Binding Path="Data.SortDirection" Source="{StaticResource ViewModelProxy}" />
+                                        <Binding Path="Data.SortedColumn" Source="{StaticResource ViewModelProxy}" />
+                                    </MultiBinding>
+                                </DataGridTextColumn.SortDirection>
                                 <DataGridTextColumn.ElementStyle>
                                     <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
                                         <Setter Property="Visibility" Value="Collapsed" />
@@ -395,6 +410,12 @@
                                 IsReadOnly="True"
                                 SortMemberPath="FolderViewModel.TypeName"
                                 Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
+                                <DataGridTemplateColumn.SortDirection>
+                                    <MultiBinding Converter="{StaticResource ColumnSortDirectionConverter}" ConverterParameter="Type">
+                                        <Binding Path="Data.SortDirection" Source="{StaticResource ViewModelProxy}" />
+                                        <Binding Path="Data.SortedColumn" Source="{StaticResource ViewModelProxy}" />
+                                    </MultiBinding>
+                                </DataGridTemplateColumn.SortDirection>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <emoji:TextBlock
@@ -413,6 +434,12 @@
                                 IsReadOnly="True"
                                 SortMemberPath="Size"
                                 Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
+                                <DataGridTextColumn.SortDirection>
+                                    <MultiBinding Converter="{StaticResource ColumnSortDirectionConverter}" ConverterParameter="Size">
+                                        <Binding Path="Data.SortDirection" Source="{StaticResource ViewModelProxy}" />
+                                        <Binding Path="Data.SortedColumn" Source="{StaticResource ViewModelProxy}" />
+                                    </MultiBinding>
+                                </DataGridTextColumn.SortDirection>
                                 <DataGridTextColumn.ElementStyle>
                                     <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
                                         <Setter Property="Text" Value="{Binding FolderViewModel.SizeString}" />

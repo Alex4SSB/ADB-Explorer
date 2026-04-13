@@ -1878,4 +1878,20 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Thumbnail Size Saved For Each Location</value>
     <comment>The setting that enables keeping track of the last thumbnail size selected for each location / folder</comment>
   </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value>Sort</value>
+    <comment>The button to sort files</comment>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value>Ascending</value>
+    <comment>File list sorting direction - ascending</comment>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value>Descending</value>
+    <comment>File list sort direction - descending</comment>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>Sorting column &amp; order saved for each location</value>
+    <comment>The setting that enables keeping track of the last sorted column and direction selected for each location / folder</comment>
+  </data>
 </root>

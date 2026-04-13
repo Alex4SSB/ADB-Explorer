@@ -426,8 +426,10 @@ public static partial class ThumbnailService
             : new("", deviceInfo.DeviceMoviesThumbnailDir, AbstractFile.FileType.Folder);
 
         var deviceDir = FileHelper.GetParentPath(deviceInfo.LocalThumbnailDir);
-        var device = Data.DevicesObject.LogicalDeviceViewModels.First(d => d.LogicalID == deviceInfo.DeviceId);
-        
+        var device = Data.DevicesObject.LogicalDeviceViewModels.FirstOrDefault(d => d.LogicalID == deviceInfo.DeviceId);
+        if (device is null)
+            return;
+
         Task.Run(() =>
         {
             var opsList = FileActionLogic.SilentPullFiles(device, deviceDir, Data.Settings.LimitThumbsPullSpeed, filesToReplace, pics, movies).ToList();

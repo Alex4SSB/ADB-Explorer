@@ -1,0 +1,110 @@
+﻿<UserControl
+    x:Class="ADB_Explorer.Controls.SortingSelector"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ADB_Explorer.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    x:Name="sortingSelector"
+    mc:Ignorable="d">
+    <local:AdbMenu DataContext="{Binding ElementName=sortingSelector}">
+        <local:AdbMenu.Style>
+            <Style BasedOn="{StaticResource AdbMenuStyle}" TargetType="local:AdbMenu">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </local:AdbMenu.Style>
+        <local:AdbMenuItem ItemsSource="{Binding Items}" ToolTip="{Binding Source={x:Static Member=strings:Resources.S_SORT}}">
+            <local:AdbMenuItem.Resources>
+                <ui:FontIcon
+                    x:Key="ThumbCheckedIcon"
+                    Margin="14,0"
+                    x:Shared="False"
+                    FontSize="6"
+                    Glyph="&#xF137;">
+                    <ui:FontIcon.Style>
+                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsChecked}" Value="False">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:FontIcon.Style>
+                </ui:FontIcon>
+            </local:AdbMenuItem.Resources>
+            <local:AdbMenuItem.Header>
+                <local:SimpleStackPanel Orientation="Horizontal" Spacing="6">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <ui:FontIcon
+                            d:FontSize="14"
+                            d:FontWeight="Bold"
+                            d:Foreground="#4CC2FF"
+                            Glyph="&#xE7EB;">
+                            <ui:FontIcon.Style>
+                                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                    <Setter Property="FontSize" Value="10" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SortDirection}" Value="Ascending">
+                                            <Setter Property="FontWeight" Value="Bold" />
+                                            <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+                                            <Setter Property="FontSize" Value="14" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:FontIcon.Style>
+                        </ui:FontIcon>
+                        <ui:FontIcon
+                            Grid.Column="1"
+                            Margin="-4,0,0,0"
+                            d:FontSize="10"
+                            Glyph="&#xE7EB;"
+                            RenderTransformOrigin="0.5,0.5">
+                            <ui:FontIcon.RenderTransform>
+                                <RotateTransform Angle="180" />
+                            </ui:FontIcon.RenderTransform>
+                            <ui:FontIcon.Style>
+                                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                    <Setter Property="FontSize" Value="10" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SortDirection}" Value="Descending">
+                                            <Setter Property="FontWeight" Value="Bold" />
+                                            <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+                                            <Setter Property="FontSize" Value="14" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:FontIcon.Style>
+                        </ui:FontIcon>
+                    </Grid>
+                    <TextBlock Margin="0,0,0,2" Text="{Binding Source={x:Static Member=strings:Resources.S_SORT}}" />
+                    <ui:FontIcon
+                        Margin="0,2,0,0"
+                        FontSize="8"
+                        Glyph="&#xE70D;" />
+                </local:SimpleStackPanel>
+            </local:AdbMenuItem.Header>
+            <local:AdbMenuItem.ItemContainerStyle>
+                <Style TargetType="local:AdbMenuItem">
+                    <Setter Property="Icon" Value="{StaticResource ThumbCheckedIcon}" />
+                    <Setter Property="Command" Value="{Binding Action.Command}" />
+                </Style>
+            </local:AdbMenuItem.ItemContainerStyle>
+            <local:AdbMenuItem.ItemTemplate>
+                <DataTemplate DataType="local:SortingSelector.SortingSelectorItem">
+                    <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+            </local:AdbMenuItem.ItemTemplate>
+        </local:AdbMenuItem>
+    </local:AdbMenu>
+</UserControl>

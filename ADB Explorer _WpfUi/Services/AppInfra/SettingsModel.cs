@@ -145,6 +145,7 @@ public static class UISettings
             [
                 new BoolSetting(() => Settings.ShowExtensions, Strings.Resources.S_SETTINGS_SHOW_EXTENSIONS, icon: "\uE8AC"),
                 new BoolSetting(() => Settings.ShowHiddenItems, Strings.Resources.S_SETTINGS_HIDDEN_ITEMS, icon: "\uE8FF"),
+                new BoolSetting(() => Settings.SortingPerLocation, Strings.Resources.S_SETTINGS_SORTING_PER_LOCATION, icon: "\uE8CB"),
                 new DoubleClickSetting(() => Settings.DoubleClick, Strings.Resources.S_SETTINGS_GROUP_DOUBLE_CLICK, [
                     new(AppSettings.DoubleClickAction.None, Strings.Resources.S_SETTINGS_DOUBLE_CLICK_NONE),
                     new(AppSettings.DoubleClickAction.Pull, Strings.Resources.S_SETTINGS_DOUBLE_CLICK_PULL, AbstractSetting.ExtractPropertyInfo(() => Settings.DefaultFolder)),

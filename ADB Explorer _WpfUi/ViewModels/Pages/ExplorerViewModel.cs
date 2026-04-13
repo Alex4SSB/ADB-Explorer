@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Converters;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
@@ -15,7 +16,67 @@ public partial class ExplorerViewModel : ObservableObject
     public partial ICollectionView DriveItemsSource { get; set; }
 
     [ObservableProperty]
-    public partial ListSortDirection? NameColumnSortDirection { get; set; }
+    public partial ListSortDirection? SortDirection { get; set; }
+
+    [ObservableProperty]
+    public partial SortingSelector.SortingProperty? SortedColumn { get; set; }
+
+    private bool _suppressSortApply;
+
+    partial void OnSortDirectionChanged(ListSortDirection? value)
+    {
+        if (!_suppressSortApply)
+            ApplySortToView();
+    }
+
+    partial void OnSortedColumnChanged(SortingSelector.SortingProperty? value)
+    {
+        if (!_suppressSortApply)
+            ApplySortToView();
+    }
+
+    private void ApplySortToView()
+    {
+        if (SortDirection is not { } dir || SortedColumn is not { } col || ExplorerItemsSource is not { } view)
+            return;
+
+        view.SortDescriptions.Clear();
+        view.SortDescriptions.Add(new(nameof(FileClass.IsTemp), ListSortDirection.Descending));
+        view.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListHelper.Invert(dir)));
+
+        var sortProp = col switch
+        {
+            SortingSelector.SortingProperty.Date => nameof(FileClass.ModifiedTime),
+            SortingSelector.SortingProperty.Size => nameof(FileClass.Size),
+            SortingSelector.SortingProperty.Type => $"{nameof(FolderViewModel)}.{nameof(FolderViewModel.TypeName)}",
+            _ => nameof(FileClass.SortName),
+        };
+
+        view.SortDescriptions.Add(new(sortProp, dir));
+
+        if (Data.Settings.SortingPerLocation)
+        {
+            if (Data.Settings.LocationSorting.ContainsKey(Data.CurrentPath))
+            {
+                Data.Settings.LocationSorting[Data.CurrentPath] = new(col, dir);
+            }
+            else
+            {
+                Data.Settings.LocationSorting.Add(Data.CurrentPath, new(col, dir));
+            }
+        }
+    }
+
+    public void SetSort(SortingSelector.DirSortingOption sort) => SetSort(sort.Property, sort.Direction);
+
+    public void SetSort(SortingSelector.SortingProperty column, ListSortDirection direction)
+    {
+        _suppressSortApply = true;
+        SortedColumn = column;
+        SortDirection = direction;
+        _suppressSortApply = false;
+        ApplySortToView();
+    }
 
     [ObservableProperty]
     public partial ListSortDirection? PackageTypeColumnSortDirection { get; set; }
@@ -202,17 +263,28 @@ public partial class ExplorerViewModel : ObservableObject
                     ? FileHelper.HideFiles()
                     : file => !FileHelper.IsHiddenRecycleItem((FileClass)file);
 
+                SortDirection ??= ListSortDirection.Ascending;
+                SortedColumn ??= SortingSelector.SortingProperty.Name;
+
                 if (!view.SortDescriptions.Any(d => d.PropertyName
                         is nameof(FileClass.IsTemp)
                         or nameof(FileClass.IsDirectory)
                         or nameof(FileClass.SortName)))
                 {
+                    var dir = SortDirection.Value;
                     view.SortDescriptions.Add(new(nameof(FileClass.IsTemp), ListSortDirection.Descending));
-                    view.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListSortDirection.Descending));
-                    view.SortDescriptions.Add(new(nameof(FileClass.SortName), ListSortDirection.Ascending));
-                }
+                    view.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListHelper.Invert(dir)));
 
-                NameColumnSortDirection ??= ListSortDirection.Ascending;
+                    var sortProp = SortedColumn.Value switch
+                    {
+                        SortingSelector.SortingProperty.Date => nameof(FileClass.ModifiedTime),
+                        SortingSelector.SortingProperty.Size => nameof(FileClass.Size),
+                        SortingSelector.SortingProperty.Type => $"{nameof(FolderViewModel)}.{nameof(FolderViewModel.TypeName)}",
+                        _ => nameof(FileClass.SortName),
+                    };
+
+                    view.SortDescriptions.Add(new(sortProp, dir));
+                }
             }
 
             ExplorerItemsSource = view;
