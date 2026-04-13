@@ -1523,6 +1523,18 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>布局和视图选项</value>
   </data>
   <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
-    <value>为不同位置所保存的缩略图尺寸</value>
+    <value>记住不同位置的缩略图尺寸</value>
+  </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value>排序</value>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value>升序</value>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value>降序</value>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>记住每个位置进行排序的列和所选方向</value>
   </data>
 </root>
