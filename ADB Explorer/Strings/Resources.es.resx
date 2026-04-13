@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>Icono(s) de Android</value>
+    <value>Icono(s) del Robot Android</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>El robot de Android se reproduce o modifica a partir del trabajo generado y compartido por Google, y se usa conforme a lo descrito en la Licencia de Atribución de Creative Commons 3.0.</value>
@@ -127,7 +127,7 @@
     <value>Animaciones de la Aplicación</value>
   </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
-    <value>El ícono de la aplicación está licenciado bajo la Licencia de Apache, Versión 2.0.</value>
+    <value>El icono de la aplicación está licenciado bajo la Licencia de Apache, Versión 2.0.</value>
   </data>
   <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
     <value>No se puede obtener la versión de ADB de la ruta especificada.</value>
@@ -1485,5 +1485,32 @@ Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
   </data>
   <data name="S_STRING_PASTE" xml:space="preserve">
     <value>Pegar</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>Comprobando huellas de actualizaciones</value>
+  </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value>Detalles</value>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value>Vista</value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>Iconos medianos</value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>Iconos grandes</value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>Iconos extragrandes</value>
+  </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value>Opciones de distribución y vista</value>
+  </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value>Tamaño de huellas guardadas para cada lugar</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>Subir huellas</value>
   </data>
 </root>
