@@ -1486,4 +1486,49 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
   <data name="S_STRING_PASTE" xml:space="preserve">
     <value>Tempel</value>
   </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>Memeriksa pembaruan thumbnail</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>Mengambil thumbnail</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>Membaca lokasi thumbnail dan basis data media</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_TITLE" xml:space="preserve">
+    <value>{0} Thumbnail</value>
+  </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value>Detail</value>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value>Tampilan</value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>Ikon Sedang</value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>Ikon Besar</value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>Ikon Sangat Besar</value>
+  </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value>Opsi tata letak dan tampilan</value>
+  </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value>Ukuran Thumbnail Disimpan Untuk Setiap Lokasi</value>
+  </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value>Urutkan</value>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value>Naik</value>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value>Turun</value>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>Kolom pengurutan &amp; urutan disimpan untuk setiap lokasi</value>
+  </data>
 </root>
