@@ -1513,4 +1513,22 @@ Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
   <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
     <value>Subir huellas</value>
   </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>Leer miniaturas de lugares y base de datos del medio</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_TITLE" xml:space="preserve">
+    <value>{0} Miniaturas</value>
+  </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value>Ordenar</value>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value>Ascendente</value>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value>Descendente</value>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>Ordenar columna y ordenación guardada por cada lugar</value>
+  </data>
 </root>
