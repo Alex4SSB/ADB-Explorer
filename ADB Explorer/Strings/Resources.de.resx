@@ -1486,4 +1486,28 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_STRING_PASTE" xml:space="preserve">
     <value>Einfügen</value>
   </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value>Sortieren</value>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value>Aufsteigend</value>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value>Absteigend</value>
+  </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value>Ansicht</value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>Mittelgroße Symbole</value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>Große Symbole</value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>Extragroße Symbole</value>
+  </data>
 </root>
