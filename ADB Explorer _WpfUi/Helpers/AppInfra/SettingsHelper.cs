@@ -6,9 +6,6 @@ namespace ADB_Explorer.Helpers;
 
 public static class SettingsHelper
 {
-    public static void DisableAnimationTipAction() =>
-        DialogService.ShowMessage(Strings.Resources.S_DISABLE_ANIMATION, Strings.Resources.S_ANIMATION_TITLE, DialogService.DialogIcon.Tip);
-
     public static void ResetAppAction()
     {
         Process.Start(Environment.ProcessPath);

@@ -21,7 +21,6 @@ public static class UISettings
         { ActionType.ChangeDefaultPath, "\uE70F" },
         { ActionType.ClearDefaultPath, "\uE711" },
         { ActionType.ResetApp, "\uE72C" },
-        { ActionType.AnimationInfo, "\uE82F" },
     };
 
     private static readonly List<SettingsAction> SettingsActions =
@@ -197,19 +196,12 @@ public static class UISettings
                                  Settings.CultureTranslationProgress,
                                  "\uF2B7",
                                  SettingsActions.Find(a => a.Name is ActionType.ResetApp)),
-                //new BoolSetting(() => Settings.ForceFluentStyles, Strings.Resources.S_SETTINGS_FLUENT, visibleProp: () => RuntimeSettings.HideForceFluent),
                 new ThemeSetting(() => Settings.Theme, Strings.Resources.S_SETTINGS_GROUP_THEME, new() {
                     { AppSettings.AppTheme.Light, Strings.Resources.S_SETTINGS_THEME_LIGHT },
                     { AppSettings.AppTheme.Dark, Strings.Resources.S_SETTINGS_THEME_DARK },
                     { AppSettings.AppTheme.WindowsDefault, Strings.Resources.S_SETTINGS_THEME_DEFAULT } },
                     icon: "\uE2B1"),
                 new BoolSetting(() => Settings.SwRender, Strings.Resources.S_SETTINGS_DISABLE_HW, icon: "\uF211"),
-                //new BoolSetting(() => Settings.DisableAnimation,
-                //                Strings.Resources.S_SETTINGS_ANIMATION,
-                //                commands: [
-                //                    SettingsActions.Find(a => a.Name is ActionType.ResetApp),
-                //                    SettingsActions.Find(a => a.Name is ActionType.AnimationInfo),
-                //                ]),
                 new BoolSetting(() => Settings.EnableSplash, Strings.Resources.S_SETTINGS_SPLASH),
             ], "\uE2B1"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_ABOUT,
@@ -280,10 +272,6 @@ public class SettingsGroup : AbstractGroup
         Name = name;
         Children = children;
         Icon = icon;
-
-        //Children.ForEach(c => c.GroupName = Name);
-
-        //Children.OfType<EnumSetting>().ForEach(es => es.Icon = icon);
     }
 }
 
@@ -293,7 +281,6 @@ public abstract class AbstractSetting : SettingsBase
     protected readonly PropertyInfo visibleProp;
 
     public string Description { get; private set; }
-    //public string GroupName { get; set; }
     public string Icon { get; set; }
     public TextAlignment HeaderAlignment { get; protected set; }
 
@@ -442,6 +429,48 @@ public class LinkSetting : AbstractSetting
                 Height = 22,
                 Stretch = Stretch.Uniform,
             };
+        }
+    }
+}
+
+public class NumericSetting : AbstractSetting
+{
+    public int Value
+    {
+        get => (int)valueProp.GetValue(Settings);
+        set => valueProp.SetValue(Settings, value);
+}
+
+    public int MinValue { get; }
+
+    public int MaxValue { get; }
+
+    public string Unit { get; }
+
+    public NumericSetting(Expression<Func<int>> propertyExpr,
+                          string description,
+                          int minValue = int.MinValue,
+                          int maxValue = int.MaxValue,
+                          string unit = "",
+                          PropertyInfo visibleProp = null,
+                          string icon = null,
+                          params BaseAction[] commands)
+        : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
+    {
+        Unit = unit;
+        MinValue = minValue;
+        MaxValue = maxValue;
+    }
+
+    protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == valueProp.Name)
+        {
+            OnPropertyChanged(nameof(Value));
+        }
+        else if (e.PropertyName == visibleProp?.Name)
+        {
+            OnPropertyChanged(nameof(Visibility));
         }
     }
 }
@@ -669,7 +698,6 @@ public class SettingsAction : BaseAction
         ClearDefaultPath,
         ClearAdbPath,
         ResetApp,
-        AnimationInfo,
     }
 
     public ActionType Name { get; }

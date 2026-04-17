@@ -382,6 +382,23 @@
                 </Grid>
             </ui:CardControl>
         </DataTemplate>
+        <DataTemplate x:Key="NumericSettingTemplate" DataType="services:NumericSetting">
+            <ui:CardControl Style="{StaticResource SettingsCardHeaderStyle}">
+                <local:SimpleStackPanel
+                    FlowDirection="LeftToRight"
+                    Orientation="Horizontal"
+                    Spacing="6">
+                    <ui:NumberBox
+                        ClearButtonEnabled="False"
+                        ContextMenu="{x:Null}"
+                        Maximum="{Binding MaxValue}"
+                        Minimum="{Binding MinValue}"
+                        SmallChange="1"
+                        Value="{Binding Value}" />
+                    <TextBlock VerticalAlignment="Center" Text="{Binding Unit}" />
+                </local:SimpleStackPanel>
+            </ui:CardControl>
+        </DataTemplate>
         <helpers:SettingsTemplateSelector
             x:Key="GroupedSettingsTemplateSelector"
             BoolSettingTemplate="{StaticResource BoolSettingTemplate}"
@@ -391,6 +408,7 @@
             LinkSettingTemplate="{StaticResource LinkSettingTemplate}"
             LongDescriptionTemplate="{StaticResource LongDescriptionSettingTemplate}"
             MultiLinkSettingTemplate="{StaticResource MultiLinkSettingTemplate}"
+            NumericTemplate="{StaticResource NumericSettingTemplate}"
             TextboxSettingTemplate="{StaticResource TextboxSettingTemplate}" />
         <Style
             x:Key="SettingsContainerStyle"
