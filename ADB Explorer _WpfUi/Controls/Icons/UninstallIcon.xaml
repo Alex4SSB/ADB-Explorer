@@ -14,6 +14,16 @@
         <ui:FontIcon
             Margin="0,0,-26,-20"
             FontSize="10"
-            Glyph="&#xECC9;" />
+            Glyph="&#xECC9;">
+            <ui:FontIcon.Style>
+                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                    <Style.Triggers>
+                        <Trigger Property="IsEnabled" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCriticalBrush}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ui:FontIcon.Style>
+        </ui:FontIcon>
     </Grid>
 </UserControl>

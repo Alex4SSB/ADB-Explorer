@@ -19,7 +19,10 @@
         Orientation="Horizontal"
         Spacing="{Binding Spacing}">
         <ui:FontIcon FontSize="18" Glyph="&#xE8EA;" />
-        <ui:FontIcon FontSize="14" Glyph="&#xE974;">
+        <ui:FontIcon
+            d:Foreground="#4CC2FF"
+            FontSize="14"
+            Glyph="&#xE974;">
             <ui:FontIcon.Style>
                 <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                     <Style.Triggers>

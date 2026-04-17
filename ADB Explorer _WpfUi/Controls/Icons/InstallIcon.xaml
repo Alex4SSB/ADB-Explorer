@@ -13,7 +13,18 @@
         <ui:FontIcon Glyph="&#xE7B8;" />
         <ui:FontIcon
             Margin="0,0,-26,-16"
+            d:Foreground="#4CC2FF"
             FontSize="10"
-            Glyph="&#xE896;" />
+            Glyph="&#xE896;">
+            <ui:FontIcon.Style>
+                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                    <Style.Triggers>
+                        <Trigger Property="IsEnabled" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ui:FontIcon.Style>
+        </ui:FontIcon>
     </Grid>
 </UserControl>
