@@ -102,20 +102,13 @@
     <ControlTemplate x:Key="DefaultExpanderToggleButtonStyle" TargetType="{x:Type ToggleButton}">
         <Grid Background="Transparent">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <ContentPresenter
-                x:Name="ContentPresenter"
-                Grid.Column="0"
-                Margin="{TemplateBinding Padding}"
-                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                Content="{TemplateBinding Content}"
-                TextElement.FontSize="{TemplateBinding FontSize}" />
             <Grid
                 x:Name="ChevronGrid"
-                Grid.Column="1"
+                Grid.Column="0"
                 Margin="{TemplateBinding Padding}"
                 VerticalAlignment="Center"
                 Background="Transparent"
@@ -133,8 +126,19 @@
                     </ui:SymbolIcon.RenderTransform>
                 </ui:SymbolIcon>
             </Grid>
+            <ContentPresenter
+                x:Name="ContentPresenter"
+                Grid.Column="1"
+                Margin="{TemplateBinding Padding}"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                Content="{TemplateBinding Content}"
+                TextElement.FontSize="{TemplateBinding FontSize}" />
         </Grid>
         <ControlTemplate.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.ChevronPlacement)}" Value="Right">
+                <Setter TargetName="ChevronGrid" Property="Grid.Column" Value="2" />
+            </DataTrigger>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=ExpandDirection}" Value="Left">
                 <Setter TargetName="ControlChevronIcon" Property="RenderTransform">
                     <Setter.Value>
@@ -206,6 +210,7 @@
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="helpers:ExpanderHelper.ExpanderArrow" Value="CCW" />
+        <Setter Property="helpers:ExpanderHelper.ChevronPlacement" Value="Right" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Expander}">

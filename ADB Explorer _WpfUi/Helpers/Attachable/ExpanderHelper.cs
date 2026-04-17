@@ -22,6 +22,19 @@ public static class ExpanderHelper
             typeof(ExpanderHelper),
             null);
 
+    public static AlignmentX GetChevronPlacement(Control control) =>
+        (AlignmentX)control.GetValue(ChevronPlacementProperty);
+
+    public static void SetChevronPlacement(Control control, AlignmentX value) =>
+        control.SetValue(ChevronPlacementProperty, value);
+
+    public static readonly DependencyProperty ChevronPlacementProperty =
+        DependencyProperty.RegisterAttached(
+            "ChevronPlacement",
+            typeof(AlignmentX),
+            typeof(ExpanderHelper),
+            new(AlignmentX.Right));
+
     public static bool GetIsListItem(Control control) =>
         (bool)control.GetValue(IsListItemProperty);
 
