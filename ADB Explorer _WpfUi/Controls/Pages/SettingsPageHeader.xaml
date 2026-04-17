@@ -337,6 +337,7 @@
         <DataTemplate x:Key="GroupedEnumSettingTemplate" DataType="services:EnumSetting">
             <ui:CardControl Style="{StaticResource SettingsCardHeaderStyle}">
                 <ComboBox
+                    ContextMenu="{x:Null}"
                     DisplayMemberPath="Name"
                     ItemsSource="{Binding Buttons}"
                     SelectedValue="{Binding Value, Mode=TwoWay}"
@@ -368,7 +369,7 @@
                         PlaceholderText="{x:Static strings:Resources.S_PLACEHOLDER_NOT_SET}"
                         Text="{Binding Value}">
                         <ui:TextBox.Style>
-                            <Style BasedOn="{StaticResource TooltipTextBoxStyle}" TargetType="ui:TextBox">
+                            <Style BasedOn="{StaticResource AdbTextBoxStyle}" TargetType="ui:TextBox">
                                 <Setter Property="FlowDirection" Value="LeftToRight" />
                                 <Style.Triggers>
                                     <Trigger Property="Text" Value="">
@@ -483,6 +484,7 @@
                             Height="32"
                             Padding="30,5,30,6"
                             PlaceholderText="{x:Static strings:Resources.S_SEARCH_SETTINGS}"
+                            Style="{StaticResource AdbTextBoxStyle}"
                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         <ui:FontIcon
                             Margin="6,0,0,0"
