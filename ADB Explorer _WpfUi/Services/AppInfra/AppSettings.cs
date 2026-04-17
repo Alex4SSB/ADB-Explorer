@@ -36,6 +36,7 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
 
     public enum ThumbnailAge
     {
+        Disabled,
         OneMonth,
         OneWeek,
         OneDay,
@@ -55,7 +56,7 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     }
 
     [ObservableProperty]
-    public partial ThumbnailAge ThumbsAge { get; set; } = ThumbnailAge.OneMonth;
+    public partial ThumbnailAge ThumbsAge { get; set; } = ThumbnailAge.Disabled;
 
     [ObservableProperty]
     public partial ThumbnailMode ThumbsMode { get; set; } = ThumbnailMode.Off;
@@ -77,6 +78,9 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     public partial Dictionary<string, ThumbnailService.ThumbnailSize> LocationThumbSize { get; set; } = [];
 
     public Dictionary<string, ThumbnailService.ThumbnailSize> _locationThumbSize { get; set; } = [];
+
+    [ObservableProperty]
+    public partial int MaxCustomThumbWeight { get; set; } = 0;
 
     [ObservableProperty]
     public partial bool SortingPerLocation { get; set; } = true;

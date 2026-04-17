@@ -30,7 +30,6 @@ public static class UISettings
         new(ActionType.ChangeAdbPath, () => true, SettingsHelper.ChangeAdbPathAction, Icons[ActionType.ChangeDefaultPath], Strings.Resources.S_BUTTON_CHANGE),
         new(ActionType.ClearAdbPath, () => !string.IsNullOrEmpty(Settings.ManualAdbPath), () => Settings.ManualAdbPath = "", Icons[ActionType.ClearDefaultPath], Strings.Resources.S_BUTTON_CLEAR),
         new(ActionType.ResetApp, () => true, SettingsHelper.ResetAppAction, Icons[ActionType.ResetApp], Strings.Resources.S_RESTART_APP),
-        new(ActionType.AnimationInfo, () => true, SettingsHelper.DisableAnimationTipAction, Icons[ActionType.AnimationInfo], Strings.Resources.S_BUTTON_MORE_INFO_TOOLTIP),
     ];
 
     /// <summary>
@@ -163,12 +162,20 @@ public static class UISettings
                 new BoolSetting(() => Settings.ThumbSizePerLocation, Strings.Resources.S_SETTINGS_THUMB_SIZE_PER_LOCATION, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uEFFF"),
                 new BoolSetting(() => Settings.PersistThumbs, Strings.Resources.S_SETTINGS_PERSIST_THUMBS, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uE78C"),
                 new ThumbsAgeSetting(() => Settings.ThumbsAge, Strings.Resources.S_SETTINGS_THUMBS_AGE, [
+                    new(AppSettings.ThumbnailAge.Disabled, Strings.Resources.S_SETTINGS_INACTIVE),
                     new(AppSettings.ThumbnailAge.OneMonth, Strings.Resources.S_ONE_MONTH),
                     new(AppSettings.ThumbnailAge.OneWeek, Strings.Resources.S_ONE_WEEK),
                     new(AppSettings.ThumbnailAge.OneDay, Strings.Resources.S_ONE_DAY),
                     new(AppSettings.ThumbnailAge.OneHour, Strings.Resources.S_ONE_HOUR)],
                     AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode),
                     "\uE823"),
+                new NumericSetting(() => Settings.MaxCustomThumbWeight,
+                                   Strings.Resources.S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT,
+                                   0,
+                                   1000,
+                                   Strings.Resources.KILO.Replace("{0}", "").Trim(),
+                                   AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode),
+                                   "\uEE71"),
                 new BoolSetting(() => Settings.LimitThumbsPullSpeed, Strings.Resources.S_SETTINGS_THUMBS_THROTTLE, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uEC48"),
                 new BoolSetting(() => Settings.SpecialFolderIcons, Strings.Resources.S_SETTINGS_SPECIAL_DIR_ICONS, icon: "\uEC25"),
             ], "\uE8B9"),
@@ -439,7 +446,7 @@ public class NumericSetting : AbstractSetting
     {
         get => (int)valueProp.GetValue(Settings);
         set => valueProp.SetValue(Settings, value);
-}
+    }
 
     public int MinValue { get; }
 

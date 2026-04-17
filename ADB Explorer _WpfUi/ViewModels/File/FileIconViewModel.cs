@@ -82,6 +82,9 @@ public partial class FileIconViewModel : FileViewModelBase
 
             var thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file.FullPath, size);
 
+            if (thumbnail is null)
+                ThumbnailService.TryPullCustomThumbnail(Data.DevicesObject.Current, _file);
+
             if (token.IsCancellationRequested)
                 return;
 

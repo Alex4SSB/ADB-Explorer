@@ -11,6 +11,7 @@ public static partial class ThumbnailService
     private const string PICTURES_THUMBNAILS = "/sdcard/Pictures/.thumbnails";
     private const string MOVIES_THUMBNAILS = "/sdcard/Movies/.thumbnails";
     private const string CSV_CACHE_FILE = "thumbnailInfo.csv";
+    private const string CUSTOM_PHOTOS_SUBFOLDER = "CustomThumbs";
     
     static readonly TimeSpan MONTH = TimeSpan.FromDays(30);
     static readonly TimeSpan WEEK = TimeSpan.FromDays(7);
@@ -25,16 +26,16 @@ public static partial class ThumbnailService
         video,
     }
 
-    public record struct ThumbnailInfo(string Id, MediaType Type, Size? Resolution, TimeSpan? Duration, DateTime LastUpdate)
+    public record struct ThumbnailInfo(string Id, MediaType Type, Size? Resolution, TimeSpan? Duration, DateTime LastUpdate, string LocalFolder = "")
     {
         const string CsvDateFormat = "yyyy-MM-dd_HH:mm";
 
-        public readonly string ToCsv() => $"{Id}|{Type}|{Resolution?.Width}|{Resolution?.Height}|{Duration?.TotalMilliseconds}|{(LastUpdate == DateTime.MinValue ? null : LastUpdate.ToString(CsvDateFormat))}";
+        public readonly string ToCsv() => $"{Id}|{Type}|{Resolution?.Width}|{Resolution?.Height}|{Duration?.TotalMilliseconds}|{(LastUpdate == DateTime.MinValue ? null : LastUpdate.ToString(CsvDateFormat))}|{LocalFolder}";
 
         public static ThumbnailInfo? FromCsv(string csv)
         {
             var parts = csv.Split('|');
-            if (parts.Length != 6)
+            if (parts.Length is not 6 and not 7)
                 return null;
 
             string id = parts[0];
@@ -51,7 +52,9 @@ public static partial class ThumbnailService
                 ? parsedDate
                 : DateTime.MinValue;
 
-            return new(id, type, resolution, duration, lastUpdate);
+            string localFolder = parts.Length == 7 ? parts[6] : "";
+
+            return new(id, type, resolution, duration, lastUpdate, localFolder);
         }
 
         public readonly bool IsOverdue
@@ -65,7 +68,8 @@ public static partial class ThumbnailService
                     AppSettings.ThumbnailAge.OneHour => age > HOUR,
                     AppSettings.ThumbnailAge.OneDay => age > DAY,
                     AppSettings.ThumbnailAge.OneWeek => age > WEEK,
-                    _ => age > MONTH,
+                    AppSettings.ThumbnailAge.OneMonth => age > MONTH,
+                    _ => false,
                 };
             }
         }
@@ -180,6 +184,90 @@ public static partial class ThumbnailService
         return localPath is not null;
     }
 
+    /// <summary>
+    /// Called when a thumbnail was requested but not found locally. Handles two cases:
+    /// <list type="bullet">
+    /// <item>The file is known in the device media DB (<see cref="ThumbnailInfo.LastUpdate"/> == <see cref="DateTime.MinValue"/>) but its local file is absent — pulls the original photo into the cached folder under its DB id.</item>
+    /// <item>The file is not in the cache at all and qualifies for custom-weight pulling — pulls it into <see cref="CUSTOM_PHOTOS_SUBFOLDER"/> with a timestamp-based name.</item>
+    /// </list>
+    /// Fires <see cref="ThumbnailUpdated"/> upon completion so the caller can reload.
+    /// </summary>
+    public static void TryPullCustomThumbnail(LogicalDeviceViewModel device, FileClass file)
+    {
+        if (Data.Settings.MaxCustomThumbWeight == 0 || file.Type is not AbstractFile.FileType.File)
+            return;
+
+        if (file.Size is null || file.Size.Value > (long)Data.Settings.MaxCustomThumbWeight * 1024)
+            return;
+
+        if (!AdbExplorerConst.COMMON_PHOTO_EXT.Contains(file.Extension, StringComparer.InvariantCultureIgnoreCase))
+            return;
+
+        var deviceInfo = _deviceInfoCache.FirstOrDefault(d => d.DeviceId == device.LogicalID);
+        if (string.IsNullOrEmpty(deviceInfo.DeviceId) || deviceInfo.ThumbnailPathCache is null)
+            return;
+
+        if (deviceInfo.ThumbnailPathCache.TryGetValue(file.FullPath, out var cachedInfo))
+        {
+            if (cachedInfo.LastUpdate != DateTime.MinValue)
+                return;
+
+            var localDir = string.IsNullOrEmpty(cachedInfo.LocalFolder)
+                ? GetLocalThumbPath(device)
+                : Path.Combine(Data.AppDataPath, deviceInfo.DeviceId, cachedInfo.LocalFolder);
+
+            if (localDir is null)
+                return;
+
+            var source = new SyncFile(file);
+            var target = SyncFile.MergeToWindowsPath(source, localDir);
+            target.UpdatePath(Path.Combine(localDir, cachedInfo.Id));
+
+            var id = cachedInfo.Id;
+            var op = FileSyncOperation.PullFile(source, target, device, App.AppDispatcher);
+
+            op.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(FileOperation.Status) && op.Status is FileOperation.OperationStatus.Completed)
+                {
+                    Size? resolution = cachedInfo.Resolution ?? ReadImageResolution(Path.Combine(localDir, id));
+                    UpdateThumbnailInfo(deviceInfo.DeviceId, id, resolution);
+                }
+            };
+
+            op.Start();
+        }
+        else
+        {
+            var targetDir = Path.Combine(Data.AppDataPath, deviceInfo.DeviceId, CUSTOM_PHOTOS_SUBFOLDER);
+            Directory.CreateDirectory(targetDir);
+
+            var noExt = file.NoExtName;
+            var prefix = noExt[^Math.Min(5, noExt.Length)..];
+            var id = $"{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}_{prefix}.jpg";
+
+            deviceInfo.ThumbnailPathCache[file.FullPath] = new ThumbnailInfo(id, MediaType.images, null, null, DateTime.MinValue, CUSTOM_PHOTOS_SUBFOLDER);
+            UpdateCache(deviceInfo);
+
+            SyncFile customSource = new(file);
+            var customTarget = SyncFile.MergeToWindowsPath(customSource, targetDir);
+            customTarget.UpdatePath(Path.Combine(targetDir, id));
+
+            var op = FileSyncOperation.PullFile(customSource, customTarget, device, App.AppDispatcher);
+
+            op.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(FileOperation.Status) && op.Status is FileOperation.OperationStatus.Completed)
+                {
+                    var resolution = ReadImageResolution(Path.Combine(targetDir, id));
+                    UpdateThumbnailInfo(deviceInfo.DeviceId, id, resolution);
+                }
+            };
+
+            op.Start();
+        }
+    }
+
     public static bool IsInitialized(string logicalDeviceId)
     {
         return _deviceInfoCache.FirstOrDefault(d => d.DeviceId == logicalDeviceId) is DeviceThumbnailInfo info
@@ -194,7 +282,11 @@ public static partial class ThumbnailService
         if (GetThumbnailName(device.LogicalID, filePath) is not ThumbnailInfo info)
             return null;
 
-        if (GetLocalThumbPath(device) is not string localThumbnailDir)
+        string? localThumbnailDir = string.IsNullOrEmpty(info.LocalFolder)
+            ? GetLocalThumbPath(device)
+            : Path.Combine(Data.AppDataPath, device.LogicalID, info.LocalFolder);
+
+        if (localThumbnailDir is null)
             return null;
 
         try
@@ -356,17 +448,21 @@ public static partial class ThumbnailService
         return combined.ToDictionary();
     }
 
-    private static void UpdateThumbnailInfo(string logicalDeviceId, string id)
+    private static void UpdateThumbnailInfo(string logicalDeviceId, string id, Size? resolution = null)
     {
         if (GetDeviceThumbsInfo(logicalDeviceId) is not DeviceThumbnailInfo deviceInfo)
             return;
-    
+
         var thumbnailPathCache = deviceInfo.ThumbnailPathCache;
         var existingEntry = thumbnailPathCache?.FirstOrDefault(kvp => kvp.Value.Id == id);
         string? updatedFilePath = null;
         if (existingEntry.HasValue)
         {
-            var updatedEntry = existingEntry.Value.Value with { LastUpdate = DateTime.Now };
+            var updatedEntry = existingEntry.Value.Value with
+            {
+                LastUpdate = DateTime.Now,
+                Resolution = resolution ?? existingEntry.Value.Value.Resolution,
+            };
             deviceInfo.ThumbnailPathCache[existingEntry.Value.Key] = updatedEntry;
             updatedFilePath = existingEntry.Value.Key;
         }
@@ -375,6 +471,20 @@ public static partial class ThumbnailService
 
         if (updatedFilePath is not null)
             ThumbnailUpdated?.Invoke(logicalDeviceId, updatedFilePath);
+    }
+
+    private static Size? ReadImageResolution(string filePath)
+    {
+        try
+        {
+            using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var frame = BitmapFrame.Create(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
+            return new Size(frame.PixelWidth, frame.PixelHeight);
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private static string? GetLocalThumbPath(LogicalDeviceViewModel device)
@@ -509,7 +619,7 @@ public static partial class ThumbnailService
                 ? null
                 : TimeSpan.FromMilliseconds(int.Parse(dur));
 
-            yield return new(path, new($"{match.Groups["ID"].Value}.jpg", type, resolution, duration, DateTime.MinValue));
+            yield return new(path, new($"{match.Groups["ID"].Value}.jpg", type, resolution, duration, DateTime.MinValue, ".thumbnails"));
         }
     }
 

@@ -3484,6 +3484,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Max Image Size To Use As Its Own Thumbnail (0 - Disabled).
+        /// </summary>
+        public static string S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Force Media Rescan On Push.
         /// </summary>
         public static string S_SETTINGS_MEDIA_RESCAN {
