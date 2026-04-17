@@ -53,7 +53,7 @@ public class Devices : ViewModelBase
         UIList.Add(new WsaPkgDeviceViewModel(new()));
 
         if (Data.Settings.SaveDevices)
-            RetrieveHistoryDevices();
+            UIList.AddRange(RetrieveHistoryDevices());
 
         UIList.CollectionChanged += UIList_CollectionChanged;
         PropertyChanged += Devices_PropertyChanged;
@@ -74,31 +74,16 @@ public class Devices : ViewModelBase
 
     #region History device handling
 
-    public void RetrieveHistoryDevices() => RetrieveHistoryDevices(UIList);
-
-    public static void RetrieveHistoryDevices(ObservableList<DeviceViewModel> uiList)
+    public static IEnumerable<HistoryDeviceViewModel> RetrieveHistoryDevices()
     {
-        //var value = Storage.RetrieveValue("SavedDevices");
-        //if (value is null)
-        //    return;
-
-        //var jArray = value.ToString();
-        //bool legacy = jArray.Contains(typeof(HistoryDevice).FullName);
-        //var historyType = legacy ? typeof(List<HistoryDevice>) : typeof(List<StorageDevice>);
-
-        //var devices = JsonConvert.DeserializeObject(jArray, historyType);
-        //if (devices is null)
-        //    return;
-
-        //var items = legacy ? ((List<HistoryDevice>)devices).Select(s => new HistoryDeviceViewModel(s)) : ((List<StorageDevice>)devices).Select(HistoryDeviceViewModel.New);
-        //uiList.AddRange(items);
+        return Data.Settings.StorageDevices?.Select(d => HistoryDeviceViewModel.FromStorage(d)) ?? [];
     }
 
     public void StoreHistoryDevices() => StoreHistoryDevices(UIList.OfType<HistoryDeviceViewModel>());
 
     public static void StoreHistoryDevices(IEnumerable<HistoryDeviceViewModel> devices)
     {
-        Storage.StoreValue("SavedDevices", devices.Select(h => h.GetStorage()));
+        Data.Settings.StorageDevices = [.. devices.Select(h => h.GetStorage())];
     }
 
     public void AddHistoryDevice(HistoryDeviceViewModel device)

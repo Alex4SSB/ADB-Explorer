@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Controls;
 using ADB_Explorer.Helpers;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
@@ -93,6 +94,9 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
 
     [ObservableProperty]
     public partial ObservableCollection<string> SavedLocations { get; set; } = [];
+
+    [ObservableProperty]
+    public partial StorageDevice[] StorageDevices { get; set; }
 
     [ObservableProperty]
     public partial bool SpecialFolderIcons { get; set; } = true;

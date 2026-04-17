@@ -16,7 +16,6 @@ public class HistoryDevice : NewDevice
         ConnectPort = device.ConnectPort;
     }
 
-    [JsonConstructor]
     public HistoryDevice(string ipAddress, string connectPort, string deviceName = "") : this()
     {
         DeviceName = deviceName;

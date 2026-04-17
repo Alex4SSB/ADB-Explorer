@@ -525,7 +525,7 @@ public static class DeviceHelper
                     if (newDevice.Type is DeviceType.New && !AdbExplorerConst.LOOPBACK_ADDRESSES.Contains(newDevice.IpAddress))
                     {
                         if (Data.Settings.SaveDevices)
-                            Data.DevicesObject.AddHistoryDevice(HistoryDeviceViewModel.New(dev));
+                            Data.DevicesObject.AddHistoryDevice(HistoryDeviceViewModel.FromNewDevice(dev));
 
                         newDeviceAddress = dev.ConnectAddress;
                         ((NewDeviceViewModel)newDevice).ClearDevice();

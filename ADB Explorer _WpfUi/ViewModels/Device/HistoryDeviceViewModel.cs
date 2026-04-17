@@ -33,17 +33,14 @@ public class HistoryDeviceViewModel : NewDeviceViewModel
         RemoveCommand = DeviceHelper.RemoveDeviceCommand(this);
     }
 
-    public static HistoryDeviceViewModel New(NewDeviceViewModel device)
+    public static HistoryDeviceViewModel FromNewDevice(NewDeviceViewModel device) => new(new()
     {
-        return new(new HistoryDevice()
-        {
-            IpAddress = device.IsIpAddressValid ? device.IpAddress : null,
-            HostName = device.IsIpAddressValid ? null : device.HostName,
-            ConnectPort = device.ConnectPort
-        });
-    }
+        IpAddress = device.IsIpAddressValid ? device.IpAddress : null,
+        HostName = device.IsIpAddressValid ? null : device.HostName,
+        ConnectPort = device.ConnectPort
+    });
 
-    public static HistoryDeviceViewModel New(StorageDevice device)
+    public static HistoryDeviceViewModel FromStorage(StorageDevice device)
     {
         HistoryDeviceViewModel historyDevice = new(new HistoryDevice()
         {
@@ -60,7 +57,7 @@ public class HistoryDeviceViewModel : NewDeviceViewModel
         return historyDevice;
     }
 
-    public StorageDevice GetStorage() => new(this);
+    public StorageDevice GetStorage() => StorageDevice.FromVM(this);
 
     public bool SetDeviceName(string name)
     {
@@ -75,24 +72,12 @@ public class HistoryDeviceViewModel : NewDeviceViewModel
     }
 }
 
-public class StorageDevice
+public record struct StorageDevice(string DeviceName, string IpAddress, string ConnectPort)
 {
-    public string DeviceName { get; private set; }
-    public string IpAddress { get; private set; }
-    public string ConnectPort { get; private set; }
-
-    public StorageDevice(HistoryDeviceViewModel device)
+    public static StorageDevice FromVM(HistoryDeviceViewModel device) => new()
     {
-        DeviceName = device.DeviceName;
-        IpAddress = device.IsIpAddressValid ? device.IpAddress : device.HostName;
-        ConnectPort = device.ConnectPort;
-    }
-
-    [JsonConstructor]
-    public StorageDevice(string deviceName, string ipAddress, string connectPort)
-    {
-        DeviceName = deviceName;
-        IpAddress = ipAddress;
-        ConnectPort = connectPort;
-    }
+        DeviceName = device.DeviceName,
+        IpAddress = device.IsIpAddressValid ? device.IpAddress : device.HostName,
+        ConnectPort = device.ConnectPort
+    };
 }
