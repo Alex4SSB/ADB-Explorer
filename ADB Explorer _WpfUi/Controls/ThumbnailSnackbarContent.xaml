@@ -33,7 +33,17 @@
                     </Style>
                 </ProgressBar.Style>
             </ProgressBar>
-            <TextBlock VerticalAlignment="Center" Text="{Binding CounterText}" />
+            <TextBlock VerticalAlignment="Center" Text="{Binding CounterText}">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Maximum}" Value="0">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
         </StackPanel>
     </StackPanel>
 </UserControl>
