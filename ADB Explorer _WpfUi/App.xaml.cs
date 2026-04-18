@@ -79,6 +79,9 @@ public partial class App
 
             services.AddSingleton<LogPage>();
             services.AddSingleton<LogViewModel>();
+
+            services.AddSingleton<OperationsPage>();
+            services.AddSingleton<OperationsViewModel>();
         }).Build();
 
     /// <summary>
@@ -150,6 +153,8 @@ public partial class App
         ThumbnailService.SaveAllThumbsToCsv();
 
         Data.FileOpQ?.Stop();
+
+        Services.GetService<OperationsViewModel>()?.StoreColumns();
 
         Services.GetService<SettingsService>().Save();
 

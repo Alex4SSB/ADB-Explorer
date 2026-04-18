@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Controls;
 using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
@@ -217,6 +218,9 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     #region File Ops
 
     [ObservableProperty]
+    public partial FileOpColumnState[]? FileOpColumns { get; set; }
+
+    [ObservableProperty]
     public partial bool EnableCompactView { get; set; } = false;
 
     [ObservableProperty]
@@ -327,6 +331,10 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
         CultureInfo actual = UICulture.Equals(CultureInfo.InvariantCulture)
             ? OriginalCulture
             : UICulture;
+
+        // Set the static resource culture so lookups are correct regardless of which
+        // thread accesses the resource strings (e.g. context menus outside the visual tree).
+        Strings.Resources.Culture = actual;
 
         string? percent = actual.Name == "en" || actual.Parent.Name == "en"
                          ? null

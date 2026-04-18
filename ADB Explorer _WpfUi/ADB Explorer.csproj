@@ -60,6 +60,9 @@
     <Compile Update="Controls\Infra\MaskedTextBox.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Controls\Pages\OperationsPageHeader.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Controls\Pages\LogPageHeader.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

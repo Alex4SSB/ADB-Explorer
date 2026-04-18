@@ -305,8 +305,7 @@ public abstract class FileOperation : ViewModelBase
 
     public void SetValidation(bool value)
     {
-        if (StatusInfo is null)
-            StatusInfo = new CompletedShellProgressViewModel();
+        StatusInfo ??= new CompletedShellProgressViewModel();
 
         StatusInfo.IsValidationInProgress = value;
         OnPropertyChanged(nameof(ValidationAllowed));

@@ -1,0 +1,841 @@
+﻿<UserControl
+    x:Class="ADB_Explorer.Controls.Pages.OperationsPageHeader"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:ADB_Explorer.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
+    xmlns:local="clr-namespace:ADB_Explorer.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:pages="clr-namespace:ADB_Explorer.ViewModels.Pages"
+    xmlns:services="clr-namespace:ADB_Explorer.Services"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    d:DataContext="{d:DesignInstance Type=pages:OperationsViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <helpers:BindingProxy x:Key="ColumnListProxy" Data="{Binding ColumnList}" />
+        <converters:TreeViewIndentConverter x:Key="TreeViewIndentConverter" />
+        <converters:FileOpTreeStatusConverter x:Key="FileOpTreeStatusConverter" />
+        <converters:CompletedStatsConverter x:Key="CompletedStatsConverter" />
+        <Style
+            x:Key="FileOpProgressStyle"
+            BasedOn="{StaticResource FluentProgressBarStyle}"
+            TargetType="ProgressBar">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding TotalPercentage, Mode=OneWay}" Value="{x:Null}">
+                    <Setter Property="IsIndeterminate" Value="True" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style
+            x:Key="BoldInProgressTextBlockStyle"
+            BasedOn="{StaticResource DisabledTooltipTextBlockStyle}"
+            TargetType="TextBlock" />
+        <Style
+            x:Key="BoldInProgressHyperTextStyle"
+            BasedOn="{StaticResource BoldInProgressTextBlockStyle}"
+            TargetType="TextBlock">
+            <Setter Property="TextDecorations" Value="Underline" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
+            <Setter Property="Foreground" Value="{DynamicResource FileOpHyperLinkBrush}" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource HyperlinkButtonForegroundPointerOver}" />
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="TextDecorations" Value="None" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style
+            x:Key="FileOpFileNamesTextBlockStyle"
+            BasedOn="{StaticResource BoldInProgressTextBlockStyle}"
+            TargetType="TextBlock">
+            <Setter Property="Text" Value="{Binding FilePath.NoExtName}" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="True">
+                    <Setter Property="Text" Value="{Binding FilePath.FullName}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding OperationName}" Value="Rename">
+                    <Setter Property="Text" Value="{Binding TargetPath.NoExtName}" />
+                </DataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding OperationName}" Value="Rename" />
+                        <Condition Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="True" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Text" Value="{Binding TargetPath.FullName}" />
+                </MultiDataTrigger>
+                <DataTrigger Binding="{Binding FilePath.NameIsRtl}" Value="False">
+                    <Setter Property="FlowDirection" Value="LeftToRight" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style
+            x:Key="FileOpFileNameFolderIconStyle"
+            BasedOn="{StaticResource GlyphFont}"
+            TargetType="ui:FontIcon">
+            <Setter Property="Margin" Value="0,0,4,0" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Glyph" Value="&#xE8b7;" />
+        </Style>
+        <DataTemplate x:Key="UninstallOpFileNameTemplate">
+            <TextBlock
+                Margin="4,0,0,0"
+                Style="{StaticResource FileOpFileNamesTextBlockStyle}"
+                Text="{Binding PackageName}" />
+        </DataTemplate>
+        <DataTemplate x:Key="FolderCompletedOpFileNameTemplate">
+            <StackPanel
+                Margin="4,0,0,0"
+                DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}"
+                Orientation="Horizontal">
+                <ui:FontIcon Style="{StaticResource FileOpFileNameFolderIconStyle}" />
+                <TextBlock Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="FolderInProgOpFileNameInnerTemplate">
+            <Grid Margin="4,0,0,0" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <ui:FontIcon Style="{StaticResource FileOpFileNameFolderIconStyle}" />
+                <TextBlock Grid.Column="1" Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
+                <TextBlock
+                    Grid.Row="1"
+                    Margin="0,-3,0,0"
+                    HorizontalAlignment="Center"
+                    FontSize="16"
+                    Text="└">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding StatusInfo.CurrentFileName}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBlock Grid.Row="1" Grid.Column="1">
+                    <TextBlock.Style>
+                        <Style BasedOn="{StaticResource DisabledTooltipTextBlockStyle}" TargetType="TextBlock">
+                            <Setter Property="Text" Value="{Binding StatusInfo.CurrentFileNameWithoutExtension}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="False">
+                                    <Setter Property="Text" Value="{Binding StatusInfo.CurrentFileName}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding StatusInfo.CurrentFileName}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="FolderInProgOpFileNameTemplate">
+            <ContentControl>
+                <ContentControl.Style>
+                    <Style TargetType="ContentControl">
+                        <Setter Property="ContentTemplate" Value="{StaticResource FolderCompletedOpFileNameTemplate}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                                <Setter Property="ContentTemplate" Value="{StaticResource FolderInProgOpFileNameInnerTemplate}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
+            </ContentControl>
+        </DataTemplate>
+        <DataTemplate x:Key="RegularOpFileNameTemplate">
+            <TextBlock Margin="4,0,0,0" Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
+        </DataTemplate>
+        <helpers:FileOpFileNameTemplateSelector
+            x:Key="FileOpFileNameTemplateSelector"
+            FolderCompletedOpFileNameTemplate="{StaticResource FolderCompletedOpFileNameTemplate}"
+            FolderInProgOpFileNameTemplate="{StaticResource FolderInProgOpFileNameTemplate}"
+            RegularOpFileNameTemplate="{StaticResource RegularOpFileNameTemplate}"
+            UninstallOpFileNameTemplate="{StaticResource UninstallOpFileNameTemplate}" />
+        <DataTemplate x:Key="CompactFolderInProgOpFileNameInnerTemplate">
+            <Grid Margin="4,0,0,0" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <ui:FontIcon Style="{StaticResource FileOpFileNameFolderIconStyle}" />
+                <TextBlock Grid.Column="1" Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="CompactFolderInProgOpFileNameTemplate">
+            <ContentControl>
+                <ContentControl.Style>
+                    <Style TargetType="ContentControl">
+                        <Setter Property="ContentTemplate" Value="{StaticResource FolderCompletedOpFileNameTemplate}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                                <Setter Property="ContentTemplate" Value="{StaticResource CompactFolderInProgOpFileNameInnerTemplate}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
+            </ContentControl>
+        </DataTemplate>
+        <DataTemplate x:Key="FileOpFileNameTemplate">
+            <DataTemplate.Triggers>
+                <Trigger Property="Visibility" Value="Visible">
+                    <Setter Property="IsEnabled" Value="False" />
+                </Trigger>
+                <DataTrigger Binding="{Binding Device.Device.Status}" Value="Ok">
+                    <Setter Property="IsEnabled" Value="True" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+            <ContentControl Content="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}" ContentTemplateSelector="{StaticResource FileOpFileNameTemplateSelector}" />
+        </DataTemplate>
+        <helpers:FileOpFileNameTemplateSelector
+            x:Key="CompactFileOpFileNameTemplateSelector"
+            FolderCompletedOpFileNameTemplate="{StaticResource FolderCompletedOpFileNameTemplate}"
+            FolderInProgOpFileNameTemplate="{StaticResource CompactFolderInProgOpFileNameTemplate}"
+            RegularOpFileNameTemplate="{StaticResource RegularOpFileNameTemplate}"
+            UninstallOpFileNameTemplate="{StaticResource UninstallOpFileNameTemplate}" />
+        <DataTemplate x:Key="CompactFileOpFileNameTemplate">
+            <DataTemplate.Triggers>
+                <Trigger Property="Visibility" Value="Visible">
+                    <Setter Property="IsEnabled" Value="False" />
+                </Trigger>
+                <DataTrigger Binding="{Binding Device.Device.Status}" Value="Ok">
+                    <Setter Property="IsEnabled" Value="True" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+            <ContentControl Content="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}" ContentTemplateSelector="{StaticResource CompactFileOpFileNameTemplateSelector}" />
+        </DataTemplate>
+        <DataTemplate x:Key="FileOpSourcePathTemplate">
+            <ui:HyperlinkButton
+                Margin="4,0"
+                Command="{Binding SourceAction.Command}"
+                FocusVisualStyle="{x:Null}">
+                <ui:HyperlinkButton.Content>
+                    <TextBlock
+                        FlowDirection="LeftToRight"
+                        Style="{StaticResource BoldInProgressHyperTextStyle}"
+                        Text="{Binding SourcePathString}" />
+                </ui:HyperlinkButton.Content>
+            </ui:HyperlinkButton>
+        </DataTemplate>
+        <DataTemplate x:Key="FileOpTargetPathTemplate">
+            <ui:HyperlinkButton
+                Margin="4,0"
+                Command="{Binding TargetAction.Command}"
+                FocusVisualStyle="{x:Null}">
+                <ui:HyperlinkButton.Content>
+                    <TextBlock
+                        FlowDirection="LeftToRight"
+                        Style="{StaticResource BoldInProgressHyperTextStyle}"
+                        Text="{Binding TargetPathString}" />
+                </ui:HyperlinkButton.Content>
+            </ui:HyperlinkButton>
+        </DataTemplate>
+        <DataTemplate x:Key="FileOpTimeStampTemplate">
+            <DataTemplate.Triggers>
+                <Trigger Property="Visibility" Value="Visible">
+                    <Setter Property="IsEnabled" Value="False" />
+                </Trigger>
+                <DataTrigger Binding="{Binding Device.Device.Status}" Value="Ok">
+                    <Setter Property="IsEnabled" Value="True" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+            <TextBlock
+                Margin="4,0"
+                Style="{StaticResource BoldInProgressTextBlockStyle}"
+                Text="{Binding Time}" />
+        </DataTemplate>
+        <DataTemplate x:Key="WaitingOpProgressTemplate">
+            <TextBlock Margin="4,0" Text="{Binding Name}" />
+        </DataTemplate>
+        <DataTemplate x:Key="InProgSyncProgressTemplate">
+            <Grid Margin="4,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Margin="4,0" Text="{Binding TotalBytes, Mode=OneWay}" />
+
+                <!--<ui:ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding TotalPercentage, Mode=OneWay, Converter={StaticResource FileOpProgressConverter}}" />
+        <ui:ProgressBar Grid.Row="1" Value="{Binding CurrentFilePercentage, Mode=OneWay, Converter={StaticResource FileOpProgressConverter}}">
+            <ui:ProgressBar.Style>
+                <Style BasedOn="{StaticResource FluentProgressBarStyle}" TargetType="ui:ProgressBar">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding CurrentFilePercentage, Mode=OneWay}" Value="{x:Null}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ui:ProgressBar.Style>
+        </ui:ProgressBar>-->
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding TotalPercentage, Mode=OneWay}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock Margin="4,0,0,0" Text="{Binding TotalPercentage, Mode=OneWay}" />
+                    <TextBlock Text="%" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding TotalPercentage, Mode=OneWay}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock Margin="4,0,0,0" Text="{Binding TotalBytes, Mode=OneWay}" />
+                </StackPanel>
+                <StackPanel
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentFilePercentage, Mode=OneWay}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock Margin="4,0,0,0" Text="{Binding CurrentFilePercentage, Mode=OneWay}" />
+                    <TextBlock Text="%" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="CompactInProgSyncProgressTemplate">
+            <Grid Margin="4,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding TotalPercentage, Mode=OneWay, Converter={StaticResource FileOpProgressConverter}}" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding TotalPercentage, Mode=OneWay}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock Margin="4,0,0,0" Text="{Binding TotalPercentage, Mode=OneWay}" />
+                    <TextBlock Text="%" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="InProgShellProgressTemplate">
+            <ProgressBar
+                Margin="4,0"
+                IsIndeterminate="True"
+                Style="{StaticResource FluentProgressBarStyle}" />
+        </DataTemplate>
+        <Style
+            x:Key="SyncProgressIconStyle"
+            BasedOn="{StaticResource GlyphFont}"
+            TargetType="ui:FontIcon">
+            <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
+            <Setter Property="Glyph" Value="&#xF13E;" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding FilesSkipped}" Value="0">
+                    <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
+                    <Setter Property="Glyph" Value="&#xF13E;" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <DataTemplate x:Key="CompletedSyncProgressInnerTemplate">
+            <Grid Margin="4,0" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}">
+                <Grid.Resources>
+                    <Style BasedOn="{StaticResource DisabledTooltipTextBlockStyle}" TargetType="TextBlock" />
+                </Grid.Resources>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ui:FontIcon Style="{StaticResource SyncProgressIconStyle}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="4,0"
+                        Text="{Binding FileCountCompletedString}"
+                        TextTrimming="CharacterEllipsis" />
+                </Grid>
+                <Separator Grid.Row="1" />
+                <TextBlock
+                    Grid.Row="2"
+                    Text="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext, Converter={StaticResource CompletedStatsConverter}}"
+                    TextTrimming="CharacterEllipsis" />
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="CompactCompletedSyncProgressInnerTemplate">
+            <Grid Margin="4,0" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <ui:FontIcon Style="{StaticResource SyncProgressIconStyle}" />
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="4,0"
+                    Style="{StaticResource DisabledTooltipTextBlockStyle}"
+                    Text="{Binding FileCountCompletedString}"
+                    TextTrimming="CharacterEllipsis" />
+            </Grid>
+        </DataTemplate>
+        <Style x:Key="CompletedIconProgressPanelStyle" TargetType="Grid">
+            <Setter Property="Margin" Value="4,0" />
+            <Style.Resources>
+                <Style BasedOn="{StaticResource DisabledTooltipTextBlockStyle}" TargetType="TextBlock" />
+                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                    <Setter Property="FontWeight" Value="Bold" />
+                    <Setter Property="Margin" Value="0,0,4,0" />
+                </Style>
+            </Style.Resources>
+        </Style>
+        <DataTemplate x:Key="CompletedShellProgressInnerTemplate">
+            <Grid DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}" Style="{StaticResource CompletedIconProgressPanelStyle}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <ui:FontIcon>
+                    <ui:FontIcon.Style>
+                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                            <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
+                            <Setter Property="Glyph" Value="&#xF13E;" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding NoConfirmation}" Value="True">
+                                    <Setter Property="Foreground" Value="{StaticResource EditorTextChangedBrush}" />
+                                    <Setter Property="Glyph" Value="&#xF142;" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:FontIcon.Style>
+                </ui:FontIcon>
+                <TextBlock Grid.Column="1" Text="{Binding Message}" />
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="ValidatingProgressInnerTemplate">
+            <Grid DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}" Style="{StaticResource CompletedIconProgressPanelStyle}">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <TextBlock Margin="0,0,0,2" Text="{Binding Source={x:Static Member=strings:Resources.S_FILEOP_VALIDATING}}" />
+                <ProgressBar
+                    Grid.Row="1"
+                    IsIndeterminate="True"
+                    Style="{StaticResource FluentProgressBarStyle}" />
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="CompletedSyncProgressTemplate">
+            <ContentControl>
+                <ContentControl.Style>
+                    <Style TargetType="ContentControl">
+                        <Setter Property="ContentTemplate" Value="{StaticResource CompletedSyncProgressInnerTemplate}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsValidationInProgress}" Value="True">
+                                <Setter Property="ContentTemplate" Value="{StaticResource ValidatingProgressInnerTemplate}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
+            </ContentControl>
+        </DataTemplate>
+        <DataTemplate x:Key="CompactCompletedSyncProgressTemplate">
+            <ContentControl>
+                <ContentControl.Style>
+                    <Style TargetType="ContentControl">
+                        <Setter Property="ContentTemplate" Value="{StaticResource CompactCompletedSyncProgressInnerTemplate}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsValidationInProgress}" Value="True">
+                                <Setter Property="ContentTemplate" Value="{StaticResource ValidatingProgressInnerTemplate}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
+            </ContentControl>
+        </DataTemplate>
+        <DataTemplate x:Key="CompletedShellProgressTemplate">
+            <ContentControl>
+                <ContentControl.Style>
+                    <Style TargetType="ContentControl">
+                        <Setter Property="ContentTemplate" Value="{StaticResource CompletedShellProgressInnerTemplate}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsValidationInProgress}" Value="True">
+                                <Setter Property="ContentTemplate" Value="{StaticResource ValidatingProgressInnerTemplate}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
+            </ContentControl>
+        </DataTemplate>
+        <DataTemplate x:Key="CanceledOpProgressTemplate">
+            <Grid Style="{StaticResource CompletedIconProgressPanelStyle}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <ui:FontIcon Foreground="{DynamicResource TrashDriveAltBorder}" Glyph="&#xF13D;" />
+                <TextBlock Grid.Column="1" Text="{Binding Name}" />
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="FailedOpProgressTemplate">
+            <Grid Style="{StaticResource CompletedIconProgressPanelStyle}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <ui:FontIcon Foreground="{DynamicResource TrashDriveAltBorder}" Glyph="&#xF13D;" />
+                <TextBlock Grid.Column="1" Text="{Binding Error}" />
+            </Grid>
+        </DataTemplate>
+        <helpers:FileOpProgressTemplateSelector
+            x:Key="FileOpProgressTemplateSelector"
+            CanceledOpProgressTemplate="{StaticResource CanceledOpProgressTemplate}"
+            CompletedShellProgressTemplate="{StaticResource CompletedShellProgressTemplate}"
+            CompletedSyncProgressTemplate="{StaticResource CompletedSyncProgressTemplate}"
+            FailedOpProgressTemplate="{StaticResource FailedOpProgressTemplate}"
+            InProgShellProgressTemplate="{StaticResource InProgShellProgressTemplate}"
+            InProgSyncProgressTemplate="{StaticResource InProgSyncProgressTemplate}"
+            WaitingOpProgressTemplate="{StaticResource WaitingOpProgressTemplate}" />
+        <Style
+            x:Key="PrevOpIconStyle"
+            BasedOn="{StaticResource GlyphFont}"
+            TargetType="ui:FontIcon">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsPastOp}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <DataTemplate x:Key="FileOpProgressTemplate">
+            <DataTemplate.Triggers>
+                <Trigger Property="Visibility" Value="Visible">
+                    <Setter Property="IsEnabled" Value="False" />
+                </Trigger>
+                <DataTrigger Binding="{Binding Device.Device.Status}" Value="Ok">
+                    <Setter Property="IsEnabled" Value="True" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <ui:FontIcon
+                    Margin="4,0"
+                    Foreground="{DynamicResource HistoryDeviceBottomBorderBrush}"
+                    Glyph="&#xE81C;"
+                    Style="{StaticResource PrevOpIconStyle}"
+                    ToolTip="{Binding Source={x:Static Member=strings:Resources.S_FILEOP_PREV}}" />
+                <ContentControl
+                    Grid.Column="1"
+                    Content="{Binding StatusInfo}"
+                    ContentTemplateSelector="{StaticResource FileOpProgressTemplateSelector}" />
+            </Grid>
+        </DataTemplate>
+        <helpers:FileOpProgressTemplateSelector
+            x:Key="CompactFileOpProgressTemplateSelector"
+            CanceledOpProgressTemplate="{StaticResource CanceledOpProgressTemplate}"
+            CompletedShellProgressTemplate="{StaticResource CompletedShellProgressTemplate}"
+            CompletedSyncProgressTemplate="{StaticResource CompactCompletedSyncProgressTemplate}"
+            FailedOpProgressTemplate="{StaticResource FailedOpProgressTemplate}"
+            InProgShellProgressTemplate="{StaticResource InProgShellProgressTemplate}"
+            InProgSyncProgressTemplate="{StaticResource CompactInProgSyncProgressTemplate}"
+            WaitingOpProgressTemplate="{StaticResource WaitingOpProgressTemplate}" />
+        <DataTemplate x:Key="CompactFileOpProgressTemplate">
+            <DataTemplate.Triggers>
+                <Trigger Property="Visibility" Value="Visible">
+                    <Setter Property="IsEnabled" Value="False" />
+                </Trigger>
+                <DataTrigger Binding="{Binding Device.Device.Status}" Value="Ok">
+                    <Setter Property="IsEnabled" Value="True" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+            <ContentControl Content="{Binding StatusInfo}" ContentTemplateSelector="{StaticResource CompactFileOpProgressTemplateSelector}" />
+        </DataTemplate>
+        <DataTemplate x:Key="OperationIconTemplate">
+            <DataTemplate.Triggers>
+                <Trigger Property="Visibility" Value="Visible">
+                    <Setter Property="IsEnabled" Value="False" />
+                </Trigger>
+                <DataTrigger Binding="{Binding Device.Device.Status}" Value="Ok">
+                    <Setter Property="IsEnabled" Value="True" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+            <ContentPresenter
+                Margin="0,0,6,0"
+                HorizontalAlignment="Right"
+                Content="{Binding OpIcon}"
+                ToolTip="{Binding Tooltip}" />
+        </DataTemplate>
+        <DataTemplate x:Key="CompactOperationIconTemplate">
+            <DataTemplate.Triggers>
+                <Trigger Property="Visibility" Value="Visible">
+                    <Setter Property="IsEnabled" Value="False" />
+                </Trigger>
+                <DataTrigger Binding="{Binding Device.Device.Status}" Value="Ok">
+                    <Setter Property="IsEnabled" Value="True" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+            <ContentPresenter
+                Margin="2,0"
+                HorizontalAlignment="Right"
+                Content="{Binding OpIcon}"
+                ToolTip="{Binding Tooltip}" />
+        </DataTemplate>
+        <HierarchicalDataTemplate x:Key="FileOpTreeFolderTemplate" ItemsSource="{Binding Children}">
+            <Grid Margin="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem, Mode=FindAncestor}, Path=(helpers:TreeViewItemHelper.Indentation), Converter={StaticResource TreeViewIndentConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <StackPanel Margin="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem, Mode=FindAncestor}, Path=(helpers:TreeViewItemHelper.Indentation)}" Orientation="Horizontal">
+                    <ui:FontIcon Margin="-3,0,4,0" Style="{StaticResource FileOpFileNameFolderIconStyle}" />
+                    <TextBlock Style="{StaticResource FileNameTextBlockStyle}" Text="{Binding FullName}" />
+                </StackPanel>
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="4,0,0,0"
+                    Text="{Binding Children, Converter={StaticResource FileOpTreeStatusConverter}}" />
+            </Grid>
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate x:Key="FileOpTreeFileTemplate">
+            <Grid Margin="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem, Mode=FindAncestor}, Path=(helpers:TreeViewItemHelper.Indentation), Converter={StaticResource TreeViewIndentConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Margin="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem, Mode=FindAncestor}, Path=(helpers:TreeViewItemHelper.Indentation)}"
+                    Style="{StaticResource FileNameTextBlockStyle}"
+                    Text="{Binding FullName}" />
+                <ui:FontIcon Grid.Column="1">
+                    <ui:FontIcon.Style>
+                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                            <Setter Property="FontWeight" Value="Bold" />
+                            <Setter Property="Glyph" Value="&#xF13D;" />
+                            <Setter Property="Foreground" Value="{DynamicResource TrashDriveAltBorder}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ProgressUpdates, Converter={StaticResource FileOpTreeStatusConverter}, ConverterParameter=Completed}" Value="True">
+                                    <Setter Property="Glyph" Value="&#xF13E;" />
+                                    <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ProgressUpdates, Converter={StaticResource FileOpTreeStatusConverter}, ConverterParameter=Validated}" Value="True">
+                                    <Setter Property="Glyph" Value="&#xF13E;" />
+                                    <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:FontIcon.Style>
+                </ui:FontIcon>
+                <TextBlock
+                    x:Name="FileStatus"
+                    Grid.Column="2"
+                    Margin="4,0,0,0"
+                    Text="{Binding ProgressUpdates, Converter={StaticResource FileOpTreeStatusConverter}}" />
+            </Grid>
+        </HierarchicalDataTemplate>
+        <helpers:FileOpTreeTemplateSelector
+            x:Key="FileOpTreeTemplateSelector"
+            FileOpTreeFileTemplate="{StaticResource FileOpTreeFileTemplate}"
+            FileOpTreeFolderTemplate="{StaticResource FileOpTreeFolderTemplate}" />
+        <DataTemplate x:Key="FileOpRowDetailTemplate">
+            <TreeView ItemTemplateSelector="{StaticResource FileOpTreeTemplateSelector}" ItemsSource="{Binding Children}" />
+        </DataTemplate>
+        <Style
+            x:Key="DetailedFileOpGridStyle"
+            BasedOn="{StaticResource AdbDataGridStyle}"
+            TargetType="ui:DataGrid">
+            <Setter Property="AutoGenerateColumns" Value="False" />
+            <Setter Property="CanUserDeleteRows" Value="False" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="HeadersVisibility" Value="Column" />
+            <Setter Property="RowDetailsTemplate" Value="{StaticResource FileOpRowDetailTemplate}" />
+            <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
+        </Style>
+        <DataTemplate x:Key="FileOpColConfigTemplate">
+            <CheckBox
+                Margin="0,-6"
+                HorizontalAlignment="Stretch"
+                Content="{Binding Name}"
+                IsChecked="{Binding IsChecked}"
+                IsEnabled="{Binding IsEnabled}" />
+        </DataTemplate>
+        <local:AdbContextMenu
+            x:Key="FileOpHeaderContextMenu"
+            ItemContainerStyle="{StaticResource WpfUiMenuItem}"
+            ItemTemplate="{StaticResource FileOpColConfigTemplate}"
+            ItemsSource="{Binding Data, Source={StaticResource ColumnListProxy}}"
+            Style="{StaticResource UiContextMenu}" />
+        <Style
+            x:Key="FileOpColumnHeaderStyle"
+            BasedOn="{StaticResource DefaultUiDataGridColumnHeaderStyle}"
+            TargetType="DataGridColumnHeader">
+            <Setter Property="ContextMenu" Value="{StaticResource FileOpHeaderContextMenu}" />
+            <EventSetter Event="SizeChanged" Handler="ColumnHeader_SizeChanged" />
+        </Style>
+        <Style
+            x:Key="FileOpDeviceTextblockStyle"
+            BasedOn="{StaticResource BoldInProgressTextBlockStyle}"
+            TargetType="TextBlock">
+            <Setter Property="Text" Value="{Binding Device.Device.Name}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Device.Device.Status}" Value="Unauthorized">
+                    <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DEVICE_UNAUTH_NONAME}}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Device.Device.Type}" Value="Emulator">
+                    <Setter Property="Text" Value="{Binding Device.Device.ID}" />
+                </DataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding Device.Device.Type}" Value="Service" />
+                        <Condition Binding="{Binding Device.Device.Name}" Value="" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_SERVICE_NONAME}}" />
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+        <DataTemplate x:Key="FileOpDeviceColumnStyle">
+            <DataTemplate.Triggers>
+                <Trigger Property="Visibility" Value="Visible">
+                    <Setter Property="IsEnabled" Value="False" />
+                </Trigger>
+                <DataTrigger Binding="{Binding Device.Device.Status}" Value="Ok">
+                    <Setter Property="IsEnabled" Value="True" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+            <TextBlock Margin="4,0" Style="{StaticResource FileOpDeviceTextblockStyle}" />
+        </DataTemplate>
+        <DataGrid
+            x:Key="CurrentOperationDataGrid"
+            x:Name="CurrentOperationDataGrid"
+            Grid.Row="1"
+            Width="Auto"
+            AutoGenerateColumns="False"
+            CanUserDeleteRows="False"
+            CellStyle="{StaticResource BaseCellStyle}"
+            FocusVisualStyle="{x:Null}"
+            HeadersVisibility="None"
+            ItemsSource="{Binding}">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn MinWidth="100" CellTemplate="{StaticResource CompactFileOpProgressTemplate}" />
+                <DataGridTemplateColumn CellTemplate="{StaticResource CompactOperationIconTemplate}" />
+                <DataGridTemplateColumn MaxWidth="130" CellTemplate="{StaticResource CompactFileOpFileNameTemplate}" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <!--<Grid x:Key="CompactFileOpDropDown">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Button
+                Margin="0,0,0,6"
+                HorizontalAlignment="Center"
+                Command="{Binding Source={x:Static Member=services:PeekDetailed.Action}, Path=Command}"
+                Content="Show Detailed View" />
+            <StaticResource ResourceKey="CurrentOperationDataGrid" />
+        </Grid>-->
+    </UserControl.Resources>
+    <Grid Margin="20,10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <TextBlock
+            Margin="30,10"
+            HorizontalAlignment="Left"
+            FontSize="24"
+            FontWeight="SemiBold"
+            Text="{Binding Source={x:Static Member=strings:Resources.S_FILE_OP_TOOLTIP}}" />
+        <ui:DataGrid
+            x:Name="DetailedFileOpDataGrid"
+            Grid.Row="1"
+            CellStyle="{StaticResource BaseCellStyle}"
+            ColumnDisplayIndexChanged="DetailedFileOpDataGrid_ColumnDisplayIndexChanged"
+            ColumnHeaderStyle="{StaticResource FileOpColumnHeaderStyle}"
+            ItemsSource="{Binding Operations}"
+            Style="{StaticResource DetailedFileOpGridStyle}">
+            <ui:DataGrid.Columns>
+                <DataGridTemplateColumn
+                    x:Name="OpTypeColumn"
+                    CanUserResize="False"
+                    CellTemplate="{StaticResource OperationIconTemplate}"
+                    SortMemberPath="OperationName">
+                    <DataGridTemplateColumn.Header>
+                        <ui:FontIcon
+                            Margin="-5,0"
+                            Glyph="&#xE8AF;"
+                            ToolTip="{x:Static strings:Resources.S_COLUMN_OP_TYPE}" />
+                    </DataGridTemplateColumn.Header>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn
+                    x:Name="FileNameColumn"
+                    CellTemplate="{StaticResource FileOpFileNameTemplate}"
+                    Header="{x:Static strings:Resources.S_COLUMN_FILE_NAME}"
+                    SortMemberPath="AndroidPath.FullName" />
+                <DataGridTemplateColumn
+                    x:Name="ProgressColumn"
+                    CellTemplate="{StaticResource FileOpProgressTemplate}"
+                    Header="{x:Static strings:Resources.S_COLUMN_PROGRESS}"
+                    SortMemberPath="Filter" />
+                <DataGridTemplateColumn
+                    x:Name="SourceColumn"
+                    CellTemplate="{StaticResource FileOpSourcePathTemplate}"
+                    Header="{x:Static strings:Resources.S_COLUMN_SOURCE}"
+                    SortMemberPath="SourcePathString" />
+                <DataGridTemplateColumn
+                    x:Name="DestColumn"
+                    CellTemplate="{StaticResource FileOpTargetPathTemplate}"
+                    Header="{x:Static strings:Resources.S_COLUMN_DESTINATION}"
+                    SortMemberPath="TargetPathString" />
+                <DataGridTemplateColumn
+                    x:Name="TimeStampColumn"
+                    CellTemplate="{StaticResource FileOpTimeStampTemplate}"
+                    Header="{x:Static strings:Resources.S_COLUMN_ADDED}"
+                    SortMemberPath="Time" />
+                <DataGridTemplateColumn
+                    x:Name="DeviceColumn"
+                    CellTemplate="{StaticResource FileOpDeviceColumnStyle}"
+                    Header="{x:Static strings:Resources.S_SETTINGS_GROUP_DEVICE}"
+                    SortMemberPath="Device.Device.Name" />
+            </ui:DataGrid.Columns>
+        </ui:DataGrid>
+    </Grid>
+</UserControl>

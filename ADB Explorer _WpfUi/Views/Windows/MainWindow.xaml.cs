@@ -110,6 +110,15 @@ public partial class MainWindow : INavigationWindow
         }
     } = null;
 
+    private OperationsPageHeader OperationsPageHeader
+    {
+        get
+        {
+            field ??= new() { DataContext = App.Services.GetService<OperationsViewModel>() };
+            return field;
+        }
+    } = null;
+
     private void RootNavigation_Navigated(NavigationView sender, NavigatedEventArgs args)
     {
         PageHeader.Content = args.Page switch
@@ -119,6 +128,7 @@ public partial class MainWindow : INavigationWindow
             Pages.ExplorerPage => ExplorerPageHeader,
             Pages.TerminalPage => TerminalPageHeader,
             Pages.LogPage => LogPageHeader,
+            Pages.OperationsPage => OperationsPageHeader,
             _ => null
         };
 

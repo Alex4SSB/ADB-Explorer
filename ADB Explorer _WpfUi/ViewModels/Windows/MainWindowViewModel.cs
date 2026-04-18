@@ -41,6 +41,13 @@ public partial class MainWindowViewModel : ObservableObject
             TargetPageType = typeof(Views.Pages.TerminalPage),
             ToolTip = Strings.Resources.S_TERMINAL
         },
+        new NavigationViewItem()
+        {
+            Content = new Wpf.Ui.Controls.TextBlock() { FontSize = 12, Text = Strings.Resources.S_FILE_OP_TOOLTIP, TextTrimming = TextTrimming.CharacterEllipsis },
+            Icon = new FontIcon { Glyph = "\uEADF" },
+            TargetPageType = typeof(Views.Pages.OperationsPage),
+            ToolTip = Strings.Resources.S_FILE_OP_TOOLTIP
+        }
     ];
 
     [ObservableProperty]

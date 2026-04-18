@@ -60,7 +60,7 @@
         BasedOn="{StaticResource FluentTooltipStyle}"
         TargetType="ToolTip">
         <Setter Property="Visibility" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=PlacementTarget, Converter={StaticResource TrimmedTooltip}}" />
-        <Setter Property="FlowDirection" Value="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=FlowDirection}" />
+        <Setter Property="FlowDirection" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=PlacementTarget.FlowDirection}" />
     </Style>
     <Style
         x:Key="TooltipTextBoxStyle"
