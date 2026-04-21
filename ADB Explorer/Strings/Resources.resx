@@ -1894,4 +1894,8 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Sorting column &amp; order saved for each location</value>
     <comment>The setting that enables keeping track of the last sorted column and direction selected for each location / folder</comment>
   </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>Max Image Size To Use As Its Own Thumbnail (0 - Disabled)</value>
+    <comment>The name of the setting that enables using images for their own thumbnail display, and the maximum size for such images</comment>
+  </data>
 </root>

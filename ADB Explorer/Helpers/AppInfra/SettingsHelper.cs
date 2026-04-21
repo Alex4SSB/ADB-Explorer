@@ -96,7 +96,8 @@ public static class SettingsHelper
 
     public static async void InitNotifications()
     {
-        if (Data.Settings.OriginalCulture is null || Data.Settings.OriginalCulture.Name != "en-US")
+        if (Data.Settings.ShowLanguageNotification &&
+            (Data.Settings.OriginalCulture is null || Data.Settings.OriginalCulture.Name != "en-US"))
         {
             UISettings.Notifications.Add(new(async () =>
             {
