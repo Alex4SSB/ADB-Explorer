@@ -1537,4 +1537,7 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
     <value>记住每个位置进行排序的列和所选方向</value>
   </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>自身缩略图图片的最大大小（0 表示禁用）</value>
+  </data>
 </root>
