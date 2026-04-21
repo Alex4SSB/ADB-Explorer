@@ -1537,4 +1537,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
     <value>הגדרות מיון נשמרות לכל מיקום</value>
   </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>גודל תמונה מקסימלי לשימוש לתצוגה מקדימה של עצמה (0 - מבוטל)</value>
+  </data>
 </root>
