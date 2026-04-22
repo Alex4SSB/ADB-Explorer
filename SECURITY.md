@@ -79,15 +79,6 @@ If you're unable to access the GitHub Security Advisory page (e.g., due to antiv
 5. **Check Browser Extensions**: Disable security-related browser extensions temporarily
 6. **Alternative Network**: Try accessing from a different network or device
 
-### Alternative CVE Assignment Process
-
-If you cannot access GitHub's advisory system:
-
-1. Implement and commit the security fix
-2. Ask the reporter to submit details directly to [MITRE](https://cveform.mitre.org/)
-3. Reference your fix commit in the CVE request
-4. The reporter can still receive credit for the discovery
-
 ## Credit
 
 Security researchers who responsibly disclose vulnerabilities will be:
