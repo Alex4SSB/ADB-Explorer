@@ -1537,4 +1537,7 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
     <value>Colonne de tri &amp; ordre enregistré pour chaque emplacement</value>
   </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>Taille max de l'image à utiliser pour sa propre miniature (0 - désactivé)</value>
+  </data>
 </root>
