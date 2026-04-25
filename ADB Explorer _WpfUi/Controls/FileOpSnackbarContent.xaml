@@ -1,0 +1,187 @@
+<UserControl
+    x:Class="ADB_Explorer.Controls.FileOpSnackbarContent"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:ADB_Explorer.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:services="clr-namespace:ADB_Explorer.Services"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    x:Name="root"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <converters:FileOpProgressConverter x:Key="FileOpProgressConverter" />
+        <converters:TreeViewIndentConverter x:Key="TreeViewIndentConverter" />
+
+        <Style
+            x:Key="FileOpProgressStyle"
+            BasedOn="{StaticResource FluentProgressBarStyle}"
+            TargetType="ProgressBar">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding TotalPercentage, Mode=OneWay}" Value="{x:Null}">
+                    <Setter Property="IsIndeterminate" Value="True" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style
+            x:Key="FileOpFileNameFolderIconStyle"
+            BasedOn="{StaticResource GlyphFont}"
+            TargetType="ui:FontIcon">
+            <Setter Property="Margin" Value="0,0,4,0" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Glyph" Value="&#xE8b7;" />
+        </Style>
+
+        <Style x:Key="FileOpFileNamesTextBlockStyle" TargetType="TextBlock">
+            <Setter Property="Text" Value="{Binding FilePath.NoExtName}" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="True">
+                    <Setter Property="Text" Value="{Binding FilePath.FullName}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding OperationName}" Value="Rename">
+                    <Setter Property="Text" Value="{Binding TargetPath.NoExtName}" />
+                </DataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding OperationName}" Value="Rename" />
+                        <Condition Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="True" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Text" Value="{Binding TargetPath.FullName}" />
+                </MultiDataTrigger>
+                <DataTrigger Binding="{Binding FilePath.NameIsRtl}" Value="False">
+                    <Setter Property="FlowDirection" Value="LeftToRight" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!--  Compact progress: progress bar + optional percentage  -->
+        <DataTemplate x:Key="CompactInProgSyncProgressTemplate">
+            <Grid Margin="4,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ui:ProgressRing
+                    Width="20"
+                    Height="20"
+                    Margin="0,0,6,0"
+                    Progress="{Binding TotalPercentage, Mode=OneWay, Converter={StaticResource FileOpProgressConverter}}" />
+                <Grid Grid.Column="1" VerticalAlignment="Center">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding TotalPercentage, Mode=OneWay}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <TextBlock Text="00.0%" Visibility="Hidden" />
+                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                        <TextBlock Margin="0,0,0,0" Text="{Binding TotalPercentage, Mode=OneWay, StringFormat='{}{0:0.0}'}" />
+                        <TextBlock Text="%" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="InProgShellProgressTemplate">
+            <ui:ProgressRing Margin="4,0" IsIndeterminate="True" />
+        </DataTemplate>
+
+        <helpers:FileOpProgressTemplateSelector
+            x:Key="CompactFileOpProgressTemplateSelector"
+            InProgShellProgressTemplate="{StaticResource InProgShellProgressTemplate}"
+            InProgSyncProgressTemplate="{StaticResource CompactInProgSyncProgressTemplate}" />
+
+        <DataTemplate x:Key="CompactFolderInProgOpFileNameInnerTemplate">
+            <Grid Margin="4,0,0,0" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <ui:FontIcon Style="{StaticResource FileOpFileNameFolderIconStyle}" />
+                <TextBlock Grid.Column="1" Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="RegularOpFileNameTemplate">
+            <TextBlock Margin="4,0,0,0" Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="UninstallOpFileNameTemplate">
+            <TextBlock Margin="4,0,0,0" Text="{Binding PackageName}" />
+        </DataTemplate>
+
+        <helpers:FileOpFileNameTemplateSelector
+            x:Key="CompactFileOpFileNameTemplateSelector"
+            FolderInProgOpFileNameTemplate="{StaticResource CompactFolderInProgOpFileNameInnerTemplate}"
+            RegularOpFileNameTemplate="{StaticResource RegularOpFileNameTemplate}"
+            UninstallOpFileNameTemplate="{StaticResource UninstallOpFileNameTemplate}" />
+
+        <DataTemplate x:Key="FileOpRowTemplate">
+            <Grid Margin="0,2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="30" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <ContentControl Content="{Binding StatusInfo}" ContentTemplateSelector="{StaticResource CompactFileOpProgressTemplateSelector}" />
+                <ContentPresenter
+                    Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    Content="{Binding OpIcon}"
+                    ToolTip="{Binding Tooltip}" />
+                <ContentControl
+                    Grid.Column="2"
+                    Content="{Binding RelativeSource={RelativeSource Self}, Path=DataContext}"
+                    ContentTemplateSelector="{StaticResource CompactFileOpFileNameTemplateSelector}" />
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="FileOpDeviceGroupTemplate">
+            <StackPanel>
+                <TextBlock
+                    Margin="2,2,0,4"
+                    FontWeight="SemiBold"
+                    Opacity="0.7"
+                    Text="{Binding DeviceName}">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsMultiDevice, ElementName=root, Mode=OneWay}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <ItemsControl ItemTemplate="{StaticResource FileOpRowTemplate}" ItemsSource="{Binding Operations}" />
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <StackPanel Margin="0,4,0,0" HorizontalAlignment="Center">
+        <ItemsControl x:Name="GroupsList" ItemTemplate="{StaticResource FileOpDeviceGroupTemplate}" />
+        <TextBlock
+            Margin="4,2,4,0"
+            HorizontalAlignment="Center"
+            Opacity="0.6">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding OverflowCount, ElementName=root, Mode=OneWay}" Value="0">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+            <Run Text="and" />
+            <Run Text="{Binding OverflowCount, ElementName=root, Mode=OneWay}" />
+            <Run Text="more..." />
+        </TextBlock>
+    </StackPanel>
+</UserControl>

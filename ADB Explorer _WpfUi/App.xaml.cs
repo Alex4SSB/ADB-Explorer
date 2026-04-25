@@ -42,7 +42,8 @@ public partial class App
 
             services.AddHostedService<ApplicationHostService>();
 
-            services.AddHostedService<ThumbnailSnackbarService>();
+            services.AddSingleton<AdbSnackbarService>();
+            services.AddHostedService(p => p.GetRequiredService<AdbSnackbarService>());
 
             services.AddHostedService<DevicePollingService>();
 

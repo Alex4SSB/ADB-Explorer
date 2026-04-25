@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Models;
+using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels.Pages;
 
 namespace ADB_Explorer.Controls.Pages;
@@ -27,9 +28,17 @@ public partial class OperationsPageHeader : UserControl
     private void DetailedFileOpDataGrid_ColumnDisplayIndexChanged(object sender, DataGridColumnEventArgs e)
         => ViewModel.UpdateColumnIndexes();
 
+    private void DetailedFileOpDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        => ViewModel.SelectedFileOps = DetailedFileOpDataGrid.SelectedItems.OfType<FileOperation>();
+
     private void ColumnHeader_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        if (sender is DataGridColumnHeader header && e.NewSize.Width > 0)
+        if (sender is DataGridColumnHeader header && header.Column is not null && e.NewSize.Width > 0)
             ViewModel.UpdateColumnWidth(header.Column, e.NewSize.Width);
+    }
+
+    private void DetailedFileOpDataGrid_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        DetailedFileOpDataGrid.UnselectAll();
     }
 }

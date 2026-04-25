@@ -599,8 +599,8 @@
                 </DataTrigger>
             </DataTemplate.Triggers>
             <ContentPresenter
-                Margin="0,0,6,0"
-                HorizontalAlignment="Right"
+                Margin="0,0,4,0"
+                HorizontalAlignment="Center"
                 Content="{Binding OpIcon}"
                 ToolTip="{Binding Tooltip}" />
         </DataTemplate>
@@ -695,12 +695,17 @@
                 Margin="0,-6"
                 HorizontalAlignment="Stretch"
                 Content="{Binding Name}"
-                IsChecked="{Binding IsChecked}"
-                IsEnabled="{Binding IsEnabled}" />
+                IsChecked="{Binding IsChecked}" />
         </DataTemplate>
+        <Style
+            x:Key="FileOpMenuItemStyle"
+            BasedOn="{StaticResource WpfUiMenuItem}"
+            TargetType="local:AdbMenuItem">
+            <Setter Property="IsEnabled" Value="{Binding IsEnabled, Mode=OneWay}" />
+        </Style>
         <local:AdbContextMenu
             x:Key="FileOpHeaderContextMenu"
-            ItemContainerStyle="{StaticResource WpfUiMenuItem}"
+            ItemContainerStyle="{StaticResource FileOpMenuItemStyle}"
             ItemTemplate="{StaticResource FileOpColConfigTemplate}"
             ItemsSource="{Binding Data, Source={StaticResource ColumnListProxy}}"
             Style="{StaticResource UiContextMenu}" />
@@ -743,47 +748,95 @@
             </DataTemplate.Triggers>
             <TextBlock Margin="4,0" Style="{StaticResource FileOpDeviceTextblockStyle}" />
         </DataTemplate>
-        <DataGrid
-            x:Key="CurrentOperationDataGrid"
-            x:Name="CurrentOperationDataGrid"
-            Grid.Row="1"
-            Width="Auto"
-            AutoGenerateColumns="False"
-            CanUserDeleteRows="False"
-            CellStyle="{StaticResource BaseCellStyle}"
-            FocusVisualStyle="{x:Null}"
-            HeadersVisibility="None"
-            ItemsSource="{Binding}">
-            <DataGrid.Columns>
-                <DataGridTemplateColumn MinWidth="100" CellTemplate="{StaticResource CompactFileOpProgressTemplate}" />
-                <DataGridTemplateColumn CellTemplate="{StaticResource CompactOperationIconTemplate}" />
-                <DataGridTemplateColumn MaxWidth="130" CellTemplate="{StaticResource CompactFileOpFileNameTemplate}" />
-            </DataGrid.Columns>
-        </DataGrid>
-        <!--<Grid x:Key="CompactFileOpDropDown">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Button
-                Margin="0,0,0,6"
-                HorizontalAlignment="Center"
-                Command="{Binding Source={x:Static Member=services:PeekDetailed.Action}, Path=Command}"
-                Content="Show Detailed View" />
-            <StaticResource ResourceKey="CurrentOperationDataGrid" />
-        </Grid>-->
     </UserControl.Resources>
     <Grid Margin="20,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <TextBlock
-            Margin="30,10"
+        <StackPanel
+            Margin="0,10"
             HorizontalAlignment="Left"
-            FontSize="24"
-            FontWeight="SemiBold"
-            Text="{Binding Source={x:Static Member=strings:Resources.S_FILE_OP_TOOLTIP}}" />
+            Orientation="Horizontal">
+            <local:AdbMenu Style="{StaticResource AdbMenuStyle}">
+                <local:AdbMenuItem
+                    ItemContainerStyle="{StaticResource FileOpMenuItemStyle}"
+                    ItemTemplate="{StaticResource FileOpColConfigTemplate}"
+                    ItemsSource="{Binding FilterList}"
+                    ToolTip="{Binding Source={x:Static Member=strings:Resources.S_FILTER_FILE_OPS}}">
+                    <local:AdbMenuItem.Header>
+                        <ui:FontIcon FontSize="20" Glyph="&#xE71C;" />
+                    </local:AdbMenuItem.Header>
+                </local:AdbMenuItem>
+                <local:AdbMenuItem IsCheckable="True" IsChecked="{Binding Mode=TwoWay, Source={x:Static Member=models:Data.FileOpQ}, Path=IsAutoPlayStopped}">
+                    <local:AdbMenuItem.Header>
+                        <ui:FontIcon FontSize="20">
+                            <ui:FontIcon.Style>
+                                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                    <Setter Property="Glyph" Value="&#xE768;" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:AdbMenuItem}, Path=IsChecked}" Value="False">
+                                            <Setter Property="Glyph" Value="&#xE769;" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:FontIcon.Style>
+                        </ui:FontIcon>
+                    </local:AdbMenuItem.Header>
+                    <local:AdbMenuItem.ToolTip>
+                        <ui:TextBlock>
+                            <ui:TextBlock.Style>
+                                <Style TargetType="ui:TextBlock">
+                                    <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_ENABLE_AUTO_PLAY}}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Mode=TwoWay, Source={x:Static Member=models:Data.FileOpQ}, Path=IsAutoPlayStopped}" Value="False">
+                                            <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_AUTO_PLAY_DISABLE}}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:TextBlock.Style>
+                        </ui:TextBlock>
+                    </local:AdbMenuItem.ToolTip>
+                </local:AdbMenuItem>
+                <local:AdbMenuItem
+                    Command="{Binding RemoveOpAction.Command}"
+                    IsEnabled="{Binding RemoveOpAction.IsEnabled}"
+                    ToolTip="{Binding RemoveTooltip}">
+                    <local:AdbMenuItem.Header>
+                        <ui:FontIcon FontSize="20" Glyph="&#xE711;" />
+                    </local:AdbMenuItem.Header>
+                </local:AdbMenuItem>
+                <local:AdbMenuItem
+                    Command="{Binding ValidateOpAction.Command}"
+                    IsEnabled="{Binding ValidateOpAction.IsEnabled}"
+                    ToolTip="{Binding ValidateTooltip}">
+                    <local:AdbMenuItem.Header>
+                        <ui:FontIcon FontSize="20" Glyph="&#xE73E;" />
+                    </local:AdbMenuItem.Header>
+                </local:AdbMenuItem>
+                <local:AdbMenuItem Command="{Binding AddTestOpAction.Command}">
+                    <local:AdbMenuItem.Header>
+                        <ui:FontIcon FontSize="20" Glyph="&#xE710;" />
+                    </local:AdbMenuItem.Header>
+                    <local:AdbMenuItem.Style>
+                        <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="local:AdbMenuItem">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsDebug}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </local:AdbMenuItem.Style>
+                </local:AdbMenuItem>
+            </local:AdbMenu>
+            <TextBlock
+                Margin="6,0,0,0"
+                VerticalAlignment="Center"
+                FontSize="24"
+                FontWeight="SemiBold"
+                Text="{Binding Source={x:Static Member=strings:Resources.S_FILE_OP_TOOLTIP}}" />
+        </StackPanel>
+        <Separator Margin="-20,0,-20,4" VerticalAlignment="Bottom" />
         <ui:DataGrid
             x:Name="DetailedFileOpDataGrid"
             Grid.Row="1"
@@ -791,6 +844,8 @@
             ColumnDisplayIndexChanged="DetailedFileOpDataGrid_ColumnDisplayIndexChanged"
             ColumnHeaderStyle="{StaticResource FileOpColumnHeaderStyle}"
             ItemsSource="{Binding Operations}"
+            MouseDown="DetailedFileOpDataGrid_MouseDown"
+            SelectionChanged="DetailedFileOpDataGrid_SelectionChanged"
             Style="{StaticResource DetailedFileOpGridStyle}">
             <ui:DataGrid.Columns>
                 <DataGridTemplateColumn

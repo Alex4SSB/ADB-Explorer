@@ -344,4 +344,20 @@ public class FileSyncOperation : FileOperation
 
     public static FileSyncOperation PushFile(SyncFile sourcePath, SyncFile targetPath, LogicalDeviceViewModel device, Dispatcher dispatcher)
         => new(OperationType.Push, sourcePath, targetPath, device, dispatcher);
+
+    public static FileSyncOperation CreateTestPullOp(LogicalDeviceViewModel device, int percentage)
+    {
+        var name = "0f80e01bafd61313cc788efd8ce1ef653e312ee3"[..new Random().Next(5, 33)];
+        var source = new SyncFile($"/sdcard/{name}.mp4");
+        var target = new SyncFile(@"C:\Temp\test_file.txt");
+
+        var op = new FileSyncOperation(OperationType.Pull, source, target, device, App.AppDispatcher);
+
+        var progressInfo = new AdbSyncProgressInfo(source.FullPath, percentage, percentage, null);
+        op.Status = OperationStatus.InProgress;
+        op.StatusInfo = new InProgSyncProgressViewModel(progressInfo);
+        op.cancelTokenSource = new();
+
+        return op;
+    }
 }

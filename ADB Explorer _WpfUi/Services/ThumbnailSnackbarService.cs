@@ -7,16 +7,17 @@ using Wpf.Ui.Controls;
 
 namespace ADB_Explorer.Services;
 
-public class ThumbnailSnackbarService(ISnackbarService snackbarService) : IHostedService
+public class ThumbnailSnackbarService(ISnackbarService snackbarService, HashSet<string> suppressedDevices) : IHostedService
 {
     private ThumbnailSnackbarContent? _thumbnailPullContent;
     private DispatcherTimer? _pullTimeoutTimer;
+    private AdbSnackbar? _currentSnackbar;
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         ThumbnailService.ThumbnailProgressChanged += OnThumbnailProgressChanged;
 #if DEBUG
-        App.SafeBeginInvoke(ShowDebugSnackbar, DispatcherPriority.Loaded);
+        //App.SafeBeginInvoke(ShowDebugSnackbar, DispatcherPriority.Loaded);
 #endif
         return Task.CompletedTask;
     }
@@ -33,12 +34,16 @@ public class ThumbnailSnackbarService(ISnackbarService snackbarService) : IHoste
         App.SafeInvoke(() =>
         {
             var presenter = snackbarService.GetSnackbarPresenter();
+            string deviceId = Data.DevicesObject.Current.LogicalID;
             string deviceName = Data.RuntimeSettings.IsRTL
                                 ? $"{TextHelper.RTL_MARK}{Data.DevicesObject.Current.Name}{TextHelper.LTR_MARK}"
                                 : Data.DevicesObject.Current.Name;
 
             if (isStarting)
             {
+                if (suppressedDevices.Contains(deviceId))
+                    return;
+
                 if (step == ThumbnailService.ThumbnailStep.Pulling)
                 {
                     if (presenter is not null)
@@ -48,7 +53,7 @@ public class ThumbnailSnackbarService(ISnackbarService snackbarService) : IHoste
                             Text = Strings.Resources.S_THUMB_SNACKBAR_PULLING,
                             ShowProgress = true,
                         };
-                        var snackbar = new AdbSnackbar(presenter)
+                        _currentSnackbar = new AdbSnackbar(presenter)
                         {
                             Title = string.Format(Strings.Resources.S_THUMB_SNACKBAR_TITLE, deviceName),
                             Content = _thumbnailPullContent,
@@ -56,7 +61,8 @@ public class ThumbnailSnackbarService(ISnackbarService snackbarService) : IHoste
                             Timeout = TimeSpan.MaxValue,
                             ProgressMode = SnackProgressMode.Off,
                         };
-                        snackbar.Show(true);
+                        SubscribeToUserDismiss(_currentSnackbar, deviceId);
+                        _currentSnackbar.Show(true);
                         StartPullTimeoutTimer();
 
                         ThumbnailService.ThumbnailPullingProgressUpdated += OnThumbnailPullingProgressUpdated;
@@ -72,7 +78,7 @@ public class ThumbnailSnackbarService(ISnackbarService snackbarService) : IHoste
                     };
                     if (presenter is not null)
                     {
-                        var snackbar = new AdbSnackbar(presenter)
+                        _currentSnackbar = new AdbSnackbar(presenter)
                         {
                             Title = string.Format(Strings.Resources.S_THUMB_SNACKBAR_TITLE, deviceName),
                             Content = new ThumbnailSnackbarContent { Text = message },
@@ -80,7 +86,8 @@ public class ThumbnailSnackbarService(ISnackbarService snackbarService) : IHoste
                             Timeout = TimeSpan.MaxValue,
                             ProgressMode = SnackProgressMode.Indeterminate,
                         };
-                        _ = presenter.ImmediatelyDisplay(snackbar);
+                        SubscribeToUserDismiss(_currentSnackbar, deviceId);
+                        _ = presenter.ImmediatelyDisplay(_currentSnackbar);
                     }
                 }
             }
@@ -92,9 +99,24 @@ public class ThumbnailSnackbarService(ISnackbarService snackbarService) : IHoste
                     ThumbnailService.ThumbnailPullingProgressUpdated -= OnThumbnailPullingProgressUpdated;
                     _thumbnailPullContent = null;
                 }
-                _ = presenter?.HideCurrent();
+                HideCurrentSnackbar();
             }
         });
+    }
+
+    private void SubscribeToUserDismiss(AdbSnackbar snackbar, string deviceId)
+    {
+        snackbar.UserClosed += () =>
+        {
+            suppressedDevices.Add(deviceId);
+            _currentSnackbar = null;
+        };
+    }
+
+    private void HideCurrentSnackbar()
+    {
+        _currentSnackbar?.Hide();
+        _currentSnackbar = null;
     }
 
     private void OnThumbnailPullingProgressUpdated(int completed, int total)
@@ -138,7 +160,7 @@ public class ThumbnailSnackbarService(ISnackbarService snackbarService) : IHoste
         StopPullTimeoutTimer();
         ThumbnailService.ThumbnailPullingProgressUpdated -= OnThumbnailPullingProgressUpdated;
         _thumbnailPullContent = null;
-        _ = snackbarService.GetSnackbarPresenter()?.HideCurrent();
+        HideCurrentSnackbar();
     }
 
 #if DEBUG

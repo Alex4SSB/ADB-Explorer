@@ -61,4 +61,6 @@ public class BaseAction : ViewModelBase
     }
 
     public void Execute() => Command.Execute(null);
+
+    public void NotifyIsEnabledChanged() => OnPropertyChanged(nameof(IsEnabled));
 }

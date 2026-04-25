@@ -16,6 +16,17 @@ public class AdbSnackbar : Snackbar
 
     public AdbSnackbar(SnackbarPresenter presenter) : base(presenter) { }
 
+    public event Action? UserClosed;
+
+    private bool _hidingProgrammatically;
+
+    public new void Hide()
+    {
+        _hidingProgrammatically = true;
+        base.Hide();
+        _hidingProgrammatically = false;
+    }
+
     public static readonly DependencyProperty ProgressModeProperty =
         DependencyProperty.Register(
             nameof(ProgressMode),
@@ -96,7 +107,11 @@ public class AdbSnackbar : Snackbar
             if ((bool)e.NewValue)
                 StartCountdown();
             else
+            {
                 StopCountdown();
+                if (!_hidingProgrammatically)
+                    UserClosed?.Invoke();
+            }
         }
     }
 
