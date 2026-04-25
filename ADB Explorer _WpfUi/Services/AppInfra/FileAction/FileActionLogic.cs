@@ -1205,53 +1205,6 @@ internal static class FileActionLogic
             NativeMethods.RefreshExplorerDirectory(op.TargetPath.ParentPath);
     }
 
-    public static void ToggleFileOpQ()
-    {
-        Data.FileOpQ.IsAutoPlayOn ^= true;
-
-        if (Data.FileOpQ.IsAutoPlayOn)
-            Data.FileOpQ.Start();
-        else
-            Data.FileOpQ.Stop();
-
-        Data.RuntimeSettings.RefreshFileOpControls = true;
-    }
-
-    private static readonly Mutex FileOpControlsMutex = new();
-
-    public static void UpdateFileOpControls()
-    {
-        App.SafeInvoke(() =>
-        {
-            FileOpControlsMutex.WaitOne(0);
-
-            var changed = false;
-            var plural = Data.FileActions.SelectedFileOps.Value.Count() != 1;
-            var opString = plural
-                ? Strings.Resources.S_ACTION_OPERATION_PLURAL
-                : Strings.Resources.S_ACTION_OPERATION;
-
-            var removeAction = string.Format(Strings.Resources.S_REM_DEVICE_TITLE, opString);
-            if (Data.FileActions.RemoveFileOpDescription.Value != removeAction)
-            {
-                Data.FileActions.RemoveFileOpDescription.Value = removeAction;
-                changed = true;
-            }
-
-            var validateAction = string.Format(Strings.Resources.S_ACTION_VALIDATE, opString);
-            if (Data.FileActions.ValidateDescription.Value != validateAction)
-            {
-                Data.FileActions.ValidateDescription.Value = validateAction;
-                changed = true;
-            }
-
-            if (changed)
-                Data.RuntimeSettings.RefreshFileOpControls = true;
-
-            FileOpControlsMutex.ReleaseMutex();
-        });
-    }
-
     public static async void FollowLink()
     {
         var target = Data.SelectedFiles.First().LinkTarget;
@@ -1283,14 +1236,5 @@ internal static class FileActionLogic
         var apk = Data.SelectedPackages.First();
         
         Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"? {apk.Name}\"");
-    }
-
-    public static void RemoveFileOps()
-    {
-        var ops = Data.FileActions.SelectedFileOps.Value;
-        if (!ops.Any())
-            ops = Data.FileOpQ.Operations;
-
-        Data.FileOpQ.Operations.RemoveAll(ops);
     }
 }

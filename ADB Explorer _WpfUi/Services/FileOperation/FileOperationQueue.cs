@@ -19,11 +19,20 @@ public class FileOperationQueue : ViewModelBase
         }
     }
 
-    private bool isAutoPlayOn = true;
-    public bool IsAutoPlayOn
+    private bool isAutoPlayStopped = false;
+    public bool IsAutoPlayStopped
     {
-        get => isAutoPlayOn;
-        set => Set(ref isAutoPlayOn, value);
+        get => isAutoPlayStopped;
+        set
+        {
+            if (Set(ref isAutoPlayStopped, value))
+            {
+                if (isAutoPlayStopped)
+                    Stop();
+                else
+                    Start();
+            }
+        }
     }
 
     private double progress = 0.0;
@@ -173,7 +182,7 @@ public class FileOperationQueue : ViewModelBase
 
     public void Start()
     {
-        if (TotalCount < 1 || !IsAutoPlayOn)
+        if (TotalCount < 1 || IsAutoPlayStopped)
             return;
 
         if (!IsActive)
@@ -306,7 +315,7 @@ public class FileOperationQueue : ViewModelBase
             {
                 MoveToCompleted(op);
 
-                if (IsAutoPlayOn)
+                if (!IsAutoPlayStopped)
                     MoveToNextOperation();
 
                 if (op.OperationName is FileOperation.OperationType.Push

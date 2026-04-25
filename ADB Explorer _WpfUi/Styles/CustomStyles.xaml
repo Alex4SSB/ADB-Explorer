@@ -868,4 +868,11 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <Style
+        x:Key="FileOpFilterCheckBox"
+        BasedOn="{StaticResource StretchCheckBoxStyle}"
+        TargetType="CheckBox">
+        <Setter Property="IsChecked" Value="{Binding IsChecked, Mode=TwoWay}" />
+        <Setter Property="IsEnabled" Value="{Binding IsEnabled, Mode=OneWay}" />
+    </Style>
 </ResourceDictionary>

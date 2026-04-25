@@ -7,11 +7,6 @@ namespace ADB_Explorer.Services;
 
 public class FileActionsEnable : ViewModelBase
 {
-    public FileActionsEnable()
-    {
-        SelectedFileOps.PropertyChanged += (object sender, PropertyChangedEventArgs<IEnumerable<FileOperation>> e) => FileActionLogic.UpdateFileOpControls();
-    }
-
     #region booleans
 
     private bool pushFilesFoldersEnabled = false;
@@ -504,10 +499,6 @@ public class FileActionsEnable : ViewModelBase
 
     public ObservableProperty<bool> IsApkActionsVisible = new() { Value = Data.Settings.EnableApk };
 
-
-    public ObservableProperty<IEnumerable<FileOperation>> SelectedFileOps = new() { Value = [] };
-
-
     public ObservableProperty<string> CopyPathDescription = new();
 
     public ObservableProperty<string> DeleteDescription = new();
@@ -517,10 +508,6 @@ public class FileActionsEnable : ViewModelBase
     public ObservableProperty<string> PasteDescription = new();
 
     public ObservableProperty<string> CutItemsCount = new();
-
-    public ObservableProperty<string> ValidateDescription = new();
-
-    public ObservableProperty<string> RemoveFileOpDescription = new();
 
     public ObservableProperty<string> PullDescription = new();
 

@@ -250,39 +250,6 @@ internal static class PathContextMenu
     ];
 }
 
-internal static class FileOpMenu
-{
-    public static ObservableList<IMenuItem> List { get; } =
-    [
-        new AltObjectMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenFileOps),
-            AppActions.Icons[FileAction.FileActionType.OpenFileOps],
-            isContentDropDown: true,
-            children:
-            [
-                new GeneralSubMenu(App.Current.Resources["CompactFileOpDropDown"], true)
-            ]),
-    ];
-}
-
-internal static class SettingsMenu
-{
-    public static ObservableList<IMenuItem> List { get; } =
-    [
-        new CompoundIconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenSettings),
-            new SettingsIcon()),
-    ];
-}
-
-internal static class SettingsPaneMenu
-{
-    public static ObservableList<IMenuItem> List { get; } =
-    [
-        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.HideSettings),
-            "\uE761",
-            iconSize: 20),
-    ];
-}
-
 internal static class EditorControls
 {
     public static ObservableList<IMenuItem> List { get; } =
@@ -297,21 +264,6 @@ internal static class EditorControls
     ];
 }
 
-internal static class FileOpControls
-{
-    public static ObservableList<IMenuItem> List { get; } =
-    [
-        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpFilter).Button,
-        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpStop).Button,
-        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpRemove),
-            AppActions.Icons[FileAction.FileActionType.FileOpRemove],
-            iconSize: 20),
-        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpValidate),
-            "\uE73E",
-            iconSize: 20),
-    ];
-}
-
 internal static class LogControls
 {
     public static ObservableList<IMenuItem> List { get; } =
@@ -321,11 +273,4 @@ internal static class LogControls
             AppActions.Icons[FileAction.FileActionType.FileOpRemove],
             iconSize: 20)
     ];
-}
-
-internal static class PeekDetailed
-{
-    public static BaseAction Action { get; } = new(
-            () => true,
-            () => Data.RuntimeSettings.IsDetailedPeekMode = true);
 }

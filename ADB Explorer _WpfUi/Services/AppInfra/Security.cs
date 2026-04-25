@@ -115,14 +115,6 @@ public static class Security
             m => m.Groups["Hash"].Value.ToUpper());
     }
 
-    public static void ValidateOps()
-    {
-        foreach (var item in Data.FileActions.SelectedFileOps.Value)
-        {
-            ValidateOperation(item);
-        }
-    }
-
     public static async void ValidateOperation(FileOperation op)
     {
         IOrderedEnumerable<KeyValuePair<string, string>> source = null, target = null;

@@ -1,31 +1,33 @@
 ﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Models;
 
 public static class FileOpFilters
 {
-    private static List<FileOpFilter> list = null;
-    public static List<FileOpFilter> List
+    public static List<FileOpFilter> FilterList
     {
         get
         {
-            if (list is null)
+            if (field is null)
             {
-                list = [.. Enum.GetValues<FileOpFilter.FilterType>().Select(f => new FileOpFilter(f))];
+                var filterTypes = Enum.GetValues<FileOpFilter.FilterType>().Where(f => f is not FileOpFilter.FilterType.Running);
+                if (Data.Settings.FileOpFilters.Length == 0)
+                    Data.Settings.FileOpFilters = [.. filterTypes];
 
-                UpdateCheckedColumns();
+                field = [.. filterTypes.Select(f => new FileOpFilter(f))];
+
+                UpdateCheckedFilters();
             }
 
-            return list;
+            return field;
         }
-    }
+    } = null;
 
     public static ObservableProperty<int> CheckedFilterCount { get; private set; } = new() { Value = -1 };
 
-    public static void UpdateCheckedColumns() =>
-        CheckedFilterCount.Value = List.Count(col => col.IsChecked is true);
+    public static void UpdateCheckedFilters() =>
+        CheckedFilterCount.Value = FilterList.Count(col => col.IsChecked is true);
 }
 
 public class FileOpFilter : ViewModelBase
@@ -41,46 +43,30 @@ public class FileOpFilter : ViewModelBase
         Previous,
     }
 
-    private bool? isChecked = null;
-    public bool? IsChecked
+    private bool isChecked = true;
+    public bool IsChecked
     {
         get => isChecked;
         set
         {
             if (Set(ref isChecked, value))
             {
+                var filters = Data.Settings.FileOpFilters.Where(f => f != Type);
+                if (value)
+                    filters = [.. filters, Type];
+
+                Data.Settings.FileOpFilters = [.. filters];
+
                 if (FileOpFilters.CheckedFilterCount > 0)
-                    FileOpFilters.UpdateCheckedColumns();
-
-                Store();
+                    FileOpFilters.UpdateCheckedFilters();
             }
-        }
-    }
-    
-    private CheckBox checkBox = null;
-    public CheckBox CheckBox
-    {
-        get
-        {
-            if (checkBox is null)
-            {
-                checkBox = new CheckBox()
-                {
-                    Style = (Style)App.Current.FindResource("FileOpFilterCheckBox"),
-                    DataContext = this,
-                    Content = GetFilterName(Type),
-                    Margin = new(0, -6, 0, -6),
-                };
-            }
-
-            return checkBox;
         }
     }
 
     public static string GetFilterName(FilterType filterType)
         => filterType switch
     {
-        FilterType.Running => Strings.Resources.S_FILEOP_RUNNING,
+        FilterType.Running => "",
         FilterType.Pending => Strings.Resources.S_FILEOP_WAITING,
         FilterType.Completed => Strings.Resources.S_FILEOP_COMPLETED,
         FilterType.Validated => Strings.Resources.S_FILEOP_VALIDATED,
@@ -90,32 +76,18 @@ public class FileOpFilter : ViewModelBase
         _ => throw new NotSupportedException()
     };
 
+    public string Name => GetFilterName(Type);
+
     public FilterType Type { get; }
 
-    public bool IsEnabled
-    {
-        get
-        {
-            if (IsChecked is null)
-                return false;
-
-            return IsChecked is false || FileOpFilters.CheckedFilterCount > 1;
-        }
-    }
+    public bool IsEnabled => !IsChecked || FileOpFilters.CheckedFilterCount > 1;
 
     public FileOpFilter(FilterType type)
     {
         Type = type;
 
-        if (type is FilterType.Running)
-            IsChecked = null;
-        else
-            IsChecked = Retrieve() is bool val ? val : true;
+        IsChecked = Data.Settings.FileOpFilters.Contains(type);
 
-        FileOpFilters.CheckedFilterCount.PropertyChanged += (object sender, PropertyChangedEventArgs<int> e) => OnPropertyChanged(nameof(IsEnabled));
+        FileOpFilters.CheckedFilterCount.PropertyChanged += (sender, e) => OnPropertyChanged(nameof(IsEnabled));
     }
-
-    private bool? Retrieve() => Storage.RetrieveBool($"{nameof(FilterType)}_{Type}");
-
-    private void Store() => Storage.StoreValue($"{nameof(FilterType)}_{Type}", $"{IsChecked}");
 }

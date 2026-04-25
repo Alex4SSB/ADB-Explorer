@@ -42,7 +42,14 @@ public class FileOpColumnConfig : ViewModelBase
     public int Index
     {
         get => index;
-        set => Set(ref index, value);
+        set
+        {
+            if (Set(ref index, value))
+            {
+                if (column is not null && value >= 0)
+                    column.DisplayIndex = value;
+            }
+        }
     }
 
     private double columnWidth;
@@ -68,27 +75,21 @@ public class FileOpColumnConfig : ViewModelBase
 
     private DataGridColumn column;
 
-    /// <summary>
-    /// Links this config to a XAML-defined <see cref="DataGridColumn"/>, applying
-    /// the persisted visibility and width.
-    /// </summary>
-    /// <summary>When non-null the column is pinned to this width — it is never read from or written to disk.</summary>
-    public double? ConstWidth { get; }
-
     public void AssignColumn(DataGridColumn col)
     {
         column = col;
         col.Visibility = VisibilityHelper.Visible(IsChecked);
-        if (ConstWidth is double cw)
-            col.Width = cw;
-        else if (ColumnWidth > 0)
+
+        if (ColumnWidth > 0)
             col.Width = ColumnWidth;
+
+        if (index >= 0)
+            col.DisplayIndex = index;
     }
 
     public FileOpColumnConfig(ColumnType type, int defaultIndex, double defaultWidth = 0, bool visibleByDefault = true, double? constWidth = null)
     {
         Type = type;
-        ConstWidth = constWidth;
 
         bool isChecked = visibleByDefault;
         int idx = defaultIndex;
@@ -99,13 +100,13 @@ public class FileOpColumnConfig : ViewModelBase
             isChecked = saved.IsChecked ?? visibleByDefault;
             idx = saved.Index >= 0 ? saved.Index : defaultIndex;
             // Width is not restored for const-width columns
-            if (constWidth is null)
-                width = saved.Width > 0 ? saved.Width : defaultWidth;
+            if (constWidth is null && saved.Width > 0)
+                width = saved.Width;
         }
 
         this.isChecked = isChecked;
         index = idx;
-        columnWidth = width;
+        columnWidth = constWidth ?? width;
 
         CheckedColumnsCount.PropertyChanged += (_, _) => OnPropertyChanged(nameof(IsEnabled));
     }

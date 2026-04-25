@@ -161,15 +161,6 @@
                 Grid.Column="3"
                 Background="Transparent"
                 MouseDown="Window_MouseDown" />
-            <!--<StackPanel
-                Grid.Column="3"
-                HorizontalAlignment="Right"
-                Orientation="Horizontal">
-            -->
-            <!--<local:AdbMenu Style="{StaticResource FileOpMenuStyle}" />
-                <local:AdbMenu Style="{StaticResource SettingsMenuStyle}" />-->
-            <!--
-            </StackPanel>-->
             <Separator Grid.ColumnSpan="3" VerticalAlignment="Bottom" />
         </Grid>
         <Border Grid.Row="2" MouseDown="GridBackgroundBlock_MouseDown">

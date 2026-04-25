@@ -310,8 +310,8 @@ public abstract class FileOperation : ViewModelBase
         StatusInfo.IsValidationInProgress = value;
         OnPropertyChanged(nameof(ValidationAllowed));
 
-        if (Data.FileActions.SelectedFileOps.Value.Contains(this))
-            Data.RuntimeSettings.RefreshFileOpControls = true;
+        //if (Data.FileActions.SelectedFileOps.Value.Contains(this))
+        //    Data.RuntimeSettings.RefreshFileOpControls = true;
     }
 
     public abstract void Start();

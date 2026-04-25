@@ -753,8 +753,8 @@ public partial class ExplorerPageHeader : UserControl
 
     private void UpdateFileOp(bool onlyProgress = true)
     {
-        if (!onlyProgress)
-            Task.Run(FileActionLogic.UpdateFileOpControls);
+        //if (!onlyProgress)
+        //    Task.Run(FileActionLogic.UpdateFileOpControls);
 
         //if (FileOpQ.AnyFailedOperations)
         //    TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Error;

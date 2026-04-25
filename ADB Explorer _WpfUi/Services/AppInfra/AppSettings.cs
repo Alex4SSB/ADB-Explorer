@@ -218,7 +218,10 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     #region File Ops
 
     [ObservableProperty]
-    public partial FileOpColumnState[]? FileOpColumns { get; set; }
+    public partial FileOpColumnState[] FileOpColumns { get; set; } = [];
+
+    [ObservableProperty]
+    public partial FileOpFilter.FilterType[] FileOpFilters { get; set; } = [];
 
     [ObservableProperty]
     public partial bool EnableCompactView { get; set; } = false;

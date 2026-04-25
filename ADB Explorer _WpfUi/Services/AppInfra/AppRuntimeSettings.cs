@@ -12,19 +12,6 @@ public partial class AppRuntimeSettings : ViewModelBase
     [ObservableProperty]
     public partial bool IsDevicesView { get; set; }
 
-    private bool isOperationsViewOpen = false;
-    public bool IsOperationsViewOpen
-    {
-        get => isOperationsViewOpen;
-        set
-        {
-            if (Set(ref isOperationsViewOpen, value))
-            {
-                IsDetailedPeekMode = false;
-            }
-        }
-    }
-
     private double maxSearchBoxWidth = AdbExplorerConst.DEFAULT_SEARCH_WIDTH;
     public double MaxSearchBoxWidth
     {
@@ -276,13 +263,6 @@ public partial class AppRuntimeSettings : ViewModelBase
         set => Set(ref isPollingStopped, value);
     }
 
-    private bool isDetailedPeekMode = false;
-    public bool IsDetailedPeekMode
-    {
-        get => isDetailedPeekMode;
-        set => Set(ref isDetailedPeekMode, value);
-    }
-
     private BitmapSource dragBitmap = null;
     public BitmapSource DragBitmap
     {
@@ -363,7 +343,6 @@ public partial class AppRuntimeSettings : ViewModelBase
     public bool InitLister { get => false; set => OnPropertyChanged(); }
     public bool DriveViewNav { get => false; set => OnPropertyChanged(); }
     public bool AutoHideSearchBox { get => false; set => OnPropertyChanged(); }
-    public bool RefreshFileOpControls { get => false; set => OnPropertyChanged(); }
     public bool ClearLogs { get => false; set => OnPropertyChanged(); }
     public bool SortFileOps { get => false; set => OnPropertyChanged(); }
     public bool RefreshExplorerSorting { get => false; set => OnPropertyChanged(); }

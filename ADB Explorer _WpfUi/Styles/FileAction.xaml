@@ -502,26 +502,6 @@
         <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:PathContextMenu.List}}" />
     </Style>
     <Style
-        x:Key="SettingsMenuStyle"
-        BasedOn="{StaticResource AdbToolBarStyle}"
-        TargetType="controls:AdbMenu">
-        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:SettingsMenu.List}}" />
-    </Style>
-    <Style
-        x:Key="FileOpMenuStyle"
-        BasedOn="{StaticResource AdbToolBarStyle}"
-        TargetType="controls:AdbMenu">
-        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:FileOpMenu.List}}" />
-    </Style>
-    <Style
-        x:Key="SettingsPaneMenuStyle"
-        BasedOn="{StaticResource AdbToolBarStyle}"
-        TargetType="controls:AdbMenu">
-        <Setter Property="Margin" Value="0,0,7,0" />
-        <Setter Property="HorizontalAlignment" Value="Right" />
-        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:SettingsPaneMenu.List}}" />
-    </Style>
-    <Style
         x:Key="EditorControlsMenuStyle"
         BasedOn="{StaticResource AdbToolBarStyle}"
         TargetType="controls:AdbMenu">
@@ -533,17 +513,6 @@
     <ItemsPanelTemplate x:Key="VerticalItemsPanel">
         <WrapPanel FlowDirection="RightToLeft" Orientation="Vertical" />
     </ItemsPanelTemplate>
-    <Style
-        x:Key="DetailedFileOpControlsStyle"
-        BasedOn="{StaticResource AdbToolBarStyle}"
-        TargetType="controls:AdbMenu">
-        <Setter Property="ItemsControl.ItemsSource" Value="{Binding Source={x:Static Member=services:FileOpControls.List}}" />
-        <Setter Property="Padding" Value="2" />
-        <Setter Property="VerticalAlignment" Value="Top" />
-        <Setter Property="ItemsPanel" Value="{StaticResource VerticalItemsPanel}" />
-        <Setter Property="helpers:MenuHelper.ItemPadding" Value="10,0" />
-        <Setter Property="helpers:MenuHelper.ItemMargin" Value="0.5" />
-    </Style>
     <Style
         x:Key="LogControlsPanelStyle"
         BasedOn="{StaticResource AdbToolBarStyle}"

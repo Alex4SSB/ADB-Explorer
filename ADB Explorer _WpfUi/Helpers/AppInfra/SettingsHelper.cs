@@ -72,18 +72,13 @@ public static class SettingsHelper
         }
     }
 
-    public static void SetSymbolFont()
-    {
-        Application.Current.Resources["SymbolThemeFontFamily"] = App.Current.FindResource("FluentSymbolThemeFontFamily");
-    }
-
     public static async void SplashScreenTask()
     {
         var startTime = DateTime.Now;
         var versionValid = await AdbHelper.CheckAdbVersion();
         var delay = AdbExplorerConst.SPLASH_DISPLAY_TIME - (DateTime.Now - startTime);
         
-        if (!versionValid) // || !Data.Settings.AdvancedDragSet
+        if (!versionValid)
             return;
 
         await Task.Delay(Data.Settings.EnableSplash && delay > TimeSpan.Zero ? delay : TimeSpan.Zero);
@@ -93,7 +88,8 @@ public static class SettingsHelper
 
     public static async void InitNotifications()
     {
-        if (Data.Settings.OriginalCulture is null || Data.Settings.OriginalCulture.Name != "en-US")
+        if (Data.Settings.ShowLanguageNotification &&
+            (Data.Settings.OriginalCulture is null || Data.Settings.OriginalCulture.Name != "en-US"))
         {
             UISettings.Notifications.Add(new(async () =>
             {

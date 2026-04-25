@@ -19,13 +19,11 @@ public static class AppActions
         { FileActionType.Edit, new(Key.E, ModifierKeys.Control) },
         { FileActionType.Uninstall, new(Key.F11, ModifierKeys.Shift) },
         { FileActionType.PushPackages, new(Key.I, ModifierKeys.Alt) },
-        { FileActionType.OpenSettings, new(Key.D0, ModifierKeys.Alt) },
         { FileActionType.Paste, new(Key.V, ModifierKeys.Control) },
     };
 
     public static readonly Dictionary<FileActionType, string> Icons = new()
     {
-        { FileActionType.OpenFileOps, "\uF16A" },
         { FileActionType.PushFolders, "\uE8B7" },
         { FileActionType.NewFile, "\uE8A5" },
         { FileActionType.Package, "\uE7B8" },
@@ -56,20 +54,6 @@ public static class AppActions
 
     public static List<ToggleMenu> ToggleActions { get; } =
     [
-        new(FileActionType.FileOpFilter,
-            () => !Data.FileOpQ.IsActive,
-            Strings.Resources.S_FILTER_FILE_OPS,
-            "\uF16C",
-            () => { },
-            toggleOnClick: false,
-            children: FileOpFilters.List.Select(f => new GeneralSubMenu(f.CheckBox))),
-        new(FileActionType.FileOpStop,
-            () => true,
-            Strings.Resources.S_ENABLE_AUTO_PLAY,
-            Icons[FileActionType.FileOpStop],
-            FileActionLogic.ToggleFileOpQ,
-            Strings.Resources.S_AUTO_PLAY_DISABLE,
-            Icons[FileActionType.PauseLogs]),
         new(FileActionType.PauseLogs,
             () => true,
             Strings.Resources.S_LOG_UPDATES_PAUSE,
@@ -120,12 +104,6 @@ public static class AppActions
             () => Data.RuntimeSettings.IsSearchBoxFocused ^= true,
             Strings.Resources.S_BUTTON_FILTER,
             Gestures[FileActionType.Filter],
-            true),
-        new(FileActionType.OpenDevices,
-            () => !Data.RuntimeSettings.IsSplashScreenVisible,
-            ToggleDevicesPane,
-            Strings.Resources.S_BUTTON_DEVICES,
-            new(Key.D1, ModifierKeys.Alt),
             true),
         new(FileActionType.Pull,
             () => Data.FileActions.PullEnabled,
@@ -349,37 +327,11 @@ public static class AppActions
             "",
             new(Key.F10),
             true),
-        new(FileActionType.OpenSettings,
-            () => !Data.RuntimeSettings.IsSplashScreenVisible,
-            ToggleSettingsPane,
-            Strings.Resources.S_SETTINGS_TITLE,
-            Gestures[FileActionType.OpenSettings],
-            true),
-        new(FileActionType.HideSettings,
-            () => true,
-            ToggleSettingsPane,
-            Strings.Resources.S_ACTION_HIDE,
-            Gestures[FileActionType.OpenSettings]),
-        new(FileActionType.OpenFileOps,
-            () => !Data.RuntimeSettings.IsSplashScreenVisible,
-            () => Data.RuntimeSettings.IsOperationsViewOpen ^= true,
-            Strings.Resources.S_FILE_OP_TOOLTIP,
-            new(Key.D9, ModifierKeys.Alt),
-            true),
-        ToggleActions.Find(a => a.FileAction.Name is FileActionType.FileOpStop).FileAction,
-        new(FileActionType.FileOpRemove,
-            () => !Data.FileOpQ.IsActive && Data.FileOpQ.Operations.Count > 0,
-            FileActionLogic.RemoveFileOps,
-            Data.FileActions.RemoveFileOpDescription),
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.PauseLogs).FileAction,
         new(FileActionType.ClearLogs,
             () => Data.CommandLog.Count > 0,
             () => Data.RuntimeSettings.ClearLogs = true,
             Strings.Resources.S_MENU_CLEAR_LOG),
-        new(FileActionType.FileOpValidate,
-            () => !Data.FileOpQ.IsActive && Data.FileActions.SelectedFileOps.Value.AnyAll(op => op.ValidationAllowed),
-            Security.ValidateOps,
-            Data.FileActions.ValidateDescription),
         new(FileActionType.FollowLink,
             () => Data.FileActions.IsFollowLinkEnabled,
             FileActionLogic.FollowLink,
@@ -409,21 +361,6 @@ public static class AppActions
             .Select(action => action.KeyBinding)
             .Where(binding => binding is not null)];
 
-    private static void ToggleSettingsPane()
-    {
-        //Data.RuntimeSettings.IsSettingsPaneOpen ^= true;
-
-        //if (Data.RuntimeSettings.IsSettingsPaneOpen)
-        //    Data.RuntimeSettings.IsDevicesPaneOpen = false;
-    }
-
-    private static void ToggleDevicesPane()
-    {
-        Data.RuntimeSettings.IsDevicesView ^= true;
-
-        //if (Data.RuntimeSettings.IsDevicesPaneOpen)
-        //    Data.RuntimeSettings.IsSettingsPaneOpen = false;
-    }
 }
 
 public class FileAction : ViewModelBase
@@ -441,7 +378,6 @@ public class FileAction : ViewModelBase
         EditCurrentPath,
         Filter,
         KeyboardFilter,
-        OpenDevices,
         Pull,
         Push,
         ContextPush,
@@ -474,16 +410,13 @@ public class FileAction : ViewModelBase
         CopyToTemp,
         PushPackages,
         ContextPushPackages,
-        OpenSettings,
         HideSettings,
-        OpenFileOps,
         CloseEditor,
         SaveEditor,
         FileOpStop,
         FileOpRemove,
         PauseLogs,
         ClearLogs,
-        FileOpValidate,
         FileOpFilter,
         FollowLink,
         PasteLink,
