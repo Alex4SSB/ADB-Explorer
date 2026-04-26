@@ -178,6 +178,19 @@ public static class ExpanderHelper
             typeof(ExpanderHelper),
             null);
 
+    public static bool GetIsAccentHeader(Control control) =>
+        (bool)control.GetValue(IsAccentHeaderProperty);
+
+    public static void SetIsAccentHeader(Control control, bool value) =>
+        control.SetValue(IsAccentHeaderProperty, value);
+
+    public static readonly DependencyProperty IsAccentHeaderProperty =
+        DependencyProperty.RegisterAttached(
+            "IsAccentHeader",
+            typeof(bool),
+            typeof(ExpanderHelper),
+            null);
+
     public static object GetHeaderTooltip(Control control) =>
         control.GetValue(HeaderTooltipProperty);
 

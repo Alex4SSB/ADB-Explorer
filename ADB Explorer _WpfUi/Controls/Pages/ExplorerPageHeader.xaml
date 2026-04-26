@@ -125,13 +125,6 @@
                 </Grid>
             </StackPanel>
             <Separator VerticalAlignment="Bottom" />
-            <ProgressBar
-                x:Name="UpperProgressBar"
-                VerticalAlignment="Bottom"
-                LargeChange="0.001"
-                Maximum="1"
-                SmallChange="0.0001"
-                Style="{StaticResource UpperProgressBarStyle}" />
         </Grid>
         <Grid
             Grid.Row="1"

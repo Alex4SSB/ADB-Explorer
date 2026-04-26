@@ -1687,6 +1687,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to and {0} more….
+        /// </summary>
+        public static string S_FILEOP_HIDDEN_ITEMS {
+            get {
+                return ResourceManager.GetString("S_FILEOP_HIDDEN_ITEMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Previous Operation.
         /// </summary>
         public static string S_FILEOP_PREV {

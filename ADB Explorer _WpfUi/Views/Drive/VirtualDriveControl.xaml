@@ -38,7 +38,7 @@
         <ui:CardAction.Icon>
             <ui:FontIcon Margin="0,0,0,1" Style="{StaticResource DriveIconStyle}" />
         </ui:CardAction.Icon>
-        <Grid Height="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}, Path=ActualHeight}">
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition />

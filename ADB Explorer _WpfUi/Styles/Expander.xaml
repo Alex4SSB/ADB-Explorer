@@ -376,11 +376,16 @@
                             <Setter Property="BorderBrush" Value="Transparent" />
                             <Setter TargetName="ContentPresenterBorder" Property="Background" Value="Transparent" />
                         </Trigger>
+                        <Trigger Property="helpers:ExpanderHelper.IsAccentHeader" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource AccentButtonBackground}" />
+                            <Setter Property="Foreground" Value="{DynamicResource AccentButtonForeground}" />
+                        </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ExpanderHeaderDisabledForeground}" />
                             <Setter TargetName="ExpanderToggleButton" Property="Foreground" Value="{DynamicResource ExpanderHeaderDisabledForeground}" />
                             <Setter TargetName="ExpanderToggleButton" Property="BorderBrush" Value="{DynamicResource ExpanderHeaderDisabledBorderBrush}" />
                         </Trigger>
+                        
                         <Trigger SourceName="ExpanderToggleButton" Property="IsMouseOver" Value="True">
                             <Setter Property="Background">
                                 <Setter.Value>
@@ -388,6 +393,14 @@
                                 </Setter.Value>
                             </Setter>
                         </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition SourceName="ExpanderToggleButton" Property="IsMouseOver" Value="True" />
+                                <Condition Property="helpers:ExpanderHelper.IsAccentHeader" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundPointerOver}" />
+                        </MultiTrigger>
+                        
                         <Trigger SourceName="ExpanderToggleButton" Property="IsPressed" Value="True">
                             <Setter Property="Background">
                                 <Setter.Value>
@@ -395,6 +408,13 @@
                                 </Setter.Value>
                             </Setter>
                         </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition SourceName="ExpanderToggleButton" Property="IsPressed" Value="True" />
+                                <Condition Property="helpers:ExpanderHelper.IsAccentHeader" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundPressed}" />
+                        </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

@@ -30,7 +30,24 @@ public partial class FileOpSnackbarContent : UserControl
     public int OverflowCount
     {
         get => (int)GetValue(OverflowCountProperty);
-        private set => SetValue(OverflowCountProperty, value);
+        private set
+        {
+            SetValue(OverflowCountProperty, value);
+            OverflowString = string.Format(Strings.Resources.S_FILEOP_HIDDEN_ITEMS, value);
+        }
+    }
+
+    public static readonly DependencyProperty OverflowStringProperty =
+        DependencyProperty.Register(
+            nameof(OverflowString),
+            typeof(string),
+            typeof(FileOpSnackbarContent),
+            new PropertyMetadata(string.Empty));
+
+    public string OverflowString
+    {
+        get => (string)GetValue(OverflowStringProperty);
+        private set => SetValue(OverflowStringProperty, value);
     }
 
     public static readonly DependencyProperty IsMultiDeviceProperty =
@@ -97,7 +114,7 @@ public partial class FileOpSnackbarContent : UserControl
 
         var visibleGroups = byDevice
             .Take(MaxVisibleDevices)
-            .Select(g => new FileOpDeviceGroup(g.Key, g.Take(MaxVisibleOpsPerDevice).ToList()))
+            .Select(g => new FileOpDeviceGroup(g.Key, [.. g.Take(MaxVisibleOpsPerDevice)]))
             .ToList();
 
         int hiddenOps = byDevice

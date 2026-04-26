@@ -11,7 +11,6 @@
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     <converters:TrimmedTooltipConverter x:Key="TrimmedTooltip" />
-    <converters:FileOpProgressConverter x:Key="FileOpProgressConverter" />
     <converters:StringFormatConverter x:Key="StringFormatConverter" />
     <Style
         x:Key="StretchCheckBoxStyle"
@@ -168,29 +167,6 @@
         <Setter Property="Padding" Value="2,2,3,3" />
         <Setter Property="Margin" Value="0,0,4,0" />
         <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_RESTART_APP}}" />
-    </Style>
-
-    <Style
-        x:Key="UpperProgressBarStyle"
-        BasedOn="{StaticResource FluentProgressBarStyle}"
-        TargetType="ProgressBar">
-        <Setter Property="Visibility" Value="Collapsed" />
-        <Setter Property="IsIndeterminate" Value="False" />
-        <Setter Property="ToolTip" Value="{Binding StringProgress}" />
-        <Setter Property="Value" Value="{Binding Progress, Mode=OneWay, Converter={StaticResource FileOpProgressConverter}}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding IsActive}" Value="True">
-                <Setter Property="Visibility" Value="Visible" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding AnyFailedOperations}" Value="True">
-                <Setter Property="Visibility" Value="Visible" />
-                <Setter Property="Foreground" Value="#FFFF99A4" />
-                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_FAILED_OPERATIONS}}" />
-            </DataTrigger>
-            <Trigger Property="Value" Value="0">
-                <Setter Property="IsIndeterminate" Value="True" />
-            </Trigger>
-        </Style.Triggers>
     </Style>
     <Style x:Key="ItemsCountStackPanelStyle" TargetType="StackPanel">
         <Setter Property="Visibility" Value="Visible" />

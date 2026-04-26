@@ -32,7 +32,7 @@
             Padding="-1"
             helpers:ExpanderHelper.ExpanderArrow="None"
             helpers:ExpanderHelper.HeaderTooltip="{Binding PlaceholderText}"
-            helpers:ExpanderHelper.IsHeaderToggleExternal="True"
+            helpers:ExpanderHelper.IsAccentHeader="{Binding IsFiltered}"
             ExpandDirection="Left"
             Expanded="Expander_Expanded"
             FocusVisualStyle="{x:Null}"

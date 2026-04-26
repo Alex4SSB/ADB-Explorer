@@ -7,7 +7,6 @@
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
-    xmlns:services="clr-namespace:ADB_Explorer.Services"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     x:Name="root"
     mc:Ignorable="d">
@@ -68,9 +67,12 @@
                 <ui:ProgressRing
                     Width="20"
                     Height="20"
-                    Margin="0,0,6,0"
+                    Margin="0,0,8,0"
                     Progress="{Binding TotalPercentage, Mode=OneWay, Converter={StaticResource FileOpProgressConverter}}" />
-                <Grid Grid.Column="1" VerticalAlignment="Center">
+                <Grid
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    FlowDirection="LeftToRight">
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
@@ -81,10 +83,7 @@
                         </Style>
                     </Grid.Style>
                     <TextBlock Text="00.0%" Visibility="Hidden" />
-                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                        <TextBlock Margin="0,0,0,0" Text="{Binding TotalPercentage, Mode=OneWay, StringFormat='{}{0:0.0}'}" />
-                        <TextBlock Text="%" />
-                    </StackPanel>
+                    <TextBlock HorizontalAlignment="Right" Text="{Binding TotalPercentage, Mode=OneWay, StringFormat='{}{0:0.0}%'}" />
                 </Grid>
             </Grid>
         </DataTemplate>
@@ -169,7 +168,8 @@
         <TextBlock
             Margin="4,2,4,0"
             HorizontalAlignment="Center"
-            Opacity="0.6">
+            Opacity="0.6"
+            Text="{Binding OverflowString, ElementName=root, Mode=OneWay}">
             <TextBlock.Style>
                 <Style TargetType="TextBlock">
                     <Style.Triggers>
@@ -179,9 +179,6 @@
                     </Style.Triggers>
                 </Style>
             </TextBlock.Style>
-            <Run Text="and" />
-            <Run Text="{Binding OverflowCount, ElementName=root, Mode=OneWay}" />
-            <Run Text="more..." />
         </TextBlock>
     </StackPanel>
 </UserControl>
