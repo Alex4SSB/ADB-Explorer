@@ -2,6 +2,7 @@
     x:Class="ADB_Explorer.Controls.FileOpSnackbarContent"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:ADB_Explorer.Controls"
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
@@ -59,25 +60,20 @@
 
         <!--  Compact progress: progress bar + optional percentage  -->
         <DataTemplate x:Key="CompactInProgSyncProgressTemplate">
-            <Grid Margin="4,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+            <controls:SimpleStackPanel
+                Margin="4,0"
+                Orientation="Horizontal"
+                Spacing="8">
                 <ui:ProgressRing
                     Width="20"
                     Height="20"
-                    Margin="0,0,8,0"
                     Progress="{Binding TotalPercentage, Mode=OneWay, Converter={StaticResource FileOpProgressConverter}}" />
-                <Grid
-                    Grid.Column="1"
-                    VerticalAlignment="Center"
-                    FlowDirection="LeftToRight">
+                <Grid VerticalAlignment="Center" FlowDirection="LeftToRight">
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding TotalPercentage, Mode=OneWay}" Value="{x:Null}">
-                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Setter Property="Visibility" Value="Hidden" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -85,7 +81,11 @@
                     <TextBlock Text="00.0%" Visibility="Hidden" />
                     <TextBlock HorizontalAlignment="Right" Text="{Binding TotalPercentage, Mode=OneWay, StringFormat='{}{0:0.0}%'}" />
                 </Grid>
-            </Grid>
+                <Grid>
+                    <TextBlock Text="0:00m" Visibility="Hidden" />
+                    <TextBlock HorizontalAlignment="Right" Text="{Binding RemainingTime}" />
+                </Grid>
+            </controls:SimpleStackPanel>
         </DataTemplate>
 
         <DataTemplate x:Key="InProgShellProgressTemplate">

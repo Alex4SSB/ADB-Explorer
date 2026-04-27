@@ -280,7 +280,7 @@ public class FileSyncOperation : FileOperation
                            currProgress.TotalBytesTransferred);
             }
 
-            StatusInfo = new InProgSyncProgressViewModel(info);
+            StatusInfo = new InProgSyncProgressViewModel(info, TransferStart, TotalBytes, Files.Sum(f => f.BytesTransferred));
         }
     }
 
@@ -355,7 +355,7 @@ public class FileSyncOperation : FileOperation
 
         var progressInfo = new AdbSyncProgressInfo(source.FullPath, percentage, percentage, null);
         op.Status = OperationStatus.InProgress;
-        op.StatusInfo = new InProgSyncProgressViewModel(progressInfo);
+        op.StatusInfo = new InProgSyncProgressViewModel(progressInfo, DateTime.Now, null, null);
         op.cancelTokenSource = new();
 
         return op;
