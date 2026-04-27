@@ -1540,4 +1540,7 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
     <value>自身缩略图图片的最大大小（0 表示禁用）</value>
   </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>及另外 {0} 个…</value>
+  </data>
 </root>
