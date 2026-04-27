@@ -24,11 +24,11 @@
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="QRCoder.Xaml" Version="1.8.0" />
-    <PackageReference Include="System.Management" Version="10.0.5" />
-    <PackageReference Include="Vanara.Windows.Shell.Common" Version="5.0.3" />
-    <PackageReference Include="WPF-UI" Version="4.2.0" />
-    <PackageReference Include="WPF-UI.DependencyInjection" Version="4.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
+    <PackageReference Include="System.Management" Version="10.0.7" />
+    <PackageReference Include="Vanara.Windows.Shell.Common" Version="5.0.4" />
+    <PackageReference Include="WPF-UI" Version="4.2.1" />
+    <PackageReference Include="WPF-UI.DependencyInjection" Version="4.2.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.7" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
   </ItemGroup>
 
