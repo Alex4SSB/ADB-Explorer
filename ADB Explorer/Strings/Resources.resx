@@ -1898,4 +1898,8 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Max Image Size To Use As Its Own Thumbnail (0 - Disabled)</value>
     <comment>The name of the setting that enables using images for their own thumbnail display, and the maximum size for such images</comment>
   </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>and {0} more…</value>
+    <comment>0 - the number of file operations currently not displayed</comment>
+  </data>
 </root>
