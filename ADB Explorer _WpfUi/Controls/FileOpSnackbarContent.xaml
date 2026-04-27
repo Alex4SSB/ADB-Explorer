@@ -82,7 +82,7 @@
                     <TextBlock HorizontalAlignment="Right" Text="{Binding TotalPercentage, Mode=OneWay, StringFormat='{}{0:0.0}%'}" />
                 </Grid>
                 <Grid>
-                    <TextBlock Text="0:00m" Visibility="Hidden" />
+                    <TextBlock Text="00:00ms" Visibility="Hidden" />
                     <TextBlock HorizontalAlignment="Right" Text="{Binding RemainingTime}" />
                 </Grid>
             </controls:SimpleStackPanel>
