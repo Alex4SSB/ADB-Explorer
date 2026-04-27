@@ -1468,4 +1468,76 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
     <value>Wymiary</value>
   </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>Jeden miesiąc</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>Jeden tydzień</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>Jeden dzień</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>Jedna godzina</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>Czas odświeżania lokalnych miniatur</value>
+  </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>Jeśli to możliwe, użyj BusyBox</value>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>Automatyczne połączenie z WSA, jeśli jest dostępne</value>
+  </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>Wklej</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>Sprawdzanie dostępności aktualizacji miniatur</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>Pobieranie miniatur</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>Odczytywanie lokalizacji miniatur i bazy danych multimediów</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_TITLE" xml:space="preserve">
+    <value>{0} Miniatury</value>
+  </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value>Szczegóły</value>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value>Widok</value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>Średnie ikony</value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>Duże ikony</value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>Extra duże ikony</value>
+  </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value>Opcje układu i widoku</value>
+  </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value>Rozmiar miniatury zapisany dla każdej lokalizacji</value>
+  </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value>Sortuj</value>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value>Rosnąco</value>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value>Malejąco</value>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>Kolumna sortowania i kolejność zapisane dla każdej lokalizacji</value>
+  </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>Maksymalny rozmiar obrazu, który może służyć jako miniatura (0 – wyłączone)</value>
+  </data>
 </root>
