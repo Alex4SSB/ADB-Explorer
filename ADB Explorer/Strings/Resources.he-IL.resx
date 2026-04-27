@@ -1540,4 +1540,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
     <value>גודל תמונה מקסימלי לשימוש לתצוגה מקדימה של עצמה (0 - מבוטל)</value>
   </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>ועוד {0}…</value>
+  </data>
 </root>
