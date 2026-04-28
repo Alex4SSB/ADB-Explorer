@@ -1534,4 +1534,7 @@ Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
   <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
     <value>Tamaño máximo de imagen para usar como miniatura independiente (0 - Inhabilitado)</value>
   </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>y {0} más…</value>
+  </data>
 </root>
