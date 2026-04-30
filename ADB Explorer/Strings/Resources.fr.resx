@@ -1540,4 +1540,7 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
     <value>Taille max de l'image à utiliser pour sa propre miniature (0 - désactivé)</value>
   </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>et {0} supplémentaires…</value>
+  </data>
 </root>
