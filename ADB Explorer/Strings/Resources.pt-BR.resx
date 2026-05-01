@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -281,5 +281,195 @@
   </data>
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>Instalar</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>Puxar para a Raíz do Disco do Windows</value>
+  </data>
+  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
+    <value>Bem-Vindo à nova versão do ADB Explorer!
+As notas de lançamento estão disponíveis no GitHub.</value>
+  </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>Puxar (Destino do Link)</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>FUSE drive.
+• Links simbólicos não são suportados
+• Nome dos arquivos não podem conter " * / : &lt; &gt; ? \ |
+• Nome dos arquivos não diferenciam maiúsculas de minúsculas
+• Instalações de APKs não são suportadas</value>
+  </data>
+  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
+    <value>O app possui muitas animações as quais estão ativadas por parte do design fluente.
+As animações laterais estão sempre desativadas quando o app, no modo janela, está maximizado na segunda tela.
+
+• Marcar essa opção desativa todas as animações do app, com exceção da barra de progresso, anel de progresso, e a barra de uso do disco.</value>
+  </data>
+  <data name="S_RESET_SETTINGS" xml:space="preserve">
+    <value>Todas as opções do app serão resetadas ao fechar o app.
+Essa ação não poderá ser desfeita. Você tem certeza?</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
+    <value>A configuração usada para ativar/desativar o estado do mDNS</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>Selecione Iniciar caso o ADB já foi autorizado no WSA.
+Para aprovar o ADB, abra as opções avançada do WSA.</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
+    <value>{0} dos arquivos selecionados não puderam ser criados na raíz do disco do Windows.</value>
+  </data>
+  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
+    <value>Aprenda Mais Sobre ADB</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>Baixar ADB</value>
+  </data>
+  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
+    <value>Localizar ADB (v{0} pelo menos):</value>
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value>Mudar</value>
+  </data>
+  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
+    <value>Selecione o Caminho do ADB</value>
+  </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value>Continuar</value>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>Mais Informações</value>
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value>Ativado</value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value>Desativado</value>
+  </data>
+  <data name="S_NEW_VERSION" xml:space="preserve">
+    <value>Um novo app {0}, versão {1}, está disponível</value>
+  </data>
+  <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
+    <value>Ir à Página da Versão</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>Fechar</value>
+  </data>
+  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
+    <value>Ir às Notas de Lançamento</value>
+  </data>
+  <data name="S_ADB_EXECUTABLE" xml:space="preserve">
+    <value>ADB Executável</value>
+  </data>
+  <data name="S_HELP_ON_ADB" xml:space="preserve">
+    <value>Esse app é uma Interface Gráfica para o ADB - Android Debug Bridge.
+Para usar ese app, você precisa ter o ADB padrão no seu PC.
+O ADB está disponível na sessão de Android SDK Platform Tools.
+Você pode usar o link providenciado para baixar o SDK Platform Tools.
+Infelizmento, nós não podemos te providenciar o ADB junto com o app, por conta de restrições de licenciamento.</value>
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value>Ajuda com o ADB</value>
+  </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value>Reiniciar o ADB Agora</value>
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value>Reiniciar Mais Tarde</value>
+  </data>
+  <data name="S_ITEM_DESTINATION" xml:space="preserve">
+    <value>Selecione o destino para o {0}</value>
+  </data>
+  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
+    <value>Selecione o destino para os múltiplos itens</value>
+  </data>
+  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
+    <value>Os a seguir serão deletados:
+{0}</value>
+  </data>
+  <data name="S_DELETE_PERMANENT" xml:space="preserve">
+    <value>Os a seguir serão deletados permanentemente:
+{0}</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>Novo Arquivo</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>Nova Pasta</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>Creative Commons</value>
+  </data>
+  <data name="S_LS_ERROR" xml:space="preserve">
+    <value>Ocorreu um erro enquanto tentava listar o conteúdo dessa pasta.
+O conteúdo visível pode estar incompleto.</value>
+  </data>
+  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
+    <value>{0} é um antecessor da pasta de destino.</value>
+  </data>
+  <data name="S_KILL_EMULATOR" xml:space="preserve">
+    <value>Você tem certeza que deseja finalizar a emulação?</value>
+  </data>
+  <data name="S_REM_DEVICE" xml:space="preserve">
+    <value>Você tem certeza que deseja remover o dispositivo?</value>
+  </data>
+  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
+    <value>Remover {0}</value>
+  </data>
+  <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
+    <value>Finalizar {0}</value>
+  </data>
+  <data name="S_REM_APK" xml:space="preserve">
+    <value>Os a seguir serão removidos:
+{0}</value>
+  </data>
+  <data name="S_REM_APK_PLURAL" xml:space="preserve">
+    <value>Os a seguir serão removidos:
+{0} pacotes</value>
+  </data>
+  <data name="S_UNINSTALL" xml:space="preserve">
+    <value>Desinstalar</value>
+  </data>
+  <data name="S_CANCEL" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="S_CONFIRM" xml:space="preserve">
+    <value>Confirmar</value>
+  </data>
+  <data name="S_SKIP" xml:space="preserve">
+    <value>Pular</value>
+  </data>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value>Substituir</value>
+  </data>
+  <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
+    <value>Mesclar ou Substituir</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
+    <value>Tem 1 item conflitando</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
+    <value>Tem 1 item conflitando em {0}</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
+    <value>Tem {0} itens conflitando</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
+    <value>Tem {0} itens conflitando em {1}</value>
+  </data>
+  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
+    <value>Colar Conflitos</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
+    <value>Selecionar pastas para empurrar (Enviar)</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
+    <value>Selecionar pastas para empurrar (Enviar) em {0}</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
+    <value>Selecionar arquivos para empurrar (Enviar)</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
+    <value>Selecionar arquivos para empurrar (Enviar) em {0}</value>
   </data>
 </root>
