@@ -472,4 +472,16 @@ O conteúdo visível pode estar incompleto.</value>
   <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
     <value>Selecionar arquivos para empurrar (Enviar) em {0}</value>
   </data>
+  <data name="S_BUTTON_CLEAR" xml:space="preserve">
+    <value>Limpar</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
+    <value>Ativar Root Automaticamente</value>
+  </data>
+  <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
+    <value>Salvar Manualmente os Dispositivos Conectados</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
+    <value>Abre Automaticamente para Pesquisas</value>
+  </data>
 </root>
