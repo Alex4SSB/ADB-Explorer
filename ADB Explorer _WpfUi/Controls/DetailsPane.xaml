@@ -1,0 +1,60 @@
+﻿<UserControl
+    x:Class="ADB_Explorer.Controls.DetailsPane"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ADB_Explorer.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    x:Name="pane"
+    d:DesignHeight="450"
+    d:DesignWidth="300"
+    d:Visibility="Visible"
+    mc:Ignorable="d">
+    <UserControl.Style>
+        <Style TargetType="UserControl">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsOpen, RelativeSource={RelativeSource Mode=Self}}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
+    <Grid DataContext="{Binding ElementName=pane}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Horizontal">
+            <Separator />
+            <GridSplitter
+                Width="8"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Stretch"
+                Background="Transparent"
+                Cursor="SizeWE"
+                DragDelta="GridSplitter_DragDelta"
+                FocusVisualStyle="{x:Null}" />
+        </StackPanel>
+        <Grid x:Name="ContentBox" Grid.Column="1">
+            <local:AdbAvalonEditor
+                x:Name="EditorTextBox"
+                d:Visibility="Visible"
+                EditorText="{Binding EditorText, Mode=TwoWay}">
+                <local:AdbAvalonEditor.Style>
+                    <Style TargetType="local:AdbAvalonEditor">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding EditorText}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </local:AdbAvalonEditor.Style>
+            </local:AdbAvalonEditor>
+        </Grid>
+    </Grid>
+</UserControl>

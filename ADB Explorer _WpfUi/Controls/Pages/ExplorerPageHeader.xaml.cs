@@ -72,8 +72,33 @@ public partial class ExplorerPageHeader : UserControl
         if (ViewModel.IsIconView)
             IconView.ScrollIntoView(item);
         else
+        {
             ExplorerGrid.ScrollIntoView(item);
+
+            if (ExplorerScrollViewer?.ComputedHorizontalScrollBarVisibility is Visibility.Visible)
+                ExplorerScrollViewer.ScrollToLeftEnd();
+        }
     }
+
+    public ScrollViewer ExplorerScrollViewer
+    {
+        get
+        {
+            field ??= StyleHelper.FindDescendant<ScrollViewer>(ExplorerGrid);
+            return field;
+        }
+    } = null;
+
+    public ScrollViewer IconScrollViewer
+    {
+        get
+        {
+            field ??= StyleHelper.FindDescendant<ScrollViewer>(IconView);
+            return field;
+        }
+    } = null;
+
+    public ScrollViewer ActiveScrollViewer => ViewModel.IsIconView ? IconScrollViewer : ExplorerScrollViewer;
 
     private static Point NullPoint => new(-1, -1);
     private double? RowHeight { get; set; }
@@ -225,7 +250,7 @@ public partial class ExplorerPageHeader : UserControl
 
     private bool ExplorerGridKeyNavigation(Key key)
     {
-        if (ActiveView.Items.Count < 1)
+        if (ActiveView.Items.Count < 1 || DetailsPane.IsEditorFocused)
             return false;
 
         switch (key)
@@ -297,10 +322,11 @@ public partial class ExplorerPageHeader : UserControl
         SelectedPackages = FileActions.IsAppDrive ? ExplorerGrid.Items.OfType<Package>().Where(p => p.IsSelected) : [];
         FileActions.SelectedItemsCount = FileActions.IsAppDrive ? SelectedPackages.Count() : SelectedFiles.Count();
 
+        DetailsPane.SelectedFiles = DetailsPane.IsOpen ? SelectedFiles : [];
+
         ViewModel.NotifySelectedFilesTotalSize();
 
         FileActionLogic.UpdateFileActions();
-        //MainToolBar.Items?.Refresh();
         //PasteGrid.Visibility = Visibility.Visible;
     }
 
@@ -865,14 +891,12 @@ public partial class ExplorerPageHeader : UserControl
         else if (file.Type is not FileType.File)
             return;
 
-        if (Settings.DoubleClick is AppSettings.DoubleClickAction.Pull
+        if (Settings.DoubleClickToPull
             && Settings.IsPullOnDoubleClickEnabled
             && FileActions.PullEnabled)
         {
             FileActionLogic.PullFiles(Settings.DefaultFolder);
         }
-        else if (Settings.DoubleClick is AppSettings.DoubleClickAction.Edit)
-            FileActionLogic.OpenEditor();
     }
 
     private void DataGridCell_MouseUp(object sender, MouseButtonEventArgs e)
@@ -1268,7 +1292,7 @@ public partial class ExplorerPageHeader : UserControl
             return;
         }
 
-        SelectionRect.Update(point, MouseDownPoint, StyleHelper.FindDescendant<ScrollViewer>(ExplorerGrid), ActiveView, ActiveSelectedItems, ViewModel);
+        SelectionRect.Update(point, MouseDownPoint, ExplorerScrollViewer, ActiveView, ActiveSelectedItems, ViewModel);
     }
 
     private void InitiateDrag(DependencyObject dragSource)
@@ -1655,10 +1679,7 @@ public partial class ExplorerPageHeader : UserControl
             if (ActiveSelectedItems.Count > 0)
                 ActiveScrollIntoView(ActiveSelectedItems[0]);
             else
-            {
-                var viewer = StyleHelper.FindDescendant<ScrollViewer>(ActiveView);
-                viewer?.ScrollToTop();
-            }
+                ActiveScrollViewer?.ScrollToTop();
         }, DispatcherPriority.Loaded);
     }
 
@@ -1670,5 +1691,10 @@ public partial class ExplorerPageHeader : UserControl
         {
             (item as DriveViewModel)?.DriveSelected = false;
         }
+    }
+
+    private void ExplorerHeader_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        DetailsPane.MaxWidth = e.NewSize.Width - 100;
     }
 }

@@ -84,72 +84,6 @@ internal static class FileActionLogic
         ShellFileOperation.ChangeDateFromName(Data.DevicesObject.Current, Data.SelectedFiles, App.AppDispatcher);
     }
 
-    public static void OpenEditor()
-    {
-        if (!Data.FileActions.EditFileEnabled || Data.FileActions.IsEditorOpen && Data.FileActions.EditorAndroidPath.Equals(Data.SelectedFiles.First()))
-        {
-            Data.FileActions.IsEditorOpen = false;
-            return;
-        }
-        Data.FileActions.IsEditorOpen = true;
-
-        Data.FileActions.EditorAndroidPath = Data.SelectedFiles.First();
-        
-        var readTask = Task.Run(() =>
-        {
-            try
-            {
-                return AdbHelper.ReadFileAsText(Data.DevicesObject.Current, Data.FileActions.EditorAndroidPath.FullPath);
-            }
-            catch (Exception e)
-            {
-                App.SafeInvoke(() =>
-                    DialogService.ShowMessage(e.Message, Strings.Resources.S_READ_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true));
-
-                return "";
-            }
-        });
-
-        readTask.ContinueWith((t) => App.SafeInvoke(() =>
-        {
-            if (t.Result is null)
-                return;
-
-            Data.FileActions.EditorText =
-            Data.FileActions.OriginalEditorText = t.Result;
-        }));
-    }
-
-    public static void SaveEditorText()
-    {
-        var writeTask = Task.Run(() =>
-        {
-            try
-            {
-                AdbHelper.WriteFile(Data.DevicesObject.Current, Data.FileActions.EditorAndroidPath.FullPath, Data.FileActions.EditorText);
-                return true;
-            }
-            catch (Exception e)
-            {
-                App.SafeInvoke(() =>
-                    DialogService.ShowMessage(e.Message, Strings.Resources.S_WRITE_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true));
-
-                return false;
-            }
-        });
-
-        writeTask.ContinueWith((t) => App.SafeInvoke(() =>
-        {
-            if (!t.Result)
-                return;
-
-            Data.FileActions.OriginalEditorText = Data.FileActions.EditorText;
-
-            if (Data.FileActions.EditorAndroidPath.ParentPath == Data.CurrentPath)
-                Data.RuntimeSettings.Refresh = true;
-        }));
-    }
-
     public static void RestoreItems()
     {
         var restoreItems = (!Data.SelectedFiles.Any() ? Data.DirList.FileList : Data.SelectedFiles).Where(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
@@ -945,13 +879,6 @@ internal static class FileActionLogic
 
         Data.FileActions.UpdateModifiedEnabled = !Data.FileActions.IsRecycleBin
             && Data.SelectedFiles.AnyAll(file => file.Type is FileType.File && !file.IsApk && !file.IsLink);
-
-        Data.FileActions.EditFileEnabled = !Data.FileActions.IsRecycleBin
-            && Data.SelectedFiles.Count() == 1
-            && Data.SelectedFiles.First().Type is FileType.File
-            && !Data.SelectedFiles.First().IsApk
-            && !Data.SelectedFiles.First().IsLink
-            && Data.SelectedFiles.First().Size < Data.Settings.EditorMaxFileSize;
 
         Data.FileActions.IsPasteLinkEnabled = Data.CurrentDrive?.IsFUSE is not true
             && Data.RuntimeSettings.IsRootActive

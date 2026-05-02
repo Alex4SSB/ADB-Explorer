@@ -9,6 +9,7 @@
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <NoWarn>$(NoWarn);XDG0001</NoWarn>
     <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<Configurations>Debug;Release;Deploy</Configurations>
@@ -20,6 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="AdvancedSharpAdbClient" Version="3.6.16" />
+    <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
     <PackageReference Include="Emoji.Wpf" Version="0.3.4" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
@@ -66,7 +68,7 @@
     <Compile Update="Controls\Pages\LogPageHeader.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Controls\SortingSelector.xaml.cs">
+    <Compile Update="Controls\MenuControls\SortingSelector.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Properties\AppGlobal.Designer.cs">

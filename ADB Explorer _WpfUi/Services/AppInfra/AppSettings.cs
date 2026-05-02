@@ -7,25 +7,11 @@ namespace ADB_Explorer.Services;
 
 public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonOnSerializing
 {
-    public enum SystemVals
-    {
-        WindowMaximized,
-        DetailedVisible,
-        DetailedHeight,
-    }
-
     public enum AppTheme
     {
         WindowsDefault,
         Light,
         Dark,
-    }
-
-    public enum DoubleClickAction
-    {
-        Pull,
-        Edit,
-        None,
     }
 
     public enum ThumbnailMode
@@ -108,6 +94,21 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     [ObservableProperty]
     public partial bool EnableWsa { get; set; } = false;
 
+    [ObservableProperty]
+    public partial bool IsDetailsPaneOpen { get; set; } = false;
+
+    [ObservableProperty]
+    public partial int DetailsPaneWidth { get; set; } = 300;
+
+    [ObservableProperty]
+    public partial bool EnableFilePreview { get; set; } = false;
+
+    [ObservableProperty]
+    public partial int MaxPreviewFileSize { get; set; } = 300;
+
+    [ObservableProperty]
+    public partial bool WindowMaximized { get; set; } = false;
+
     #region paths
 
     private string defaultFolder = "";
@@ -148,7 +149,7 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     #region Double Click
 
     [ObservableProperty]
-    public partial DoubleClickAction DoubleClick { get; set; } = DoubleClickAction.None;
+    public partial bool DoubleClickToPull { get; set; } = false;
 
     #endregion
 
@@ -294,8 +295,7 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
 
     [ObservableProperty]
     public partial bool ShowLaunchWsaMessage { get; set; } = true;
-    public long EditorMaxFileSize { get; set; } = 300_000;
-
+    
     public bool? UnrootOnDisconnect { get; set; } = null;
 
     public string? LastDevice { get; set; } = null;

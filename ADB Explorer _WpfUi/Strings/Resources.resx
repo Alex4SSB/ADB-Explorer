@@ -1902,4 +1902,20 @@ Please help us localize the app to your language on Weblate.</value>
     <value>and {0} more…</value>
     <comment>0 - the number of file operations currently not displayed</comment>
   </data>
+  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
+    <value>Show or hide the details pane.</value>
+    <comment>The tooltip of the button that controls the details pane visibility</comment>
+  </data>
+  <data name="S_SETTINGS_ENABLE_FILE_PREVIEW" xml:space="preserve">
+    <value>File Preview</value>
+    <comment>The setting that enables preview of selected a file in the details pane</comment>
+  </data>
+  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
+    <value>Max File Size For Preview</value>
+    <comment>The maximum size of a file for preview</comment>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>Pull To Default Folder On File Double Click</value>
+    <comment>The setting that enables pulling a file to the default folder on double click</comment>
+  </data>
 </root>

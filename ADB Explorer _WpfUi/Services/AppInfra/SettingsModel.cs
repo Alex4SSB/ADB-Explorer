@@ -144,11 +144,15 @@ public static class UISettings
                 new BoolSetting(() => Settings.ShowExtensions, Strings.Resources.S_SETTINGS_SHOW_EXTENSIONS, icon: "\uE8AC"),
                 new BoolSetting(() => Settings.ShowHiddenItems, Strings.Resources.S_SETTINGS_HIDDEN_ITEMS, icon: "\uE8FF"),
                 new BoolSetting(() => Settings.SortingPerLocation, Strings.Resources.S_SETTINGS_SORTING_PER_LOCATION, icon: "\uE8CB"),
-                new DoubleClickSetting(() => Settings.DoubleClick, Strings.Resources.S_SETTINGS_GROUP_DOUBLE_CLICK, [
-                    new(AppSettings.DoubleClickAction.None, Strings.Resources.S_SETTINGS_DOUBLE_CLICK_NONE),
-                    new(AppSettings.DoubleClickAction.Pull, Strings.Resources.S_SETTINGS_DOUBLE_CLICK_PULL, AbstractSetting.ExtractPropertyInfo(() => Settings.DefaultFolder)),
-                    new(AppSettings.DoubleClickAction.Edit, Strings.Resources.S_SETTINGS_DOUBLE_CLICK_OPEN) ],
-                    icon: "\uE7C9"),
+                new BoolSetting(() => Settings.EnableFilePreview, Strings.Resources.S_SETTINGS_ENABLE_FILE_PREVIEW, icon: "\uE89F"),
+                new NumericSetting(() => Settings.MaxPreviewFileSize,
+                                   Strings.Resources.S_SETTINGS_PREVIEW_MAX_SIZE,
+                                   0,
+                                   1000,
+                                   Strings.Resources.KILO.Replace("{0}", "").Trim(),
+                                   AbstractSetting.ExtractPropertyInfo(() => Settings.EnableFilePreview),
+                                   "\uE1A5"),
+                new BoolSetting(() => Settings.DoubleClickToPull, Strings.Resources.S_SETTINGS_PULL_ON_DOUBLE_CLICK, AbstractSetting.ExtractPropertyInfo(() => Settings.DefaultFolder), "\uE7C9"),
             ], "\uEC50"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_ICONS,
             [
@@ -226,6 +230,7 @@ public static class UISettings
                     new("Vanara", Resources.Links.VANARA),
                     new("QRCoder", Resources.Links.QR_CODER),
                     new("Emoji.Wpf", Resources.Links.EMOJI_WPF),
+                    new("AvalonEdit", Resources.Links.AVALONEDIT),
                     new("CommunityToolkit.Mvvm", Resources.Links.MVVM_TOOLKIT),
                     new("WindowsAPICodePack", Resources.Links.API_CODEPACK),
                     new("Newtonsoft.Json", Resources.Links.JSON),
@@ -305,10 +310,14 @@ public abstract class AbstractSetting : SettingsBase
             }
             else if (value is Enum enumVal)
             {
-                return Convert.ToInt32(enumVal) != 0 ? Visibility.Visible : Visibility.Collapsed;
+                return Convert.ToInt32(enumVal) == 0 ? Visibility.Collapsed : Visibility.Visible;
+            }
+            else if (value is string strVal)
+            {
+                return string.IsNullOrEmpty(strVal) ? Visibility.Collapsed : Visibility.Visible;
             }
 
-            return visibleProp is null || (bool)visibleProp.GetValue(Settings) ? Visibility.Visible : Visibility.Collapsed;
+            return Visibility.Visible;
         }
     }
 
@@ -607,21 +616,6 @@ public class ThemeSetting : EnumSetting
         {
             return new EnumComboboxItem(val.Key, val.Value);
         }));
-    }
-}
-
-public class DoubleClickSetting : EnumSetting
-{
-    public AppSettings.DoubleClickAction Value
-    {
-        get => (AppSettings.DoubleClickAction)valueProp.GetValue(Settings);
-        set => valueProp.SetValue(Settings, value);
-    }
-
-    public DoubleClickSetting(Expression<Func<AppSettings.DoubleClickAction>> propertyExpr, string description, IEnumerable<EnumComboboxItem> enumNames, PropertyInfo visibleProp = null, string icon = null, params BaseAction[] commands)
-        : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
-    {
-        Buttons = [.. enumNames];
     }
 }
 

@@ -23,6 +23,7 @@
     PreviewKeyDown="MainWin_PreviewKeyDown"
     PreviewKeyUp="MainWindow_OnPreviewKeyUp"
     PreviewQueryContinueDrag="MainWindow_OnPreviewQueryContinueDrag"
+    SizeChanged="ExplorerHeader_SizeChanged"
     mc:Ignorable="d">
     <UserControl.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
@@ -134,31 +135,44 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <local:AdbMenu x:Name="MainToolBar" Style="{StaticResource MainToolBarStyle}" />
             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <StackPanel.Style>
-                    <Style TargetType="StackPanel">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </StackPanel.Style>
-                <Separator Margin="0,2" />
-                <local:ThumbsSizeSelector ThumbnailSize="{Binding CurrentThumbsSize, Mode=TwoWay}" />
-                <local:SortingSelector SortDirection="{Binding SortDirection, Mode=TwoWay}" SortOption="{Binding SortedColumn, Mode=TwoWay}" />
+                <Separator Margin="0,2">
+                    <Separator.Style>
+                        <Style BasedOn="{StaticResource {x:Type Separator}}" TargetType="Separator">
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding ElementName=ThumbsSizeSelector, Path=ActualWidth}" Value="0" />
+                                        <Condition Binding="{Binding ElementName=SortingSelector, Path=ActualWidth}" Value="0" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Separator.Style>
+                </Separator>
+                <local:ThumbsSizeSelector x:Name="ThumbsSizeSelector" ThumbnailSize="{Binding CurrentThumbsSize, Mode=TwoWay}" />
+                <local:SortingSelector
+                    x:Name="SortingSelector"
+                    SortDirection="{Binding SortDirection, Mode=TwoWay}"
+                    SortOption="{Binding SortedColumn, Mode=TwoWay}" />
             </StackPanel>
             <Border
                 Grid.Column="3"
                 Background="Transparent"
                 MouseDown="Window_MouseDown" />
-            <Separator Grid.ColumnSpan="3" VerticalAlignment="Bottom" />
+            <local:DetailsControl Grid.Column="4" IsChecked="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsDetailsPaneOpen, Mode=TwoWay}" />
+            <Separator Grid.ColumnSpan="4" VerticalAlignment="Bottom" />
         </Grid>
         <Border Grid.Row="2" MouseDown="GridBackgroundBlock_MouseDown">
             <Grid>
-                <!--  Background="{DynamicResource ApplicationBackgroundBrush}"  -->
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
                 <ScrollViewer PreviewMouseDown="DriveList_PreviewMouseDown" Style="{StaticResource DriveViewScrollViewerStyle}">
                     <StackPanel>
                         <Expander
@@ -519,6 +533,11 @@
                     </StackPanel>
                     <TextBlock Style="{StaticResource EmptyFolderAltPromptStyle}" />
                 </Grid>
+                <local:DetailsPane
+                    x:Name="DetailsPane"
+                    Grid.Column="1"
+                    MinWidth="100"
+                    IsOpen="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsDetailsPaneOpen, Mode=OneWay}" />
             </Grid>
         </Border>
         <Grid

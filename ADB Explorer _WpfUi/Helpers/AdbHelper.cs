@@ -40,6 +40,39 @@ internal static class AdbHelper
         }
     });
 
+    public static Task<bool> WriteTextFileAsync(LogicalDeviceViewModel device, string filePath, string content) =>
+        Task.Run(() =>
+    {
+        try
+        {
+            WriteFile(device, filePath, content);
+            return true;
+        }
+        catch (Exception e)
+        {
+            App.SafeInvoke(() =>
+                DialogService.ShowMessage(e.Message, Strings.Resources.S_WRITE_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true));
+
+            return false;
+        }
+    });
+
+    public static Task<string?> ReadTextFileAsync(LogicalDeviceViewModel device, string filePath) =>
+        Task.Run(() =>
+    {
+        try
+        {
+            return ReadFileAsText(device, filePath);
+        }
+        catch (Exception e)
+        {
+            App.SafeInvoke(() =>
+                DialogService.ShowMessage(e.Message, Strings.Resources.S_READ_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true));
+
+            return "";
+        }
+    });
+
     public static string? ReadFileAsText(LogicalDeviceViewModel device, string path)
     {
         var stream = ReadFileAsStream(device, path);

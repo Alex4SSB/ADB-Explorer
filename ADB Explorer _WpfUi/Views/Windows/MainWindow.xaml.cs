@@ -191,4 +191,9 @@ public partial class MainWindow : INavigationWindow
     {
         
     }
+
+    private void FluentWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        Data.Settings.WindowMaximized = WindowState is WindowState.Maximized;
+    }
 }

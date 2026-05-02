@@ -185,6 +185,18 @@ public static class StyleHelper
         return null;
     }
 
+    public static HashSet<FrameworkElement> EnumerateVisualChildren(FrameworkElement root)
+    {
+        var result = new HashSet<FrameworkElement> { root };
+        var count = VisualTreeHelper.GetChildrenCount(root);
+        for (int i = 0; i < count; i++)
+        {
+            if (VisualTreeHelper.GetChild(root, i) is FrameworkElement child)
+                result.UnionWith(EnumerateVisualChildren(child));
+        }
+        return result;
+    }
+
     public static void VerifyIcon(string icon, [CallerMemberName] string propertyName = null)
     {
         if (!IsFontIcon(icon))

@@ -1,4 +1,6 @@
-﻿namespace ADB_Explorer.Models;
+﻿using ADB_Explorer.ViewModels;
+
+namespace ADB_Explorer.Models;
 
 public partial class Package : ObservableObject, IBrowserItem
 {
@@ -15,6 +17,8 @@ public partial class Package : ObservableObject, IBrowserItem
     public partial string Path { get; set; }
 
     public string DisplayName => Name;
+
+    public FolderViewModel FolderViewModel => null;
 
     [ObservableProperty]
     public partial PackageType Type { get; set; }

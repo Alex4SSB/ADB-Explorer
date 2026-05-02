@@ -20,11 +20,21 @@
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     Loaded="FluentWindow_Loaded"
     RenderOptions.BitmapScalingMode="HighQuality"
+    SizeChanged="FluentWindow_SizeChanged"
     SnapsToDevicePixels="False"
     WindowBackdropType="Mica"
     WindowCornerPreference="Round"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
+    <ui:FluentWindow.Style>
+        <Style BasedOn="{StaticResource DefaultFluentWindowStyle}" TargetType="ui:FluentWindow">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=WindowMaximized}" Value="True">
+                    <Setter Property="WindowState" Value="Maximized" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </ui:FluentWindow.Style>
     <Grid>
         <Grid.Style>
             <Style TargetType="Grid">

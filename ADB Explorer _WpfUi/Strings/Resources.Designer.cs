@@ -1072,6 +1072,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show or hide the details pane..
+        /// </summary>
+        public static string S_DETAILS_PANE_TOOLTIP {
+            get {
+                return ResourceManager.GetString("S_DETAILS_PANE_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to QR Pairing.
         /// </summary>
         public static string S_DEVICE_QR {
@@ -3358,6 +3367,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File Preview.
+        /// </summary>
+        public static string S_SETTINGS_ENABLE_FILE_PREVIEW {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_ENABLE_FILE_PREVIEW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to mDNS.
         /// </summary>
         public static string S_SETTINGS_ENABLE_MDNS {
@@ -3561,6 +3579,24 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_POLL_DRIVES {
             get {
                 return ResourceManager.GetString("S_SETTINGS_POLL_DRIVES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Max File Size For Preview.
+        /// </summary>
+        public static string S_SETTINGS_PREVIEW_MAX_SIZE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_PREVIEW_MAX_SIZE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pull To Default Folder On File Double Click.
+        /// </summary>
+        public static string S_SETTINGS_PULL_ON_DOUBLE_CLICK {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_PULL_ON_DOUBLE_CLICK", resourceCulture);
             }
         }
         
