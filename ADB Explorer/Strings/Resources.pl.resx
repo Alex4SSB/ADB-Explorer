@@ -320,7 +320,7 @@ Aby zatwierdzić ADB, otwórz ustawienia zaawansowane WSA.</value>
     <value>Wyłączone</value>
   </data>
   <data name="S_NEW_VERSION" xml:space="preserve">
-    <value>0 = wyświetlana nazwa aplikacji. 1 = nowy numer wersji</value>
+    <value>Dostępna jest nowa wersja {0} – {1}</value>
   </data>
   <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
     <value>Przejdź do strony wersji</value>
@@ -387,10 +387,10 @@ Widoczna zawartość może być niekompletna.</value>
     <value>Czy na pewno chcesz usunąć to urządzenie?</value>
   </data>
   <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
-    <value>0 = Nazwa urządzenia do usunięcia</value>
+    <value>Usuń {0}</value>
   </data>
   <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
-    <value>0 = Nazwa emulatora do zabicia</value>
+    <value>Zabij {0}</value>
   </data>
   <data name="S_REM_APK" xml:space="preserve">
     <value>Następujące elementy zostaną usunięte:
