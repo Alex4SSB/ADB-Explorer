@@ -310,7 +310,7 @@ As animações laterais estão sempre desativadas quando o app, no modo janela, 
 Essa ação não poderá ser desfeita. Você tem certeza?</value>
   </data>
   <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>A configuração usada para ativar/desativar o estado do mDNS</value>
+    <value>mDNS</value>
   </data>
   <data name="S_WSA_LAUNCH" xml:space="preserve">
     <value>Selecione Iniciar caso o ADB já foi autorizado no WSA.
