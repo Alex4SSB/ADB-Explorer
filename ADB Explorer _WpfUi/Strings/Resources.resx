@@ -1903,12 +1903,12 @@ Please help us localize the app to your language on Weblate.</value>
     <comment>0 - the number of file operations currently not displayed</comment>
   </data>
   <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
-    <value>Show or hide the details pane.</value>
+    <value>Show or hide the details and preview pane.</value>
     <comment>The tooltip of the button that controls the details pane visibility</comment>
   </data>
-  <data name="S_SETTINGS_ENABLE_FILE_PREVIEW" xml:space="preserve">
-    <value>File Preview</value>
-    <comment>The setting that enables preview of selected a file in the details pane</comment>
+  <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
+    <value>Preview</value>
+    <comment>Side pane in file preview mode</comment>
   </data>
   <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
     <value>Max File Size For Preview</value>
@@ -1917,5 +1917,37 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
     <value>Pull To Default Folder On File Double Click</value>
     <comment>The setting that enables pulling a file to the default folder on double click</comment>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value>Select a single file to get more information.</value>
+    <comment>The tip displayed in the details pane when multiple (or none) files are selected</comment>
+  </data>
+  <data name="S_ITEM_LOCATION" xml:space="preserve">
+    <value>Location</value>
+    <comment>Location as in parent path of a file</comment>
+  </data>
+  <data name="S_IMAGE_F_STOP" xml:space="preserve">
+    <value>F-stop</value>
+    <comment>The f-stop of an image metadata</comment>
+  </data>
+  <data name="S_IMAGE_ISO" xml:space="preserve">
+    <value>ISO speed</value>
+    <comment>The ISO number of the image metadata</comment>
+  </data>
+  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
+    <value>Exposure time</value>
+    <comment>The exposure time in parts of a second of the image metadata</comment>
+  </data>
+  <data name="S_VIDEO_BITRATE" xml:space="preserve">
+    <value>Bitrate</value>
+    <comment>The bitrate from the video file metadata</comment>
+  </data>
+  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
+    <value>Select a file to preview.</value>
+    <comment>The hint displayed in the preview pane when no file is selected</comment>
+  </data>
+  <data name="S_PREVIEW_INVALID" xml:space="preserve">
+    <value>No preview available.</value>
+    <comment>The hint displayed in the preview pane when the selected file(s) cannot be previewed</comment>
   </data>
 </root>

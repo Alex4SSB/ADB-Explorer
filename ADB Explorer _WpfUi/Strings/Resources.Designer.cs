@@ -1072,7 +1072,16 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Show or hide the details pane..
+        ///   Looks up a localized string similar to Select a single file to get more information..
+        /// </summary>
+        public static string S_DETAILS_MULTI_FILE_SELECTED {
+            get {
+                return ResourceManager.GetString("S_DETAILS_MULTI_FILE_SELECTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show or hide the details and preview pane..
         /// </summary>
         public static string S_DETAILS_PANE_TOOLTIP {
             get {
@@ -1884,6 +1893,33 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Exposure time.
+        /// </summary>
+        public static string S_IMAGE_EXPOSURE {
+            get {
+                return ResourceManager.GetString("S_IMAGE_EXPOSURE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to F-stop.
+        /// </summary>
+        public static string S_IMAGE_F_STOP {
+            get {
+                return ResourceManager.GetString("S_IMAGE_F_STOP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ISO speed.
+        /// </summary>
+        public static string S_IMAGE_ISO {
+            get {
+                return ResourceManager.GetString("S_IMAGE_ISO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select packages to install.
         /// </summary>
         public static string S_INSTALL_APK {
@@ -1916,6 +1952,15 @@ namespace ADB_Explorer.Strings {
         public static string S_ITEM_DESTINATION_PLURAL {
             get {
                 return ResourceManager.GetString("S_ITEM_DESTINATION_PLURAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Location.
+        /// </summary>
+        public static string S_ITEM_LOCATION {
+            get {
+                return ResourceManager.GetString("S_ITEM_LOCATION", resourceCulture);
             }
         }
         
@@ -2797,6 +2842,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select a file to preview..
+        /// </summary>
+        public static string S_PREVIEW_EMPTY_SELECTION {
+            get {
+                return ResourceManager.GetString("S_PREVIEW_EMPTY_SELECTION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No preview available..
+        /// </summary>
+        public static string S_PREVIEW_INVALID {
+            get {
+                return ResourceManager.GetString("S_PREVIEW_INVALID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Privacy Policy.
         /// </summary>
         public static string S_PRIVACY_POLICY {
@@ -3367,15 +3430,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to File Preview.
-        /// </summary>
-        public static string S_SETTINGS_ENABLE_FILE_PREVIEW {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_ENABLE_FILE_PREVIEW", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to mDNS.
         /// </summary>
         public static string S_SETTINGS_ENABLE_MDNS {
@@ -3790,6 +3844,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Preview.
+        /// </summary>
+        public static string S_SIDE_PANE_PREVIEW {
+            get {
+                return ResourceManager.GetString("S_SIDE_PANE_PREVIEW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select ROM for sideload.
         /// </summary>
         public static string S_SIDELOAD_ROM_TITLE {
@@ -4110,6 +4173,15 @@ namespace ADB_Explorer.Strings {
         public static string S_VALIDATION_ERROR {
             get {
                 return ResourceManager.GetString("S_VALIDATION_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bitrate.
+        /// </summary>
+        public static string S_VIDEO_BITRATE {
+            get {
+                return ResourceManager.GetString("S_VIDEO_BITRATE", resourceCulture);
             }
         }
         

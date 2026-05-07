@@ -26,16 +26,32 @@ public static partial class ThumbnailService
         video,
     }
 
-    public record struct ThumbnailInfo(string Id, MediaType Type, Size? Resolution, TimeSpan? Duration, DateTime LastUpdate, string LocalFolder = "")
+    public record struct ThumbnailInfo(string Id,
+                                       MediaType Type,
+                                       Size? Resolution,
+                                       TimeSpan? Duration,
+                                       DateTime LastUpdate,
+                                       string LocalFolder = "",
+                                       double? FNumber = null,
+                                       int? ISO = null,
+                                       double? ExposureTime = null,
+                                       int? Bitrate = null)
     {
         const string CsvDateFormat = "yyyy-MM-dd_HH:mm";
 
-        public readonly string ToCsv() => $"{Id}|{Type}|{Resolution?.Width}|{Resolution?.Height}|{Duration?.TotalMilliseconds}|{(LastUpdate == DateTime.MinValue ? null : LastUpdate.ToString(CsvDateFormat))}|{LocalFolder}";
+        public readonly string ResolutionString => Resolution.HasValue ? $"{Resolution.Value.Width} \u00D7 {Resolution.Value.Height}" : "";
+        public readonly string DurationString => Duration.HasValue ? $"{Duration.Value.Hours:D2}:{Duration.Value.Minutes:D2}:{Duration.Value.Seconds:D2}" : "";
+        public readonly string FNumberString => FNumber.HasValue ? $"ƒ/{FNumber.Value}" : "";
+        public readonly string ISOString => ISO.HasValue ? $"ISO-{ISO.Value}" : "";
+        public readonly string ExposureTimeString => ExposureTime.HasValue ? $"1/{(int)(1 / ExposureTime.Value)} {Strings.Resources.S_SECONDS_SHORT.Trim("{0}")}" : "";
+        public readonly string BitrateString => Bitrate.HasValue ? string.Format(Strings.Resources.S_SECONDS_SHORT,$"{string.Format(Strings.Resources.KILO, Bitrate.Value / 1024)}/") : "";
+
+        public readonly string ToCsv() => $"{Id}|{Type}|{Resolution?.Width}|{Resolution?.Height}|{Duration?.TotalMilliseconds}|{(LastUpdate == DateTime.MinValue ? null : LastUpdate.ToString(CsvDateFormat))}|{LocalFolder}|{FNumber}|{ISO}|{ExposureTime}|{Bitrate}";
 
         public static ThumbnailInfo? FromCsv(string csv)
         {
             var parts = csv.Split('|');
-            if (parts.Length is not 6 and not 7)
+            if (parts.Length < 6)
                 return null;
 
             string id = parts[0];
@@ -52,9 +68,13 @@ public static partial class ThumbnailService
                 ? parsedDate
                 : DateTime.MinValue;
 
-            string localFolder = parts.Length == 7 ? parts[6] : "";
+            string localFolder = parts.Length > 6 ? parts[6] : "";
+            double? fNumber = parts.Length > 7 && double.TryParse(parts[7], out double f) ? f : null;
+            int? iso = parts.Length > 8 && int.TryParse(parts[8], out int i) ? i : null;
+            double? exposureTime = parts.Length > 9 && double.TryParse(parts[9], out double e) ? e : null;
+            int? bitrate = parts.Length > 10 && int.TryParse(parts[10], out int b) ? b : null;
 
-            return new(id, type, resolution, duration, lastUpdate, localFolder);
+            return new(id, type, resolution, duration, lastUpdate, localFolder, fNumber, iso, exposureTime, bitrate);
         }
 
         public readonly bool IsOverdue
@@ -87,8 +107,8 @@ public static partial class ThumbnailService
         Disabled = 0,
         Medium = 48,
         Large = 96,
-        Drag = 120,
         ExtraLarge = 192,
+        Drag = 256,
     }
 
     /// <summary>
@@ -141,8 +161,11 @@ public static partial class ThumbnailService
         public Dictionary<string, ThumbnailInfo> ThumbnailPathCache { get; set; }
     }
 
-    [GeneratedRegex(@"Row: \d+ _id=(?<ID>\d+), _data=(?<Path>.+), resolution=(?:(?<ResX>\d+).(?<ResY>\d+))?, duration=(?<Dur>\d+)?", RegexOptions.Multiline)]
-    private static partial Regex RE_THUMBNAIL_PATH();
+    [GeneratedRegex(@"Row: \d+ _id=(?<ID>\d+), _data=(?<Path>.+), resolution=(?:(?:(?<ResX>\d+).(?<ResY>\d+))|NULL), f_number=(?:(?<fNum>[\d.]+)|NULL), iso=(?:(?<ISO>\d+)|NULL), exposure_time=(?:(?<Exposure>[\d.E-]+)|NULL)", RegexOptions.Multiline)]
+    private static partial Regex RE_IMAGE_METADATA();
+
+    [GeneratedRegex(@"Row: \d+ _id=(?<ID>\d+), _data=(?<Path>.+), resolution=(?:(?:(?<ResX>\d+).(?<ResY>\d+))|NULL), duration=(?:(?<Dur>\d+)|NULL), bitrate=(?:(?<Bitrate>\d+)|NULL)", RegexOptions.Multiline)]
+    private static partial Regex RE_VIDEO_METADATA();
 
     private static DeviceThumbnailInfo? GetDeviceThumbsInfo(string logicalDeviceId)
     {
@@ -293,7 +316,7 @@ public static partial class ThumbnailService
         {
             var fullPath = Path.Combine(localThumbnailDir, info.Id);
             if (!File.Exists(fullPath))
-                return null;
+                return new(null, info);
 
             var decodePixelWidth = Data.RuntimeSettings.MainWindowScalingFactor > 0
                 ? (int)Math.Ceiling((int)size / Data.RuntimeSettings.MainWindowScalingFactor)
@@ -377,12 +400,10 @@ public static partial class ThumbnailService
     private static void MergeDeviceWithLocalCache(DeviceThumbnailInfo deviceInfo)
     {
         var deviceCache = GetThumbsCacheFromDevice(deviceInfo);
-        bool hasUpdates = false;
 
         foreach (var kvp in deviceCache)
         {
-            if (deviceInfo.ThumbnailPathCache.TryAdd(kvp.Key, kvp.Value))
-                hasUpdates = true;
+            deviceInfo.ThumbnailPathCache.TryAdd(kvp.Key, kvp.Value);
         }
 
         UpdateCache(deviceInfo);
@@ -406,7 +427,15 @@ public static partial class ThumbnailService
         if (!File.Exists(csvPath))
             return [];
 
-        var lines = File.ReadAllLines(csvPath, CsvEncoding);
+        string[] lines;
+        try
+        {
+            lines = File.ReadAllLines(csvPath, CsvEncoding);
+        }
+        catch
+        {
+            return cache;
+        }
 
         foreach (var line in lines)
         {
@@ -599,7 +628,14 @@ public static partial class ThumbnailService
 
     private static IEnumerable<KeyValuePair<string, ThumbnailInfo>> ParseThumbnailMap(string stdout, MediaType type)
     {
-        foreach (Match match in RE_THUMBNAIL_PATH().Matches(stdout))
+        Regex re = type switch
+        {
+            MediaType.images => RE_IMAGE_METADATA(),
+            MediaType.video => RE_VIDEO_METADATA(),
+            _ => throw new NotSupportedException($"Unsupported media type: {type}"),
+        };
+
+        foreach (Match match in re.Matches(stdout))
         {
             if (!match.Success)
                 continue;
@@ -607,7 +643,7 @@ public static partial class ThumbnailService
             var path = match.Groups["Path"].Value.TrimEnd();
             var resX = match.Groups["ResX"];
             var resY = match.Groups["ResY"];
-
+            
             Size? resolution = null;
             if (resX.Success && resY.Success)
             {
@@ -618,8 +654,13 @@ public static partial class ThumbnailService
             TimeSpan? duration = string.IsNullOrEmpty(dur)
                 ? null
                 : TimeSpan.FromMilliseconds(int.Parse(dur));
+            
+            var fNum = double.TryParse(match.Groups["fNum"]?.Value, out double f) ? f : (double?)null;
+            var iso = int.TryParse(match.Groups["ISO"]?.Value, out int i) ? i : (int?)null;
+            var exposure = double.TryParse(match.Groups["Exposure"]?.Value, out double e) ? e : (double?)null;
+            var bitrate = int.TryParse(match.Groups["Bitrate"]?.Value, out int b) ? b : (int?)null;
 
-            yield return new(path, new($"{match.Groups["ID"].Value}.jpg", type, resolution, duration, DateTime.MinValue, ".thumbnails"));
+            yield return new(path, new($"{match.Groups["ID"].Value}.jpg", type, resolution, duration, DateTime.MinValue, ".thumbnails", fNum, iso, exposure, bitrate));
         }
     }
 
@@ -631,7 +672,7 @@ public static partial class ThumbnailService
                     cancellationToken,
                     "query",
                     "--uri", $"content://media/external/{media}/media",
-                    "--projection", "_id:_data:resolution:duration"
+                    "--projection", $"_id:_data:resolution:{(media is MediaType.images ? "f_number:iso:exposure_time" : "duration:bitrate")}"
                 );
 
         return stdout;

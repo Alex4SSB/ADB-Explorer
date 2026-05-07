@@ -29,6 +29,7 @@ public class FileToIconConverter
     private const string Shell32 = "shell32.dll";
     private const string Imageres = "imageres.dll";
     private static readonly SpecialIcon FolderIcon = new(Shell32, 3);
+    private static readonly SpecialIcon DriveIcon = new(Shell32, 7);
     private static readonly SpecialIcon LinkOverlayIcon = new(Shell32, 29);
     private static readonly SpecialIcon UnknownIcon = new(Shell32, 224);
     private static readonly SpecialIcon BrokenLinkIcon = new(Shell32, 271);
@@ -36,9 +37,10 @@ public class FileToIconConverter
     private static readonly SpecialIcon MusicFolderIcon = new(Imageres, 103);
     private static readonly SpecialIcon DocumentsFolderIcon = new(Imageres, 107);
     private static readonly SpecialIcon PicturesFolderIcon = new(Imageres, 108);
+    private static readonly SpecialIcon MultipleFilesIcon = new(Imageres, 142);
     private static readonly SpecialIcon DownloadsFolderIcon = new(Imageres, 175);
     private static readonly SpecialIcon VideosFolderIcon = new(Imageres, 178);
-
+    
     private static readonly System.Drawing.Color Gray232 = System.Drawing.Color.FromArgb(232, 232, 232);
 
     private readonly record struct IconCacheKey(string IconId, IconSize Size, int DesiredSize);
@@ -334,6 +336,8 @@ public class FileToIconConverter
             AbstractFile.SpecialFileType.BrokenLink => BrokenLinkIcon,
             AbstractFile.SpecialFileType.Unknown => UnknownIcon,
             AbstractFile.SpecialFileType.LinkOverlay => LinkOverlayIcon,
+            AbstractFile.SpecialFileType.MultipleFiles => MultipleFilesIcon,
+            AbstractFile.SpecialFileType.Drive => DriveIcon,
             _ => SpecialIcon.None,
         };
     }

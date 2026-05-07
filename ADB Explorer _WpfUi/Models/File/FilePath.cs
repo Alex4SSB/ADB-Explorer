@@ -30,6 +30,8 @@ public abstract class AbstractFile : ViewModelBase
         FIFO = 5,
         Unknown = 6,
         BrokenLink = 7,
+        MultipleFiles = 8,
+        Drive = 9,
     }
 
     [Flags]
@@ -42,6 +44,8 @@ public abstract class AbstractFile : ViewModelBase
         Unknown = 16,
         LinkOverlay = 32,
         Archive = 64,
+        MultipleFiles = 128,
+        Drive = 256,
     }
 
     public static string GetFileTypeName(FileType type) => type switch

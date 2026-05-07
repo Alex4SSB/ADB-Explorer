@@ -18,6 +18,9 @@ public partial class ThumbsSizeSelector : UserControl
             new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_MEDIUM, ThumbnailService.ThumbnailSize.Medium, this),
             new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_LARGE, ThumbnailService.ThumbnailSize.Large, this),
             new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_XL, ThumbnailService.ThumbnailSize.ExtraLarge, this),
+            new Separator(),
+            new SidePaneModeItem(Strings.Resources.S_THUMBSIZE_DETAILS, AppSettings.SidePaneMode.Details),
+            new SidePaneModeItem(Strings.Resources.S_SIDE_PANE_PREVIEW, AppSettings.SidePaneMode.Preview),
         ];
 
         InitializeComponent();
@@ -30,8 +33,26 @@ public partial class ThumbsSizeSelector : UserControl
         { ThumbnailService.ThumbnailSize.Large, new LargeThumbsIcon() { SubFontSize = 8 } },
         { ThumbnailService.ThumbnailSize.ExtraLarge, new FontIcon() { Glyph = "\uE15A", FontSize = 16 } },
     };
-    
-    public ICollection<ThumbSizeItem> Items { get; }
+
+    static Dictionary<AppSettings.SidePaneMode, UIElement> SidePaneModeIcons => new()
+    {
+        { AppSettings.SidePaneMode.Details, new FontIcon()
+        {
+            Glyph = "\uE99C",
+            FontSize = 16,
+            RenderTransformOrigin = new(0.5, 0.5),
+            RenderTransform = Data.RuntimeSettings.IsRTL ? null : new ScaleTransform(-1, 1)
+        } },
+        { AppSettings.SidePaneMode.Preview, new FontIcon()
+        {
+            Glyph = "\uE1AC",
+            FontSize = 16,
+            RenderTransformOrigin = new(0.5, 0.5),
+            RenderTransform = Data.RuntimeSettings.IsRTL ? null : new ScaleTransform(-1, 1)
+        } },
+    };
+
+    public ICollection<object> Items { get; }
 
     public UIElement SelectedIcon => Icons[ThumbnailSize];
 
@@ -55,6 +76,33 @@ public partial class ThumbsSizeSelector : UserControl
         var selector = (ThumbsSizeSelector)d;
         selector.OnPropertyChanged(nameof(SelectedIcon));
         selector.OnPropertyChanged(nameof(ThumbnailSize));
+    }
+
+    public partial class SidePaneModeItem : ObservableObject
+    {
+        public string Name { get; set; }
+        public UIElement Icon { get; set; }
+
+        [ObservableProperty]
+        public partial bool IsChecked { get; set; } = false;
+
+        public BaseAction Action { get; set; }
+
+        public SidePaneModeItem(string name, AppSettings.SidePaneMode mode)
+        {
+            Name = name;
+            Icon = SidePaneModeIcons[mode];
+            Action = new(() => true, () => Data.Settings.SidePane = mode);
+            Data.Settings.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(AppSettings.SidePane))
+                {
+                    IsChecked = Data.Settings.SidePane == mode;
+                }
+            };
+
+            IsChecked = Data.Settings.SidePane == mode;
+        }
     }
 
     public partial class ThumbSizeItem : ObservableObject

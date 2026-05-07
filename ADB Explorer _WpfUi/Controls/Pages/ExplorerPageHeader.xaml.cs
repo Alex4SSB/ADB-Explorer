@@ -679,6 +679,10 @@ public partial class ExplorerPageHeader : UserControl
 
         RuntimeSettings.ExplorerSource = DirList.FileList;
         FileActionLogic.UpdateFileActions();
+        
+        DetailsPane.SelectedFiles = [new FileClass("", "", FileType.Unknown)];
+        DetailsPane.SelectedFiles = [];
+
         return true;
     }
 

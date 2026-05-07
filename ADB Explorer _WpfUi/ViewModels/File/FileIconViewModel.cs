@@ -159,14 +159,13 @@ public partial class FileIconViewModel : FileViewModelBase
         if (thumb.Info.Type is ThumbnailService.MediaType.video)
         {
             result.Add($"{Strings.Resources.S_COLUMN_SIZE}: {SizeString}");
-
-            if (thumb.Info.Duration is TimeSpan duration)
-                result.Add($"{Strings.Resources.S_VIDEO_DURATION}: {duration.Hours:D2}:{duration.Minutes:D2}:{duration.Seconds:D2}");
+            if (thumb.Info.Duration is not null)
+                result.Add($"{Strings.Resources.S_VIDEO_DURATION}: {thumb.Info.DurationString}");
         }
         else if (thumb.Info.Type is ThumbnailService.MediaType.images)
         {
-            if (thumb.Info.Resolution is Size res)
-                result.Add($"{Strings.Resources.S_PICTURE_DIMENSIONS}: {$"{res.Width} \u00D7 {res.Height}"}");
+            if (thumb.Info.Resolution is not null)
+                result.Add($"{Strings.Resources.S_PICTURE_DIMENSIONS}: {thumb.Info.ResolutionString}");
 
             result.Add($"{Strings.Resources.S_COLUMN_SIZE}: {SizeString}");
         }

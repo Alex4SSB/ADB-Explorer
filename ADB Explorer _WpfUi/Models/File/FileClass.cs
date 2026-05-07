@@ -95,13 +95,14 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     private BitmapSource LargeFileIcon => FileToIconConverter.GetImage(this, 120).First();
 
     private ThumbnailService.Thumbnail? _cacheThumbnail = null;
-    private ThumbnailService.Thumbnail? CacheThumbnail
+    public ThumbnailService.Thumbnail? CacheThumbnail
     {
         get
         {
             if (_cacheThumbnail is null && Data.DevicesObject.Current.Type 
                 is DeviceType.Local 
-                or DeviceType.Remote)
+                or DeviceType.Remote
+                or DeviceType.Service)
             {
                 if (!ThumbnailService.IsInitialized(Data.DevicesObject.Current.LogicalID))
                 {
@@ -116,6 +117,8 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             return _cacheThumbnail;
         }
     }
+
+    public BitmapSource FileIcon32 => FileToIconConverter.GetImage(this, 32).First();
 
     private FileIconViewModel? _iconViewModel;
     public FileIconViewModel IconViewModel 
@@ -289,6 +292,8 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             FileType.Folder => SpecialFileType.Folder,
             FileType.Unknown => SpecialFileType.Unknown,
             FileType.BrokenLink => SpecialFileType.BrokenLink,
+            FileType.MultipleFiles => SpecialFileType.MultipleFiles,
+            FileType.Drive => SpecialFileType.Drive,
             _ => SpecialFileType.Regular
         };
 
