@@ -1463,10 +1463,10 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
     <value>Inclure les vignettes vidéo</value>
   </data>
   <data name="S_VIDEO_DURATION" xml:space="preserve">
-    <value>Longueur</value>
+    <value>Durée</value>
   </data>
   <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
-    <value>Dimensions</value>
+    <value>Résolution</value>
   </data>
   <data name="S_ONE_MONTH" xml:space="preserve">
     <value>Un mois</value>
