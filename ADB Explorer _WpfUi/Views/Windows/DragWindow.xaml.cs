@@ -3,6 +3,7 @@ using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels.Windows;
 using System.Windows.Documents;
+using Wpf.Ui.Appearance;
 using static ADB_Explorer.Services.NativeMethods;
 
 namespace ADB_Explorer.Views.Windows;
@@ -40,6 +41,12 @@ public partial class DragWindow : INotifyPropertyChanged
         InitializeComponent();
 
         DragTimer.Tick += DragTimer_Tick;
+
+        ApplicationThemeManager.Changed += (_, _) =>
+        {
+            if (Child is FrameworkElement child)
+                ApplicationThemeManager.Apply(child);
+        };
 
 #if !DEPLOY
         MainBorder.BorderThickness = new Thickness(1);
