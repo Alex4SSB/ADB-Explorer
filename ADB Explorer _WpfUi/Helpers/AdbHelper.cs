@@ -40,12 +40,12 @@ internal static class AdbHelper
         }
     });
 
-    public static Task<bool> WriteTextFileAsync(LogicalDeviceViewModel device, string filePath, string content) =>
-        Task.Run(() =>
+    public static Task<bool> WriteTextFileAsync(LogicalDeviceViewModel device, string filePath, string content, CancellationToken cancellationToken = default) =>
+        Task.Run(async () =>
     {
         try
         {
-            WriteFile(device, filePath, content);
+            await WriteFileAsync(device, filePath, content, cancellationToken);
             return true;
         }
         catch (Exception e)
@@ -78,17 +78,6 @@ internal static class AdbHelper
             return "";
         }
     });
-
-    public static string? ReadFileAsText(LogicalDeviceViewModel device, string path)
-    {
-        var stream = ReadFileAsStream(device, path);
-        if (stream is null)
-            return null;
-
-        using var reader = new StreamReader(stream);
-
-        return reader.ReadToEnd();
-    }
 
     public static async Task<MemoryStream?> ReadFileAsStreamAsync(LogicalDeviceViewModel device, string path, CancellationToken cancellationToken = default)
     {
@@ -128,15 +117,15 @@ internal static class AdbHelper
         return stream;
     }
 
-    public static void WriteFile(LogicalDeviceViewModel device, string path, string content)
+    public static async Task WriteFileAsync(LogicalDeviceViewModel device, string path, string content, CancellationToken cancellationToken = default)
     {
         using MemoryStream stream = new();
         using StreamWriter writer = new(stream);
-        writer.Write(content);
-        writer.Flush();
+        await writer.WriteAsync(content);
+        await writer.FlushAsync(cancellationToken);
         stream.Position = 0;
 
         using SyncService service = new(device.Device.DeviceData);
-        service.Push(stream, path, (UnixFileMode)0x1ED, DateTime.Now); // 0x1ED = 0777 in octal
+        await service.PushAsync(stream, path, (UnixFileMode)0x1ED, DateTime.Now, cancellationToken: cancellationToken); // 0x1ED = 0777 in octal
     }
 }

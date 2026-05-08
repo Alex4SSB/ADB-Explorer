@@ -56,6 +56,7 @@ public partial class AdbAvalonEditor : UserControl
         control._updatingText = false;
 
         control.OriginalText = val;
+        control.HasUnsavedChanges = control.EditorText != control.OriginalText;
     }
 
     public AdbAvalonEditor()

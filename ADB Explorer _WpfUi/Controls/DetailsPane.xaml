@@ -9,12 +9,17 @@
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    xmlns:pdfImage="clr-namespace:PDFtoImage;assembly=PDFtoImage"
     x:Name="pane"
     d:DesignHeight="450"
     d:DesignWidth="300"
     d:Visibility="Visible"
     mc:Ignorable="d">
+    <UserControl.InputBindings>
+        <KeyBinding
+            Key="S"
+            Command="{Binding SaveCommand, ElementName=pane}"
+            Modifiers="Ctrl" />
+    </UserControl.InputBindings>
     <UserControl.Style>
         <Style TargetType="UserControl">
             <Style.Triggers>
@@ -30,9 +35,9 @@
     <Grid DataContext="{Binding ElementName=pane}">
         <Grid x:Name="ContentBox">
             <Grid>
-                <local:AdbAvalonEditor x:Name="EditorTextBox" EditorText="{Binding EditorText, Mode=TwoWay}">
-                    <local:AdbAvalonEditor.Style>
-                        <Style TargetType="local:AdbAvalonEditor">
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding EditorText}" Value="{x:Null}">
                                     <Setter Property="Visibility" Value="Collapsed" />
@@ -42,8 +47,28 @@
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </local:AdbAvalonEditor.Style>
-                </local:AdbAvalonEditor>
+                    </Grid.Style>
+                    <local:AdbAvalonEditor x:Name="EditorTextBox" EditorText="{Binding EditorText, Mode=TwoWay}" />
+                    <local:AdbMenu
+                        Margin="0,0,12,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Style="{StaticResource AdbMenuStyle}"
+                        Visibility="{Binding HasUnsavedChanges, ElementName=EditorTextBox, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <local:AdbMenuItem
+                            Command="{Binding SaveCommand, ElementName=pane}"
+                            IsChecked="True"
+                            Style="{StaticResource AdbMenuItemStyle}"
+                            ToolTip="{Binding Source={x:Static Member=strings:Resources.S_MENU_SAVE_CHANGES}}">
+                            <local:AdbMenuItem.Header>
+                                <ui:FontIcon
+                                    Margin="-4"
+                                    FontSize="20"
+                                    Glyph="&#xE74E;" />
+                            </local:AdbMenuItem.Header>
+                        </local:AdbMenuItem>
+                    </local:AdbMenu>
+                </Grid>
                 <ScrollViewer x:Name="PdfScrollViewer" Visibility="Collapsed">
                     <ItemsControl x:Name="PdfPagesControl">
                         <ItemsControl.ItemTemplate>
@@ -51,16 +76,16 @@
                                 <Grid Margin="0,0,0,4">
                                     <Image Source="{Binding Image}" />
                                     <Border
-                                        HorizontalAlignment="Left"
-                                        VerticalAlignment="Bottom"
                                         Margin="6"
                                         Padding="4,2"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Bottom"
                                         Background="#99000000"
                                         CornerRadius="3">
                                         <TextBlock
-                                            Text="{Binding Label}"
+                                            FontSize="11"
                                             Foreground="White"
-                                            FontSize="11" />
+                                            Text="{Binding Label}" />
                                     </Border>
                                 </Grid>
                             </DataTemplate>

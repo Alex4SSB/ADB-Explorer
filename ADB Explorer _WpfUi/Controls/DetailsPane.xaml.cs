@@ -70,10 +70,12 @@ public partial class DetailsPane : UserControl
 
     public ObservableCollection<FileDetailsViewModel> ThumbnailInfoItems { get; } = [];
 
+    public AsyncRelayCommand SaveCommand { get; }
+
     private static readonly FileClass MultipleFiles = new("MultipleFiles", "/MultipleFiles", AbstractFile.FileType.MultipleFiles);
     private static readonly FileClass Drive = new("Drive", "/Drive", AbstractFile.FileType.Drive);
 
-    private CancellationTokenSource? _pdfCts;
+    private CancellationTokenSource? _cancellationToken;
 
     private static void OnSelectedFilesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
@@ -83,8 +85,8 @@ public partial class DetailsPane : UserControl
         control.EditorText = null;
         control.PdfScrollViewer.Visibility = Visibility.Collapsed;
         control.PdfPagesControl.ItemsSource = null;
-        control._pdfCts?.Cancel();
-        control._pdfCts = null;
+        control._cancellationToken?.Cancel();
+        control._cancellationToken = null;
         if (files.FirstOrDefault() is FileClass fc && string.IsNullOrEmpty(fc.FullName))
             return;
 
@@ -107,7 +109,7 @@ public partial class DetailsPane : UserControl
                 if (file.Extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase))
                 {
                     var cts = new CancellationTokenSource();
-                    control._pdfCts = cts;
+                    control._cancellationToken = cts;
                     var device = Data.DevicesObject.Current;
                     var fullPath = file.FullPath;
 
@@ -158,7 +160,7 @@ public partial class DetailsPane : UserControl
                 else
                 {
                     var cts = new CancellationTokenSource();
-                    control._pdfCts = cts;
+                    control._cancellationToken = cts;
                     var device = Data.DevicesObject.Current;
                     var fullPath = Data.SelectedFiles.First().FullPath;
 
@@ -225,6 +227,21 @@ public partial class DetailsPane : UserControl
 
     public DetailsPane()
     {
+        SaveCommand = new AsyncRelayCommand(async () =>
+        {
+            var result = await AdbHelper.WriteTextFileAsync(Data.DevicesObject.Current, SelectedFiles.First().FullPath, EditorText, _cancellationToken.Token);
+
+            if (result)
+            {
+                var text = EditorText;
+                EditorText = null;
+                EditorText = text;
+
+                SelectedFiles.First().ModifiedTime = DateTime.Now;
+                SelectedFiles.First().Size = Encoding.UTF8.GetByteCount(EditorText);
+            }
+        });
+
         InitializeComponent();
 
         ContentBox.Width = Data.Settings.DetailsPaneWidth;
