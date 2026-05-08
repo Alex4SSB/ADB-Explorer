@@ -1072,6 +1072,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select a single file to get more information..
+        /// </summary>
+        public static string S_DETAILS_MULTI_FILE_SELECTED {
+            get {
+                return ResourceManager.GetString("S_DETAILS_MULTI_FILE_SELECTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show or hide the details and preview pane..
+        /// </summary>
+        public static string S_DETAILS_PANE_TOOLTIP {
+            get {
+                return ResourceManager.GetString("S_DETAILS_PANE_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to QR Pairing.
         /// </summary>
         public static string S_DEVICE_QR {
@@ -1875,6 +1893,33 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Exposure time.
+        /// </summary>
+        public static string S_IMAGE_EXPOSURE {
+            get {
+                return ResourceManager.GetString("S_IMAGE_EXPOSURE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to F-stop.
+        /// </summary>
+        public static string S_IMAGE_F_STOP {
+            get {
+                return ResourceManager.GetString("S_IMAGE_F_STOP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ISO speed.
+        /// </summary>
+        public static string S_IMAGE_ISO {
+            get {
+                return ResourceManager.GetString("S_IMAGE_ISO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select packages to install.
         /// </summary>
         public static string S_INSTALL_APK {
@@ -1907,6 +1952,15 @@ namespace ADB_Explorer.Strings {
         public static string S_ITEM_DESTINATION_PLURAL {
             get {
                 return ResourceManager.GetString("S_ITEM_DESTINATION_PLURAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Location.
+        /// </summary>
+        public static string S_ITEM_LOCATION {
+            get {
+                return ResourceManager.GetString("S_ITEM_LOCATION", resourceCulture);
             }
         }
         
@@ -2788,6 +2842,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select a file to preview..
+        /// </summary>
+        public static string S_PREVIEW_EMPTY_SELECTION {
+            get {
+                return ResourceManager.GetString("S_PREVIEW_EMPTY_SELECTION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No preview available..
+        /// </summary>
+        public static string S_PREVIEW_INVALID {
+            get {
+                return ResourceManager.GetString("S_PREVIEW_INVALID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Privacy Policy.
         /// </summary>
         public static string S_PRIVACY_POLICY {
@@ -3565,6 +3637,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Max File Size For Preview.
+        /// </summary>
+        public static string S_SETTINGS_PREVIEW_MAX_SIZE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_PREVIEW_MAX_SIZE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pull To Default Folder On File Double Click.
+        /// </summary>
+        public static string S_SETTINGS_PULL_ON_DOUBLE_CLICK {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_PULL_ON_DOUBLE_CLICK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save Manually Connected Devices.
         /// </summary>
         public static string S_SETTINGS_SAVE_DEVICES {
@@ -3750,6 +3840,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_WSA {
             get {
                 return ResourceManager.GetString("S_SETTINGS_WSA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Preview.
+        /// </summary>
+        public static string S_SIDE_PANE_PREVIEW {
+            get {
+                return ResourceManager.GetString("S_SIDE_PANE_PREVIEW", resourceCulture);
             }
         }
         
@@ -4074,6 +4173,15 @@ namespace ADB_Explorer.Strings {
         public static string S_VALIDATION_ERROR {
             get {
                 return ResourceManager.GetString("S_VALIDATION_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bitrate.
+        /// </summary>
+        public static string S_VIDEO_BITRATE {
+            get {
+                return ResourceManager.GetString("S_VIDEO_BITRATE", resourceCulture);
             }
         }
         
