@@ -229,6 +229,7 @@ public static class UISettings
                     new("QRCoder", Resources.Links.QR_CODER),
                     new("Emoji.Wpf", Resources.Links.EMOJI_WPF),
                     new("AvalonEdit", Resources.Links.AVALONEDIT),
+                    new("PDFtoImage", Resources.Links.PDF_TO_IMAGE),
                     new("CommunityToolkit.Mvvm", Resources.Links.MVVM_TOOLKIT),
                     new("WindowsAPICodePack", Resources.Links.API_CODEPACK),
                     new("Newtonsoft.Json", Resources.Links.JSON),

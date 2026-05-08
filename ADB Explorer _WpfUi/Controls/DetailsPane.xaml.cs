@@ -10,6 +10,14 @@ namespace ADB_Explorer.Controls;
 /// </summary>
 public partial class DetailsPane : UserControl
 {
+    public partial class PdfPageItem(BitmapSource image, int index) : ObservableObject
+    {
+        public BitmapSource Image { get; } = image;
+
+        [ObservableProperty]
+        public partial string Label { get; set; } = $"{index}/…";
+    }
+
     public bool IsOpen
     {
         get => (bool)GetValue(IsOpenProperty);
@@ -65,16 +73,22 @@ public partial class DetailsPane : UserControl
     private static readonly FileClass MultipleFiles = new("MultipleFiles", "/MultipleFiles", AbstractFile.FileType.MultipleFiles);
     private static readonly FileClass Drive = new("Drive", "/Drive", AbstractFile.FileType.Drive);
 
+    private CancellationTokenSource? _pdfCts;
+
     private static void OnSelectedFilesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         var control = (DetailsPane)d;
         var files = (IEnumerable<FileClass>)e.NewValue;
 
         control.EditorText = null;
+        control.PdfScrollViewer.Visibility = Visibility.Collapsed;
+        control.PdfPagesControl.ItemsSource = null;
+        control._pdfCts?.Cancel();
+        control._pdfCts = null;
         if (files.FirstOrDefault() is FileClass fc && string.IsNullOrEmpty(fc.FullName))
             return;
 
-        if (Data.Settings.SidePane is Services.AppSettings.SidePaneMode.Preview)
+        if (Data.Settings.SidePane is AppSettings.SidePaneMode.Preview)
         {
             control.NoPreviewTextBlock.Text = files.Any()
                 ? Strings.Resources.S_PREVIEW_INVALID
@@ -90,17 +104,71 @@ public partial class DetailsPane : UserControl
             {
                 control.NoPreviewTextBlock.Visibility = Visibility.Collapsed;
 
-                var readTask = AdbHelper.ReadTextFileAsync(Data.DevicesObject.Current, Data.SelectedFiles.First().FullPath);
-                readTask.ContinueWith(t =>
+                if (file.Extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (t.Result is not null)
+                    var cts = new CancellationTokenSource();
+                    control._pdfCts = cts;
+                    var device = Data.DevicesObject.Current;
+                    var fullPath = file.FullPath;
+
+                    _ = Task.Run(async () =>
                     {
+                        var stream = await AdbHelper.ReadFileAsStreamAsync(device, fullPath, cts.Token);
+                        if (stream is null || cts.IsCancellationRequested) return;
+
+                        var pages = new ObservableCollection<PdfPageItem>();
                         App.SafeInvoke(() =>
                         {
-                            control.EditorText = t.Result;
+                            control.PdfPagesControl.ItemsSource = pages;
+                            control.PdfScrollViewer.Visibility = Visibility.Visible;
                         });
-                    }
-                });
+
+                        var renderOptions = new PDFtoImage.RenderOptions(
+                            Width: (int)(Data.Settings.DetailsPaneWidth / Data.RuntimeSettings.MainWindowScalingFactor / 0.75), 
+                            WithAspectRatio: true);
+
+                        int index = 0;
+                        await foreach (var skBitmap in PDFtoImage.Conversion.ToImagesAsync(stream, options: renderOptions, cancellationToken: cts.Token))
+                        {
+                            using var _ = skBitmap;
+                            if (cts.IsCancellationRequested) break;
+
+                            using var skData = skBitmap.Encode(SkiaSharp.SKEncodedImageFormat.Png, 100);
+                            using var ms = new MemoryStream(skData.ToArray());
+                            var bmp = new BitmapImage();
+                            bmp.BeginInit();
+                            bmp.CacheOption = BitmapCacheOption.OnLoad;
+                            bmp.StreamSource = ms;
+                            bmp.EndInit();
+                            bmp.Freeze();
+
+                            App.SafeInvoke(() => pages.Add(new PdfPageItem(bmp, ++index)));
+                        }
+
+                        if (cts.IsCancellationRequested) return;
+
+                        var total = pages.Count;
+                        App.SafeInvoke(() =>
+                        {
+                            foreach (var page in pages)
+                                page.Label = $"{pages.IndexOf(page) + 1}/{total}";
+                        });
+                    }, cts.Token);
+                }
+                else
+                {
+                    var cts = new CancellationTokenSource();
+                    control._pdfCts = cts;
+                    var device = Data.DevicesObject.Current;
+                    var fullPath = Data.SelectedFiles.First().FullPath;
+
+                    _ = Task.Run(async () =>
+                    {
+                        var text = await AdbHelper.ReadTextFileAsync(device, fullPath, cts.Token);
+                        if (text is not null && !cts.IsCancellationRequested)
+                            App.SafeInvoke(() => control.EditorText = text);
+                    }, cts.Token);
+                }
             }
             else
             {

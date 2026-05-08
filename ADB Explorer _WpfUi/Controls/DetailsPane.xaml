@@ -9,6 +9,7 @@
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:pdfImage="clr-namespace:PDFtoImage;assembly=PDFtoImage"
     x:Name="pane"
     d:DesignHeight="450"
     d:DesignWidth="300"
@@ -43,6 +44,29 @@
                         </Style>
                     </local:AdbAvalonEditor.Style>
                 </local:AdbAvalonEditor>
+                <ScrollViewer x:Name="PdfScrollViewer" Visibility="Collapsed">
+                    <ItemsControl x:Name="PdfPagesControl">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,0,0,4">
+                                    <Image Source="{Binding Image}" />
+                                    <Border
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Bottom"
+                                        Margin="6"
+                                        Padding="4,2"
+                                        Background="#99000000"
+                                        CornerRadius="3">
+                                        <TextBlock
+                                            Text="{Binding Label}"
+                                            Foreground="White"
+                                            FontSize="11" />
+                                    </Border>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
                 <TextBlock
                     x:Name="NoPreviewTextBlock"
                     HorizontalAlignment="Center"

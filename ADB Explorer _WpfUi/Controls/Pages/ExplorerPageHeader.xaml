@@ -154,11 +154,11 @@
                         </Style>
                     </Separator.Style>
                 </Separator>
-                <local:ThumbsSizeSelector x:Name="ThumbsSizeSelector" ThumbnailSize="{Binding CurrentThumbsSize, Mode=TwoWay}" />
                 <local:SortingSelector
                     x:Name="SortingSelector"
                     SortDirection="{Binding SortDirection, Mode=TwoWay}"
                     SortOption="{Binding SortedColumn, Mode=TwoWay}" />
+                <local:ThumbsSizeSelector x:Name="ThumbsSizeSelector" ThumbnailSize="{Binding CurrentThumbsSize, Mode=TwoWay}" />
             </StackPanel>
             <Border
                 Grid.Column="3"

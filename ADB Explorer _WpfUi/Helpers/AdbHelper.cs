@@ -57,15 +57,21 @@ internal static class AdbHelper
         }
     });
 
-    public static Task<string?> ReadTextFileAsync(LogicalDeviceViewModel device, string filePath) =>
-        Task.Run(() =>
+    public static Task<string?> ReadTextFileAsync(LogicalDeviceViewModel device, string filePath, CancellationToken cancellationToken = default) =>
+        Task.Run(async () =>
     {
         try
         {
-            return ReadFileAsText(device, filePath);
+            var stream = await ReadFileAsStreamAsync(device, filePath, cancellationToken);
+            if (stream is null) return null;
+
+            using var reader = new StreamReader(stream);
+            return await reader.ReadToEndAsync(cancellationToken);
         }
         catch (Exception e)
         {
+            if (e is OperationCanceledException) return null;
+
             App.SafeInvoke(() =>
                 DialogService.ShowMessage(e.Message, Strings.Resources.S_READ_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true));
 
@@ -82,6 +88,25 @@ internal static class AdbHelper
         using var reader = new StreamReader(stream);
 
         return reader.ReadToEnd();
+    }
+
+    public static async Task<MemoryStream?> ReadFileAsStreamAsync(LogicalDeviceViewModel device, string path, CancellationToken cancellationToken = default)
+    {
+        MemoryStream stream = new();
+        using (SyncService service = new(device.Device.DeviceData))
+        {
+            try
+            {
+                await service.PullAsync(path, stream, cancellationToken: cancellationToken);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        stream.Position = 0;
+        return stream;
     }
 
     public static MemoryStream? ReadFileAsStream(LogicalDeviceViewModel device, string path)
