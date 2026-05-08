@@ -13,6 +13,8 @@
     <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<Configurations>Debug;Release;Deploy</Configurations>
+	<RuntimeIdentifier Condition="'$(Platform)' == 'ARM64'">win-arm64</RuntimeIdentifier>
+	<RuntimeIdentifier Condition="'$(Platform)' != 'ARM64'">win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
@@ -141,5 +143,11 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+
+  <Target Name="RemoveSkiaSharpPdb" AfterTargets="ResolvePackageAssets">
+    <ItemGroup>
+      <NativeCopyLocalItems Remove="@(NativeCopyLocalItems)" Condition="'%(Filename)%(Extension)' == 'libSkiaSharp.pdb'" />
+    </ItemGroup>
+  </Target>
 
 </Project>

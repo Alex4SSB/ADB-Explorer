@@ -313,7 +313,7 @@
                         <ui:DataGrid.Columns>
                             <DataGridTemplateColumn
                                 x:Name="IconColumn"
-                                MaxWidth="24"
+                                MaxWidth="30"
                                 CanUserResize="False"
                                 CellTemplate="{StaticResource FileIconTemplate}"
                                 IsReadOnly="True"
