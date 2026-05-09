@@ -2635,6 +2635,33 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This PDF is password protected..
+        /// </summary>
+        public static string S_PDF_PASSWORD_PROTECTED {
+            get {
+                return ResourceManager.GetString("S_PDF_PASSWORD_PROTECTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unlock.
+        /// </summary>
+        public static string S_PDF_PASSWORD_UNLOCK {
+            get {
+                return ResourceManager.GetString("S_PDF_PASSWORD_UNLOCK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect password..
+        /// </summary>
+        public static string S_PDF_PASSWORD_WRONG {
+            get {
+                return ResourceManager.GetString("S_PDF_PASSWORD_WRONG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Permanently Delete.
         /// </summary>
         public static string S_PERM_DEL {

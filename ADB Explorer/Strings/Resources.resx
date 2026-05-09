@@ -1950,4 +1950,16 @@ Please help us localize the app to your language on Weblate.</value>
     <value>No preview available.</value>
     <comment>The hint displayed in the preview pane when the selected file(s) cannot be previewed</comment>
   </data>
+  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
+    <value>This PDF is password protected.</value>
+    <comment>The hint displayed in the preview pane when the selected PDF is password protected</comment>
+  </data>
+  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
+    <value>Incorrect password.</value>
+    <comment>Error shown in the PDF password prompt when the entered password is wrong</comment>
+  </data>
+  <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
+    <value>Unlock</value>
+    <comment>Button label to submit the PDF password</comment>
+  </data>
 </root>
