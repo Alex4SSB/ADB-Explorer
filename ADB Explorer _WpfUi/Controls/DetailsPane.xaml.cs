@@ -2,6 +2,8 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
+using Windows.Data.Pdf;
+using Windows.Storage.Streams;
 
 namespace ADB_Explorer.Controls;
 
@@ -71,11 +73,33 @@ public partial class DetailsPane : UserControl
     public ObservableCollection<FileDetailsViewModel> ThumbnailInfoItems { get; } = [];
 
     public AsyncRelayCommand SaveCommand { get; }
+    public RelayCommand PdfUnlockCommand { get; }
+
+    public bool IsPdfPasswordPromptVisible
+    {
+        get => (bool)GetValue(IsPdfPasswordPromptVisibleProperty);
+        set => SetValue(IsPdfPasswordPromptVisibleProperty, value);
+    }
+
+    public static readonly DependencyProperty IsPdfPasswordPromptVisibleProperty =
+        DependencyProperty.Register("IsPdfPasswordPromptVisible", typeof(bool),
+          typeof(DetailsPane), new PropertyMetadata(false));
+
+    public bool IsPdfPasswordWrong
+    {
+        get => (bool)GetValue(IsPdfPasswordWrongProperty);
+        set => SetValue(IsPdfPasswordWrongProperty, value);
+    }
+
+    public static readonly DependencyProperty IsPdfPasswordWrongProperty =
+        DependencyProperty.Register("IsPdfPasswordWrong", typeof(bool),
+          typeof(DetailsPane), new PropertyMetadata(false));
 
     private static readonly FileClass MultipleFiles = new("MultipleFiles", "/MultipleFiles", AbstractFile.FileType.MultipleFiles);
     private static readonly FileClass Drive = new("Drive", "/Drive", AbstractFile.FileType.Drive);
 
     private CancellationTokenSource? _cancellationToken;
+    private MemoryStream? _pdfMemoryStream;
 
     private static void OnSelectedFilesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
@@ -85,6 +109,9 @@ public partial class DetailsPane : UserControl
         control.EditorText = null;
         control.PdfScrollViewer.Visibility = Visibility.Collapsed;
         control.PdfPagesControl.ItemsSource = null;
+        control.IsPdfPasswordPromptVisible = false;
+        control.IsPdfPasswordWrong = false;
+        control._pdfMemoryStream = null;
         control._cancellationToken?.Cancel();
         control._cancellationToken = null;
         if (files.FirstOrDefault() is FileClass fc && string.IsNullOrEmpty(fc.FullName))
@@ -100,6 +127,7 @@ public partial class DetailsPane : UserControl
                 && !Data.FileActions.IsRecycleBin
                 && files.First() is FileClass file
                 && file.Type is AbstractFile.FileType.File
+                && !AdbExplorerConst.COMMON_PHOTO_EXT.Contains(file.Extension, StringComparer.OrdinalIgnoreCase)
                 && !file.IsApk
                 && !file.IsLink
                 && file.Size / 1000 < Data.Settings.MaxPreviewFileSize)
@@ -118,43 +146,13 @@ public partial class DetailsPane : UserControl
                         var stream = await AdbHelper.ReadFileAsStreamAsync(device, fullPath, cts.Token);
                         if (stream is null || cts.IsCancellationRequested) return;
 
-                        var pages = new ObservableCollection<PdfPageItem>();
-                        App.SafeInvoke(() =>
-                        {
-                            control.PdfPagesControl.ItemsSource = pages;
-                            control.PdfScrollViewer.Visibility = Visibility.Visible;
-                        });
-
-                        var renderOptions = new PDFtoImage.RenderOptions(
-                            Width: (int)(Data.Settings.DetailsPaneWidth / Data.RuntimeSettings.MainWindowScalingFactor / 0.75), 
-                            WithAspectRatio: true);
-
-                        int index = 0;
-                        await foreach (var skBitmap in PDFtoImage.Conversion.ToImagesAsync(stream, options: renderOptions, cancellationToken: cts.Token))
-                        {
-                            using var _ = skBitmap;
-                            if (cts.IsCancellationRequested) break;
-
-                            using var skData = skBitmap.Encode(SkiaSharp.SKEncodedImageFormat.Png, 100);
-                            using var ms = new MemoryStream(skData.ToArray());
-                            var bmp = new BitmapImage();
-                            bmp.BeginInit();
-                            bmp.CacheOption = BitmapCacheOption.OnLoad;
-                            bmp.StreamSource = ms;
-                            bmp.EndInit();
-                            bmp.Freeze();
-
-                            App.SafeInvoke(() => pages.Add(new PdfPageItem(bmp, ++index)));
-                        }
-
+                        var memStream = new MemoryStream();
+                        await stream.CopyToAsync(memStream, cts.Token);
                         if (cts.IsCancellationRequested) return;
 
-                        var total = pages.Count;
-                        App.SafeInvoke(() =>
-                        {
-                            foreach (var page in pages)
-                                page.Label = $"{pages.IndexOf(page) + 1}/{total}";
-                        });
+                        App.SafeInvoke(() => control._pdfMemoryStream = memStream);
+
+                        await RenderPdfAsync(control, memStream, password: null, cts);
                     }, cts.Token);
                 }
                 else
@@ -242,6 +240,18 @@ public partial class DetailsPane : UserControl
             }
         });
 
+        PdfUnlockCommand = new RelayCommand(() =>
+        {
+            if (_pdfMemoryStream is null || _cancellationToken is null) return;
+
+            IsPdfPasswordWrong = false;
+            var password = PdfPasswordBox.Password;
+            var cts = _cancellationToken;
+            var memStream = _pdfMemoryStream;
+
+            _ = Task.Run(() => RenderPdfAsync(this, memStream, password, cts));
+        });
+
         InitializeComponent();
 
         ContentBox.Width = Data.Settings.DetailsPaneWidth;
@@ -258,6 +268,79 @@ public partial class DetailsPane : UserControl
         };
 
         OnSelectedFilesChanged(this, new DependencyPropertyChangedEventArgs(SelectedFilesProperty, null, SelectedFiles));
+    }
+
+    private static async Task RenderPdfAsync(DetailsPane control, MemoryStream memStream, string? password, CancellationTokenSource cts)
+    {
+        memStream.Position = 0;
+        var rasStream = memStream.AsRandomAccessStream();
+
+        PdfDocument pdfDoc;
+        try
+        {
+            pdfDoc = password is null
+                ? await PdfDocument.LoadFromStreamAsync(rasStream)
+                : await PdfDocument.LoadFromStreamAsync(rasStream, password);
+        }
+        catch (Exception ex) when (ex.HResult is (int)NativeMethods.HResult.ERROR_WRONG_PASSWORD)
+        {
+            App.SafeInvoke(() =>
+            {
+                control.PdfScrollViewer.Visibility = Visibility.Collapsed;
+                control.PdfPagesControl.ItemsSource = null;
+                control.IsPdfPasswordWrong = password is not null;
+                control.IsPdfPasswordPromptVisible = true;
+                control.NoPreviewTextBlock.Visibility = Visibility.Collapsed;
+            });
+            return;
+        }
+
+        if (cts.IsCancellationRequested) return;
+
+        var pages = new ObservableCollection<PdfPageItem>();
+        App.SafeInvoke(() =>
+        {
+            control.IsPdfPasswordPromptVisible = false;
+            control.IsPdfPasswordWrong = false;
+            control.PdfPagesControl.ItemsSource = pages;
+            control.PdfScrollViewer.Visibility = Visibility.Visible;
+            control.PdfScrollViewer.ScrollToTop();
+        });
+
+        uint pageCount = pdfDoc.PageCount;
+        for (uint i = 0; i < pageCount; i++)
+        {
+            if (cts.IsCancellationRequested) break;
+
+            using var pdfPage = pdfDoc.GetPage(i);
+            var ms = new InMemoryRandomAccessStream();
+            var renderOptions = new PdfPageRenderOptions
+            {
+                DestinationWidth = (uint)(Data.Settings.DetailsPaneWidth / Data.RuntimeSettings.MainWindowScalingFactor / 0.75)
+            };
+            await pdfPage.RenderToStreamAsync(ms, renderOptions);
+
+            if (cts.IsCancellationRequested) break;
+
+            var bmp = new BitmapImage();
+            bmp.BeginInit();
+            bmp.CacheOption = BitmapCacheOption.OnLoad;
+            bmp.StreamSource = ms.AsStream();
+            bmp.EndInit();
+            bmp.Freeze();
+
+            uint pageIndex = i;
+            App.SafeInvoke(() => pages.Add(new PdfPageItem(bmp, (int)pageIndex + 1)));
+        }
+
+        if (cts.IsCancellationRequested) return;
+
+        var total = pages.Count;
+        App.SafeInvoke(() =>
+        {
+            foreach (var page in pages)
+                page.Label = $"{pages.IndexOf(page) + 1}/{total}";
+        });
     }
 
     private void PopulateThumbnailInfoItems(FileClass file)
@@ -310,5 +393,10 @@ public partial class DetailsPane : UserControl
             ContentBox.Width = newWidth;
             Data.Settings.DetailsPaneWidth = (int)ContentBox.Width;
         }
+    }
+
+    private void PdfPasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+    {
+        IsPdfPasswordWrong = false;
     }
 }

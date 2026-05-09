@@ -191,9 +191,10 @@ public partial class ExplorerPageHeader : UserControl
     private void OnButtonKeyDown(object sender, KeyEventArgs e)
     {
         if (Keyboard.Modifiers.HasFlag(ModifierKeys.Alt)
-            || !NAVIGATION_KEYS.Contains(e.Key))
+            || !NAVIGATION_KEYS.Contains(e.Key)
+            || DetailsPane.IsKeyboardFocusWithin)
             return;
-
+        
         bool handle = false;
 
         if (FileActions.IsExplorerVisible)

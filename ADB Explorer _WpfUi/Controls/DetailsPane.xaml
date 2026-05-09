@@ -97,6 +97,75 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     FontSize="12" />
+                <Border
+                    Padding="16"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+                    BorderBrush="{DynamicResource SeparatorBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="6">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsPdfPasswordPromptVisible, ElementName=pane}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <local:SimpleStackPanel Spacing="8">
+                        <Grid HorizontalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <ui:FontIcon
+                                Margin="0,0,8,0"
+                                VerticalAlignment="Center"
+                                FontSize="16"
+                                Glyph="&#xE72E;" />
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                FontSize="13"
+                                FontWeight="SemiBold"
+                                Text="{Binding Source={x:Static Member=strings:Resources.S_PDF_PASSWORD_PROTECTED}}"
+                                TextWrapping="Wrap" />
+                        </Grid>
+                        <PasswordBox
+                            x:Name="PdfPasswordBox"
+                            Padding="4"
+                            FontSize="18"
+                            MaxLength="512"
+                            PasswordChanged="PdfPasswordBox_PasswordChanged"
+                            PasswordChar="•">
+                            <PasswordBox.InputBindings>
+                                <KeyBinding Key="Return" Command="{Binding PdfUnlockCommand, ElementName=pane}" />
+                            </PasswordBox.InputBindings>
+                        </PasswordBox>
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            FontSize="11"
+                            Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                            Text="{Binding Source={x:Static Member=strings:Resources.S_PDF_PASSWORD_WRONG}}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPdfPasswordWrong, ElementName=pane}" Value="False">
+                                            <Setter Property="Visibility" Value="Hidden" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <ui:Button
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding PdfUnlockCommand, ElementName=pane}"
+                            Content="{Binding Source={x:Static Member=strings:Resources.S_PDF_PASSWORD_UNLOCK}}" />
+                    </local:SimpleStackPanel>
+                </Border>
             </Grid>
             <ScrollViewer>
                 <ScrollViewer.Style>

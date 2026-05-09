@@ -87,6 +87,8 @@ public static partial class NativeMethods
 
         /// <summary>Path too long</summary>
         PATH_TOO_LONG = -2147417803, // 0x80010135
+
+        ERROR_WRONG_PASSWORD = -2147023573, // 0x8007052B
     }
 
     [Flags]

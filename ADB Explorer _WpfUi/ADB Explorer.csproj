@@ -27,7 +27,6 @@
     <PackageReference Include="Emoji.Wpf" Version="0.3.4" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="PDFtoImage" Version="5.2.1" />
     <PackageReference Include="QRCoder.Xaml" Version="1.8.0" />
     <PackageReference Include="System.Management" Version="10.0.7" />
     <PackageReference Include="Vanara.Windows.Shell.Common" Version="5.0.4" />
