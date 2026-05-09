@@ -1543,4 +1543,49 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
     <value>ועוד {0}…</value>
   </data>
+  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
+    <value>הצג או הסתר את חלונית הפרטים והתצוגה המקדימה.</value>
+  </data>
+  <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
+    <value>תצוגה מקדימה</value>
+  </data>
+  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
+    <value>גודל קובץ מקסימלי לתצוגה מקדימה</value>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>הורד קובץ לתיקיית ברירת המחדל בלחיצה כפולה</value>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value>בחר קובץ בודד כדי לקבל יותר מידע.</value>
+  </data>
+  <data name="S_ITEM_LOCATION" xml:space="preserve">
+    <value>מיקום</value>
+  </data>
+  <data name="S_IMAGE_F_STOP" xml:space="preserve">
+    <value>F-סטופ</value>
+  </data>
+  <data name="S_IMAGE_ISO" xml:space="preserve">
+    <value>מהירות ISO</value>
+  </data>
+  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
+    <value>זמן חשיפה</value>
+  </data>
+  <data name="S_VIDEO_BITRATE" xml:space="preserve">
+    <value>קצב מידע</value>
+  </data>
+  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
+    <value>בחר קובץ לתצוגה מקדימה.</value>
+  </data>
+  <data name="S_PREVIEW_INVALID" xml:space="preserve">
+    <value>תצוגה מקדימה אינה אפשרית.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
+    <value>PDF זה מוגן בסיסמה.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
+    <value>סיסמה שגויה.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
+    <value>פתח</value>
+  </data>
 </root>
