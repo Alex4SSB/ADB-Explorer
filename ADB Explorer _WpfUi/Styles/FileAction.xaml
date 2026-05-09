@@ -8,6 +8,7 @@
     xmlns:services="clr-namespace:ADB_Explorer.Services"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     <converters:MenuItemConverter x:Key="MenuItemConverter" />
+    <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     <Style
         x:Key="MenuIconStyle"
         BasedOn="{StaticResource DisabledGlyphStyle}"
@@ -110,7 +111,19 @@
             BorderThickness="1,0,0,0" />
     </DataTemplate>
     <DataTemplate x:Key="CompoundIconMenuTemplate">
-        <ContentPresenter Content="{Binding CompoundIcon}" />
+        <controls:SimpleStackPanel Orientation="Horizontal" Spacing="6">
+            <ContentPresenter Content="{Binding CompoundIcon}" />
+            <TextBlock
+                Grid.Column="1"
+                Height="{Binding IconSize}"
+                Text="{Binding Tooltip}"
+                Visibility="{Binding IsNameDisplayed, Converter={StaticResource BoolToVisibility}}" />
+            <ui:FontIcon
+                Margin="0,2,0,0"
+                FontSize="8"
+                Glyph="&#xE70D;"
+                Visibility="{Binding IsChevronVisible, Converter={StaticResource BoolToVisibility}}" />
+        </controls:SimpleStackPanel>
     </DataTemplate>
     <DataTemplate x:Key="DualActionButtonTemplate">
         <ui:FontIcon Style="{StaticResource MenuIconStyle}" />
@@ -301,11 +314,16 @@
         <Setter Property="helpers:StyleHelper.AnimateOnClick" Value="{Binding AnimateOnClick}" />
         <Setter Property="helpers:StyleHelper.ActivateAnimation" Value="{Binding ActivateAnimation}" />
         <Setter Property="helpers:StyleHelper.MirrorContentInRTL" Value="{Binding MirrorInRTL}" />
-        <!--<Style.Triggers>
-            <Trigger Property="helpers:MenuHelper.IsButtonMenu" Value="True">
-                <Setter Property="MinWidth" Value="20" />
-            </Trigger>
-        </Style.Triggers>-->
+    </Style>
+    <Style
+        x:Key="CompoundIconMenuStyle"
+        BasedOn="{StaticResource IconMenuStyle}"
+        TargetType="controls:AdbMenuItem">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsNameDisplayed}" Value="True">
+                <Setter Property="ToolTip" Value="{x:Null}" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="DynamicAltTextStyle"
@@ -443,7 +461,7 @@
         AltObjectStyle="{StaticResource AltObjectMenuStyle}"
         AnimatedNotifyStyle="{StaticResource AnimatedNotifyStyle}"
         CompoundDualActionStyle="{StaticResource DualActionButtonStyle}"
-        CompoundIconMenuStyle="{StaticResource IconMenuStyle}"
+        CompoundIconMenuStyle="{StaticResource CompoundIconMenuStyle}"
         CompoundIconSubMenuStyle="{StaticResource CompoundIconSubMenuStyle}"
         DualActionButtonStyle="{StaticResource DualActionButtonStyle}"
         DummySubMenuStyle="{StaticResource DummySubMenuStyle}"

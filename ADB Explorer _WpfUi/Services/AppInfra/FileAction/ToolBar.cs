@@ -56,6 +56,8 @@ internal static class MainToolBar
         new CompoundIconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Push),
             new PushIcon(),
+            isChevronVisible: true,
+            children: 
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFolders), AppActions.Icons[FileAction.FileActionType.PushFolders]),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFiles), AppActions.Icons[FileAction.FileActionType.NewFile]),
@@ -65,11 +67,11 @@ internal static class MainToolBar
                     isVisible: Data.FileActions.IsApkActionsVisible),
             ]),
         new MenuSeparator(),
-        new AltTextMenu(
+        new CompoundIconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.New),
-            AppActions.Icons[FileAction.FileActionType.New],
-            iconSize: 20,
-            isTooltipVisible: false,
+            new NewItemIcon(),
+            isNameDisplayed: true,
+            isChevronVisible: true,
             children:
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFolder), "\uE8F4"),
@@ -191,9 +193,9 @@ internal static class ExplorerContextMenu
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFiles), AppActions.Icons[FileAction.FileActionType.NewFile]),
             ]),
         new SubMenuSeparator(),
-        new SubMenu(
+        new CompoundIconSubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextNew),
-            AppActions.Icons[FileAction.FileActionType.New],
+            new NewItemIcon(),
             children:
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFolder), "\uE8F4"),

@@ -11,7 +11,7 @@ public partial class DevicesPage : INavigableView<DevicesViewModel>
     public DevicesPage(DevicesViewModel viewModel)
     {
         Thread.CurrentThread.CurrentCulture =
-        Thread.CurrentThread.CurrentUICulture = Data.Settings.UICulture;
+        Thread.CurrentThread.CurrentUICulture = Data.Settings.ActualUICulture;
 
         ViewModel = viewModel;
         DataContext = this;

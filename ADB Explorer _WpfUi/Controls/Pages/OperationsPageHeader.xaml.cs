@@ -11,7 +11,7 @@ public partial class OperationsPageHeader : UserControl
     public OperationsPageHeader()
     {
         Thread.CurrentThread.CurrentCulture =
-        Thread.CurrentThread.CurrentUICulture = Data.Settings.UICulture;
+        Thread.CurrentThread.CurrentUICulture = Data.Settings.ActualUICulture;
 
         InitializeComponent();
 

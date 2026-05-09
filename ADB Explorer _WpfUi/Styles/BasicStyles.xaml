@@ -1089,6 +1089,7 @@
                                         <ui:Button
                                             x:Name="PrimaryButton"
                                             Grid.Column="0"
+                                            MinWidth="100"
                                             HorizontalAlignment="Stretch"
                                             Appearance="{TemplateBinding PrimaryButtonAppearance}"
                                             Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ui:ContentDialog}}, Mode=OneTime, Path=TemplateButtonCommand}"
@@ -1105,6 +1106,7 @@
                                         <ui:Button
                                             x:Name="SecondaryButton"
                                             Grid.Column="2"
+                                            MinWidth="100"
                                             HorizontalAlignment="Stretch"
                                             Appearance="{TemplateBinding SecondaryButtonAppearance}"
                                             Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ui:ContentDialog}}, Mode=OneTime, Path=TemplateButtonCommand}"
@@ -1121,6 +1123,7 @@
                                         <ui:Button
                                             x:Name="CloseButton"
                                             Grid.Column="4"
+                                            MinWidth="100"
                                             HorizontalAlignment="Stretch"
                                             Appearance="{TemplateBinding CloseButtonAppearance}"
                                             Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ui:ContentDialog}}, Mode=OneTime, Path=TemplateButtonCommand}"

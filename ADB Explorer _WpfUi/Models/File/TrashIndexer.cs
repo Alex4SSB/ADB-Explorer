@@ -14,7 +14,7 @@ public partial class TrashIndexer : ObservableObject
     [ObservableProperty]
     public partial DateTime? DateModified { get; set; }
 
-    public string ModifiedTimeString => TabularDateFormatter.Format(DateModified, Thread.CurrentThread.CurrentCulture);
+    public string ModifiedTimeString => TabularDateFormatter.Format(DateModified, Data.Settings.ActualUICulture);
 
     public string IndexerPath => $"{AdbExplorerConst.RECYCLE_PATH}/.{RecycleName}{AdbExplorerConst.RECYCLE_INDEX_SUFFIX}";
 

@@ -335,6 +335,9 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
         }
     }
 
+    [JsonIgnore]
+    public CultureInfo ActualUICulture => UICulture.Equals(CultureInfo.InvariantCulture) ? OriginalCulture : UICulture;
+
     private void UpdateTranslation()
     {
         CultureInfo actual = UICulture.Equals(CultureInfo.InvariantCulture)
@@ -369,7 +372,7 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
             {
                 try
                 {
-                    originalCulture = Thread.CurrentThread.CurrentUICulture;
+                    originalCulture = CultureInfo.CurrentCulture;
                 }
                 catch
                 { }

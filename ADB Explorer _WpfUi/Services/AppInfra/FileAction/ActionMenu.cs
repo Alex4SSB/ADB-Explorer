@@ -114,6 +114,8 @@ public abstract class ActionMenu : ActionBase
 {
     public IEnumerable<SubMenu> Children { get; set; }
 
+    public bool IsChevronVisible { get; set; }
+
     protected ActionMenu(FileAction fileAction,
                          string icon,
                          IEnumerable<SubMenu> children = null,
@@ -122,10 +124,12 @@ public abstract class ActionMenu : ActionBase
                          AnimationSource animationSource = AnimationSource.Command,
                          FileAction altAction = null,
                          ObservableProperty<bool> isVisible = null,
-                         bool mirrorInRTL = false)
+                         bool mirrorInRTL = false,
+                         bool isChevronVisible = false)
         : base(fileAction, icon, iconSize, animation, animationSource, altAction, isVisible, mirrorInRTL)
     {
         Children = children;
+        IsChevronVisible = isChevronVisible;
     }
 
     protected ActionMenu()
@@ -277,15 +281,20 @@ public class CompoundIconMenu : ActionMenu
 {
     public UserControl CompoundIcon { get; }
 
+    public bool IsNameDisplayed { get; }
+
     public CompoundIconMenu(FileAction fileAction,
                        UserControl icon,
                        IEnumerable<SubMenu> children = null,
                        StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                        FileAction altAction = null,
-                       ObservableProperty<bool> isVisible = null)
-        : base(fileAction, null, children, animation, altAction: altAction, isVisible: isVisible)
+                       ObservableProperty<bool> isVisible = null,
+                       bool isNameDisplayed = false,
+                       bool isChevronVisible = false)
+        : base(fileAction, null, children, animation, altAction: altAction, isVisible: isVisible, isChevronVisible: isChevronVisible)
     {
         CompoundIcon = icon;
+        IsNameDisplayed = isNameDisplayed;
     }
 }
 

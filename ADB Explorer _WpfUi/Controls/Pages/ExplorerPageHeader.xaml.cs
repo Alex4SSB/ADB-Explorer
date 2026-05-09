@@ -323,7 +323,10 @@ public partial class ExplorerPageHeader : UserControl
         SelectedPackages = FileActions.IsAppDrive ? ExplorerGrid.Items.OfType<Package>().Where(p => p.IsSelected) : [];
         FileActions.SelectedItemsCount = FileActions.IsAppDrive ? SelectedPackages.Count() : SelectedFiles.Count();
 
-        DetailsPane.SelectedFiles = DetailsPane.IsOpen ? SelectedFiles : [];
+        if (DetailsPane.IsOpen)
+        {
+            DetailsPane.SelectedFiles = FileActions.IsAppDrive ? SelectedPackages : SelectedFiles;
+        }
 
         ViewModel.NotifySelectedFilesTotalSize();
 
@@ -599,6 +602,7 @@ public partial class ExplorerPageHeader : UserControl
         //PasteGrid.Visibility = Visibility.Collapsed;
         FileActions.ListingInProgress = true;
 
+        FileActions.WasInAppDrive = FileActions.IsAppDrive;
         FileActions.ExplorerFilter = "";
         NavHistory.Navigate(realPath);
 
@@ -657,6 +661,9 @@ public partial class ExplorerPageHeader : UserControl
             ViewModel.SetSort(SortingSelector.SortingProperty.Name, ListSortDirection.Ascending);
         }
 
+        DetailsPane.SelectedFiles = [new FileClass("", "", FileType.Unknown)];
+        DetailsPane.SelectedFiles = [];
+
         if (FileActions.IsRecycleBin)
         {
             TrashHelper.ParseIndexersAsync().ContinueWith(_ => DirList.Navigate(realPath));
@@ -681,9 +688,6 @@ public partial class ExplorerPageHeader : UserControl
         RuntimeSettings.ExplorerSource = DirList.FileList;
         FileActionLogic.UpdateFileActions();
         
-        DetailsPane.SelectedFiles = [new FileClass("", "", FileType.Unknown)];
-        DetailsPane.SelectedFiles = [];
-
         return true;
     }
 

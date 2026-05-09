@@ -40,6 +40,9 @@ public partial class ExplorerViewModel : ObservableObject
         if (SortDirection is not { } dir || SortedColumn is not { } col || ExplorerItemsSource is not { } view)
             return;
 
+        if (Data.FileActions.IsAppDrive || Data.FileActions.WasInAppDrive)
+            return;
+
         view.SortDescriptions.Clear();
         view.SortDescriptions.Add(new(nameof(FileClass.IsTemp), ListSortDirection.Descending));
         view.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListHelper.Invert(dir)));

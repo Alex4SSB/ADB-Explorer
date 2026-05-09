@@ -12,7 +12,7 @@ public partial class DevicesPageHeader : UserControl
     public DevicesPageHeader()
     {
         Thread.CurrentThread.CurrentCulture =
-        Thread.CurrentThread.CurrentUICulture = Data.Settings.UICulture;
+        Thread.CurrentThread.CurrentUICulture = Data.Settings.ActualUICulture;
 
         InitializeComponent();
 
@@ -55,7 +55,7 @@ public partial class DevicesPageHeader : UserControl
         App.SafeInvoke(() =>
         {
             Thread.CurrentThread.CurrentCulture =
-            Thread.CurrentThread.CurrentUICulture = Data.Settings.UICulture;
+            Thread.CurrentThread.CurrentUICulture = Data.Settings.ActualUICulture;
 
             DeviceHelper.FilterDevices(CollectionViewSource.GetDefaultView(LogicalDevicesList.ItemsSource));
             DeviceHelper.FilterDevices(CollectionViewSource.GetDefaultView(VirtualDevicesList.ItemsSource));
