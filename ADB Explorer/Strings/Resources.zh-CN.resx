@@ -1579,4 +1579,13 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_PREVIEW_INVALID" xml:space="preserve">
     <value>无预览可用。</value>
   </data>
+  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
+    <value>此 PDF 受密码保护。</value>
+  </data>
+  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
+    <value>密码不对。</value>
+  </data>
+  <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
+    <value>解锁</value>
+  </data>
 </root>
