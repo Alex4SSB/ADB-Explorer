@@ -92,7 +92,7 @@ public partial class ThumbsSizeSelector : UserControl
         {
             Name = name;
             Icon = SidePaneModeIcons[mode];
-            Action = new(() => true, () => Data.Settings.SidePane = mode);
+            Action = new(() => !Data.FileActions.IsRecycleBin, () => Data.Settings.SidePane = mode);
             Data.Settings.PropertyChanged += (_, e) =>
             {
                 if (e.PropertyName == nameof(AppSettings.SidePane))

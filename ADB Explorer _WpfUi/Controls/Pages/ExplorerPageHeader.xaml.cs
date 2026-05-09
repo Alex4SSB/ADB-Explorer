@@ -621,6 +621,13 @@ public partial class ExplorerPageHeader : UserControl
         FileActions.IsTemp = CurrentPath == TEMP_PATH;
         FileActions.ParentEnabled = CurrentPath != ParentPath && !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
 
+        if (DetailsPane.IsOpen
+            && Settings.SidePane is AppSettings.SidePaneMode.Preview
+            && (FileActions.IsAppDrive || FileActions.IsRecycleBin))
+        {
+            Settings.SidePane = AppSettings.SidePaneMode.Details;
+        }
+
         FileActionLogic.IsPasteEnabled();
 
         if (!RuntimeSettings.IsRootActive && DevicesObject.Current.Root is RootStatus.Enabled)
@@ -1378,7 +1385,17 @@ public partial class ExplorerPageHeader : UserControl
     private void SyncSelectionToOtherView(object sender, SelectionChangedEventArgs e)
     {
         if (FileActions.IsAppDrive)
+        {
+            // Fix IsSelected on Package items whose containers were recycled by virtualization
+            // so UnselectAll() could not propagate through the TwoWay binding.
+            var selectedSet = new HashSet<object>(ExplorerGrid.SelectedItems.Cast<object>());
+            foreach (var item in ExplorerGrid.Items)
+            {
+                if (item is Package pkg && pkg.IsSelected != selectedSet.Contains(item))
+                    pkg.IsSelected = !pkg.IsSelected;
+            }
             return;
+        }
 
         _isSyncingSelection = true;
         try

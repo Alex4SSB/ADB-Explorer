@@ -36,19 +36,20 @@ public abstract class AbstractFile : ViewModelBase
         FullTrash,
     }
 
+    [Flags]
     public enum SpecialFileType
     {
-        Regular,
-        Folder,
-        Apk,
-        BrokenLink,
-        Unknown,
-        LinkOverlay,
-        Archive,
-        MultipleFiles,
-        Drive,
-        EmptyTrash,
-        FullTrash,
+        Regular = 1,
+        Folder = 2,
+        Apk = 4,
+        BrokenLink = 8,
+        Unknown = 16,
+        LinkOverlay = 32,
+        Archive = 64,
+        MultipleFiles = 128,
+        Drive = 256,
+        EmptyTrash = 512,
+        FullTrash = 1024,
     }
 
     public static string GetFileTypeName(FileType type) => type switch
