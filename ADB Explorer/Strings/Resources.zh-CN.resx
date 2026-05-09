@@ -1543,4 +1543,40 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
     <value>及另外 {0} 个…</value>
   </data>
+  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
+    <value>显示或隐藏详情和预览窗格。</value>
+  </data>
+  <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
+    <value>预览</value>
+  </data>
+  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
+    <value>预览的最大文件大小</value>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>双击文件将文件下拉到默认文件夹</value>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value>选择单个文件来获取更多信息。</value>
+  </data>
+  <data name="S_ITEM_LOCATION" xml:space="preserve">
+    <value>位置</value>
+  </data>
+  <data name="S_IMAGE_F_STOP" xml:space="preserve">
+    <value>F 档</value>
+  </data>
+  <data name="S_IMAGE_ISO" xml:space="preserve">
+    <value>ISO 速度</value>
+  </data>
+  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
+    <value>曝光时间</value>
+  </data>
+  <data name="S_VIDEO_BITRATE" xml:space="preserve">
+    <value>比特率</value>
+  </data>
+  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
+    <value>选择要预览的文件。</value>
+  </data>
+  <data name="S_PREVIEW_INVALID" xml:space="preserve">
+    <value>无预览可用。</value>
+  </data>
 </root>
