@@ -128,4 +128,25 @@ internal static class AdbHelper
         using SyncService service = new(device.Device.DeviceData);
         await service.PushAsync(stream, path, (UnixFileMode)0x1ED, DateTime.Now, cancellationToken: cancellationToken); // 0x1ED = 0777 in octal
     }
+
+    public static async Task FetchDumpsysInfoAsync(LogicalDeviceViewModel device, Package package, CancellationToken cancellationToken = default)
+    {
+        string stdout = "", stderr = "";
+        await Task.Run(() => ADBService.ExecuteDeviceAdbShellCommand(device.ID, "dumpsys", out stdout, out stderr, cancellationToken, "package", package.Name), cancellationToken);
+
+        if (cancellationToken.IsCancellationRequested || string.IsNullOrEmpty(stdout))
+            return;
+
+        var versionNameMatch = AdbRegEx.RE_DUMPSYS_VERSION_NAME().Match(stdout);
+        var lastUpdateMatch = AdbRegEx.RE_DUMPSYS_LAST_UPDATE().Match(stdout);
+
+        App.SafeInvoke(() =>
+        {
+            if (versionNameMatch.Success)
+                package.VersionName = versionNameMatch.Groups["VersionName"].Value;
+
+            if (lastUpdateMatch.Success && DateTime.TryParseExact(lastUpdateMatch.Groups["LastUpdateTime"].Value, "yyyy-MM-dd HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out var updated))
+                package.LastUpdateTime = updated;
+        });
+    }
 }

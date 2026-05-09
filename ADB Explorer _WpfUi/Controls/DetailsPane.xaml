@@ -245,9 +245,13 @@
                                 <StackPanel.Style>
                                     <Style TargetType="StackPanel">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding File}" Value="{x:Null}">
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding File}" Value="{x:Null}" />
+                                                    <Condition Binding="{Binding Package}" Value="{x:Null}" />
+                                                </MultiDataTrigger.Conditions>
                                                 <Setter Property="Visibility" Value="Collapsed" />
-                                            </DataTrigger>
+                                            </MultiDataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </StackPanel.Style>

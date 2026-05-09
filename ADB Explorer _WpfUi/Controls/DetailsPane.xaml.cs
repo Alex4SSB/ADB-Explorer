@@ -50,15 +50,15 @@ public partial class DetailsPane : UserControl
         DependencyProperty.Register("IsEditorFocused", typeof(bool),
           typeof(DetailsPane), new PropertyMetadata(false));
 
-    public IEnumerable<FileClass> SelectedFiles
+    public IEnumerable<IBrowserItem> SelectedFiles
     {
-        get => (IEnumerable<FileClass>)GetValue(SelectedFilesProperty);
+        get => (IEnumerable<IBrowserItem>)GetValue(SelectedFilesProperty);
         set => SetValue(SelectedFilesProperty, value);
     }
 
     public static readonly DependencyProperty SelectedFilesProperty =
-        DependencyProperty.Register("SelectedFiles", typeof(IEnumerable<FileClass>),
-          typeof(DetailsPane), new PropertyMetadata(Array.Empty<FileClass>(), OnSelectedFilesChanged));
+        DependencyProperty.Register("SelectedFiles", typeof(IEnumerable<IBrowserItem>),
+          typeof(DetailsPane), new PropertyMetadata(Array.Empty<IBrowserItem>(), OnSelectedFilesChanged));
 
     public FileClass? File
     {
@@ -70,7 +70,17 @@ public partial class DetailsPane : UserControl
         DependencyProperty.Register("File", typeof(FileClass),
           typeof(DetailsPane), new PropertyMetadata(null));
 
-    public ObservableCollection<FileDetailsViewModel> ThumbnailInfoItems { get; } = [];
+    public Package? Package
+    {
+        get => (Package?)GetValue(PackageProperty);
+        private set => SetValue(PackageProperty, value);
+    }
+
+    public static readonly DependencyProperty PackageProperty =
+        DependencyProperty.Register("Package", typeof(Package),
+          typeof(DetailsPane), new PropertyMetadata(null));
+
+    public ObservableCollection<IDetailsViewModel> ThumbnailInfoItems { get; } = [];
 
     public AsyncRelayCommand SaveCommand { get; }
     public RelayCommand PdfUnlockCommand { get; }
@@ -97,6 +107,9 @@ public partial class DetailsPane : UserControl
 
     private static readonly FileClass MultipleFiles = new("MultipleFiles", "/MultipleFiles", AbstractFile.FileType.MultipleFiles);
     private static readonly FileClass Drive = new("Drive", "/Drive", AbstractFile.FileType.Drive);
+    private static readonly FileClass EmptyTrash = new("RecycleBin", "/RecycleBin", AbstractFile.FileType.EmptyTrash);
+    private static readonly FileClass FullTrash = new("RecycleBin", "/RecycleBin", AbstractFile.FileType.FullTrash);
+    private static readonly BitmapSource AppIcon = FileToIconConverter.LoadBitmap(new System.Drawing.Icon(Properties.AppGlobal.APK_icon, 128, 128).ToBitmap());
 
     private CancellationTokenSource? _cancellationToken;
     private MemoryStream? _pdfMemoryStream;
@@ -104,7 +117,7 @@ public partial class DetailsPane : UserControl
     private static void OnSelectedFilesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         var control = (DetailsPane)d;
-        var files = (IEnumerable<FileClass>)e.NewValue;
+        var files = (IEnumerable<IBrowserItem>)e.NewValue;
 
         control.EditorText = null;
         control.PdfScrollViewer.Visibility = Visibility.Collapsed;
@@ -179,18 +192,32 @@ public partial class DetailsPane : UserControl
         {
             if (files.Count() == 1)
             {
-                var f = files.First();
-                control.File = f;
-                control.FileNameTextBlock.Text = f.DisplayName;
-                control.LargeFileIcon.Source = f.DragImage;
-                control.LargeFileIcon.MaxHeight = f.CacheThumbnail?.Image is null ? 128 : 192;
-                control.SmallFileIcon.Source = f.CacheThumbnail?.Image is null ? null : f.FileIcon32;
-                control.InvalidSelectionBorder.Visibility = Visibility.Collapsed;
-                control.PopulateThumbnailInfoItems(f);
+                var item = files.First();
+                if (item is FileClass f)
+                {
+                    control.File = f;
+                    control.FileNameTextBlock.Text = f.DisplayName;
+                    control.LargeFileIcon.Source = f.DragImage;
+                    control.LargeFileIcon.MaxHeight = f.CacheThumbnail?.Image is null ? 128 : 192;
+                    control.SmallFileIcon.Source = f.CacheThumbnail?.Image is null ? null : f.FileIcon32;
+                    control.InvalidSelectionBorder.Visibility = Visibility.Collapsed;
+                    control.PopulateThumbnailInfoItems(f);
+                }
+                else if (item is Package p)
+                {
+                    control.Package = p;
+                    control.FileNameTextBlock.Text = p.DisplayName;
+                    control.LargeFileIcon.Source = AppIcon;
+                    control.LargeFileIcon.MaxHeight = 128;
+                    control.SmallFileIcon.Source = null;
+                    control.InvalidSelectionBorder.Visibility = Visibility.Collapsed;
+                    control.PopulateThumbnailInfoItems(p);
+                }
             }
             else if (files.Count() > 1)
             {
                 control.File = null;
+                control.Package = null;
                 control.FileNameTextBlock.Text = $"{files.Count()} {Strings.Resources.S_ITEMS_SELECTED_PLURAL}";
                 control.LargeFileIcon.Source = MultipleFiles.DragImage;
                 control.LargeFileIcon.MaxHeight = 128;
@@ -200,10 +227,22 @@ public partial class DetailsPane : UserControl
             else
             {
                 control.File = null;
+                control.Package = null;
                 if (Data.CurrentPath is null)
                 {
                     control.FileNameTextBlock.Text = "";
                     control.LargeFileIcon.Source = null;
+                }
+                else if (Data.FileActions.IsRecycleBin)
+                {
+                    control.FileNameTextBlock.Text = Strings.Resources.S_DRIVE_TRASH;
+                    bool emptyTrash = Data.DevicesObject.Current.Drives.OfType<VirtualDriveViewModel>().First(d => d.Type is AbstractDrive.DriveType.Trash).ItemsCount == 0;
+                    control.LargeFileIcon.Source = emptyTrash ? EmptyTrash.DragImage : FullTrash.DragImage;
+                }
+                else if (Data.FileActions.IsAppDrive)
+                {
+                    control.FileNameTextBlock.Text = Strings.Resources.S_DRIVE_APPS;
+                    control.LargeFileIcon.Source = AppIcon;
                 }
                 else if (Data.CurrentDrive?.Path == Data.CurrentPath)
                 {
@@ -227,7 +266,8 @@ public partial class DetailsPane : UserControl
     {
         SaveCommand = new AsyncRelayCommand(async () =>
         {
-            var result = await AdbHelper.WriteTextFileAsync(Data.DevicesObject.Current, SelectedFiles.First().FullPath, EditorText, _cancellationToken.Token);
+            var file = SelectedFiles.First() as FileClass;
+            var result = await AdbHelper.WriteTextFileAsync(Data.DevicesObject.Current, file.FullPath, EditorText, _cancellationToken.Token);
 
             if (result)
             {
@@ -235,8 +275,8 @@ public partial class DetailsPane : UserControl
                 EditorText = null;
                 EditorText = text;
 
-                SelectedFiles.First().ModifiedTime = DateTime.Now;
-                SelectedFiles.First().Size = Encoding.UTF8.GetByteCount(EditorText);
+                file.ModifiedTime = DateTime.Now;
+                file.Size = Encoding.UTF8.GetByteCount(EditorText);
             }
         });
 
@@ -343,23 +383,53 @@ public partial class DetailsPane : UserControl
         });
     }
 
+    private void PopulateThumbnailInfoItems(Package package)
+    {
+        ThumbnailInfoItems.Clear();
+
+        ThumbnailInfoItems.Add(new PackageDetailsViewModel(package, Strings.Resources.S_ITEM_LOCATION, f => FileHelper.GetParentPath(f.Path), valueIsLtr: true));
+
+        ThumbnailInfoItems.Add(new PackageDetailsViewModel(package, Strings.Resources.S_COLUMN_TYPE, p => $"{p.Type}"));
+
+        ThumbnailInfoItems.Add(new PackageDetailsViewModel(package, Strings.Resources.S_COLUMN_USER_ID, p => $"{p.Uid}"));
+
+        ThumbnailInfoItems.Add(new PackageDetailsViewModel(package, Strings.Resources.S_COLUMN_VERSION, p => p.VersionName ?? $"{p.Version}").Init());
+
+        ThumbnailInfoItems.Add(new PackageDetailsViewModel(package, Strings.Resources.S_COLUMN_DATE_MODIFIED, p => p.LastUpdateTime.HasValue ? p.LastUpdateTime.Value.ToString(Data.Settings.ActualUICulture) : "").Init());
+
+        var cts = new CancellationTokenSource();
+        _cancellationToken = cts;
+
+        if (package.VersionName is null || package.LastUpdateTime is null)
+        {
+            var device = Data.DevicesObject.Current;
+            _ = Task.Run(() => AdbHelper.FetchDumpsysInfoAsync(device, package, cts.Token), cts.Token);
+        }
+    }
+
     private void PopulateThumbnailInfoItems(FileClass file)
     {
         ThumbnailInfoItems.Clear();
 
         if (file.Type is not AbstractFile.FileType.Unknown)
-            ThumbnailInfoItems.Add(new(file, Strings.Resources.S_COLUMN_TYPE, f => f.FolderViewModel.TypeName));
+            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_COLUMN_TYPE, f => f.FolderViewModel.TypeName));
 
-        ThumbnailInfoItems.Add(new(file, Strings.Resources.S_ITEM_LOCATION, f => f.ParentPath, valueIsLtr: true));
+        if (Data.FileActions.IsRecycleBin)
+            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_COLUMN_ORIGINAL_LOCATION, f => f.TrashIndex.OriginalPath, valueIsLtr: true));
+        else
+            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_ITEM_LOCATION, f => f.ParentPath, valueIsLtr: true));
 
         if (file.Type is AbstractFile.FileType.File && file.Size.HasValue)
-            ThumbnailInfoItems.Add(new(file, Strings.Resources.S_COLUMN_SIZE, f => f.FolderViewModel.SizeString));
+            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_COLUMN_SIZE, f => f.FolderViewModel.SizeString));
 
         if (file.ModifiedTime.HasValue)
-            ThumbnailInfoItems.Add(new(file, Strings.Resources.S_COLUMN_DATE_MODIFIED, f => f.FolderViewModel.ModifiedTimeString));
+            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_COLUMN_DATE_MODIFIED, f => f.FolderViewModel.ModifiedTimeString));
+
+        if (Data.FileActions.IsRecycleBin)
+            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_COLUMN_DATE_DELETED, f => f.TrashIndex.ModifiedTimeString));
 
         if (file.IsLink)
-            ThumbnailInfoItems.Add(new(file, Strings.Resources.S_FILE_TYPE_LINK, f => f.LinkTarget, valueIsLtr: true));
+            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_FILE_TYPE_LINK, f => f.LinkTarget, valueIsLtr: true));
 
         if (file.CacheThumbnail is not { } thumb)
             return;
@@ -367,22 +437,22 @@ public partial class DetailsPane : UserControl
         var info = thumb.Info;
 
         if (info.Resolution.HasValue)
-            ThumbnailInfoItems.Add(new(file, Strings.Resources.S_PICTURE_DIMENSIONS, f => f.CacheThumbnail!.Value.Info.ResolutionString, valueIsLtr: true));
+            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_PICTURE_DIMENSIONS, f => f.CacheThumbnail!.Value.Info.ResolutionString, valueIsLtr: true));
 
         if (info.Duration.HasValue)
-            ThumbnailInfoItems.Add(new(file, Strings.Resources.S_VIDEO_DURATION, f => f.CacheThumbnail!.Value.Info.DurationString));
+            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_VIDEO_DURATION, f => f.CacheThumbnail!.Value.Info.DurationString));
 
         if (info.FNumber.HasValue)
-            ThumbnailInfoItems.Add(new(file, Strings.Resources.S_IMAGE_F_STOP, f => f.CacheThumbnail!.Value.Info.FNumberString, valueIsLtr: true));
+            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_IMAGE_F_STOP, f => f.CacheThumbnail!.Value.Info.FNumberString, valueIsLtr: true));
 
         if (info.ExposureTime.HasValue)
-            ThumbnailInfoItems.Add(new(file, Strings.Resources.S_IMAGE_EXPOSURE, f => f.CacheThumbnail!.Value.Info.ExposureTimeString));
+            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_IMAGE_EXPOSURE, f => f.CacheThumbnail!.Value.Info.ExposureTimeString));
 
         if (info.ISO.HasValue)
-            ThumbnailInfoItems.Add(new(file, Strings.Resources.S_IMAGE_ISO, f => f.CacheThumbnail!.Value.Info.ISOString, valueIsLtr: true));
+            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_IMAGE_ISO, f => f.CacheThumbnail!.Value.Info.ISOString, valueIsLtr: true));
 
         if (info.Bitrate.HasValue)
-            ThumbnailInfoItems.Add(new(file, Strings.Resources.S_VIDEO_BITRATE, f => f.CacheThumbnail!.Value.Info.BitrateString, valueIsLtr: true));
+            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_VIDEO_BITRATE, f => f.CacheThumbnail!.Value.Info.BitrateString, valueIsLtr: true));
     }
 
     private void GridSplitter_DragDelta(object sender, DragDeltaEventArgs e)

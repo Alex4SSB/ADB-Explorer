@@ -26,7 +26,7 @@ public partial class FileViewModelBase : ObservableObject
     public bool TypeIsRtl => TextHelper.ContainsRtl(TypeName);
     public FlowDirection TypeFlowDirection => TypeIsRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
 
-    public string ModifiedTimeString => TabularDateFormatter.Format(_file.ModifiedTime, Thread.CurrentThread.CurrentCulture);
+    public string ModifiedTimeString => TabularDateFormatter.Format(_file.ModifiedTime, Data.Settings.ActualUICulture);
 
     public string SizeString => _file.IsDirectory ? "" : _file.Size?.BytesToSize(true);
 

@@ -22,30 +22,33 @@ public abstract class AbstractFile : ViewModelBase
 
     public enum FileType
     {
-        Socket = 0,
-        File = 1,
-        BlockDevice = 2,
-        Folder = 3,
-        CharDevice = 4,
-        FIFO = 5,
-        Unknown = 6,
-        BrokenLink = 7,
-        MultipleFiles = 8,
-        Drive = 9,
+        Socket,
+        File,
+        BlockDevice,
+        Folder,
+        CharDevice,
+        FIFO,
+        Unknown,
+        BrokenLink,
+        MultipleFiles,
+        Drive,
+        EmptyTrash,
+        FullTrash,
     }
 
-    [Flags]
     public enum SpecialFileType
     {
-        Regular = 1,
-        Folder = 2,
-        Apk = 4,
-        BrokenLink = 8,
-        Unknown = 16,
-        LinkOverlay = 32,
-        Archive = 64,
-        MultipleFiles = 128,
-        Drive = 256,
+        Regular,
+        Folder,
+        Apk,
+        BrokenLink,
+        Unknown,
+        LinkOverlay,
+        Archive,
+        MultipleFiles,
+        Drive,
+        EmptyTrash,
+        FullTrash,
     }
 
     public static string GetFileTypeName(FileType type) => type switch

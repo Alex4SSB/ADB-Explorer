@@ -31,6 +31,8 @@ public class FileToIconConverter
     private static readonly SpecialIcon FolderIcon = new(Shell32, 3);
     private static readonly SpecialIcon DriveIcon = new(Shell32, 7);
     private static readonly SpecialIcon LinkOverlayIcon = new(Shell32, 29);
+    private static readonly SpecialIcon EmptyTrashIcon = new(Shell32, 31);
+    private static readonly SpecialIcon FullTrashIcon = new(Shell32, 32);
     private static readonly SpecialIcon UnknownIcon = new(Shell32, 224);
     private static readonly SpecialIcon BrokenLinkIcon = new(Shell32, 271);
     private static readonly SpecialIcon GalleryIcon = new(Shell32, 318);
@@ -148,7 +150,7 @@ public class FileToIconConverter
         return Rectangle.FromLTRB(minX, minY, maxX + 1, maxY + 1);
     }
 
-    private static BitmapSource LoadBitmap(Bitmap source)
+    public static BitmapSource LoadBitmap(Bitmap source)
     {
         var hBitmap = source.GetHbitmap();
         //Memory Leak fixes, for more info : http://social.msdn.microsoft.com/forums/en-US/wpf/thread/edcf2482-b931-4939-9415-15b3515ddac6/
@@ -338,6 +340,8 @@ public class FileToIconConverter
             AbstractFile.SpecialFileType.LinkOverlay => LinkOverlayIcon,
             AbstractFile.SpecialFileType.MultipleFiles => MultipleFilesIcon,
             AbstractFile.SpecialFileType.Drive => DriveIcon,
+            AbstractFile.SpecialFileType.EmptyTrash => EmptyTrashIcon,
+            AbstractFile.SpecialFileType.FullTrash => FullTrashIcon,
             _ => SpecialIcon.None,
         };
     }
@@ -369,7 +373,7 @@ public class FileToIconConverter
         
         if (specialType.HasFlag(AbstractFile.SpecialFileType.Apk))
         {
-            Icon apkIcon = new(Properties.AppGlobal.APK_icon, IconToSize(size));
+            Icon apkIcon = new(size is IconSize.Small ? Properties.AppGlobal.APK_icon : Properties.AppGlobal.APK_icon_256px, IconToSize(size));
 
             yield return AddToDictionary(apkIcon, size, AbstractFile.SpecialFileType.Apk);
         }

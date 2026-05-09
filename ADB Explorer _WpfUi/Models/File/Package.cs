@@ -30,6 +30,12 @@ public partial class Package : ObservableObject, IBrowserItem
     public partial long? Version { get; set; } = null;
 
     [ObservableProperty]
+    public partial string VersionName { get; set; }
+
+    [ObservableProperty]
+    public partial DateTime? LastUpdateTime { get; set; }
+
+    [ObservableProperty]
     public partial bool IsSelected { get; set; }
 
     public static Package New(string package, PackageType type)

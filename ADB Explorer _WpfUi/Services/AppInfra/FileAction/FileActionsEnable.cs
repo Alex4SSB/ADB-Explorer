@@ -205,6 +205,9 @@ public partial class FileActionsEnable : ObservableObject
         }
     }
 
+    [ObservableProperty]
+    public partial bool WasInAppDrive { get; set; } = false;
+
     private bool isTemp;
     public bool IsTemp
     {

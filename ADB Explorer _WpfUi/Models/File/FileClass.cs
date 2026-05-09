@@ -294,6 +294,8 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             FileType.BrokenLink => SpecialFileType.BrokenLink,
             FileType.MultipleFiles => SpecialFileType.MultipleFiles,
             FileType.Drive => SpecialFileType.Drive,
+            FileType.EmptyTrash => SpecialFileType.EmptyTrash,
+            FileType.FullTrash => SpecialFileType.FullTrash,
             _ => SpecialFileType.Regular
         };
 
