@@ -1543,4 +1543,40 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
     <value>et {0} supplémentaires…</value>
   </data>
+  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
+    <value>Afficher ou masquer le panneau des détails et de prévisualisation.</value>
+  </data>
+  <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
+    <value>Aperçu</value>
+  </data>
+  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
+    <value>Taille maximale du fichier pour la prévisualisation</value>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>Enoyer vers le dossier par défaut lors du double-clique sur fichier</value>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value>Sélectionnez un seul fichier pour obtenir plus d'informations.</value>
+  </data>
+  <data name="S_ITEM_LOCATION" xml:space="preserve">
+    <value>Localisation</value>
+  </data>
+  <data name="S_IMAGE_F_STOP" xml:space="preserve">
+    <value>F-stop</value>
+  </data>
+  <data name="S_IMAGE_ISO" xml:space="preserve">
+    <value>Vitesse ISO</value>
+  </data>
+  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
+    <value>Temps d'exposition</value>
+  </data>
+  <data name="S_VIDEO_BITRATE" xml:space="preserve">
+    <value>Bitrate</value>
+  </data>
+  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
+    <value>Sélectionnez un fichier à prévisualiser.</value>
+  </data>
+  <data name="S_PREVIEW_INVALID" xml:space="preserve">
+    <value>Pas d'aperçu disponible.</value>
+  </data>
 </root>
