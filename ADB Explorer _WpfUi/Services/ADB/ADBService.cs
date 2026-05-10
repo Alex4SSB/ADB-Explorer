@@ -651,13 +651,18 @@ public partial class ADBService
             size = null;
         }
 
+        UnixFileMode? permissions = mode is UnixFileMode.None 
+            ? null 
+            : mode & (UnixFileMode)511;
+
         return new(
             FullName: name,
             FullPath: FileHelper.ConcatPaths(path, name),
             Type: type,
             IsLink: mode.HasFlag(UnixFileMode.S_IFLNK),
             Size: size,
-            ModifiedTime: (time > 0) ? DateTimeOffset.FromUnixTimeSeconds(time).DateTime.ToLocalTime() : null);
+            ModifiedTime: (time > 0) ? DateTimeOffset.FromUnixTimeSeconds(time).DateTime.ToLocalTime() : null,
+            Permissions: (System.IO.UnixFileMode?)permissions);
     }
 
     private static FileType ParseFileMode(UnixFileMode mode)
@@ -671,6 +676,35 @@ public partial class ADBService
         if (mode.HasFlag(UnixFileMode.S_IFIFO)) return FileType.FIFO;
 
         return FileType.Unknown;
+    }
+
+    public static FileExtraInfo? GetFileExtraInfo(string deviceId, string path, CancellationToken cancellationToken)
+    {
+        // Get user, group, access time, creation time and modification time using human-readable format to preserve UTC offset
+        var res = ExecuteDeviceAdbShellCommand(deviceId, "stat", out string stdout, out _, cancellationToken, "-c", "%U\u001F%G\u001F%x\u001F%z\u001F%y", EscapeAdbShellString(path));
+        if (res != 0 || string.IsNullOrWhiteSpace(stdout))
+        {
+            return null;
+        }
+
+        string user, group;
+        DateTimeOffset accessTime, creationTime, modifiedTime;
+
+        try
+        {
+            var parts = stdout.Split('\u001F');
+            user = parts[0];
+            group = parts[1];
+            accessTime = DateTimeOffset.Parse(parts[2].Trim(), CultureInfo.InvariantCulture);
+            creationTime = DateTimeOffset.Parse(parts[3].Trim(), CultureInfo.InvariantCulture);
+            modifiedTime = DateTimeOffset.Parse(parts[4].Trim(), CultureInfo.InvariantCulture);
+        }
+        catch
+        {
+            return null;
+        }
+
+        return new FileExtraInfo(user, group, accessTime, creationTime, modifiedTime);
     }
 
     public static IEnumerable<(string, FileType)> GetLinkType(string deviceId, IEnumerable<string> filePaths, CancellationToken cancellationToken)
@@ -940,3 +974,9 @@ public readonly record struct DriveSnapshot(
             IsEmulator: isEmulator);
     }
 }
+
+public record struct FileExtraInfo(string User,
+                                   string Group,
+                                   DateTimeOffset AccessTime,
+                                   DateTimeOffset CreationTime,
+                                   DateTimeOffset ModifiedTime);

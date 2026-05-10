@@ -2,6 +2,39 @@
 
 public static partial class TabularDateFormatter
 {
+    // Cached once per app session — the local machine's UTC offset at startup
+    private static readonly TimeSpan LocalUtcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTimeOffset.UtcNow);
+
+    /// <summary>
+    /// Formats a DateTimeOffset using the given culture's date/time format,
+    /// ensures zero-padding, and appends the UTC offset only when it differs
+    /// from the local machine's offset.
+    /// </summary>
+    public static string Format(DateTimeOffset? dateTime, CultureInfo culture)
+    {
+        if (dateTime is null)
+            return string.Empty;
+
+        // Build combined pattern from ShortDate and LongTime patterns
+        string pattern = culture.DateTimeFormat.ShortDatePattern
+                         + " " + culture.DateTimeFormat.LongTimePattern;
+
+        // Normalize to tabular pattern
+        pattern = PadDateTimePattern(pattern);
+
+        // Only append UTC offset when it differs from the local timezone
+        if (dateTime.Value.Offset != LocalUtcOffset)
+            pattern += " (UTCzzz)";
+
+        // Format the DateTimeOffset
+        string result = dateTime.Value.ToString(pattern, culture);
+
+        // Remove RTL marks that might appear in RTL cultures
+        result = RemoveRtlMarks(result);
+
+        return result;
+    }
+
     /// <summary>
     /// Formats a DateTime using the given culture's date/time format,
     /// but ensures zero-padding for consistent column width.

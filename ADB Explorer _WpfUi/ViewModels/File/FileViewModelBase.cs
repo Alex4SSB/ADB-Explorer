@@ -27,6 +27,11 @@ public partial class FileViewModelBase : ObservableObject
     public FlowDirection TypeFlowDirection => TypeIsRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
 
     public string ModifiedTimeString => TabularDateFormatter.Format(_file.ModifiedTime, Data.Settings.ActualUICulture);
+    public string ModifiedTimeWithOffsetString => _file.ModifiedTimeWithOffset is { } dto
+        ? TabularDateFormatter.Format(dto, Data.Settings.ActualUICulture)
+        : TabularDateFormatter.Format(_file.ModifiedTime, Data.Settings.ActualUICulture);
+    public string CreationTimeString => TabularDateFormatter.Format(_file.CreationTime, Data.Settings.ActualUICulture);
+    public string LastAccessTimeString => TabularDateFormatter.Format(_file.LastAccessTime, Data.Settings.ActualUICulture);
 
     public string SizeString => _file.IsDirectory ? "" : _file.Size?.BytesToSize(true);
 
@@ -37,6 +42,48 @@ public partial class FileViewModelBase : ObservableObject
             return (_file.Extension.Length > 1 && Array.IndexOf(AdbExplorerConst.UNICODE_ICONS, char.GetUnicodeCategory(_file.Extension[1])) > -1)
                 ? _file.Extension[1..]
                 : "";
+        }
+    }
+
+    public string UserPermissionsString
+    {
+        get
+        {
+            if (_file.Permissions is null)
+                return "";
+
+            return GetPermissionsString(_file.Permissions.Value,
+                                        UnixFileMode.UserRead,
+                                        UnixFileMode.UserWrite,
+                                        UnixFileMode.UserExecute);
+        }
+    }
+
+    public string GroupPermissionsString
+    {
+        get
+        {
+            if (_file.Permissions is null)
+                return "";
+
+            return GetPermissionsString(_file.Permissions.Value,
+                                        UnixFileMode.GroupRead,
+                                        UnixFileMode.GroupWrite,
+                                        UnixFileMode.GroupExecute);
+        }
+    }
+
+    public string OtherPermissionsString
+    {
+        get
+        {
+            if (_file.Permissions is null)
+                return "";
+
+            return GetPermissionsString(_file.Permissions.Value,
+                                        UnixFileMode.OtherRead,
+                                        UnixFileMode.OtherWrite,
+                                        UnixFileMode.OtherExecute);
         }
     }
 
@@ -99,9 +146,33 @@ public partial class FileViewModelBase : ObservableObject
         }
     }
 
+    private static string GetPermissionsString(UnixFileMode fileMode, UnixFileMode read, UnixFileMode write, UnixFileMode execute)
+    {
+        var userPermissions = fileMode & (read | write | execute);
+        string result = "";
+
+        if (userPermissions.HasFlag(read))
+            result += "r";
+        else
+            result += "-";
+
+        if (userPermissions.HasFlag(write))
+            result += "w";
+        else
+            result += "-";
+
+        if (userPermissions.HasFlag(execute))
+            result += "x";
+        else
+            result += "-";
+
+        return result;
+    }
+
     public void OnModifiedTimeChanged()
     {
         OnPropertyChanged(nameof(ModifiedTimeString));
+        OnPropertyChanged(nameof(ModifiedTimeWithOffsetString));
     }
 
     public void OnSizeChanged()

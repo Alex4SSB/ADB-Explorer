@@ -81,6 +81,7 @@ public partial class DetailsPane : UserControl
           typeof(DetailsPane), new PropertyMetadata(null));
 
     public ObservableCollection<IDetailsViewModel> ThumbnailInfoItems { get; } = [];
+    public ObservableCollection<IDetailsViewModel> PermissionsItems { get; } = [];
 
     public AsyncRelayCommand SaveCommand { get; }
     public RelayCommand PdfUnlockCommand { get; }
@@ -410,6 +411,7 @@ public partial class DetailsPane : UserControl
     private void PopulateThumbnailInfoItems(FileClass file)
     {
         ThumbnailInfoItems.Clear();
+        PermissionsItems.Clear();
 
         if (file.Type is not AbstractFile.FileType.Unknown)
             ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_COLUMN_TYPE, f => f.FolderViewModel.TypeName));
@@ -423,7 +425,13 @@ public partial class DetailsPane : UserControl
             ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_COLUMN_SIZE, f => f.FolderViewModel.SizeString));
 
         if (file.ModifiedTime.HasValue)
-            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_COLUMN_DATE_MODIFIED, f => f.FolderViewModel.ModifiedTimeString));
+        {
+            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_FILE_INFO_MODIFIED, f => f.FolderViewModel.ModifiedTimeWithOffsetString).Init());
+
+            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_DATE_ACCESSED, f => f.FolderViewModel.LastAccessTimeString).Init());
+
+            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_CREATION_TIME, f => f.FolderViewModel.CreationTimeString).Init());
+        }
 
         if (Data.FileActions.IsRecycleBin)
             ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_COLUMN_DATE_DELETED, f => f.TrashIndex.ModifiedTimeString));
@@ -431,28 +439,43 @@ public partial class DetailsPane : UserControl
         if (file.IsLink)
             ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_FILE_TYPE_LINK, f => f.LinkTarget, valueIsLtr: true));
 
-        if (file.CacheThumbnail is not { } thumb)
-            return;
+        if (file.CacheThumbnail is { } thumb)
+        {
+            var info = thumb.Info;
 
-        var info = thumb.Info;
+            if (info.Resolution.HasValue)
+                ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_PICTURE_DIMENSIONS, f => f.CacheThumbnail!.Value.Info.ResolutionString, valueIsLtr: true));
 
-        if (info.Resolution.HasValue)
-            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_PICTURE_DIMENSIONS, f => f.CacheThumbnail!.Value.Info.ResolutionString, valueIsLtr: true));
+            if (info.Duration.HasValue)
+                ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_VIDEO_DURATION, f => f.CacheThumbnail!.Value.Info.DurationString));
 
-        if (info.Duration.HasValue)
-            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_VIDEO_DURATION, f => f.CacheThumbnail!.Value.Info.DurationString));
+            if (info.FNumber.HasValue)
+                ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_IMAGE_F_STOP, f => f.CacheThumbnail!.Value.Info.FNumberString, valueIsLtr: true));
 
-        if (info.FNumber.HasValue)
-            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_IMAGE_F_STOP, f => f.CacheThumbnail!.Value.Info.FNumberString, valueIsLtr: true));
+            if (info.ExposureTime.HasValue)
+                ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_IMAGE_EXPOSURE, f => f.CacheThumbnail!.Value.Info.ExposureTimeString));
 
-        if (info.ExposureTime.HasValue)
-            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_IMAGE_EXPOSURE, f => f.CacheThumbnail!.Value.Info.ExposureTimeString));
+            if (info.ISO.HasValue)
+                ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_IMAGE_ISO, f => f.CacheThumbnail!.Value.Info.ISOString, valueIsLtr: true));
 
-        if (info.ISO.HasValue)
-            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_IMAGE_ISO, f => f.CacheThumbnail!.Value.Info.ISOString, valueIsLtr: true));
+            if (info.Bitrate.HasValue)
+                ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_VIDEO_BITRATE, f => f.CacheThumbnail!.Value.Info.BitrateString, valueIsLtr: true));
+        }
 
-        if (info.Bitrate.HasValue)
-            ThumbnailInfoItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_VIDEO_BITRATE, f => f.CacheThumbnail!.Value.Info.BitrateString, valueIsLtr: true));
+        if (file.Permissions.HasValue)
+        {
+            PermissionsItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_FILE_PERM_USER, f => $"{(f.User is null ? "" : $"({f.User}) ")}{f.FolderViewModel.UserPermissionsString}", useConsoleFont: true).Init());
+            PermissionsItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_FILE_PERM_GROUP, f => $"{(f.Group is null ? "" : $"({f.Group}) ")}{f.FolderViewModel.GroupPermissionsString}", useConsoleFont: true).Init());
+            PermissionsItems.Add(new FileDetailsViewModel(file, Strings.Resources.S_FILE_PERM_OTHER, f => $"{f.FolderViewModel.OtherPermissionsString}", useConsoleFont: true));
+
+            var cts = new CancellationTokenSource();
+            _cancellationToken = cts;
+
+            if (file.User is null || file.Group is null)
+            {
+                _ = Task.Run(() => file.UpdateExtraInfo(cts.Token), cts.Token);
+            }
+        }
     }
 
     private void GridSplitter_DragDelta(object sender, DragDeltaEventArgs e)

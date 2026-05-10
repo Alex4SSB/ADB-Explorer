@@ -5,4 +5,5 @@ public record struct FileStat(string FullName,
                        AbstractFile.FileType Type,
                        bool IsLink,
                        long? Size,
-                       DateTime? ModifiedTime) : IBaseFile, IFileStat;
+                       DateTime? ModifiedTime,
+                       UnixFileMode? Permissions) : IBaseFile, IFileStat;

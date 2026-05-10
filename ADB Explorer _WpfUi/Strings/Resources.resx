@@ -1962,4 +1962,32 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Unlock</value>
     <comment>Button label to submit the PDF password</comment>
   </data>
+  <data name="S_FILE_PERMISSIONS" xml:space="preserve">
+    <value>Permissions</value>
+    <comment>The title of the permissions section of a file in the details pane</comment>
+  </data>
+  <data name="S_FILE_PERM_USER" xml:space="preserve">
+    <value>User</value>
+    <comment>Unix file permissions for the selected user</comment>
+  </data>
+  <data name="S_FILE_PERM_GROUP" xml:space="preserve">
+    <value>Group</value>
+    <comment>Unix file permissions for the group the user is in</comment>
+  </data>
+  <data name="S_FILE_PERM_OTHER" xml:space="preserve">
+    <value>Others</value>
+    <comment>Unix file permissions for users outside the group</comment>
+  </data>
+  <data name="S_DATE_ACCESSED" xml:space="preserve">
+    <value>Accessed</value>
+    <comment>File info - last access date</comment>
+  </data>
+  <data name="S_CREATION_TIME" xml:space="preserve">
+    <value>Created</value>
+    <comment>File info - creation time</comment>
+  </data>
+  <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
+    <value>Modified</value>
+    <comment>File info - date modified (but without "date")</comment>
+  </data>
 </root>

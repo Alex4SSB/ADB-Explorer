@@ -21,6 +21,9 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         _iconViewModel?.OnSizeChanged();
     }
 
+    [ObservableProperty]
+    public partial UnixFileMode? Permissions { get; set; }
+
     private bool isLink;
     public bool IsLink
     {
@@ -49,6 +52,18 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         }
     }
 
+    [ObservableProperty]
+    public partial string? User { get; set; }
+
+    [ObservableProperty]
+    public partial string? Group { get; set; }
+
+    [ObservableProperty]
+    public partial DateTimeOffset? LastAccessTime { get; set; }
+
+    [ObservableProperty]
+    public partial DateTimeOffset? CreationTime { get; set; }
+
     private DateTime? modifiedTime;
     public DateTime? ModifiedTime
     {
@@ -56,6 +71,20 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         set
         {
             if (Set(ref modifiedTime, value))
+            {
+                _folderViewModel?.OnModifiedTimeChanged();
+                _iconViewModel?.OnModifiedTimeChanged();
+            }
+        }
+    }
+
+    private DateTimeOffset? modifiedTimeWithOffset;
+    public DateTimeOffset? ModifiedTimeWithOffset
+    {
+        get => modifiedTimeWithOffset;
+        set
+        {
+            if (Set(ref modifiedTimeWithOffset, value))
             {
                 _folderViewModel?.OnModifiedTimeChanged();
                 _iconViewModel?.OnModifiedTimeChanged();
@@ -199,7 +228,8 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         bool isLink = false,
         long? size = null,
         DateTime? modifiedTime = null,
-        bool isTemp = false)
+        bool isTemp = false,
+        UnixFileMode? permissions = null)
         : base(path, fileName, type)
     {
         Type = type;
@@ -207,6 +237,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         ModifiedTime = modifiedTime;
         IsLink = isLink;
         IsTemp = isTemp;
+        Permissions = permissions;
         
         SortName = new(FullName);
 
@@ -255,9 +286,10 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         fileName: fileStat.FullName,
         path: fileStat.FullPath,
         type: fileStat.Type,
+        isLink: fileStat.IsLink,
         size: fileStat.Size,
         modifiedTime: fileStat.ModifiedTime,
-        isLink: fileStat.IsLink
+        permissions: fileStat.Permissions
     );
 
     private void OnSettingsPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -304,6 +336,22 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
         if (IsLink && Type is not FileType.BrokenLink)
             SpecialType |= SpecialFileType.LinkOverlay;
+    }
+
+    public void UpdateExtraInfo(CancellationToken cancellationToken)
+    {
+        var info = ADBService.GetFileExtraInfo(Data.DevicesObject.Current, FullPath, cancellationToken);
+        if (info is null)
+            return;
+
+        App.SafeInvoke(() =>
+        {
+            User = info?.User;
+            Group = info?.Group;
+            LastAccessTime = info?.AccessTime;
+            CreationTime = info?.CreationTime;
+            ModifiedTimeWithOffset = info?.ModifiedTime;
+        });
     }
 
     public SyncFile GetSyncFile() => new(this, Children);

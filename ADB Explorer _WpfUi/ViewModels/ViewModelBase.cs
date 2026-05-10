@@ -19,6 +19,12 @@ public abstract class ViewModelBase : ObservableObject, INotifyPropertyChanged
 
     protected void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        PropertyChanged?.Invoke(this, e);
+    }
+
     public static void ExecuteInDispatcher(Action action, bool executeInDispatcher = true)
     {
         if (App.IsShuttingDown || App.AppDispatcher is null || executeInDispatcher)
