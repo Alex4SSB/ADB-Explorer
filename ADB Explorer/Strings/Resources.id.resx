@@ -1531,4 +1531,55 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
   <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
     <value>Kolom pengurutan &amp; urutan disimpan untuk setiap lokasi</value>
   </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>Ukuran Gambar Maksimal untuk Digunakan sebagai Thumbnail Sendiri (0 - Dinonaktifkan)</value>
+  </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>dan {0} lainnya…</value>
+  </data>
+  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
+    <value>Tampilkan atau sembunyikan panel detail dan pratinjau.</value>
+  </data>
+  <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
+    <value>Pratinjau</value>
+  </data>
+  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
+    <value>Ukuran File Maksimal untuk Pratinjau</value>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>Tarik ke Folder Default saat Klik Dua Kali File</value>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value>Pilih satu file untuk mendapatkan informasi lebih lanjut.</value>
+  </data>
+  <data name="S_ITEM_LOCATION" xml:space="preserve">
+    <value>Lokasi</value>
+  </data>
+  <data name="S_IMAGE_F_STOP" xml:space="preserve">
+    <value>F-stop</value>
+  </data>
+  <data name="S_IMAGE_ISO" xml:space="preserve">
+    <value>Kecepatan ISO</value>
+  </data>
+  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
+    <value>Waktu eksposur</value>
+  </data>
+  <data name="S_VIDEO_BITRATE" xml:space="preserve">
+    <value>Bitrate</value>
+  </data>
+  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
+    <value>Pilih file untuk pratinjau.</value>
+  </data>
+  <data name="S_PREVIEW_INVALID" xml:space="preserve">
+    <value>Tidak ada pratinjau tersedia.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
+    <value>PDF ini dilindungi kata sandi.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
+    <value>Kata sandi salah.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
+    <value>Buka kunci</value>
+  </data>
 </root>
