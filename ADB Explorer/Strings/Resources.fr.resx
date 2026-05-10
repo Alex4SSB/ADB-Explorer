@@ -1579,4 +1579,13 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="S_PREVIEW_INVALID" xml:space="preserve">
     <value>Pas d'aperçu disponible.</value>
   </data>
+  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
+    <value>Ce PDF est protégé par mot de passe.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
+    <value>Mot de passe incorrect.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
+    <value>Déverrouiller</value>
+  </data>
 </root>
