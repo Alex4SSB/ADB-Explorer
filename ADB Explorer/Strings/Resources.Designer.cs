@@ -1016,11 +1016,29 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Created.
+        /// </summary>
+        public static string S_CREATION_TIME {
+            get {
+                return ResourceManager.GetString("S_CREATION_TIME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Custom App Settings Path.
         /// </summary>
         public static string S_CUSTOM_DATA_PATH {
             get {
                 return ResourceManager.GetString("S_CUSTOM_DATA_PATH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Accessed.
+        /// </summary>
+        public static string S_DATE_ACCESSED {
+            get {
+                return ResourceManager.GetString("S_DATE_ACCESSED", resourceCulture);
             }
         }
         
@@ -1072,7 +1090,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select a single file to get more information..
+        ///   Looks up a localized string similar to Select a single item to get more information..
         /// </summary>
         public static string S_DETAILS_MULTI_FILE_SELECTED {
             get {
@@ -1606,11 +1624,56 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Modified.
+        /// </summary>
+        public static string S_FILE_INFO_MODIFIED {
+            get {
+                return ResourceManager.GetString("S_FILE_INFO_MODIFIED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File Operations.
         /// </summary>
         public static string S_FILE_OP_TOOLTIP {
             get {
                 return ResourceManager.GetString("S_FILE_OP_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Group.
+        /// </summary>
+        public static string S_FILE_PERM_GROUP {
+            get {
+                return ResourceManager.GetString("S_FILE_PERM_GROUP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Others.
+        /// </summary>
+        public static string S_FILE_PERM_OTHER {
+            get {
+                return ResourceManager.GetString("S_FILE_PERM_OTHER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User.
+        /// </summary>
+        public static string S_FILE_PERM_USER {
+            get {
+                return ResourceManager.GetString("S_FILE_PERM_USER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Permissions.
+        /// </summary>
+        public static string S_FILE_PERMISSIONS {
+            get {
+                return ResourceManager.GetString("S_FILE_PERMISSIONS", resourceCulture);
             }
         }
         
@@ -1629,6 +1692,15 @@ namespace ADB_Explorer.Strings {
         public static string S_FILE_SOCKET {
             get {
                 return ResourceManager.GetString("S_FILE_SOCKET", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File system.
+        /// </summary>
+        public static string S_FILE_SYSTEM {
+            get {
+                return ResourceManager.GetString("S_FILE_SYSTEM", resourceCulture);
             }
         }
         
@@ -2396,6 +2468,24 @@ namespace ADB_Explorer.Strings {
         public static string S_MISSING_ADB_OVERRIDE {
             get {
                 return ResourceManager.GetString("S_MISSING_ADB_OVERRIDE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mount options.
+        /// </summary>
+        public static string S_MOUNT_OPTIONS {
+            get {
+                return ResourceManager.GetString("S_MOUNT_OPTIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mount point.
+        /// </summary>
+        public static string S_MOUNT_POINT {
+            get {
+                return ResourceManager.GetString("S_MOUNT_POINT", resourceCulture);
             }
         }
         
