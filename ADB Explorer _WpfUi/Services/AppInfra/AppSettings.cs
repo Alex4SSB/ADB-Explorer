@@ -31,12 +31,6 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
         OneHour,
     }
 
-    public enum SidePaneMode
-    {
-        Details,
-        Preview,
-    }
-
     void IJsonOnDeserialized.OnDeserialized()
     {
         LocationThumbSize = _locationThumbSize;
@@ -107,7 +101,7 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     public partial int DetailsPaneWidth { get; set; } = 300;
 
     [ObservableProperty]
-    public partial SidePaneMode SidePane { get; set; } = SidePaneMode.Details;
+    public partial DetailsPane.SidePaneMode SidePane { get; set; } = DetailsPane.SidePaneMode.Details;
 
     [ObservableProperty]
     public partial int MaxPreviewFileSize { get; set; } = 300;

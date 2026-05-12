@@ -634,7 +634,7 @@
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="False" />
-                    <Condition Binding="{Binding DriveSelected}" Value="False" />
+                    <Condition Binding="{Binding IsSelected}" Value="False" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="Transparent" />
             </MultiDataTrigger>
@@ -696,7 +696,7 @@
         <Setter Property="Height" Value="80" />
         <Setter Property="Padding" Value="14,10" />
         <Setter Property="helpers:StyleHelper.EnableSelection" Value="True" />
-        <Setter Property="helpers:StyleHelper.IsSelected" Value="{Binding DriveSelected}" />
+        <Setter Property="helpers:StyleHelper.IsSelected" Value="{Binding IsSelected}" />
     </Style>
     <Style
         x:Key="DriveContainerStyle"
@@ -707,7 +707,7 @@
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
-        <Setter Property="IsSelected" Value="{Binding DriveSelected, Mode=TwoWay}" />
+        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
         <Setter Property="IsEnabled" Value="{Binding DriveEnabled}" />
     </Style>
     <Style x:Key="IconFileContainerStyle" TargetType="ui:ListViewItem">

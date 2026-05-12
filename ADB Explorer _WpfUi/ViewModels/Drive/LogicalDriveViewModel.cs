@@ -3,14 +3,26 @@ using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
 
-class LogicalDriveViewModel : DriveViewModel
+public partial class LogicalDriveViewModel : DriveViewModel
 {
-    private LogicalDrive drive;
-    protected new LogicalDrive Drive
+    [ObservableProperty]
+    protected new partial LogicalDrive Drive { get; set; }
+
+    [ObservableProperty]
+    public partial Models.FileSystemInfo? FSInfo { get; set; }
+
+    partial void OnFSInfoChanged(Models.FileSystemInfo? value)
     {
-        get => drive;
-        set => Set(ref drive, value);
+        OnPropertyChanged(nameof(BlockDevice));
+        OnPropertyChanged(nameof(FileSystem));
+        OnPropertyChanged(nameof(MountPoint));
+        OnPropertyChanged(nameof(MountOptions));
     }
+
+    public string BlockDevice => FSInfo?.BlockDev;
+    public string FileSystem => FSInfo?.FileSystemType;
+    public string MountPoint => FSInfo?.MountPoint;
+    public string[] MountOptions => FSInfo?.Options;
 
     public string Size => Drive.Size;
     public string Used => Drive.Used;

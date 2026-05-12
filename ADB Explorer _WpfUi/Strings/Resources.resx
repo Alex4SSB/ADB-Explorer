@@ -1919,7 +1919,7 @@ Please help us localize the app to your language on Weblate.</value>
     <comment>The setting that enables pulling a file to the default folder on double click</comment>
   </data>
   <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
-    <value>Select a single file to get more information.</value>
+    <value>Select a single item to get more information.</value>
     <comment>The tip displayed in the details pane when multiple (or none) files are selected</comment>
   </data>
   <data name="S_ITEM_LOCATION" xml:space="preserve">
@@ -1989,5 +1989,17 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
     <value>Modified</value>
     <comment>File info - date modified (but without "date")</comment>
+  </data>
+  <data name="S_FILE_SYSTEM" xml:space="preserve">
+    <value>File system</value>
+    <comment>The file system type of a drive</comment>
+  </data>
+  <data name="S_MOUNT_POINT" xml:space="preserve">
+    <value>Mount point</value>
+    <comment>The Unix mount point of a drive</comment>
+  </data>
+  <data name="S_MOUNT_OPTIONS" xml:space="preserve">
+    <value>Mount options</value>
+    <comment>The Unix mount options of a drive</comment>
   </data>
 </root>

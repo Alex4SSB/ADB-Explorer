@@ -2,14 +2,10 @@
 
 namespace ADB_Explorer.ViewModels;
 
-class VirtualDriveViewModel : DriveViewModel
+public partial class VirtualDriveViewModel : DriveViewModel
 {
-    private VirtualDrive drive;
-    protected new VirtualDrive Drive
-    {
-        get => drive;
-        set => Set(ref drive, value);
-    }
+    [ObservableProperty]
+    protected new partial VirtualDrive Drive { get; set; }
 
     public long? ItemsCount => Drive.ItemsCount;
 

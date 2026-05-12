@@ -1,13 +1,9 @@
 ﻿namespace ADB_Explorer.Models;
 
-public class VirtualDrive : Drive
+public partial class VirtualDrive : Drive
 {
-    private long? itemsCount = 0;
-    public long? ItemsCount
-    {
-        get => itemsCount;
-        set => Set(ref itemsCount, value);
-    }
+    [ObservableProperty]
+    public partial long? ItemsCount { get; set; } = 0;
 
     public override bool IsFUSE => false;
 

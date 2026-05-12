@@ -24,9 +24,6 @@
     <UserControl.Style>
         <Style TargetType="UserControl">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                </DataTrigger>
                 <DataTrigger Binding="{Binding IsOpen, RelativeSource={RelativeSource Mode=Self}}" Value="False">
                     <Setter Property="Visibility" Value="Collapsed" />
                 </DataTrigger>
@@ -44,7 +41,17 @@
                 <TextBlock
                     FontSize="12"
                     Foreground="{DynamicResource InfoBadgeInformationalSeverityBackgroundBrush}"
-                    Text="{Binding Label}" />
+                    Text="{Binding Label}">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding LabelConsoleFont}" Value="True">
+                                    <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
                 <TextBlock
                     Grid.Column="2"
                     HorizontalAlignment="Right"
@@ -58,7 +65,7 @@
                                 <DataTrigger Binding="{Binding ValueIsLtr}" Value="True">
                                     <Setter Property="FlowDirection" Value="LeftToRight" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding UseConsoleFont}" Value="True">
+                                <DataTrigger Binding="{Binding ValueConsoleFont}" Value="True">
                                     <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -71,14 +78,20 @@
     <Grid DataContext="{Binding ElementName=pane}">
         <Grid x:Name="ContentBox">
             <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Mode, ElementName=pane}" Value="Details">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
                 <Grid>
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding EditorText}" Value="{x:Null}">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=SidePane}" Value="Details">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -207,7 +220,7 @@
                 <ScrollViewer.Style>
                     <Style BasedOn="{StaticResource UiScrollViewer}" TargetType="ScrollViewer">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=SidePane}" Value="Preview">
+                            <DataTrigger Binding="{Binding Mode, ElementName=pane}" Value="Preview">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                         </Style.Triggers>
@@ -281,13 +294,9 @@
                                 <StackPanel.Style>
                                     <Style TargetType="StackPanel">
                                         <Style.Triggers>
-                                            <MultiDataTrigger>
-                                                <MultiDataTrigger.Conditions>
-                                                    <Condition Binding="{Binding File}" Value="{x:Null}" />
-                                                    <Condition Binding="{Binding Package}" Value="{x:Null}" />
-                                                </MultiDataTrigger.Conditions>
+                                            <DataTrigger Binding="{Binding SelectionInfoItems.Count}" Value="0">
                                                 <Setter Property="Visibility" Value="Collapsed" />
-                                            </MultiDataTrigger>
+                                            </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </StackPanel.Style>
@@ -296,7 +305,24 @@
                                     FontSize="12"
                                     FontWeight="SemiBold"
                                     Text="{Binding Source={x:Static Member=strings:Resources.S_THUMBSIZE_DETAILS}}" />
-                                <ItemsControl ItemTemplate="{StaticResource FileDetailsTemplate}" ItemsSource="{Binding ThumbnailInfoItems}" />
+                                <ItemsControl ItemTemplate="{StaticResource FileDetailsTemplate}" ItemsSource="{Binding SelectionInfoItems}" />
+                            </StackPanel>
+                            <StackPanel>
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding MountOptionsItems.Count}" Value="0">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock
+                                    Margin="0,10"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
+                                    Text="{Binding Source={x:Static Member=strings:Resources.S_MOUNT_OPTIONS}}" />
+                                <ItemsControl ItemTemplate="{StaticResource FileDetailsTemplate}" ItemsSource="{Binding MountOptionsItems}" />
                             </StackPanel>
                             <StackPanel>
                                 <StackPanel.Style>

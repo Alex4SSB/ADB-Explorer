@@ -19,8 +19,8 @@ public partial class ThumbsSizeSelector : UserControl
             new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_LARGE, ThumbnailService.ThumbnailSize.Large, this),
             new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_XL, ThumbnailService.ThumbnailSize.ExtraLarge, this),
             new Separator(),
-            new SidePaneModeItem(Strings.Resources.S_THUMBSIZE_DETAILS, AppSettings.SidePaneMode.Details),
-            new SidePaneModeItem(Strings.Resources.S_SIDE_PANE_PREVIEW, AppSettings.SidePaneMode.Preview),
+            new SidePaneModeItem(Strings.Resources.S_THUMBSIZE_DETAILS, DetailsPane.SidePaneMode.Details),
+            new SidePaneModeItem(Strings.Resources.S_SIDE_PANE_PREVIEW, DetailsPane.SidePaneMode.Preview),
         ];
 
         InitializeComponent();
@@ -34,16 +34,16 @@ public partial class ThumbsSizeSelector : UserControl
         { ThumbnailService.ThumbnailSize.ExtraLarge, new FontIcon() { Glyph = "\uE15A", FontSize = 16 } },
     };
 
-    static Dictionary<AppSettings.SidePaneMode, UIElement> SidePaneModeIcons => new()
+    static Dictionary<DetailsPane.SidePaneMode, UIElement> SidePaneModeIcons => new()
     {
-        { AppSettings.SidePaneMode.Details, new FontIcon()
+        { DetailsPane.SidePaneMode.Details, new FontIcon()
         {
             Glyph = "\uE99C",
             FontSize = 16,
             RenderTransformOrigin = new(0.5, 0.5),
             RenderTransform = Data.RuntimeSettings.IsRTL ? null : new ScaleTransform(-1, 1)
         } },
-        { AppSettings.SidePaneMode.Preview, new FontIcon()
+        { DetailsPane.SidePaneMode.Preview, new FontIcon()
         {
             Glyph = "\uE1AC",
             FontSize = 16,
@@ -88,21 +88,36 @@ public partial class ThumbsSizeSelector : UserControl
 
         public BaseAction Action { get; set; }
 
-        public SidePaneModeItem(string name, AppSettings.SidePaneMode mode)
+        public SidePaneModeItem(string name, DetailsPane.SidePaneMode mode)
         {
             Name = name;
             Icon = SidePaneModeIcons[mode];
-            Action = new(() => !Data.FileActions.IsRecycleBin, () => Data.Settings.SidePane = mode);
+            Action = new(IsPreviewAllowed, () => Data.Settings.SidePane = mode);
             Data.Settings.PropertyChanged += (_, e) =>
             {
                 if (e.PropertyName == nameof(AppSettings.SidePane))
                 {
-                    IsChecked = Data.Settings.SidePane == mode;
+                    IsChecked = IsPreviewAllowed()
+                        ? Data.Settings.SidePane == mode
+                        : mode == DetailsPane.SidePaneMode.Details;
+                }
+            };
+            Data.FileActions.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName is nameof(FileActionsEnable.IsDriveViewVisible) or nameof(FileActionsEnable.IsAppDrive) or nameof(FileActionsEnable.IsRecycleBin))
+                {
+                    IsChecked = IsPreviewAllowed()
+                        ? Data.Settings.SidePane == mode
+                        : mode == DetailsPane.SidePaneMode.Details;
                 }
             };
 
-            IsChecked = Data.Settings.SidePane == mode;
+            IsChecked = IsPreviewAllowed()
+                ? Data.Settings.SidePane == mode
+                : mode == DetailsPane.SidePaneMode.Details;
         }
+
+        private static bool IsPreviewAllowed() => !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive && !Data.FileActions.IsDriveViewVisible;
     }
 
     public partial class ThumbSizeItem : ObservableObject

@@ -149,4 +149,58 @@ internal static class AdbHelper
                 package.LastUpdateTime = updated;
         });
     }
+
+    public static void ApplyMountInfo(LogicalDeviceViewModel device, CancellationToken cancellationToken)
+    {
+        var infos = GetMountInfo(device, cancellationToken);
+        var driveList = device.Drives.OfType<LogicalDriveViewModel>();
+        foreach (var drive in driveList)
+        {
+            if (cancellationToken.IsCancellationRequested)
+                break;
+
+            if (drive.Type is AbstractDrive.DriveType.Root)
+            {
+                drive.FSInfo = infos.FirstOrDefault(i => i.MountPoint == "/");
+            }
+            else
+            {
+                var path = drive.Path;
+                Models.FileSystemInfo? info = null;
+
+                do
+                {
+                    if (infos.FirstOrDefault(i => i.MountPoint == path) is Models.FileSystemInfo inf && inf.MountPoint is not null)
+                    {
+                        info = inf;
+                        break;
+                    }
+                    path = FileHelper.GetParentPath(path);
+
+                } while (path != "/");
+
+                App.SafeInvoke(() => drive.FSInfo = info);
+            }
+        }
+    }
+
+    private static IEnumerable<Models.FileSystemInfo> GetMountInfo(LogicalDeviceViewModel device, CancellationToken cancellationToken)
+    {
+        ADBService.ExecuteDeviceAdbShellCommand(device.ID, "mount", out string stdout, out _, cancellationToken);
+
+        var matches = AdbRegEx.RE_MOUNT_PARSE().Matches(stdout);
+
+        foreach (Match match in matches)
+        {
+            if (cancellationToken.IsCancellationRequested)
+                yield break;
+
+            yield return new(
+                BlockDev: match.Groups["BlockDev"].Value,
+                MountPoint: match.Groups["MntPt"].Value,
+                FileSystemType: match.Groups["Type"].Value,
+                Options: match.Groups["Attr"].Value.Split(',')
+            );
+        }
+    }
 }

@@ -3,30 +3,18 @@ using ADB_Explorer.Models;
 
 namespace ADB_Explorer.ViewModels;
 
-public class DriveViewModel : AbstractDrive
+public partial class DriveViewModel : AbstractDrive, IBrowserItem
 {
     #region Full properties
 
-    private Drive drive;
-    public Drive Drive
-    {
-        get => drive;
-        set => Set(ref drive, value);
-    }
+    [ObservableProperty]
+    public partial Drive Drive { get; set; }
 
-    private bool driveSelected = false;
-    public bool DriveSelected
-    {
-        get => driveSelected;
-        set => Set(ref driveSelected, value);
-    }
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; } = false;
 
-    private bool driveEnabled = true;
-    public bool DriveEnabled
-    {
-        get => driveEnabled;
-        protected set => Set(ref driveEnabled, value);
-    }
+    [ObservableProperty]
+    public partial bool DriveEnabled { get; protected set; } = true;
 
     #endregion
 

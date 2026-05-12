@@ -1090,7 +1090,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select a single file to get more information..
+        ///   Looks up a localized string similar to Select a single item to get more information..
         /// </summary>
         public static string S_DETAILS_MULTI_FILE_SELECTED {
             get {
@@ -1692,6 +1692,15 @@ namespace ADB_Explorer.Strings {
         public static string S_FILE_SOCKET {
             get {
                 return ResourceManager.GetString("S_FILE_SOCKET", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File system.
+        /// </summary>
+        public static string S_FILE_SYSTEM {
+            get {
+                return ResourceManager.GetString("S_FILE_SYSTEM", resourceCulture);
             }
         }
         
@@ -2459,6 +2468,24 @@ namespace ADB_Explorer.Strings {
         public static string S_MISSING_ADB_OVERRIDE {
             get {
                 return ResourceManager.GetString("S_MISSING_ADB_OVERRIDE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mount options.
+        /// </summary>
+        public static string S_MOUNT_OPTIONS {
+            get {
+                return ResourceManager.GetString("S_MOUNT_OPTIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mount point.
+        /// </summary>
+        public static string S_MOUNT_POINT {
+            get {
+                return ResourceManager.GetString("S_MOUNT_POINT", resourceCulture);
             }
         }
         

@@ -154,6 +154,18 @@ public partial class ExplorerPageHeader : UserControl
         });
 
         SelectionTimer.Tick += SelectionTimer_Tick;
+
+        DriveList.SelectionChanged += DriveList_SelectionChanged;
+    }
+
+    private void DriveList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (DriveList.SelectedItem is DriveViewModel selectedDrive)
+        {
+            DetailsPane.SelectedFiles = [selectedDrive];
+        }
+        else
+            DetailsPane.SelectedFiles = [];
     }
 
     private void MainWindow_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -621,13 +633,6 @@ public partial class ExplorerPageHeader : UserControl
         FileActions.IsTemp = CurrentPath == TEMP_PATH;
         FileActions.ParentEnabled = CurrentPath != ParentPath && !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
 
-        if (DetailsPane.IsOpen
-            && Settings.SidePane is AppSettings.SidePaneMode.Preview
-            && (FileActions.IsAppDrive || FileActions.IsRecycleBin))
-        {
-            Settings.SidePane = AppSettings.SidePaneMode.Details;
-        }
-
         FileActionLogic.IsPasteEnabled();
 
         if (!RuntimeSettings.IsRootActive && DevicesObject.Current.Root is RootStatus.Enabled)
@@ -780,10 +785,14 @@ public partial class ExplorerPageHeader : UserControl
         UpdateFileOp();
 
         NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
+        CurrentPath =
         NavigationBox.Path = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
         NavHistory.Navigate(Navigation.SpecialLocation.DriveView);
 
         CurrentDrive = null;
+
+        DetailsPane.SelectedFiles = [new FileClass("", "", FileType.Unknown)];
+        DetailsPane.SelectedFiles = [];
 
         if (DriveList.SelectedIndex > -1)
             SelectionHelper.GetListViewItemContainer(DriveList).Focus();
@@ -1715,7 +1724,7 @@ public partial class ExplorerPageHeader : UserControl
     {
         foreach (var item in DriveList.Items)
         {
-            (item as DriveViewModel)?.DriveSelected = false;
+            (item as DriveViewModel)?.IsSelected = false;
         }
     }
 

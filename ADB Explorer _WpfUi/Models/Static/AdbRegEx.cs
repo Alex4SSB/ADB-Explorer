@@ -76,5 +76,8 @@
 
         [GeneratedRegex(@"^\s*lastUpdateTime=(?<LastUpdateTime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s*$", RegexOptions.Multiline)]
         public static partial Regex RE_DUMPSYS_LAST_UPDATE();
+
+        [GeneratedRegex(@"(?<BlockDev>.+) on (?<MntPt>.+) type (?<Type>.+) \((?<Attr>.+)\)", RegexOptions.Multiline)]
+        public static partial Regex RE_MOUNT_PARSE();
     }
 }

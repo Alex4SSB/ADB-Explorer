@@ -1,5 +1,3 @@
-using ADB_Explorer.Models;
-
 namespace ADB_Explorer.ViewModels;
 
 public interface IDetailsViewModel
@@ -7,45 +5,41 @@ public interface IDetailsViewModel
     string Label { get; }
     string Value { get; }
     bool ValueIsLtr { get; }
-    bool UseConsoleFont { get; }
+    bool ValueConsoleFont { get; }
+    bool LabelConsoleFont { get; }
 }
 
-public class FileDetailsViewModel(FileClass file, string label, Func<FileClass, string> valueSelector, bool valueIsLtr = false, bool useConsoleFont = false, Func<FileClass, bool>? visibilityPredicate = null)
-    : FileViewModelBase(file), IDetailsViewModel
+public class MountOptionViewModel(string option) : IDetailsViewModel
 {
-    private readonly Func<FileClass, string> _valueSelector = valueSelector;
+    private static readonly char[] separator = ['='];
+
+    public string Label { get; } = option.Contains('=') ? option.Split(separator, 2)[0] : option;
+
+    public string Value { get; } = option.Contains('=') ? option.Split(separator, 2)[1] : "";
+
+    public bool ValueIsLtr { get; } = true;
+    public bool ValueConsoleFont { get; } = true;
+    public bool LabelConsoleFont { get; } = true;
+}
+
+public class ItemDetailsViewModel<T>(T item, string label, Func<T, string> valueSelector, bool valueIsLtr = false, bool useConsoleFont = false)
+    : ObservableObject, IDetailsViewModel where T : INotifyPropertyChanged
+{
+    private readonly Func<T, string> _valueSelector = valueSelector;
 
     public string Label { get; } = label;
 
     public bool ValueIsLtr { get; } = valueIsLtr;
 
-    public string Value => _valueSelector(_file);
+    public string Value => _valueSelector(item);
 
-    public bool UseConsoleFont { get; } = useConsoleFont;
+    public bool ValueConsoleFont { get; } = useConsoleFont;
 
-    public FileDetailsViewModel Init()
+    public bool LabelConsoleFont { get; } = false;
+
+    public ItemDetailsViewModel<T> Init()
     {
-        file.PropertyChanged += (s, e) => OnPropertyChanged(nameof(Value));
-        return this;
-    }
-}
-
-public class PackageDetailsViewModel(Package package, string label, Func<Package, string> valueSelector, bool valueIsLtr = false, bool useConsoleFont = false) 
-    : ObservableObject, IDetailsViewModel
-{
-    private readonly Func<Package, string> _valueSelector = valueSelector;
-
-    public string Label { get; } = label;
-
-    public bool ValueIsLtr { get; } = valueIsLtr;
-
-    public string Value => _valueSelector(package);
-
-    public bool UseConsoleFont { get; } = useConsoleFont;
-
-    public PackageDetailsViewModel Init()
-    {
-        package.PropertyChanged += (s, e) => OnPropertyChanged(nameof(Value));
+        item.PropertyChanged += (s, e) => OnPropertyChanged(nameof(Value));
         return this;
     }
 }

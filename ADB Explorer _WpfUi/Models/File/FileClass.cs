@@ -328,6 +328,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             FileType.Drive => SpecialFileType.Drive,
             FileType.EmptyTrash => SpecialFileType.EmptyTrash,
             FileType.FullTrash => SpecialFileType.FullTrash,
+            FileType.Phone => SpecialFileType.Phone,
             _ => SpecialFileType.Regular
         };
 

@@ -10,16 +10,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     x:Name="dc"
     mc:Ignorable="d">
-    <local:AdbMenu d:Visibility="Visible" DataContext="{Binding ElementName=dc}">
-        <local:AdbMenu.Style>
-            <Style BasedOn="{StaticResource AdbMenuStyle}" TargetType="local:AdbMenu">
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </local:AdbMenu.Style>
+    <local:AdbMenu DataContext="{Binding ElementName=dc}" Style="{StaticResource AdbMenuStyle}">
         <local:AdbMenuItem
             IsCheckable="True"
             IsChecked="{Binding IsChecked, Mode=TwoWay}"
@@ -39,7 +30,7 @@
                                             </Setter.Value>
                                         </Setter>
                                     </DataTrigger>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=SidePane}" Value="Preview">
+                                    <DataTrigger Binding="{Binding Mode}" Value="Preview">
                                         <Setter Property="Glyph" Value="&#xE1AC;" />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -51,7 +42,7 @@
                             <Style TargetType="TextBlock">
                                 <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_THUMBSIZE_DETAILS}}" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=SidePane}" Value="Preview">
+                                    <DataTrigger Binding="{Binding Mode}" Value="Preview">
                                         <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_SIDE_PANE_PREVIEW}}" />
                                     </DataTrigger>
                                 </Style.Triggers>

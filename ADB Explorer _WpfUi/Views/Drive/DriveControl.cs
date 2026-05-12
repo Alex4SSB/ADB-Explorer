@@ -7,7 +7,7 @@ public class DriveControl : UserControl
     protected void Card_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         if (sender is FrameworkElement { DataContext: DriveViewModel drive })
-            drive.DriveSelected = true;
+            drive.IsSelected = true;
     }
 
     protected void Card_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -28,7 +28,7 @@ public class DriveControl : UserControl
         }
         else if (e.Key is Key.Escape)
         {
-            drive.DriveSelected = false;
+            drive.IsSelected = false;
             e.Handled = true;
         }
     }
