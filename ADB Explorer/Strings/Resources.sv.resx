@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -164,5 +164,1356 @@
   </data>
   <data name="S_DELETE_ACTION" xml:space="preserve">
     <value>Radera</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>Målsökvägsfel</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>misslyckades med att ansluta till</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Anslutningsfel</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Frånkopplingsfel</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>Parningsfel</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>Rotåtkomst kan inte aktiveras på vald enhet.</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>Rotåtkomst</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Bekräfta radering</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>Ta bort permanent</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>Fel vid skapande</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>Återställ konflikter</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>Bekräfta avinstallation</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>Välj paket att installera</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>Stäng emulator</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>Ta bort enhet</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>Koppla ifrån enhet</value>
+  </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>Filoperationer</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>Installera paket</value>
+  </data>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>Para och/eller ansluta en WiFi-enhet (utan att använda mDNS)</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>Starta om appen för att ändringar ska träda i kraft</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Fel vid läsning av fil</value>
+  </data>
+  <data name="S_READ_FILE_ERROR" xml:space="preserve">
+    <value>Kan inte dra filen för att läsa den.</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Fel vid skrivning av fil</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>Kunde inte trycka filen tillbaka till enheten.</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>ADB-server måste startas om för att inaktivera mDNS.</value>
+  </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>Inaktivera mDNS</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>Starta WSA i bakgrunden</value>
+  </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>Dra</value>
+  </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>Dra (Länka mål)</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>Återställ</value>
+  </data>
+  <data name="S_REDIRECTION" xml:space="preserve">
+    <value>Framsteg omdirigering</value>
+  </data>
+  <data name="S_LS_ERROR_TITLE" xml:space="preserve">
+    <value>Lista katalogfel</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>Dra till Windows-enhetens rot</value>
+  </data>
+  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
+    <value>Välkommen till en ny ADB Explorer-version!
+Releaseanteckningarna finns tillgängliga på GitHub.</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>FUSE drive.
+• Symboliska länkar stöds inte
+• Filnamn kan inte innehålla "* / : &lt;&gt; | |
+• Filnamn är skiftlägesokänslig
+• Installation av APK stöds inte</value>
+  </data>
+  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
+    <value>Appen har många animationer som är aktiverade som en del av den flytande designen.
+Sidvisningsanimationen är alltid inaktiverad när appfönstret maximeras på en sekundär display.
+
+• Att aktivera denna inställning inaktiverar alla appanimationer utom förloppsindikatorer, framstegsringar och användningsindikatorer för hårddisk.</value>
+  </data>
+  <data name="S_RESET_SETTINGS" xml:space="preserve">
+    <value>Alla appinställningar kommer att återställas när du stänger appen.
+Detta kan inte göras ogjort. Är du säker?</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>Välj Starta om ADB redan är auktoriserad i WSA.
+För att godkänna ADB, öppna WSA avancerade inställningar.</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
+    <value>{0} av de valda filerna kan inte skapas under en Windows rootenhet.</value>
+  </data>
+  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
+    <value>Läs mer om ADB</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>Ladda ner ADB</value>
+  </data>
+  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
+    <value>Hitta Android Debug Bridge (v{0} åtminstone):</value>
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value>Ändra</value>
+  </data>
+  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
+    <value>Välj ADB-sökväg</value>
+  </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value>Fortsätt</value>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>Mer information</value>
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value>Aktiverad</value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value>Inaktiverad</value>
+  </data>
+  <data name="S_NEW_VERSION" xml:space="preserve">
+    <value>En ny {0} version {1} är tillgänglig</value>
+  </data>
+  <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
+    <value>Gå till versionssida</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>Stäng</value>
+  </data>
+  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
+    <value>Gå till versionsfakta</value>
+  </data>
+  <data name="S_ADB_EXECUTABLE" xml:space="preserve">
+    <value>ADB körbar fil</value>
+  </data>
+  <data name="S_HELP_ON_ADB" xml:space="preserve">
+    <value>Denna app är ett användargränssnitt för ADB - Android Debug Bridge.
+För att använda appen måste du ha ADB på din dator.
+ADB är tillgänglig som en del av Android SDK Platform Tools.
+Du kan använda den angivna länken för att ladda ner SDK Platform Tools.
+Tyvärr kan vi inte tillhandahålla ADB med appen på grund av licensbegränsningar.</value>
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value>Hjälp på Android Debug Bridge</value>
+  </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value>Starta om Android Debug Bridge nu</value>
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value>Starta om senare</value>
+  </data>
+  <data name="S_ITEM_DESTINATION" xml:space="preserve">
+    <value>Välj destination för {0}</value>
+  </data>
+  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
+    <value>Välj destination för flera objekt</value>
+  </data>
+  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
+    <value>Följande raderas:
+{0}</value>
+  </data>
+  <data name="S_DELETE_PERMANENT" xml:space="preserve">
+    <value>Följande raderas permanent:
+{0}</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>Ny fil</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>Ny mapp</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>Creative Commons</value>
+  </data>
+  <data name="S_LS_ERROR" xml:space="preserve">
+    <value>Ett fel inträffade när du försökte lista innehållet i den här mappen.
+Synligt innehåll kan vara ofullständigt.</value>
+  </data>
+  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
+    <value>{0} ligger tidigare i mapphierarkin än destinationsmappen.</value>
+  </data>
+  <data name="S_KILL_EMULATOR" xml:space="preserve">
+    <value>Är du säker på att du vill döda denna emulator?</value>
+  </data>
+  <data name="S_REM_DEVICE" xml:space="preserve">
+    <value>Är du säker på att du vill ta bort den här enheten?</value>
+  </data>
+  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
+    <value>Ta bort {0}</value>
+  </data>
+  <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
+    <value>Döda {0}</value>
+  </data>
+  <data name="S_REM_APK" xml:space="preserve">
+    <value>Följande kommer att tas bort:
+{0}</value>
+  </data>
+  <data name="S_REM_APK_PLURAL" xml:space="preserve">
+    <value>Följande kommer att tas bort:
+{0} paket</value>
+  </data>
+  <data name="S_UNINSTALL" xml:space="preserve">
+    <value>Avinstallera</value>
+  </data>
+  <data name="S_CANCEL" xml:space="preserve">
+    <value>Avbryt</value>
+  </data>
+  <data name="S_CONFIRM" xml:space="preserve">
+    <value>Bekräfta</value>
+  </data>
+  <data name="S_SKIP" xml:space="preserve">
+    <value>Hoppa över</value>
+  </data>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value>Ersätt</value>
+  </data>
+  <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
+    <value>Slå samman eller ersätt</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
+    <value>Det finns ett föremål i konflikt</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
+    <value>Det finns ett föremål i konflikt i {0}</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
+    <value>Det finns {0} föremål i konflikt</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
+    <value>Det finns {0} föremål i konflikt i {1}</value>
+  </data>
+  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
+    <value>Klistra konflikter</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
+    <value>Välj mappar för att trycka</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
+    <value>Välj mappar för att trycka till {0}</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
+    <value>Välj filer för att trycka</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
+    <value>Välj filer för att trycka in till {0}</value>
+  </data>
+  <data name="S_BUTTON_CLEAR" xml:space="preserve">
+    <value>Rensa</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
+    <value>mDNS</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
+    <value>Polling efter enheter</value>
+  </data>
+  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
+    <value>Polling för batteristatus</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
+    <value>Aktivera root automatiskt</value>
+  </data>
+  <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
+    <value>Spara manuellt anslutna enheter</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
+    <value>Öppna automatiskt för surfning</value>
+  </data>
+  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
+    <value>Kompakt vy</value>
+  </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value>Stoppa polling på Dra/Tryck</value>
+  </data>
+  <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
+    <value>Samtidiga operationer</value>
+  </data>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value>Tvinga omskanning av media vid Tryckning</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
+    <value>Polling för lagringsenheter</value>
+  </data>
+  <data name="S_SETTINGS_APK" xml:space="preserve">
+    <value>APK support</value>
+  </data>
+  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
+    <value>Visa filnamnstillägg</value>
+  </data>
+  <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
+    <value>Visa dolda föremål</value>
+  </data>
+  <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
+    <value>Visa systemappar</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
+    <value>Dubbelklick för filer</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
+    <value>Ingen</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
+    <value>Dra till standardmapp</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
+    <value>Öppna i Redigerare</value>
+  </data>
+  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
+    <value>Åsidosätt ADB-sökväg</value>
+  </data>
+  <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
+    <value>Standardmapp</value>
+  </data>
+  <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
+    <value>Ljust</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
+    <value>Mörkt</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
+    <value>Windows standard</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
+    <value>Tema</value>
+  </data>
+  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
+    <value>Framtvinga flytande stilar</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
+    <value>Inaktivera hårdvaruacceleration</value>
+  </data>
+  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
+    <value>Inaktivera animationer</value>
+  </data>
+  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
+    <value>Splashscreen</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES" xml:space="preserve">
+    <value>Kolla efter uppdateringar</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
+    <value>Grafik</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
+    <value>Arbetsgrupper</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
+    <value>Utforskare</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
+    <value>Enheter &amp; funktioner</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
+    <value>Enhet</value>
+  </data>
+  <data name="S_DONATE" xml:space="preserve">
+    <value>Donera eller sponsra</value>
+  </data>
+  <data name="S_APP_DATA_FOLDER" xml:space="preserve">
+    <value>Appdatamappar</value>
+  </data>
+  <data name="S_GITHUB_REPO" xml:space="preserve">
+    <value>GitHubförråd</value>
+  </data>
+  <data name="S_PRIVACY_POLICY" xml:space="preserve">
+    <value>Integritetspolicy</value>
+  </data>
+  <data name="S_ATTRIBUTIONS" xml:space="preserve">
+    <value>Attributioner och tredjepartslicenser</value>
+  </data>
+  <data name="S_SEE_TERMS" xml:space="preserve">
+    <value>Se villkor</value>
+  </data>
+  <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
+    <value>[inte inställd]</value>
+  </data>
+  <data name="S_SEARCH_SETTINGS" xml:space="preserve">
+    <value>Sökinställningar</value>
+  </data>
+  <data name="S_EXIT_SEARCH" xml:space="preserve">
+    <value>Stäng sökning</value>
+  </data>
+  <data name="S_SEARCH_VIEW" xml:space="preserve">
+    <value>Sök vy</value>
+  </data>
+  <data name="S_COLLAPSE_ALL" xml:space="preserve">
+    <value>Kollapsa alla</value>
+  </data>
+  <data name="S_EXPAND_ALL" xml:space="preserve">
+    <value>Expandera alla</value>
+  </data>
+  <data name="S_SETTINGS_TITLE" xml:space="preserve">
+    <value>Inställningar</value>
+  </data>
+  <data name="S_ACTION_HIDE" xml:space="preserve">
+    <value>Dölj</value>
+  </data>
+  <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
+    <value>Språk</value>
+  </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="S_FILTER_FILE_OPS" xml:space="preserve">
+    <value>Filtrera filoperationer</value>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>Aktivera automatisk uppspelning</value>
+  </data>
+  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
+    <value>Inaktivera automatiskt uppspelning
+Avbryt alla aktiva</value>
+  </data>
+  <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
+    <value>Loguppdateringar är pausade</value>
+  </data>
+  <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
+    <value>Pausa logguppdateringar</value>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>Kommandologg</value>
+  </data>
+  <data name="S_BUTTON_DRIVES" xml:space="preserve">
+    <value>Lagringsenheter</value>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value>Tillbaka</value>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value>Framåt</value>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>Upp</value>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>Enheter</value>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>Tryck</value>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>Mappar</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>Filer</value>
+  </data>
+  <data name="S_MENU_REFRESH" xml:space="preserve">
+    <value>Uppdatera</value>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>Kopiera</value>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>Mer</value>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>Redigera</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>Nytt</value>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value>Mapp</value>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value>Fil</value>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value>Välj alla</value>
+  </data>
+  <data name="S_MENU_CUT" xml:space="preserve">
+    <value>Klipp ut</value>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value>Klistra in länk</value>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value>Byt namn</value>
+  </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value>Paket</value>
+  </data>
+  <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
+    <value>Uppdateringstid ändrad</value>
+  </data>
+  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
+    <value>Stäng Redigerare</value>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>Spara ändringar</value>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>Installera</value>
+  </data>
+  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
+    <value>Kopiera till Temp</value>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>Rensa kommandologg</value>
+  </data>
+  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
+    <value>Öppna föremålets plats</value>
+  </data>
+  <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
+    <value>Sök i browser</value>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value>Kopiera till urklipp</value>
+  </data>
+  <data name="S_ADB_DISK_USAGE" xml:space="preserve">
+    <value>ADB diskanvändning</value>
+  </data>
+  <data name="S_DISK_USAGE_READ" xml:space="preserve">
+    <value>Läs: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
+    <value>Skriv: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
+    <value>Andra: {0}</value>
+  </data>
+  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
+    <value>Kolla efter uppdateringar vid varje start</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
+    <value>Om</value>
+  </data>
+  <data name="S_BROWSER_ITEMS" xml:space="preserve">
+    <value>föremål</value>
+  </data>
+  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
+    <value>föremål</value>
+  </data>
+  <data name="S_FOLDER_EMPTY" xml:space="preserve">
+    <value>Denna mapp är tom.</value>
+  </data>
+  <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
+    <value>Kan inte hämta listan.</value>
+  </data>
+  <data name="S_EMPTY_FILTER" xml:space="preserve">
+    <value>Inga objekt matchar aktuellt filter.</value>
+  </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value>&lt;Span&gt; Denna mapp &lt;Italic&gt; ser &lt;/Italic&gt; tom &lt;LineBreak /&gt;&lt;Span FontSize="10"&gt; ... ut vid första anblick &lt;/Span&gt;&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ITEMS_SELECTED" xml:space="preserve">
+    <value>föremål valt</value>
+  </data>
+  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
+    <value>föremål valda</value>
+  </data>
+  <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
+    <value>Operationstyp</value>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>Filnamn</value>
+  </data>
+  <data name="S_COLUMN_PROGRESS" xml:space="preserve">
+    <value>Framsteg</value>
+  </data>
+  <data name="S_COLUMN_SOURCE" xml:space="preserve">
+    <value>Källa</value>
+  </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value>Destination</value>
+  </data>
+  <data name="S_COLUMN_ADDED" xml:space="preserve">
+    <value>Tillagd</value>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>Ikon</value>
+  </data>
+  <data name="S_COLUMN_NAME" xml:space="preserve">
+    <value>Namn</value>
+  </data>
+  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
+    <value>Ursprungsplats</value>
+  </data>
+  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
+    <value>Ändringsdatum</value>
+  </data>
+  <data name="S_COLUMN_TYPE" xml:space="preserve">
+    <value>Typ</value>
+  </data>
+  <data name="S_COLUMN_SIZE" xml:space="preserve">
+    <value>Storlek</value>
+  </data>
+  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
+    <value>Raderingsdatum</value>
+  </data>
+  <data name="S_COLUMN_USER_ID" xml:space="preserve">
+    <value>Användar-ID</value>
+  </data>
+  <data name="S_COLUMN_VERSION" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
+    <value>ADB servern svarar inte</value>
+  </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value>Tid sedan senaste serversvar</value>
+  </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}s</value>
+  </data>
+  <data name="S_KILL_SERVER" xml:space="preserve">
+    <value>Döda server</value>
+  </data>
+  <data name="S_KILL_PROCESS" xml:space="preserve">
+    <value>Döda process</value>
+  </data>
+  <data name="S_REFRESH_DEVICES" xml:space="preserve">
+    <value>Uppdatera enheter</value>
+  </data>
+  <data name="S_RESTART_ADB" xml:space="preserve">
+    <value>Starta om ADB</value>
+  </data>
+  <data name="S_SERVER_DOWN" xml:space="preserve">
+    <value>mDNS servern är nere</value>
+  </data>
+  <data name="S_AWAITING_RESPONSE" xml:space="preserve">
+    <value>Väntar på svar: {0}</value>
+  </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0}ms</value>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0} m</value>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value>{0}h</value>
+  </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>mDNS-servern är igång</value>
+  </data>
+  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
+    <value>Begränsad support</value>
+  </data>
+  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
+    <value>Vissa operationer har misslyckats</value>
+  </data>
+  <data name="S_ROOT_ENABLED" xml:space="preserve">
+    <value>Root-åtkomst aktiverat</value>
+  </data>
+  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
+    <value>Root kan aktiveras</value>
+  </data>
+  <data name="S_RECOVERY_MODE" xml:space="preserve">
+    <value>Återställning</value>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value>Spänning: {0}v</value>
+  </data>
+  <data name="S_BAT_TEMP" xml:space="preserve">
+    <value>Temperatur: {0°C</value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>Nuvarande balans: {0}A</value>
+  </data>
+  <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
+    <value>Omstartsinformation</value>
+  </data>
+  <data name="S_REBOOT_SYSTEM" xml:space="preserve">
+    <value>Systembild</value>
+  </data>
+  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
+    <value>Bootloader</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
+    <value>Sideload</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
+    <value>Sideload (Automatisk omstart)</value>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - Offline</value>
+  </data>
+  <data name="S_STATUS_UNAUTH" xml:space="preserve">
+    <value>{0} - Obehörig</value>
+  </data>
+  <data name="S_TYPE_EMULATOR" xml:space="preserve">
+    <value>Emulator</value>
+  </data>
+  <data name="S_TYPE_SERVICE" xml:space="preserve">
+    <value>mDNS-tjänst</value>
+  </data>
+  <data name="S_TYPE_USB" xml:space="preserve">
+    <value>USB</value>
+  </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value>WiFi</value>
+  </data>
+  <data name="S_TYPE_WSA" xml:space="preserve">
+    <value>WSA</value>
+  </data>
+  <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
+    <value>Batteristatus okänd</value>
+  </data>
+  <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
+    <value>{0}%, Inkopplad</value>
+  </data>
+  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
+    <value>Trådlös</value>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>AC</value>
+  </data>
+  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
+    <value>Ingen</value>
+  </data>
+  <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
+    <value>Okänt</value>
+  </data>
+  <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
+    <value>Laddar</value>
+  </data>
+  <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
+    <value>Laddar ur</value>
+  </data>
+  <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
+    <value>Laddar inte</value>
+  </data>
+  <data name="S_BAT_STATE_FULL" xml:space="preserve">
+    <value>Full</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>Status: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH" xml:space="preserve">
+    <value>Hälsa: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
+    <value>Bra</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
+    <value>Överhettning</value>
+  </data>
+  <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
+    <value>Död</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
+    <value>Överspänning</value>
+  </data>
+  <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
+    <value>Ospecificerat fel</value>
+  </data>
+  <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
+    <value>Kallt</value>
+  </data>
+  <data name="S_BUTTON_LAUNCH" xml:space="preserve">
+    <value>Starta</value>
+  </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value>WSA-start</value>
+  </data>
+  <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
+    <value>Visa inte detta igen.</value>
+  </data>
+  <data name="S_BUTTON_ABORT" xml:space="preserve">
+    <value>Avbryt</value>
+  </data>
+  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
+    <value>Skicka till Shell</value>
+  </data>
+  <data name="S_PASTE_CONFLICT" xml:space="preserve">
+    <value>{0} Konflikt</value>
+  </data>
+  <data name="S_PASTE" xml:space="preserve">
+    <value>Klistra in</value>
+  </data>
+  <data name="S_DROP" xml:space="preserve">
+    <value>Släpp</value>
+  </data>
+  <data name="S_ACTION_OPERATION" xml:space="preserve">
+    <value>Operation</value>
+  </data>
+  <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
+    <value>Operationer</value>
+  </data>
+  <data name="S_ACTION_VALIDATE" xml:space="preserve">
+    <value>Validera {0}</value>
+  </data>
+  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
+    <value>Länk</value>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} (Länk)</value>
+  </data>
+  <data name="S_FILE_TYPE_APK" xml:space="preserve">
+    <value>Android applikationspaket (APK)</value>
+  </data>
+  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
+    <value>Körbar Windowsfil</value>
+  </data>
+  <data name="S_DRIVE_TRASH" xml:space="preserve">
+    <value>Papperskorg</value>
+  </data>
+  <data name="S_BUTTON_YES" xml:space="preserve">
+    <value>Ja</value>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>Root</value>
+  </data>
+  <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
+    <value>Intern lagring</value>
+  </data>
+  <data name="S_DRIVE_APPS" xml:space="preserve">
+    <value>Installerade appar</value>
+  </data>
+  <data name="S_DRIVE_SD" xml:space="preserve">
+    <value>μSD-kort</value>
+  </data>
+  <data name="S_DRIVE_OTG" xml:space="preserve">
+    <value>OTG-enhet</value>
+  </data>
+  <data name="S_DRIVE_EMULATED" xml:space="preserve">
+    <value>Emulerad enhet</value>
+  </data>
+  <data name="S_DRIVE_TEMP" xml:space="preserve">
+    <value>Temp</value>
+  </data>
+  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
+    <value>Filnamnet är inte tillåtet på målfilsystem: {0}</value>
+  </data>
+  <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
+    <value>Innehåll överensstämmer inte</value>
+  </data>
+  <data name="S_VALIDATE_MISSING" xml:space="preserve">
+    <value>Saknas från målplats</value>
+  </data>
+  <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
+    <value>Permanent borttagning</value>
+  </data>
+  <data name="S_LOCATION_NA" xml:space="preserve">
+    <value>N/A</value>
+  </data>
+  <data name="S_PATH_INVALID" xml:space="preserve">
+    <value>Argumentet måste ange hela vägen för en ny eller befintlig inställningsfil.</value>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>Sökväg för anpassade appinställningar</value>
+  </data>
+  <data name="S_MENU_EMPTY" xml:space="preserve">
+    <value>Menyn är tom</value>
+  </data>
+  <data name="S_ITEM_COPY" xml:space="preserve">
+    <value>{0} Kopiera</value>
+  </data>
+  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
+    <value>Följer Unix namnregler (via ADB)</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>Håller sig till FUSE namnregler</value>
+  </data>
+  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
+    <value>Håller sig till Windows namnregler</value>
+  </data>
+  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
+    <value>Håller sig till Windows-enhetens regler för rotnamn</value>
+  </data>
+  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
+    <value>Unik på aktuell plats</value>
+  </data>
+  <data name="S_POPUP_WARNING" xml:space="preserve">
+    <value>Varningar</value>
+  </data>
+  <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
+    <value>En vald fil bryter mot Windows namngivningsregler</value>
+  </data>
+  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
+    <value>En vald fil bryter mot Windowsenhetens namnregler för roten</value>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>Vissa utvalda filer har motstridiga namn på FUSE / Windows</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>En utvald fil bryter mot FUSE namngivningsregler</value>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>Vissa kopierade filer har motstridiga namn på FUSE</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>En kopierad fil bryter mot FUSE namnregler</value>
+  </data>
+  <data name="S_POPUP_NON_FILE" xml:space="preserve">
+    <value>Ett valt objekt är inte en fil / mapp</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
+    <value>Kan ogiltigförklaras med återställningsinställningar eller manuellt i inställningsfilen</value>
+  </data>
+  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
+    <value>Fram till nästa appstart</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
+    <value>Visa aldrig igen</value>
+  </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value>WSA-app</value>
+  </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>Rootstatus: {0}</value>
+  </data>
+  <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
+    <value>Okontrollerad</value>
+  </data>
+  <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
+    <value>Förbjudet</value>
+  </data>
+  <data name="S_BUTTON_ENABLE" xml:space="preserve">
+    <value>Aktivera</value>
+  </data>
+  <data name="S_BUTTON_DISABLE" xml:space="preserve">
+    <value>Inaktivera</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>Parkopplingskod</value>
+  </data>
+  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
+    <value>IP-adress / Värdnamn</value>
+  </data>
+  <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
+    <value>Parkopplingsport</value>
+  </data>
+  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
+    <value>Parkoppla &amp; anslut</value>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value>Sparad enhet</value>
+  </data>
+  <data name="S_DEVICE_QR" xml:space="preserve">
+    <value>QR-parkoppling</value>
+  </data>
+  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
+    <value>Redo att parkoppla</value>
+  </data>
+  <data name="S_CLEAR_ALL" xml:space="preserve">
+    <value>Rensa alla</value>
+  </data>
+  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
+    <value>Lägg till ny enhet</value>
+  </data>
+  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
+    <value>[Oauktoriserad]</value>
+  </data>
+  <data name="S_SERVICE_NONAME" xml:space="preserve">
+    <value>[Service]</value>
+  </data>
+  <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
+    <value>För närvarande surfar</value>
+  </data>
+  <data name="S_BUTTON_BROWSE" xml:space="preserve">
+    <value>Bläddra</value>
+  </data>
+  <data name="S_BUTTON_CONNECT" xml:space="preserve">
+    <value>Anslut</value>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value>{0} ledigt av {1}</value>
+  </data>
+  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
+    <value>Tomt</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
+    <value>APK-installationsfil</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
+    <value>APK-installationsfiler</value>
+  </data>
+  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
+    <value>Paket</value>
+  </data>
+  <data name="S_FILEOP_ERROR" xml:space="preserve">
+    <value>Fel: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATED" xml:space="preserve">
+    <value>Validerad</value>
+  </data>
+  <data name="S_FILEOP_COMPLETED" xml:space="preserve">
+    <value>Slutförd</value>
+  </data>
+  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
+    <value>{0} Misslyckades</value>
+  </data>
+  <data name="S_FILEOP_TOTAL" xml:space="preserve">
+    <value>Totalt:</value>
+  </data>
+  <data name="S_FILEOP_PREV" xml:space="preserve">
+    <value>Föregående operation</value>
+  </data>
+  <data name="S_FILEOP_RUNNING" xml:space="preserve">
+    <value>Kör</value>
+  </data>
+  <data name="S_FILEOP_WAITING" xml:space="preserve">
+    <value>Köad</value>
+  </data>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>Misslyckades</value>
+  </data>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value>Avbruten</value>
+  </data>
+  <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
+    <value>Föregående</value>
+  </data>
+  <data name="S_ACTION_MOVE" xml:space="preserve">
+    <value>Flytta</value>
+  </data>
+  <data name="S_ACTION_RECYCLE" xml:space="preserve">
+    <value>Kasta</value>
+  </data>
+  <data name="S_ACTION_UPDATE" xml:space="preserve">
+    <value>Uppdatera</value>
+  </data>
+  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
+    <value>{0}% Används</value>
+  </data>
+  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
+    <value>Scrolla här</value>
+  </data>
+  <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
+    <value>Topp</value>
+  </data>
+  <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
+    <value>Botten</value>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>Sida upp</value>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>Sida ner</value>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>Scrolla upp</value>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>Scrolla ner</value>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>Vänster kant</value>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>Höger kant</value>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>Sida åt vänster</value>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>Sida åt höger</value>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>Scrolla vänster</value>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>Scrolla höger</value>
+  </data>
+  <data name="S_MENU_UNDO" xml:space="preserve">
+    <value>Ångra</value>
+  </data>
+  <data name="S_MENU_REDO" xml:space="preserve">
+    <value>Gör om</value>
+  </data>
+  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
+    <value>Notiser</value>
+  </data>
+  <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
+    <value>Klicka för att visa mer info</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
+    <value>Appspråk</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION" xml:space="preserve">
+    <value>Välj ditt appspråk i inställningarna.
+Översättningsframsteg visas för det valda språket.
+Hjälp oss att översätta appen till ditt språk på Weblate.</value>
+  </data>
+  <data name="S_GOTO_WEBLATE" xml:space="preserve">
+    <value>Gå till Weblate</value>
+  </data>
+  <data name="S_FILE_SOCKET" xml:space="preserve">
+    <value>Socket</value>
+  </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>Blockera enhet</value>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>Char-enhet</value>
+  </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
+  </data>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>Okänt</value>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>Trasig länk</value>
+  </data>
+  <data name="S_NAV_HISTORY" xml:space="preserve">
+    <value>Navigationshistoria</value>
+  </data>
+  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
+    <value>Lägg till aktuell plats</value>
+  </data>
+  <data name="S_REMOVE" xml:space="preserve">
+    <value>Ta bort</value>
+  </data>
+  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
+    <value>Sparade platser</value>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} KB</value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} MB</value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} GB</value>
+  </data>
+  <data name="TERA" xml:space="preserve">
+    <value>{0} TB</value>
+  </data>
+  <data name="PETA" xml:space="preserve">
+    <value>{0} PB</value>
+  </data>
+  <data name="EXA" xml:space="preserve">
+    <value>{0} EB</value>
+  </data>
+  <data name="MILLI" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="MICRO" xml:space="preserve">
+    <value>u</value>
+  </data>
+  <data name="NANO" xml:space="preserve">
+    <value>n</value>
+  </data>
+  <data name="BYTES" xml:space="preserve">
+    <value>{0} B</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Kopiera {0} objekt</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
+    <value>Kopiera {0} objekt till {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
+    <value>Flytta {0} objekt till {1}</value>
+  </data>
+  <data name="S_DRAGDROP_LINK" xml:space="preserve">
+    <value>Skapa länk i {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>Flytta {0} objekt</value>
+  </data>
+  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
+    <value>Klistra in ett utklippt föremål</value>
+  </data>
+  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
+    <value>Klistra in ett kopierat föremål</value>
+  </data>
+  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
+    <value>Klistra in {0} kopierade föremål</value>
+  </data>
+  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
+    <value>Klistra in {0} utklippta föremål</value>
+  </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{0} i {1} ({2})</value>
+  </data>
+  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
+    <value>{0} av {1}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
+    <value>Kopiera {0}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
+    <value>Kopiera {0} till {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
+    <value>Flytta {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>Flytta {0} till {1}</value>
+  </data>
+  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
+    <value>Filen hittades inte</value>
+  </data>
+  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
+    <value>Avslutad utan bekräftelse</value>
+  </data>
+  <data name="S_VALIDATION_ERROR" xml:space="preserve">
+    <value>Valideringsfel: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATING" xml:space="preserve">
+    <value>Validerar…</value>
+  </data>
+  <data name="S_FILES_PLURAL" xml:space="preserve">
+    <value>{0} filer</value>
+  </data>
+  <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
+    <value>Välj ROM för sidladdning</value>
+  </data>
+  <data name="S_ROM_FILE" xml:space="preserve">
+    <value>ROM-fil</value>
+  </data>
+  <data name="S_TERMINAL" xml:space="preserve">
+    <value>Terminal</value>
+  </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>Behåll fildatum modifierad</value>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>Installera {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>Installera {0} APK:er</value>
+  </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value>På</value>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value>Av</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>Kontrollerar mDNS serverstatus…</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value>Ikoner</value>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>Dra &amp; visa miniatyrbilder</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>Endast i ikonvy</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>Endast i fotomappar</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value>Vid anslutning</value>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>Spara miniatyrbilder mellan sessioner</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>Begränsa miniatyrers hastighet vid dragning</value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>Visa ikoner för speciella mappar</value>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>Inkludera videominiatyrer</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>Längd</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>Dimensioner</value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>En månad</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>En vecka</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>En dag</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>En timme</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>Lokala miniatyrers uppdateringstid</value>
+  </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>Använd BusyBox om tillgänglig</value>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>Anslut till WSA automatiskt om det är tillgängligt</value>
+  </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>Klistra in</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>Kolla efter miniatyruppdateringar</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>Dragminiatyrbilder</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>Läsa miniatyrbildsplatser och mediedatabas</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_TITLE" xml:space="preserve">
+    <value>{0} Miniatyrbilder</value>
+  </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value>Detaljer</value>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value>Vy</value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>Medium ikoner</value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>Stora ikoner</value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>Extra stora ikoner</value>
+  </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value>Layout- och vyalternativ</value>
   </data>
 </root>
