@@ -1525,4 +1525,97 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
     <value>אפשרויות פריסה ותצוגה</value>
   </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value>מיין</value>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value>סדר עולה</value>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value>סדר יורד</value>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>הגדרות מיון נשמרות לכל מיקום</value>
+  </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>גודל תמונה מקסימלי לשימוש לתצוגה מקדימה של עצמה (0 - מבוטל)</value>
+  </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>ועוד {0}…</value>
+  </data>
+  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
+    <value>הצג או הסתר את חלונית הפרטים והתצוגה המקדימה.</value>
+  </data>
+  <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
+    <value>תצוגה מקדימה</value>
+  </data>
+  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
+    <value>גודל קובץ מקסימלי לתצוגה מקדימה</value>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>הורד קובץ לתיקיית ברירת המחדל בלחיצה כפולה</value>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value>בחר פריט בודד כדי לקבל יותר מידע.</value>
+  </data>
+  <data name="S_ITEM_LOCATION" xml:space="preserve">
+    <value>מיקום</value>
+  </data>
+  <data name="S_IMAGE_F_STOP" xml:space="preserve">
+    <value>F-סטופ</value>
+  </data>
+  <data name="S_IMAGE_ISO" xml:space="preserve">
+    <value>מהירות ISO</value>
+  </data>
+  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
+    <value>זמן חשיפה</value>
+  </data>
+  <data name="S_VIDEO_BITRATE" xml:space="preserve">
+    <value>קצב מידע</value>
+  </data>
+  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
+    <value>בחר קובץ לתצוגה מקדימה.</value>
+  </data>
+  <data name="S_PREVIEW_INVALID" xml:space="preserve">
+    <value>תצוגה מקדימה אינה אפשרית.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
+    <value>PDF זה מוגן בסיסמה.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
+    <value>סיסמה שגויה.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
+    <value>פתח</value>
+  </data>
+  <data name="S_FILE_PERMISSIONS" xml:space="preserve">
+    <value>הרשאות</value>
+  </data>
+  <data name="S_FILE_PERM_USER" xml:space="preserve">
+    <value>משתמש</value>
+  </data>
+  <data name="S_FILE_PERM_GROUP" xml:space="preserve">
+    <value>קבוצה</value>
+  </data>
+  <data name="S_FILE_PERM_OTHER" xml:space="preserve">
+    <value>אחרים</value>
+  </data>
+  <data name="S_DATE_ACCESSED" xml:space="preserve">
+    <value>גישה אחרונה</value>
+  </data>
+  <data name="S_CREATION_TIME" xml:space="preserve">
+    <value>נוצר</value>
+  </data>
+  <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
+    <value>השתנה</value>
+  </data>
+  <data name="S_FILE_SYSTEM" xml:space="preserve">
+    <value>מערכת קבצים</value>
+  </data>
+  <data name="S_MOUNT_POINT" xml:space="preserve">
+    <value>נקודת mount</value>
+  </data>
+  <data name="S_MOUNT_OPTIONS" xml:space="preserve">
+    <value>אפשרויות mount</value>
+  </data>
 </root>

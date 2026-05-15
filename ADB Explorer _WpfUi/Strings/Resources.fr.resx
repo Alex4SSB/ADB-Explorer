@@ -1460,13 +1460,13 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
     <value>Afficher icônes pour dossiers spéciaux</value>
   </data>
   <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
-    <value>Le réglage pour permettre l'affichage des miniatures de vidéos (recherche et affichage)</value>
+    <value>Inclure les vignettes vidéo</value>
   </data>
   <data name="S_VIDEO_DURATION" xml:space="preserve">
-    <value>Élément de l’aperçu détaillé d'un fichier vidéo (longueur = durée)</value>
+    <value>Durée</value>
   </data>
   <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
-    <value>Élément de l'aperçu détaillé d'un fichier vidéo (dimensions = résolution)</value>
+    <value>Résolution</value>
   </data>
   <data name="S_ONE_MONTH" xml:space="preserve">
     <value>Un mois</value>
@@ -1482,5 +1482,140 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   </data>
   <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
     <value>Heure d'actualisation de la vignette locale</value>
+  </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>Utilisez BusyBox si disponible</value>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>Connecter automatiquement en WSA si disponible</value>
+  </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>Coller</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>Vérification des mises à jour des vignettes</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>Récupération des vignettes</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>Lecture des localisations des vignettes et de la base de données</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_TITLE" xml:space="preserve">
+    <value>{0} Miniatures</value>
+  </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value>Détails</value>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value>Vue</value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>Icônes moyennes</value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>Grandes icônes</value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>Icônes extra-larges</value>
+  </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value>Options d'affichage et d'interface</value>
+  </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value>Enregistrement du réglage de taille des miniatures pour chaque dossier</value>
+  </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value>Regrouper</value>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value>Ascendant</value>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value>Descendant</value>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>Colonne de tri &amp; ordre enregistré pour chaque emplacement</value>
+  </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>Taille max de l'image à utiliser pour sa propre miniature (0 - désactivé)</value>
+  </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>et {0} supplémentaires…</value>
+  </data>
+  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
+    <value>Afficher ou masquer le panneau des détails et de prévisualisation.</value>
+  </data>
+  <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
+    <value>Aperçu</value>
+  </data>
+  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
+    <value>Taille maximale du fichier pour la prévisualisation</value>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>Enoyer vers le dossier par défaut lors du double-clique sur fichier</value>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value>Sélectionnez un seul élément pour obtenir plus d'informations.</value>
+  </data>
+  <data name="S_ITEM_LOCATION" xml:space="preserve">
+    <value>Localisation</value>
+  </data>
+  <data name="S_IMAGE_F_STOP" xml:space="preserve">
+    <value>F-stop</value>
+  </data>
+  <data name="S_IMAGE_ISO" xml:space="preserve">
+    <value>Vitesse ISO</value>
+  </data>
+  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
+    <value>Temps d'exposition</value>
+  </data>
+  <data name="S_VIDEO_BITRATE" xml:space="preserve">
+    <value>Bitrate</value>
+  </data>
+  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
+    <value>Sélectionnez un fichier à prévisualiser.</value>
+  </data>
+  <data name="S_PREVIEW_INVALID" xml:space="preserve">
+    <value>Pas d'aperçu disponible.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
+    <value>Ce PDF est protégé par mot de passe.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
+    <value>Mot de passe incorrect.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
+    <value>Déverrouiller</value>
+  </data>
+  <data name="S_FILE_PERMISSIONS" xml:space="preserve">
+    <value>Permissions</value>
+  </data>
+  <data name="S_FILE_PERM_USER" xml:space="preserve">
+    <value>Utilisateur</value>
+  </data>
+  <data name="S_FILE_PERM_GROUP" xml:space="preserve">
+    <value>Groupe</value>
+  </data>
+  <data name="S_FILE_PERM_OTHER" xml:space="preserve">
+    <value>Autres</value>
+  </data>
+  <data name="S_DATE_ACCESSED" xml:space="preserve">
+    <value>Accédé le</value>
+  </data>
+  <data name="S_CREATION_TIME" xml:space="preserve">
+    <value>Créé le</value>
+  </data>
+  <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
+    <value>Modifié le</value>
+  </data>
+  <data name="S_FILE_SYSTEM" xml:space="preserve">
+    <value>Système de fichiers</value>
+  </data>
+  <data name="S_MOUNT_POINT" xml:space="preserve">
+    <value>Point de montage</value>
+  </data>
+  <data name="S_MOUNT_OPTIONS" xml:space="preserve">
+    <value>Options de montage</value>
   </data>
 </root>

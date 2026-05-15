@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1434,5 +1434,20 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_ENABLE_MDNS" xml:space="preserve">
     <value>Нажмите, чтобы включить сервер и опрос</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value>При подключении</value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>Один месяц</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>Одна неделя</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>Один день</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>Один час</value>
   </data>
 </root>

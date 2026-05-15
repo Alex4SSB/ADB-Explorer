@@ -260,13 +260,16 @@
                                         </Style>
                                     </Image.Style>
                                 </Image>
-                                <emoji:TextBlock
-                                    x:Name="FileNameTextBlock"
+                                <Grid
                                     Grid.Column="1"
-                                    VerticalAlignment="Center"
-                                    FontSize="16"
-                                    FontWeight="SemiBold"
-                                    TextWrapping="Wrap" />
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                                    <emoji:TextBlock
+                                        x:Name="FileNameTextBlock"
+                                        FontSize="16"
+                                        FontWeight="SemiBold"
+                                        TextWrapping="Wrap" />
+                                </Grid>
                             </Grid>
                             <Border
                                 x:Name="InvalidSelectionBorder"

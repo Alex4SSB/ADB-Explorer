@@ -232,6 +232,10 @@ public partial class DetailsPane : UserControl
                 {
                     control.File = f;
                     control.FileNameTextBlock.Text = f.DisplayName;
+                    control.FileNameTextBlock.FlowDirection = f.NameIsRtl
+                        ? FlowDirection.RightToLeft
+                        : FlowDirection.LeftToRight;
+
                     control.LargeFileIcon.Source = f.DragImage;
                     control.LargeFileIcon.MaxHeight = f.CacheThumbnail?.Image is null ? 128 : 192;
                     control.SmallFileIcon.Source = f.CacheThumbnail?.Image is null ? null : f.FileIcon32;
@@ -242,6 +246,7 @@ public partial class DetailsPane : UserControl
                 {
                     control.Package = p;
                     control.FileNameTextBlock.Text = p.DisplayName;
+                    control.FileNameTextBlock.FlowDirection = FlowDirection.LeftToRight;
                     control.LargeFileIcon.Source = AppIcon;
                     control.LargeFileIcon.MaxHeight = 128;
                     control.SmallFileIcon.Source = null;
@@ -254,6 +259,9 @@ public partial class DetailsPane : UserControl
                     control.Package = null;
                     control.Drive = drive;
                     control.FileNameTextBlock.Text = drive.DisplayName;
+                    control.FileNameTextBlock.FlowDirection = Data.RuntimeSettings.IsRTL
+                        ? FlowDirection.RightToLeft
+                        : FlowDirection.LeftToRight;
 
                     var trashDrive = Data.DevicesObject.Current.Drives.OfType<VirtualDriveViewModel>().First(d => d.Type is AbstractDrive.DriveType.Trash);
 
@@ -276,6 +284,10 @@ public partial class DetailsPane : UserControl
                 control.File = null;
                 control.Package = null;
                 control.FileNameTextBlock.Text = $"{files.Count()} {Strings.Resources.S_ITEMS_SELECTED_PLURAL}";
+                control.FileNameTextBlock.FlowDirection = Data.RuntimeSettings.IsRTL
+                        ? FlowDirection.RightToLeft
+                        : FlowDirection.LeftToRight;
+
                 control.LargeFileIcon.Source = MultipleFiles.DragImage;
                 control.LargeFileIcon.MaxHeight = 128;
                 control.SmallFileIcon.Source = null;
@@ -286,6 +298,10 @@ public partial class DetailsPane : UserControl
                 control.File = null;
                 control.Package = null;
                 control.Drive = null;
+
+                control.FileNameTextBlock.FlowDirection = Data.RuntimeSettings.IsRTL
+                        ? FlowDirection.RightToLeft
+                        : FlowDirection.LeftToRight;
 
                 if (Data.CurrentPath is null)
                 {
@@ -307,10 +323,11 @@ public partial class DetailsPane : UserControl
                 {
                     control.FileNameTextBlock.Text = Data.DevicesObject.Current.Name;
                     control.LargeFileIcon.Source = Phone.DragImage;
+                    control.FileNameTextBlock.FlowDirection = FlowDirection.LeftToRight;
                 }
                 else if (Data.CurrentDrive?.Path == Data.CurrentPath)
                 {
-                    control.FileNameTextBlock.Text = $"{Data.CurrentDrive.DisplayName}{(Data.CurrentDrive.Path == "/" ? " " : "\n")}({Data.CurrentDrive.Path})";
+                    control.FileNameTextBlock.Text = $"{Data.CurrentDrive.DisplayName}\n{TextHelper.LTR_MARK}({Data.CurrentDrive.Path}){TextHelper.LTR_MARK}";
                     control.LargeFileIcon.Source = DriveIcon.DragImage;
                 }
                 else
@@ -474,11 +491,11 @@ public partial class DetailsPane : UserControl
 
         if (drive is LogicalDriveViewModel logicalDrive)
         {
-            SelectionInfoItems.Add(new ItemDetailsViewModel<LogicalDriveViewModel>(logicalDrive, Strings.Resources.S_MOUNT_POINT, d => d.FSInfo is null ? "" : d.MountPoint).Init());
+            SelectionInfoItems.Add(new ItemDetailsViewModel<LogicalDriveViewModel>(logicalDrive, Strings.Resources.S_MOUNT_POINT, d => d.MountPoint is null ? "" : d.MountPoint, valueIsLtr: true).Init());
 
-            SelectionInfoItems.Add(new ItemDetailsViewModel<LogicalDriveViewModel>(logicalDrive, Strings.Resources.S_FILE_SYSTEM, d => d.FSInfo is null ? "" : d.FileSystem.ToUpper()).Init());
+            SelectionInfoItems.Add(new ItemDetailsViewModel<LogicalDriveViewModel>(logicalDrive, Strings.Resources.S_FILE_SYSTEM, d => d.FileSystem is null ? "" : d.FileSystem.ToUpper(), valueIsLtr: true).Init());
 
-            SelectionInfoItems.Add(new ItemDetailsViewModel<LogicalDriveViewModel>(logicalDrive, Strings.Resources.S_FILE_BLOCK, d => d.FSInfo is null ? "" : d.BlockDevice).Init());
+            SelectionInfoItems.Add(new ItemDetailsViewModel<LogicalDriveViewModel>(logicalDrive, Strings.Resources.S_FILE_BLOCK, d => d.BlockDevice is null ? "" : d.BlockDevice, valueIsLtr: true).Init());
 
             if (logicalDrive.MountOptions is { } opts)
             {
@@ -490,12 +507,15 @@ public partial class DetailsPane : UserControl
             {
                 if (e.PropertyName == nameof(LogicalDriveViewModel.MountOptions))
                 {
-                    MountOptionsItems.Clear();
-                    if (logicalDrive.MountOptions is { } newOpts)
+                    App.SafeInvoke(() =>
                     {
-                        foreach (var opt in newOpts)
-                            MountOptionsItems.Add(new MountOptionViewModel(opt));
-                    }
+                        MountOptionsItems.Clear();
+                        if (logicalDrive.MountOptions is { } newOpts)
+                        {
+                            foreach (var opt in newOpts)
+                                MountOptionsItems.Add(new MountOptionViewModel(opt));
+                        }
+                    });
                 }
             };
 
@@ -556,10 +576,10 @@ public partial class DetailsPane : UserControl
 
         if (file.ModifiedTime.HasValue)
         {
-            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_FILE_INFO_MODIFIED, f => f.FolderViewModel.ModifiedTimeWithOffsetString).Init());
-            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_DATE_ACCESSED, f => f.FolderViewModel.LastAccessTimeString).Init());
+            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_FILE_INFO_MODIFIED, f => f.FolderViewModel.ModifiedTimeWithOffsetString, valueIsLtr: true).Init());
+            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_DATE_ACCESSED, f => f.FolderViewModel.LastAccessTimeString, valueIsLtr: true).Init());
 
-            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_CREATION_TIME, f => f.FolderViewModel.CreationTimeString).Init());
+            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_CREATION_TIME, f => f.FolderViewModel.CreationTimeString, valueIsLtr: true).Init());
         }
 
         if (Data.FileActions.IsRecycleBin)
@@ -592,9 +612,39 @@ public partial class DetailsPane : UserControl
 
         if (file.Permissions.HasValue)
         {
-            PermissionsItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_FILE_PERM_USER, f => $"{(f.User is null ? "" : $"({f.User}) ")}{f.FolderViewModel.UserPermissionsString}", useConsoleFont: true).Init());
-            PermissionsItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_FILE_PERM_GROUP, f => $"{(f.Group is null ? "" : $"({f.Group}) ")}{f.FolderViewModel.GroupPermissionsString}", useConsoleFont: true).Init());
-            PermissionsItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_FILE_PERM_OTHER, f => $"{f.FolderViewModel.OtherPermissionsString}", useConsoleFont: true));
+            static string userSelector(FileClass f)
+            {
+                string user = f.User is null ? "" : $"({f.User})";
+                string permission = f.FolderViewModel.UserPermissionsString;
+
+                return Data.RuntimeSettings.IsRTL
+                    ? $"{permission} {user}"
+                    : $"{user} {permission}";
+            }
+
+            static string groupSelector(FileClass f)
+            {
+                string group = f.Group is null ? "" : $"({f.Group})";
+                string permission = f.FolderViewModel.GroupPermissionsString;
+
+                return Data.RuntimeSettings.IsRTL
+                    ? $"{permission} {group}"
+                    : $"{group} {permission}";
+            }
+
+            PermissionsItems.Add(new ItemDetailsViewModel<FileClass>(file,
+                                                                     Strings.Resources.S_FILE_PERM_USER,
+                                                                     userSelector,
+                                                                     valueIsLtr: true,
+                                                                     useConsoleFont: true).Init());
+
+            PermissionsItems.Add(new ItemDetailsViewModel<FileClass>(file,
+                                                                     Strings.Resources.S_FILE_PERM_GROUP,
+                                                                     groupSelector,
+                                                                     valueIsLtr: true,
+                                                                     useConsoleFont: true).Init());
+
+            PermissionsItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_FILE_PERM_OTHER, f => $"{f.FolderViewModel.OtherPermissionsString}", valueIsLtr: true, useConsoleFont: true));
 
             var cts = new CancellationTokenSource();
             _cancellationToken = cts;

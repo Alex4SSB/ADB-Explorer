@@ -161,10 +161,10 @@
                 <local:ThumbsSizeSelector x:Name="ThumbsSizeSelector" ThumbnailSize="{Binding CurrentThumbsSize, Mode=TwoWay}" />
             </StackPanel>
             <Border
-                Grid.Column="3"
+                Grid.Column="2"
                 Background="Transparent"
                 MouseDown="Window_MouseDown" />
-            <local:DetailsControl Grid.Column="4" IsChecked="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsDetailsPaneOpen, Mode=TwoWay}" />
+            <local:DetailsControl Grid.Column="3" IsChecked="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsDetailsPaneOpen, Mode=TwoWay}" />
             <Separator Grid.ColumnSpan="4" VerticalAlignment="Bottom" />
         </Grid>
         <Border Grid.Row="2" MouseDown="GridBackgroundBlock_MouseDown">

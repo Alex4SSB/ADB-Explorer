@@ -1,4 +1,6 @@
-﻿namespace ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Models;
+
+namespace ADB_Explorer.Helpers;
 
 public static partial class TabularDateFormatter
 {
