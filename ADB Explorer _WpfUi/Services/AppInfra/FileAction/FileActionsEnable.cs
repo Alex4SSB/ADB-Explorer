@@ -336,41 +336,6 @@ public partial class FileActionsEnable : ObservableObject
         set => SetProperty(ref isOpenApkLocationEnabled, value);
     }
 
-    private bool isRenameUnixLegal = false;
-    public bool IsRenameUnixLegal
-    {
-        get => isRenameUnixLegal;
-        set => SetProperty(ref isRenameUnixLegal, value);
-    }
-
-    private bool isRenameFuseLegal = false;
-    public bool IsRenameFuseLegal
-    {
-        get => isRenameFuseLegal;
-        set => SetProperty(ref isRenameFuseLegal, value);
-    }
-
-    private bool isRenameWindowsLegal = false;
-    public bool IsRenameWindowsLegal
-    {
-        get => isRenameWindowsLegal;
-        set => SetProperty(ref isRenameWindowsLegal, value);
-    }
-
-    private bool isRenameDriveRootLegal = false;
-    public bool IsRenameDriveRootLegal
-    {
-        get => isRenameDriveRootLegal;
-        set => SetProperty(ref isRenameDriveRootLegal, value);
-    }
-
-    private bool isRenameUnique = false;
-    public bool IsRenameUnique
-    {
-        get => isRenameUnique;
-        set => SetProperty(ref isRenameUnique, value);
-    }
-
     private int selectedFilesCount = 0;
     public int SelectedItemsCount
     {

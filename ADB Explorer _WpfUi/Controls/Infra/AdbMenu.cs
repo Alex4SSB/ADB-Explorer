@@ -49,7 +49,7 @@ public class AdbMenuItem : Wpf.Ui.Controls.MenuItem
     {
         base.OnClick();
 
-        if (Helpers.StyleHelper.GetAnimateOnClick(this) && Models.Data.Settings.IsAnimated)
+        if (Helpers.StyleHelper.GetAnimateOnClick(this))
             PlayAnimation();
     }
 

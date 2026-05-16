@@ -2,6 +2,7 @@ using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.Services.AppInfra;
 
 namespace ADB_Explorer.ViewModels;
 
@@ -93,10 +94,82 @@ public partial class FileViewModelBase : ObservableObject
     [ObservableProperty]
     public partial bool IsInEditMode { get; set; }
 
+    [ObservableProperty]
+    public partial bool IsRenameUnixLegal { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsRenameFuseLegal { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsRenameWindowsLegal { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsRenameDriveRootLegal { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsRenameUnique { get; set; }
+
     protected FileViewModelBase(FileClass file)
     {
         _file = file;
         _typeName = GetTypeName();
+    }
+
+    public static void RenameTextChanged(TextBox textBox)
+    {
+        if (textBox.DataContext is not FileClass file)
+            return;
+
+        textBox.FilterString(Data.CurrentDrive.IsFUSE
+            ? AdbExplorerConst.INVALID_NTFS_CHARS
+            : AdbExplorerConst.INVALID_UNIX_CHARS);
+
+        var vm = file.ActiveViewModel;
+
+        vm.IsRenameUnixLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Unix);
+        vm.IsRenameFuseLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.FUSE);
+        vm.IsRenameWindowsLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Windows);
+        vm.IsRenameDriveRootLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.WinRoot);
+
+        var fullName = Data.Settings.ShowExtensions
+            ? textBox.Text
+            : textBox.Text + file.Extension;
+
+        var comparison = Data.CurrentDrive.IsFUSE
+            ? StringComparison.InvariantCultureIgnoreCase
+            : StringComparison.InvariantCulture;
+
+        vm.IsRenameUnique = !Data.DirList.FileList.Except([file]).Any(f => f.FullName.Equals(fullName, comparison));
+    }
+
+    public static void RenameKeyDown(TextBox textBox, Key key, Action<FileClass> exitEditMode)
+    {
+        if (textBox.DataContext is not FileClass file)
+            return;
+
+        if (key is Key.Escape or Key.F2)
+        {
+            var name = FileHelper.DisplayName(textBox);
+            if (string.IsNullOrEmpty(name))
+                Data.DirList.FileList.Remove(file);
+            else
+                textBox.Text = name;
+
+            exitEditMode(file);
+        }
+        else if (key is Key.Enter)
+        {
+            exitEditMode(file);
+        }
+    }
+
+    public static void RenameCommit(TextBox textBox, Action<FileClass> exitEditMode)
+    {
+        if (textBox.DataContext is not FileClass file)
+            return;
+
+        FileActionLogic.Rename(textBox);
+        exitEditMode(file);
     }
 
     public virtual void UpdateType()

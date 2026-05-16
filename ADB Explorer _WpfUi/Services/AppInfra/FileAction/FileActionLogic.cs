@@ -510,12 +510,13 @@ internal static class FileActionLogic
     {
         if (textBox.DataContext is not FileClass file)
             return;
-        
+
+        var vm = file.ActiveViewModel;
         var name = FileHelper.DisplayName(textBox);
 
-        if (!Data.FileActions.IsRenameUnixLegal
-            || (Data.CurrentDrive?.IsFUSE is true && !Data.FileActions.IsRenameFuseLegal)
-            || !Data.FileActions.IsRenameUnique)
+        if (!vm.IsRenameUnixLegal
+            || (Data.CurrentDrive?.IsFUSE is true && !vm.IsRenameFuseLegal)
+            || !vm.IsRenameUnique)
         {
             return;
         }

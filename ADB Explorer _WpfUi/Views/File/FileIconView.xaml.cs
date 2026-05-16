@@ -1,6 +1,5 @@
-using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Services.AppInfra;
+using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.Data;
 
@@ -14,6 +13,16 @@ public partial class FileIconView : UserControl
     private bool _wasSelectedOnMouseDown;
     private bool _wasEditingOnMouseDown;
     private int _clickCount;
+
+    /// <summary>
+    /// Raised when icon rename editing starts. Sender is the <see cref="FileIconView"/> instance.
+    /// </summary>
+    public static event EventHandler<FileClass> RenameStarted;
+
+    /// <summary>
+    /// Raised when icon rename editing ends. Sender is the <see cref="FileIconView"/> instance.
+    /// </summary>
+    public static event EventHandler RenameEnded;
 
     public FileIconView()
     {
@@ -84,6 +93,15 @@ public partial class FileIconView : UserControl
 
         textBox.Focus();
         textBox.SelectAll();
+
+        if (DataContext is FileClass file)
+            RenameStarted?.Invoke(this, file);
+    }
+
+    private static void ExitIconEditMode(FileClass file)
+    {
+        file.IconViewModel.IsInEditMode = false;
+        FileActions.IsExplorerEditing = false;
     }
 
     private void IconViewNameEdit_LostFocus(object sender, RoutedEventArgs e)
@@ -91,13 +109,8 @@ public partial class FileIconView : UserControl
         if (sender is not System.Windows.Controls.TextBox textBox)
             return;
 
-        if (textBox.DataContext is not FileClass file || !file.IconViewModel.IsInEditMode)
-            return;
-
-        FileActionLogic.Rename(textBox);
-
-        file.IconViewModel.IsInEditMode = false;
-        FileActions.IsExplorerEditing = false;
+        RenameEnded?.Invoke(this, EventArgs.Empty);
+        FileViewModelBase.RenameCommit(textBox, ExitIconEditMode);
     }
 
     private void IconViewNameEdit_KeyDown(object sender, KeyEventArgs e)
@@ -105,33 +118,9 @@ public partial class FileIconView : UserControl
         if (sender is not System.Windows.Controls.TextBox textBox)
             return;
 
-        if (textBox.DataContext is not FileClass file)
-            return;
-
-        if (e.Key is Key.Escape or Key.F2)
-        {
-            var name = FileHelper.DisplayName(textBox);
-            if (string.IsNullOrEmpty(name))
-            {
-                DirList.FileList.Remove(file);
-            }
-            else
-            {
-                textBox.Text = FileHelper.DisplayName(textBox);
-            }
-
-            file.IconViewModel.IsInEditMode = false;
-            FileActions.IsExplorerEditing = false;
-        }
-        else if (e.Key is Key.Enter)
-        {
-            file.IconViewModel.IsInEditMode = false;
-            FileActions.IsExplorerEditing = false;
-        }
-        else
-            return;
-
-        e.Handled = true;
+        FileViewModelBase.RenameKeyDown(textBox, e.Key, ExitIconEditMode);
+        if (e.Key is Key.Escape or Key.F2 or Key.Enter)
+            e.Handled = true;
     }
 
     private void IconViewNameEdit_TextChanged(object sender, TextChangedEventArgs e)
@@ -139,26 +128,6 @@ public partial class FileIconView : UserControl
         if (sender is not System.Windows.Controls.TextBox textBox)
             return;
 
-        if (textBox.DataContext is not FileClass file)
-            return;
-
-        textBox.FilterString(CurrentDrive.IsFUSE
-            ? INVALID_NTFS_CHARS
-            : INVALID_UNIX_CHARS);
-
-        FileActions.IsRenameUnixLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Unix);
-        FileActions.IsRenameFuseLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.FUSE);
-        FileActions.IsRenameWindowsLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Windows);
-        FileActions.IsRenameDriveRootLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.WinRoot);
-
-        var fullName = Settings.ShowExtensions
-            ? textBox.Text
-            : textBox.Text + file.Extension;
-
-        var comparison = CurrentDrive.IsFUSE
-            ? StringComparison.InvariantCultureIgnoreCase
-            : StringComparison.InvariantCulture;
-
-        FileActions.IsRenameUnique = !DirList.FileList.Except([file]).Any(f => f.FullName.Equals(fullName, comparison));
+        FileViewModelBase.RenameTextChanged(textBox);
     }
 }

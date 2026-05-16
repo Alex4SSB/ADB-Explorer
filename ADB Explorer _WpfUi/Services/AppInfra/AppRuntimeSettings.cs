@@ -167,20 +167,6 @@ public partial class AppRuntimeSettings : ViewModelBase
         }
     }
 
-    private bool isTerminalOpen = false;
-    public bool IsTerminalOpen
-    {
-        get => isTerminalOpen;
-        set => Set(ref isTerminalOpen, value);
-    }
-
-    private bool isLogOpen = false;
-    public bool IsLogOpen
-    {
-        get => isLogOpen;
-        set => Set(ref isLogOpen, value);
-    }
-
     private bool isLogPaused = false;
     public bool IsLogPaused
     {
@@ -205,13 +191,6 @@ public partial class AppRuntimeSettings : ViewModelBase
             return false;
 #endif
         }
-    }
-
-    private bool isWindowLoaded = false;
-    public bool IsWindowLoaded
-    {
-        get => isWindowLoaded;
-        set => Set(ref isWindowLoaded, value);
     }
 
     private bool isExplorerLoaded = false;

@@ -73,6 +73,12 @@
     <Compile Update="Controls\MenuControls\SortingSelector.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Controls\PasteAndPullTooltip.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\RenameTooltip.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Properties\AppGlobal.Designer.cs">
       <DependentUpon>AppGlobal.resx</DependentUpon>
       <DesignTime>True</DesignTime>

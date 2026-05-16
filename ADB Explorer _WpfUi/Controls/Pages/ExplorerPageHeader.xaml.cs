@@ -5,6 +5,7 @@ using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
 using ADB_Explorer.ViewModels.Pages;
+using ADB_Explorer.Views;
 using static ADB_Explorer.Helpers.VisibilityHelper;
 using static ADB_Explorer.Models.AbstractFile;
 using static ADB_Explorer.Models.AdbExplorerConst;
@@ -156,6 +157,8 @@ public partial class ExplorerPageHeader : UserControl
         SelectionTimer.Tick += SelectionTimer_Tick;
 
         DriveList.SelectionChanged += DriveList_SelectionChanged;
+
+        FileIconView.RenameStarted += IconView_RenameStarted;
     }
 
     private void DriveList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -1466,37 +1469,20 @@ public partial class ExplorerPageHeader : UserControl
         e.Handled = true;
     }
 
+    private static void ExitFolderEditMode(FileClass file)
+    {
+        file.FolderViewModel.IsInEditMode = false;
+        FileActions.IsExplorerEditing = false;
+    }
+
     private void NameColumnEdit_KeyDown(object sender, KeyEventArgs e)
     {
-        if (ExplorerGrid.SelectedItem is not FileClass file)
+        if (sender is not TextBox textBox)
             return;
 
-        var textBox = sender as TextBox;
-
-        if (e.Key is Key.Escape or Key.F2)
-        {
-            var name = FileHelper.DisplayName(textBox);
-            if (string.IsNullOrEmpty(name))
-            {
-                DirList.FileList.Remove(file);
-            }
-            else
-            {
-                textBox.Text = FileHelper.DisplayName(textBox);
-            }
-
-            file.FolderViewModel.IsInEditMode = false;
-            FileActions.IsExplorerEditing = false;
-        }
-        else if (e.Key is Key.Enter)
-        {
-            file.FolderViewModel.IsInEditMode = false;
-            FileActions.IsExplorerEditing = false;
-        }
-        else
-            return;
-
-        e.Handled = true;
+        FileViewModelBase.RenameKeyDown(textBox, e.Key, ExitFolderEditMode);
+        if (e.Key is Key.Escape or Key.F2 or Key.Enter)
+            e.Handled = true;
     }
 
     private void NameColumnEdit_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -1507,42 +1493,32 @@ public partial class ExplorerPageHeader : UserControl
         var textBox = sender as TextBox;
         textBox.Focus();
         textBox.SelectAll();
+        FileViewModelBase.RenameTextChanged(textBox);
+
+        if (ActiveView.SelectedItem is FileClass file)
+            RenameTooltipControl.Show(textBox, file.FolderViewModel);
+    }
+
+    private void IconView_RenameStarted(object sender, FileClass file)
+    {
+        if (sender is FrameworkElement anchor)
+            RenameTooltipControl.Show(anchor, file.IconViewModel, centerHorizontally: true);
     }
 
     private void NameColumnEdit_LostFocus(object sender, RoutedEventArgs e)
     {
-        var textBox = sender as TextBox;
-        if (textBox.DataContext is not FileClass file || !file.FolderViewModel.IsInEditMode)
+        if (sender is not TextBox textBox)
             return;
 
-        FileActionLogic.Rename(textBox);
-
-        file.FolderViewModel.IsInEditMode = false;
-        FileActions.IsExplorerEditing = false;
+        FileViewModelBase.RenameCommit(textBox, ExitFolderEditMode);
     }
 
     private void NameColumnEdit_TextChanged(object sender, TextChangedEventArgs e)
     {
-        var textBox = sender as TextBox;
-        var file = (FileClass)textBox.DataContext;
-        textBox.FilterString(CurrentDrive.IsFUSE
-            ? INVALID_NTFS_CHARS
-            : INVALID_UNIX_CHARS);
+        if (sender is not TextBox textBox)
+            return;
 
-        FileActions.IsRenameUnixLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Unix);
-        FileActions.IsRenameFuseLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.FUSE);
-        FileActions.IsRenameWindowsLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Windows);
-        FileActions.IsRenameDriveRootLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.WinRoot);
-
-        var fullName = Settings.ShowExtensions
-            ? textBox.Text
-            : textBox.Text + file.Extension;
-
-        var comparison = CurrentDrive.IsFUSE
-            ? StringComparison.InvariantCultureIgnoreCase
-            : StringComparison.InvariantCulture;
-
-        FileActions.IsRenameUnique = !DirList.FileList.Except([file]).Any(f => f.FullName.Equals(fullName, comparison));
+        FileViewModelBase.RenameTextChanged(textBox);
     }
 
     private void SelectionRect_PreviewMouseUp(object sender, MouseButtonEventArgs e)

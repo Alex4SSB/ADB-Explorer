@@ -259,28 +259,6 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     [ObservableProperty]
     public partial bool SwRender { get; set; } = false;
 
-    [field: JsonIgnore]
-    [ObservableProperty]
-    public partial bool IsAnimated { get; set; } = true;
-
-    //private bool disableAnimation = false;
-    /// <summary>
-    /// Disables all visual animations
-    /// </summary>
-    public bool DisableAnimation
-    {
-        get
-        {
-            //if (!Data.RuntimeSettings.IsWindowLoaded)
-            //    IsAnimated = !disableAnimation;
-
-            //return disableAnimation;
-
-            return false;
-        }
-        //set => SetProperty(ref disableAnimation, value);
-    }
-
     [ObservableProperty]
     public partial bool EnableSplash { get; set; } = true;
 
@@ -289,8 +267,6 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     [ObservableProperty]
     public partial AppTheme Theme { get; set; } = AppTheme.WindowsDefault;
 
-    [ObservableProperty]
-    public partial bool HidePasteNamingInfo { get; set; } = false;
     public string LastVersion { get; set; } = "0.0.0";
 
     [ObservableProperty]

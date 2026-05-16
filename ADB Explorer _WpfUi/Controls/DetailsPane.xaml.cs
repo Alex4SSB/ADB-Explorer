@@ -150,6 +150,14 @@ public partial class DetailsPane : UserControl
         var control = (DetailsPane)d;
         var files = (IEnumerable<IBrowserItem>)e.NewValue;
 
+        // Unsubscribe from the previous single FileClass selection
+        if (e.OldValue is IEnumerable<IBrowserItem> oldFiles
+            && oldFiles.Count() == 1
+            && oldFiles.First() is FileClass oldFile)
+        {
+            oldFile.PropertyChanged -= control.OnFileFullPathChanged;
+        }
+
         control.EditorText = null;
         control.PdfScrollViewer.Visibility = Visibility.Collapsed;
         control.PdfPagesControl.ItemsSource = null;
@@ -231,6 +239,7 @@ public partial class DetailsPane : UserControl
                 if (item is FileClass f)
                 {
                     control.File = f;
+                    f.PropertyChanged += control.OnFileFullPathChanged;
                     control.FileNameTextBlock.Text = f.DisplayName;
                     control.FileNameTextBlock.FlowDirection = f.NameIsRtl
                         ? FlowDirection.RightToLeft
@@ -341,6 +350,12 @@ public partial class DetailsPane : UserControl
                 control.InvalidSelectionBorder.Visibility = Visibility.Visible;
             }
         }
+    }
+
+    private void OnFileFullPathChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(FileClass.DisplayName))
+            OnSelectedFilesChanged(this, new DependencyPropertyChangedEventArgs(SelectedFilesProperty, SelectedFiles, SelectedFiles));
     }
 
     public DetailsPane()

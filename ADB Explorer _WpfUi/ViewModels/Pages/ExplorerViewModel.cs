@@ -135,7 +135,7 @@ public partial class ExplorerViewModel : ObservableObject
     public string SelectedFilesTotalSize => (Data.SelectedFiles is not null && FileHelper.TotalSize(Data.SelectedFiles) is long size and > 0) ? size.BytesToSize(true) : "";
     public string SelectedFilesCount => $"{(Data.FileActions.IsAppDrive ? Data.SelectedPackages.Count() : Data.SelectedFiles.Count())}";
 
-    public Visibility SelectedItemsCountVisibility => SelectedFilesCount == "0" ? Visibility.Hidden : Visibility.Visible;
+    public Visibility SelectedItemsCountVisibility => SelectedFilesCount == "0" ? Visibility.Collapsed : Visibility.Visible;
 
     public Visibility SelectedFilesTotalSizeVisibility => string.IsNullOrEmpty(SelectedFilesTotalSize) ? Visibility.Collapsed : Visibility.Visible;
 

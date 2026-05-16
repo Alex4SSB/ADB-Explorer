@@ -102,9 +102,6 @@ public abstract class ActionBase : ViewModelBase, IMenuItem
 
     private void OnExecute_PropertyChanged(object sender, PropertyChangedEventArgs<bool> e)
     {
-        if (!Data.Settings.IsAnimated)
-            return;
-
         ActivateAnimation = true;
         Task.Delay(200).ContinueWith((t) => ActivateAnimation = false);
     }
@@ -147,7 +144,7 @@ public class AltTextMenu : ActionMenu
         get => altText;
         set
         {
-            if (Set(ref altText, value) && Data.Settings.IsAnimated && ActionAnimationSource is AnimationSource.External)
+            if (Set(ref altText, value) && ActionAnimationSource is AnimationSource.External)
             {
                 ActivateAnimation = true;
                 Task.Delay(Animation is StyleHelper.ContentAnimation.Pulsate ? 500 : 200).ContinueWith((t) => ActivateAnimation = false);

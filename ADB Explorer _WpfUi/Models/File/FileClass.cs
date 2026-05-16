@@ -172,6 +172,10 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         _folderViewModel = null;
     }
 
+    public FileViewModelBase ActiveViewModel => FolderViewModel.IsInEditMode 
+        ? FolderViewModel 
+        : IconViewModel;
+
     [ObservableProperty]
     public partial DragDropEffects CutState { get; set; }
 
