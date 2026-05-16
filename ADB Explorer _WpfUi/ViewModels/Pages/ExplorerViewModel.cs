@@ -88,6 +88,18 @@ public partial class ExplorerViewModel : ObservableObject
     public partial bool IsIconView { get; set; } = false;
 
     [ObservableProperty]
+    public partial string AdbReadRate { get; set; } = null;
+
+    [ObservableProperty]
+    public partial string AdbWriteRate { get; set; } = null;
+
+    [ObservableProperty]
+    public partial bool IsAdbReadActive { get; set; } = false;
+
+    [ObservableProperty]
+    public partial bool IsAdbWriteActive { get; set; } = false;
+
+    [ObservableProperty]
     public partial ThumbnailService.ThumbnailSize CurrentThumbsSize { get; set; }
     
     partial void OnCurrentThumbsSizeChanged(ThumbnailService.ThumbnailSize value)

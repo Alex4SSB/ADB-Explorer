@@ -47,6 +47,8 @@ public partial class App
 
             services.AddHostedService<DevicePollingService>();
 
+            services.AddHostedService<DiskUsagePollingService>();
+
             // Theme manipulation
             services.AddSingleton<IThemeService, ThemeService>();
 

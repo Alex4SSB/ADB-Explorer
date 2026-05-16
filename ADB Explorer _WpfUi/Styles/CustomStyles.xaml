@@ -475,8 +475,8 @@
         </Style.Triggers>
     </Style>
     <Style x:Key="DiskUsageIconStyle" TargetType="controls:TransferIndicator">
-        <Setter Property="IsUpVisible" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsAdbReadActive}" />
-        <Setter Property="IsDownVisible" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsAdbWriteActive}" />
+        <Setter Property="IsUpVisible" Value="{Binding IsAdbReadActive}" />
+        <Setter Property="IsDownVisible" Value="{Binding IsAdbWriteActive}" />
         <Setter Property="ToolTip">
             <Setter.Value>
                 <StackPanel>
@@ -493,21 +493,14 @@
                     <TextBlock>
                         <TextBlock.Text>
                             <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_DISK_USAGE_READ}">
-                                <Binding Path="AdbReadRate" Source="{x:Static Member=models:Data.RuntimeSettings}" />
+                                <Binding Path="AdbReadRate" />
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
                     <TextBlock>
                         <TextBlock.Text>
                             <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_DISK_USAGE_WRITE}">
-                                <Binding Path="AdbWriteRate" Source="{x:Static Member=models:Data.RuntimeSettings}" />
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-                    <TextBlock>
-                        <TextBlock.Text>
-                            <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_DISK_USAGE_OTHER}">
-                                <Binding Path="AdbOtherRate" Source="{x:Static Member=models:Data.RuntimeSettings}" />
+                                <Binding Path="AdbWriteRate" />
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>

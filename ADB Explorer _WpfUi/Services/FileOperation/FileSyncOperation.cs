@@ -13,6 +13,8 @@ public class FileSyncOperation : FileOperation
     private CancellationTokenSource cancelTokenSource;
     public ObservableList<FileOpProgressInfo> ProgressUpdates;
 
+    private readonly ConcurrentDictionary<string, long> lastReportedBytes = new();
+
     public override SyncFile FilePath { get; }
 
     public override SyncFile AndroidPath => FilePath.PathType is AbstractFile.FilePathType.Android
@@ -248,8 +250,20 @@ public class FileSyncOperation : FileOperation
     {
         item.Size ??= (long)eventArgs.TotalBytesToReceive;
 
+        var currentBytes = (long)eventArgs.ReceivedBytesSize;
+        var previousBytes = lastReportedBytes.GetOrAdd(item.FullPath, 0L);
+        lastReportedBytes[item.FullPath] = currentBytes;
+        var deltaBytes = currentBytes - previousBytes;
+        if (deltaBytes > 0)
+        {
+            if (OperationName is OperationType.Pull)
+                SyncTransferTracker.AddPullBytes(deltaBytes);
+            else
+                SyncTransferTracker.AddPushBytes(deltaBytes);
+        }
+
         mutex.WaitOne();
-        ProgressUpdates.Add(new AdbSyncProgressInfo(item.FullPath, null, eventArgs.ProgressPercentage, (long)eventArgs.ReceivedBytesSize));
+        ProgressUpdates.Add(new AdbSyncProgressInfo(item.FullPath, null, eventArgs.ProgressPercentage, currentBytes));
         mutex.ReleaseMutex();
 
         TransferEnd = DateTime.Now;

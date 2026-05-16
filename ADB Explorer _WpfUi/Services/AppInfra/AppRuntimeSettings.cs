@@ -200,41 +200,6 @@ public partial class AppRuntimeSettings : ViewModelBase
         set => Set(ref isExplorerLoaded, value);
     }
 
-    private string adbReadRate = null;
-    public string AdbReadRate
-    {
-        get => adbReadRate;
-        set => Set(ref adbReadRate, value);
-    }
-
-    private string adbWriteRate = null;
-    public string AdbWriteRate
-    {
-        get => adbWriteRate;
-        set => Set(ref adbWriteRate, value);
-    }
-
-    private string adbOtherRate = null;
-    public string AdbOtherRate
-    {
-        get => adbOtherRate;
-        set => Set(ref adbOtherRate, value);
-    }
-
-    private bool isAdbReadActive = false;
-    public bool IsAdbReadActive
-    {
-        get => isAdbReadActive;
-        set => Set(ref isAdbReadActive, value);
-    }
-
-    private bool isAdbWriteActive = false;
-    public bool IsAdbWriteActive
-    {
-        get => isAdbWriteActive;
-        set => Set(ref isAdbWriteActive, value);
-    }
-
     private bool isPollingStopped = false;
     public bool IsPollingStopped
     {

@@ -87,6 +87,7 @@ internal static class AdbHelper
             try
             {
                 await service.PullAsync(path, stream, cancellationToken: cancellationToken);
+                SyncTransferTracker.AddPullBytes(stream.Position);
             }
             catch
             {
@@ -106,6 +107,7 @@ internal static class AdbHelper
             try
             {
                 service.Pull(path, stream);
+                SyncTransferTracker.AddPullBytes(stream.Position);
             }
             catch
             {
@@ -127,6 +129,7 @@ internal static class AdbHelper
 
         using SyncService service = new(device.Device.DeviceData);
         await service.PushAsync(stream, path, (UnixFileMode)0x1ED, DateTime.Now, cancellationToken: cancellationToken); // 0x1ED = 0777 in octal
+        SyncTransferTracker.AddPushBytes(stream.Length);
     }
 
     public static async Task FetchDumpsysInfoAsync(LogicalDeviceViewModel device, Package package, CancellationToken cancellationToken = default)
