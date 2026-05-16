@@ -21,13 +21,12 @@
             Command="{Binding SaveCommand, ElementName=pane}"
             Modifiers="Ctrl" />
     </UserControl.InputBindings>
+    <UserControl.RenderTransform>
+        <TranslateTransform x:Name="SlideTransform" />
+    </UserControl.RenderTransform>
     <UserControl.Style>
         <Style TargetType="UserControl">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsOpen, RelativeSource={RelativeSource Mode=Self}}" Value="False">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                </DataTrigger>
-            </Style.Triggers>
+            <Setter Property="Visibility" Value="Collapsed" />
         </Style>
     </UserControl.Style>
     <UserControl.Resources>

@@ -2,6 +2,7 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
+using System.Windows.Media.Animation;
 using Windows.Data.Pdf;
 using Windows.Storage.Streams;
 
@@ -35,7 +36,38 @@ public partial class DetailsPane : UserControl
 
     public static readonly DependencyProperty IsOpenProperty =
         DependencyProperty.Register("IsOpen", typeof(bool),
-          typeof(DetailsPane), new PropertyMetadata(false));
+          typeof(DetailsPane), new PropertyMetadata(false, OnIsOpenChanged));
+
+    private static void OnIsOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is not DetailsPane pane) return;
+        bool isOpen = (bool)e.NewValue;
+
+        var animation = new DoubleAnimation
+        {
+            Duration = new Duration(TimeSpan.FromMilliseconds(200)),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut },
+        };
+
+        if (isOpen)
+        {
+            pane.Visibility = Visibility.Visible;
+            pane.SlideTransform.X = pane.ActualWidth > 0 ? pane.ActualWidth : Data.Settings.DetailsPaneWidth;
+            animation.To = 0;
+            pane.SlideTransform.BeginAnimation(TranslateTransform.XProperty, animation);
+        }
+        else
+        {
+            animation.To = pane.ActualWidth > 0 ? pane.ActualWidth : Data.Settings.DetailsPaneWidth;
+            animation.Completed += (_, _) =>
+            {
+                pane.Visibility = Visibility.Collapsed;
+                pane.SlideTransform.BeginAnimation(TranslateTransform.XProperty, null);
+                pane.SlideTransform.X = 0;
+            };
+            pane.SlideTransform.BeginAnimation(TranslateTransform.XProperty, animation);
+        }
+    }
 
     public string? EditorText
     {

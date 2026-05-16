@@ -345,6 +345,7 @@ public class FileToIconConverter
             AbstractFile.SpecialFileType.EmptyTrash => EmptyTrashIcon,
             AbstractFile.SpecialFileType.FullTrash => FullTrashIcon,
             AbstractFile.SpecialFileType.Phone => PhoneIcon,
+            AbstractFile.SpecialFileType.Gallery => GalleryIcon,
             _ => SpecialIcon.None,
         };
     }

@@ -55,8 +55,15 @@ public class Devices : AbstractDevice
 
         UIList.CollectionChanged += UIList_CollectionChanged;
         PropertyChanged += Devices_PropertyChanged;
+        Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
 
         ObservableCount.Value = "0";
+    }
+
+    private void RuntimeSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(AppRuntimeSettings.DeviceToOpen))
+            OnPropertyChanged(nameof(Current));
     }
 
     private void Devices_PropertyChanged(object sender, PropertyChangedEventArgs e)

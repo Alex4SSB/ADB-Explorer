@@ -819,7 +819,6 @@ internal static class FileActionLogic
         {
             Data.CurrentDisplayNames.Clear();
             Data.CurrentPath = null;
-            Data.RuntimeSettings.CurrentDevice = null;
             Data.RuntimeSettings.ClearNavBox = true;
 
             UpdateFileActions();

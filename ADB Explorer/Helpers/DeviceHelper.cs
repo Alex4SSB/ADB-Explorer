@@ -625,7 +625,6 @@ public static class DeviceHelper
         Data.CopyPaste.GetClipboardPasteItems();
         Data.RuntimeSettings.FilterDrives = true;
 
-        Data.RuntimeSettings.CurrentDevice = Data.DevicesObject.Current;
         Data.FileActions.PushPackageEnabled = Data.Settings.EnableApk && Data.DevicesObject?.Current?.Type is not DeviceType.Recovery;
 
         Data.FileOpQ.MoveOperationsToPast();

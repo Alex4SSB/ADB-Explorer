@@ -166,7 +166,10 @@
             <local:DetailsControl Grid.Column="3" IsChecked="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsDetailsPaneOpen, Mode=TwoWay}" />
             <Separator Grid.ColumnSpan="4" VerticalAlignment="Bottom" />
         </Grid>
-        <Border Grid.Row="2" MouseDown="GridBackgroundBlock_MouseDown">
+        <Border
+            Grid.Row="2"
+            ClipToBounds="True"
+            MouseDown="GridBackgroundBlock_MouseDown">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
@@ -526,7 +529,7 @@
                     x:Name="SelectionRect"
                     PreviewMouseUp="SelectionRect_PreviewMouseUp"
                     RectMouseMove="SelectionRect_MouseMove" />
-                <local:RenameTooltip x:Name="RenameTooltipControl" />
+                <local:RenameTooltip x:Name="RenameTooltipControl" DataContext="{x:Null}" />
                 <Grid Margin="0,40" Style="{StaticResource EmptyFolderGridStyle}">
                     <StackPanel Style="{StaticResource NonRootEmptyFolderStyle}">
                         <TextBlock
@@ -588,18 +591,37 @@
                 Grid.Column="2"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                DataContext="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=CurrentDevice}"
                 Orientation="Horizontal">
-                <StackPanel Orientation="Horizontal">
-                    <local:TransferIndicator Margin="0,1,0,0" Style="{StaticResource DiskUsageIconStyle}" />
-                    <Separator Style="{StaticResource DiskUsageSeparatorStyle}" />
-                </StackPanel>
-                <views:DetailedBatteryControl x:Name="CurrentDeviceBatteryIcon" DataContext="{Binding Battery}" />
+                <local:ThumbProgressTooltip Margin="0,0,6,0" Icon="{Binding GalleryFile.Icon}" />
+                <local:TransferIndicator Margin="0,1,0,0" Style="{StaticResource DiskUsageIconStyle}" />
+                <Separator x:Name="DeviceInfoSeparator">
+                    <Separator.Style>
+                        <Style BasedOn="{StaticResource StatusBarSeparatorStyle}" TargetType="Separator">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsDeviceInfoSeparatorVisible}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Separator.Style>
+                </Separator>
+                <views:DetailedBatteryControl DataContext="{Binding CurrentDeviceBattery}" />
+                <Separator>
+                    <Separator.Style>
+                        <Style BasedOn="{StaticResource StatusBarSeparatorStyle}" TargetType="Separator">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsBatteryVisible}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Separator.Style>
+                </Separator>
                 <StackPanel
                     Margin="0,1,0,0"
+                    DataContext="{Binding CurrentDevice}"
                     Orientation="Horizontal"
                     Style="{StaticResource AndroidTextBlockStyle}">
-                    <Separator Style="{StaticResource CurrentDeviceBatterySeparatorStyle}" />
                     <ui:FontIcon Style="{DynamicResource UnsupportedIconStyle}" />
                     <TextBlock Text="Android " />
                     <TextBlock Text="{Binding AndroidVersion}" />

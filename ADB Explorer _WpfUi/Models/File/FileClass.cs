@@ -128,6 +128,9 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     {
         get
         {
+            if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.Off)
+                return null;
+
             if (_cacheThumbnail is null && Data.DevicesObject.Current.Type 
                 is DeviceType.Local 
                 or DeviceType.Remote
@@ -333,6 +336,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             FileType.EmptyTrash => SpecialFileType.EmptyTrash,
             FileType.FullTrash => SpecialFileType.FullTrash,
             FileType.Phone => SpecialFileType.Phone,
+            FileType.Gallery => SpecialFileType.Gallery,
             _ => SpecialFileType.Regular
         };
 

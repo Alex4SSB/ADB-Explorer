@@ -406,7 +406,7 @@
     <Style x:Key="EmptyFolderGridStyle" TargetType="Grid">
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Top" />
-        <Setter Property="DataContext" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=CurrentDevice}" />
+        <Setter Property="DataContext" Value="{Binding Source={x:Static Member=models:Data.DevicesObject}, Path=Current}" />
         <Setter Property="Visibility" Value="Collapsed" />
         <Style.Triggers>
             <MultiDataTrigger>
@@ -427,30 +427,6 @@
         BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
         TargetType="Separator">
         <Setter Property="Margin" Value="8,6" />
-    </Style>
-    <Style
-        x:Key="CurrentDeviceBatterySeparatorStyle"
-        BasedOn="{StaticResource StatusBarSeparatorStyle}"
-        TargetType="Separator">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=CurrentDeviceBatteryIcon, Path=Visibility}" Value="Collapsed">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="DiskUsageSeparatorStyle"
-        BasedOn="{StaticResource StatusBarSeparatorStyle}"
-        TargetType="Separator">
-        <Style.Triggers>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding AndroidVersion}" Value="{x:Null}" />
-                    <Condition Binding="{Binding ElementName=CurrentDeviceBatteryIcon, Path=Visibility}" Value="Collapsed" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Visibility" Value="Collapsed" />
-            </MultiDataTrigger>
-        </Style.Triggers>
     </Style>
     <Style
         x:Key="AndroidVersionRecoveryTextblockStyle"

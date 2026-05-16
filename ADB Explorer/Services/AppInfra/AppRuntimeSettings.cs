@@ -224,13 +224,6 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref explorerSource, value);
     }
 
-    private LogicalDeviceViewModel currentDevice = null;
-    public LogicalDeviceViewModel CurrentDevice
-    {
-        get => currentDevice;
-        set => Set(ref currentDevice, value);
-    }
-
     private bool? isPathBoxFocused = null;
     public bool? IsPathBoxFocused
     {

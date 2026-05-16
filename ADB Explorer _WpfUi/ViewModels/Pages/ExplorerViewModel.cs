@@ -154,6 +154,28 @@ public partial class ExplorerViewModel : ObservableObject
         OnPropertyChanged(nameof(SelectedFilesTotalSizeVisibility));
     }
 
+    public FileClass GalleryFile
+    {
+        get
+        {
+            field ??= new("Gallery", "/Gallery", AbstractFile.FileType.Gallery);
+
+            return field;
+        }
+    } = null;
+
+    public LogicalDeviceViewModel? CurrentDevice => Data.DevicesObject.Current;
+
+    public Battery? CurrentDeviceBattery => Data.DevicesObject.Current?.Battery;
+
+    public bool IsBatteryVisible =>
+        Data.Settings.PollBattery
+        && CurrentDeviceBattery?.ChargeState is not Battery.ChargingState.Unknown
+        && CurrentDeviceBattery?.Level is not null;
+
+    public bool IsDeviceInfoSeparatorVisible =>
+        IsBatteryVisible || CurrentDevice?.AndroidVersion is not null;
+
     public ExplorerViewModel()
     {
         IsIconView = Data.RuntimeSettings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
@@ -161,6 +183,32 @@ public partial class ExplorerViewModel : ObservableObject
         Data.FileActions.PropertyChanged += FileActions_PropertyChanged;
         Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
         Data.Settings.PropertyChanged += Settings_PropertyChanged;
+        Data.DevicesObject.PropertyChanged += DevicesObject_PropertyChanged;
+    }
+
+    private void NotifyBatteryVisibility()
+    {
+        OnPropertyChanged(nameof(IsBatteryVisible));
+        OnPropertyChanged(nameof(IsDeviceInfoSeparatorVisible));
+    }
+
+    private Battery? _subscribedBattery;
+
+    private void SubscribeToBattery(Battery? battery)
+    {
+        if (_subscribedBattery is not null)
+            _subscribedBattery.PropertyChanged -= Battery_PropertyChanged;
+
+        _subscribedBattery = battery;
+
+        if (_subscribedBattery is not null)
+            _subscribedBattery.PropertyChanged += Battery_PropertyChanged;
+    }
+
+    private void Battery_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(Battery.ChargeState) or nameof(Battery.Level))
+            NotifyBatteryVisibility();
     }
 
     private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -170,6 +218,10 @@ public partial class ExplorerViewModel : ObservableObject
             case nameof(AppSettings.EnableApk):
             case nameof(AppSettings.EnableRecycle):
                 UpdateDriveView();
+                break;
+
+            case nameof(AppSettings.PollBattery):
+                NotifyBatteryVisibility();
                 break;
 
             default:
@@ -195,6 +247,17 @@ public partial class ExplorerViewModel : ObservableObject
 
             default:
                 break;
+        }
+    }
+
+    private void DevicesObject_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Devices.Current))
+        {
+            OnPropertyChanged(nameof(CurrentDevice));
+            OnPropertyChanged(nameof(CurrentDeviceBattery));
+            OnPropertyChanged(nameof(IsDeviceInfoSeparatorVisible));
+            SubscribeToBattery(CurrentDeviceBattery);
         }
     }
 
