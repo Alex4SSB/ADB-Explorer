@@ -1543,4 +1543,79 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
     <value>oraz {0} więcej…</value>
   </data>
+  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
+    <value>Pokaż lub ukryj okienko szczegółów i podglądu.</value>
+  </data>
+  <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
+    <value>Podgląd</value>
+  </data>
+  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
+    <value>Maksymalny rozmiar pliku do podglądu</value>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>Przenieś do folderu domyślnego po dwukrotnym kliknięciu pliku</value>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value>Wybierz jedną pozycję, aby uzyskać więcej informacji.</value>
+  </data>
+  <data name="S_ITEM_LOCATION" xml:space="preserve">
+    <value>Lokalizacja</value>
+  </data>
+  <data name="S_IMAGE_F_STOP" xml:space="preserve">
+    <value>Przesłona</value>
+  </data>
+  <data name="S_IMAGE_ISO" xml:space="preserve">
+    <value>Czułość ISO</value>
+  </data>
+  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
+    <value>Czas naświetlania</value>
+  </data>
+  <data name="S_VIDEO_BITRATE" xml:space="preserve">
+    <value>Szybkość transmisji</value>
+  </data>
+  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
+    <value>Wybierz plik, aby wyświetlić podgląd.</value>
+  </data>
+  <data name="S_PREVIEW_INVALID" xml:space="preserve">
+    <value>Nie jest dostępny podgląd.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
+    <value>Ten plik PDF jest chroniony hasłem.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
+    <value>Nieprawidłowe hasło.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
+    <value>Odblokuj</value>
+  </data>
+  <data name="S_FILE_PERMISSIONS" xml:space="preserve">
+    <value>Uprawnienia</value>
+  </data>
+  <data name="S_FILE_PERM_USER" xml:space="preserve">
+    <value>Użytkownik</value>
+  </data>
+  <data name="S_FILE_PERM_GROUP" xml:space="preserve">
+    <value>Grupa</value>
+  </data>
+  <data name="S_FILE_PERM_OTHER" xml:space="preserve">
+    <value>Inne</value>
+  </data>
+  <data name="S_DATE_ACCESSED" xml:space="preserve">
+    <value>Data dostępu</value>
+  </data>
+  <data name="S_CREATION_TIME" xml:space="preserve">
+    <value>Utworzono</value>
+  </data>
+  <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
+    <value>Zmodyfikowano</value>
+  </data>
+  <data name="S_FILE_SYSTEM" xml:space="preserve">
+    <value>System plików</value>
+  </data>
+  <data name="S_MOUNT_POINT" xml:space="preserve">
+    <value>Punkt montowania</value>
+  </data>
+  <data name="S_MOUNT_OPTIONS" xml:space="preserve">
+    <value>Opcje montowania</value>
+  </data>
 </root>
