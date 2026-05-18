@@ -2,6 +2,8 @@
     x:Class="ADB_Explorer.Controls.Pages.SettingsPageHeader"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:ADB_Explorer.Converters"
+    xmlns:picker="clr-namespace:ADB_Explorer.Controls.ColorPicker"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:local="clr-namespace:ADB_Explorer.Controls"
@@ -399,8 +401,18 @@
                 </local:SimpleStackPanel>
             </ui:CardControl>
         </DataTemplate>
+
+        <DataTemplate x:Key="AccentColorSettingTemplate" DataType="services:AccentColorSetting">
+            <ui:CardControl Style="{StaticResource SettingsCardHeaderStyle}">
+                <picker:ColorPickerControl
+                    HorizontalAlignment="Right"
+                    SelectedColor="{Binding PickerColor, Mode=TwoWay}" />
+            </ui:CardControl>
+        </DataTemplate>
+
         <helpers:SettingsTemplateSelector
             x:Key="GroupedSettingsTemplateSelector"
+            AccentColorSettingTemplate="{StaticResource AccentColorSettingTemplate}"
             BoolSettingTemplate="{StaticResource BoolSettingTemplate}"
             CultureInfoSettingTemplate="{StaticResource CultureInfoSettingTemplate}"
             EnumSettingTemplate="{StaticResource GroupedEnumSettingTemplate}"

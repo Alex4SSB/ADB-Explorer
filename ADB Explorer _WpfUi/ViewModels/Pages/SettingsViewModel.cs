@@ -45,6 +45,11 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
             {
                 AdbThemeService.SetTheme(Data.Settings.Theme);
             }
+
+            if (e.PropertyName == nameof(AppSettings.UseCustomAccent))
+            {
+                AdbThemeService.SetAccent(Data.Settings.UseCustomAccent ? Data.Settings.AccentColor : null);
+            }
         };
 
         PropertyChanged += (_, e) =>

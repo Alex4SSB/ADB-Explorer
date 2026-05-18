@@ -13,6 +13,7 @@ public class SettingsTemplateSelector : DataTemplateSelector
     public DataTemplate MultiLinkSettingTemplate { get; set; }
     public DataTemplate LongDescriptionTemplate { get; set; }
     public DataTemplate NumericTemplate { get; set; }
+    public DataTemplate AccentColorSettingTemplate { get; set; }
 
     public override DataTemplate SelectTemplate(object item, DependencyObject container)
     {
@@ -27,6 +28,7 @@ public class SettingsTemplateSelector : DataTemplateSelector
             EnumSetting => EnumSettingTemplate,
             ComboSetting<CultureInfo> => CultureInfoSettingTemplate,
             NumericSetting => NumericTemplate,
+            AccentColorSetting => AccentColorSettingTemplate,
             _ => throw new NotImplementedException(),
         };
     }

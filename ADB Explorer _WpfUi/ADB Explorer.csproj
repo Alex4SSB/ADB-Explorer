@@ -43,6 +43,9 @@
   </ItemGroup>
 
   <ItemGroup>
+	<Compile Update="Controls\ColorPicker\ColorPickerControl.xaml.cs">
+	  <SubType>Code</SubType>
+	</Compile>
     <Compile Update="Controls\Icons\InstallIcon.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

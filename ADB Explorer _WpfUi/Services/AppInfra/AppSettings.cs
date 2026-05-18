@@ -262,6 +262,22 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     [ObservableProperty]
     public partial bool EnableSplash { get; set; } = true;
 
+    [ObservableProperty]
+    public partial bool UseCustomAccent { get; set; } = false;
+
+    [ObservableProperty]
+    public partial string? AccentColorHex { get; set; } = null;
+
+    [JsonIgnore]
+    public Color? AccentColor
+    {
+        get => AccentColorHex is null ? null
+            : (Color)ColorConverter.ConvertFromString(AccentColorHex);
+        set => AccentColorHex = value.HasValue
+            ? $"#{value.Value.R:X2}{value.Value.G:X2}{value.Value.B:X2}"
+            : null;
+    }
+
     #endregion
 
     [ObservableProperty]

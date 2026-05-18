@@ -15,4 +15,6 @@
     <SolidColorBrush x:Key="SelectedInactiveBackground" Color="#FFD9D9D9" />
     <SolidColorBrush x:Key="SelectedMouseOverInactiveBackground" Color="#FFCCE8FF" />
     <SolidColorBrush x:Key="DeviceMouseOverBackground" Color="#FFC9C9C9" />
+
+    <SolidColorBrush x:Key="OpaqueBorderBrush" Color="#10000000" />
 </ResourceDictionary>

@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.ViewModels;
 using System.Linq.Expressions;
+using Wpf.Ui.Appearance;
 using static ADB_Explorer.Models.Data;
 using static ADB_Explorer.Services.SettingsAction;
 
@@ -210,6 +211,12 @@ public static class UISettings
                     { AppSettings.AppTheme.Dark, Strings.Resources.S_SETTINGS_THEME_DARK },
                     { AppSettings.AppTheme.WindowsDefault, Strings.Resources.S_SETTINGS_THEME_DEFAULT } },
                     icon: "\uE2B1"),
+                new BoolSetting(() => Settings.UseCustomAccent,
+                                "Custom accent color",
+                                icon: "\uE790"),
+                new AccentColorSetting("Accent color",
+                                       AbstractSetting.ExtractPropertyInfo(() => Settings.UseCustomAccent),
+                                       "\uE771"),
                 new BoolSetting(() => Settings.SwRender, Strings.Resources.S_SETTINGS_DISABLE_HW, icon: "\uF211"),
                 new BoolSetting(() => Settings.EnableSplash, Strings.Resources.S_SETTINGS_SPLASH),
             ], "\uE2B1"),
@@ -643,6 +650,38 @@ public class ThumbsAgeSetting : EnumSetting
         : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
     {
         Buttons = [.. enumNames];
+    }
+}
+
+public class AccentColorSetting : AbstractSetting
+{
+    public Color PickerColor
+    {
+        get
+        {
+            if (Settings.AccentColor is { } saved)
+                return saved;
+            var sys = ApplicationAccentColorManager.SystemAccent;
+            return sys == Colors.Transparent
+                ? ApplicationAccentColorManager.GetColorizationColor()
+                : sys;
+        }
+        set
+        {
+            Settings.AccentColor = value;
+            AdbThemeService.SetAccent(value);
+            OnPropertyChanged();
+        }
+    }
+
+    public AccentColorSetting(string description, PropertyInfo visibleProp = null, string icon = null)
+        : base(null, description, visibleProp, icon) { }
+
+    protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        base.Settings_PropertyChanged(sender, e);
+        if (e.PropertyName is nameof(AppSettings.AccentColorHex) or nameof(AppSettings.UseCustomAccent))
+            OnPropertyChanged(nameof(PickerColor));
     }
 }
 

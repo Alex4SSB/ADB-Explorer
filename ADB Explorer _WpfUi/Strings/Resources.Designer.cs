@@ -791,6 +791,33 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Blue.
+        /// </summary>
+        public static string S_COLOR_BLUE {
+            get {
+                return ResourceManager.GetString("S_COLOR_BLUE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Green.
+        /// </summary>
+        public static string S_COLOR_GREEN {
+            get {
+                return ResourceManager.GetString("S_COLOR_GREEN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Red.
+        /// </summary>
+        public static string S_COLOR_RED {
+            get {
+                return ResourceManager.GetString("S_COLOR_RED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Added.
         /// </summary>
         public static string S_COLUMN_ADDED {
@@ -2761,6 +2788,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pick a color.
+        /// </summary>
+        public static string S_PICK_COLOR {
+            get {
+                return ResourceManager.GetString("S_PICK_COLOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Dimensions.
         /// </summary>
         public static string S_PICTURE_DIMENSIONS {
@@ -3439,6 +3475,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Accent color.
+        /// </summary>
+        public static string S_SETTINGS_ACCENT_COLOR {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_ACCENT_COLOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to On.
         /// </summary>
         public static string S_SETTINGS_ACTIVE {
@@ -3498,6 +3543,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_COMPACT_VIEW {
             get {
                 return ResourceManager.GetString("S_SETTINGS_COMPACT_VIEW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Custom accent color.
+        /// </summary>
+        public static string S_SETTINGS_CUSTOM_ACCENT {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_CUSTOM_ACCENT", resourceCulture);
             }
         }
         
