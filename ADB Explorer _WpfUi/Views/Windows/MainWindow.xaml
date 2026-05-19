@@ -2,6 +2,7 @@
     x:Class="ADB_Explorer.Views.Windows.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:ADB_Explorer.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:ADB_Explorer.Views.Windows"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -35,6 +36,11 @@
             </Style.Triggers>
         </Style>
     </ui:FluentWindow.Style>
+    <ui:FluentWindow.Resources>
+        <Style BasedOn="{StaticResource {x:Type ui:TitleBarButton}}" TargetType="ui:TitleBarButton">
+            <Setter Property="Height" Value="{Binding ElementName=TitleBar, Path=ActualHeight}" />
+        </Style>
+    </ui:FluentWindow.Resources>
     <Grid>
         <Grid.Style>
             <Style TargetType="Grid">
@@ -86,9 +92,19 @@
                 VerticalAlignment="Bottom" />
         </Grid>
 
-        <ui:TitleBar
-            x:Name="TitleBar"
-            Title="{Binding ViewModel.ApplicationTitle}"
-            Grid.Row="0" />
+        <ui:TitleBar x:Name="TitleBar" Grid.Row="0">
+            <ui:TitleBar.Header>
+                <TextBlock
+                    Margin="16,0,0,0"
+                    VerticalAlignment="Center"
+                    FontFamily="{StaticResource Nunito}"
+                    FontSize="20"
+                    Text="{Binding ViewModel.ApplicationTitle}" />
+            </ui:TitleBar.Header>
+            <ui:TitleBar.TrailingContent>
+                <controls:NotificationBell Margin="0,0,10,0" Notifications="{Binding ViewModel.Notifications, Mode=TwoWay}" />
+            </ui:TitleBar.TrailingContent>
+        </ui:TitleBar>
+
     </Grid>
 </ui:FluentWindow>

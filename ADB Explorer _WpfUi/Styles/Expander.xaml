@@ -385,7 +385,7 @@
                             <Setter TargetName="ExpanderToggleButton" Property="Foreground" Value="{DynamicResource ExpanderHeaderDisabledForeground}" />
                             <Setter TargetName="ExpanderToggleButton" Property="BorderBrush" Value="{DynamicResource ExpanderHeaderDisabledBorderBrush}" />
                         </Trigger>
-                        
+
                         <Trigger SourceName="ExpanderToggleButton" Property="IsMouseOver" Value="True">
                             <Setter Property="Background">
                                 <Setter.Value>
@@ -400,7 +400,7 @@
                             </MultiTrigger.Conditions>
                             <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundPointerOver}" />
                         </MultiTrigger>
-                        
+
                         <Trigger SourceName="ExpanderToggleButton" Property="IsPressed" Value="True">
                             <Setter Property="Background">
                                 <Setter.Value>

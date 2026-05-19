@@ -1,4 +1,7 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
+using ADB_Explorer.Resources;
+using ADB_Explorer.Services;
 using Wpf.Ui.Controls;
 
 namespace ADB_Explorer.ViewModels.Windows;
@@ -62,11 +65,8 @@ public partial class MainWindowViewModel : ObservableObject
         }
     ];
 
-    //[ObservableProperty]
-    //private ObservableCollection<Wpf.Ui.Controls.MenuItem> _trayMenuItems = new()
-    //{
-    //    new Wpf.Ui.Controls.MenuItem { Header = "Home", Tag = "tray_home" }
-    //};
+    [ObservableProperty]
+    public partial ObservableList<Controls.NotificationBell.Notification> Notifications { get; set; } = [];
 
     public MainWindowViewModel()
     {
@@ -74,10 +74,81 @@ public partial class MainWindowViewModel : ObservableObject
 
         Data.Settings.PropertyChanged += (s, e) =>
         {
-            if (e.PropertyName == nameof(Services.AppSettings.EnableLog))
+            if (e.PropertyName == nameof(AppSettings.EnableLog))
             {
                 _logItem.Visibility = Data.Settings.EnableLog ? Visibility.Visible : Visibility.Collapsed;
             }
         };
+
+        Task.Run(InitNotifications);
+    }
+
+    public async void InitNotifications()
+    {
+        if (Data.Settings.ShowLanguageNotification &&
+            (Data.Settings.OriginalCulture is null || Data.Settings.OriginalCulture.Name != "en-US"))
+        {
+            App.SafeInvoke(() =>
+            {
+                Notifications.Add(new(async () =>
+                {
+                    var res = await DialogService.ShowConfirmation(Strings.Resources.S_LANG_NOTIFICATION,
+                        Strings.Resources.S_LANG_NOTIFICATION_TITLE,
+                        Strings.Resources.S_GOTO_WEBLATE,
+                        cancelText: Strings.Resources.S_BUTTON_CLOSE,
+                        icon: DialogService.DialogIcon.Informational);
+
+                    if (res.Item1 is ContentDialogResult.Primary)
+                        Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"{Links.WEBLATE}\"");
+
+                    Data.Settings.ShowLanguageNotification = false;
+                }, Strings.Resources.S_LANG_NOTIFICATION_TITLE,
+                Notifications));
+            });
+        }
+
+        if (new Version(Properties.AppGlobal.AppVersion) > new Version(Data.Settings.LastVersion))
+        {
+            App.SafeInvoke(() =>
+            {
+                Notifications.Add(new(async () =>
+                {
+                    var res = await DialogService.ShowConfirmation(
+                        Strings.Resources.S_NEW_VERSION_MSG,
+                        Strings.Resources.S_NEW_VERSION_TITLE,
+                        Strings.Resources.S_GO_TO_RELEASE_NOTES,
+                        cancelText: Strings.Resources.S_BUTTON_CLOSE);
+
+                    if (res.Item1 is ContentDialogResult.Primary)
+                        Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{Properties.AppGlobal.AppVersion}\"");
+
+                    Data.Settings.LastVersion = Properties.AppGlobal.AppVersion;
+                }, Strings.Resources.S_NEW_VERSION_TITLE,
+                Notifications));
+            });
+        }
+
+        if (!Data.RuntimeSettings.IsAppDeployed && Data.Settings.CheckForUpdates)
+        {
+            var latestVersion = await Network.LatestAppReleaseAsync();
+            if (latestVersion is null || latestVersion <= Data.AppVersion)
+                return;
+
+            App.SafeInvoke(() =>
+            {
+                Notifications.Add(new(async () =>
+                {
+                    var res = await DialogService.ShowConfirmation(string.Format(Strings.Resources.S_NEW_VERSION, Properties.AppGlobal.AppDisplayName, latestVersion),
+                        Strings.Resources.S_NEW_VERSION_TITLE,
+                        Strings.Resources.S_GO_TO_VERSION_PAGE,
+                        cancelText: Strings.Resources.S_BUTTON_CLOSE,
+                        icon: DialogService.DialogIcon.Informational);
+
+                    if (res.Item1 is ContentDialogResult.Primary)
+                        Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{latestVersion}\"");
+                }, Strings.Resources.S_NEW_VERSION_TITLE,
+                Notifications));
+            });
+        }
     }
 }

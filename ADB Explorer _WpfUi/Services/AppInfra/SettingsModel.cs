@@ -11,8 +11,6 @@ public static class UISettings
 {
     public static ObservableList<AbstractGroup> SettingsList { get; set; }
 
-    public static ObservableList<Notification> Notifications { get; set; } = [];
-
     public static IEnumerable<AbstractSetting> SortSettings => SettingsList.SelectMany(group => group.Children)
         .Where(set => set.Visibility is Visibility.Visible && set.Description != Properties.AppGlobal.AppDisplayName)
         .OrderBy(sett => sett.Description).Prepend(SettingsList.SelectMany(group => group.Children).First(s => s.Description == Properties.AppGlobal.AppDisplayName));
@@ -248,23 +246,6 @@ public static class UISettings
                 new LongDescriptionSetting(Strings.Resources.S_ANDROID_ICONS_TITLE, $"{Strings.Resources.S_ANDROID_ROBOT_LIC}\n\n{Strings.Resources.S_APK_ICON_LIC}", "\uE946"),
             ], "\uE946"),
         ];
-    }
-}
-
-public class Notification : BaseAction
-{
-    public string Title { get; }
-
-    public static string Tooltip => Strings.Resources.S_TOOLTIP_MORE_INFO;
-
-    public Notification(Action action, string title) : base(() => true, action)
-    {
-        Title = title;
-
-        ((CommandHandler)Command).OnExecute.PropertyChanged += (sender, e) =>
-        {
-            UISettings.Notifications.Remove(this);
-        };
     }
 }
 

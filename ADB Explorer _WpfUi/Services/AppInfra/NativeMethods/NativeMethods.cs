@@ -705,31 +705,6 @@ public static partial class NativeMethods
 
     #endregion
 
-    #region Process Info
-
-    public struct IO_COUNTERS
-    {
-        public ulong ReadOperationCount;
-        public ulong WriteOperationCount;
-        public ulong OtherOperationCount;
-        public ulong ReadTransferCount;
-        public ulong WriteTransferCount;
-        public ulong OtherTransferCount;
-    }
-
-    [LibraryImport("Kernel32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool GetProcessIoCounters(HANDLE ProcessHandle, out IO_COUNTERS IoCounters);
-
-    public static IO_COUNTERS GetProcessIoCounters(HANDLE ProcessHandle)
-    {
-        GetProcessIoCounters(ProcessHandle, out var counters);
-
-        return counters;
-    }
-
-    #endregion
-
     [DllImport("User32.dll", CharSet = CharSet.Auto)]
     private static extern IntPtr SendMessage(HANDLE hWnd, uint Msg, IntPtr wParam, ref COPYDATASTRUCT lParam);
 
