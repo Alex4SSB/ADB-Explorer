@@ -111,7 +111,7 @@ public partial class AppRuntimeSettings : ViewModelBase
         }
     }
 
-    private Version adbVersion;
+    private Version adbVersion = null;
     public Version AdbVersion
     {
         get => adbVersion;
@@ -121,6 +121,9 @@ public partial class AppRuntimeSettings : ViewModelBase
                 OnPropertyChanged(nameof(AdbVersionString));
         }
     }
+
+    [ObservableProperty]
+    public partial AdbHelper.AdbStatus AdbStatus { get; set; } = AdbHelper.AdbStatus.NotFound;
 
     public string AdbVersionString => $"v{AdbVersion}";
 

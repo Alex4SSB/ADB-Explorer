@@ -5,8 +5,18 @@ using AdvancedSharpAdbClient;
 
 namespace ADB_Explorer.Helpers;
 
-internal static class AdbHelper
+public static class AdbHelper
 {
+    public enum AdbStatus
+    {
+        NotFound,       // we don't know where to look
+        PathInvalid,    // we know where to look but we'd rather not
+        Compromised,    // we found it but we'd rather not execute it
+        VersionUnknown, // it is safe but it doesn't report its version
+        Outdated,       // it is definitely ADB but it is too old
+        Valid           // all good
+    }
+
     public static Task<bool> CheckAdbVersion() => Task.Run(() =>
     {
         string adbPath = string.IsNullOrEmpty(Data.Settings.ManualAdbPath)
@@ -15,7 +25,7 @@ internal static class AdbHelper
 
         ADBService.VerifyAdbVersion(adbPath);
 
-        return Data.RuntimeSettings.AdbVersion >= AdbExplorerConst.MIN_ADB_VERSION;
+        return Data.RuntimeSettings.AdbStatus is not AdbStatus.Valid;
     });
 
     public static void EnableMdns() => App.SafeInvoke(async () =>

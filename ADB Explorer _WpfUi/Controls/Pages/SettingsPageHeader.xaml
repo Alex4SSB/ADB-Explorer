@@ -8,10 +8,12 @@
     xmlns:local="clr-namespace:ADB_Explorer.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:pages="clr-namespace:ADB_Explorer.ViewModels.Pages"
     xmlns:picker="clr-namespace:ADB_Explorer.Controls.ColorPicker"
     xmlns:services="clr-namespace:ADB_Explorer.Services"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    d:DataContext="{d:DesignInstance Type=pages:SettingsViewModel}"
     d:DesignHeight="50"
     d:DesignWidth="600"
     mc:Ignorable="d">
@@ -441,6 +443,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Border
                 Margin="0,0,0,8"
@@ -630,20 +633,45 @@
                         ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
                 </ui:DynamicScrollViewer>
             </Grid>
-            <!--<Grid Grid.Row="1" Margin="0,0,0,4">
+            <Grid Grid.Row="2" Margin="0,10">
                 <Grid.Style>
                     <Style TargetType="Grid">
-                        <Setter Property="Visibility" Value="Collapsed" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Source={x:Static Member=services:UISettings.Notifications}, Path=Count}" Value="0">
-                                <Setter Property="Visibility" Value="Visible" />
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbStatus}" Value="Valid">
+                                <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Grid.Style>
-                <Separator Style="{x:Null}" />
-            </Grid>-->
-
+                <ui:CardControl>
+                    <ui:CardControl.Icon>
+                        <ui:FontIcon Foreground="{DynamicResource SystemFillColorCriticalBrush}" Glyph="&#xEB90;" />
+                    </ui:CardControl.Icon>
+                    <ui:CardControl.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Text="{Binding AdbStatus}"
+                                TextWrapping="Wrap" />
+                            <ui:Button
+                                Grid.Column="2"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Click="Button_Click"
+                                ToolTip="{Binding Source={x:Static Member=strings:Resources.S_TOOLTIP_MORE_INFO}}">
+                                <ui:Button.Content>
+                                    <ui:FontIcon Glyph="&#xE897;" />
+                                </ui:Button.Content>
+                            </ui:Button>
+                        </Grid>
+                    </ui:CardControl.Header>
+                </ui:CardControl>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

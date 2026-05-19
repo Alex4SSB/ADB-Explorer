@@ -472,25 +472,41 @@ public partial class ADBService
     /// </remarks>
     public static void VerifyAdbVersion(string adbPath)
     {
-        if (string.IsNullOrEmpty(adbPath) 
-            || adbPath.StartsWith(@"\\")                                                // Forbid UNC paths for security reasons
-            || new FileInfo(adbPath).Attributes.HasFlag(FileAttributes.ReparsePoint))   // Forbid symlinks  for security reasons
+        if (string.IsNullOrEmpty(adbPath))
         {
-            RuntimeSettings.AdbVersion = null;
+            RuntimeSettings.AdbStatus = AdbHelper.AdbStatus.NotFound;
             return;
         }
 
-        // If the path is not a direct file reference, try to resolve it from the system PATH
-        if (!File.Exists(adbPath))
+        // Forbid UNC paths for security reasons
+        if (adbPath.StartsWith(@"\\"))                                                
         {
-            adbPath = FileHelper.ResolveExecutableFromPath(adbPath);
-            if (adbPath is null)
+            RuntimeSettings.AdbStatus = AdbHelper.AdbStatus.PathInvalid;
+            return;
+        }
+
+        FileInfo file = new(adbPath);
+
+        if (file.Exists)
+        {
+            // Forbid symlinks for security reasons
+            if (file.Attributes.HasFlag(FileAttributes.ReparsePoint))
             {
-                RuntimeSettings.AdbVersion = null;
+                RuntimeSettings.AdbStatus = AdbHelper.AdbStatus.PathInvalid;
                 return;
             }
         }
-        
+        else
+        {
+            // If the path is not a direct file reference, try to resolve it from the system PATH
+            adbPath = FileHelper.ResolveExecutableFromPath(adbPath);
+            if (adbPath is null)
+            {
+                RuntimeSettings.AdbStatus = AdbHelper.AdbStatus.NotFound;
+                return;
+            }
+        }
+
         bool isHashValid = false;
         var adbSHA = Security.CalculateWindowsFileHash(adbPath, true);
         if (adbSHA is not null)
@@ -509,7 +525,7 @@ public partial class ADBService
 
         if (!isHashValid)
         {
-            RuntimeSettings.AdbVersion = null;
+            RuntimeSettings.AdbStatus = AdbHelper.AdbStatus.Compromised;
             return;
         }
 
@@ -523,7 +539,7 @@ public partial class ADBService
 
         if (exitCode != 0)
         {
-            RuntimeSettings.AdbVersion = new(0, 0, 0);
+            RuntimeSettings.AdbStatus = AdbHelper.AdbStatus.VersionUnknown;
             return;
         }
 
@@ -533,7 +549,12 @@ public partial class ADBService
 
         string version = match.Groups["version"].Value;
         if (!string.IsNullOrEmpty(version))
+        {
             RuntimeSettings.AdbVersion = new(version);
+            RuntimeSettings.AdbStatus = RuntimeSettings.AdbVersion < MIN_ADB_VERSION
+                ? AdbHelper.AdbStatus.Outdated
+                : AdbHelper.AdbStatus.Valid;
+        }
     }
 
     public static string GetInternalStorage(string deviceId)

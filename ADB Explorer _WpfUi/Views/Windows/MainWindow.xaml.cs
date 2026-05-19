@@ -177,7 +177,10 @@ public partial class MainWindow : INavigationWindow
 
     private void FluentWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        Navigate(typeof(Pages.DevicesPage));
+        if (ViewModel.IsNavigationEnabled)
+            Navigate(typeof(Pages.DevicesPage));
+        else
+            Navigate(typeof(Pages.SettingsPage));
     }
 
     private void RootNavigation_PreviewMouseDown(object sender, MouseButtonEventArgs e)

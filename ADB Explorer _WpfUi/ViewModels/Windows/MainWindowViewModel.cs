@@ -68,6 +68,8 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     public partial ObservableList<Controls.NotificationBell.Notification> Notifications { get; set; } = [];
 
+    public bool IsNavigationEnabled => Data.RuntimeSettings.AdbVersion is not null && Data.RuntimeSettings.AdbVersion >= AdbExplorerConst.MIN_ADB_VERSION;
+
     public MainWindowViewModel()
     {
         MenuItems.Add(_logItem);
@@ -77,6 +79,14 @@ public partial class MainWindowViewModel : ObservableObject
             if (e.PropertyName == nameof(AppSettings.EnableLog))
             {
                 _logItem.Visibility = Data.Settings.EnableLog ? Visibility.Visible : Visibility.Collapsed;
+            }
+        };
+
+        Data.RuntimeSettings.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(AppRuntimeSettings.AdbVersion))
+            {
+                OnPropertyChanged(nameof(IsNavigationEnabled));
             }
         };
 

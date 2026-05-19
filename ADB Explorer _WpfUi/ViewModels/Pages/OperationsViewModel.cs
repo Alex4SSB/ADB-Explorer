@@ -91,8 +91,13 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
         config?.ColumnWidth = width;
     }
 
-    public void StoreColumns() =>
+    public void StoreColumns()
+    {
+        if (ColumnList is null)
+            return;
+
         Data.Settings.FileOpColumns = [.. ColumnList.Select(c => new FileOpColumnState(c.Type, c.IsChecked, c.Index, c.ColumnWidth))];
+    }
 
     #endregion
 
@@ -128,6 +133,9 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
 
     public OperationsViewModel()
     {
+        if (App.IsShuttingDown)
+            return;
+
         RemoveOpAction = new(() => Data.FileOpQ.Operations.Count > 0, () =>
         {
             if (SelectedFileOps.Any())

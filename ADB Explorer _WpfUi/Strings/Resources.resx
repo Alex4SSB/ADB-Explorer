@@ -833,10 +833,6 @@ Cancel All Running</value>
     <value>Write: {0}</value>
     <comment>ADB disk write speed. 0 = the speed including MB/s</comment>
   </data>
-  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
-    <value>Other: {0}</value>
-    <comment>ADB disk other speed (other than file transfers). 0 = the speed including MB/s</comment>
-  </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>Checks for updates on each launch</value>
     <comment>The tooltip of the setting that enables checking for updates</comment>
@@ -2025,5 +2021,15 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_COLOR_BLUE" xml:space="preserve">
     <value>Blue</value>
     <comment>The label of the blue channel in the color picker</comment>
+  </data>
+  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
+    <value>Unable to locate ADB from system PATH. Please use "{0}" to locate it.</value>
+    <comment>0 - the name of the Override ADB Path setting</comment>
+  </data>
+  <data name="S_ADB_PATH_INVALID" xml:space="preserve">
+    <value>Provided ADB path is either a Windows shortcut or a UNC (remote) path, which is not allowed.</value>
+  </data>
+  <data name="S_ADB_COMPROMISED" xml:space="preserve">
+    <value>The provided executable cannot be verified as ADB. Make sure you download only official Android Platform Tools from Google.</value>
   </data>
 </root>

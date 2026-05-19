@@ -182,18 +182,18 @@ public static class UISettings
             ], "\uE8B9"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_WORK_DIRS,
             [
-                new TextboxSetting(() => Settings.DefaultFolder,
-                                  Strings.Resources.S_SETTINGS_DEFAULT_FOLDER,
-                                  commands: [
-                                      SettingsActions.Find(a => a.Name is ActionType.ChangeDefaultPath),
-                                      SettingsActions.Find(a => a.Name is ActionType.ClearDefaultPath),
-                                  ]),
                 new TextboxSetting(() => Settings.ManualAdbPath,
                                   Strings.Resources.S_SETTINGS_OVERRIDE_ADB,
                                   commands: [
                                       SettingsActions.Find(a => a.Name is ActionType.ChangeAdbPath),
                                       SettingsActions.Find(a => a.Name is ActionType.ClearAdbPath),
                                       SettingsActions.Find(a => a.Name is ActionType.ResetApp),
+                                  ]),
+                new TextboxSetting(() => Settings.DefaultFolder,
+                                  Strings.Resources.S_SETTINGS_DEFAULT_FOLDER,
+                                  commands: [
+                                      SettingsActions.Find(a => a.Name is ActionType.ChangeDefaultPath),
+                                      SettingsActions.Find(a => a.Name is ActionType.ClearDefaultPath),
                                   ]),
             ], "\uE62F"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_GRAPHICS,

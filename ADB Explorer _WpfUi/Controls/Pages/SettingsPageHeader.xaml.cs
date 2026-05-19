@@ -13,7 +13,6 @@ public partial class SettingsPageHeader : UserControl
     {
         InitializeComponent();
 
-        Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
         Data.Settings.PropertyChanged += Settings_PropertyChanged;
     }
 
@@ -29,12 +28,8 @@ public partial class SettingsPageHeader : UserControl
         }
     }
 
-    private void RuntimeSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void Button_Click(object sender, RoutedEventArgs e)
     {
-        switch (e.PropertyName)
-        {
-            default:
-                break;
-        }
+        DialogService.ShowMessage(Strings.Resources.S_HELP_ON_ADB, Strings.Resources.S_HELP_ON_ADB_TITLE, DialogService.DialogIcon.Informational);
     }
 }

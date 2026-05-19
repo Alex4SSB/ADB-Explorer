@@ -205,6 +205,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The provided executable cannot be verified as ADB. Make sure you download only official Android Platform Tools from Google..
+        /// </summary>
+        public static string S_ADB_COMPROMISED {
+            get {
+                return ResourceManager.GetString("S_ADB_COMPROMISED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ADB Disk Usage.
         /// </summary>
         public static string S_ADB_DISK_USAGE {
@@ -237,6 +246,24 @@ namespace ADB_Explorer.Strings {
         public static string S_ADB_LEARN_MORE {
             get {
                 return ResourceManager.GetString("S_ADB_LEARN_MORE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to locate ADB from system PATH. Please use &quot;{0}&quot; to locate it..
+        /// </summary>
+        public static string S_ADB_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("S_ADB_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Provided ADB path is either a Windows shortcut or a UNC (remote) path, which is not allowed..
+        /// </summary>
+        public static string S_ADB_PATH_INVALID {
+            get {
+                return ResourceManager.GetString("S_ADB_PATH_INVALID", resourceCulture);
             }
         }
         
@@ -1233,15 +1260,6 @@ namespace ADB_Explorer.Strings {
         public static string S_DISCONN_FAILED_TITLE {
             get {
                 return ResourceManager.GetString("S_DISCONN_FAILED_TITLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Other: {0}.
-        /// </summary>
-        public static string S_DISK_USAGE_OTHER {
-            get {
-                return ResourceManager.GetString("S_DISK_USAGE_OTHER", resourceCulture);
             }
         }
         
