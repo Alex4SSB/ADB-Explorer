@@ -274,8 +274,6 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         : base(windowsPath)
     {
         Type = IsDirectory ? FileType.Folder : FileType.File;
-        Size = IsDirectory ? null : windowsPath.FileInfo.Length;
-        ModifiedTime = windowsPath.FileInfo?.LastWriteTime;
         IsLink = windowsPath.IsLink;
 
         SortName = new(FullName);

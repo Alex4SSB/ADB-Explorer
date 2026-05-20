@@ -28,6 +28,16 @@ An interface to ADB that allows browsing, transferring, and editing of files wit
 </a>
 
 <br></br>
+[Development process of the new WpfUi based version of the app](https://github.com/Alex4SSB/ADB-Explorer/discussions/291)
+
+<h2 align="left"/>ADB Platform-Tools</h2>
+
+For a comprehensive list of all official ADB platform-tools versions from Google with download URLs and checksums, see [OFFICIAL_ADB_VERSIONS.md](OFFICIAL_ADB_VERSIONS.md).
+
+<h2 align="left"/>Security</h2>
+
+For information on reporting security vulnerabilities, please see our [Security Policy](SECURITY.md).
+
 <h2 align="left"/>Translation</h2>
 Help with translation is most welcome - please visit our translation project on Weblate: https://hosted.weblate.org/engage/adb-explorer/
 

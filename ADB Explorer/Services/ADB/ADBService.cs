@@ -472,7 +472,7 @@ public partial class ADBService
     /// </remarks>
     public static void VerifyAdbVersion(string adbPath)
     {
-        if (string.IsNullOrEmpty(adbPath))
+        if (string.IsNullOrEmpty(adbPath) || adbPath.StartsWith(@"\\"))   // Forbid UNC paths for security reasons
         {
             RuntimeSettings.AdbStatus = AdbHelper.AdbStatus.NotFound;
             return;

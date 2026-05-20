@@ -453,4 +453,69 @@ public static class FileHelper
 
         return null;
     }
+
+    public static (long? Size, DateTime? ModifiedTime) GetShellSizeDate(ShellItem shellItem, bool isDirectory)
+    {
+        long? size = null;
+        DateTime? modifiedTime = null;
+
+        try
+        {
+            size = isDirectory ? null : shellItem.FileInfo.Length;
+            modifiedTime = shellItem.FileInfo.LastWriteTime;
+        }
+        catch (Exception)
+        {
+            if (!isDirectory
+                && shellItem.Properties.TryGetValue<ulong>(Ole32.PROPERTYKEY.System.Size, out var sz))
+            {
+                size = (long)sz;
+            }
+
+            if (shellItem.Properties.TryGetValue<System.Runtime.InteropServices.ComTypes.FILETIME>(Ole32.PROPERTYKEY.System.DateModified, out var modified))
+            {
+                modifiedTime = new NativeMethods.FILETIME(modified).DateTimeLocal;
+            }
+        }
+
+        return (size, modifiedTime);
+    }
+
+    /// <summary>
+    /// Resolves an executable name (e.g. "adb") to its full path by searching the system PATH directories.
+    /// </summary>
+    /// <returns>The full path to the executable if found; otherwise, <see langword="null"/>.</returns>
+    public static string ResolveExecutableFromPath(string fileName)
+    {
+        var pathEnv = Environment.GetEnvironmentVariable("PATH");
+        if (string.IsNullOrEmpty(pathEnv))
+            return null;
+
+        // PATHEXT defines executable extensions to try (e.g. ".EXE;.CMD")
+        var extensions = (Environment.GetEnvironmentVariable("PATHEXT") ?? ".EXE")
+            .Split(';', StringSplitOptions.RemoveEmptyEntries);
+
+        bool hasExtension = Path.HasExtension(fileName);
+
+        foreach (var dir in pathEnv.Split(';', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (hasExtension)
+            {
+                var candidate = Path.Combine(dir, fileName);
+                if (File.Exists(candidate))
+                    return Path.GetFullPath(candidate);
+            }
+            else
+            {
+                foreach (var ext in extensions)
+                {
+                    var candidate = Path.Combine(dir, fileName + ext);
+                    if (File.Exists(candidate))
+                        return Path.GetFullPath(candidate);
+                }
+            }
+        }
+
+        return null;
+    }
 }
