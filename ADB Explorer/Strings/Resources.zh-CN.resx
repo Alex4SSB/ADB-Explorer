@@ -1618,4 +1618,31 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MOUNT_OPTIONS" xml:space="preserve">
     <value>挂载选项</value>
   </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>自定义强调色</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>强调色</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>选择颜色</value>
+  </data>
+  <data name="S_COLOR_RED" xml:space="preserve">
+    <value>红</value>
+  </data>
+  <data name="S_COLOR_GREEN" xml:space="preserve">
+    <value>绿</value>
+  </data>
+  <data name="S_COLOR_BLUE" xml:space="preserve">
+    <value>蓝</value>
+  </data>
+  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
+    <value>无法从系统路径定位 ADB。请用 "{0}" 定位它。</value>
+  </data>
+  <data name="S_ADB_PATH_INVALID" xml:space="preserve">
+    <value>提供的 ADB 路径为 Windows 快捷方式或 UNC（远端）路径，这是不允许的。</value>
+  </data>
+  <data name="S_ADB_COMPROMISED" xml:space="preserve">
+    <value>提供的可执行文件无法被验证为 ADB。确保从 Google 下载官方 Android 平台工具。</value>
+  </data>
 </root>
