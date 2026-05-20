@@ -10,6 +10,7 @@
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:pages="clr-namespace:ADB_Explorer.ViewModels.Pages"
     xmlns:picker="clr-namespace:ADB_Explorer.Controls.ColorPicker"
+    xmlns:resources="clr-namespace:ADB_Explorer.Resources"
     xmlns:services="clr-namespace:ADB_Explorer.Services"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
@@ -644,22 +645,31 @@
                     </Style>
                 </Grid.Style>
                 <ui:CardControl>
-                    <ui:CardControl.Icon>
-                        <ui:FontIcon Foreground="{DynamicResource SystemFillColorCriticalBrush}" Glyph="&#xEB90;" />
-                    </ui:CardControl.Icon>
                     <ui:CardControl.Header>
                         <Grid>
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="10" />
                                 <ColumnDefinition />
                                 <ColumnDefinition Width="10" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="10" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <ui:FontIcon
+                                FontSize="24"
+                                Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                                Glyph="&#xEB90;" />
                             <TextBlock
+                                Grid.Column="2"
                                 VerticalAlignment="Center"
                                 Text="{Binding AdbStatus}"
                                 TextWrapping="Wrap" />
                             <ui:Button
-                                Grid.Column="2"
+                                Grid.Column="4"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Center"
                                 Click="Button_Click"
@@ -668,6 +678,28 @@
                                     <ui:FontIcon Glyph="&#xE897;" />
                                 </ui:Button.Content>
                             </ui:Button>
+                            <ui:HyperlinkButton
+                                Grid.Row="2"
+                                Grid.Column="2"
+                                HorizontalAlignment="Center"
+                                NavigateUri="{Binding Source={x:Static Member=resources:Links.L_ADB_PAGE}}">
+                                <ui:HyperlinkButton.ToolTip>
+                                    <ToolTip
+                                        MaxWidth="800"
+                                        Content="{Binding Source={x:Static Member=resources:Links.L_ADB_PAGE}}"
+                                        FlowDirection="LeftToRight" />
+                                </ui:HyperlinkButton.ToolTip>
+                                <ui:HyperlinkButton.Style>
+                                    <Style BasedOn="{StaticResource DefaultUiHyperlinkButtonStyle}" TargetType="ui:HyperlinkButton">
+                                        <Setter Property="Content" Value="{Binding Source={x:Static Member=strings:Resources.S_ADB_DOWNLOAD}}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsAppDeployed}" Value="True">
+                                                <Setter Property="Content" Value="{Binding Source={x:Static Member=strings:Resources.S_ADB_LEARN_MORE}}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:HyperlinkButton.Style>
+                            </ui:HyperlinkButton>
                         </Grid>
                     </ui:CardControl.Header>
                 </ui:CardControl>
