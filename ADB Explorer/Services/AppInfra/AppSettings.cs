@@ -1,377 +1,297 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
-public class AppSettings : ViewModelBase
+public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonOnSerializing
 {
-    public enum SystemVals
-    {
-        windowMaximized,
-        detailedVisible,
-        detailedHeight,
-    }
-
     public enum AppTheme
     {
-        windowsDefault,
-        light,
-        dark,
+        WindowsDefault,
+        Light,
+        Dark,
     }
 
-    public enum DoubleClickAction
+    public enum ThumbnailMode
     {
-        pull,
-        edit,
-        none,
+        Off,
+        IconViewOnly,
+        OnPhotoDir,
+        OnConnect,
     }
+
+    public enum ThumbnailAge
+    {
+        Disabled,
+        OneMonth,
+        OneWeek,
+        OneDay,
+        OneHour,
+    }
+
+    void IJsonOnDeserialized.OnDeserialized()
+    {
+        LocationThumbSize = _locationThumbSize;
+        LocationSorting = _locationSorting;
+    }
+
+    void IJsonOnSerializing.OnSerializing()
+    {
+        _locationThumbSize = LocationThumbSize.Where(kv => kv.Value is not ThumbnailService.ThumbnailSize.Disabled).ToDictionary();
+        _locationSorting = LocationSorting.Where(kv => kv.Value.Property != SortingSelector.SortingProperty.Name || kv.Value.Direction != ListSortDirection.Ascending).ToDictionary();
+    }
+
+    [ObservableProperty]
+    public partial ThumbnailAge ThumbsAge { get; set; } = ThumbnailAge.Disabled;
+
+    [ObservableProperty]
+    public partial ThumbnailMode ThumbsMode { get; set; } = ThumbnailMode.Off;
+
+    [ObservableProperty]
+    public partial bool MovieThumbsEnabled { get; set; } = false;
+
+    [ObservableProperty]
+    public partial bool PersistThumbs { get; set; } = true;
+
+    [ObservableProperty]
+    public partial bool LimitThumbsPullSpeed { get; set; } = true;
+
+    [ObservableProperty]
+    public partial bool ThumbSizePerLocation { get; set; } = true;
+
+    [JsonIgnore]
+    [ObservableProperty]
+    public partial Dictionary<string, ThumbnailService.ThumbnailSize> LocationThumbSize { get; set; } = [];
+
+    public Dictionary<string, ThumbnailService.ThumbnailSize> _locationThumbSize { get; set; } = [];
+
+    [ObservableProperty]
+    public partial int MaxCustomThumbWeight { get; set; } = 0;
+
+    [ObservableProperty]
+    public partial bool SortingPerLocation { get; set; } = true;
+
+    [JsonIgnore]
+    [ObservableProperty]
+    public partial Dictionary<string, SortingSelector.DirSortingOption> LocationSorting { get; set; } = [];
+
+    public Dictionary<string, SortingSelector.DirSortingOption> _locationSorting { get; set; } = [];
+
+    [ObservableProperty]
+    public partial ObservableCollection<string> SavedLocations { get; set; } = [];
+
+    [ObservableProperty]
+    public partial StorageDevice[] StorageDevices { get; set; }
+
+    [ObservableProperty]
+    public partial bool SpecialFolderIcons { get; set; } = true;
+
+    [ObservableProperty]
+    public partial bool EnableBusyBox { get; set; } = false;
+
+    [ObservableProperty]
+    public partial bool EnableWsa { get; set; } = false;
+
+    [ObservableProperty]
+    public partial bool IsDetailsPaneOpen { get; set; } = false;
+
+    [ObservableProperty]
+    public partial int DetailsPaneWidth { get; set; } = 300;
+
+    [ObservableProperty]
+    public partial DetailsPane.SidePaneMode SidePane { get; set; } = DetailsPane.SidePaneMode.Details;
+
+    [ObservableProperty]
+    public partial int MaxPreviewFileSize { get; set; } = 300;
+
+    [ObservableProperty]
+    public partial bool WindowMaximized { get; set; } = false;
 
     #region paths
 
-    private string defaultFolder;
+    private string defaultFolder = "";
     /// <summary>
     /// Default Folder For Pull On Double-Click And Folder / File Browsers
     /// </summary>
     public string DefaultFolder
     {
-        get => Get(ref defaultFolder, "");
+        get => defaultFolder;
         set
         {
-            if (Set(ref defaultFolder, value))
+            if (SetProperty(ref defaultFolder, value))
                 OnPropertyChanged(nameof(IsPullOnDoubleClickEnabled));
         }
     }
 
+    [JsonIgnore]
     public bool IsPullOnDoubleClickEnabled => !string.IsNullOrEmpty(DefaultFolder);
 
-    private string manualAdbPath;
-    public string ManualAdbPath
-    {
-        get => Get(ref manualAdbPath, "");
-        set => Set(ref manualAdbPath, value);
-    }
+    [ObservableProperty]
+    public partial string ManualAdbPath { get; set; } = "";
 
     #endregion
 
     #region File Behavior
 
-    private bool showExtensions;
-    public bool ShowExtensions
-    {
-        get => Get(ref showExtensions, true);
-        set => Set(ref showExtensions, value);
-    }
+    [ObservableProperty]
+    public partial bool ShowExtensions { get; set; } = true;
 
-    private bool showSystemPackages;
-    public bool ShowSystemPackages
-    {
-        get => Get(ref showSystemPackages, true);
-        set => Set(ref showSystemPackages, value);
-    }
+    [ObservableProperty]
+    public partial bool ShowSystemPackages { get; set; } = true;
 
-    private bool showHiddenItems;
-    public bool ShowHiddenItems
-    {
-        get => Get(ref showHiddenItems, true);
-        set => Set(ref showHiddenItems, value);
-    }
+    [ObservableProperty]
+    public partial bool ShowHiddenItems { get; set; } = true;
 
     #endregion
 
     #region Double Click
 
-    private DoubleClickAction doubleClick;
-    public DoubleClickAction DoubleClick
-    {
-        get => Get(ref doubleClick, DoubleClickAction.pull);
-        set => Set(ref doubleClick, value);
-    }
+    [ObservableProperty]
+    public partial bool DoubleClickToPull { get; set; } = false;
 
     #endregion
 
     #region device
 
-    private bool saveDevices;
-    public bool SaveDevices
-    {
-        get => Get(ref saveDevices, true);
-        set => Set(ref saveDevices, value);
-    }
+    [ObservableProperty]
+    public partial bool SaveDevices { get; set; } = true;
 
-    private bool autoOpen;
     /// <summary>
     /// Automatically Open Device For Browsing
     /// </summary>
-    public bool AutoOpen
-    {
-        get => Get(ref autoOpen, false);
-        set => Set(ref autoOpen, value);
-    }
+    [ObservableProperty]
+    public partial bool AutoOpen { get; set; } = false;
 
-    private bool autoRoot;
     /// <summary>
     /// Automatically Try To Open Devices Using Root Privileges
     /// </summary>
-    public bool AutoRoot
-    {
-        get => Get(ref autoRoot, false);
-        set => Set(ref autoRoot, value);
-    }
+    [ObservableProperty]
+    public partial bool AutoRoot { get; set; } = false;
 
     #endregion
 
     #region Drives & Features
 
-    private bool pollDrives;
-    public bool PollDrives
-    {
-        get => Get(ref pollDrives, true);
-        set => Set(ref pollDrives, value);
-    }
+    [ObservableProperty]
+    public partial bool PollDrives { get; set; } = true;
 
-    private bool enableRecycle;
     /// <summary>
     /// Enable moving deleted items to a special folder, instead of permanently deleting them
     /// </summary>
-    public bool EnableRecycle
-    {
-        get => Get(ref enableRecycle, false);
-        set => Set(ref enableRecycle, value);
-    }
+    [ObservableProperty]
+    public partial bool EnableRecycle { get; set; } = false;
 
-    private bool enableApk;
-    public bool EnableApk
-    {
-        get => Get(ref enableApk, false);
-        set => Set(ref enableApk, value);
-    }
+    [ObservableProperty]
+    public partial bool EnableApk { get; set; } = false;
 
     #endregion
 
     #region adb
 
-    private bool enableMdns;
     /// <summary>
     /// Runs ADB server with mDNS enabled, polling for services is enabled in the connection expander
     /// </summary>
-    public bool EnableMdns
-    {
-        get => Get(ref enableMdns, false);
-        set => Set(ref enableMdns, value);
-    }
+    [ObservableProperty]
+    public partial bool EnableMdns { get; set; } = true;
 
-    private bool pollDevices;
     /// <summary>
     /// <see langword="false"/> - disables polling for both ADB devices and mDNS services. Enables manual refresh button
     /// </summary>
-    public bool PollDevices
-    {
-        get => Get(ref pollDevices, true);
-        set => Set(ref pollDevices, value);
-    }
+    [ObservableProperty]
+    public partial bool PollDevices { get; set; } = true;
 
-    private bool pollBattery;
     /// <summary>
     /// Enables battery information for all devices (polling and displaying)
     /// </summary>
-    public bool PollBattery
-    {
-        get => Get(ref pollBattery, true);
-        set => Set(ref pollBattery, value);
-    }
+    [ObservableProperty]
+    public partial bool PollBattery { get; set; } = true;
 
-    private bool enableLog;
     /// <summary>
     /// <see langword="false"/> - disables logging of commands and command log button
     /// </summary>
-    public bool EnableLog
-    {
-        get => Get(ref enableLog, false);
-        set => Set(ref enableLog, value);
-    }
+    [ObservableProperty]
+    public partial bool EnableLog { get; set; } = false;
 
     #endregion
 
     #region File Ops
 
-    private bool enableCompactView;
-    public bool EnableCompactView
-    {
-        get => Get(ref enableCompactView, false);
-        set => Set(ref enableCompactView, value);
-    }
+    [ObservableProperty]
+    public partial FileOpColumnState[] FileOpColumns { get; set; } = [];
 
-    private bool stopPollingWhileSync;
-    public bool StopPollingOnSync
-    {
-        get => Get(ref stopPollingWhileSync, false);
-        set
-        {
-            if (Set(ref stopPollingWhileSync, value))
-            {
-                Data.RuntimeSettings.IsPollingStopped = value
-                    && Data.FileOpQ.Operations.Any(op => op is FileSyncOperation && op.Status is FileOperation.OperationStatus.InProgress);
-            }
-        }
-    }
+    [ObservableProperty]
+    public partial FileOpFilter.FilterType[] FileOpFilters { get; set; } = [];
 
-    private bool allowMultiOp;
-    public bool AllowMultiOp
-    {
-        get => Get(ref allowMultiOp, true);
-        set => Set(ref allowMultiOp, value);
-    }
+    [ObservableProperty]
+    public partial bool EnableCompactView { get; set; } = false;
 
-    private bool rescanOnPush;
-    public bool RescanOnPush
-    {
-        get => Get(ref rescanOnPush, true);
-        set => Set(ref rescanOnPush, value);
-    }
+    [ObservableProperty]
+    public partial bool StopPollingOnSync { get; set; } = false;
 
-    private bool keepDateModified;
-    public bool KeepDateModified
-    {
-        get => Get(ref keepDateModified, true);
-        set => Set(ref keepDateModified, value);
-    }
+    [ObservableProperty]
+    public partial bool AllowMultiOp { get; set; } = true;
+
+    [ObservableProperty]
+    public partial bool RescanOnPush { get; set; } = true;
+
+    [ObservableProperty]
+    public partial bool KeepDateModified { get; set; } = true;
 
     #endregion
 
     #region about
 
-    private bool checkForUpdates;
     /// <summary>
     /// GET releases on GitHub repo on each launch
     /// </summary>
-    public bool CheckForUpdates
-    {
-        get => Get(ref checkForUpdates, true);
-        set => Set(ref checkForUpdates, value);
-    }
+    [ObservableProperty]
+    public partial bool CheckForUpdates { get; set; } = true;
 
     #endregion
 
     #region graphics
 
-    private bool forceFluentStyles;
-    /// <summary>
-    /// Use Fluent [Windows 11] Styles In Windows 10
-    /// </summary>
-    public bool ForceFluentStyles
-    {
-        get => Get(ref forceFluentStyles, false);
-        set => Set(ref forceFluentStyles, value);
-    }
-
-    private bool swRender;
     /// <summary>
     /// Disables HW acceleration
     /// </summary>
-    public bool SwRender
+    [ObservableProperty]
+    public partial bool SwRender { get; set; } = false;
+
+    [ObservableProperty]
+    public partial bool UseCustomAccent { get; set; } = false;
+
+    [ObservableProperty]
+    public partial string? AccentColorHex { get; set; } = null;
+
+    [JsonIgnore]
+    public Color? AccentColor
     {
-        get => Get(ref swRender, false);
-        set => Set(ref swRender, value);
-    }
-
-    private bool isAnimated = true;
-    /// <summary>
-    /// This setting is not updated at runtime as long as we are unable to combine it with different enter and exit storyboards. <br />
-    /// The issue is the inability to separate the change of this setting from the change of the original triggers.
-    /// </summary>
-    public bool IsAnimated
-    {
-        get => isAnimated;
-        set
-        {
-            isAnimated = value;
-            OnPropertyChanged(nameof(isAnimated));
-        }
-    }
-
-    private bool disableAnimation;
-    /// <summary>
-    /// Disables all visual animations
-    /// </summary>
-    public bool DisableAnimation
-    {
-        get
-        {
-            var value = Get(ref disableAnimation, false);
-
-            if (!Data.RuntimeSettings.IsWindowLoaded)
-                IsAnimated = !disableAnimation;
-
-            return value;
-        }
-        set => Set(ref disableAnimation, value);
-    }
-
-    private bool enableSplash;
-    public bool EnableSplash
-    {
-        get => Get(ref enableSplash, true);
-        set => Set(ref enableSplash, value);
+        get => AccentColorHex is null ? null
+            : (Color)ColorConverter.ConvertFromString(AccentColorHex);
+        set => AccentColorHex = value.HasValue
+            ? $"#{value.Value.R:X2}{value.Value.G:X2}{value.Value.B:X2}"
+            : null;
     }
 
     #endregion
 
-    private AppTheme appTheme;
-    public AppTheme Theme
-    {
-        get => Get(ref appTheme, AppTheme.windowsDefault);
-        set => Set(ref appTheme, value);
-    }
+    [ObservableProperty]
+    public partial AppTheme Theme { get; set; } = AppTheme.WindowsDefault;
 
-    private bool hidePasteNamingInfo;
-    public bool HidePasteNamingInfo
-    {
-        get => Get(ref hidePasteNamingInfo, false);
-        set => Set(ref hidePasteNamingInfo, value);
-    }
+    public string LastVersion { get; set; } = "0.0.0";
 
-    private string lastVersion;
-    public string LastVersion
-    {
-        get => Get(ref lastVersion, "0.0.0");
-        set => Set(ref lastVersion, value);
-    }
+    [ObservableProperty]
+    public partial bool ShowLaunchWsaMessage { get; set; } = true;
+    
+    public bool? UnrootOnDisconnect { get; set; } = null;
 
-    private bool showLaunchWsaMessage;
-    public bool ShowLaunchWsaMessage
-    {
-        get => Get(ref showLaunchWsaMessage, true);
-        set => Set(ref showLaunchWsaMessage, value);
-    }
+    public string? LastDevice { get; set; } = null;
 
-    private long editorMaxFileSize;
-    public long EditorMaxFileSize
-    {
-        get
-        {
-            if (editorMaxFileSize == 0)
-                Set(ref editorMaxFileSize, 300000);
-
-            return Get(ref editorMaxFileSize, 300000);
-        }
-    }
-
-    private bool? unrootOnDisconnect;
-    public bool? UnrootOnDisconnect
-    {
-        get => Get(ref unrootOnDisconnect, null);
-        set => Set(ref unrootOnDisconnect, value);
-    }
-
-    private string lastDevice = null;
-    public string LastDevice
-    {
-        get => Get(ref lastDevice, null);
-        set => Set(ref lastDevice, value);
-    }
-
-    private CultureInfo uiCulture;
+    [JsonIgnore]
+    private CultureInfo? uiCulture;
+    [JsonIgnore]
     public CultureInfo UICulture
     {
         get
@@ -390,7 +310,7 @@ public class AppSettings : ViewModelBase
         }
         set
         {
-            if (base.Set(ref uiCulture, value))
+            if (SetProperty(ref uiCulture, value))
             {
                 UILanguage = value.Name;
                 UpdateTranslation();
@@ -398,29 +318,35 @@ public class AppSettings : ViewModelBase
         }
     }
 
+    [JsonIgnore]
+    public CultureInfo ActualUICulture => UICulture.Equals(CultureInfo.InvariantCulture) ? OriginalCulture : UICulture;
+
     private void UpdateTranslation()
     {
-        var actual = UICulture.Equals(CultureInfo.InvariantCulture)
+        CultureInfo actual = UICulture.Equals(CultureInfo.InvariantCulture)
             ? OriginalCulture
             : UICulture;
 
-        string precent = actual.Name == "en" || actual.Parent.Name == "en"
+        // Set the static resource culture so lookups are correct regardless of which
+        // thread accesses the resource strings (e.g. context menus outside the visual tree).
+        Strings.Resources.Culture = actual;
+
+        string? percent = actual.Name == "en" || actual.Parent.Name == "en"
                          ? null
                          : $"\u200E{SettingsHelper.GetCurrentPercentageTranslated(actual) * 100:f0}%";
 
-        CultureTranslationProgress.Value = precent;
+        CultureTranslationProgress.Value = percent;
     }
 
+    [JsonIgnore]
     public ObservableProperty<string> CultureTranslationProgress { get; private set; } = new() { Value = null };
 
-    private string uiLanguage;
-    public string UILanguage
-    {
-        get => Get(ref uiLanguage, "");
-        set => Set(ref uiLanguage, value);
-    }
+    [ObservableProperty]
+    public partial string UILanguage { get; set; } = "";
 
-    private CultureInfo originalCulture = null;
+    [JsonIgnore]
+    private CultureInfo? originalCulture = null;
+    [JsonIgnore]
     public CultureInfo OriginalCulture
     {
         get
@@ -429,7 +355,7 @@ public class AppSettings : ViewModelBase
             {
                 try
                 {
-                    originalCulture = Thread.CurrentThread.CurrentUICulture;
+                    originalCulture = CultureInfo.CurrentCulture;
                 }
                 catch
                 { }
@@ -438,53 +364,9 @@ public class AppSettings : ViewModelBase
         }
     }
 
-    private bool showLanguageNotification;
-    public bool ShowLanguageNotification
-    {
-        get => Get(ref showLanguageNotification, true);
-        set => Set(ref showLanguageNotification, value);
-    }
+    [ObservableProperty]
+    public partial bool ShowLanguageNotification { get; set; } = true;
 
-    private bool homeLocationsExpanded;
-    public bool HomeLocationsExpanded
-    {
-        get => Get(ref homeLocationsExpanded, false);
-        set => Set(ref homeLocationsExpanded, value);
-    }
-
-    protected override bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (Equals(storage, value))
-        {
-            return false;
-        }
-
-        storage = value;
-        Storage.StoreValue(propertyName, value);
-
-        OnPropertyChanged(propertyName);
-
-        return true;
-    }
-
-    private static T Get<T>(ref T storage, T defaultValue, [CallerMemberName] string propertyName = null)
-    {
-        if (storage is null || storage.Equals(default(T)))
-        {
-            var value = storage switch
-            {
-                Version => new Version((string)Storage.RetrieveValue(propertyName)),
-                Enum => Storage.RetrieveEnum<T>(propertyName),
-                bool => Storage.RetrieveBool(propertyName),
-                null when typeof(T) == typeof(string) => Storage.RetrieveValue(propertyName),
-                null when typeof(T) == typeof(bool?) => Storage.RetrieveBool(propertyName),
-                null when typeof(T) == typeof(Version) => new Version((string)Storage.RetrieveValue(propertyName)),
-                _ => Storage.RetrieveValue(propertyName),
-            };
-
-            storage = (T)(value ?? defaultValue);
-        }
-
-        return storage;
-    }
+    [ObservableProperty]
+    public partial bool HomeLocationsExpanded { get; set; } = false;
 }

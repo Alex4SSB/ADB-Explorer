@@ -1,7 +1,8 @@
-﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Controls;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
+using Wpf.Ui.Controls;
 using static ADB_Explorer.Services.FileAction;
 
 namespace ADB_Explorer.Services;
@@ -97,7 +98,7 @@ public abstract class FileOperation : ViewModelBase
 
     public Dispatcher Dispatcher { get; }
 
-    public ADBService.AdbDevice Device { get; }
+    public LogicalDeviceViewModel Device { get; }
 
     public virtual FilePath FilePath { get; }
 
@@ -234,27 +235,27 @@ public abstract class FileOperation : ViewModelBase
 
             return StatusInfo is null 
                 || (!StatusInfo.IsValidationInProgress 
-                && Device.Device.Status is AbstractDevice.DeviceStatus.Ok);
+                && Device.Status is DeviceStatus.Ok);
         }
     }
 
     public bool IsSourceNavigable => FilePath?.PathType is AbstractFile.FilePathType.Windows
-                || (Device.Status is AbstractDevice.DeviceStatus.Ok && AltSource.IsNoneOrNavigable);
+                || (Device.Status is DeviceStatus.Ok && AltSource.IsNoneOrNavigable);
 
     public bool IsTargetNavigable => TargetPath?.PathType is AbstractFile.FilePathType.Windows
-                || (Device.Status is AbstractDevice.DeviceStatus.Ok && AltTarget.IsNoneOrNavigable);
+                || (Device.Status is DeviceStatus.Ok && AltTarget.IsNoneOrNavigable);
 
     #endregion
 
     public BaseAction SourceAction { get; private set; }
     public BaseAction TargetAction { get; private set; }
 
-    public FileOperation(FilePath filePath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
+    public FileOperation(FilePath filePath, LogicalDeviceViewModel device, Dispatcher dispatcher)
     {
         TimeStamp = DateTime.Now;
 
         Dispatcher = dispatcher;
-        Device = adbDevice;
+        Device = device;
         FilePath = filePath;
 
         SourceAction = new(
@@ -264,16 +265,6 @@ public abstract class FileOperation : ViewModelBase
         TargetAction = new(
             () => IsTargetNavigable && !Data.FileActions.ListingInProgress,
             () => OpenLocation(true));
-
-        Device.Device.PropertyChanged += Device_PropertyChanged;
-    }
-
-    private void Device_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(Device.Status))
-        {
-            Data.RuntimeSettings.SortFileOps = true;
-        }
     }
 
     private void OpenLocation(bool target)
@@ -295,16 +286,16 @@ public abstract class FileOperation : ViewModelBase
             }
             else
             {
-                if (!Device.Device.IsOpen)
-                    Data.RuntimeSettings.DeviceToOpen = Device.Device;
+                if (!Device.IsOpen)
+                    Data.RuntimeSettings.DeviceToOpen = Device;
 
                 Data.RuntimeSettings.LocationToNavigate = new(file.ParentPath);
             }
         }
         else if (location is AdbLocation loc)
         {
-            if (!Device.Device.IsOpen)
-                Data.RuntimeSettings.DeviceToOpen = Device.Device;
+            if (!Device.IsOpen)
+                Data.RuntimeSettings.DeviceToOpen = Device;
 
             Data.RuntimeSettings.LocationToNavigate = loc;
         }
@@ -314,14 +305,13 @@ public abstract class FileOperation : ViewModelBase
 
     public void SetValidation(bool value)
     {
-        if (StatusInfo is null)
-            StatusInfo = new CompletedShellProgressViewModel();
+        StatusInfo ??= new CompletedShellProgressViewModel();
 
         StatusInfo.IsValidationInProgress = value;
         OnPropertyChanged(nameof(ValidationAllowed));
 
-        if (Data.FileActions.SelectedFileOps.Value.Contains(this))
-            Data.RuntimeSettings.RefreshFileOpControls = true;
+        //if (Data.FileActions.SelectedFileOps.Value.Contains(this))
+        //    Data.RuntimeSettings.RefreshFileOpControls = true;
     }
 
     public abstract void Start();

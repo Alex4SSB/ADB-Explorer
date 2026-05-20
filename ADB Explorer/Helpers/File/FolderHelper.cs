@@ -10,10 +10,12 @@ public static class FolderHelper
     public static void CombineDisplayNames()
     {
         var driveView = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
-        if (Data.CurrentDisplayNames.ContainsKey(driveView))
-            Data.CurrentDisplayNames[driveView] = Data.DevicesObject.Current.Name;
-        else
-            Data.CurrentDisplayNames.Add(driveView, Data.DevicesObject.Current.Name);
+        string name = Data.DevicesObject.Current.Name;
+        if (!string.IsNullOrEmpty(Data.DevicesObject.Current.BrandName))
+            name = Data.DevicesObject.Current.BrandName;
+
+        if (!Data.CurrentDisplayNames.TryAdd(driveView, name))
+            Data.CurrentDisplayNames[driveView] = name;
 
         foreach (var drive in Data.DevicesObject.Current.Drives.OfType<LogicalDriveViewModel>().Where(d => d.Type 
             is not AbstractDrive.DriveType.Root 
@@ -38,8 +40,6 @@ public static class FolderHelper
             if (names.Any())
                 Data.CurrentDisplayNames.TryAdd(item.Key, names.First());
         }
-
-        Data.RuntimeSettings.RefreshBreadcrumbs = true;
     }
 
     public static string FolderExists(string path)
@@ -52,7 +52,7 @@ public static class FolderHelper
 
         try
         {
-            return Data.CurrentADBDevice.TranslateDevicePath(path);
+            return ADBService.TranslateDevicePath(Data.DevicesObject.Current.ID, path);
         }
         catch (Exception e)
         {

@@ -320,7 +320,7 @@ Aby zatwierdzić ADB, otwórz ustawienia zaawansowane WSA.</value>
     <value>Wyłączone</value>
   </data>
   <data name="S_NEW_VERSION" xml:space="preserve">
-    <value>0 = wyświetlana nazwa aplikacji. 1 = nowy numer wersji</value>
+    <value>Dostępna jest nowa wersja {0} – {1}</value>
   </data>
   <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
     <value>Przejdź do strony wersji</value>
@@ -370,6 +370,9 @@ Niestety, ze względu na ograniczenia licencyjne nie możemy udostępnić ADB wr
   <data name="S_NEW_FOLDER" xml:space="preserve">
     <value>Nowy folder</value>
   </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>Creative Commons</value>
+  </data>
   <data name="S_LS_ERROR" xml:space="preserve">
     <value>Wystąpił błąd podczas próby wyświetlenia zawartości tego folderu.
 Widoczna zawartość może być niekompletna.</value>
@@ -384,10 +387,10 @@ Widoczna zawartość może być niekompletna.</value>
     <value>Czy na pewno chcesz usunąć to urządzenie?</value>
   </data>
   <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
-    <value>0 = Nazwa urządzenia do usunięcia</value>
+    <value>Usuń {0}</value>
   </data>
   <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
-    <value>0 = Nazwa emulatora do zabicia</value>
+    <value>Zabij {0}</value>
   </data>
   <data name="S_REM_APK" xml:space="preserve">
     <value>Następujące elementy zostaną usunięte:
@@ -446,16 +449,13 @@ Widoczna zawartość może być niekompletna.</value>
     <value>Wyczyść</value>
   </data>
   <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>Włącz mDNS</value>
+    <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>Statystyki dla urządzeń</value>
   </data>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
     <value>Statystyki dotyczące stanu baterii</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
-    <value>Włącz dziennik poleceń</value>
   </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>Automatyczne włączanie roota</value>
@@ -467,13 +467,13 @@ Widoczna zawartość może być niekompletna.</value>
     <value>Automatycznie otwórz do przeglądania</value>
   </data>
   <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>Włącz widok kompaktowy</value>
+    <value>Widok kompaktowy</value>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>Zatrzymaj statystyki w trybie push/pull</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>Zezwalaj na jednoczesne operacje</value>
+    <value>Jednoczesne operacje</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
     <value>Wymuś ponowne skanowanie multimediów podczas przesyłania</value>
@@ -481,11 +481,8 @@ Widoczna zawartość może być niekompletna.</value>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
     <value>Statystyki dla dysków</value>
   </data>
-  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
-    <value>Włącz kosz</value>
-  </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
-    <value>Włącz obsługę APK</value>
+    <value>Obsługa APK</value>
   </data>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
     <value>Pokaż rozszerzenia plików</value>
@@ -536,7 +533,7 @@ Widoczna zawartość może być niekompletna.</value>
     <value>Wyłącz animacje</value>
   </data>
   <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>Wyświetl ekran powitalny</value>
+    <value>Ekran powitalny</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>Sprawdź dostępność aktualizacji</value>
@@ -806,6 +803,9 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
     <value>Czas od ostatniej odpowiedzi serwera</value>
   </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}s</value>
+  </data>
   <data name="S_KILL_SERVER" xml:space="preserve">
     <value>Zabij serwer</value>
   </data>
@@ -819,19 +819,22 @@ Anuluj wszystkie uruchomione</value>
     <value>Zrestartuj ADB</value>
   </data>
   <data name="S_SERVER_DOWN" xml:space="preserve">
-    <value>Serwer jest wyłączony</value>
+    <value>Serwer mDNS jest wyłączony</value>
   </data>
   <data name="S_AWAITING_RESPONSE" xml:space="preserve">
     <value>Oczekiwanie na odpowiedź: {0}</value>
   </data>
-  <data name="S_MDNS_OFF" xml:space="preserve">
-    <value>&lt;Span&gt;• Statystyki usług są WYŁĄCZONE&lt;LineBreak /&gt;• Serwer &lt;Italic&gt;może&lt;/Italic&gt; być WŁĄCZONY&lt;/Span&gt;</value>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0}ms</value>
   </data>
-  <data name="S_ENABLE_MDNS" xml:space="preserve">
-    <value>Kliknij, aby włączyć serwer i statystyki</value>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0}m</value>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value>{0}h</value>
   </data>
   <data name="S_MDNS_ON" xml:space="preserve">
-    <value>Serwer jest uruchomiony i działa</value>
+    <value>Serwer mDNS jest uruchomiony i działa</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Ograniczone wsparcie</value>
@@ -863,17 +866,35 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_REBOOT_SYSTEM" xml:space="preserve">
     <value>Obraz systemu</value>
   </data>
+  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
+    <value>Bootloader</value>
+  </data>
   <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
     <value>Tryb Sideload</value>
   </data>
   <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
     <value>Tryb Sideload (Automatyczne Uruchomienie)</value>
   </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - Offline</value>
+  </data>
   <data name="S_STATUS_UNAUTH" xml:space="preserve">
     <value>{0} - Nieautoryzowane</value>
   </data>
+  <data name="S_TYPE_EMULATOR" xml:space="preserve">
+    <value>Emulator</value>
+  </data>
   <data name="S_TYPE_SERVICE" xml:space="preserve">
     <value>Usługa mDNS</value>
+  </data>
+  <data name="S_TYPE_USB" xml:space="preserve">
+    <value>USB</value>
+  </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value>WiFi</value>
+  </data>
+  <data name="S_TYPE_WSA" xml:space="preserve">
+    <value>WSA</value>
   </data>
   <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
     <value>Nieznany stan baterii</value>
@@ -904,6 +925,9 @@ Anuluj wszystkie uruchomione</value>
   </data>
   <data name="S_BAT_STATE_FULL" xml:space="preserve">
     <value>Pełne</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>Status: {0}</value>
   </data>
   <data name="S_BAT_HEALTH" xml:space="preserve">
     <value>Zdrowie: {0}</value>
@@ -959,6 +983,12 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_ACTION_VALIDATE" xml:space="preserve">
     <value>Sprawdź {0}</value>
   </data>
+  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
+    <value>Link</value>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} (Link)</value>
+  </data>
   <data name="S_FILE_TYPE_APK" xml:space="preserve">
     <value>Pakiet aplikacji na Androida</value>
   </data>
@@ -970,6 +1000,9 @@ Anuluj wszystkie uruchomione</value>
   </data>
   <data name="S_BUTTON_YES" xml:space="preserve">
     <value>Tak</value>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>Root</value>
   </data>
   <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
     <value>Pamięć wewnętrzna</value>
@@ -1005,10 +1038,10 @@ Anuluj wszystkie uruchomione</value>
     <value>Nie dotyczy</value>
   </data>
   <data name="S_PATH_INVALID" xml:space="preserve">
-    <value>Podana ścieżka nie istnieje.</value>
+    <value>Argument musi określać pełną ścieżkę nowego lub istniejącego pliku ustawień.</value>
   </data>
   <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
-    <value>Niestandardowa ścieżka danych aplikacji</value>
+    <value>Ścieżka niestandardowych ustawień aplikacji</value>
   </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Menu jest puste</value>
@@ -1066,6 +1099,9 @@ Anuluj wszystkie uruchomione</value>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>Aplikacja WSA</value>
+  </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>Root Status: {0}</value>
   </data>
   <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
     <value>Nie sprawdzony</value>
@@ -1138,6 +1174,9 @@ Anuluj wszystkie uruchomione</value>
   </data>
   <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
     <value>Pakiety</value>
+  </data>
+  <data name="S_FILEOP_ERROR" xml:space="preserve">
+    <value>Błąd: {0}</value>
   </data>
   <data name="S_FILEOP_VALIDATED" xml:space="preserve">
     <value>Zweryfikowany</value>
@@ -1249,6 +1288,12 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   <data name="S_FILE_BLOCK" xml:space="preserve">
     <value>Zablokuj urządzenie</value>
   </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>Typ urządzenia</value>
+  </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
+  </data>
   <data name="S_FILE_UNKNOWN" xml:space="preserve">
     <value>Nieznany</value>
   </data>
@@ -1266,6 +1311,36 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   </data>
   <data name="S_SAVED_LOCATIONS" xml:space="preserve">
     <value>Zapisane lokalizacje</value>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} KB</value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} MB</value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} GB</value>
+  </data>
+  <data name="TERA" xml:space="preserve">
+    <value>{0} TB</value>
+  </data>
+  <data name="PETA" xml:space="preserve">
+    <value>{0} PB</value>
+  </data>
+  <data name="EXA" xml:space="preserve">
+    <value>{0} EB</value>
+  </data>
+  <data name="MILLI" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="MICRO" xml:space="preserve">
+    <value>u</value>
+  </data>
+  <data name="NANO" xml:space="preserve">
+    <value>n</value>
+  </data>
+  <data name="BYTES" xml:space="preserve">
+    <value>{0} B</value>
   </data>
   <data name="S_DRAGDROP_COPY" xml:space="preserve">
     <value>Skopiuj {0} elementów</value>
@@ -1324,7 +1399,148 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
     <value>Walidowanie…</value>
   </data>
+  <data name="S_FILES_PLURAL" xml:space="preserve">
+    <value>{0} pliki</value>
+  </data>
+  <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
+    <value>Wybierz ROM dla sideload</value>
+  </data>
+  <data name="S_ROM_FILE" xml:space="preserve">
+    <value>plik ROM</value>
+  </data>
   <data name="S_TERMINAL" xml:space="preserve">
     <value>Terminal</value>
+  </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>Zachowaj datę modyfikacji pliku</value>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>Zainstaluj {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>Zainstaluj {0} plików APK</value>
+  </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value>Włącz</value>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value>Wyłącz</value>
+  </data>
+  <data name="S_MDNS_OFF" xml:space="preserve">
+    <value>&lt;Span&gt;• Statystyki usług są WYŁĄCZONE&lt;LineBreak /&gt;• Serwer &lt;Italic&gt;może&lt;/Italic&gt; być WŁĄCZONY&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ENABLE_MDNS" xml:space="preserve">
+    <value>Kliknij, aby włączyć serwer i statystyki</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>Sprawdzam status serwera mDNS…</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value>Ikony</value>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>Pociągnij i wyświetl miniatury</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>Tylko w widoku ikon</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>Tylko w katalogach zdjęć</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value>Po podłączeniu</value>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>Utrzymuj miniatury między sesjami</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>Ogranicz prędkość pobierania miniatur</value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>Pokaż ikony dla specjalnych folderów</value>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>Dołącz miniatury filmów</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>Długość</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>Wymiary</value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>Jeden miesiąc</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>Jeden tydzień</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>Jeden dzień</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>Jedna godzina</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>Czas odświeżania lokalnych miniatur</value>
+  </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>Jeśli to możliwe, użyj BusyBox</value>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>Automatyczne połączenie z WSA, jeśli jest dostępne</value>
+  </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>Wklej</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>Sprawdzanie dostępności aktualizacji miniatur</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>Pobieranie miniatur</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>Odczytywanie lokalizacji miniatur i bazy danych multimediów</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_TITLE" xml:space="preserve">
+    <value>{0} Miniatury</value>
+  </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value>Szczegóły</value>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value>Widok</value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>Średnie ikony</value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>Duże ikony</value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>Extra duże ikony</value>
+  </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value>Opcje układu i widoku</value>
+  </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value>Rozmiar miniatury zapisany dla każdej lokalizacji</value>
+  </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value>Sortuj</value>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value>Rosnąco</value>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value>Malejąco</value>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>Kolumna sortowania i kolejność zapisane dla każdej lokalizacji</value>
+  </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>Maksymalny rozmiar obrazu, który może służyć jako miniatura (0 – wyłączone)</value>
+  </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>oraz {0} więcej…</value>
   </data>
 </root>

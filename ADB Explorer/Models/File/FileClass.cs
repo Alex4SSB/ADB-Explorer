@@ -2,21 +2,27 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
+using ADB_Explorer.ViewModels;
 using Vanara.PInvoke;
 using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Models;
 
-public class FileClass : FilePath, IFileStat, IBrowserItem
+public partial class FileClass : FilePath, IFileStat, IBrowserItem
 {
     #region Notify Properties
 
-    private long? size;
-    public long? Size
+    [ObservableProperty]
+    public partial long? Size { get; set; }
+
+    partial void OnSizeChanged(long? value)
     {
-        get => size;
-        set => Set(ref size, value);
+        _folderViewModel?.OnSizeChanged();
+        _iconViewModel?.OnSizeChanged();
     }
+
+    [ObservableProperty]
+    public partial UnixFileMode? Permissions { get; set; }
 
     private bool isLink;
     public bool IsLink
@@ -29,13 +35,12 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         }
     }
 
-    private string linkTarget = "";
-    public string LinkTarget
-    {
-        get => linkTarget;
-        set => Set(ref linkTarget, value);
-    }
+    [ObservableProperty]
+    public partial string LinkTarget { get; set; } = "";
 
+    [ObservableProperty]
+    public partial bool IsIconPlaceholder { get; set; }
+    
     private FileType type;
     public FileType Type
     {
@@ -47,12 +52,17 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         }
     }
 
-    private string typeName;
-    public string TypeName
-    {
-        get => typeName;
-        private set => Set(ref typeName, value);
-    }
+    [ObservableProperty]
+    public partial string? User { get; set; }
+
+    [ObservableProperty]
+    public partial string? Group { get; set; }
+
+    [ObservableProperty]
+    public partial DateTimeOffset? LastAccessTime { get; set; }
+
+    [ObservableProperty]
+    public partial DateTimeOffset? CreationTime { get; set; }
 
     private DateTime? modifiedTime;
     public DateTime? ModifiedTime
@@ -61,32 +71,116 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         set
         {
             if (Set(ref modifiedTime, value))
-                OnPropertyChanged(nameof(ModifiedTimeString));
+            {
+                _folderViewModel?.OnModifiedTimeChanged();
+                _iconViewModel?.OnModifiedTimeChanged();
+            }
+        }
+    }
+
+    private DateTimeOffset? modifiedTimeWithOffset;
+    public DateTimeOffset? ModifiedTimeWithOffset
+    {
+        get => modifiedTimeWithOffset;
+        set
+        {
+            if (Set(ref modifiedTimeWithOffset, value))
+            {
+                _folderViewModel?.OnModifiedTimeChanged();
+                _iconViewModel?.OnModifiedTimeChanged();
+            }
         }
     }
 
     public double? UnixTime => ModifiedTime.ToUnixTime();
 
-    private BitmapSource icon = null;
+    private BitmapSource? _icon = null;
     public BitmapSource Icon
     {
-        get => icon;
-        private set => Set(ref icon, value);
+        get
+        {
+            if (_icon is null)
+                GetIcon();
+
+            return _icon;
+        }
     }
 
-    private BitmapSource iconOverlay = null;
-    public BitmapSource IconOverlay
+    [ObservableProperty]
+    public partial BitmapSource? IconOverlay { get; set; } = null;
+
+    public BitmapSource DragImage
     {
-        get => iconOverlay;
-        private set => Set(ref iconOverlay, value);
+        get
+        {
+            return Data.Settings.ThumbsMode > AppSettings.ThumbnailMode.IconViewOnly
+                ? LargeIcon
+                : LargeFileIcon;
+        }
     }
 
-    private DragDropEffects cutState = DragDropEffects.None;
-    public DragDropEffects CutState
+    public BitmapSource LargeIcon => CacheThumbnail?.Image ?? LargeFileIcon;
+
+    private BitmapSource LargeFileIcon => FileToIconConverter.GetImage(this, 120).First();
+
+    private ThumbnailService.Thumbnail? _cacheThumbnail = null;
+    public ThumbnailService.Thumbnail? CacheThumbnail
     {
-        get => cutState;
-        set => Set(ref cutState, value);
+        get
+        {
+            if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.Off)
+                return null;
+
+            if (_cacheThumbnail is null && Data.DevicesObject.Current.Type 
+                is DeviceType.Local 
+                or DeviceType.Remote
+                or DeviceType.Service)
+            {
+                if (!ThumbnailService.IsInitialized(Data.DevicesObject.Current.LogicalID))
+                {
+                    Task.Run(() => ThumbnailService.ForceLoad(Data.DevicesObject.Current));
+                }
+                else
+                {
+                    _cacheThumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, FullPath, ThumbnailService.ThumbnailSize.Drag, false);
+                }
+            }
+
+            return _cacheThumbnail;
+        }
     }
+
+    public BitmapSource FileIcon32 => FileToIconConverter.GetImage(this, 32).First();
+
+    private FileIconViewModel? _iconViewModel;
+    public FileIconViewModel IconViewModel 
+        => _iconViewModel ??= new FileIconViewModel(this);
+
+    public void DisposeIconViewModel()
+    {
+        _iconViewModel?.Dispose();
+        _iconViewModel = null;
+        _cacheThumbnail = null;
+    }
+
+    public void InvalidateIconViewModelThumbnail() => _iconViewModel?.InvalidateThumbnail();
+
+    private FolderViewModel? _folderViewModel;
+    public FolderViewModel FolderViewModel
+        => _folderViewModel ??= new FolderViewModel(this);
+
+    public void DisposeFolderViewModel()
+    {
+        _folderViewModel?.Dispose();
+        _folderViewModel = null;
+    }
+
+    public FileViewModelBase ActiveViewModel => FolderViewModel.IsInEditMode 
+        ? FolderViewModel 
+        : IconViewModel;
+
+    [ObservableProperty]
+    public partial DragDropEffects CutState { get; set; }
 
     private TrashIndexer trashIndex;
     public TrashIndexer TrashIndex
@@ -102,25 +196,11 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
 
     #endregion
 
-    private bool extensionIsGlyph = false;
-    public bool ExtensionIsGlyph
-    {
-        get => extensionIsGlyph;
-        set => Set(ref extensionIsGlyph, value);
-    }
-
-    private bool extensionIsFontIcon = false;
-    public bool ExtensionIsFontIcon
-    {
-        get => extensionIsFontIcon;
-        set => Set(ref extensionIsFontIcon, value);
-    }
-
     public bool IsTemp { get; set; }
 
     public FileNameSort SortName { get; private set; }
 
-    public (string, long?, double?)[] Children => !IsDirectory
+    public FolderTree[]? Children => !IsDirectory
         ? null 
         : FileHelper.GetFolderTree([FullPath]);
 
@@ -138,21 +218,15 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
     /// </summary>
     public override string Extension => Type is FileType.File ? base.Extension : "";
 
-    public string ShortExtension
-    {
-        get
-        {
-            return (Extension.Length > 1 && Array.IndexOf(AdbExplorerConst.UNICODE_ICONS, char.GetUnicodeCategory(Extension[1])) > -1)
-                ? Extension[1..]
-                : "";
-        }
-    }
-
-    public string ModifiedTimeString => TabularDateFormatter.Format(ModifiedTime, Thread.CurrentThread.CurrentCulture);
-
-    public string SizeString => IsDirectory ? "" : Size?.BytesToSize(true);
-
     #endregion
+
+    public FileClass(FolderTree treeItem)
+        : this("",
+               treeItem.Name,
+               treeItem.IsFolder ? FileType.Folder : FileType.File,
+               size: treeItem.Size,
+               modifiedTime: treeItem.Date.FromUnixTime())
+    { }
 
     public FileClass(
         string fileName,
@@ -161,19 +235,22 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         bool isLink = false,
         long? size = null,
         DateTime? modifiedTime = null,
-        bool isTemp = false)
+        bool isTemp = false,
+        UnixFileMode? permissions = null)
         : base(path, fileName, type)
     {
         Type = type;
         Size = size;
         ModifiedTime = modifiedTime;
         IsLink = isLink;
-
-        GetIcon();
-        TypeName = GetTypeName();
         IsTemp = isTemp;
+        Permissions = permissions;
         
-        SortName = new(fileName);
+        SortName = new(FullName);
+
+        // Use a weak event pattern to prevent Settings from rooting this object
+        WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(
+            Data.Settings, nameof(Data.Settings.PropertyChanged), OnSettingsPropertyChanged);
     }
 
     public FileClass(FileClass other)
@@ -201,9 +278,6 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         ModifiedTime = windowsPath.FileInfo?.LastWriteTime;
         IsLink = windowsPath.IsLink;
 
-        GetIcon();
-        TypeName = GetTypeName();
-
         SortName = new(FullName);
     }
 
@@ -219,10 +293,19 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         fileName: fileStat.FullName,
         path: fileStat.FullPath,
         type: fileStat.Type,
+        isLink: fileStat.IsLink,
         size: fileStat.Size,
         modifiedTime: fileStat.ModifiedTime,
-        isLink: fileStat.IsLink
+        permissions: fileStat.Permissions
     );
+
+    private void OnSettingsPropertyChanged(object sender, PropertyChangedEventArgs args)
+    {
+        if (args.PropertyName == nameof(Data.Settings.ShowExtensions))
+        {
+            OnPropertyChanged(nameof(DisplayName));
+        }
+    }
 
     public override void UpdatePath(string androidPath)
     {
@@ -234,10 +317,11 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
 
     public void UpdateType()
     {
-        TypeName = GetTypeName();
+        _folderViewModel?.UpdateType();
+
+        _iconViewModel?.UpdateType();
+
         GetIcon();
-        OnPropertyChanged(nameof(ExtensionIsGlyph));
-        OnPropertyChanged(nameof(ExtensionIsFontIcon));
     }
 
     public void UpdateSpecialType()
@@ -247,6 +331,12 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
             FileType.Folder => SpecialFileType.Folder,
             FileType.Unknown => SpecialFileType.Unknown,
             FileType.BrokenLink => SpecialFileType.BrokenLink,
+            FileType.MultipleFiles => SpecialFileType.MultipleFiles,
+            FileType.Drive => SpecialFileType.Drive,
+            FileType.EmptyTrash => SpecialFileType.EmptyTrash,
+            FileType.FullTrash => SpecialFileType.FullTrash,
+            FileType.Phone => SpecialFileType.Phone,
+            FileType.Gallery => SpecialFileType.Gallery,
             _ => SpecialFileType.Regular
         };
 
@@ -257,58 +347,20 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
             SpecialType |= SpecialFileType.LinkOverlay;
     }
 
-    private string GetTypeName()
+    public void UpdateExtraInfo(CancellationToken cancellationToken)
     {
-        var type = Type switch
+        var info = ADBService.GetFileExtraInfo(Data.DevicesObject.Current, FullPath, cancellationToken);
+        if (info is null)
+            return;
+
+        App.SafeInvoke(() =>
         {
-            FileType.File => GetTypeName(FullName),
-            FileType.Folder => Strings.Resources.S_MENU_FOLDER,
-            FileType.Unknown => "",
-            _ => GetFileTypeName(Type),
-        };
-
-        if (IsLink && Type is not FileType.BrokenLink)
-            type = string.IsNullOrEmpty(type)
-                ? Strings.Resources.S_FILE_TYPE_LINK
-                : string.Format(Strings.Resources.S_KNOWN_TYPE_LINK, type);
-
-        return type;
-    }
-
-    public string GetTypeName(string fileName)
-    {
-        if (IsApk)
-            return Strings.Resources.S_FILE_TYPE_APK;
-
-        if (string.IsNullOrEmpty(fileName) || (IsHidden && FullName.Count(c => c == '.') == 1))
-            return Strings.Resources.S_MENU_FILE;
-
-        if (Extension.Equals(".exe", StringComparison.CurrentCultureIgnoreCase))
-            return Strings.Resources.S_FILE_TYPE_EXE;
-
-        if (!Ascii.IsValid(Extension))
-        {
-            if (ShortExtension.Length == 1)
-                ExtensionIsGlyph = true;
-            else if (ShortExtension.Length > 1)
-                ExtensionIsFontIcon = true;
-            else
-            {
-                ExtensionIsGlyph =
-                ExtensionIsFontIcon = false;
-
-                return $"{Extension[1..]} {Strings.Resources.S_MENU_FILE}";
-            }
-
-            return $"{ShortExtension} {Strings.Resources.S_MENU_FILE}";
-        }
-        else
-        {
-            ExtensionIsGlyph =
-            ExtensionIsFontIcon = false;
-
-            return NativeMethods.GetShellFileType(fileName);
-        }
+            User = info?.User;
+            Group = info?.Group;
+            LastAccessTime = info?.AccessTime;
+            CreationTime = info?.CreationTime;
+            ModifiedTimeWithOffset = info?.ModifiedTime;
+        });
     }
 
     public SyncFile GetSyncFile() => new(this, Children);
@@ -324,11 +376,11 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
 
         var children = Children;
 
-        var fileOp = FileSyncOperation.PullFile(new(this, children), target, Data.CurrentADBDevice, App.Current.Dispatcher);
+        var fileOp = FileSyncOperation.PullFile(new(this, children), target, Data.DevicesObject.Current, App.AppDispatcher);
         fileOp.PropertyChanged += PullOperation_PropertyChanged;
         fileOp.VFDO = vfdo;
 
-        (string, long?, double?)[] items = [(name, Size, UnixTime)];
+        FolderTree[] items = [new(name, Size, UnixTime)];
         if (includeContent && children is not null)
         {
             items = [.. items, .. children];
@@ -336,14 +388,14 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
 
         Descriptors = items.Select(item => new FileDescriptor
         {
-            Name = FileHelper.ExtractRelativePath(item.Item1, ParentPath),
+            Name = FileHelper.ExtractRelativePath(item.Name, ParentPath),
             SourcePath = FullPath,
-            IsDirectory = item.Item2 is null,
-            Length = item.Item2,
-            ChangeTimeUtc = item.Item3.FromUnixTime(),
+            IsDirectory = item.IsFolder,
+            Length = item.Size,
+            ChangeTimeUtc = item.Date.FromUnixTime(),
             Stream = () =>
             {
-                var isActive = App.Current.Dispatcher.Invoke(() => App.Current.MainWindow.IsActive);
+                var isActive = App.AppDispatcher?.Invoke(() => App.Current?.MainWindow?.IsActive == true) == true;
                 var operations = vfdo.Operations.Where(op => op.Status is FileOperation.OperationStatus.None);
 
                 // When a VFDO that does not contain folders is sent to the clipboard, the shell immediately requests the file contents.
@@ -361,7 +413,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
                 // For all consecutive files this list will be empty.
                 foreach (var op in operations)
                 {
-                    App.Current.Dispatcher.Invoke(() => Data.FileOpQ.AddOperation(op));
+                    App.SafeInvoke(() => Data.FileOpQ.AddOperation(op));
                 }
 
                 // Wait for the operation to complete
@@ -370,7 +422,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
                     Thread.Sleep(100);
                 }
 
-                var file = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, FileHelper.ExtractRelativePath(item.Item1, ParentPath), '\\');
+                var file = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, FileHelper.ExtractRelativePath(item.Name, ParentPath), '\\');
 
                 // Try 10 times to read from the file and write to the stream,
                 // in case the file is still in use by ADB or hasn't appeared yet
@@ -418,7 +470,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
                 ShellFileOperation.SilentDelete(op.Device, op.FilePath.FullPath);
 
                 // Remove file in UI if present
-                if (op.Device.ID == Data.CurrentADBDevice.ID
+                if (op.Device.ID == Data.DevicesObject.Current.ID
                     && op.FilePath.ParentPath == Data.CurrentPath)
                 {
                     op.Dispatcher.Invoke(() =>
@@ -440,12 +492,14 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
 
     public void GetIcon()
     {
-        var icons = FileToIconConverter.GetImage(this, true).ToArray();
-        
+        var icons = FileToIconConverter.GetImage(this, 16).ToArray();
+
         if (icons.Length > 0 && icons[0] is BitmapSource icon)
-            Icon = icon;
+            _icon = icon;
         else
-            Icon = null;
+            _icon = null;
+
+        OnPropertyChanged(nameof(Icon));
 
         if (icons.Length > 1 && icons[1] is BitmapSource icon2)
             IconOverlay = icon2;
@@ -455,13 +509,17 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
 
     public override string ToString()
     {
+        var timeStr = TabularDateFormatter.Format(ModifiedTime, Thread.CurrentThread.CurrentCulture);
+        var sizeStr = IsDirectory ? "" : Size?.BytesToSize(true);
+        var typeStr = _folderViewModel?.TypeName ?? $"{Type}";
+
         if (TrashIndex is null)
         {
-            return $"{DisplayName} \n{ModifiedTimeString} \n{TypeName} \n{SizeString}";
+            return $"{DisplayName} \n{timeStr} \n{typeStr} \n{sizeStr}";
         }
         else
         {
-            return $"{DisplayName} \n{TrashIndex.OriginalPath} \n{TrashIndex.ModifiedTimeString} \n{TypeName} \n{SizeString} \n{ModifiedTimeString}";
+            return $"{DisplayName} \n{TrashIndex.OriginalPath} \n{TrashIndex.ModifiedTimeString} \n{typeStr} \n{sizeStr} \n{timeStr}";
         }
     }
 

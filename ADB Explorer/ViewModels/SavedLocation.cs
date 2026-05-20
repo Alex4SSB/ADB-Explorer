@@ -1,6 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
 
@@ -25,23 +24,11 @@ public class SavedLocation : ViewModelBase
 
         DeleteAction = new(
             () => !string.IsNullOrEmpty(Path),
-            () =>
-            {
-                Data.RuntimeSettings.SavedLocations = [.. Data.RuntimeSettings.SavedLocations.Except([Path])];
-                Storage.StoreValue(nameof(Data.RuntimeSettings.SavedLocations), Data.RuntimeSettings.SavedLocations.ToArray());
-            });
+            () => Data.Settings.SavedLocations.Remove(Path));
 
         AddAction = new(
             () => string.IsNullOrEmpty(Path),
-            () =>
-            {
-                if (Data.RuntimeSettings.SavedLocations is null)
-                    Data.RuntimeSettings.SavedLocations = [Data.CurrentPath];
-                else
-                    Data.RuntimeSettings.SavedLocations = [.. Data.RuntimeSettings.SavedLocations, Data.CurrentPath];
-
-                Storage.StoreValue(nameof(Data.RuntimeSettings.SavedLocations), Data.RuntimeSettings.SavedLocations.ToArray());
-            });
+            () => Data.Settings.SavedLocations.Add(Data.CurrentPath));
 
         NavigateAction = new(
             () => !string.IsNullOrEmpty(Path),

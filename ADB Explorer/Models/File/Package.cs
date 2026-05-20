@@ -2,50 +2,41 @@
 
 namespace ADB_Explorer.Models;
 
-public class Package : ViewModelBase, IBrowserItem
+public partial class Package : ObservableObject, IBrowserItem
 {
     public enum PackageType
     {
         System,
         User,
     }
-    
-    private string name;
-    public string Name
-    {
-        get => name;
-        private set => Set(ref name, value);
-    }
 
-    private string path;
-    public string Path
-    {
-        get => path;
-        private set => Set(ref path, value);
-    }
+    [ObservableProperty]
+    public partial string Name { get; set; }
+
+    [ObservableProperty]
+    public partial string Path { get; set; }
 
     public string DisplayName => Name;
 
-    private PackageType type;
-    public PackageType Type
-    {
-        get => type;
-        private set => Set(ref type, value);
-    }
+    public FolderViewModel FolderViewModel => null;
 
-    private long? uid = null;
-    public long? Uid
-    {
-        get => uid;
-        private set => Set(ref uid, value);
-    }
+    [ObservableProperty]
+    public partial PackageType Type { get; set; }
 
-    private long? version = null;
-    public long? Version
-    {
-        get => version;
-        private set => Set(ref version, value);
-    }
+    [ObservableProperty]
+    public partial long? Uid { get; set; } = null;
+
+    [ObservableProperty]
+    public partial long? Version { get; set; } = null;
+
+    [ObservableProperty]
+    public partial string VersionName { get; set; }
+
+    [ObservableProperty]
+    public partial DateTime? LastUpdateTime { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; }
 
     public static Package New(string package, PackageType type)
     {

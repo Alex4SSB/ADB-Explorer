@@ -1,7 +1,8 @@
-﻿namespace ADB_Explorer.Services;
+namespace ADB_Explorer.Services;
 
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.ViewModels;
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.InteropServices.Marshalling;
 
@@ -75,7 +76,7 @@ public static partial class NativeMethods
         public string parentFolder;
         public string[] items;
 
-        public ADBDRAGLIST(ADBService.AdbDevice device, IEnumerable<FileClass> files)
+        public ADBDRAGLIST(LogicalDeviceViewModel device, IEnumerable<FileClass> files)
         {
             pid = Environment.ProcessId;
             deviceId = device.ID;

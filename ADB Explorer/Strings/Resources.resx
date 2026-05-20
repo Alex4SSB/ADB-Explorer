@@ -276,12 +276,6 @@ The release notes are available on GitHub.</value>
 • File names are case insensitive
 • Installation of APKs is not supported</value>
   </data>
-  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>The app has many animations that are enabled as part of the fluent design.
-The side views animation is always disabled when the app window is maximized on a secondary display.
-
-• Checking this setting disables all app animations except progress bars, progress rings, and drive usage bars.</value>
-  </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>All app settings will be reset upon closing the app.
 This cannot be undone. Are you sure?</value>
@@ -462,20 +456,16 @@ Visible content may be incomplete.</value>
     <comment>The tooltip of a button used to clear a textbox</comment>
   </data>
   <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>Enable mDNS</value>
+    <value>mDNS</value>
     <comment>The setting used to toggle mDNS enabled state</comment>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
-    <value>Poll For Devices</value>
+    <value>Polling For Devices</value>
     <comment>The setting used to toggle polling for devices</comment>
   </data>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
-    <value>Poll For Battery Status</value>
+    <value>Polling For Battery Status</value>
     <comment>The setting used to toggle battery status polling</comment>
-  </data>
-  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
-    <value>Enable Command Log</value>
-    <comment>The setting used to toggle command log enabled state</comment>
   </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>Automatically Enable Root</value>
@@ -490,7 +480,7 @@ Visible content may be incomplete.</value>
     <comment>The setting used to toggle automatically opening the only connected device or the last connected device</comment>
   </data>
   <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>Enable Compact View</value>
+    <value>Compact View</value>
     <comment>The setting used to enable the file operations compact view</comment>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
@@ -498,7 +488,7 @@ Visible content may be incomplete.</value>
     <comment>The setting used to stop device and battery polling when there are active push or pull operations</comment>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>Allow Simultaneous Operations</value>
+    <value>Simultaneous Operations</value>
     <comment>The setting used to allow performing simultaneous operations on separate devices</comment>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
@@ -506,15 +496,11 @@ Visible content may be incomplete.</value>
     <comment>The setting used to enable forcing the device to perform a media rescan after a successful push operation batch</comment>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
-    <value>Poll For Drives</value>
+    <value>Polling For Drives</value>
     <comment>The setting used to toggle polling for device drives when in drive view</comment>
   </data>
-  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
-    <value>Enable Recycle Bin</value>
-    <comment>The setting used to enable the recycle bin (trash)</comment>
-  </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
-    <value>Enable APK Handling</value>
+    <value>APK Support</value>
     <comment>The setting used to enable everything related to APK</comment>
   </data>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
@@ -569,9 +555,17 @@ Visible content may be incomplete.</value>
     <value>Theme</value>
     <comment>The title of the settings group used to control the app theme</comment>
   </data>
-  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
-    <value>Force Fluent Styles</value>
-    <comment>The setting used in Windows 10 to force the app to use the fluent style design</comment>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Custom accent color</value>
+    <comment>The setting to enable a custom accent color instead of the system accent</comment>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Accent color</value>
+    <comment>The setting to choose a custom accent color</comment>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Pick a color</value>
+    <comment>Title of the color picker dialog</comment>
   </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>Disable Hardware Acceleration</value>
@@ -580,10 +574,6 @@ Visible content may be incomplete.</value>
   <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
     <value>Disable Animations</value>
     <comment>The setting used to disable app animations</comment>
-  </data>
-  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>Display Splash Screen</value>
-    <comment>The setting used to enable showing the splash screen on app startup</comment>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>Check For Updates</value>
@@ -829,10 +819,6 @@ Cancel All Running</value>
     <value>Write: {0}</value>
     <comment>ADB disk write speed. 0 = the speed including MB/s</comment>
   </data>
-  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
-    <value>Other: {0}</value>
-    <comment>ADB disk other speed (other than file transfers). 0 = the speed including MB/s</comment>
-  </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>Checks for updates on each launch</value>
     <comment>The tooltip of the setting that enables checking for updates</comment>
@@ -962,7 +948,7 @@ Cancel All Running</value>
     <comment>The content of a button to restart ADB server</comment>
   </data>
   <data name="S_SERVER_DOWN" xml:space="preserve">
-    <value>Server is down</value>
+    <value>mDNS server is down</value>
     <comment>A notification indicating that ADB server is down</comment>
   </data>
   <data name="S_AWAITING_RESPONSE" xml:space="preserve">
@@ -981,17 +967,9 @@ Cancel All Running</value>
     <value>{0}h</value>
     <comment>Hours display (eg. 8h)</comment>
   </data>
-  <data name="S_MDNS_OFF" xml:space="preserve">
-    <value>&lt;Span&gt;• Polling for services is OFF&lt;LineBreak /&gt;• Server &lt;Italic&gt;might&lt;/Italic&gt; be ON&lt;/Span&gt;</value>
-    <comment>The notification displayed when mDNS server has been turned off</comment>
-  </data>
-  <data name="S_ENABLE_MDNS" xml:space="preserve">
-    <value>Click to enable server and polling</value>
-    <comment>The tooltip of the checkbox to enable the mDNS server</comment>
-  </data>
   <data name="S_MDNS_ON" xml:space="preserve">
-    <value>Server is up and running</value>
-    <comment>The tooltip of the mDNS checkbox when the server is on</comment>
+    <value>mDNS server is up and running</value>
+    <comment>A notification indicating mDNS server is on</comment>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Limited Support</value>
@@ -1171,7 +1149,7 @@ Cancel All Running</value>
   </data>
   <data name="S_PASTE" xml:space="preserve">
     <value>Paste</value>
-    <comment>The file paste operation</comment>
+    <comment>As in "Paste Conflict" (a file conflict while pasting)</comment>
   </data>
   <data name="S_DROP" xml:space="preserve">
     <value>Drop</value>
@@ -1261,11 +1239,11 @@ Cancel All Running</value>
     <comment>Displayed in the source / target of a file operation when those are unknown</comment>
   </data>
   <data name="S_PATH_INVALID" xml:space="preserve">
-    <value>Provided path does not exist.</value>
+    <value>Argument must specify full path of a new or existing settings file.</value>
     <comment>Displayed when an invalid path argument is provided for app launch</comment>
   </data>
   <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
-    <value>Custom App Data Path</value>
+    <value>Custom App Settings Path</value>
     <comment>The title of the error message when an invalid path argument is provided</comment>
   </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">
@@ -1765,5 +1743,279 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
     <value>Install {0} APKs</value>
     <comment>The drag tooltip when dragging multiple APK files over the installed apps view. 0 - number of APKs being dragged</comment>
+  </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value>On</value>
+    <comment>The label of the switch toggle on a setting when it is on / active / enabled</comment>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value>Off</value>
+    <comment>The label of the switch toggle on a setting when it is off / inactive / disabled</comment>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>Checking mDNS server status…</value>
+    <comment>The notification displayed when waiting for a status response from the server</comment>
+  </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value>Icons</value>
+    <comment>The title of the group for settings related to icons</comment>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>Pull &amp; Display Thumbnails</value>
+    <comment>The title of the setting that controls thumbnail behavior</comment>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>Only in Icon View</value>
+    <comment>Thumbnails mode setting: icon view mode</comment>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>Only in Photo Directories</value>
+    <comment>Thumbnails mode setting: photo directories mode</comment>
+  </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value>Upon Connection</value>
+    <comment>Thumbnails mode setting: on connection mode</comment>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>Persist Thumbnails Between Sessions</value>
+    <comment>The setting used allow saving thumbnails locally from one app session to another</comment>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>Limit Thumbnails Pull Speed</value>
+    <comment>The setting used to limit the speed at which thumbnails are pulled in bulk from the device</comment>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>Show Icons For Special Folders</value>
+    <comment>The setting used to allow displaying Windows icons for Windows special folders (Downloads, Documents, etc.)</comment>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>Include Video Thumbnails</value>
+    <comment>The setting to enable video thumbnails (pull &amp; display)</comment>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>Length</value>
+    <comment>Part of the tooltip of a video file (Length = duration)</comment>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>Dimensions</value>
+    <comment>Part of the tooltip of a picture file (dimensions = resolution)</comment>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>One Month</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>One Week</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>One Day</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>One Hour</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>Local Thumbnails Refresh Time</value>
+    <comment>The setting used to control how long local persistent thumbnails should be used before updating them</comment>
+  </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>Use BusyBox If Available</value>
+    <comment>The setting used to enable checking connected devices for busybox and which shell commands it supports</comment>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>Auto Connect WSA If Available</value>
+    <comment>The setting used to enable checking for installed WSA, launching it, and connecting to it automatically</comment>
+  </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>Paste</value>
+    <comment>As in "Paste the copied string"</comment>
+  </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>Checking for thumbnail updates</value>
+    <comment>A hint displayed for a short time in the snackbar</comment>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>Pulling thumbnails</value>
+    <comment>A hint displayed for a short time in the snackbar</comment>
+  </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>Reading thumbnail locations and media database</value>
+    <comment>A hint displayed for a short time in the snackbar</comment>
+  </data>
+  <data name="S_THUMB_SNACKBAR_TITLE" xml:space="preserve">
+    <value>{0} Thumbnails</value>
+    <comment>0 - device name. example: Pixel 9 Thumbnails</comment>
+  </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value>Details</value>
+    <comment>Thumbnail size selector - disabled (details view)</comment>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value>View</value>
+    <comment>The title of the thumbnail size selector menu</comment>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>Medium Icons</value>
+    <comment>Thumbnail size selector - medium icons</comment>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>Large Icons</value>
+    <comment>Thumbnail size selector - large icons</comment>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>Extra Large Icons</value>
+    <comment>Thumbnail size selector - extra large icons</comment>
+  </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value>Layout and view options</value>
+    <comment>The tooltip of the thumbnail size selector. view = icon view / details view</comment>
+  </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value>Thumbnail Size Saved For Each Location</value>
+    <comment>The setting that enables keeping track of the last thumbnail size selected for each location / folder</comment>
+  </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value>Sort</value>
+    <comment>The button to sort files</comment>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value>Ascending</value>
+    <comment>File list sorting direction - ascending</comment>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value>Descending</value>
+    <comment>File list sort direction - descending</comment>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>Sorting column &amp; order saved for each location</value>
+    <comment>The setting that enables keeping track of the last sorted column and direction selected for each location / folder</comment>
+  </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>Max Image Size To Use As Its Own Thumbnail (0 - Disabled)</value>
+    <comment>The name of the setting that enables using images for their own thumbnail display, and the maximum size for such images</comment>
+  </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>and {0} more…</value>
+    <comment>0 - the number of file operations currently not displayed</comment>
+  </data>
+  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
+    <value>Show or hide the details and preview pane.</value>
+    <comment>The tooltip of the button that controls the details pane visibility</comment>
+  </data>
+  <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
+    <value>Preview</value>
+    <comment>Side pane in file preview mode</comment>
+  </data>
+  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
+    <value>Max File Size For Preview</value>
+    <comment>The maximum size of a file for preview</comment>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>Pull To Default Folder On File Double Click</value>
+    <comment>The setting that enables pulling a file to the default folder on double click</comment>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value>Select a single item to get more information.</value>
+    <comment>The tip displayed in the details pane when multiple (or none) files are selected</comment>
+  </data>
+  <data name="S_ITEM_LOCATION" xml:space="preserve">
+    <value>Location</value>
+    <comment>Location as in parent path of a file</comment>
+  </data>
+  <data name="S_IMAGE_F_STOP" xml:space="preserve">
+    <value>F-stop</value>
+    <comment>The f-stop of an image metadata</comment>
+  </data>
+  <data name="S_IMAGE_ISO" xml:space="preserve">
+    <value>ISO speed</value>
+    <comment>The ISO number of the image metadata</comment>
+  </data>
+  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
+    <value>Exposure time</value>
+    <comment>The exposure time in parts of a second of the image metadata</comment>
+  </data>
+  <data name="S_VIDEO_BITRATE" xml:space="preserve">
+    <value>Bitrate</value>
+    <comment>The bitrate from the video file metadata</comment>
+  </data>
+  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
+    <value>Select a file to preview.</value>
+    <comment>The hint displayed in the preview pane when no file is selected</comment>
+  </data>
+  <data name="S_PREVIEW_INVALID" xml:space="preserve">
+    <value>No preview available.</value>
+    <comment>The hint displayed in the preview pane when the selected file(s) cannot be previewed</comment>
+  </data>
+  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
+    <value>This PDF is password protected.</value>
+    <comment>The hint displayed in the preview pane when the selected PDF is password protected</comment>
+  </data>
+  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
+    <value>Incorrect password.</value>
+    <comment>Error shown in the PDF password prompt when the entered password is wrong</comment>
+  </data>
+  <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
+    <value>Unlock</value>
+    <comment>Button label to submit the PDF password</comment>
+  </data>
+  <data name="S_FILE_PERMISSIONS" xml:space="preserve">
+    <value>Permissions</value>
+    <comment>The title of the permissions section of a file in the details pane</comment>
+  </data>
+  <data name="S_FILE_PERM_USER" xml:space="preserve">
+    <value>User</value>
+    <comment>Unix file permissions for the selected user</comment>
+  </data>
+  <data name="S_FILE_PERM_GROUP" xml:space="preserve">
+    <value>Group</value>
+    <comment>Unix file permissions for the group the user is in</comment>
+  </data>
+  <data name="S_FILE_PERM_OTHER" xml:space="preserve">
+    <value>Others</value>
+    <comment>Unix file permissions for users outside the group</comment>
+  </data>
+  <data name="S_DATE_ACCESSED" xml:space="preserve">
+    <value>Accessed</value>
+    <comment>File info - last access date</comment>
+  </data>
+  <data name="S_CREATION_TIME" xml:space="preserve">
+    <value>Created</value>
+    <comment>File info - creation time</comment>
+  </data>
+  <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
+    <value>Modified</value>
+    <comment>File info - date modified (but without "date")</comment>
+  </data>
+  <data name="S_FILE_SYSTEM" xml:space="preserve">
+    <value>File system</value>
+    <comment>The file system type of a drive</comment>
+  </data>
+  <data name="S_MOUNT_POINT" xml:space="preserve">
+    <value>Mount point</value>
+    <comment>The Unix mount point of a drive</comment>
+  </data>
+  <data name="S_MOUNT_OPTIONS" xml:space="preserve">
+    <value>Mount options</value>
+    <comment>The Unix mount options of a drive</comment>
+  </data>
+  <data name="S_COLOR_RED" xml:space="preserve">
+    <value>Red</value>
+    <comment>The label of the red channel in the color picker</comment>
+  </data>
+  <data name="S_COLOR_GREEN" xml:space="preserve">
+    <value>Green</value>
+    <comment>The label of the green channel in the color picker</comment>
+  </data>
+  <data name="S_COLOR_BLUE" xml:space="preserve">
+    <value>Blue</value>
+    <comment>The label of the blue channel in the color picker</comment>
+  </data>
+  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
+    <value>Unable to locate ADB from system PATH. Please use "{0}" to locate it.</value>
+    <comment>0 - the name of the Override ADB Path setting</comment>
+  </data>
+  <data name="S_ADB_PATH_INVALID" xml:space="preserve">
+    <value>Provided ADB path is either a Windows shortcut or a UNC (remote) path, which is not allowed.</value>
+  </data>
+  <data name="S_ADB_COMPROMISED" xml:space="preserve">
+    <value>The provided executable cannot be verified as ADB. Make sure you download only official Android Platform Tools from Google.</value>
   </data>
 </root>

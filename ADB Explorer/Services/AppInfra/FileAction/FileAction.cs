@@ -16,16 +16,13 @@ public static class AppActions
         { FileActionType.Copy, new(Key.C, ModifierKeys.Control) },
         { FileActionType.Restore, new(Key.R, ModifierKeys.Control) },
         { FileActionType.Delete, new(Key.Delete) },
-        { FileActionType.Edit, new(Key.E, ModifierKeys.Control) },
         { FileActionType.Uninstall, new(Key.F11, ModifierKeys.Shift) },
         { FileActionType.PushPackages, new(Key.I, ModifierKeys.Alt) },
-        { FileActionType.OpenSettings, new(Key.D0, ModifierKeys.Alt) },
         { FileActionType.Paste, new(Key.V, ModifierKeys.Control) },
     };
 
     public static readonly Dictionary<FileActionType, string> Icons = new()
     {
-        { FileActionType.OpenFileOps, "\uF16A" },
         { FileActionType.PushFolders, "\uE8B7" },
         { FileActionType.NewFile, "\uE8A5" },
         { FileActionType.Package, "\uE7B8" },
@@ -39,7 +36,7 @@ public static class AppActions
         { FileActionType.Uninstall, "\uE25B" },
         { FileActionType.More, "\uE712" },
         { FileActionType.UpdateModified, "\uE787" },
-        { FileActionType.Edit, "\uE70F" },
+        { FileActionType.EditCurrentPath, "\uE70F" },
         { FileActionType.Install, "\uE896" },
         { FileActionType.CopyToTemp, "\uF413" },
         { FileActionType.FileOpRemove, "\uE711" },
@@ -50,56 +47,19 @@ public static class AppActions
         { FileActionType.SearchApkOnWeb, "\uF6FA" },
         { FileActionType.Home, "\uE80F" },
         { FileActionType.Refresh, "\uE72C" },
+        { FileActionType.CopyItemPath, "\uE62F" },
+        { FileActionType.FileOpStop, "\uE768" },
     };
 
     public static List<ToggleMenu> ToggleActions { get; } =
     [
-        new(FileActionType.FileOpFilter,
-            () => !Data.FileOpQ.IsActive,
-            Strings.Resources.S_FILTER_FILE_OPS,
-            "\uF16C",
-            () => { },
-            toggleOnClick: false,
-            children: FileOpFilters.List.Select(f => new GeneralSubMenu(f.CheckBox))),
-        new(FileActionType.FileOpStop,
-            () => true,
-            Strings.Resources.S_ENABLE_AUTO_PLAY,
-            "\uE768",
-            FileActionLogic.ToggleFileOpQ,
-            Strings.Resources.S_AUTO_PLAY_DISABLE,
-            Icons[FileActionType.PauseLogs]),
         new(FileActionType.PauseLogs,
             () => true,
             Strings.Resources.S_LOG_UPDATES_PAUSE,
-            Icons[FileActionType.PauseLogs],
+            Icons[FileActionType.FileOpStop],
             () => Data.RuntimeSettings.IsLogPaused ^= true,
-            Strings.Resources.S_LOG_UPDATES_ALT),
-        new(FileActionType.SortSettings,
-            () => true,
-            Strings.Resources.S_EXIT_SEARCH,
-            Icons[FileActionType.FileOpRemove],
-            FileActionLogic.ToggleSettingsSort,
-            Strings.Resources.S_SEARCH_VIEW,
-            "\uE721"),
-        new(FileActionType.ExpandSettings,
-            () => true,
-            Strings.Resources.S_COLLAPSE_ALL,
-            "\uE16A",
-            FileActionLogic.ToggleSettingsExpand,
-            Strings.Resources.S_EXPAND_ALL,
-            "\uE169",
-            isVisible: Data.FileActions.IsExpandSettingsVisible),
-        new(FileActionType.LogToggle,
-            () => true,
-            Strings.Resources.S_BUTTON_LOG,
-            "\uE9A4",
-            () => Data.RuntimeSettings.IsLogOpen ^= true,
-            isVisible: Data.FileActions.IsLogToggleVisible),
-        new(FileActionType.TerminalToggle,
-            () => true,
-            Strings.Resources.S_TERMINAL,
-            "\uE756",
-            () => Data.RuntimeSettings.IsTerminalOpen ^= true),
+            Strings.Resources.S_LOG_UPDATES_ALT,
+            Icons[FileActionType.PauseLogs]),
     ];
 
     public static List<FileAction> List { get; } =
@@ -144,12 +104,6 @@ public static class AppActions
             Strings.Resources.S_BUTTON_FILTER,
             Gestures[FileActionType.Filter],
             true),
-        new(FileActionType.OpenDevices,
-            () => !Data.RuntimeSettings.IsSplashScreenVisible,
-            ToggleDevicesPane,
-            Strings.Resources.S_BUTTON_DEVICES,
-            new(Key.D1, ModifierKeys.Alt),
-            true),
         new(FileActionType.Pull,
             () => Data.FileActions.PullEnabled,
             () => FileActionLogic.PullFiles(),
@@ -191,10 +145,6 @@ public static class AppActions
             Strings.Resources.S_MENU_COPY,
             new(Key.F6),
             true),
-        new(FileActionType.More,
-            () => Data.FileActions.MoreEnabled,
-            () => { },
-            Strings.Resources.S_MENU_MORE),
         new(FileActionType.EditCurrentPath,
             () => Data.FileActions.IsCopyCurrentPathEnabled,
             () => Data.RuntimeSettings.IsPathBoxFocused = null,
@@ -313,25 +263,6 @@ public static class AppActions
             Strings.Resources.S_MENU_UPDATE_MODIFIED,
             new(Key.U, ModifierKeys.Control),
             true),
-        new(FileActionType.Edit,
-            () => Data.FileActions.EditFileEnabled,
-            FileActionLogic.OpenEditor,
-            Strings.Resources.S_SETTINGS_DOUBLE_CLICK_OPEN,
-            Gestures[FileActionType.Edit],
-            true),
-        new(FileActionType.CloseEditor,
-            () => true,
-            FileActionLogic.OpenEditor,
-            Strings.Resources.S_MENU_CLOSE_EDITOR,
-            Gestures[FileActionType.Edit],
-            true),
-        new(FileActionType.SaveEditor,
-            () => Data.FileActions.IsEditorTextChanged,
-            FileActionLogic.SaveEditorText,
-            Strings.Resources.S_MENU_SAVE_CHANGES,
-            new(Key.S, ModifierKeys.Control),
-            true,
-            clearClipboard: true),
         new(FileActionType.Install,
             () => Data.FileActions.InstallPackageEnabled,
             FileActionLogic.InstallPackages,
@@ -372,44 +303,11 @@ public static class AppActions
             "",
             new(Key.F10),
             true),
-        new(FileActionType.OpenSettings,
-            () => !Data.RuntimeSettings.IsSplashScreenVisible,
-            ToggleSettingsPane,
-            Strings.Resources.S_SETTINGS_TITLE,
-            Gestures[FileActionType.OpenSettings],
-            true),
-        new(FileActionType.HideSettings,
-            () => true,
-            ToggleSettingsPane,
-            Strings.Resources.S_ACTION_HIDE,
-            Gestures[FileActionType.OpenSettings]),
-        new(FileActionType.OpenFileOps,
-            () => !Data.RuntimeSettings.IsSplashScreenVisible,
-            () => Data.RuntimeSettings.IsOperationsViewOpen ^= true,
-            Strings.Resources.S_FILE_OP_TOOLTIP,
-            new(Key.D9, ModifierKeys.Alt),
-            true),
-        ToggleActions.Find(a => a.FileAction.Name is FileActionType.FileOpStop).FileAction,
-        new(FileActionType.FileOpRemove,
-            () => !Data.FileOpQ.IsActive && Data.FileActions.SelectedFileOps.Value.Any(),
-            () => Data.FileOpQ.Operations.RemoveAll(Data.FileActions.SelectedFileOps.Value),
-            Data.FileActions.RemoveFileOpDescription),
-        ToggleActions.Find(a => a.FileAction.Name is FileActionType.LogToggle).FileAction,
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.PauseLogs).FileAction,
         new(FileActionType.ClearLogs,
             () => Data.CommandLog.Count > 0,
             () => Data.RuntimeSettings.ClearLogs = true,
             Strings.Resources.S_MENU_CLEAR_LOG),
-        new(FileActionType.ResetSettings,
-            () => true,
-            FileActionLogic.ResetAppSettings,
-            Strings.Resources.S_RESET_SETTINGS_TITLE),
-        ToggleActions.Find(a => a.FileAction.Name is FileActionType.SortSettings).FileAction,
-        ToggleActions.Find(a => a.FileAction.Name is FileActionType.ExpandSettings).FileAction,
-        new(FileActionType.FileOpValidate,
-            () => !Data.FileOpQ.IsActive && Data.FileActions.SelectedFileOps.Value.AnyAll(op => op.ValidationAllowed),
-            Security.ValidateOps,
-            Data.FileActions.ValidateDescription),
         new(FileActionType.FollowLink,
             () => Data.FileActions.IsFollowLinkEnabled,
             FileActionLogic.FollowLink,
@@ -422,14 +320,6 @@ public static class AppActions
             Strings.Resources.S_MENU_SEARCH_WEB,
             new(Key.O, ModifierKeys.Control),
             true),
-        new(FileActionType.CopyMessageToClipboard,
-            () => !string.IsNullOrEmpty(Data.FileActions.MessageToCopy),
-            () =>
-            {
-                Clipboard.SetText(Data.FileActions.MessageToCopy);
-                Data.FileActions.MessageToCopy = "";
-            },
-            Strings.Resources.S_BUTTON_COPY_TO_CLIP),
         new(FileActionType.NavHistory,
             () => NavHistory.MenuHistory.Value.Any() && !Data.FileActions.ListingInProgress,
             () => { },
@@ -447,21 +337,6 @@ public static class AppActions
             .Select(action => action.KeyBinding)
             .Where(binding => binding is not null)];
 
-    private static void ToggleSettingsPane()
-    {
-        Data.RuntimeSettings.IsSettingsPaneOpen ^= true;
-
-        if (Data.RuntimeSettings.IsSettingsPaneOpen)
-            Data.RuntimeSettings.IsDevicesPaneOpen = false;
-    }
-
-    private static void ToggleDevicesPane()
-    {
-        Data.RuntimeSettings.IsDevicesPaneOpen ^= true;
-
-        if (Data.RuntimeSettings.IsDevicesPaneOpen)
-            Data.RuntimeSettings.IsSettingsPaneOpen = false;
-    }
 }
 
 public class FileAction : ViewModelBase
@@ -479,7 +354,6 @@ public class FileAction : ViewModelBase
         EditCurrentPath,
         Filter,
         KeyboardFilter,
-        OpenDevices,
         Pull,
         Push,
         ContextPush,
@@ -504,7 +378,6 @@ public class FileAction : ViewModelBase
         CopyItemPath,
         More,
         UpdateModified,
-        Edit,
         Package,
         Install,
         Uninstall,
@@ -512,27 +385,16 @@ public class FileAction : ViewModelBase
         CopyToTemp,
         PushPackages,
         ContextPushPackages,
-        OpenSettings,
         HideSettings,
-        OpenFileOps,
-        CloseEditor,
-        SaveEditor,
         FileOpStop,
         FileOpRemove,
         PauseLogs,
         ClearLogs,
-        ResetSettings,
-        SortSettings,
-        ExpandSettings,
-        LogToggle,
-        FileOpValidate,
         FileOpFilter,
         FollowLink,
         PasteLink,
         SearchApkOnWeb,
-        CopyMessageToClipboard,
         NavHistory,
-        TerminalToggle,
         OpenPackageLocation,
     }
 
@@ -623,7 +485,11 @@ public class FileAction : ViewModelBase
                       bool clearClipboard = false)
         : this(name, new(canExecute, action), description.Value, gesture, useForGesture, clearClipboard)
     {
-        description.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) => Description = e.NewValue;
+        description.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) =>
+        {
+            Description = e.NewValue;
+            OnPropertyChanged(nameof(Description));
+        };
     }
 
     public override string ToString()

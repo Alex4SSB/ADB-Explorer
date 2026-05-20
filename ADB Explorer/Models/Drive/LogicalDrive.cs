@@ -1,36 +1,20 @@
-﻿using ADB_Explorer.Converters;
+﻿using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Models;
 
-public class LogicalDrive : Drive
+public partial class LogicalDrive : Drive
 {
-    private string size;
-    public string Size
-    {
-        get => size;
-        set => Set(ref size, value);
-    }
+    [ObservableProperty]
+    public partial string Size { get; set; }
 
-    private string used;
-    public string Used
-    {
-        get => used;
-        set => Set(ref used, value);
-    }
+    [ObservableProperty]
+    public partial string Used { get; set; }
 
-    private string available;
-    public string Available
-    {
-        get => available;
-        set => Set(ref available, value);
-    }
+    [ObservableProperty]
+    public partial string Available { get; set; }
 
-    private sbyte usageP;
-    public sbyte UsageP
-    {
-        get => usageP;
-        set => Set(ref usageP, value);
-    }
+    [ObservableProperty]
+    public partial sbyte UsageP { get; set; }
 
     private string fileSystem = "";
     public string FileSystem
@@ -38,7 +22,7 @@ public class LogicalDrive : Drive
         get => fileSystem;
         set
         {
-            if (Set(ref fileSystem, value))
+            if (SetProperty(ref fileSystem, value))
                 OnPropertyChanged(nameof(IsFUSE));
         }
     }
@@ -86,15 +70,20 @@ public class LogicalDrive : Drive
         FileSystem = fileSystem;
     }
 
-    public LogicalDrive(GroupCollection match, bool isMMC = false, bool isEmulator = false, string forcePath = "")
-        : this(
-              (long.Parse(match["size_kB"].Value) * 1024).BytesToSize(true, 1, 0),
-              (long.Parse(match["used_kB"].Value) * 1024).BytesToSize(true, 1, 0),
-              (long.Parse(match["available_kB"].Value) * 1024).BytesToSize(true, 1, 0),
-              sbyte.Parse(match["usage_P"].Value),
-              string.IsNullOrEmpty(forcePath) ? match["path"].Value : forcePath,
-              isMMC,
-              isEmulator,
-              match["FileSystem"].Value)
-    { }
+    public static LogicalDrive From(DriveSnapshot snapshot)
+    {
+        var drive = new LogicalDrive(
+            size: snapshot.Size,
+            used: snapshot.Used,
+            available: snapshot.Available,
+            usageP: snapshot.UsageP,
+            path: snapshot.Path,
+            isEmulator: snapshot.IsEmulator,
+            fileSystem: snapshot.FileSystem);
+
+        if (snapshot.Type is not DriveType.Unknown && drive.Type != snapshot.Type)
+            drive.Type = snapshot.Type;
+
+        return drive;
+    }
 }

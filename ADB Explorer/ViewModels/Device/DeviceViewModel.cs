@@ -3,7 +3,7 @@ using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
 
-public abstract class DeviceViewModel : AbstractDevice
+public abstract class DeviceViewModel : ViewModelBase
 {
     #region Full properties
 
@@ -42,7 +42,7 @@ public abstract class DeviceViewModel : AbstractDevice
         DeviceType.Local => "\uE839",
         DeviceType.Remote => "\uEE77",
         DeviceType.Emulator => "\uE99A",
-        DeviceType.Service when Device is ServiceDevice service && service.MdnsType is ServiceDevice.ServiceType.QrCode => "\uED14",
+        DeviceType.Service when Device is ServiceDevice service && service.MdnsType is ServiceDevice.PairingMode.QrCode => "\uED14",
         DeviceType.Service => "\uEDE4",
         DeviceType.Recovery => "\uED10",
         DeviceType.Sideload => "\uE67A",
@@ -87,11 +87,7 @@ public abstract class DeviceViewModel : AbstractDevice
 
     private void RuntimeSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(AppRuntimeSettings.CollapseDevices) && Data.RuntimeSettings.CollapseDevices)
-        {
-            DeviceSelected = false;
-        }
-        else if (e.PropertyName == nameof(AppRuntimeSettings.ConnectNewDevice))
+        if (e.PropertyName == nameof(AppRuntimeSettings.ConnectNewDevice))
         {
             OnPropertyChanged(nameof(IsDeviceConnectionInProgress));
         }

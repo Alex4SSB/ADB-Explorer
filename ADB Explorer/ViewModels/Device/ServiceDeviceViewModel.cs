@@ -3,7 +3,7 @@ using ADB_Explorer.Models;
 
 namespace ADB_Explorer.ViewModels;
 
-public abstract class ServiceDeviceViewModel : PairingDeviceViewModel
+public class ServiceDeviceViewModel : PairingDeviceViewModel
 {
     #region Full properties
 
@@ -29,13 +29,15 @@ public abstract class ServiceDeviceViewModel : PairingDeviceViewModel
 
     #region Read only properties
 
-    public ServiceDevice.ServiceType MdnsType => Device.MdnsType;
+    public ServiceDevice.PairingMode MdnsType => Device.MdnsType;
+
+    public ServiceConnectionKind ConnectionKind => Device.ConnectionKind;
 
     public override string Tooltip
     {
         get
         {
-            var type = MdnsType is ServiceDevice.ServiceType.QrCode
+            var type = MdnsType is ServiceDevice.PairingMode.QrCode
                 ? Strings.Resources.S_DEVICE_QR
                 : Strings.Resources.S_DEVICE_READY_PAIR;
 
@@ -51,8 +53,17 @@ public abstract class ServiceDeviceViewModel : PairingDeviceViewModel
     {
         Device = service;
 
+        UpdateServiceStatus();
+
         PairCommand = new(() => IsPairingCodeValid && device.Status is DeviceStatus.Unauthorized,
                           () => _ = DeviceHelper.PairService(this));
+    }
+
+    private void UpdateServiceStatus()
+    {
+        Device.Status = Device.MdnsType is ServiceDevice.PairingMode.QrCode ? DeviceStatus.Ok : DeviceStatus.Unauthorized;
+        OnPropertyChanged(nameof(Status));
+        OnPropertyChanged(nameof(StatusIcon));
     }
 
     /// <summary>
@@ -61,43 +72,16 @@ public abstract class ServiceDeviceViewModel : PairingDeviceViewModel
     /// <param name="other">The service with the new port.</param>
     public bool UpdateService(ServiceDeviceViewModel other)
     {
-        return SetPairingPort(other.PairingPort);
-    }
+        bool changed = SetPairingPort(other.PairingPort);
 
-    public static ServiceDeviceViewModel New(ServiceDevice device)
-    {
-        return device switch
+        if (Device.MdnsType != other.Device.MdnsType)
         {
-            PairingService => new PairingServiceViewModel(device),
-            ConnectService => new ConnectServiceViewModel(device),
-            _ => throw new NotImplementedException(),
-        };
-    }
-}
+            Device.MdnsType = other.Device.MdnsType;
+            OnPropertyChanged(nameof(MdnsType));
+            UpdateServiceStatus();
+            changed = true;
+        }
 
-public class PairingServiceViewModel : ServiceDeviceViewModel
-{
-    public PairingServiceViewModel(ServiceDevice service) : base(service)
-    { }
-}
-
-public class ConnectServiceViewModel : ServiceDeviceViewModel
-{
-    public ConnectServiceViewModel(ServiceDevice service) : base(service)
-    { }
-}
-
-public class ServiceDeviceViewModelEqualityComparer : IEqualityComparer<ServiceDeviceViewModel>
-{
-    public bool Equals(ServiceDeviceViewModel x, ServiceDeviceViewModel y)
-    {
-        // IDs are equal and either both ports have a value, or they're both null
-        // We do not update the port since it can change too frequently, and we do not use it anyway
-        return x.ID == y.ID && !(string.IsNullOrEmpty(x.PairingPort) ^ string.IsNullOrEmpty(y.PairingPort));
-    }
-
-    public int GetHashCode([DisallowNull] ServiceDeviceViewModel obj)
-    {
-        throw new NotImplementedException();
+        return changed;
     }
 }

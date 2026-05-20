@@ -1,4 +1,8 @@
-﻿namespace ADB_Explorer.Helpers;
+﻿using System.Windows.Documents;
+using System.Windows.Markup;
+using System.Xml;
+
+namespace ADB_Explorer.Helpers;
 
 public static class TextHelper
 {
@@ -261,4 +265,22 @@ public static class TextHelper
 
     public const char LTR_MARK = '\u200E';
     public const char RTL_MARK = '\u200F';
+
+    public static void BuildLocalizedInlines(object sender, RoutedEventArgs e)
+    {
+        var textBlock = sender as TextBlock;
+        var altText = GetAltText(textBlock);
+
+        string xamlString = $"<Span xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\" xml:space=\"preserve\"{altText[5..]}";
+
+        Span parsedSpan;
+        using (StringReader stringReader = new(xamlString))
+        using (XmlReader xmlReader = XmlReader.Create(stringReader))
+        {
+            parsedSpan = (Span)XamlReader.Load(xmlReader);
+        }
+
+        textBlock.Inlines.Clear();
+        textBlock.Inlines.Add(parsedSpan);
+    }
 }

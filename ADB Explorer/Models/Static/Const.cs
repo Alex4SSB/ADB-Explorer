@@ -24,6 +24,10 @@ public static class AdbExplorerConst
         { "/storage/emulated", AbstractDrive.DriveType.Internal },
         { "/mnt/runtime/write/emulated/0", AbstractDrive.DriveType.Internal }, // for emulators
         { RECYCLE_PATH, AbstractDrive.DriveType.Trash },
+        { $"/storage/emulated/0/{RECYCLE_FOLDER}", AbstractDrive.DriveType.Trash },
+        { $"/storage/self/primary/{RECYCLE_FOLDER}", AbstractDrive.DriveType.Trash },
+        { $"/mnt/sdcard/{RECYCLE_FOLDER}", AbstractDrive.DriveType.Trash },
+        { $"/mnt/runtime/write/emulated/0/{RECYCLE_FOLDER}", AbstractDrive.DriveType.Trash },
         { AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin), AbstractDrive.DriveType.Trash },
         { TEMP_PATH, AbstractDrive.DriveType.Temp },
         { AdbLocation.StringFromLocation(Navigation.SpecialLocation.PackageDrive), AbstractDrive.DriveType.Package },
@@ -38,9 +42,7 @@ public static class AdbExplorerConst
     public static readonly TimeSpan DIR_LIST_VISIBLE_PROGRESS_DELAY = TimeSpan.FromMilliseconds(500);
     public static readonly TimeSpan DIR_LIST_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(500);
     public static readonly TimeSpan DIR_LIST_UPDATE_START_INTERVAL = TimeSpan.FromMilliseconds(100);
-    public static readonly TimeSpan SPLASH_DISPLAY_TIME = TimeSpan.FromMilliseconds(2000);
     public static readonly TimeSpan MOUSE_DOWN_VALID = TimeSpan.FromMilliseconds(150);
-    public static readonly TimeSpan LINK_CLICK_DELAY = TimeSpan.FromMilliseconds(300);
     public static readonly TimeSpan RENAME_CLICK_DELAY = TimeSpan.FromMilliseconds(500);
     public static readonly TimeSpan CONNECT_TIMER_INTERVAL = TimeSpan.FromMilliseconds(2000);
     public static readonly TimeSpan CONNECT_TIMER_INIT = TimeSpan.FromMilliseconds(50);
@@ -59,10 +61,6 @@ public static class AdbExplorerConst
     public const sbyte MIN_SUPPORTED_ANDROID_VER = 6;
     public const sbyte MIN_PKG_UID_ANDROID_VER = 9;
     public const sbyte MIN_MEDIA_SCAN_ANDROID_VER = 10;
-
-    public const double MAX_PANE_HEIGHT_RATIO = 0.4;
-    public const int MIN_PANE_HEIGHT = 150;
-    public const double MIN_PANE_HEIGHT_RATIO = 0.15;
 
     public static readonly string[] APK_NAMES = [".APK", ".XAPK", ".APKS", ".APKM", ".APEX"];
     public static readonly string[] INSTALL_APK = [".APK", ".APEX"];
@@ -95,7 +93,7 @@ public static class AdbExplorerConst
     public const double MAX_WINDOW_WIDTH_FOR_SEARCH_AUTO_COLLAPSE = 800;
     public const double MIN_SEARCH_WIDTH = 100;
 
-    public const string APP_SETTINGS_FILE = "App.txt";
+    public const string APP_SETTINGS_FILE = "settings.json";
 
     public const int DRIVE_WARNING = 99;
 
@@ -117,7 +115,8 @@ public static class AdbExplorerConst
 
     public static readonly Point DRAG_OFFSET_DEFAULT = new(48, 89);
 
-    public static readonly string TEMP_DRAG_FOLDER = $"TempDrag_{Helpers.RandomString.GetUniqueKey(3, [.. WIFI_PAIRING_ALPHABET.Except(INVALID_NTFS_CHARS)])}";
-
     public static readonly Key[] NAVIGATION_KEYS = [Key.Enter, Key.Up, Key.Down, Key.Left, Key.Right, Key.Escape, Key.Home, Key.End];
+
+    public static readonly string[] COMMON_PHOTO_EXT = [".jpg", ".jpeg", ".png", ".bmp", ".gif", ".webp"];
+    public const float PHOTO_DIR_THRESHOLD = 0.8f;
 }

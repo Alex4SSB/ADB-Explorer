@@ -34,15 +34,16 @@ public static class ShellCommands
 
     public static Dictionary<string, Dictionary<ShellCmd, string>> DeviceCommands { get; set; } = [];
 
-    public static bool BusyBoxExists { get; private set; }
+    public static bool BusyBoxExists { get; private set; } = false;
 
-    public static bool FindPrintf { get; private set; }
+    public static bool FindPrintf { get; private set; } = true;
 
     public static string TranslateCommand(string cmd)
     {
-        if (Enum.TryParse<ShellCmd>(cmd, out var enumCmd)
-            && Data.CurrentADBDevice is not null
-            && DeviceCommands.TryGetValue(Data.CurrentADBDevice.ID, out var dict)
+        if (Data.Settings.EnableBusyBox
+            && Enum.TryParse<ShellCmd>(cmd, out var enumCmd)
+            && Data.DevicesObject.Current is not null
+            && DeviceCommands.TryGetValue(Data.DevicesObject.Current.ID, out var dict)
             && dict.TryGetValue(enumCmd, out var deviceCmd))
             return deviceCmd;
 
@@ -51,6 +52,9 @@ public static class ShellCommands
 
     public static void FindCommands(string deviceID)
     {
+        if (!Data.Settings.EnableBusyBox)
+            return;
+
         int returnCode = 0;
 
         returnCode = ADBService.ExecuteDeviceAdbShellCommand(deviceID, "busybox", out string helpResult, out _, CancellationToken.None, "--help");

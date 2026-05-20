@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
@@ -23,7 +23,6 @@ public class RebootCommand : DeviceAction
 {
     public enum RebootType
     {
-        Title,
         Regular,
         Bootloader,
         Recovery,
@@ -32,8 +31,8 @@ public class RebootCommand : DeviceAction
     }
 
     public RebootCommand(LogicalDeviceViewModel device, RebootType type)
-        : base(() => type is not RebootType.Title,
-            () => Task.Run(() => ADBService.AdbDevice.Reboot(device.ID, RebootParam(type))),
+        : base(null,
+            () => Task.Run(() => ADBService.Reboot(device.ID, RebootParam(type))),
             RebootString(type))
     { }
 
@@ -49,7 +48,6 @@ public class RebootCommand : DeviceAction
 
     private static string RebootString(RebootType type) => type switch
     {
-        RebootType.Title => Strings.Resources.S_DEVICE_REBOOT_TITLE,
         RebootType.Regular => Strings.Resources.S_REBOOT_SYSTEM,
         RebootType.Bootloader => Strings.Resources.S_REBOOT_BOOTLOADER,
         RebootType.Recovery => Strings.Resources.S_RECOVERY_MODE,

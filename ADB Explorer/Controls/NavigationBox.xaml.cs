@@ -9,7 +9,7 @@ namespace ADB_Explorer.Controls;
 /// <summary>
 /// Interaction logic for NavigationBox.xaml
 /// </summary>
-public partial class NavigationBox
+public partial class NavigationBox : UserControl
 {
     public enum ViewMode
     {
@@ -32,13 +32,11 @@ public partial class NavigationBox
         {
             if (args.PropertyName == nameof(AppRuntimeSettings.LocationToNavigate))
             {
-                FlyoutService.GetFlyout(SavedItemsButton).Hide();
-            }
-            else if (args.PropertyName == nameof(AppRuntimeSettings.SavedLocations))
-            {
-                UpdateSavedItems();
+                OverflowPopup.IsOpen = false;
             }
         };
+
+        Data.Settings.SavedLocations.CollectionChanged += (sender, args) => UpdateSavedItems();
     }
 
     #region Dependency Properties
@@ -51,7 +49,7 @@ public partial class NavigationBox
             bool update = Path != value;
 
             SetValue(PathProperty, value);
-            
+
             if (update)
             {
                 IsFUSE = DriveHelper.GetCurrentDrive(value)?.IsFUSE is true;
@@ -192,16 +190,14 @@ public partial class NavigationBox
 
     private void UpdateSavedItems()
     {
-        SavedItems = Data.RuntimeSettings.SavedLocations is null
+        SavedItems = Data.Settings.SavedLocations is null
             ? []
-            : [.. Data.RuntimeSettings.SavedLocations.Select(p => new SavedLocation(p))];
+            : [.. Data.Settings.SavedLocations.Select(p => new SavedLocation(p))];
 
         IsCurrentSaved = SavedItems.Any(i => i.Path == Path);
 
         if (AdbLocation.LocationFromString(Path) is Navigation.SpecialLocation.None && !IsCurrentSaved)
             SavedItems.Insert(0, new SavedLocation());
-
-        ((ItemsControl)Resources["SavedItemsControl"]).ItemsSource = SavedItems;
     }
 
     public void Refresh() => AddDevice(Path);
@@ -258,7 +254,7 @@ public partial class NavigationBox
             return;
 
         locations = SeparatePath(path);
-        breadcrumbs = locations.Select(item => item.NameSubMenu).ToList();
+        breadcrumbs = [.. locations.Select(item => item.NameSubMenu)];
         breadcrumbs[^1].IsLast = true;
 
         var template = (DataTemplate)Resources["BreadcrumbTemplate"];
@@ -275,7 +271,8 @@ public partial class NavigationBox
         int lastHiddenIndex = -1;
         for (var i = 1; i < breadcrumbs.Count; i++)
         {
-            if (125 + itemWidths[0] + itemWidths[i..].Sum() > PathBox.ActualWidth)
+            var width = PathItemsControl.ActualWidth;
+            if (125 + itemWidths[0] + itemWidths[i..].Sum() > PathItemsControl.ActualWidth)
             {
                 lastHiddenIndex = i;
             }
@@ -291,7 +288,7 @@ public partial class NavigationBox
                 Children = locations.ToList()[1..(lastHiddenIndex + 1)].Select(item => item.ExcessSubMenu)
             };
 
-            var itemsControl = (ItemsControl)Resources["OverflowItemsControl"];
+            var itemsControl = OverflowItemsControl;
             itemsControl.ItemsSource = excessButton.Children;
 
             Items = [breadcrumbs[0], excessButton, .. breadcrumbs[(lastHiddenIndex + 1)..]];
@@ -311,6 +308,9 @@ public partial class NavigationBox
         DisplayPath = AdbLocation.LocationFromString(Path) is Navigation.SpecialLocation.None ? Path : "";
 
         PathBox.SelectAll();
+
+        if (Data.RuntimeSettings.IsPathBoxFocused is not true)
+            Data.RuntimeSettings.IsPathBoxFocused = true;
     }
 
     private void PathBox_KeyDown(object sender, KeyEventArgs e)
@@ -334,6 +334,15 @@ public partial class NavigationBox
     private void PathBox_LostFocus(object sender, RoutedEventArgs e)
     {
         Mode = ViewMode.Breadcrumbs;
+    }
+
+    private void BreadcrumbButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.DataContext is TextMenu { Children: not null })
+        {
+            OverflowPopup.PlacementTarget = fe;
+            OverflowPopup.IsOpen = true;
+        }
     }
 
     private void FuseIcon_Click(object sender, RoutedEventArgs e)

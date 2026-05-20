@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Models;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services.AppInfra;
 
@@ -24,7 +25,7 @@ public class IpcService
                 break;
             case MessageType.FileMoved:
                 var content = msgContent[1].Split('\n');
-                if (Data.CurrentADBDevice.ID != content[0])
+                if (Data.DevicesObject.Current.ID != content[0])
                     return;
 
                 FilePath file = new(content[1]);
@@ -57,7 +58,7 @@ public class IpcService
             SendIpcMessage(NativeMethods.InterceptMouse.WindowUnderMouse, MessageType.DragCanceled, $"{hr}");
     }
 
-    public static void NotifyFileMoved(int remotePid, ADBService.AdbDevice device, FilePath file)
+    public static void NotifyFileMoved(int remotePid, LogicalDeviceViewModel device, FilePath file)
     {
         var process = Process.GetProcessById(remotePid);
 

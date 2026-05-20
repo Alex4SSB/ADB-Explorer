@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Controls;
+﻿//using ADB_Explorer.Controls;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 
@@ -16,13 +16,13 @@ public class PackageInstallOperation : AbstractShellFileOperation
         ? Strings.Resources.S_UNINSTALL
         : Strings.Resources.S_MENU_INSTALL;
 
-    public override FrameworkElement OpIcon => IsUninstall ? new UninstallIcon() : new InstallIcon();
+    public override FrameworkElement OpIcon => new(); // IsUninstall ? new UninstallIcon() : new InstallIcon();
 
     public PackageInstallOperation(Dispatcher dispatcher,
-                                   ADBService.AdbDevice adbDevice,
+                                   LogicalDeviceViewModel device,
                                    FileClass path = null,
                                    string packageName = null,
-                                   bool pushPackage = false) : base(path, adbDevice, dispatcher)
+                                   bool pushPackage = false) : base(path, device, dispatcher)
     {
         OperationName = OperationType.Install;
         PackageName = packageName;

@@ -205,6 +205,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The provided executable cannot be verified as ADB. Make sure you download only official Android Platform Tools from Google..
+        /// </summary>
+        public static string S_ADB_COMPROMISED {
+            get {
+                return ResourceManager.GetString("S_ADB_COMPROMISED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ADB Disk Usage.
         /// </summary>
         public static string S_ADB_DISK_USAGE {
@@ -237,6 +246,24 @@ namespace ADB_Explorer.Strings {
         public static string S_ADB_LEARN_MORE {
             get {
                 return ResourceManager.GetString("S_ADB_LEARN_MORE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to locate ADB from system PATH. Please use &quot;{0}&quot; to locate it..
+        /// </summary>
+        public static string S_ADB_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("S_ADB_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Provided ADB path is either a Windows shortcut or a UNC (remote) path, which is not allowed..
+        /// </summary>
+        public static string S_ADB_PATH_INVALID {
+            get {
+                return ResourceManager.GetString("S_ADB_PATH_INVALID", resourceCulture);
             }
         }
         
@@ -791,6 +818,33 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Blue.
+        /// </summary>
+        public static string S_COLOR_BLUE {
+            get {
+                return ResourceManager.GetString("S_COLOR_BLUE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Green.
+        /// </summary>
+        public static string S_COLOR_GREEN {
+            get {
+                return ResourceManager.GetString("S_COLOR_GREEN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Red.
+        /// </summary>
+        public static string S_COLOR_RED {
+            get {
+                return ResourceManager.GetString("S_COLOR_RED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Added.
         /// </summary>
         public static string S_COLUMN_ADDED {
@@ -1016,11 +1070,29 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Custom App Data Path.
+        ///   Looks up a localized string similar to Created.
+        /// </summary>
+        public static string S_CREATION_TIME {
+            get {
+                return ResourceManager.GetString("S_CREATION_TIME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Custom App Settings Path.
         /// </summary>
         public static string S_CUSTOM_DATA_PATH {
             get {
                 return ResourceManager.GetString("S_CUSTOM_DATA_PATH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Accessed.
+        /// </summary>
+        public static string S_DATE_ACCESSED {
+            get {
+                return ResourceManager.GetString("S_DATE_ACCESSED", resourceCulture);
             }
         }
         
@@ -1068,6 +1140,24 @@ namespace ADB_Explorer.Strings {
         public static string S_DEST_ERR {
             get {
                 return ResourceManager.GetString("S_DEST_ERR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select a single item to get more information..
+        /// </summary>
+        public static string S_DETAILS_MULTI_FILE_SELECTED {
+            get {
+                return ResourceManager.GetString("S_DETAILS_MULTI_FILE_SELECTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show or hide the details and preview pane..
+        /// </summary>
+        public static string S_DETAILS_PANE_TOOLTIP {
+            get {
+                return ResourceManager.GetString("S_DETAILS_PANE_TOOLTIP", resourceCulture);
             }
         }
         
@@ -1126,18 +1216,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The app has many animations that are enabled as part of the fluent design.
-        ///The side views animation is always disabled when the app window is maximized on a secondary display.
-        ///
-        ///• Checking this setting disables all app animations except progress bars, progress rings, and drive usage bars..
-        /// </summary>
-        public static string S_DISABLE_ANIMATION {
-            get {
-                return ResourceManager.GetString("S_DISABLE_ANIMATION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to ADB server needs to be restarted in order to disable mDNS..
         /// </summary>
         public static string S_DISABLE_MDNS {
@@ -1170,15 +1248,6 @@ namespace ADB_Explorer.Strings {
         public static string S_DISCONN_FAILED_TITLE {
             get {
                 return ResourceManager.GetString("S_DISCONN_FAILED_TITLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Other: {0}.
-        /// </summary>
-        public static string S_DISK_USAGE_OTHER {
-            get {
-                return ResourceManager.GetString("S_DISK_USAGE_OTHER", resourceCulture);
             }
         }
         
@@ -1489,15 +1558,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Click to enable server and polling.
-        /// </summary>
-        public static string S_ENABLE_MDNS {
-            get {
-                return ResourceManager.GetString("S_ENABLE_MDNS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Enabled.
         /// </summary>
         public static string S_ENABLED {
@@ -1597,11 +1657,56 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Modified.
+        /// </summary>
+        public static string S_FILE_INFO_MODIFIED {
+            get {
+                return ResourceManager.GetString("S_FILE_INFO_MODIFIED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File Operations.
         /// </summary>
         public static string S_FILE_OP_TOOLTIP {
             get {
                 return ResourceManager.GetString("S_FILE_OP_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Group.
+        /// </summary>
+        public static string S_FILE_PERM_GROUP {
+            get {
+                return ResourceManager.GetString("S_FILE_PERM_GROUP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Others.
+        /// </summary>
+        public static string S_FILE_PERM_OTHER {
+            get {
+                return ResourceManager.GetString("S_FILE_PERM_OTHER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User.
+        /// </summary>
+        public static string S_FILE_PERM_USER {
+            get {
+                return ResourceManager.GetString("S_FILE_PERM_USER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Permissions.
+        /// </summary>
+        public static string S_FILE_PERMISSIONS {
+            get {
+                return ResourceManager.GetString("S_FILE_PERMISSIONS", resourceCulture);
             }
         }
         
@@ -1620,6 +1725,15 @@ namespace ADB_Explorer.Strings {
         public static string S_FILE_SOCKET {
             get {
                 return ResourceManager.GetString("S_FILE_SOCKET", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File system.
+        /// </summary>
+        public static string S_FILE_SYSTEM {
+            get {
+                return ResourceManager.GetString("S_FILE_SYSTEM", resourceCulture);
             }
         }
         
@@ -1692,6 +1806,15 @@ namespace ADB_Explorer.Strings {
         public static string S_FILEOP_FAILED {
             get {
                 return ResourceManager.GetString("S_FILEOP_FAILED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to and {0} more….
+        /// </summary>
+        public static string S_FILEOP_HIDDEN_ITEMS {
+            get {
+                return ResourceManager.GetString("S_FILEOP_HIDDEN_ITEMS", resourceCulture);
             }
         }
         
@@ -1875,6 +1998,33 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Exposure time.
+        /// </summary>
+        public static string S_IMAGE_EXPOSURE {
+            get {
+                return ResourceManager.GetString("S_IMAGE_EXPOSURE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to F-stop.
+        /// </summary>
+        public static string S_IMAGE_F_STOP {
+            get {
+                return ResourceManager.GetString("S_IMAGE_F_STOP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ISO speed.
+        /// </summary>
+        public static string S_IMAGE_ISO {
+            get {
+                return ResourceManager.GetString("S_IMAGE_ISO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select packages to install.
         /// </summary>
         public static string S_INSTALL_APK {
@@ -1907,6 +2057,15 @@ namespace ADB_Explorer.Strings {
         public static string S_ITEM_DESTINATION_PLURAL {
             get {
                 return ResourceManager.GetString("S_ITEM_DESTINATION_PLURAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Location.
+        /// </summary>
+        public static string S_ITEM_LOCATION {
+            get {
+                return ResourceManager.GetString("S_ITEM_LOCATION", resourceCulture);
             }
         }
         
@@ -2067,16 +2226,16 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;Span&gt;• Polling for services is OFF&lt;LineBreak /&gt;• Server &lt;Italic&gt;might&lt;/Italic&gt; be ON&lt;/Span&gt;.
+        ///   Looks up a localized string similar to Checking mDNS server status….
         /// </summary>
-        public static string S_MDNS_OFF {
+        public static string S_MDNS_IN_PROGRESS {
             get {
-                return ResourceManager.GetString("S_MDNS_OFF", resourceCulture);
+                return ResourceManager.GetString("S_MDNS_IN_PROGRESS", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Server is up and running.
+        ///   Looks up a localized string similar to mDNS server is up and running.
         /// </summary>
         public static string S_MDNS_ON {
             get {
@@ -2346,6 +2505,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Mount options.
+        /// </summary>
+        public static string S_MOUNT_OPTIONS {
+            get {
+                return ResourceManager.GetString("S_MOUNT_OPTIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mount point.
+        /// </summary>
+        public static string S_MOUNT_POINT {
+            get {
+                return ResourceManager.GetString("S_MOUNT_POINT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File name illegal on target file system: {0}.
         /// </summary>
         public static string S_NAME_ILLEGAL_FS {
@@ -2446,6 +2623,42 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to One Day.
+        /// </summary>
+        public static string S_ONE_DAY {
+            get {
+                return ResourceManager.GetString("S_ONE_DAY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One Hour.
+        /// </summary>
+        public static string S_ONE_HOUR {
+            get {
+                return ResourceManager.GetString("S_ONE_HOUR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One Month.
+        /// </summary>
+        public static string S_ONE_MONTH {
+            get {
+                return ResourceManager.GetString("S_ONE_MONTH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One Week.
+        /// </summary>
+        public static string S_ONE_WEEK {
+            get {
+                return ResourceManager.GetString("S_ONE_WEEK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select ADB Executable.
         /// </summary>
         public static string S_OVERRIDE_ADB_BROWSE {
@@ -2536,11 +2749,38 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Provided path does not exist..
+        ///   Looks up a localized string similar to Argument must specify full path of a new or existing settings file..
         /// </summary>
         public static string S_PATH_INVALID {
             get {
                 return ResourceManager.GetString("S_PATH_INVALID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This PDF is password protected..
+        /// </summary>
+        public static string S_PDF_PASSWORD_PROTECTED {
+            get {
+                return ResourceManager.GetString("S_PDF_PASSWORD_PROTECTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unlock.
+        /// </summary>
+        public static string S_PDF_PASSWORD_UNLOCK {
+            get {
+                return ResourceManager.GetString("S_PDF_PASSWORD_UNLOCK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect password..
+        /// </summary>
+        public static string S_PDF_PASSWORD_WRONG {
+            get {
+                return ResourceManager.GetString("S_PDF_PASSWORD_WRONG", resourceCulture);
             }
         }
         
@@ -2550,6 +2790,24 @@ namespace ADB_Explorer.Strings {
         public static string S_PERM_DEL {
             get {
                 return ResourceManager.GetString("S_PERM_DEL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pick a color.
+        /// </summary>
+        public static string S_PICK_COLOR {
+            get {
+                return ResourceManager.GetString("S_PICK_COLOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dimensions.
+        /// </summary>
+        public static string S_PICTURE_DIMENSIONS {
+            get {
+                return ResourceManager.GetString("S_PICTURE_DIMENSIONS", resourceCulture);
             }
         }
         
@@ -2739,6 +2997,24 @@ namespace ADB_Explorer.Strings {
         public static string S_POPUP_WINDOWS_NAMING {
             get {
                 return ResourceManager.GetString("S_POPUP_WINDOWS_NAMING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select a file to preview..
+        /// </summary>
+        public static string S_PREVIEW_EMPTY_SELECTION {
+            get {
+                return ResourceManager.GetString("S_PREVIEW_EMPTY_SELECTION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No preview available..
+        /// </summary>
+        public static string S_PREVIEW_INVALID {
+            get {
+                return ResourceManager.GetString("S_PREVIEW_INVALID", resourceCulture);
             }
         }
         
@@ -3178,7 +3454,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Server is down.
+        ///   Looks up a localized string similar to mDNS server is down.
         /// </summary>
         public static string S_SERVER_DOWN {
             get {
@@ -3205,6 +3481,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Accent color.
+        /// </summary>
+        public static string S_SETTINGS_ACCENT_COLOR {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_ACCENT_COLOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to On.
+        /// </summary>
+        public static string S_SETTINGS_ACTIVE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_ACTIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Disable Animations.
         /// </summary>
         public static string S_SETTINGS_ANIMATION {
@@ -3214,7 +3508,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable APK Handling.
+        ///   Looks up a localized string similar to APK Support.
         /// </summary>
         public static string S_SETTINGS_APK {
             get {
@@ -3241,11 +3535,29 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable Compact View.
+        ///   Looks up a localized string similar to Use BusyBox If Available.
+        /// </summary>
+        public static string S_SETTINGS_BUSYBOX {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_BUSYBOX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Compact View.
         /// </summary>
         public static string S_SETTINGS_COMPACT_VIEW {
             get {
                 return ResourceManager.GetString("S_SETTINGS_COMPACT_VIEW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Custom accent color.
+        /// </summary>
+        public static string S_SETTINGS_CUSTOM_ACCENT {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_CUSTOM_ACCENT", resourceCulture);
             }
         }
         
@@ -3295,38 +3607,11 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable Command Log.
-        /// </summary>
-        public static string S_SETTINGS_ENABLE_LOG {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_ENABLE_LOG", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Enable mDNS.
+        ///   Looks up a localized string similar to mDNS.
         /// </summary>
         public static string S_SETTINGS_ENABLE_MDNS {
             get {
                 return ResourceManager.GetString("S_SETTINGS_ENABLE_MDNS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Enable Recycle Bin.
-        /// </summary>
-        public static string S_SETTINGS_ENABLE_TRASH {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_ENABLE_TRASH", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Force Fluent Styles.
-        /// </summary>
-        public static string S_SETTINGS_FLUENT {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_FLUENT", resourceCulture);
             }
         }
         
@@ -3385,6 +3670,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Icons.
+        /// </summary>
+        public static string S_SETTINGS_GROUP_ICONS {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_GROUP_ICONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Theme.
         /// </summary>
         public static string S_SETTINGS_GROUP_THEME {
@@ -3412,6 +3706,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Off.
+        /// </summary>
+        public static string S_SETTINGS_INACTIVE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_INACTIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Preserve File Date Modified.
         /// </summary>
         public static string S_SETTINGS_KEEP_MODIFIED_DATE {
@@ -3426,6 +3729,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_LANGUAGE {
             get {
                 return ResourceManager.GetString("S_SETTINGS_LANGUAGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Max Image Size To Use As Its Own Thumbnail (0 - Disabled).
+        /// </summary>
+        public static string S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT", resourceCulture);
             }
         }
         
@@ -3448,7 +3760,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Allow Simultaneous Operations.
+        ///   Looks up a localized string similar to Simultaneous Operations.
         /// </summary>
         public static string S_SETTINGS_PARALLEL_OPERATIONS {
             get {
@@ -3457,7 +3769,16 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Poll For Battery Status.
+        ///   Looks up a localized string similar to Persist Thumbnails Between Sessions.
+        /// </summary>
+        public static string S_SETTINGS_PERSIST_THUMBS {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_PERSIST_THUMBS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Polling For Battery Status.
         /// </summary>
         public static string S_SETTINGS_POLL_BATTERY {
             get {
@@ -3466,7 +3787,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Poll For Devices.
+        ///   Looks up a localized string similar to Polling For Devices.
         /// </summary>
         public static string S_SETTINGS_POLL_DEVICES {
             get {
@@ -3475,11 +3796,29 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Poll For Drives.
+        ///   Looks up a localized string similar to Polling For Drives.
         /// </summary>
         public static string S_SETTINGS_POLL_DRIVES {
             get {
                 return ResourceManager.GetString("S_SETTINGS_POLL_DRIVES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Max File Size For Preview.
+        /// </summary>
+        public static string S_SETTINGS_PREVIEW_MAX_SIZE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_PREVIEW_MAX_SIZE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pull To Default Folder On File Double Click.
+        /// </summary>
+        public static string S_SETTINGS_PULL_ON_DOUBLE_CLICK {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_PULL_ON_DOUBLE_CLICK", resourceCulture);
             }
         }
         
@@ -3502,11 +3841,20 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Display Splash Screen.
+        ///   Looks up a localized string similar to Sorting column &amp; order saved for each location.
         /// </summary>
-        public static string S_SETTINGS_SPLASH {
+        public static string S_SETTINGS_SORTING_PER_LOCATION {
             get {
-                return ResourceManager.GetString("S_SETTINGS_SPLASH", resourceCulture);
+                return ResourceManager.GetString("S_SETTINGS_SORTING_PER_LOCATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Icons For Special Folders.
+        /// </summary>
+        public static string S_SETTINGS_SPECIAL_DIR_ICONS {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_SPECIAL_DIR_ICONS", resourceCulture);
             }
         }
         
@@ -3556,6 +3904,69 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Thumbnail Size Saved For Each Location.
+        /// </summary>
+        public static string S_SETTINGS_THUMB_SIZE_PER_LOCATION {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THUMB_SIZE_PER_LOCATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pull &amp; Display Thumbnails.
+        /// </summary>
+        public static string S_SETTINGS_THUMBNAIL_MODE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THUMBNAIL_MODE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Local Thumbnails Refresh Time.
+        /// </summary>
+        public static string S_SETTINGS_THUMBS_AGE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THUMBS_AGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upon Connection.
+        /// </summary>
+        public static string S_SETTINGS_THUMBS_CONNECT {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THUMBS_CONNECT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only in Icon View.
+        /// </summary>
+        public static string S_SETTINGS_THUMBS_ICON_VIEW {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THUMBS_ICON_VIEW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only in Photo Directories.
+        /// </summary>
+        public static string S_SETTINGS_THUMBS_PHOTO_DIR {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THUMBS_PHOTO_DIR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Limit Thumbnails Pull Speed.
+        /// </summary>
+        public static string S_SETTINGS_THUMBS_THROTTLE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THUMBS_THROTTLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Settings.
         /// </summary>
         public static string S_SETTINGS_TITLE {
@@ -3574,6 +3985,33 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Include Video Thumbnails.
+        /// </summary>
+        public static string S_SETTINGS_VIDEO_THUMBNAILS {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_VIDEO_THUMBNAILS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Auto Connect WSA If Available.
+        /// </summary>
+        public static string S_SETTINGS_WSA {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_WSA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Preview.
+        /// </summary>
+        public static string S_SIDE_PANE_PREVIEW {
+            get {
+                return ResourceManager.GetString("S_SIDE_PANE_PREVIEW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select ROM for sideload.
         /// </summary>
         public static string S_SIDELOAD_ROM_TITLE {
@@ -3588,6 +4026,33 @@ namespace ADB_Explorer.Strings {
         public static string S_SKIP {
             get {
                 return ResourceManager.GetString("S_SKIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sort.
+        /// </summary>
+        public static string S_SORT {
+            get {
+                return ResourceManager.GetString("S_SORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ascending.
+        /// </summary>
+        public static string S_SORT_ASCENDING {
+            get {
+                return ResourceManager.GetString("S_SORT_ASCENDING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Descending.
+        /// </summary>
+        public static string S_SORT_DESCENDING {
+            get {
+                return ResourceManager.GetString("S_SORT_DESCENDING", resourceCulture);
             }
         }
         
@@ -3628,6 +4093,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Paste.
+        /// </summary>
+        public static string S_STRING_PASTE {
+            get {
+                return ResourceManager.GetString("S_STRING_PASTE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File not found.
         /// </summary>
         public static string S_SYNC_FILE_NOT_FOUND {
@@ -3651,6 +4125,96 @@ namespace ADB_Explorer.Strings {
         public static string S_TERMINAL {
             get {
                 return ResourceManager.GetString("S_TERMINAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Checking for thumbnail updates.
+        /// </summary>
+        public static string S_THUMB_SNACKBAR_CHECKING {
+            get {
+                return ResourceManager.GetString("S_THUMB_SNACKBAR_CHECKING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pulling thumbnails.
+        /// </summary>
+        public static string S_THUMB_SNACKBAR_PULLING {
+            get {
+                return ResourceManager.GetString("S_THUMB_SNACKBAR_PULLING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reading thumbnail locations and media database.
+        /// </summary>
+        public static string S_THUMB_SNACKBAR_READING {
+            get {
+                return ResourceManager.GetString("S_THUMB_SNACKBAR_READING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Thumbnails.
+        /// </summary>
+        public static string S_THUMB_SNACKBAR_TITLE {
+            get {
+                return ResourceManager.GetString("S_THUMB_SNACKBAR_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Details.
+        /// </summary>
+        public static string S_THUMBSIZE_DETAILS {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_DETAILS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Large Icons.
+        /// </summary>
+        public static string S_THUMBSIZE_LARGE {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_LARGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Medium Icons.
+        /// </summary>
+        public static string S_THUMBSIZE_MEDIUM {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_MEDIUM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View.
+        /// </summary>
+        public static string S_THUMBSIZE_TITLE {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Layout and view options.
+        /// </summary>
+        public static string S_THUMBSIZE_TOOLTIP {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extra Large Icons.
+        /// </summary>
+        public static string S_THUMBSIZE_XL {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_XL", resourceCulture);
             }
         }
         
@@ -3768,6 +4332,24 @@ namespace ADB_Explorer.Strings {
         public static string S_VALIDATION_ERROR {
             get {
                 return ResourceManager.GetString("S_VALIDATION_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bitrate.
+        /// </summary>
+        public static string S_VIDEO_BITRATE {
+            get {
+                return ResourceManager.GetString("S_VIDEO_BITRATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Length.
+        /// </summary>
+        public static string S_VIDEO_DURATION {
+            get {
+                return ResourceManager.GetString("S_VIDEO_DURATION", resourceCulture);
             }
         }
         

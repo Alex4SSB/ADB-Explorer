@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -12,9 +12,8 @@
     <NoWarn>$(NoWarn);XDG0001</NoWarn>
     <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<Platforms>AnyCPU;x64;arm64</Platforms>
 	<Configurations>Debug;Release;Deploy</Configurations>
-	<RuntimeIdentifier Condition="'$(Platform)' == 'ARM64'">win-arm64</RuntimeIdentifier>
-	<RuntimeIdentifier Condition="'$(Platform)' != 'ARM64'">win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>

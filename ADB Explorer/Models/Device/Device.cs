@@ -1,66 +1,42 @@
-﻿using ADB_Explorer.ViewModels;
+﻿namespace ADB_Explorer.Models;
 
-namespace ADB_Explorer.Models;
-
-public abstract class AbstractDevice : ViewModelBase
+public enum DeviceType
 {
-    public enum DeviceType
-    {
-        Service,
-        Local,
-        Remote,
-        Recovery,
-        Sideload,
-        WSA,
-        Emulator,
-        History,
-        New,
-    }
-
-    public enum DeviceStatus
-    {
-        Ok, // online \ does not require attention
-        Offline,
-        Unauthorized,
-    }
-
-    public enum RootStatus
-    {
-        Unchecked,
-        Forbidden,
-        Disabled,
-        Enabled,
-    }
+    Service,
+    Local,
+    Remote,
+    Recovery,
+    Sideload,
+    WSA,
+    Emulator,
+    History,
+    New,
 }
 
-public abstract class Device : AbstractDevice
+public enum DeviceStatus
 {
-    #region Full properties
+    Ok, // online \ does not require attention
+    Offline,
+    Unauthorized,
+}
 
-    private DeviceType type;
-    public virtual DeviceType Type
-    {
-        get => type;
-        protected set => Set(ref type, value);
-    }
+public enum RootStatus
+{
+    Unchecked,
+    Forbidden,
+    Disabled,
+    Enabled,
+}
 
-    private DeviceStatus status;
-    public virtual DeviceStatus Status
-    {
-        get => status;
-        set => Set(ref status, value);
-    }
+public abstract class Device
+{
+    public DeviceType Type { get; set; }
 
-    private string ipAddress;
-    public virtual string IpAddress
-    {
-        get => ipAddress;
-        set => Set(ref ipAddress, value);
-    }
+    public DeviceStatus Status { get; set; }
 
-    public virtual string ID { get; protected set; }
+    public string IpAddress { get; set; }
 
-    #endregion
+    public string ID { get; set; }
 
     public static implicit operator bool(Device obj)
     {
@@ -73,21 +49,7 @@ public abstract class Device : AbstractDevice
 /// </summary>
 public abstract class PairingDevice : Device
 {
-    #region Full properties
+    public string PairingPort { get; set; }
 
-    private string pairingPort;
-    public virtual string PairingPort
-    {
-        get => pairingPort;
-        set => Set(ref pairingPort, value);
-    }
-
-    private string pairingCode;
-    public string PairingCode
-    {
-        get => pairingCode;
-        set => Set(ref pairingCode, value);
-    }
-
-    #endregion
+    public string PairingCode { get; set; }
 }

@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -449,16 +449,13 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>清空</value>
   </data>
   <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>启用 mDNS</value>
+    <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>轮询设备</value>
   </data>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
-    <value>电池状态查询</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
-    <value>启用命令日志</value>
+    <value>轮询电池状态</value>
   </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>自动启用 Root 权限</value>
@@ -470,13 +467,13 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>自动打开以进行浏览</value>
   </data>
   <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>启用紧凑视图</value>
+    <value>紧凑视图</value>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>停止 推送 / 拉取 轮询</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>允许同时操作</value>
+    <value>同时操作</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
     <value>在 Push 时强制媒体重新扫描</value>
@@ -484,11 +481,8 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
     <value>轮询设备</value>
   </data>
-  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
-    <value>启用回收站</value>
-  </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
-    <value>启用 APK 处理</value>
+    <value>APK 支持</value>
   </data>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
     <value>显示文件扩展名</value>
@@ -539,7 +533,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>禁用动画</value>
   </data>
   <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>显示启动画面</value>
+    <value>启动画面</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>检查更新</value>
@@ -605,7 +599,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>语言</value>
   </data>
   <data name="S_BUTTON_OK" xml:space="preserve">
-    <value>OK</value>
+    <value>确定</value>
   </data>
   <data name="S_FILTER_FILE_OPS" xml:space="preserve">
     <value>筛选文件操作</value>
@@ -726,7 +720,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>写入速度: {0}</value>
   </data>
   <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
-    <value>其它速度: {0}</value>
+    <value>其他速度: {0}</value>
   </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>每次启动时检查更新</value>
@@ -825,7 +819,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>重启 ADB</value>
   </data>
   <data name="S_SERVER_DOWN" xml:space="preserve">
-    <value>服务器停止运行</value>
+    <value>mDNS 服务器停止运行</value>
   </data>
   <data name="S_AWAITING_RESPONSE" xml:space="preserve">
     <value>等待回复: {0}</value>
@@ -839,14 +833,8 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_HOURS_SHORT" xml:space="preserve">
     <value>{0}时</value>
   </data>
-  <data name="S_MDNS_OFF" xml:space="preserve">
-    <value>&lt;Span&gt;• 服务轮询功能已关闭&lt;LineBreak /&gt;• 服务器&lt;Italic&gt;可能&lt;/Italic&gt;处于运行状态&lt;/Span&gt;</value>
-  </data>
-  <data name="S_ENABLE_MDNS" xml:space="preserve">
-    <value>点击以启用服务器和轮询</value>
-  </data>
   <data name="S_MDNS_ON" xml:space="preserve">
-    <value>服务器正常运行</value>
+    <value>服务器正在运行中</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>有限的支持</value>
@@ -1050,10 +1038,10 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>N/A</value>
   </data>
   <data name="S_PATH_INVALID" xml:space="preserve">
-    <value>提供的路径不存在。</value>
+    <value>变量必须明确新的或现有的设置文件的完整路径。</value>
   </data>
   <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
-    <value>自定义应用数据路径</value>
+    <value>自定义应用设置路径</value>
   </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>菜单为空</value>
@@ -1419,5 +1407,215 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_ROM_FILE" xml:space="preserve">
     <value>侧载的ROM</value>
+  </data>
+  <data name="S_TERMINAL" xml:space="preserve">
+    <value>终端</value>
+  </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>保存文件修改日期</value>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>安装 {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>安装 {0} 个 APK</value>
+  </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value>开</value>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value>关</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>正在检查服务器状态…</value>
+  </data>
+  <data name="S_MDNS_OFF" xml:space="preserve">
+    <value>&lt;Span&gt;• 服务轮询功能已关闭&lt;LineBreak /&gt;• 服务器&lt;Italic&gt;可能&lt;/Italic&gt;处于运行状态&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ENABLE_MDNS" xml:space="preserve">
+    <value>点击以启用服务器和轮询</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value>图标</value>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>拉取和展示缩略图</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>仅在图标视图下</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>仅在照片目录中</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value>连接时</value>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>会话</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>限制缩略图拉取速度</value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>显示特殊文件夹图标</value>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>包含视频缩略图</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>长度</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>分辨率</value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>1 个月</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>1 周</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>1 天</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>1 小时</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>本地缩略图刷新时间</value>
+  </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>如果可用使用 BusyBox</value>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>如果可用自动连接 Windows 安卓子系统</value>
+  </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>粘贴</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>正在检查缩略图更新</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>正在拉取缩略图</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>正在读取缩略图位置和媒体数据库</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_TITLE" xml:space="preserve">
+    <value>{0} 缩略图</value>
+  </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value>详情</value>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value>视图</value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>中等图标</value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>大图标</value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>特大图标</value>
+  </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value>布局和视图选项</value>
+  </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value>记住不同位置的缩略图尺寸</value>
+  </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value>排序</value>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value>升序</value>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value>降序</value>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>记住每个位置进行排序的列和所选方向</value>
+  </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>自身缩略图图片的最大大小（0 表示禁用）</value>
+  </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>及另外 {0} 个…</value>
+  </data>
+  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
+    <value>显示或隐藏详情和预览窗格。</value>
+  </data>
+  <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
+    <value>预览</value>
+  </data>
+  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
+    <value>预览的最大文件大小</value>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>双击文件将文件下拉到默认文件夹</value>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value>选择单个项目来获取更多信息。</value>
+  </data>
+  <data name="S_ITEM_LOCATION" xml:space="preserve">
+    <value>位置</value>
+  </data>
+  <data name="S_IMAGE_F_STOP" xml:space="preserve">
+    <value>F 档</value>
+  </data>
+  <data name="S_IMAGE_ISO" xml:space="preserve">
+    <value>ISO 速度</value>
+  </data>
+  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
+    <value>曝光时间</value>
+  </data>
+  <data name="S_VIDEO_BITRATE" xml:space="preserve">
+    <value>比特率</value>
+  </data>
+  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
+    <value>选择要预览的文件。</value>
+  </data>
+  <data name="S_PREVIEW_INVALID" xml:space="preserve">
+    <value>无预览可用。</value>
+  </data>
+  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
+    <value>此 PDF 受密码保护。</value>
+  </data>
+  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
+    <value>密码不对。</value>
+  </data>
+  <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
+    <value>解锁</value>
+  </data>
+  <data name="S_FILE_PERMISSIONS" xml:space="preserve">
+    <value>权限</value>
+  </data>
+  <data name="S_FILE_PERM_USER" xml:space="preserve">
+    <value>用户</value>
+  </data>
+  <data name="S_FILE_PERM_GROUP" xml:space="preserve">
+    <value>组</value>
+  </data>
+  <data name="S_FILE_PERM_OTHER" xml:space="preserve">
+    <value>其他</value>
+  </data>
+  <data name="S_DATE_ACCESSED" xml:space="preserve">
+    <value>访问</value>
+  </data>
+  <data name="S_CREATION_TIME" xml:space="preserve">
+    <value>创建</value>
+  </data>
+  <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
+    <value>修改</value>
+  </data>
+  <data name="S_FILE_SYSTEM" xml:space="preserve">
+    <value>文件系统</value>
+  </data>
+  <data name="S_MOUNT_POINT" xml:space="preserve">
+    <value>挂载点</value>
+  </data>
+  <data name="S_MOUNT_OPTIONS" xml:space="preserve">
+    <value>挂载选项</value>
   </data>
 </root>

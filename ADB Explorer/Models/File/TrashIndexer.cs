@@ -1,33 +1,20 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
-using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Models;
 
-public class TrashIndexer : ViewModelBase
+public partial class TrashIndexer : ObservableObject
 {
-    private string recycleName;
-    public string RecycleName
-    {
-        get => recycleName;
-        set => Set(ref recycleName, value);
-    }
+    [ObservableProperty]
+    public partial string RecycleName { get; set; }
 
-    private string originalPath;
-    public string OriginalPath
-    {
-        get => originalPath;
-        set => Set(ref originalPath, value);
-    }
+    [ObservableProperty]
+    public partial string OriginalPath { get; set; }
 
-    private DateTime? dateModified;
-    public DateTime? DateModified
-    {
-        get => dateModified;
-        set => Set(ref dateModified, value);
-    }
+    [ObservableProperty]
+    public partial DateTime? DateModified { get; set; }
 
-    public string ModifiedTimeString => TabularDateFormatter.Format(DateModified, Thread.CurrentThread.CurrentCulture);
+    public string ModifiedTimeString => TabularDateFormatter.Format(DateModified, Data.Settings.ActualUICulture);
 
     public string IndexerPath => $"{AdbExplorerConst.RECYCLE_PATH}/.{RecycleName}{AdbExplorerConst.RECYCLE_INDEX_SUFFIX}";
 

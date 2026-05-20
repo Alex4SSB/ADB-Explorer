@@ -1,15 +1,14 @@
-﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
 
-public class Devices : AbstractDevice
+public class Devices : ViewModelBase
 {
     #region Full properties
 
-    private ObservableList<DeviceViewModel> uiDevices = new();
+    private ObservableList<DeviceViewModel> uiDevices = [];
     public ObservableList<DeviceViewModel> UIList
     {
         get => uiDevices;
@@ -18,7 +17,7 @@ public class Devices : AbstractDevice
 
     public DateTime LastUpdate { get; set; }
 
-    public List<string> RootDevices { get; protected set; } = new();
+    public List<string> RootDevices { get; protected set; } = [];
 
     public NewDeviceViewModel CurrentNewDevice { get; set; }
 
@@ -28,6 +27,8 @@ public class Devices : AbstractDevice
 
     #region Read only lists
 
+    public IEnumerable<DeviceViewModel> PrimaryDevices => UIList?.Where(device => device is not MdnsDeviceViewModel and not NewDeviceViewModel);
+    public IEnumerable<DeviceViewModel> SecondaryDevices => UIList?.Where(device => device is MdnsDeviceViewModel or NewDeviceViewModel);
     public IEnumerable<LogicalDeviceViewModel> LogicalDeviceViewModels => UIList?.OfType<LogicalDeviceViewModel>();
     public IEnumerable<ServiceDeviceViewModel> ServiceDeviceViewModels => UIList?.OfType<ServiceDeviceViewModel>();
     public IEnumerable<HistoryDeviceViewModel> HistoryDeviceViewModels => UIList?.OfType<HistoryDeviceViewModel>();
@@ -47,23 +48,17 @@ public class Devices : AbstractDevice
 
     public Devices()
     {
+        UIList.Add(new MdnsDeviceViewModel(new()));
         UIList.Add(new NewDeviceViewModel(new()));
         UIList.Add(new WsaPkgDeviceViewModel(new()));
 
         if (Data.Settings.SaveDevices)
-            RetrieveHistoryDevices();
+            UIList.AddRange(RetrieveHistoryDevices());
 
         UIList.CollectionChanged += UIList_CollectionChanged;
         PropertyChanged += Devices_PropertyChanged;
-        Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
 
         ObservableCount.Value = "0";
-    }
-
-    private void RuntimeSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(AppRuntimeSettings.DeviceToOpen))
-            OnPropertyChanged(nameof(Current));
     }
 
     private void Devices_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -79,31 +74,16 @@ public class Devices : AbstractDevice
 
     #region History device handling
 
-    public void RetrieveHistoryDevices() => RetrieveHistoryDevices(UIList);
-
-    public static void RetrieveHistoryDevices(ObservableList<DeviceViewModel> uiList)
+    public static IEnumerable<HistoryDeviceViewModel> RetrieveHistoryDevices()
     {
-        var value = Storage.RetrieveValue("SavedDevices");
-        if (value is null)
-            return;
-
-        var jArray = value.ToString();
-        bool legacy = jArray.Contains(typeof(HistoryDevice).FullName);
-        var historyType = legacy ? typeof(List<HistoryDevice>) : typeof(List<StorageDevice>);
-
-        var devices = JsonConvert.DeserializeObject(jArray, historyType);
-        if (devices is null)
-            return;
-
-        var items = legacy ? ((List<HistoryDevice>)devices).Select(s => new HistoryDeviceViewModel(s)) : ((List<StorageDevice>)devices).Select(HistoryDeviceViewModel.New);
-        uiList.AddRange(items);
+        return Data.Settings.StorageDevices?.Select(d => HistoryDeviceViewModel.FromStorage(d)) ?? [];
     }
 
     public void StoreHistoryDevices() => StoreHistoryDevices(UIList.OfType<HistoryDeviceViewModel>());
 
     public static void StoreHistoryDevices(IEnumerable<HistoryDeviceViewModel> devices)
     {
-        Storage.StoreValue("SavedDevices", devices.Select(h => h.GetStorage()));
+        Data.Settings.StorageDevices = [.. devices.Select(h => h.GetStorage())];
     }
 
     public void AddHistoryDevice(HistoryDeviceViewModel device)
@@ -141,21 +121,26 @@ public class Devices : AbstractDevice
         }
     }
 
-    public bool ServicesChanged(IEnumerable<ServiceDeviceViewModel> other)
+    public bool ServicesChanged(IEnumerable<ServiceSnapshot> snapshots)
     {
         // if the list is null, we're probably not ready to update
-        if (other is null)
+        if (snapshots is null)
             return false;
 
         // if the list is empty, we need to update (and remove all items)
-        if (!other.Any())
+        if (!snapshots.Any())
             return ServiceDeviceViewModels.Any();
 
-        var pairing = other.OfType<PairingServiceViewModel>();
+        var pairing = snapshots.Where(s => s.ConnectionKind is ServiceConnectionKind.Pairing).OrderBy(s => s.ID).ToList();
+        var existing = ServiceDeviceViewModels.OrderBy(d => d.ID).ToList();
+
         // if there's any service whose ID is not found in any logical device,
         // AND an ordering of both new and old lists doesn't match up all IDs
-        return pairing.Any(service => !LogicalDeviceViewModels.Any(device => device.Status == DeviceStatus.Ok && device.BaseID == service.ID || device.IpAddress == service.IpAddress))
-               && !ServiceDeviceViewModels.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(pairing.OrderBy(otherDevice => otherDevice.ID), new ServiceDeviceViewModelEqualityComparer());
+        return pairing.Any(s => !LogicalDeviceViewModels.Any(d => d.Status == DeviceStatus.Ok && d.BaseID == s.ID || d.IpAddress == s.IpAddress))
+            && (existing.Count != pairing.Count
+                || existing.Zip(pairing).Any(p =>
+                    p.First.ID != p.Second.ID
+                    || string.IsNullOrEmpty(p.First.PairingPort) != string.IsNullOrEmpty(p.Second.Port)));
     }
 
     #endregion
@@ -164,10 +149,13 @@ public class Devices : AbstractDevice
 
     public bool UpdateDevices(IEnumerable<LogicalDeviceViewModel> other)
     {
-        var result = UpdateDevices(UIList, other);
+        var result = App.AppDispatcher is not null
+            ? App.AppDispatcher.Invoke(() => UpdateDevices(UIList, other))
+            : UpdateDevices(UIList, other);
         OnPropertyChanged(nameof(Count));
 
         UpdateLogicalIp();
+        UpdateBrandNames();
         UpdateHistoryNames();
 
         return result;
@@ -196,9 +184,6 @@ public class Devices : AbstractDevice
                     isCurrentTypeUpdated = true;
 
                 device.UpdateDevice(item);
-
-                if (device.Drives.Count != item.Drives.Count)
-                    device.UpdateDrives(item, App.Current.Dispatcher, true);
             }
             else
             {
@@ -212,11 +197,20 @@ public class Devices : AbstractDevice
         return isCurrentTypeUpdated;
     }
 
-    public bool DevicesChanged(IEnumerable<LogicalDeviceViewModel> other)
+    public bool DevicesChanged(IEnumerable<DeviceSnapshot> snapshots)
     {
-        return other is not null
-            && !LogicalDeviceViewModels.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(
-                other.OrderBy(otherDevice => otherDevice.ID), new DeviceViewModelEqualityComparer());
+        if (snapshots is null)
+            return false;
+
+        var existing = LogicalDeviceViewModels.OrderBy(d => d.ID).ToList();
+        var incoming = snapshots.OrderBy(s => s.ID).ToList();
+
+        return existing.Count != incoming.Count
+            || existing.Zip(incoming).Any(p =>
+                p.First.ID != p.Second.ID
+                || p.First.Type != p.Second.Type
+                || p.First.Status != p.Second.Status
+                || p.First.DeviceData != p.Second.DeviceData);
     }
 
     #endregion
@@ -261,6 +255,14 @@ public class Devices : AbstractDevice
         return result;
     }
 
+    public async void UpdateBrandNames()
+    {
+        await Task.Run(() =>
+            UIList.OfType<LogicalDeviceViewModel>().ForEach(d => _ = d.BrandName));
+
+        App.SafeInvoke(() => UIList.OfType<LogicalDeviceViewModel>().ForEach(d => d.UpdateName()));
+    }
+
     public async void UpdateLogicalIp()
     {
         if (await UpdateLogicalIp(UIList))
@@ -283,7 +285,7 @@ public class Devices : AbstractDevice
                 }
             }
 
-            await Task.Run(() => result |= ADBService.AdbDevice.GetDeviceIp(item));
+            await Task.Run(() => result |= ADBService.GetDeviceIp(item));
         }
 
         return result;
@@ -301,7 +303,7 @@ public class Devices : AbstractDevice
     public bool SetOpenDevice(string selectedId)
         => SetOpenDevice(AvailableDevices().FirstOrDefault(device => device.ID == selectedId));
 
-    public bool SetOpenDevice(LogicalDeviceViewModel device)
+    public static bool SetOpenDevice(LogicalDeviceViewModel? device)
     {
         if (Data.RuntimeSettings.DeviceToOpen is null && device is null)
             return false;

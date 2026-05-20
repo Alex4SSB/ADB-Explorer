@@ -2,99 +2,21 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 using System.Collections;
-using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Services;
 
-public class AppRuntimeSettings : ViewModelBase
+public partial class AppRuntimeSettings : ViewModelBase
 {
-    public AppRuntimeSettings()
-    {
-        Data.Settings.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>
-        {
-            if (e.PropertyName == nameof(Data.Settings.ForceFluentStyles))
-                OnPropertyChanged(nameof(UseFluentStyles));
-        };
-    }
-
     public bool ResetAppSettings { get; set; } = false;
 
-    private bool isSettingsPaneOpen = false;
-    public bool IsSettingsPaneOpen
-    {
-        get => isSettingsPaneOpen;
-        set
-        {
-            if (Set(ref isSettingsPaneOpen, value))
-                DeviceHelper.CollapseDevices();
-        }
-    }
-
-    private bool isDevicesPaneOpen = false;
-    public bool IsDevicesPaneOpen
-    {
-        get => isDevicesPaneOpen;
-        set
-        {
-            if (Set(ref isDevicesPaneOpen, value))
-                DeviceHelper.CollapseDevices();
-        }
-    }
-
-    private bool isMdnsExpanderOpen = false;
-    public bool IsMdnsExpanderOpen
-    {
-        get => isMdnsExpanderOpen;
-        set => Set(ref isMdnsExpanderOpen, value);
-    }
-
-    private bool isOperationsViewOpen = false;
-    public bool IsOperationsViewOpen
-    {
-        get => isOperationsViewOpen;
-        set
-        {
-            if (Set(ref isOperationsViewOpen, value))
-            {
-                DeviceHelper.CollapseDevices();
-                IsDetailedPeekMode = false;
-            }
-        }
-    }
-
-    private bool sortedView = false;
-    public bool SortedView
-    {
-        get => sortedView;
-        set => Set(ref sortedView, value);
-    }
-
-    private bool groupsExpanded = false;
-    public bool GroupsExpanded
-    {
-        get => groupsExpanded;
-        set => Set(ref groupsExpanded, value);
-    }
-
-    private string searchText = "";
-    public string SearchText
-    {
-        get => searchText;
-        set => Set(ref searchText, value);
-    }
+    [ObservableProperty]
+    public partial bool IsDevicesView { get; set; }
 
     private double maxSearchBoxWidth = AdbExplorerConst.DEFAULT_SEARCH_WIDTH;
     public double MaxSearchBoxWidth
     {
         get => maxSearchBoxWidth;
         set => Set(ref maxSearchBoxWidth, value);
-    }
-
-    private bool collapseDevices = false;
-    public bool CollapseDevices
-    {
-        get => collapseDevices;
-        set => Set(ref collapseDevices, value);
     }
 
     private bool collapseDrives = false;
@@ -154,20 +76,12 @@ public class AppRuntimeSettings : ViewModelBase
         {
             lastServerResponse = value;
 
-            try
+            App.SafeInvoke(() =>
             {
-                App.Current?.Dispatcher.Invoke(() =>
-                {
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(TimeFromLastResponse));
-                    OnPropertyChanged(nameof(ServerUnresponsive));
-                });
-            }
-            catch
-            {
-                if (App.Current?.Dispatcher is not null)
-                    throw;
-            }
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(TimeFromLastResponse));
+                OnPropertyChanged(nameof(ServerUnresponsive));
+            });
         }
     }
 
@@ -197,7 +111,7 @@ public class AppRuntimeSettings : ViewModelBase
         }
     }
 
-    private Version adbVersion;
+    private Version adbVersion = null;
     public Version AdbVersion
     {
         get => adbVersion;
@@ -208,14 +122,10 @@ public class AppRuntimeSettings : ViewModelBase
         }
     }
 
-    public string AdbVersionString => $"\u200E - v{AdbVersion}";
+    [ObservableProperty]
+    public partial AdbHelper.AdbStatus AdbStatus { get; set; } = AdbHelper.AdbStatus.NotFound;
 
-    private bool isSplashScreenVisible = true;
-    public bool IsSplashScreenVisible
-    {
-        get => isSplashScreenVisible;
-        set => Set(ref isSplashScreenVisible, value);
-    }
+    public string AdbVersionString => $"v{AdbVersion}";
 
     private IEnumerable explorerSource;
     public IEnumerable ExplorerSource
@@ -246,20 +156,6 @@ public class AppRuntimeSettings : ViewModelBase
         }
     }
 
-    private bool isTerminalOpen = false;
-    public bool IsTerminalOpen
-    {
-        get => isTerminalOpen;
-        set => Set(ref isTerminalOpen, value);
-    }
-
-    private bool isLogOpen = false;
-    public bool IsLogOpen
-    {
-        get => isLogOpen;
-        set => Set(ref isLogOpen, value);
-    }
-
     private bool isLogPaused = false;
     public bool IsLogPaused
     {
@@ -286,13 +182,6 @@ public class AppRuntimeSettings : ViewModelBase
         }
     }
 
-    private bool isWindowLoaded = false;
-    public bool IsWindowLoaded
-    {
-        get => isWindowLoaded;
-        set => Set(ref isWindowLoaded, value);
-    }
-
     private bool isExplorerLoaded = false;
     public bool IsExplorerLoaded
     {
@@ -300,53 +189,11 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref isExplorerLoaded, value);
     }
 
-    private string adbReadRate = null;
-    public string AdbReadRate
-    {
-        get => adbReadRate;
-        set => Set(ref adbReadRate, value);
-    }
-
-    private string adbWriteRate = null;
-    public string AdbWriteRate
-    {
-        get => adbWriteRate;
-        set => Set(ref adbWriteRate, value);
-    }
-
-    private string adbOtherRate = null;
-    public string AdbOtherRate
-    {
-        get => adbOtherRate;
-        set => Set(ref adbOtherRate, value);
-    }
-
-    private bool isAdbReadActive = false;
-    public bool IsAdbReadActive
-    {
-        get => isAdbReadActive;
-        set => Set(ref isAdbReadActive, value);
-    }
-
-    private bool isAdbWriteActive = false;
-    public bool IsAdbWriteActive
-    {
-        get => isAdbWriteActive;
-        set => Set(ref isAdbWriteActive, value);
-    }
-
     private bool isPollingStopped = false;
     public bool IsPollingStopped
     {
         get => isPollingStopped;
         set => Set(ref isPollingStopped, value);
-    }
-
-    private bool isDetailedPeekMode = false;
-    public bool IsDetailedPeekMode
-    {
-        get => isDetailedPeekMode;
-        set => Set(ref isDetailedPeekMode, value);
     }
 
     private BitmapSource dragBitmap = null;
@@ -370,11 +217,11 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref cursor, value);
     }
 
-    private float dpiScalingFactor = 1.0f;
-    public float DpiScalingFactor
+    private float mainWindowScalingFactor = 1.0f;
+    public float MainWindowScalingFactor
     {
-        get => dpiScalingFactor;
-        set => Set(ref dpiScalingFactor, value);
+        get => mainWindowScalingFactor;
+        set => Set(ref mainWindowScalingFactor, value);
     }
 
     private bool dragWithinSlave = false;
@@ -384,46 +231,34 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref dragWithinSlave, value);
     }
 
-    private List<string> savedLocations = null;
-    public List<string> SavedLocations
+    private ThumbnailService.ThumbnailSize thumbsSize = ThumbnailService.ThumbnailSize.Disabled;
+    public ThumbnailService.ThumbnailSize ThumbsSize
     {
-        get
+        get => thumbsSize;
+        set
         {
-            if (savedLocations is null)
-            {
-                var storage = Storage.RetrieveValue(nameof(SavedLocations));
-                if (storage is not null && storage is string[] locations)
-                {
-                    savedLocations = [.. locations];
-                }
-            }
-            return savedLocations;
+            thumbsSize = value;
+            OnPropertyChanged();
         }
-
-        set => Set(ref savedLocations, value);
     }
 
     public string DefaultBrowserPath { get; set; }
 
     public string AdbPath { get; set; }
 
-    public string TempDragPath => FileHelper.ConcatPaths(Data.AppDataPath, AdbExplorerConst.TEMP_DRAG_FOLDER, '\\');
+    public string TempDragPath
+    {
+        get
+        {
+            field ??= Directory.CreateTempSubdirectory().FullName;
 
-    public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
+            return field;
+        }
+    } = null;
 
-    public bool IsWin11 =>
-#if DEBUG
-        false;
-#else
-        Environment.OSVersion.Version >= AdbExplorerConst.WIN11_VERSION;
-#endif
-
+    public bool IsAppDeployed => Environment.CurrentDirectory.Equals(@"C:\WINDOWS\SYSTEM32", StringComparison.InvariantCultureIgnoreCase);
 
     public bool Is22H2 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_22H2;
-
-    public bool HideForceFluent => !IsWin11;
-
-    public bool UseFluentStyles => IsWin11 || Data.Settings.ForceFluentStyles;
 
     public bool IsRTL => Thread.CurrentThread.CurrentUICulture.TextInfo.IsRightToLeft;
 
@@ -441,13 +276,7 @@ public class AppRuntimeSettings : ViewModelBase
     public bool InitLister { get => false; set => OnPropertyChanged(); }
     public bool DriveViewNav { get => false; set => OnPropertyChanged(); }
     public bool AutoHideSearchBox { get => false; set => OnPropertyChanged(); }
-    public bool RefreshFileOpControls { get => false; set => OnPropertyChanged(); }
     public bool ClearLogs { get => false; set => OnPropertyChanged(); }
-    public bool RefreshSettingsControls { get => false; set => OnPropertyChanged(); }
-    public bool SortFileOps { get => false; set => OnPropertyChanged(); }
-    public bool RefreshExplorerSorting { get => false; set => OnPropertyChanged(); }
-    public bool FinalizeSplash { get => false; set => OnPropertyChanged(); }
-    public bool RefreshBreadcrumbs { get => false; set => OnPropertyChanged(); }
 
     #endregion
 }

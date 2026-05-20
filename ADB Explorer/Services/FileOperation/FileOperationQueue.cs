@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 
@@ -19,11 +19,20 @@ public class FileOperationQueue : ViewModelBase
         }
     }
 
-    private bool isAutoPlayOn = true;
-    public bool IsAutoPlayOn
+    private bool isAutoPlayStopped = false;
+    public bool IsAutoPlayStopped
     {
-        get => isAutoPlayOn;
-        set => Set(ref isAutoPlayOn, value);
+        get => isAutoPlayStopped;
+        set
+        {
+            if (Set(ref isAutoPlayStopped, value))
+            {
+                if (isAutoPlayStopped)
+                    Stop();
+                else
+                    Start();
+            }
+        }
     }
 
     private double progress = 0.0;
@@ -68,6 +77,14 @@ public class FileOperationQueue : ViewModelBase
     public FileOperationQueue()
     {
         Operations.CollectionChanged += Operations_CollectionChanged;
+        Data.Settings.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName is nameof(AppSettings.StopPollingOnSync))
+            {
+                Data.RuntimeSettings.IsPollingStopped = Data.Settings.StopPollingOnSync
+                    && Operations.Any(op => op is FileSyncOperation && op.Status is FileOperation.OperationStatus.InProgress);
+            }
+        };
     }
 
     public void AddOperation(FileOperation fileOp)
@@ -165,7 +182,7 @@ public class FileOperationQueue : ViewModelBase
 
     public void Start()
     {
-        if (TotalCount < 1 || !IsAutoPlayOn)
+        if (TotalCount < 1 || IsAutoPlayStopped)
             return;
 
         if (!IsActive)
@@ -190,7 +207,7 @@ public class FileOperationQueue : ViewModelBase
         }
         IsActive = false;
         
-        if (isPush && !App.Current.Dispatcher.HasShutdownStarted)
+        if (isPush && !App.IsShuttingDown)
             Data.RuntimeSettings.Refresh = true;
     }
 
@@ -271,7 +288,7 @@ public class FileOperationQueue : ViewModelBase
     private void CheckForRescan(FileOperation fileOp)
     {
         var target = fileOp.TargetPath.ParentPath;
-        if (fileOp.Device.Device.AndroidVersion < AdbExplorerConst.MIN_MEDIA_SCAN_ANDROID_VER
+        if (fileOp.Device.AndroidVersion < AdbExplorerConst.MIN_MEDIA_SCAN_ANDROID_VER
             || Operations.Any(op =>
                 op.TypeOnDevice == fileOp.TypeOnDevice
                 && op.TargetPath.ParentPath == target
@@ -280,7 +297,7 @@ public class FileOperationQueue : ViewModelBase
             return;
         }
 
-        ADBService.AdbDevice.ForceMediaScan(fileOp.Device.Device);
+        ADBService.ForceMediaScan(fileOp.Device);
     }
 
     private void CurrentOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -298,7 +315,7 @@ public class FileOperationQueue : ViewModelBase
             {
                 MoveToCompleted(op);
 
-                if (IsAutoPlayOn)
+                if (!IsAutoPlayStopped)
                     MoveToNextOperation();
 
                 if (op.OperationName is FileOperation.OperationType.Push
@@ -309,7 +326,7 @@ public class FileOperationQueue : ViewModelBase
 
         if (e.PropertyName is nameof(FileOperation.StatusInfo)
             && op.Status is FileOperation.OperationStatus.InProgress
-            && op.StatusInfo is InProgSyncProgressViewModel { TotalPercentage: int percentage })
+            && op.StatusInfo is InProgSyncProgressViewModel { TotalPercentage: double percentage })
         {
             op.LastProgress = percentage;
             UpdateProgress();

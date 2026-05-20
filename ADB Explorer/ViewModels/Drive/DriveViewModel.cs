@@ -1,33 +1,20 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
 
-public class DriveViewModel : AbstractDrive
+public partial class DriveViewModel : AbstractDrive, IBrowserItem
 {
     #region Full properties
 
-    private Drive drive;
-    public Drive Drive
-    {
-        get => drive;
-        set => Set(ref drive, value);
-    }
+    [ObservableProperty]
+    public partial Drive Drive { get; set; }
 
-    private bool driveSelected = false;
-    public bool DriveSelected
-    {
-        get => driveSelected;
-        set => Set(ref driveSelected, value);
-    }
+    [ObservableProperty]
+    public partial bool IsSelected { get; set; } = false;
 
-    private bool driveEnabled = true;
-    public bool DriveEnabled
-    {
-        get => driveEnabled;
-        protected set => Set(ref driveEnabled, value);
-    }
+    [ObservableProperty]
+    public partial bool DriveEnabled { get; protected set; } = true;
 
     #endregion
 
@@ -35,7 +22,7 @@ public class DriveViewModel : AbstractDrive
 
     public string Path => Drive.Path;
     public new DriveType Type => Drive.Type;
-    public bool IsFUSE => Drive.IsFUSE;
+    public virtual bool IsFUSE => Drive.IsFUSE;
 
     public new string DisplayName => Drive.DisplayName;
 
@@ -60,7 +47,6 @@ public class DriveViewModel : AbstractDrive
     #region Commands
 
     public BaseAction BrowseCommand { get; private set; }
-    public BaseAction SelectCommand { get; private set; }
     
     #endregion
 
@@ -69,17 +55,6 @@ public class DriveViewModel : AbstractDrive
         Drive = drive;
 
         BrowseCommand = new(() => true, () => Data.RuntimeSettings.BrowseDrive = this);
-        SelectCommand = new(() => true, () => DriveSelected = true);
-
-        Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
-    }
-
-    private void RuntimeSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(AppRuntimeSettings.CollapseDrives) && Data.RuntimeSettings.CollapseDrives)
-        {
-            DriveSelected = false;
-        }
     }
 
     public void SetType(DriveType type)

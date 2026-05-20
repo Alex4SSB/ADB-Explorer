@@ -5,100 +5,42 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
+    xmlns:local="clr-namespace:ADB_Explorer.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     x:Name="NavBox"
     d:DesignHeight="32"
     d:DesignWidth="500"
     mc:Ignorable="d">
     <UserControl.Resources>
         <DataTemplate x:Key="BreadcrumbFlyoutItemTemplate">
-            <MenuItem
+            <local:AdbMenuItem
                 Margin="2"
                 Command="{Binding Action.Command.Command}"
                 Icon="{StaticResource MenuIcon}"
-                Style="{StaticResource AdbMenuItemStyle}">
-                <MenuItem.Header>
+                Style="{StaticResource WpfUiMenuItem}">
+                <local:AdbMenuItem.Header>
                     <TextBlock Text="{Binding Action.Description}" TextOptions.TextFormattingMode="Display" />
-                </MenuItem.Header>
-            </MenuItem>
+                </local:AdbMenuItem.Header>
+            </local:AdbMenuItem>
         </DataTemplate>
-        <DataTemplate x:Key="SavedItemTemplate">
-            <MenuItem>
-                <MenuItem.Style>
-                    <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding AddAction.IsEnabled}" Value="True">
-                                <Setter Property="Header">
-                                    <Setter.Value>
-                                        <Grid Width="240" Margin="0,3">
-                                            <ui:SimpleStackPanel
-                                                HorizontalAlignment="Center"
-                                                Orientation="Horizontal"
-                                                Spacing="4">
-                                                <ui:FontIcon Glyph="&#xE710;" />
-                                                <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_ADD_CURRENT_LOC}}" />
-                                            </ui:SimpleStackPanel>
-                                        </Grid>
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter Property="Command" Value="{Binding AddAction.Command}" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                        <Setter Property="Command" Value="{Binding NavigateAction.Command}" />
-                        <Setter Property="Header">
-                            <Setter.Value>
-                                <Grid Width="240" Margin="0,3">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock
-                                        Margin="0,0,6,0"
-                                        Style="{StaticResource TooltipTextBlockStyle}"
-                                        Text="{Binding Path}" />
-                                    <Button
-                                        Grid.Column="1"
-                                        Command="{Binding DeleteAction.Command}"
-                                        ToolTip="{Binding Source={x:Static Member=strings:Resources.S_REMOVE}}">
-                                        <Button.Style>
-                                            <Style BasedOn="{StaticResource RestartAppButtonStyle}" TargetType="Button">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuItem}, Path=IsMouseOver}" Value="False">
-                                                        <Setter Property="Visibility" Value="Hidden" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Button.Style>
-                                        <ui:FontIcon Glyph="&#xE711;" />
-                                    </Button>
-                                </Grid>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </MenuItem.Style>
-            </MenuItem>
-        </DataTemplate>
-        <ItemsControl
-            x:Key="OverflowItemsControl"
-            x:Name="OverflowItemsControl"
-            ItemTemplate="{StaticResource BreadcrumbFlyoutItemTemplate}" />
-        <ItemsControl
-            x:Key="SavedItemsControl"
-            x:Name="SavedItemsControl"
-            ItemTemplate="{StaticResource SavedItemTemplate}" />
         <DataTemplate x:Key="BreadcrumbTemplate">
             <StackPanel Orientation="Horizontal">
-                <Button
+                <ui:Button
                     Height="24"
                     Margin="2,0"
                     Padding="8,0"
-                    Command="{Binding Action.Command.Command}">
-                    <Button.Content>
+                    Click="BreadcrumbButton_Click"
+                    Command="{Binding Action.Command.Command}"
+                    FlowDirection="LeftToRight">
+                    <ui:Button.Content>
                         <Grid>
-                            <emoji:TextBlock Text="{Binding Action.Description}" TextOptions.TextFormattingMode="Display">
+                            <emoji:TextBlock
+                                FlowDirection="{Binding FlowDirection}"
+                                Text="{Binding Action.Description}"
+                                TextOptions.TextFormattingMode="Display">
                                 <emoji:TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Visibility" Value="Collapsed" />
@@ -122,65 +64,72 @@
                                 </ui:FontIcon.Style>
                             </ui:FontIcon>
                         </Grid>
-                    </Button.Content>
-                    <Button.Style>
-                        <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
-                            <Setter Property="ui:FlyoutService.Flyout">
+                    </ui:Button.Content>
+                    <ui:Button.Style>
+                        <Style BasedOn="{StaticResource DefaultUiButtonStyle}" TargetType="ui:Button">
+                            <!--<Setter Property="ui:FlyoutService.Flyout">
                                 <Setter.Value>
                                     <ui:Flyout Content="{StaticResource OverflowItemsControl}" Placement="Bottom" />
                                 </Setter.Value>
-                            </Setter>
+                            </Setter>-->
                             <Setter Property="ContextMenu">
                                 <Setter.Value>
-                                    <ContextMenu Style="{StaticResource PathBoxContextMenuStyle}" />
+                                    <local:AdbContextMenu Style="{StaticResource PathBoxContextMenuStyle}" />
                                 </Setter.Value>
                             </Setter>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Children}" Value="{x:Null}">
+                                <!--<DataTrigger Binding="{Binding Children}" Value="{x:Null}">
                                     <Setter Property="ui:FlyoutService.Flyout" Value="{x:Null}" />
-                                </DataTrigger>
+                                </DataTrigger>-->
                                 <Trigger Property="IsMouseOver" Value="False">
                                     <Setter Property="BorderBrush" Value="Transparent" />
                                     <Setter Property="Background" Value="Transparent" />
                                 </Trigger>
                             </Style.Triggers>
                         </Style>
-                    </Button.Style>
-                </Button>
+                    </ui:Button.Style>
+                </ui:Button>
                 <ui:FontIcon
                     Margin="2,0"
                     VerticalAlignment="Center"
-                    FontSize="8"
-                    Glyph="&#xE970;">
+                    FontSize="8">
                     <ui:FontIcon.Style>
-                        <Style TargetType="ui:FontIcon">
+                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                            <Setter Property="Glyph" Value="&#xE970;" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsLast}" Value="True">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
+                                <Trigger Property="FlowDirection" Value="RightToLeft">
+                                    <Setter Property="Glyph" Value="&#xE973;" />
+                                </Trigger>
                             </Style.Triggers>
                         </Style>
                     </ui:FontIcon.Style>
                 </ui:FontIcon>
             </StackPanel>
         </DataTemplate>
-        <ToolTip x:Key="FuseTooltip" Content="{Binding Source={x:Static Member=strings:Resources.S_FUSE_DRIVE_TOOLTIP}}" />
+        <ToolTip
+            x:Key="FuseTooltip"
+            MaxWidth="300"
+            Content="{Binding Source={x:Static Member=strings:Resources.S_FUSE_DRIVE_TOOLTIP}}" />
     </UserControl.Resources>
     <Grid
         Height="{Binding Height}"
         MinWidth="150"
         DataContext="{Binding ElementName=NavBox}">
-        <TextBox
+        <!--  ui:TextBoxHelper.IsDeleteButtonVisible="False"  -->
+        <ui:TextBox
             x:Name="PathBox"
             Height="{Binding Height}"
             VerticalAlignment="Center"
             d:Background="LightGray"
-            ui:TextBoxHelper.IsDeleteButtonVisible="False"
+            FlowDirection="LeftToRight"
             GotFocus="PathBox_GotFocus"
             KeyDown="PathBox_KeyDown"
             LostFocus="PathBox_LostFocus">
-            <TextBox.Style>
-                <Style BasedOn="{StaticResource TextBoxFluentStyle}" TargetType="TextBox">
+            <ui:TextBox.Style>
+                <Style BasedOn="{StaticResource AdbTextBoxStyle}" TargetType="ui:TextBox">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Mode}" Value="None">
                             <Setter Property="IsEnabled" Value="False" />
@@ -193,23 +142,21 @@
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
-            </TextBox.Style>
-        </TextBox>
-        <ui:ProgressBar
+            </ui:TextBox.Style>
+        </ui:TextBox>
+        <ProgressBar
             x:Name="LoadingProgressBar"
-            Margin="0,0,0,1"
+            Height="35"
+            Margin="0"
             VerticalAlignment="Stretch"
             Background="Transparent"
+            BorderBrush="Transparent"
             Foreground="{StaticResource NavigationBarProgressBrush}"
             IsHitTestVisible="False">
-            <ui:ProgressBar.Style>
-                <Style BasedOn="{StaticResource FluentProgressBarStyle}" TargetType="ui:ProgressBar">
+            <ProgressBar.Style>
+                <Style BasedOn="{StaticResource FluentProgressBarStyle}" TargetType="ProgressBar">
                     <Setter Property="IsIndeterminate" Value="False" />
-                    <Setter Property="CornerRadius" Value="4,4,2,2" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="False">
-                            <Setter Property="CornerRadius" Value="0" />
-                        </DataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding Mode}" Value="Breadcrumbs" />
@@ -219,8 +166,8 @@
                         </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
-            </ui:ProgressBar.Style>
-        </ui:ProgressBar>
+            </ProgressBar.Style>
+        </ProgressBar>
         <Grid>
             <Grid.Style>
                 <Style TargetType="Grid">
@@ -237,36 +184,26 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Button
+            <ui:Button
                 x:Name="FuseIcon"
                 Height="24"
                 Margin="4,0,0,0"
                 Padding="3,0"
+                Appearance="Primary"
                 Click="FuseIcon_Click"
                 MouseLeave="FuseIcon_MouseLeave"
                 ToolTip="{StaticResource FuseTooltip}">
                 <ui:FontIcon FontSize="20" Glyph="&#xF0EF;" />
-                <Button.Style>
-                    <Style BasedOn="{StaticResource AccentButtonStyle}" TargetType="Button">
+                <ui:Button.Style>
+                    <Style BasedOn="{StaticResource DefaultUiButtonStyle}" TargetType="ui:Button">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding ElementName=NavBox, Path=IsFUSE}" Value="False">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Opacity" Value="1" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Opacity" Value="1" />
-                                <Setter Property="Foreground">
-                                    <Setter.Value>
-                                        <SolidColorBrush Opacity="1" Color="{ui:ThemeResource SystemAltHighColor}" />
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
                         </Style.Triggers>
                     </Style>
-                </Button.Style>
-            </Button>
+                </ui:Button.Style>
+            </ui:Button>
             <ItemsControl
                 x:Name="PathItemsControl"
                 Grid.Column="1"
@@ -279,44 +216,128 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
-            <Button
-                x:Name="SavedItemsButton"
+            <local:AdbMenu
                 Grid.Column="2"
-                Margin="0,0,2,0"
-                Padding="3"
-                VerticalAlignment="Center"
-                ToolTip="{Binding Source={x:Static Member=strings:Resources.S_SAVED_LOCATIONS}}">
-                <Button.Style>
-                    <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
-                        <Setter Property="ui:FlyoutService.Flyout">
-                            <Setter.Value>
-                                <ui:Flyout Content="{StaticResource SavedItemsControl}" Placement="Bottom" />
-                            </Setter.Value>
-                        </Setter>
-                        <Setter Property="Content">
-                            <Setter.Value>
-                                <ui:FontIcon Glyph="&#xE734;" Style="{StaticResource GlyphFont}" />
-                            </Setter.Value>
-                        </Setter>
+                Margin="0,0"
+                VerticalAlignment="Center">
+                <local:AdbMenu.Style>
+                    <Style BasedOn="{StaticResource AdbMenuStyle}" TargetType="local:AdbMenu">
                         <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="False">
-                                <Setter Property="BorderBrush" Value="Transparent" />
-                                <Setter Property="Background" Value="Transparent" />
-                            </Trigger>
                             <DataTrigger Binding="{Binding ElementName=NavBox, Path=SavedItems.Count}" Value="0">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding ElementName=NavBox, Path=IsCurrentSaved}" Value="True">
-                                <Setter Property="Content">
-                                    <Setter.Value>
-                                        <ui:FontIcon Glyph="&#xE735;" Style="{StaticResource BlueFontIconStyle}" />
-                                    </Setter.Value>
-                                </Setter>
-                            </DataTrigger>
                         </Style.Triggers>
                     </Style>
-                </Button.Style>
-            </Button>
+                </local:AdbMenu.Style>
+                <local:AdbMenuItem ItemsSource="{Binding SavedItems}" ToolTip="{Binding Source={x:Static Member=strings:Resources.S_SAVED_LOCATIONS}}">
+                    <local:AdbMenuItem.Header>
+                        <ui:FontIcon Margin="-5">
+                            <ui:FontIcon.Style>
+                                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                    <Setter Property="Glyph" Value="&#xE734;" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=NavBox, Path=IsCurrentSaved}" Value="True">
+                                            <Setter Property="Glyph" Value="&#xE735;" />
+                                            <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:FontIcon.Style>
+                        </ui:FontIcon>
+                    </local:AdbMenuItem.Header>
+                    <local:AdbMenuItem.ItemContainerStyle>
+                        <Style BasedOn="{StaticResource WpfUiMenuItem}" TargetType="local:AdbMenuItem">
+                            <Setter Property="Command" Value="{Binding NavigateAction.Command}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding AddAction.IsEnabled}" Value="True">
+                                    <Setter Property="Command" Value="{Binding AddAction.Command}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </local:AdbMenuItem.ItemContainerStyle>
+                    <local:AdbMenuItem.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Width="240" Margin="0,3">
+                                <Grid>
+                                    <Grid.Style>
+                                        <Style TargetType="Grid">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding AddAction.IsEnabled}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock
+                                        Margin="0,0,6,0"
+                                        FlowDirection="LeftToRight"
+                                        Style="{StaticResource TooltipTextBlockStyle}"
+                                        Text="{Binding Path}" />
+                                    <ui:Button
+                                        Grid.Column="1"
+                                        Command="{Binding DeleteAction.Command}"
+                                        ToolTip="{Binding Source={x:Static Member=strings:Resources.S_REMOVE}}">
+                                        <ui:Button.Style>
+                                            <Style BasedOn="{StaticResource RestartAppButtonStyle}" TargetType="ui:Button">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuItem}, Path=IsMouseOver}" Value="False">
+                                                        <Setter Property="Visibility" Value="Hidden" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ui:Button.Style>
+                                        <ui:FontIcon Glyph="&#xE711;" />
+                                    </ui:Button>
+                                </Grid>
+                                <Grid>
+                                    <Grid.Style>
+                                        <Style TargetType="Grid">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding AddAction.IsEnabled}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
+                                    <local:SimpleStackPanel
+                                        HorizontalAlignment="Center"
+                                        Orientation="Horizontal"
+                                        Spacing="4">
+                                        <ui:FontIcon Glyph="&#xE710;" />
+                                        <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_ADD_CURRENT_LOC}}" />
+                                    </local:SimpleStackPanel>
+                                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                    </local:AdbMenuItem.ItemTemplate>
+                </local:AdbMenuItem>
+            </local:AdbMenu>
         </Grid>
+        <Popup
+            x:Name="OverflowPopup"
+            AllowsTransparency="True"
+            Placement="Bottom"
+            StaysOpen="False">
+            <Border
+                Padding="0,3"
+                Background="{DynamicResource FlyoutBackground}"
+                BorderBrush="{DynamicResource FlyoutBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Border.Effect>
+                    <DropShadowEffect
+                        BlurRadius="20"
+                        Direction="270"
+                        Opacity="0.135"
+                        ShadowDepth="10"
+                        Color="#202020" />
+                </Border.Effect>
+                <ItemsControl x:Name="OverflowItemsControl" ItemTemplate="{StaticResource BreadcrumbFlyoutItemTemplate}" />
+            </Border>
+        </Popup>
     </Grid>
 </UserControl>

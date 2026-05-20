@@ -1,126 +1,181 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels.Pages;
+using ADB_Explorer.ViewModels.Windows;
+using ADB_Explorer.Views.Pages;
+using ADB_Explorer.Views.Windows;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Wpf.Ui;
+using Wpf.Ui.DependencyInjection;
 
 namespace ADB_Explorer;
 
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
-public partial class App : Application
+public partial class App
 {
-    private static string SettingsFilePath;
-    private static readonly JsonSerializerSettings JsonSettings = new() { TypeNameHandling = TypeNameHandling.Objects };
+    /// <summary>
+    /// Cached dispatcher reference that remains valid after <see cref="Application.Current"/> becomes null during shutdown.
+    /// </summary>
+    public static Dispatcher AppDispatcher { get; private set; }
 
-    private void Application_Startup(object sender, StartupEventArgs e)
+    /// <summary>
+    /// Indicates whether the application has begun shutting down. Check this before dispatching work
+    /// that should not execute during shutdown.
+    /// </summary>
+    public static bool IsShuttingDown { get; private set; }
+
+    // The.NET Generic Host provides dependency injection, configuration, logging, and other services.
+    // https://docs.microsoft.com/dotnet/core/extensions/generic-host
+    // https://docs.microsoft.com/dotnet/core/extensions/dependency-injection
+    // https://docs.microsoft.com/dotnet/core/extensions/configuration
+    // https://docs.microsoft.com/dotnet/core/extensions/logging
+    private static readonly IHost _host = Host
+        .CreateDefaultBuilder()
+        .ConfigureAppConfiguration(c => { c.SetBasePath(Path.GetDirectoryName(AppContext.BaseDirectory)); })
+        .ConfigureServices((context, services) =>
+        {
+            services.AddNavigationViewPageProvider();
+
+            services.AddHostedService<ApplicationHostService>();
+
+            services.AddSingleton<AdbSnackbarService>();
+            services.AddHostedService(p => p.GetRequiredService<AdbSnackbarService>());
+
+            services.AddHostedService<DevicePollingService>();
+
+            services.AddHostedService<DiskUsagePollingService>();
+
+            // Theme manipulation
+            services.AddSingleton<IThemeService, ThemeService>();
+
+            // TaskBar manipulation
+            services.AddSingleton<ITaskBarService, TaskBarService>();
+
+            // Service containing navigation, same as INavigationWindow... but without window
+            services.AddSingleton<INavigationService, NavigationService>();
+
+            services.AddSingleton<IContentDialogService, ContentDialogService>();
+
+            services.AddSingleton<ISnackbarService, SnackbarService>();
+
+            // Main window with navigation
+            services.AddSingleton<INavigationWindow, MainWindow>();
+            services.AddSingleton<MainWindowViewModel>();
+
+            services.AddSingleton<ExplorerPage>();
+            services.AddSingleton<ExplorerViewModel>();
+
+            services.AddSingleton<DevicesPage>();
+            services.AddSingleton<DevicesViewModel>();
+
+            services.AddSingleton<SettingsService>();
+
+            services.AddSingleton<SettingsPage>();
+            services.AddSingleton<SettingsViewModel>();
+
+            services.AddSingleton<TerminalPage>();
+            services.AddSingleton<TerminalViewModel>();
+
+            services.AddSingleton<LogPage>();
+            services.AddSingleton<LogViewModel>();
+
+            services.AddSingleton<OperationsPage>();
+            services.AddSingleton<OperationsViewModel>();
+        }).Build();
+
+    /// <summary>
+    /// Gets services.
+    /// </summary>
+    public static IServiceProvider Services
     {
+        get { return _host.Services; }
+    }
+
+    /// <summary>
+    /// Occurs when the application is loading.
+    /// </summary>
+    private async void OnStartup(object sender, StartupEventArgs e)
+    {
+        AppDispatcher = Current.Dispatcher;
+
         // Read to force it to be set to Windows' culture
         _ = Data.Settings.OriginalCulture;
 
+        // Similar to %LocalAppData%\ADB Explorer (but avoids virtualization for Store versions)
+        Data.AppDataPath = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "AppData", "Local", AdbExplorerConst.APP_DATA_FOLDER);
+
+        var settingsPath = "";
         if (e.Args.Length > 0)
         {
-            if (!Directory.Exists(e.Args[0]))
+            // verify that the provided path is valid - it should not exist as a directory, but its parent directory should exist
+            if (!Directory.Exists(FileHelper.GetParentPath(e.Args[0])) || Directory.Exists(e.Args[0]))
             {
                 MessageBox.Show($"{Strings.Resources.S_PATH_INVALID}\n\n{e.Args[0]}", Strings.Resources.S_CUSTOM_DATA_PATH, MessageBoxButton.OK, MessageBoxImage.Error);
-                
+
                 Current.Shutdown(1);
                 return;
             }
 
-            Data.AppDataPath = e.Args[0];
+            settingsPath = Path.GetFullPath(e.Args[0]);
         }
         else
-            Data.AppDataPath = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "AppData", "Local", AdbExplorerConst.APP_DATA_FOLDER);
+            settingsPath = FileHelper.ConcatPaths(Data.AppDataPath, AdbExplorerConst.APP_SETTINGS_FILE, '\\');
 
-        SettingsFilePath = FileHelper.ConcatPaths(Data.AppDataPath, AdbExplorerConst.APP_SETTINGS_FILE, '\\');
-        
-        try
+        var settings = Services.GetRequiredService<SettingsService>();
+        settings.Load(settingsPath);
+
+        if (!Data.Settings.UICulture.Equals(CultureInfo.InvariantCulture))
         {
-            // if settings file exists in local app data - try to read it from there, otherwise try to read it from the isolated storage (old method)
-            if (File.Exists(SettingsFilePath))
-            {
-                using StreamReader appDataReader = new(SettingsFilePath);
-                ReadSettingsFile(appDataReader);
-            }
-            else
-            {
-                if (!Directory.Exists(Data.AppDataPath))
-                    Directory.CreateDirectory(Data.AppDataPath);
+            Thread.CurrentThread.CurrentUICulture =
+            Thread.CurrentThread.CurrentCulture = Data.Settings.UICulture;
+        }
 
-                using IsolatedStorageFileStream stream = new(AdbExplorerConst.APP_SETTINGS_FILE,
-                                                             FileMode.Open,
-                                                             IsolatedStorageFile.GetUserStoreForDomain());
-                using StreamReader reader = new(stream);
-                ReadSettingsFile(reader);
-            }
-
-            if (!Data.Settings.UICulture.Equals(CultureInfo.InvariantCulture))
-            {
-                Thread.CurrentThread.CurrentUICulture =
-                Thread.CurrentThread.CurrentCulture = Data.Settings.UICulture;
-            }
-            
 #if !DEPLOY
-            if (!File.Exists(ADB_Explorer.Properties.AppGlobal.DragDropLogPath))
-            {
-                File.WriteAllText(ADB_Explorer.Properties.AppGlobal.DragDropLogPath, "");
-            }
+        if (!File.Exists(ADB_Explorer.Properties.AppGlobal.DragDropLogPath))
+        {
+            File.WriteAllText(ADB_Explorer.Properties.AppGlobal.DragDropLogPath, "");
+        }
 #endif
 
-        }
-        catch
-        {
-            // in any case of failing to read the settings, try to write them instead
-            // will happen on first ever launch, or after resetting app settings
+        ClearFoldersInAppData();
 
-            WriteSettings();
-        }
-
-        //Select the text in a TextBox when it receives focus.
-        EventManager.RegisterClassHandler(typeof(TextBox), TextBox.PreviewMouseLeftButtonDownEvent,
-            new MouseButtonEventHandler(SelectivelyIgnoreMouseButton));
-        EventManager.RegisterClassHandler(typeof(TextBox), TextBox.GotKeyboardFocusEvent,
-            new RoutedEventHandler(SelectAllText));
-        EventManager.RegisterClassHandler(typeof(TextBox), TextBox.MouseDoubleClickEvent,
-            new RoutedEventHandler(SelectAllText));
-
-
-        void ReadSettingsFile(StreamReader reader)
-        {
-            while (!reader.EndOfStream)
-            {
-                string[] keyValue = reader.ReadLine().TrimEnd(';').Split(':', 2);
-                try
-                {
-                    var jObj = JsonConvert.DeserializeObject(keyValue[1], JsonSettings);
-                    if (jObj is JArray jArr)
-                        Properties[keyValue[0]] = jArr.Values<string>().ToArray();
-                    else
-                        Properties[keyValue[0]] = jObj;
-                }
-                catch (Exception)
-                {
-                    Properties[keyValue[0]] = keyValue[1];
-                }
-            }
-        }
-
-        ClearDrag();
+        await _host.StartAsync();
     }
 
-    private void Application_Exit(object sender, ExitEventArgs e)
+    /// <summary>
+    /// Occurs when the application is closing.
+    /// </summary>
+    private async void OnExit(object sender, ExitEventArgs e)
     {
-        Data.FileOpQ.Stop();
-        WriteSettings();
+        IsShuttingDown = true;
+
+        ThumbnailService.SaveAllThumbsToCsv();
+
+        Data.FileOpQ?.Stop();
+
+        Services.GetService<OperationsViewModel>()?.StoreColumns();
+
+        Services.GetService<SettingsService>().Save();
 
         if (Data.Settings.UnrootOnDisconnect is true)
-            ADBService.Unroot(Data.CurrentADBDevice);
+            ADBService.Unroot(Data.DevicesObject.Current.ID);
 
-        App.Current.Dispatcher.Invoke(ClearDrag);
+        ClearFoldersInAppData();
+
+        await _host.StopAsync();
+
+        _host.Dispose();
     }
 
-    private static void ClearDrag()
+    private static void ClearFoldersInAppData()
     {
+        if (Data.Settings.PersistThumbs)
+            return;
+
         try
         {
             Directory.GetDirectories(Data.AppDataPath).ForEach(dir => Directory.Delete(dir, true));
@@ -129,69 +184,46 @@ public partial class App : Application
         { }
     }
 
-    private void WriteSettings()
-    {
-        if (Data.RuntimeSettings.ResetAppSettings)
-        {
-            try
-            {
-                File.Delete(SettingsFilePath);
-            }
-            catch
-            { }
-            
-            return;
-        }
-
-        try
-        {
-            using StreamWriter writer = new(SettingsFilePath);
-
-            foreach (string key in from string key in Properties.Keys
-                                   orderby key
-                                   select key)
-            {
-                writer.WriteLine($"{key}:{JsonConvert.SerializeObject(Properties[key], JsonSettings)};");
-            }
-        }
-        catch (Exception)
-        { }
-    }
-
-    private void SelectivelyIgnoreMouseButton(object sender, MouseButtonEventArgs e)
-    {
-        // Find the TextBox
-        DependencyObject parent = e.OriginalSource as UIElement;
-        while (parent is not null and not TextBox)
-            parent = VisualTreeHelper.GetParent(parent);
-
-        if (parent is not null)
-        {
-            var textBox = (TextBox)parent;
-            if (!textBox.IsKeyboardFocusWithin)
-            {
-                // If the text box is not yet focused, give it the focus and
-                // stop further processing of this click event.
-                textBox.Focus();
-                e.Handled = true;
-            }
-        }
-    }
-
-    private void SelectAllText(object sender, RoutedEventArgs e)
-    {
-        if (sender is TextBox tb)
-            tb.SelectAll();
-    }
-
-    private void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    /// <summary>
+    /// Occurs when an exception is thrown by an application but not handled.
+    /// </summary>
+    private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         // Handle error 0x800401D0 (CLIPBRD_E_CANT_OPEN) - global WPF issue
         if (e.Exception is COMException comException && comException.ErrorCode == -2147221040)
             e.Handled = true;
 
         // If application shutdown has started, do not throw exceptions
-        if (App.Current is null || App.Current.Dispatcher is null)
+        if (IsShuttingDown || App.Current is null || App.Current.Dispatcher is null)
             e.Handled = true;
+    }
+
+    /// <summary>
+    /// Safely invokes an action on the UI dispatcher. No-ops if the application is shutting down
+    /// or the dispatcher is unavailable.
+    /// </summary>
+    public static void SafeInvoke(Action action)
+    {
+        var dispatcher = AppDispatcher;
+        if (dispatcher is null || IsShuttingDown || dispatcher.HasShutdownStarted)
+            return;
+
+        if (dispatcher.CheckAccess())
+            action();
+        else
+            dispatcher.Invoke(action);
+    }
+
+    /// <summary>
+    /// Safely begins an asynchronous invoke on the UI dispatcher. No-ops if the application is
+    /// shutting down or the dispatcher is unavailable.
+    /// </summary>
+    public static void SafeBeginInvoke(Action action, DispatcherPriority priority = DispatcherPriority.Normal)
+    {
+        var dispatcher = AppDispatcher;
+        if (dispatcher is null || IsShuttingDown || dispatcher.HasShutdownStarted)
+            return;
+
+        dispatcher.BeginInvoke(action, priority);
     }
 }

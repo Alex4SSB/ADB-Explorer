@@ -26,6 +26,9 @@
         [GeneratedRegex(@"^Version[\t ]*(?<version>[\d.]+)[\s\S]*^Installed as (?<Path>.+)$", RegexOptions.Multiline)]
         public static partial Regex RE_ADB_VERSION();
 
+        [GeneratedRegex(@"EXE SHA-256: (?<Hash>[0-9a-zA-Z]+)$", RegexOptions.Multiline)]
+        public static partial Regex RE_ADB_LIST_HASH();
+
         [GeneratedRegex(@"(?:INSTALL_FAILED_INVALID_APK.*?)(?<package>com\.[\w.]+)(?:])")]
         public static partial Regex RE_PACKAGE_NAME();
 
@@ -67,5 +70,14 @@
 
         [GeneratedRegex(@" +(?<Size>\d+) +(?<Date>\d{4}-\d\d-\d\d \d\d:\d\d) +(?<Name>.+)")]
         public static partial Regex RE_UNZIP_LIST();
+
+        [GeneratedRegex(@"^\s*versionName=(?<VersionName>.+?)\s*$", RegexOptions.Multiline)]
+        public static partial Regex RE_DUMPSYS_VERSION_NAME();
+
+        [GeneratedRegex(@"^\s*lastUpdateTime=(?<LastUpdateTime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s*$", RegexOptions.Multiline)]
+        public static partial Regex RE_DUMPSYS_LAST_UPDATE();
+
+        [GeneratedRegex(@"(?<BlockDev>.+) on (?<MntPt>.+) type (?<Type>.+) \((?<Attr>.+)\)", RegexOptions.Multiline)]
+        public static partial Regex RE_MOUNT_PARSE();
     }
 }

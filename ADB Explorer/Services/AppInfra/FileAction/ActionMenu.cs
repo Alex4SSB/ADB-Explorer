@@ -54,13 +54,16 @@ public abstract class ActionBase : ViewModelBase, IMenuItem
 
     public bool AnimateOnClick => ActionAnimationSource is AnimationSource.Click;
 
+    public bool MirrorInRTL { get; }
+
     protected ActionBase(FileAction action,
                          string icon,
                          int iconSize,
                          StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                          AnimationSource animationSource = AnimationSource.Command,
                          FileAction altAction = null,
-                         ObservableProperty<bool> isVisible = null)
+                         ObservableProperty<bool> isVisible = null,
+                         bool mirrorInRTL = false)
     {
         if (!string.IsNullOrEmpty(icon))
             StyleHelper.VerifyIcon(icon);
@@ -71,6 +74,7 @@ public abstract class ActionBase : ViewModelBase, IMenuItem
         Animation = animation;
         ActionAnimationSource = animationSource;
         AltAction = altAction;
+        MirrorInRTL = mirrorInRTL;
 
         if (animationSource is AnimationSource.Command)
         {
@@ -85,6 +89,12 @@ public abstract class ActionBase : ViewModelBase, IMenuItem
             IsVisible = isVisible;
             isVisible.PropertyChanged += (sender, e) => IsVisible = e.NewValue;
         }
+
+        Action.PropertyChanged += (sender, e) =>
+        {
+            if (e.PropertyName == nameof(FileAction.Description))
+                OnPropertyChanged(nameof(Tooltip));
+        };
     }
 
     protected ActionBase()
@@ -92,9 +102,6 @@ public abstract class ActionBase : ViewModelBase, IMenuItem
 
     private void OnExecute_PropertyChanged(object sender, PropertyChangedEventArgs<bool> e)
     {
-        if (!Data.Settings.IsAnimated)
-            return;
-
         ActivateAnimation = true;
         Task.Delay(200).ContinueWith((t) => ActivateAnimation = false);
     }
@@ -104,6 +111,8 @@ public abstract class ActionMenu : ActionBase
 {
     public IEnumerable<SubMenu> Children { get; set; }
 
+    public bool IsChevronVisible { get; set; }
+
     protected ActionMenu(FileAction fileAction,
                          string icon,
                          IEnumerable<SubMenu> children = null,
@@ -111,10 +120,13 @@ public abstract class ActionMenu : ActionBase
                          int iconSize = 18,
                          AnimationSource animationSource = AnimationSource.Command,
                          FileAction altAction = null,
-                         ObservableProperty<bool> isVisible = null)
-        : base(fileAction, icon, iconSize, animation, animationSource, altAction, isVisible)
+                         ObservableProperty<bool> isVisible = null,
+                         bool mirrorInRTL = false,
+                         bool isChevronVisible = false)
+        : base(fileAction, icon, iconSize, animation, animationSource, altAction, isVisible, mirrorInRTL)
     {
         Children = children;
+        IsChevronVisible = isChevronVisible;
     }
 
     protected ActionMenu()
@@ -132,7 +144,7 @@ public class AltTextMenu : ActionMenu
         get => altText;
         set
         {
-            if (Set(ref altText, value) && Data.Settings.IsAnimated && ActionAnimationSource is AnimationSource.External)
+            if (Set(ref altText, value) && ActionAnimationSource is AnimationSource.External)
             {
                 ActivateAnimation = true;
                 Task.Delay(Animation is StyleHelper.ContentAnimation.Pulsate ? 500 : 200).ContinueWith((t) => ActivateAnimation = false);
@@ -223,8 +235,9 @@ public class IconMenu : ActionMenu
                     ObservableProperty<bool> selectionBar = null,
                     IEnumerable<SubMenu> children = null,
                     FileAction altAction = null,
-                    ObservableProperty<bool> isVisible = null)
-        : base(fileAction, icon, children, animation, iconSize: iconSize, altAction: altAction, isVisible: isVisible)
+                    ObservableProperty<bool> isVisible = null,
+                    bool mirrorInRTL = false)
+        : base(fileAction, icon, children, animation, iconSize: iconSize, altAction: altAction, isVisible: isVisible, mirrorInRTL: mirrorInRTL)
     {
         if (selectionBar is not null)
         {
@@ -265,21 +278,30 @@ public class CompoundIconMenu : ActionMenu
 {
     public UserControl CompoundIcon { get; }
 
+    public bool IsNameDisplayed { get; }
+
     public CompoundIconMenu(FileAction fileAction,
                        UserControl icon,
                        IEnumerable<SubMenu> children = null,
                        StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                        FileAction altAction = null,
-                       ObservableProperty<bool> isVisible = null)
-        : base(fileAction, null, children, animation, altAction: altAction, isVisible: isVisible)
+                       ObservableProperty<bool> isVisible = null,
+                       bool isNameDisplayed = false,
+                       bool isChevronVisible = false)
+        : base(fileAction, null, children, animation, altAction: altAction, isVisible: isVisible, isChevronVisible: isChevronVisible)
     {
         CompoundIcon = icon;
+        IsNameDisplayed = isNameDisplayed;
     }
 }
 
 public class TextMenu : ActionMenu
 {
     public bool IsLast { get; set; } = false;
+
+    public FlowDirection FlowDirection => TextHelper.ContainsRtl(Action.Description)
+        ? FlowDirection.RightToLeft
+        : FlowDirection.LeftToRight;
 
     public TextMenu(FileAction fileAction)
         : base(fileAction, null)

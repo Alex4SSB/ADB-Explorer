@@ -119,13 +119,16 @@
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="APK_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\APK_format_icon_2014-2019_.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>..\Assets\APK_format_icon_2014-2019_.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="APK_icon_256px" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Assets\APK_icon_256px_vecteezy.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="AppDisplayName" xml:space="preserve">
     <value>ADB Explorer</value>
   </data>
   <data name="AppVersion" xml:space="preserve">
-    <value>0.9.25111</value>
+    <value>1.0.26051</value>
   </data>
   <data name="DragDropLogPath" xml:space="preserve">
     <value>E:\Log\log.txt</value>

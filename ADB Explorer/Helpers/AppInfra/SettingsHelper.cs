@@ -6,9 +6,6 @@ namespace ADB_Explorer.Helpers;
 
 public static class SettingsHelper
 {
-    public static void DisableAnimationTipAction() =>
-        DialogService.ShowMessage(Strings.Resources.S_DISABLE_ANIMATION, Strings.Resources.S_ANIMATION_TITLE, DialogService.DialogIcon.Tip);
-
     public static void ResetAppAction()
     {
         Process.Start(Environment.ProcessPath);
@@ -73,114 +70,6 @@ public static class SettingsHelper
 
             Data.Settings.ManualAdbPath = dialog.FileName;
         }
-    }
-
-    public static void SetSymbolFont()
-    {
-        Application.Current.Resources["SymbolThemeFontFamily"] = App.Current.FindResource(Data.RuntimeSettings.UseFluentStyles ? "FluentSymbolThemeFontFamily" : "AltSymbolThemeFontFamily");
-    }
-
-    public static async void SplashScreenTask()
-    {
-        var startTime = DateTime.Now;
-        var versionValid = await AdbHelper.CheckAdbVersion();
-        var delay = AdbExplorerConst.SPLASH_DISPLAY_TIME - (DateTime.Now - startTime);
-        
-        if (!versionValid) // || !Data.Settings.AdvancedDragSet
-            return;
-
-        await Task.Delay(Data.Settings.EnableSplash && delay > TimeSpan.Zero ? delay : TimeSpan.Zero);
-
-        Data.RuntimeSettings.FinalizeSplash = true;
-    }
-
-    public static async void InitNotifications()
-    {
-        if (Data.Settings.OriginalCulture is null || Data.Settings.OriginalCulture.Name != "en-US")
-        {
-            UISettings.Notifications.Add(new(async () =>
-            {
-                var res = await DialogService.ShowConfirmation(Strings.Resources.S_LANG_NOTIFICATION,
-                    Strings.Resources.S_LANG_NOTIFICATION_TITLE,
-                    Strings.Resources.S_GOTO_WEBLATE,
-                    cancelText: Strings.Resources.S_BUTTON_CLOSE,
-                    icon: DialogService.DialogIcon.Informational);
-
-                if (res.Item1 is ContentDialogResult.Primary)
-                    Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"{Links.WEBLATE}\"");
-
-                Data.Settings.ShowLanguageNotification = false;
-            }, Strings.Resources.S_LANG_NOTIFICATION_TITLE));
-        }
-
-        if (new Version(Properties.AppGlobal.AppVersion) > new Version(Data.Settings.LastVersion))
-        {
-            UISettings.Notifications.Add(new(async () =>
-            {
-                var res = await DialogService.ShowConfirmation(
-                    Strings.Resources.S_NEW_VERSION_MSG,
-                    Strings.Resources.S_NEW_VERSION_TITLE,
-                    Strings.Resources.S_GO_TO_RELEASE_NOTES,
-                    cancelText: Strings.Resources.S_BUTTON_CLOSE);
-
-                if (res.Item1 is ContentDialogResult.Primary)
-                    Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{Properties.AppGlobal.AppVersion}\"");
-
-                Data.Settings.LastVersion = Properties.AppGlobal.AppVersion;
-            }, Strings.Resources.S_NEW_VERSION_TITLE));
-        }
-
-        if (!Data.RuntimeSettings.IsAppDeployed && Data.Settings.CheckForUpdates)
-        {
-            var latestVersion = await Network.LatestAppReleaseAsync();
-            if (latestVersion is null || latestVersion <= Data.AppVersion)
-                return;
-
-            UISettings.Notifications.Add(new(async () =>
-            {
-                var res = await DialogService.ShowConfirmation(string.Format(Strings.Resources.S_NEW_VERSION, Properties.AppGlobal.AppDisplayName, latestVersion),
-                    Strings.Resources.S_NEW_VERSION_TITLE,
-                    Strings.Resources.S_GO_TO_VERSION_PAGE,
-                    cancelText: Strings.Resources.S_BUTTON_CLOSE,
-                    icon: DialogService.DialogIcon.Informational);
-
-                if (res.Item1 is ContentDialogResult.Primary)
-                    Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{latestVersion}\"");
-            }, Strings.Resources.S_NEW_VERSION_TITLE));
-        }
-    }
-
-    public static void ShowAndroidRobotLicense()
-    {
-        SimpleStackPanel stack = new()
-        {
-            Spacing = 8,
-            Children =
-            {
-                new TextBlock()
-                {
-                    TextWrapping = TextWrapping.Wrap,
-                    Text = Strings.Resources.S_ANDROID_ROBOT_LIC,
-                },
-                new TextBlock()
-                {
-                    TextWrapping = TextWrapping.Wrap,
-                    Text = Strings.Resources.S_APK_ICON_LIC,
-                },
-                new HyperlinkButton()
-                {
-                    Content = Strings.Resources.S_CC_NAME,
-                    ToolTip = Links.L_CC_LIC,
-                    NavigateUri = Links.L_CC_LIC,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                }
-            },
-        };
-
-        App.Current.Dispatcher.Invoke(() =>
-        {
-            DialogService.ShowDialog(stack, Strings.Resources.S_ANDROID_ICONS_TITLE, DialogService.DialogIcon.Informational);
-        });
     }
 
     public static IEnumerable<CultureInfo> GetAvailableLanguages()

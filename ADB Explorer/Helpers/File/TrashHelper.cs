@@ -28,7 +28,7 @@ internal static class TrashHelper
                 count = FolderHelper.FolderExists(AdbExplorerConst.RECYCLE_PATH) is null ? -1 : 0;
 
             var trash = Data.DevicesObject.Current?.Drives.Find(d => d.Type is AbstractDrive.DriveType.Trash);
-            App.Current.Dispatcher.Invoke(() => ((VirtualDriveViewModel)trash)?.SetItemsCount(count));
+            App.SafeInvoke(() => ((VirtualDriveViewModel)trash)?.SetItemsCount(count));
         });
     }
 
@@ -36,11 +36,11 @@ internal static class TrashHelper
     {
         Data.RecycleIndex.Clear();
 
-        var indexers = ADBService.FindFilesInPath(Data.CurrentADBDevice.ID,
+        var indexers = ADBService.FindFilesInPath(Data.DevicesObject.Current.ID,
                                                   AdbExplorerConst.RECYCLE_PATH,
                                                   includeNames: ["*" + AdbExplorerConst.RECYCLE_INDEX_SUFFIX]);
 
-        var lines = ShellFileOperation.ReadAllText(Data.CurrentADBDevice, indexers).Split(ADBService.LINE_SEPARATORS,
+        var lines = ShellFileOperation.ReadAllText(Data.DevicesObject.Current, indexers).Split(ADBService.LINE_SEPARATORS,
                                                                                           StringSplitOptions.RemoveEmptyEntries);
 
         lines.ToList().ForEach(line => Data.RecycleIndex.Add(new(line)));
@@ -50,11 +50,11 @@ internal static class TrashHelper
     {
         Data.RecycleIndex.Clear();
 
-        var indexers = ADBService.FindFilesInPath(Data.CurrentADBDevice.ID,
+        var indexers = ADBService.FindFilesInPath(Data.DevicesObject.Current.ID,
                                                   AdbExplorerConst.RECYCLE_PATH,
                                                   includeNames: ["*" + AdbExplorerConst.RECYCLE_INDEX_SUFFIX]);
 
-        var lines = ShellFileOperation.ReadAllText(Data.CurrentADBDevice, indexers).Split(ADBService.LINE_SEPARATORS,
+        var lines = ShellFileOperation.ReadAllText(Data.DevicesObject.Current, indexers).Split(ADBService.LINE_SEPARATORS,
                                                                                           StringSplitOptions.RemoveEmptyEntries);
 
         lines.ToList().ForEach(line => Data.RecycleIndex.Add(new(line)));

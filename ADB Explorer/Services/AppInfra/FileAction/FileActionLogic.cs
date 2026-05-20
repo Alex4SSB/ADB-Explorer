@@ -29,7 +29,7 @@ internal static class FileActionLogic
             Strings.Resources.S_UNINSTALL,
             icon: DialogService.DialogIcon.Exclamation);
 
-        if (result.Item1 is not ContentDialogResult.Primary)
+        if (result.Item1 is not Wpf.Ui.Controls.ContentDialogResult.Primary)
             return;
 
         var packageTask = await Task.Run(() =>
@@ -37,17 +37,17 @@ internal static class FileActionLogic
             if (Data.FileActions.IsAppDrive)
                 return pkgs.Select(pkg => pkg.Name);
 
-            return files.Select(item => ShellFileOperation.GetPackageName(Data.CurrentADBDevice, item.FullPath));
+            return files.Select(item => ShellFileOperation.GetPackageName(Data.DevicesObject.Current, item.FullPath));
         });
 
-        ShellFileOperation.UninstallPackages(Data.CurrentADBDevice, packageTask, App.Current.Dispatcher);
+        ShellFileOperation.UninstallPackages(Data.DevicesObject.Current, packageTask, App.AppDispatcher);
     }
 
     public static void InstallPackages()
     {
         var packages = Data.SelectedFiles;
 
-        ShellFileOperation.InstallPackages(Data.CurrentADBDevice, packages, App.Current.Dispatcher);
+        ShellFileOperation.InstallPackages(Data.DevicesObject.Current, packages, App.AppDispatcher);
     }
 
     public static void CopyToTemp()
@@ -56,8 +56,8 @@ internal static class FileActionLogic
             DragDropEffects.Copy,
             AdbExplorerConst.TEMP_PATH,
             Data.SelectedFiles,
-            App.Current.Dispatcher,
-            Data.CurrentADBDevice,
+            App.AppDispatcher,
+            Data.DevicesObject.Current,
             Data.CurrentPath);
     }
 
@@ -76,75 +76,12 @@ internal static class FileActionLogic
             return;
 
         var shItems = dialog.FileNames.Select(ShellItem.Open);
-        ShellFileOperation.PushPackages(Data.CurrentADBDevice, shItems, App.Current.Dispatcher);
+        ShellFileOperation.PushPackages(Data.DevicesObject.Current, shItems, App.AppDispatcher);
     }
 
     public static void UpdateModifiedDates()
     {
-        ShellFileOperation.ChangeDateFromName(Data.CurrentADBDevice, Data.SelectedFiles, App.Current.Dispatcher);
-    }
-
-    public static void OpenEditor()
-    {
-        if (!Data.FileActions.EditFileEnabled || Data.FileActions.IsEditorOpen && Data.FileActions.EditorAndroidPath.Equals(Data.SelectedFiles.First()))
-        {
-            Data.FileActions.IsEditorOpen = false;
-            return;
-        }
-        Data.FileActions.IsEditorOpen = true;
-
-        Data.FileActions.EditorAndroidPath = Data.SelectedFiles.First();
-        
-        var readTask = Task.Run(() =>
-        {
-            try
-            {
-                return AdbHelper.ReadFile(Data.CurrentADBDevice, Data.FileActions.EditorAndroidPath.FullPath);
-            }
-            catch (Exception e)
-            {
-                App.Current.Dispatcher.Invoke(() =>
-                    DialogService.ShowMessage(e.Message, Strings.Resources.S_READ_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true));
-
-                return "";
-            }
-        });
-
-        readTask.ContinueWith((t) => App.Current.Dispatcher.Invoke(() =>
-        {
-            Data.FileActions.EditorText =
-            Data.FileActions.OriginalEditorText = t.Result;
-        }));
-    }
-
-    public static void SaveEditorText()
-    {
-        var writeTask = Task.Run(() =>
-        {
-            try
-            {
-                AdbHelper.WriteFile(Data.CurrentADBDevice, Data.FileActions.EditorAndroidPath.FullPath, Data.FileActions.EditorText);
-                return true;
-            }
-            catch (Exception e)
-            {
-                App.Current.Dispatcher.Invoke(() =>
-                    DialogService.ShowMessage(e.Message, Strings.Resources.S_WRITE_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true));
-
-                return false;
-            }
-        });
-
-        writeTask.ContinueWith((t) => App.Current.Dispatcher.Invoke(() =>
-        {
-            if (!t.Result)
-                return;
-
-            Data.FileActions.OriginalEditorText = Data.FileActions.EditorText;
-
-            if (Data.FileActions.EditorAndroidPath.ParentPath == Data.CurrentPath)
-                Data.RuntimeSettings.Refresh = true;
-        }));
+        ShellFileOperation.ChangeDateFromName(Data.DevicesObject.Current, Data.SelectedFiles, App.AppDispatcher);
     }
 
     public static void RestoreItems()
@@ -156,7 +93,7 @@ internal static class FileActionLogic
 
         var restoreTask = Task.Run(() =>
         {
-            existingItems = ADBService.FindFiles(Data.CurrentADBDevice.ID, restoreItems.Select(file => file.TrashIndex.OriginalPath));
+            existingItems = ADBService.PathsExist(Data.DevicesObject.Current.ID, restoreItems.Select(file => file.TrashIndex.OriginalPath));
             if (existingItems?.Length > 0)
             {
                 if (restoreItems.Any(item => item.IsDirectory && existingItems.Contains(item.TrashIndex.OriginalPath)))
@@ -182,7 +119,7 @@ internal static class FileActionLogic
 
         restoreTask.ContinueWith((t) =>
         {
-            App.Current.Dispatcher.BeginInvoke(async () =>
+            App.SafeBeginInvoke(async () =>
             {
                 if (existingItems.Length is int count and > 0)
                 {
@@ -198,12 +135,12 @@ internal static class FileActionLogic
                         cancelText: Strings.Resources.S_CANCEL,
                         icon: DialogService.DialogIcon.Exclamation);
 
-                    if (result.Item1 is ContentDialogResult.None)
+                    if (result.Item1 is Wpf.Ui.Controls.ContentDialogResult.None)
                     {
                         return;
                     }
 
-                    if (result.Item1 is ContentDialogResult.Secondary)
+                    if (result.Item1 is Wpf.Ui.Controls.ContentDialogResult.Secondary)
                     {
                         restoreItems = existingFiles.Count != count
                             ? restoreItems.Where(item => !existingItems.Contains(item.FullName))
@@ -211,12 +148,12 @@ internal static class FileActionLogic
                     }
                 }
 
-                ShellFileOperation.MoveItems(device: Data.CurrentADBDevice,
+                ShellFileOperation.MoveItems(device: Data.DevicesObject.Current,
                                          items: restoreItems,
                                          targetPath: null,
                                          currentPath: Data.CurrentPath,
                                          fileList: Data.DirList.FileList,
-                                         dispatcher: App.Current.Dispatcher);
+                                         dispatcher: App.AppDispatcher);
 
                 var remainingItems = Data.DirList.FileList.Except(restoreItems);
                 TrashHelper.EnableRecycleButtons(remainingItems);
@@ -224,7 +161,7 @@ internal static class FileActionLogic
                 // Clear all remaining files if none of them are indexed
                 if (!remainingItems.Any(item => item.TrashIndex is not null))
                 {
-                    _ = Task.Run(() => ShellFileOperation.SilentDelete(Data.CurrentADBDevice, remainingItems));
+                    _ = Task.Run(() => ShellFileOperation.SilentDelete(Data.DevicesObject.Current, remainingItems));
                 }
 
                 if (!Data.SelectedFiles.Any())
@@ -250,9 +187,9 @@ internal static class FileActionLogic
         try
         {
             if (file.Type is FileType.Folder)
-                ShellFileOperation.MakeDir(Data.CurrentADBDevice, file.FullPath);
+                ShellFileOperation.MakeDir(Data.DevicesObject.Current, file.FullPath);
             else if (file.Type is FileType.File)
-                ShellFileOperation.MakeFile(Data.CurrentADBDevice, file.FullPath);
+                ShellFileOperation.MakeFile(Data.DevicesObject.Current, file.FullPath);
             else
                 throw new NotSupportedException();
         }
@@ -329,8 +266,16 @@ internal static class FileActionLogic
             Data.FileActions.PasteDescription.Value = stringFormat;
         }
 
-        Data.FileActions.PasteEnabled = EnableUiPaste();
-        Data.FileActions.IsKeyboardPasteEnabled = EnableKeyboardPaste();
+        if (Data.FileActions.IsAppDrive)
+        {
+            Data.FileActions.PasteEnabled = FileHelper.AllFilesAreApks(Data.CopyPaste.Files);
+            Data.FileActions.IsKeyboardPasteEnabled = false;
+        }
+        else
+        {
+            Data.FileActions.PasteEnabled = EnableUiPaste();
+            Data.FileActions.IsKeyboardPasteEnabled = EnableKeyboardPaste();
+        }
     }
 
     public static bool EnableUiPaste()
@@ -548,7 +493,7 @@ internal static class FileActionLogic
 
     public static void CutFiles(IEnumerable<FileClass> items, bool isCopy = false)
     {
-        var itemsToCut = Data.DevicesObject.Current.Root is not AbstractDevice.RootStatus.Enabled
+        var itemsToCut = Data.DevicesObject.Current.Root is not RootStatus.Enabled
                     ? items.Where(file => file.Type is FileType.File or FileType.Folder) : items;
 
         Data.FileActions.CopyEnabled = !isCopy;
@@ -565,12 +510,13 @@ internal static class FileActionLogic
     {
         if (textBox.DataContext is not FileClass file)
             return;
-        
+
+        var vm = file.ActiveViewModel;
         var name = FileHelper.DisplayName(textBox);
 
-        if (!Data.FileActions.IsRenameUnixLegal
-            || (Data.CurrentDrive?.IsFUSE is true && !Data.FileActions.IsRenameFuseLegal)
-            || !Data.FileActions.IsRenameUnique)
+        if (!vm.IsRenameUnixLegal
+            || (Data.CurrentDrive?.IsFUSE is true && !vm.IsRenameFuseLegal)
+            || !vm.IsRenameUnique)
         {
             return;
         }
@@ -617,11 +563,11 @@ internal static class FileActionLogic
         }
         else
         {
-            itemsToDelete = [.. Data.DevicesObject.Current.Root != AbstractDevice.RootStatus.Enabled
+            itemsToDelete = [.. Data.DevicesObject.Current.Root != RootStatus.Enabled
                 ? Data.SelectedFiles.Where(file => file.Type is FileType.File or FileType.Folder)
                 : Data.SelectedFiles];
         }
-
+        
         string deletedString;
         if (itemsToDelete.Count == 1)
             deletedString = FileHelper.DisplayName(itemsToDelete.First());
@@ -645,23 +591,23 @@ internal static class FileActionLogic
             checkBoxText: Data.Settings.EnableRecycle && !Data.FileActions.IsRecycleBin ? Strings.Resources.S_PERM_DEL : "",
             icon: DialogService.DialogIcon.Delete);
 
-        if (result.Item1 is not ContentDialogResult.Primary)
+        if (result.Item1 is not Wpf.Ui.Controls.ContentDialogResult.Primary)
             return;
 
         if (!Data.FileActions.IsRecycleBin && Data.Settings.EnableRecycle && !result.Item2)
         {
-            await Task.Run(() => ShellFileOperation.MakeDir(Data.CurrentADBDevice, AdbExplorerConst.RECYCLE_PATH));
+            await Task.Run(() => ShellFileOperation.MakeDir(Data.DevicesObject.Current, AdbExplorerConst.RECYCLE_PATH));
 
-            ShellFileOperation.MoveItems(Data.CurrentADBDevice,
+            ShellFileOperation.MoveItems(Data.DevicesObject.Current,
                                          itemsToDelete,
                                          AdbExplorerConst.RECYCLE_PATH,
                                          Data.CurrentPath,
                                          Data.DirList.FileList,
-                                         App.Current.Dispatcher);
+                                         App.AppDispatcher);
         }
         else
         {
-            ShellFileOperation.DeleteItems(Data.CurrentADBDevice, itemsToDelete, App.Current.Dispatcher);
+            ShellFileOperation.DeleteItems(Data.DevicesObject.Current, itemsToDelete, App.AppDispatcher);
 
             if (Data.FileActions.IsRecycleBin)
             {
@@ -671,7 +617,7 @@ internal static class FileActionLogic
                 // Clear all remaining files if none of them are indexed
                 if (!remainingItems.Any(item => item.TrashIndex is not null))
                 {
-                    _ = Task.Run(() => ShellFileOperation.SilentDelete(Data.CurrentADBDevice, remainingItems));
+                    _ = Task.Run(() => ShellFileOperation.SilentDelete(Data.DevicesObject.Current, remainingItems));
                 }
             }
         }
@@ -687,12 +633,12 @@ internal static class FileActionLogic
 
         var driveTask = Task.Run(() =>
         {
-            if (Data.CurrentADBDevice is null)
+            if (Data.DevicesObject.Current is null)
                 return null;
 
-            var drives = Data.CurrentADBDevice.GetDrives();
+            var drives = ADBService.GetDrives(Data.DevicesObject.Current.ID, Data.DevicesObject.Current.Type);
 
-            if (Data.DevicesObject.Current.Type is AbstractDevice.DeviceType.Recovery)
+            if (Data.DevicesObject.Current.Type is DeviceType.Recovery)
             {
                 foreach (var item in Data.DevicesObject.Current.Drives.OfType<VirtualDriveViewModel>())
                 {
@@ -718,9 +664,9 @@ internal static class FileActionLogic
             if (t.IsCanceled || t.Result is null)
                 return;
 
-            App.Current?.Dispatcher.Invoke(async () =>
+            App.SafeInvoke(async () =>
             {
-                if (await Data.DevicesObject.Current?.UpdateDrives(await t, App.Current.Dispatcher, asyncClassify))
+                if (App.AppDispatcher is not null && await Data.DevicesObject.Current?.UpdateDrives(await t, App.AppDispatcher, asyncClassify))
                 {
                     Data.RuntimeSettings.FilterDrives = true;
                     FolderHelper.CombineDisplayNames();
@@ -732,7 +678,7 @@ internal static class FileActionLogic
     public static void UpdateInstallersCount()
     {
         var countTask = Task.Run(() => ADBService.CountPackages(Data.DevicesObject.Current.ID));
-        countTask.ContinueWith((t) => App.Current?.Dispatcher.Invoke(() =>
+        countTask.ContinueWith((t) => App.SafeInvoke(() =>
         {
             if (!t.IsCanceled && Data.DevicesObject.Current is not null)
             {
@@ -744,14 +690,14 @@ internal static class FileActionLogic
 
     public static void UpdatePackagesCount()
     {
-        var packageTask = Task.Run(() => ShellFileOperation.GetPackagesCount(Data.CurrentADBDevice));
+        var packageTask = Task.Run(() => ShellFileOperation.GetPackagesCount(Data.DevicesObject.Current));
 
         packageTask.ContinueWith((t) =>
         {
             if (t.IsCanceled || t.Result is null || Data.DevicesObject.Current is null)
                 return;
 
-            App.Current.Dispatcher.Invoke(() =>
+            App.SafeInvoke(() =>
             {
                 var package = Data.DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Package);
                 ((VirtualDriveViewModel)package)?.SetItemsCount((int?)t.Result);
@@ -764,14 +710,14 @@ internal static class FileActionLogic
         Data.FileActions.ListingInProgress = true;
 
         var version = Data.DevicesObject.Current.AndroidVersion;
-        var packageTask = Task.Run(() => ShellFileOperation.GetPackages(Data.CurrentADBDevice, Data.Settings.ShowSystemPackages, version is not null && version >= AdbExplorerConst.MIN_PKG_UID_ANDROID_VER));
+        var packageTask = Task.Run(() => ShellFileOperation.GetPackages(Data.DevicesObject.Current, Data.Settings.ShowSystemPackages, version is not null && version >= AdbExplorerConst.MIN_PKG_UID_ANDROID_VER));
 
         packageTask.ContinueWith((t) =>
         {
             if (t.IsCanceled)
                 return;
 
-            App.Current.Dispatcher.Invoke(() =>
+            App.SafeInvoke(() =>
             {
                 Data.Packages = t.Result;
                 if (updateExplorer)
@@ -790,39 +736,42 @@ internal static class FileActionLogic
 
     public static void ClearExplorer(bool clearDevice = true)
     {
-        Data.DirList?.FileList?.Clear();
-        Data.Packages.Clear();
-        Data.SelectedFiles = [];
-        Data.SelectedPackages = [];
-
-        Data.FileActions.PushFilesFoldersEnabled =
-        Data.FileActions.PullEnabled =
-        Data.FileActions.DeleteEnabled =
-        Data.FileActions.RenameEnabled =
-        Data.FileActions.HomeEnabled =
-        Data.FileActions.NewEnabled =
-        Data.FileActions.PasteEnabled =
-        Data.FileActions.IsUninstallVisible.Value =
-        Data.FileActions.CutEnabled =
-        Data.FileActions.CopyEnabled =
-        Data.FileActions.IsExplorerVisible =
-        Data.FileActions.PackageActionsEnabled =
-        Data.FileActions.IsCopyItemPathEnabled =
-        Data.FileActions.UpdateModifiedEnabled =
-        Data.FileActions.IsFollowLinkEnabled =
-        Data.RuntimeSettings.IsExplorerLoaded =
-        Data.FileActions.ParentEnabled = false;
-
-        Data.FileActions.ExplorerFilter = "";
-
-        if (clearDevice)
+        App.SafeInvoke(() =>
         {
-            Data.CurrentDisplayNames.Clear();
-            Data.CurrentPath = null;
-            Data.RuntimeSettings.ClearNavBox = true;
+            Data.DirList?.FileList?.Clear();
+            Data.Packages.Clear();
+            Data.SelectedFiles = [];
+            Data.SelectedPackages = [];
 
-            UpdateFileActions();
-        }
+            Data.FileActions.PushFilesFoldersEnabled =
+            Data.FileActions.PullEnabled =
+            Data.FileActions.DeleteEnabled =
+            Data.FileActions.RenameEnabled =
+            Data.FileActions.HomeEnabled =
+            Data.FileActions.NewEnabled =
+            Data.FileActions.PasteEnabled =
+            Data.FileActions.IsUninstallVisible.Value =
+            Data.FileActions.CutEnabled =
+            Data.FileActions.CopyEnabled =
+            Data.FileActions.IsExplorerVisible =
+            Data.FileActions.PackageActionsEnabled =
+            Data.FileActions.IsCopyItemPathEnabled =
+            Data.FileActions.UpdateModifiedEnabled =
+            Data.FileActions.IsFollowLinkEnabled =
+            Data.RuntimeSettings.IsExplorerLoaded =
+            Data.FileActions.ParentEnabled = false;
+
+            Data.FileActions.ExplorerFilter = "";
+
+            if (clearDevice)
+            {
+                Data.CurrentDisplayNames.Clear();
+                Data.CurrentPath = null;
+                Data.RuntimeSettings.ClearNavBox = true;
+
+                UpdateFileActions();
+            }
+        });
 
         Data.RuntimeSettings.FilterActions = true;
     }
@@ -830,7 +779,7 @@ internal static class FileActionLogic
     public static void UpdateFileActions()
     {
         Data.FileActions.IsApkActionsVisible.Value = Data.Settings.EnableApk && Data.DevicesObject?.Current;
-        Data.FileActions.PushPackageEnabled = Data.FileActions.IsApkActionsVisible && Data.DevicesObject.Current.Type is not AbstractDevice.DeviceType.Recovery;
+        Data.FileActions.PushPackageEnabled = Data.FileActions.IsApkActionsVisible && Data.DevicesObject.Current.Type is not DeviceType.Recovery;
 
         Data.FileActions.UninstallPackageEnabled = Data.FileActions.IsAppDrive && Data.SelectedPackages.Any();
         Data.FileActions.ContextPushPackagesEnabled = Data.FileActions.IsAppDrive && !Data.SelectedPackages.Any();
@@ -915,7 +864,7 @@ internal static class FileActionLogic
         Data.FileActions.PackageActionsEnabled = Data.Settings.EnableApk
                                                  && Data.SelectedFiles.AnyAll(file => file.IsInstallApk)
                                                  && !Data.FileActions.IsRecycleBin
-                                                 && !(Data.DevicesObject?.Current?.Type is AbstractDevice.DeviceType.Recovery
+                                                 && !(Data.DevicesObject?.Current?.Type is DeviceType.Recovery
                                                  && Data.FileActions.IsTemp);
 
         Data.FileActions.IsCopyItemPathEnabled = Data.FileActions.IsAppDrive
@@ -926,17 +875,10 @@ internal static class FileActionLogic
 
         Data.FileActions.SubmenuUninstallEnabled = Data.CurrentDrive?.IsFUSE is not true
             && Data.SelectedFiles.AnyAll(file => file.IsInstallApk)
-            && Data.DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;
+            && Data.DevicesObject?.Current?.Type is not DeviceType.Recovery;
 
         Data.FileActions.UpdateModifiedEnabled = !Data.FileActions.IsRecycleBin
             && Data.SelectedFiles.AnyAll(file => file.Type is FileType.File && !file.IsApk && !file.IsLink);
-
-        Data.FileActions.EditFileEnabled = !Data.FileActions.IsRecycleBin
-            && Data.SelectedFiles.Count() == 1
-            && Data.SelectedFiles.First().Type is FileType.File
-            && !Data.SelectedFiles.First().IsApk
-            && !Data.SelectedFiles.First().IsLink
-            && Data.SelectedFiles.First().Size < Data.Settings.EditorMaxFileSize;
 
         Data.FileActions.IsPasteLinkEnabled = Data.CurrentDrive?.IsFUSE is not true
             && Data.RuntimeSettings.IsRootActive
@@ -946,7 +888,7 @@ internal static class FileActionLogic
             && (!Data.SelectedFiles.Any() ||
             (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 
-        Data.FileActions.InstallPackageEnabled = Data.DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery
+        Data.FileActions.InstallPackageEnabled = Data.DevicesObject?.Current?.Type is not DeviceType.Recovery
             && Data.CurrentDrive?.IsFUSE is not true;
 
         if (!Data.CopyPaste.IsDrag)
@@ -1001,9 +943,9 @@ internal static class FileActionLogic
             source.IsDirectory ? FileType.Folder : FileType.File)
             { Size = source.Size };
 
-        App.Current.Dispatcher.Invoke(() =>
+        App.SafeInvoke(() =>
         {
-            pushOperation = FileSyncOperation.PushFile(source, target, Data.CurrentADBDevice, App.Current.Dispatcher);
+            pushOperation = FileSyncOperation.PushFile(source, target, Data.DevicesObject.Current, App.AppDispatcher);
             pushOperation.DropEffects = dropEffects;
             pushOperation.OriginalShellItem = originalShellItem;
             pushOperation.PropertyChanged += PushOperation_PropertyChanged;
@@ -1029,7 +971,7 @@ internal static class FileActionLogic
         if (op.Status is FileOperation.OperationStatus.Completed)
         {
             // Current path (and device) is where the new file was pushed to and it is not shown yet
-            if (op.Device.ID == Data.CurrentADBDevice.ID
+            if (op.Device.ID == Data.DevicesObject.Current.ID
                 && op.TargetPath.ParentPath == Data.CurrentPath
                 && Data.DirList.FileList.All(f => f.FullName != op.FilePath.FullName))
             {
@@ -1072,13 +1014,8 @@ internal static class FileActionLogic
         Data.RuntimeSettings.IsPathBoxFocused = false;
 
         var pullItems = Data.SelectedFiles;
-        ShellItem path;
 
-        if (!string.IsNullOrEmpty(targetPath))
-        {
-            path = ShellItem.Open(targetPath);
-        }
-        else
+        if (string.IsNullOrEmpty(targetPath))
         {
             var dialog = new CommonOpenFileDialog()
             {
@@ -1092,19 +1029,19 @@ internal static class FileActionLogic
 
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
                 return;
-            
-            path = ShellItem.Open(dialog.FileName);
+
+            targetPath = dialog.FileName;
         }
 
-        PullFiles(path, pullItems);
+        PullFiles(targetPath, pullItems, true);
     }
 
-    public static async void PullFiles(ShellItem path, IEnumerable<FileClass> pullItems, bool notify = false)
+    public static async void PullFiles(string targetPath, IEnumerable<FileClass> pullItems, bool notify = false)
     {
         if (pullItems is null || !pullItems.Any())
             return;
 
-        var match = AdbRegEx.RE_WINDOWS_DRIVE_ROOT().Match(path.ParsingName);
+        var match = AdbRegEx.RE_WINDOWS_DRIVE_ROOT().Match(targetPath);
         var invalidFiles = pullItems.Where(f => AdbExplorerConst.INVALID_WINDOWS_ROOT_PATHS.Contains(f.FullName));
 
         if (match.Success && invalidFiles.Any())
@@ -1114,17 +1051,17 @@ internal static class FileActionLogic
                                                  primaryText: Strings.Resources.S_SKIP,
                                                  icon: DialogService.DialogIcon.Exclamation);
 
-            if (result.Item1 is not ContentDialogResult.Primary)
+            if (result.Item1 is not Wpf.Ui.Controls.ContentDialogResult.Primary)
                 return;
 
             pullItems = pullItems.Except(invalidFiles);
         }
 
-        if (!Directory.Exists(path.ParsingName))
+        if (!Directory.Exists(targetPath))
         {
             try
             {
-                Directory.CreateDirectory(path.ParsingName);
+                Directory.CreateDirectory(targetPath);
             }
             catch (Exception e)
             {
@@ -1133,7 +1070,7 @@ internal static class FileActionLogic
             }
         }
 
-        var files = await CopyPasteService.MergeFiles(pullItems.Select(f => f.FullPath), path.ParsingName);
+        var files = await CopyPasteService.MergeFiles(pullItems.Select(f => f.FullPath), targetPath);
         if (files.Count() < pullItems.Count())
         {
             pullItems = pullItems.Where(f => files.Contains(f.FullPath));
@@ -1141,109 +1078,58 @@ internal static class FileActionLogic
 
         await Task.Run(() =>
         {
-            App.Current.Dispatcher.Invoke(() => Data.FileOpQ.AddOperations(GeneratePullOps(path, pullItems, notify)));
+            App.SafeInvoke(() => Data.FileOpQ.AddOperations(GeneratePullOps(targetPath, pullItems, notify)));
         });
-        
-        static IEnumerable<FileSyncOperation> GeneratePullOps(ShellItem path, IEnumerable<FileClass> pullItems, bool notify)
+    }
+
+    public static IEnumerable<FileSyncOperation> SilentPullFiles(LogicalDeviceViewModel device, string target, bool disableParallel, IEnumerable<string> filesToReplace, params IEnumerable<FileClass> pullItems)
+    {
+        foreach (var item in pullItems)
         {
-            foreach (var item in pullItems.Select(f => f.GetSyncFile()))
-            {
-                var target = SyncFile.MergeToWindowsPath(item, path);
-                var fileOp = FileSyncOperation.PullFile(item, target, Data.CurrentADBDevice, App.Current.Dispatcher);
+            if (item.Type is not FileType.Folder)
+                continue;
 
-                if (notify)
-                    fileOp.PropertyChanged += PullOperation_PropertyChanged;
+            var syncFile = CopyPasteService.MergeFolderTree(item, target, filesToReplace);
+            if (syncFile.Children.Count == 0)
+                continue;
 
-                yield return fileOp;
-            }
+            var op = GeneratePullOp(target, syncFile, false, device);
+            if (disableParallel)
+                op.MaxThreads = 1;
+
+            op.Start();
+            yield return op;
         }
     }
 
-    private static void PullOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private static IEnumerable<FileSyncOperation> GeneratePullOps(string targetPath, IEnumerable<FileClass> pullItems, bool notify, LogicalDeviceViewModel? device = null)
     {
-        if (e.PropertyName != nameof(FileOperation.Status))
-            return;
+        device ??= Data.DevicesObject.Current;
 
-        var op = sender as FileSyncOperation;
-        if (op.Status is FileOperation.OperationStatus.Completed)
-            ExplorerHelper.NotifyFileCreated(op.TargetPath.FullPath);
-    }
-
-    public static void ToggleFileOpQ()
-    {
-        Data.FileOpQ.IsAutoPlayOn ^= true;
-
-        if (Data.FileOpQ.IsAutoPlayOn)
-            Data.FileOpQ.Start();
-        else
-            Data.FileOpQ.Stop();
-
-        Data.RuntimeSettings.RefreshFileOpControls = true;
-    }
-
-    private static readonly Mutex FileOpControlsMutex = new();
-
-    public static void UpdateFileOpControls()
-    {
-        App.Current.Dispatcher.Invoke(() =>
+        foreach (var item in pullItems.Select(f => f.GetSyncFile()))
         {
-            FileOpControlsMutex.WaitOne(0);
-
-            var changed = false;
-            var plural = Data.FileActions.SelectedFileOps.Value.Count() > 1;
-            var opString = plural
-                ? Strings.Resources.S_ACTION_OPERATION_PLURAL
-                : Strings.Resources.S_ACTION_OPERATION;
-
-            var removeAction = string.Format(Strings.Resources.S_REM_DEVICE_TITLE, opString);
-            if (Data.FileActions.RemoveFileOpDescription.Value != removeAction)
-            {
-                Data.FileActions.RemoveFileOpDescription.Value = removeAction;
-                changed = true;
-            }
-
-            var validateAction = string.Format(Strings.Resources.S_ACTION_VALIDATE, opString);
-            if (Data.FileActions.ValidateDescription.Value != validateAction)
-            {
-                Data.FileActions.ValidateDescription.Value = validateAction;
-                changed = true;
-            }
-
-            if (changed)
-                Data.RuntimeSettings.RefreshFileOpControls = true;
-
-            FileOpControlsMutex.ReleaseMutex();
-        });
+            yield return GeneratePullOp(targetPath, item, notify, device);
+        }
     }
 
-    public static async void ResetAppSettings()
+    private static FileSyncOperation GeneratePullOp(string targetPath, SyncFile item, bool notify, LogicalDeviceViewModel device)
     {
-        var result = await DialogService.ShowConfirmation(
-                        Strings.Resources.S_RESET_SETTINGS,
-                        Strings.Resources.S_RESET_SETTINGS_TITLE,
-                        primaryText: Strings.Resources.S_CONFIRM,
-                        cancelText: Strings.Resources.S_CANCEL,
-                        icon: DialogService.DialogIcon.Exclamation);
+        var target = SyncFile.MergeToWindowsPath(item, targetPath);
+        var fileOp = FileSyncOperation.PullFile(item, target, device, App.AppDispatcher);
 
-        if (result.Item1 == ContentDialogResult.None)
+        if (notify)
+            fileOp.PropertyChanged += PullOperation_PropertyChanged;
+
+        return fileOp;
+    }
+
+    private static void PullOperation_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(FileOperation.Status) || sender is not FileSyncOperation op)
             return;
 
-        Data.RuntimeSettings.ResetAppSettings = true;
-    }
-
-    public static void ToggleSettingsSort()
-    {
-        Data.RuntimeSettings.SortedView ^= true;
-        Data.FileActions.IsExpandSettingsVisible.Value ^= true;
-
-        Data.RuntimeSettings.RefreshSettingsControls = true;
-    }
-
-    public static void ToggleSettingsExpand()
-    {
-        Data.RuntimeSettings.GroupsExpanded ^= true;
-
-        Data.RuntimeSettings.RefreshSettingsControls = true;
+        if (op.Status is FileOperation.OperationStatus.Completed)
+            NativeMethods.RefreshExplorerDirectory(op.TargetPath.ParentPath);
     }
 
     public static async void FollowLink()

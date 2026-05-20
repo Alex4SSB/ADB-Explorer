@@ -71,20 +71,20 @@
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.props" />
   <PropertyGroup>
     <ProjectGuid>e85c36a4-a01a-407b-a1ac-1073007b0df9</ProjectGuid>
-    <TargetPlatformVersion>10.0.22621.0</TargetPlatformVersion>
+    <TargetPlatformVersion>10.0.26100.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.18362.0</TargetPlatformMinVersion>
     <DefaultLanguage>en-US</DefaultLanguage>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
-    <PackageCertificateThumbprint>E3378940061A812DEA46B2DF96EB92D47317FFE4</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>2CFAE480725FA8611CFD446D5ED1DC3C36185C4C</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
-    <AppxBundlePlatforms>x64|arm64</AppxBundlePlatforms>
+    <AppxBundlePlatforms>x64</AppxBundlePlatforms>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
     <UserSecretsId>f104f418-f0ec-4054-a745-20dcb30a3f4c</UserSecretsId>
-    <EntryPointProjectUniqueName>..\ADB Explorer\ADB Explorer _ModernWPF.csproj</EntryPointProjectUniqueName>
+    <EntryPointProjectUniqueName>..\ADB Explorer\ADB Explorer.csproj</EntryPointProjectUniqueName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AppxBundle>Always</AppxBundle>
@@ -199,8 +199,6 @@
     <PackageReference Include="System.Private.Uri" Version="4.3.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ADB Explorer\ADB Explorer _ModernWPF.csproj">
-      <SkipGetTargetFrameworkProperties>True</SkipGetTargetFrameworkProperties>
-    </ProjectReference>
+    <ProjectReference Include="..\ADB Explorer\ADB Explorer.csproj" />
   </ItemGroup>
 </Project>
