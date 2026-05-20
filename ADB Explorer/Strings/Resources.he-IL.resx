@@ -1618,4 +1618,31 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_MOUNT_OPTIONS" xml:space="preserve">
     <value>אפשרויות mount</value>
   </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>צבע הדגשה מותאם אישית</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>צבע הדגשה</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>בחר צבע</value>
+  </data>
+  <data name="S_COLOR_RED" xml:space="preserve">
+    <value>אדום</value>
+  </data>
+  <data name="S_COLOR_GREEN" xml:space="preserve">
+    <value>ירוק</value>
+  </data>
+  <data name="S_COLOR_BLUE" xml:space="preserve">
+    <value>כחול</value>
+  </data>
+  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
+    <value>לא ניתן לאתר את ADB ע"י ה-PATH של המערכת. אנא השתמשו ב "{0}" כדי לאתרו.</value>
+  </data>
+  <data name="S_ADB_PATH_INVALID" xml:space="preserve">
+    <value>נתיב ה-ADB שסופק הוא קיצור דרך של וינדוס או נתיב UNC (מרוחק), מה שאסור.</value>
+  </data>
+  <data name="S_ADB_COMPROMISED" xml:space="preserve">
+    <value>לא ניתן לאמת את הקובץ שסופק כ-ADB. הקפידו להוריד רק כלי אנדרואיד רשמיים מ-Google.</value>
+  </data>
 </root>
