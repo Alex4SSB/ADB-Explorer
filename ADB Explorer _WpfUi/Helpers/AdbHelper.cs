@@ -25,7 +25,7 @@ public static class AdbHelper
 
         ADBService.VerifyAdbVersion(adbPath);
 
-        return Data.RuntimeSettings.AdbStatus is not AdbStatus.Valid;
+        return Data.RuntimeSettings.AdbStatus is AdbStatus.Valid;
     });
 
     public static void EnableMdns() => App.SafeInvoke(async () =>

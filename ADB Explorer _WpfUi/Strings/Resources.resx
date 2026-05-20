@@ -276,12 +276,6 @@ The release notes are available on GitHub.</value>
 • File names are case insensitive
 • Installation of APKs is not supported</value>
   </data>
-  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>The app has many animations that are enabled as part of the fluent design.
-The side views animation is always disabled when the app window is maximized on a secondary display.
-
-• Checking this setting disables all app animations except progress bars, progress rings, and drive usage bars.</value>
-  </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>All app settings will be reset upon closing the app.
 This cannot be undone. Are you sure?</value>
@@ -573,10 +567,6 @@ Visible content may be incomplete.</value>
     <value>Pick a color</value>
     <comment>Title of the color picker dialog</comment>
   </data>
-  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
-    <value>Force Fluent Styles</value>
-    <comment>The setting used in Windows 10 to force the app to use the fluent style design</comment>
-  </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>Disable Hardware Acceleration</value>
     <comment>The setting used to disable HW / GPU acceleration</comment>
@@ -584,10 +574,6 @@ Visible content may be incomplete.</value>
   <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
     <value>Disable Animations</value>
     <comment>The setting used to disable app animations</comment>
-  </data>
-  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>Splash Screen</value>
-    <comment>The setting used to enable showing the splash screen on app startup</comment>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>Check For Updates</value>

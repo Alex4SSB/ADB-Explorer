@@ -217,7 +217,5 @@ public class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewModel devic
         }
 
         IsLinkListingFinished = true;
-
-        Data.RuntimeSettings.RefreshExplorerSorting = true;
     }
 }

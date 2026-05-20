@@ -260,9 +260,6 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     public partial bool SwRender { get; set; } = false;
 
     [ObservableProperty]
-    public partial bool EnableSplash { get; set; } = true;
-
-    [ObservableProperty]
     public partial bool UseCustomAccent { get; set; } = false;
 
     [ObservableProperty]

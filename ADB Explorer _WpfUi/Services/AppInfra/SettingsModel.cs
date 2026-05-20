@@ -216,7 +216,6 @@ public static class UISettings
                                        AbstractSetting.ExtractPropertyInfo(() => Settings.UseCustomAccent),
                                        "\uE771"),
                 new BoolSetting(() => Settings.SwRender, Strings.Resources.S_SETTINGS_DISABLE_HW, icon: "\uF211"),
-                new BoolSetting(() => Settings.EnableSplash, Strings.Resources.S_SETTINGS_SPLASH),
             ], "\uE2B1"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_ABOUT,
             [

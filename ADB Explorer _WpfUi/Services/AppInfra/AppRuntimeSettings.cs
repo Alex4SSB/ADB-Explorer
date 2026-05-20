@@ -127,25 +127,11 @@ public partial class AppRuntimeSettings : ViewModelBase
 
     public string AdbVersionString => $"v{AdbVersion}";
 
-    private bool isSplashScreenVisible = true;
-    public bool IsSplashScreenVisible
-    {
-        get => isSplashScreenVisible;
-        set => Set(ref isSplashScreenVisible, value);
-    }
-
     private IEnumerable explorerSource;
     public IEnumerable ExplorerSource
     {
         get => explorerSource;
         set => Set(ref explorerSource, value);
-    }
-
-    private LogicalDeviceViewModel currentDevice = null;
-    public LogicalDeviceViewModel CurrentDevice
-    {
-        get => currentDevice;
-        set => Set(ref currentDevice, value);
     }
 
     private bool? isPathBoxFocused = null;
@@ -291,10 +277,6 @@ public partial class AppRuntimeSettings : ViewModelBase
     public bool DriveViewNav { get => false; set => OnPropertyChanged(); }
     public bool AutoHideSearchBox { get => false; set => OnPropertyChanged(); }
     public bool ClearLogs { get => false; set => OnPropertyChanged(); }
-    public bool SortFileOps { get => false; set => OnPropertyChanged(); }
-    public bool RefreshExplorerSorting { get => false; set => OnPropertyChanged(); }
-    public bool FinalizeSplash { get => false; set => OnPropertyChanged(); }
-    public bool RefreshBreadcrumbs { get => false; set => OnPropertyChanged(); }
 
     #endregion
 }

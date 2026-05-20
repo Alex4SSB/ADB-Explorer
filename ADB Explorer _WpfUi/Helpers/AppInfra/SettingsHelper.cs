@@ -72,20 +72,6 @@ public static class SettingsHelper
         }
     }
 
-    public static async void SplashScreenTask()
-    {
-        var startTime = DateTime.Now;
-        var versionValid = await AdbHelper.CheckAdbVersion();
-        var delay = AdbExplorerConst.SPLASH_DISPLAY_TIME - (DateTime.Now - startTime);
-        
-        if (!versionValid)
-            return;
-
-        await Task.Delay(Data.Settings.EnableSplash && delay > TimeSpan.Zero ? delay : TimeSpan.Zero);
-
-        Data.RuntimeSettings.FinalizeSplash = true;
-    }
-
     public static IEnumerable<CultureInfo> GetAvailableLanguages()
     {
         string assemblyName = Assembly.GetEntryAssembly()?.GetName().Name;

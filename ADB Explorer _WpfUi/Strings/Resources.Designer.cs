@@ -1216,18 +1216,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The app has many animations that are enabled as part of the fluent design.
-        ///The side views animation is always disabled when the app window is maximized on a secondary display.
-        ///
-        ///• Checking this setting disables all app animations except progress bars, progress rings, and drive usage bars..
-        /// </summary>
-        public static string S_DISABLE_ANIMATION {
-            get {
-                return ResourceManager.GetString("S_DISABLE_ANIMATION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to ADB server needs to be restarted in order to disable mDNS..
         /// </summary>
         public static string S_DISABLE_MDNS {
@@ -3628,15 +3616,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Force Fluent Styles.
-        /// </summary>
-        public static string S_SETTINGS_FLUENT {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_FLUENT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to About.
         /// </summary>
         public static string S_SETTINGS_GROUP_ABOUT {
@@ -3876,15 +3855,6 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_SPECIAL_DIR_ICONS {
             get {
                 return ResourceManager.GetString("S_SETTINGS_SPECIAL_DIR_ICONS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Splash Screen.
-        /// </summary>
-        public static string S_SETTINGS_SPLASH {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_SPLASH", resourceCulture);
             }
         }
         

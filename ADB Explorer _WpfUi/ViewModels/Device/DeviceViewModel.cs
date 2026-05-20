@@ -118,9 +118,6 @@ public abstract class DeviceViewModel : ViewModelBase
             OnPropertyChanged(nameof(Status));
             OnPropertyChanged(nameof(StatusIcon));
 
-            if (Data.FileOpQ?.Operations.Any(op => op.Device.ID == ID) is true)
-                Data.RuntimeSettings.SortFileOps = true;
-
             if (this is LogicalDeviceViewModel)
             {
                 ShellCommands.DeviceCommands.Remove(ID);

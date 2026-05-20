@@ -42,9 +42,7 @@ public static class AdbExplorerConst
     public static readonly TimeSpan DIR_LIST_VISIBLE_PROGRESS_DELAY = TimeSpan.FromMilliseconds(500);
     public static readonly TimeSpan DIR_LIST_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(500);
     public static readonly TimeSpan DIR_LIST_UPDATE_START_INTERVAL = TimeSpan.FromMilliseconds(100);
-    public static readonly TimeSpan SPLASH_DISPLAY_TIME = TimeSpan.FromMilliseconds(2000);
     public static readonly TimeSpan MOUSE_DOWN_VALID = TimeSpan.FromMilliseconds(150);
-    public static readonly TimeSpan LINK_CLICK_DELAY = TimeSpan.FromMilliseconds(300);
     public static readonly TimeSpan RENAME_CLICK_DELAY = TimeSpan.FromMilliseconds(500);
     public static readonly TimeSpan CONNECT_TIMER_INTERVAL = TimeSpan.FromMilliseconds(2000);
     public static readonly TimeSpan CONNECT_TIMER_INIT = TimeSpan.FromMilliseconds(50);
@@ -63,10 +61,6 @@ public static class AdbExplorerConst
     public const sbyte MIN_SUPPORTED_ANDROID_VER = 6;
     public const sbyte MIN_PKG_UID_ANDROID_VER = 9;
     public const sbyte MIN_MEDIA_SCAN_ANDROID_VER = 10;
-
-    public const double MAX_PANE_HEIGHT_RATIO = 0.4;
-    public const int MIN_PANE_HEIGHT = 150;
-    public const double MIN_PANE_HEIGHT_RATIO = 0.15;
 
     public static readonly string[] APK_NAMES = [".APK", ".XAPK", ".APKS", ".APKM", ".APEX"];
     public static readonly string[] INSTALL_APK = [".APK", ".APEX"];

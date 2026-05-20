@@ -576,6 +576,7 @@ public partial class ExplorerPageHeader : UserControl
                 {
                     if (ActiveView.Items.Count > 0)
                     {
+                        SortExplorer();
                         ActiveScrollIntoView(ActiveView.Items[0]);
 
                         if (Settings.ThumbsMode is AppSettings.ThumbnailMode.OnPhotoDir
@@ -667,14 +668,7 @@ public partial class ExplorerPageHeader : UserControl
                 : RuntimeSettings.ThumbsSize;
         }
 
-        if (Settings.SortingPerLocation && Settings.LocationSorting.TryGetValue(CurrentPath, out var sort))
-        {
-            ViewModel.SetSort(sort);
-        }
-        else
-        {
-            ViewModel.SetSort(SortingSelector.SortingProperty.Name, ListSortDirection.Ascending);
-        }
+        SortExplorer();
 
         DetailsPane.SelectedFiles = [new FileClass("", "", FileType.Unknown)];
         DetailsPane.SelectedFiles = [];
@@ -702,8 +696,20 @@ public partial class ExplorerPageHeader : UserControl
 
         RuntimeSettings.ExplorerSource = DirList.FileList;
         FileActionLogic.UpdateFileActions();
-        
+
         return true;
+    }
+
+    private void SortExplorer()
+    {
+        if (Settings.SortingPerLocation && Settings.LocationSorting.TryGetValue(CurrentPath, out var sort))
+        {
+            ViewModel.SetSort(sort);
+        }
+        else
+        {
+            ViewModel.SetSort(SortingSelector.SortingProperty.Name, ListSortDirection.Ascending);
+        }
     }
 
     private static void InvalidateFileIcons()
