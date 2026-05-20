@@ -106,5 +106,15 @@ namespace ADB_Explorer.Properties {
                 return ResourceManager.GetString("DragDropLogPath", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap icons8_android_os_94 {
+            get {
+                object obj = ResourceManager.GetObject("icons8_android_os_94", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Properties;
 using ADB_Explorer.ViewModels;
 using System.Linq.Expressions;
 using Wpf.Ui.Appearance;
@@ -225,6 +226,7 @@ public static class UISettings
                 new LinkSetting(Strings.Resources.S_GITHUB_REPO, Resources.Links.ADB_EXPLORER_GITHUB, pathData: GitHubGeometry),
                 new LinkSetting(Strings.Resources.S_GOTO_WEBLATE, Resources.Links.WEBLATE, imageSource: WeblateLogo),
                 new LinkSetting(Strings.Resources.S_PRIVACY_POLICY, Resources.Links.ADB_EXPLORER_PRIVACY, "\uE72E"),
+                new LinkSetting(Models.Data.RuntimeSettings.IsAppDeployed ? Strings.Resources.S_ADB_LEARN_MORE : Strings.Resources.S_ADB_DOWNLOAD, Resources.Links.L_ADB_PAGE, imageSource: FileToIconConverter.LoadBitmap(AppGlobal.icons8_android_os_94)),
                 new BoolSetting(() => Settings.CheckForUpdates, Strings.Resources.S_SETTINGS_UPDATES, icon: "\uE895"),
                 new MultiLinkSetting(Strings.Resources.S_ATTRIBUTIONS, [
                     new("WpfUi", Resources.Links.WPF_UI),
