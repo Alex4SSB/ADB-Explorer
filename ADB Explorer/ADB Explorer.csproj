@@ -1,96 +1,157 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0-windows10.0.22621.0</TargetFramework>
-    <RollForward>Major</RollForward>
-    <RootNamespace>ADB_Explorer</RootNamespace>
-    <UseWPF>true</UseWPF>
-    <ApplicationIcon>app_icon_2023_combined.ico</ApplicationIcon>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+	<RollForward>Major</RollForward>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Platforms>AnyCPU;x64;ARM64</Platforms>
+    <ApplicationIcon>Assets\app_icon_2023_combined.ico</ApplicationIcon>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NoWarn>$(NoWarn);XDG0001</NoWarn>
     <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
-    <Configurations>Debug;Release;Deploy</Configurations>
-	<GenerateSatelliteAssembliesForCore>true</GenerateSatelliteAssembliesForCore>
-	<InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.Extensions.Configuration.Binder.SourceGeneration</InterceptorsNamespaces>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+	<Platforms>AnyCPU;x64;arm64</Platforms>
+	<Configurations>Debug;Release;Deploy</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="PortableLauncher.bat" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="app_icon_2023_combined.ico" />
+    <Content Include="Assets\app_icon_2023_combined.ico" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AdvancedSharpAdbClient" Version="3.6.16" />
+    <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
     <PackageReference Include="Emoji.Wpf" Version="0.3.4" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
-    <PackageReference Include="ModernWpfUI" Version="0.9.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="QRCoder.Xaml" Version="1.7.0" />
-    <PackageReference Include="System.Management" Version="9.0.11" />
-    <PackageReference Include="Vanara.Windows.Shell.Common" Version="5.0.0" />
+    <PackageReference Include="QRCoder.Xaml" Version="1.8.0" />
+    <PackageReference Include="System.Management" Version="10.0.7" />
+    <PackageReference Include="Vanara.Windows.Shell.Common" Version="5.0.4" />
+    <PackageReference Include="WPF-UI" Version="4.3.0" />
+    <PackageReference Include="WPF-UI.DependencyInjection" Version="4.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.7" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
   </ItemGroup>
-	
+
   <ItemGroup>
+    <Resource Include="Assets\APK_format_icon_2014-2019_.ico" />
+    <Resource Include="Assets\app_icon_black_2023_256px.png" />
+    <Resource Include="Resources\Fonts\Nunito-VariableFont_wght.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<Compile Update="Controls\ColorPicker\ColorPickerControl.xaml.cs">
+	  <SubType>Code</SubType>
+	</Compile>
+    <Compile Update="Controls\Icons\InstallIcon.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\Icons\LargeThumbsIcon.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\Icons\PushIcon.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\Icons\UninstallIcon.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\Icons\ResetSettingsIcon.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\Infra\MaskedTextBox.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\Pages\OperationsPageHeader.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\Pages\LogPageHeader.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\MenuControls\SortingSelector.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\PasteAndPullTooltip.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\RenameTooltip.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Properties\AppGlobal.Designer.cs">
+      <DependentUpon>AppGlobal.resx</DependentUpon>
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>AppGlobal.resx</DependentUpon>
     </Compile>
     <Compile Update="Strings\Resources.Designer.cs">
+      <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Battery\CompactBatteryControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Battery\DetailedBatteryControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Device\HistoryDeviceControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Device\LogicalDeviceControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Device\NewDeviceControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Device\ServiceDeviceControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Device\WsaPkgDeviceControl.xaml.cs">
+      <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Update="Properties\AppGlobal.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
       <LastGenOutput>AppGlobal.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Strings\Resources.ar.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Strings\Resources.cs.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Strings\Resources.de.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Strings\Resources.es.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Strings\Resources.fr.resx">
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Update="Strings\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Strings\Resources.ru.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Strings\Resources.tr.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Strings\Resources.zh-CN.resx">
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="app_icon_black_2023_256px.png" />
-    <Content Include="PortableLauncher.bat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+  <Target Name="RemoveSkiaSharpPdb" AfterTargets="ResolvePackageAssets">
+    <ItemGroup>
+      <NativeCopyLocalItems Remove="@(NativeCopyLocalItems)" Condition="'%(Filename)%(Extension)' == 'libSkiaSharp.pdb'" />
+    </ItemGroup>
+  </Target>
 
-  <ItemGroup>
-    <Resource Include="Resources\APK_format_icon_2014-2019_.ico" />
-    <Resource Include="Resources\Fonts\Nunito-VariableFont_wght.ttf" />
-  </ItemGroup>
-	
-  <ItemGroup>
-    <None Update="app_icon_2023_combined.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-	
 </Project>

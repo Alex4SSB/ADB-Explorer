@@ -205,6 +205,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The provided executable cannot be verified as ADB. Make sure you download only official Android Platform Tools from Google..
+        /// </summary>
+        public static string S_ADB_COMPROMISED {
+            get {
+                return ResourceManager.GetString("S_ADB_COMPROMISED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ADB Disk Usage.
         /// </summary>
         public static string S_ADB_DISK_USAGE {
@@ -237,6 +246,24 @@ namespace ADB_Explorer.Strings {
         public static string S_ADB_LEARN_MORE {
             get {
                 return ResourceManager.GetString("S_ADB_LEARN_MORE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to locate ADB from system PATH. Please use &quot;{0}&quot; to locate it..
+        /// </summary>
+        public static string S_ADB_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("S_ADB_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Provided ADB path is either a Windows shortcut or a UNC (remote) path, which is not allowed..
+        /// </summary>
+        public static string S_ADB_PATH_INVALID {
+            get {
+                return ResourceManager.GetString("S_ADB_PATH_INVALID", resourceCulture);
             }
         }
         
@@ -791,6 +818,33 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Blue.
+        /// </summary>
+        public static string S_COLOR_BLUE {
+            get {
+                return ResourceManager.GetString("S_COLOR_BLUE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Green.
+        /// </summary>
+        public static string S_COLOR_GREEN {
+            get {
+                return ResourceManager.GetString("S_COLOR_GREEN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Red.
+        /// </summary>
+        public static string S_COLOR_RED {
+            get {
+                return ResourceManager.GetString("S_COLOR_RED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Added.
         /// </summary>
         public static string S_COLUMN_ADDED {
@@ -1162,18 +1216,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The app has many animations that are enabled as part of the fluent design.
-        ///The side views animation is always disabled when the app window is maximized on a secondary display.
-        ///
-        ///• Checking this setting disables all app animations except progress bars, progress rings, and drive usage bars..
-        /// </summary>
-        public static string S_DISABLE_ANIMATION {
-            get {
-                return ResourceManager.GetString("S_DISABLE_ANIMATION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to ADB server needs to be restarted in order to disable mDNS..
         /// </summary>
         public static string S_DISABLE_MDNS {
@@ -1206,15 +1248,6 @@ namespace ADB_Explorer.Strings {
         public static string S_DISCONN_FAILED_TITLE {
             get {
                 return ResourceManager.GetString("S_DISCONN_FAILED_TITLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Other: {0}.
-        /// </summary>
-        public static string S_DISK_USAGE_OTHER {
-            get {
-                return ResourceManager.GetString("S_DISK_USAGE_OTHER", resourceCulture);
             }
         }
         
@@ -2761,6 +2794,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pick a color.
+        /// </summary>
+        public static string S_PICK_COLOR {
+            get {
+                return ResourceManager.GetString("S_PICK_COLOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Dimensions.
         /// </summary>
         public static string S_PICTURE_DIMENSIONS {
@@ -3439,6 +3481,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Accent color.
+        /// </summary>
+        public static string S_SETTINGS_ACCENT_COLOR {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_ACCENT_COLOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to On.
         /// </summary>
         public static string S_SETTINGS_ACTIVE {
@@ -3502,6 +3553,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Custom accent color.
+        /// </summary>
+        public static string S_SETTINGS_CUSTOM_ACCENT {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_CUSTOM_ACCENT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Default Folder.
         /// </summary>
         public static string S_SETTINGS_DEFAULT_FOLDER {
@@ -3552,15 +3612,6 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_ENABLE_MDNS {
             get {
                 return ResourceManager.GetString("S_SETTINGS_ENABLE_MDNS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Force Fluent Styles.
-        /// </summary>
-        public static string S_SETTINGS_FLUENT {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_FLUENT", resourceCulture);
             }
         }
         
@@ -3804,15 +3855,6 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_SPECIAL_DIR_ICONS {
             get {
                 return ResourceManager.GetString("S_SETTINGS_SPECIAL_DIR_ICONS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Splash Screen.
-        /// </summary>
-        public static string S_SETTINGS_SPLASH {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_SPLASH", resourceCulture);
             }
         }
         

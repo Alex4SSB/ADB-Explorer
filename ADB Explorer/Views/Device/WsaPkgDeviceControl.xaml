@@ -6,7 +6,7 @@
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:WsaPkgDeviceViewModel}"
     d:Width="200"
@@ -23,7 +23,7 @@
                     <DataTrigger Binding="{Binding Status}" Value="Unauthorized">
                         <Setter Property="helpers:ExpanderHelper.HeaderBottomContent">
                             <Setter.Value>
-                                <ui:ProgressBar
+                                <ProgressBar
                                     Foreground="{DynamicResource NewDeviceAltBorder}"
                                     IsIndeterminate="True"
                                     Style="{StaticResource ExpanderHeaderProgressBarStyle}" />
@@ -48,7 +48,7 @@
             </Grid>
         </Expander.Header>
         <Grid Style="{StaticResource DeviceContentGridStyle}">
-            <Button
+            <ui:Button
                 HorizontalAlignment="Right"
                 Command="{Binding LaunchWsaCommand.Command}"
                 Content="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_LAUNCH}}"

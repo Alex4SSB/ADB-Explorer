@@ -70,5 +70,14 @@
 
         [GeneratedRegex(@" +(?<Size>\d+) +(?<Date>\d{4}-\d\d-\d\d \d\d:\d\d) +(?<Name>.+)")]
         public static partial Regex RE_UNZIP_LIST();
+
+        [GeneratedRegex(@"^\s*versionName=(?<VersionName>.+?)\s*$", RegexOptions.Multiline)]
+        public static partial Regex RE_DUMPSYS_VERSION_NAME();
+
+        [GeneratedRegex(@"^\s*lastUpdateTime=(?<LastUpdateTime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s*$", RegexOptions.Multiline)]
+        public static partial Regex RE_DUMPSYS_LAST_UPDATE();
+
+        [GeneratedRegex(@"(?<BlockDev>.+) on (?<MntPt>.+) type (?<Type>.+) \((?<Attr>.+)\)", RegexOptions.Multiline)]
+        public static partial Regex RE_MOUNT_PARSE();
     }
 }

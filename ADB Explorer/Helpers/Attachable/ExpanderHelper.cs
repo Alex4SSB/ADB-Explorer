@@ -22,6 +22,19 @@ public static class ExpanderHelper
             typeof(ExpanderHelper),
             null);
 
+    public static AlignmentX GetChevronPlacement(Control control) =>
+        (AlignmentX)control.GetValue(ChevronPlacementProperty);
+
+    public static void SetChevronPlacement(Control control, AlignmentX value) =>
+        control.SetValue(ChevronPlacementProperty, value);
+
+    public static readonly DependencyProperty ChevronPlacementProperty =
+        DependencyProperty.RegisterAttached(
+            "ChevronPlacement",
+            typeof(AlignmentX),
+            typeof(ExpanderHelper),
+            new(AlignmentX.Right));
+
     public static bool GetIsListItem(Control control) =>
         (bool)control.GetValue(IsListItemProperty);
 
@@ -162,6 +175,32 @@ public static class ExpanderHelper
         DependencyProperty.RegisterAttached(
             "IsTransparent",
             typeof(bool),
+            typeof(ExpanderHelper),
+            null);
+
+    public static bool GetIsAccentHeader(Control control) =>
+        (bool)control.GetValue(IsAccentHeaderProperty);
+
+    public static void SetIsAccentHeader(Control control, bool value) =>
+        control.SetValue(IsAccentHeaderProperty, value);
+
+    public static readonly DependencyProperty IsAccentHeaderProperty =
+        DependencyProperty.RegisterAttached(
+            "IsAccentHeader",
+            typeof(bool),
+            typeof(ExpanderHelper),
+            null);
+
+    public static object GetHeaderTooltip(Control control) =>
+        control.GetValue(HeaderTooltipProperty);
+
+    public static void SetHeaderTooltip(Control control, object value) =>
+        control.SetValue(HeaderTooltipProperty, value);
+
+    public static readonly DependencyProperty HeaderTooltipProperty =
+        DependencyProperty.RegisterAttached(
+            "HeaderTooltip",
+            typeof(object),
             typeof(ExpanderHelper),
             null);
 }

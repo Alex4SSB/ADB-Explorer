@@ -78,6 +78,8 @@ public class Battery : ViewModelBase
             {
                 OnPropertyChanged(nameof(BatteryIcon));
                 OnPropertyChanged(nameof(CompactStateString));
+                OnPropertyChanged(nameof(BatteryLow));
+                OnPropertyChanged(nameof(FullyCharged));
             }
         }
     }
@@ -92,6 +94,8 @@ public class Battery : ViewModelBase
             {
                 OnPropertyChanged(nameof(BatteryIcon));
                 OnPropertyChanged(nameof(CompactStateString));
+                OnPropertyChanged(nameof(BatteryLow));
+                OnPropertyChanged(nameof(FullyCharged));
             }
         }
     }
@@ -137,6 +141,9 @@ public class Battery : ViewModelBase
     private DateTime? prevChargeUpdate = null;
 
     #region Read only properties
+
+    public bool BatteryLow => Level is not null && Level <= 10 && ChargeState is not ChargingState.Charging;
+    public bool FullyCharged => Level is not null && Level >= 100 && ChargeState is ChargingState.Charging;
 
     public string BatteryStateString
     {

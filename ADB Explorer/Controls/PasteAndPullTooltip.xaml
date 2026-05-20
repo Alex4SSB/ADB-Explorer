@@ -8,282 +8,238 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     x:Name="pasteTooltip"
     d:Visibility="Visible"
     DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
+    TextElement.FontSize="14"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <Style BasedOn="{StaticResource AccentButtonStyle}" TargetType="Button" />
-        <Grid x:Key="ErrorIcon" x:Shared="False">
-            <ui:FontIcon Margin="0,0,4,0">
-                <ui:FontIcon.Style>
-                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                        <Setter Property="FontWeight" Value="Bold" />
-                        <Setter Property="Glyph" Value="&#xF13D;" />
-                        <Setter Property="Foreground" Value="{DynamicResource TrashDriveAltBorder}" />
-                    </Style>
-                </ui:FontIcon.Style>
-            </ui:FontIcon>
-        </Grid>
-    </UserControl.Resources>
-    <UserControl.Style>
-        <Style TargetType="UserControl">
-            <Style.Triggers>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="False" />
-                        <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWinRoot}" Value="False" />
-                        <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionConflictingOnFuse}" Value="False" />
-                        <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingOnFuse}" Value="False" />
-                        <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRegularItem}" Value="True" />
-                    </MultiDataTrigger.Conditions>
-                    <Setter Property="Visibility" Value="Collapsed" />
-                </MultiDataTrigger>
-                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalOnFuse}" Value="True">
-                    <Setter Property="Visibility" Value="Visible" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingOnFuse}" Value="True">
-                    <Setter Property="Visibility" Value="Visible" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRecycleBin}" Value="True">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=HidePasteNamingInfo}" Value="True">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Source={x:Static models:Data.FileActions}, Path=ListingInProgress}" Value="True">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsLogOpen}" Value="True">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-    </UserControl.Style>
-    <Border
-        Background="{DynamicResource DeviceConnectionPanelBackground}"
-        BorderBrush="Black"
-        BorderThickness="1,1,1,0"
-        Style="{StaticResource BorderStyle}">
-        <Border
-            BorderBrush="{DynamicResource SystemControlErrorTextForegroundBrush}"
-            BorderThickness="0,0,0,2"
-            Style="{StaticResource BorderStyle}">
-            <Grid Margin="4,4,6,4">
-                <Grid.Style>
-                    <Style TargetType="Grid">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
-                                <Setter Property="FlowDirection" Value="RightToLeft" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition Height="6" />
-                    <RowDefinition />
-                    <RowDefinition Height="10" />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <Grid>
+        <ui:FontIcon
+            x:Key="ErrorIcon"
+            x:Shared="False"
+            FontSize="20"
+            FontWeight="Bold"
+            Foreground="{DynamicResource TrashDriveAltBorder}"
+            Glyph="&#xF13D;"
+            Style="{StaticResource GlyphFont}" />
+        <ToolTip x:Key="PasteTooltip" MaxWidth="800">
+            <local:SimpleStackPanel Spacing="4">
+                <Grid d:Visibility="Visible">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <local:WarningIcon />
                     <TextBlock
-                        HorizontalAlignment="Center"
+                        Grid.Column="1"
                         VerticalAlignment="Center"
-                        Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_WARNING}}" />
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_SELECTED_WINDOWS_NAMING}}"
+                        TextWrapping="Wrap" />
                 </Grid>
-                <Separator Grid.Row="1" Margin="-4,0,-6,0" />
-                <ui:SimpleStackPanel
-                    Grid.Row="2"
-                    Margin="2"
-                    Spacing="4">
-                    <Grid d:Visibility="Visible">
-                        <Grid.Style>
-                            <Style TargetType="Grid">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Grid.Style>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <StaticResource ResourceKey="WarningIcon" />
-                        <TextBlock
-                            Grid.Column="1"
-                            VerticalAlignment="Center"
-                            Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_SELECTED_WINDOWS_NAMING}}" />
-                    </Grid>
-                    <Grid d:Visibility="Visible">
-                        <Grid.Style>
-                            <Style TargetType="Grid">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWinRoot}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="True">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Grid.Style>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <StaticResource ResourceKey="WarningIcon" />
-                        <TextBlock
-                            Grid.Column="1"
-                            VerticalAlignment="Center"
-                            Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_SELECTED_DRIVE_ROOT}}" />
-                    </Grid>
-                    <Grid d:Visibility="Visible">
-                        <Grid.Style>
-                            <Style TargetType="Grid">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionConflictingOnFuse}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="True">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Grid.Style>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <StaticResource ResourceKey="WarningIcon" />
-                        <TextBlock
-                            Grid.Column="1"
-                            VerticalAlignment="Center"
-                            Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_SELECTED_UNIQUE}}" />
-                    </Grid>
-                    <Grid d:Visibility="Visible">
-                        <Grid.Style>
-                            <Style TargetType="Grid">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnFuse}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Grid.Style>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <StaticResource ResourceKey="WarningIcon" />
-                        <TextBlock
-                            Grid.Column="1"
-                            VerticalAlignment="Center"
-                            Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_SELECTED_FUSE}}" />
-                    </Grid>
-                    <Grid d:Visibility="Visible">
-                        <Grid.Style>
-                            <Style TargetType="Grid">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingOnFuse}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalOnFuse}" Value="True">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Grid.Style>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <StaticResource ResourceKey="ErrorIcon" />
-                        <TextBlock
-                            Grid.Column="1"
-                            VerticalAlignment="Center"
-                            Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_COPIED_UNIQUE}}" />
-                    </Grid>
-                    <Grid d:Visibility="Visible">
-                        <Grid.Style>
-                            <Style TargetType="Grid">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalOnFuse}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Grid.Style>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <StaticResource ResourceKey="ErrorIcon" />
-                        <TextBlock
-                            Grid.Column="1"
-                            VerticalAlignment="Center"
-                            Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_COPIED_FUSE_NAMING}}" />
-                    </Grid>
-                    <Grid d:Visibility="Visible">
-                        <Grid.Style>
-                            <Style TargetType="Grid">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRegularItem}" Value="True">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Grid.Style>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <StaticResource ResourceKey="ErrorIcon" />
-                        <TextBlock
-                            Grid.Column="1"
-                            VerticalAlignment="Center"
-                            Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_NON_FILE}}" />
-                    </Grid>
-                </ui:SimpleStackPanel>
-                <Grid Grid.Row="4" Margin="2">
-                    <CheckBox
-                        x:Name="PermanentHideCheckBox"
-                        Content="{Binding Source={x:Static Member=strings:Resources.S_POPUP_CHECKBOX}}"
-                        ToolTip="{Binding Source={x:Static Member=strings:Resources.S_POPUP_CHECKBOX_TOOLTIP}}" />
-                    <Button
-                        HorizontalAlignment="Right"
-                        Click="Button_Click"
-                        Content="{Binding Source={x:Static Member=strings:Resources.S_ACTION_HIDE}}"
-                        ToolTip="{Binding Source={x:Static Member=strings:Resources.S_POPUP_HIDE_TOOLTIP}}" />
+                <Grid d:Visibility="Visible">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWinRoot}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <local:WarningIcon />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_SELECTED_DRIVE_ROOT}}"
+                        TextWrapping="Wrap" />
                 </Grid>
-            </Grid>
-        </Border>
-    </Border>
+                <Grid d:Visibility="Visible">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionConflictingOnFuse}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <local:WarningIcon />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_SELECTED_UNIQUE}}"
+                        TextWrapping="Wrap" />
+                </Grid>
+                <Grid d:Visibility="Visible">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnFuse}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <local:WarningIcon />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_SELECTED_FUSE}}"
+                        TextWrapping="Wrap" />
+                </Grid>
+                <Grid d:Visibility="Visible">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingOnFuse}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalOnFuse}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <StaticResource ResourceKey="ErrorIcon" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_COPIED_UNIQUE}}"
+                        TextWrapping="Wrap" />
+                </Grid>
+                <Grid d:Visibility="Visible">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalOnFuse}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <StaticResource ResourceKey="ErrorIcon" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_COPIED_FUSE_NAMING}}"
+                        TextWrapping="Wrap" />
+                </Grid>
+                <Grid d:Visibility="Visible">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRegularItem}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <StaticResource ResourceKey="ErrorIcon" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_NON_FILE}}"
+                        TextWrapping="Wrap" />
+                </Grid>
+            </local:SimpleStackPanel>
+        </ToolTip>
+    </UserControl.Resources>
+    <local:WarningIcon
+        Margin="0,-2,0,0"
+        d:Visibility="Visible"
+        FontSize="24"
+        ToolTip="{StaticResource PasteTooltip}"
+        ToolTipService.InitialShowDelay="0"
+        ToolTipService.Placement="Top"
+        ToolTipService.ShowDuration="60000">
+        <local:WarningIcon.Style>
+            <Style TargetType="local:WarningIcon">
+                <Style.Triggers>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="False" />
+                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWinRoot}" Value="False" />
+                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionConflictingOnFuse}" Value="False" />
+                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingOnFuse}" Value="False" />
+                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRegularItem}" Value="True" />
+                        </MultiDataTrigger.Conditions>
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </MultiDataTrigger>
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalOnFuse}" Value="True">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingOnFuse}" Value="True">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRecycleBin}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Source={x:Static models:Data.FileActions}, Path=ListingInProgress}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </local:WarningIcon.Style>
+    </local:WarningIcon>
 </UserControl>

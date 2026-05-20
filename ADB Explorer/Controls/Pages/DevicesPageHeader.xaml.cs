@@ -1,0 +1,64 @@
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
+using ADB_Explorer.Services;
+
+namespace ADB_Explorer.Controls.Pages;
+
+/// <summary>
+/// Interaction logic for DevicesPageHeader.xaml
+/// </summary>
+public partial class DevicesPageHeader : UserControl
+{
+    public DevicesPageHeader()
+    {
+        Thread.CurrentThread.CurrentCulture =
+        Thread.CurrentThread.CurrentUICulture = Data.Settings.ActualUICulture;
+
+        InitializeComponent();
+
+        Data.DevicesObject.UIList.CollectionChanged += UIList_CollectionChanged;
+        Data.DevicesObject.PropertyChanged += DevicesObject_PropertyChanged;
+        Data.Settings.PropertyChanged += Settings_PropertyChanged;
+    }
+
+    private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        switch (e.PropertyName)
+        {
+            case nameof(AppSettings.EnableMdns):
+                FilterDevices();
+
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void RefreshDevicesButton_Click(object sender, RoutedEventArgs e)
+    {
+        DevicePollingService.RefreshDevices();
+    }
+
+    private void UIList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        FilterDevices();
+    }
+
+    private void DevicesObject_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ViewModels.Devices.UIList))
+            FilterDevices();
+    }
+
+    private void FilterDevices()
+    {
+        App.SafeInvoke(() =>
+        {
+            Thread.CurrentThread.CurrentCulture =
+            Thread.CurrentThread.CurrentUICulture = Data.Settings.ActualUICulture;
+
+            DeviceHelper.FilterDevices(CollectionViewSource.GetDefaultView(LogicalDevicesList.ItemsSource));
+            DeviceHelper.FilterDevices(CollectionViewSource.GetDefaultView(VirtualDevicesList.ItemsSource));
+        });
+    }
+}

@@ -1,9 +1,8 @@
-﻿using ADB_Explorer.ViewModels;
-using static ADB_Explorer.Models.AdbExplorerConst;
+﻿using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Models;
 
-public abstract class AbstractDrive : ViewModelBase
+public abstract partial class AbstractDrive : ObservableObject
 {
     public enum DriveType
     {
@@ -18,12 +17,8 @@ public abstract class AbstractDrive : ViewModelBase
         Package,
     }
 
-    private DriveType type = DriveType.Unknown;
-    public DriveType Type
-    {
-        get => type;
-        set => Set(ref type, value);
-    }
+    [ObservableProperty]
+    public partial DriveType Type { get; set; } = DriveType.Unknown;
 
 
     public static implicit operator bool(AbstractDrive obj)
@@ -64,7 +59,6 @@ public class Drive : AbstractDrive
     /// </summary>
     public virtual bool IsFUSE { get; }
 
-
     public Drive(string path = "")
     {
         Path = path;
@@ -76,4 +70,12 @@ public class Drive : AbstractDrive
                 Path = "/sdcard";
         }
     }
+
+    public void UpdatePath(string newPath)
+    {
+        Path = newPath;
+        OnPropertyChanged(nameof(Path));
+    }
 }
+
+public record struct FileSystemInfo(string BlockDev, string MountPoint, string FileSystemType, string[] Options);

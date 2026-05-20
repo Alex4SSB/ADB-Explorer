@@ -5,7 +5,7 @@
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:views="clr-namespace:ADB_Explorer.Views">
     <Style BasedOn="{StaticResource FluentTooltipStyle}" TargetType="ToolTip">
         <Style.Triggers>
@@ -13,6 +13,29 @@
                 <Setter Property="FlowDirection" Value="RightToLeft" />
             </DataTrigger>
         </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="DeviceHeaderIcon"
+        BasedOn="{StaticResource GlyphFont}"
+        TargetType="ui:FontIcon">
+        <Setter Property="FontSize" Value="18" />
+    </Style>
+    <Style
+        x:Key="RootIconStyle"
+        BasedOn="{StaticResource DeviceHeaderIcon}"
+        TargetType="ui:FontIcon">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Root}" Value="Disabled">
+                <Setter Property="Visibility" Value="Visible" />
+                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_ROOT_POSSIBLE}}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Root}" Value="Enabled">
+                <Setter Property="Visibility" Value="Visible" />
+                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_ROOT_ENABLED}}" />
+            </DataTrigger>
+        </Style.Triggers>
+        <Setter Property="Visibility" Value="Collapsed" />
     </Style>
     <Style
         x:Key="DeviceStatusFontSizeStyle"
@@ -34,22 +57,9 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style
-        x:Key="DeviceNameTextBlockStyle"
-        BasedOn="{StaticResource TooltipTextBlockStyle}"
-        TargetType="TextBlock">
+    <Style x:Key="DeviceNameTextBlockStyle" TargetType="TextBlock">
         <Setter Property="HorizontalAlignment" Value="Left" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsMouseOver}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsPressed}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource DriveForegroundPressed}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
-                <Setter Property="FlowDirection" Value="RightToLeft" />
-            </DataTrigger>
-        </Style.Triggers>
+        <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
     <Style x:Key="DeviceStatusGridStyle" TargetType="Grid">
         <Style.Triggers>
@@ -61,14 +71,14 @@
     <Style
         x:Key="PairingBoxStyle"
         BasedOn="{StaticResource NumericTextBoxStyle}"
-        TargetType="TextBox">
-        <Setter Property="ui:ControlHelper.PlaceholderText" Value="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_CODE}}" />
-        <Setter Property="ui:TextBoxHelper.IsDeleteButtonVisible" Value="False" />
-        <Style.Triggers>
-            <Trigger Property="ui:TextBoxHelper.HasText" Value="True">
-                <Setter Property="FontSize" Value="18" />
-            </Trigger>
-        </Style.Triggers>
+        TargetType="ui:TextBox">
+        <Setter Property="PlaceholderText" Value="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_CODE}}" />
+        <!--<Setter Property="ui:TextBoxHelper.IsDeleteButtonVisible" Value="False" />
+    <Style.Triggers>
+        <Trigger Property="ui:TextBoxHelper.HasText" Value="True">
+            <Setter Property="FontSize" Value="18" />
+        </Trigger>
+    </Style.Triggers>-->
     </Style>
     <Style
         x:Key="NewDeviceMaskedTextBoxStyle"
@@ -94,7 +104,7 @@
         <Setter Property="Text" Value="{Binding UIPairingCode, Mode=TwoWay}" />
         <Setter Property="ControlStyle">
             <Setter.Value>
-                <Style BasedOn="{StaticResource PairingBoxStyle}" TargetType="TextBox">
+                <Style BasedOn="{StaticResource PairingBoxStyle}" TargetType="ui:TextBox">
                     <Setter Property="Padding" Value="7,5,0,6" />
                     <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:MaskedTextBox}, Path=(helpers:StyleHelper.AltBorderBrush)}" />
                 </Style>
@@ -110,11 +120,12 @@
         x:Key="NewDeviceIpBoxStyle"
         BasedOn="{StaticResource NewDeviceMaskedTextBoxStyle}"
         TargetType="controls:MaskedTextBox">
+        <!--  Validation is disabled for the IP box since we allow hostnames as well  -->
         <Setter Property="Text" Value="{Binding IpAddress, Mode=TwoWay}" />
         <Setter Property="ControlStyle">
             <Setter.Value>
-                <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
-                    <Setter Property="ui:ControlHelper.PlaceholderText" Value="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_HOST}}" />
+                <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="ui:TextBox">
+                    <Setter Property="PlaceholderText" Value="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_HOST}}" />
                     <Setter Property="Padding" Value="4,5,4,6" />
                     <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:MaskedTextBox}, Path=(helpers:StyleHelper.AltBorderBrush)}" />
                 </Style>
@@ -136,7 +147,7 @@
     <Style
         x:Key="PortTextBoxStyle"
         BasedOn="{StaticResource NumericTextBoxStyle}"
-        TargetType="TextBox">
+        TargetType="ui:TextBox">
         <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:MaskedTextBox}, Path=(helpers:StyleHelper.AltBorderBrush)}" />
     </Style>
     <Style
@@ -160,8 +171,8 @@
         TargetType="controls:MaskedTextBox">
         <Setter Property="ControlStyle">
             <Setter.Value>
-                <Style BasedOn="{StaticResource PortTextBoxStyle}" TargetType="TextBox">
-                    <Setter Property="ui:ControlHelper.PlaceholderText" Value="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PORT}}" />
+                <Style BasedOn="{StaticResource PortTextBoxStyle}" TargetType="ui:TextBox">
+                    <Setter Property="PlaceholderText" Value="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PORT}}" />
                     <Setter Property="Padding" Value="4,5,4,6" />
                 </Style>
             </Setter.Value>
@@ -182,8 +193,8 @@
         <Setter Property="MaxNumber" Value="65535" />
         <Setter Property="ControlStyle">
             <Setter.Value>
-                <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
-                    <Setter Property="ui:ControlHelper.PlaceholderText" Value="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_PORT}}" />
+                <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="ui:TextBox">
+                    <Setter Property="PlaceholderText" Value="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_PORT}}" />
                     <Setter Property="Padding" Value="7,5,0,6" />
                     <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:MaskedTextBox}, Path=(helpers:StyleHelper.AltBorderBrush)}" />
                 </Style>
@@ -208,12 +219,12 @@
     </Style>
     <Style
         x:Key="DeviceTextButtonStyle"
-        BasedOn="{StaticResource ButtonStyle}"
-        TargetType="Button" />
+        BasedOn="{StaticResource DefaultUiButtonStyle}"
+        TargetType="ui:Button" />
     <Style
         x:Key="ConnectNewDeviceButtonStyle"
         BasedOn="{StaticResource DeviceTextButtonStyle}"
-        TargetType="Button">
+        TargetType="ui:Button">
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="Content" Value="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_BUTTON_CONNECT}}" />
         <Setter Property="Command" Value="{Binding ConnectCommand.Command}" />
@@ -267,17 +278,6 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style
-        x:Key="NewDevicePairingPortAsteriskStyle"
-        BasedOn="{StaticResource GlyphFont}"
-        TargetType="ui:FontIcon">
-        <Setter Property="Margin" Value="0,4,0,0" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=HideForceFluent}" Value="True">
-                <Setter Property="Margin" Value="10,8,-10,0" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
     <DataTemplate x:Key="LogicalDeviceTemplate">
         <views:LogicalDeviceControl />
     </DataTemplate>
@@ -293,186 +293,39 @@
     <DataTemplate x:Key="WsaPkgDeviceTemplate">
         <views:WsaPkgDeviceControl />
     </DataTemplate>
+    <DataTemplate x:Key="MdnsDeviceTemplate">
+        <views:MdnsDeviceControl />
+    </DataTemplate>
     <helpers:DeviceTemplateSelector
         x:Key="DeviceTemplateSelector"
         HistoryDeviceTemplate="{StaticResource HistoryDeviceTemplate}"
         LogicalDeviceTemplate="{StaticResource LogicalDeviceTemplate}"
+        MdnsDeviceTemplate="{StaticResource MdnsDeviceTemplate}"
         NewDeviceTemplate="{StaticResource NewDeviceTemplate}"
         ServiceDeviceTemplate="{StaticResource ServiceDeviceTemplate}"
         WsaPkgDeviceTemplate="{StaticResource WsaPkgDeviceTemplate}" />
     <Style
         x:Key="DeviceContainerStyle"
         BasedOn="{StaticResource StretchListViewItem}"
-        TargetType="ListViewItem">
-        <Setter Property="Margin" Value="0,1" />
+        TargetType="ui:ListViewItem">
+        <Setter Property="Margin" Value="5" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="Width" Value="250" />
     </Style>
     <Style
         x:Key="DevicesListViewStyle"
         BasedOn="{StaticResource ListViewStyle}"
-        TargetType="ListView">
+        TargetType="ui:ListView">
         <Setter Property="ItemContainerStyle" Value="{StaticResource DeviceContainerStyle}" />
         <Setter Property="ItemTemplateSelector" Value="{StaticResource DeviceTemplateSelector}" />
     </Style>
     <Style
         x:Key="DeviceActionsMenuItemStyle"
-        BasedOn="{StaticResource AdbMenuItemStyle}"
-        TargetType="MenuItem">
-        <Setter Property="Height" Value="30" />
+        BasedOn="{StaticResource WpfUiMenuItem}"
+        TargetType="controls:AdbMenuItem">
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
-                <Setter Property="Height" Value="32" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
-                <Setter Property="FlowDirection" Value="RightToLeft" />
-            </DataTrigger>
-        </Style.Triggers>
     </Style>
-    <Menu x:Key="DeviceActionsMenu" x:Shared="False">
-        <Menu.Resources>
-            <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
-                <Setter Property="FontSize" Value="18" />
-                <Setter Property="Margin" Value="-5,2" />
-            </Style>
-            <Style TargetType="TextBlock">
-                <Style.Triggers>
-                    <Trigger Property="IsEnabled" Value="False">
-                        <Setter Property="FontWeight" Value="Bold" />
-                        <Setter Property="Foreground" Value="{DynamicResource SystemControlBackgroundBaseHighBrush}" />
-                    </Trigger>
-                </Style.Triggers>
-            </Style>
-        </Menu.Resources>
-        <Menu.Style>
-            <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
-                <Setter Property="IsEnabled" Value="False" />
-                <Setter Property="Height" Value="30" />
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding Status}" Value="Ok">
-                        <Setter Property="IsEnabled" Value="True" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
-                        <Setter Property="Height" Value="32" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Menu.Style>
-        <MenuItem ToolTip="{Binding Source={x:Static strings:Resources.S_ROOT_FORBID_TITLE}}">
-            <MenuItem.Style>
-                <Style BasedOn="{StaticResource DeviceActionsMenuItemStyle}" TargetType="MenuItem">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Type}" Value="Sideload">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </MenuItem.Style>
-            <MenuItem.Header>
-                <ui:FontIcon Glyph="&#xE7EF;" />
-            </MenuItem.Header>
-            <MenuItem IsEnabled="False">
-                <MenuItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock FontWeight="Bold">
-                            <TextBlock.Text>
-                                <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_ROOT_STATUS_TITLE}">
-                                    <Binding Path="RootString" />
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
-                        <TextBlock FontWeight="Bold" Style="{StaticResource RecoveryRootStatusStyle}">
-                            <Run Text=" - " />
-                            <Run Text="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_RECOVERY_MODE}}" />
-                        </TextBlock>
-                    </StackPanel>
-                </MenuItem.Header>
-            </MenuItem>
-            <Separator>
-                <Separator.Style>
-                    <Style BasedOn="{StaticResource {x:Static MenuItem.SeparatorStyleKey}}" TargetType="Separator">
-                        <Setter Property="Margin" Value="-11,0" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Root}" Value="Forbidden">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Type}" Value="Recovery">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Separator.Style>
-            </Separator>
-            <MenuItem Command="{Binding ToggleRootCommand.Command}">
-                <MenuItem.Style>
-                    <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Root}" Value="Forbidden">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Type}" Value="Recovery">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </MenuItem.Style>
-                <MenuItem.Header>
-                    <TextBlock>
-                        <TextBlock.Style>
-                            <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock">
-                                <Setter Property="Text" Value="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_BUTTON_ENABLE}}" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Root}" Value="Enabled">
-                                        <Setter Property="Text" Value="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_BUTTON_DISABLE}}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </MenuItem.Header>
-            </MenuItem>
-        </MenuItem>
-        <MenuItem
-            ItemsSource="{Binding RebootCommands}"
-            Style="{StaticResource DeviceActionsMenuItemStyle}"
-            ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_DEVICE_REBOOT_TITLE}}">
-            <MenuItem.ItemContainerStyle>
-                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-                    <Setter Property="Command" Value="{Binding Command}" />
-                </Style>
-            </MenuItem.ItemContainerStyle>
-            <MenuItem.Header>
-                <ui:FontIcon Glyph="&#xE777;" />
-            </MenuItem.Header>
-        </MenuItem>
-        <MenuItem Command="{Binding RemoveCommand.Command}" ToolTip="{Binding RemoveCommand.Description}">
-            <MenuItem.Style>
-                <Style BasedOn="{StaticResource DeviceActionsMenuItemStyle}" TargetType="MenuItem">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding RemoveCommand.IsEnabled}" Value="False">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </MenuItem.Style>
-            <MenuItem.Header>
-                <ui:FontIcon Glyph="&#xE711;" />
-            </MenuItem.Header>
-        </MenuItem>
-        <MenuItem Command="{Binding SideloadCommand.Command}" ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_REBOOT_SIDELOAD}}">
-            <MenuItem.Style>
-                <Style BasedOn="{StaticResource DeviceActionsMenuItemStyle}" TargetType="MenuItem">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding SideloadCommand.IsEnabled}" Value="False">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </MenuItem.Style>
-            <MenuItem.Header>
-                <ui:FontIcon Glyph="&#xE67A;" />
-            </MenuItem.Header>
-        </MenuItem>
-    </Menu>
+
     <Style
         x:Key="DevicesListStyle"
         BasedOn="{StaticResource SplitViewBorderStyle}"
@@ -480,26 +333,18 @@
         <Setter Property="BorderThickness" Value="0,1,1,0" />
         <Setter Property="BorderBrush" Value="Gray" />
     </Style>
-    <Style
-        x:Key="DevicesSplitViewStyle"
-        BasedOn="{StaticResource SplitViewStyle}"
-        TargetType="ui:SplitView">
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="OpenPaneLength" Value="242" />
-        <Setter Property="PanePlacement" Value="Left" />
-        <Setter Property="IsPaneOpen" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsDevicesPaneOpen, Mode=TwoWay}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=DeviceListScrollViewer, Path=ScrollableHeight}" Value="0">
-                <Setter Property="OpenPaneLength" Value="228" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="NewDeviceStackPanelStyle" TargetType="ui:SimpleStackPanel">
+    <Style x:Key="NewDeviceStackPanelStyle" TargetType="controls:SimpleStackPanel">
         <Style.Resources>
             <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                 <Setter Property="Margin" Value="-1,0,4,0" />
             </Style>
         </Style.Resources>
         <Setter Property="Spacing" Value="8" />
+    </Style>
+    <Style
+        x:Key="DeviceExpanderStyle"
+        BasedOn="{StaticResource AdbCardControl}"
+        TargetType="ui:CardControl">
+        <Setter Property="MinHeight" Value="40" />
     </Style>
 </ResourceDictionary>

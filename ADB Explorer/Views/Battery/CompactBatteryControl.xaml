@@ -5,7 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     d:DataContext="{d:DesignInstance Type=models:Battery}"
     mc:Ignorable="d">
     <UserControl.Style>
@@ -33,6 +33,14 @@
                         </ToolTip>
                     </Setter.Value>
                 </Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding FullyCharged}" Value="True">
+                        <Setter Property="Foreground" Value="#FF1DB159" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding BatteryLow}" Value="True">
+                        <Setter Property="Foreground" Value="#FFF44336" />
+                    </DataTrigger>
+                </Style.Triggers>
             </Style>
         </ui:FontIcon.Style>
     </ui:FontIcon>

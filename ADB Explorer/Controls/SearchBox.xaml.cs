@@ -26,6 +26,16 @@ public partial class SearchBox : UserControl
         DependencyProperty.Register("Text", typeof(string),
           typeof(SearchBox), new PropertyMetadata(null));
 
+    public string PlaceholderText
+    {
+        get => (string)GetValue(PlaceholderTextProperty);
+        set => SetValue(PlaceholderTextProperty, value);
+    }
+
+    public static readonly DependencyProperty PlaceholderTextProperty =
+        DependencyProperty.Register("PlaceholderText", typeof(string),
+          typeof(SearchBox), new PropertyMetadata(null));
+
     public bool IsActive
     {
         get => (bool)GetValue(IsActiveProperty);
@@ -38,7 +48,7 @@ public partial class SearchBox : UserControl
 
     public bool IsExpanded
     {
-        get => (bool)GetValue(IsExpandedProperty);
+        get => (bool)GetValue(IsExpandedProperty); 
         set => SetValue(IsExpandedProperty, value);
     }
 
@@ -132,5 +142,14 @@ public partial class SearchBox : UserControl
     private void ContentBox_Loaded(object sender, RoutedEventArgs e)
     {
         ContentBox.Width = DefaultControlWidth;
+    }
+
+    private void Expander_Expanded(object sender, RoutedEventArgs e)
+    {
+        Dispatcher.InvokeAsync(() =>
+        {
+            ContentBox.Focus();
+            Keyboard.Focus(ContentBox);
+        }, DispatcherPriority.Input);
     }
 }

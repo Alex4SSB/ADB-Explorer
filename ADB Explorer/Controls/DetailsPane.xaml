@@ -1,0 +1,365 @@
+﻿<UserControl
+    x:Class="ADB_Explorer.Controls.DetailsPane"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
+    xmlns:local="clr-namespace:ADB_Explorer.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
+    x:Name="pane"
+    d:DesignHeight="450"
+    d:DesignWidth="300"
+    d:Visibility="Visible"
+    mc:Ignorable="d">
+    <UserControl.InputBindings>
+        <KeyBinding
+            Key="S"
+            Command="{Binding SaveCommand, ElementName=pane}"
+            Modifiers="Ctrl" />
+    </UserControl.InputBindings>
+    <UserControl.RenderTransform>
+        <TranslateTransform x:Name="SlideTransform" />
+    </UserControl.RenderTransform>
+    <UserControl.Style>
+        <Style TargetType="UserControl">
+            <Setter Property="Visibility" Value="Collapsed" />
+        </Style>
+    </UserControl.Style>
+    <UserControl.Resources>
+        <DataTemplate x:Key="FileDetailsTemplate" DataType="{x:Type viewmodels:IDetailsViewModel}">
+            <Grid Margin="0,3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    FontSize="12"
+                    Foreground="{DynamicResource InfoBadgeInformationalSeverityBackgroundBrush}"
+                    Text="{Binding Label}">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding LabelConsoleFont}" Value="True">
+                                    <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBlock
+                    Grid.Column="2"
+                    HorizontalAlignment="Right"
+                    FontSize="12"
+                    Foreground="{DynamicResource InfoBadgeInformationalSeverityBackgroundBrush}"
+                    Text="{Binding Value}"
+                    TextTrimming="CharacterEllipsis">
+                    <TextBlock.Style>
+                        <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ValueIsLtr}" Value="True">
+                                    <Setter Property="FlowDirection" Value="LeftToRight" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ValueConsoleFont}" Value="True">
+                                    <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid DataContext="{Binding ElementName=pane}">
+        <Grid x:Name="ContentBox">
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Mode, ElementName=pane}" Value="Details">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding EditorText}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <local:AdbAvalonEditor x:Name="EditorTextBox" EditorText="{Binding EditorText, Mode=TwoWay}" />
+                    <local:AdbMenu
+                        Margin="0,0,12,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Style="{StaticResource AdbMenuStyle}"
+                        Visibility="{Binding HasUnsavedChanges, ElementName=EditorTextBox, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <local:AdbMenuItem
+                            Command="{Binding SaveCommand, ElementName=pane}"
+                            IsChecked="True"
+                            Style="{StaticResource AdbMenuItemStyle}"
+                            ToolTip="{Binding Source={x:Static Member=strings:Resources.S_MENU_SAVE_CHANGES}}">
+                            <local:AdbMenuItem.Header>
+                                <ui:FontIcon
+                                    Margin="-4"
+                                    FontSize="20"
+                                    Glyph="&#xE74E;" />
+                            </local:AdbMenuItem.Header>
+                        </local:AdbMenuItem>
+                    </local:AdbMenu>
+                </Grid>
+                <ScrollViewer x:Name="PdfScrollViewer" Visibility="Collapsed">
+                    <ItemsControl x:Name="PdfPagesControl">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,0,0,4">
+                                    <Image Source="{Binding Image}" />
+                                    <Border
+                                        Margin="6"
+                                        Padding="4,2"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Bottom"
+                                        Background="#99000000"
+                                        CornerRadius="3">
+                                        <TextBlock
+                                            FontSize="11"
+                                            Foreground="White"
+                                            Text="{Binding Label}" />
+                                    </Border>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+                <TextBlock
+                    x:Name="NoPreviewTextBlock"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="12" />
+                <Border
+                    Padding="16"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+                    BorderBrush="{DynamicResource SeparatorBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="6">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsPdfPasswordPromptVisible, ElementName=pane}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <local:SimpleStackPanel Spacing="8">
+                        <Grid HorizontalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <ui:FontIcon
+                                Margin="0,0,8,0"
+                                VerticalAlignment="Center"
+                                FontSize="16"
+                                Glyph="&#xE72E;" />
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                FontSize="13"
+                                FontWeight="SemiBold"
+                                Text="{Binding Source={x:Static Member=strings:Resources.S_PDF_PASSWORD_PROTECTED}}"
+                                TextWrapping="Wrap" />
+                        </Grid>
+                        <PasswordBox
+                            x:Name="PdfPasswordBox"
+                            Padding="4"
+                            FontSize="18"
+                            MaxLength="512"
+                            PasswordChanged="PdfPasswordBox_PasswordChanged"
+                            PasswordChar="•">
+                            <PasswordBox.InputBindings>
+                                <KeyBinding Key="Return" Command="{Binding PdfUnlockCommand, ElementName=pane}" />
+                            </PasswordBox.InputBindings>
+                        </PasswordBox>
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            FontSize="11"
+                            Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                            Text="{Binding Source={x:Static Member=strings:Resources.S_PDF_PASSWORD_WRONG}}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPdfPasswordWrong, ElementName=pane}" Value="False">
+                                            <Setter Property="Visibility" Value="Hidden" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <ui:Button
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding PdfUnlockCommand, ElementName=pane}"
+                            Content="{Binding Source={x:Static Member=strings:Resources.S_PDF_PASSWORD_UNLOCK}}" />
+                    </local:SimpleStackPanel>
+                </Border>
+            </Grid>
+            <ScrollViewer>
+                <ScrollViewer.Style>
+                    <Style BasedOn="{StaticResource UiScrollViewer}" TargetType="ScrollViewer">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Mode, ElementName=pane}" Value="Preview">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ScrollViewer.Style>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="200" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Border>
+                        <Image
+                            x:Name="LargeFileIcon"
+                            Margin="4,4,12,4"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+                    </Border>
+                    <Grid
+                        Grid.Row="1"
+                        Margin="0,0,0,0"
+                        Background="{DynamicResource SolidBackgroundFillColorBaseBrush}">
+                        <local:SimpleStackPanel Margin="20" Spacing="14">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Image x:Name="SmallFileIcon" Height="32">
+                                    <Image.Style>
+                                        <Style TargetType="Image">
+                                            <Setter Property="Margin" Value="0,0,10,0" />
+                                            <Style.Triggers>
+                                                <Trigger Property="Source" Value="{x:Null}">
+                                                    <Setter Property="Margin" Value="0" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
+                                <Grid
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center">
+                                    <emoji:TextBlock
+                                        x:Name="FileNameTextBlock"
+                                        FontSize="16"
+                                        FontWeight="SemiBold"
+                                        TextWrapping="Wrap" />
+                                </Grid>
+                            </Grid>
+                            <Border
+                                x:Name="InvalidSelectionBorder"
+                                Padding="12"
+                                BorderBrush="{DynamicResource SeparatorBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="10" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:FontIcon
+                                        FontSize="16"
+                                        Foreground="{DynamicResource InfoBadgeInformationalSeverityBackgroundBrush}"
+                                        Glyph="&#xF167;" />
+                                    <TextBlock
+                                        Grid.Column="2"
+                                        Text="{Binding Source={x:Static Member=strings:Resources.S_DETAILS_MULTI_FILE_SELECTED}}"
+                                        TextWrapping="Wrap" />
+                                </Grid>
+                            </Border>
+                            <StackPanel>
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SelectionInfoItems.Count}" Value="0">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock
+                                    Margin="0,0,0,10"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
+                                    Text="{Binding Source={x:Static Member=strings:Resources.S_THUMBSIZE_DETAILS}}" />
+                                <ItemsControl ItemTemplate="{StaticResource FileDetailsTemplate}" ItemsSource="{Binding SelectionInfoItems}" />
+                            </StackPanel>
+                            <StackPanel>
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding MountOptionsItems.Count}" Value="0">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock
+                                    Margin="0,10"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
+                                    Text="{Binding Source={x:Static Member=strings:Resources.S_MOUNT_OPTIONS}}" />
+                                <ItemsControl ItemTemplate="{StaticResource FileDetailsTemplate}" ItemsSource="{Binding MountOptionsItems}" />
+                            </StackPanel>
+                            <StackPanel>
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding File}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding File.Permissions}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock
+                                    Margin="0,10"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
+                                    Text="{Binding Source={x:Static Member=strings:Resources.S_FILE_PERMISSIONS}}" />
+                                <ItemsControl ItemTemplate="{StaticResource FileDetailsTemplate}" ItemsSource="{Binding PermissionsItems}" />
+                            </StackPanel>
+                        </local:SimpleStackPanel>
+                    </Grid>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+            <Separator />
+            <GridSplitter
+                Width="8"
+                VerticalAlignment="Stretch"
+                Background="Transparent"
+                Cursor="SizeWE"
+                DragDelta="GridSplitter_DragDelta"
+                FocusVisualStyle="{x:Null}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

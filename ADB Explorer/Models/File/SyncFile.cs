@@ -50,7 +50,7 @@ public class SyncFile : FilePath
         }
     }
 
-    public SyncFile(FileClass fileClass, IEnumerable<(string, long?, double?)> tree = null)
+    public SyncFile(FileClass fileClass, IEnumerable<FolderTree> tree = null)
         : base(fileClass.FullPath, fileClass.FullName, fileClass.Type)
     {
         Size = fileClass.Size;
@@ -85,19 +85,19 @@ public class SyncFile : FilePath
         }
     }
 
-    static IEnumerable<SyncFile> GetFolderTree(IEnumerable<(string, long?, double?)> tree, string parent)
+    static IEnumerable<SyncFile> GetFolderTree(IEnumerable<FolderTree> tree, string parent)
     {
         // empty folder
         if (!tree.Any())
             yield break;
 
-        var groups = tree.GroupBy(f => f.Item1.Split(parent)[1].Trim('/').Split('/')[0]);
+        var groups = tree.GroupBy(f => f.Name.Split(parent)[1].Trim('/').Split('/')[0]);
 
         foreach (var group in groups.Where(g => g.Key is not null))
         {
             var fullPath = FileHelper.ConcatPaths(parent, group.Key);
 
-            if (group.First().Item2 is null)
+            if (group.First().IsFolder)
             {
                 var children = GetFolderTree(group.Skip(1), fullPath);
 
@@ -111,8 +111,8 @@ public class SyncFile : FilePath
             {
                 yield return new(fullPath, FileType.File)
                 {
-                    Size = group.First().Item2,
-                    UnixTime = group.First().Item3,
+                    Size = group.First().Size,
+                    UnixTime = group.First().Date,
                     ProgressUpdates = [new AdbSyncProgressInfo(fullPath, null, null, null)]
                 };
             }
@@ -149,11 +149,11 @@ public class SyncFile : FilePath
             newUpdates = newUpdates.Where(u => !string.IsNullOrEmpty(u.AndroidPath));
 
         var groups = newUpdates.GroupBy(update => DirectChildPath(update.AndroidPath));
-        
+
         foreach (var group in groups.Where(g => g.Key is not null))
         {
             SyncFile file = Children.FirstOrDefault(child => child.FullPath.Equals(group.Key));
-            
+
             if (file is null)
             {
                 bool isDir = !group.Key.Equals(group.First().AndroidPath) || group.Key[^1] is '/' or '\\';
@@ -165,7 +165,7 @@ public class SyncFile : FilePath
                 ExecuteInDispatcher(() =>
                 {
                     Children.Add(file);
-                    
+
                     OnPropertyChanged(nameof(Children));
                 }, executeInDispatcher);
             }
@@ -190,11 +190,11 @@ public class SyncFile : FilePath
         }
     }
 
-    public static SyncFile MergeToWindowsPath(SyncFile syncFile, ShellItem windowsPath)
+    public static SyncFile MergeToWindowsPath(SyncFile syncFile, string windowsPath)
     {
         SyncFile copy = new(syncFile);
 
-        copy.UpdatePath(FileHelper.ConcatPaths(windowsPath.ParsingName, syncFile.FullName, '\\'));
+        copy.UpdatePath(FileHelper.ConcatPaths(windowsPath, syncFile.FullName, '\\'));
         copy.PathType = FilePathType.Windows;
 
         return copy;

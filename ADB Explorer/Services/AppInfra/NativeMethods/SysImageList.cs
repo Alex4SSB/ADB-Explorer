@@ -134,24 +134,17 @@ public static partial class NativeMethods
 
     #region SysImageList
     /// <summary>
-    /// Summary description for SysImageList.
+    /// Provides access to the system image list, allowing retrieval and drawing of icons associated with files and
+    /// system resources.
     /// </summary>
+    /// <remarks>The SysImageList class enables managed code to interact with the Windows Shell system image
+    /// list, supporting operations such as retrieving icon indices for files, obtaining icon handles, and drawing icons
+    /// to device contexts. The image list size can be specified during instantiation. This class implements IDisposable
+    /// to ensure that unmanaged resources are released appropriately. It is typically used to display file or folder
+    /// icons consistent with those shown by Windows Explorer.</remarks>
     public class SysImageList : IDisposable
     {
         #region UnmanagedCode
-
-        [DllImport("ComCtl32.dll")]
-        private static extern int ImageList_Draw(
-            HANDLE hIml,
-            int i,
-            HANDLE hdcDst,
-            int x,
-            int y,
-            int fStyle);
-
-        [DllImport("ComCtl32.dll")]
-        private static extern int ImageList_DrawIndirect(
-            ref IMAGELISTDRAWPARAMS pimldp);
 
         [DllImport("ComCtl32.dll")]
         private static extern HANDLE ImageList_GetIcon(
@@ -181,14 +174,6 @@ public static partial class NativeMethods
         #endregion
 
         #region Private ImageList structures
-        [StructLayout(LayoutKind.Sequential)]
-        private struct RECT
-        {
-            public int left;
-            public int top;
-            public int right;
-            public int bottom;
-        }
 
         [StructLayout(LayoutKind.Sequential)]
         private struct IMAGELISTDRAWPARAMS
@@ -332,58 +317,6 @@ public static partial class NativeMethods
             [PreserveSig]
             int GetBkColor(
                 ref int pclr);
-
-            [PreserveSig]
-            int BeginDrag(
-                int iTrack,
-                int dxHotspot,
-                int dyHotspot);
-
-            [PreserveSig]
-            int EndDrag();
-
-            [PreserveSig]
-            int DragEnter(
-                HANDLE hwndLock,
-                int x,
-                int y);
-
-            [PreserveSig]
-            int DragLeave(
-                HANDLE hwndLock);
-
-            [PreserveSig]
-            int DragMove(
-                int x,
-                int y);
-
-            [PreserveSig]
-            int SetDragCursorImage(
-                ref IImageList punk,
-                int iDrag,
-                int dxHotspot,
-                int dyHotspot);
-
-            [PreserveSig]
-            int DragShowNolock(
-                int fShow);
-
-            [PreserveSig]
-            int GetDragImage(
-                ref POINT ppt,
-                ref POINT pptHotspot,
-                ref Guid riid,
-                ref HANDLE ppv);
-
-            [PreserveSig]
-            int GetItemFlags(
-                int i,
-                ref int dwFlags);
-
-            [PreserveSig]
-            int GetOverlayImage(
-                int iOverlay,
-                ref int piIndex);
         };
         #endregion
 
@@ -521,193 +454,6 @@ public static partial class NativeMethods
         }
 
         /// <summary>
-        /// Draws an image
-        /// </summary>
-        /// <param name="hdc">Device context to draw to</param>
-        /// <param name="index">Index of image to draw</param>
-        /// <param name="x">X Position to draw at</param>
-        /// <param name="y">Y Position to draw at</param>
-        public void DrawImage(
-            HANDLE hdc,
-            int index,
-            int x,
-            int y
-            )
-        {
-            DrawImage(hdc, index, x, y, ImageListDrawItemConstants.ILD_TRANSPARENT);
-        }
-
-        /// <summary>
-        /// Draws an image using the specified flags
-        /// </summary>
-        /// <param name="hdc">Device context to draw to</param>
-        /// <param name="index">Index of image to draw</param>
-        /// <param name="x">X Position to draw at</param>
-        /// <param name="y">Y Position to draw at</param>
-        /// <param name="flags">Drawing flags</param>
-        public void DrawImage(
-            HANDLE hdc,
-            int index,
-            int x,
-            int y,
-            ImageListDrawItemConstants flags
-            )
-        {
-            if (iImageList == null)
-            {
-                _ = ImageList_Draw(
-                    hIml,
-                    index,
-                    hdc,
-                    x,
-                    y,
-                    (int)flags);
-            }
-            else
-            {
-                IMAGELISTDRAWPARAMS pimldp = new()
-                {
-                    hdcDst = hdc,
-                    cbSize = Marshal.SizeOf(typeof(IMAGELISTDRAWPARAMS)),
-                    i = index,
-                    x = x,
-                    y = y,
-                    rgbFg = -1,
-                    fStyle = flags,
-                };
-                
-                iImageList.Draw(ref pimldp);
-            }
-
-        }
-
-        /// <summary>
-        /// Draws an image using the specified flags and specifies
-        /// the size to clip to (or to stretch to if ILD_SCALE
-        /// is provided).
-        /// </summary>
-        /// <param name="hdc">Device context to draw to</param>
-        /// <param name="index">Index of image to draw</param>
-        /// <param name="x">X Position to draw at</param>
-        /// <param name="y">Y Position to draw at</param>
-        /// <param name="flags">Drawing flags</param>
-        /// <param name="cx">Width to draw</param>
-        /// <param name="cy">Height to draw</param>
-        public void DrawImage(
-            HANDLE hdc,
-            int index,
-            int x,
-            int y,
-            ImageListDrawItemConstants flags,
-            int cx,
-            int cy
-            )
-        {
-            IMAGELISTDRAWPARAMS pimldp = new()
-            {
-                hdcDst = hdc,
-                cbSize = Marshal.SizeOf(typeof(IMAGELISTDRAWPARAMS)),
-                i = index,
-                x = x,
-                y = y,
-                cx = cx,
-                cy = cy,
-                fStyle = flags
-            };
-
-            if (iImageList == null)
-            {
-                pimldp.himl = hIml;
-                _ = ImageList_DrawIndirect(ref pimldp);
-            }
-            else
-            {
-                iImageList.Draw(ref pimldp);
-            }
-        }
-
-        /// <summary>
-        /// Draws an image using the specified flags and state on XP systems.
-        /// </summary>
-        /// <param name="hdc">Device context to draw to</param>
-        /// <param name="index">Index of image to draw</param>
-        /// <param name="x">X Position to draw at</param>
-        /// <param name="y">Y Position to draw at</param>
-        /// <param name="flags">Drawing flags</param>
-        /// <param name="cx">Width to draw</param>
-        /// <param name="cy">Height to draw</param>
-        /// <param name="foreColor">Fore colour to blend with when using the 
-        /// ILD_SELECTED or ILD_BLEND25 flags</param>
-        /// <param name="stateFlags">State flags</param>
-        /// <param name="glowOrShadowColor">If stateFlags include ILS_GLOW, then
-        /// the colour to use for the glow effect.  Otherwise if stateFlags includes 
-        /// ILS_SHADOW, then the colour to use for the shadow.</param>
-        /// <param name="saturateColorOrAlpha">If stateFlags includes ILS_ALPHA,
-        /// then the alpha component is applied to the icon. Otherwise if 
-        /// ILS_SATURATE is included, then the (R,G,B) components are used
-        /// to saturate the image.</param>
-        public void DrawImage(
-            HANDLE hdc,
-            int index,
-            int x,
-            int y,
-            ImageListDrawItemConstants flags,
-            int cx,
-            int cy,
-            Color foreColor,
-            ImageListDrawStateConstants stateFlags,
-            Color saturateColorOrAlpha,
-            Color glowOrShadowColor
-            )
-        {
-            IMAGELISTDRAWPARAMS pimldp = new()
-            {
-                hdcDst = hdc,
-                cbSize = Marshal.SizeOf(typeof(IMAGELISTDRAWPARAMS)),
-                i = index,
-                x = x,
-                y = y,
-                cx = cx,
-                cy = cy,
-                rgbFg = Color.FromArgb(0, foreColor.R, foreColor.G, foreColor.B).ToArgb(),
-                fStyle = flags,
-                fState = stateFlags
-            };
-            if ((stateFlags & ImageListDrawStateConstants.ILS_ALPHA) ==
-                ImageListDrawStateConstants.ILS_ALPHA)
-            {
-                // Set the alpha:
-                pimldp.Frame = saturateColorOrAlpha.A;
-            }
-            else if ((stateFlags & ImageListDrawStateConstants.ILS_SATURATE) ==
-                ImageListDrawStateConstants.ILS_SATURATE)
-            {
-                // discard alpha channel:
-                saturateColorOrAlpha = Color.FromArgb(0,
-                    saturateColorOrAlpha.R,
-                    saturateColorOrAlpha.G,
-                    saturateColorOrAlpha.B);
-                // set the saturate color
-                pimldp.Frame = saturateColorOrAlpha.ToArgb();
-            }
-            glowOrShadowColor = Color.FromArgb(0,
-                glowOrShadowColor.R,
-                glowOrShadowColor.G,
-                glowOrShadowColor.B);
-            pimldp.crEffect = glowOrShadowColor.ToArgb();
-            if (iImageList == null)
-            {
-                pimldp.himl = hIml;
-                _= ImageList_DrawIndirect(ref pimldp);
-            }
-            else
-            {
-
-                iImageList.Draw(ref pimldp);
-            }
-        }
-
-        /// <summary>
         /// Creates the SystemImageList
         /// </summary>
         private void Create()
@@ -716,12 +462,20 @@ public static partial class NativeMethods
             hIml = IntPtr.Zero;
 
             // Get the System IImageList object from the Shell:
-            Guid iidImageList = new Guid("46EB5926-582E-4017-9FDF-E8998DAA0950");
-            _ = SHGetImageList(
+            Guid iidImageList = new("46EB5926-582E-4017-9FDF-E8998DAA0950");
+
+            try
+            {
+                _ = SHGetImageList(
                 (int)size,
                 ref iidImageList,
                 ref iImageList
                 );
+            }
+            catch
+            {
+                iImageList = null;
+            }
 
             // the image list handle is the IUnknown pointer, but 
             // using Marshal.GetIUnknownForObject doesn't return
@@ -735,13 +489,7 @@ public static partial class NativeMethods
         #endregion
 
         #region Constructor, Dispose, Destructor
-        /// <summary>
-        /// Creates a Small Icons SystemImageList 
-        /// </summary>
-        public SysImageList()
-        {
-            Create();
-        }
+
         /// <summary>
         /// Creates a SystemImageList with the specified size
         /// </summary>

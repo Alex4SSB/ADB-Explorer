@@ -7,7 +7,7 @@
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:HistoryDeviceViewModel}"
     d:Width="200"
@@ -24,7 +24,7 @@
                     <DataTrigger Binding="{Binding IsDeviceConnectionInProgress}" Value="True">
                         <Setter Property="helpers:ExpanderHelper.HeaderBottomContent">
                             <Setter.Value>
-                                <ui:ProgressBar
+                                <ProgressBar
                                     Foreground="{DynamicResource HistoryDeviceBottomBorderBrush}"
                                     IsIndeterminate="True"
                                     Style="{StaticResource ExpanderHeaderProgressBarStyle}" />
@@ -67,32 +67,32 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-                    <Button
+                    <ui:Button
                         Grid.Column="2"
                         Command="{Binding RemoveCommand.Command}"
                         Opacity="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.ExpansionProgress)}"
                         Style="{StaticResource RestartAppButtonStyle}"
                         ToolTip="{Binding Source={x:Static Member=strings:Resources.S_REM_HIST_DEV}}">
                         <ui:FontIcon Glyph="&#xE74D;" />
-                    </Button>
+                    </ui:Button>
                 </Grid>
             </Border>
         </Expander.Header>
         <Grid Style="{StaticResource DeviceContentGridStyle}">
-            <ui:SimpleStackPanel Style="{StaticResource NewDeviceStackPanelStyle}">
+            <controls:SimpleStackPanel Style="{StaticResource NewDeviceStackPanelStyle}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <ui:FontIcon Glyph="&#xE774;" ToolTip="{Binding Source={x:Static Member=strings:Resources.S_PLACEHOLDER_HOST}}" />
-                    <TextBox
+                    <ui:TextBox
                         Grid.Column="1"
                         Padding="4,5,0,6"
                         d:Background="LightGray"
                         IsReadOnly="True">
-                        <TextBox.Style>
-                            <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
+                        <ui:TextBox.Style>
+                            <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="ui:TextBox">
                                 <Setter Property="Text" Value="{Binding IpAddress}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsIpAddressValid}" Value="False">
@@ -100,8 +100,8 @@
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </TextBox.Style>
-                    </TextBox>
+                        </ui:TextBox.Style>
+                    </ui:TextBox>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -127,7 +127,7 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <Separator />
-                    <Button
+                    <ui:Button
                         Grid.Column="1"
                         Margin="4,0"
                         Style="{StaticResource ConnectNewDeviceButtonStyle}" />
@@ -158,7 +158,7 @@
                     </Grid>
                     <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePairingPortBoxStyle}" />
                 </Grid>
-            </ui:SimpleStackPanel>
+            </controls:SimpleStackPanel>
         </Grid>
     </Expander>
 </UserControl>

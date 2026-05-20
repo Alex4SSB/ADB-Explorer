@@ -276,12 +276,6 @@ The release notes are available on GitHub.</value>
 • File names are case insensitive
 • Installation of APKs is not supported</value>
   </data>
-  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>The app has many animations that are enabled as part of the fluent design.
-The side views animation is always disabled when the app window is maximized on a secondary display.
-
-• Checking this setting disables all app animations except progress bars, progress rings, and drive usage bars.</value>
-  </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>All app settings will be reset upon closing the app.
 This cannot be undone. Are you sure?</value>
@@ -561,9 +555,17 @@ Visible content may be incomplete.</value>
     <value>Theme</value>
     <comment>The title of the settings group used to control the app theme</comment>
   </data>
-  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
-    <value>Force Fluent Styles</value>
-    <comment>The setting used in Windows 10 to force the app to use the fluent style design</comment>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Custom accent color</value>
+    <comment>The setting to enable a custom accent color instead of the system accent</comment>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Accent color</value>
+    <comment>The setting to choose a custom accent color</comment>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Pick a color</value>
+    <comment>Title of the color picker dialog</comment>
   </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>Disable Hardware Acceleration</value>
@@ -572,10 +574,6 @@ Visible content may be incomplete.</value>
   <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
     <value>Disable Animations</value>
     <comment>The setting used to disable app animations</comment>
-  </data>
-  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>Splash Screen</value>
-    <comment>The setting used to enable showing the splash screen on app startup</comment>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>Check For Updates</value>
@@ -820,10 +818,6 @@ Cancel All Running</value>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>Write: {0}</value>
     <comment>ADB disk write speed. 0 = the speed including MB/s</comment>
-  </data>
-  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
-    <value>Other: {0}</value>
-    <comment>ADB disk other speed (other than file transfers). 0 = the speed including MB/s</comment>
   </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>Checks for updates on each launch</value>
@@ -2001,5 +1995,27 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_MOUNT_OPTIONS" xml:space="preserve">
     <value>Mount options</value>
     <comment>The Unix mount options of a drive</comment>
+  </data>
+  <data name="S_COLOR_RED" xml:space="preserve">
+    <value>Red</value>
+    <comment>The label of the red channel in the color picker</comment>
+  </data>
+  <data name="S_COLOR_GREEN" xml:space="preserve">
+    <value>Green</value>
+    <comment>The label of the green channel in the color picker</comment>
+  </data>
+  <data name="S_COLOR_BLUE" xml:space="preserve">
+    <value>Blue</value>
+    <comment>The label of the blue channel in the color picker</comment>
+  </data>
+  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
+    <value>Unable to locate ADB from system PATH. Please use "{0}" to locate it.</value>
+    <comment>0 - the name of the Override ADB Path setting</comment>
+  </data>
+  <data name="S_ADB_PATH_INVALID" xml:space="preserve">
+    <value>Provided ADB path is either a Windows shortcut or a UNC (remote) path, which is not allowed.</value>
+  </data>
+  <data name="S_ADB_COMPROMISED" xml:space="preserve">
+    <value>The provided executable cannot be verified as ADB. Make sure you download only official Android Platform Tools from Google.</value>
   </data>
 </root>

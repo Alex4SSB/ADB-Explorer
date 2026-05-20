@@ -71,6 +71,16 @@ namespace ADB_Explorer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        public static System.Drawing.Icon APK_icon_256px {
+            get {
+                object obj = ResourceManager.GetObject("APK_icon_256px", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ADB Explorer.
         /// </summary>
         public static string AppDisplayName {
@@ -80,7 +90,7 @@ namespace ADB_Explorer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 0.9.26040.
+        ///   Looks up a localized string similar to 1.0.26051.
         /// </summary>
         public static string AppVersion {
             get {

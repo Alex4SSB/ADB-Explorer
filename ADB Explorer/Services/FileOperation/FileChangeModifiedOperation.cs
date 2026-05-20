@@ -7,8 +7,8 @@ public class FileChangeModifiedOperation : AbstractShellFileOperation
 {
     public readonly DateTime NewDate;
 
-    public FileChangeModifiedOperation(FileClass filePath, DateTime newDate, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
-        : base(filePath, adbDevice, dispatcher)
+    public FileChangeModifiedOperation(FileClass filePath, DateTime newDate, LogicalDeviceViewModel device, Dispatcher dispatcher)
+        : base(filePath, device, dispatcher)
     {
         OperationName = OperationType.Update;
         NewDate = newDate;

@@ -16,7 +16,8 @@ internal static class NavigationToolBar
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Back),
             "\uE72B",
-            StyleHelper.ContentAnimation.LeftMarquee),
+            StyleHelper.ContentAnimation.LeftMarquee,
+            mirrorInRTL: true),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.NavHistory),
             "\uE70D",
@@ -26,7 +27,8 @@ internal static class NavigationToolBar
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Forward),
             "\uE72A",
-            StyleHelper.ContentAnimation.RightMarquee),
+            StyleHelper.ContentAnimation.RightMarquee,
+            mirrorInRTL: true),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Up),
             "\uE197",
@@ -34,7 +36,8 @@ internal static class NavigationToolBar
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Refresh),
             AppActions.Icons[FileAction.FileActionType.Refresh],
-            StyleHelper.ContentAnimation.RotateCW),
+            StyleHelper.ContentAnimation.RotateCW,
+            mirrorInRTL: true),
         ];
 
 }
@@ -42,17 +45,19 @@ internal static class NavigationToolBar
 internal static class MainToolBar
 {
     public static ObservableList<IMenuItem> List { get; } = [
-        new AnimatedNotifyMenu(
-            AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenDevices),
-            Data.DevicesObject.ObservableCount,
-            "\uE8CC"),
-        new MenuSeparator(),
+        //new AnimatedNotifyMenu(
+        //    AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenDevices),
+        //    Data.DevicesObject.ObservableCount,
+        //    "\uE8CC"),
+        //new MenuSeparator(),
         new CompoundIconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Pull),
             new PullIcon()),
         new CompoundIconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Push),
             new PushIcon(),
+            isChevronVisible: true,
+            children: 
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFolders), AppActions.Icons[FileAction.FileActionType.PushFolders]),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFiles), AppActions.Icons[FileAction.FileActionType.NewFile]),
@@ -62,11 +67,11 @@ internal static class MainToolBar
                     isVisible: Data.FileActions.IsApkActionsVisible),
             ]),
         new MenuSeparator(),
-        new AltTextMenu(
+        new CompoundIconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.New),
-            AppActions.Icons[FileAction.FileActionType.New],
-            iconSize: 20,
-            isTooltipVisible: false,
+            new NewItemIcon(),
+            isNameDisplayed: true,
+            isChevronVisible: true,
             children:
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFolder), "\uE8F4"),
@@ -126,7 +131,7 @@ internal static class MainToolBar
             iconSize: 20,
             children:
             [
-                new CompoundIconSubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), new Controls.PathIcon()),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), AppActions.Icons[FileAction.FileActionType.CopyItemPath]),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.SearchApkOnWeb),
                     AppActions.Icons[FileAction.FileActionType.SearchApkOnWeb],
                     isVisible: Data.FileActions.IsApkActionsVisible),
@@ -135,7 +140,6 @@ internal static class MainToolBar
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PasteLink), AppActions.Icons[FileAction.FileActionType.PasteLink]),
                 new SubMenuSeparator(),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), AppActions.Icons[FileAction.FileActionType.UpdateModified]),
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Edit), AppActions.Icons[FileAction.FileActionType.Edit]),
                 new SubMenuSeparator(Data.FileActions.IsApkActionsVisible),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Package),
                     AppActions.Icons[FileAction.FileActionType.Package],
@@ -158,7 +162,7 @@ internal static class ExplorerContextMenu
         var list = List.ToArray();
         var separators = list.OfType<SubMenuSeparator>().Select(separator => (separator, List.IndexOf(separator))).ToList();
 
-        App.Current.Dispatcher.Invoke(() =>
+        App.SafeInvoke(() =>
         {
             for (int i = 0; i < separators.Count; i++)
             {
@@ -179,19 +183,19 @@ internal static class ExplorerContextMenu
     public static ObservableList<SubMenu> List { get; } = [
         new CompoundIconSubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Pull),
-            new PullIcon(-5)),
+            new PullIcon()),
         new CompoundIconSubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPush),
-            new PushIcon(-5),
+            new PushIcon(),
             children:
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFolders), AppActions.Icons[FileAction.FileActionType.PushFolders]),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFiles), AppActions.Icons[FileAction.FileActionType.NewFile]),
             ]),
         new SubMenuSeparator(),
-        new SubMenu(
+        new CompoundIconSubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextNew),
-            AppActions.Icons[FileAction.FileActionType.New],
+            new NewItemIcon(),
             children:
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFolder), "\uE8F4"),
@@ -206,15 +210,8 @@ internal static class ExplorerContextMenu
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Rename), AppActions.Icons[FileAction.FileActionType.Rename]),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FollowLink), AppActions.Icons[FileAction.FileActionType.FollowLink]),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenPackageLocation), AppActions.Icons[FileAction.FileActionType.FollowLink]),
-        new CompoundIconSubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), new Controls.PathIcon()),
-        new SubMenu(
-            AppActions.List.Find(a => a.Name is FileAction.FileActionType.More),
-            AppActions.Icons[FileAction.FileActionType.More],
-            children:
-            [
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), AppActions.Icons[FileAction.FileActionType.UpdateModified]),
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Edit), AppActions.Icons[FileAction.FileActionType.Edit]),
-            ]),
+        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), AppActions.Icons[FileAction.FileActionType.CopyItemPath]),
+        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), AppActions.Icons[FileAction.FileActionType.UpdateModified]),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Uninstall), AppActions.Icons[FileAction.FileActionType.Uninstall]),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Restore), AppActions.Icons[FileAction.FileActionType.Restore]),
         new SubMenuSeparator(),
@@ -240,72 +237,10 @@ internal static class PathContextMenu
 {
     public static ObservableList<SubMenu> List { get; } =
     [
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.EditCurrentPath), AppActions.Icons[FileAction.FileActionType.Edit]),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.EditCurrentPath), AppActions.Icons[FileAction.FileActionType.EditCurrentPath]),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyCurrentPath), AppActions.Icons[FileAction.FileActionType.Copy]),
         new SubMenuSeparator(),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Refresh), AppActions.Icons[FileAction.FileActionType.Refresh]),
-    ];
-}
-
-internal static class FileOpMenu
-{
-    public static ObservableList<IMenuItem> List { get; } =
-    [
-        new AltObjectMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenFileOps),
-            AppActions.Icons[FileAction.FileActionType.OpenFileOps],
-            isContentDropDown: true,
-            children:
-            [
-                new GeneralSubMenu(App.Current.Resources["CompactFileOpDropDown"], true)
-            ]),
-    ];
-}
-
-internal static class SettingsMenu
-{
-    public static ObservableList<IMenuItem> List { get; } =
-    [
-        new CompoundIconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenSettings),
-            new SettingsIcon()),
-    ];
-}
-
-internal static class SettingsPaneMenu
-{
-    public static ObservableList<IMenuItem> List { get; } =
-    [
-        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.HideSettings),
-            "\uE761",
-            iconSize: 20),
-    ];
-}
-
-internal static class EditorControls
-{
-    public static ObservableList<IMenuItem> List { get; } =
-    [
-        new DualActionButton(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CloseEditor),
-            AppActions.Icons[FileAction.FileActionType.FileOpRemove],
-            iconSize: 16),
-        new DualActionButton(AppActions.List.Find(a => a.Name is FileAction.FileActionType.SaveEditor),
-            "\uE74E",
-            animation: StyleHelper.ContentAnimation.Bounce,
-            iconSize: 16),
-    ];
-}
-
-internal static class FileOpControls
-{
-    public static ObservableList<IMenuItem> List { get; } =
-    [
-        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpFilter).Button,
-        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpStop).Button,
-        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpRemove),
-            AppActions.Icons[FileAction.FileActionType.FileOpRemove],
-            iconSize: 20),
-        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpValidate),
-            "\uE73E",
-            iconSize: 20),
     ];
 }
 
@@ -317,47 +252,5 @@ internal static class LogControls
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ClearLogs),
             AppActions.Icons[FileAction.FileActionType.FileOpRemove],
             iconSize: 20)
-    ];
-}
-
-internal static class ResetSettings
-{
-    public static ObservableList<IMenuItem> List { get; } =
-    [
-        new CompoundDualAction(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ResetSettings),
-            new ResetSettingsIcon()),
-    ];
-}
-
-internal static class SettingsControls
-{
-    public static ObservableList<IMenuItem> List { get; } =
-    [
-        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.SortSettings).Button,
-        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.ExpandSettings).Button,
-    ];
-}
-
-internal static class LogToggle
-{
-    public static ObservableList<IMenuItem> List { get; } =
-    [
-        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.TerminalToggle).Button,
-        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.LogToggle).Button,
-    ];
-}
-
-internal static class PeekDetailed
-{
-    public static BaseAction Action { get; } = new(
-            () => true,
-            () => Data.RuntimeSettings.IsDetailedPeekMode = true);
-}
-
-internal static class DialogExtraButtons
-{
-    public static ObservableList<IMenuItem> List { get; } =
-    [
-        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyMessageToClipboard), "\uF0E3"),
     ];
 }

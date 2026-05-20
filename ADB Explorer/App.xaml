@@ -2,43 +2,23 @@
     x:Class="ADB_Explorer.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:ui="http://schemas.modernwpf.com/2019"
-    DispatcherUnhandledException="Application_DispatcherUnhandledException"
-    Exit="Application_Exit"
-    Startup="Application_Startup"
-    StartupUri="MainWindow.xaml">
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    DispatcherUnhandledException="OnDispatcherUnhandledException"
+    Exit="OnExit"
+    Startup="OnStartup">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ui:ThemeResources />
-                <ui:XamlControlsResources />
-                <ResourceDictionary Source="Styles\Colors.xaml" />
-                <ResourceDictionary Source="Styles\BasicStyles.xaml" />
-                <ResourceDictionary Source="Styles\Controls\ScrollBar.xaml" />
-                <ResourceDictionary Source="Styles\Controls\ScrollViewer.xaml" />
-                <ResourceDictionary Source="Styles\Controls\ContextMenu.xaml" />
-                <ResourceDictionary Source="Styles\Controls\CheckBox.xaml" />
-                <ResourceDictionary Source="Styles\Controls\RadioButton.xaml" />
-                <ResourceDictionary Source="Styles\Controls\Button.xaml" />
-                <ResourceDictionary Source="Styles\Controls\ToggleButton.xaml" />
-                <ResourceDictionary Source="Styles\Controls\ComboBox.xaml" />
-                <ResourceDictionary Source="Styles\Controls\MenuItem.xaml" />
-                <ResourceDictionary Source="Styles\Controls\TextBox.xaml" />
-                <ResourceDictionary Source="Styles\Controls\Expander.xaml" />
-                <ResourceDictionary Source="Styles\CustomStyles.xaml" />
-                <ResourceDictionary Source="Styles\Controls\DataGrid.xaml" />
-                <ResourceDictionary Source="Styles\Controls\SplitView.xaml" />
-                <ResourceDictionary Source="Styles\FileAction.xaml" />
-                <ResourceDictionary Source="Styles\Settings.xaml" />
-                <ResourceDictionary Source="Styles\Drive.xaml" />
-                <ResourceDictionary Source="Styles\Device.xaml" />
-                <ResourceDictionary Source="Styles\FileOp.xaml" />
-                <ResourceDictionary Source="Styles\FileOpColumn.xaml" />
-                <ResourceDictionary Source="Styles\Controls\ContentDialog.xaml" />
-                <!--  Other merged dictionaries here  -->
-                <!--<ResourceDictionary Source="pack://application:,,,/PresentationFramework.Fluent;component/Themes/Fluent.xaml" />-->
+                <ui:ThemesDictionary Theme="Light" />
+                <ui:ControlsDictionary />
+                <ResourceDictionary Source="/Styles/Colors.xaml" />
+                <ResourceDictionary Source="/Themes/Light.xaml" />
+                <ResourceDictionary Source="/Styles/BasicStyles.xaml" />
+                <ResourceDictionary Source="/Styles/CustomStyles.xaml" />
+                <ResourceDictionary Source="/Styles/Expander.xaml" />
+                <ResourceDictionary Source="/Styles/FileAction.xaml" />
+                <ResourceDictionary Source="/Styles/Device.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <!--  Other app resources here  -->
 
             <FontFamily x:Key="SymbolThemeFontFamily">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
             <FontFamily x:Key="Nunito">pack://application:,,,/Resources/Fonts/#Nunito</FontFamily>

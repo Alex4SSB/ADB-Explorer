@@ -4,10 +4,8 @@ using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Models;
 
-internal static class Data
+public static class Data
 {
-    public static ADBService.AdbDevice CurrentADBDevice { get; set; } = null;
-
     public static string CurrentPath { get; set; }
     public static string ParentPath { get; set; }
 
@@ -39,9 +37,7 @@ internal static class Data
 
     public static Devices DevicesObject { get; set; }
 
-    public static MDNS MdnsService { get; set; } = new();
-
-    public static PairingQrClass QrClass { get; set; }
+    public static MDNS MdnsService { get; } = new();
 
     public static IEnumerable<FileClass> SelectedFiles { get; set; } = [];
 

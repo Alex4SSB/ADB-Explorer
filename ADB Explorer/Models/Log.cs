@@ -1,6 +1,6 @@
 ﻿namespace ADB_Explorer.Models;
 
-internal class Log
+public class Log
 {
     public string Content { get; set; }
 

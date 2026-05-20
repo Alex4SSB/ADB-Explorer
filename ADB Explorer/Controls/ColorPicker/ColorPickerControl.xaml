@@ -1,0 +1,27 @@
+<UserControl
+    x:Class="ADB_Explorer.Controls.ColorPicker.ColorPickerControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:ADB_Explorer.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    x:Name="Root"
+    mc:Ignorable="d">
+
+    <ui:Button x:Name="SwatchButton" Click="SwatchButton_Click">
+        <controls:SimpleStackPanel Orientation="Horizontal" Spacing="10">
+            <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_MENU_EDIT}}" />
+            <Border
+                Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ui:Button}, Path=ActualHeight}"
+                d:Background="#7FC9E4"
+                CornerRadius="3">
+                <Border.Background>
+                    <SolidColorBrush x:Name="SwatchBrush" />
+                </Border.Background>
+            </Border>
+        </controls:SimpleStackPanel>
+
+    </ui:Button>
+</UserControl>

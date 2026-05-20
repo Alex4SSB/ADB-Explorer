@@ -2,8 +2,9 @@
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
+using ADB_Explorer.Views.Pages;
 using Windows.Management.Deployment;
-using static ADB_Explorer.Models.AbstractDevice;
+using Wpf.Ui;
 
 namespace ADB_Explorer.Helpers;
 
@@ -45,12 +46,12 @@ public static class DeviceHelper
             return null;
 
         // Try to find the MMC in the props
-        if (Data.CurrentADBDevice.MmcProp is string mmcId)
+        if (Data.DevicesObject.Current.MmcProp is string mmcId)
         {
             return drives.FirstOrDefault(d => d.ID == mmcId);
         }
         // If OTG exists, but no MMC ID - there is no MMC
-        else if (Data.CurrentADBDevice.OtgProp is not null)
+        else if (Data.DevicesObject.Current.OtgProp is not null)
             return null;
 
         var externalDrives = drives.Where(d => d.Type is AbstractDrive.DriveType.Unknown);
@@ -63,6 +64,30 @@ public static class DeviceHelper
                 return drives.FirstOrDefault(d => d.ID == mmc);
 
             // Only check whether MMC exists if there's only one drive
+            case 1:
+                return ADBService.MmcExists(deviceID) ? externalDrives.First() : null;
+            default:
+                return null;
+        }
+    }
+
+    public static DriveSnapshot? GetMmcDrive(IEnumerable<DriveSnapshot> snapshots, string deviceID)
+    {
+        if (snapshots is null)
+            return null;
+
+        if (Data.DevicesObject.Current.MmcProp is string mmcId)
+            return snapshots.Where(d => d.ID == mmcId).Select(d => (DriveSnapshot?)d).FirstOrDefault();
+        else if (Data.DevicesObject.Current.OtgProp is not null)
+            return null;
+
+        var externalDrives = snapshots.Where(d => d.Type is AbstractDrive.DriveType.Unknown).ToList();
+
+        switch (externalDrives.Count)
+        {
+            case > 1:
+                var mmc = ADBService.GetMmcId(deviceID);
+                return snapshots.Where(d => d.ID == mmc).Select(d => (DriveSnapshot?)d).FirstOrDefault();
             case 1:
                 return ADBService.MmcExists(deviceID) ? externalDrives.First() : null;
             default:
@@ -137,7 +162,7 @@ public static class DeviceHelper
             : Strings.Resources.S_REM_DEVICE_TITLE;
 
         var dialogTask = await DialogService.ShowConfirmation(message, string.Format(title, name));
-        if (dialogTask.Item1 is not ContentDialogResult.Primary)
+        if (dialogTask.Item1 is not Wpf.Ui.Controls.ContentDialogResult.Primary)
             return;
 
         if (device.Type is DeviceType.Emulator)
@@ -201,7 +226,7 @@ public static class DeviceHelper
 
         if (device.Root is RootStatus.Forbidden)
         {
-            App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(Strings.Resources.S_ROOT_FORBID, Strings.Resources.S_ROOT_FORBID_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
+            App.SafeInvoke(() => DialogService.ShowMessage(Strings.Resources.S_ROOT_FORBID, Strings.Resources.S_ROOT_FORBID_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
         }
     }
 
@@ -233,7 +258,7 @@ public static class DeviceHelper
 
                 Data.Settings.ShowLaunchWsaMessage = !result.Item2;
 
-                if (result.Item1 is not ContentDialogResult.Primary)
+                if (result.Item1 is not Wpf.Ui.Controls.ContentDialogResult.Primary)
                     return;
             }
 
@@ -244,11 +269,15 @@ public static class DeviceHelper
 
     public static readonly Predicate<DeviceViewModel> DevicePredicate = device =>
     {
+        // The mDNS device cannot hide itself when in a listview
+        if (device is MdnsDeviceViewModel)
+            return Data.Settings.EnableMdns;
+
         // current device cannot be hidden
         if (device is LogicalDeviceViewModel { IsOpen: true })
             return true;
 
-        if (device is LogicalDeviceViewModel && device.Type is DeviceType.Service)
+        if (device is LogicalDeviceViewModel logDev && device.Type is DeviceType.Service)
         {
             if (device.Status is DeviceStatus.Offline)
             {
@@ -257,9 +286,14 @@ public static class DeviceHelper
             }
 
             // if there's a logical service and a remote device with the same IP - hide the logical service
-            return !Data.DevicesObject.LogicalDeviceViewModels.Any(l => l.IpAddress == device.IpAddress
+            var res = !Data.DevicesObject.LogicalDeviceViewModels.Any(l => l.IpAddress == device.IpAddress
                                                     && l.Type is DeviceType.Remote or DeviceType.Local
                                                     && l.Status is DeviceStatus.Ok);
+
+            if (res)
+                logDev.UseIdForName = false;
+
+            return res;
         }
 
         if (device is LogicalDeviceViewModel && device.Type is DeviceType.Remote)
@@ -281,7 +315,7 @@ public static class DeviceHelper
         if (device is ServiceDeviceViewModel service)
         {
             // connect services are always hidden
-            if (service is ConnectServiceViewModel)
+            if (service.ConnectionKind is ServiceConnectionKind.Connect)
                 return false;
 
             // if there's any online logical device with the IP of a pairing service - hide the pairing service
@@ -289,8 +323,8 @@ public static class DeviceHelper
                 return false;
 
             // if there's any QR service with the IP of a code pairing service - hide the code pairing service
-            if (service.MdnsType is ServiceDevice.ServiceType.PairingCode
-                && Data.DevicesObject.ServiceDeviceViewModels.Any(qr => qr.MdnsType is ServiceDevice.ServiceType.QrCode
+            if (service.MdnsType is ServiceDevice.PairingMode.PairingCode
+                && Data.DevicesObject.ServiceDeviceViewModels.Any(qr => qr.MdnsType is ServiceDevice.PairingMode.QrCode
                                                           && qr.IpAddress == service.IpAddress))
                 return false;
         }
@@ -313,13 +347,13 @@ public static class DeviceHelper
         if (device is LogicalDeviceViewModel logicalDev && logicalDev.Type is not DeviceType.Emulator)
         {
             // if there are multiple logical devices of the same model, display their ID instead
-            logicalDev.UseIdForName = Data.DevicesObject.LogicalDeviceViewModels.Count(dev => dev.Name.Equals(logicalDev.Name)) > 1;
+            logicalDev.UseIdForName = Data.DevicesObject.LogicalDeviceViewModels.Count(dev => dev.Name.Equals(logicalDev.Name) && dev.IpAddress != logicalDev.IpAddress) > 1;
         }
 
         return true;
     };
 
-    public static readonly Predicate<object> devicePredicate = d => DevicePredicate((DeviceViewModel)d);
+    public static readonly Predicate<object> DevicesFilter = d => DevicePredicate((DeviceViewModel)d);
 
     public static void FilterDevices(ICollectionView collectionView)
     {
@@ -332,7 +366,7 @@ public static class DeviceHelper
             return;
         }
 
-        collectionView.Filter = new(devicePredicate);
+        collectionView.Filter = new(DevicesFilter);
         collectionView.SortDescriptions.Clear();
         collectionView.SortDescriptions.Add(new SortDescription(nameof(DeviceViewModel.Type), ListSortDirection.Ascending));
     }
@@ -341,7 +375,7 @@ public static class DeviceHelper
     {
         Data.DevicesObject.Current?.UpdateBattery();
 
-        if (DateTime.Now - Data.DevicesObject.LastUpdate <= AdbExplorerConst.BATTERY_UPDATE_INTERVAL && !Data.RuntimeSettings.IsDevicesPaneOpen)
+        if (DateTime.Now - Data.DevicesObject.LastUpdate <= AdbExplorerConst.BATTERY_UPDATE_INTERVAL && !Data.RuntimeSettings.IsDevicesView)
             return;
 
         var items = Data.DevicesObject.LogicalDeviceViewModels.Where(device => !device.IsOpen);
@@ -353,21 +387,25 @@ public static class DeviceHelper
         Data.DevicesObject.LastUpdate = DateTime.Now;
     }
 
-    public static async void ListServices(IEnumerable<ServiceDevice> services)
+    public static async void ListServices(IEnumerable<ServiceSnapshot> snapshots)
     {
-        if (services is null)
+        if (snapshots is null)
             return;
 
-        var viewModels = services.Select(ServiceDeviceViewModel.New);
-
-        if (!Data.DevicesObject.ServicesChanged(viewModels))
+        if (!Data.DevicesObject.ServicesChanged(snapshots))
             return;
+
+        var viewModels = snapshots.Select(s => new ServiceDeviceViewModel(ServiceDevice.From(s)));
 
         Data.DevicesObject.UpdateServices(viewModels);
 
+        var qrClass = Data.MdnsService?.QrClass;
+        if (qrClass is null)
+            return;
+
         var qrServices = Data.DevicesObject.ServiceDeviceViewModels.Where(service =>
-            service.MdnsType == ServiceDevice.ServiceType.QrCode
-            && service.ID == Data.QrClass.ServiceName);
+            service.MdnsType == ServiceDevice.PairingMode.QrCode
+            && service.ID == qrClass.ServiceName);
 
         if (qrServices.Any())
         {
@@ -377,9 +415,12 @@ public static class DeviceHelper
 
     public static async Task<bool> PairService(ServiceDeviceViewModel service)
     {
-        var code = service.MdnsType == ServiceDevice.ServiceType.QrCode
-            ? Data.QrClass.Password
+        var code = service.MdnsType == ServiceDevice.PairingMode.QrCode
+            ? Data.MdnsService?.QrClass?.Password
             : service.PairingCode;
+
+        if (string.IsNullOrEmpty(code))
+            return false;
 
         return await Task.Run(() =>
         {
@@ -389,21 +430,12 @@ public static class DeviceHelper
             }
             catch (Exception ex)
             {
-                App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
+                App.SafeInvoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
                 return false;
             }
 
             return true;
         });
-    }
-
-    public static void CollapseDevices()
-    {
-        // To make sure value changes to true
-        Data.RuntimeSettings.CollapseDevices = false;
-        Data.RuntimeSettings.CollapseDevices = true;
-
-        Data.RuntimeSettings.IsPathBoxFocused = false;
     }
 
     public static void UpdateDevicesRootAccess()
@@ -413,9 +445,9 @@ public static class DeviceHelper
         {
             bool root = ADBService.WhoAmI(device.ID);
             bool rootDisabled = Data.DevicesObject.RootDevices.Contains(device.ID);
-            App.Current?.Dispatcher?.Invoke(() =>
+            App.SafeInvoke(() =>
             {
-                return device.SetRootStatus(root ? RootStatus.Enabled
+                device.SetRootStatus(root ? RootStatus.Enabled
                     : rootDisabled ? RootStatus.Disabled
                         : RootStatus.Unchecked);
             });
@@ -434,7 +466,7 @@ public static class DeviceHelper
             }
             catch (Exception ex)
             {
-                App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
+                App.SafeInvoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
                 return false;
             }
         }).ContinueWith(t =>
@@ -442,7 +474,7 @@ public static class DeviceHelper
             if (t.IsCanceled)
                 return;
 
-            App.Current.Dispatcher.Invoke(() =>
+            App.SafeInvoke(() =>
             {
                 if (t.Result)
                     ConnectNewDevice();
@@ -474,7 +506,7 @@ public static class DeviceHelper
                     Data.DevicesObject.CurrentNewDevice.EnablePairing();
                 }
                 else
-                    App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_FAILED_CONN_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
+                    App.SafeInvoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_FAILED_CONN_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
 
                 return false;
             }
@@ -483,7 +515,7 @@ public static class DeviceHelper
             if (t.IsCanceled)
                 return;
 
-            App.Current.Dispatcher.Invoke(() =>
+            App.SafeInvoke(() =>
             {
                 if (t.Result)
                 {
@@ -493,7 +525,7 @@ public static class DeviceHelper
                     if (newDevice.Type is DeviceType.New && !AdbExplorerConst.LOOPBACK_ADDRESSES.Contains(newDevice.IpAddress))
                     {
                         if (Data.Settings.SaveDevices)
-                            Data.DevicesObject.AddHistoryDevice(HistoryDeviceViewModel.New(dev));
+                            Data.DevicesObject.AddHistoryDevice(HistoryDeviceViewModel.FromNewDevice(dev));
 
                         newDeviceAddress = dev.ConnectAddress;
                         ((NewDeviceViewModel)newDevice).ClearDevice();
@@ -507,7 +539,6 @@ public static class DeviceHelper
                             Data.DevicesObject.StoreHistoryDevices();
                     }
 
-                    CollapseDevices();
                     DeviceListSetup(newDeviceAddress);
                 }
 
@@ -522,17 +553,17 @@ public static class DeviceHelper
         var pastOps = Data.FileOpQ.Operations.Where(op => op.IsPastOp);
 
         // get the newly acquired devices with similar IDs to devices of the past file ops [the objects of] which also do not exist in the devices UI list
-        var exceptDevices = devices.Where(d => pastOps.Any(op => op.Device.ID == d.ID && !Data.DevicesObject.UIList.Contains(op.Device.Device)));
+        var exceptDevices = devices.Where(d => pastOps.Any(op => op.Device.ID == d.ID && !Data.DevicesObject.UIList.Contains(op.Device)));
 
         // get the corresponding file op devices
-        var fileOpDevices = pastOps.Select(op => op.Device.Device).Where(d => exceptDevices.Any(e => e.ID == d.ID));
+        var fileOpDevices = pastOps.Select(op => op.Device).Where(d => exceptDevices.Any(e => e.ID == d.ID));
 
         return devices.Except(exceptDevices, new LogicalDeviceViewModelEqualityComparer()).AppendRange(fileOpDevices.Distinct());
     }
 
     public static void DeviceListSetup(string selectedAddress = "")
     {
-        Task.Run(ADBService.GetDevices).ContinueWith((t) => App.Current.Dispatcher.Invoke(() => DeviceListSetup(t.Result.Select(l => new LogicalDeviceViewModel(l)), selectedAddress)));
+        Task.Run(ADBService.GetDevices).ContinueWith((t) => App.SafeInvoke(() => DeviceListSetup(t.Result.Select(s => new LogicalDeviceViewModel(LogicalDevice.From(s))), selectedAddress)));
     }
 
     public static void DeviceListSetup(IEnumerable<LogicalDeviceViewModel> devices, string selectedAddress = "")
@@ -544,17 +575,15 @@ public static class DeviceHelper
         if (Data.DevicesObject.Current is null || Data.DevicesObject.Current.IsOpen && Data.DevicesObject.Current.Status is not DeviceStatus.Ok)
         {
             DriveHelper.ClearDrives();
-            Data.DevicesObject.SetOpenDevice((LogicalDeviceViewModel)null);
+            Devices.SetOpenDevice(null);
         }
 
         if (Data.DevicesObject.DevicesAvailable(true))
             return;
 
-        CollapseDevices();
+        Devices.SetOpenDevice(null);
 
-        Data.DevicesObject.SetOpenDevice((LogicalDeviceViewModel)null);
-
-        Data.CopyPaste.GetClipboardPasteItems();
+        App.SafeInvoke(Data.CopyPaste.GetClipboardPasteItems);
 
         FileActionLogic.ClearExplorer();
         Data.FileActions.IsExplorerVisible = false;
@@ -602,31 +631,56 @@ public static class DeviceHelper
                 Thread.Sleep(500);
             }
             return true;
-        }).ContinueWith(t => App.Current.Dispatcher.Invoke(() =>
+        }).ContinueWith(t => App.SafeInvoke(() =>
         {
             if (!t.Result)
                 return;
 
-            Data.DevicesObject.SetOpenDevice(device);
-            Data.CurrentADBDevice = new(Data.DevicesObject.Current);
+            Devices.SetOpenDevice(device);
             Data.RuntimeSettings.InitLister = true;
         }));
     }
 
-    public static void InitDevice()
+    public static async void InitDevice()
     {
-        SetAndroidVersion();
+        var device = Data.DevicesObject.Current;
+        var internalDrive = device.Drives.First(d => d.Type is AbstractDrive.DriveType.Internal).Drive;
+
+        // Run both ADB calls concurrently on background threads instead of blocking the UI thread.
+        // Props (getprop) is needed by CombineDisplayNames (BrandName) and SetAndroidVersion.
+        // GetInternalStorage (readlink) is independent and updates the internal drive path.
+        var propsTask = Task.Run(() => device.Props);
+        var storageTask = Task.Run(() => ADBService.GetInternalStorage(device.ID));
+
+        storageTask.ContinueWith(t =>
+        {
+            if (!t.IsFaulted && !t.IsCanceled && Data.DevicesObject.Current == device)
+                App.SafeInvoke(() => internalDrive.UpdatePath(t.Result));
+        });
+
+        // Start drive enumeration immediately — it is independent of Props
         FileActionLogic.RefreshDrives(true);
 
+        // Suspend until Props is loaded without blocking the UI thread.
+        // CombineDisplayNames and DriveViewNav must run after Props so that
+        // BrandName and CurrentDisplayNames are populated before breadcrumbs render.
+        await propsTask;
+
+        if (Data.DevicesObject.Current != device)
+            return;
+
+        device.SetAndroidVersion();
         FolderHelper.CombineDisplayNames();
         Data.RuntimeSettings.DriveViewNav = true;
         NavHistory.Navigate(Navigation.SpecialLocation.DriveView);
 
+        if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.OnConnect)
+            Task.Run(() => ThumbnailService.ForceLoad(device));
+
         Data.CopyPaste.GetClipboardPasteItems();
         Data.RuntimeSettings.FilterDrives = true;
 
-        Data.RuntimeSettings.CurrentDevice = Data.DevicesObject.Current;
-        Data.FileActions.PushPackageEnabled = Data.Settings.EnableApk && Data.DevicesObject?.Current?.Type is not DeviceType.Recovery;
+        Data.FileActions.PushPackageEnabled = Data.Settings.EnableApk && device?.Type is not DeviceType.Recovery;
 
         Data.FileOpQ.MoveOperationsToPast();
         FileActionLogic.UpdateFileActions();
@@ -636,21 +690,21 @@ public static class DeviceHelper
     {
         //ConnectTimer.IsEnabled = false;
 
-        //DevicesObject.UpdateServices(new List<ServiceDevice>() { new PairingService("sdfsdfdsf_adb-tls-pairing._tcp.", "192.168.1.20", "5555") { MdnsType = ServiceDevice.ServiceType.PairingCode } });
+        //DevicesObject.UpdateServices(new List<ServiceDevice>() { new ServiceDevice("sdfsdfdsf_adb-tls-pairing._tcp.", "192.168.1.20", "5555", ServiceConnectionKind.Pairing) { MdnsType = ServiceDevice.ServiceType.PairingCode } });
         //DevicesObject.UpdateDevices(new List<LogicalDevice>() { LogicalDevice.New("Test", "test.ID", "device") });
     }
 
     public static void SetAndroidVersion()
     {
-        var versionTask = Task.Run(Data.CurrentADBDevice.GetAndroidVersion);
-        versionTask.ContinueWith(t =>
+        var versionTask = Data.DevicesObject.Current.GetAndroidVersion();
+        versionTask?.ContinueWith(t =>
         {
             if (t.IsCanceled)
                 return;
 
-            App.Current.Dispatcher.Invoke(() =>
+            App.SafeInvoke(() =>
             {
-                Data.DevicesObject.Current.SetAndroidVersion(t.Result);
+                Data.DevicesObject.Current.SetAndroidVersion();
             });
         });
     }
@@ -677,7 +731,6 @@ public static class DeviceHelper
                     FileActionLogic.ClearExplorer();
                     NavHistory.Reset();
                     Data.FileActions.IsExplorerVisible = false;
-                    Data.CurrentADBDevice = null;
                     Data.DirList = null;
                     Data.RuntimeSettings.DeviceToOpen = null;
                 }
@@ -696,14 +749,16 @@ public static class DeviceHelper
 
     public static void OpenDevice(LogicalDeviceViewModel device)
     {
-        Data.CurrentADBDevice = new(device);
-        Data.DevicesObject.SetOpenDevice(device);
+        Devices.SetOpenDevice(device);
+
+        App.Services.GetService<INavigationService>()?.Navigate(typeof(ExplorerPage));
         Data.RuntimeSettings.InitLister = true;
+        
         FileActionLogic.ClearExplorer();
         NavHistory.Reset();
         InitDevice();
 
-        Data.RuntimeSettings.IsDevicesPaneOpen = false;
+        Data.RuntimeSettings.IsDevicesView = false;
     }
 
     public static void ConnectWsaDevice()
@@ -758,6 +813,9 @@ public static class DeviceHelper
 
     public static void UpdateWsaPkgStatus()
     {
+        if (!Data.Settings.EnableWsa)
+            return;
+
         var wsa = Data.DevicesObject.UIList.OfType<WsaPkgDeviceViewModel>().FirstOrDefault();
         if (wsa is null)
             return;
@@ -794,7 +852,7 @@ public static class DeviceHelper
 
         if (newStatus != oldStatus)
         {
-            App.Current.Dispatcher.Invoke(() => wsa.SetStatus(newStatus));
+            App.SafeInvoke(() => wsa.SetStatus(newStatus));
             Data.RuntimeSettings.FilterDevices = true;
         }
     }

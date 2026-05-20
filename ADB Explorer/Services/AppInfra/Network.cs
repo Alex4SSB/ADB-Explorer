@@ -1,4 +1,6 @@
 ﻿using ADB_Explorer.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
@@ -82,7 +84,7 @@ public static class Network
         var ipv4 = addresses.Where(add => add.Address.AddressFamily is System.Net.Sockets.AddressFamily.InterNetwork);
         if (!ipv4.Any())
             return null;
-        
+
         return ipv4.First().Address.ToString();
     }
 

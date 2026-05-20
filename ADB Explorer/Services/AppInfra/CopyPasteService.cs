@@ -53,6 +53,21 @@ public class CopyPasteService : ViewModelBase
         set => Set(ref dropTarget, value);
     }
 
+    public string DropTargetName
+    {
+        get
+        {
+            if (DropTarget is null)
+                return "";
+
+            string destination = FileHelper.GetFullName(DropTarget);
+            if (Data.CurrentDisplayNames.TryGetValue(DropTarget, out var drive))
+                destination = drive;
+
+            return destination;
+        }
+    }
+
     private DataSource pasteSource = DataSource.None;
     public DataSource PasteSource
     {
@@ -63,7 +78,7 @@ public class CopyPasteService : ViewModelBase
                 && pasteSource.HasFlag(DataSource.None)
                 && value is not DataSource.None)
             {
-                // Remove the none flag when settings something else
+                // Remove the none flag when setting something else
                 pasteSource &= ~DataSource.None;
             }
         }
@@ -328,7 +343,7 @@ public class CopyPasteService : ViewModelBase
             PasteSource |= DataSource.Android | DataSource.Self;
         }
 
-        SourceDevice = Data.CurrentADBDevice.Device;
+        SourceDevice = Data.DevicesObject.Current;
         MasterPid = Environment.ProcessId;
         DragParent = VirtualFileDataObject.SelfFiles.First().ParentPath;
         DragFiles = [.. VirtualFileDataObject.SelfFileGroup.FileDescriptors.Select(d => d.Name)];
@@ -359,9 +374,9 @@ public class CopyPasteService : ViewModelBase
             if (FileHelper.AllFilesAreApks(DragFiles))
                 return DragDropEffects.Copy;
         }
-        else if (dataContext is null || file?.IsDirectory is true)
+        else if (file is null || file.IsDirectory)
         {
-            Data.CopyPaste.DropTarget = dataContext is null
+            Data.CopyPaste.DropTarget = file is null
                 ? Data.CurrentPath
                 : file.FullPath;
 
@@ -383,7 +398,7 @@ public class CopyPasteService : ViewModelBase
     {
         CurrentSource &= ~(DataSource.Android | DataSource.Self | DataSource.Virtual);
 
-        if (Data.CurrentADBDevice is null)
+        if (Data.DevicesObject.Current is null)
             return;
 
         DragParent = "";
@@ -395,7 +410,7 @@ public class CopyPasteService : ViewModelBase
             var dragList = NativeMethods.ADBDRAGLIST.FromStream(adbStream);
             var deviceId = dragList.deviceId;
 
-            var device = Data.DevicesObject.UIList.OfType<LogicalDeviceViewModel>().FirstOrDefault(d => d.ID == deviceId && d.Status is AbstractDevice.DeviceStatus.Ok);
+            var device = Data.DevicesObject.UIList.OfType<LogicalDeviceViewModel>().FirstOrDefault(d => d.ID == deviceId && d.Status is DeviceStatus.Ok);
             if (!IsDrag && device is null)
             {
                 Clear();
@@ -409,7 +424,7 @@ public class CopyPasteService : ViewModelBase
             DragFiles = [.. dragList.items.Select(f => FileHelper.ConcatPaths(DragParent, f))];
 
             CurrentSource |= DataSource.Android;
-            if (deviceId == Data.CurrentADBDevice.ID)
+            if (deviceId == Data.DevicesObject.Current.ID)
                 CurrentSource |= DataSource.Self;
             else
                 CurrentSource |= DataSource.Virtual;
@@ -419,14 +434,27 @@ public class CopyPasteService : ViewModelBase
                 Task.Run(() =>
                 {
                     Task.Delay(500);
-                    App.Current.Dispatcher.Invoke(() => GetDescriptors(dataObject));
+                    App.SafeInvoke(() => GetDescriptors(dataObject));
                 });
             }
         }
         // Shell ID List - the only format Microsoft supports for anything added after Windows XP (non-ZIP archives, UNC paths, etc.)
         else if (dataObject.GetDataPresent(AdbDataFormats.ShellidList))
         {
-            var shItems = ShellItemArray.FromDataObject((System.Runtime.InteropServices.ComTypes.IDataObject)dataObject);
+            var ido = (System.Runtime.InteropServices.ComTypes.IDataObject)dataObject;
+            ShellItemArray? shItems = null;
+
+            try
+            {
+                shItems = ShellItemArray.FromDataObject(ido);
+            }
+            catch (Exception e) // E_ACCESS_DENIED may be thrown if the data object has already been disposed by the source, but not from the clipboard
+            {
+#if !DEPLOY
+                DebugLog.PrintLine($"Failed to get ShellItemArray from IDataObject: {e}");
+#endif
+            }
+
             if (shItems is not null)
             {
                 Descriptors = [.. shItems.Select(sh => new FileDescriptor(sh))];
@@ -505,14 +533,13 @@ public class CopyPasteService : ViewModelBase
                 // Transfer from another Android device
                 if (!IsWindows)
                 {
-                    ADBService.AdbDevice sourceDevice = new(SourceDevice);
                     foreach (var item in CurrentFiles)
                     {
                         SyncFile target = new(item) { PathType = FilePathType.Windows };
                         target.UpdatePath(FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, item.FullName, '\\'));
 
                         // Pull the file from the source device to the temp folder
-                        var pullOp = FileSyncOperation.PullFile(new(item), target, sourceDevice, App.Current.Dispatcher);
+                        var pullOp = FileSyncOperation.PullFile(new(item), target, SourceDevice, App.AppDispatcher);
                         pullOp.PropertyChanged += (s, e) =>
                         {
                             if (e.PropertyName != nameof(FileSyncOperation.Status)
@@ -524,7 +551,7 @@ public class CopyPasteService : ViewModelBase
                             if (Data.FileActions.IsAppDrive)
                             {
                                 if (FileHelper.AllFilesAreApks(DragFiles))
-                                    ShellFileOperation.PushPackages(Data.CurrentADBDevice, [file.ShellItem], App.Current.Dispatcher);
+                                    ShellFileOperation.PushPackages(Data.DevicesObject.Current, [file.ShellItem], App.AppDispatcher);
 
                                 return;
                             }
@@ -540,9 +567,9 @@ public class CopyPasteService : ViewModelBase
                                     return;
 
                                 // Once the second part is done, delete the file from the source device if needed, and notify if its another window
-                                ShellFileOperation.SilentDelete(sourceDevice, item.FullName);
+                                ShellFileOperation.SilentDelete(SourceDevice, item.FullName);
                                 if (IsDragFromMaster)
-                                    IpcService.NotifyFileMoved(MasterPid, sourceDevice, item);
+                                    IpcService.NotifyFileMoved(MasterPid, SourceDevice, item);
                             };
                         };
 
@@ -572,7 +599,7 @@ public class CopyPasteService : ViewModelBase
                             if (Data.FileActions.IsAppDrive)
                             {
                                 if (FileHelper.AllFilesAreApks(DragFiles))
-                                    ShellFileOperation.PushPackages(Data.CurrentADBDevice, [lastTopItem], App.Current.Dispatcher);
+                                    ShellFileOperation.PushPackages(Data.DevicesObject.Current, [lastTopItem], App.AppDispatcher);
                             }
                             else
                                 VerifyAndPush(targetFolder, new FileClass(lastTopItem), CurrentEffect, lastTopSource);
@@ -590,7 +617,7 @@ public class CopyPasteService : ViewModelBase
                             if (Data.FileActions.IsAppDrive)
                             {
                                 if (FileHelper.AllFilesAreApks(DragFiles))
-                                    ShellFileOperation.PushPackages(Data.CurrentADBDevice, [lastTopItem], App.Current.Dispatcher);
+                                    ShellFileOperation.PushPackages(Data.DevicesObject.Current, [lastTopItem], App.AppDispatcher);
                             }
                             else
                                 VerifyAndPush(targetFolder, new FileClass(lastTopItem), CurrentEffect, lastTopSource);
@@ -622,14 +649,14 @@ public class CopyPasteService : ViewModelBase
                             catch (COMException e)
                             {
                                 // If failed, add a failed operation to the queue
-                                App.Current.Dispatcher.Invoke(() =>
+                                App.SafeInvoke(() =>
                                 {
                                     Data.FileOpQ.AddOperation(
                                         new FileSyncOperation(
                                             FileOperation.OperationType.Push,
                                             Descriptors[i],
                                             new(targetFolder),
-                                            Data.CurrentADBDevice,
+                                            Data.DevicesObject.Current,
                                             new FailedOpProgressViewModel(e.Message)));
                                 });
 
@@ -660,7 +687,7 @@ public class CopyPasteService : ViewModelBase
                             if (Data.FileActions.IsAppDrive)
                             {
                                 if (FileHelper.AllFilesAreApks(DragFiles))
-                                    ShellFileOperation.PushPackages(Data.CurrentADBDevice, shItems.Select(f => f.ShellItem), App.Current.Dispatcher);
+                                    ShellFileOperation.PushPackages(Data.DevicesObject.Current, shItems.Select(f => f.ShellItem), App.AppDispatcher);
                             }
                             else
                                 VerifyAndPush(targetFolder, shItems, CurrentEffect);
@@ -673,7 +700,7 @@ public class CopyPasteService : ViewModelBase
                 if (Data.FileActions.IsAppDrive)
                 {
                     if (FileHelper.AllFilesAreApks(DragFiles))
-                        ShellFileOperation.PushPackages(Data.CurrentADBDevice, CurrentFiles.Select(f => f.ShellItem), App.Current.Dispatcher);
+                        ShellFileOperation.PushPackages(Data.DevicesObject.Current, CurrentFiles.Select(f => f.ShellItem), App.AppDispatcher);
                 }
                 else
                     VerifyAndPush(targetFolder, CurrentFiles, CurrentEffect);
@@ -687,7 +714,7 @@ public class CopyPasteService : ViewModelBase
                 if (Data.FileActions.IsAppDrive)
                 {
                     if (FileHelper.AllFilesAreApks(DragFiles))
-                        ShellFileOperation.InstallPackages(Data.CurrentADBDevice, CurrentFiles, App.Current.Dispatcher);
+                        ShellFileOperation.InstallPackages(Data.DevicesObject.Current, CurrentFiles, App.AppDispatcher);
                 }
                 else
                 {
@@ -695,8 +722,8 @@ public class CopyPasteService : ViewModelBase
                     VerifyAndPaste(isLink ? DragDropEffects.Link : CurrentEffect,
                                targetFolder,
                                CurrentFiles,
-                               App.Current.Dispatcher,
-                               Data.CurrentADBDevice,
+                               App.AppDispatcher,
+                               Data.DevicesObject.Current,
                                Data.CurrentPath,
                                masterPid);
                 }
@@ -753,7 +780,7 @@ public class CopyPasteService : ViewModelBase
                                string targetPath,
                                IEnumerable<FileClass> pasteItems,
                                Dispatcher dispatcher,
-                               ADBService.AdbDevice device,
+                               LogicalDeviceViewModel device,
                                string currentPath,
                                int masterPid = 0)
     {
@@ -773,6 +800,24 @@ public class CopyPasteService : ViewModelBase
                   dispatcher: dispatcher,
                   cutType: cutType,
                   masterPid: masterPid);
+    }
+
+    public static SyncFile MergeFolderTree(FileClass folder, string targetPath, IEnumerable<string> filesToReplace)
+    {
+        StringComparer comparer = StringComparer.InvariantCultureIgnoreCase;
+
+        var children = folder.Children;
+        if (children is null || children.Length == 0)
+            return folder.GetSyncFile();
+
+        var existingPaths = Directory.EnumerateFiles(targetPath, "*", SearchOption.AllDirectories);
+
+        var parent = folder.ParentPath;
+
+        var remote = existingPaths.Select(f => FileHelper.ConcatPaths(parent, FileHelper.ExtractRelativePath(f, targetPath)));
+        var tree = children.Where(c => !remote.Contains(c.Name, comparer) || filesToReplace.Contains(c.Name, comparer));
+
+        return new(folder, tree);
     }
 
     /// <summary>
@@ -814,7 +859,7 @@ public class CopyPasteService : ViewModelBase
             }
             else
             {
-                var foundFiles = ADBService.FindFilesInPath(Data.CurrentADBDevice.ID, targetPath, includeNames: fileNames, caseSensitive: isUnix);
+                var foundFiles = ADBService.FindFilesInPath(Data.DevicesObject.Current.ID, targetPath, includeNames: fileNames, caseSensitive: isUnix);
                 existingItems = foundFiles.Select(FileHelper.GetFullName).ToHashSet(comparer);
             }
         }
@@ -846,11 +891,11 @@ public class CopyPasteService : ViewModelBase
             cancelText: Strings.Resources.S_CANCEL,
             icon: DialogService.DialogIcon.Exclamation);
 
-        if (result.Item1 is ContentDialogResult.None) // Cancel
+        if (result.Item1 is Wpf.Ui.Controls.ContentDialogResult.None) // Cancel
         {
             return [];
         }
-        if (result.Item1 is ContentDialogResult.Secondary) // Skip
+        if (result.Item1 is Wpf.Ui.Controls.ContentDialogResult.Secondary) // Skip
         {
             filePaths = [.. filePaths.Where(item => !existingItems.Contains(FileHelper.GetFullName(item)))];
         }
@@ -897,7 +942,7 @@ public class CopyPasteService : ViewModelBase
             }
             else
             {
-                var foundFiles = ADBService.FindFilesInPath(Data.CurrentADBDevice.ID, targetPath, includeNames: fileNames, caseSensitive: isUnix);
+                var foundFiles = ADBService.FindFilesInPath(Data.DevicesObject.Current.ID, targetPath, includeNames: fileNames, caseSensitive: isUnix);
                 existingItems = foundFiles.Select(FileHelper.GetFullName).ToHashSet(comparer);
             }
         }
@@ -929,11 +974,11 @@ public class CopyPasteService : ViewModelBase
             cancelText: Strings.Resources.S_CANCEL,
             icon: DialogService.DialogIcon.Exclamation);
 
-        if (result.Item1 is ContentDialogResult.None) // Cancel
+        if (result.Item1 is Wpf.Ui.Controls.ContentDialogResult.None) // Cancel
         {
             return [];
         }
-        if (result.Item1 is ContentDialogResult.Secondary) // Skip
+        if (result.Item1 is Wpf.Ui.Controls.ContentDialogResult.Secondary) // Skip
         {
             filePaths = [.. filePaths.Where(item => !existingItems.Contains(item.FullName))];
         }
@@ -961,7 +1006,7 @@ public class CopyPasteService : ViewModelBase
             cancelText: Strings.Resources.S_BUTTON_ABORT,
             icon: DialogService.DialogIcon.Exclamation);
 
-        return result.Item1 is ContentDialogResult.Primary
+        return result.Item1 is Wpf.Ui.Controls.ContentDialogResult.Primary
             ? pasteItems.Except([ancestor])
             : [];
     }

@@ -22,14 +22,20 @@ public abstract class AbstractFile : ViewModelBase
 
     public enum FileType
     {
-        Socket = 0,
-        File = 1,
-        BlockDevice = 2,
-        Folder = 3,
-        CharDevice = 4,
-        FIFO = 5,
-        Unknown = 6,
-        BrokenLink = 7,
+        Socket,
+        File,
+        BlockDevice,
+        Folder,
+        CharDevice,
+        FIFO,
+        Unknown,
+        BrokenLink,
+        MultipleFiles,
+        Drive,
+        EmptyTrash,
+        FullTrash,
+        Phone,
+        Gallery,
     }
 
     [Flags]
@@ -42,6 +48,12 @@ public abstract class AbstractFile : ViewModelBase
         Unknown = 16,
         LinkOverlay = 32,
         Archive = 64,
+        MultipleFiles = 128,
+        Drive = 256,
+        EmptyTrash = 512,
+        FullTrash = 1024,
+        Phone = 2048,
+        Gallery = 4096,
     }
 
     public static string GetFileTypeName(FileType type) => type switch
@@ -55,6 +67,11 @@ public abstract class AbstractFile : ViewModelBase
         FileType.BrokenLink => Strings.Resources.S_FILE_BROKEN_LINK,
         _ => Strings.Resources.S_FILE_UNKNOWN,
     };
+
+    public record struct FolderTree(string Name, long? Size, double? Date)
+    {
+        public readonly bool IsFolder => Size is null;
+    }
 }
 
 public class FilePath : AbstractFile, IBaseFile
@@ -83,17 +100,22 @@ public class FilePath : AbstractFile, IBaseFile
         protected set => Set(ref fullName, value);
     }
     public string NoExtName => IsRegularFile ? FullName[..^Extension.Length] : FullName;
+    public bool NameIsRtl => TextHelper.ContainsRtl(NoExtName);
+    public bool ExtensionIsRtl => TextHelper.ContainsRtl(Extension);
+    public FlowDirection NameFlowDirection => NameIsRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
 
     public string DisplayName
     {
         get
         {
             var noExtName = NoExtName;
+            // Display RTL names correctly in LTR mode.
             // Add RTL mark to end of RTL file names with LTR extensions.
             // This prevents numbers and punctuation from breaking the RTL ordering.
-            if (TextHelper.ContainsRtl(NoExtName)
+            if (!Data.RuntimeSettings.IsRTL
+                && NameIsRtl
                 && NoExtName[^1] != TextHelper.RTL_MARK
-                && !TextHelper.ContainsRtl(Extension))
+                && !ExtensionIsRtl)
             {
                 noExtName = $"{NoExtName}{TextHelper.RTL_MARK}";
             }
@@ -106,6 +128,13 @@ public class FilePath : AbstractFile, IBaseFile
     public ShellItem ShellItem { get; set; }
 
     public bool IsHidden => FullName.StartsWith('.');
+
+    private bool isSelected;
+    public bool IsSelected
+    {
+        get => isSelected;
+        set => Set(ref isSelected, value);
+    }
 
     /// <summary>
     /// Returns the extension (including the period ".").<br />

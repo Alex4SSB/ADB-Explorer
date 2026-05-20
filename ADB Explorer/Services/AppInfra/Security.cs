@@ -59,7 +59,7 @@ public static class Security
         var hash = useSHA
             ? SHA256.HashData(file)
             : MD5.HashData(file);
-        
+
         return Convert.ToHexString(hash);
     }
 
@@ -87,40 +87,32 @@ public static class Security
 
         var files = Directory.GetFiles(path);
         var fileHashes = files.AsParallel().ToDictionary(f => FileHelper.ExtractRelativePath(f, parent).Replace('\\', '/'), f => CalculateWindowsFileHash(f));
-        
+
         return new(folderHashes.Concat(fileHashes));
     }
 
-    public static Dictionary<string, string> CalculateAndroidFolderHash(FilePath path, Device device)
+    public static Dictionary<string, string> CalculateAndroidFolderHash(FilePath path, string deviceId)
     {
         // find ./ -mindepth 1 -type f -exec md5sum {} \;
-        string[] args = [ ADBService.EscapeAdbShellString(path.FullPath), "-type", "f", "-exec", "md5sum", "{}", @"\;" ];
-        ADBService.ExecuteDeviceAdbShellCommand(device.ID, "find", out string stdout, out string stderr, new(), args);
+        string[] args = [ADBService.EscapeAdbShellString(path.FullPath), "-type", "f", "-exec", "md5sum", "{}", @"\;"];
+        ADBService.ExecuteDeviceAdbShellCommand(deviceId, "find", out string stdout, out string stderr, new(), args);
 
         var list = AdbRegEx.RE_ANDROID_FIND_HASH().Matches(stdout);
         return list.Where(m => m.Success).ToDictionary(
-            m => FileHelper.ExtractRelativePath(m.Groups["Path"].Value.TrimEnd('\r', '\n'), path.FullPath), 
+            m => FileHelper.ExtractRelativePath(m.Groups["Path"].Value.TrimEnd('\r', '\n'), path.FullPath),
             m => m.Groups["Hash"].Value.ToUpper());
     }
 
-    public static Dictionary<string, string> CalculateAndroidArchiveHash(FilePath path, Device device)
+    public static Dictionary<string, string> CalculateAndroidArchiveHash(FilePath path, string deviceId)
     {
         // tar -xf *.tar.gz --to-command='echo $(md5sum) $TAR_FILENAME'
-        string[] args = [ "xf", ADBService.EscapeAdbShellString(path.FullPath), "--to-command='echo $(md5sum) $TAR_FILENAME'" ];
-        ADBService.ExecuteDeviceAdbShellCommand(device.ID, "tar", out string stdout, out string stderr, new(), args);
+        string[] args = ["xf", ADBService.EscapeAdbShellString(path.FullPath), "--to-command='echo $(md5sum) $TAR_FILENAME'"];
+        ADBService.ExecuteDeviceAdbShellCommand(deviceId, "tar", out string stdout, out string stderr, new(), args);
 
         var list = AdbRegEx.RE_ANDROID_FIND_HASH().Matches(stdout);
         return list.Where(m => m.Success).ToDictionary(
             m => m.Groups["Path"].Value.TrimEnd('\r', '\n'),
             m => m.Groups["Hash"].Value.ToUpper());
-    }
-
-    public static void ValidateOps()
-    {
-        foreach (var item in Data.FileActions.SelectedFileOps.Value)
-        {
-            ValidateOperation(item);
-        }
     }
 
     public static async void ValidateOperation(FileOperation op)
@@ -134,13 +126,13 @@ public static class Security
             () =>
             {
                 source = (op.FilePath.PathType is AbstractFile.FilePathType.Android
-                    ? CalculateAndroidFolderHash(op.FilePath, op.Device)
+                    ? CalculateAndroidFolderHash(op.FilePath, op.Device.ID)
                     : CalculateWindowsFolderHash(op.FilePath.FullPath)).OrderBy(k => k.Key);
             },
             () =>
             {
                 target = (op.TargetPath.PathType is AbstractFile.FilePathType.Android
-                    ? CalculateAndroidFolderHash(op.TargetPath, op.Device)
+                    ? CalculateAndroidFolderHash(op.TargetPath, op.Device.ID)
                     : CalculateWindowsFolderHash(op.TargetPath.FullPath)).OrderBy(k => k.Key);
             });
         });
@@ -156,7 +148,7 @@ public static class Security
                                     (op.OperationName is FileOperation.OperationType.Copy
                                     && target.Count() == 1));
 
-            key = op.AndroidPath.IsDirectory 
+            key = op.AndroidPath.IsDirectory
                 ? FileHelper.ConcatPaths(op.AndroidPath, key)
                 : op.AndroidPath.FullPath;
 

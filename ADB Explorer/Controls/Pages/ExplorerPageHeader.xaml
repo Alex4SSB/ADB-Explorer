@@ -1,0 +1,637 @@
+﻿<UserControl
+    x:Class="ADB_Explorer.Controls.Pages.ExplorerPageHeader"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:ADB_Explorer.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
+    xmlns:local="clr-namespace:ADB_Explorer.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:pages="clr-namespace:ADB_Explorer.ViewModels.Pages"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:views="clr-namespace:ADB_Explorer.Views"
+    x:Name="ExplorerHeader"
+    d:DataContext="{d:DesignInstance Type=pages:ExplorerViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    MouseDown="Window_MouseDown"
+    MouseUp="Window_MouseUp"
+    PreviewKeyDown="MainWin_PreviewKeyDown"
+    PreviewKeyUp="MainWindow_OnPreviewKeyUp"
+    PreviewQueryContinueDrag="MainWindow_OnPreviewQueryContinueDrag"
+    SizeChanged="ExplorerHeader_SizeChanged"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <sys:Int16 x:Key="FontSize">13</sys:Int16>
+        <local:AdbContextMenu x:Key="RowContextMenu" Style="{StaticResource ExplorerContextMenuStyle}" />
+        <converters:ColumnSortDirectionConverter x:Key="ColumnSortDirectionConverter" />
+        <helpers:BindingProxy x:Key="ViewModelProxy" Data="{Binding}" />
+        <Style
+            x:Key="DataGridCellStyle"
+            BasedOn="{StaticResource BaseCellStyle}"
+            TargetType="{x:Type DataGridCell}">
+            <EventSetter Event="RequestBringIntoView" Handler="DataGridCell_RequestBringIntoView" />
+            <EventSetter Event="PreviewMouseDown" Handler="DataGridCell_PreviewMouseDown" />
+            <EventSetter Event="MouseUp" Handler="DataGridCell_MouseUp" />
+        </Style>
+        <Style
+            x:Key="RowStyle"
+            BasedOn="{StaticResource BaseRowStyle}"
+            TargetType="DataGridRow">
+            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+            <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
+            <EventSetter Event="MouseDown" Handler="DataGridRow_MouseDown" />
+            <EventSetter Event="MouseDoubleClick" Handler="ItemContainer_MouseDoubleClick" />
+            <EventSetter Event="KeyDown" Handler="DataGridRow_KeyDown" />
+            <EventSetter Event="Drop" Handler="DataGridRow_Drop" />
+            <EventSetter Event="MouseUp" Handler="DataGridCell_MouseUp" />
+            <EventSetter Event="DragOver" Handler="ExplorerGrid_DragOver" />
+            <EventSetter Event="PreviewDragEnter" Handler="Row_PreviewDragEnter" />
+            <EventSetter Event="PreviewDragLeave" Handler="Row_PreviewDragLeave" />
+            <EventSetter Event="MouseLeave" Handler="Row_MouseLeave" />
+        </Style>
+        <DataTemplate x:Key="LogicalDriveTemplate">
+            <views:LogicalDriveControl />
+        </DataTemplate>
+        <DataTemplate x:Key="VirtualDriveTemplate">
+            <views:VirtualDriveControl />
+        </DataTemplate>
+        <helpers:DriveTemplateSelector
+            x:Key="DriveTemplateSelector"
+            LogicalDriveTemplate="{StaticResource LogicalDriveTemplate}"
+            VirtualDriveTemplate="{StaticResource VirtualDriveTemplate}" />
+        <Style
+            x:Key="DriveListViewStyle"
+            BasedOn="{StaticResource ListViewStyle}"
+            TargetType="ui:ListView">
+            <Setter Property="SelectionMode" Value="Single" />
+            <Setter Property="ItemTemplateSelector" Value="{StaticResource DriveTemplateSelector}" />
+            <Setter Property="ItemContainerStyle" Value="{StaticResource DriveContainerStyle}" />
+        </Style>
+        <Style
+            x:Key="IconFileContainerWithContextMenuStyle"
+            BasedOn="{StaticResource IconFileContainerStyle}"
+            TargetType="ui:ListViewItem">
+            <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
+            <EventSetter Event="MouseDoubleClick" Handler="ItemContainer_MouseDoubleClick" />
+            <EventSetter Event="PreviewDragEnter" Handler="Row_PreviewDragEnter" />
+            <EventSetter Event="PreviewDragLeave" Handler="Row_PreviewDragLeave" />
+            <EventSetter Event="MouseLeave" Handler="Row_MouseLeave" />
+            <EventSetter Event="Drop" Handler="DataGridRow_Drop" />
+            <EventSetter Event="DragOver" Handler="ExplorerGrid_DragOver" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="False">
+                    <Setter Property="AllowDrop" Value="{Binding IsDirectory}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
+                    <Setter Property="AllowDrop" Value="True" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid Height="48" MouseEnter="Grid_MouseEnter">
+            <StackPanel>
+                <Grid Margin="6,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <local:AdbMenu
+                        x:Name="NavigationToolBar"
+                        Margin="0,0,6,0"
+                        Style="{StaticResource NavigationToolBarStyle}" />
+                    <local:NavigationBox
+                        x:Name="NavigationBox"
+                        Grid.Column="1"
+                        Margin="0,1,0,0" />
+                    <local:SearchBox
+                        x:Name="SearchBox"
+                        Grid.Column="2"
+                        IsExpanded="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsSearchBoxFocused, Mode=TwoWay}"
+                        Style="{StaticResource SearchBoxStyle}" />
+                </Grid>
+            </StackPanel>
+            <Separator VerticalAlignment="Bottom" />
+        </Grid>
+        <Grid
+            Grid.Row="1"
+            Height="48"
+            Margin="0,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <local:AdbMenu x:Name="MainToolBar" Style="{StaticResource MainToolBarStyle}" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Separator Margin="0,2">
+                    <Separator.Style>
+                        <Style BasedOn="{StaticResource {x:Type Separator}}" TargetType="Separator">
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding ElementName=ThumbsSizeSelector, Path=ActualWidth}" Value="0" />
+                                        <Condition Binding="{Binding ElementName=SortingSelector, Path=ActualWidth}" Value="0" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Separator.Style>
+                </Separator>
+                <local:SortingSelector
+                    x:Name="SortingSelector"
+                    SortDirection="{Binding SortDirection, Mode=TwoWay}"
+                    SortOption="{Binding SortedColumn, Mode=TwoWay}" />
+                <local:ThumbsSizeSelector x:Name="ThumbsSizeSelector" ThumbnailSize="{Binding CurrentThumbsSize, Mode=TwoWay}" />
+            </StackPanel>
+            <Border
+                Grid.Column="2"
+                Background="Transparent"
+                MouseDown="Window_MouseDown" />
+            <local:DetailsControl Grid.Column="3" IsChecked="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsDetailsPaneOpen, Mode=TwoWay}" />
+            <Separator Grid.ColumnSpan="4" VerticalAlignment="Bottom" />
+        </Grid>
+        <Border
+            Grid.Row="2"
+            ClipToBounds="True"
+            MouseDown="GridBackgroundBlock_MouseDown">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ScrollViewer PreviewMouseDown="DriveList_PreviewMouseDown" Style="{StaticResource DriveViewScrollViewerStyle}">
+                    <StackPanel>
+                        <Expander
+                            Margin="4"
+                            helpers:ExpanderHelper.ChevronPlacement="Left"
+                            helpers:ExpanderHelper.IsTransparent="True"
+                            IsExpanded="{Binding Source={x:Static Member=models:Data.Settings}, Path=HomeLocationsExpanded, Mode=TwoWay}"
+                            Style="{StaticResource AdbExpanderStyle}">
+                            <Expander.Header>
+                                <local:SimpleStackPanel Orientation="Horizontal" Spacing="10">
+                                    <ui:FontIcon FontSize="18" Glyph="&#xE734;" />
+                                    <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_SAVED_LOCATIONS}}" />
+                                </local:SimpleStackPanel>
+                            </Expander.Header>
+                            <ui:ListView x:Name="HomeSavedLocationsList" Style="{StaticResource HomeSavedLocationsListStyle}">
+                                <ui:ListView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Width="{Binding RelativeSource={RelativeSource AncestorType=ui:ListView}, Path=ActualWidth}" />
+                                    </ItemsPanelTemplate>
+                                </ui:ListView.ItemsPanel>
+                            </ui:ListView>
+                        </Expander>
+                        <Expander
+                            Margin="4"
+                            helpers:ExpanderHelper.ChevronPlacement="Left"
+                            helpers:ExpanderHelper.IsTransparent="True"
+                            IsExpanded="True"
+                            Style="{StaticResource AdbExpanderStyle}">
+                            <Expander.Header>
+                                <local:SimpleStackPanel Orientation="Horizontal" Spacing="10">
+                                    <ui:FontIcon
+                                        Margin="0,1,0,0"
+                                        FontSize="18"
+                                        Glyph="&#xE8CE;" />
+                                    <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_DRIVES}}" />
+                                </local:SimpleStackPanel>
+                            </Expander.Header>
+                            <ui:ListView
+                                x:Name="DriveList"
+                                HorizontalAlignment="Stretch"
+                                ItemsSource="{Binding DriveItemsSource}"
+                                PreviewMouseDown="DriveList_PreviewMouseDown"
+                                Style="{StaticResource DriveListViewStyle}">
+                                <ui:ListView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Width="{Binding RelativeSource={RelativeSource AncestorType=ui:ListView}, Path=ActualWidth}" />
+                                    </ItemsPanelTemplate>
+                                </ui:ListView.ItemsPanel>
+                            </ui:ListView>
+                        </Expander>
+                    </StackPanel>
+                </ScrollViewer>
+                <local:AdbListView
+                    x:Name="IconView"
+                    HorizontalAlignment="Stretch"
+                    ContextMenu="{StaticResource RowContextMenu}"
+                    ContextMenuClosing="ExplorerGrid_ContextMenuClosing"
+                    ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
+                    DragOver="ExplorerGrid_DragOver"
+                    Drop="DataGridRow_Drop"
+                    ItemsSource="{Binding ExplorerItemsSource}"
+                    MouseMove="IconView_MouseMove"
+                    PreviewMouseDown="IconView_PreviewMouseDown"
+                    SelectionChanged="ExplorerGrid_SelectionChanged">
+                    <local:AdbListView.Resources>
+                        <DataTemplate x:Key="FileIconViewTemplate">
+                            <views:FileIconView />
+                        </DataTemplate>
+                    </local:AdbListView.Resources>
+                    <local:AdbListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <local:AdbVirtualizingWrapPanel
+                                Width="{Binding RelativeSource={RelativeSource AncestorType=local:AdbListView}, Path=ActualWidth}"
+                                CacheLength="2,2"
+                                CacheLengthUnit="Page"
+                                IsVirtualizing="True"
+                                VirtualizationMode="Recycling" />
+                        </ItemsPanelTemplate>
+                    </local:AdbListView.ItemsPanel>
+                    <local:AdbListView.Style>
+                        <Style BasedOn="{StaticResource ListViewStyle}" TargetType="local:AdbListView">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsIconView}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsDriveViewVisible}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRecycleBin}" Value="False">
+                                    <Setter Property="AllowDrop" Value="True" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                            <Setter Property="SnapsToDevicePixels" Value="False" />
+                            <Setter Property="SelectionMode" Value="Extended" />
+                            <Setter Property="IsItemScrolling" Value="True" />
+                            <Setter Property="ItemContainerStyle" Value="{StaticResource IconFileContainerWithContextMenuStyle}" />
+                            <Setter Property="ItemTemplate" Value="{StaticResource FileIconViewTemplate}" />
+                        </Style>
+                    </local:AdbListView.Style>
+                </local:AdbListView>
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsIconView}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <ui:DataGrid
+                        x:Name="ExplorerGrid"
+                        AutoGenerateColumns="False"
+                        Background="Transparent"
+                        CanUserResizeRows="False"
+                        CellStyle="{StaticResource DataGridCellStyle}"
+                        ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
+                        ContextMenu="{StaticResource RowContextMenu}"
+                        ContextMenuClosing="ExplorerGrid_ContextMenuClosing"
+                        ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
+                        DragOver="ExplorerGrid_DragOver"
+                        Drop="DataGridRow_Drop"
+                        GridLinesVisibility="None"
+                        HeadersVisibility="Column"
+                        IsReadOnly="False"
+                        ItemsSource="{Binding ExplorerItemsSource}"
+                        KeyboardNavigation.TabNavigation="Once"
+                        MouseDown="ExplorerGrid_MouseDown"
+                        MouseMove="ExplorerGrid_MouseMove"
+                        RowStyle="{StaticResource RowStyle}"
+                        SelectionChanged="ExplorerGrid_SelectionChanged"
+                        SelectionMode="Extended"
+                        SelectionUnit="FullRow"
+                        Sorting="ExplorerGrid_Sorting"
+                        Style="{StaticResource ExplorerGridStyle}">
+                        <ui:DataGrid.Columns>
+                            <DataGridTemplateColumn
+                                x:Name="IconColumn"
+                                MaxWidth="30"
+                                CanUserResize="False"
+                                CellTemplate="{StaticResource FileIconTemplate}"
+                                IsReadOnly="True"
+                                Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
+                                <DataGridTemplateColumn.HeaderStyle>
+                                    <Style BasedOn="{StaticResource DataGridColumnHeaderStyle}" TargetType="DataGridColumnHeader">
+                                        <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_ICON}}" />
+                                    </Style>
+                                </DataGridTemplateColumn.HeaderStyle>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn
+                                x:Name="NameColumn"
+                                Width="300"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_NAME}}"
+                                IsReadOnly="True"
+                                SortMemberPath="FullName"
+                                Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
+                                <DataGridTemplateColumn.SortDirection>
+                                    <MultiBinding Converter="{StaticResource ColumnSortDirectionConverter}" ConverterParameter="Name">
+                                        <Binding Path="Data.SortDirection" Source="{StaticResource ViewModelProxy}" />
+                                        <Binding Path="Data.SortedColumn" Source="{StaticResource ViewModelProxy}" />
+                                    </MultiBinding>
+                                </DataGridTemplateColumn.SortDirection>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <ui:TextBox
+                                                FlowDirection="{Binding NameFlowDirection}"
+                                                IsVisibleChanged="NameColumnEdit_IsVisibleChanged"
+                                                KeyDown="NameColumnEdit_KeyDown"
+                                                LostFocus="NameColumnEdit_LostFocus"
+                                                TextChanged="NameColumnEdit_TextChanged">
+                                                <ui:TextBox.Style>
+                                                    <Style BasedOn="{StaticResource FileNameEditingElementStyle}" TargetType="ui:TextBox">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding FolderViewModel.IsInEditMode}" Value="False">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ui:TextBox.Style>
+                                            </ui:TextBox>
+                                            <emoji:TextBlock FlowDirection="{Binding NameFlowDirection}" Text="{Binding DisplayName}">
+                                                <emoji:TextBlock.Style>
+                                                    <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding FolderViewModel.IsInEditMode}" Value="True">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </emoji:TextBlock.Style>
+                                            </emoji:TextBlock>
+                                        </Grid>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn
+                                x:Name="OriginalPath"
+                                Width="180"
+                                Binding="{Binding TrashIndex.ParentPath}"
+                                FontSize="{Binding Source={StaticResource FontSize}}"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_ORIGINAL_LOCATION}}"
+                                IsReadOnly="True"
+                                Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.RecycleBinColumnVisibility}">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
+                                        <Setter Property="FlowDirection" Value="LeftToRight" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn
+                                x:Name="DateColumn"
+                                Width="Auto"
+                                FontSize="{Binding Source={StaticResource FontSize}}"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_DATE_MODIFIED}}"
+                                IsReadOnly="True"
+                                SortMemberPath="ModifiedTime"
+                                Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
+                                <DataGridTextColumn.SortDirection>
+                                    <MultiBinding Converter="{StaticResource ColumnSortDirectionConverter}" ConverterParameter="Date">
+                                        <Binding Path="Data.SortDirection" Source="{StaticResource ViewModelProxy}" />
+                                        <Binding Path="Data.SortedColumn" Source="{StaticResource ViewModelProxy}" />
+                                    </MultiBinding>
+                                </DataGridTextColumn.SortDirection>
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Setter Property="Text" Value="{Binding FolderViewModel.ModifiedTimeString}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Type}" Value="File">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Type}" Value="Folder">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Type}" Value="BrokenLink">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTemplateColumn
+                                x:Name="TypeColumn"
+                                Width="150"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_TYPE}}"
+                                IsReadOnly="True"
+                                SortMemberPath="FolderViewModel.TypeName"
+                                Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
+                                <DataGridTemplateColumn.SortDirection>
+                                    <MultiBinding Converter="{StaticResource ColumnSortDirectionConverter}" ConverterParameter="Type">
+                                        <Binding Path="Data.SortDirection" Source="{StaticResource ViewModelProxy}" />
+                                        <Binding Path="Data.SortedColumn" Source="{StaticResource ViewModelProxy}" />
+                                    </MultiBinding>
+                                </DataGridTemplateColumn.SortDirection>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <emoji:TextBlock
+                                            FlowDirection="{Binding FolderViewModel.TypeFlowDirection}"
+                                            FontSize="{Binding Source={StaticResource FontSize}}"
+                                            Style="{StaticResource DirectoryGridCellStyle}"
+                                            Text="{Binding FolderViewModel.TypeName}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn
+                                x:Name="SizeColumn"
+                                Width="Auto"
+                                FontSize="{Binding Source={StaticResource FontSize}}"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_SIZE}}"
+                                IsReadOnly="True"
+                                SortMemberPath="Size"
+                                Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
+                                <DataGridTextColumn.SortDirection>
+                                    <MultiBinding Converter="{StaticResource ColumnSortDirectionConverter}" ConverterParameter="Size">
+                                        <Binding Path="Data.SortDirection" Source="{StaticResource ViewModelProxy}" />
+                                        <Binding Path="Data.SortedColumn" Source="{StaticResource ViewModelProxy}" />
+                                    </MultiBinding>
+                                </DataGridTextColumn.SortDirection>
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
+                                        <Setter Property="Text" Value="{Binding FolderViewModel.SizeString}" />
+                                        <Setter Property="HorizontalAlignment" Value="Right" />
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <Trigger Property="FlowDirection" Value="RightToLeft">
+                                                <Setter Property="HorizontalAlignment" Value="Left" />
+                                            </Trigger>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding Type}" Value="File" />
+                                                    <Condition Binding="{Binding IsLink}" Value="False" />
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </MultiDataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn
+                                x:Name="OriginalDate"
+                                Width="Auto"
+                                Binding="{Binding TrashIndex.ModifiedTimeString}"
+                                ElementStyle="{StaticResource DirectoryGridCellStyle}"
+                                FontSize="{Binding Source={StaticResource FontSize}}"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_DATE_DELETED}}"
+                                IsReadOnly="True"
+                                Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.RecycleBinColumnVisibility}" />
+                            <DataGridTextColumn
+                                x:Name="PackageName"
+                                Width="400"
+                                Binding="{Binding Name}"
+                                ElementStyle="{StaticResource ExplorerGridCellStyle}"
+                                FontSize="{Binding Source={StaticResource FontSize}}"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_NAME}}"
+                                IsReadOnly="True"
+                                Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageColumnVisibility}" />
+                            <DataGridTextColumn
+                                x:Name="PackageType"
+                                Width="100"
+                                Binding="{Binding Type}"
+                                ElementStyle="{StaticResource ExplorerGridCellStyle}"
+                                FontSize="{Binding Source={StaticResource FontSize}}"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_TYPE}}"
+                                IsReadOnly="True"
+                                SortDirection="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageTypeColumnSortDirection}"
+                                Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageColumnVisibility}" />
+                            <DataGridTextColumn
+                                x:Name="PackageUid"
+                                Width="100"
+                                Binding="{Binding Uid}"
+                                ElementStyle="{StaticResource ExplorerGridCellStyle}"
+                                FontSize="{Binding Source={StaticResource FontSize}}"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_USER_ID}}"
+                                IsReadOnly="True"
+                                Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageColumnVisibility}" />
+                            <DataGridTextColumn
+                                x:Name="PackageVersion"
+                                Width="100"
+                                Binding="{Binding Version}"
+                                ElementStyle="{StaticResource ExplorerGridCellStyle}"
+                                FontSize="{Binding Source={StaticResource FontSize}}"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_VERSION}}"
+                                IsReadOnly="True"
+                                Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageColumnVisibility}" />
+                        </ui:DataGrid.Columns>
+                    </ui:DataGrid>
+                </Grid>
+                <local:SelectionRectangle
+                    x:Name="SelectionRect"
+                    PreviewMouseUp="SelectionRect_PreviewMouseUp"
+                    RectMouseMove="SelectionRect_MouseMove" />
+                <local:RenameTooltip x:Name="RenameTooltipControl" DataContext="{x:Null}" />
+                <Grid Margin="0,40" Style="{StaticResource EmptyFolderGridStyle}">
+                    <StackPanel Style="{StaticResource NonRootEmptyFolderStyle}">
+                        <TextBlock
+                            helpers:TextHelper.AltText="{Binding Source={x:Static Member=strings:Resources.S_NON_ROOT_EMPTY_FOLDER}}"
+                            Loaded="EmptyNonRootTextBlock_Loaded"
+                            TextAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Style="{StaticResource EmptyFolderAltPromptStyle}" />
+                </Grid>
+                <local:DetailsPane
+                    x:Name="DetailsPane"
+                    Grid.Column="1"
+                    MinWidth="100"
+                    IsOpen="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsDetailsPaneOpen, Mode=OneWay}" />
+            </Grid>
+        </Border>
+        <Grid
+            Grid.Row="3"
+            Height="30"
+            Margin="6,0">
+            <Grid.Resources>
+                <Style BasedOn="{StaticResource MarginedTextBlockStyle}" TargetType="TextBlock" />
+            </Grid.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Separator
+                Grid.ColumnSpan="3"
+                Margin="-6,0"
+                VerticalAlignment="Top" />
+            <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountContainerStyle}">
+                <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountStackPanelStyle}">
+                    <TextBlock x:Name="ItemsCountBlock" Style="{StaticResource ItemsCountStyle}" />
+                    <TextBlock Text=" " />
+                    <TextBlock Style="{StaticResource ItemsCountSuffixStyle}" />
+                    <TextBlock
+                        x:Name="UnfinishedBlock"
+                        Style="{StaticResource UnfinishedTextblockStyle}"
+                        Text=" *" />
+                </StackPanel>
+                <Separator Style="{StaticResource StatusBarSeparatorStyle}" Visibility="{Binding SelectedItemsCountVisibility}" />
+                <StackPanel
+                    x:Name="SelectedItemsCountContainer"
+                    Orientation="Horizontal"
+                    Visibility="{Binding SelectedItemsCountVisibility}">
+                    <TextBlock x:Name="SelectedItemsBlock" Style="{StaticResource SelectedItemsStyle}" />
+                    <TextBlock Text=" " />
+                    <TextBlock Style="{StaticResource SelectedItemsSuffixStyle}" />
+                    <TextBlock
+                        Margin="6,4,0,4"
+                        Text="{Binding SelectedFilesTotalSize}"
+                        Visibility="{Binding SelectedFilesTotalSizeVisibility}" />
+                </StackPanel>
+                <local:PasteAndPullTooltip Margin="10,0" />
+            </StackPanel>
+            <StackPanel
+                Grid.Column="2"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Orientation="Horizontal">
+                <local:ThumbProgressTooltip Margin="0,0,6,0" Icon="{Binding GalleryFile.Icon}" />
+                <local:TransferIndicator Margin="0,1,0,0" Style="{StaticResource DiskUsageIconStyle}" />
+                <Separator x:Name="DeviceInfoSeparator">
+                    <Separator.Style>
+                        <Style BasedOn="{StaticResource StatusBarSeparatorStyle}" TargetType="Separator">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsDeviceInfoSeparatorVisible}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Separator.Style>
+                </Separator>
+                <views:DetailedBatteryControl DataContext="{Binding CurrentDeviceBattery}" />
+                <Separator>
+                    <Separator.Style>
+                        <Style BasedOn="{StaticResource StatusBarSeparatorStyle}" TargetType="Separator">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsBatteryVisible}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Separator.Style>
+                </Separator>
+                <StackPanel
+                    Margin="0,1,0,0"
+                    DataContext="{Binding CurrentDevice}"
+                    Orientation="Horizontal"
+                    Style="{StaticResource AndroidTextBlockStyle}">
+                    <ui:FontIcon Style="{DynamicResource UnsupportedIconStyle}" />
+                    <TextBlock Text="Android " />
+                    <TextBlock Text="{Binding AndroidVersion}" />
+                    <TextBlock Style="{StaticResource AndroidVersionRecoveryTextblockStyle}">
+                        <Run Text=" (" />
+                        <Run Text="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_RECOVERY_MODE}}" />
+                        <Run Text=")" />
+                    </TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

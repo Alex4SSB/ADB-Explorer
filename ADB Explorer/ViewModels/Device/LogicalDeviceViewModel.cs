@@ -1,20 +1,16 @@
-﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using AdvancedSharpAdbClient.Models;
 
 namespace ADB_Explorer.ViewModels;
 
-public class LogicalDeviceViewModel : DeviceViewModel
+public partial class LogicalDeviceViewModel : DeviceViewModel
 {
     #region Full properties
 
-    private LogicalDevice device;
-    protected new LogicalDevice Device
-    {
-        get => device;
-        set => Set(ref device, value);
-    }
+    [ObservableProperty]
+    public new partial LogicalDevice Device { get; set; }
 
     private bool isOpen;
     /// <summary>
@@ -28,7 +24,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
             if (Set(ref isOpen, value) && Root is RootStatus.Enabled)
             {
                 if (!value && Data.Settings.UnrootOnDisconnect is true)
-                    ADBService.Unroot(Device);
+                    ADBService.Unroot(Device.ID);
 
                 if (value)
                     Data.RuntimeSettings.IsRootActive = true;
@@ -38,19 +34,13 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     public DeviceData DeviceData => Device.DeviceData;
 
-    private byte? androidVersion;
-    public byte? AndroidVersion
-    {
-        get => androidVersion;
-        private set => Set(ref androidVersion, value);
-    }
+    public byte? AndroidVersion => byte.TryParse(AndroidVersionString?.Split('.')[0], out byte ver) ? ver : null;
 
-    private bool useIdForName;
-    public bool UseIdForName
-    {
-        get => useIdForName;
-        set => Set(ref useIdForName, value);
-    }
+    [ObservableProperty]
+    public partial bool UseIdForName { get; set; }
+
+    [ObservableProperty]
+    public partial ObservableList<DriveViewModel> Drives { get; set; } = [];
 
     #endregion
 
@@ -115,9 +105,87 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     public Battery Battery => Device.Battery;
 
-    public ObservableList<DriveViewModel> Drives => Device.Drives;
+    #endregion
+
+    #region Device properties (lazy-loaded from ADB)
+
+    public Dictionary<string, string> Props
+    {
+        get
+        {
+            if (field is null)
+            {
+                int exitCode = ADBService.ExecuteDeviceAdbShellCommand(ID, ADBService.GET_PROP, out string stdout, out string stderr, CancellationToken.None);
+                if (exitCode == 0)
+                {
+                    field = stdout.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries).Where(
+                        l => l[0] == '[' && l[^1] == ']').TryToDictionary(
+                            line => line.Split(':')[0].Trim('[', ']', ' '),
+                            line => line.Split(':')[1].Trim('[', ']', ' '));
+                }
+                else
+                    field = [];
+            }
+
+            return field;
+        }
+    }
+
+    public string? BrandName
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(field))
+            {
+                field = Props.GetValueOrDefault(ADBService.BRAND_NAME);
+                if (field is not null)
+                    Device.Name = field;
+            }
+            return field;
+        }
+    } = null;
+
+    public string? MmcProp
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(field))
+            {
+                field = Props.GetValueOrDefault(ADBService.MMC_PROP);
+            }
+            return field;
+        }
+    } = null;
+
+    public string? OtgProp
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(field))
+            {
+                field = Props.GetValueOrDefault(ADBService.OTG_PROP);
+            }
+            return field;
+        }
+    } = null;
+
+    public string? AndroidVersionString
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(field))
+            {
+                field = Props.GetValueOrDefault(ADBService.ANDROID_VERSION, "");
+            }
+            return field;
+        }
+    } = "";
+
+    public Task<string?> GetAndroidVersion() => Task.Run(() => AndroidVersionString);
 
     #endregion
+
+    public static implicit operator string(LogicalDeviceViewModel vm) => vm?.ID;
 
     public DateTime DiscoverTime { get; }
 
@@ -127,7 +195,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
     public DeviceAction RemoveCommand { get; }
     public DeviceAction ToggleRootCommand { get; }
     public DeviceAction SideloadCommand { get; }
-    public List<object> RebootCommands { get; } = [];
+    public List<RebootCommand> RebootCommands { get; } = [];
 
     #endregion
 
@@ -139,6 +207,8 @@ public class LogicalDeviceViewModel : DeviceViewModel
         if (Device.Type is DeviceType.Emulator)
             UseIdForName = true;
 
+        InitDeviceDrives();
+
         BrowseCommand = new(() => !IsOpen && device.Status is DeviceStatus.Ok && device.Type is not DeviceType.Sideload,
                             () => DeviceHelper.BrowseDeviceAction(this));
 
@@ -146,13 +216,14 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
         ToggleRootCommand = DeviceHelper.ToggleRootDeviceCommand(this);
 
-        foreach (RebootCommand.RebootType item in Enum.GetValues<RebootCommand.RebootType>())
+        App.SafeInvoke(() =>
         {
-            RebootCommands.Add(new RebootCommand(this, item));
+            Thread.CurrentThread.CurrentCulture =
+            Thread.CurrentThread.CurrentUICulture = Data.Settings.ActualUICulture;
 
-            if (item is RebootCommand.RebootType.Title)
-                RebootCommands.Add(new Separator() { Margin = new(-11, 0, -11, 0)});
-        }
+            foreach (RebootCommand.RebootType type in Enum.GetValues<RebootCommand.RebootType>())
+                RebootCommands.Add(new RebootCommand(this, type));
+        });
 
         SideloadCommand = new(() => Device.Type is DeviceType.Sideload or DeviceType.Recovery && device.Status is DeviceStatus.Ok,
                               () => DeviceHelper.SideloadDeviceAction(this));
@@ -171,13 +242,12 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     #region Setter functions
 
-    public void SetAndroidVersion(string version)
+    public void SetAndroidVersion()
     {
         if (!IsOpen)
             return;
 
-        if (byte.TryParse(version.Split('.')[0], out byte ver))
-            AndroidVersion = ver;
+        OnPropertyChanged(nameof(AndroidVersion));
     }
 
     public void UpdateDevice(LogicalDeviceViewModel other) => UpdateDevice(other.Device);
@@ -190,7 +260,13 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     public void EnableRoot(bool enable)
     {
-        Device.EnableRoot(enable);
+        Device.Root = enable
+            ? ADBService.Root(Device.ID) ? RootStatus.Enabled : RootStatus.Forbidden
+            : ADBService.Unroot(Device.ID) ? RootStatus.Disabled : RootStatus.Unchecked;
+
+        if (Data.DevicesObject.Current.ID == ID)
+            Data.RuntimeSettings.IsRootActive = Root is RootStatus.Enabled;
+
         OnPropertyChanged(nameof(Root));
     }
 
@@ -211,12 +287,145 @@ public class LogicalDeviceViewModel : DeviceViewModel
         return false;
     }
 
-    public void UpdateBattery() => Device.UpdateBattery();
+    public void UpdateBattery()
+    {
+        Device.Battery.Update(ADBService.GetBatteryInfo(this));
+    }
 
-    public Task<bool> UpdateDrives(IEnumerable<Drive> drives, Dispatcher dispatcher, bool asyncClassify = false) => Device.UpdateDrives(drives, dispatcher, asyncClassify);
+    public void UpdateName() => OnPropertyChanged(nameof(Name));
 
-    public Task<bool> UpdateDrives(LogicalDeviceViewModel other, Dispatcher dispatcher, bool asyncClassify = false)
-        => UpdateDrives(other.Device.Drives.Select(d => d.Drive), dispatcher, asyncClassify);
+    #endregion
+
+    #region Drive handling
+
+    private void InitDeviceDrives()
+    {
+        Drives.Add(new LogicalDriveViewModel(new(path: AdbExplorerConst.DRIVE_TYPES.First(d => d.Value is AbstractDrive.DriveType.Root).Key)));
+        Drives.Add(new LogicalDriveViewModel(new(path: AdbExplorerConst.DRIVE_TYPES.First(d => d.Value is AbstractDrive.DriveType.Internal).Key)));
+
+        Drives.Add(new VirtualDriveViewModel(new(path: AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin), -1)));
+        Drives.Add(new VirtualDriveViewModel(new(path: AdbExplorerConst.TEMP_PATH)));
+        Drives.Add(new VirtualDriveViewModel(new(path: AdbLocation.StringFromLocation(Navigation.SpecialLocation.PackageDrive))));
+    }
+
+    public async Task<bool> UpdateDrives(IEnumerable<DriveSnapshot> snapshots, Dispatcher dispatcher, bool asyncClassify = false)
+    {
+        bool collectionChanged;
+
+        if (asyncClassify)
+        {
+            collectionChanged = await UpdateExtensionDrivesAsync(snapshots, dispatcher);
+        }
+        else
+        {
+            collectionChanged = SetDrives(snapshots);
+            UpdateExtensionDrives(snapshots, dispatcher);
+        }
+
+        return collectionChanged;
+    }
+
+    private void UpdateExtensionDrives(IEnumerable<DriveSnapshot> snapshots, Dispatcher dispatcher)
+    {
+        var mmcTask = Task.Run(() => DeviceHelper.GetMmcDrive(snapshots, ID));
+        mmcTask.ContinueWith(t =>
+        {
+            if (t.IsCanceled)
+                return;
+
+            dispatcher.BeginInvoke(() =>
+            {
+                SetMmcDrive(t.Result);
+                SetExternalDrives();
+            });
+        });
+    }
+
+    private async Task<bool> UpdateExtensionDrivesAsync(IEnumerable<DriveSnapshot> snapshots, Dispatcher dispatcher)
+    {
+        var list = snapshots.ToList();
+
+        await Task.Run(() =>
+        {
+            if (DeviceHelper.GetMmcDrive(list, ID) is { } mmc)
+            {
+                var idx = list.IndexOf(mmc);
+                list[idx] = mmc with { Type = AbstractDrive.DriveType.Expansion };
+            }
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i].Type is AbstractDrive.DriveType.Unknown)
+                    list[i] = list[i] with { Type = AbstractDrive.DriveType.External };
+            }
+        });
+
+        var result = false;
+        await dispatcher.BeginInvoke(() => result = SetDrives(list));
+        return result;
+    }
+
+    private bool SetDrives(IEnumerable<DriveSnapshot> snapshots)
+    {
+        if (snapshots is null)
+            return false;
+
+        bool added = false;
+
+        foreach (var snapshot in snapshots)
+        {
+            var selfQ = Drives.Where(d => d.Path == snapshot.Path
+                || (snapshot.Type is AbstractDrive.DriveType.Internal && d.Type is AbstractDrive.DriveType.Internal));
+
+            if (selfQ.Any())
+            {
+                var self = selfQ.First() as LogicalDriveViewModel
+                    ?? throw new NotSupportedException();
+
+                self.UpdateDrive(snapshot);
+                if (snapshot.Type is not AbstractDrive.DriveType.Unknown)
+                    self.SetType(snapshot.Type);
+            }
+            else
+            {
+                Drives.Add(new LogicalDriveViewModel(LogicalDrive.From(snapshot)));
+                added = true;
+            }
+        }
+
+        var removed = Drives.RemoveAll(self => self is LogicalDriveViewModel
+            && !snapshots.Any(s => s.Path == self.Path
+                || (s.Type is AbstractDrive.DriveType.Internal && self.Type is AbstractDrive.DriveType.Internal)));
+
+        return added || removed;
+    }
+
+    public void SetMmcDrive(DriveSnapshot? mmc)
+    {
+        if (mmc is not { } mmcDrive)
+            return;
+
+        ((LogicalDriveViewModel)Drives.FirstOrDefault(d => d.Path == mmcDrive.Path))?.SetExtension();
+    }
+
+    public void SetMmcDrive(LogicalDrive mmcDrive)
+    {
+        if (mmcDrive is null)
+            return;
+
+        ((LogicalDriveViewModel)Drives.FirstOrDefault(d => d.Path == mmcDrive.Path))?.SetExtension();
+    }
+
+    /// <summary>
+    /// Sets type of all <see cref="DriveViewModel"/> with unknown type as external.
+    /// </summary>
+    public void SetExternalDrives()
+    {
+        foreach (var item in Drives.Where(d => d.Type == AbstractDrive.DriveType.Unknown))
+        {
+            ((LogicalDriveViewModel)item).SetExtension(false);
+        }
+    }
 
     #endregion
 }

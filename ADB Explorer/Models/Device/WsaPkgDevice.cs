@@ -2,12 +2,7 @@
 
 public class WsaPkgDevice : Device
 {
-    private DateTime lastLaunch = DateTime.MinValue;
-    public DateTime LastLaunch
-    {
-        get => lastLaunch;
-        set => Set(ref lastLaunch, value);
-    }
+    public DateTime LastLaunch { get; set; } = DateTime.MinValue;
 
     public WsaPkgDevice()
     {

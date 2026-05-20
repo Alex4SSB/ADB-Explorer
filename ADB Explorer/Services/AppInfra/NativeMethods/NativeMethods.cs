@@ -87,6 +87,8 @@ public static partial class NativeMethods
 
         /// <summary>Path too long</summary>
         PATH_TOO_LONG = -2147417803, // 0x80010135
+
+        ERROR_WRONG_PASSWORD = -2147023573, // 0x8007052B
     }
 
     [Flags]
@@ -405,6 +407,8 @@ public static partial class NativeMethods
     public enum WindowMessages
     {
         WM_COPYDATA = 0x004A,
+        WM_DISPLAYCHANGE = 0x007E,
+        WM_DPICHANGED = 0x02E0,
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -531,6 +535,8 @@ public static partial class NativeMethods
     [StructLayout(LayoutKind.Sequential)]
     public struct FILETIME
     {
+        public long dwDateTime;
+
         public FILETIME(DateTime dateUTC)
         {
             dwDateTime = dateUTC.ToLocalTime().ToFileTime();
@@ -540,8 +546,6 @@ public static partial class NativeMethods
         {
             dwDateTime = ((long)fileTime.dwHighDateTime << 32) + fileTime.dwLowDateTime;
         }
-
-        public long dwDateTime;
 
         public readonly DateTime DateTimeUTC => DateTime.FromFileTime(dwDateTime).ToUniversalTime();
 
@@ -643,6 +647,29 @@ public static partial class NativeMethods
         return icon;
     }
 
+    [LibraryImport("User32.dll", EntryPoint = "PrivateExtractIconsW", StringMarshalling = StringMarshalling.Utf16)]
+    private static partial uint PrivateExtractIcons(
+        string szFileName,
+        int nIconIndex,
+        int cxIcon,
+        int cyIcon,
+        out HANDLE phicon,
+        out int piconid,
+        uint nIcons,
+        uint flags);
+
+    public static Icon ExtractIconByIndex(string filePath, int index, int size)
+    {
+        uint result = PrivateExtractIcons(filePath, index, size, size, out HANDLE hIcon, out _, 1, 0);
+        if (result == 0 || hIcon == IntPtr.Zero)
+            return null;
+
+        Icon icon = (Icon)Icon.FromHandle(hIcon).Clone();
+        DestroyIcon(hIcon);
+
+        return icon;
+    }
+
     [LibraryImport("Gdi32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool DeleteObject(HANDLE hObject);
@@ -674,31 +701,6 @@ public static partial class NativeMethods
             return "File";
 
         return shInfo.szTypeName;
-    }
-
-    #endregion
-
-    #region Process Info
-
-    public struct IO_COUNTERS
-    {
-        public ulong ReadOperationCount;
-        public ulong WriteOperationCount;
-        public ulong OtherOperationCount;
-        public ulong ReadTransferCount;
-        public ulong WriteTransferCount;
-        public ulong OtherTransferCount;
-    }
-
-    [LibraryImport("Kernel32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool GetProcessIoCounters(HANDLE ProcessHandle, out IO_COUNTERS IoCounters);
-
-    public static IO_COUNTERS GetProcessIoCounters(HANDLE ProcessHandle)
-    {
-        GetProcessIoCounters(ProcessHandle, out var counters);
-
-        return counters;
     }
 
     #endregion

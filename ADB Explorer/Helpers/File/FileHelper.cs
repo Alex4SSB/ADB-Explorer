@@ -69,7 +69,7 @@ public static class FileHelper
         if (!Data.Settings.ShowExtensions)
             newPath += file.Extension;
 
-        ShellFileOperation.Rename(file, newPath, Data.CurrentADBDevice);
+        ShellFileOperation.Rename(file, newPath, Data.DevicesObject.Current);
     }
 
     public static string DisplayName(TextBox textBox) => DisplayName(textBox.DataContext as FilePath);
@@ -331,11 +331,9 @@ public static class FileHelper
         return RelationType.Unrelated;
     }
 
-    public static IEnumerable<FileClass> GetFilesFromTree((string, long?, double?)[] tree) => 
-        tree.Select(t => new FileClass(GetFullName(t.Item1), t.Item1, t.Item2 is null ? FileType.Folder : FileType.File, size: t.Item2)
-        { ModifiedTime = t.Item3.FromUnixTime() });
+    public static IEnumerable<FileClass> GetFilesFromTree(FolderTree[] tree) => tree.Select(t => new FileClass(t));
 
-    public static (string, long?, double?)[] GetFolderTree(IEnumerable<string> paths, bool isFolder = true)
+    public static FolderTree[] GetFolderTree(IEnumerable<string> paths, bool isFolder = true)
     {
         string stdout = "";
         var files = string.Join(" ", paths.Select(p => ADBService.EscapeAdbShellString(p)));
@@ -354,7 +352,7 @@ public static class FileHelper
                 "2>&1"
             ];
 
-            ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "find", out stdout, out _, CancellationToken.None, args);
+            ADBService.ExecuteDeviceAdbShellCommand(Data.DevicesObject.Current.ID, "find", out stdout, out _, CancellationToken.None, args);
         }
         else // when find does not support -printf
         {
@@ -370,17 +368,90 @@ public static class FileHelper
                 """fi; done;"""
             ];
 
-            ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "find", out stdout, out _, CancellationToken.None, args);
+            ADBService.ExecuteDeviceAdbShellCommand(Data.DevicesObject.Current.ID, "find", out stdout, out _, CancellationToken.None, args);
         }
         var matches = AdbRegEx.RE_FIND_TREE().Matches(stdout);
 
         return [.. matches.Where(m => m.Success)
                 .Select(m =>
-                (
-                    m.Groups["Name"].Value,
-                    m.Groups["Size"].Value == "d" ? (long?)null : long.Parse(m.Groups["Size"].Value, CultureInfo.InvariantCulture),
-                    m.Groups["Date"].Value == "d" ? (double?)null : double.Parse(m.Groups["Date"].Value, CultureInfo.InvariantCulture)
-                ))];
+                new FolderTree{
+                    Name = m.Groups["Name"].Value,
+                    Size = m.Groups["Size"].Value == "d" ? null : long.Parse(m.Groups["Size"].Value, CultureInfo.InvariantCulture),
+                    Date = m.Groups["Date"].Value == "d" ? null : double.Parse(m.Groups["Date"].Value, CultureInfo.InvariantCulture)
+                })];
+    }
+
+    public static (long? Size, DateTime? ModifiedTime) GetShellSizeDate(ShellItem shellItem, bool isDirectory)
+    {
+        long? size = null;
+        DateTime? modifiedTime = null;
+
+        try
+        {
+            size = isDirectory ? null : shellItem.FileInfo.Length;
+            modifiedTime = shellItem.FileInfo.LastWriteTime;
+        }
+        catch (Exception)
+        {
+            if (!isDirectory
+                && shellItem.Properties.TryGetValue<ulong>(Ole32.PROPERTYKEY.System.Size, out var sz))
+            {
+                size = (long)sz;
+            }
+
+            if (shellItem.Properties.TryGetValue<System.Runtime.InteropServices.ComTypes.FILETIME>(Ole32.PROPERTYKEY.System.DateModified, out var modified))
+            {
+                modifiedTime = new NativeMethods.FILETIME(modified).DateTimeLocal;
+            }
+        }
+
+        return (size, modifiedTime);
+    }
+
+    public static bool IsPhotoDir()
+    {
+        float photos = Data.DirList.FileList.Count(f => 
+            AdbExplorerConst.COMMON_PHOTO_EXT.Contains(f.Extension, StringComparer.InvariantCultureIgnoreCase));
+
+        return photos / Data.DirList.FileList.Count > AdbExplorerConst.PHOTO_DIR_THRESHOLD;
+    }
+
+    /// <summary>
+    /// Resolves an executable name (e.g. "adb") to its full path by searching the system PATH directories.
+    /// </summary>
+    /// <returns>The full path to the executable if found; otherwise, <see langword="null"/>.</returns>
+    public static string ResolveExecutableFromPath(string fileName)
+    {
+        var pathEnv = Environment.GetEnvironmentVariable("PATH");
+        if (string.IsNullOrEmpty(pathEnv))
+            return null;
+
+        // PATHEXT defines executable extensions to try (e.g. ".EXE;.CMD")
+        var extensions = (Environment.GetEnvironmentVariable("PATHEXT") ?? ".EXE")
+            .Split(';', StringSplitOptions.RemoveEmptyEntries);
+
+        bool hasExtension = Path.HasExtension(fileName);
+
+        foreach (var dir in pathEnv.Split(';', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (hasExtension)
+            {
+                var candidate = Path.Combine(dir, fileName);
+                if (File.Exists(candidate))
+                    return Path.GetFullPath(candidate);
+            }
+            else
+            {
+                foreach (var ext in extensions)
+                {
+                    var candidate = Path.Combine(dir, fileName + ext);
+                    if (File.Exists(candidate))
+                        return Path.GetFullPath(candidate);
+                }
+            }
+        }
+
+        return null;
     }
 
     public static (long? Size, DateTime? ModifiedTime) GetShellSizeDate(ShellItem shellItem, bool isDirectory)

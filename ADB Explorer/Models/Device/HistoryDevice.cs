@@ -2,12 +2,7 @@
 
 public class HistoryDevice : NewDevice
 {
-    private string deviceName = null;
-    public string DeviceName
-    {
-        get => deviceName;
-        set => Set(ref deviceName, value);
-    }
+    public string DeviceName { get; set; }
 
     public HistoryDevice()
     {
@@ -21,7 +16,6 @@ public class HistoryDevice : NewDevice
         ConnectPort = device.ConnectPort;
     }
 
-    [JsonConstructor]
     public HistoryDevice(string ipAddress, string connectPort, string deviceName = "") : this()
     {
         DeviceName = deviceName;

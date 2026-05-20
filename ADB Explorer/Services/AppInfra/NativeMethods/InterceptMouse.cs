@@ -64,7 +64,7 @@ public static partial class NativeMethods
             }
             else
             {
-                POINT newPoint = new(hookStruct.pt.X, hookStruct.pt.Y);
+                POINT newPoint = hookStruct.pt;
                 if (newPoint != MousePosition)
                     _mouseMoveAction?.Invoke(MousePosition);
 
