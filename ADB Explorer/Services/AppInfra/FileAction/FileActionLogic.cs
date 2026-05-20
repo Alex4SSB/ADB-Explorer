@@ -1164,13 +1164,4 @@ internal static class FileActionLogic
         
         Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"? {apk.Name}\"");
     }
-
-    public static void RemoveFileOps()
-    {
-        var ops = Data.FileActions.SelectedFileOps.Value;
-        if (!ops.Any())
-            ops = Data.FileOpQ.Operations;
-
-        Data.FileOpQ.Operations.RemoveAll(ops);
-    }
 }

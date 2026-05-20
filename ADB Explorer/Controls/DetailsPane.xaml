@@ -75,7 +75,16 @@
         </DataTemplate>
     </UserControl.Resources>
     <Grid DataContext="{Binding ElementName=pane}">
-        <Grid x:Name="ContentBox">
+        <Grid x:Name="ContentBox" d:Visibility="Visible">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.DevicesObject}, Path=Current}" Value="{x:Null}">
+                            <Setter Property="Visibility" Value="Hidden" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
             <Grid>
                 <Grid.Style>
                     <Style TargetType="Grid">

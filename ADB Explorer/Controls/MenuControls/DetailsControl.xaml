@@ -10,7 +10,16 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     x:Name="dc"
     mc:Ignorable="d">
-    <local:AdbMenu DataContext="{Binding ElementName=dc}" Style="{StaticResource AdbMenuStyle}">
+    <local:AdbMenu DataContext="{Binding ElementName=dc}">
+        <local:AdbMenu.Style>
+            <Style BasedOn="{StaticResource AdbMenuStyle}" TargetType="local:AdbMenu">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.DevicesObject}, Path=Current}" Value="{x:Null}">
+                        <Setter Property="IsEnabled" Value="False" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </local:AdbMenu.Style>
         <local:AdbMenuItem
             IsCheckable="True"
             IsChecked="{Binding IsChecked, Mode=TwoWay}"
