@@ -3481,7 +3481,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Accent color.
+        ///   Looks up a localized string similar to Accent Color.
         /// </summary>
         public static string S_SETTINGS_ACCENT_COLOR {
             get {
@@ -3553,7 +3553,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Custom accent color.
+        ///   Looks up a localized string similar to Custom Accent Color.
         /// </summary>
         public static string S_SETTINGS_CUSTOM_ACCENT {
             get {

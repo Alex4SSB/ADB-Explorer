@@ -52,7 +52,7 @@ public partial class ColorPickerControl : UserControl
         var result = await DialogService.ShowDialog(
             AdbContentDialog.CustomContentDialog(panel),
             Strings.Resources.S_PICK_COLOR,
-            primaryText: Strings.Resources.S_BUTTON_OK,
+            primaryText: Strings.Resources.S_CONFIRM,
             closeText: Strings.Resources.S_CANCEL);
 
         if (result == Wpf.Ui.Controls.ContentDialogResult.Primary)

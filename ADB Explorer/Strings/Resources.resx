@@ -556,11 +556,11 @@ Visible content may be incomplete.</value>
     <comment>The title of the settings group used to control the app theme</comment>
   </data>
   <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
-    <value>Custom accent color</value>
+    <value>Custom Accent Color</value>
     <comment>The setting to enable a custom accent color instead of the system accent</comment>
   </data>
   <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
-    <value>Accent color</value>
+    <value>Accent Color</value>
     <comment>The setting to choose a custom accent color</comment>
   </data>
   <data name="S_PICK_COLOR" xml:space="preserve">
