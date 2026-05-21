@@ -1618,4 +1618,31 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="S_MOUNT_OPTIONS" xml:space="preserve">
     <value>Options de montage</value>
   </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Couleur d'accent personnalisée</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Couleur d'accent</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Choisissez une couleur</value>
+  </data>
+  <data name="S_COLOR_RED" xml:space="preserve">
+    <value>Rouge</value>
+  </data>
+  <data name="S_COLOR_GREEN" xml:space="preserve">
+    <value>Vert</value>
+  </data>
+  <data name="S_COLOR_BLUE" xml:space="preserve">
+    <value>Bleu</value>
+  </data>
+  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
+    <value>Impossible de localiser ABD à partir du système PATH. Veuillez utiliser "{0}" pour le localiser.</value>
+  </data>
+  <data name="S_ADB_PATH_INVALID" xml:space="preserve">
+    <value>Le chemin ADB fourni est soit un raccourci Windows, soit un chemin UNC (distanciel), qui n'est pas autorisé.</value>
+  </data>
+  <data name="S_ADB_COMPROMISED" xml:space="preserve">
+    <value>L'exécutable fourni ne peut être vérifié en tant qu'ADB. Assurez-vous de télécharger uniquement les outils de plateforme Android officiels de Google.</value>
+  </data>
 </root>
