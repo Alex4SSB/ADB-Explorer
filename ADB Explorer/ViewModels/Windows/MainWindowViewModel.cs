@@ -2,6 +2,7 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
+using System.Windows.Shell;
 using Wpf.Ui.Controls;
 
 namespace ADB_Explorer.ViewModels.Windows;
@@ -70,6 +71,12 @@ public partial class MainWindowViewModel : ObservableObject
 
     public bool IsNavigationEnabled => Data.RuntimeSettings.AdbVersion is not null && Data.RuntimeSettings.AdbVersion >= AdbExplorerConst.MIN_ADB_VERSION;
 
+    [ObservableProperty]
+    public partial TaskbarItemProgressState TaskbarItemProgress { get; set; }
+
+    [ObservableProperty]
+    public partial double TaskbarProgressValue { get; set; }
+
     public MainWindowViewModel()
     {
         MenuItems.Add(_logItem);
@@ -91,6 +98,24 @@ public partial class MainWindowViewModel : ObservableObject
         };
 
         Task.Run(InitNotifications);
+    }
+
+    public void UpdateFileOp()
+    {
+        if (Data.FileOpQ.AnyFailedOperations)
+            TaskbarItemProgress = TaskbarItemProgressState.Error;
+        else if (Data.FileOpQ.IsActive)
+        {
+            if (Data.FileOpQ.Progress == 0)
+                TaskbarItemProgress = TaskbarItemProgressState.Indeterminate;
+            else
+            {
+                TaskbarItemProgress = TaskbarItemProgressState.Normal;
+                TaskbarProgressValue = Data.FileOpQ.Progress;
+            }
+        }
+        else
+            TaskbarItemProgress = TaskbarItemProgressState.None;
     }
 
     public async void InitNotifications()

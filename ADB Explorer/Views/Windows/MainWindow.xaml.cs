@@ -61,6 +61,24 @@ public partial class MainWindow : INavigationWindow
                                               IpcService.AcceptIpcMessage,
                                               scale => Data.RuntimeSettings.MainWindowScalingFactor = scale);
 
+        Data.FileOpQ.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName is (nameof(FileOperationQueue.IsActive))
+            or (nameof(FileOperationQueue.Progress))
+            or (nameof(FileOperationQueue.AnyFailedOperations)))
+            {
+                ViewModel.UpdateFileOp();
+            }
+        };
+
+        Data.FileActions.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(FileActionsEnable.IsDriveViewVisible))
+            {
+                ViewModel.UpdateFileOp();
+            }
+        };
+
         DeviceHelper.UpdateWsaPkgStatus();
 
         dw.Show();

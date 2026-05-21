@@ -346,7 +346,6 @@ public partial class ExplorerPageHeader : UserControl
         ViewModel.NotifySelectedFilesTotalSize();
 
         FileActionLogic.UpdateFileActions();
-        //PasteGrid.Visibility = Visibility.Visible;
     }
 
     private void RuntimeSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -606,8 +605,6 @@ public partial class ExplorerPageHeader : UserControl
         FileActions.HomeEnabled = true;
         RuntimeSettings.BrowseDrive = null;
 
-        UpdateFileOp();
-
         Task.Delay(EXPLORER_NAV_DELAY).ContinueWith(_ => App.SafeInvoke(() => RuntimeSettings.IsExplorerLoaded = true));
 
         return _navigateToPath(realPath);
@@ -615,7 +612,6 @@ public partial class ExplorerPageHeader : UserControl
 
     private bool _navigateToPath(string realPath)
     {
-        //PasteGrid.Visibility = Visibility.Collapsed;
         FileActions.ListingInProgress = true;
 
         FileActions.WasInAppDrive = FileActions.IsAppDrive;
@@ -791,7 +787,6 @@ public partial class ExplorerPageHeader : UserControl
     {
         FileActionLogic.ClearExplorer(false);
         FileActions.IsDriveViewVisible = true;
-        UpdateFileOp();
 
         NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
         CurrentPath =
@@ -809,24 +804,6 @@ public partial class ExplorerPageHeader : UserControl
         HomeSavedLocationsList.ItemsSource = NavigationBox.SavedItems;
         if (NavigationBox.SavedItems.Count == 0)
             Settings.HomeLocationsExpanded = false;
-    }
-
-    private void UpdateFileOp(bool onlyProgress = true)
-    {
-        //if (!onlyProgress)
-        //    Task.Run(FileActionLogic.UpdateFileOpControls);
-
-        //if (FileOpQ.AnyFailedOperations)
-        //    TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Error;
-        //else if (FileOpQ.IsActive)
-        //{
-        //    if (FileOpQ.Progress == 0)
-        //        TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
-        //    else
-        //        TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Normal;
-        //}
-        //else
-        //    TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
     }
 
     private void DataGridCell_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
