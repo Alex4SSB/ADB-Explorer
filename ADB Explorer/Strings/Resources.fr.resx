@@ -1640,7 +1640,7 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
     <value>Impossible de localiser ADB à partir du système PATH. Veuillez utiliser "{0}" pour le localiser.</value>
   </data>
   <data name="S_ADB_PATH_INVALID" xml:space="preserve">
-    <value>Le chemin ADB fourni est soit un raccourci Windows, soit un chemin UNC (distanciel), qui n'est pas autorisé.</value>
+    <value>Le chemin {0} fourni est soit un raccourci Windows, soit un chemin UNC (distanciel), qui n'est pas autorisé.</value>
   </data>
   <data name="S_ADB_COMPROMISED" xml:space="preserve">
     <value>L'exécutable fourni ne peut être vérifié en tant qu'ADB. Assurez-vous de télécharger uniquement les outils de plateforme Android officiels de Google.</value>
