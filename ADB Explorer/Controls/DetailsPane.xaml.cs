@@ -55,6 +55,8 @@ public partial class DetailsPane : UserControl
             pane.SlideTransform.X = pane.ActualWidth > 0 ? pane.ActualWidth : Data.Settings.DetailsPaneWidth;
             animation.To = 0;
             pane.SlideTransform.BeginAnimation(TranslateTransform.XProperty, animation);
+
+            OnSelectedFilesChanged(d, new DependencyPropertyChangedEventArgs(SelectedFilesProperty, pane.SelectedFiles, pane.SelectedFiles));
         }
         else
         {

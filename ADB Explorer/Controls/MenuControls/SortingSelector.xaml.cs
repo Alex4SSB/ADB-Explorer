@@ -44,14 +44,14 @@ public partial class SortingSelector : UserControl
         SortOption = option;
     }
 
-    public ListSortDirection SortDirection
+    public ListSortDirection? SortDirection
     {
-        get => (ListSortDirection)GetValue(SortDirectionProperty);
+        get => (ListSortDirection?)GetValue(SortDirectionProperty);
         set => SetValue(SortDirectionProperty, value);
     }
 
     public static readonly DependencyProperty SortDirectionProperty =
-        DependencyProperty.Register(nameof(SortDirection), typeof(ListSortDirection),
+        DependencyProperty.Register(nameof(SortDirection), typeof(ListSortDirection?),
           typeof(SortingSelector), new PropertyMetadata(ListSortDirection.Ascending, OnSortDirectionPropertyChanged));
 
     private static void OnSortDirectionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -60,14 +60,14 @@ public partial class SortingSelector : UserControl
         selector.OnPropertyChanged(nameof(SortDirection));
     }
 
-    public SortingProperty SortOption
+    public SortingProperty? SortOption
     {
-        get => (SortingProperty)GetValue(SortOptionProperty);
+        get => (SortingProperty?)GetValue(SortOptionProperty);
         set => SetValue(SortOptionProperty, value);
     }
 
     public static readonly DependencyProperty SortOptionProperty =
-        DependencyProperty.Register(nameof(SortOption), typeof(SortingProperty),
+        DependencyProperty.Register(nameof(SortOption), typeof(SortingProperty?),
           typeof(SortingSelector), new PropertyMetadata(SortingProperty.Name, OnSortOptionPropertyChanged));
 
     private static void OnSortOptionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

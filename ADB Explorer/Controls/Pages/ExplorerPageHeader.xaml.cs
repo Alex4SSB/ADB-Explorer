@@ -884,12 +884,12 @@ public partial class ExplorerPageHeader : UserControl
         }
 
         RuntimeSettings.IsPathBoxFocused = false;
-
+        
         if (!row.IsSelected
-            && CopyPaste.DragStatus is not CopyPasteService.DragState.None
             && Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
         {
             ExplorerGrid.UnselectAll();
+            ExplorerGrid.SelectedIndex = -1;
             row.IsSelected = true;
         }
 
@@ -1273,6 +1273,7 @@ public partial class ExplorerPageHeader : UserControl
             if (Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
             {
                 ExplorerGrid.UnselectAll();
+                ExplorerGrid.SelectedIndex =
                 selectionIndex = -1;
             }
         }
