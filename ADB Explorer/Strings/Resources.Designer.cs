@@ -259,7 +259,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Provided ADB path is either a Windows shortcut or a UNC (remote) path, which is not allowed..
+        ///   Looks up a localized string similar to Provided {0} path is either a Windows shortcut or a UNC (remote) path, which is not allowed..
         /// </summary>
         public static string S_ADB_PATH_INVALID {
             get {

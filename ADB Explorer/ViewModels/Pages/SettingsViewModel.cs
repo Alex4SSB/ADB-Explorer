@@ -111,7 +111,7 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
         AdbStatus = Data.RuntimeSettings.AdbStatus switch
         {
             AdbHelper.AdbStatus.NotFound => string.Format(Strings.Resources.S_ADB_NOT_FOUND, Strings.Resources.S_SETTINGS_OVERRIDE_ADB),
-            AdbHelper.AdbStatus.PathInvalid => Strings.Resources.S_ADB_PATH_INVALID,
+            AdbHelper.AdbStatus.PathInvalid => string.Format(Strings.Resources.S_ADB_PATH_INVALID, "ADB"),
             AdbHelper.AdbStatus.Compromised => Strings.Resources.S_ADB_COMPROMISED,
             AdbHelper.AdbStatus.VersionUnknown => Strings.Resources.S_MISSING_ADB_OVERRIDE,
             AdbHelper.AdbStatus.Outdated => Strings.Resources.S_ADB_VERSION_LOW_OVERRIDE,

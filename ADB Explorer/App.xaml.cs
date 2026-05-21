@@ -111,8 +111,17 @@ public partial class App
         var settingsPath = "";
         if (e.Args.Length > 0)
         {
-            // verify that the provided path is valid - it should not exist as a directory, but its parent directory should exist
-            if (!Directory.Exists(FileHelper.GetParentPath(e.Args[0])) || Directory.Exists(e.Args[0]))
+            FileInfo file = new(e.Args[0]);
+            DirectoryInfo parent = file.Directory;
+
+            // Provided path must not be a directory, network location, or symlink
+            // Parent directory must exist and not be a symlink (the file itself doesn't have to exist)
+            if (e.Args[0].StartsWith(@"\\")
+                || !parent.Exists
+                || !parent.Attributes.HasFlag(FileAttributes.Directory)
+                || parent.Attributes.HasFlag(FileAttributes.ReparsePoint)
+                || file.Attributes.HasFlag(FileAttributes.Directory) 
+                || file.Attributes.HasFlag(FileAttributes.ReparsePoint))
             {
                 MessageBox.Show($"{Strings.Resources.S_PATH_INVALID}\n\n{e.Args[0]}", Strings.Resources.S_CUSTOM_DATA_PATH, MessageBoxButton.OK, MessageBoxImage.Error);
 

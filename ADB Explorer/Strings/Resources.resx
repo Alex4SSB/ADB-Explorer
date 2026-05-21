@@ -2013,7 +2013,8 @@ Please help us localize the app to your language on Weblate.</value>
     <comment>0 - the name of the Override ADB Path setting</comment>
   </data>
   <data name="S_ADB_PATH_INVALID" xml:space="preserve">
-    <value>Provided ADB path is either a Windows shortcut or a UNC (remote) path, which is not allowed.</value>
+    <value>Provided {0} path is either a Windows shortcut or a UNC (remote) path, which is not allowed.</value>
+    <comment>0 - either "ADB" or nothing</comment>
   </data>
   <data name="S_ADB_COMPROMISED" xml:space="preserve">
     <value>The provided executable cannot be verified as ADB. Make sure you download only official Android Platform Tools from Google.</value>

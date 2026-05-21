@@ -1,5 +1,4 @@
 ﻿using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Helpers;
@@ -17,13 +16,27 @@ public static class SettingsHelper
         var dialog = new CommonOpenFileDialog()
         {
             IsFolderPicker = true,
-            Multiselect = false
+            Multiselect = false,
+            AllowNonFileSystemItems = false,
+            EnsurePathExists = true,
         };
         if (Data.Settings.DefaultFolder != "")
             dialog.DefaultDirectory = Data.Settings.DefaultFolder;
 
         if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
         {
+            DirectoryInfo dir = new(dialog.FileName);
+            if (dialog.FileName.StartsWith(@"\\")
+                || !dir.Exists
+                || dir.Attributes.HasFlag(FileAttributes.ReparsePoint))
+            {
+                string message = string.Format(Strings.Resources.S_ADB_PATH_INVALID, "");
+                message = message.Replace("  ", " ");
+
+                DialogService.ShowMessage(message);
+                return;
+            }
+
             Data.Settings.DefaultFolder = dialog.FileName;
         }
     }
@@ -51,23 +64,7 @@ public static class SettingsHelper
 
         if (dialog.ShowDialog() == true)
         {
-            string message = "";
             ADBService.VerifyAdbVersion(dialog.FileName);
-            if (Data.RuntimeSettings.AdbVersion is null)
-            {
-                message = Strings.Resources.S_MISSING_ADB_OVERRIDE;
-            }
-            else if (Data.RuntimeSettings.AdbVersion < AdbExplorerConst.MIN_ADB_VERSION)
-            {
-                message = Strings.Resources.S_ADB_VERSION_LOW_OVERRIDE;
-            }
-
-            if (message != "")
-            {
-                DialogService.ShowMessage(message, Strings.Resources.S_FAIL_OVERRIDE_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true);
-                return;
-            }
-
             Data.Settings.ManualAdbPath = dialog.FileName;
         }
     }
