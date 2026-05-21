@@ -1,8 +1,8 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Properties;
 using ADB_Explorer.ViewModels;
 using System.Linq.Expressions;
-using Wpf.Ui.Appearance;
 using static ADB_Explorer.Models.Data;
 using static ADB_Explorer.Services.SettingsAction;
 
@@ -154,7 +154,7 @@ public static class UISettings
             ], "\uEC50"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_ICONS,
             [
-                new ThumbsModeSetting(() => Settings.ThumbsMode, Strings.Resources.S_SETTINGS_THUMBNAIL_MODE, [
+                new SimpleComboSetting<AppSettings.ThumbnailMode>(() => Settings.ThumbsMode, Strings.Resources.S_SETTINGS_THUMBNAIL_MODE, [
                     new(AppSettings.ThumbnailMode.Off, Strings.Resources.S_SETTINGS_INACTIVE),
                     new(AppSettings.ThumbnailMode.IconViewOnly, Strings.Resources.S_SETTINGS_THUMBS_ICON_VIEW),
                     new(AppSettings.ThumbnailMode.OnPhotoDir, Strings.Resources.S_SETTINGS_THUMBS_PHOTO_DIR),
@@ -163,14 +163,14 @@ public static class UISettings
                 new BoolSetting(() => Settings.MovieThumbsEnabled, Strings.Resources.S_SETTINGS_VIDEO_THUMBNAILS, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uE8B2"),
                 new BoolSetting(() => Settings.ThumbSizePerLocation, Strings.Resources.S_SETTINGS_THUMB_SIZE_PER_LOCATION, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uEFFF"),
                 new BoolSetting(() => Settings.PersistThumbs, Strings.Resources.S_SETTINGS_PERSIST_THUMBS, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uE78C"),
-                new ThumbsAgeSetting(() => Settings.ThumbsAge, Strings.Resources.S_SETTINGS_THUMBS_AGE, [
+                new SimpleComboSetting<AppSettings.ThumbnailAge>(() => Settings.ThumbsAge, Strings.Resources.S_SETTINGS_THUMBS_AGE, [
                     new(AppSettings.ThumbnailAge.Disabled, Strings.Resources.S_SETTINGS_INACTIVE),
                     new(AppSettings.ThumbnailAge.OneMonth, Strings.Resources.S_ONE_MONTH),
                     new(AppSettings.ThumbnailAge.OneWeek, Strings.Resources.S_ONE_WEEK),
                     new(AppSettings.ThumbnailAge.OneDay, Strings.Resources.S_ONE_DAY),
                     new(AppSettings.ThumbnailAge.OneHour, Strings.Resources.S_ONE_HOUR)],
-                    AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode),
-                    "\uE823"),
+                    visibleProp: AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode),
+                    icon: "\uE823"),
                 new NumericSetting(() => Settings.MaxCustomThumbWeight,
                                    Strings.Resources.S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT,
                                    0,
@@ -205,17 +205,18 @@ public static class UISettings
                                  Settings.CultureTranslationProgress,
                                  "\uF2B7",
                                  SettingsActions.Find(a => a.Name is ActionType.ResetApp)),
-                new ThemeSetting(() => Settings.Theme, Strings.Resources.S_SETTINGS_GROUP_THEME, new() {
-                    { AppSettings.AppTheme.Light, Strings.Resources.S_SETTINGS_THEME_LIGHT },
-                    { AppSettings.AppTheme.Dark, Strings.Resources.S_SETTINGS_THEME_DARK },
-                    { AppSettings.AppTheme.WindowsDefault, Strings.Resources.S_SETTINGS_THEME_DEFAULT } },
+                new SimpleComboSetting<AppSettings.AppTheme>(() => Settings.Theme, Strings.Resources.S_SETTINGS_GROUP_THEME, [
+                    new(AppSettings.AppTheme.Light, Strings.Resources.S_SETTINGS_THEME_LIGHT),
+                    new(AppSettings.AppTheme.Dark, Strings.Resources.S_SETTINGS_THEME_DARK),
+                    new(AppSettings.AppTheme.WindowsDefault, Strings.Resources.S_SETTINGS_THEME_DEFAULT)], 
                     icon: "\uE2B1"),
                 new BoolSetting(() => Settings.UseCustomAccent,
                                 Strings.Resources.S_SETTINGS_CUSTOM_ACCENT,
                                 icon: "\uE790"),
-                new AccentColorSetting(Strings.Resources.S_SETTINGS_ACCENT_COLOR,
-                                       AbstractSetting.ExtractPropertyInfo(() => Settings.UseCustomAccent),
-                                       "\uE771"),
+                new ColorSetting(() => Settings.AccentColor,
+                                       Strings.Resources.S_SETTINGS_ACCENT_COLOR,
+                                       visibleProp: AbstractSetting.ExtractPropertyInfo(() => Settings.UseCustomAccent),
+                                       icon: "\uE771"),
                 new BoolSetting(() => Settings.SwRender, Strings.Resources.S_SETTINGS_DISABLE_HW, icon: "\uF211"),
             ], "\uE2B1"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_ABOUT,
@@ -467,14 +468,9 @@ public class NumericSetting : AbstractSetting
 
     protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
+        base.Settings_PropertyChanged(sender, e);
         if (e.PropertyName == valueProp.Name)
-        {
             OnPropertyChanged(nameof(Value));
-        }
-        else if (e.PropertyName == visibleProp?.Name)
-        {
-            OnPropertyChanged(nameof(Visibility));
-        }
     }
 }
 
@@ -498,14 +494,9 @@ public class BoolSetting : AbstractSetting
 
     protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
+        base.Settings_PropertyChanged(sender, e);
         if (e.PropertyName == valueProp.Name)
-        {
             OnPropertyChanged(nameof(Value));
-        }
-        else if (e.PropertyName == visibleProp?.Name)
-        {
-            OnPropertyChanged(nameof(Visibility));
-        }
     }
 }
 
@@ -523,14 +514,26 @@ public class TextboxSetting : AbstractSetting
 
     protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
+        base.Settings_PropertyChanged(sender, e);
         if (e.PropertyName == valueProp.Name)
-        {
             OnPropertyChanged(nameof(Value));
-        }
-        else if (e.PropertyName == visibleProp?.Name)
-        {
-            OnPropertyChanged(nameof(Visibility));
-        }
+    }
+}
+
+public class SimpleComboSetting<T> : AbstractSetting
+{
+    public T Value
+    {
+        get => (T)valueProp.GetValue(Settings);
+        set => valueProp.SetValue(Settings, value);
+    }
+
+    public IEnumerable<EnumComboboxItem> Options { get; } = [];
+
+    public SimpleComboSetting(Expression<Func<T>> propertyExpr, string description, IEnumerable<EnumComboboxItem> options, PropertyInfo visibleProp = null, string icon = null, params BaseAction[] commands)
+        : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
+    {
+        Options = options;
     }
 }
 
@@ -568,101 +571,50 @@ public class ComboSetting<T> : AbstractSetting
 
     protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
+        base.Settings_PropertyChanged(sender, e);
         if (e.PropertyName == valueProp.Name)
-        {
             OnPropertyChanged(nameof(Value));
-        }
-        else if (e.PropertyName == visibleProp?.Name)
-        {
-            OnPropertyChanged(nameof(Visibility));
-        }
     }
 }
 
-public class EnumSetting : AbstractSetting
-{
-    public List<EnumComboboxItem> Buttons { get; protected set; } = [];
-
-    public EnumSetting(PropertyInfo valueProp, string description, PropertyInfo visibleProp = null, string icon = null, params BaseAction[] commands)
-        : base(valueProp, description, visibleProp, icon, commands)
-    { }
-}
-
-public class ThemeSetting : EnumSetting
-{
-    public AppSettings.AppTheme Value
-    {
-        get => (AppSettings.AppTheme)valueProp.GetValue(Settings);
-        set => valueProp.SetValue(Settings, value);
-    }
-
-    public ThemeSetting(Expression<Func<AppSettings.AppTheme>> propertyExpr, string description, Dictionary<AppSettings.AppTheme, string> enumNames, PropertyInfo visibleProp = null, string icon = null, params BaseAction[] commands)
-        : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
-    {
-        Buttons.AddRange(enumNames.Select(val =>
-        {
-            return new EnumComboboxItem(val.Key, val.Value);
-        }));
-    }
-}
-
-public class ThumbsModeSetting : EnumSetting
-{
-    public AppSettings.ThumbnailMode Value
-    {
-        get => (AppSettings.ThumbnailMode)valueProp.GetValue(Settings);
-        set => valueProp.SetValue(Settings, value);
-    }
-
-    public ThumbsModeSetting(Expression<Func<AppSettings.ThumbnailMode>> propertyExpr, string description, IEnumerable<EnumComboboxItem> enumNames, PropertyInfo visibleProp = null, string icon = null, params BaseAction[] commands)
-        : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
-    {
-        Buttons = [.. enumNames];
-    }
-}
-
-public class ThumbsAgeSetting : EnumSetting
-{
-    public AppSettings.ThumbnailAge Value
-    {
-        get => (AppSettings.ThumbnailAge)valueProp.GetValue(Settings);
-        set => valueProp.SetValue(Settings, value);
-    }
-    public ThumbsAgeSetting(Expression<Func<AppSettings.ThumbnailAge>> propertyExpr, string description, IEnumerable<EnumComboboxItem> enumNames, PropertyInfo visibleProp = null, string icon = null, params BaseAction[] commands)
-        : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
-    {
-        Buttons = [.. enumNames];
-    }
-}
-
-public class AccentColorSetting : AbstractSetting
+public class ColorSetting : AbstractSetting
 {
     public Color PickerColor
     {
-        get
-        {
-            if (Settings.AccentColor is { } saved)
-                return saved;
-            var sys = ApplicationAccentColorManager.SystemAccent;
-            return sys == Colors.Transparent
-                ? ApplicationAccentColorManager.GetColorizationColor()
-                : sys;
-        }
-        set
-        {
-            Settings.AccentColor = value;
-            AdbThemeService.SetAccent(value);
-            OnPropertyChanged();
-        }
+        get => (Color)valueProp.GetValue(Settings); 
+        set => valueProp.SetValue(Settings, value);
     }
 
-    public AccentColorSetting(string description, PropertyInfo visibleProp = null, string icon = null)
-        : base(null, description, visibleProp, icon) { }
+    public AsyncRelayCommand PickColorCommand { get; }
+
+    public ColorSetting(Expression<Func<Color>> propertyExpr,
+                        string description,
+                        PropertyInfo visibleProp = null,
+                        string icon = null)
+        : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon)
+    {
+        PickColorCommand = new AsyncRelayCommand(async () =>
+        {
+            var panel = new Controls.ColorPicker.ColorPickerPanel
+            {
+                SelectedColor = PickerColor
+            };
+
+            var result = await DialogService.ShowDialog(
+                AdbContentDialog.CustomContentDialog(panel),
+                Strings.Resources.S_PICK_COLOR,
+                primaryText: Strings.Resources.S_CONFIRM,
+                closeText: Strings.Resources.S_CANCEL);
+
+            if (result == Wpf.Ui.Controls.ContentDialogResult.Primary)
+                PickerColor = panel.SelectedColor;
+        });
+    }
 
     protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         base.Settings_PropertyChanged(sender, e);
-        if (e.PropertyName is nameof(AppSettings.AccentColorHex) or nameof(AppSettings.UseCustomAccent))
+        if (e.PropertyName == valueProp?.Name)
             OnPropertyChanged(nameof(PickerColor));
     }
 }

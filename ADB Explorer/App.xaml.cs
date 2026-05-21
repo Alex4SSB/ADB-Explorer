@@ -189,13 +189,19 @@ public partial class App
     /// </summary>
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
-        // Handle error 0x800401D0 (CLIPBRD_E_CANT_OPEN) - global WPF issue
-        if (e.Exception is COMException comException && comException.ErrorCode == -2147221040)
+        if (e.Exception is COMException comException && comException.ErrorCode is (int)NativeMethods.HResult.CLIPBRD_E_CANT_OPEN)
             e.Handled = true;
 
         // If application shutdown has started, do not throw exceptions
         if (IsShuttingDown || App.Current is null || App.Current.Dispatcher is null)
             e.Handled = true;
+
+        var res = MessageBox.Show($@"An unhandled exception occurred, and the application has crashed. Press OK to copy the error message to the clipboard:
+
+{e.Exception.Message}", "Unhandled Exception", MessageBoxButton.OKCancel, MessageBoxImage.Error);
+
+        if (res is MessageBoxResult.OK)
+            Clipboard.SetText(e.Exception.Message);
     }
 
     /// <summary>

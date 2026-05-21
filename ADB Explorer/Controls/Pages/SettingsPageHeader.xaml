@@ -9,7 +9,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:pages="clr-namespace:ADB_Explorer.ViewModels.Pages"
-    xmlns:picker="clr-namespace:ADB_Explorer.Controls.ColorPicker"
     xmlns:resources="clr-namespace:ADB_Explorer.Resources"
     xmlns:services="clr-namespace:ADB_Explorer.Services"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
@@ -339,12 +338,12 @@
                 </Grid>
             </ui:CardControl>
         </DataTemplate>
-        <DataTemplate x:Key="GroupedEnumSettingTemplate" DataType="services:EnumSetting">
+        <DataTemplate x:Key="GroupedEnumSettingTemplate" DataType="services:SimpleComboSetting`1">
             <ui:CardControl Style="{StaticResource SettingsCardHeaderStyle}">
                 <ComboBox
                     ContextMenu="{x:Null}"
                     DisplayMemberPath="Name"
-                    ItemsSource="{Binding Buttons}"
+                    ItemsSource="{Binding Options}"
                     SelectedValue="{Binding Value, Mode=TwoWay}"
                     SelectedValuePath="Key">
                     <ComboBox.ItemContainerStyle>
@@ -405,15 +404,26 @@
             </ui:CardControl>
         </DataTemplate>
 
-        <DataTemplate x:Key="AccentColorSettingTemplate" DataType="services:AccentColorSetting">
+        <DataTemplate x:Key="ColorSettingTemplate" DataType="services:ColorSetting">
             <ui:CardControl Style="{StaticResource SettingsCardHeaderStyle}">
-                <picker:ColorPickerControl HorizontalAlignment="Right" SelectedColor="{Binding PickerColor, Mode=TwoWay}" />
+                <ui:Button HorizontalAlignment="Right" Command="{Binding PickColorCommand}">
+                    <local:SimpleStackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_MENU_EDIT}}" />
+                        <Border
+                            Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ui:Button}, Path=ActualHeight}"
+                            CornerRadius="4">
+                            <Border.Background>
+                                <SolidColorBrush Color="{Binding PickerColor}" />
+                            </Border.Background>
+                        </Border>
+                    </local:SimpleStackPanel>
+                </ui:Button>
             </ui:CardControl>
         </DataTemplate>
 
         <helpers:SettingsTemplateSelector
             x:Key="GroupedSettingsTemplateSelector"
-            AccentColorSettingTemplate="{StaticResource AccentColorSettingTemplate}"
+            ColorSettingTemplate="{StaticResource ColorSettingTemplate}"
             BoolSettingTemplate="{StaticResource BoolSettingTemplate}"
             CultureInfoSettingTemplate="{StaticResource CultureInfoSettingTemplate}"
             EnumSettingTemplate="{StaticResource GroupedEnumSettingTemplate}"

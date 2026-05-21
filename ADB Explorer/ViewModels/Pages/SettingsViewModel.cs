@@ -27,7 +27,7 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
 
     Predicate<object> SettingsFilterPredicate => sett =>
         ((AbstractSetting)sett).Description.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
-        || (sett is EnumSetting enumSett && enumSett.Buttons.Any(button => button.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)));
+        || (sett is SimpleComboSetting<object> enumSett && enumSett.Options.Any(opt => opt.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)));
 
     public Task OnNavigatedToAsync()
     {
@@ -43,10 +43,14 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
     {
         Data.Settings.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName == nameof(AppSettings.Theme) || e.PropertyName == nameof(AppSettings.UseCustomAccent))
+            if (e.PropertyName is nameof(AppSettings.Theme) or nameof(AppSettings.UseCustomAccent))
             {
                 AdbThemeService.SetTheme(Data.Settings.Theme);
                 AdbThemeService.SetAccent(Data.Settings.UseCustomAccent ? Data.Settings.AccentColor : null);
+            }
+            else if (e.PropertyName is nameof(AppSettings.AccentColor) && Data.Settings.UseCustomAccent)
+            {
+                AdbThemeService.SetAccent(Data.Settings.AccentColor);
             }
         };
 

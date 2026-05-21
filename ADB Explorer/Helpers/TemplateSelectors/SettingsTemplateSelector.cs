@@ -13,7 +13,7 @@ public class SettingsTemplateSelector : DataTemplateSelector
     public DataTemplate MultiLinkSettingTemplate { get; set; }
     public DataTemplate LongDescriptionTemplate { get; set; }
     public DataTemplate NumericTemplate { get; set; }
-    public DataTemplate AccentColorSettingTemplate { get; set; }
+    public DataTemplate ColorSettingTemplate { get; set; }
 
     public override DataTemplate SelectTemplate(object item, DependencyObject container)
     {
@@ -25,10 +25,10 @@ public class SettingsTemplateSelector : DataTemplateSelector
             LongDescriptionSetting => LongDescriptionTemplate,
             BoolSetting => BoolSettingTemplate,
             TextboxSetting => TextboxSettingTemplate,
-            EnumSetting => EnumSettingTemplate,
             ComboSetting<CultureInfo> => CultureInfoSettingTemplate,
             NumericSetting => NumericTemplate,
-            AccentColorSetting => AccentColorSettingTemplate,
+            ColorSetting => ColorSettingTemplate,
+            _ when item.GetType().IsGenericType && item.GetType().GetGenericTypeDefinition() == typeof(SimpleComboSetting<>) => EnumSettingTemplate,
             _ => throw new NotImplementedException(),
         };
     }

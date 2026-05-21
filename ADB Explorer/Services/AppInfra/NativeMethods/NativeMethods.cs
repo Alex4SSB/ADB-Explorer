@@ -88,7 +88,11 @@ public static partial class NativeMethods
         /// <summary>Path too long</summary>
         PATH_TOO_LONG = -2147417803, // 0x80010135
 
+        /// <summary>e.g. Opening a password-protected PDF</summary>
         ERROR_WRONG_PASSWORD = -2147023573, // 0x8007052B
+
+        /// <summary>Global WPF issue</summary>
+        CLIPBRD_E_CANT_OPEN = -2147221040, // 0x800401D0
     }
 
     [Flags]

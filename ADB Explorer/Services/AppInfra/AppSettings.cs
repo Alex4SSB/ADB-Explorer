@@ -2,6 +2,7 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
+using Wpf.Ui.Appearance;
 
 namespace ADB_Explorer.Services;
 
@@ -266,14 +267,22 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     public partial string? AccentColorHex { get; set; } = null;
 
     [JsonIgnore]
-    public Color? AccentColor
+    public Color AccentColor
     {
-        get => AccentColorHex is null ? null
-            : (Color)ColorConverter.ConvertFromString(AccentColorHex);
-        set => AccentColorHex = value.HasValue
-            ? $"#{value.Value.R:X2}{value.Value.G:X2}{value.Value.B:X2}"
-            : null;
+        get
+        {
+            if (AccentColorHex is { } hex)
+                return (Color)ColorConverter.ConvertFromString(hex);
+            var sys = ApplicationAccentColorManager.SystemAccent;
+            return sys == Colors.Transparent
+                ? ApplicationAccentColorManager.GetColorizationColor()
+                : sys;
+        }
+        set => AccentColorHex = $"#{value.R:X2}{value.G:X2}{value.B:X2}";
     }
+
+    partial void OnAccentColorHexChanged(string? value) => OnPropertyChanged(nameof(AccentColor));
+    partial void OnUseCustomAccentChanged(bool value) => OnPropertyChanged(nameof(AccentColor));
 
     #endregion
 
