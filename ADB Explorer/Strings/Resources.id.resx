@@ -1550,7 +1550,7 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
     <value>Tarik ke Folder Default saat Klik Dua Kali File</value>
   </data>
   <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
-    <value>Pilih satu file untuk mendapatkan informasi lebih lanjut.</value>
+    <value>Pilih satu item untuk mendapatkan informasi lebih lanjut.</value>
   </data>
   <data name="S_ITEM_LOCATION" xml:space="preserve">
     <value>Lokasi</value>
@@ -1581,5 +1581,62 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
   </data>
   <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
     <value>Buka kunci</value>
+  </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Warna Aksen Kustom</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Warna Aksen</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Pilih warna</value>
+  </data>
+  <data name="S_FILE_PERMISSIONS" xml:space="preserve">
+    <value>Izin</value>
+  </data>
+  <data name="S_FILE_PERM_USER" xml:space="preserve">
+    <value>Pengguna</value>
+  </data>
+  <data name="S_FILE_PERM_GROUP" xml:space="preserve">
+    <value>Grup</value>
+  </data>
+  <data name="S_FILE_PERM_OTHER" xml:space="preserve">
+    <value>Lainnya</value>
+  </data>
+  <data name="S_DATE_ACCESSED" xml:space="preserve">
+    <value>Diakses</value>
+  </data>
+  <data name="S_CREATION_TIME" xml:space="preserve">
+    <value>Dibuat</value>
+  </data>
+  <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
+    <value>Dimodifikasi</value>
+  </data>
+  <data name="S_FILE_SYSTEM" xml:space="preserve">
+    <value>Sistem berkas</value>
+  </data>
+  <data name="S_MOUNT_POINT" xml:space="preserve">
+    <value>Titik kait (mount point)</value>
+  </data>
+  <data name="S_MOUNT_OPTIONS" xml:space="preserve">
+    <value>Opsi kait (mount options)</value>
+  </data>
+  <data name="S_COLOR_RED" xml:space="preserve">
+    <value>Merah</value>
+  </data>
+  <data name="S_COLOR_GREEN" xml:space="preserve">
+    <value>Hijau</value>
+  </data>
+  <data name="S_COLOR_BLUE" xml:space="preserve">
+    <value>Biru</value>
+  </data>
+  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
+    <value>Tidak dapat menemukan ADB dari PATH sistem. Silakan gunakan "{0}" untuk menemukannya.</value>
+  </data>
+  <data name="S_ADB_PATH_INVALID" xml:space="preserve">
+    <value>Jalur {0} yang diberikan adalah pintasan Windows atau jalur UNC (remote), yang tidak diizinkan.</value>
+  </data>
+  <data name="S_ADB_COMPROMISED" xml:space="preserve">
+    <value>Eksekutabel yang diberikan tidak dapat diverifikasi sebagai ADB. Pastikan Anda hanya mengunduh Android Platform Tools resmi dari Google.</value>
   </data>
 </root>

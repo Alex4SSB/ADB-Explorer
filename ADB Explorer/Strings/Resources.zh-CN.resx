@@ -1640,7 +1640,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>无法从系统路径定位 ADB。请用 "{0}" 定位它。</value>
   </data>
   <data name="S_ADB_PATH_INVALID" xml:space="preserve">
-    <value>提供的 ADB 路径为 Windows 快捷方式或 UNC（远端）路径，这是不允许的。</value>
+    <value>提供的 {0} 路径为 Windows 快捷方式或 UNC（远端）路径，这是不允许的。</value>
   </data>
   <data name="S_ADB_COMPROMISED" xml:space="preserve">
     <value>提供的可执行文件无法被验证为 ADB。确保从 Google 下载官方 Android 平台工具。</value>
