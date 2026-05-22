@@ -106,7 +106,7 @@ public partial class ADBService
 
     public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, CancellationToken cancellationToken, params string[] args)
     {
-        var result = ExecuteCommand(RuntimeSettings.AdbPath, cmd, out stdout, out stderr, Encoding.UTF8, cancellationToken, args);
+        var result = ExecuteCommand(AdbHelper.CurrentAdbState.Path, cmd, out stdout, out stderr, Encoding.UTF8, cancellationToken, args);
         RuntimeSettings.LastServerResponse = DateTime.Now;
 
         return result;
@@ -198,7 +198,7 @@ public partial class ADBService
     }
 
     public static IEnumerable<string> ExecuteAdbCommandAsync(string cmd, CancellationToken cancellationToken, params string[] args) =>
-        ExecuteCommandAsync(RuntimeSettings.AdbPath, cmd, Encoding.UTF8, cancellationToken, args: args);
+        ExecuteCommandAsync(AdbHelper.CurrentAdbState.Path, cmd, Encoding.UTF8, cancellationToken, args: args);
 
     public static IEnumerable<string> ExecuteDeviceAdbCommandAsync(string deviceSerial, string cmd, CancellationToken cancellationToken, params string[] args)
     {
@@ -243,28 +243,26 @@ public partial class ADBService
 
     public static string EscapeAdbString(string str) => $"\"{str}\"";
 
-    public static IEnumerable<DeviceSnapshot> GetDevices()
+    public static IEnumerable<DeviceSnapshot> GetDevices(CancellationToken cancellationToken)
     {
-        ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, CancellationToken.None, "-l");
+        ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, cancellationToken, "-l");
 
         return RE_DEVICE_NAME().Matches(stdout).Select(DeviceSnapshot.Parse).Where(s => s);
     }
 
-    public static void ConnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("connect", $"{host}:{port}");
-    public static void ConnectNetworkDevice(string fullAddress) => NetworkDeviceOperation("connect", fullAddress);
-    public static void DisconnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("disconnect", $"{host}:{port}");
-    public static void DisconnectNetworkDevice(string fullAddress) => NetworkDeviceOperation("disconnect", fullAddress);
+    public static void ConnectNetworkDevice(string fullAddress, CancellationToken cancellationToken) => NetworkDeviceOperation("connect", fullAddress, cancellationToken);
+    public static void DisconnectNetworkDevice(string fullAddress, CancellationToken cancellationToken) => NetworkDeviceOperation("disconnect", fullAddress, cancellationToken);
 
-    public static void PairNetworkDevice(string fullAddress, string pairingCode) => NetworkDeviceOperation("pair", fullAddress, pairingCode);
+    public static void PairNetworkDevice(string fullAddress, string pairingCode, CancellationToken cancellationToken) => NetworkDeviceOperation("pair", fullAddress, cancellationToken, pairingCode);
 
     public static void KillEmulator(string emulatorName) => ExecuteDeviceAdbCommand(emulatorName, "emu", out _, out _, CancellationToken.None, "kill");
 
     /// <param name="cmd">connect / disconnect</param>
     /// <exception cref="ConnectionRefusedException"></exception>
     /// <exception cref="ConnectionTimeoutException"></exception>
-    private static void NetworkDeviceOperation(string cmd, string fullAddress, string pairingCode = null)
+    private static void NetworkDeviceOperation(string cmd, string fullAddress, CancellationToken cancellationToken, string pairingCode = null)
     {
-        ExecuteAdbCommand(cmd, out string stdout, out _, CancellationToken.None, fullAddress, pairingCode);
+        ExecuteAdbCommand(cmd, out string stdout, out _, cancellationToken, fullAddress, pairingCode);
         if (stdout.ToLower() is string lower
             && (lower.Contains("cannot connect") || lower.Contains("error") || lower.Contains("failed")))
         {
@@ -474,14 +472,14 @@ public partial class ADBService
     {
         if (string.IsNullOrEmpty(adbPath) || adbPath.StartsWith(@"\\"))   // Forbid UNC paths for security reasons
         {
-            RuntimeSettings.AdbStatus = AdbHelper.AdbStatus.NotFound;
+            AdbHelper.CurrentAdbState.Status = AdbHelper.AdbStatus.NotFound;
             return;
         }
 
         // Forbid UNC paths for security reasons
         if (adbPath.StartsWith(@"\\"))                                                
         {
-            RuntimeSettings.AdbStatus = AdbHelper.AdbStatus.PathInvalid;
+            AdbHelper.CurrentAdbState.Status = AdbHelper.AdbStatus.PathInvalid;
             return;
         }
 
@@ -492,7 +490,7 @@ public partial class ADBService
             // Forbid symlinks for security reasons
             if (file.Attributes.HasFlag(FileAttributes.ReparsePoint))
             {
-                RuntimeSettings.AdbStatus = AdbHelper.AdbStatus.PathInvalid;
+                AdbHelper.CurrentAdbState.Status = AdbHelper.AdbStatus.PathInvalid;
                 return;
             }
         }
@@ -502,7 +500,7 @@ public partial class ADBService
             adbPath = FileHelper.ResolveExecutableFromPath(adbPath);
             if (adbPath is null)
             {
-                RuntimeSettings.AdbStatus = AdbHelper.AdbStatus.NotFound;
+                AdbHelper.CurrentAdbState.Status = AdbHelper.AdbStatus.NotFound;
                 return;
             }
         }
@@ -525,7 +523,7 @@ public partial class ADBService
 
         if (!isHashValid)
         {
-            RuntimeSettings.AdbStatus = AdbHelper.AdbStatus.Compromised;
+            AdbHelper.CurrentAdbState.Status = AdbHelper.AdbStatus.Compromised;
             return;
         }
 
@@ -539,19 +537,19 @@ public partial class ADBService
 
         if (exitCode != 0)
         {
-            RuntimeSettings.AdbStatus = AdbHelper.AdbStatus.VersionUnknown;
+            AdbHelper.CurrentAdbState.Status = AdbHelper.AdbStatus.VersionUnknown;
             return;
         }
 
         // Update the path in case we got it from environment PATH
         var match = RE_ADB_VERSION().Match(stdout);
-        RuntimeSettings.AdbPath = match.Groups["Path"].Value.Trim();
+        AdbHelper.CurrentAdbState.Path = match.Groups["Path"].Value.Trim();
 
         string version = match.Groups["version"].Value;
         if (!string.IsNullOrEmpty(version))
         {
-            RuntimeSettings.AdbVersion = new(version);
-            RuntimeSettings.AdbStatus = RuntimeSettings.AdbVersion < MIN_ADB_VERSION
+            AdbHelper.CurrentAdbState.Version = new(version);
+            AdbHelper.CurrentAdbState.Status = AdbHelper.CurrentAdbState.Version < MIN_ADB_VERSION
                 ? AdbHelper.AdbStatus.Outdated
                 : AdbHelper.AdbStatus.Valid;
         }
@@ -820,25 +818,25 @@ public partial class ADBService
         return stdout.TrimEnd(LINE_SEPARATORS);
     }
 
-    public static List<DriveSnapshot> GetDrives(string deviceId, DeviceType deviceType)
+    public static List<DriveSnapshot> GetDrives(string deviceId, DeviceType deviceType, CancellationToken cancellationToken)
     {
         List<DriveSnapshot> drives = [];
 
         // unified df doesn't seem to shorten execution time
 
-        var root = ReadDrives(deviceId, deviceType, RE_EMULATED_STORAGE_SINGLE(), "/");
+        var root = ReadDrives(deviceId, deviceType, RE_EMULATED_STORAGE_SINGLE(), cancellationToken, "/");
         if (root is null)
             return null;
         else if (root.Any())
             drives.Add(root.First());
 
-        var intStorage = ReadDrives(deviceId, deviceType, RE_EMULATED_STORAGE_SINGLE(), "/sdcard");
+        var intStorage = ReadDrives(deviceId, deviceType, RE_EMULATED_STORAGE_SINGLE(), cancellationToken, "/sdcard");
         if (intStorage is null)
             return drives;
         if (intStorage.Any())
             drives.Add(intStorage.First());
 
-        var extStorage = ReadDrives(deviceId, deviceType, RE_EMULATED_ONLY(), EMULATED_DRIVES_GREP);
+        var extStorage = ReadDrives(deviceId, deviceType, RE_EMULATED_ONLY(), cancellationToken, EMULATED_DRIVES_GREP);
         if (extStorage is null)
             return drives;
 
@@ -857,18 +855,18 @@ public partial class ADBService
         return drives;
     }
 
-    private static IEnumerable<DriveSnapshot> ReadDrives(string deviceId, DeviceType deviceType, Regex re, params string[] args)
+    private static IEnumerable<DriveSnapshot> ReadDrives(string deviceId, DeviceType deviceType, Regex re, CancellationToken cancellationToken, params string[] args)
     {
-        int exitCode = ExecuteDeviceAdbShellCommand(deviceId, "df", out string stdout, out string stderr, CancellationToken.None, args);
+        int exitCode = ExecuteDeviceAdbShellCommand(deviceId, "df", out string stdout, out string stderr, cancellationToken, args);
         if (exitCode != 0)
             return null;
 
         return re.Matches(stdout).Select(m => DriveSnapshot.Parse(m.Groups, isEmulator: deviceType is DeviceType.Emulator, forcePath: args[0] == "/" ? "/" : ""));
     }
 
-    public static Dictionary<string, string> GetBatteryInfo(string deviceId)
+    public static Dictionary<string, string> GetBatteryInfo(string deviceId, CancellationToken cancellationToken)
     {
-        if (ExecuteDeviceAdbShellCommand(deviceId, BATTERY, out string stdout, out string stderr, CancellationToken.None) == 0)
+        if (ExecuteDeviceAdbShellCommand(deviceId, BATTERY, out string stdout, out string stderr, cancellationToken) == 0)
         {
             return stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Where(l => l.Contains(':')).ToDictionary(
                 line => line.Split(':')[0].Trim(),

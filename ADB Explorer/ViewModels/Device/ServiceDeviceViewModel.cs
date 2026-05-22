@@ -56,7 +56,7 @@ public class ServiceDeviceViewModel : PairingDeviceViewModel
         UpdateServiceStatus();
 
         PairCommand = new(() => IsPairingCodeValid && device.Status is DeviceStatus.Unauthorized,
-                          () => _ = DeviceHelper.PairService(this));
+                          () => _ = DeviceHelper.PairService(this, CancellationToken.None));
     }
 
     private void UpdateServiceStatus()

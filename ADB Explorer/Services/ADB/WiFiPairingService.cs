@@ -14,9 +14,9 @@ public class WiFiPairingService
         return $"WIFI:T:ADB;S:{service};P:{password};;";
     }
 
-    public static IEnumerable<ServiceSnapshot> GetServices()
+    public static IEnumerable<ServiceSnapshot> GetServices(CancellationToken cancellationToken)
     {
-        ADBService.ExecuteAdbCommand("mdns", out string services, out _, new(), "services");
+        ADBService.ExecuteAdbCommand("mdns", out string services, out _, cancellationToken, "services");
 
         return RE_MDNS_SERVICE().Matches(services).Select(ServiceSnapshot.Parse).Where(s => s).Distinct();
     }

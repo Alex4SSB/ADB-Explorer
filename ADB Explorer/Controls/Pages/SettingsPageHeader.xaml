@@ -409,9 +409,7 @@
                 <ui:Button HorizontalAlignment="Right" Command="{Binding PickColorCommand}">
                     <local:SimpleStackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_MENU_EDIT}}" />
-                        <Border
-                            Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ui:Button}, Path=ActualHeight}"
-                            CornerRadius="4">
+                        <Border Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ui:Button}, Path=ActualHeight}" CornerRadius="4">
                             <Border.Background>
                                 <SolidColorBrush Color="{Binding PickerColor}" />
                             </Border.Background>
@@ -423,8 +421,8 @@
 
         <helpers:SettingsTemplateSelector
             x:Key="GroupedSettingsTemplateSelector"
-            ColorSettingTemplate="{StaticResource ColorSettingTemplate}"
             BoolSettingTemplate="{StaticResource BoolSettingTemplate}"
+            ColorSettingTemplate="{StaticResource ColorSettingTemplate}"
             CultureInfoSettingTemplate="{StaticResource CultureInfoSettingTemplate}"
             EnumSettingTemplate="{StaticResource GroupedEnumSettingTemplate}"
             InfoSettingTemplate="{StaticResource InfoSettingTemplate}"
@@ -616,14 +614,14 @@
                                                     <DataTrigger Binding="{Binding Name}" Value="ADB">
                                                         <Setter Property="Visibility" Value="Visible" />
                                                     </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbVersion}" Value="{x:Null}">
+                                                    <DataTrigger Binding="{Binding Source={x:Static Member=helpers:AdbHelper.CurrentAdbState}, Path=Version}" Value="{x:Null}">
                                                         <Setter Property="Visibility" Value="Collapsed" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </StackPanel.Style>
                                         <TextBlock Text=" - " />
-                                        <TextBlock Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbVersionString}" />
+                                        <TextBlock Text="{Binding Source={x:Static Member=helpers:AdbHelper.CurrentAdbState}, Path=VersionString}" />
                                     </StackPanel>
                                 </StackPanel>
                             </DataTemplate>
@@ -648,7 +646,7 @@
                 <Grid.Style>
                     <Style TargetType="Grid">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbStatus}" Value="Valid">
+                            <DataTrigger Binding="{Binding Source={x:Static Member=helpers:AdbHelper.CurrentAdbState}, Path=Status}" Value="Valid">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                         </Style.Triggers>

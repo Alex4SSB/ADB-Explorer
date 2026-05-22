@@ -419,7 +419,7 @@ public partial class ExplorerPageHeader : UserControl
                         default:
                             bfNavigation = false;
                             if (FileActions.IsDriveViewVisible && RuntimeSettings.LocationToNavigate.Location is Navigation.SpecialLocation.DriveView)
-                                FileActionLogic.RefreshDrives(true);
+                                FileActionLogic.RefreshDrives(true, CancellationToken.None);
                             else
                                 NavigateToLocation(RuntimeSettings.LocationToNavigate);
                             break;
@@ -747,7 +747,7 @@ public partial class ExplorerPageHeader : UserControl
         {
             FileActions.IsRecycleBin = false;
             RuntimeSettings.IsPathBoxFocused = false;
-            FileActionLogic.RefreshDrives();
+            FileActionLogic.RefreshDrives(true, CancellationToken.None);
             DriveViewNav();
 
             FileActionLogic.UpdateFileActions();

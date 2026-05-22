@@ -5,6 +5,29 @@ using AdvancedSharpAdbClient;
 
 namespace ADB_Explorer.Helpers;
 
+public partial class AdbState : ObservableObject
+{
+    [ObservableProperty]
+    public partial string Path { get; set; }
+
+    [ObservableProperty]
+    public partial AdbHelper.AdbStatus Status { get; set; } = AdbHelper.AdbStatus.NotFound;
+
+    [ObservableProperty]
+    public partial Version Version { get; set; }
+
+    public string VersionString => $"v{Version}";
+
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        if (e.PropertyName == nameof(Version))
+        {
+            OnPropertyChanged(nameof(VersionString));
+        }
+    }
+}
+
 public static class AdbHelper
 {
     public enum AdbStatus
@@ -17,6 +40,8 @@ public static class AdbHelper
         Valid           // all good
     }
 
+    public static AdbState CurrentAdbState { get; } = new();
+
     public static Task<bool> CheckAdbVersion() => Task.Run(() =>
     {
         string adbPath = string.IsNullOrEmpty(Data.Settings.ManualAdbPath)
@@ -25,7 +50,7 @@ public static class AdbHelper
 
         ADBService.VerifyAdbVersion(adbPath);
 
-        return Data.RuntimeSettings.AdbStatus is AdbStatus.Valid;
+        return CurrentAdbState.Status is AdbStatus.Valid;
     });
 
     public static void EnableMdns() => App.SafeInvoke(async () =>

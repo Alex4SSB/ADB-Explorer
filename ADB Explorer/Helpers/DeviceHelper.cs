@@ -181,7 +181,7 @@ public static class DeviceHelper
         {
             try
             {
-                ADBService.DisconnectNetworkDevice(device.ID);
+                ADBService.DisconnectNetworkDevice(device.ID, CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -371,23 +371,23 @@ public static class DeviceHelper
         collectionView.SortDescriptions.Add(new SortDescription(nameof(DeviceViewModel.Type), ListSortDirection.Ascending));
     }
 
-    public static void UpdateDevicesBatInfo()
+    public static void UpdateDevicesBatInfo(CancellationToken cancellationToken)
     {
-        Data.DevicesObject.Current?.UpdateBattery();
+        Data.DevicesObject.Current?.UpdateBattery(cancellationToken);
 
-        if (DateTime.Now - Data.DevicesObject.LastUpdate <= AdbExplorerConst.BATTERY_UPDATE_INTERVAL && !Data.RuntimeSettings.IsDevicesView)
+        if (DateTime.Now - Data.DevicesObject.LastUpdate <= AdbExplorerConst.BATTERY_UPDATE_INTERVAL && Data.CurrentPage.Value != typeof(DevicesPage))
             return;
 
         var items = Data.DevicesObject.LogicalDeviceViewModels.Where(device => !device.IsOpen);
         foreach (var item in items)
         {
-            item.UpdateBattery();
+            item.UpdateBattery(cancellationToken);
         }
 
         Data.DevicesObject.LastUpdate = DateTime.Now;
     }
 
-    public static async void ListServices(IEnumerable<ServiceSnapshot> snapshots)
+    public static async void ListServices(IEnumerable<ServiceSnapshot> snapshots, CancellationToken cancellationToken)
     {
         if (snapshots is null)
             return;
@@ -409,11 +409,11 @@ public static class DeviceHelper
 
         if (qrServices.Any())
         {
-            await PairService(qrServices.First());
+            await PairService(qrServices.First(), cancellationToken);
         }
     }
 
-    public static async Task<bool> PairService(ServiceDeviceViewModel service)
+    public static async Task<bool> PairService(ServiceDeviceViewModel service, CancellationToken cancellationToken)
     {
         var code = service.MdnsType == ServiceDevice.PairingMode.QrCode
             ? Data.MdnsService?.QrClass?.Password
@@ -426,7 +426,7 @@ public static class DeviceHelper
         {
             try
             {
-                ADBService.PairNetworkDevice(service.ID, code);
+                ADBService.PairNetworkDevice(service.ID, code, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -461,7 +461,7 @@ public static class DeviceHelper
         {
             try
             {
-                ADBService.PairNetworkDevice(dev.PairingAddress, dev.PairingCode);
+                ADBService.PairNetworkDevice(dev.PairingAddress, dev.PairingCode, CancellationToken.None);
                 return true;
             }
             catch (Exception ex)
@@ -492,7 +492,7 @@ public static class DeviceHelper
         {
             try
             {
-                ADBService.ConnectNetworkDevice(dev.ConnectAddress);
+                ADBService.ConnectNetworkDevice(dev.ConnectAddress, CancellationToken.None);
                 return true;
             }
             catch (Exception ex)
@@ -563,7 +563,8 @@ public static class DeviceHelper
 
     public static void DeviceListSetup(string selectedAddress = "")
     {
-        Task.Run(ADBService.GetDevices).ContinueWith((t) => App.SafeInvoke(() => DeviceListSetup(t.Result.Select(s => new LogicalDeviceViewModel(LogicalDevice.From(s))), selectedAddress)));
+        Task.Run(() => ADBService.GetDevices(CancellationToken.None)).ContinueWith((t) 
+            => App.SafeInvoke(() => DeviceListSetup(t.Result.Select(s => new LogicalDeviceViewModel(LogicalDevice.From(s))), selectedAddress)));
     }
 
     public static void DeviceListSetup(IEnumerable<LogicalDeviceViewModel> devices, string selectedAddress = "")
@@ -659,7 +660,7 @@ public static class DeviceHelper
         });
 
         // Start drive enumeration immediately — it is independent of Props
-        FileActionLogic.RefreshDrives(true);
+        FileActionLogic.RefreshDrives(true, CancellationToken.None);
 
         // Suspend until Props is loaded without blocking the UI thread.
         // CombineDisplayNames and DriveViewNav must run after Props so that
@@ -751,14 +752,12 @@ public static class DeviceHelper
     {
         Devices.SetOpenDevice(device);
 
-        App.Services.GetService<INavigationService>()?.Navigate(typeof(ExplorerPage));
+        Data.CurrentPage.Value = typeof(ExplorerPage);
         Data.RuntimeSettings.InitLister = true;
         
         FileActionLogic.ClearExplorer();
         NavHistory.Reset();
         InitDevice();
-
-        Data.RuntimeSettings.IsDevicesView = false;
     }
 
     public static void ConnectWsaDevice()

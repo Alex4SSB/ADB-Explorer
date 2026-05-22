@@ -2,15 +2,23 @@ using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
+using ADB_Explorer.Views.Pages;
 using Microsoft.Extensions.Hosting;
 
 namespace ADB_Explorer.Services;
 
 public class DevicePollingService : BackgroundService
 {
+    private static bool isDevicesPage = false;
+
+    private static int pollingInterval => isDevicesPage ? 500 : 2000;
+
     public DevicePollingService()
     {
-        
+        Data.CurrentPage.PropertyChanged += (s, e) =>
+        {
+            isDevicesPage = Data.CurrentPage.Value == typeof(DevicesPage);
+        };
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -20,60 +28,55 @@ public class DevicePollingService : BackgroundService
             try
             {
                 if (!Data.RuntimeSettings.IsPollingStopped
-                    && Data.RuntimeSettings.AdbVersion is not null
-                    && Data.RuntimeSettings.AdbVersion.Major > 0)
+                    && AdbHelper.CurrentAdbState.Status is AdbHelper.AdbStatus.Valid)
                 {
                     await PollAsync(stoppingToken);
                 }
 
-                await Task.Delay(AdbExplorerConst.CONNECT_TIMER_INTERVAL, stoppingToken);
+                await Task.Delay(pollingInterval, stoppingToken);
             }
             catch (OperationCanceledException) { }
         }
-
     }
 
-    private Task PollAsync(CancellationToken ct)
+    private static Task PollAsync(CancellationToken cancellationToken)
     {
         if (Data.Settings.PollDevices)
         {
-            RefreshDevices();
+            RefreshDevices(cancellationToken);
         }
 
         if (Data.Settings.PollBattery)
         {
-            DeviceHelper.UpdateDevicesBatInfo();
+            DeviceHelper.UpdateDevicesBatInfo(cancellationToken);
         }
 
         if (Data.FileActions.IsDriveViewVisible && Data.Settings.PollDrives)
         {
-            FileActionLogic.RefreshDrives(true);
-        }
-
-        if (Data.RuntimeSettings.IsDevicesView)
-        {
-            DeviceHelper.UpdateDevicesRootAccess();
-
-            DeviceHelper.UpdateWsaPkgStatus();
+            FileActionLogic.RefreshDrives(true, cancellationToken);
         }
 
         return Task.CompletedTask;
     }
 
-    public static void RefreshDevices()
+    public static void RefreshDevices(CancellationToken cancellationToken)
     {
-        ListDevices(ADBService.GetDevices());
+        ListDevices(ADBService.GetDevices(cancellationToken));
 
         if (Data.Settings.EnableWsa)
             DeviceHelper.ConnectWsaDevice();
 
-        if (!Data.RuntimeSettings.IsDevicesView)
+        if (!isDevicesPage)
             return;
 
         Data.DevicesObject.UpdateLogicalIp();
 
         if (Data.MdnsService?.State is MDNS.MdnsState.Running)
-            DeviceHelper.ListServices(WiFiPairingService.GetServices());
+            DeviceHelper.ListServices(WiFiPairingService.GetServices(cancellationToken), cancellationToken);
+
+        DeviceHelper.UpdateDevicesRootAccess();
+
+        DeviceHelper.UpdateWsaPkgStatus();
     }
 
     private static void ListDevices(IEnumerable<DeviceSnapshot> snapshots)

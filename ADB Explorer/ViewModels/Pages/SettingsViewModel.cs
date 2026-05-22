@@ -93,9 +93,9 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
         SortedSettings = CollectionViewSource.GetDefaultView(UISettings.SortSettings);
         SortedSettings.Filter = SettingsFilterPredicate;
 
-        Data.RuntimeSettings.PropertyChanged += (sender, e) =>
+        AdbHelper.CurrentAdbState.PropertyChanged += (sender, e) =>
         {
-            if (e.PropertyName == nameof(AppRuntimeSettings.AdbStatus))
+            if (e.PropertyName == nameof(AdbHelper.CurrentAdbState.Status))
             {
                 TranslateAdbStatus();
             }
@@ -108,7 +108,7 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
 
     private void TranslateAdbStatus()
     {
-        AdbStatus = Data.RuntimeSettings.AdbStatus switch
+        AdbStatus = AdbHelper.CurrentAdbState.Status switch
         {
             AdbHelper.AdbStatus.NotFound => string.Format(Strings.Resources.S_ADB_NOT_FOUND, Strings.Resources.S_SETTINGS_OVERRIDE_ADB),
             AdbHelper.AdbStatus.PathInvalid => string.Format(Strings.Resources.S_ADB_PATH_INVALID, "ADB"),

@@ -278,13 +278,6 @@ public partial class FileActionsEnable : ObservableObject
         set => SetProperty(ref isCopyCurrentPathEnabled, value);
     }
 
-    private bool isFileOpRingVisible = false;
-    public bool IsFileOpRingVisible
-    {
-        get => isFileOpRingVisible;
-        set => SetProperty(ref isFileOpRingVisible, value);
-    }
-
     #endregion
 
     private string explorerFilter = "";

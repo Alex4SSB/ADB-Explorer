@@ -414,7 +414,7 @@ public partial class DetailsPane : UserControl
                 control.InvalidSelectionBorder.Visibility = Visibility.Visible;
             }
         }
-    });
+    }, DispatcherPriority.Render);
 
     private void OnFileFullPathChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {

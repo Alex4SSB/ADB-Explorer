@@ -11,12 +11,8 @@ public class FileOperationQueue : ViewModelBase
     private bool isActive;
     public bool IsActive
     {
-        get => isActive;
-        set
-        {
-            if (Set(ref isActive, value))
-                FileOpRingVisibility();
-        }
+        get => isActive; 
+        set => Set(ref isActive, value);
     }
 
     private bool isAutoPlayStopped = false;
@@ -45,7 +41,6 @@ public class FileOperationQueue : ViewModelBase
             {
                 OnPropertyChanged(nameof(AnyFailedOperations));
                 OnPropertyChanged(nameof(StringProgress));
-                FileOpRingVisibility();
             }
         }
     }
@@ -176,8 +171,6 @@ public class FileOperationQueue : ViewModelBase
         double current = running.Sum(op => op.LastProgress) / 100.0;
 
         Progress = (done + current) / TotalCount;
-
-        FileOpRingVisibility();
     }
 
     public void Start()
@@ -221,7 +214,6 @@ public class FileOperationQueue : ViewModelBase
             UpdateProgress();
 
             OnPropertyChanged(nameof(HasIncompleteOperations));
-            FileOpRingVisibility();
         }
         finally
         { 
@@ -331,11 +323,6 @@ public class FileOperationQueue : ViewModelBase
             op.LastProgress = percentage;
             UpdateProgress();
         }
-    }
-
-    private void FileOpRingVisibility()
-    {
-        Data.FileActions.IsFileOpRingVisible = IsActive && !AnyFailedOperations && Progress > 0 && TotalCount > 0;
     }
 
     private void Operations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

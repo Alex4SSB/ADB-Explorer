@@ -36,7 +36,7 @@ public partial class DevicesPageHeader : UserControl
 
     private void RefreshDevicesButton_Click(object sender, RoutedEventArgs e)
     {
-        DevicePollingService.RefreshDevices();
+        DevicePollingService.RefreshDevices(CancellationToken.None);
     }
 
     private void UIList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

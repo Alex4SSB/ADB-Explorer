@@ -69,7 +69,7 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     public partial ObservableList<Controls.NotificationBell.Notification> Notifications { get; set; } = [];
 
-    public bool IsNavigationEnabled => Data.RuntimeSettings.AdbVersion is not null && Data.RuntimeSettings.AdbVersion >= AdbExplorerConst.MIN_ADB_VERSION;
+    public bool IsNavigationEnabled => AdbHelper.CurrentAdbState.Status is AdbHelper.AdbStatus.Valid;
 
     [ObservableProperty]
     public partial TaskbarItemProgressState TaskbarItemProgress { get; set; }
@@ -89,9 +89,9 @@ public partial class MainWindowViewModel : ObservableObject
             }
         };
 
-        Data.RuntimeSettings.PropertyChanged += (s, e) =>
+        AdbHelper.CurrentAdbState.PropertyChanged += (s, e) =>
         {
-            if (e.PropertyName == nameof(AppRuntimeSettings.AdbVersion))
+            if (e.PropertyName == nameof(AdbHelper.CurrentAdbState.Status))
             {
                 OnPropertyChanged(nameof(IsNavigationEnabled));
             }

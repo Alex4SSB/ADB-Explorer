@@ -287,9 +287,9 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         return false;
     }
 
-    public void UpdateBattery()
+    public void UpdateBattery(CancellationToken cancellationToken)
     {
-        Device.Battery.Update(ADBService.GetBatteryInfo(this));
+        Device.Battery.Update(ADBService.GetBatteryInfo(this, cancellationToken));
     }
 
     public void UpdateName() => OnPropertyChanged(nameof(Name));

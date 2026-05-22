@@ -13,23 +13,23 @@ public partial class MdnsDeviceControl : UserControl
     {
         InitializeComponent();
 
-        Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
+        AdbHelper.CurrentAdbState.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(AdbHelper.CurrentAdbState.Status))
+            {
+                InitMdns();
+            }
+        };
 
         InitMdns();
     }
 
     private static void InitMdns()
     {
-        if (Data.RuntimeSettings.AdbVersion is not null && Data.RuntimeSettings.AdbVersion.Major > 0)
+        if (AdbHelper.CurrentAdbState.Status is AdbHelper.AdbStatus.Valid)
         {
             AdbHelper.EnableMdns();
         }
-    }
-
-    private static void RuntimeSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(AppRuntimeSettings.AdbVersion))
-            InitMdns();
     }
 
     private void RestartAdbButton_Click(object sender, RoutedEventArgs e)

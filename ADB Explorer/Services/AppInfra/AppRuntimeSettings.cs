@@ -9,9 +9,6 @@ public partial class AppRuntimeSettings : ViewModelBase
 {
     public bool ResetAppSettings { get; set; } = false;
 
-    [ObservableProperty]
-    public partial bool IsDevicesView { get; set; }
-
     private double maxSearchBoxWidth = AdbExplorerConst.DEFAULT_SEARCH_WIDTH;
     public double MaxSearchBoxWidth
     {
@@ -110,22 +107,6 @@ public partial class AppRuntimeSettings : ViewModelBase
                 OnPropertyChanged();        
         }
     }
-
-    private Version adbVersion = null;
-    public Version AdbVersion
-    {
-        get => adbVersion;
-        set
-        {
-            if (Set(ref adbVersion, value))
-                OnPropertyChanged(nameof(AdbVersionString));
-        }
-    }
-
-    [ObservableProperty]
-    public partial AdbHelper.AdbStatus AdbStatus { get; set; } = AdbHelper.AdbStatus.NotFound;
-
-    public string AdbVersionString => $"v{AdbVersion}";
 
     private IEnumerable explorerSource;
     public IEnumerable ExplorerSource
@@ -243,8 +224,6 @@ public partial class AppRuntimeSettings : ViewModelBase
     }
 
     public string DefaultBrowserPath { get; set; }
-
-    public string AdbPath { get; set; }
 
     public string TempDragPath
     {

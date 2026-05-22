@@ -63,20 +63,15 @@ public partial class MainWindow : INavigationWindow
 
         Data.FileOpQ.PropertyChanged += (s, e) =>
         {
-            if (e.PropertyName is (nameof(FileOperationQueue.IsActive))
-            or (nameof(FileOperationQueue.Progress))
-            or (nameof(FileOperationQueue.AnyFailedOperations)))
+            if (e.PropertyName is (nameof(FileOperationQueue.IsActive)) or (nameof(FileOperationQueue.Progress)))
             {
                 ViewModel.UpdateFileOp();
             }
         };
 
-        Data.FileActions.PropertyChanged += (s, e) =>
+        Data.CurrentPage.PropertyChanged += (s, e) =>
         {
-            if (e.PropertyName == nameof(FileActionsEnable.IsDriveViewVisible))
-            {
-                ViewModel.UpdateFileOp();
-            }
+            Navigate(e.NewValue);
         };
 
         DeviceHelper.UpdateWsaPkgStatus();
@@ -152,8 +147,6 @@ public partial class MainWindow : INavigationWindow
             Pages.OperationsPage => OperationsPageHeader,
             _ => null
         };
-
-        Data.RuntimeSettings.IsDevicesView = args.Page is Pages.DevicesPage;
     }
 
     #region INavigationWindow methods

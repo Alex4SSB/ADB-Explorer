@@ -623,7 +623,7 @@ internal static class FileActionLogic
         }
     }
 
-    public static void RefreshDrives(bool asyncClassify = false)
+    public static void RefreshDrives(bool asyncClassify, CancellationToken cancellationToken)
     {
         if (Data.DevicesObject.Current is null)
             return;

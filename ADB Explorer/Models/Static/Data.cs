@@ -52,4 +52,6 @@ public static class Data
     public static IEnumerable<FileClass> SelectedFiles { get; set; } = [];
 
     public static IEnumerable<Package> SelectedPackages { get; set; } = [];
+
+    public static ObservableProperty<Type> CurrentPage { get; set; } = new();
 }
