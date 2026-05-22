@@ -183,6 +183,8 @@ public partial class ExplorerViewModel : ObservableObject
 
     public Battery? CurrentDeviceBattery => Data.DevicesObject.Current?.Battery;
 
+    public Action RequestModeRefresh { get; set; }
+
     public bool IsBatteryVisible =>
         Data.Settings.PollBattery
         && CurrentDeviceBattery?.ChargeState is not Battery.ChargingState.Unknown
@@ -202,6 +204,11 @@ public partial class ExplorerViewModel : ObservableObject
         Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
         Data.Settings.PropertyChanged += Settings_PropertyChanged;
         Data.DevicesObject.PropertyChanged += DevicesObject_PropertyChanged;
+
+        Data.CurrentPathO.PropertyChanged += (s, e) =>
+        {
+            RequestModeRefresh?.Invoke();
+        };
     }
 
     private void SavedLocations_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -246,6 +253,10 @@ public partial class ExplorerViewModel : ObservableObject
 
             case nameof(AppSettings.PollBattery):
                 NotifyBatteryVisibility();
+                break;
+
+            case nameof(AppSettings.SidePane):
+                RequestModeRefresh?.Invoke();
                 break;
 
             default:

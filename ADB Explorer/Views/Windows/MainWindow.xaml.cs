@@ -108,7 +108,7 @@ public partial class MainWindow : INavigationWindow
     {
         get
         {
-            field ??= new() { DataContext = App.Services.GetService<ExplorerViewModel>() };
+            field ??= new(App.Services.GetService<ExplorerViewModel>()); 
             return field;
         }
     } = null;

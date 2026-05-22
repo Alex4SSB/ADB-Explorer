@@ -6,8 +6,18 @@ namespace ADB_Explorer.Models;
 
 public static class Data
 {
-    public static string CurrentPath { get; set; }
-    public static string ParentPath { get; set; }
+    public static string CurrentPath 
+    {
+        get;
+        set
+        {
+            field = value;
+            CurrentPathO.Value = value;
+        }
+    } = "";
+    public static string ParentPath => FileHelper.GetParentPath(CurrentPath);
+
+    public static ObservableProperty<string> CurrentPathO { get; } = new();
 
     public static DriveViewModel CurrentDrive { get; set; } = null;
 

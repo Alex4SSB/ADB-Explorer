@@ -118,7 +118,7 @@ public partial class DetailsPane : UserControl
     }
 
     public static readonly DependencyProperty SelectedFilesProperty =
-        DependencyProperty.Register("SelectedFiles", typeof(IEnumerable<IBrowserItem>),
+        DependencyProperty.Register(nameof(SelectedFiles), typeof(IEnumerable<IBrowserItem>),
           typeof(DetailsPane), new PropertyMetadata(Array.Empty<IBrowserItem>(), OnSelectedFilesChanged));
 
     public FileClass? File
@@ -128,7 +128,7 @@ public partial class DetailsPane : UserControl
     }
 
     public static readonly DependencyProperty FileProperty =
-        DependencyProperty.Register("File", typeof(FileClass),
+        DependencyProperty.Register(nameof(File), typeof(FileClass),
           typeof(DetailsPane), new PropertyMetadata(null));
 
     public Package? Package
@@ -138,7 +138,7 @@ public partial class DetailsPane : UserControl
     }
 
     public static readonly DependencyProperty PackageProperty =
-        DependencyProperty.Register("Package", typeof(Package),
+        DependencyProperty.Register(nameof(Package), typeof(Package),
           typeof(DetailsPane), new PropertyMetadata(null));
 
     public DriveViewModel? Drive
@@ -148,7 +148,7 @@ public partial class DetailsPane : UserControl
     }
 
     public static readonly DependencyProperty DriveProperty =
-        DependencyProperty.Register("Drive", typeof(DriveViewModel),
+        DependencyProperty.Register(nameof(Drive), typeof(DriveViewModel),
           typeof(DetailsPane), new PropertyMetadata(null));
 
     public SidePaneMode Mode
@@ -158,7 +158,7 @@ public partial class DetailsPane : UserControl
     }
 
     public static readonly DependencyProperty ModeProperty =
-        DependencyProperty.Register("Mode", typeof(SidePaneMode),
+        DependencyProperty.Register(nameof(Mode), typeof(SidePaneMode),
           typeof(DetailsPane), new PropertyMetadata(SidePaneMode.Details));
 
     public ObservableCollection<IDetailsViewModel> SelectionInfoItems { get; } = [];
@@ -176,7 +176,7 @@ public partial class DetailsPane : UserControl
     }
 
     public static readonly DependencyProperty IsPdfPasswordPromptVisibleProperty =
-        DependencyProperty.Register("IsPdfPasswordPromptVisible", typeof(bool),
+        DependencyProperty.Register(nameof(IsPdfPasswordPromptVisible), typeof(bool),
           typeof(DetailsPane), new PropertyMetadata(false));
 
     public bool IsPdfPasswordWrong
@@ -186,8 +186,18 @@ public partial class DetailsPane : UserControl
     }
 
     public static readonly DependencyProperty IsPdfPasswordWrongProperty =
-        DependencyProperty.Register("IsPdfPasswordWrong", typeof(bool),
+        DependencyProperty.Register(nameof(IsPdfPasswordWrong), typeof(bool),
           typeof(DetailsPane), new PropertyMetadata(false));
+
+    public Action RequestModeRefresh
+    {
+        get => (Action)GetValue(RequestModeRefreshProperty);
+        set => SetValue(RequestModeRefreshProperty, value);
+    }
+
+    public static readonly DependencyProperty RequestModeRefreshProperty =
+        DependencyProperty.Register(nameof(RequestModeRefresh), typeof(Action),
+          typeof(DetailsPane), new PropertyMetadata(null));
 
     private static readonly FileClass MultipleFiles = new("MultipleFiles", "/MultipleFiles", AbstractFile.FileType.MultipleFiles);
     private static readonly FileClass DriveIcon = new("Drive", "/Drive", AbstractFile.FileType.Drive);
@@ -199,7 +209,7 @@ public partial class DetailsPane : UserControl
     private CancellationTokenSource? _cancellationToken;
     private MemoryStream? _pdfMemoryStream;
 
-    private static void OnSelectedFilesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    private static void OnSelectedFilesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => App.SafeBeginInvoke(() =>
     {
         var control = (DetailsPane)d;
         var files = (IEnumerable<IBrowserItem>)e.NewValue;
@@ -404,7 +414,7 @@ public partial class DetailsPane : UserControl
                 control.InvalidSelectionBorder.Visibility = Visibility.Visible;
             }
         }
-    }
+    });
 
     private void OnFileFullPathChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
@@ -451,34 +461,19 @@ public partial class DetailsPane : UserControl
             IsEditorFocused = EditorTextBox.IsKeyboardFocusWithin || EditorTextBox.IsContextMenuOpen;
         };
 
-        Data.Settings.PropertyChanged += Settings_PropertyChanged;
-        Data.FileActions.PropertyChanged += Settings_PropertyChanged;
-
-        OnSelectedFilesChanged(this, new DependencyPropertyChangedEventArgs(SelectedFilesProperty, null, SelectedFiles));
-    }
-
-    ~DetailsPane()
-    {
-        Data.Settings.PropertyChanged -= Settings_PropertyChanged;
-        Data.FileActions.PropertyChanged -= Settings_PropertyChanged;
-    }
-
-    private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(AppSettings.SidePane)
-            or nameof(FileActionsEnable.IsDriveViewVisible) 
-            or nameof(FileActionsEnable.IsAppDrive) 
-            or nameof(FileActionsEnable.IsRecycleBin))
+        RequestModeRefresh = () =>
         {
             Mode = IsPreviewAllowed()
                 ? Data.Settings.SidePane
                 : SidePaneMode.Details;
 
             OnSelectedFilesChanged(this, new DependencyPropertyChangedEventArgs(SelectedFilesProperty, null, SelectedFiles));
-        }
+        };
+
+        OnSelectedFilesChanged(this, new DependencyPropertyChangedEventArgs(SelectedFilesProperty, null, SelectedFiles));
     }
 
-    private static bool IsPreviewAllowed() => !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive && !Data.FileActions.IsDriveViewVisible;
+    public static bool IsPreviewAllowed() => !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive && !Data.FileActions.IsDriveViewVisible;
 
     private static async Task RenderPdfAsync(DetailsPane control, MemoryStream memStream, string? password, CancellationTokenSource cts)
     {

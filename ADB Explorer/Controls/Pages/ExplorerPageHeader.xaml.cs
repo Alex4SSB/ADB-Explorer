@@ -33,7 +33,7 @@ public partial class ExplorerPageHeader : UserControl
     private bool WasDragging;
     private Point MouseDownPoint;
 
-    private ExplorerViewModel ViewModel => (ExplorerViewModel)DataContext;
+    private ExplorerViewModel ViewModel { get; }
 
     /// <summary>
     /// Returns the currently active items view (either <see cref="IconView"/> or <see cref="ExplorerGrid"/>).
@@ -135,10 +135,13 @@ public partial class ExplorerPageHeader : UserControl
     private readonly DispatcherTimer SelectionTimer = new() { Interval = SELECTION_CHANGED_DELAY };
     private bool _isSyncingSelection = false;
 
-    public ExplorerPageHeader()
+    public ExplorerPageHeader(ExplorerViewModel viewModel)
     {
         Thread.CurrentThread.CurrentCulture =
         Thread.CurrentThread.CurrentUICulture = Settings.UICulture;
+
+        DataContext =
+        ViewModel = viewModel;
 
         RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
 
@@ -159,6 +162,12 @@ public partial class ExplorerPageHeader : UserControl
         DriveList.SelectionChanged += DriveList_SelectionChanged;
 
         FileIconView.RenameStarted += IconView_RenameStarted;
+
+        ViewModel.RequestModeRefresh = () =>
+        {
+            DetailsPane.RequestModeRefresh?.Invoke();
+            DetailsControl.RequestModeRefresh?.Invoke();
+        };
     }
 
     private void DriveList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -625,7 +634,6 @@ public partial class ExplorerPageHeader : UserControl
         CurrentPath = realPath;
 
         NavigationBox.Path = realPath == RECYCLE_PATH ? AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin) : realPath;
-        ParentPath = FileHelper.GetParentPath(CurrentPath);
         CurrentDrive = DriveHelper.GetCurrentDrive(CurrentPath);
 
         FileActions.IsRecycleBin = CurrentPath == RECYCLE_PATH;
@@ -665,9 +673,6 @@ public partial class ExplorerPageHeader : UserControl
         }
 
         SortExplorer();
-
-        DetailsPane.SelectedFiles = [new FileClass("", "", FileType.Unknown)];
-        DetailsPane.SelectedFiles = [];
 
         if (FileActions.IsRecycleBin)
         {
@@ -794,9 +799,6 @@ public partial class ExplorerPageHeader : UserControl
         NavHistory.Navigate(Navigation.SpecialLocation.DriveView);
 
         CurrentDrive = null;
-
-        DetailsPane.SelectedFiles = [new FileClass("", "", FileType.Unknown)];
-        DetailsPane.SelectedFiles = [];
 
         if (DriveList.SelectedIndex > -1)
             SelectionHelper.GetListViewItemContainer(DriveList).Focus();
