@@ -116,8 +116,8 @@
                     <local:NavigationBox
                         x:Name="NavigationBox"
                         Grid.Column="1"
-                        Margin="0,1,0,0" />
-                    <local:SearchBox
+                        Margin="0,1,0,0"
+                        SavedItems="{Binding SavedItems, Mode=OneWay}" />
                         x:Name="SearchBox"
                         Grid.Column="2"
                         IsExpanded="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsSearchBoxFocused, Mode=TwoWay}"
@@ -180,16 +180,27 @@
                         <Expander
                             Margin="4"
                             helpers:ExpanderHelper.ChevronPlacement="Left"
-                            helpers:ExpanderHelper.IsTransparent="True"
-                            IsExpanded="{Binding Source={x:Static Member=models:Data.Settings}, Path=HomeLocationsExpanded, Mode=TwoWay}"
-                            Style="{StaticResource AdbExpanderStyle}">
+                            helpers:ExpanderHelper.IsTransparent="True">
+                            <Expander.Style>
+                                <Style BasedOn="{StaticResource AdbExpanderStyle}" TargetType="Expander">
+                                    <Setter Property="IsExpanded" Value="{Binding Source={x:Static Member=models:Data.Settings}, Path=HomeLocationsExpanded, Mode=TwoWay}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SavedItems.Count}" Value="0">
+                                            <Setter Property="IsExpanded" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Expander.Style>
                             <Expander.Header>
                                 <local:SimpleStackPanel Orientation="Horizontal" Spacing="10">
                                     <ui:FontIcon FontSize="18" Glyph="&#xE734;" />
                                     <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_SAVED_LOCATIONS}}" />
                                 </local:SimpleStackPanel>
                             </Expander.Header>
-                            <ui:ListView x:Name="HomeSavedLocationsList" Style="{StaticResource HomeSavedLocationsListStyle}">
+                            <ui:ListView
+                                x:Name="HomeSavedLocationsList"
+                                ItemsSource="{Binding SavedItems}"
+                                Style="{StaticResource HomeSavedLocationsListStyle}">
                                 <ui:ListView.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <WrapPanel Width="{Binding RelativeSource={RelativeSource AncestorType=ui:ListView}, Path=ActualWidth}" />

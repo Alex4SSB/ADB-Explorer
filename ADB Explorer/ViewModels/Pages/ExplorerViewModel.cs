@@ -101,7 +101,10 @@ public partial class ExplorerViewModel : ObservableObject
 
     [ObservableProperty]
     public partial ThumbnailService.ThumbnailSize CurrentThumbsSize { get; set; }
-    
+
+    [ObservableProperty]
+    public partial ObservableList<SavedLocation> SavedItems { get; set; }
+
     partial void OnCurrentThumbsSizeChanged(ThumbnailService.ThumbnailSize value)
     {
         IsIconView = value is not ThumbnailService.ThumbnailSize.Disabled;
@@ -192,10 +195,21 @@ public partial class ExplorerViewModel : ObservableObject
     {
         IsIconView = Data.RuntimeSettings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
 
+        Data.Settings.SavedLocations.CollectionChanged += SavedLocations_CollectionChanged;
+        SavedLocations_CollectionChanged(null, null);
+
         Data.FileActions.PropertyChanged += FileActions_PropertyChanged;
         Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
         Data.Settings.PropertyChanged += Settings_PropertyChanged;
         Data.DevicesObject.PropertyChanged += DevicesObject_PropertyChanged;
+    }
+
+    private void SavedLocations_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        App.SafeBeginInvoke(() =>
+        {
+            SavedItems = [.. Data.Settings.SavedLocations.Select(p => new SavedLocation(p))];
+        });
     }
 
     private void NotifyBatteryVisibility()
@@ -208,13 +222,11 @@ public partial class ExplorerViewModel : ObservableObject
 
     private void SubscribeToBattery(Battery? battery)
     {
-        if (_subscribedBattery is not null)
-            _subscribedBattery.PropertyChanged -= Battery_PropertyChanged;
+        _subscribedBattery?.PropertyChanged -= Battery_PropertyChanged;
 
         _subscribedBattery = battery;
 
-        if (_subscribedBattery is not null)
-            _subscribedBattery.PropertyChanged += Battery_PropertyChanged;
+        _subscribedBattery?.PropertyChanged += Battery_PropertyChanged;
     }
 
     private void Battery_PropertyChanged(object? sender, PropertyChangedEventArgs e)

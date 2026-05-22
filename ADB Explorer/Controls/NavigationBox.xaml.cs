@@ -28,15 +28,7 @@ public partial class NavigationBox : UserControl
 
         SizeChanged += (sender, args) => ArrangeBreadcrumbs();
 
-        Data.RuntimeSettings.PropertyChanged += (sender, args) =>
-        {
-            if (args.PropertyName == nameof(AppRuntimeSettings.LocationToNavigate))
-            {
-                OverflowPopup.IsOpen = false;
-            }
-        };
 
-        Data.Settings.SavedLocations.CollectionChanged += (sender, args) => UpdateSavedItems();
     }
 
     #region Dependency Properties
@@ -50,11 +42,16 @@ public partial class NavigationBox : UserControl
 
             SetValue(PathProperty, value);
 
-            if (update)
+            App.SafeBeginInvoke(() =>
             {
-                IsFUSE = DriveHelper.GetCurrentDrive(value)?.IsFUSE is true;
-                AddDevice(value);
-            }
+                OverflowPopup.IsOpen = false;
+
+                if (update)
+                {
+                    IsFUSE = DriveHelper.GetCurrentDrive(value)?.IsFUSE is true;
+                    AddDevice(value);
+                }
+            }, DispatcherPriority.Render);
         }
     }
 
@@ -132,6 +129,11 @@ public partial class NavigationBox : UserControl
         DependencyProperty.Register(nameof(Items), typeof(ObservableList<IMenuItem>),
           typeof(NavigationBox), new PropertyMetadata(null));
 
+    private readonly SavedLocation _sentinel = new();
+    private readonly ObservableCollection<SavedLocation> _sentinelCollection = [];
+
+    public CompositeCollection AllSavedItems { get; } = [];
+
     public ObservableList<SavedLocation> SavedItems
     {
         get => (ObservableList<SavedLocation>)GetValue(SavedItemsProperty);
@@ -140,7 +142,22 @@ public partial class NavigationBox : UserControl
 
     public static readonly DependencyProperty SavedItemsProperty =
         DependencyProperty.Register(nameof(SavedItems), typeof(ObservableList<SavedLocation>),
-          typeof(NavigationBox), new PropertyMetadata(null));
+          typeof(NavigationBox), new PropertyMetadata(null, OnSavedItemsChanged));
+
+    private static void OnSavedItemsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var box = (NavigationBox)d;
+
+        box.AllSavedItems.Clear();
+        box.AllSavedItems.Add(new CollectionContainer { Collection = box._sentinelCollection });
+        if (e.NewValue is ObservableList<SavedLocation> items)
+        {
+            box.AllSavedItems.Add(new CollectionContainer { Collection = items });
+            items.CollectionChanged += (_, _) => box.UpdateSavedItems();
+        }
+
+        box.UpdateSavedItems();
+    }
 
     public bool IsCurrentSaved
     {
@@ -190,14 +207,13 @@ public partial class NavigationBox : UserControl
 
     private void UpdateSavedItems()
     {
-        SavedItems = Data.Settings.SavedLocations is null
-            ? []
-            : [.. Data.Settings.SavedLocations.Select(p => new SavedLocation(p))];
+        IsCurrentSaved = SavedItems?.Any(i => i.Path == Path) is true;
 
-        IsCurrentSaved = SavedItems.Any(i => i.Path == Path);
-
-        if (AdbLocation.LocationFromString(Path) is Navigation.SpecialLocation.None && !IsCurrentSaved)
-            SavedItems.Insert(0, new SavedLocation());
+        var sentinelVisible = AdbLocation.LocationFromString(Path) is Navigation.SpecialLocation.None && !IsCurrentSaved;
+        if (sentinelVisible && _sentinelCollection.Count == 0)
+            _sentinelCollection.Add(_sentinel);
+        else if (!sentinelVisible && _sentinelCollection.Count > 0)
+            _sentinelCollection.Clear();
     }
 
     public void Refresh() => AddDevice(Path);

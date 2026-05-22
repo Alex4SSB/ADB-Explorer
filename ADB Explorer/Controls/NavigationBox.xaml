@@ -67,20 +67,12 @@
                     </ui:Button.Content>
                     <ui:Button.Style>
                         <Style BasedOn="{StaticResource DefaultUiButtonStyle}" TargetType="ui:Button">
-                            <!--<Setter Property="ui:FlyoutService.Flyout">
-                                <Setter.Value>
-                                    <ui:Flyout Content="{StaticResource OverflowItemsControl}" Placement="Bottom" />
-                                </Setter.Value>
-                            </Setter>-->
                             <Setter Property="ContextMenu">
                                 <Setter.Value>
                                     <local:AdbContextMenu Style="{StaticResource PathBoxContextMenuStyle}" />
                                 </Setter.Value>
                             </Setter>
                             <Style.Triggers>
-                                <!--<DataTrigger Binding="{Binding Children}" Value="{x:Null}">
-                                    <Setter Property="ui:FlyoutService.Flyout" Value="{x:Null}" />
-                                </DataTrigger>-->
                                 <Trigger Property="IsMouseOver" Value="False">
                                     <Setter Property="BorderBrush" Value="Transparent" />
                                     <Setter Property="Background" Value="Transparent" />
@@ -118,12 +110,12 @@
         Height="{Binding Height}"
         MinWidth="150"
         DataContext="{Binding ElementName=NavBox}">
-        <!--  ui:TextBoxHelper.IsDeleteButtonVisible="False"  -->
         <ui:TextBox
             x:Name="PathBox"
             Height="{Binding Height}"
             VerticalAlignment="Center"
             d:Background="LightGray"
+            ClearButtonEnabled="False"
             FlowDirection="LeftToRight"
             GotFocus="PathBox_GotFocus"
             KeyDown="PathBox_KeyDown"
@@ -229,7 +221,7 @@
                         </Style.Triggers>
                     </Style>
                 </local:AdbMenu.Style>
-                <local:AdbMenuItem ItemsSource="{Binding SavedItems}" ToolTip="{Binding Source={x:Static Member=strings:Resources.S_SAVED_LOCATIONS}}">
+                <local:AdbMenuItem ItemsSource="{Binding ElementName=NavBox, Path=AllSavedItems}" ToolTip="{Binding Source={x:Static Member=strings:Resources.S_SAVED_LOCATIONS}}">
                     <local:AdbMenuItem.Header>
                         <ui:FontIcon Margin="-5">
                             <ui:FontIcon.Style>

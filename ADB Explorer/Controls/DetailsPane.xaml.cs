@@ -38,6 +38,26 @@ public partial class DetailsPane : UserControl
         DependencyProperty.Register("IsOpen", typeof(bool),
           typeof(DetailsPane), new PropertyMetadata(false, OnIsOpenChanged));
 
+    public double PaneMinWidth
+    {
+        get => (double)GetValue(PaneMinWidthProperty);
+        set => SetValue(PaneMinWidthProperty, value);
+    }
+
+    public static readonly DependencyProperty PaneMinWidthProperty =
+        DependencyProperty.Register("PaneMinWidth", typeof(double),
+          typeof(DetailsPane), new PropertyMetadata(100.0));
+
+    public double PaneMaxWidth
+    {
+        get => (double)GetValue(PaneMaxWidthProperty);
+        set => SetValue(PaneMaxWidthProperty, value);
+    }
+
+    public static readonly DependencyProperty PaneMaxWidthProperty =
+        DependencyProperty.Register("PaneMaxWidth", typeof(double),
+          typeof(DetailsPane), new PropertyMetadata(1000.0));
+
     private static void OnIsOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is not DetailsPane pane) return;
@@ -708,7 +728,7 @@ public partial class DetailsPane : UserControl
     private void GridSplitter_DragDelta(object sender, DragDeltaEventArgs e)
     {
         double newWidth = ContentBox.ActualWidth - e.HorizontalChange;
-        if (newWidth > MinWidth && newWidth < MaxWidth)
+        if (newWidth > PaneMinWidth && newWidth < PaneMaxWidth)
         {
             ContentBox.Width = newWidth;
             Data.Settings.DetailsPaneWidth = (int)ContentBox.Width;

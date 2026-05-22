@@ -800,10 +800,6 @@ public partial class ExplorerPageHeader : UserControl
 
         if (DriveList.SelectedIndex > -1)
             SelectionHelper.GetListViewItemContainer(DriveList).Focus();
-
-        HomeSavedLocationsList.ItemsSource = NavigationBox.SavedItems;
-        if (NavigationBox.SavedItems.Count == 0)
-            Settings.HomeLocationsExpanded = false;
     }
 
     private void DataGridCell_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
