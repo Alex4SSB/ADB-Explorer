@@ -12,7 +12,7 @@
 		<img src="https://img.shields.io/badge/Platform-Windows-blue" alt="Platform" /></a>
  	<br></br>
 	<a href="https://github.com/Alex4SSB/ADB-Explorer/issues">
-		<img alt="Issues" src="https://img.shields.io/github/issues/Alex4SSB/ADB-Explorer?color=0088ff" style="display:block;"/></a>
+		<img alt="Issues" src="https://img.shields.io/github/issues/Alex4SSB/ADB-Explorer" /></a>
 	<a href="https://github.com/Alex4SSB/ADB-Explorer/releases">
 		<img alt="Downloads" src="https://img.shields.io/github/downloads/Alex4SSB/ADB-Explorer/total" /></a>
 	<a href="https://github.com/Alex4SSB/ADB-Explorer/commits">
