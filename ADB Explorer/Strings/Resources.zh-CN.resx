@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -123,9 +123,6 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Android 机器人是在 Google 原创及共享成果的基础上再创作或修改而成，须遵照知识共享署名 3.0 许可所述条款付诸应用。</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>应用动画</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>APK 图标根据 Apache License，版本 2.0 获得许可。</value>
   </data>
@@ -134,9 +131,6 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>指定路径的 ADB 版本过低。</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>无法覆盖 ADB</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>选择 ADB 可执行文件</value>
@@ -255,9 +249,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>恢复</value>
   </data>
-  <data name="S_REDIRECTION" xml:space="preserve">
-    <value>进度重置</value>
-  </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>目录列表错误</value>
   </data>
@@ -274,12 +265,6 @@
 • 文件名不能包含 " * / : &lt;&gt; ? \ |
 • 文件名不区分大小写
 • 不支持安装 APK</value>
-  </data>
-  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>应用启用了流畅设计中的许多动画。
-当应用窗口在副显示器上最大化时，侧边视图动画始终禁用。
-
-• 勾选此设置将禁用所有动画（进度条、进度环和驱动器使用条除外）。</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>关闭应用后，所有设置将被重置。
@@ -523,17 +508,17 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>主题</value>
   </data>
-  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
-    <value>强制 Fluent 风格</value>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>自定义强调色</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>强调色</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>选择颜色</value>
   </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>禁用硬件加速</value>
-  </data>
-  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
-    <value>禁用动画</value>
-  </data>
-  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>启动画面</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>检查更新</value>
@@ -567,9 +552,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>归属及第三方许可</value>
-  </data>
-  <data name="S_SEE_TERMS" xml:space="preserve">
-    <value>查看条款</value>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
     <value>[未设置]</value>
@@ -686,9 +668,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
     <value>修改日期</value>
   </data>
-  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
-    <value>关闭编辑器</value>
-  </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>保存更改</value>
   </data>
@@ -718,9 +697,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>写入速度: {0}</value>
-  </data>
-  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
-    <value>其他速度: {0}</value>
   </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>每次启动时检查更新</value>
@@ -1064,9 +1040,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
     <value>当前文件夹内已有同名文件或当前路径下唯一</value>
   </data>
-  <data name="S_POPUP_WARNING" xml:space="preserve">
-    <value>警告</value>
-  </data>
   <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
     <value>选中的文件违反了 Windows 命名规则</value>
   </data>
@@ -1087,15 +1060,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>选中的项目不是文件/文件夹</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
-    <value>可以通过重置应用设置来撤消，或者手动在设置文件中进行</value>
-  </data>
-  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
-    <value>直到下次应用启动</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
-    <value>不再显示</value>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>WSA 应用</value>
@@ -1429,12 +1393,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
     <value>正在检查服务器状态…</value>
   </data>
-  <data name="S_MDNS_OFF" xml:space="preserve">
-    <value>&lt;Span&gt;• 服务轮询功能已关闭&lt;LineBreak /&gt;• 服务器&lt;Italic&gt;可能&lt;/Italic&gt;处于运行状态&lt;/Span&gt;</value>
-  </data>
-  <data name="S_ENABLE_MDNS" xml:space="preserve">
-    <value>点击以启用服务器和轮询</value>
-  </data>
   <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
     <value>图标</value>
   </data>
@@ -1500,9 +1458,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
     <value>正在读取缩略图位置和媒体数据库</value>
-  </data>
-  <data name="S_THUMB_SNACKBAR_TITLE" xml:space="preserve">
-    <value>{0} 缩略图</value>
   </data>
   <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
     <value>详情</value>
@@ -1617,15 +1572,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_MOUNT_OPTIONS" xml:space="preserve">
     <value>挂载选项</value>
-  </data>
-  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
-    <value>自定义强调色</value>
-  </data>
-  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
-    <value>强调色</value>
-  </data>
-  <data name="S_PICK_COLOR" xml:space="preserve">
-    <value>选择颜色</value>
   </data>
   <data name="S_COLOR_RED" xml:space="preserve">
     <value>红</value>

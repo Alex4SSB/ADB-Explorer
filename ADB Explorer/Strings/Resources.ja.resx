@@ -123,9 +123,6 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Android ロボットは、Google が作成および提供している作品から複製または変更したものであり、クリエイティブ・コモンズ表示 3.0 ライセンスに記載された条件に従って使用しています。</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>アプリアニメーション</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>APK アイコンは、Apache ライセンス バージョン 2.0 に基づいてライセンスされます。</value>
   </data>
@@ -134,9 +131,6 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>指定されたパスの ADB バージョンが低すぎます。</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>ADBの上書きに失敗しました</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>ADB実行ファイルを選択</value>
@@ -255,9 +249,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>復元</value>
   </data>
-  <data name="S_REDIRECTION" xml:space="preserve">
-    <value>進捗状況のリダイレクト</value>
-  </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>ディレクトリの一覧表示エラー</value>
   </data>
@@ -274,12 +265,6 @@
 • ファイル名に " * / : &lt; &gt; ? \ | を含めることはできません
 • ファイル名は大文字と小文字を区別しません
 • APKのインストールはサポートされていません</value>
-  </data>
-  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>アプリには、fluent design の一環として有効化されている多くのアニメーションがあります。
-アプリウィンドウがセカンダリディスプレイで最大化されている場合、サイドビューアニメーションは常に無効になります。
-
-・この設定にチェックを入れると、進捗バー、進捗リング、ドライブ使用状況バーを除くすべてのアプリアニメーションが無効になります。</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>アプリを閉じると、すべてのアプリ設定がリセットされます。
@@ -523,17 +508,8 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>テーマ</value>
   </data>
-  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
-    <value>Fluent Stylesを強制する</value>
-  </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>ハードウェアアクセラレーションを無効にする</value>
-  </data>
-  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
-    <value>アニメーションを無効にする</value>
-  </data>
-  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>スプラッシュスクリーンを表示</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>アップデートを確認する</value>
@@ -567,9 +543,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>帰属表示とサードパーティライセンス</value>
-  </data>
-  <data name="S_SEE_TERMS" xml:space="preserve">
-    <value>利用規約を見る</value>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
     <value>[未設定]</value>
@@ -686,9 +659,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
     <value>更新時間の変更</value>
   </data>
-  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
-    <value>エディターを閉じる</value>
-  </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>変更を保存</value>
   </data>
@@ -718,9 +688,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>書き込み: {0}</value>
-  </data>
-  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
-    <value>その他: {0}</value>
   </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>起動ごとにアップデートをチェックします</value>
@@ -1064,9 +1031,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
     <value>現在の場所でユニーク</value>
   </data>
-  <data name="S_POPUP_WARNING" xml:space="preserve">
-    <value>警告</value>
-  </data>
   <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
     <value>選択したファイルは Windows の命名規則に違反しています</value>
   </data>
@@ -1087,15 +1051,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>選択された項目はファイル/フォルダではありません</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
-    <value>「アプリ設定をリセット」を使用するか、設定ファイルで手動で元に戻すことができます</value>
-  </data>
-  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
-    <value>次のアプリのリリースまで</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
-    <value>二度と表示しない</value>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>WSAアプリ</value>
@@ -1419,11 +1374,5 @@ Weblate でアプリをあなたの言語にローカライズできるよう、
   </data>
   <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
     <value>{0} 個のAPKをインストールする</value>
-  </data>
-  <data name="S_MDNS_OFF" xml:space="preserve">
-    <value>&lt;Span&gt;・サービスのポーリングはオフです&lt;LineBreak /&gt;・サーバーは &lt;Italic&gt;オンの可能性があります&lt;/Italic&gt;&lt;/Span&gt;</value>
-  </data>
-  <data name="S_ENABLE_MDNS" xml:space="preserve">
-    <value>クリックしてサーバーとポーリングを有効にします</value>
   </data>
 </root>

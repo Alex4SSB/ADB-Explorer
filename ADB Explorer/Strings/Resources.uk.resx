@@ -123,9 +123,6 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Робота Android відтворено або змінено з роботи, створеної та поширеної Google, і використовується відповідно до умов, описаних у ліцензії Creative Commons 3.0 Attribution.</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>Анімації додатку</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>Піктограма APK ліцензована за ліцензією Apache версії 2.0.</value>
   </data>
@@ -134,9 +131,6 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>Версія ADB з наданого шляху занадто низька.</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>Не вдалося перезаписати ADB</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>Виберіть виконуваний файл ADB</value>

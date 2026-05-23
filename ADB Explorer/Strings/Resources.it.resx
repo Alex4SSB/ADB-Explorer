@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -123,9 +123,6 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Il robot Android viene riprodotto o modificato da un lavoro creato e condiviso da Google e utilizzato secondo i termini descritti nella licenza Creative Commons 3.0.</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>Animazioni nell'app</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>L'icona APK è rilasciata sotto licenza Apache, versione 2.0.</value>
   </data>
@@ -134,9 +131,6 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>La versione di ADB del percorso fornito è troppo vecchia.</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>Impossibile sovrascrivere il percorso di ADB</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>Seleziona l'eseguibile di ADB</value>
@@ -255,9 +249,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Ripristina</value>
   </data>
-  <data name="S_REDIRECTION" xml:space="preserve">
-    <value>Reindirizzamento del progresso delle operazioni</value>
-  </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>Errore nell'elenco della cartella</value>
   </data>
@@ -274,12 +265,6 @@ Le note di rilascio sono disponibili su GitHub.</value>
 - I nomi dei file non possono contenere " * / : &lt; &gt; ? \ |
 - I nomi dei file sono case insensitive (non c'è differenza tra maiuscole e minuscole)
 - L'installazione di APK non è supportata</value>
-  </data>
-  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>L'applicazione ha molte animazioni che sono abilitate come parte del Fluent design di Windows.
-L'animazione delle viste laterali è sempre disabilitata quando la finestra dell'applicazione è massimizzata su un display secondario.
-
-• Attivando questa impostazione si disattivano tutte le animazioni dell'app, tranne quella delle barre / anelli di progresso e delle barre di utilizzo del disco.</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>Tutte le impostazioni dell'applicazione verranno ripristinate alla chiusura dell'applicazione.
@@ -523,17 +508,8 @@ Il contenuto che vedi potrebbe essere incompleto.</value>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>Tema</value>
   </data>
-  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
-    <value>Forza lo stile Fluent di Windows</value>
-  </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>Disabilita accelerazione hardware</value>
-  </data>
-  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
-    <value>Disabilita animazioni</value>
-  </data>
-  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>Schermata di avvio</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>Controlla aggiornamenti</value>
@@ -567,9 +543,6 @@ Il contenuto che vedi potrebbe essere incompleto.</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>Crediti e Licenze di terze parti</value>
-  </data>
-  <data name="S_SEE_TERMS" xml:space="preserve">
-    <value>Vedi i termini</value>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
     <value>[non impostato]</value>
@@ -686,9 +659,6 @@ Annulla tutte le operazioni in corso</value>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
     <value>Aggiorna l'ultima modifica</value>
   </data>
-  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
-    <value>Chiudi l'editor</value>
-  </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Salva le modifiche</value>
   </data>
@@ -718,9 +688,6 @@ Annulla tutte le operazioni in corso</value>
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>Scrittura: {0}</value>
-  </data>
-  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
-    <value>Altro: {0}</value>
   </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>Cerca aggiornamenti all'apertura</value>
@@ -1064,9 +1031,6 @@ Annulla tutte le operazioni in corso</value>
   <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
     <value>Unico nella cartella corrente</value>
   </data>
-  <data name="S_POPUP_WARNING" xml:space="preserve">
-    <value>Avvisi</value>
-  </data>
   <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
     <value>Un file selezionato non rispetta le regole di Windows sul nome</value>
   </data>
@@ -1087,15 +1051,6 @@ Annulla tutte le operazioni in corso</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>Un file selezionato non è un file / cartella</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
-    <value>Può essere annullato con Reimposta le impostazioni dell'app, o manualmente nel file delle impostazioni</value>
-  </data>
-  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
-    <value>Fino al prossimo avvio</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
-    <value>Non chiedere più</value>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>App WSA</value>
@@ -1428,12 +1383,6 @@ Aiutaci a localizzare l'app nella vostra lingua su Weblate.</value>
   </data>
   <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
     <value>Controllo dello stato del server mDNS…</value>
-  </data>
-  <data name="S_MDNS_OFF" xml:space="preserve">
-    <value>&lt;Span&gt;• Il rilevamento dei servizi è disattivato&lt;LineBreak /&gt;• Il server&lt;Italic&gt;potrebbe&lt;/Italic&gt; essere acceso&lt;/Span&gt;</value>
-  </data>
-  <data name="S_ENABLE_MDNS" xml:space="preserve">
-    <value>Premi per attivare il server e il rilevamento</value>
   </data>
   <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
     <value>Icone</value>

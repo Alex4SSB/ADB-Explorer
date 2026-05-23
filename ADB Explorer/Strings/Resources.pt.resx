@@ -1,6 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -64,9 +123,6 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>O robô do Android é reproduzido ou modificado com base no trabalho criado e partilhado pelo Google e é usado de acordo com os termos descritos na Licença de Atribuição 3.0 do Creative Commons.</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>Animações da app</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>O ícone APK está licenciado sob a Apache License, Versão 2.0.</value>
   </data>
@@ -75,9 +131,6 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>A versão do ADB do caminho fornecido é muito baixa.</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>Falha ao substituir ADB</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>Selecione o executável ADB</value>
@@ -133,6 +186,12 @@
   <data name="S_PERM_DEL" xml:space="preserve">
     <value>Apagar Permanentemente</value>
   </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>Erro ao criar</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>Conflitos na restauração</value>
+  </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>Confirmar Desinstalação</value>
   </data>
@@ -178,14 +237,17 @@
   <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
     <value>Desativar mDNS</value>
   </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>Lançar WSA no fundo</value>
+  </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>Puxar</value>
+  </data>
   <data name="S_PULL_ACTION_LINK" xml:space="preserve">
     <value>Puxar (Destino da Ligação)</value>
   </data>
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Restaurar</value>
-  </data>
-  <data name="S_REDIRECTION" xml:space="preserve">
-    <value>Redirecionamento do progresso</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>Erro de Diretório de Lista</value>
@@ -374,6 +436,12 @@ O conteúdo visível pode estar incompleto.</value>
   <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
     <value>mDNS</value>
   </data>
+  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
+    <value>Polling por dispositivos</value>
+  </data>
+  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
+    <value>Polling para o estado da bateria</value>
+  </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>Ativar Root Automaticamente</value>
   </data>
@@ -382,6 +450,9 @@ O conteúdo visível pode estar incompleto.</value>
   </data>
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
     <value>Abre Automaticamente para Pesquisas</value>
+  </data>
+  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
+    <value>Visualização compacta</value>
   </data>
   <data name="S_BUTTON_OK" xml:space="preserve">
     <value>Ok</value>
@@ -401,31 +472,7 @@ O conteúdo visível pode estar incompleto.</value>
   <data name="S_MENU_NEW" xml:space="preserve">
     <value>Novo</value>
   </data>
-  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
-    <value>Fechar Editor</value>
-  </data>
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>Instalar</value>
-  </data>
-  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
-    <value>Erro ao criar</value>
-  </data>
-  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>Conflitos na restauração</value>
-  </data>
-  <data name="S_WSA_PKG_TIP" xml:space="preserve">
-    <value>Lançar WSA no fundo</value>
-  </data>
-  <data name="S_PULL_ACTION" xml:space="preserve">
-    <value>Puxar</value>
-  </data>
-  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
-    <value>Polling por dispositivos</value>
-  </data>
-  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
-    <value>Polling para o estado da bateria</value>
-  </data>
-  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>Visualização compacta</value>
   </data>
 </root>

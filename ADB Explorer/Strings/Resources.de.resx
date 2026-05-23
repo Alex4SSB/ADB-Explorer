@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -123,9 +123,6 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Das Android-Roboter-Logo wurde aus einer von Google erstellten und geteilten Arbeit reproduziert oder geändert und wird gemäß den Bedingungen der Creative Commons 3.0-Attributionslizenz verwendet.</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>App-Animationen</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>Das APK-Symbol unterliegt der Apache-Lizenz, Version 2.0.</value>
   </data>
@@ -134,9 +131,6 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>Die ADB-Version aus dem angegebenen Pfad ist zu niedrig.</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>ADB konnte nicht überschrieben werden</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>ADB-Programmdatei auswählen</value>
@@ -255,9 +249,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Wiederherstellen</value>
   </data>
-  <data name="S_REDIRECTION" xml:space="preserve">
-    <value>Fortschrittsumleitung</value>
-  </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>Fehler beim Auflisten des Verzeichnisses</value>
   </data>
@@ -274,12 +265,6 @@ Die Versionshinweise sind auf GitHub verfügbar.</value>
 • Dateinamen dürfen keine der folgenden Zeichen enthalten: " * / : &lt; &gt; ? \ |
 • Bei Dateinamen wird nicht zwischen Groß- und Kleinschreibung unterschieden
 • Die Installation von APKs wird nicht unterstützt</value>
-  </data>
-  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>Die App verfügt über zahlreiche Animationen, die als Teil des Fluent Designs aktiviert sind.
-Die Seitenansichtsanimation ist immer deaktiviert, wenn das App-Fenster auf einem sekundären Bildschirm maximiert ist.
-
-• Durch Aktivieren dieser Einstellung werden alle App-Animationen außer Fortschrittsbalken, Fortschrittsringen und Speicherbelegungsbalken deaktiviert.</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>Alle App-Einstellungen werden beim Schließen der App zurückgesetzt.
@@ -523,17 +508,8 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>Thema</value>
   </data>
-  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
-    <value>Fluent-Stile erzwingen</value>
-  </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>Hardwarebeschleunigung deaktivieren</value>
-  </data>
-  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
-    <value>Animationen deaktivieren</value>
-  </data>
-  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>Begrüßungsbildschirm</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>Auf Aktualisierungen prüfen</value>
@@ -567,9 +543,6 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>Quellenangaben und Lizenzen von Drittanbietern</value>
-  </data>
-  <data name="S_SEE_TERMS" xml:space="preserve">
-    <value>Bedingungen ansehen</value>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
     <value>[nicht festgelegt]</value>
@@ -686,9 +659,6 @@ Alle laufenden Vorgänge abbrechen</value>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
     <value>Änderungszeit aktualisieren</value>
   </data>
-  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
-    <value>Editor schließen</value>
-  </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Änderungen speichern</value>
   </data>
@@ -718,9 +688,6 @@ Alle laufenden Vorgänge abbrechen</value>
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>Schreiben: {0}</value>
-  </data>
-  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
-    <value>Andere: {0}</value>
   </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>Prüft bei jedem Start auf Aktualisierungen</value>
@@ -1064,9 +1031,6 @@ Alle laufenden Vorgänge abbrechen</value>
   <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
     <value>Einzigartig am aktuellen Ort</value>
   </data>
-  <data name="S_POPUP_WARNING" xml:space="preserve">
-    <value>Warnungen</value>
-  </data>
   <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
     <value>Eine ausgewählte Datei verstößt gegen die Windows-Namenskonventionen</value>
   </data>
@@ -1087,15 +1051,6 @@ Alle laufenden Vorgänge abbrechen</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>Ein ausgewähltes Element ist keine Datei/kein Ordner</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
-    <value>Kann über App-Einstellungen zurücksetzen oder manuell in der Einstellungsdatei rückgängig gemacht werden</value>
-  </data>
-  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
-    <value>Bis zum nächsten App-Start</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
-    <value>Nie wieder anzeigen</value>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>WSA-App</value>
@@ -1429,12 +1384,6 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
     <value>mDNS-Serverstatus wird überprüft…</value>
   </data>
-  <data name="S_MDNS_OFF" xml:space="preserve">
-    <value>&lt;Span&gt;• Die Abfrage von Dienstleistungen ist AUS&lt;LineBreak /&gt;• Der Server &lt;Italic&gt;könnte&lt;/Italic&gt; EIN sein&lt;/Span&gt;</value>
-  </data>
-  <data name="S_ENABLE_MDNS" xml:space="preserve">
-    <value>Server &amp; Polling an</value>
-  </data>
   <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
     <value>Symbole</value>
   </data>
@@ -1486,15 +1435,6 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_STRING_PASTE" xml:space="preserve">
     <value>Einfügen</value>
   </data>
-  <data name="S_SORT" xml:space="preserve">
-    <value>Sortieren</value>
-  </data>
-  <data name="S_SORT_ASCENDING" xml:space="preserve">
-    <value>Aufsteigend</value>
-  </data>
-  <data name="S_SORT_DESCENDING" xml:space="preserve">
-    <value>Absteigend</value>
-  </data>
   <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
     <value>Details</value>
   </data>
@@ -1509,5 +1449,14 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_THUMBSIZE_XL" xml:space="preserve">
     <value>Extragroße Symbole</value>
+  </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value>Sortieren</value>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value>Aufsteigend</value>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value>Absteigend</value>
   </data>
 </root>

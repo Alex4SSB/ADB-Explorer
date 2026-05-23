@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -120,9 +120,6 @@
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
     <value>Ikona(y) robota Android</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>Animace v aplikaci</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>Ikona APK je chráněna licencí Apache License, verze 2.0.</value>
   </data>
@@ -132,17 +129,71 @@
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>ADB verze z uvedené cesty je zastaralá.</value>
   </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>Nepodařilo se přepsat ADB</value>
-  </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>Vyber exe soubor ADB</value>
   </data>
   <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
     <value>Resetovat nastavení aplikace</value>
   </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>Nová verze aplikace</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>Chyba navigace</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>Zkopírovat název balíčku</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>Zkopírovat cestu položky</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>Obnovit všechny položky</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Vymazat koš</value>
+  </data>
   <data name="S_DELETE_ACTION" xml:space="preserve">
     <value>Smazat</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>připojení selhalo</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Chyba připojení</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Chyba odpojení</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>Chyba párování</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>Na vybraném zařízení nelze povolit přístup k root právům.</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>Root přístup</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Potvrdit smazání</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>Trvale smazat</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>Chyba při vytváření</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>Obnovit konflikty</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>Potvrdit odinstalaci</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>Vyberte balíčky k instalaci</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>Okamžitě ukončit emulátor</value>
   </data>
   <data name="S_REM_HIST_DEV" xml:space="preserve">
     <value>Odebrat zařízení</value>
@@ -150,23 +201,14 @@
   <data name="S_REM_DEV" xml:space="preserve">
     <value>Odpojit zařízení</value>
   </data>
-  <data name="S_RESTORE_ACTION" xml:space="preserve">
-    <value>Obnova ze zálohy</value>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>Práce se soubory</value>
   </data>
-  <data name="S_EMPTY_TRASH" xml:space="preserve">
-    <value>Vymazat koš</value>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>Nainstalovat balíčky</value>
   </data>
-  <data name="S_RESTORE_ALL" xml:space="preserve">
-    <value>Obnovit všechny položky</value>
-  </data>
-  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
-    <value>Root přístup</value>
-  </data>
-  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
-    <value>Chyba při vytváření</value>
-  </data>
-  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
-    <value>Chyba párování</value>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>Spárovat a/nebo se připojit k WiFi zařízení (bez použití mDNS)</value>
   </data>
   <data name="S_RESTART_APP" xml:space="preserve">
     <value>Restartujte aplikaci, aby se projevily změny</value>
@@ -174,32 +216,31 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Chyba čtení souboru</value>
   </data>
-  <data name="S_PERM_DEL" xml:space="preserve">
-    <value>Trvale smazat</value>
-  </data>
-  <data name="S_COPY_APK_NAME" xml:space="preserve">
-    <value>Zkopírovat název balíčku</value>
-  </data>
-  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
-    <value>Potvrdit smazání</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Chyba zápisu souboru</value>
   </data>
-  <data name="S_INSTALL_APK" xml:space="preserve">
-    <value>Vyberte balíčky k instalaci</value>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>Nepodařilo se odeslat soubor zpět do zařízení.</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>Je třeba restartovat server ADB, aby se deaktivovala služba mDNS.</value>
   </data>
   <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
     <value>Zakázat mDNS</value>
   </data>
-  <data name="S_BUTTON_CHANGE" xml:space="preserve">
-    <value>Změnit</value>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>Spustit WSA v pozadí</value>
   </data>
-  <data name="S_ENABLED" xml:space="preserve">
-    <value>Povoleno</value>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>Obnova ze zálohy</value>
   </data>
-  <data name="S_DISABLED" xml:space="preserve">
-    <value>Zakázáno</value>
+  <data name="S_RESET_SETTINGS" xml:space="preserve">
+    <value>Po zavření aplikace dojde k resetování všech nastavení.
+Tento krok nelze vrátit zpět. Opravdu chcete pokračovat?</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>Pokud je ADB ve WSA již autorizováno, vyberte možnost Spustit.
+Chcete-li ADB povolit, otevřete pokročilá nastavení WSA.</value>
   </data>
   <data name="S_ADB_LEARN_MORE" xml:space="preserve">
     <value>Dozvěte se více o ADB</value>
@@ -207,20 +248,47 @@
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>Stáhnout ADB</value>
   </data>
+  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
+    <value>Najděte ADB (alespoň verzi {0}):</value>
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value>Změnit</value>
+  </data>
+  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
+    <value>Vybrat cestu ADB</value>
+  </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>Pokračovat</value>
   </data>
   <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
     <value>Více informací</value>
   </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value>Povoleno</value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value>Zakázáno</value>
+  </data>
+  <data name="S_NEW_VERSION" xml:space="preserve">
+    <value>Nový {0} ve verzi {1} je k dispozici</value>
+  </data>
   <data name="S_BUTTON_CLOSE" xml:space="preserve">
     <value>Zavřít</value>
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value>Pomoc pro ADB</value>
   </data>
   <data name="S_RESTART_ADB_NOW" xml:space="preserve">
     <value>Restartovat ADB nyní</value>
   </data>
   <data name="S_RESTART_LATER" xml:space="preserve">
     <value>Restartovat později</value>
+  </data>
+  <data name="S_ITEM_DESTINATION" xml:space="preserve">
+    <value>Zvolte cíl pro {0}</value>
+  </data>
+  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
+    <value>Zvolte cíl pro více položek</value>
   </data>
   <data name="S_NEW_ITEM" xml:space="preserve">
     <value>Nový soubor</value>
@@ -230,18 +298,6 @@
   </data>
   <data name="S_CC_NAME" xml:space="preserve">
     <value>Creative Commons</value>
-  </data>
-  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
-    <value>Pomoc pro ADB</value>
-  </data>
-  <data name="S_ITEM_DESTINATION" xml:space="preserve">
-    <value>Zvolte cíl pro {0}</value>
-  </data>
-  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
-    <value>Zvolte cíl pro více položek</value>
-  </data>
-  <data name="S_NEW_VERSION" xml:space="preserve">
-    <value>Nový {0} ve verzi {1} je k dispozici</value>
   </data>
   <data name="S_UNINSTALL" xml:space="preserve">
     <value>Odinstalovat</value>
@@ -293,9 +349,6 @@
   </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>Zakázat hardwarovou akceleraci</value>
-  </data>
-  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
-    <value>Zakázat animace</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>Zkontrolovat aktualizace</value>
@@ -390,9 +443,6 @@
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
     <value>Aktualizovat čas úpravy</value>
   </data>
-  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
-    <value>Zavřít editor</value>
-  </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Uložit změny</value>
   </data>
@@ -416,9 +466,6 @@
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>Zápis: {0}</value>
-  </data>
-  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
-    <value>Jiné: {0}</value>
   </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>Zkontrolovat aktualizace po každém zapnutí</value>
@@ -591,20 +638,14 @@
   <data name="S_ITEM_COPY" xml:space="preserve">
     <value>{0} - Kopírovat</value>
   </data>
-  <data name="S_POPUP_WARNING" xml:space="preserve">
-    <value>Varování</value>
-  </data>
-  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
-    <value>Do příštího spuštění aplikace</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
-    <value>Nikdy neukazovat znovu</value>
-  </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>Aplikace WSA</value>
   </data>
   <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
     <value>Zakázáno</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>Kód párování</value>
   </data>
   <data name="S_DEVICE_SAVED" xml:space="preserve">
     <value>Uložené zařízení</value>
@@ -614,9 +655,6 @@
   </data>
   <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
     <value>Připraveno k párování</value>
-  </data>
-  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
-    <value>Kód párování</value>
   </data>
   <data name="S_BUTTON_BROWSE" xml:space="preserve">
     <value>Prozkoumat</value>
@@ -735,8 +773,14 @@
   <data name="S_ONE_HOUR" xml:space="preserve">
     <value>Jedna hodina</value>
   </data>
-  <data name="S_SORT" xml:space="preserve">
-    <value>Seřadit</value>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>Vložit</value>
+  </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value>Podrobnosti</value>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value>Zobrazit</value>
   </data>
   <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
     <value>Střední ikony</value>
@@ -747,81 +791,13 @@
   <data name="S_THUMBSIZE_XL" xml:space="preserve">
     <value>Největší ikony</value>
   </data>
-  <data name="S_STRING_PASTE" xml:space="preserve">
-    <value>Vložit</value>
-  </data>
-  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
-    <value>Zobrazit</value>
+  <data name="S_SORT" xml:space="preserve">
+    <value>Seřadit</value>
   </data>
   <data name="S_SORT_ASCENDING" xml:space="preserve">
     <value>Vzestupně</value>
   </data>
   <data name="S_SORT_DESCENDING" xml:space="preserve">
     <value>Sestupně</value>
-  </data>
-  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
-    <value>Podrobnosti</value>
-  </data>
-  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
-    <value>Nová verze aplikace</value>
-  </data>
-  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
-    <value>Chyba navigace</value>
-  </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>připojení selhalo</value>
-  </data>
-  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
-    <value>Chyba připojení</value>
-  </data>
-  <data name="S_ROOT_FORBID" xml:space="preserve">
-    <value>Na vybraném zařízení nelze povolit přístup k root právům.</value>
-  </data>
-  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
-    <value>Potvrdit odinstalaci</value>
-  </data>
-  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>Obnovit konflikty</value>
-  </data>
-  <data name="S_PUSH_PKG" xml:space="preserve">
-    <value>Nainstalovat balíčky</value>
-  </data>
-  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
-    <value>Spárovat a/nebo se připojit k WiFi zařízení (bez použití mDNS)</value>
-  </data>
-  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>Vybrat cestu ADB</value>
-  </data>
-  <data name="S_COPY_PATH" xml:space="preserve">
-    <value>Zkopírovat cestu položky</value>
-  </data>
-  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
-    <value>Chyba odpojení</value>
-  </data>
-  <data name="S_REM_EMU" xml:space="preserve">
-    <value>Okamžitě ukončit emulátor</value>
-  </data>
-  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
-    <value>Práce se soubory</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>Nepodařilo se odeslat soubor zpět do zařízení.</value>
-  </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>Je třeba restartovat server ADB, aby se deaktivovala služba mDNS.</value>
-  </data>
-  <data name="S_WSA_PKG_TIP" xml:space="preserve">
-    <value>Spustit WSA v pozadí</value>
-  </data>
-  <data name="S_RESET_SETTINGS" xml:space="preserve">
-    <value>Po zavření aplikace dojde k resetování všech nastavení.
-Tento krok nelze vrátit zpět. Opravdu chcete pokračovat?</value>
-  </data>
-  <data name="S_WSA_LAUNCH" xml:space="preserve">
-    <value>Pokud je ADB ve WSA již autorizováno, vyberte možnost Spustit.
-Chcete-li ADB povolit, otevřete pokročilá nastavení WSA.</value>
-  </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>Najděte ADB (alespoň verzi {0}):</value>
   </data>
 </root>

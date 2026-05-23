@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -123,9 +123,6 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Le robot Android est reproduit ou modifié à partir d'une ressource créée et partagée par Google qui est utilisée selon les conditions décrites dans la licence d'attribution Creative Commons 3.0.</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>Animations de l'application</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>L'icône de l'APK est sous licence Apache version 2.0.</value>
   </data>
@@ -134,9 +131,6 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>La version d'ADB obtenue à partir du chemin fourni est trop basse.</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>Impossible de remplacer ADB</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>Sélectionner l'exécutable ADB</value>
@@ -255,9 +249,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Restaurer</value>
   </data>
-  <data name="S_REDIRECTION" xml:space="preserve">
-    <value>Redirection de la progression</value>
-  </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>Erreur lors de l'affichage du répertoire</value>
   </data>
@@ -274,12 +265,6 @@ Les notes de version sont disponibles sur GitHub.</value>
 • Les noms de fichiers ne peuvent pas contenir " * / : &lt; &gt; ? \ |
 • Les noms de fichiers ne tiennent pas compte de la casse
 • L’installation de fichiers APK n’est pas prise en charge</value>
-  </data>
-  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>L’application comporte de nombreuses animations activées dans le cadre du Fluent design.
-L’animation des volets latéraux est toujours désactivée lorsque la fenêtre de l’application est maximisée sur un écran secondaire.
-
-• Activer cette option désactive toutes les animations de l’application, à l’exception des barres de progression, anneaux de progression et indicateurs d’utilisation du lecteur.</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>Tous les paramètres de l’application seront réinitialisés à la fermeture.
@@ -523,17 +508,17 @@ Le contenu visible peut être incomplet.</value>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>Thème</value>
   </data>
-  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
-    <value>Forcer styles fluides</value>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Couleur d'accent personnalisée</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Couleur d'accent</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Choisissez une couleur</value>
   </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>Désactiver accélération matérielle</value>
-  </data>
-  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
-    <value>Désactiver animations</value>
-  </data>
-  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>Écran de démarrage</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>Vérifier mises à jour</value>
@@ -567,9 +552,6 @@ Le contenu visible peut être incomplet.</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>Attributions et Licences de tiers</value>
-  </data>
-  <data name="S_SEE_TERMS" xml:space="preserve">
-    <value>Voir les termes</value>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
     <value>[non défini(e)]</value>
@@ -686,9 +668,6 @@ Annuler tout en cours</value>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
     <value>Heure de mise à jour modifiée</value>
   </data>
-  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
-    <value>Fermer Editeur</value>
-  </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Enregistrer les modifications</value>
   </data>
@@ -718,9 +697,6 @@ Annuler tout en cours</value>
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>Écriture : {0}</value>
-  </data>
-  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
-    <value>Autres : {0}</value>
   </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>Vérifier mises à jour à chaque lancement</value>
@@ -1064,9 +1040,6 @@ Annuler tout en cours</value>
   <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
     <value>Unique dans l’emplacement actuel</value>
   </data>
-  <data name="S_POPUP_WARNING" xml:space="preserve">
-    <value>Avertissements</value>
-  </data>
   <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
     <value>Un fichier sélectionné viole les règles de nommage de Windows</value>
   </data>
@@ -1087,15 +1060,6 @@ Annuler tout en cours</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>Un élément sélectionné n’est pas un fichier / dossier</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
-    <value>Peut être annulé en remettant à zéro les paramètres de l'application, ou manuellement dans le fichier de configuration</value>
-  </data>
-  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
-    <value>Jusqu’au prochain lancement de l’app</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
-    <value>Ne plus remontrer</value>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>App WSA</value>
@@ -1429,12 +1393,6 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
     <value>Vérification de l’état du serveur mDNS…</value>
   </data>
-  <data name="S_MDNS_OFF" xml:space="preserve">
-    <value>&lt;Span&gt;• La recherche de services est désactivée&lt;LineBreak /&gt;• Le serveur &lt;Italic&gt;peut&lt;/Italic&gt; être activé&lt;/Span&gt;</value>
-  </data>
-  <data name="S_ENABLE_MDNS" xml:space="preserve">
-    <value>Cliquez pour activer le serveur et l'interrogation</value>
-  </data>
   <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
     <value>Icônes</value>
   </data>
@@ -1500,9 +1458,6 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   </data>
   <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
     <value>Lecture des localisations des vignettes et de la base de données</value>
-  </data>
-  <data name="S_THUMB_SNACKBAR_TITLE" xml:space="preserve">
-    <value>{0} Miniatures</value>
   </data>
   <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
     <value>Détails</value>
@@ -1617,15 +1572,6 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   </data>
   <data name="S_MOUNT_OPTIONS" xml:space="preserve">
     <value>Options de montage</value>
-  </data>
-  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
-    <value>Couleur d'accent personnalisée</value>
-  </data>
-  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
-    <value>Couleur d'accent</value>
-  </data>
-  <data name="S_PICK_COLOR" xml:space="preserve">
-    <value>Choisissez une couleur</value>
   </data>
   <data name="S_COLOR_RED" xml:space="preserve">
     <value>Rouge</value>

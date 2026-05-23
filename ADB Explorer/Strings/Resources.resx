@@ -123,9 +123,6 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>The Android robot is reproduced or modified from work created and shared by Google and used according to terms described in the Creative Commons 3.0 Attribution License.</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>App Animations</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>The APK icon is licensed under the Apache License, Version 2.0.</value>
   </data>
@@ -134,9 +131,6 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>ADB version from provided path is too low.</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>Fail to override ADB</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>Select ADB Executable</value>
@@ -255,9 +249,6 @@
   </data>
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Restore</value>
-  </data>
-  <data name="S_REDIRECTION" xml:space="preserve">
-    <value>Progress Redirection</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>List Directory Error</value>
@@ -571,10 +562,6 @@ Visible content may be incomplete.</value>
     <value>Disable Hardware Acceleration</value>
     <comment>The setting used to disable HW / GPU acceleration</comment>
   </data>
-  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
-    <value>Disable Animations</value>
-    <comment>The setting used to disable app animations</comment>
-  </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>Check For Updates</value>
     <comment>The setting used to enable checking for updates in non MS Store installs</comment>
@@ -617,10 +604,6 @@ Visible content may be incomplete.</value>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>Attributions &amp; Third Party Licenses</value>
     <comment>The title of the about section listing licenses</comment>
-  </data>
-  <data name="S_SEE_TERMS" xml:space="preserve">
-    <value>See terms</value>
-    <comment>The tooltip of the button that shows license(s)</comment>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
     <value>[not set]</value>
@@ -774,10 +757,6 @@ Cancel All Running</value>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
     <value>Update Time Modified</value>
     <comment>The menu used to update the time modified of files using their names</comment>
-  </data>
-  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
-    <value>Close Editor</value>
-    <comment>The tooltip of a button used to close the text editor</comment>
   </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Save Changes</value>
@@ -1274,10 +1253,6 @@ Cancel All Running</value>
     <value>Unique in current location</value>
     <comment>Will show if a file name isn't unique in the current location, according to the file system naming rules</comment>
   </data>
-  <data name="S_POPUP_WARNING" xml:space="preserve">
-    <value>Warnings</value>
-    <comment>The title of the paste and pull warnings popup</comment>
-  </data>
   <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
     <value>A selected file violates Windows naming rules</value>
     <comment>Will show if a selected file doesn't meet Windows naming rules</comment>
@@ -1305,18 +1280,6 @@ Cancel All Running</value>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>A selected item is not a file / folder</value>
     <comment>Will show when selecting an item that can't be copied</comment>
-  </data>
-  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
-    <value>Can be undone using Reset App Settings, or manually in settings file</value>
-    <comment>The tooltip displayed on the "Never show again" checkbox in the paste warnings popup</comment>
-  </data>
-  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
-    <value>Until next app launch</value>
-    <comment>The tooltip of the button used to hide the paste warnings popup</comment>
-  </data>
-  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
-    <value>Never Show Again</value>
-    <comment>The paste popup permanent hide checkbox content</comment>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>WSA App</value>
@@ -1839,10 +1802,6 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
     <value>Reading thumbnail locations and media database</value>
     <comment>A hint displayed for a short time in the snackbar</comment>
-  </data>
-  <data name="S_THUMB_SNACKBAR_TITLE" xml:space="preserve">
-    <value>{0} Thumbnails</value>
-    <comment>0 - device name. example: Pixel 9 Thumbnails</comment>
   </data>
   <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
     <value>Details</value>

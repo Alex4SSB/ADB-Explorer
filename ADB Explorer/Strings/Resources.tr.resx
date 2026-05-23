@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -123,9 +123,6 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Android robotu, Google tarafından oluşturulan ve paylaşılan bir çalışmadan çoğaltılmış veya değiştirilmiş olup Creative Commons 3.0 Atıf Lisansı'nda açıklanan şartlara uygun şekilde kullanılmıştır.</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>Uygulama Animasyonları</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>Uygulama simgesi Apache Lisansı altında lisanslanmıştır, Versiyon 2.0.</value>
   </data>
@@ -134,9 +131,6 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>Sağlanan yoldan ADB versiyonu çok düşük.</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>ADB Geçersiz kılma başarısız oldu</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>ADB Yürütülebilir Dosyasını Seçin</value>
@@ -255,9 +249,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Geri Yükle</value>
   </data>
-  <data name="S_REDIRECTION" xml:space="preserve">
-    <value>İlerleme Yönlendirme</value>
-  </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>Liste Dizini Hatası</value>
   </data>
@@ -274,12 +265,6 @@ Sürüm notları GitHub'da mevcuttur.</value>
 • Dosya adları " * / : &lt; &gt; ? \ | içeremez
 • Dosya adları büyük/küçük harfe duyarlı değildir
 • APK'ların yüklenmesi desteklenmez</value>
-  </data>
-  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>Uygulama, akıcı tasarımın bir parçası olarak etkinleştirilen birçok animasyona sahiptir.
-Yan görünüm animasyonu, uygulama penceresi ikincil bir ekranda maksimize edildiğinde her zaman devre dışı bırakılır.
-
-• Bu ayarı işaretlemek, ilerleme çubukları, ilerleme halkaları ve sürücü kullanım çubukları hariç tüm uygulama animasyonlarını devre dışı bırakır.</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>Uygulama kapatıldığında tüm uygulama ayarları sıfırlanacaktır.

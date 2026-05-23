@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -123,9 +123,6 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>רובוט האנדרואיד משוחזר או שונה מיצירה שנוצרה ושותפה על ידי גוגל ומשמש בהתאם לתנאים המתוארים ברישיון ייחוס Creative Commons 3.0.</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>הנפשות היישום</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>השימוש בסמל ה-APK נעשה תחת רישיון Apache, גירסה 2.0.</value>
   </data>
@@ -134,9 +131,6 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>גרסת ADB מהנתיב שסופק נמוכה מדי.</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>כשל בהחלפת ADB</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>בחירת קובץ הרצה של ADB</value>
@@ -255,9 +249,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>שחזר</value>
   </data>
-  <data name="S_REDIRECTION" xml:space="preserve">
-    <value>ניתוב ההתקדמות</value>
-  </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>שגיאה בקבלת תוכן התיקייה</value>
   </data>
@@ -274,12 +265,6 @@
 • שמות קבצים לא יכולים להכיל " * / : &lt; &gt; ? \ |
 • אין משמעות לאותיות גדולות/קטנות בשמות קבצים
 • אין תמיכה בהרצת קבצי התקנה APK</value>
-  </data>
-  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>התוכנה כוללת מספר אנימציות אשר מאופשרות כחלק מעיצוב fluent.
-אנימציית התצוגות הצדדיות תמיד מבוטלת כאשר התוכנה פועלת בחלון מלא על מסך משני.
-
-• איפשור הגדרה זו מבטל את כל האנימציות חוץ מפקדים המציגים התקדמות או ניצול נפח.</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>כל ההגדרות יאופסו בסגירת התוכנה.
@@ -523,17 +508,17 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>צבע</value>
   </data>
-  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
-    <value>השתמש בסטייל Fluent</value>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>צבע הדגשה מותאם אישית</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>צבע הדגשה</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>בחר צבע</value>
   </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>בטל האצה חומרתית</value>
-  </data>
-  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
-    <value>בטל אנימציות</value>
-  </data>
-  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>מסך נחיתה</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>בדוק אחר עדכונים</value>
@@ -567,9 +552,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>ייחוסים ורשיונות צד ג'‏</value>
-  </data>
-  <data name="S_SEE_TERMS" xml:space="preserve">
-    <value>ראה תנאים</value>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
     <value>[לא הוגדר]</value>
@@ -686,9 +668,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
     <value>עדכן זמן שינוי</value>
   </data>
-  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
-    <value>סגור את העורך</value>
-  </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>שמור שינויים</value>
   </data>
@@ -718,9 +697,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>כתיבה: {0}</value>
-  </data>
-  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
-    <value>אחר: {0}</value>
   </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>מאפשר חיפוש עדכונים בכל הפעלה</value>
@@ -1064,9 +1040,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
     <value>ייחודי במיקום הנוכחי</value>
   </data>
-  <data name="S_POPUP_WARNING" xml:space="preserve">
-    <value>אזהרות</value>
-  </data>
   <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
     <value>קובץ שנבחר אינו עומד בחוקי שם קובץ וינדוס</value>
   </data>
@@ -1087,15 +1060,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>פריט שנבחר אינו קובץ / תיקייה</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
-    <value>ניתן לשינוי ע"י איפוס הגדרות התוכנה, או ידנית בקובץ ההגדרות</value>
-  </data>
-  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
-    <value>עד ההדלקה הבאה של התוכנה</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
-    <value>אל תציג זאת יותר</value>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>תוכנת WSA</value>
@@ -1429,12 +1393,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
     <value>בודק את מצב שרת ה-mDNS…</value>
   </data>
-  <data name="S_MDNS_OFF" xml:space="preserve">
-    <value>&lt;Span&gt;• הסריקה אחר שירותי mDNS מבוטלת&lt;LineBreak /&gt;• השרת &lt;Italic&gt;עלול&lt;/Italic&gt; להיות פעיל&lt;/Span&gt;</value>
-  </data>
-  <data name="S_ENABLE_MDNS" xml:space="preserve">
-    <value>לחצו כדי לאפשר את השרת והסריקה</value>
-  </data>
   <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
     <value>סמלים</value>
   </data>
@@ -1501,9 +1459,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
     <value>קורא מיקומי תמונות ומסד נתונים</value>
   </data>
-  <data name="S_THUMB_SNACKBAR_TITLE" xml:space="preserve">
-    <value>תמונות תצוגה מקדימה ל {0}</value>
-  </data>
   <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
     <value>פרטים</value>
   </data>
@@ -1519,11 +1474,11 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_THUMBSIZE_XL" xml:space="preserve">
     <value>סמלים גדולים מאוד</value>
   </data>
-  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
-    <value>גודל תצוגה מקדימה נשמר לכל מיקום</value>
-  </data>
   <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
     <value>אפשרויות פריסה ותצוגה</value>
+  </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value>גודל תצוגה מקדימה נשמר לכל מיקום</value>
   </data>
   <data name="S_SORT" xml:space="preserve">
     <value>מיין</value>
@@ -1617,15 +1572,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_MOUNT_OPTIONS" xml:space="preserve">
     <value>אפשרויות mount</value>
-  </data>
-  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
-    <value>צבע הדגשה מותאם אישית</value>
-  </data>
-  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
-    <value>צבע הדגשה</value>
-  </data>
-  <data name="S_PICK_COLOR" xml:space="preserve">
-    <value>בחר צבע</value>
   </data>
   <data name="S_COLOR_RED" xml:space="preserve">
     <value>אדום</value>

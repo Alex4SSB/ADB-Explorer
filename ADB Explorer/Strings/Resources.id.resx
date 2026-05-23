@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -123,9 +123,6 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Robot Android direproduksi atau dimodifikasi dari karya yang dibuat dan dibagikan oleh Google serta digunakan sesuai ketentuan yang dijelaskan dalam Lisensi Atribusi Creative Commons 3.0.</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>Animasi Aplikasi</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>Ikon APK dilisensikan berdasarkan Lisensi Apache, Versi 2.0.</value>
   </data>
@@ -134,9 +131,6 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>Versi ADB dari jalur yang diberikan terlalu rendah.</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>Gagal mengganti ADB</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>Pilih File Eksekusi ADB</value>
@@ -255,9 +249,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Pulihkan</value>
   </data>
-  <data name="S_REDIRECTION" xml:space="preserve">
-    <value>Pengalihan Progres</value>
-  </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>Kesalahan Daftar Direktori</value>
   </data>
@@ -274,12 +265,6 @@ Catatan rilis tersedia di GitHub.</value>
 -  Nama berkas tidak boleh berisi " * / : &lt; &gt; ? \ |
 -  Nama berkas tidak peka huruf besar/kecil
 -  Instalasi APK tidak didukung</value>
-  </data>
-  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>Aplikasi memiliki banyak animasi yang diaktifkan sebagai bagian dari desain Fluent.
-Animasi tampilan samping selalu dinonaktifkan ketika jendela aplikasi dimaksimalkan pada layar sekunder.
-
--  Mencentang pengaturan ini menonaktifkan semua animasi aplikasi kecuali bilah progres, cincin progres, dan bilah penggunaan drive.</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>Semua pengaturan aplikasi akan diatur ulang saat aplikasi ditutup.
@@ -523,17 +508,17 @@ Konten yang terlihat mungkin tidak lengkap.</value>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>Tema</value>
   </data>
-  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
-    <value>Paksa Gaya Fluent</value>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Warna Aksen Kustom</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Warna Aksen</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Pilih warna</value>
   </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>Nonaktifkan Akselerasi Perangkat Keras</value>
-  </data>
-  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
-    <value>Nonaktifkan Animasi</value>
-  </data>
-  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>Layar Pembuka</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>Periksa Pembaruan</value>
@@ -567,9 +552,6 @@ Konten yang terlihat mungkin tidak lengkap.</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>Atribusi &amp; Lisensi Pihak Ketiga</value>
-  </data>
-  <data name="S_SEE_TERMS" xml:space="preserve">
-    <value>Lihat ketentuan</value>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
     <value>[tidak diatur]</value>
@@ -686,9 +668,6 @@ Batalkan Semua yang Sedang Berjalan</value>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
     <value>Perbarui Waktu Modifikasi</value>
   </data>
-  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
-    <value>Tutup Editor</value>
-  </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Simpan Perubahan</value>
   </data>
@@ -718,9 +697,6 @@ Batalkan Semua yang Sedang Berjalan</value>
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>Tulis: {0}</value>
-  </data>
-  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
-    <value>Lainnya: {0}</value>
   </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>Memeriksa pembaruan setiap kali diluncurkan</value>
@@ -1064,9 +1040,6 @@ Batalkan Semua yang Sedang Berjalan</value>
   <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
     <value>Unik di lokasi saat ini</value>
   </data>
-  <data name="S_POPUP_WARNING" xml:space="preserve">
-    <value>Peringatan</value>
-  </data>
   <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
     <value>Berkas yang dipilih melanggar aturan penamaan Windows</value>
   </data>
@@ -1087,15 +1060,6 @@ Batalkan Semua yang Sedang Berjalan</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>Item yang dipilih bukan berkas / folder</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
-    <value>Dapat dibatalkan menggunakan Atur Ulang Pengaturan Aplikasi, atau secara manual di berkas pengaturan</value>
-  </data>
-  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
-    <value>Sampai peluncuran aplikasi berikutnya</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
-    <value>Jangan Pernah Tampilkan Lagi</value>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>Aplikasi WSA</value>
@@ -1495,9 +1459,6 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
   <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
     <value>Membaca lokasi thumbnail dan basis data media</value>
   </data>
-  <data name="S_THUMB_SNACKBAR_TITLE" xml:space="preserve">
-    <value>{0} Thumbnail</value>
-  </data>
   <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
     <value>Detail</value>
   </data>
@@ -1581,15 +1542,6 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
   </data>
   <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
     <value>Buka kunci</value>
-  </data>
-  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
-    <value>Warna Aksen Kustom</value>
-  </data>
-  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
-    <value>Warna Aksen</value>
-  </data>
-  <data name="S_PICK_COLOR" xml:space="preserve">
-    <value>Pilih warna</value>
   </data>
   <data name="S_FILE_PERMISSIONS" xml:space="preserve">
     <value>Izin</value>

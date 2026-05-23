@@ -123,9 +123,6 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>تتم إعادة إنتاج روبوت Android أو تعديله من عمل أنشأته Google وشاركته، ويتم استخدامه وفقًا للبنود الموضّحة في ترخيص Creative Commons 3.0 Attribution.</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>انيميشنات التطبيق</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>علامه الحزمه مرخصه تحت رخصه apache الإصدار الثاني.</value>
   </data>
@@ -134,9 +131,6 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>اصدار ADB من هذا الطريق منخفض جداً.</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>خطأ في الكتابه علي ADB</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>اختر مخرجات ADB</value>
@@ -254,9 +248,6 @@
   </data>
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>اعاده</value>
-  </data>
-  <data name="S_REDIRECTION" xml:space="preserve">
-    <value>اعاده توجيه التحميل</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>خطأ في تصنيف المكتبه</value>

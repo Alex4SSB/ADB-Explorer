@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -123,9 +123,6 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Android 機器人是由 Google 建立和分享的作品重製或修改而成，並遵循《創用 CC 3.0 授權》中的條款使用。</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>應用程式動畫</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>APK 圖示根據 Apache License，版本 2.0 獲得許可。</value>
   </data>
@@ -134,9 +131,6 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>指定路徑的 ADB 版本過低。</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>無法覆蓋 ADB</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>選擇 ADB 可執行檔</value>
@@ -255,9 +249,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>還原</value>
   </data>
-  <data name="S_REDIRECTION" xml:space="preserve">
-    <value>進度輸出轉向</value>
-  </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>列出目錄清單出錯</value>
   </data>
@@ -274,12 +265,6 @@
 • 檔名不能包含 " * / : &lt; &gt; ? \ |
 • 檔名不區分大小寫
 • 不支援安裝 APK</value>
-  </data>
-  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>應用程式啟用了Fluent 風格中的多種動畫效果。
-若應用程式視窗在副螢幕上最大化，就停用側邊檢視動畫。
-
-• 勾選此設定，將停用所有動畫效果（進度條、進度環和磁碟機使用狀態列除外）。</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>關閉應用程式後，所有設定將被重設。
@@ -523,17 +508,8 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>主題</value>
   </data>
-  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
-    <value>强制 Fluent 風格</value>
-  </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>停用硬體加速</value>
-  </data>
-  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
-    <value>停用動畫</value>
-  </data>
-  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>顯示啓動畫面</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>檢查更新</value>
@@ -567,9 +543,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>歸屬及第三方許可</value>
-  </data>
-  <data name="S_SEE_TERMS" xml:space="preserve">
-    <value>查看條款</value>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
     <value>[未設定]</value>
@@ -686,9 +659,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
     <value>修改日期</value>
   </data>
-  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
-    <value>關閉編輯器</value>
-  </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>儲存變更</value>
   </data>
@@ -718,9 +688,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>寫入速度: {0}</value>
-  </data>
-  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
-    <value>其他速度: {0}</value>
   </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>每次啓動時檢查更新</value>
@@ -1064,9 +1031,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
     <value>目前位置必須無同名檔</value>
   </data>
-  <data name="S_POPUP_WARNING" xml:space="preserve">
-    <value>警告</value>
-  </data>
   <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
     <value>一個所選檔違背了 Windows 命名規則</value>
   </data>
@@ -1087,15 +1051,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>一個所選項目不是檔案/資料夾</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
-    <value>可以通過重設應用程式設定來撤銷，或者手動在設定檔中撤銷</value>
-  </data>
-  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
-    <value>直到下次應用啓動</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
-    <value>不再顯示</value>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>WSA 應用程式</value>
@@ -1428,12 +1383,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
     <value>檢查 mDNS 伺服器狀態…</value>
-  </data>
-  <data name="S_MDNS_OFF" xml:space="preserve">
-    <value>&lt;Span&gt;• 服務輪詢功能已關閉&lt;LineBreak /&gt;• 服務器&lt;Italic&gt;可能&lt;/Italic&gt;處於運行狀態&lt;/Span&gt;</value>
-  </data>
-  <data name="S_ENABLE_MDNS" xml:space="preserve">
-    <value>點擊以啓用服務器和輪詢</value>
   </data>
   <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
     <value>圖示</value>

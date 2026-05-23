@@ -123,9 +123,6 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>ربات Android از کارهای ایجاد شده و به اشتراک گذاشته شده توسط Google تکثیر یا اصلاح شده است و طبق شرایط توضیح داده شده در Creative Commons 3.0 Attribution License استفاده می شود.</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>انیمیشن های اپ</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>آیکنAPK تحت مجوز Apache Version 2 لایسنس بندی شده است</value>
   </data>
@@ -134,8 +131,5 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>نسخه ADB از مسیر داده شده خیلی کم است.</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>نتوانستیم adb را اووررایت کنیم</value>
   </data>
 </root>

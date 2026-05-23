@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -123,9 +123,6 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Androidroboten reproduceras eller ändras från arbete som skapats och delas av Google och används enligt villkor som beskrivs i Creative Commons 3.0 Attribution License.</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>Appanimationer</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>APK-ikonen är licensierad under Apache License, Version 2.0.</value>
   </data>
@@ -134,9 +131,6 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>ADB-version från angiven sökväg är för låg.</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>Misslyckades med att åsidosätta ADB</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>Välj körbar fil för ADB</value>
@@ -255,9 +249,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Återställ</value>
   </data>
-  <data name="S_REDIRECTION" xml:space="preserve">
-    <value>Framsteg omdirigering</value>
-  </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>Lista katalogfel</value>
   </data>
@@ -274,12 +265,6 @@ Releaseanteckningarna finns tillgängliga på GitHub.</value>
 • Filnamn kan inte innehålla "* / : &lt;&gt; | |
 • Filnamn är skiftlägesokänslig
 • Installation av APK stöds inte</value>
-  </data>
-  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>Appen har många animationer som är aktiverade som en del av den flytande designen.
-Sidvisningsanimationen är alltid inaktiverad när appfönstret maximeras på en sekundär display.
-
-• Att aktivera denna inställning inaktiverar alla appanimationer utom förloppsindikatorer, framstegsringar och användningsindikatorer för hårddisk.</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>Alla appinställningar kommer att återställas när du stänger appen.
@@ -523,17 +508,8 @@ Synligt innehåll kan vara ofullständigt.</value>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>Tema</value>
   </data>
-  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
-    <value>Framtvinga flytande stilar</value>
-  </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>Inaktivera hårdvaruacceleration</value>
-  </data>
-  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
-    <value>Inaktivera animationer</value>
-  </data>
-  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>Splashscreen</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>Kolla efter uppdateringar</value>
@@ -567,9 +543,6 @@ Synligt innehåll kan vara ofullständigt.</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>Attributioner och tredjepartslicenser</value>
-  </data>
-  <data name="S_SEE_TERMS" xml:space="preserve">
-    <value>Se villkor</value>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
     <value>[inte inställd]</value>
@@ -686,9 +659,6 @@ Avbryt alla aktiva</value>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
     <value>Uppdateringstid ändrad</value>
   </data>
-  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
-    <value>Stäng Redigerare</value>
-  </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Spara ändringar</value>
   </data>
@@ -718,9 +688,6 @@ Avbryt alla aktiva</value>
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>Skriv: {0}</value>
-  </data>
-  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
-    <value>Andra: {0}</value>
   </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>Kolla efter uppdateringar vid varje start</value>
@@ -1064,9 +1031,6 @@ Avbryt alla aktiva</value>
   <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
     <value>Unik på aktuell plats</value>
   </data>
-  <data name="S_POPUP_WARNING" xml:space="preserve">
-    <value>Varningar</value>
-  </data>
   <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
     <value>En vald fil bryter mot Windows namngivningsregler</value>
   </data>
@@ -1087,15 +1051,6 @@ Avbryt alla aktiva</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>Ett valt objekt är inte en fil / mapp</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
-    <value>Kan ogiltigförklaras med återställningsinställningar eller manuellt i inställningsfilen</value>
-  </data>
-  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
-    <value>Fram till nästa appstart</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
-    <value>Visa aldrig igen</value>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>WSA-app</value>
@@ -1494,9 +1449,6 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
   </data>
   <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
     <value>Läsa miniatyrbildsplatser och mediedatabas</value>
-  </data>
-  <data name="S_THUMB_SNACKBAR_TITLE" xml:space="preserve">
-    <value>{0} Miniatyrbilder</value>
   </data>
   <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
     <value>Detaljer</value>

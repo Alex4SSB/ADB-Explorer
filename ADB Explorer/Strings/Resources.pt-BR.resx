@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -123,9 +123,6 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>O robô do Android é reproduzido ou modificado com base no trabalho criado e compartilhado pelo Google e é usado de acordo com os termos descritos na Licença de Atribuição 3.0 do Creative Commons.</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>Animações do aplicativos</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>O ícone APK está licenciado sob a Apache License, Versão 2.0.</value>
   </data>
@@ -134,9 +131,6 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>A versão do ADB do caminho fornecido é muito baixa.</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>Falha ao substituir ADB</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>Selecione o executável ADB</value>
@@ -249,38 +243,14 @@
   <data name="S_PULL_ACTION" xml:space="preserve">
     <value>Puxar</value>
   </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>Puxar (Destino do Link)</value>
+  </data>
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Restaurar</value>
   </data>
-  <data name="S_REDIRECTION" xml:space="preserve">
-    <value>Redirecionamento do progresso</value>
-  </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>Erro de Diretório de Lista</value>
-  </data>
-  <data name="S_BUTTON_OK" xml:space="preserve">
-    <value>Ok</value>
-  </data>
-  <data name="S_MENU_FOLDERS" xml:space="preserve">
-    <value>Pastas</value>
-  </data>
-  <data name="S_MENU_FILES" xml:space="preserve">
-    <value>Arquivos</value>
-  </data>
-  <data name="S_MENU_COPY" xml:space="preserve">
-    <value>Copiar</value>
-  </data>
-  <data name="S_MENU_EDIT" xml:space="preserve">
-    <value>Editar</value>
-  </data>
-  <data name="S_MENU_NEW" xml:space="preserve">
-    <value>Novo</value>
-  </data>
-  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
-    <value>Fechar Editor</value>
-  </data>
-  <data name="S_MENU_INSTALL" xml:space="preserve">
-    <value>Instalar</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Puxar para a Raíz do Disco do Windows</value>
@@ -289,9 +259,6 @@
     <value>Bem-Vindo à nova versão do ADB Explorer!
 As notas de lançamento estão disponíveis no GitHub.</value>
   </data>
-  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
-    <value>Puxar (Destino do Link)</value>
-  </data>
   <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
     <value>FUSE drive.
 • Links simbólicos não são suportados
@@ -299,18 +266,9 @@ As notas de lançamento estão disponíveis no GitHub.</value>
 • Nome dos arquivos não diferenciam maiúsculas de minúsculas
 • Instalações de APKs não são suportadas</value>
   </data>
-  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>O app possui muitas animações as quais estão ativadas por parte do design fluente.
-As animações laterais estão sempre desativadas quando o app, no modo janela, está maximizado na segunda tela.
-
-• Marcar essa opção desativa todas as animações do app, com exceção da barra de progresso, anel de progresso, e a barra de uso do disco.</value>
-  </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>Todas as opções do app serão resetadas ao fechar o app.
 Essa ação não poderá ser desfeita. Você tem certeza?</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>mDNS</value>
   </data>
   <data name="S_WSA_LAUNCH" xml:space="preserve">
     <value>Selecione Iniciar caso o ADB já foi autorizado no WSA.
@@ -475,6 +433,9 @@ O conteúdo visível pode estar incompleto.</value>
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
     <value>Limpar</value>
   </data>
+  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
+    <value>mDNS</value>
+  </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>Ativar Root Automaticamente</value>
   </data>
@@ -483,5 +444,26 @@ O conteúdo visível pode estar incompleto.</value>
   </data>
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
     <value>Abre Automaticamente para Pesquisas</value>
+  </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>Pastas</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>Arquivos</value>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>Copiar</value>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>Editar</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>Novo</value>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>Instalar</value>
   </data>
 </root>

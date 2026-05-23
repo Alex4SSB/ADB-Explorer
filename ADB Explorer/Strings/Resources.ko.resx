@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -123,9 +123,6 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Android 로봇은 Google에서 제작하여 공유한 저작물을 복제하거나 수정한 것으로, Creative Commons 3.0 저작자 표시 라이선스에 명시된 조건에 따라 사용됩니다.</value>
   </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>앱 애니메이션</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>APK 아이콘은 Apache License 버전 2.0에 따라 라이선스가 부여됩니다.</value>
   </data>
@@ -134,9 +131,6 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>제공된 경로의 ADB 버전이 너무 낮습니다.</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>ADB 재정의 실패</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>ADB 실행 파일 선택</value>
@@ -255,9 +249,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>복원</value>
   </data>
-  <data name="S_REDIRECTION" xml:space="preserve">
-    <value>진행 상황 리디렉션</value>
-  </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>디렉터리 목록 오류</value>
   </data>
@@ -274,12 +265,6 @@
 • 파일 이름에 " * / : &lt; &gt; ? \ | "를 포함할 수 없습니다.
 • 파일 이름은 대소문자를 구분하지 않습니다.
 • APK 설치는 지원되지 않습니다</value>
-  </data>
-  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>이 앱에는 플루언트 디자인의 일부로 활성화된 다양한 애니메이션이 있습니다.
-보조 디스플레이에서 앱 창이 최대화되면 측면 보기 애니메이션은 항상 비활성화됩니다.
-
-• 이 설정을 선택하면 진행률 표시줄, 진행률 링 및 드라이브 사용량 표시줄을 제외한 모든 앱 애니메이션이 비활성화됩니다.</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>앱을 종료하면 모든 앱 설정이 초기화됩니다.
@@ -523,17 +508,8 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>테마</value>
   </data>
-  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
-    <value>플루언트 스타일 강제</value>
-  </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>하드웨어 가속 비활성화</value>
-  </data>
-  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
-    <value>애니메이션 비활성화</value>
-  </data>
-  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>시작 화면</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>업데이트 확인</value>
@@ -567,9 +543,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>저작자 표시 및 타사 라이선스</value>
-  </data>
-  <data name="S_SEE_TERMS" xml:space="preserve">
-    <value>약관 보기</value>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
     <value>[설정되지 않음]</value>
@@ -686,9 +659,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
     <value>수정 시간 업데이트</value>
   </data>
-  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
-    <value>편집기 닫기</value>
-  </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>변경 사항 저장</value>
   </data>
@@ -718,9 +688,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>쓰기: {0}</value>
-  </data>
-  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
-    <value>기타: {0}</value>
   </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>앱 실행 시마다 업데이트 확인</value>
@@ -1064,9 +1031,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
     <value>현재 위치에서 고유</value>
   </data>
-  <data name="S_POPUP_WARNING" xml:space="preserve">
-    <value>경고</value>
-  </data>
   <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
     <value>선택한 파일이 Windows 명명 규칙을 위반합니다</value>
   </data>
@@ -1087,15 +1051,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>선택한 항목이 파일/폴더가 아닙니다</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
-    <value>앱 설정 초기화를 사용하거나 설정 파일에서 수동으로 실행 취소할 수 있습니다</value>
-  </data>
-  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
-    <value>다음 앱 실행 시까지</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
-    <value>다시 표시하지 않음</value>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>WSA 앱</value>

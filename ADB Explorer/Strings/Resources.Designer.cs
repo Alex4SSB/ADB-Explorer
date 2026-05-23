@@ -313,15 +313,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to App Animations.
-        /// </summary>
-        public static string S_ANIMATION_TITLE {
-            get {
-                return ResourceManager.GetString("S_ANIMATION_TITLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The APK icon is licensed under the Apache License, Version 2.0..
         /// </summary>
         public static string S_APK_ICON_LIC {
@@ -1585,15 +1576,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Fail to override ADB.
-        /// </summary>
-        public static string S_FAIL_OVERRIDE_TITLE {
-            get {
-                return ResourceManager.GetString("S_FAIL_OVERRIDE_TITLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to failed to connect to.
         /// </summary>
         public static string S_FAILED_CONN {
@@ -2253,15 +2235,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Close Editor.
-        /// </summary>
-        public static string S_MENU_CLOSE_EDITOR {
-            get {
-                return ResourceManager.GetString("S_MENU_CLOSE_EDITOR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Copy.
         /// </summary>
         public static string S_MENU_COPY {
@@ -2857,24 +2830,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Never Show Again.
-        /// </summary>
-        public static string S_POPUP_CHECKBOX {
-            get {
-                return ResourceManager.GetString("S_POPUP_CHECKBOX", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Can be undone using Reset App Settings, or manually in settings file.
-        /// </summary>
-        public static string S_POPUP_CHECKBOX_TOOLTIP {
-            get {
-                return ResourceManager.GetString("S_POPUP_CHECKBOX_TOOLTIP", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to A copied file violates FUSE naming rules.
         /// </summary>
         public static string S_POPUP_COPIED_FUSE_NAMING {
@@ -2907,15 +2862,6 @@ namespace ADB_Explorer.Strings {
         public static string S_POPUP_FUSE_NAMING {
             get {
                 return ResourceManager.GetString("S_POPUP_FUSE_NAMING", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Until next app launch.
-        /// </summary>
-        public static string S_POPUP_HIDE_TOOLTIP {
-            get {
-                return ResourceManager.GetString("S_POPUP_HIDE_TOOLTIP", resourceCulture);
             }
         }
         
@@ -2979,15 +2925,6 @@ namespace ADB_Explorer.Strings {
         public static string S_POPUP_UNIX_NAMING {
             get {
                 return ResourceManager.GetString("S_POPUP_UNIX_NAMING", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Warnings.
-        /// </summary>
-        public static string S_POPUP_WARNING {
-            get {
-                return ResourceManager.GetString("S_POPUP_WARNING", resourceCulture);
             }
         }
         
@@ -3114,15 +3051,6 @@ namespace ADB_Explorer.Strings {
         public static string S_RECOVERY_MODE {
             get {
                 return ResourceManager.GetString("S_RECOVERY_MODE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Progress Redirection.
-        /// </summary>
-        public static string S_REDIRECTION {
-            get {
-                return ResourceManager.GetString("S_REDIRECTION", resourceCulture);
             }
         }
         
@@ -3391,15 +3319,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to See terms.
-        /// </summary>
-        public static string S_SEE_TERMS {
-            get {
-                return ResourceManager.GetString("S_SEE_TERMS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Select ADB Path.
         /// </summary>
         public static string S_SELECT_ADB_PATH {
@@ -3495,15 +3414,6 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_ACTIVE {
             get {
                 return ResourceManager.GetString("S_SETTINGS_ACTIVE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Disable Animations.
-        /// </summary>
-        public static string S_SETTINGS_ANIMATION {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_ANIMATION", resourceCulture);
             }
         }
         
@@ -4152,15 +4062,6 @@ namespace ADB_Explorer.Strings {
         public static string S_THUMB_SNACKBAR_READING {
             get {
                 return ResourceManager.GetString("S_THUMB_SNACKBAR_READING", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} Thumbnails.
-        /// </summary>
-        public static string S_THUMB_SNACKBAR_TITLE {
-            get {
-                return ResourceManager.GetString("S_THUMB_SNACKBAR_TITLE", resourceCulture);
             }
         }
         
