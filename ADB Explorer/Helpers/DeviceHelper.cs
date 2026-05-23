@@ -113,7 +113,7 @@ public static class DeviceHelper
     public static string ParseDeviceName(string model, string device)
     {
         var name = device;
-        if (device == device.ToLower())
+        if (device.Equals(device, StringComparison.InvariantCultureIgnoreCase))
             name = model;
 
         return name.Replace('_', ' ');
@@ -121,7 +121,7 @@ public static class DeviceHelper
 
     public static void BrowseDeviceAction(LogicalDeviceViewModel device)
     {
-        Data.RuntimeSettings.DeviceToOpen = device;
+        Data.DevicesObject.DeviceToOpen = device;
     }
 
     public static void SideloadDeviceAction(LogicalDeviceViewModel device)
@@ -201,7 +201,7 @@ public static class DeviceHelper
 
     public static DeviceAction RemoveDeviceCommand(DeviceViewModel device) => new(
             () => device.Type is DeviceType.History
-                || !Data.RuntimeSettings.IsManualPairingInProgress
+                || !Data.DevicesObject.IsManualPairingInProgress
                     && device.Type is DeviceType.Remote or DeviceType.Emulator,
             () => RemoveDeviceAction(device),
             device.Type switch
@@ -241,7 +241,7 @@ public static class DeviceHelper
             return !device.IsPairingEnabled
                    || (device.IsPairingCodeValid && device.IsPairingPortValid);
         },
-        () => Data.RuntimeSettings.ConnectNewDevice = device);
+        () => Data.DevicesObject.DeviceToConnect = device);
 
     public static DeviceAction LaunchWsa(WsaPkgDeviceViewModel device) => new(
         () => device.Status is DeviceStatus.Ok,
@@ -456,7 +456,10 @@ public static class DeviceHelper
 
     public static async void PairNewDevice()
     {
-        var dev = (NewDeviceViewModel)Data.RuntimeSettings.ConnectNewDevice;
+        var dev = Data.DevicesObject.DeviceToConnect;
+        if (dev is null)
+            return;
+
         await Task.Run(() =>
         {
             try
@@ -479,15 +482,18 @@ public static class DeviceHelper
                 if (t.Result)
                     ConnectNewDevice();
 
-                Data.RuntimeSettings.ConnectNewDevice = null;
-                Data.RuntimeSettings.IsManualPairingInProgress = false;
+                Data.DevicesObject.DeviceToConnect = null;
+                Data.DevicesObject.IsManualPairingInProgress = false;
             });
         });
     }
 
     public static async void ConnectNewDevice()
     {
-        var dev = (NewDeviceViewModel)Data.RuntimeSettings.ConnectNewDevice;
+        var dev = Data.DevicesObject.DeviceToConnect;
+        if (dev is null)
+            return;
+
         await Task.Run(() =>
         {
             try
@@ -501,7 +507,7 @@ public static class DeviceHelper
                     return true;
 
                 if (ex.Message.Contains(Strings.Resources.S_FAILED_CONN + dev.ConnectAddress)
-                    && !((NewDeviceViewModel)Data.RuntimeSettings.ConnectNewDevice).IsPairingEnabled)
+                    && !dev.IsPairingEnabled)
                 {
                     Data.DevicesObject.CurrentNewDevice.EnablePairing();
                 }
@@ -520,7 +526,7 @@ public static class DeviceHelper
                 if (t.Result)
                 {
                     string newDeviceAddress = "";
-                    var newDevice = Data.RuntimeSettings.ConnectNewDevice is null ? Data.DevicesObject.CurrentNewDevice : Data.RuntimeSettings.ConnectNewDevice;
+                    var newDevice = Data.DevicesObject.DeviceToConnect ?? Data.DevicesObject.CurrentNewDevice;
 
                     if (newDevice.Type is DeviceType.New && !AdbExplorerConst.LOOPBACK_ADDRESSES.Contains(newDevice.IpAddress))
                     {
@@ -542,8 +548,8 @@ public static class DeviceHelper
                     DeviceListSetup(newDeviceAddress);
                 }
 
-                Data.RuntimeSettings.ConnectNewDevice = null;
-                Data.RuntimeSettings.IsManualPairingInProgress = false;
+                Data.DevicesObject.DeviceToConnect = null;
+                Data.DevicesObject.IsManualPairingInProgress = false;
             });
         });
     }
@@ -710,12 +716,12 @@ public static class DeviceHelper
         });
     }
 
-    public static void ConnectDevice(DeviceViewModel device)
+    public static void ConnectDevice(NewDeviceViewModel device)
     {
-        Data.RuntimeSettings.IsManualPairingInProgress = true;
-        Data.DevicesObject.CurrentNewDevice = (NewDeviceViewModel)device;
+        Data.DevicesObject.IsManualPairingInProgress = true;
+        Data.DevicesObject.CurrentNewDevice = device;
 
-        if (device is NewDeviceViewModel newDevice && newDevice.IsPairingEnabled)
+        if (device.IsPairingEnabled)
             PairNewDevice();
         else
             ConnectNewDevice();
@@ -733,7 +739,7 @@ public static class DeviceHelper
                     NavHistory.Reset();
                     Data.FileActions.IsExplorerVisible = false;
                     Data.DirList = null;
-                    Data.RuntimeSettings.DeviceToOpen = null;
+                    Data.DevicesObject.DeviceToOpen = null;
                 }
 
                 Data.DevicesObject.UIList.Remove(device);

@@ -636,7 +636,7 @@ internal static class FileActionLogic
             if (Data.DevicesObject.Current is null)
                 return null;
 
-            var drives = ADBService.GetDrives(Data.DevicesObject.Current.ID, Data.DevicesObject.Current.Type);
+            var drives = ADBService.GetDrives(Data.DevicesObject.Current.ID, Data.DevicesObject.Current.Type, cancellationToken);
 
             if (Data.DevicesObject.Current.Type is DeviceType.Recovery)
             {

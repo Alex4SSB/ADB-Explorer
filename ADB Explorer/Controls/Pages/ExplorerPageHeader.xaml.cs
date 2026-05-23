@@ -800,6 +800,9 @@ public partial class ExplorerPageHeader : UserControl
 
         CurrentDrive = null;
 
+        if (!bfNavigation)
+            DriveList.SelectedIndex = -1;
+
         if (DriveList.SelectedIndex > -1)
             SelectionHelper.GetListViewItemContainer(DriveList).Focus();
     }
@@ -1525,7 +1528,6 @@ public partial class ExplorerPageHeader : UserControl
     private void GridBackgroundBlock_MouseDown(object sender, MouseButtonEventArgs e)
     {
         RuntimeSettings.IsPathBoxFocused = false;
-        DriveHelper.ClearSelectedDrives();
     }
 
     private void Window_MouseDown(object sender, MouseButtonEventArgs e)

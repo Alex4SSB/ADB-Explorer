@@ -287,7 +287,7 @@ public abstract class FileOperation : ViewModelBase
             else
             {
                 if (!Device.IsOpen)
-                    Data.RuntimeSettings.DeviceToOpen = Device;
+                    Data.DevicesObject.DeviceToOpen = Device;
 
                 Data.RuntimeSettings.LocationToNavigate = new(file.ParentPath);
             }
@@ -295,7 +295,7 @@ public abstract class FileOperation : ViewModelBase
         else if (location is AdbLocation loc)
         {
             if (!Device.IsOpen)
-                Data.RuntimeSettings.DeviceToOpen = Device;
+                Data.DevicesObject.DeviceToOpen = Device;
 
             Data.RuntimeSettings.LocationToNavigate = loc;
         }

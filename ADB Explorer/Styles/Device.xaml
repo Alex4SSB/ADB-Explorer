@@ -209,7 +209,7 @@
     <Style x:Key="DeviceContentGridStyle" TargetType="Grid">
         <Setter Property="Margin" Value="0,5" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsManualPairingInProgress}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.DevicesObject}, Path=IsManualPairingInProgress}" Value="True">
                 <Setter Property="IsEnabled" Value="False" />
             </DataTrigger>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="InProgress">

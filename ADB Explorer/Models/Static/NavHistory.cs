@@ -196,12 +196,7 @@ namespace ADB_Explorer.Models
                 throw new ArgumentException("Only Back & Forward navigation is accepted");
 
             if (!NavigationAvailable(direction))
-            {
-                if (Data.FileActions.IsDriveViewVisible)
-                    DriveHelper.ClearSelectedDrives();
-
                 return false;
-            }
 
             var fileAction = direction is SpecialLocation.Forward
                 ? FileAction.FileActionType.Forward

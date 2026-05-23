@@ -19,14 +19,14 @@
         <ui:CardControl.Style>
             <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="ui:CardControl">
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsManualPairingInProgress}" Value="True">
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.DevicesObject}, Path=IsManualPairingInProgress}" Value="True">
                         <Setter Property="IsEnabled" Value="False" />
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
         </ui:CardControl.Style>
         <helpers:ExpanderHelper.HeaderBottomContent>
-                <ProgressBar Padding="0">
+            <ProgressBar Padding="0">
                 <ProgressBar.Style>
                     <Style BasedOn="{StaticResource ExpanderHeaderProgressBarStyle}" TargetType="ProgressBar">
                         <Setter Property="Value" Value="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=Progress, Mode=OneWay}" />

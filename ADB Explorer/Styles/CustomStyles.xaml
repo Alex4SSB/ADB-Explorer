@@ -134,7 +134,6 @@
         BasedOn="{StaticResource DefaultDataGridCellStyle}"
         TargetType="DataGridCell">
         <Setter Property="Background" Value="Transparent" />
-        <!--<Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />-->
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
             <Setter.Value>
@@ -239,7 +238,6 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ui:ListViewItem">
-                    <!--  Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollContentPresenter}, Path=ActualWidth}"  -->
                     <Grid>
                         <ContentPresenter />
                     </Grid>
@@ -324,7 +322,6 @@
         </Style.Triggers>
     </Style>
     <Style x:Key="DriveViewScrollViewerStyle" TargetType="ScrollViewer">
-        <!--  BasedOn="{StaticResource ScrollViewerStyle}"  -->
         <Setter Property="AllowDrop" Value="False" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsDriveViewVisible}" Value="False">
@@ -338,45 +335,10 @@
         <Setter Property="Icon" Value="&#xE71C;" />
         <Setter Property="IsActive" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=IsActive, Mode=OneWay}" />
         <Setter Property="IsEnabled" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=HomeEnabled}" />
-        <Setter Property="MaxControlWidth" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=MaxSearchBoxWidth}" />
+        <Setter Property="MaxControlWidth" Value="{Binding Source={x:Static Member=models:AdbExplorerConst.DEFAULT_SEARCH_WIDTH}}" />
         <Setter Property="MinControlWidth" Value="{Binding Source={x:Static Member=models:AdbExplorerConst.MIN_SEARCH_WIDTH}}" />
         <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ExplorerFilter, Mode=TwoWay}" />
     </Style>
-    <!--<Style
-        x:Key="UnresponsiveServerBorderStyle"
-        BasedOn="{StaticResource BorderStyle}"
-        TargetType="Border">
-        <Setter Property="Background" Value="{DynamicResource NoticeBorderBackground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DeviceConnectionPanelBorder}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=ServerUnresponsive}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="DragBackgroundStyle" TargetType="Border">
-        <Style.Triggers>
-            <Trigger Property="Background" Value="White">
-                <Setter Property="BorderThickness" Value="1" />
-            </Trigger>
-        </Style.Triggers>
-        <Setter Property="CornerRadius" Value="3" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="BorderBrush" Value="Black" />
-    </Style>
-
-    <Style
-        x:Key="NotificationsBorderStyle"
-        BasedOn="{StaticResource BorderStyle}"
-        TargetType="Border">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=services:UISettings.Notifications}, Path=Count}" Value="0">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>-->
     <Style x:Key="NonRootEmptyFolderStyle" TargetType="StackPanel">
         <Style.Triggers>
             <DataTrigger Binding="{Binding Root}" Value="Enabled">

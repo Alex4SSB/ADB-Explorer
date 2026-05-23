@@ -15,7 +15,13 @@ public partial class LogViewModel : ObservableObject, INavigationAware
     public LogViewModel()
     {
         Data.Settings.PropertyChanged += Settings_PropertyChanged;
-        Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
+
+        Data.IsLogPaused.PropertyChanged += (s, e) => RefreshControls?.Invoke();
+        Data.ClearLogs += (s, e) =>
+        {
+            LogCleared?.Invoke();
+            RefreshControls?.Invoke();
+        };
     }
 
     public Task OnNavigatedToAsync()
@@ -58,22 +64,9 @@ public partial class LogViewModel : ObservableObject, INavigationAware
         }
     }
 
-    private void RuntimeSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(AppRuntimeSettings.ClearLogs))
-        {
-            LogCleared?.Invoke();
-            RefreshControls?.Invoke();
-        }
-        else if (e.PropertyName is nameof(AppRuntimeSettings.IsLogPaused))
-        {
-            RefreshControls?.Invoke();
-        }
-    }
-
     private void CommandLog_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        if (e.Action is NotifyCollectionChangedAction.Add && e.NewItems is not null && !Data.RuntimeSettings.IsLogPaused)
+        if (e.Action is NotifyCollectionChangedAction.Add && e.NewItems is not null && !Data.IsLogPaused)
         {
             foreach (Log entry in e.NewItems)
             {

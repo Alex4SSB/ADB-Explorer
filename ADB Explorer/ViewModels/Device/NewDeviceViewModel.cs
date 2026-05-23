@@ -68,7 +68,7 @@ public class NewDeviceViewModel : PairingDeviceViewModel
 
     public DeviceAction ClearCommand { get; }
 
-    public NewDeviceViewModel(NewDevice device) : base(device)
+    public NewDeviceViewModel(NewDevice device, Devices devicesObject = null) : base(device, devicesObject)
     {
         Device = device;
         

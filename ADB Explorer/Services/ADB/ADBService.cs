@@ -68,7 +68,7 @@ public partial class ADBService
         
         cmdProcess.Start();
 
-        if (Settings.EnableLog && !RuntimeSettings.IsLogPaused)
+        if (Settings.EnableLog && !IsLogPaused)
             CommandLog.Add(new($"{file} {arguments}"));
 
         return cmdProcess;
@@ -188,9 +188,6 @@ public partial class ADBService
             if (!string.IsNullOrEmpty(stderr) && stderr[1] == '\0')
             {
                 stderr = Encoding.Unicode.GetString(Encoding.UTF8.GetBytes(stderr));
-
-                if (stderr.StartsWith("Error"))
-                    stderr = $"{Strings.Resources.S_REDIRECTION} {stderr}";
             }
 
             throw new ProcessFailedException(cmdProcess.ExitCode, stderr.Trim());

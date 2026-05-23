@@ -54,4 +54,10 @@ public static class Data
     public static IEnumerable<Package> SelectedPackages { get; set; } = [];
 
     public static ObservableProperty<Type> CurrentPage { get; set; } = new();
+
+    public static event EventHandler ClearLogs;
+
+    public static void RaiseClearLogs() => ClearLogs?.Invoke(null, EventArgs.Empty);
+
+    public static ObservableProperty<bool> IsLogPaused { get; set; } = new();
 }

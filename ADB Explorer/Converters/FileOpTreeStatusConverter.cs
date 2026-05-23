@@ -47,9 +47,7 @@ public static class FileOpStatusConverter
     {
         if (!string.IsNullOrEmpty(message))
         {
-            return message.StartsWith(Strings.Resources.S_REDIRECTION)
-                ? message
-                : string.Format(Strings.Resources.S_FILEOP_ERROR, message);
+            return string.Format(Strings.Resources.S_FILEOP_ERROR, message);
         }
 
         var completedString = (type == typeof(HashFailInfo) || type == typeof(HashSuccessInfo))

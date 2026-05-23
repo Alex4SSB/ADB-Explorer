@@ -4,16 +4,31 @@ using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
 
-public class Devices : ViewModelBase
+public partial class Devices : ObservableObject
 {
     #region Full properties
 
-    private ObservableList<DeviceViewModel> uiDevices = [];
-    public ObservableList<DeviceViewModel> UIList
+    [ObservableProperty]
+    public partial ObservableList<DeviceViewModel> UIList { get; private set; } = [];
+
+    [ObservableProperty]
+    public partial LogicalDeviceViewModel? DeviceToOpen { get; set; }
+    partial void OnDeviceToOpenChanged(LogicalDeviceViewModel? value)
     {
-        get => uiDevices;
-        private set => Set(ref uiDevices, value);
+        if (value is not null)
+            DeviceHelper.OpenDevice(value);
     }
+
+    [ObservableProperty]
+    public partial NewDeviceViewModel? DeviceToConnect { get; set; }
+    partial void OnDeviceToConnectChanged(NewDeviceViewModel? value)
+    {
+        if (value is not null)
+            DeviceHelper.ConnectDevice(value);
+    }
+
+    [ObservableProperty]
+    public partial bool IsManualPairingInProgress { get; set; }
 
     public DateTime LastUpdate { get; set; }
 
@@ -37,8 +52,7 @@ public class Devices : ViewModelBase
 
     #region Read only properties
 
-    public LogicalDeviceViewModel Current => LogicalDeviceViewModels?.FirstOrDefault(device => device.IsOpen)
-        ?? Data.RuntimeSettings.DeviceToOpen;
+    public LogicalDeviceViewModel Current => LogicalDeviceViewModels?.FirstOrDefault(device => device.IsOpen) ?? DeviceToOpen;
 
     public int Count => UIList.Count(d => DeviceHelper.DevicePredicate(d) && d is not HistoryDeviceViewModel and not NewDeviceViewModel);
 
@@ -48,9 +62,9 @@ public class Devices : ViewModelBase
 
     public Devices()
     {
-        UIList.Add(new MdnsDeviceViewModel(new()));
-        UIList.Add(new NewDeviceViewModel(new()));
-        UIList.Add(new WsaPkgDeviceViewModel(new()));
+        UIList.Add(new MdnsDeviceViewModel(new(), this));
+        UIList.Add(new NewDeviceViewModel(new(), this));
+        UIList.Add(new WsaPkgDeviceViewModel(new(), this));
 
         if (Data.Settings.SaveDevices)
             UIList.AddRange(RetrieveHistoryDevices());
@@ -305,11 +319,11 @@ public class Devices : ViewModelBase
 
     public static bool SetOpenDevice(LogicalDeviceViewModel? device)
     {
-        if (Data.RuntimeSettings.DeviceToOpen is null && device is null)
+        if (Data.DevicesObject.DeviceToOpen is null && device is null)
             return false;
 
-        if (Data.RuntimeSettings.DeviceToOpen?.Equals(device) is not true)
-            Data.RuntimeSettings.DeviceToOpen = device;
+        if (Data.DevicesObject.DeviceToOpen?.Equals(device) is not true)
+            Data.DevicesObject.DeviceToOpen = device;
 
         Data.RuntimeSettings.IsRootActive = device?.Root is RootStatus.Enabled;
 

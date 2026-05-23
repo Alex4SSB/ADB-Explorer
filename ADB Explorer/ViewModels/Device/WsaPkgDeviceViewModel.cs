@@ -20,7 +20,7 @@ public class WsaPkgDeviceViewModel : DeviceViewModel
 
     public override bool DeviceExists => false;
 
-    public WsaPkgDeviceViewModel(WsaPkgDevice device) : base(device)
+    public WsaPkgDeviceViewModel(WsaPkgDevice device, Devices devicesObject = null) : base(device, devicesObject)
     {
         Device = device;
 

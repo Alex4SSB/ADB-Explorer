@@ -49,7 +49,7 @@ public class ServiceDeviceViewModel : PairingDeviceViewModel
 
     public DeviceAction PairCommand { get; }
 
-    public ServiceDeviceViewModel(ServiceDevice service) : base(service)
+    public ServiceDeviceViewModel(ServiceDevice service, Devices devicesObject = null) : base(service, devicesObject)
     {
         Device = service;
 

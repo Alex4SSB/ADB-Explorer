@@ -1,5 +1,4 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
+﻿using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 using System.Collections;
 
@@ -9,60 +8,11 @@ public partial class AppRuntimeSettings : ViewModelBase
 {
     public bool ResetAppSettings { get; set; } = false;
 
-    private double maxSearchBoxWidth = AdbExplorerConst.DEFAULT_SEARCH_WIDTH;
-    public double MaxSearchBoxWidth
-    {
-        get => maxSearchBoxWidth;
-        set => Set(ref maxSearchBoxWidth, value);
-    }
-
-    private bool collapseDrives = false;
-    public bool CollapseDrives
-    {
-        get => collapseDrives;
-        set => Set(ref collapseDrives, value);
-    }
-
-    private LogicalDeviceViewModel deviceToBrowse = null;
-    public LogicalDeviceViewModel DeviceToOpen
-    {
-        get => deviceToBrowse;
-        set
-        {
-            if (Set(ref deviceToBrowse, value))
-            {
-                if (value is not null)
-                    DeviceHelper.OpenDevice(value);
-            }
-        }
-    }
-
-    private bool isManualPairingInProgress = false;
-    public bool IsManualPairingInProgress
-    {
-        get => isManualPairingInProgress;
-        set => Set(ref isManualPairingInProgress, value);
-    }
-
     private DriveViewModel browseDrive = null;
     public DriveViewModel BrowseDrive
     {
         get => browseDrive;
         set => Set(ref browseDrive, value);
-    }
-
-    private DeviceViewModel connectNewDevice = null;
-    public DeviceViewModel ConnectNewDevice
-    {
-        get => connectNewDevice;
-        set
-        {
-            if (Set(ref connectNewDevice, value))
-            {
-                if (value is not null)
-                    DeviceHelper.ConnectDevice(value);
-            }
-        }
     }
 
     private DateTime lastServerResponse = DateTime.Now;
@@ -135,13 +85,6 @@ public partial class AppRuntimeSettings : ViewModelBase
             if (!Set(ref isSearchBoxFocused, value))
                 OnPropertyChanged();
         }
-    }
-
-    private bool isLogPaused = false;
-    public bool IsLogPaused
-    {
-        get => isLogPaused;
-        set => Set(ref isLogPaused, value);
     }
 
     private bool isRootActive = false;
@@ -255,7 +198,6 @@ public partial class AppRuntimeSettings : ViewModelBase
     public bool InitLister { get => false; set => OnPropertyChanged(); }
     public bool DriveViewNav { get => false; set => OnPropertyChanged(); }
     public bool AutoHideSearchBox { get => false; set => OnPropertyChanged(); }
-    public bool ClearLogs { get => false; set => OnPropertyChanged(); }
 
     #endregion
 }

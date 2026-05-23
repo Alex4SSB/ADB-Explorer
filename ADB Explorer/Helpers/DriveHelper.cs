@@ -5,12 +5,6 @@ namespace ADB_Explorer.Helpers;
 
 internal class DriveHelper
 {
-    public static void ClearSelectedDrives()
-    {
-        Data.RuntimeSettings.CollapseDrives = true;
-        Data.RuntimeSettings.CollapseDrives = false;
-    }
-
     public static void ClearDrives()
     {
         App.SafeInvoke(() => Data.DevicesObject.Current?.Drives.Clear());

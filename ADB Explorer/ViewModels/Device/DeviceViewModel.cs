@@ -69,25 +69,27 @@ public abstract class DeviceViewModel : ViewModelBase
                                     && IpAddress.Count(c => c == '.') == 3
                                     && IpAddress.Split('.').Count(i => byte.TryParse(i, out _)) == 4;
 
-    public bool IsDeviceConnectionInProgress => Data.RuntimeSettings.ConnectNewDevice?.Equals(this) is true;
+    public bool IsDeviceConnectionInProgress => Data.DevicesObject.DeviceToConnect?.Equals(this) is true;
 
     #endregion
 
     public virtual string Tooltip { get; }
 
-    private DeviceViewModel()
+    private DeviceViewModel(Devices devicesObject = null)
     {
-        Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
+        devicesObject ??= Data.DevicesObject;
+
+        devicesObject.PropertyChanged += DevicesObject_PropertyChanged;
     }
 
-    protected DeviceViewModel(Device device) : this()
+    protected DeviceViewModel(Device device, Devices devicesObject = null) : this(devicesObject)
     {
         Device = device;
     }
 
-    private void RuntimeSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void DevicesObject_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(AppRuntimeSettings.ConnectNewDevice))
+        if (e.PropertyName == nameof(Devices.DeviceToConnect))
         {
             OnPropertyChanged(nameof(IsDeviceConnectionInProgress));
         }
@@ -176,7 +178,7 @@ public abstract class PairingDeviceViewModel : DeviceViewModel
 
     #endregion
 
-    protected PairingDeviceViewModel(PairingDevice device) : base(device)
+    protected PairingDeviceViewModel(PairingDevice device, Devices devicesObject) : base(device, devicesObject)
     {
         Device = device;
     }

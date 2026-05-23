@@ -57,7 +57,7 @@ public static class AppActions
             () => true,
             Strings.Resources.S_LOG_UPDATES_PAUSE,
             Icons[FileActionType.FileOpStop],
-            () => Data.RuntimeSettings.IsLogPaused ^= true,
+            () => Data.IsLogPaused.Value ^= true,
             Strings.Resources.S_LOG_UPDATES_ALT,
             Icons[FileActionType.PauseLogs]),
     ];
@@ -306,7 +306,7 @@ public static class AppActions
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.PauseLogs).FileAction,
         new(FileActionType.ClearLogs,
             () => Data.CommandLog.Count > 0,
-            () => Data.RuntimeSettings.ClearLogs = true,
+            Data.RaiseClearLogs,
             Strings.Resources.S_MENU_CLEAR_LOG),
         new(FileActionType.FollowLink,
             () => Data.FileActions.IsFollowLinkEnabled,
