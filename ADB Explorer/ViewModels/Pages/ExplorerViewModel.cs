@@ -88,18 +88,6 @@ public partial class ExplorerViewModel : ObservableObject
     public partial bool IsIconView { get; set; } = false;
 
     [ObservableProperty]
-    public partial string AdbReadRate { get; set; } = null;
-
-    [ObservableProperty]
-    public partial string AdbWriteRate { get; set; } = null;
-
-    [ObservableProperty]
-    public partial bool IsAdbReadActive { get; set; } = false;
-
-    [ObservableProperty]
-    public partial bool IsAdbWriteActive { get; set; } = false;
-
-    [ObservableProperty]
     public partial ThumbnailService.ThumbnailSize CurrentThumbsSize { get; set; }
 
     [ObservableProperty]
@@ -190,9 +178,6 @@ public partial class ExplorerViewModel : ObservableObject
         && CurrentDeviceBattery?.ChargeState is not Battery.ChargingState.Unknown
         && CurrentDeviceBattery?.Level is not null;
 
-    public bool IsDeviceInfoSeparatorVisible =>
-        IsBatteryVisible || CurrentDevice?.AndroidVersion is not null;
-
     public ExplorerViewModel()
     {
         IsIconView = Data.RuntimeSettings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
@@ -222,7 +207,6 @@ public partial class ExplorerViewModel : ObservableObject
     private void NotifyBatteryVisibility()
     {
         OnPropertyChanged(nameof(IsBatteryVisible));
-        OnPropertyChanged(nameof(IsDeviceInfoSeparatorVisible));
     }
 
     private Battery? _subscribedBattery;
@@ -291,7 +275,6 @@ public partial class ExplorerViewModel : ObservableObject
         {
             OnPropertyChanged(nameof(CurrentDevice));
             OnPropertyChanged(nameof(CurrentDeviceBattery));
-            OnPropertyChanged(nameof(IsDeviceInfoSeparatorVisible));
             SubscribeToBattery(CurrentDeviceBattery);
         }
     }

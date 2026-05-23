@@ -23,6 +23,19 @@ public partial class ADBService
 
     public static bool IsMdnsEnabled { get; set; }
 
+    private static int _activeCommandCount = 0;
+    public static bool IsCommandActive => _activeCommandCount > 0;
+
+    public static event Action<bool> CommandActiveChanged;
+
+    private static void UpdateCommandActive(int delta)
+    {
+        var prev = _activeCommandCount;
+        var next = Interlocked.Add(ref _activeCommandCount, delta);
+        if ((prev == 0) != (next == 0))
+            CommandActiveChanged?.Invoke(next > 0);
+    }
+
     public class ProcessFailedException : Exception
     {
         public ProcessFailedException() { }
@@ -49,7 +62,7 @@ public partial class ADBService
         var arguments = string.Join(' ', args.Prepend(cmd).Where(arg => !string.IsNullOrEmpty(arg)));
 
         cmdProcess.StartInfo.UseShellExecute = false;
-        
+
         cmdProcess.StartInfo.RedirectStandardOutput =
         cmdProcess.StartInfo.RedirectStandardError =
         cmdProcess.StartInfo.CreateNoWindow = redirect;
@@ -76,6 +89,7 @@ public partial class ADBService
     public static int ExecuteCommand(
         string file, string cmd, out string stdout, out string stderr, Encoding encoding, CancellationToken cancellationToken, params string[] args)
     {
+        UpdateCommandActive(1);
         using var cmdProcess = StartCommandProcess(file, cmd, encoding, args: args);
 
         var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync();
@@ -102,12 +116,16 @@ public partial class ADBService
 
             return -1;
         }
+        finally
+        {
+            UpdateCommandActive(-1);
+        }
     }
 
     public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, CancellationToken cancellationToken, params string[] args)
     {
         var result = ExecuteCommand(AdbHelper.CurrentAdbState.Path, cmd, out stdout, out stderr, Encoding.UTF8, cancellationToken, args);
-        RuntimeSettings.LastServerResponse = DateTime.Now;
+        DiskUsagePollingService.LastServerResponse = DateTime.Now;
 
         return result;
     }
@@ -133,6 +151,9 @@ public partial class ADBService
     public static IEnumerable<string> ExecuteCommandAsync(
         string file, string cmd, Encoding encoding, CancellationToken cancellationToken, bool redirect = true, Process process = null, string workingDir = null, params string[] args)
     {
+        UpdateCommandActive(1);
+        try
+        {
         using var cmdProcess = StartCommandProcess(file, cmd, encoding, redirect, process, workingDir, args: args);
         cancellationToken.Register(() => ProcessHandling.KillProcess(cmdProcess));
 
@@ -149,7 +170,7 @@ public partial class ADBService
                     outputQueue.Add(e.Data, cancellationToken);
                 }
 
-            RuntimeSettings.LastServerResponse = DateTime.Now;
+            DiskUsagePollingService.LastServerResponse = DateTime.Now;
         };
         cmdProcess.ErrorDataReceived += (sender, e) =>
         {
@@ -191,6 +212,11 @@ public partial class ADBService
             }
 
             throw new ProcessFailedException(cmdProcess.ExitCode, stderr.Trim());
+        }
+        }
+        finally
+        {
+            UpdateCommandActive(-1);
         }
     }
 

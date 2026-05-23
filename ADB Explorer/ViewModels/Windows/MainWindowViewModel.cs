@@ -77,6 +77,24 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     public partial double TaskbarProgressValue { get; set; }
 
+    [ObservableProperty]
+    public partial string AdbReadRate { get; set; } = null;
+
+    [ObservableProperty]
+    public partial string AdbWriteRate { get; set; } = null;
+
+    [ObservableProperty]
+    public partial bool IsAdbReadActive { get; set; } = false;
+
+    [ObservableProperty]
+    public partial bool IsAdbWriteActive { get; set; } = false;
+
+    [ObservableProperty]
+    public partial bool ServerUnresponsive { get; set; } = false;
+
+    [ObservableProperty]
+    public partial string LastResponse { get; set; }
+
     public MainWindowViewModel()
     {
         MenuItems.Add(_logItem);

@@ -53,8 +53,6 @@ public static class AdbExplorerConst
     public static readonly TimeSpan SERVICE_DISPLAY_DELAY = TimeSpan.FromMilliseconds(2000);
     public static readonly TimeSpan EMPTY_FOLDER_NOTICE_DELAY = TimeSpan.FromMilliseconds(1500);
     public static readonly TimeSpan MDNS_FORCE_CONNECT_TIME = TimeSpan.FromMilliseconds(2500);
-    public static readonly TimeSpan DISK_USAGE_INTERVAL_ACTIVE = TimeSpan.FromMilliseconds(200);
-    public static readonly TimeSpan DISK_USAGE_INTERVAL_IDLE = TimeSpan.FromMilliseconds(1000);
 
     public const sbyte MIN_SUPPORTED_ANDROID_VER = 6;
     public const sbyte MIN_PKG_UID_ANDROID_VER = 9;

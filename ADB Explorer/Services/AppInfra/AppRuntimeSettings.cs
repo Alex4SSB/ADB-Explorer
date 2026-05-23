@@ -15,27 +15,6 @@ public partial class AppRuntimeSettings : ViewModelBase
         set => Set(ref browseDrive, value);
     }
 
-    private DateTime lastServerResponse = DateTime.Now;
-    public DateTime LastServerResponse
-    {
-        get => lastServerResponse;
-        set
-        {
-            lastServerResponse = value;
-
-            App.SafeInvoke(() =>
-            {
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(TimeFromLastResponse));
-                OnPropertyChanged(nameof(ServerUnresponsive));
-            });
-        }
-    }
-
-    public string TimeFromLastResponse => $"{DateTime.Now.Subtract(LastServerResponse).TotalSeconds:0}";
-
-    public bool ServerUnresponsive => Data.Settings.PollDevices && DateTime.Now.Subtract(LastServerResponse) > AdbExplorerConst.SERVER_RESPONSE_TIMEOUT;
-
     private AdbLocation locationToNavigate = new(Navigation.SpecialLocation.None);
     public AdbLocation LocationToNavigate
     {

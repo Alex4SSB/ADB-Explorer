@@ -113,7 +113,13 @@
                     Text="{Binding ViewModel.ApplicationTitle}" />
             </ui:TitleBar.Header>
             <ui:TitleBar.TrailingContent>
-                <controls:NotificationBell Margin="0,0,10,0" Notifications="{Binding ViewModel.Notifications, Mode=TwoWay}" />
+                <controls:SimpleStackPanel
+                    Margin="0,0,10,0"
+                    Orientation="Horizontal"
+                    Spacing="6">
+                    <controls:TransferIndicator DataContext="{Binding ViewModel}" />
+                    <controls:NotificationBell Notifications="{Binding ViewModel.Notifications, Mode=TwoWay}" />
+                </controls:SimpleStackPanel>
             </ui:TitleBar.TrailingContent>
         </ui:TitleBar>
 

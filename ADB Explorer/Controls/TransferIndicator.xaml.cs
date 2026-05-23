@@ -17,7 +17,7 @@ public partial class TransferIndicator : UserControl
     }
 
     public static readonly DependencyProperty IsUpVisibleProperty =
-        DependencyProperty.Register("IsUpVisible", typeof(bool),
+        DependencyProperty.Register(nameof(IsUpVisible), typeof(bool),
           typeof(TransferIndicator), new PropertyMetadata(null));
 
     public bool IsDownVisible
@@ -27,10 +27,43 @@ public partial class TransferIndicator : UserControl
     }
 
     public static readonly DependencyProperty IsDownVisibleProperty =
-        DependencyProperty.Register("IsDownVisible", typeof(bool),
+        DependencyProperty.Register(nameof(IsDownVisible), typeof(bool),
           typeof(TransferIndicator), new PropertyMetadata(null));
 
-    public Visibility UpVisibility => IsUpVisible ? Visibility.Visible : Visibility.Collapsed;
+    public bool ServerUnresponsive
+    {
+        get => (bool)GetValue(ServerUnresponsiveProperty);
+        set => SetValue(ServerUnresponsiveProperty, value);
+    }
 
-    public Visibility DownVisibility => IsDownVisible ? Visibility.Visible : Visibility.Collapsed;
+    public static readonly DependencyProperty ServerUnresponsiveProperty =
+        DependencyProperty.Register(nameof(ServerUnresponsive), typeof(bool),
+          typeof(TransferIndicator), new PropertyMetadata(false, OnServerUnresponsiveChanged));
+
+    private static void OnServerUnresponsiveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var self = (TransferIndicator)d;
+        if ((bool)e.NewValue)
+        {
+            self.RootMenuItem.Items.Add(new AdbMenuItem
+            {
+                Header = "adb kill-server",
+                FontFamily = (FontFamily)self.FindResource("ConsoleFont"),
+                Style = (Style)self.FindResource("AdbMenuItemStyle"),
+                Command = new RelayCommand(() => Task.Run(() => Services.ADBService.KillAdbServer())),
+            });
+
+            self.RootMenuItem.Items.Add(new AdbMenuItem
+            {
+                Header = "taskkill /f /im adb.exe",
+                FontFamily = (FontFamily)self.FindResource("ConsoleFont"),
+                Style = (Style)self.FindResource("AdbMenuItemStyle"),
+                Command = new RelayCommand(() => Task.Run(() => Services.ADBService.KillAdbProcess())),
+            });
+        }
+        else
+        {
+            self.RootMenuItem.Items.Clear();
+        }
+    }
 }

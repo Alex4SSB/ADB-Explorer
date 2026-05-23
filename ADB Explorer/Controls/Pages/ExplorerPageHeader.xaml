@@ -606,18 +606,6 @@
                 VerticalAlignment="Center"
                 Orientation="Horizontal">
                 <local:ThumbProgressTooltip Margin="0,0,6,0" Icon="{Binding GalleryFile.Icon}" />
-                <local:TransferIndicator Margin="0,1,0,0" Style="{StaticResource DiskUsageIconStyle}" />
-                <Separator x:Name="DeviceInfoSeparator">
-                    <Separator.Style>
-                        <Style BasedOn="{StaticResource StatusBarSeparatorStyle}" TargetType="Separator">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsDeviceInfoSeparatorVisible}" Value="False">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Separator.Style>
-                </Separator>
                 <views:DetailedBatteryControl DataContext="{Binding CurrentDeviceBattery}" />
                 <Separator>
                     <Separator.Style>

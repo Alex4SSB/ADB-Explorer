@@ -9,7 +9,7 @@ namespace ADB_Explorer.Services;
 
 public class DevicePollingService : BackgroundService
 {
-    private static bool isDevicesPage = false;
+    private static bool isDevicesPage = true;
 
     private static int pollingInterval => isDevicesPage ? 500 : 2000;
 

@@ -436,40 +436,6 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="DiskUsageIconStyle" TargetType="controls:TransferIndicator">
-        <Setter Property="IsUpVisible" Value="{Binding IsAdbReadActive}" />
-        <Setter Property="IsDownVisible" Value="{Binding IsAdbWriteActive}" />
-        <Setter Property="ToolTip">
-            <Setter.Value>
-                <StackPanel>
-                    <StackPanel.Style>
-                        <Style TargetType="StackPanel">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
-                                    <Setter Property="FlowDirection" Value="RightToLeft" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </StackPanel.Style>
-                    <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_ADB_DISK_USAGE}}" />
-                    <TextBlock>
-                        <TextBlock.Text>
-                            <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_DISK_USAGE_READ}">
-                                <Binding Path="AdbReadRate" />
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-                    <TextBlock>
-                        <TextBlock.Text>
-                            <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_DISK_USAGE_WRITE}">
-                                <Binding Path="AdbWriteRate" />
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-                </StackPanel>
-            </Setter.Value>
-        </Setter>
-    </Style>
     <Style x:Key="ListViewItemContainerStyle" TargetType="ui:ListViewItem">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
