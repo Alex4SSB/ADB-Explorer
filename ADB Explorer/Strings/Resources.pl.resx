@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1563,5 +1563,32 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   </data>
   <data name="S_MOUNT_OPTIONS" xml:space="preserve">
     <value>Opcje montowania</value>
+  </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Niestandardowy kolor akcentu</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Kolor Akcentu</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Wybierz kolor</value>
+  </data>
+  <data name="S_COLOR_RED" xml:space="preserve">
+    <value>Czerwony</value>
+  </data>
+  <data name="S_COLOR_GREEN" xml:space="preserve">
+    <value>Zielony</value>
+  </data>
+  <data name="S_COLOR_BLUE" xml:space="preserve">
+    <value>Niebieski</value>
+  </data>
+  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
+    <value>Nie można znaleźć pliku ADB w ścieżce systemowej PATH. Proszę użyć "{0}", aby go zlokalizować.</value>
+  </data>
+  <data name="S_ADB_PATH_INVALID" xml:space="preserve">
+    <value>Podana ścieżka {0} jest skrótem systemu Windows lub ścieżką UNC (zdalną), co jest niedozwolone.</value>
+  </data>
+  <data name="S_ADB_COMPROMISED" xml:space="preserve">
+    <value>Nie można zweryfikować, czy dostarczony plik wykonywalny jest narzędziem ADB. Upewnij się, że pobierasz wyłącznie oficjalne narzędzia platformy Android od Google.</value>
   </data>
 </root>
