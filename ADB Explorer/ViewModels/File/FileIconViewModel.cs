@@ -80,7 +80,7 @@ public partial class FileIconViewModel : FileViewModelBase
             if (token.IsCancellationRequested)
                 return;
 
-            var thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file.FullPath, size);
+            var thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file.ParsedFullPath, size);
 
             if (thumbnail is null)
                 ThumbnailService.TryPullCustomThumbnail(Data.DevicesObject.Current, _file);
@@ -111,7 +111,7 @@ public partial class FileIconViewModel : FileViewModelBase
 
         _thumbnailUpdatedHandler = (updatedDeviceId, updatedFilePath) =>
         {
-            if (updatedDeviceId != logicalDeviceId || updatedFilePath != _file.FullPath)
+            if (updatedDeviceId != logicalDeviceId || updatedFilePath != _file.ParsedFullPath)
                 return;
 
             Task.Run(() =>
@@ -119,7 +119,7 @@ public partial class FileIconViewModel : FileViewModelBase
                 if (token.IsCancellationRequested)
                     return;
 
-                var thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file.FullPath, size);
+                var thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file.ParsedFullPath, size);
                 if (thumbnail is not ThumbnailService.Thumbnail thumb)
                     return;
 

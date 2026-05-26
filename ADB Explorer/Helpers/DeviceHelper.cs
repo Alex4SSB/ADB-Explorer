@@ -654,19 +654,14 @@ public static class DeviceHelper
     public static async void InitDevice()
     {
         var device = Data.DevicesObject.Current;
-        var internalDrive = device.Drives.First(d => d.Type is AbstractDrive.DriveType.Internal).Drive;
+        var internalDrive = device.Drives.First(d => d.Type is AbstractDrive.DriveType.Internal).Drive as LogicalDrive;
 
         // Run both ADB calls concurrently on background threads instead of blocking the UI thread.
         // Props (getprop) is needed by CombineDisplayNames (BrandName) and SetAndroidVersion.
         // GetInternalStorage (readlink) is independent and updates the internal drive path.
         var propsTask = Task.Run(() => device.Props);
-        var storageTask = Task.Run(() => ADBService.GetInternalStorage(device.ID));
 
-        storageTask.ContinueWith(t =>
-        {
-            if (!t.IsFaulted && !t.IsCanceled && Data.DevicesObject.Current == device)
-                App.SafeInvoke(() => internalDrive.UpdatePath(t.Result));
-        });
+        internalDrive.UpdateInternalStorage(device.ID);
 
         // Start drive enumeration immediately — it is independent of Props
         FileActionLogic.RefreshDrives(true, CancellationToken.None);

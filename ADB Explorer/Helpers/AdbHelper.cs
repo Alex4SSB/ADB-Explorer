@@ -203,7 +203,7 @@ public static class AdbHelper
             }
             else
             {
-                var path = drive.Path;
+                var path = drive.LinkTargetPath ?? drive.Path;
                 Models.FileSystemInfo? info = null;
 
                 do

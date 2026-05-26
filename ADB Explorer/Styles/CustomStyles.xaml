@@ -218,13 +218,6 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="AndroidTextBlockStyle" TargetType="StackPanel">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding AndroidVersion}" Value="{x:Null}">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
     <Style x:Key="RecoveryRootStatusStyle" TargetType="TextBlock">
         <Setter Property="Visibility" Value="Collapsed" />
         <Style.Triggers>

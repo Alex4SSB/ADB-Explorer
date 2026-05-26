@@ -622,8 +622,16 @@
                 <StackPanel
                     Margin="0,1,0,0"
                     DataContext="{Binding CurrentDevice}"
-                    Orientation="Horizontal"
-                    Style="{StaticResource AndroidTextBlockStyle}">
+                    Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding AndroidVersion}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
                     <ui:FontIcon Style="{DynamicResource UnsupportedIconStyle}" />
                     <TextBlock Text="Android " />
                     <TextBlock Text="{Binding AndroidVersion}" />

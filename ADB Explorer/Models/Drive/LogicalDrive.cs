@@ -16,16 +16,18 @@ public partial class LogicalDrive : Drive
     [ObservableProperty]
     public partial sbyte UsageP { get; set; }
 
-    private string fileSystem = "";
+    [ObservableProperty]
+    public partial string LinkTargetPath { get; set; }
+
     public string FileSystem
     {
-        get => fileSystem;
+        get;
         set
         {
-            if (SetProperty(ref fileSystem, value))
+            if (SetProperty(ref field, value))
                 OnPropertyChanged(nameof(IsFUSE));
         }
-    }
+    } = "";
 
     public override bool IsFUSE => FileSystem.Contains("fuse");
 
@@ -68,6 +70,48 @@ public partial class LogicalDrive : Drive
         }
 
         FileSystem = fileSystem;
+    }
+
+    public void UpdateInternalStorage(string deviceId)
+    {
+        if (Type is not DriveType.Internal)
+            return;
+
+        const string storage = "echo $EXTERNAL_STORAGE";
+        string path = "", target = "";
+
+        var task = Task.Run(() =>
+        {
+            var result = ADBService.ExecuteDeviceAdbShellCommand(deviceId,
+                                                                "readlink",
+                                                                out string stdout,
+                                                                out string stderr,
+                                                                CancellationToken.None,
+                                                                "-fe",
+                                                                $"`{storage}`",
+                                                                ";", storage);
+
+            if (result == 0)
+            {
+                var items = stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+                if (items.Length == 2 && !string.IsNullOrEmpty(items[1]))
+                {
+                    target = items[0].Trim();
+                    path = items[1].Trim();
+                }
+                else
+                    path = AdbExplorerConst.DRIVE_TYPES.First(d => d.Value is DriveType.Internal).Key;
+            }
+        });
+
+        task.ContinueWith((t) =>
+        {
+            App.SafeInvoke(() =>
+            {
+                Path = path;
+                LinkTargetPath = target;
+            });
+        });
     }
 
     public static LogicalDrive From(DriveSnapshot snapshot)

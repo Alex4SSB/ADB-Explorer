@@ -12,6 +12,10 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 {
     #region Notify Properties
 
+    public string ParsedFullPath => Data.CurrentDrive?.LinkTargetPath is null
+        ? FullPath
+        : FullPath.Replace(Data.CurrentDrive.Path, Data.CurrentDrive.LinkTargetPath);
+
     [ObservableProperty]
     public partial long? Size { get; set; }
 
@@ -142,10 +146,10 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
                 }
                 else
                 {
-                    _cacheThumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, FullPath, ThumbnailService.ThumbnailSize.Drag, false);
+                    _cacheThumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, ParsedFullPath, ThumbnailService.ThumbnailSize.Drag, false);
                 }
             }
-
+            
             return _cacheThumbnail;
         }
     }

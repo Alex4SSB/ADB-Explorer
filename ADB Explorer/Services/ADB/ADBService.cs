@@ -578,27 +578,6 @@ public partial class ADBService
         }
     }
 
-    public static string GetInternalStorage(string deviceId)
-    {
-        // readlink -f `echo $EXTERNAL_STORAGE`
-        var result = ExecuteDeviceAdbShellCommand(deviceId,
-                                                            "readlink",
-                                                            out string stdout,
-                                                            out string stderr,
-                                                            CancellationToken.None,
-                                                            "-fe",
-                                                            "`echo $EXTERNAL_STORAGE`");
-
-        if (result == 0)
-        {
-            var path = stdout.Trim();
-            if (!string.IsNullOrEmpty(path))
-                return path;
-        }
-
-        return DRIVE_TYPES.First(d => d.Value is AbstractDrive.DriveType.Internal).Key;
-    }
-
     #region Former AdbDevice members
 
     public static readonly char[] LINE_SEPARATORS = ['\n', '\r'];

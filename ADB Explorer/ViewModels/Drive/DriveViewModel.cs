@@ -21,6 +21,8 @@ public partial class DriveViewModel : AbstractDrive, IBrowserItem
     #region Read only properties
 
     public string Path => Drive.Path;
+    public string? LinkTargetPath => (Drive as LogicalDrive)?.LinkTargetPath;
+
     public new DriveType Type => Drive.Type;
     public virtual bool IsFUSE => Drive.IsFUSE;
 

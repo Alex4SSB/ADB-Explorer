@@ -82,7 +82,10 @@
         </Style>
     </UserControl.Style>
     <local:AdbMenu d:Background="#202020" Style="{StaticResource AdbMenuStyle}">
-        <local:AdbMenuItem x:Name="RootMenuItem" Style="{StaticResource AdbMenuItemStyle}" ToolTip="{StaticResource TransferIndicatorToolTip}">
+        <local:AdbMenuItem
+            x:Name="RootMenuItem"
+            Style="{StaticResource AdbMenuItemStyle}"
+            ToolTip="{StaticResource TransferIndicatorToolTip}">
             <local:AdbMenuItem.Header>
                 <Grid Margin="-4">
                     <ui:FontIcon
