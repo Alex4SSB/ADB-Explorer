@@ -54,7 +54,7 @@ public class IpcService
 
     public static void NotifyDropCancel(NativeMethods.HResult hr)
     {
-        if (Data.RuntimeSettings.DragWithinSlave)
+        if (Data.CopyPaste.DragWithinSlave)
             SendIpcMessage(NativeMethods.InterceptMouse.WindowUnderMouse, MessageType.DragCanceled, $"{hr}");
     }
 

@@ -29,10 +29,10 @@
         <Border.Style>
             <Style TargetType="Border">
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=DragBitmap}" Value="{x:Null}">
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=DragBitmap}" Value="{x:Null}">
                         <Setter Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=DragWithinSlave}" Value="True">
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=DragWithinSlave}" Value="True">
                         <Setter Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
                 </Style.Triggers>
@@ -53,7 +53,7 @@
                     IsHitTestVisible="False"
                     Opacity="0.9"
                     RenderOptions.BitmapScalingMode="HighQuality"
-                    Source="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=DragBitmap}"
+                    Source="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=DragBitmap}"
                     Stretch="Fill" />
                 <TextBlock
                     x:Name="DebugLabel"

@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
+using ADB_Explorer.ViewModels.Pages;
 using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
 
@@ -721,7 +722,7 @@ internal static class FileActionLogic
             {
                 Data.Packages = t.Result;
                 if (updateExplorer)
-                    Data.RuntimeSettings.ExplorerSource = Data.Packages;
+                    App.Services.GetService<ExplorerViewModel>().ExplorerSource = Data.Packages;
 
                 if (!updateExplorer && Data.DevicesObject.Current is not null)
                 {

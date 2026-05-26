@@ -16,7 +16,7 @@ namespace ADB_Explorer.Services;
 /// <summary>
 /// Handles everything related to Shell Drag & Drop (including clipboard) 
 /// </summary>
-public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.InteropServices.ComTypes.IDataObject, IAsyncOperation
+public partial class VirtualFileDataObject : ObservableObject, System.Runtime.InteropServices.ComTypes.IDataObject, IAsyncOperation
 {
     public static FileGroup SelfFileGroup { get; private set; }
     public static IEnumerable<FileClass> SelfFiles { get; private set; }
@@ -395,16 +395,17 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
 
     public List<FileSyncOperation> Operations { get; private set; }
 
-    private DragDropEffects currentEffect = DragDropEffects.None;
+    public DragDropKeyStates DragModifiers { get; set; }
+
     public DragDropEffects CurrentEffect
     {
-        get => currentEffect;
+        get;
         set
         {
-            if (Set(ref currentEffect, value))
+            if (SetProperty(ref field, value))
                 Data.CopyPaste.CurrentDropEffect = value & ~DragDropEffects.Scroll;
         }
-    }
+    } = DragDropEffects.None;
 
     public DragDropEffects? PasteSucceeded
     {
@@ -668,21 +669,9 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     /// </remarks>
     public void DoDragDrop(DependencyObject dragSource, DragDropEffects allowedEffects)
     {
-        Action<DragDropEffects> dragFeedback = value =>
-        {
-            if (value.HasFlag(DragDropEffects.Move)
-                && !Data.RuntimeSettings.DragModifiers.HasFlag(DragDropKeyStates.ShiftKey))
-            {
-                // Override default since Windows gives Move as default
-                value = DragDropEffects.Copy;
-            }
-
-            CurrentEffect = value;
-        };
-
         try
         {
-            NativeMethods.MDoDragDrop(this, new DropSource(dragFeedback), allowedEffects);
+            NativeMethods.MDoDragDrop(this, new DropSource(this), allowedEffects);
         }
         catch (Exception e)
         {
@@ -695,7 +684,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     /// <summary>
     /// Contains the methods for generating visual feedback to the end user and for cancelling or completing the drag-and-drop operation.
     /// </summary>
-    private class DropSource(Action<DragDropEffects> onFeedback = null) : NativeMethods.IDropSource
+    private class DropSource(VirtualFileDataObject vfdo) : NativeMethods.IDropSource
     {
         /// <summary>
         /// Determines whether a drag-and-drop operation should continue.
@@ -706,19 +695,19 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         public int QueryContinueDrag(int fEscapePressed, uint grfKeyState)
         {
             var escapePressed = (0 != fEscapePressed);
-            Data.RuntimeSettings.DragModifiers = (DragDropKeyStates)grfKeyState;
+            vfdo.DragModifiers = (DragDropKeyStates)grfKeyState;
             
             var res = escapePressed switch
             {
                 true => NativeMethods.HResult.DRAGDROP_S_CANCEL,
-                false when Data.RuntimeSettings.DragModifiers.HasFlag(DragDropKeyStates.RightMouseButton) => NativeMethods.HResult.DRAGDROP_S_CANCEL,
-                false when !Data.RuntimeSettings.DragModifiers.HasFlag(DragDropKeyStates.LeftMouseButton) => NativeMethods.HResult.DRAGDROP_S_DROP,
+                false when vfdo.DragModifiers.HasFlag(DragDropKeyStates.RightMouseButton) => NativeMethods.HResult.DRAGDROP_S_CANCEL,
+                false when !vfdo.DragModifiers.HasFlag(DragDropKeyStates.LeftMouseButton) => NativeMethods.HResult.DRAGDROP_S_DROP,
                 _ => NativeMethods.HResult.Ok,
             };
 
             if (res is not NativeMethods.HResult.Ok)
             {
-                Data.RuntimeSettings.DragBitmap = null;
+                Data.CopyPaste.DragBitmap = null;
                 Data.CopyPaste.DragStatus = CopyPasteService.DragState.None;
                 IpcService.NotifyDropCancel(res);
             }
@@ -734,7 +723,14 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         public int GiveFeedback(uint dwEffect)
         {
             var dragDropEffects = (DragDropEffects)dwEffect & ~DragDropEffects.Scroll;
-            onFeedback?.Invoke(dragDropEffects);
+            if (dragDropEffects.HasFlag(DragDropEffects.Move)
+                && !vfdo.DragModifiers.HasFlag(DragDropKeyStates.ShiftKey))
+            {
+                // Override default since Windows gives Move as default
+                dragDropEffects = DragDropEffects.Copy;
+            }
+
+            vfdo.CurrentEffect = dragDropEffects;
 
 #if !DEPLOY
             DebugLog.PrintLine($"GiveFeedback dwEffect: {dragDropEffects}");

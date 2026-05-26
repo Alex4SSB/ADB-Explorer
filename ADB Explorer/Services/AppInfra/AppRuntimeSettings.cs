@@ -1,6 +1,5 @@
 ﻿using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
-using System.Collections;
 
 namespace ADB_Explorer.Services;
 
@@ -35,13 +34,6 @@ public partial class AppRuntimeSettings : ViewModelBase
             if (!Set(ref pathBoxNavigation, value))
                 OnPropertyChanged();        
         }
-    }
-
-    private IEnumerable explorerSource;
-    public IEnumerable ExplorerSource
-    {
-        get => explorerSource;
-        set => Set(ref explorerSource, value);
     }
 
     private bool? isPathBoxFocused = null;
@@ -99,20 +91,6 @@ public partial class AppRuntimeSettings : ViewModelBase
         set => Set(ref isPollingStopped, value);
     }
 
-    private BitmapSource dragBitmap = null;
-    public BitmapSource DragBitmap
-    {
-        get => dragBitmap;
-        set => Set(ref dragBitmap, value);
-    }
-
-    private DragDropKeyStates dragModifiers = DragDropKeyStates.None;
-    public DragDropKeyStates DragModifiers
-    {
-        get => dragModifiers;
-        set => Set(ref dragModifiers, value);
-    }
-
     private Cursor cursor = Cursors.Arrow;
     public Cursor MainCursor
     {
@@ -125,13 +103,6 @@ public partial class AppRuntimeSettings : ViewModelBase
     {
         get => mainWindowScalingFactor;
         set => Set(ref mainWindowScalingFactor, value);
-    }
-
-    private bool dragWithinSlave = false;
-    public bool DragWithinSlave
-    {
-        get => dragWithinSlave;
-        set => Set(ref dragWithinSlave, value);
     }
 
     private ThumbnailService.ThumbnailSize thumbsSize = ThumbnailService.ThumbnailSize.Disabled;

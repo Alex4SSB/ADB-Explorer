@@ -13,6 +13,11 @@ public partial class ExplorerViewModel : ObservableObject
     public partial ICollectionView ExplorerItemsSource { get; set; }
 
     [ObservableProperty]
+    public partial IEnumerable<IBrowserItem> ExplorerSource { get; set; }
+
+    partial void OnExplorerSourceChanged(IEnumerable<IBrowserItem> value) => UpdateExplorerView();
+
+    [ObservableProperty]
     public partial ICollectionView DriveItemsSource { get; set; }
 
     [ObservableProperty]
@@ -252,10 +257,6 @@ public partial class ExplorerViewModel : ObservableObject
     {
         switch (e.PropertyName)
         {
-            case nameof(AppRuntimeSettings.ExplorerSource):
-                UpdateExplorerView();
-                break;
-
             case nameof(AppRuntimeSettings.FilterDrives):
                 UpdateDriveView();
                 break;
@@ -320,7 +321,7 @@ public partial class ExplorerViewModel : ObservableObject
             if (!Data.FileActions.IsExplorerVisible)
                 return;
 
-            var source = Data.RuntimeSettings.ExplorerSource;
+            var source = ExplorerSource;
             if (source is null)
                 return;
 

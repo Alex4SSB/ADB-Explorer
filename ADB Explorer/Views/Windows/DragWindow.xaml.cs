@@ -67,7 +67,7 @@ public partial class DragWindow : INotifyPropertyChanged
 
     private void DragTimer_Tick(object sender, EventArgs e)
     {
-        if (Data.RuntimeSettings.DragBitmap is not null)
+        if (Data.CopyPaste.DragBitmap is not null)
         {
             if (imageEmpty)
                 UpdateMouse(InterceptMouse.MousePosition);
@@ -246,7 +246,7 @@ public partial class DragWindow : INotifyPropertyChanged
         {
             if ((e.PropertyName == nameof(Data.CopyPaste.DragFiles)
                 || e.PropertyName == nameof(Data.CopyPaste.DropTarget))
-                && Data.RuntimeSettings.DragBitmap is not null)
+                && Data.CopyPaste.DragBitmap is not null)
             {
                 GetPathUnderMouse();
             }
@@ -269,11 +269,11 @@ public partial class DragWindow : INotifyPropertyChanged
         DragTimer.Start();
     }
 
-    private void CancelDrag() => Data.RuntimeSettings.DragBitmap = null;
+    private void CancelDrag() => Data.CopyPaste.DragBitmap = null;
 
     private void UpdateMouse(POINT point)
     {
-        if (Data.RuntimeSettings.DragBitmap is null)
+        if (Data.CopyPaste.DragBitmap is null)
             return;
 
         ViewModel.DragImageHeight = 96 * (1 / MonitorInfo.GetScalingFromWindow(dragWindowHandle));
@@ -297,7 +297,7 @@ public partial class DragWindow : INotifyPropertyChanged
         MouseWithinApp = hwndUnderMouse == InterceptClipboard.MainWindowHandle;
 
         if (!MouseWithinApp && Data.CopyPaste.DragStatus is CopyPasteService.DragState.None)
-            Data.RuntimeSettings.DragBitmap = null;
+            Data.CopyPaste.DragBitmap = null;
 
         if (!MouseWithinApp)
         {
@@ -305,12 +305,12 @@ public partial class DragWindow : INotifyPropertyChanged
                 Data.CopyPaste.PasteState = DragDropEffects.None;
         }
         else
-            Data.RuntimeSettings.DragWithinSlave = false;
+            Data.CopyPaste.DragWithinSlave = false;
     }
 
     private void Border_MouseUp(object sender, MouseButtonEventArgs e)
     {
-        Data.RuntimeSettings.DragBitmap = null;
+        Data.CopyPaste.DragBitmap = null;
     }
 }
 

@@ -695,7 +695,7 @@ public partial class ExplorerPageHeader : UserControl
             FileActions.DeleteDescription.Value = Strings.Resources.S_DELETE_ACTION;
         }
 
-        RuntimeSettings.ExplorerSource = DirList.FileList;
+        ViewModel.ExplorerSource = DirList.FileList;
         FileActionLogic.UpdateFileActions();
 
         return true;
@@ -1179,7 +1179,7 @@ public partial class ExplorerPageHeader : UserControl
 
         if (CopyPaste.CurrentFiles.Any())
         {
-            RuntimeSettings.DragBitmap = CopyPaste.CurrentFiles.First().DragImage;
+            CopyPaste.DragBitmap = CopyPaste.CurrentFiles.First().DragImage;
         }
 
         e.Handled = true;
@@ -1329,7 +1329,7 @@ public partial class ExplorerPageHeader : UserControl
         if (vfdo is not null)
         {
             CopyPaste.UpdateSelfVFDO(true);
-            RuntimeSettings.DragBitmap = selectedItems.First().DragImage;
+            CopyPaste.DragBitmap = selectedItems.First().DragImage;
 
             vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, dragSource, vfdo.PreferredDropEffect.Value);
         }
@@ -1561,7 +1561,7 @@ public partial class ExplorerPageHeader : UserControl
     private void MainWin_PreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (CopyPaste.IsDrag && CopyPaste.DragStatus is not CopyPasteService.DragState.Active && e.Key is Key.Escape)
-            RuntimeSettings.DragBitmap = null;
+            CopyPaste.DragBitmap = null;
         else
         {
             if (!FileActions.IsExplorerEditing && RuntimeSettings.IsPathBoxFocused is not true)
@@ -1578,7 +1578,7 @@ public partial class ExplorerPageHeader : UserControl
     private void MainWindow_OnPreviewQueryContinueDrag(object sender, QueryContinueDragEventArgs e)
     {
         if (e.EscapePressed)
-            RuntimeSettings.DragBitmap = null;
+            CopyPaste.DragBitmap = null;
     }
 
     private void IconView_PreviewMouseDown(object sender, MouseButtonEventArgs e)

@@ -7,7 +7,7 @@ using static ADB_Explorer.Models.AbstractFile;
 
 namespace ADB_Explorer.Services;
 
-public class CopyPasteService : ViewModelBase
+public partial class CopyPasteService : ObservableObject
 {
     [Flags]
     public enum DataSource
@@ -18,40 +18,34 @@ public class CopyPasteService : ViewModelBase
         Virtual = 0x4,      // 0 for immediately available files
     }
 
-    private DragDropEffects pasteState = DragDropEffects.None;
+    public enum DragState
+    {
+        None,
+        Pending,
+        Active,
+    }
+
     public DragDropEffects PasteState
     {
-        get => pasteState;
+        get;
         set
         {
-            if (Set(ref pasteState, value))
+            if (SetProperty(ref field, value))
             {
                 Data.FileActions.IsCutState.Value = value is DragDropEffects.Move;
                 Data.FileActions.IsCopyState.Value = value is DragDropEffects.Copy;
             }
         }
-    }
+    } = DragDropEffects.None;
 
-    private DragDropEffects dropEffect = DragDropEffects.None;
-    public DragDropEffects DropEffect
-    {
-        get => dropEffect;
-        set => Set(ref dropEffect, value);
-    }
+    [ObservableProperty]
+    public partial DragDropEffects DropEffect { get; set; } = DragDropEffects.None;
 
-    private DragDropEffects currentDropEffect = DragDropEffects.None;
-    public DragDropEffects CurrentDropEffect
-    {
-        get => currentDropEffect;
-        set => Set(ref currentDropEffect, value);
-    }
+    [ObservableProperty]
+    public partial DragDropEffects CurrentDropEffect { get; set; } = DragDropEffects.None;
 
-    private string dropTarget = null;
-    public string DropTarget
-    {
-        get => dropTarget;
-        set => Set(ref dropTarget, value);
-    }
+    [ObservableProperty]
+    public partial string? DropTarget { get; set; } = null;
 
     public string DropTargetName
     {
@@ -68,52 +62,38 @@ public class CopyPasteService : ViewModelBase
         }
     }
 
-    private DataSource pasteSource = DataSource.None;
     public DataSource PasteSource
     {
-        get => pasteSource;
+        get;
         set
         {
-            if (Set(ref pasteSource, value)
-                && pasteSource.HasFlag(DataSource.None)
+            if (SetProperty(ref field, value)
+                && field.HasFlag(DataSource.None)
                 && value is not DataSource.None)
             {
                 // Remove the none flag when setting something else
-                pasteSource &= ~DataSource.None;
+                field &= ~DataSource.None;
             }
         }
-    }
+    } = DataSource.None;
 
-    private DataSource dragPasteSource = DataSource.None;
     public DataSource DragPasteSource
     {
-        get => dragPasteSource;
+        get;
         set
         {
-            if (Set(ref dragPasteSource, value)
-                && dragPasteSource.HasFlag(DataSource.None)
+            if (SetProperty(ref field, value)
+                && field.HasFlag(DataSource.None)
                 && value is not DataSource.None)
             {
                 // Remove the none flag when settings something else
-                dragPasteSource &= ~DataSource.None;
+                field &= ~DataSource.None;
             }
         }
-    }
+    } = DataSource.None;
 
-    public enum DragState
-    {
-        None,
-        Pending,
-        Active,
-    }
-
-    private DragState dragStatus = DragState.None;
-
-    public DragState DragStatus
-    {
-        get => dragStatus;
-        set => Set(ref dragStatus, value);
-    }
+    [ObservableProperty]
+    public partial DragState DragStatus { get; set; } = DragState.None;
 
     public bool IsDrag => DragPasteSource is not DataSource.None;
     public bool IsClipboard => PasteSource is not DataSource.None && !IsDrag;
@@ -130,6 +110,12 @@ public class CopyPasteService : ViewModelBase
         }
     }
 
+    [ObservableProperty]
+    public partial BitmapSource? DragBitmap { get; set; } = null;
+
+    [ObservableProperty]
+    public partial bool DragWithinSlave { get; set; } = false;
+
     public NativeMethods.HResult DragResult { get; set; }
 
     public DragDropEffects CurrentEffect => IsDrag ? DropEffect : PasteState;
@@ -139,56 +125,42 @@ public class CopyPasteService : ViewModelBase
     public bool IsWindows => !CurrentSource.HasFlag(DataSource.None) && !CurrentSource.HasFlag(DataSource.Android);
     public bool IsVirtual => CurrentSource.HasFlag(DataSource.Virtual);
 
-    private string parentFolder = "";
-    public string ParentFolder
-    {
-        get => parentFolder;
-        set => Set(ref parentFolder, value);
-    }
+    [ObservableProperty]
+    public partial string ParentFolder { get; set; } = "";
 
-    private string dragParent = "";
-    public string DragParent
-    {
-        get => dragParent;
-        set => Set(ref dragParent, value);
-    }
+    [ObservableProperty]
+    public partial string DragParent { get; set; } = "";
 
-    private string[] files = [];
-    public string[] Files
-    {
-        get => files;
-        set => Set(ref files, value);
-    }
+    [ObservableProperty]
+    public partial string[] Files { get; set; } = [];
 
-    private string[] dragFiles = [];
     public string[] DragFiles
     {
-        get => dragFiles;
+        get;
         set
         {
             // The Set method only compares instances
-            if (dragFiles.SequenceEqual(value))
+            if (field.SequenceEqual(value))
                 return;
 
-            Set(ref dragFiles, value);
+            SetProperty(ref field, value);
             _currentFiles = null;
         }
-    }
+    } = [];
 
-    private FileDescriptor[] descriptors = [];
     public FileDescriptor[] Descriptors
     {
-        get => descriptors;
+        get;
         set
         {
             // The Set method only compares instances
-            if (descriptors.SequenceEqual(value))
+            if (field.SequenceEqual(value))
                 return;
 
-            Set(ref descriptors, value);
+            SetProperty(ref field, value);
             _currentFiles = null;
         }
-    }
+    } = [];
 
     private IEnumerable<FileClass> _currentFiles = [];
     public IEnumerable<FileClass> CurrentFiles
@@ -281,7 +253,7 @@ public class CopyPasteService : ViewModelBase
         if (!IsDrag)
             return;
 
-        Data.RuntimeSettings.DragBitmap = null;
+        DragBitmap = null;
         if (IsClipboard)
             return;
 
