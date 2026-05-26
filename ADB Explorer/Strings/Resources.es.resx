@@ -451,9 +451,6 @@ El contenido visible puede estar incompleto.</value>
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
     <value>Abierto Automáticamente para Navegar</value>
   </data>
-  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>Vista Compacta</value>
-  </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>Detener Encuesta en Importar/Exportar</value>
   </data>

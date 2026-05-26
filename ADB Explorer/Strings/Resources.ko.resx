@@ -451,9 +451,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
     <value>자동으로 탐색 열기</value>
   </data>
-  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>간결한 보기</value>
-  </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>푸시/풀 시 폴링 중지</value>
   </data>

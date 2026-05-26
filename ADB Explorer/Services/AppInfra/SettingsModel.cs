@@ -121,7 +121,6 @@ public static class UISettings
             ], "\uE8EA"),
             new SettingsGroup(Strings.Resources.S_FILE_OP_TOOLTIP,
             [
-                new BoolSetting(() => Settings.EnableCompactView, Strings.Resources.S_SETTINGS_COMPACT_VIEW, icon: "\uED0C"),
                 new BoolSetting(() => Settings.StopPollingOnSync, Strings.Resources.S_SETTINGS_STOP_ON_SYNC, icon: "\uE8D8"),
                 new BoolSetting(() => Settings.AllowMultiOp, Strings.Resources.S_SETTINGS_PARALLEL_OPERATIONS, icon: "\uE762"),
                 new BoolSetting(() => Settings.RescanOnPush, Strings.Resources.S_SETTINGS_MEDIA_RESCAN, icon: "\uE7C5"),

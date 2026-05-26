@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -451,9 +451,6 @@ Widoczna zawartość może być niekompletna.</value>
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
     <value>Automatycznie otwórz do przeglądania</value>
   </data>
-  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>Widok kompaktowy</value>
-  </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>Zatrzymaj statystyki w trybie push/pull</value>
   </data>
@@ -507,6 +504,15 @@ Widoczna zawartość może być niekompletna.</value>
   </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>Motyw</value>
+  </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Niestandardowy kolor akcentu</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Kolor Akcentu</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Wybierz kolor</value>
   </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>Wyłącz przyspieszenie sprzętowe</value>
@@ -1563,15 +1569,6 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   </data>
   <data name="S_MOUNT_OPTIONS" xml:space="preserve">
     <value>Opcje montowania</value>
-  </data>
-  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
-    <value>Niestandardowy kolor akcentu</value>
-  </data>
-  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
-    <value>Kolor Akcentu</value>
-  </data>
-  <data name="S_PICK_COLOR" xml:space="preserve">
-    <value>Wybierz kolor</value>
   </data>
   <data name="S_COLOR_RED" xml:space="preserve">
     <value>Czerwony</value>

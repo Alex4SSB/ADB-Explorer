@@ -556,6 +556,9 @@ public static class DeviceHelper
 
     public static IEnumerable<LogicalDeviceViewModel> ReconnectFileOpDevice(IEnumerable<LogicalDeviceViewModel> devices)
     {
+        if (Data.FileOpQ is null)
+            return [];
+
         var pastOps = Data.FileOpQ.Operations.Where(op => op.IsPastOp);
 
         // get the newly acquired devices with similar IDs to devices of the past file ops [the objects of] which also do not exist in the devices UI list

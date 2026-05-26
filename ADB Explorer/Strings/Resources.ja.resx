@@ -451,9 +451,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
     <value>最後に接続されたデバイスを自動的に開く</value>
   </data>
-  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>コンパクトビューを有効にする</value>
-  </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>送受信時にポーリングを停止する</value>
   </data>

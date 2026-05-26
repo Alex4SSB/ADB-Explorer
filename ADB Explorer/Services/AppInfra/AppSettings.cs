@@ -226,9 +226,6 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     public partial FileOpFilter.FilterType[] FileOpFilters { get; set; } = [];
 
     [ObservableProperty]
-    public partial bool EnableCompactView { get; set; } = false;
-
-    [ObservableProperty]
     public partial bool StopPollingOnSync { get; set; } = false;
 
     [ObservableProperty]

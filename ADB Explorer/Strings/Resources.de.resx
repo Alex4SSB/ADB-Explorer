@@ -451,9 +451,6 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
     <value>Automatisch zum Durchsuchen öffnen</value>
   </data>
-  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>Kompaktansicht</value>
-  </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>Stopen Sie das Polling bei Push/Pull</value>
   </data>

@@ -451,9 +451,6 @@ O conteúdo visível pode estar incompleto.</value>
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
     <value>Abre Automaticamente para Pesquisas</value>
   </data>
-  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>Visualização compacta</value>
-  </data>
   <data name="S_BUTTON_OK" xml:space="preserve">
     <value>Ok</value>
   </data>

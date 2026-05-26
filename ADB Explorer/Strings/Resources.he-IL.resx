@@ -451,9 +451,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
     <value>אוטומטית פתח לסיור</value>
   </data>
-  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>תצוגה קומפקטית</value>
-  </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>עצור סריקות בזמן הורדה/העלאה</value>
   </data>

@@ -30,7 +30,6 @@ internal class MenuTemplateSelector : DataTemplateSelector
         SubMenu or string => SubMenuTemplate,
         AltTextMenu => DynamicAltTextTemplate,
         IconMenu => IconMenuTemplate,
-        AltObjectMenu => AltObjectTemplate,
         CompoundIconMenu => CompoundIconMenuTemplate,
         null => new(),
         _ => throw new NotSupportedException(),
@@ -67,7 +66,6 @@ internal class MenuStyleSelector : StyleSelector
         SubMenu or string => SubMenuStyle,
         AltTextMenu => DynamicAltTextStyle,
         IconMenu => IconMenuStyle,
-        AltObjectMenu => AltObjectStyle,
         CompoundIconMenu => CompoundIconMenuStyle,
         _ => throw new NotSupportedException(),
     };

@@ -451,9 +451,6 @@ Le contenu visible peut être incomplet.</value>
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
     <value>Automatiquement ouvert pour navigation</value>
   </data>
-  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>Vue compacte</value>
-  </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>Arrêt du rafraichissage de la batterie en push/pull</value>
   </data>

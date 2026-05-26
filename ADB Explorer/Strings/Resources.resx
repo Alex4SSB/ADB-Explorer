@@ -470,10 +470,6 @@ Visible content may be incomplete.</value>
     <value>Automatically Open For Browsing</value>
     <comment>The setting used to toggle automatically opening the only connected device or the last connected device</comment>
   </data>
-  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>Compact View</value>
-    <comment>The setting used to enable the file operations compact view</comment>
-  </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>Stop Polling On Push/Pull</value>
     <comment>The setting used to stop device and battery polling when there are active push or pull operations</comment>

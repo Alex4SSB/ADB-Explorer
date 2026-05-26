@@ -118,6 +118,7 @@
                         Grid.Column="1"
                         Margin="0,1,0,0"
                         SavedItems="{Binding SavedItems, Mode=OneWay}" />
+                    <local:SearchBox
                         x:Name="SearchBox"
                         Grid.Column="2"
                         IsExpanded="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsSearchBoxFocused, Mode=TwoWay}"

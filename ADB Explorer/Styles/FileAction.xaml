@@ -96,12 +96,6 @@
                 Text="{Binding AltText}" />
         </Grid>
     </DataTemplate>
-    <DataTemplate x:Key="AltObjectMenuTemplate">
-        <Grid>
-            <ui:FontIcon Style="{StaticResource OperationsIconStyle}" />
-            <ui:ProgressRing Style="{StaticResource OperationsProgressRingStyle}" />
-        </Grid>
-    </DataTemplate>
     <DataTemplate x:Key="MenuSeparatorTemplate">
         <Border
             Width="1"
@@ -137,7 +131,6 @@
     </DataTemplate>
     <helpers:MenuTemplateSelector
         x:Key="MenuTemplateSelector"
-        AltObjectTemplate="{StaticResource AltObjectMenuTemplate}"
         AnimatedNotifyTemplate="{StaticResource AnimatedNotifyTemplate}"
         CompoundDualActionTemplate="{StaticResource CompoundIconMenuTemplate}"
         CompoundIconMenuTemplate="{StaticResource CompoundIconMenuTemplate}"
@@ -337,37 +330,6 @@
         BasedOn="{StaticResource IconMenuStyle}"
         TargetType="controls:AdbMenuItem" />
     <Style
-        x:Key="AltObjectMenuStyle"
-        BasedOn="{StaticResource IconMenuStyle}"
-        TargetType="controls:AdbMenuItem">
-        <Setter Property="helpers:StyleHelper.ContentAnimation" Value="RotateCW" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsOperationsViewOpen}" Value="False">
-                <Setter Property="helpers:StyleHelper.ContentAnimation" Value="RotateCCW" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsFileOpRingVisible}" Value="True">
-                <Setter Property="helpers:StyleHelper.ContentAnimation" Value="None" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsContentDropDown}" Value="True">
-                <Setter Property="helpers:MenuHelper.DropDownPlacement" Value="Left" />
-            </DataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding IsContentDropDown}" Value="True" />
-                    <Condition Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableCompactView}" Value="False" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="ItemsSource" Value="{x:Null}" />
-            </MultiDataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding IsContentDropDown}" Value="True" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsDetailedPeekMode}" Value="True" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="ItemsSource" Value="{x:Null}" />
-            </MultiDataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
         x:Key="MenuSeparatorStyle"
         BasedOn="{StaticResource WpfUiMenuItem}"
         TargetType="controls:AdbMenuItem">
@@ -459,7 +421,6 @@
     </Style>
     <helpers:MenuStyleSelector
         x:Key="MenuStyleSelector"
-        AltObjectStyle="{StaticResource AltObjectMenuStyle}"
         AnimatedNotifyStyle="{StaticResource AnimatedNotifyStyle}"
         CompoundDualActionStyle="{StaticResource DualActionButtonStyle}"
         CompoundIconMenuStyle="{StaticResource CompoundIconMenuStyle}"

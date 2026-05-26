@@ -29,7 +29,7 @@
                 </Style>
             </local:AdbMenuItem.ItemContainerStyle>
             <local:AdbMenuItem.Header>
-                <Grid Margin="0,-6,-4,0">
+                <Grid Margin="0,-4,-4,-2">
                     <ui:FontIcon
                         Margin="0,4,4,0"
                         FontSize="24"

@@ -3454,15 +3454,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Compact View.
-        /// </summary>
-        public static string S_SETTINGS_COMPACT_VIEW {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_COMPACT_VIEW", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Custom Accent Color.
         /// </summary>
         public static string S_SETTINGS_CUSTOM_ACCENT {

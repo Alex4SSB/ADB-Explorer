@@ -451,9 +451,6 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
     <value>Авто открытие для обзора</value>
   </data>
-  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>Компактный вид</value>
-  </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>Прекращать опрос при передаче файлов</value>
   </data>

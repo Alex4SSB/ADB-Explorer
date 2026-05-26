@@ -189,16 +189,6 @@ public class DynamicAltTextMenu : AltTextMenu
     }
 }
 
-public class AltObjectMenu : ActionMenu
-{
-    public bool IsContentDropDown { get; }
-    public AltObjectMenu(FileAction fileAction, string icon, FileAction altAction = null, IEnumerable<SubMenu> children = null, bool isContentDropDown = false)
-        : base(fileAction, icon, altAction: altAction, children: children)
-    {
-        IsContentDropDown = isContentDropDown;
-    }
-}
-
 public class IconMenu : ActionMenu
 {
     private bool isSelectionBarVisible = false;

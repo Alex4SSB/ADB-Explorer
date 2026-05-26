@@ -451,9 +451,6 @@ Synligt innehåll kan vara ofullständigt.</value>
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
     <value>Öppna automatiskt för surfning</value>
   </data>
-  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>Kompakt vy</value>
-  </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>Stoppa polling på Dra/Tryck</value>
   </data>
