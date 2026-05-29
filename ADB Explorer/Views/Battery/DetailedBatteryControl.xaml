@@ -33,15 +33,15 @@
         ToolTipService.ShowDuration="60000">
         <controls:SimpleStackPanel.ToolTip>
             <controls:SimpleStackPanel Spacing="4">
-                <controls:SimpleStackPanel.Style>
-                    <Style TargetType="controls:SimpleStackPanel">
+                <controls:SimpleStackPanel.Resources>
+                    <Style TargetType="TextBlock">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
-                                <Setter Property="FlowDirection" Value="RightToLeft" />
-                            </DataTrigger>
+                            <Trigger Property="Text" Value="">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </Trigger>
                         </Style.Triggers>
                     </Style>
-                </controls:SimpleStackPanel.Style>
+                </controls:SimpleStackPanel.Resources>
                 <TextBlock Text="{Binding BatteryStateString}" />
                 <TextBlock Text="{Binding BatteryHealthString}" />
                 <TextBlock Text="{Binding VoltageString}" />
