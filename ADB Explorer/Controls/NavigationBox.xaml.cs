@@ -338,7 +338,7 @@ public partial class NavigationBox : UserControl
 
         DisplayPath = AdbLocation.LocationFromString(Path) is Navigation.SpecialLocation.None ? Path : "";
 
-        PathBox.SelectAll();
+        App.SafeBeginInvoke(PathBox.SelectAll);
 
         if (Data.RuntimeSettings.IsPathBoxFocused is not true)
             Data.RuntimeSettings.IsPathBoxFocused = true;

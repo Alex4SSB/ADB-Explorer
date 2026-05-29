@@ -630,13 +630,13 @@ public partial class ExplorerPageHeader : UserControl
 
         ViewModel.FirstSelectedIndex = -1;
         ViewModel.CurrentSelectedIndex = -1;
+        ActiveUnselectAll();
 
         ActiveView.Focus();
         CurrentPath = realPath;
 
         NavigationBox.Path = realPath == RECYCLE_PATH ? AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin) : realPath;
         CurrentDrive = DriveHelper.GetCurrentDrive(CurrentPath);
-
         FileActions.IsRecycleBin = CurrentPath == RECYCLE_PATH;
         FileActions.IsAppDrive = CurrentPath == AdbLocation.StringFromLocation(Navigation.SpecialLocation.PackageDrive);
         FileActions.IsTemp = CurrentPath == TEMP_PATH;
@@ -1482,8 +1482,8 @@ public partial class ExplorerPageHeader : UserControl
 
         var textBox = sender as TextBox;
         textBox.Focus();
-        textBox.SelectAll();
         FileViewModelBase.RenameTextChanged(textBox);
+        textBox.SelectAll();
 
         if (ActiveView.SelectedItem is FileClass file)
             RenameTooltipControl.Show(textBox, file.FolderViewModel);
