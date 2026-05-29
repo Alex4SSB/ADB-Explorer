@@ -287,13 +287,6 @@ public partial class FileActionsEnable : ObservableObject
         set => SetProperty(ref explorerFilter, value);
     }
 
-    private object itemToSelect = null;
-    public object ItemToSelect
-    {
-        get => itemToSelect;
-        set => SetProperty(ref itemToSelect, value);
-    }
-
     private bool isExplorerEditing = false;
     public bool IsExplorerEditing
     {

@@ -209,7 +209,7 @@ internal static class FileActionLogic
         var index = Data.DirList.FileList.IndexOf(file);
         Data.DirList.FileList.Remove(file);
         Data.DirList.FileList.Insert(index, file);
-        Data.FileActions.ItemToSelect = file;
+        Data.ItemToSelect.Value = file;
     }
 
     public static void IsPasteEnabled()
@@ -1149,7 +1149,7 @@ internal static class FileActionLogic
 
         var file = Data.DirList.FileList.FirstOrDefault(f => f.FullPath == target);
         if (file is not null)
-            Data.FileActions.ItemToSelect = file;
+            Data.ItemToSelect.Value = file;
     }
 
     public static void OpenApkLocation(Package apk = null)

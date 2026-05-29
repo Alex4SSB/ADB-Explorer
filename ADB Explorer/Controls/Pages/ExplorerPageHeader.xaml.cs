@@ -148,7 +148,7 @@ public partial class ExplorerPageHeader : UserControl
         InitializeComponent();
 
         KeyDown += new KeyEventHandler(OnButtonKeyDown);
-        PreviewTextInput += new TextCompositionEventHandler(MainWindow_PreviewTextInput);
+        PreviewTextInput += new TextCompositionEventHandler(ExplorerPageHeader_PreviewTextInput);
 
         AppActions.Bindings.ForEach(binding =>
         {
@@ -168,9 +168,16 @@ public partial class ExplorerPageHeader : UserControl
             DetailsPane.RequestModeRefresh?.Invoke();
             DetailsControl.RequestModeRefresh?.Invoke();
         };
+
+        ItemToSelect.PropertyChanged += (s, e) =>
+        {
+            ActiveView.SelectedItem = ItemToSelect.Value;
+            if (ItemToSelect is not null)
+                ActiveScrollIntoView(ItemToSelect.Value);
+        };
     }
 
-    private void MainWindow_PreviewTextInput(object sender, TextCompositionEventArgs e)
+    private void ExplorerPageHeader_PreviewTextInput(object sender, TextCompositionEventArgs e)
     {
         if (SearchBox.IsFocused
             || NavigationBox.Mode is NavigationBox.ViewMode.Path
@@ -179,27 +186,27 @@ public partial class ExplorerPageHeader : UserControl
 
         var selected = ActiveSelectedItems.Count;
         var selectedIndex = ActiveView.SelectedIndex;
-        object altItem = null;
+        IBrowserItem? nextItem = null;
 
         for (int i = 0; i < ActiveView.Items.Count; i++)
         {
-            var item = ActiveView.Items[i];
+            var item = (IBrowserItem)ActiveView.Items[i];
             var name = item.ToString();
 
             if (name.StartsWith(e.Text, StringComparison.OrdinalIgnoreCase))
             {
                 if (selected != 1 || selectedIndex < i)
                 {
-                    FileActions.ItemToSelect = item;
+                    ItemToSelect.Value = item;
                     break;
                 }
                 else
-                    altItem ??= item;
+                    nextItem ??= item;
             }
         }
 
-        if (selectedIndex == ActiveView.SelectedIndex && altItem is not null)
-            FileActions.ItemToSelect = altItem;
+        if (selectedIndex == ActiveView.SelectedIndex && nextItem is not null)
+            ItemToSelect.Value = nextItem;
     }
 
     private void OnButtonKeyDown(object sender, KeyEventArgs e)
@@ -566,7 +573,7 @@ public partial class ExplorerPageHeader : UserControl
 
             case nameof(DirectoryLister.IsLinkListingFinished) when bfNavigation
                     && !string.IsNullOrEmpty(prevPath) && DirList.FileList.FirstOrDefault(item => item.FullPath == prevPath) is var prevItem and not null:
-                FileActions.ItemToSelect = prevItem;
+                ItemToSelect.Value = prevItem;
 
                 break;
 

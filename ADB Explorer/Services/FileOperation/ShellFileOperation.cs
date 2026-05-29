@@ -111,11 +111,11 @@ public static class ShellFileOperation
             op.Dispatcher.Invoke(() => file.UpdatePath(op.TargetPath.FullPath));
 
             if (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First() == file)
-                Data.FileActions.ItemToSelect = null;
+                Data.ItemToSelect.Value = null;
 
             // only select the item if there aren't any other operations
             if (Data.FileOpQ.TotalCount == 1)
-                Data.FileActions.ItemToSelect = file;
+                Data.ItemToSelect.Value = file;
         }
 
         op.PropertyChanged -= RenameFileOp_PropertyChanged;
@@ -287,7 +287,7 @@ public static class ShellFileOperation
 
                         // only select the item if there aren't any other operations
                         if (Data.FileOpQ.TotalCount == 1)
-                            Data.FileActions.ItemToSelect = newFile;
+                            Data.ItemToSelect.Value = newFile;
                     }
                     else
                     {
@@ -296,7 +296,7 @@ public static class ShellFileOperation
 
                         // only select the item if there aren't any other operations
                         if (Data.FileOpQ.TotalCount == 1)
-                            Data.FileActions.ItemToSelect = op.FilePath;
+                            Data.ItemToSelect.Value = op.FilePath;
                     }
 
                     FileActionLogic.UpdateFileActions();
