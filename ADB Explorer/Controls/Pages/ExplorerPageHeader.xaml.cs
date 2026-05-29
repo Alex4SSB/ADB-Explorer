@@ -159,7 +159,6 @@ public partial class ExplorerPageHeader : UserControl
 
         SelectionTimer.Tick += SelectionTimer_Tick;
 
-        DriveList.SelectionChanged += DriveList_SelectionChanged;
 
         FileIconView.RenameStarted += IconView_RenameStarted;
 
@@ -168,16 +167,6 @@ public partial class ExplorerPageHeader : UserControl
             DetailsPane.RequestModeRefresh?.Invoke();
             DetailsControl.RequestModeRefresh?.Invoke();
         };
-    }
-
-    private void DriveList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (DriveList.SelectedItem is DriveViewModel selectedDrive)
-        {
-            DetailsPane.SelectedFiles = [selectedDrive];
-        }
-        else
-            DetailsPane.SelectedFiles = [];
     }
 
     private void MainWindow_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -1682,9 +1671,22 @@ public partial class ExplorerPageHeader : UserControl
 
     private void DriveList_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        foreach (var item in DriveList.Items)
+        var hitItem = e.OriginalSource is DependencyObject source
+            ? ItemsControl.ContainerFromElement(DriveList, source) as FrameworkElement
+            : null;
+
+        if (hitItem is null || hitItem.DataContext is not DriveViewModel drive)
         {
-            (item as DriveViewModel)?.IsSelected = false;
+            foreach (var item in DriveList.Items)
+            {
+                (item as DriveViewModel)?.IsSelected = false;
+            }
+
+            DetailsPane.SelectedFiles = [];
+        }
+        else
+        {
+            DetailsPane.SelectedFiles = [drive];
         }
     }
 
