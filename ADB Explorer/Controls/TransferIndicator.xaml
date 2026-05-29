@@ -11,9 +11,6 @@
     xmlns:windows="clr-namespace:ADB_Explorer.ViewModels.Windows"
     x:Name="transferIndicator"
     d:DataContext="{d:DesignInstance Type=windows:MainWindowViewModel}"
-    ToolTipService.InitialShowDelay="0"
-    ToolTipService.Placement="Bottom"
-    ToolTipService.ShowDuration="60000"
     mc:Ignorable="d">
     <UserControl.Resources>
         <Style
@@ -85,7 +82,10 @@
         <local:AdbMenuItem
             x:Name="RootMenuItem"
             Style="{StaticResource AdbMenuItemStyle}"
-            ToolTip="{StaticResource TransferIndicatorToolTip}">
+            ToolTip="{StaticResource TransferIndicatorToolTip}"
+            ToolTipService.InitialShowDelay="0"
+            ToolTipService.Placement="Bottom"
+            ToolTipService.ShowDuration="60000">
             <local:AdbMenuItem.Header>
                 <Grid Margin="-4">
                     <ui:FontIcon
