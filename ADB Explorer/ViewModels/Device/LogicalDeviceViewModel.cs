@@ -138,7 +138,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         {
             if (string.IsNullOrEmpty(field))
             {
-                field = Props.GetValueOrDefault(ADBService.BRAND_NAME);
+                field = Props.GetValueOrDefault(ADBService.BRAND_NAME) ?? Props.GetValueOrDefault(ADBService.HOST_NAME);
                 if (field is not null)
                     Device.Name = field;
             }
