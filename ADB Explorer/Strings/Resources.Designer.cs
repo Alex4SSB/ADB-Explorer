@@ -737,6 +737,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pair.
+        /// </summary>
+        public static string S_BUTTON_PAIR {
+            get {
+                return ResourceManager.GetString("S_BUTTON_PAIR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pair &amp; Connect.
         /// </summary>
         public static string S_BUTTON_PAIR_CONNECT {
