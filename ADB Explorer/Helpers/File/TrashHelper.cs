@@ -15,9 +15,9 @@ internal static class TrashHelper
         Data.FileActions.DeleteEnabled = fileList.Any(item => item.Extension != AdbExplorerConst.RECYCLE_INDEX_SUFFIX);
     }
 
-    public static void UpdateRecycledItemsCount()
+    public static void UpdateRecycledItemsCount(CancellationToken cancellationToken = default)
     {
-        var countTask = Task.Run(() => ADBService.CountRecycle(Data.DevicesObject.Current.ID));
+        var countTask = Task.Run(() => ADBService.CountRecycle(Data.DevicesObject.Current.ID), cancellationToken);
         countTask.ContinueWith((t) =>
         {
             if (t.IsCanceled || Data.DevicesObject.Current is null)
@@ -32,7 +32,7 @@ internal static class TrashHelper
         });
     }
 
-    public static Task ParseIndexersAsync() => Task.Run(() =>
+    public static Task ParseIndexersAsync(CancellationToken cancellationToken = default) => Task.Run(() =>
     {
         Data.RecycleIndex.Clear();
 
@@ -44,7 +44,7 @@ internal static class TrashHelper
                                                                                           StringSplitOptions.RemoveEmptyEntries);
 
         lines.ToList().ForEach(line => Data.RecycleIndex.Add(new(line)));
-    });
+    }, cancellationToken);
 
     public static void ParseIndexers()
     {

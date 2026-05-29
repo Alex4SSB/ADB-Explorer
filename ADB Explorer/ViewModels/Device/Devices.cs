@@ -17,6 +17,8 @@ public partial class Devices : ObservableObject
     {
         if (value is not null)
             DeviceHelper.OpenDevice(value);
+
+        OnPropertyChanged(nameof(Current));
     }
 
     [ObservableProperty]

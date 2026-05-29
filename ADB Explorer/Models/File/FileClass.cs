@@ -206,7 +206,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     public FolderTree[]? Children => !IsDirectory
         ? null 
-        : FileHelper.GetFolderTree([FullPath]);
+        : FileHelper.GetFolderTree([FullPath], cancellationToken: Data.DeviceCts.Token);
 
     public IEnumerable<FileDescriptor> Descriptors { get; private set; }
 

@@ -559,7 +559,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         CopyPasteService.ClearTempFolder();
         VirtualFileDataObject vfdo = new(DragDropEffects.Copy, method);
 
-        var files = FileHelper.GetFilesFromTree(FileHelper.GetFolderTree(packages.Select(p => p.Path), false)).ToList();
+        var files = FileHelper.GetFilesFromTree(FileHelper.GetFolderTree(packages.Select(p => p.Path), false, Data.DeviceCts.Token)).ToList();
         vfdo.Operations = [.. files.Select(f => f.PrepareDescriptors(vfdo))];
         vfdo.SetFileDescriptors(files.SelectMany(f => f.Descriptors));
         vfdo.SetAdbDrag(files, Data.DevicesObject.Current);

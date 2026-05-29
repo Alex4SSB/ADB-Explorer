@@ -28,7 +28,22 @@ public partial class NavigationBox : UserControl
 
         SizeChanged += (sender, args) => ArrangeBreadcrumbs();
 
+        Data.ClearNavBox += (_, _) => Clear();
+    }
 
+    public void Clear()
+    {
+        App.SafeInvoke(() =>
+        {
+            Path = null;
+            DisplayPath = null;
+            Items = [];
+            breadcrumbs = [];
+            itemWidths = [];
+            locations = [];
+            Mode = ViewMode.None;
+            OverflowPopup.IsOpen = false;
+        });
     }
 
     #region Dependency Properties

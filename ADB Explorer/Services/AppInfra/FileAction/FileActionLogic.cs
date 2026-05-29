@@ -649,13 +649,13 @@ internal static class FileActionLogic
             else
             {
                 if (Data.Settings.EnableRecycle && Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Trash))
-                    TrashHelper.UpdateRecycledItemsCount();
+                    TrashHelper.UpdateRecycledItemsCount(cancellationToken);
 
                 if (Data.Settings.EnableApk && Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Temp))
-                    UpdateInstallersCount();
+                    UpdateInstallersCount(cancellationToken);
 
                 if (Data.Settings.EnableApk && Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Package))
-                    UpdatePackagesCount();
+                    UpdatePackagesCount(cancellationToken);
             }
 
             return drives;
@@ -676,9 +676,9 @@ internal static class FileActionLogic
         });
     }
 
-    public static void UpdateInstallersCount()
+    public static void UpdateInstallersCount(CancellationToken cancellationToken = default)
     {
-        var countTask = Task.Run(() => ADBService.CountPackages(Data.DevicesObject.Current.ID));
+        var countTask = Task.Run(() => ADBService.CountPackages(Data.DevicesObject.Current.ID), cancellationToken);
         countTask.ContinueWith((t) => App.SafeInvoke(() =>
         {
             if (!t.IsCanceled && Data.DevicesObject.Current is not null)
@@ -689,9 +689,9 @@ internal static class FileActionLogic
         }));
     }
 
-    public static void UpdatePackagesCount()
+    public static void UpdatePackagesCount(CancellationToken cancellationToken = default)
     {
-        var packageTask = Task.Run(() => ShellFileOperation.GetPackagesCount(Data.DevicesObject.Current));
+        var packageTask = Task.Run(() => ShellFileOperation.GetPackagesCount(Data.DevicesObject.Current), cancellationToken);
 
         packageTask.ContinueWith((t) =>
         {
@@ -706,12 +706,12 @@ internal static class FileActionLogic
         });
     }
 
-    public static void UpdatePackages(bool updateExplorer = false)
+    public static void UpdatePackages(bool updateExplorer = false, CancellationToken cancellationToken = default)
     {
         Data.FileActions.ListingInProgress = true;
 
         var version = Data.DevicesObject.Current.AndroidVersion;
-        var packageTask = Task.Run(() => ShellFileOperation.GetPackages(Data.DevicesObject.Current, Data.Settings.ShowSystemPackages, version is not null && version >= AdbExplorerConst.MIN_PKG_UID_ANDROID_VER));
+        var packageTask = Task.Run(() => ShellFileOperation.GetPackages(Data.DevicesObject.Current, Data.Settings.ShowSystemPackages, version is not null && version >= AdbExplorerConst.MIN_PKG_UID_ANDROID_VER), cancellationToken);
 
         packageTask.ContinueWith((t) =>
         {
@@ -768,7 +768,7 @@ internal static class FileActionLogic
             {
                 Data.CurrentDisplayNames.Clear();
                 Data.CurrentPath = null;
-                Data.RuntimeSettings.ClearNavBox = true;
+                Data.RaiseClearNavBox();
 
                 UpdateFileActions();
             }

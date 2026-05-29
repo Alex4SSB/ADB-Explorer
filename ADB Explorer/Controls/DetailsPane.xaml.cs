@@ -336,11 +336,11 @@ public partial class DetailsPane : UserControl
                         ? FlowDirection.RightToLeft
                         : FlowDirection.LeftToRight;
 
-                    var trashDrive = Data.DevicesObject.Current.Drives.OfType<VirtualDriveViewModel>().First(d => d.Type is AbstractDrive.DriveType.Trash);
+                    var trashDrive = Data.DevicesObject.Current?.Drives.OfType<VirtualDriveViewModel>().FirstOrDefault(d => d.Type is AbstractDrive.DriveType.Trash);
 
                     control.LargeFileIcon.Source = drive.Type switch
                     {
-                        AbstractDrive.DriveType.Trash when trashDrive.ItemsCount == 0 => EmptyTrash.DragImage,
+                        AbstractDrive.DriveType.Trash when trashDrive?.ItemsCount == 0 => EmptyTrash.DragImage,
                         AbstractDrive.DriveType.Trash => FullTrash.DragImage,
                         AbstractDrive.DriveType.Package => AppIcon,
                         _ => DriveIcon.DragImage,

@@ -584,6 +584,11 @@ public static class DeviceHelper
 
         if (Data.DevicesObject.Current is null || Data.DevicesObject.Current.IsOpen && Data.DevicesObject.Current.Status is not DeviceStatus.Ok)
         {
+            Data.DeviceCts.Cancel();
+            Data.DeviceCts.Dispose();
+            Data.DeviceCts = new();
+
+            ThumbnailService.StopLoading();
             DriveHelper.ClearDrives();
             Devices.SetOpenDevice(null);
         }
@@ -620,10 +625,13 @@ public static class DeviceHelper
 
         if (Data.DevicesObject.Current is null)
         {
-            if (string.IsNullOrEmpty(Data.Settings.LastDevice))
-                device = devices.First();
+            var available = devices.ToList();
+            if (available.Count == 1)
+                device = available[0];
+            else if (string.IsNullOrEmpty(Data.Settings.LastDevice))
+                device = available.FirstOrDefault();
             else
-                device = devices.FirstOrDefault(d => d.Name == Data.Settings.LastDevice);
+                device = available.FirstOrDefault(d => d.Name == Data.Settings.LastDevice);
         }
         else
             device = Data.DevicesObject.Current;
@@ -646,8 +654,7 @@ public static class DeviceHelper
             if (!t.Result)
                 return;
 
-            Devices.SetOpenDevice(device);
-            Data.RuntimeSettings.InitLister = true;
+            OpenDevice(device);
         }));
     }
 
@@ -663,8 +670,9 @@ public static class DeviceHelper
 
         internalDrive.UpdateInternalStorage(device.ID);
 
-        // Start drive enumeration immediately — it is independent of Props
+        // Start drive enumeration and battery update immediately — both are independent of Props
         FileActionLogic.RefreshDrives(true, CancellationToken.None);
+        Task.Run(() => device.UpdateBattery(CancellationToken.None));
 
         // Suspend until Props is loaded without blocking the UI thread.
         // CombineDisplayNames and DriveViewNav must run after Props so that
@@ -732,6 +740,11 @@ public static class DeviceHelper
             case LogicalDeviceViewModel logical:
                 if (logical.IsOpen)
                 {
+                    Data.DeviceCts.Cancel();
+                    Data.DeviceCts.Dispose();
+                    Data.DeviceCts = new();
+
+                    ThumbnailService.StopLoading();
                     DriveHelper.ClearDrives();
                     FileActionLogic.ClearExplorer();
                     NavHistory.Reset();
@@ -754,6 +767,10 @@ public static class DeviceHelper
 
     public static void OpenDevice(LogicalDeviceViewModel device)
     {
+        Data.DeviceCts.Cancel();
+        Data.DeviceCts.Dispose();
+        Data.DeviceCts = new();
+
         Devices.SetOpenDevice(device);
 
         Data.CurrentPage.Value = typeof(ExplorerPage);

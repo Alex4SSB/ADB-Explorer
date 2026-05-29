@@ -416,7 +416,7 @@ public partial class ExplorerPageHeader : UserControl
                         default:
                             bfNavigation = false;
                             if (FileActions.IsDriveViewVisible && RuntimeSettings.LocationToNavigate.Location is Navigation.SpecialLocation.DriveView)
-                                FileActionLogic.RefreshDrives(true, CancellationToken.None);
+                                        FileActionLogic.RefreshDrives(true, DeviceCts.Token);
                             else
                                 NavigateToLocation(RuntimeSettings.LocationToNavigate);
                             break;
@@ -618,6 +618,10 @@ public partial class ExplorerPageHeader : UserControl
 
     private bool _navigateToPath(string realPath)
     {
+        DeviceCts.Cancel();
+        DeviceCts.Dispose();
+        DeviceCts = new();
+
         FileActions.ListingInProgress = true;
 
         FileActions.WasInAppDrive = FileActions.IsAppDrive;
@@ -673,7 +677,7 @@ public partial class ExplorerPageHeader : UserControl
 
         if (FileActions.IsRecycleBin)
         {
-            TrashHelper.ParseIndexersAsync().ContinueWith(_ => DirList.Navigate(realPath));
+            TrashHelper.ParseIndexersAsync(DeviceCts.Token).ContinueWith(_ => DirList.Navigate(realPath));
 
             FileActions.DeleteDescription.Value = Strings.Resources.S_EMPTY_TRASH;
             FileActions.RestoreDescription.Value = Strings.Resources.S_RESTORE_ALL;
@@ -682,7 +686,7 @@ public partial class ExplorerPageHeader : UserControl
         {
             if (FileActions.IsAppDrive)
             {
-                FileActionLogic.UpdatePackages(true);
+                FileActionLogic.UpdatePackages(true, DeviceCts.Token);
                 FileActionLogic.UpdateFileActions();
                 return true;
             }
@@ -744,7 +748,7 @@ public partial class ExplorerPageHeader : UserControl
         {
             FileActions.IsRecycleBin = false;
             RuntimeSettings.IsPathBoxFocused = false;
-            FileActionLogic.RefreshDrives(true, CancellationToken.None);
+            FileActionLogic.RefreshDrives(true, DeviceCts.Token);
             DriveViewNav();
 
             FileActionLogic.UpdateFileActions();
@@ -787,6 +791,10 @@ public partial class ExplorerPageHeader : UserControl
 
     private void DriveViewNav()
     {
+        DeviceCts.Cancel();
+        DeviceCts.Dispose();
+        DeviceCts = new();
+
         FileActionLogic.ClearExplorer(false);
         FileActions.IsDriveViewVisible = true;
 

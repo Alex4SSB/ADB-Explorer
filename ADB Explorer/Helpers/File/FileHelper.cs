@@ -333,8 +333,11 @@ public static class FileHelper
 
     public static IEnumerable<FileClass> GetFilesFromTree(FolderTree[] tree) => tree.Select(t => new FileClass(t));
 
-    public static FolderTree[] GetFolderTree(IEnumerable<string> paths, bool isFolder = true)
+    public static FolderTree[] GetFolderTree(IEnumerable<string> paths, bool isFolder = true, CancellationToken cancellationToken = default)
     {
+        if (Data.DevicesObject.Current is null)
+            return [];
+
         string stdout = "";
         var files = string.Join(" ", paths.Select(p => ADBService.EscapeAdbShellString(p)));
         var depth = isFolder ? "-mindepth 1" : "";
@@ -352,7 +355,7 @@ public static class FileHelper
                 "2>&1"
             ];
 
-            ADBService.ExecuteDeviceAdbShellCommand(Data.DevicesObject.Current.ID, "find", out stdout, out _, CancellationToken.None, args);
+            ADBService.ExecuteDeviceAdbShellCommand(Data.DevicesObject.Current.ID, "find", out stdout, out _, cancellationToken, args);
         }
         else // when find does not support -printf
         {
@@ -368,7 +371,7 @@ public static class FileHelper
                 """fi; done;"""
             ];
 
-            ADBService.ExecuteDeviceAdbShellCommand(Data.DevicesObject.Current.ID, "find", out stdout, out _, CancellationToken.None, args);
+            ADBService.ExecuteDeviceAdbShellCommand(Data.DevicesObject.Current.ID, "find", out stdout, out _, cancellationToken, args);
         }
         var matches = AdbRegEx.RE_FIND_TREE().Matches(stdout);
 

@@ -59,7 +59,13 @@ public static class Data
 
     public static void RaiseClearLogs() => ClearLogs?.Invoke(null, EventArgs.Empty);
 
+    public static event EventHandler ClearNavBox;
+
+    public static void RaiseClearNavBox() => ClearNavBox?.Invoke(null, EventArgs.Empty);
+
     public static ObservableProperty<bool> IsLogPaused { get; set; } = new();
 
     public static ObservableProperty<IBrowserItem?> ItemToSelect { get; set; } = new();
+
+    public static CancellationTokenSource DeviceCts { get; set; } = new();
 }

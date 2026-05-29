@@ -276,6 +276,7 @@ public partial class ExplorerViewModel : ObservableObject
         {
             OnPropertyChanged(nameof(CurrentDevice));
             OnPropertyChanged(nameof(CurrentDeviceBattery));
+            OnPropertyChanged(nameof(IsBatteryVisible));
             SubscribeToBattery(CurrentDeviceBattery);
         }
     }
@@ -378,7 +379,7 @@ public partial class ExplorerViewModel : ObservableObject
 
     private void UpdateDriveView()
     {
-        var source = Data.DevicesObject.Current.Drives;
+        var source = Data.DevicesObject.Current?.Drives;
         if (source is null)
             return;
 

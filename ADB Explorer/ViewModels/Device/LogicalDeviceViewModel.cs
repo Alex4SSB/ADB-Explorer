@@ -123,8 +123,9 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
                             line => line.Split(':')[0].Trim('[', ']', ' '),
                             line => line.Split(':')[1].Trim('[', ']', ' '));
                 }
+                // Do not cache on failure so subsequent attempts can retry
                 else
-                    field = [];
+                    return [];
             }
 
             return field;
@@ -236,6 +237,9 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         if (e.PropertyName == nameof(Devices.DeviceToOpen))
         {
             IsOpen = Data.DevicesObject.DeviceToOpen?.ID == ID;
+
+            if (!IsOpen)
+                OnPropertyChanged(nameof(AndroidVersion));
         }
     }
 

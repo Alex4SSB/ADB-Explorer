@@ -194,6 +194,15 @@ public static partial class ThumbnailService
     public static void InvalidateThumbnailDirCache(string logicalDeviceId)
         => _deviceInfoCache.RemoveAll(d => d.DeviceId == logicalDeviceId);
 
+    /// <summary>
+    /// Cancels any in-progress thumbnail loading and hides the progress tooltip.
+    /// </summary>
+    public static void StopLoading()
+    {
+        foreach (ThumbnailStep step in Enum.GetValues<ThumbnailStep>())
+            ThumbnailProgressChanged?.Invoke(step, false);
+    }
+
     public static bool ForceLoad(LogicalDeviceViewModel device)
     {
         if (!_mutex.WaitOne(0))
@@ -458,11 +467,12 @@ public static partial class ThumbnailService
     {
         ThumbnailProgressChanged?.Invoke(ThumbnailStep.ReadingDatabase, true);
 
-        var picsResponse = GetThumbsFromDevice(deviceInfo, MediaType.images, CancellationToken.None);
+        var ct = Data.DeviceCts.Token;
+        var picsResponse = GetThumbsFromDevice(deviceInfo, MediaType.images, ct);
         var thumbnailMap = ParseThumbnailMap(picsResponse, MediaType.images).ToList();
 
         string moviesResponse = Data.Settings.MovieThumbsEnabled
-            ? GetThumbsFromDevice(deviceInfo, MediaType.video, CancellationToken.None)
+            ? GetThumbsFromDevice(deviceInfo, MediaType.video, ct)
             : "";
 
         var moviesThumbnailMap = ParseThumbnailMap(moviesResponse, MediaType.video);
