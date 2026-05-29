@@ -159,6 +159,7 @@ public partial class ExplorerPageHeader : UserControl
 
         SelectionTimer.Tick += SelectionTimer_Tick;
 
+        DriveList.SelectionChanged += DriveList_SelectionChanged;
 
         FileIconView.RenameStarted += IconView_RenameStarted;
 
@@ -1669,25 +1670,26 @@ public partial class ExplorerPageHeader : UserControl
 
     private void EmptyNonRootTextBlock_Loaded(object sender, RoutedEventArgs e) => TextHelper.BuildLocalizedInlines(sender, e);
 
+    private void DriveList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        DetailsPane.SelectedFiles = DriveList.SelectedItem is DriveViewModel selectedDrive ? [selectedDrive] : [];
+    }
+
     private void DriveList_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
         var hitItem = e.OriginalSource is DependencyObject source
-            ? ItemsControl.ContainerFromElement(DriveList, source) as FrameworkElement
+            ? ItemsControl.ContainerFromElement(DriveList, source)
             : null;
 
-        if (hitItem is null || hitItem.DataContext is not DriveViewModel drive)
-        {
-            foreach (var item in DriveList.Items)
-            {
-                (item as DriveViewModel)?.IsSelected = false;
-            }
+        if (hitItem is not null)
+            return;
 
-            DetailsPane.SelectedFiles = [];
-        }
-        else
+        foreach (var item in DriveList.Items)
         {
-            DetailsPane.SelectedFiles = [drive];
+            (item as DriveViewModel)?.IsSelected = false;
         }
+
+        DriveList.SelectedIndex = -1;
     }
 
     private void ExplorerHeader_SizeChanged(object sender, SizeChangedEventArgs e)

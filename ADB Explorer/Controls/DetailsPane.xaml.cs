@@ -427,7 +427,7 @@ public partial class DetailsPane : UserControl
         SaveCommand = new AsyncRelayCommand(async () =>
         {
             var file = SelectedFiles.First() as FileClass;
-            var result = await AdbHelper.WriteTextFileAsync(Data.DevicesObject.Current, file.FullPath, EditorText, _cancellationToken.Token);
+            var result = await AdbHelper.WriteTextFileAsync(Data.DevicesObject.Current, file, EditorText, _cancellationToken.Token);
 
             if (result)
             {

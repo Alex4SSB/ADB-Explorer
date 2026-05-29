@@ -75,12 +75,12 @@ public static class AdbHelper
         }
     });
 
-    public static Task<bool> WriteTextFileAsync(LogicalDeviceViewModel device, string filePath, string content, CancellationToken cancellationToken = default) =>
+    public static Task<bool> WriteTextFileAsync(LogicalDeviceViewModel device, FileClass file, string content, CancellationToken cancellationToken = default) =>
         Task.Run(async () =>
     {
         try
         {
-            await WriteFileAsync(device, filePath, content, cancellationToken);
+            await WriteFileAsync(device, file, content, cancellationToken);
             return true;
         }
         catch (Exception e)
@@ -154,7 +154,7 @@ public static class AdbHelper
         return stream;
     }
 
-    public static async Task WriteFileAsync(LogicalDeviceViewModel device, string path, string content, CancellationToken cancellationToken = default)
+    public static async Task WriteFileAsync(LogicalDeviceViewModel device, FileClass file, string content, CancellationToken cancellationToken = default)
     {
         using MemoryStream stream = new();
         using StreamWriter writer = new(stream);
@@ -163,7 +163,7 @@ public static class AdbHelper
         stream.Position = 0;
 
         using SyncService service = new(device.Device.DeviceData);
-        await service.PushAsync(stream, path, (UnixFileMode)0x1ED, DateTime.Now, cancellationToken: cancellationToken); // 0x1ED = 0777 in octal
+        await service.PushAsync(stream, file.FullPath, file.Permissions ?? (UnixFileMode)0x1ED, DateTime.Now, cancellationToken: cancellationToken); // 0x1ED = 0777 in octal
         SyncTransferTracker.AddPushBytes(stream.Length);
     }
 
