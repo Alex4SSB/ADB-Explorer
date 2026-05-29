@@ -14,9 +14,9 @@
 	<a href="https://github.com/Alex4SSB/ADB-Explorer/issues">
 		<img alt="Issues" src="https://img.shields.io/github/issues/Alex4SSB/ADB-Explorer" /></a>
 	<a href="https://github.com/Alex4SSB/ADB-Explorer/releases">
-		<img alt="Downloads" src="https://img.shields.io/github/downloads/Alex4SSB/ADB-Explorer/total" /></a>
-	<a href="https://github.com/Alex4SSB/ADB-Explorer/commits">
-  		<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Alex4SSB/ADB-Explorer?label=Last%20commit"></a>
+		<img alt="Downloads" src="https://img.shields.io/github/downloads/Alex4SSB/ADB-Explorer/total?cacheSeconds=3600" /></a>
+	<a href="https://github.com/Alex4SSB/ADB-Explorer/commits/master">
+  		<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Alex4SSB/ADB-Explorer/master?label=Last%20commit&cacheSeconds=3600"></a>
 </p>
 
 An interface to ADB that allows browsing, transferring, and editing of files with ease, in a modern and fluent Windows app, built in WPF.
