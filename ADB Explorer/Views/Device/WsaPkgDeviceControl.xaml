@@ -11,9 +11,9 @@
     d:DataContext="{d:DesignInstance Type=viewmodels:WsaPkgDeviceViewModel}"
     d:Width="200"
     mc:Ignorable="d">
-    <Expander>
-        <Expander.Style>
-            <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="Expander">
+    <ui:CardControl>
+        <ui:CardControl.Style>
+            <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="ui:CardControl">
                 <Setter Property="helpers:ExpanderHelper.HeaderBottomContent">
                     <Setter.Value>
                         <Border BorderBrush="{DynamicResource NewDeviceAltBorder}" BorderThickness="0,1" />
@@ -32,8 +32,8 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-        </Expander.Style>
-        <Expander.Header>
+        </ui:CardControl.Style>
+        <ui:CardControl.Header>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -46,7 +46,7 @@
                     Style="{StaticResource DeviceNameTextBlockStyle}"
                     Text="{Binding Source={x:Static Member=strings:Resources.S_DEVICE_WSA_APP}}" />
             </Grid>
-        </Expander.Header>
+        </ui:CardControl.Header>
         <Grid Style="{StaticResource DeviceContentGridStyle}">
             <ui:Button
                 HorizontalAlignment="Right"
@@ -54,5 +54,5 @@
                 Content="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_LAUNCH}}"
                 Style="{StaticResource DeviceTextButtonStyle}" />
         </Grid>
-    </Expander>
+    </ui:CardControl>
 </UserControl>

@@ -35,7 +35,7 @@ public partial class DetailsPane : UserControl
     }
 
     public static readonly DependencyProperty IsOpenProperty =
-        DependencyProperty.Register("IsOpen", typeof(bool),
+        DependencyProperty.Register(nameof(IsOpen), typeof(bool),
           typeof(DetailsPane), new PropertyMetadata(false, OnIsOpenChanged));
 
     public double PaneMinWidth
@@ -45,7 +45,7 @@ public partial class DetailsPane : UserControl
     }
 
     public static readonly DependencyProperty PaneMinWidthProperty =
-        DependencyProperty.Register("PaneMinWidth", typeof(double),
+        DependencyProperty.Register(nameof(PaneMinWidth), typeof(double),
           typeof(DetailsPane), new PropertyMetadata(100.0));
 
     public double PaneMaxWidth
@@ -55,7 +55,7 @@ public partial class DetailsPane : UserControl
     }
 
     public static readonly DependencyProperty PaneMaxWidthProperty =
-        DependencyProperty.Register("PaneMaxWidth", typeof(double),
+        DependencyProperty.Register(nameof(PaneMaxWidth), typeof(double),
           typeof(DetailsPane), new PropertyMetadata(1000.0));
 
     private static void OnIsOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -98,7 +98,7 @@ public partial class DetailsPane : UserControl
     }
 
     public static readonly DependencyProperty EditorTextProperty =
-        DependencyProperty.Register("EditorText", typeof(string),
+        DependencyProperty.Register(nameof(EditorText), typeof(string),
           typeof(DetailsPane), new PropertyMetadata(null));
 
     public bool IsEditorFocused
@@ -108,7 +108,7 @@ public partial class DetailsPane : UserControl
     }
 
     public static readonly DependencyProperty IsEditorFocusedProperty =
-        DependencyProperty.Register("IsEditorFocused", typeof(bool),
+        DependencyProperty.Register(nameof(IsEditorFocused), typeof(bool),
           typeof(DetailsPane), new PropertyMetadata(false));
 
     public IEnumerable<IBrowserItem> SelectedFiles

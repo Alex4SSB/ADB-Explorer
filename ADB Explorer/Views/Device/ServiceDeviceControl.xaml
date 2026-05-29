@@ -6,21 +6,16 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:ServiceDeviceViewModel}"
     mc:Ignorable="d">
-    <Expander>
-        <Expander.Style>
-            <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="Expander">
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding MdnsType}" Value="QrCode">
-                        <Setter Property="helpers:ExpanderHelper.IsExpandEnabled" Value="False" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Expander.Style>
-        <Expander.Header>
+    <ui:CardControl>
+        <ui:CardControl.Style>
+            <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="ui:CardControl" />
+        </ui:CardControl.Style>
+        <ui:CardControl.Header>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -42,24 +37,31 @@
                     Style="{StaticResource DeviceNameTextBlockStyle}"
                     Text="{Binding IpAddress}" />
             </Grid>
-        </Expander.Header>
-        <Grid Style="{StaticResource DeviceContentGridStyle}">
+        </ui:CardControl.Header>
+        <Grid>
+            <Grid.Style>
+                <Style BasedOn="{StaticResource DeviceContentGridStyle}" TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding MdnsType}" Value="QrCode">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <controls:MaskedTextBox
-                Height="32"
                 EnterCommand="{Binding PairCommand.Command}"
                 Style="{StaticResource PairingCodeBoxStyle}"
                 Text="{Binding UIPairingCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            <Button
+            <ui:Button
                 Grid.Column="1"
-                Height="32"
                 Margin="8,0,0,0"
                 VerticalAlignment="Center"
                 Command="{Binding PairCommand.Command}"
-                Content="Pair" />
+                Content="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_PAIR}}" />
         </Grid>
-    </Expander>
+    </ui:CardControl>
 </UserControl>
