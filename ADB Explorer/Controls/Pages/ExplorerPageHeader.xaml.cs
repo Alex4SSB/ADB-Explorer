@@ -632,6 +632,9 @@ public partial class ExplorerPageHeader : UserControl
         ViewModel.CurrentSelectedIndex = -1;
         ActiveUnselectAll();
 
+        if (DetailsPane.IsOpen)
+            DetailsPane.SelectedFiles = [];
+
         ActiveView.Focus();
         CurrentPath = realPath;
 
@@ -809,7 +812,12 @@ public partial class ExplorerPageHeader : UserControl
             DriveList.SelectedIndex = -1;
 
         if (DriveList.SelectedIndex > -1)
+        {
             SelectionHelper.GetListViewItemContainer(DriveList).Focus();
+
+            if (DetailsPane.IsOpen)
+                DetailsPane.SelectedFiles = DriveList.SelectedItem is DriveViewModel selectedDrive ? [selectedDrive] : [];
+        }
     }
 
     private void DataGridCell_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
