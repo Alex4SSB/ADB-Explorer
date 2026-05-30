@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1587,5 +1587,8 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_ADB_COMPROMISED" xml:space="preserve">
     <value>提供的可执行文件无法被验证为 ADB。确保从 Google 下载官方 Android 平台工具。</value>
+  </data>
+  <data name="S_BUTTON_PAIR" xml:space="preserve">
+    <value>配对</value>
   </data>
 </root>
