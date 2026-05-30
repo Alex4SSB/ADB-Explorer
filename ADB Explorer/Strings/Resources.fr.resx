@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1587,5 +1587,8 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   </data>
   <data name="S_ADB_COMPROMISED" xml:space="preserve">
     <value>L'exécutable fourni ne peut être vérifié en tant qu'ADB. Assurez-vous de télécharger uniquement les outils de plateforme Android officiels de Google.</value>
+  </data>
+  <data name="S_BUTTON_PAIR" xml:space="preserve">
+    <value>Apairer</value>
   </data>
 </root>
