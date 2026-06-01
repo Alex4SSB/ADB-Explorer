@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1455,5 +1455,14 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_SORT_DESCENDING" xml:space="preserve">
     <value>Absteigend</value>
+  </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Benutzerdefinierte Akzentfarbe</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Akzentfarbe</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Farbe auswählen</value>
   </data>
 </root>
