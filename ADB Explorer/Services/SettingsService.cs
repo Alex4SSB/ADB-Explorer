@@ -11,15 +11,35 @@ public class SettingsService
         WriteIndented = true
     };
 
-    public void Load(string settingsPath)
+    public void Load(string settingsPath, string oldFile = "")
     {
         _path = settingsPath;
 
         if (!File.Exists(_path))
-            return;
+        {
+            Data.Settings = new AppSettings();
 
-        var json = File.ReadAllText(_path);
-        Data.Settings = JsonSerializer.Deserialize<AppSettings>(json, _options) ?? new AppSettings();
+            if (!string.IsNullOrEmpty(oldFile) && File.Exists(oldFile))
+            {
+                var oldSettings = File.ReadAllText(oldFile);
+                var s1 = oldSettings.Split("ManualAdbPath:\"");
+                if (s1.Length > 1)
+                {
+                    var adbPath = s1[1].Split("\";")[0];
+                    if (adbPath.Length > 0)
+                    {
+                        Data.Settings.ManualAdbPath = adbPath;
+                    }
+                }
+
+                File.Delete(oldFile);
+            }
+        }
+        else
+        {
+            var json = File.ReadAllText(_path);
+            Data.Settings = JsonSerializer.Deserialize<AppSettings>(json, _options) ?? new AppSettings();
+        }
     }
 
     public void Save()

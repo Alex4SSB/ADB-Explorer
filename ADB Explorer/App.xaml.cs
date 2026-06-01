@@ -108,7 +108,7 @@ public partial class App
         // Similar to %LocalAppData%\ADB Explorer (but avoids virtualization for Store versions)
         Data.AppDataPath = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "AppData", "Local", AdbExplorerConst.APP_DATA_FOLDER);
 
-        var settingsPath = "";
+        string settingsPath = "", oldPath = "";
         if (e.Args.Length > 0)
         {
             FileInfo file = new(e.Args[0]);
@@ -132,10 +132,13 @@ public partial class App
             settingsPath = Path.GetFullPath(e.Args[0]);
         }
         else
+        {
             settingsPath = FileHelper.ConcatPaths(Data.AppDataPath, AdbExplorerConst.APP_SETTINGS_FILE, '\\');
+            oldPath = FileHelper.ConcatPaths(Data.AppDataPath, "App.txt", '\\');
+        }
 
         var settings = Services.GetRequiredService<SettingsService>();
-        settings.Load(settingsPath);
+        settings.Load(settingsPath, oldPath);
 
         if (!Data.Settings.UICulture.Equals(CultureInfo.InvariantCulture))
         {
