@@ -53,6 +53,77 @@
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
+        <StackPanel
+            Grid.Row="1"
+            Grid.Column="0"
+            Margin="6,4,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Orientation="Vertical">
+            <StackPanel.Style>
+                <Style TargetType="StackPanel">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsDebug}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Style>
+            <Button
+                Margin="0,1"
+                Padding="4,2"
+                Command="{Binding TestAddLocalCommand}"
+                Content="+ USB"
+                FontSize="10" />
+            <Button
+                Margin="0,1"
+                Padding="4,2"
+                Command="{Binding TestAddRemoteCommand}"
+                Content="+ Wi-Fi"
+                FontSize="10" />
+            <Button
+                Margin="0,1"
+                Padding="4,2"
+                Command="{Binding TestAddEmulatorCommand}"
+                Content="+ Emu"
+                FontSize="10" />
+            <Button
+                Margin="0,1"
+                Padding="4,2"
+                Command="{Binding TestAddRecoveryCommand}"
+                Content="+ Rec"
+                FontSize="10" />
+            <Button
+                Margin="0,1"
+                Padding="4,2"
+                Command="{Binding TestAddUnauthorizedCommand}"
+                Content="+ Unauth"
+                FontSize="10" />
+            <Button
+                Margin="0,1"
+                Padding="4,2"
+                Command="{Binding TestAddOfflineCommand}"
+                Content="+ Offline"
+                FontSize="10" />
+            <Button
+                Margin="0,1"
+                Padding="4,2"
+                Command="{Binding TestAddPairingServiceCommand}"
+                Content="+ Pair"
+                FontSize="10" />
+            <Button
+                Margin="0,1"
+                Padding="4,2"
+                Command="{Binding TestAddQrServiceCommand}"
+                Content="+ QR"
+                FontSize="10" />
+            <Button
+                Margin="0,1"
+                Padding="4,2"
+                Command="{Binding TestClearCommand}"
+                Content="Clear"
+                FontSize="10" />
+        </StackPanel>
         <Grid Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" MinWidth="24" />

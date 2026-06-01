@@ -19,7 +19,7 @@
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     ExtendsContentIntoTitleBar="True"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-    Loaded="FluentWindow_Loaded"
+    ContentRendered="FluentWindow_Loaded"
     RenderOptions.BitmapScalingMode="HighQuality"
     SizeChanged="FluentWindow_SizeChanged"
     SnapsToDevicePixels="False"

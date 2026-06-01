@@ -36,4 +36,39 @@ public partial class DevicesViewModel : ObservableObject, INavigationAware
 
         _isInitialized = true;
     }
+
+    private void RefreshViews()
+    {
+        PrimaryDevicesView?.Refresh();
+        SecondaryDevicesView?.Refresh();
+    }
+
+#if DEBUG
+    [RelayCommand]
+    private void TestAddLocal() { DeviceHelper.TestDevices_AddLocal(); RefreshViews(); }
+
+    [RelayCommand]
+    private void TestAddRemote() { DeviceHelper.TestDevices_AddRemote(); RefreshViews(); }
+
+    [RelayCommand]
+    private void TestAddEmulator() { DeviceHelper.TestDevices_AddEmulator(); RefreshViews(); }
+
+    [RelayCommand]
+    private void TestAddRecovery() { DeviceHelper.TestDevices_AddRecovery(); RefreshViews(); }
+
+    [RelayCommand]
+    private void TestAddUnauthorized() { DeviceHelper.TestDevices_AddUnauthorized(); RefreshViews(); }
+
+    [RelayCommand]
+    private void TestAddOffline() { DeviceHelper.TestDevices_AddOffline(); RefreshViews(); }
+
+    [RelayCommand]
+    private void TestAddPairingService() { DeviceHelper.TestDevices_AddPairingService(); RefreshViews(); }
+
+    [RelayCommand]
+    private void TestAddQrService() { DeviceHelper.TestDevices_AddQrService(); RefreshViews(); }
+
+    [RelayCommand]
+    private void TestClear() { DeviceHelper.TestDevices_Clear(); RefreshViews(); }
+#endif
 }

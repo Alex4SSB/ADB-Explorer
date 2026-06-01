@@ -73,12 +73,7 @@
         BasedOn="{StaticResource NumericTextBoxStyle}"
         TargetType="ui:TextBox">
         <Setter Property="PlaceholderText" Value="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_CODE}}" />
-        <!--<Setter Property="ui:TextBoxHelper.IsDeleteButtonVisible" Value="False" />
-    <Style.Triggers>
-        <Trigger Property="ui:TextBoxHelper.HasText" Value="True">
-            <Setter Property="FontSize" Value="18" />
-        </Trigger>
-    </Style.Triggers>-->
+        <Setter Property="Padding" Value="4,5,4,6" />
     </Style>
     <Style
         x:Key="NewDeviceMaskedTextBoxStyle"

@@ -267,7 +267,7 @@ public static class DeviceHelper
             Process.Start($"{AdbExplorerConst.WSA_PROCESS_NAME}.exe");
         });
 
-    public static readonly Predicate<DeviceViewModel> DevicePredicate = device =>
+    public static bool EvaluateDevicePredicate(DeviceViewModel device, Devices devicesObject)
     {
         // The mDNS device cannot hide itself when in a listview
         if (device is MdnsDeviceViewModel)
@@ -282,11 +282,11 @@ public static class DeviceHelper
             if (device.Status is DeviceStatus.Offline)
             {
                 // if a logical service is offline, and we have one of its services - hide the logical service
-                return Data.DevicesObject.ServiceDeviceViewModels.All(s => s.IpAddress != device.IpAddress);
+                return devicesObject.ServiceDeviceViewModels.All(s => s.IpAddress != device.IpAddress);
             }
 
             // if there's a logical service and a remote device with the same IP - hide the logical service
-            var res = !Data.DevicesObject.LogicalDeviceViewModels.Any(l => l.IpAddress == device.IpAddress
+            var res = !devicesObject.LogicalDeviceViewModels.Any(l => l.IpAddress == device.IpAddress
                                                     && l.Type is DeviceType.Remote or DeviceType.Local
                                                     && l.Status is DeviceStatus.Ok);
 
@@ -299,7 +299,7 @@ public static class DeviceHelper
         if (device is LogicalDeviceViewModel && device.Type is DeviceType.Remote)
         {
             // if a remote device is also connected by USB and both are authorized - hide the remote device
-            return !Data.DevicesObject.LogicalDeviceViewModels.Any(usb => usb.Type is DeviceType.Local
+            return !devicesObject.LogicalDeviceViewModels.Any(usb => usb.Type is DeviceType.Local
                 && usb.Status is DeviceStatus.Ok
                 && (device.ID.Contains(usb.ID)
                     || usb.IpAddress == device.IpAddress));
@@ -308,8 +308,8 @@ public static class DeviceHelper
         if (device is HistoryDeviceViewModel hist)
         {
             // if there's any device with the IP of a history device - hide the history device
-            return Data.Settings.SaveDevices && !Data.DevicesObject.LogicalDeviceViewModels.Any(logical => logical.IpAddress == hist.IpAddress || logical.IpAddress == hist.HostName)
-                    && !Data.DevicesObject.ServiceDeviceViewModels.Any(service => service.IpAddress == hist.IpAddress || service.IpAddress == hist.HostName);
+            return Data.Settings.SaveDevices && !devicesObject.LogicalDeviceViewModels.Any(logical => logical.IpAddress == hist.IpAddress || logical.IpAddress == hist.HostName)
+                    && !devicesObject.ServiceDeviceViewModels.Any(service => service.IpAddress == hist.IpAddress || service.IpAddress == hist.HostName);
         }
 
         if (device is ServiceDeviceViewModel service)
@@ -319,12 +319,12 @@ public static class DeviceHelper
                 return false;
 
             // if there's any online logical device with the IP of a pairing service - hide the pairing service
-            if (Data.DevicesObject.LogicalDeviceViewModels.Any(logical => logical.Status is not DeviceStatus.Offline && logical.IpAddress == service.IpAddress))
+            if (devicesObject.LogicalDeviceViewModels.Any(logical => logical.Status is not DeviceStatus.Offline && logical.IpAddress == service.IpAddress))
                 return false;
 
             // if there's any QR service with the IP of a code pairing service - hide the code pairing service
             if (service.MdnsType is ServiceDevice.PairingMode.PairingCode
-                && Data.DevicesObject.ServiceDeviceViewModels.Any(qr => qr.MdnsType is ServiceDevice.PairingMode.QrCode
+                && devicesObject.ServiceDeviceViewModels.Any(qr => qr.MdnsType is ServiceDevice.PairingMode.QrCode
                                                           && qr.IpAddress == service.IpAddress))
                 return false;
         }
@@ -336,7 +336,7 @@ public static class DeviceHelper
                 return false;
 
             // if an online logical WSA device exists, the WSA package is hidden
-            if (Data.DevicesObject.LogicalDeviceViewModels.Any(logical => logical.Type is DeviceType.WSA && logical.Status is not DeviceStatus.Offline))
+            if (devicesObject.LogicalDeviceViewModels.Any(logical => logical.Type is DeviceType.WSA && logical.Status is not DeviceStatus.Offline))
                 return false;
         }
 
@@ -347,13 +347,15 @@ public static class DeviceHelper
         if (device is LogicalDeviceViewModel logicalDev && logicalDev.Type is not DeviceType.Emulator)
         {
             // if there are multiple logical devices of the same model, display their ID instead
-            logicalDev.UseIdForName = Data.DevicesObject.LogicalDeviceViewModels.Count(dev => dev.Name.Equals(logicalDev.Name) && dev.IpAddress != logicalDev.IpAddress) > 1;
+            logicalDev.UseIdForName = devicesObject.LogicalDeviceViewModels.Count(dev => dev.Device.Name.Equals(logicalDev.Device.Name) && dev.IpAddress != logicalDev.IpAddress) > 1;
         }
 
         return true;
-    };
+    }
 
-    public static readonly Predicate<object> DevicesFilter = d => DevicePredicate((DeviceViewModel)d);
+    public static readonly Predicate<DeviceViewModel> DevicePredicate = device => EvaluateDevicePredicate(device, Data.DevicesObject);
+
+    public static readonly Predicate<object> DevicesFilter = d => EvaluateDevicePredicate((DeviceViewModel)d, Data.DevicesObject);
 
     public static void FilterDevices(ICollectionView collectionView)
     {
@@ -699,28 +701,92 @@ public static class DeviceHelper
         FileActionLogic.UpdateFileActions();
     }
 
-    public static void TestDevices()
-    {
-        //ConnectTimer.IsEnabled = false;
+    #region Test device injection (DEBUG only)
 
-        //DevicesObject.UpdateServices(new List<ServiceDevice>() { new ServiceDevice("sdfsdfdsf_adb-tls-pairing._tcp.", "192.168.1.20", "5555", ServiceConnectionKind.Pairing) { MdnsType = ServiceDevice.ServiceType.PairingCode } });
-        //DevicesObject.UpdateDevices(new List<LogicalDevice>() { LogicalDevice.New("Test", "test.ID", "device") });
+    private static int _testDeviceCounter = 0;
+
+    private static LogicalDeviceViewModel MakeLogicalVM(string nameSuffix, string id, string ipAddress, DeviceType type, DeviceStatus status)
+        => new(LogicalDevice.From(new DeviceSnapshot(id, nameSuffix, status, type, RootStatus.Unchecked, ipAddress, default))) { IsTestDevice = true };
+
+    private static IEnumerable<LogicalDeviceViewModel> CurrentLogical()
+        => Data.DevicesObject.LogicalDeviceViewModels.ToList();
+
+    private static IEnumerable<ServiceDeviceViewModel> CurrentServices()
+        => Data.DevicesObject.ServiceDeviceViewModels.ToList();
+
+    public static void TestDevices_AddLocal()
+    {
+        int n = ++_testDeviceCounter;
+        var vm = MakeLogicalVM($"USB Device {n}", $"TEST_USB_{n}", "", DeviceType.Local, DeviceStatus.Ok);
+        Data.DevicesObject.UpdateDevices([.. CurrentLogical(), vm]);
     }
 
-    public static void SetAndroidVersion()
+    public static void TestDevices_AddRemote()
     {
-        var versionTask = Data.DevicesObject.Current.GetAndroidVersion();
-        versionTask?.ContinueWith(t =>
+        int n = ++_testDeviceCounter;
+        var ip = $"192.168.{n / 256}.{n % 256}";
+        var vm = MakeLogicalVM($"Wi-Fi Device {n}", $"{ip}:5555", ip, DeviceType.Remote, DeviceStatus.Ok);
+        Data.DevicesObject.UpdateDevices([.. CurrentLogical(), vm]);
+    }
+
+    public static void TestDevices_AddEmulator()
+    {
+        int n = ++_testDeviceCounter;
+        var vm = MakeLogicalVM($"emulator-{5554 + n}", $"emulator-{5554 + n}", "", DeviceType.Emulator, DeviceStatus.Ok);
+        Data.DevicesObject.UpdateDevices([.. CurrentLogical(), vm]);
+    }
+
+    public static void TestDevices_AddRecovery()
+    {
+        int n = ++_testDeviceCounter;
+        var vm = MakeLogicalVM($"Recovery Device {n}", $"TEST_RECOVERY_{n}", "", DeviceType.Recovery, DeviceStatus.Ok);
+        Data.DevicesObject.UpdateDevices([.. CurrentLogical(), vm]);
+    }
+
+    public static void TestDevices_AddUnauthorized()
+    {
+        int n = ++_testDeviceCounter;
+        var vm = MakeLogicalVM($"Unauthorized Device {n}", $"TEST_UNAUTH_{n}", "", DeviceType.Local, DeviceStatus.Unauthorized);
+        Data.DevicesObject.UpdateDevices([.. CurrentLogical(), vm]);
+    }
+
+    public static void TestDevices_AddOffline()
+    {
+        int n = ++_testDeviceCounter;
+        var vm = MakeLogicalVM($"Offline Device {n}", $"TEST_OFFLINE_{n}", "", DeviceType.Local, DeviceStatus.Offline);
+        Data.DevicesObject.UpdateDevices([.. CurrentLogical(), vm]);
+    }
+
+    public static void TestDevices_AddPairingService()
+    {
+        int n = ++_testDeviceCounter;
+        var ip = $"10.0.{n / 256}.{n % 256}";
+        var svc = new ServiceDeviceViewModel(new ServiceDevice($"test-code-{n}_adb-tls-pairing._tcp.", ip, $"{5555 + n}", ServiceConnectionKind.Pairing)
         {
-            if (t.IsCanceled)
-                return;
-
-            App.SafeInvoke(() =>
-            {
-                Data.DevicesObject.Current.SetAndroidVersion();
-            });
-        });
+            MdnsType = ServiceDevice.PairingMode.PairingCode
+        }) { IsTestDevice = true };
+        Data.DevicesObject.UpdateServices([.. CurrentServices(), svc]);
     }
+
+    public static void TestDevices_AddQrService()
+    {
+        int n = ++_testDeviceCounter;
+        var ip = $"10.1.{n / 256}.{n % 256}";
+        var svc = new ServiceDeviceViewModel(new ServiceDevice($"ADB_WIFI_QR_{n}_adb-tls-pairing._tcp.", ip, $"{5555 + n}", ServiceConnectionKind.Pairing)
+        {
+            MdnsType = ServiceDevice.PairingMode.QrCode
+        }) { IsTestDevice = true };
+        Data.DevicesObject.UpdateServices([.. CurrentServices(), svc]);
+    }
+
+    public static void TestDevices_Clear()
+    {
+        _testDeviceCounter = 0;
+        Data.DevicesObject.UpdateDevices([]);
+        Data.DevicesObject.UpdateServices([]);
+    }
+
+    #endregion
 
     public static void ConnectDevice(NewDeviceViewModel device)
     {

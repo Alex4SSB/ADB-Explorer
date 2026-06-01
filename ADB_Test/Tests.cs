@@ -2,6 +2,7 @@ using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -404,6 +405,281 @@ namespace ADB_Test
             Assert.IsTrue(emptyDir.IsDirectory);
             Assert.AreEqual(AbstractFile.FileType.Folder, emptyDir.Type);
             Assert.AreEqual(AbstractFile.FilePathType.Windows, emptyDir.PathType);
+        }
+    }
+
+    [TestClass]
+    public class DevicePredicateTests
+    {
+        // Helpers
+
+        private static LogicalDeviceViewModel MakeLogical(string id, string name, DeviceType type, DeviceStatus status, string ip = "")
+            => new(LogicalDevice.From(new DeviceSnapshot(id, name, status, type, RootStatus.Unchecked, ip, default)));
+
+        private static ServiceDeviceViewModel MakeService(string id, string ip, ServiceDevice.PairingMode mode, ServiceConnectionKind kind = ServiceConnectionKind.Pairing)
+            => new(new ServiceDevice(id, ip, "5555", kind) { MdnsType = mode });
+
+        private static bool Eval(DeviceViewModel device) => DeviceHelper.EvaluateDevicePredicate(device, Data.DevicesObject);
+
+        [TestInitialize]
+        public void Setup()
+        {
+            Data.Settings = new AppSettings();
+            Data.DevicesObject = new Devices();
+            // Remove the default VMs added by Devices() so tests start with a clean UIList
+            Data.DevicesObject.UIList.Clear();
+        }
+
+        // ── MdnsDeviceViewModel ────────────────────────────────────────────────
+
+        [TestMethod]
+        public void MdnsDevice_HiddenWhenMdnsDisabled()
+        {
+            Data.Settings.EnableMdns = false;
+            var vm = new MdnsDeviceViewModel(new MdnsDevice());
+            Assert.IsFalse(Eval(vm));
+        }
+
+        [TestMethod]
+        public void MdnsDevice_ShownWhenMdnsEnabled()
+        {
+            Data.Settings.EnableMdns = true;
+            var vm = new MdnsDeviceViewModel(new MdnsDevice());
+            Assert.IsTrue(Eval(vm));
+        }
+
+        // ── LogicalDeviceViewModel — open device always shown ─────────────────
+
+        [TestMethod]
+        public void OpenLogicalDevice_AlwaysShown()
+        {
+            var vm = MakeLogical("USB1", "Phone", DeviceType.Local, DeviceStatus.Ok);
+            Data.DevicesObject.UIList.Add(vm);
+            // Simulate open by setting DeviceToOpen (IsOpen is driven by DeviceToOpen match)
+            Data.DevicesObject.DeviceToOpen = vm;
+            Assert.IsTrue(Eval(vm));
+        }
+
+        // ── DeviceType.Service logical — offline ─────────────────────────────
+
+        [TestMethod]
+        public void ServiceLogical_Offline_NoMatchingService_Shown()
+        {
+            var vm = MakeLogical("svc.1", "Svc", DeviceType.Service, DeviceStatus.Offline, "192.168.1.10");
+            Data.DevicesObject.UIList.Add(vm);
+            // No ServiceDeviceViewModel with that IP
+            Assert.IsTrue(Eval(vm));
+        }
+
+        [TestMethod]
+        public void ServiceLogical_Offline_MatchingServiceExists_Hidden()
+        {
+            var svc = MakeService("svc_adb-tls-pairing._tcp.", "192.168.1.10", ServiceDevice.PairingMode.PairingCode);
+            var logical = MakeLogical("svc.1", "Svc", DeviceType.Service, DeviceStatus.Offline, "192.168.1.10");
+            Data.DevicesObject.UIList.Add(svc);
+            Data.DevicesObject.UIList.Add(logical);
+            Assert.IsFalse(Eval(logical));
+        }
+
+        // ── DeviceType.Service logical — online ──────────────────────────────
+
+        [TestMethod]
+        public void ServiceLogical_Online_NoDuplicateRemote_Shown()
+        {
+            var vm = MakeLogical("svc.2", "Svc", DeviceType.Service, DeviceStatus.Ok, "192.168.1.20");
+            Data.DevicesObject.UIList.Add(vm);
+            Assert.IsTrue(Eval(vm));
+        }
+
+        [TestMethod]
+        public void ServiceLogical_Online_DuplicateRemoteOnline_Hidden()
+        {
+            var remote = MakeLogical("192.168.1.20:5555", "Phone", DeviceType.Remote, DeviceStatus.Ok, "192.168.1.20");
+            var svcLogical = MakeLogical("svc.3", "Svc", DeviceType.Service, DeviceStatus.Ok, "192.168.1.20");
+            Data.DevicesObject.UIList.Add(remote);
+            Data.DevicesObject.UIList.Add(svcLogical);
+            Assert.IsFalse(Eval(svcLogical));
+        }
+
+        // ── DeviceType.Remote ─────────────────────────────────────────────────
+
+        [TestMethod]
+        public void RemoteDevice_NoUsbDuplicate_Shown()
+        {
+            var vm = MakeLogical("192.168.1.30:5555", "Phone", DeviceType.Remote, DeviceStatus.Ok, "192.168.1.30");
+            Data.DevicesObject.UIList.Add(vm);
+            Assert.IsTrue(Eval(vm));
+        }
+
+        [TestMethod]
+        public void RemoteDevice_UsbDuplicateByIp_Hidden()
+        {
+            var usb = MakeLogical("SERIALABC", "Phone", DeviceType.Local, DeviceStatus.Ok, "192.168.1.30");
+            var remote = MakeLogical("192.168.1.30:5555", "Phone", DeviceType.Remote, DeviceStatus.Ok, "192.168.1.30");
+            Data.DevicesObject.UIList.Add(usb);
+            Data.DevicesObject.UIList.Add(remote);
+            Assert.IsFalse(Eval(remote));
+        }
+
+        [TestMethod]
+        public void RemoteDevice_UsbDuplicateById_Hidden()
+        {
+            var usb = MakeLogical("SERIALABC", "Phone", DeviceType.Local, DeviceStatus.Ok, "");
+            var remote = MakeLogical("SERIALABC:5555", "Phone", DeviceType.Remote, DeviceStatus.Ok, "192.168.1.31");
+            Data.DevicesObject.UIList.Add(usb);
+            Data.DevicesObject.UIList.Add(remote);
+            Assert.IsFalse(Eval(remote));
+        }
+
+        // ── HistoryDeviceViewModel ────────────────────────────────────────────
+
+        [TestMethod]
+        public void HistoryDevice_ShownWhenNoMatchingLogicalOrService()
+        {
+            Data.Settings.SaveDevices = true;
+            var hist = new HistoryDeviceViewModel(new HistoryDevice("192.168.1.40", "5555", "OldPhone"));
+            Data.DevicesObject.UIList.Add(hist);
+            Assert.IsTrue(Eval(hist));
+        }
+
+        [TestMethod]
+        public void HistoryDevice_HiddenWhenSaveDevicesFalse()
+        {
+            Data.Settings.SaveDevices = false;
+            var hist = new HistoryDeviceViewModel(new HistoryDevice("192.168.1.40", "5555", "OldPhone"));
+            Data.DevicesObject.UIList.Add(hist);
+            Assert.IsFalse(Eval(hist));
+        }
+
+        [TestMethod]
+        public void HistoryDevice_HiddenWhenMatchingLogicalExists()
+        {
+            Data.Settings.SaveDevices = true;
+            var logical = MakeLogical("192.168.1.50:5555", "Phone", DeviceType.Remote, DeviceStatus.Ok, "192.168.1.50");
+            var hist = new HistoryDeviceViewModel(new HistoryDevice("192.168.1.50", "5555", "OldPhone"));
+            Data.DevicesObject.UIList.Add(logical);
+            Data.DevicesObject.UIList.Add(hist);
+            Assert.IsFalse(Eval(hist));
+        }
+
+        [TestMethod]
+        public void HistoryDevice_HiddenWhenMatchingServiceExists()
+        {
+            Data.Settings.SaveDevices = true;
+            var svc = MakeService("svc_adb-tls-pairing._tcp.", "192.168.1.60", ServiceDevice.PairingMode.PairingCode);
+            var hist = new HistoryDeviceViewModel(new HistoryDevice("192.168.1.60", "5555", "OldPhone"));
+            Data.DevicesObject.UIList.Add(svc);
+            Data.DevicesObject.UIList.Add(hist);
+            Assert.IsFalse(Eval(hist));
+        }
+
+        // ── ServiceDeviceViewModel ────────────────────────────────────────────
+
+        [TestMethod]
+        public void ServiceDevice_ConnectKind_AlwaysHidden()
+        {
+            var vm = MakeService("svc_connect._tcp.", "192.168.1.70", ServiceDevice.PairingMode.PairingCode, ServiceConnectionKind.Connect);
+            Data.DevicesObject.UIList.Add(vm);
+            Assert.IsFalse(Eval(vm));
+        }
+
+        [TestMethod]
+        public void ServiceDevice_PairingCode_ShownWhenNoConflicts()
+        {
+            var vm = MakeService("svc_code_adb-tls-pairing._tcp.", "192.168.1.80", ServiceDevice.PairingMode.PairingCode);
+            Data.DevicesObject.UIList.Add(vm);
+            Assert.IsTrue(Eval(vm));
+        }
+
+        [TestMethod]
+        public void ServiceDevice_PairingCode_HiddenWhenQrServiceSameIp()
+        {
+            var qr = MakeService("svc_qr_adb-tls-pairing._tcp.", "192.168.1.90", ServiceDevice.PairingMode.QrCode);
+            var code = MakeService("svc_code2_adb-tls-pairing._tcp.", "192.168.1.90", ServiceDevice.PairingMode.PairingCode);
+            Data.DevicesObject.UIList.Add(qr);
+            Data.DevicesObject.UIList.Add(code);
+            Assert.IsFalse(Eval(code));
+        }
+
+        [TestMethod]
+        public void ServiceDevice_PairingCode_HiddenWhenOnlineLogicalSameIp()
+        {
+            var logical = MakeLogical("192.168.1.100:5555", "Phone", DeviceType.Remote, DeviceStatus.Ok, "192.168.1.100");
+            var svc = MakeService("svc_code3_adb-tls-pairing._tcp.", "192.168.1.100", ServiceDevice.PairingMode.PairingCode);
+            Data.DevicesObject.UIList.Add(logical);
+            Data.DevicesObject.UIList.Add(svc);
+            Assert.IsFalse(Eval(svc));
+        }
+
+        // ── WsaPkgDeviceViewModel ─────────────────────────────────────────────
+
+        [TestMethod]
+        public void WsaPkg_Offline_Hidden()
+        {
+            var wsa = new WsaPkgDeviceViewModel(new WsaPkgDevice() /* Status=Offline by default */);
+            Data.DevicesObject.UIList.Add(wsa);
+            Assert.IsFalse(Eval(wsa));
+        }
+
+        [TestMethod]
+        public void WsaPkg_Online_NoWsaLogical_Shown()
+        {
+            var wsaDevice = new WsaPkgDevice();
+            wsaDevice.Status = DeviceStatus.Ok;
+            var wsa = new WsaPkgDeviceViewModel(wsaDevice);
+            Data.DevicesObject.UIList.Add(wsa);
+            Assert.IsTrue(Eval(wsa));
+        }
+
+        [TestMethod]
+        public void WsaPkg_Online_WsaLogicalExists_Hidden()
+        {
+            var wsaDevice = new WsaPkgDevice();
+            wsaDevice.Status = DeviceStatus.Ok;
+            var wsa = new WsaPkgDeviceViewModel(wsaDevice);
+            var wsaLogical = MakeLogical("localhost:5555", "Windows Subsystem", DeviceType.WSA, DeviceStatus.Ok, "");
+            Data.DevicesObject.UIList.Add(wsa);
+            Data.DevicesObject.UIList.Add(wsaLogical);
+            Assert.IsFalse(Eval(wsa));
+        }
+
+        // ── WSA logical offline ───────────────────────────────────────────────
+
+        [TestMethod]
+        public void WsaLogical_Offline_Hidden()
+        {
+            var vm = MakeLogical("localhost:5555", "WSA", DeviceType.WSA, DeviceStatus.Offline, "");
+            Data.DevicesObject.UIList.Add(vm);
+            Assert.IsFalse(Eval(vm));
+        }
+
+        // ── Duplicate name → UseIdForName ─────────────────────────────────────
+
+        [TestMethod]
+        public void DuplicateName_UseIdForName_SetToTrue()
+        {
+            // UseIdForName is set when there are more than 1 other devices with the same name and different IPs.
+            var vm1 = MakeLogical("SERIAL001", "MyPhone", DeviceType.Local, DeviceStatus.Ok, "192.168.1.1");
+            var vm2 = MakeLogical("SERIAL002", "MyPhone", DeviceType.Local, DeviceStatus.Ok, "192.168.1.2");
+            var vm3 = MakeLogical("SERIAL003", "MyPhone", DeviceType.Local, DeviceStatus.Ok, "192.168.1.3");
+            Data.DevicesObject.UIList.Add(vm1);
+            Data.DevicesObject.UIList.Add(vm2);
+            Data.DevicesObject.UIList.Add(vm3);
+
+            Eval(vm1);
+
+            Assert.IsTrue(vm1.UseIdForName);
+        }
+
+        [TestMethod]
+        public void UniqueName_UseIdForName_RemainsDefault()
+        {
+            var vm = MakeLogical("SERIAL001", "MyPhone", DeviceType.Local, DeviceStatus.Ok, "192.168.1.1");
+            Data.DevicesObject.UIList.Add(vm);
+
+            Eval(vm);
+
+            Assert.IsFalse(vm.UseIdForName);
         }
     }
 }

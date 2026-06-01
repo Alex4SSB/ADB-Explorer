@@ -65,6 +65,8 @@ public abstract class DeviceViewModel : ViewModelBase
     /// </summary>
     public virtual bool DeviceExists => Status is not DeviceStatus.Offline;
 
+    public bool IsTestDevice { get; init; }
+
     public bool IsIpAddressValid => !string.IsNullOrWhiteSpace(IpAddress)
                                     && IpAddress.Count(c => c == '.') == 3
                                     && IpAddress.Split('.').Count(i => byte.TryParse(i, out _)) == 4;

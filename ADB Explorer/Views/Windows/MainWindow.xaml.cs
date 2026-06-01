@@ -38,6 +38,11 @@ public partial class MainWindow : INavigationWindow
         navigationService.SetNavigationControl(RootNavigation);
 
         RootNavigation.Navigated += RootNavigation_Navigated;
+
+        Data.CurrentPage.PropertyChanged += (s, e) =>
+        {
+            Navigate(e.NewValue);
+        };
     }
 
     private async void Initialize()
@@ -67,11 +72,6 @@ public partial class MainWindow : INavigationWindow
             {
                 ViewModel.UpdateFileOp();
             }
-        };
-
-        Data.CurrentPage.PropertyChanged += (s, e) =>
-        {
-            Navigate(e.NewValue);
         };
 
         DeviceHelper.UpdateWsaPkgStatus();
@@ -186,12 +186,26 @@ public partial class MainWindow : INavigationWindow
         throw new NotImplementedException();
     }
 
-    private void FluentWindow_Loaded(object sender, RoutedEventArgs e)
+    private void FluentWindow_Loaded(object sender, EventArgs e)
     {
-        if (ViewModel.IsNavigationEnabled)
-            Navigate(typeof(Pages.DevicesPage));
-        else
-            Navigate(typeof(Pages.SettingsPage));
+        // the retries are to force the navigation view to show the selection. doesn't work in DEBUG
+
+        for (int i = 0; i < 4; i++)
+        {
+            Task.Delay(100).ContinueWith(_ =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    if (ViewModel.IsNavigationEnabled)
+                        Navigate(typeof(Pages.DevicesPage));
+                    else
+                        Navigate(typeof(Pages.SettingsPage));
+                });
+            });
+
+            if (RootNavigation.SelectedItem is not null)
+                break;
+        }
     }
 
     private void RootNavigation_PreviewMouseDown(object sender, MouseButtonEventArgs e)

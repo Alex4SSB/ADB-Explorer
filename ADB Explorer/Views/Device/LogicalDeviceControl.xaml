@@ -241,7 +241,10 @@
                                 Style="{StaticResource GlyphFont}" />
                         </controls:AdbMenuItem.Header>
                     </controls:AdbMenuItem>
-                    <controls:AdbMenuItem Command="{Binding RemoveCommand.Command}" ToolTip="{Binding RemoveCommand.Description}">
+                    <controls:AdbMenuItem
+                        Height="38"
+                        Command="{Binding RemoveCommand.Command}"
+                        ToolTip="{Binding RemoveCommand.Description}">
                         <controls:AdbMenuItem.Style>
                             <Style BasedOn="{StaticResource DeviceActionsMenuItemStyle}" TargetType="controls:AdbMenuItem">
                                 <Style.Triggers>
@@ -253,13 +256,16 @@
                         </controls:AdbMenuItem.Style>
                         <controls:AdbMenuItem.Header>
                             <ui:FontIcon
-                                Margin="-4,-5,-6,-5"
+                                Margin="-4,-8,-6,-8"
                                 FontSize="18"
                                 Glyph="&#xE711;"
                                 Style="{StaticResource GlyphFont}" />
                         </controls:AdbMenuItem.Header>
                     </controls:AdbMenuItem>
-                    <controls:AdbMenuItem Command="{Binding SideloadCommand.Command}" ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_REBOOT_SIDELOAD}}">
+                    <controls:AdbMenuItem
+                        Height="38"
+                        Command="{Binding SideloadCommand.Command}"
+                        ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_REBOOT_SIDELOAD}}">
                         <controls:AdbMenuItem.Style>
                             <Style BasedOn="{StaticResource DeviceActionsMenuItemStyle}" TargetType="controls:AdbMenuItem">
                                 <Style.Triggers>
@@ -271,7 +277,7 @@
                         </controls:AdbMenuItem.Style>
                         <controls:AdbMenuItem.Header>
                             <ui:FontIcon
-                                Margin="-8"
+                                Margin="-4,-8"
                                 FontSize="18"
                                 Glyph="&#xE67A;"
                                 Style="{StaticResource GlyphFont}" />

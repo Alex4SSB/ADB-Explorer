@@ -182,8 +182,6 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         }
     } = "";
 
-    public Task<string?> GetAndroidVersion() => Task.Run(() => AndroidVersionString);
-
     #endregion
 
     public static implicit operator string(LogicalDeviceViewModel vm) => vm?.ID;

@@ -122,7 +122,9 @@ public partial class Devices : ObservableObject
 
     public static void UpdateServices(ObservableList<DeviceViewModel> self, IEnumerable<ServiceDeviceViewModel> other)
     {
-        self.RemoveAll(thisDevice => thisDevice is ServiceDeviceViewModel && !other.Any(otherDevice => otherDevice.ID == thisDevice.ID));
+        self.RemoveAll(thisDevice => thisDevice is ServiceDeviceViewModel
+            && !thisDevice.IsTestDevice
+            && !other.Any(otherDevice => otherDevice.ID == thisDevice.ID));
 
         foreach (var item in other)
         {
@@ -145,10 +147,10 @@ public partial class Devices : ObservableObject
 
         // if the list is empty, we need to update (and remove all items)
         if (!snapshots.Any())
-            return ServiceDeviceViewModels.Any();
+            return ServiceDeviceViewModels.Any(s => !s.IsTestDevice);
 
         var pairing = snapshots.Where(s => s.ConnectionKind is ServiceConnectionKind.Pairing).OrderBy(s => s.ID).ToList();
-        var existing = ServiceDeviceViewModels.OrderBy(d => d.ID).ToList();
+        var existing = ServiceDeviceViewModels.Where(s => !s.IsTestDevice).OrderBy(d => d.ID).ToList();
 
         // if there's any service whose ID is not found in any logical device,
         // AND an ordering of both new and old lists doesn't match up all IDs
@@ -181,8 +183,10 @@ public partial class Devices : ObservableObject
     {
         bool isCurrentTypeUpdated = false;
 
-        // First remove all devices that no longer exist
-        var devicesToRemove = self.Where(thisDevice => thisDevice is LogicalDeviceViewModel && !other.Any(otherDevice => otherDevice.ID == thisDevice.ID));
+        // First remove all non-test devices that no longer exist
+        var devicesToRemove = self.Where(thisDevice => thisDevice is LogicalDeviceViewModel
+            && !thisDevice.IsTestDevice
+            && !other.Any(otherDevice => otherDevice.ID == thisDevice.ID));
         foreach (var item in devicesToRemove)
         {
             // Set status as offline for file op mechanism
@@ -218,7 +222,7 @@ public partial class Devices : ObservableObject
         if (snapshots is null)
             return false;
 
-        var existing = LogicalDeviceViewModels.OrderBy(d => d.ID).ToList();
+        var existing = LogicalDeviceViewModels.Where(d => !d.IsTestDevice).OrderBy(d => d.ID).ToList();
         var incoming = snapshots.OrderBy(s => s.ID).ToList();
 
         return existing.Count != incoming.Count
