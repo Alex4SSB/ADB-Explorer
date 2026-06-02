@@ -28,6 +28,8 @@ public partial class ExplorerViewModel : ObservableObject
 
     private bool _suppressSortApply;
 
+    private readonly DispatcherTimer _filterDebounceTimer;
+
     partial void OnSortDirectionChanged(ListSortDirection? value)
     {
         if (!_suppressSortApply)
@@ -187,6 +189,13 @@ public partial class ExplorerViewModel : ObservableObject
     {
         IsIconView = Data.RuntimeSettings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
 
+        _filterDebounceTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
+        _filterDebounceTimer.Tick += (s, e) =>
+        {
+            _filterDebounceTimer.Stop();
+            RefreshExplorerFilter();
+        };
+
         Data.Settings.SavedLocations.CollectionChanged += SavedLocations_CollectionChanged;
         SavedLocations_CollectionChanged(null, null);
 
@@ -307,12 +316,21 @@ public partial class ExplorerViewModel : ObservableObject
                 break;
 
             case nameof(FileActionsEnable.ExplorerFilter):
-                UpdateExplorerView();
+                _filterDebounceTimer.Stop();
+                _filterDebounceTimer.Start();
                 break;
 
             default:
                 break;
         }
+    }
+
+    private void RefreshExplorerFilter()
+    {
+        App.SafeInvoke(() =>
+        {
+            ExplorerItemsSource?.Refresh();
+        });
     }
 
     private void UpdateExplorerView()
