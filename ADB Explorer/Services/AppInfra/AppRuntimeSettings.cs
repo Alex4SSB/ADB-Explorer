@@ -132,7 +132,7 @@ public partial class AppRuntimeSettings : ViewModelBase
 
     public bool Is22H2 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_22H2;
 
-    public bool IsRTL => Thread.CurrentThread.CurrentUICulture.TextInfo.IsRightToLeft;
+    public bool IsRTL => Data.Settings.ActualUICulture.TextInfo.IsRightToLeft;
 
     #region Event-only properties
 

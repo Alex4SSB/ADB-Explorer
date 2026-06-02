@@ -217,7 +217,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
         App.SafeInvoke(() =>
         {
-            Thread.CurrentThread.CurrentCulture =
+            Thread.CurrentThread.CurrentCulture = Data.Settings.ActualFormatCulture;
             Thread.CurrentThread.CurrentUICulture = Data.Settings.ActualUICulture;
 
             foreach (RebootCommand.RebootType type in Enum.GetValues<RebootCommand.RebootType>())

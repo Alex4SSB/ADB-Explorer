@@ -27,12 +27,12 @@ public partial class FileViewModelBase : ObservableObject
     public bool TypeIsRtl => TextHelper.ContainsRtl(TypeName);
     public FlowDirection TypeFlowDirection => TypeIsRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
 
-    public string ModifiedTimeString => TabularDateFormatter.Format(_file.ModifiedTime, Data.Settings.ActualUICulture);
+    public string ModifiedTimeString => TabularDateFormatter.Format(_file.ModifiedTime, Data.Settings.ActualFormatCulture);
     public string ModifiedTimeWithOffsetString => _file.ModifiedTimeWithOffset is { } dto
-        ? TabularDateFormatter.Format(dto, Data.Settings.ActualUICulture)
-        : TabularDateFormatter.Format(_file.ModifiedTime, Data.Settings.ActualUICulture);
-    public string CreationTimeString => TabularDateFormatter.Format(_file.CreationTime, Data.Settings.ActualUICulture);
-    public string LastAccessTimeString => TabularDateFormatter.Format(_file.LastAccessTime, Data.Settings.ActualUICulture);
+        ? TabularDateFormatter.Format(dto, Data.Settings.ActualFormatCulture)
+        : TabularDateFormatter.Format(_file.ModifiedTime, Data.Settings.ActualFormatCulture);
+    public string CreationTimeString => TabularDateFormatter.Format(_file.CreationTime, Data.Settings.ActualFormatCulture);
+    public string LastAccessTimeString => TabularDateFormatter.Format(_file.LastAccessTime, Data.Settings.ActualFormatCulture);
 
     public string SizeString => _file.IsDirectory ? "" : _file.Size?.BytesToSize(true);
 

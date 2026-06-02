@@ -12,7 +12,7 @@
     <NoWarn>$(NoWarn);XDG0001</NoWarn>
     <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<Platforms>AnyCPU;x64;arm64</Platforms>
+	<Platforms>AnyCPU;x64;ARM64</Platforms>
 	<Configurations>Debug;Release;Deploy</Configurations>
   </PropertyGroup>
 

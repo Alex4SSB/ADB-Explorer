@@ -137,8 +137,8 @@ public partial class ExplorerPageHeader : UserControl
 
     public ExplorerPageHeader(ExplorerViewModel viewModel)
     {
-        Thread.CurrentThread.CurrentCulture =
-        Thread.CurrentThread.CurrentUICulture = Settings.UICulture;
+        Thread.CurrentThread.CurrentCulture = Settings.ActualFormatCulture;
+        Thread.CurrentThread.CurrentUICulture = Settings.ActualUICulture;
 
         DataContext =
         ViewModel = viewModel;

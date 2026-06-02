@@ -54,7 +54,7 @@ public partial class DevicesPageHeader : UserControl
     {
         App.SafeInvoke(() =>
         {
-            Thread.CurrentThread.CurrentCulture =
+            Thread.CurrentThread.CurrentCulture = Data.Settings.ActualFormatCulture;
             Thread.CurrentThread.CurrentUICulture = Data.Settings.ActualUICulture;
 
             DeviceHelper.FilterDevices(CollectionViewSource.GetDefaultView(LogicalDevicesList.ItemsSource));

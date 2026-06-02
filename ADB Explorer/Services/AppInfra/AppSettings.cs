@@ -325,12 +325,16 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     }
 
     [JsonIgnore]
-    public CultureInfo ActualUICulture => UICulture.Equals(CultureInfo.InvariantCulture) ? OriginalCulture : UICulture;
+    public CultureInfo ActualUICulture => UICulture.Equals(CultureInfo.InvariantCulture) ? OriginalUICulture : UICulture;
+
+    /// <summary>Culture used for date, time, and number formatting. Always Windows' regional format when no explicit app language is set.</summary>
+    [JsonIgnore]
+    public CultureInfo ActualFormatCulture => UICulture.Equals(CultureInfo.InvariantCulture) ? OriginalCulture : UICulture;
 
     private void UpdateTranslation()
     {
         CultureInfo actual = UICulture.Equals(CultureInfo.InvariantCulture)
-            ? OriginalCulture
+            ? OriginalUICulture
             : UICulture;
 
         // Set the static resource culture so lookups are correct regardless of which
@@ -367,6 +371,27 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
                 { }
             }
             return originalCulture;
+        }
+    }
+
+    [JsonIgnore]
+    private CultureInfo? originalUICulture = null;
+    /// <summary>Windows display language, used as the default app UI language.</summary>
+    [JsonIgnore]
+    public CultureInfo OriginalUICulture
+    {
+        get
+        {
+            if (originalUICulture is null)
+            {
+                try
+                {
+                    originalUICulture = CultureInfo.CurrentUICulture;
+                }
+                catch
+                { }
+            }
+            return originalUICulture;
         }
     }
 

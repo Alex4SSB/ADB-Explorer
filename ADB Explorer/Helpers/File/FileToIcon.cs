@@ -256,7 +256,7 @@ public class FileToIconConverter
 
         if (!iconDic.ContainsKey(key))
             lock (iconDic)
-                iconDic.Add(key, GetImage(fileName, size, desiredSize, specialType));
+                iconDic.TryAdd(key, GetImage(fileName, size, desiredSize, specialType));
 
         return iconDic[key];
     }
@@ -267,7 +267,7 @@ public class FileToIconConverter
 
         if (!iconDic.ContainsKey(key))
             lock (iconDic)
-                iconDic.Add(key, LoadBitmap(icon.ToBitmap()));
+                iconDic.TryAdd(key, LoadBitmap(icon.ToBitmap()));
 
         return iconDic[key];
     }

@@ -10,7 +10,7 @@ public partial class OperationsPageHeader : UserControl
 
     public OperationsPageHeader()
     {
-        Thread.CurrentThread.CurrentCulture =
+        Thread.CurrentThread.CurrentCulture = Data.Settings.ActualFormatCulture;
         Thread.CurrentThread.CurrentUICulture = Data.Settings.ActualUICulture;
 
         InitializeComponent();

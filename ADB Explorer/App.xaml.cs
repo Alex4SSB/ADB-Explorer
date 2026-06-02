@@ -102,8 +102,10 @@ public partial class App
     {
         AppDispatcher = Current.Dispatcher;
 
-        // Read to force it to be set to Windows' culture
+        // Read to force it to be set to system regional format
         _ = Data.Settings.OriginalCulture;
+        // Read to force it to be set to system display language
+        _ = Data.Settings.OriginalUICulture;
 
         // Similar to %LocalAppData%\ADB Explorer (but avoids virtualization for Store versions)
         Data.AppDataPath = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "AppData", "Local", AdbExplorerConst.APP_DATA_FOLDER);
@@ -142,8 +144,8 @@ public partial class App
 
         if (!Data.Settings.UICulture.Equals(CultureInfo.InvariantCulture))
         {
-            Thread.CurrentThread.CurrentUICulture =
-            Thread.CurrentThread.CurrentCulture = Data.Settings.UICulture;
+            Thread.CurrentThread.CurrentCulture = Data.Settings.ActualFormatCulture;
+            Thread.CurrentThread.CurrentUICulture = Data.Settings.UICulture;
         }
 
 #if !DEPLOY

@@ -10,7 +10,7 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
 
     public SettingsPage(SettingsViewModel viewModel)
     {
-        Thread.CurrentThread.CurrentCulture =
+        Thread.CurrentThread.CurrentCulture = Data.Settings.ActualFormatCulture;
         Thread.CurrentThread.CurrentUICulture = Data.Settings.ActualUICulture;
 
         ViewModel = viewModel;

@@ -139,7 +139,7 @@ public partial class MainWindowViewModel : ObservableObject
     public async void InitNotifications()
     {
         if (Data.Settings.ShowLanguageNotification &&
-            (Data.Settings.OriginalCulture is null || Data.Settings.OriginalCulture.Name != "en-US"))
+            (Data.Settings.OriginalUICulture is null || Data.Settings.OriginalUICulture.Name != "en-US"))
         {
             App.SafeInvoke(() =>
             {

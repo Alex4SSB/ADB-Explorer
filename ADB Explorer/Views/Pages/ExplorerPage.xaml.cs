@@ -10,7 +10,7 @@ namespace ADB_Explorer.Views.Pages
 
         public ExplorerPage(ExplorerViewModel viewModel)
         {
-            Thread.CurrentThread.CurrentCulture =
+            Thread.CurrentThread.CurrentCulture = Data.Settings.ActualFormatCulture;
             Thread.CurrentThread.CurrentUICulture = Data.Settings.ActualUICulture;
 
             ViewModel = viewModel;
