@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1398,5 +1398,47 @@ Weblate에서 앱을 해당 언어로 현지화하는 데 도움을 주세요.</
   </data>
   <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
     <value>썸네일 pull 속도 제한</value>
+  </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>사용자 지정 강조색</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>사용자 지정 강조색 선택</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>색깔 선택</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value>연결되었습니다</value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>특수 폴더 아이콘 표시</value>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>썸네일 추출</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>재생 시간</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>해상도</value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>한달</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>1주일</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>1일</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>1시간</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>썸네일 유지할 시간</value>
+  </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>가능한 경우 BusyBox 사용</value>
   </data>
 </root>
