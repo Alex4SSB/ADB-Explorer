@@ -43,6 +43,17 @@ public partial class MainWindow : INavigationWindow
         {
             Navigate(e.NewValue);
         };
+
+        Deactivated += (s, e) =>
+        {
+            Data.RaiseUnfocusSearchBox();
+            Data.RaiseFocusNavigationBox(false);
+        };
+
+        StateChanged += (s, e) =>
+        {
+            Data.Settings.WindowMaximized = WindowState is WindowState.Maximized;
+        };
     }
 
     private async void Initialize()
@@ -214,15 +225,5 @@ public partial class MainWindow : INavigationWindow
         {
             e.Handled = true;
         }
-    }
-
-    private void RootNavigation_PreviewKeyDown(object sender, KeyEventArgs e)
-    {
-        
-    }
-
-    private void FluentWindow_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        Data.Settings.WindowMaximized = WindowState is WindowState.Maximized;
     }
 }

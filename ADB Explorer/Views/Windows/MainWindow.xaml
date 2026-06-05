@@ -17,11 +17,10 @@
     d:DesignWidth="800"
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    ContentRendered="FluentWindow_Loaded"
     ExtendsContentIntoTitleBar="True"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-    ContentRendered="FluentWindow_Loaded"
     RenderOptions.BitmapScalingMode="HighQuality"
-    SizeChanged="FluentWindow_SizeChanged"
     SnapsToDevicePixels="False"
     WindowBackdropType="Mica"
     WindowCornerPreference="Round"
@@ -67,7 +66,6 @@
             IsBackButtonVisible="Collapsed"
             IsPaneToggleVisible="False"
             PaneDisplayMode="LeftFluent"
-            PreviewKeyDown="RootNavigation_PreviewKeyDown"
             PreviewMouseDown="RootNavigation_PreviewMouseDown">
             <ui:NavigationView.Header>
                 <ContentPresenter x:Name="PageHeader" Height="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ui:NavigationView}, Path=ActualHeight}" />

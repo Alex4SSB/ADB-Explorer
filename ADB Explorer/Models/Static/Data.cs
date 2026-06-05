@@ -55,13 +55,18 @@ public static class Data
 
     public static ObservableProperty<Type> CurrentPage { get; set; } = new();
 
-    public static event EventHandler ClearLogs;
+    public static event EventHandler? ClearLogs;
 
     public static void RaiseClearLogs() => ClearLogs?.Invoke(null, EventArgs.Empty);
 
-    public static event EventHandler ClearNavBox;
+    public static event EventHandler? ClearNavigationBox;
+    public static void RaiseClearNavigationBox() => ClearNavigationBox?.Invoke(null, EventArgs.Empty);
 
-    public static void RaiseClearNavBox() => ClearNavBox?.Invoke(null, EventArgs.Empty);
+    public static event EventHandler<bool>? UnfocusNavigationBox;
+    public static void RaiseFocusNavigationBox(bool focus) => UnfocusNavigationBox?.Invoke(null, focus);
+
+    public static event EventHandler? UnfocusSearchBox;
+    public static void RaiseUnfocusSearchBox() => UnfocusSearchBox?.Invoke(null, EventArgs.Empty);
 
     public static ObservableProperty<bool> IsLogPaused { get; set; } = new();
 

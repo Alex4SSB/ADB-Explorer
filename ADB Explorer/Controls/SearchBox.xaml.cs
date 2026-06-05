@@ -1,4 +1,6 @@
-﻿namespace ADB_Explorer.Controls;
+﻿using ADB_Explorer.Models;
+
+namespace ADB_Explorer.Controls;
 
 /// <summary>
 /// Interaction logic for SearchBox.xaml
@@ -14,6 +16,16 @@ public partial class SearchBox : UserControl
             if (!IsEnabled)
                 Expander.IsExpanded = false;
         };
+
+        Data.UnfocusSearchBox += (s, e) => Unfocus();
+    }
+
+    private void Unfocus()
+    {
+        if (!IsKeyboardFocusWithin)
+            return;
+
+        UnfocusTarget?.Focus();
     }
 
     public string Text
@@ -106,6 +118,16 @@ public partial class SearchBox : UserControl
         DependencyProperty.Register("DefaultControlWidth", typeof(double),
           typeof(SearchBox), new PropertyMetadata(null));
 
+    public UIElement? UnfocusTarget
+    {
+        get => (UIElement?)GetValue(UnfocusTargetProperty);
+        set => SetValue(UnfocusTargetProperty, value);
+    }
+
+    public static readonly DependencyProperty UnfocusTargetProperty =
+        DependencyProperty.Register(nameof(UnfocusTarget), typeof(UIElement),
+          typeof(SearchBox), new PropertyMetadata(null));
+
     public void Refresh()
     {
         if (ContentBox.ActualWidth > MaxControlWidth)
@@ -119,11 +141,7 @@ public partial class SearchBox : UserControl
         if (e.Key is Key.Escape)
         {
             Text = "";
-            Models.Data.RuntimeSettings.AutoHideSearchBox = true;
-        }
-        else if (e.Key is Key.Enter)
-        {
-            Models.Data.RuntimeSettings.AutoHideSearchBox = true;
+            Unfocus();
         }
     }
 

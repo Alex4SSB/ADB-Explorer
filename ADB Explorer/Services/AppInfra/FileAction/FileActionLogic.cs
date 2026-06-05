@@ -768,7 +768,7 @@ internal static class FileActionLogic
             {
                 Data.CurrentDisplayNames.Clear();
                 Data.CurrentPath = null;
-                Data.RaiseClearNavBox();
+                Data.RaiseClearNavigationBox();
 
                 UpdateFileActions();
             }
@@ -898,7 +898,7 @@ internal static class FileActionLogic
 
     public static void PushItems(bool isFolderPicker, bool isContextMenu)
     {
-        Data.RuntimeSettings.IsPathBoxFocused = false;
+        Data.RaiseFocusNavigationBox(false);
 
         string targetPath, targetName = "";
         string title = "";
@@ -1012,7 +1012,7 @@ internal static class FileActionLogic
     // Pull where we know the actual target path
     public static void PullFiles(string targetPath = "")
     {
-        Data.RuntimeSettings.IsPathBoxFocused = false;
+        Data.RaiseFocusNavigationBox(false);
 
         var pullItems = Data.SelectedFiles;
 

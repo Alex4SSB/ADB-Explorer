@@ -150,6 +150,9 @@ public partial class ExplorerPageHeader : UserControl
         KeyDown += new KeyEventHandler(OnButtonKeyDown);
         PreviewTextInput += new TextCompositionEventHandler(ExplorerPageHeader_PreviewTextInput);
 
+        NavigationBox.UnfocusTarget =
+        SearchBox.UnfocusTarget = ActiveView;
+
         AppActions.Bindings.ForEach(binding =>
         {
             InputBindings.Add(binding);
@@ -179,7 +182,7 @@ public partial class ExplorerPageHeader : UserControl
 
     private void ExplorerPageHeader_PreviewTextInput(object sender, TextCompositionEventArgs e)
     {
-        if (SearchBox.IsFocused
+        if (SearchBox.IsFocused || SearchBox.IsKeyboardFocusWithin
             || NavigationBox.Mode is NavigationBox.ViewMode.Path
             || FileActions.IsExplorerEditing)
             return;
@@ -213,7 +216,10 @@ public partial class ExplorerPageHeader : UserControl
     {
         if (Keyboard.Modifiers.HasFlag(ModifierKeys.Alt)
             || !NAVIGATION_KEYS.Contains(e.Key)
-            || DetailsPane.IsKeyboardFocusWithin)
+            || DetailsPane.IsKeyboardFocusWithin
+            || SearchBox.IsKeyboardFocusWithin
+            || NavigationBox.IsKeyboardFocusWithin
+            || FileActions.IsExplorerEditing)
             return;
         
         bool handle = false;
@@ -448,14 +454,6 @@ public partial class ExplorerPageHeader : UserControl
                     IsInEditMode ^= true;
                     break;
 
-                case nameof(AppRuntimeSettings.IsPathBoxFocused):
-                    IsPathBoxFocused(RuntimeSettings.IsPathBoxFocused
-                                     ?? NavigationBox.Mode
-                                     is NavigationBox.ViewMode.Breadcrumbs);
-
-                    RuntimeSettings.AutoHideSearchBox = true;
-                    break;
-
                 case nameof(AppRuntimeSettings.SelectAll):
                     if (ActiveView.Items.Count == ActiveSelectedItems.Count)
                         ActiveUnselectAll();
@@ -473,7 +471,7 @@ public partial class ExplorerPageHeader : UserControl
         });
     }
 
-    private void IsPathBoxFocused(bool isFocused)
+    private void PathBoxFocus(bool isFocused)
     {
         if (isFocused)
             _focusPathBox();
@@ -490,7 +488,6 @@ public partial class ExplorerPageHeader : UserControl
             if (NavigationBox.Mode is NavigationBox.ViewMode.None)
                 return;
 
-            NavigationBox.UnfocusTarget = ActiveView;
             NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
         }
     }
@@ -750,7 +747,8 @@ public partial class ExplorerPageHeader : UserControl
         if (location.Location is Navigation.SpecialLocation.DriveView)
         {
             FileActions.IsRecycleBin = false;
-            RuntimeSettings.IsPathBoxFocused = false;
+            PathBoxFocus(false);
+            RaiseUnfocusSearchBox();
             FileActionLogic.RefreshDrives(true, DeviceCts.Token);
             DriveViewNav();
 
@@ -874,8 +872,9 @@ public partial class ExplorerPageHeader : UserControl
             return;
         }
 
-        RuntimeSettings.IsPathBoxFocused = false;
-        
+        PathBoxFocus(false);
+        RaiseUnfocusSearchBox();
+
         if (!row.IsSelected
             && Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
         {
@@ -1540,12 +1539,14 @@ public partial class ExplorerPageHeader : UserControl
 
     private void GridBackgroundBlock_MouseDown(object sender, MouseButtonEventArgs e)
     {
-        RuntimeSettings.IsPathBoxFocused = false;
+        PathBoxFocus(false);
+        RaiseUnfocusSearchBox();
     }
 
     private void Window_MouseDown(object sender, MouseButtonEventArgs e)
     {
-        RuntimeSettings.IsPathBoxFocused = false;
+        PathBoxFocus(false);
+        RaiseUnfocusSearchBox();
     }
 
     private void Grid_MouseEnter(object sender, MouseEventArgs e)
@@ -1577,8 +1578,7 @@ public partial class ExplorerPageHeader : UserControl
             CopyPaste.DragBitmap = null;
         else
         {
-            if (!FileActions.IsExplorerEditing && RuntimeSettings.IsPathBoxFocused is not true)
-                OnButtonKeyDown(sender, e);
+            OnButtonKeyDown(sender, e);
         }
     }
 

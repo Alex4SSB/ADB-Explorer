@@ -36,17 +36,6 @@ public partial class AppRuntimeSettings : ViewModelBase
         }
     }
 
-    private bool? isPathBoxFocused = null;
-    public bool? IsPathBoxFocused
-    {
-        get => isPathBoxFocused;
-        set
-        {
-            if (!Set(ref isPathBoxFocused, value))
-                OnPropertyChanged();
-        }
-    }
-
     private bool isSearchBoxFocused = false;
     public bool IsSearchBoxFocused
     {
@@ -146,7 +135,6 @@ public partial class AppRuntimeSettings : ViewModelBase
     public bool FilterActions { get => false; set => OnPropertyChanged(); }
     public bool InitLister { get => false; set => OnPropertyChanged(); }    
     public bool DriveViewNav { get => false; set => OnPropertyChanged(); }
-    public bool AutoHideSearchBox { get => false; set => OnPropertyChanged(); }
 
     #endregion
 }

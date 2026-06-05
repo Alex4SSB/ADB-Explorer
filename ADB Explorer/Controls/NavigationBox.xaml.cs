@@ -28,10 +28,12 @@ public partial class NavigationBox : UserControl
 
         SizeChanged += (sender, args) => ArrangeBreadcrumbs();
 
-        Data.ClearNavBox += (_, _) => Clear();
+        Data.ClearNavigationBox += (s, e) => Clear();
+
+        Data.UnfocusNavigationBox += (s, focus) => Unfocus(focus);
     }
 
-    public void Clear()
+    private void Clear()
     {
         App.SafeInvoke(() =>
         {
@@ -44,6 +46,14 @@ public partial class NavigationBox : UserControl
             Mode = ViewMode.None;
             OverflowPopup.IsOpen = false;
         });
+    }
+
+    private void Unfocus(bool focus)
+    {
+        if (focus && Mode is not ViewMode.Path)
+            Mode = ViewMode.Path;
+        else
+            UnfocusTarget?.Focus();
     }
 
     #region Dependency Properties
@@ -196,7 +206,7 @@ public partial class NavigationBox : UserControl
             if (value is ViewMode.Path)
                 PathBox.Focus();
             else if (UnfocusTarget is not null && PathBox.IsFocused)
-                UnfocusTarget.Focus();
+                UnfocusTarget?.Focus();
         }
     }
 
@@ -339,9 +349,6 @@ public partial class NavigationBox : UserControl
         DisplayPath = AdbLocation.LocationFromString(Path) is Navigation.SpecialLocation.None ? Path : "";
 
         App.SafeBeginInvoke(PathBox.SelectAll);
-
-        if (Data.RuntimeSettings.IsPathBoxFocused is not true)
-            Data.RuntimeSettings.IsPathBoxFocused = true;
     }
 
     private void PathBox_KeyDown(object sender, KeyEventArgs e)

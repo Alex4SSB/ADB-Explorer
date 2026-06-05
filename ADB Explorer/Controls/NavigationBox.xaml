@@ -117,6 +117,7 @@
             d:Background="LightGray"
             ClearButtonEnabled="False"
             FlowDirection="LeftToRight"
+            FocusVisualStyle="{x:Null}"
             GotFocus="PathBox_GotFocus"
             KeyDown="PathBox_KeyDown"
             LostFocus="PathBox_LostFocus">
