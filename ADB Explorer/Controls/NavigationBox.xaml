@@ -212,16 +212,8 @@
             <local:AdbMenu
                 Grid.Column="2"
                 Margin="0,0"
-                VerticalAlignment="Center">
-                <local:AdbMenu.Style>
-                    <Style BasedOn="{StaticResource AdbMenuStyle}" TargetType="local:AdbMenu">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding ElementName=NavBox, Path=SavedItems.Count}" Value="0">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </local:AdbMenu.Style>
+                VerticalAlignment="Center"
+                Style="{StaticResource AdbMenuStyle}">
                 <local:AdbMenuItem ItemsSource="{Binding ElementName=NavBox, Path=AllSavedItems}" ToolTip="{Binding Source={x:Static Member=strings:Resources.S_SAVED_LOCATIONS}}">
                     <local:AdbMenuItem.Header>
                         <ui:FontIcon Margin="-5">

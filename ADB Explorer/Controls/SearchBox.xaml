@@ -28,7 +28,7 @@
         <Expander
             x:Name="Expander"
             Grid.Column="1"
-            Height="38"
+            Height="35"
             Padding="-1"
             helpers:ExpanderHelper.ExpanderArrow="None"
             helpers:ExpanderHelper.HeaderTooltip="{Binding PlaceholderText}"

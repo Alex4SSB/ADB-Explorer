@@ -116,7 +116,6 @@
                     <local:NavigationBox
                         x:Name="NavigationBox"
                         Grid.Column="1"
-                        Margin="0,1,0,0"
                         SavedItems="{Binding SavedItems, Mode=OneWay}" />
                     <local:SearchBox
                         x:Name="SearchBox"
