@@ -165,7 +165,21 @@ public partial class DragWindow : INotifyPropertyChanged
                         : [source, target]);
                 }
 
-                var split = result.Split(source);
+                string[] split;
+
+                if (!result.Contains(source))
+                {
+                    split = result.Split(target);
+
+                    DragTooltip.Inlines.Add(new Run(split[0]) { Foreground = blueBrush });
+                    DragTooltip.Inlines.Add(target);
+
+                    if (split.Length > 1)
+                        DragTooltip.Inlines.Add(new Run(split[1]) { Foreground = blueBrush });
+                }
+                else
+                {
+                    split = result.Split(source);
 
                 DragTooltip.Inlines.Add(new Run(split[0]) { Foreground = blueBrush });
                 DragTooltip.Inlines.Add(source);
@@ -178,6 +192,7 @@ public partial class DragWindow : INotifyPropertyChanged
                     DragTooltip.Inlines.Add(target);
                     DragTooltip.Inlines.Add(new Run(split[1]) { Foreground = blueBrush });
                 }
+            }
             }
             else
             {
