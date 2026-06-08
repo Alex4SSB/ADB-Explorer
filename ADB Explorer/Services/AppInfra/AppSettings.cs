@@ -110,6 +110,9 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     [ObservableProperty]
     public partial bool WindowMaximized { get; set; } = false;
 
+    [ObservableProperty]
+    public partial bool ShowMessageOnCrash { get; set; } = true;
+
     #region paths
 
     private string defaultFolder = "";

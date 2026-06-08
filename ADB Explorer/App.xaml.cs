@@ -210,12 +210,15 @@ public partial class App
         if (IsShuttingDown || App.Current is null || App.Current.Dispatcher is null)
             e.Handled = true;
 
-        var res = MessageBox.Show($@"An unhandled exception occurred, and the application has crashed. Press OK to copy the error message to the clipboard:
+        if (Data.Settings.ShowMessageOnCrash)
+        {
+            MessageBox.Show($"""
+An unhandled exception occurred, and the application has crashed.
+To disable this message, set '"ShowMessageOnCrash": false' in %LocalAppData%\AdbExplorer\settings.json
 
-{e.Exception.Message}", "Unhandled Exception", MessageBoxButton.OKCancel, MessageBoxImage.Error);
-
-        if (res is MessageBoxResult.OK)
-            Clipboard.SetText(e.Exception.Message);
+{e.Exception.Message}
+""", "Unhandled Exception", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     /// <summary>
