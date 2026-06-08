@@ -27,9 +27,6 @@ An interface to ADB that allows browsing, transferring, and editing of files wit
       <img alt="Issues" width=300px src="https://get.microsoft.com/images/en-us%20light.svg" />
 </a>
 
-<br></br>
-[Development process of the new WpfUi based version of the app](https://github.com/Alex4SSB/ADB-Explorer/discussions/291)
-
 <h2 align="left"/>ADB Platform-Tools</h2>
 
 For a comprehensive list of all official ADB platform-tools versions from Google with download URLs and checksums, see [OFFICIAL_ADB_VERSIONS.md](OFFICIAL_ADB_VERSIONS.md).
