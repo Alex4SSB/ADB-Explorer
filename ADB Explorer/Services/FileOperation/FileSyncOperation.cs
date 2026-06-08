@@ -174,6 +174,7 @@ public class FileSyncOperation : FileOperation
 
                         if (item.DateModified is not null)
                             File.SetLastWriteTime(targetPath, item.DateModified.Value);
+
                     }
                     catch (Exception e)
                     {
@@ -204,7 +205,7 @@ public class FileSyncOperation : FileOperation
             {
                 string message = FilePath.LastUpdate is SyncErrorInfo errorInfo
                     ? errorInfo.Message
-                    : ProgressUpdates.OfType<SyncErrorInfo>().Last().Message;
+                    : ProgressUpdates.OfType<SyncErrorInfo>().LastOrDefault()?.Message;
 
                 Status = OperationStatus.Failed;
                 StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(typeof(SyncErrorInfo), message: message, total: true));
@@ -263,7 +264,14 @@ public class FileSyncOperation : FileOperation
         }
 
         mutex.WaitOne();
-        ProgressUpdates.Add(new AdbSyncProgressInfo(item.FullPath, null, eventArgs.ProgressPercentage, currentBytes));
+        var progressInfo = new AdbSyncProgressInfo(item.FullPath, null, eventArgs.ProgressPercentage, currentBytes);
+
+        // Update the individual SyncFile's progress so that Files.Sum(f => f.BytesTransferred)
+        // in ProgressUpdates_CollectionChanged returns the correct running total.
+        item.AddUpdates(progressInfo);
+
+        ProgressUpdates.Add(progressInfo);
+
         mutex.ReleaseMutex();
 
         TransferEnd = DateTime.Now;
@@ -273,8 +281,6 @@ public class FileSyncOperation : FileOperation
     {
         if (Status is not OperationStatus.InProgress)
             return;
-
-        AddUpdates(e.NewItems.Cast<FileOpProgressInfo>());
 
         if (ProgressUpdates.LastOrDefault() is AdbSyncProgressInfo currProgress and not null)
         {

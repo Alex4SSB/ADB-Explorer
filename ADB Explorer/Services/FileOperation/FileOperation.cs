@@ -49,22 +49,25 @@ public abstract class FileOperation : ViewModelBase
         }
     }
 
-    private OperationStatus status = OperationStatus.None;
+    // Volatile so the spin-wait on the UI thread can see updates written by background pull threads
+    // without going through the dispatcher (which would deadlock while Thread.Sleep is running).
+    private volatile OperationStatus status = OperationStatus.None;
     public OperationStatus Status
     {
         get => status;
         protected set
         {
-            Dispatcher.Invoke(() =>
+            if (status == value) return;
+            status = value; // Immediately visible to any thread reading the volatile field
+            CancelTokenSource = value is OperationStatus.InProgress or OperationStatus.Waiting ? new() : null;
+
+            App.SafeBeginInvoke(() =>
             {
-                if (Set(ref status, value))
-                {
-                    CancelTokenSource = value is OperationStatus.InProgress ? new() : null;
+                OnPropertyChanged(nameof(ValidationAllowed));
 
-                    OnPropertyChanged(nameof(ValidationAllowed));
+                LastProgress = 0;
 
-                    LastProgress = 0;
-                }
+                OnPropertyChanged(nameof(Status));
             });
         }
     }
@@ -73,7 +76,9 @@ public abstract class FileOperation : ViewModelBase
     public FileOpProgressViewModel StatusInfo
     {
         get => statusInfo;
-        set => Dispatcher.Invoke(() => Set(ref statusInfo, value));
+        // BeginInvoke (fire-and-forget) so background pull threads are never blocked waiting
+        // for the UI thread to process the update (which would deadlock with the spin-wait).
+        set => Dispatcher.BeginInvoke(() => Set(ref statusInfo, value));
     }
 
     private bool isPastOp = false;

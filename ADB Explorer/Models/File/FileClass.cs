@@ -379,8 +379,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         var children = Children;
 
         var fileOp = FileSyncOperation.PullFile(new(this, children), target, Data.DevicesObject.Current, App.AppDispatcher);
-        fileOp.PropertyChanged += PullOperation_PropertyChanged;
-        fileOp.VFDO = vfdo;
+        vfdo.OperationCompleted += VFDO_OperationCompleted;
 
         FolderTree[] items = [new(name, Size, UnixTime)];
         if (includeContent && children is not null)
@@ -405,7 +404,9 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
                 // When a legitimate request for data is made, the app can't be focused during the first file, but it can become focused again for the next files.
                 if ((Data.CopyPaste.IsClipboard && isActive && operations.Any())
                     || !includeContent)
+                {
                     return null;
+                }
 
 #if !DEPLOY
                 DebugLog.PrintLine($"Total uninitiated operations: {operations.Count()}");
@@ -415,13 +416,29 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
                 // For all consecutive files this list will be empty.
                 foreach (var op in operations)
                 {
-                    App.SafeInvoke(() => Data.FileOpQ.AddOperation(op));
+                    App.Current.Dispatcher.Invoke(() => Data.FileOpQ.AddOperation(op));
                 }
 
-                // Wait for the operation to complete
-                while (fileOp.Status is not FileOperation.OperationStatus.Completed)
+                // Wait for the operation to complete.
+                // When called on the UI thread (clipboard path), pump the dispatcher on each iteration
+                // so that queued BeginInvoke items (StatusInfo progress updates) are processed and
+                // visible in the UI during the transfer. Thread.Sleep alone would block the dispatcher
+                // queue, causing all progress notifications to arrive only after the transfer finishes.
+                while (fileOp.Status is FileOperation.OperationStatus.InProgress or FileOperation.OperationStatus.Waiting)
                 {
-                    Thread.Sleep(100);
+                    if (App.AppDispatcher?.CheckAccess() == true)
+                    {
+                        // Push a short-lived nested message pump that exits at Background priority
+                        // (i.e., after all pending Normal-priority BeginInvoke items have run).
+                        var frame = new DispatcherFrame();
+                        App.AppDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => frame.Continue = false));
+                        Dispatcher.PushFrame(frame);
+                        Thread.Sleep(16); // brief yield (~60 fps) before next pump to avoid busy-spinning
+                    }
+                    else
+                    {
+                        Thread.Sleep(100);
+                    }
                 }
 
                 var file = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, FileHelper.ExtractRelativePath(item.Name, ParentPath), '\\');
@@ -455,41 +472,37 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         return fileOp;
     }
 
-    private static void PullOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void VFDO_OperationCompleted(object sender, NativeMethods.HResult hResult)
     {
-        var op = sender as FileSyncOperation;
-
-        if (e.PropertyName != nameof(FileOperation.Status)
-            || op.Status is FileOperation.OperationStatus.Waiting
-            or FileOperation.OperationStatus.InProgress)
+        if (sender is not VirtualFileDataObject vfdo)
             return;
 
-        if (op.Status is FileOperation.OperationStatus.Completed)
+        if (hResult is NativeMethods.HResult.Ok)
         {
-            if (op.VFDO.CurrentEffect.HasFlag(DragDropEffects.Move))
+            if (vfdo.CurrentEffect.HasFlag(DragDropEffects.Move))
             {
+                var device = vfdo.Operations.First().Device;
+
                 // Delete file from device
-                ShellFileOperation.SilentDelete(op.Device, op.FilePath.FullPath);
+                ShellFileOperation.SilentDelete(device, FullPath);
 
                 // Remove file in UI if present
-                if (op.Device.ID == Data.DevicesObject.Current.ID
-                    && op.FilePath.ParentPath == Data.CurrentPath)
+                if (device.ID == Data.DevicesObject.Current.ID
+                    && ParentPath == Data.CurrentPath)
                 {
-                    op.Dispatcher.Invoke(() =>
+                    App.SafeInvoke(() =>
                     {
-                        Data.DirList.FileList.RemoveAll(f => f.FullPath == op.FilePath.FullPath);
+                        Data.DirList.FileList.RemoveAll(f => f.FullPath == FullPath);
                         FileActionLogic.UpdateFileActions();
                     });
                 }
 
-                if (op.VFDO.Operations.All(op => op.Status is FileOperation.OperationStatus.Completed))
+                if (vfdo.Operations.All(op => op.Status is FileOperation.OperationStatus.Completed))
                     Data.CopyPaste.Clear();
             }
-
-            op.VFDO = null;
         }
 
-        op.PropertyChanged -= PullOperation_PropertyChanged;
+        vfdo.OperationCompleted -= VFDO_OperationCompleted!;
     }
 
     public void GetIcon()

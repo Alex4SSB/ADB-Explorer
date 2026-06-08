@@ -130,7 +130,7 @@
                                     <MultiDataTrigger>
                                         <MultiDataTrigger.Conditions>
                                             <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True" />
-                                            <Condition Binding="{Binding MouseWithinApp}" Value="True" />
+                                            <Condition Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=MouseWithinApp}" Value="True" />
                                         </MultiDataTrigger.Conditions>
                                         <Setter Property="Glyph" Value="&#xE896;" />
                                     </MultiDataTrigger>

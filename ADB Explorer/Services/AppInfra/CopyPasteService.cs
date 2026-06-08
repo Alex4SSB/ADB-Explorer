@@ -116,6 +116,9 @@ public partial class CopyPasteService : ObservableObject
     [ObservableProperty]
     public partial bool DragWithinSlave { get; set; } = false;
 
+    [ObservableProperty]
+    public partial bool MouseWithinApp { get; set; } = true;
+
     public NativeMethods.HResult DragResult { get; set; }
 
     public DragDropEffects CurrentEffect => IsDrag ? DropEffect : PasteState;

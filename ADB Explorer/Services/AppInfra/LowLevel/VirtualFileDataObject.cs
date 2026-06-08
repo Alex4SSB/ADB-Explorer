@@ -21,6 +21,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     public static FileGroup SelfFileGroup { get; private set; }
     public static IEnumerable<FileClass> SelfFiles { get; private set; }
     public static string DummyFileName { get; private set; }
+    public bool IsContentIncluded { get; private set; } = true;
 
     /// <summary>
     /// In-order list of registered data objects.
@@ -148,24 +149,32 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
 
             if (dataObject is not null)
             {
+                if (formatCopy.tymed.HasFlag(TYMED.TYMED_ISTREAM) && !inOperation && Method is DataObjectMethod.DragDrop)
+                {
+                    // forbid access to stream before drop operation starts
+                    hr = NativeMethods.HResult.DV_E_FORMATETC;
+                }
+                else
+                {
 #if !DEPLOY
-                var index = adbDataFormat == AdbDataFormats.FileContents
-                        ? $"[{dataObject.FORMATETC.lindex}]"
-                        : "";
+                    var index = adbDataFormat == AdbDataFormats.FileContents
+                            ? $"[{dataObject.FORMATETC.lindex}]"
+                            : "";
 
-                // Unknown formats are not printed
-                if (adbDataFormat is not null)
-                    DebugLog.PrintLine($"Get data: {adbDataFormat.Name}{index}");
+                    // Unknown formats are not printed
+                    if (adbDataFormat is not null)
+                        DebugLog.PrintLine($"Get data: {adbDataFormat.Name}{index} (isUIThread={App.AppDispatcher?.CheckAccess()}, method={Method}, inOperation={inOperation})");
 #endif
 
-                // Populate the STGMEDIUM
-                medium.tymed = dataObject.FORMATETC.tymed;
-                var result = dataObject.GetData(); // Possible call to user code
+                    // Populate the STGMEDIUM
+                    medium.tymed = dataObject.FORMATETC.tymed;
+                    var result = dataObject.GetData(); // Possible call to user code
 
-                hr = result.Item2;
-                if (hr is NativeMethods.HResult.Ok)
-                {
-                    medium.unionmember = result.Item1;
+                    hr = result.Item2;
+                    if (hr is NativeMethods.HResult.Ok)
+                    {
+                        medium.unionmember = result.Item1;
+                    }
                 }
             }
             else
@@ -260,6 +269,24 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
                     var format = AdbDataFormats.GetFormat(formatIn.cfFormat) ?? new AdbDataFormat(formatIn.cfFormat);
                     SetData(format, data);
                     handled = true;
+
+                    // IAsyncOperation.EndOperation is never called for clipboard paste operations —
+                    // it is a drag-and-drop-only protocol. For clipboard, Explorer instead sets
+                    // CFSTR_PERFORMEDDROPEFFECT with the actually applied effect, then
+                    // CFSTR_PASTESUCCEEDED (always None, so its value is unreliable).
+
+                    if (format == AdbDataFormats.PasteSucceeded)
+                    {
+                        var completionResult = PerformedDropEffect is DragDropEffects.None
+                            ? NativeMethods.HResult.Canceled
+                            : NativeMethods.HResult.Ok;
+
+#if !DEPLOY
+                        DebugLog.PrintLine($"PasteSucceeded received. PerformedDropEffect={PerformedDropEffect}, completionResult={completionResult}");
+#endif
+
+                        OperationCompleted?.Invoke(this, completionResult);
+                    }
                 }
                 finally
                 {
@@ -365,6 +392,8 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         GetData = () =>
         {
             var iStream = streamData();
+            if (iStream is null)
+                return (IntPtr.Zero, NativeMethods.HResult.DV_E_FORMATETC);
             var ptr = Marshal.GetComInterfaceForObject(iStream, typeof(IStream));
             Marshal.ReleaseComObject(iStream);
 
@@ -379,6 +408,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
 
         UpdateData(AdbDataFormats.FileDescriptor, group.GroupDescriptorBytes);
 
+        IsContentIncluded = includeContent;
         if (includeContent)
             UpdateData(AdbDataFormats.FileContents, group.DataStreams);
     }
@@ -509,6 +539,10 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     /// <param name="pbcReserved">Reserved. Set this value to NULL.</param>
     void IAsyncOperation.StartOperation(IBindCtx pbcReserved)
     {
+#if !DEPLOY
+        DebugLog.PrintLine("IAsyncOperation.StartOperation called");
+#endif
+
         inOperation = true;
     }
 
@@ -529,10 +563,20 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     /// <param name="dwEffects">A DROPEFFECT value that indicates the result of an optimized move. This should be the same value that would be passed to the data object as a CFSTR_PERFORMEDDROPEFFECT format with a normal data extraction operation.</param>
     void IAsyncOperation.EndOperation(int hResult, IBindCtx pbcReserved, uint dwEffects)
     {
+        var hRes = (NativeMethods.HResult)hResult;
+        var dwEffect = (DragDropEffects)dwEffects;
+
+#if !DEPLOY
+        DebugLog.PrintLine($"EndOperation called with hResult={hRes}, dwEffects={dwEffect}");
+#endif
+
         inOperation = false;
+        OperationCompleted?.Invoke(this, hRes);
     }
 
     #endregion
+
+    public event EventHandler<NativeMethods.HResult>? OperationCompleted;
 
     /// <summary>
     /// Class representing the result of a SetData call.
@@ -696,14 +740,24 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         {
             var escapePressed = (0 != fEscapePressed);
             vfdo.DragModifiers = (DragDropKeyStates)grfKeyState;
-            
-            var res = escapePressed switch
+
+            var res = NativeMethods.HResult.Ok;
+
+            if (escapePressed)
             {
-                true => NativeMethods.HResult.DRAGDROP_S_CANCEL,
-                false when vfdo.DragModifiers.HasFlag(DragDropKeyStates.RightMouseButton) => NativeMethods.HResult.DRAGDROP_S_CANCEL,
-                false when !vfdo.DragModifiers.HasFlag(DragDropKeyStates.LeftMouseButton) => NativeMethods.HResult.DRAGDROP_S_DROP,
-                _ => NativeMethods.HResult.Ok,
-            };
+                res = NativeMethods.HResult.DRAGDROP_S_CANCEL;
+            }
+            else
+            {
+                if (vfdo.DragModifiers.HasFlag(DragDropKeyStates.RightMouseButton))
+                    res = NativeMethods.HResult.DRAGDROP_S_CANCEL;
+                else if (!vfdo.DragModifiers.HasFlag(DragDropKeyStates.LeftMouseButton))
+                {
+                    res = vfdo.CurrentEffect is DragDropEffects.None
+                        ? NativeMethods.HResult.DRAGDROP_S_CANCEL
+                        : NativeMethods.HResult.DRAGDROP_S_DROP;
+                }
+            }
 
             if (res is not NativeMethods.HResult.Ok)
             {
@@ -712,6 +766,10 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
                 IpcService.NotifyDropCancel(res);
             }
             Data.CopyPaste.DragResult = res;
+
+#if !DEPLOY
+            DebugLog.PrintLine($"QueryContinueDrag result: {res}");
+#endif
 
             return (int)res;
         }
@@ -730,17 +788,25 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
                 dragDropEffects = DragDropEffects.Copy;
             }
 
+            if (!Data.CopyPaste.MouseWithinApp)
+            {
+                // When content is illegal for Windows, or user attempts to create a link - display 🚫
+                if (vfdo.DragModifiers.HasFlag(DragDropKeyStates.AltKey) || !vfdo.IsContentIncluded)
+                    dragDropEffects = DragDropEffects.None;
+            }
+
             vfdo.CurrentEffect = dragDropEffects;
 
 #if !DEPLOY
             DebugLog.PrintLine($"GiveFeedback dwEffect: {dragDropEffects}");
 #endif
 
-            if (dragDropEffects is DragDropEffects.None)
-                return (int)NativeMethods.HResult.DRAGDROP_S_USEDEFAULTCURSORS;
-
             // Set default cursor when cursor control is manual
-            Mouse.SetCursor(Cursors.Arrow);
+            if (dragDropEffects is DragDropEffects.None)
+                Mouse.SetCursor(Cursors.No);
+            else
+                Mouse.SetCursor(Cursors.Arrow);
+
             return (int)NativeMethods.HResult.Ok;
         }
     }

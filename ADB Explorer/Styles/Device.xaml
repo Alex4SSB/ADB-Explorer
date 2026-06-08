@@ -86,7 +86,6 @@
         x:Key="PairingCodeBoxStyle"
         BasedOn="{StaticResource NewDeviceMaskedTextBoxStyle}"
         TargetType="controls:MaskedTextBox">
-        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=NewDeviceUIPairingCode, Mode=TwoWay}" />
         <Setter Property="ValidationType" Value="SeparateAndLimitDigits" />
         <Setter Property="Separator" Value="-" />
         <Setter Property="MaxChars" Value="6" />
