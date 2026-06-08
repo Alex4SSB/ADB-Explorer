@@ -44,12 +44,10 @@ Help with translation is most welcome - please visit our translation project on 
 `%LocalAppData%\AdbExplorer`
 
 
-### ℹ️ For Store version: <br />To be able to see these files, create `%LocalAppData%\AdbExplorer\App.txt` <br /> *before installing*, otherwise the files are stored in an unknown location.
+### ℹ️ For Store version: <br />To be able to see these files, create `%LocalAppData%\AdbExplorer\settings.json` <br /> *before installing*, otherwise the files are stored in an unknown location.
 
 
-* App.txt - persistent settings file.
-* TEMP - a folder to which edited files are transferred temporarily.
-* TempDrag... - folder(s) to which files are temporarily transferred for Drag & Drop / Clipboard transfer to / from PC.
+* settings.json - persistent settings file.
 
 The settings file contains user app settings as well as other settings not directly accessible.
 The file can be edited, but the format must be preserved.
