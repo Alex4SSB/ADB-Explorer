@@ -12,8 +12,10 @@
     <NoWarn>$(NoWarn);XDG0001</NoWarn>
     <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<Platforms>AnyCPU;x64;ARM64</Platforms>
+	<Platforms>x64;ARM64</Platforms>
 	<Configurations>Debug;Release;Deploy</Configurations>
+	<!-- Use Roslyn (csc) instead of legacy al.exe for satellite assemblies; al.exe rejects /platform:arm64 (AL1012) -->
+	<GenerateSatelliteAssembliesForCore>true</GenerateSatelliteAssembliesForCore>
   </PropertyGroup>
 
   <ItemGroup>

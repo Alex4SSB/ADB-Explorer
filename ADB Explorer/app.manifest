@@ -61,6 +61,11 @@
   </application>
 
   <!-- Enable themes for Windows common controls and dialogs (Windows XP and later) -->
+  <!-- NOTE: Commented out because ClickOnce manifest generation fails trying to resolve this
+       win32 SxS assembly as a file ("Could not find file 'Microsoft.Windows.Common-Controls'").
+       WPF does not require it. See Microsoft docs: "How to: Publish a WPF Application with
+       Visual Styles Enabled". -->
+  <!--
   <dependency>
       <dependentAssembly>
           <assemblyIdentity
@@ -72,4 +77,5 @@
               language="*" />
       </dependentAssembly>
   </dependency>
+  -->
 </assembly>
