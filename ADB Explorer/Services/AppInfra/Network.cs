@@ -17,6 +17,27 @@ public static class Network
         Client.Timeout = TimeSpan.FromSeconds(20);
     }
 
+    public static async Task<bool> PostJsonAsync(Uri url, string json, IReadOnlyDictionary<string, string>? headers = null)
+    {
+        try
+        {
+            using var content = new StringContent(json, Encoding.UTF8, "application/json");
+            using var request = new HttpRequestMessage(HttpMethod.Post, url) { Content = content };
+            if (headers is not null)
+            {
+                foreach (var (name, value) in headers)
+                    request.Headers.TryAddWithoutValidation(name, value);
+            }
+
+            using var response = await Client.SendAsync(request).ConfigureAwait(false);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
     public static async Task<string> GetRequestAsync(Uri url)
     {
         try

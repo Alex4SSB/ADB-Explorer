@@ -18,9 +18,23 @@
 	<GenerateSatelliteAssembliesForCore>true</GenerateSatelliteAssembliesForCore>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)' == 'Deploy'">
+    <DefineConstants>$(DefineConstants);DEPLOY</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <Content Include="Assets\app_icon_2023_combined.ico" />
   </ItemGroup>
+
+  <ItemGroup Condition="Exists('FaroCollector.url') And '$(Configuration)' != 'Debug'">
+    <EmbeddedResource Include="FaroCollector.url">
+      <LogicalName>FaroCollector.url</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <Target Name="WarnMissingFaroCollectorUrl" BeforeTargets="Build" Condition="'$(Configuration)' != 'Debug' And !Exists('FaroCollector.url')">
+    <Warning Text="FaroCollector.url not found; this $(Configuration) build will not send crash reports to Grafana Cloud." />
+  </Target>
 
   <ItemGroup>
     <PackageReference Include="AdvancedSharpAdbClient" Version="3.6.16" />

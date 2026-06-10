@@ -102,6 +102,48 @@ public static class UISettings
     /// </summary>
     private static readonly Geometry GitHubGeometry = Geometry.Parse("M 48.854 0 C 21.839 0 0 22 0 49.217 c 0 21.756 13.993 40.172 33.405 46.69 c 2.427 0.49 3.316 -1.059 3.316 -2.362 c 0 -1.141 -0.08 -5.052 -0.08 -9.127 c -13.59 2.934 -16.42 -5.867 -16.42 -5.867 c -2.184 -5.704 -5.42 -7.17 -5.42 -7.17 c -4.448 -3.015 0.324 -3.015 0.324 -3.015 c 4.934 0.326 7.523 5.052 7.523 5.052 c 4.367 7.496 11.404 5.378 14.235 4.074 c 0.404 -3.178 1.699 -5.378 3.074 -6.6 c -10.839 -1.141 -22.243 -5.378 -22.243 -24.283 c 0 -5.378 1.94 -9.778 5.014 -13.2 c -0.485 -1.222 -2.184 -6.275 0.486 -13.038 c 0 0 4.125 -1.304 13.426 5.052 a 46.97 46.97 0 0 1 12.214 -1.63 c 4.125 0 8.33 0.571 12.213 1.63 c 9.302 -6.356 13.427 -5.052 13.427 -5.052 c 2.67 6.763 0.97 11.816 0.485 13.038 c 3.155 3.422 5.015 7.822 5.015 13.2 c 0 18.905 -11.404 23.06 -22.324 24.283 c 1.78 1.548 3.316 4.481 3.316 9.126 c 0 6.6 -0.08 11.897 -0.08 13.526 c 0 1.304 0.89 2.853 3.316 2.364 c 19.412 -6.52 33.405 -24.935 33.405 -46.691 C 97.707 22 75.788 0 48.854 0 Z");
 
+    private static List<AbstractSetting> BuildAboutSettings()
+    {
+        var settings = new List<AbstractSetting>
+        {
+            new InfoSetting(AppGlobal.AppDisplayName, null, (FontFamily)App.Current.Resources["Nunito"], 18, $"v{AppGlobal.AppVersion}", TextAlignment.Center),
+            new LinkSetting(Strings.Resources.S_DONATE, Resources.Links.SPONSOR, "\uEB51", "SponsorIconBrush"),
+            new LinkSetting(Strings.Resources.S_APP_DATA_FOLDER, new(AppDataPath), "\uE62F"),
+            new LinkSetting(Strings.Resources.S_GITHUB_REPO, Resources.Links.ADB_EXPLORER_GITHUB, pathData: GitHubGeometry),
+            new LinkSetting(Strings.Resources.S_GOTO_WEBLATE, Resources.Links.WEBLATE, imageSource: WeblateLogo),
+            new LinkSetting(Strings.Resources.S_PRIVACY_POLICY, Resources.Links.ADB_EXPLORER_PRIVACY, "\uE72E"),
+            new LinkSetting(RuntimeSettings.IsAppDeployed ? Strings.Resources.S_ADB_LEARN_MORE : Strings.Resources.S_ADB_DOWNLOAD, Resources.Links.L_ADB_PAGE, imageSource: FileToIconConverter.LoadBitmap(AppGlobal.icons8_android_os_94)),
+            new BoolSetting(() => Settings.CheckForUpdates, Strings.Resources.S_SETTINGS_UPDATES, icon: "\uE895"),
+        };
+
+        if (CrashReportService.IsConfigured)
+        {
+            settings.Add(new BoolSetting(() => Settings.ShowMessageOnCrash, Strings.Resources.S_SETTINGS_CRASH_DIALOG, icon: "\uE783"));
+            settings.Add(new LongDescriptionSetting(Strings.Resources.S_CRASH_REPORTING_TITLE, Strings.Resources.S_CRASH_REPORTING_NOTICE, "\uE783"));
+        }
+
+        settings.Add(new MultiLinkSetting(Strings.Resources.S_ATTRIBUTIONS, [
+            new("WpfUi", Resources.Links.WPF_UI),
+            new("AdvancedSharpAdb", Resources.Links.ADVANCED_SHARP_ADB),
+            new("Vanara", Resources.Links.VANARA),
+            new("QRCoder", Resources.Links.QR_CODER),
+            new("Emoji.Wpf", Resources.Links.EMOJI_WPF),
+            new("AvalonEdit", Resources.Links.AVALONEDIT),
+            new("CommunityToolkit.Mvvm", Resources.Links.MVVM_TOOLKIT),
+            new("WindowsAPICodePack", Resources.Links.API_CODEPACK),
+            new("Newtonsoft.Json", Resources.Links.JSON),
+            new("Icons8", Resources.Links.ICONS8),
+            new("Vecteezy", Resources.Links.VECTEEZY),
+            new("Grafana Labs", Resources.Links.GRAFANA_LABS),
+            new("LGPL v3", Resources.Links.LGPL3),
+            new("Apache", Resources.Links.L_APACHE_LIC),
+            new(Strings.Resources.S_CC_NAME, Resources.Links.L_CC_LIC),
+        ], "\uE90F"));
+        settings.Add(new LongDescriptionSetting(Strings.Resources.S_ANDROID_ICONS_TITLE, $"{Strings.Resources.S_ANDROID_ROBOT_LIC}\n\n{Strings.Resources.S_APK_ICON_LIC}", "\uE946"));
+
+        return settings;
+    }
+
     public static void Init()
     {
         SettingsList =
@@ -218,34 +260,7 @@ public static class UISettings
                                        icon: "\uE771"),
                 new BoolSetting(() => Settings.SwRender, Strings.Resources.S_SETTINGS_DISABLE_HW, icon: "\uF211"),
             ], "\uE2B1"),
-            new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_ABOUT,
-            [
-                new InfoSetting(AppGlobal.AppDisplayName, null, (FontFamily)App.Current.Resources["Nunito"], 18, $"v{AppGlobal.AppVersion}", TextAlignment.Center),
-                new LinkSetting(Strings.Resources.S_DONATE, Resources.Links.SPONSOR, "\uEB51", "SponsorIconBrush"),
-                new LinkSetting(Strings.Resources.S_APP_DATA_FOLDER, new(AppDataPath), "\uE62F"),
-                new LinkSetting(Strings.Resources.S_GITHUB_REPO, Resources.Links.ADB_EXPLORER_GITHUB, pathData: GitHubGeometry),
-                new LinkSetting(Strings.Resources.S_GOTO_WEBLATE, Resources.Links.WEBLATE, imageSource: WeblateLogo),
-                new LinkSetting(Strings.Resources.S_PRIVACY_POLICY, Resources.Links.ADB_EXPLORER_PRIVACY, "\uE72E"),
-                new LinkSetting(RuntimeSettings.IsAppDeployed ? Strings.Resources.S_ADB_LEARN_MORE : Strings.Resources.S_ADB_DOWNLOAD, Resources.Links.L_ADB_PAGE, imageSource: FileToIconConverter.LoadBitmap(AppGlobal.icons8_android_os_94)),
-                new BoolSetting(() => Settings.CheckForUpdates, Strings.Resources.S_SETTINGS_UPDATES, icon: "\uE895"),
-                new MultiLinkSetting(Strings.Resources.S_ATTRIBUTIONS, [
-                    new("WpfUi", Resources.Links.WPF_UI),
-                    new("AdvancedSharpAdb", Resources.Links.ADVANCED_SHARP_ADB),
-                    new("Vanara", Resources.Links.VANARA),
-                    new("QRCoder", Resources.Links.QR_CODER),
-                    new("Emoji.Wpf", Resources.Links.EMOJI_WPF),
-                    new("AvalonEdit", Resources.Links.AVALONEDIT),
-                    new("CommunityToolkit.Mvvm", Resources.Links.MVVM_TOOLKIT),
-                    new("WindowsAPICodePack", Resources.Links.API_CODEPACK),
-                    new("Newtonsoft.Json", Resources.Links.JSON),
-                    new("Icons8", Resources.Links.ICONS8),
-                    new("Vecteezy", Resources.Links.VECTEEZY),
-                    new("LGPL v3", Resources.Links.LGPL3),
-                    new("Apache", Resources.Links.L_APACHE_LIC),
-                    new(Strings.Resources.S_CC_NAME, Resources.Links.L_CC_LIC),
-                    ], "\uE90F"),
-                new LongDescriptionSetting(Strings.Resources.S_ANDROID_ICONS_TITLE, $"{Strings.Resources.S_ANDROID_ROBOT_LIC}\n\n{Strings.Resources.S_APK_ICON_LIC}", "\uE946"),
-            ], "\uE946"),
+            new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_ABOUT, BuildAboutSettings(), "\uE946"),
         ];
     }
 }

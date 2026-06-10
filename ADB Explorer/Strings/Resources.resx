@@ -597,6 +597,18 @@ Visible content may be incomplete.</value>
     <value>Privacy Policy</value>
     <comment>The title of the hyperlink to our privacy policy</comment>
   </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Show Crash Report Dialog</value>
+    <comment>Toggle in About settings to show or hide the optional crash report dialog after an unhandled exception</comment>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Crash Reporting</value>
+    <comment>Title of the About settings notice describing optional crash reporting</comment>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>After a crash, you may optionally send a diagnostic report to help us fix it. Reports are sent only when you click Send Report and usually include the exception message, stack trace, app and Windows version, and the page that was open. The data is processed by Grafana Labs (Grafana Cloud). See the Privacy Policy link above.</value>
+    <comment>About settings notice describing optional crash reporting and Grafana as processor</comment>
+  </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>Attributions &amp; Third Party Licenses</value>
     <comment>The title of the about section listing licenses</comment>

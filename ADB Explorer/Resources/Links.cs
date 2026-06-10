@@ -27,4 +27,7 @@ public static class Links
     public static readonly Uri REPO_ADB_VER_LIST = new("https://raw.githubusercontent.com/Alex4SSB/ADB-Explorer/master/OFFICIAL_ADB_VERSIONS.md");
     public static readonly Uri VECTEEZY = new("https://www.vecteezy.com/free-vector/apk");
     public static readonly Uri AVALONEDIT = new("https://github.com/icsharpcode/AvalonEdit");
+    public static readonly Uri GRAFANA_INSTANCE = new("https://adbexplorer.grafana.net");
+    public static readonly Uri GRAFANA_LABS = new("https://grafana.com/");
+    public static readonly Uri GRAFANA_PRIVACY_POLICY = new("https://grafana.com/legal/privacy-policy/");
 }

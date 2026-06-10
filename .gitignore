@@ -363,3 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 /ADB Explorer/Properties/launchSettings.json
 /.github/copilot-instructions.md
+
+# Grafana Faro collector URL (contains app key; copy from FaroCollector.url.example)
+ADB Explorer/FaroCollector.url

@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels.Pages;
@@ -27,6 +28,11 @@ public partial class App
     /// that should not execute during shutdown.
     /// </summary>
     public static bool IsShuttingDown { get; private set; }
+
+    /// <summary>
+    /// After the crash dialog completes, the original exception is rethrown and must not be handled again.
+    /// </summary>
+    private static bool s_crashDialogCompleted;
 
     // The.NET Generic Host provides dependency injection, configuration, logging, and other services.
     // https://docs.microsoft.com/dotnet/core/extensions/generic-host
@@ -203,6 +209,9 @@ public partial class App
     /// </summary>
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
+        // Stop mouse interception which causes partial mouse freeze during crashes
+        NativeMethods.InterceptMouse.Close();
+
         if (e.Exception is COMException comException && comException.ErrorCode is (int)NativeMethods.HResult.CLIPBRD_E_CANT_OPEN)
             e.Handled = true;
 
@@ -210,14 +219,135 @@ public partial class App
         if (IsShuttingDown || App.Current is null || App.Current.Dispatcher is null)
             e.Handled = true;
 
+        if (s_crashDialogCompleted)
+        {
+            e.Handled = false;
+            return;
+        }
+
         if (Data.Settings.ShowMessageOnCrash)
         {
-            MessageBox.Show($"""
-An unhandled exception occurred, and the application has crashed.
-To disable this message, set '"ShowMessageOnCrash": false' in %LocalAppData%\AdbExplorer\settings.json
+            // Mark handled so WPF does not terminate before the queued dialog can run.
+            e.Handled = true;
+            ShowCrashDialog(e.Exception);
+        }
+    }
 
-{e.Exception.Message}
-""", "Unhandled Exception", MessageBoxButton.OK, MessageBoxImage.Error);
+    private static void ShowCrashDialog(Exception exception)
+    {
+        SafeBeginInvoke(async () =>
+        {
+            if (IsShuttingDown)
+                return;
+
+            try
+            {
+                var message = CrashDialog.FormatMessage(exception.Message);
+                var contentDialog = AdbContentDialog.StringDialog(message, DialogService.DialogIcon.Critical, copyToClipboard: true);
+
+                Wpf.Ui.Controls.ContentDialogResult result;
+                try
+                {
+                    result = await DialogService.ShowDialog(
+                        contentDialog,
+                        CrashDialog.Title,
+                        primaryText: CrashReportService.IsConfigured ? CrashDialog.Send : "",
+                        closeText: CrashDialog.Dismiss);
+                }
+                catch
+                {
+                    MessageBox.Show(message, CrashDialog.Title, MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                if (result is Wpf.Ui.Controls.ContentDialogResult.Primary)
+                {
+                    var sent = await CrashReportService.SendAsync(exception);
+                    var sentMessage = CrashReportService.UsesLocalCollector
+                        ? CrashDialog.SentDebug
+                        : CrashDialog.SentRelease;
+                    var failedMessage = CrashReportService.UsesLocalCollector
+                        ? CrashDialog.SendFailedDebug
+                        : CrashDialog.SendFailedRelease;
+                    var feedbackDialog = AdbContentDialog.StringDialog(
+                        sent ? sentMessage : failedMessage,
+                        sent ? DialogService.DialogIcon.Informational : DialogService.DialogIcon.Exclamation);
+                    await DialogService.ShowDialog(feedbackDialog, CrashDialog.Title);
+                }
+            }
+            finally
+            {
+                RethrowAfterCrashDialog(exception);
+            }
+        });
+    }
+
+    private static void RethrowAfterCrashDialog(Exception exception)
+    {
+        if (IsShuttingDown)
+            return;
+
+        s_crashDialogCompleted = true;
+
+        var dispatcher = AppDispatcher;
+        if (dispatcher is null || dispatcher.HasShutdownStarted)
+            return;
+
+        dispatcher.BeginInvoke(() => throw exception, DispatcherPriority.Send);
+    }
+
+    // Crash report strings are not translated
+    private static class CrashDialog
+    {
+        public const string Title = "Unhandled Exception";
+        public const string Send = "Send Report";
+        public const string Dismiss = "Dismiss";
+
+        public const string SentDebug =
+            "Thank you. The crash report was sent successfully.\n\n" +
+            "In Grafana Explore → Loki, run:\n" +
+            "{source=\"adb-explorer\", kind=\"exception\"}";
+
+        public const string SentRelease =
+            """
+            Thank you. The crash report was sent to Grafana Cloud.
+            
+            Task failed successfully...
+            """;
+
+        public const string SendFailedDebug =
+            "Unable to send the crash report. Make sure Grafana Alloy is running on this PC, then try again.";
+
+        public const string SendFailedRelease =
+            "Unable to send the crash report. Check your internet connection and try again.";
+
+        public static string FormatMessage(string exceptionMessage)
+        {
+            var privacyUrl = ADB_Explorer.Resources.Links.ADB_EXPLORER_PRIVACY.ToString();
+            var optOutHint = CrashReportService.IsConfigured
+                ? "To disable this dialog, turn off \"Show crash report dialog\" in Settings → About."
+                : $"To disable this message, set '\"ShowMessageOnCrash\": false' in %LocalAppData%\\AdbExplorer\\settings.json";
+
+            if (!CrashReportService.IsConfigured)
+            {
+                return $"""
+An unhandled exception occurred, and the application has crashed.
+{optOutHint}
+
+{exceptionMessage}
+""";
+            }
+
+            return $"""
+An unhandled exception occurred, and the application has crashed.
+
+If you choose Send Report, diagnostic data is sent to Grafana Cloud (Grafana Labs) to help fix bugs. This may include the exception message, stack trace, app and Windows version, and which view was open. Sending is optional — choose Dismiss to send nothing.
+Privacy Policy: {privacyUrl}
+
+{optOutHint}
+
+{exceptionMessage}
+""";
         }
     }
 

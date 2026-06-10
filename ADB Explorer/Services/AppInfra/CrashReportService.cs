@@ -1,0 +1,261 @@
+using ADB_Explorer.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+namespace ADB_Explorer.Services;
+
+/// <summary>
+/// Sends unhandled exception reports via the Faro collector API.
+/// Debug builds use local Grafana Alloy. Release builds use an embedded <c>FaroCollector.url</c> when present.
+/// Deploy builds only report when <see cref="AppRuntimeSettings.IsAppDeployed"/> is true (Store install).
+/// </summary>
+public static class CrashReportService
+{
+    private const string LocalAlloyCollectorUrl = "http://127.0.0.1:12347/collect";
+
+    private static readonly string SessionId = Guid.NewGuid().ToString("N");
+    private static readonly Lazy<Uri?> CollectorUrl = new(ResolveCollectorUrl);
+
+    public static bool IsConfigured => CollectorUrl.Value is not null;
+
+    /// <summary>True when crash reports are sent to local Grafana Alloy (Debug builds only).</summary>
+    public static bool UsesLocalCollector
+    {
+        get
+        {
+#if DEBUG
+            return true;
+#else
+            return false;
+#endif
+        }
+    }
+
+    public static async Task<bool> SendAsync(Exception exception)
+    {
+        if (!IsConfigured)
+            return false;
+
+        var json = BuildPayloadJson(exception);
+        var headers = new Dictionary<string, string> { ["X-Faro-Session-Id"] = SessionId };
+        return await Network.PostJsonAsync(CollectorUrl.Value!, json, headers).ConfigureAwait(false);
+    }
+
+    private static Uri? ResolveCollectorUrl()
+    {
+        foreach (var candidate in EnumerateCollectorUrlCandidates())
+        {
+            if (Uri.TryCreate(candidate, UriKind.Absolute, out var uri))
+                return uri;
+        }
+
+        return null;
+    }
+
+    private static IEnumerable<string> EnumerateCollectorUrlCandidates()
+    {
+#if DEBUG
+        yield return LocalAlloyCollectorUrl;
+#else
+#if DEPLOY
+        if (!Data.RuntimeSettings.IsAppDeployed)
+            yield break;
+#endif
+        var embedded = ReadEmbeddedCollectorUrl();
+        if (!string.IsNullOrWhiteSpace(embedded))
+            yield return embedded;
+#endif
+    }
+
+    private const string EmbeddedCollectorResourceName = "FaroCollector.url";
+
+    private static string? ReadEmbeddedCollectorUrl()
+    {
+        var assembly = typeof(CrashReportService).Assembly;
+        var stream = assembly.GetManifestResourceStream(EmbeddedCollectorResourceName);
+        if (stream is null)
+        {
+            var fallbackName = assembly.GetManifestResourceNames()
+                .FirstOrDefault(name => name.EndsWith(EmbeddedCollectorResourceName, StringComparison.Ordinal));
+            if (fallbackName is null)
+                return null;
+
+            stream = assembly.GetManifestResourceStream(fallbackName);
+            if (stream is null)
+                return null;
+        }
+
+        using (stream)
+        {
+            using var reader = new StreamReader(stream, Encoding.UTF8);
+            return NormalizeCollectorUrl(reader.ReadToEnd());
+        }
+    }
+
+    private static string? NormalizeCollectorUrl(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw))
+            return null;
+
+        var url = raw.Trim();
+        if (url.Length > 0 && url[0] == '\uFEFF')
+            url = url[1..].Trim();
+
+        return string.IsNullOrWhiteSpace(url) ? null : url;
+    }
+
+    private static string BuildPayloadJson(Exception exception)
+    {
+        var timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
+        var viewName = GetCurrentViewName(exception);
+        var pageId = GetPageId(viewName);
+
+        var exceptionObject = new JObject
+        {
+            ["type"] = exception.GetType().FullName ?? exception.GetType().Name,
+            ["value"] = exception.Message,
+            ["timestamp"] = timestamp,
+        };
+
+        var stacktrace = BuildStacktraceJObject(exception);
+        if (stacktrace is not null)
+            exceptionObject["stacktrace"] = stacktrace;
+
+        var context = BuildContextJObject(exception);
+        if (context.HasValues)
+            exceptionObject["context"] = context;
+
+        var payload = new JObject
+        {
+            ["meta"] = new JObject
+            {
+                ["sdk"] = new JObject
+                {
+                    ["name"] = "adb-explorer-desktop",
+                    ["version"] = Data.AppVersion.ToString(),
+                },
+                ["app"] = new JObject
+                {
+                    ["name"] = Properties.AppGlobal.AppDisplayName,
+                    ["version"] = Properties.AppGlobal.AppVersion,
+                    ["environment"] = Data.RuntimeSettings.IsAppDeployed ? "store" : "portable",
+                },
+                ["session"] = new JObject { ["id"] = SessionId },
+                ["page"] = new JObject
+                {
+                    ["id"] = pageId,
+                    ["url"] = $"https://adb-explorer.local{pageId}",
+                },
+                ["browser"] = new JObject
+                {
+                    ["name"] = "Windows",
+                    ["version"] = Environment.OSVersion.Version.ToString(),
+                    ["os"] = RuntimeInformation.OSDescription,
+                    ["userAgent"] = $"ADB-Explorer/{Properties.AppGlobal.AppVersion} ({RuntimeInformation.OSArchitecture})",
+                },
+            },
+            ["exceptions"] = new JArray(exceptionObject),
+        };
+
+        return payload.ToString(Formatting.None);
+    }
+
+    private static string GetCurrentViewName(Exception exception)
+    {
+        var page = Data.CurrentPage.Value;
+        if (page is not null)
+            return PageTypeNameToViewName(page.Name);
+
+        foreach (var frame in new StackTrace(exception, true).GetFrames() ?? [])
+        {
+            var declaringType = frame.GetMethod()?.DeclaringType?.FullName;
+            if (declaringType is null)
+                continue;
+
+            var viewName = ViewNameFromDeclaringType(declaringType);
+            if (viewName is not null)
+                return viewName;
+        }
+
+        return "Unknown";
+    }
+
+    private static string GetPageId(string viewName) =>
+        $"/{viewName.ToLowerInvariant()}";
+
+    private static string PageTypeNameToViewName(string pageTypeName) => pageTypeName.Replace("Page", "");
+
+    private static string? ViewNameFromDeclaringType(string declaringTypeFullName)
+    {
+        if (declaringTypeFullName.Contains("ADB_Explorer.Views.Pages."))
+            return declaringTypeFullName.Replace("ADB_Explorer.Views.Pages.", "").Replace("Page", "");
+
+        return null;
+    }
+
+    private static JObject? BuildStacktraceJObject(Exception exception)
+    {
+        var frames = new StackTrace(exception, true).GetFrames();
+        if (frames is null || frames.Length == 0)
+            return null;
+
+        var frameObjects = new JArray();
+        foreach (var frame in frames)
+        {
+            var frameObject = new JObject
+            {
+                ["function"] = frame.GetMethod()?.Name ?? "",
+                ["module"] = frame.GetMethod()?.DeclaringType?.FullName ?? "",
+            };
+
+            var filename = frame.GetFileName();
+            if (!string.IsNullOrWhiteSpace(filename))
+                frameObject["filename"] = filename;
+
+            var line = frame.GetFileLineNumber();
+            if (line > 0)
+                frameObject["lineno"] = line;
+
+            var column = frame.GetFileColumnNumber();
+            if (column > 0)
+                frameObject["colno"] = column;
+
+            frameObjects.Add(frameObject);
+        }
+
+        return new JObject { ["frames"] = frameObjects };
+    }
+
+    private static JObject BuildContextJObject(Exception exception)
+    {
+        var context = new JObject
+        {
+            ["dotnetVersion"] = Environment.Version.ToString(),
+            ["osArchitecture"] = RuntimeInformation.OSArchitecture.ToString(),
+        };
+
+        if (exception.InnerException is not null)
+            context["innerException"] = FormatExceptionChain(exception.InnerException);
+
+        if (!string.IsNullOrWhiteSpace(exception.StackTrace))
+            context["stackTrace"] = exception.StackTrace;
+
+        return context;
+    }
+
+    private static string FormatExceptionChain(Exception exception)
+    {
+        var builder = new StringBuilder();
+        var current = exception;
+
+        while (current is not null)
+        {
+            builder.Append(current.GetType().FullName);
+            builder.Append(": ");
+            builder.AppendLine(current.Message);
+            current = current.InnerException;
+        }
+
+        return builder.ToString().TrimEnd();
+    }
+}

@@ -1061,6 +1061,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to After a crash, you may optionally send a diagnostic report to help us fix it. Reports are sent only when you click Send Report and usually include the exception message, stack trace, app and Windows version, and the page that was open. The data is processed by Grafana Labs (Grafana Cloud). See the Privacy Policy link above..
+        /// </summary>
+        public static string S_CRASH_REPORTING_NOTICE {
+            get {
+                return ResourceManager.GetString("S_CRASH_REPORTING_NOTICE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Crash Reporting.
+        /// </summary>
+        public static string S_CRASH_REPORTING_TITLE {
+            get {
+                return ResourceManager.GetString("S_CRASH_REPORTING_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create Error.
         /// </summary>
         public static string S_CREATE_ERR_TITLE {
@@ -3459,6 +3477,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_BUSYBOX {
             get {
                 return ResourceManager.GetString("S_SETTINGS_BUSYBOX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Crash Report Dialog.
+        /// </summary>
+        public static string S_SETTINGS_CRASH_DIALOG {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_CRASH_DIALOG", resourceCulture);
             }
         }
         
