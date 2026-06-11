@@ -3,10 +3,11 @@ using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using Wpf.Ui.Abstractions.Controls;
 
 namespace ADB_Explorer.ViewModels.Pages;
 
-public partial class ExplorerViewModel : ObservableObject
+public partial class ExplorerViewModel : ObservableObject, INavigationAware
 {
 
     [ObservableProperty]
@@ -210,6 +211,15 @@ public partial class ExplorerViewModel : ObservableObject
         };
     }
 
+    public Task OnNavigatedToAsync()
+    {
+        Data.CurrentPage.Value = typeof(Views.Pages.ExplorerPage);
+
+        return Task.CompletedTask;
+    }
+
+    public Task OnNavigatedFromAsync() => Task.CompletedTask;
+
     private void SavedLocations_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         App.SafeBeginInvoke(() =>
@@ -287,6 +297,7 @@ public partial class ExplorerViewModel : ObservableObject
             OnPropertyChanged(nameof(CurrentDeviceBattery));
             OnPropertyChanged(nameof(IsBatteryVisible));
             SubscribeToBattery(CurrentDeviceBattery);
+            UpdateDriveView();
         }
     }
 
@@ -405,28 +416,29 @@ public partial class ExplorerViewModel : ObservableObject
         if (view is null)
             return;
 
-        if (view.Filter is not null)
+        if (view.Filter is null)
+        {
+            Predicate<object> predicate = d =>
+            {
+                var drive = (DriveViewModel)d;
+
+                return drive.Type switch
+                {
+                    AbstractDrive.DriveType.Trash => Data.Settings.EnableRecycle,
+                    AbstractDrive.DriveType.Temp or AbstractDrive.DriveType.Package => Data.Settings.EnableApk,
+                    _ => true,
+                };
+            };
+
+            view.Filter = predicate;
+
+            if (view.SortDescriptions.All(d => d.PropertyName != nameof(DriveViewModel.Type)))
+                view.SortDescriptions.Add(new(nameof(DriveViewModel.Type), ListSortDirection.Ascending));
+        }
+        else
         {
             view.Refresh();
-            return;
         }
-
-        Predicate<object> predicate = d =>
-        {
-            var drive = (DriveViewModel)d;
-
-            return drive.Type switch
-            {
-                AbstractDrive.DriveType.Trash => Data.Settings.EnableRecycle,
-                AbstractDrive.DriveType.Temp or AbstractDrive.DriveType.Package => Data.Settings.EnableApk,
-                _ => true,
-            };
-        };
-
-        view.Filter = predicate;
-
-        if (view.SortDescriptions.All(d => d.PropertyName != nameof(DriveViewModel.Type)))
-            view.SortDescriptions.Add(new(nameof(DriveViewModel.Type), ListSortDirection.Ascending));
 
         DriveItemsSource = view;
     }

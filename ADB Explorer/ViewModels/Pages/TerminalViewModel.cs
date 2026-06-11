@@ -20,6 +20,8 @@ public partial class TerminalViewModel : ObservableObject, INavigationAware
         if (!_isInitialized)
             InitializeViewModel();
 
+        Data.CurrentPage.Value = typeof(Views.Pages.TerminalPage);
+
         return Task.CompletedTask;
     }
 

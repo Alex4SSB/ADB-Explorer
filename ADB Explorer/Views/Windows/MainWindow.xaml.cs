@@ -164,7 +164,18 @@ public partial class MainWindow : INavigationWindow
 
     public INavigationView GetNavigation() => RootNavigation;
 
-    public bool Navigate(Type pageType) => RootNavigation.Navigate(pageType);
+    public bool Navigate(Type pageType)
+    {
+        try
+        {
+            return RootNavigation.Navigate(pageType);
+        }
+        catch (Exception e)
+        {
+
+            return false;
+        }
+    }
 
     public void SetPageService(INavigationViewPageProvider navigationViewPageProvider) => RootNavigation.SetPageProviderService(navigationViewPageProvider);
 

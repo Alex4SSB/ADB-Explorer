@@ -29,6 +29,8 @@ public partial class LogViewModel : ObservableObject, INavigationAware
         if (!_isInitialized)
             InitializeViewModel();
 
+        Data.CurrentPage.Value = typeof(Views.Pages.LogPage);
+
         return Task.CompletedTask;
     }
 

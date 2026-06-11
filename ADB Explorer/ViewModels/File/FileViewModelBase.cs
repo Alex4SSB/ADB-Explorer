@@ -117,7 +117,7 @@ public partial class FileViewModelBase : ObservableObject
 
     public static void RenameTextChanged(TextBox textBox)
     {
-        if (textBox.DataContext is not FileClass file)
+        if (textBox.DataContext is not FileClass file || Data.CurrentDrive is null)
             return;
 
         textBox.FilterString(Data.CurrentDrive.IsFUSE

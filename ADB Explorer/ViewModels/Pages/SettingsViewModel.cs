@@ -34,6 +34,8 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
         if (!_isInitialized)
             InitializeViewModel();
 
+        Data.CurrentPage.Value = typeof(Views.Pages.SettingsPage);
+
         return Task.CompletedTask;
     }
 

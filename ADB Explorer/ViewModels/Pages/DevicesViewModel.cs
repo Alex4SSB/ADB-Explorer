@@ -21,6 +21,8 @@ public partial class DevicesViewModel : ObservableObject, INavigationAware
         else
             PrimaryDevicesView.Refresh();
 
+        Data.CurrentPage.Value = typeof(Views.Pages.DevicesPage);
+
         return Task.CompletedTask;
     }
 

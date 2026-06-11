@@ -54,7 +54,7 @@ public partial class Devices : ObservableObject
 
     #region Read only properties
 
-    public LogicalDeviceViewModel Current => LogicalDeviceViewModels?.FirstOrDefault(device => device.IsOpen) ?? DeviceToOpen;
+    public LogicalDeviceViewModel Current => DeviceToOpen ?? LogicalDeviceViewModels?.FirstOrDefault(device => device.IsOpen);
 
     public int Count => UIList.Count(d => DeviceHelper.DevicePredicate(d) && d is not HistoryDeviceViewModel and not NewDeviceViewModel);
 

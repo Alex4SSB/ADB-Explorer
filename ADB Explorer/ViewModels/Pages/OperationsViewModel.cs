@@ -191,7 +191,12 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
         ValidateTooltip = string.Format(Strings.Resources.S_ACTION_VALIDATE, opString);
     }
 
-    public Task OnNavigatedToAsync() => Task.CompletedTask;
+    public Task OnNavigatedToAsync()
+    {
+        Data.CurrentPage.Value = typeof(Views.Pages.OperationsPage);
+
+        return Task.CompletedTask;
+    }
 
     public Task OnNavigatedFromAsync() => Task.CompletedTask;
 }
