@@ -139,6 +139,7 @@ public class Battery : ViewModelBase
     private long? prevChargeCounter = null;
     private DateTime? chargeUpdate = null;
     private DateTime? prevChargeUpdate = null;
+    private long? currentNowMicroAmps = null;
 
     #region Read only properties
 
@@ -190,17 +191,35 @@ public class Battery : ViewModelBase
     {
         get
         {
+            if (currentNowMicroAmps is long now)
+                return FormatCurrentBalance(now);
+
             if (chargeCounter is null || prevChargeCounter is null || prevChargeUpdate is null)
                 return "";
 
             var currentDiff = chargeCounter.Value - prevChargeCounter.Value;
             var timeDiff = DateTime.Now - prevChargeUpdate.Value;
-            var perHourConsumption = currentDiff / timeDiff.TotalHours;
-            var positive = perHourConsumption > 0;
+            if (timeDiff.TotalSeconds < 1)
+                return "";
 
-            return string.Format(Strings.Resources.S_BAT_BALANCE, $"{(positive ? "+" : "")}{(perHourConsumption / 1000000).AmpsToSize()}");
+            var perHourConsumption = currentDiff / timeDiff.TotalHours;
+            return FormatCurrentBalance((long)perHourConsumption);
         }
     }
+
+    private static string FormatCurrentBalance(long microAmpsPerHourOrNow)
+    {
+        var amps = microAmpsPerHourOrNow / 1_000_000.0;
+        var positive = amps > 0;
+        return string.Format(Strings.Resources.S_BAT_BALANCE, $"{(positive ? "+" : "")}{amps.AmpsToSize()}");
+    }
+
+    private static long NormalizeCurrentSign(long microAmps, ChargingState state) => state switch
+    {
+        ChargingState.Charging when microAmps < 0 => -microAmps,
+        ChargingState.Discharging when microAmps > 0 => -microAmps,
+        _ => microAmps,
+    };
 
     public string TemperatureString => Temperature switch
     {
@@ -259,6 +278,8 @@ public class Battery : ViewModelBase
         if (batteryInfo is null)
             return;
 
+        ChargeSource = Source.None;
+
         if (batteryInfo.TryGetValue("AC powered", out string ac) && ac == "true")
             ChargeSource = Source.AC;
 
@@ -310,6 +331,16 @@ public class Battery : ViewModelBase
             BatteryHealth = !Enum.TryParse(typeof(Health), batteryInfo["health"], out object health)
                 ? Health.Unknown
                 : (Health)health;
+        }
+
+        if (batteryInfo.TryGetValue("Current now", out string currentNow)
+            && long.TryParse(currentNow, out long microAmps))
+        {
+            currentNowMicroAmps = NormalizeCurrentSign(microAmps, ChargeState);
+        }
+        else
+        {
+            currentNowMicroAmps = null;
         }
 
         if (batteryInfo.TryGetValue("Charge counter", out string value)

@@ -681,5 +681,26 @@ namespace ADB_Test
 
             Assert.IsFalse(vm.UseIdForName);
         }
+
+        [TestMethod]
+        public void ParseBatteryPropertyValueTest()
+        {
+            const string chargingUsb = """
+                Result: Parcel(
+                  0x00000000: 00000000 00000000 00000001 fffacfe0 '................'
+                  0x00000010: ffffffff                            '....            ')
+                """;
+
+            const string discharging = """
+                Result: Parcel(
+                  0x00000000: 00000000 00000000 00000001 fffde439 '............9...'
+                  0x00000010: ffffffff                            '....            ')
+                """;
+
+            Assert.AreEqual(-340000L, ADBService.ParseBatteryPropertyValue(chargingUsb));
+            Assert.AreEqual(-138183L, ADBService.ParseBatteryPropertyValue(discharging));
+            Assert.IsNull(ADBService.ParseBatteryPropertyValue("Result: Parcel(00000000    '....')"));
+            Assert.IsNull(ADBService.ParseBatteryPropertyValue("Result: Parcel(Error: 0xffffffffffffffb6 \"Not a data message\")"));
+        }
     }
 }

@@ -867,15 +867,95 @@ public partial class ADBService
         return re.Matches(stdout).Select(m => DriveSnapshot.Parse(m.Groups, isEmulator: deviceType is DeviceType.Emulator, forcePath: args[0] == "/" ? "/" : ""));
     }
 
+    private const int BATTERY_PROPERTY_CURRENT_NOW = 2;
+
+    private static readonly string[] BATTERY_CURRENT_NOW_PATHS =
+    [
+        "/sys/class/power_supply/battery/current_now",
+        "/sys/class/power_supply/main/current_now",
+        "/sys/class/power_supply/bms/current_now",
+    ];
+
+    private static readonly int[] BATTERY_PROPERTIES_TRANSACTIONS = [1, 3];
+
     public static Dictionary<string, string> GetBatteryInfo(string deviceId, CancellationToken cancellationToken)
     {
-        if (ExecuteDeviceAdbShellCommand(deviceId, BATTERY, out string stdout, out string stderr, cancellationToken) == 0)
+        Dictionary<string, string> info = null;
+
+        if (ExecuteDeviceAdbShellCommand(deviceId, BATTERY, out string stdout, out _, cancellationToken) == 0)
         {
-            return stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Where(l => l.Contains(':')).ToDictionary(
+            info = stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Where(l => l.Contains(':')).ToDictionary(
                 line => line.Split(':')[0].Trim(),
                 line => line.Split(':')[1].Trim());
         }
+
+        var currentMicroAmps = TryGetBatteryCurrentMicroAmps(deviceId, cancellationToken);
+        if (currentMicroAmps is null && info is null)
+            return null;
+
+        info ??= [];
+        if (currentMicroAmps is not null)
+            info["Current now"] = currentMicroAmps.Value.ToString();
+
+        return info;
+    }
+
+    private static long? TryGetBatteryCurrentMicroAmps(string deviceId, CancellationToken cancellationToken)
+    {
+        foreach (var path in BATTERY_CURRENT_NOW_PATHS)
+        {
+            if (ExecuteDeviceAdbShellCommand(deviceId, "cat", out string stdout, out _, cancellationToken, path, "2>/dev/null") != 0)
+                continue;
+
+            if (long.TryParse(stdout.Trim(LINE_SEPARATORS), out long microAmps))
+                return microAmps;
+        }
+
+        foreach (var transaction in BATTERY_PROPERTIES_TRANSACTIONS)
+        {
+            if (ExecuteDeviceAdbShellCommand(deviceId,
+                                             "service",
+                                             out string stdout,
+                                             out _,
+                                             cancellationToken,
+                                             "call",
+                                             "batteryproperties",
+                                             transaction.ToString(),
+                                             "i32",
+                                             BATTERY_PROPERTY_CURRENT_NOW.ToString()) != 0)
+                continue;
+
+            var value = ParseBatteryPropertyValue(stdout);
+            if (value is not null)
+                return value;
+        }
+
         return null;
+    }
+
+    public static long? ParseBatteryPropertyValue(string serviceOutput)
+    {
+        if (string.IsNullOrWhiteSpace(serviceOutput)
+            || serviceOutput.Contains("Error:", StringComparison.OrdinalIgnoreCase))
+            return null;
+
+        var words = serviceOutput.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries)
+            .Where(l => l.Contains(':'))
+            .SelectMany(l =>
+            {
+                var data = l.Split(':', 2)[1];
+                return RE_SERVICE_CALL_WORD().Matches(data).Select(m => Convert.ToUInt32(m.Groups[1].Value, 16));
+            })
+            .ToArray();
+
+        // Empty reply: Result: Parcel(00000000    '....')
+        if (words.Length < 4 || words[1] != 0)
+            return null;
+
+        // BatteryProperty long payloads still store the value in the low 32 bits.
+        long value = unchecked((int)words[3]);
+
+        return value == long.MinValue ? null : value;
     }
 
     public static void Reboot(string deviceId, string arg)

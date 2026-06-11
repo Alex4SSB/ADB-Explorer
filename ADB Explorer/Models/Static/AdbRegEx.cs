@@ -79,5 +79,8 @@
 
         [GeneratedRegex(@"(?<BlockDev>.+) on (?<MntPt>.+) type (?<Type>.+) \((?<Attr>.+)\)", RegexOptions.Multiline)]
         public static partial Regex RE_MOUNT_PARSE();
+
+        [GeneratedRegex(@"\b([0-9a-fA-F]{8})\b")]
+        public static partial Regex RE_SERVICE_CALL_WORD();
     }
 }
