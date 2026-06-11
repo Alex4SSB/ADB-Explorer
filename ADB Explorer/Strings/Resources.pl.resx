@@ -1591,4 +1591,13 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>Sparuj</value>
   </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Pokaż okno dialogowe raportu o awarii</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Zgłaszanie awarii</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>W przypadku awarii możesz opcjonalnie przesłać raport diagnostyczny, aby pomóc nam w jej usunięciu. Raporty są wysyłane wyłącznie po kliknięciu przycisku „Wyślij raport” i zazwyczaj zawierają komunikat o wyjątku, ślad stosu, wersję aplikacji i systemu Windows oraz informacje o otwartej stronie. Dane są przetwarzane przez firmę Grafana Labs (Grafana Cloud). Zapoznaj się z Polityką prywatności, do której link znajduje się powyżej.</value>
+  </data>
 </root>
