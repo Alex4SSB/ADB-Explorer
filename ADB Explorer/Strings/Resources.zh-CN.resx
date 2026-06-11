@@ -1591,4 +1591,13 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>配对</value>
   </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>显示崩溃报告对话框</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>崩溃报告</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>崩溃后可以选择发送诊断报告帮助我们修复它。仅在单击“发送报告”时发送报告，报告内容通常包括异常信息、堆栈踪迹、应用和 Windows 版本、打开的页面。数据由 Grafana Labs (Grafana Cloud) 处理。见上方的隐私政策链接。</value>
+  </data>
 </root>
