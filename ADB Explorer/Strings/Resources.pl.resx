@@ -1526,7 +1526,7 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
     <value>Szybkość transmisji</value>
   </data>
   <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
-    <value>Wybierz plik, aby wyświetlić podgląd.</value>
+    <value>Wybierz plik, żeby wyświetlić podgląd.</value>
   </data>
   <data name="S_PREVIEW_INVALID" xml:space="preserve">
     <value>Podgląd nie jest dostępny.</value>
