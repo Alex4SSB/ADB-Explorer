@@ -28,7 +28,11 @@ namespace ADB_Explorer.Models
 
         public AdbLocation(string path)
         {
-            Path = path;
+            var specialLocation = LocationFromString(path);
+            if (specialLocation is not SpecialLocation.None)
+                Location = specialLocation;
+            else
+                Path = path;
         }
 
         public string Path { get; private set; }

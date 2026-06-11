@@ -135,7 +135,7 @@ public static class AppActions
             clearClipboard: true),
         new(FileActionType.Refresh,
             () => Data.FileActions.IsRefreshEnabled && !Data.FileActions.ListingInProgress,
-            () => Data.RuntimeSettings.Refresh = true,
+            () => Data.RuntimeSettings.LocationToNavigate = new(Data.CurrentPath),
             Strings.Resources.S_MENU_REFRESH,
             new(Key.F5),
             true),
