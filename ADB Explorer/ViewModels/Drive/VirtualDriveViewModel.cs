@@ -28,8 +28,6 @@ public partial class VirtualDriveViewModel : DriveViewModel
             Drive.ItemsCount = newCount;
             OnPropertyChanged(nameof(ItemsCount));
         }
-
-        DriveEnabled = ItemsCount != -1;
     }
 
     public override string ToString() => $"{Type}";

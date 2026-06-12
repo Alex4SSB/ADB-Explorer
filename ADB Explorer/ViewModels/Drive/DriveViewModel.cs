@@ -13,9 +13,6 @@ public partial class DriveViewModel : AbstractDrive, IBrowserItem
     [ObservableProperty]
     public partial bool IsSelected { get; set; } = false;
 
-    [ObservableProperty]
-    public partial bool DriveEnabled { get; protected set; } = true;
-
     #endregion
 
     #region Read only properties
