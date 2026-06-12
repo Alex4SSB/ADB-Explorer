@@ -1044,13 +1044,13 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>קובץ שנבחר אינו עומד בחוקי שם קובץ בראשית כונן וינדוס</value>
   </data>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
-    <value>נבחרו קבצים בעלי שמות מתנגשים בוינדוס / FUSE</value>
+    <value>נבחרו קבצים בעלי שמות זהים להוציא אותיות גדולות/קטנות</value>
   </data>
   <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
     <value>קובץ שנבחר אינו עומד בחוקי שם קובץ FUSE</value>
   </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
-    <value>הועתקו קבצים בעלי שמות מתנגשים בוינדוס / FUSE</value>
+    <value>הועתקו קבצים בעלי שמות זהים להוציא אותיות גדולות/קטנות</value>
   </data>
   <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
     <value>קובץ שהועתקו אינו עומד בחוקי שם קובץ FUSE</value>
@@ -1608,5 +1608,29 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
     <value>דו"ח קריסה</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>לאחר קריסה, ניתן לשלוח דו"ח אבחון כדי לעזור לנו לתקן אותה. דוחות נשלחים רק בלחיצה על כפתור שליחת דו"ח ובדרך כלל כוללים: הודעת השגיאה, stack trace, גרסת אפליקציה + ווינדוס, ואת הדף שהיה פתוח. הנתונים מעובדים על ידי Grafana Labs. ראה קישור למדיניות הפרטיות מעלה.</value>
+  </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>חוקי בתור שם קובץ ב user space</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>קובץ שנבחר אינו עומד בתנאי שם קובץ ב user space</value>
+  </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>קובץ שהועתק אינו עומד בתנאי שם קובץ ב user space</value>
+  </data>
+  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
+    <value>סריקה אחר אימולטורים</value>
+  </data>
+  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
+    <value>הפעל אימולטור זה</value>
+  </data>
+  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
+    <value>הפעלת אימולטור</value>
+  </data>
+  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
+    <value>אנדרואיד SDK לא נמצא. התקן את חבילת הסימולטור של Android SDK או הגדר ANDROID_SDK_ROOT.</value>
   </data>
 </root>
