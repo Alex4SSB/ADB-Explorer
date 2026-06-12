@@ -159,7 +159,7 @@ public partial class FileViewModelBase : ObservableObject
         }
         else if (key is Key.Enter)
         {
-            exitEditMode(file);
+            RenameCommit(textBox, exitEditMode);
         }
     }
 

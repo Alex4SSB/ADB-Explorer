@@ -17,7 +17,7 @@ public partial class FileIconView : UserControl
     /// <summary>
     /// Raised when icon rename editing starts. Sender is the <see cref="FileIconView"/> instance.
     /// </summary>
-    public static event EventHandler<FileClass> RenameStarted;
+    public static event EventHandler<System.Windows.Controls.TextBox> RenameStarted;
 
     /// <summary>
     /// Raised when icon rename editing ends. Sender is the <see cref="FileIconView"/> instance.
@@ -94,14 +94,15 @@ public partial class FileIconView : UserControl
         textBox.Focus();
         textBox.SelectAll();
 
-        if (DataContext is FileClass file)
-            RenameStarted?.Invoke(this, file);
+        if (DataContext is FileClass)
+            RenameStarted?.Invoke(this, textBox);
     }
 
     private static void ExitIconEditMode(FileClass file)
     {
         file.IconViewModel.IsInEditMode = false;
         FileActions.IsExplorerEditing = false;
+        RenameEnded?.Invoke(null, EventArgs.Empty);
     }
 
     private void IconViewNameEdit_LostFocus(object sender, RoutedEventArgs e)
@@ -109,7 +110,9 @@ public partial class FileIconView : UserControl
         if (sender is not System.Windows.Controls.TextBox textBox)
             return;
 
-        RenameEnded?.Invoke(this, EventArgs.Empty);
+        if (textBox.DataContext is FileClass file && !file.IconViewModel.IsInEditMode)
+            return;
+
         FileViewModelBase.RenameCommit(textBox, ExitIconEditMode);
     }
 

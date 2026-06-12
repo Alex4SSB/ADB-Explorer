@@ -89,7 +89,11 @@
         </DataTemplate>
 
         <DataTemplate x:Key="InProgShellProgressTemplate">
-            <ui:ProgressRing Margin="4,0" IsIndeterminate="True" />
+            <ui:ProgressRing
+                Width="20"
+                Height="20"
+                Margin="4,0"
+                IsIndeterminate="True" />
         </DataTemplate>
 
         <helpers:FileOpProgressTemplateSelector

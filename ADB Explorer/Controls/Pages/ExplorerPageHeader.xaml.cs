@@ -32,6 +32,7 @@ public partial class ExplorerPageHeader : UserControl
     private bool WasEditing;
     private bool WasDragging;
     private Point MouseDownPoint;
+    private TextBox? _renameTextBox;
 
     private ExplorerViewModel ViewModel { get; }
 
@@ -168,6 +169,7 @@ public partial class ExplorerPageHeader : UserControl
         DriveList.SelectionChanged += DriveList_SelectionChanged;
 
         FileIconView.RenameStarted += IconView_RenameStarted;
+        FileIconView.RenameEnded += (_, _) => ClearRename();
 
         ViewModel.RequestModeRefresh = () =>
         {
@@ -1354,16 +1356,8 @@ public partial class ExplorerPageHeader : UserControl
     {
         if (_isSyncingSelection)
             return;
-        
-        if (ExplorerGrid.Items[0] is FileClass)
-        {
-            foreach (var file in e.RemovedItems.Cast<FileClass>())
-            {
-                var vm = ViewModel.IsIconView ? (FileViewModelBase)file.IconViewModel : file.FolderViewModel;
-                if (vm.IsInEditMode && (ActiveSelectedItems.Count != 1 || ActiveSelectedItems[0] != file))
-                    vm.IsInEditMode = false;
-            }
-        }
+
+        CommitRenameIfDeselected();
 
         if (ActiveSelectedItems.Count > 0 && !RuntimeSettings.IsExplorerLoaded)
         {
@@ -1479,10 +1473,43 @@ public partial class ExplorerPageHeader : UserControl
         e.Handled = true;
     }
 
-    private static void ExitFolderEditMode(FileClass file)
+    private void BeginRename(TextBox textBox) => _renameTextBox = textBox;
+
+    private void ClearRename() => _renameTextBox = null;
+
+    private void CommitRenameIfDeselected()
+    {
+        if (_renameTextBox?.DataContext is not FileClass file)
+        {
+            ClearRename();
+            return;
+        }
+
+        var vm = ViewModel.IsIconView ? (FileViewModelBase)file.IconViewModel : file.FolderViewModel;
+        if (!vm.IsInEditMode)
+        {
+            ClearRename();
+            return;
+        }
+
+        if (ActiveSelectedItems.Count == 1 && ReferenceEquals(ActiveSelectedItems[0], file))
+            return;
+
+        FileViewModelBase.RenameCommit(_renameTextBox, ViewModel.IsIconView ? ExitIconEditMode : ExitFolderEditMode);
+    }
+
+    private void ExitFolderEditMode(FileClass file)
     {
         file.FolderViewModel.IsInEditMode = false;
         FileActions.IsExplorerEditing = false;
+        ClearRename();
+    }
+
+    private void ExitIconEditMode(FileClass file)
+    {
+        file.IconViewModel.IsInEditMode = false;
+        FileActions.IsExplorerEditing = false;
+        ClearRename();
     }
 
     private void NameColumnEdit_KeyDown(object sender, KeyEventArgs e)
@@ -1505,19 +1532,26 @@ public partial class ExplorerPageHeader : UserControl
         FileViewModelBase.RenameTextChanged(textBox);
         textBox.SelectAll();
 
-        if (ActiveView.SelectedItem is FileClass file)
+        if (textBox.DataContext is FileClass file)
+        {
+            BeginRename(textBox);
             RenameTooltipControl.Show(textBox, file.FolderViewModel);
+        }
     }
 
-    private void IconView_RenameStarted(object sender, FileClass file)
+    private void IconView_RenameStarted(object sender, TextBox textBox)
     {
-        if (sender is FrameworkElement anchor)
-            RenameTooltipControl.Show(anchor, file.IconViewModel, centerHorizontally: true);
+        BeginRename(textBox);
+        if (textBox.DataContext is FileClass file)
+            RenameTooltipControl.Show(textBox, file.IconViewModel, centerHorizontally: true);
     }
 
     private void NameColumnEdit_LostFocus(object sender, RoutedEventArgs e)
     {
         if (sender is not TextBox textBox)
+            return;
+
+        if (textBox.DataContext is FileClass file && !file.FolderViewModel.IsInEditMode)
             return;
 
         FileViewModelBase.RenameCommit(textBox, ExitFolderEditMode);
