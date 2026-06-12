@@ -473,7 +473,7 @@ public partial class CopyPasteService : ObservableObject
         }
     }
 
-    public void AcceptDataObject(System.Windows.DragEventArgs e, FrameworkElement sender, bool isLink = false)
+    public void AcceptDataObject(System.Windows.DragEventArgs e, FrameworkElement sender)
     {
         var dataContext = sender.DataContext;
 
@@ -485,7 +485,7 @@ public partial class CopyPasteService : ObservableObject
         if (IsSelf && targetFolder == DragParent && e.KeyStates is DragDropKeyStates.None)
             return;
 
-        AcceptDataObject(e.Data, targetFolder, isLink);
+        AcceptDataObject(e.Data, targetFolder, e.KeyStates.HasFlag(DragDropKeyStates.AltKey));
     }
 
     public void AcceptDataObject(IDataObject dataObject, IEnumerable<FileClass> selectedFiles, bool isLink = false)

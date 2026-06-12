@@ -4,6 +4,7 @@ using ADB_Explorer.Services;
 using Vanara.PInvoke;
 using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
+using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Helpers;
 
@@ -349,9 +350,9 @@ public static class FileHelper
             [
                 files,
                 depth,
-                """\( -type d -printf '/// %p /// d /// d ///\n' \)""",
+                $"""\( -type d -printf '%p{ADB_FIELD_SEP}d{ADB_FIELD_SEP}d{ADB_FIELD_SEP}\n' \)""",
                 "-o",
-                $"""\( -type f -printf '/// %p /// %s /// {(Data.Settings.KeepDateModified ? "%T@" : "d")} ///\n' \)""",
+                $"""\( -type f -printf '%p{ADB_FIELD_SEP}%s{ADB_FIELD_SEP}{(Data.Settings.KeepDateModified ? "%T@" : "d")}{ADB_FIELD_SEP}\n' \)""",
                 "2>&1"
             ];
 
@@ -366,22 +367,29 @@ public static class FileHelper
                 depth,
                 """2>/dev/null | while IFS= read -r f;""",
                 """do if [ -d \"$f\" ]; then""",
-                """echo /// $f /// d /// d ///;""",
-                $"""else echo /// $f /// $(stat -c '%s /// %Y' {(Data.Settings.KeepDateModified ? "\\\"$f\\\")" : ") d")} ///;""",
+                $"""echo "$f{ADB_FIELD_SEP}d{ADB_FIELD_SEP}d{ADB_FIELD_SEP}";""",
+                $"""else echo "$f{ADB_FIELD_SEP}$(stat -c '%s{ADB_FIELD_SEP}%Y' {(Data.Settings.KeepDateModified ? "\\\"$f\\\")" : ") d")}{ADB_FIELD_SEP}";""",
                 """fi; done;"""
             ];
 
             ADBService.ExecuteDeviceAdbShellCommand(Data.DevicesObject.Current.ID, "find", out stdout, out _, cancellationToken, args);
         }
-        var matches = AdbRegEx.RE_FIND_TREE().Matches(stdout);
 
-        return [.. matches.Where(m => m.Success)
-                .Select(m =>
-                new FolderTree{
-                    Name = m.Groups["Name"].Value,
-                    Size = m.Groups["Size"].Value == "d" ? null : long.Parse(m.Groups["Size"].Value, CultureInfo.InvariantCulture),
-                    Date = m.Groups["Date"].Value == "d" ? null : double.Parse(m.Groups["Date"].Value, CultureInfo.InvariantCulture)
-                })];
+        return [.. stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries)
+            .Select(ParseFolderTreeLine)
+            .Where(line => line.HasValue)
+            .Select(line => line!.Value)];
+    }
+
+    private static FolderTree? ParseFolderTreeLine(string line)
+    {
+        var parts = line.Split(ADB_FIELD_SEP, StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length < 3)
+            return null;
+
+        long? size = parts[1] == "d" ? null : long.Parse(parts[1], CultureInfo.InvariantCulture);
+        double? date = parts[2] == "d" ? null : double.Parse(parts[2], CultureInfo.InvariantCulture);
+        return new FolderTree(parts[0], size, date);
     }
 
     public static (long? Size, DateTime? ModifiedTime) GetShellSizeDate(ShellItem shellItem, bool isDirectory)

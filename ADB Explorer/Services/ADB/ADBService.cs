@@ -597,9 +597,7 @@ public partial class ADBService
     private static readonly string[] MMC_BLOCK_DEVICES = ["/dev/block/mmcblk0p1", "/dev/block/mmcblk1p1"];
     private static readonly string[] EMULATED_DRIVES_GREP = ["|", "grep", "-E", "'/mnt/media_rw/|/storage/'"];
 
-    private static readonly string[] READLINK_ARGS1 = ["link", "in"]; // Preceded by 'for'
-    private static readonly string[] READLINK_ARGS2 = [";", "do", "target=$(readlink", "-f", "$link", "2>&1);", "echo", "/// $link /// $target ///;", "done"];
-    private static readonly string[] STAT_LINKMODE_ARGS = ["-c", "'/// %n /// %f ///'", "2>&1"];
+    private static readonly string[] STAT_LINKMODE_ARGS = ["-c", $"%n{ADB_FIELD_SEP}%f", "2>&1"];
 
     private static readonly string[] INET_ARGS = ["-f", "inet", "addr", "show", "wlan0"];
 
@@ -705,7 +703,7 @@ public partial class ADBService
     public static FileExtraInfo? GetFileExtraInfo(string deviceId, string path, CancellationToken cancellationToken)
     {
         // Get user, group, access time, creation time and modification time using human-readable format to preserve UTC offset
-        var res = ExecuteDeviceAdbShellCommand(deviceId, "stat", out string stdout, out _, cancellationToken, "-c", "%U\u001F%G\u001F%x\u001F%z\u001F%y", EscapeAdbShellString(path));
+        var res = ExecuteDeviceAdbShellCommand(deviceId, "stat", out string stdout, out _, cancellationToken, "-c", $"%U{ADB_FIELD_SEP}%G{ADB_FIELD_SEP}%x{ADB_FIELD_SEP}%z{ADB_FIELD_SEP}%y", EscapeAdbShellString(path));
         if (res != 0 || string.IsNullOrWhiteSpace(stdout))
         {
             return null;
@@ -716,7 +714,7 @@ public partial class ADBService
 
         try
         {
-            var parts = stdout.Split('\u001F');
+            var parts = stdout.Split(ADB_FIELD_SEP);
             user = parts[0];
             group = parts[1];
             accessTime = DateTimeOffset.Parse(parts[2].Trim(), CultureInfo.InvariantCulture);
@@ -733,27 +731,58 @@ public partial class ADBService
 
     public static IEnumerable<(string, FileType)> GetLinkType(string deviceId, IEnumerable<string> filePaths, CancellationToken cancellationToken)
     {
-        // Run readlink in a loop to support single param version
+        var pathList = filePaths as IList<string> ?? [.. filePaths];
+        if (pathList.Count == 0)
+            yield break;
+
+        var echo = ShellCommands.TranslateCommand("echo");
+        var readlink = ShellCommands.TranslateCommand("readlink");
+
+        // Inline each path in readlink/echo; a for-loop $link loses quotes through adb/Windows parsing.
+        var readlinkScript = string.Join("; ", pathList.Select(path =>
+            $"{echo} {EscapeAdbShellString(path + ADB_FIELD_SEP)}$({readlink} -f {EscapeAdbShellString(path)} 2>&1){ADB_FIELD_SEP}"));
+
         ExecuteDeviceAdbShellCommand(deviceId,
-                                     "for",
+                                     readlinkScript,
                                      out string stdout,
                                      out string stderr,
-                                     cancellationToken,
-                                     [.. READLINK_ARGS1, .. filePaths.Select(f => EscapeAdbShellString(f)), .. READLINK_ARGS2]);
+                                     cancellationToken);
 
-        // Prepare a link->target dictionary, where the RegEx matched
-        var links = RE_LINK_TARGETS().Matches(stdout);
-        var linkDict = links.Where(match => match.Success).ToDictionary(match => match.Groups["Source"].Value, match => match.Groups["Target"].Value);
+        var linkDict = new Dictionary<string, string>();
+        foreach (var line in stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries))
+        {
+            var parts = line.Split(ADB_FIELD_SEP, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 2)
+            {
+                ExecuteDeviceAdbShellCommand(deviceId,
+                                     $"{readlink} {EscapeAdbShellString(parts[0])}",
+                                     out string stdout1,
+                                     out string stderr1,
+                                     cancellationToken);
+
+                if (stdout1.Split([ADB_FIELD_SEP, .. LINE_SEPARATORS], StringSplitOptions.RemoveEmptyEntries) is var parts1 && parts1.Length > 0)
+                {
+                    linkDict[parts[0]] = parts1[0];
+                }
+
+                continue;
+            }
+
+            linkDict[parts[0]] = parts[1];
+        }
+
         var uniqueLinks = linkDict.Values.Where(l => !string.IsNullOrWhiteSpace(l)).Distinct().Select(l => EscapeAdbShellString(l));
 
-        // Get file mode of all unique links
+        // Get file mode of all unique link targets
         ExecuteDeviceAdbShellCommand(deviceId, "stat", out string statStdout, out string statStderr, cancellationToken, [.. uniqueLinks, .. STAT_LINKMODE_ARGS]);
-        var modes = RE_LINK_MODE().Matches(statStdout);
 
-        // Prepare a target->mode dictionary, where the RegEx matches
-        var linkTypes = modes.Where(match => match.Success).ToDictionary(
-            match => match.Groups["Target"].Value,
-            match => ParseFileMode((UnixFileMode)UInt32.Parse(match.Groups["Mode"].Value, NumberStyles.HexNumber)));
+        var linkTypes = new Dictionary<string, FileType>();
+        foreach (var line in statStdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries))
+        {
+            var parts = line.Split(ADB_FIELD_SEP);
+            if (parts.Length >= 2 && UInt32.TryParse(parts[1].Trim(), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var modeValue))
+                linkTypes[parts[0]] = ParseFileMode((UnixFileMode)modeValue);
+        }
 
         // Iterate over input files using the dictionaries
         foreach (var file in filePaths)
