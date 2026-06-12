@@ -69,6 +69,14 @@ public partial class ExplorerPageHeader : UserControl
             ExplorerGrid.SelectAll();
     }
 
+    private void ToggleSelectAll()
+    {
+        if (ActiveView.Items.Count == ActiveSelectedItems.Count && ActiveSelectedItems.Count > 0)
+            ActiveUnselectAll();
+        else
+            ActiveSelectAll();
+    }
+
     private void ActiveScrollIntoView(object item)
     {
         if (item is null)
@@ -151,18 +159,10 @@ public partial class ExplorerPageHeader : UserControl
 
         InitializeComponent();
 
-        KeyDown += new KeyEventHandler(OnButtonKeyDown);
-        PreviewTextInput += new TextCompositionEventHandler(ExplorerPageHeader_PreviewTextInput);
+        PreviewTextInput += ExplorerPageHeader_PreviewTextInput;
 
         NavigationBox.UnfocusTarget =
         SearchBox.UnfocusTarget = ActiveView;
-
-        AppActions.Bindings.ForEach(binding =>
-        {
-            InputBindings.Add(binding);
-            ExplorerGrid.InputBindings.Add(binding);
-            IconView.InputBindings.Add(binding);
-        });
 
         SelectionTimer.Tick += SelectionTimer_Tick;
 
@@ -220,14 +220,22 @@ public partial class ExplorerPageHeader : UserControl
     private void OnButtonKeyDown(object sender, KeyEventArgs e)
     {
         if (Keyboard.Modifiers.HasFlag(ModifierKeys.Alt)
-            || !NAVIGATION_KEYS.Contains(e.Key)
-            || DetailsPane.IsKeyboardFocusWithin
             || SearchBox.IsKeyboardFocusWithin
             || NavigationBox.IsKeyboardFocusWithin
             || FileActions.IsExplorerEditing)
             return;
         
         bool handle = false;
+
+        if (e.Key is Key.A && Keyboard.Modifiers is ModifierKeys.Control)
+        {
+            ToggleSelectAll();
+            e.Handled = true;
+
+            return;
+        }
+        else if (!NAVIGATION_KEYS.Contains(e.Key))
+            return;
 
         if (FileActions.IsExplorerVisible)
         {
@@ -460,10 +468,7 @@ public partial class ExplorerPageHeader : UserControl
                     break;
 
                 case nameof(AppRuntimeSettings.SelectAll):
-                    if (ActiveView.Items.Count == ActiveSelectedItems.Count)
-                        ActiveUnselectAll();
-                    else
-                        ActiveSelectAll();
+                    ToggleSelectAll();
                     break;
 
                 case nameof(AppRuntimeSettings.ThumbsSize):
@@ -1528,12 +1533,10 @@ public partial class ExplorerPageHeader : UserControl
             return;
 
         var textBox = sender as TextBox;
-        textBox.Focus();
-        FileViewModelBase.RenameTextChanged(textBox);
-        textBox.SelectAll();
 
         if (textBox.DataContext is FileClass file)
         {
+            FileViewModelBase.PrepareRenameTextBox(textBox);
             BeginRename(textBox);
             RenameTooltipControl.Show(textBox, file.FolderViewModel);
         }
@@ -1624,10 +1627,12 @@ public partial class ExplorerPageHeader : UserControl
         if (CopyPaste.IsDrag && CopyPaste.DragStatus is not CopyPasteService.DragState.Active && e.Key is Key.Escape)
             CopyPaste.DragBitmap = null;
         else
-        {
             OnButtonKeyDown(sender, e);
-        }
     }
+
+    public void HandlePreviewKeyDown(KeyEventArgs e) => MainWin_PreviewKeyDown(this, e);
+
+    public void HandlePreviewKeyUp(KeyEventArgs e) => MainWindow_OnPreviewKeyUp(this, e);
 
     private void MainWindow_OnPreviewKeyUp(object sender, KeyEventArgs e)
     {

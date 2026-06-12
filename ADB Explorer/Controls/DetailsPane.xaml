@@ -126,7 +126,11 @@
                         </local:AdbMenuItem>
                     </local:AdbMenu>
                 </Grid>
-                <ScrollViewer x:Name="PdfScrollViewer" Visibility="Collapsed">
+                <ScrollViewer
+                    x:Name="PdfScrollViewer"
+                    Focusable="False"
+                    KeyboardNavigation.IsTabStop="False"
+                    Visibility="Collapsed">
                     <ItemsControl x:Name="PdfPagesControl">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -224,9 +228,11 @@
                     </local:SimpleStackPanel>
                 </Border>
             </Grid>
-            <ScrollViewer>
+            <ScrollViewer Focusable="False" KeyboardNavigation.IsTabStop="False">
                 <ScrollViewer.Style>
                     <Style BasedOn="{StaticResource UiScrollViewer}" TargetType="ScrollViewer">
+                        <Setter Property="Focusable" Value="False" />
+                        <Setter Property="KeyboardNavigation.IsTabStop" Value="False" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Mode, ElementName=pane}" Value="Preview">
                                 <Setter Property="Visibility" Value="Collapsed" />

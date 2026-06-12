@@ -115,6 +115,22 @@ public partial class FileViewModelBase : ObservableObject
         _typeName = GetTypeName();
     }
 
+    public static void PrepareRenameTextBox(TextBox textBox)
+    {
+        if (textBox.DataContext is not FileClass file)
+            return;
+
+        textBox.ClearValue(TextBox.TextProperty);
+        if (textBox.GetBindingExpression(TextBox.TextProperty) is { } expression)
+            expression.UpdateTarget();
+        else
+            textBox.Text = FileHelper.DisplayName(file);
+
+        RenameTextChanged(textBox);
+        textBox.Focus();
+        textBox.SelectAll();
+    }
+
     public static void RenameTextChanged(TextBox textBox)
     {
         if (textBox.DataContext is not FileClass file || Data.CurrentDrive is null)
@@ -149,11 +165,16 @@ public partial class FileViewModelBase : ObservableObject
 
         if (key is Key.Escape or Key.F2)
         {
-            var name = FileHelper.DisplayName(textBox);
-            if (string.IsNullOrEmpty(name))
+            if (file.IsTemp && key is Key.Escape)
                 Data.DirList.FileList.Remove(file);
             else
-                textBox.Text = name;
+            {
+                var name = FileHelper.DisplayName(textBox);
+                if (string.IsNullOrEmpty(name))
+                    Data.DirList.FileList.Remove(file);
+                else
+                    textBox.Text = name;
+            }
 
             exitEditMode(file);
         }

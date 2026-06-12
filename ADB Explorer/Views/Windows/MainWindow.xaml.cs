@@ -5,6 +5,7 @@ using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels.Pages;
 using ADB_Explorer.ViewModels.Windows;
+using ADB_Explorer.Views.Pages;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
 using Wpf.Ui.Appearance;
@@ -31,6 +32,7 @@ public partial class MainWindow : INavigationWindow
         Initialize();
 
         InitializeComponent();
+        AppActions.Bindings.ForEach(binding => InputBindings.Add(binding));
         SetPageService(navigationViewPageProvider);
         contentDialogService.SetDialogHost(RootContentDialog);
         snackbarService.SetSnackbarPresenter(RootSnackbar);
@@ -228,6 +230,18 @@ public partial class MainWindow : INavigationWindow
             if (RootNavigation.SelectedItem is not null)
                 break;
         }
+    }
+
+    private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (Data.CurrentPage.Value == typeof(ExplorerPage))
+            ExplorerPageHeader.HandlePreviewKeyDown(e);
+    }
+
+    private void MainWindow_PreviewKeyUp(object sender, KeyEventArgs e)
+    {
+        if (Data.CurrentPage.Value == typeof(ExplorerPage))
+            ExplorerPageHeader.HandlePreviewKeyUp(e);
     }
 
     private void RootNavigation_PreviewMouseDown(object sender, MouseButtonEventArgs e)

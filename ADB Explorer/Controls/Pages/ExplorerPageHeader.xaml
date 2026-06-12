@@ -20,8 +20,6 @@
     d:DesignWidth="800"
     MouseDown="Window_MouseDown"
     MouseUp="Window_MouseUp"
-    PreviewKeyDown="MainWin_PreviewKeyDown"
-    PreviewKeyUp="MainWindow_OnPreviewKeyUp"
     PreviewQueryContinueDrag="MainWindow_OnPreviewQueryContinueDrag"
     SizeChanged="ExplorerHeader_SizeChanged"
     mc:Ignorable="d">

@@ -91,8 +91,7 @@ public partial class FileIconView : UserControl
         if (sender is not System.Windows.Controls.TextBox textBox)
             return;
 
-        textBox.Focus();
-        textBox.SelectAll();
+        FileViewModelBase.PrepareRenameTextBox(textBox);
 
         if (DataContext is FileClass)
             RenameStarted?.Invoke(this, textBox);

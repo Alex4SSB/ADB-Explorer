@@ -17,6 +17,8 @@
     d:DesignWidth="800"
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    PreviewKeyDown="MainWindow_PreviewKeyDown"
+    PreviewKeyUp="MainWindow_PreviewKeyUp"
     ContentRendered="FluentWindow_Loaded"
     ExtendsContentIntoTitleBar="True"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"

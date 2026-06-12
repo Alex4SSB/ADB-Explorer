@@ -619,6 +619,8 @@
         </Setter>
     </Style>
     <Style BasedOn="{StaticResource {x:Type ui:Snackbar}}" TargetType="controls:AdbSnackbar">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="KeyboardNavigation.IsTabStop" Value="False" />
         <Setter Property="ProgressForeground" Value="{DynamicResource SystemFillColorCautionBrush}" />
         <Setter Property="Template">
             <Setter.Value>
@@ -744,8 +746,6 @@
                             <Setter TargetName="SnackProgressBar" Property="IsIndeterminate" Value="True" />
                         </Trigger>
                         <Trigger Property="IsShown" Value="True">
-                            <Setter Property="Focusable" Value="True" />
-                            <Setter Property="KeyboardNavigation.IsTabStop" Value="True" />
                             <Trigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>
