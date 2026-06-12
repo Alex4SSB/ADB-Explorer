@@ -96,6 +96,9 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     public partial bool EnableWsa { get; set; } = false;
 
     [ObservableProperty]
+    public partial bool EnableEmulatorDiscovery { get; set; } = false;
+
+    [ObservableProperty]
     public partial bool IsDetailsPaneOpen { get; set; } = false;
 
     [ObservableProperty]

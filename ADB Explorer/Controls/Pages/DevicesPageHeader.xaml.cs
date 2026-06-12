@@ -26,6 +26,7 @@ public partial class DevicesPageHeader : UserControl
         switch (e.PropertyName)
         {
             case nameof(AppSettings.EnableMdns):
+            case nameof(AppSettings.EnableEmulatorDiscovery):
                 FilterDevices();
 
                 break;
@@ -58,6 +59,7 @@ public partial class DevicesPageHeader : UserControl
             Thread.CurrentThread.CurrentUICulture = Data.Settings.ActualUICulture;
 
             DeviceHelper.FilterDevices(CollectionViewSource.GetDefaultView(LogicalDevicesList.ItemsSource));
+            DeviceHelper.FilterDevices(CollectionViewSource.GetDefaultView(EmulatorDevicesList.ItemsSource));
             DeviceHelper.FilterDevices(CollectionViewSource.GetDefaultView(VirtualDevicesList.ItemsSource));
         });
     }

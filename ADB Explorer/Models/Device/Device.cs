@@ -9,6 +9,7 @@ public enum DeviceType
     Sideload,
     WSA,
     Emulator,
+    EmulatorPackage,
     History,
     New,
 }

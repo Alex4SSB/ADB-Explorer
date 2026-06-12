@@ -590,6 +590,8 @@ public partial class ADBService
 
     public const string BRAND_NAME = "ro.product.brand_device_name";
     public const string HOST_NAME = "net.hostname";
+    public const string QEMU_BOOT_AVD_NAME = "ro.boot.qemu.avd_name";
+    public const string QEMU_KERNEL_AVD_NAME = "ro.kernel.qemu.avd_name";
 
     // First partition of MMC block device 0 / 1
     private static readonly string[] MMC_BLOCK_DEVICES = ["/dev/block/mmcblk0p1", "/dev/block/mmcblk1p1"];

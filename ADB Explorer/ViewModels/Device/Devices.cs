@@ -44,11 +44,46 @@ public partial class Devices : ObservableObject
 
     #region Read only lists
 
-    public IEnumerable<DeviceViewModel> PrimaryDevices => UIList?.Where(device => device is not MdnsDeviceViewModel and not NewDeviceViewModel);
+    public IEnumerable<DeviceViewModel> PrimaryDevices => UIList?.Where(device =>
+        device is not MdnsDeviceViewModel
+        && device is not NewDeviceViewModel
+        && device is not EmulatorPackageDeviceViewModel
+        && (device is not LogicalDeviceViewModel logical || logical.Type != DeviceType.Emulator));
+
+    public IEnumerable<DeviceViewModel> EmulatorDevices => UIList?.Where(device =>
+        device is EmulatorPackageDeviceViewModel
+        || (device is LogicalDeviceViewModel logical && logical.Type == DeviceType.Emulator));
+
     public IEnumerable<DeviceViewModel> SecondaryDevices => UIList?.Where(device => device is MdnsDeviceViewModel or NewDeviceViewModel);
     public IEnumerable<LogicalDeviceViewModel> LogicalDeviceViewModels => UIList?.OfType<LogicalDeviceViewModel>();
     public IEnumerable<ServiceDeviceViewModel> ServiceDeviceViewModels => UIList?.OfType<ServiceDeviceViewModel>();
     public IEnumerable<HistoryDeviceViewModel> HistoryDeviceViewModels => UIList?.OfType<HistoryDeviceViewModel>();
+
+    #endregion
+
+    #region Emulator package handling
+
+    public void UpdateEmulatorPackages(IEnumerable<EmulatorPackageDeviceViewModel> other) => UpdateEmulatorPackages(UIList, other);
+
+    public static void UpdateEmulatorPackages(ObservableList<DeviceViewModel> self, IEnumerable<EmulatorPackageDeviceViewModel> other)
+    {
+        self.RemoveAll(thisDevice => thisDevice is EmulatorPackageDeviceViewModel model
+            && !model.IsTestDevice
+            && !other.Any(otherDevice => otherDevice.AvdName == model.AvdName));
+
+        foreach (var item in other)
+        {
+            if (self?.Find(thisDevice => thisDevice is EmulatorPackageDeviceViewModel pkg && pkg.AvdName == item.AvdName) is EmulatorPackageDeviceViewModel existing)
+            {
+                if (existing.Status is DeviceStatus.Offline && item.Status is DeviceStatus.Ok)
+                    existing.SetStatus(DeviceStatus.Ok);
+            }
+            else
+            {
+                self.Add(item);
+            }
+        }
+    }
 
     #endregion
 

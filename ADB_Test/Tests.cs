@@ -419,6 +419,19 @@ namespace ADB_Test
         private static ServiceDeviceViewModel MakeService(string id, string ip, ServiceDevice.PairingMode mode, ServiceConnectionKind kind = ServiceConnectionKind.Pairing)
             => new(new ServiceDevice(id, ip, "5555", kind) { MdnsType = mode });
 
+        private static EmulatorPackageDeviceViewModel MakeEmulatorPackage(string avdName, DeviceStatus status = DeviceStatus.Ok)
+        {
+            var device = new EmulatorPackageDevice(avdName) { Status = status };
+            return new EmulatorPackageDeviceViewModel(device);
+        }
+
+        private static LogicalDeviceViewModel MakeEmulatorLogical(string id, string avdName, DeviceStatus status = DeviceStatus.Ok)
+        {
+            var vm = MakeLogical(id, avdName, DeviceType.Emulator, status);
+            vm.SetAvdName(avdName);
+            return vm;
+        }
+
         private static bool Eval(DeviceViewModel device) => DeviceHelper.EvaluateDevicePredicate(device, Data.DevicesObject);
 
         [TestInitialize]
@@ -651,6 +664,57 @@ namespace ADB_Test
             var vm = MakeLogical("localhost:5555", "WSA", DeviceType.WSA, DeviceStatus.Offline, "");
             Data.DevicesObject.UIList.Add(vm);
             Assert.IsFalse(Eval(vm));
+        }
+
+        // ── EmulatorPackageDeviceViewModel ────────────────────────────────────
+
+        [TestMethod]
+        public void EmulatorPkg_Offline_Hidden()
+        {
+            Data.Settings.EnableEmulatorDiscovery = true;
+            var pkg = MakeEmulatorPackage("Pixel_7", DeviceStatus.Offline);
+            Data.DevicesObject.UIList.Add(pkg);
+            Assert.IsFalse(Eval(pkg));
+        }
+
+        [TestMethod]
+        public void EmulatorPkg_Ok_NoLogical_Shown()
+        {
+            Data.Settings.EnableEmulatorDiscovery = true;
+            var pkg = MakeEmulatorPackage("Pixel_7");
+            Data.DevicesObject.UIList.Add(pkg);
+            Assert.IsTrue(Eval(pkg));
+        }
+
+        [TestMethod]
+        public void EmulatorPkg_Ok_LogicalSameAvd_Hidden()
+        {
+            Data.Settings.EnableEmulatorDiscovery = true;
+            var pkg = MakeEmulatorPackage("Pixel_7");
+            var logical = MakeEmulatorLogical("emulator-5554", "Pixel_7");
+            Data.DevicesObject.UIList.Add(pkg);
+            Data.DevicesObject.UIList.Add(logical);
+            Assert.IsFalse(Eval(pkg));
+        }
+
+        [TestMethod]
+        public void EmulatorPkg_Ok_LogicalDifferentAvd_Shown()
+        {
+            Data.Settings.EnableEmulatorDiscovery = true;
+            var pkg = MakeEmulatorPackage("Pixel_4");
+            var logical = MakeEmulatorLogical("emulator-5554", "Pixel_7");
+            Data.DevicesObject.UIList.Add(pkg);
+            Data.DevicesObject.UIList.Add(logical);
+            Assert.IsTrue(Eval(pkg));
+        }
+
+        [TestMethod]
+        public void EmulatorPkg_SettingOff_Hidden()
+        {
+            Data.Settings.EnableEmulatorDiscovery = false;
+            var pkg = MakeEmulatorPackage("Pixel_7");
+            Data.DevicesObject.UIList.Add(pkg);
+            Assert.IsFalse(Eval(pkg));
         }
 
         // ── Duplicate name → UseIdForName ─────────────────────────────────────

@@ -267,6 +267,26 @@ public static class DeviceHelper
             Process.Start($"{AdbExplorerConst.WSA_PROCESS_NAME}.exe");
         });
 
+    public static DeviceAction LaunchEmulator(EmulatorPackageDeviceViewModel device) => new(
+        () => device.Status is DeviceStatus.Ok,
+        () =>
+        {
+            try
+            {
+                device.SetLastLaunch();
+                device.SetStatus(DeviceStatus.Unauthorized);
+                EmulatorHelper.LaunchAvd(device.AvdName);
+            }
+            catch (Exception ex)
+            {
+                device.SetStatus(DeviceStatus.Ok);
+                DialogService.ShowMessage(ex.Message,
+                                          Strings.Resources.S_EMULATOR_DIALOG_TITLE,
+                                          DialogService.DialogIcon.Critical,
+                                          copyToClipboard: true);
+            }
+        });
+
     public static bool EvaluateDevicePredicate(DeviceViewModel device, Devices devicesObject)
     {
         // The mDNS device cannot hide itself when in a listview
@@ -337,6 +357,21 @@ public static class DeviceHelper
 
             // if an online logical WSA device exists, the WSA package is hidden
             if (devicesObject.LogicalDeviceViewModels.Any(logical => logical.Type is DeviceType.WSA && logical.Status is not DeviceStatus.Offline))
+                return false;
+        }
+
+        if (device is EmulatorPackageDeviceViewModel emuPkg)
+        {
+            if (!Data.Settings.EnableEmulatorDiscovery)
+                return false;
+
+            if (emuPkg.Status is DeviceStatus.Offline)
+                return false;
+
+            if (devicesObject.LogicalDeviceViewModels.Any(logical =>
+                    logical.Type is DeviceType.Emulator
+                    && logical.Status is not DeviceStatus.Offline
+                    && EmulatorMatchesPackage(logical, emuPkg)))
                 return false;
         }
 
@@ -582,7 +617,6 @@ public static class DeviceHelper
     {
         devices = ReconnectFileOpDevice(devices);
         Data.DevicesObject.UpdateDevices(devices);
-        Data.RuntimeSettings.FilterDevices = true;
 
         if (Data.DevicesObject.Current is null || Data.DevicesObject.Current.IsOpen && Data.DevicesObject.Current.Status is not DeviceStatus.Ok)
         {
@@ -820,11 +854,12 @@ public static class DeviceHelper
                 }
 
                 Data.DevicesObject.UIList.Remove(device);
-                Data.RuntimeSettings.FilterDevices = true;
                 DeviceListSetup();
+
                 break;
             case HistoryDeviceViewModel hist:
                 Data.DevicesObject.RemoveHistoryDevice(hist);
+
                 break;
             default:
                 throw new NotSupportedException();
@@ -939,7 +974,182 @@ public static class DeviceHelper
         if (newStatus != oldStatus)
         {
             App.SafeInvoke(() => wsa.SetStatus(newStatus));
-            Data.RuntimeSettings.FilterDevices = true;
+        }
+    }
+
+    private static DateTime lastEmulatorAvdScan = DateTime.MinValue;
+    private static string[] cachedAvdList = [];
+
+    public static void UpdateEmulatorPackages()
+    {
+        if (!Data.Settings.EnableEmulatorDiscovery)
+        {
+            if (Data.DevicesObject.UIList.Any(d => d is EmulatorPackageDeviceViewModel && !d.IsTestDevice))
+            {
+                Data.DevicesObject.UIList.RemoveAll(d => d is EmulatorPackageDeviceViewModel && !d.IsTestDevice);
+            }
+
+            lastEmulatorAvdScan = DateTime.MinValue;
+            cachedAvdList = [];
+            return;
+        }
+
+        if (!EmulatorHelper.IsAvailable())
+        {
+            if (Data.DevicesObject.UIList.Any(d => d is EmulatorPackageDeviceViewModel && !d.IsTestDevice))
+            {
+                Data.DevicesObject.UIList.RemoveAll(d => d is EmulatorPackageDeviceViewModel && !d.IsTestDevice);
+            }
+
+            return;
+        }
+
+        if (lastEmulatorAvdScan == DateTime.MinValue
+            || DateTime.Now - lastEmulatorAvdScan >= AdbExplorerConst.EMULATOR_AVD_SCAN_INTERVAL)
+        {
+            cachedAvdList = EmulatorHelper.ListAvds();
+            lastEmulatorAvdScan = DateTime.Now;
+        }
+
+        var packages = cachedAvdList.Select(avd => new EmulatorPackageDeviceViewModel(new(avd))).ToList();
+        Data.DevicesObject.UpdateEmulatorPackages(packages);
+    }
+
+    public static void UpdateEmulatorPackageStatus()
+    {
+        if (!Data.Settings.EnableEmulatorDiscovery)
+            return;
+
+        foreach (var emuPkg in Data.DevicesObject.UIList.OfType<EmulatorPackageDeviceViewModel>())
+        {
+            if (emuPkg.LastLaunch == DateTime.MaxValue
+                || DateTime.Now - emuPkg.LastLaunch < AdbExplorerConst.EMULATOR_LAUNCH_DELAY)
+                continue;
+
+            if (Data.DevicesObject.LogicalDeviceViewModels.Any(logical =>
+                    logical.Type is DeviceType.Emulator
+                    && logical.Status is not DeviceStatus.Offline
+                    && EmulatorMatchesPackage(logical, emuPkg)))
+            {
+                if (emuPkg.Status is DeviceStatus.Unauthorized)
+                {
+                    App.SafeInvoke(() =>
+                    {
+                        emuPkg.SetStatus(DeviceStatus.Ok);
+                        emuPkg.SetLastLaunch(DateTime.MaxValue);
+                    });
+                }
+
+                continue;
+            }
+
+            if (emuPkg.Status is DeviceStatus.Unauthorized
+                && DateTime.Now - emuPkg.LastLaunch > AdbExplorerConst.EMULATOR_BOOT_TIMEOUT)
+            {
+                App.SafeInvoke(() =>
+                {
+                    emuPkg.SetStatus(DeviceStatus.Ok);
+                    emuPkg.SetLastLaunch(DateTime.MaxValue);
+                });
+            }
+        }
+    }
+
+    public static void UpdateLogicalEmulatorAvdNames()
+    {
+        foreach (var device in Data.DevicesObject.LogicalDeviceViewModels
+            .Where(d => d.Type is DeviceType.Emulator && d.Status is not DeviceStatus.Offline && string.IsNullOrEmpty(d.AvdName)))
+        {
+            try
+            {
+                var name = device.GetAvdNameFromProps()
+                    ?? EmulatorHelper.TryGetAvdNameFromEmuOrConsole(device.ID);
+                if (!string.IsNullOrWhiteSpace(name))
+                    App.SafeInvoke(() => device.SetAvdName(name));
+            }
+            catch
+            {
+                // Emulator may not be ready yet
+            }
+        }
+
+        TryAssignAvdNamesFromRecentLaunches();
+    }
+
+    private static bool EmulatorMatchesPackage(LogicalDeviceViewModel logical, EmulatorPackageDeviceViewModel emuPkg)
+    {
+        if (string.Equals(logical.AvdName, emuPkg.AvdName, StringComparison.Ordinal))
+            return true;
+
+        return IsRecentSingleEmulatorLaunch(logical, emuPkg);
+    }
+
+    private static bool IsRecentSingleEmulatorLaunch(LogicalDeviceViewModel logical, EmulatorPackageDeviceViewModel emuPkg)
+    {
+        if (emuPkg.LastLaunch == DateTime.MinValue || emuPkg.LastLaunch == DateTime.MaxValue)
+            return false;
+
+        if (DateTime.Now - emuPkg.LastLaunch > AdbExplorerConst.EMULATOR_BOOT_TIMEOUT)
+            return false;
+
+        var onlineEmulators = Data.DevicesObject.LogicalDeviceViewModels
+            .Where(d => d.Type is DeviceType.Emulator && d.Status is not DeviceStatus.Offline)
+            .ToList();
+
+        return onlineEmulators.Count == 1 && onlineEmulators[0].ID == logical.ID;
+    }
+
+    private static void TryAssignAvdNamesFromRecentLaunches()
+    {
+        var onlineEmulators = Data.DevicesObject.LogicalDeviceViewModels
+            .Where(d => d.Type is DeviceType.Emulator && d.Status is not DeviceStatus.Offline && string.IsNullOrEmpty(d.AvdName))
+            .ToList();
+
+        if (onlineEmulators.Count != 1)
+            return;
+
+        var recentPackages = Data.DevicesObject.UIList.OfType<EmulatorPackageDeviceViewModel>()
+            .Where(p => p.LastLaunch != DateTime.MinValue
+                && p.LastLaunch != DateTime.MaxValue
+                && DateTime.Now - p.LastLaunch < AdbExplorerConst.EMULATOR_BOOT_TIMEOUT)
+            .ToList();
+
+        if (recentPackages.Count != 1)
+            return;
+
+        App.SafeInvoke(() => onlineEmulators[0].SetAvdName(recentPackages[0].AvdName));
+    }
+
+    private static readonly HashSet<string> poweredOnEmulators = [];
+    private static readonly HashSet<string> pendingEmulatorPowerOn = [];
+
+    public static void HandleEmulatorPostPoll(IEnumerable<DeviceSnapshot> snapshots)
+    {
+        if (snapshots is null)
+            return;
+
+        var emulatorIds = snapshots.Where(s => s.Type is DeviceType.Emulator).Select(s => s.ID).ToHashSet();
+        poweredOnEmulators.RemoveWhere(id => !emulatorIds.Contains(id));
+        pendingEmulatorPowerOn.RemoveWhere(id => !emulatorIds.Contains(id));
+
+        UpdateLogicalEmulatorAvdNames();
+
+        foreach (var snapshot in snapshots.Where(s => s.Type is DeviceType.Emulator))
+        {
+            if (snapshot.Status is DeviceStatus.Offline)
+            {
+                if (pendingEmulatorPowerOn.Add(snapshot.ID))
+                    Task.Run(() => EmulatorHelper.EnsurePoweredOn(snapshot.ID));
+
+                continue;
+            }
+
+            pendingEmulatorPowerOn.Remove(snapshot.ID);
+
+            if (!poweredOnEmulators.Add(snapshot.ID))
+                continue;
+
+            Task.Run(() => EmulatorHelper.EnsurePoweredOn(snapshot.ID));
         }
     }
 }

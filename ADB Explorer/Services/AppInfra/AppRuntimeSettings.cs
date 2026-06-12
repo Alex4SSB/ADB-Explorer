@@ -131,7 +131,6 @@ public partial class AppRuntimeSettings : ViewModelBase
     public bool SelectAll { get => false; set => OnPropertyChanged(); }
     public bool Refresh { get => false; set => OnPropertyChanged(); }
     public bool FilterDrives { get => false; set => OnPropertyChanged(); }
-    public bool FilterDevices { get => false; set => OnPropertyChanged(); }
     public bool FilterActions { get => false; set => OnPropertyChanged(); }
     public bool InitLister { get => false; set => OnPropertyChanged(); }    
     public bool DriveViewNav { get => false; set => OnPropertyChanged(); }

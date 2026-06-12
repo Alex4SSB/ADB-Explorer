@@ -42,6 +42,7 @@ public abstract class DeviceViewModel : ViewModelBase
         DeviceType.Local => "\uE839",
         DeviceType.Remote => "\uEE77",
         DeviceType.Emulator => "\uE99A",
+        DeviceType.EmulatorPackage => "\uE99A",
         DeviceType.Service when Device is ServiceDevice service && service.MdnsType is ServiceDevice.PairingMode.QrCode => "\uED14",
         DeviceType.Service => "\uEDE4",
         DeviceType.Recovery => "\uED10",

@@ -102,6 +102,9 @@ public static class AdbExplorerConst
 
     public static readonly TimeSpan WSA_LAUNCH_DELAY = TimeSpan.FromSeconds(2);
     public static readonly TimeSpan WSA_CONNECT_TIMEOUT = TimeSpan.FromSeconds(8);
+    public static readonly TimeSpan EMULATOR_AVD_SCAN_INTERVAL = TimeSpan.FromSeconds(30);
+    public static readonly TimeSpan EMULATOR_LAUNCH_DELAY = TimeSpan.FromSeconds(2);
+    public static readonly TimeSpan EMULATOR_BOOT_TIMEOUT = TimeSpan.FromSeconds(120);
     public static readonly TimeSpan EXPLORER_NAV_DELAY = TimeSpan.FromMilliseconds(800);
     public static readonly TimeSpan INIT_NAV_HIDE_FILTER_DELAY = TimeSpan.FromMilliseconds(1000);
 

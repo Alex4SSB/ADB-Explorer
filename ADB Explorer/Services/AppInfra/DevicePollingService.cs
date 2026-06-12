@@ -61,7 +61,12 @@ public class DevicePollingService : BackgroundService
 
     public static void RefreshDevices(CancellationToken cancellationToken)
     {
-        ListDevices(ADBService.GetDevices(cancellationToken));
+        var snapshots = ADBService.GetDevices(cancellationToken)?.ToList();
+        if (snapshots is null)
+            return;
+
+        ListDevices(snapshots);
+        DeviceHelper.HandleEmulatorPostPoll(snapshots);
 
         if (Data.Settings.EnableWsa)
             DeviceHelper.ConnectWsaDevice();
@@ -77,6 +82,12 @@ public class DevicePollingService : BackgroundService
         DeviceHelper.UpdateDevicesRootAccess();
 
         DeviceHelper.UpdateWsaPkgStatus();
+
+        if (Data.Settings.EnableEmulatorDiscovery)
+        {
+            DeviceHelper.UpdateEmulatorPackages();
+            DeviceHelper.UpdateEmulatorPackageStatus();
+        }
     }
 
     private static void ListDevices(IEnumerable<DeviceSnapshot> snapshots)

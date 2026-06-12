@@ -54,9 +54,17 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
             if (string.IsNullOrEmpty(Device.Name) && DiscoverTime - DateTime.Now < AdbExplorerConst.SERVICE_DISPLAY_DELAY)
                 return " ";
 
+            if (Device.Type is DeviceType.Emulator && !string.IsNullOrEmpty(Device.AvdName))
+                return Device.AvdName;
+
+            if (!UseIdForName && !string.IsNullOrEmpty(BrandName))
+                return BrandName;
+
             return UseIdForName ? Device.ID : Device.Name;
         }
     }
+
+    public string AvdName => Device.AvdName;
 
     public string BaseID => Type is DeviceType.Service ? ID.Split('.')[0] : ID;
 
@@ -136,12 +144,14 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     {
         get
         {
+            if (Device.Type is DeviceType.Emulator)
+                return Device.AvdName;
+
             if (string.IsNullOrEmpty(field))
             {
                 field = Props.GetValueOrDefault(ADBService.BRAND_NAME) ?? Props.GetValueOrDefault(ADBService.HOST_NAME);
-                if (field is not null)
-                    Device.Name = field;
             }
+
             return field;
         }
     } = null;
@@ -203,8 +213,6 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         DiscoverTime = DateTime.Now;
 
         Device = device;
-        if (Device.Type is DeviceType.Emulator)
-            UseIdForName = true;
 
         InitDeviceDrives();
 
@@ -255,8 +263,41 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
     public void UpdateDevice(LogicalDevice other)
     {
-        Device.Name = other.Name;
+        if (Device.Type is DeviceType.Emulator)
+        {
+            if (!string.IsNullOrEmpty(other.AvdName))
+                Device.AvdName = other.AvdName;
+        }
+        else if (string.IsNullOrEmpty(BrandName))
+        {
+            Device.Name = other.Name;
+        }
+
         SetStatus(other.Status);
+        Device.DeviceData = other.DeviceData;
+
+        if (other.Status is DeviceStatus.Offline)
+            SetAvdName(null);
+    }
+
+    public string? GetAvdNameFromProps()
+    {
+        if (Device.Type is not DeviceType.Emulator)
+            return null;
+
+        return Props.GetValueOrDefault(ADBService.QEMU_BOOT_AVD_NAME)
+            ?? Props.GetValueOrDefault(ADBService.QEMU_KERNEL_AVD_NAME);
+    }
+
+    public void SetAvdName(string avdName)
+    {
+        if (Device.AvdName == avdName)
+            return;
+
+        Device.AvdName = avdName;
+        OnPropertyChanged(nameof(AvdName));
+        OnPropertyChanged(nameof(BrandName));
+        UpdateName();
     }
 
     public void EnableRoot(bool enable)
@@ -265,7 +306,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
             ? ADBService.Root(Device.ID) ? RootStatus.Enabled : RootStatus.Forbidden
             : ADBService.Unroot(Device.ID) ? RootStatus.Disabled : RootStatus.Unchecked;
 
-        if (Data.DevicesObject.Current.ID == ID)
+        if (Data.DevicesObject.Current?.ID == ID)
             Data.RuntimeSettings.IsRootActive = Root is RootStatus.Enabled;
 
         OnPropertyChanged(nameof(Root));

@@ -14,12 +14,18 @@ public partial class DevicesViewModel : ObservableObject, INavigationAware
     [ObservableProperty]
     public partial ICollectionView SecondaryDevicesView { get; set; }
 
+    [ObservableProperty]
+    public partial ICollectionView EmulatorDevicesView { get; set; }
+
     public Task OnNavigatedToAsync()
     {
         if (!_isInitialized)
             InitializeViewModel();
         else
+        {
             PrimaryDevicesView.Refresh();
+            EmulatorDevicesView?.Refresh();
+        }
 
         Data.CurrentPage.Value = typeof(Views.Pages.DevicesPage);
 
@@ -33,6 +39,11 @@ public partial class DevicesViewModel : ObservableObject, INavigationAware
         PrimaryDevicesView = CollectionViewSource.GetDefaultView(Data.DevicesObject.PrimaryDevices);
         PrimaryDevicesView.Filter = DeviceHelper.DevicesFilter;
 
+        EmulatorDevicesView = CollectionViewSource.GetDefaultView(Data.DevicesObject.EmulatorDevices);
+        EmulatorDevicesView.Filter = DeviceHelper.DevicesFilter;
+        EmulatorDevicesView.SortDescriptions.Clear();
+        EmulatorDevicesView.SortDescriptions.Add(new SortDescription(nameof(DeviceViewModel.Type), ListSortDirection.Ascending));
+
         SecondaryDevicesView = CollectionViewSource.GetDefaultView(Data.DevicesObject.SecondaryDevices);
         SecondaryDevicesView.Filter = DeviceHelper.DevicesFilter;
 
@@ -42,6 +53,7 @@ public partial class DevicesViewModel : ObservableObject, INavigationAware
     private void RefreshViews()
     {
         PrimaryDevicesView?.Refresh();
+        EmulatorDevicesView?.Refresh();
         SecondaryDevicesView?.Refresh();
     }
 

@@ -287,6 +287,9 @@
     <DataTemplate x:Key="WsaPkgDeviceTemplate">
         <views:WsaPkgDeviceControl />
     </DataTemplate>
+    <DataTemplate x:Key="EmulatorPackageDeviceTemplate">
+        <views:EmulatorPackageDeviceControl />
+    </DataTemplate>
     <DataTemplate x:Key="MdnsDeviceTemplate">
         <views:MdnsDeviceControl />
     </DataTemplate>
@@ -297,7 +300,8 @@
         MdnsDeviceTemplate="{StaticResource MdnsDeviceTemplate}"
         NewDeviceTemplate="{StaticResource NewDeviceTemplate}"
         ServiceDeviceTemplate="{StaticResource ServiceDeviceTemplate}"
-        WsaPkgDeviceTemplate="{StaticResource WsaPkgDeviceTemplate}" />
+        WsaPkgDeviceTemplate="{StaticResource WsaPkgDeviceTemplate}"
+        EmulatorPackageDeviceTemplate="{StaticResource EmulatorPackageDeviceTemplate}" />
     <Style
         x:Key="DeviceContainerStyle"
         BasedOn="{StaticResource StretchListViewItem}"

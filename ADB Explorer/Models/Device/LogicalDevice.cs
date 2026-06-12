@@ -10,6 +10,8 @@ public class LogicalDevice : Device
 {
     public string Name { get; set; }
 
+    public string AvdName { get; set; }
+
     public RootStatus Root { get; set; } = RootStatus.Unchecked;
 
     public Battery Battery { get; set; } = new();

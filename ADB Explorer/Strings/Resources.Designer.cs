@@ -1567,6 +1567,33 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Emulator Launch.
+        /// </summary>
+        public static string S_EMULATOR_DIALOG_TITLE {
+            get {
+                return ResourceManager.GetString("S_EMULATOR_DIALOG_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Launch this emulator.
+        /// </summary>
+        public static string S_EMULATOR_PKG_TIP {
+            get {
+                return ResourceManager.GetString("S_EMULATOR_PKG_TIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Android SDK emulator was not found. Install the Android SDK emulator package or set ANDROID_SDK_ROOT..
+        /// </summary>
+        public static string S_EMULATOR_SDK_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("S_EMULATOR_SDK_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enable Auto Play.
         /// </summary>
         public static string S_ENABLE_AUTO_PLAY {
@@ -3540,6 +3567,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_DOUBLE_CLICK_PULL {
             get {
                 return ResourceManager.GetString("S_SETTINGS_DOUBLE_CLICK_PULL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Discover Android Emulators.
+        /// </summary>
+        public static string S_SETTINGS_EMULATOR_DISCOVERY {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_EMULATOR_DISCOVERY", resourceCulture);
             }
         }
         

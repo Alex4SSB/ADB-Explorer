@@ -174,6 +174,7 @@ public static class UISettings
                 new BoolSetting(() => Settings.EnableRecycle, Strings.Resources.S_DRIVE_TRASH, icon: "\uE74D"),
                 new BoolSetting(() => Settings.EnableBusyBox, Strings.Resources.S_SETTINGS_BUSYBOX, icon: "\uF133"),
                 new BoolSetting(() => Settings.EnableWsa, Strings.Resources.S_SETTINGS_WSA, icon: "\uE78A"),
+                new BoolSetting(() => Settings.EnableEmulatorDiscovery, Strings.Resources.S_SETTINGS_EMULATOR_DISCOVERY, icon: "\uE99A"),
             ], "\uE8CE"),
             new SettingsGroup("APK",
             [

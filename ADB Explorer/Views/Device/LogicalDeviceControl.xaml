@@ -48,9 +48,6 @@
                                 <DataTrigger Binding="{Binding Status}" Value="Unauthorized">
                                     <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DEVICE_UNAUTH_NONAME}}" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Type}" Value="Emulator">
-                                    <Setter Property="Text" Value="{Binding ID}" />
-                                </DataTrigger>
                                 <MultiDataTrigger>
                                     <MultiDataTrigger.Conditions>
                                         <Condition Binding="{Binding Type}" Value="Service" />

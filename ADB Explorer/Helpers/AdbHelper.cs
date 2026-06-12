@@ -203,7 +203,10 @@ public static class AdbHelper
             }
             else
             {
-                var path = drive.LinkTargetPath ?? drive.Path;
+                var path = string.IsNullOrEmpty(drive.LinkTargetPath) 
+                    ? drive.Path 
+                    : drive.LinkTargetPath;
+
                 Models.FileSystemInfo? info = null;
 
                 do
