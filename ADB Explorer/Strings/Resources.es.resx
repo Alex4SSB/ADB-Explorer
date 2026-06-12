@@ -1591,4 +1591,13 @@ Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>Pareja</value>
   </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Mostrar Informe del Diálogo del Cuelgue</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Informe del cuelgue</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>Después de un cuelgue, puede enviar un informe de diagnóstico opcional para ayudarnos a solucionarlo. Los informes se envían sólo cuando pulse en Enviar Informe y generalmente incluyen el mensaje de excepción, la traza de pila, la aplicación y la versión de Windows, y la página que estaba abierta. Los datos son procesados por Grafana Labs (Grafana Cloud). Consulte el enlace de Política de Privacidad arriba.</value>
+  </data>
 </root>
