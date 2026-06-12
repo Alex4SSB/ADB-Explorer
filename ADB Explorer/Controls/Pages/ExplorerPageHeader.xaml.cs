@@ -951,7 +951,10 @@ public partial class ExplorerPageHeader : UserControl
         DataGridRow row;
 
         if (CopyPaste.DragStatus is CopyPasteService.DragState.Active || WasDragging)
-            return false;
+        {
+            WasDragging = false;
+            return true;
+        }
 
         switch (sender)
         {
@@ -1213,8 +1216,6 @@ public partial class ExplorerPageHeader : UserControl
             var point = Mouse.GetPosition(ExplorerGrid);
             if (point.Y < ColumnHeaderHeight || WasDragging)
             {
-                WasDragging = false;
-
                 ViewModel.IsMenuOpen = false;
                 e.Handled = true;
                 return;
@@ -1222,8 +1223,6 @@ public partial class ExplorerPageHeader : UserControl
         }
         else if (WasDragging)
         {
-            WasDragging = false;
-
             ViewModel.IsMenuOpen = false;
             e.Handled = true;
             return;
@@ -1355,6 +1354,16 @@ public partial class ExplorerPageHeader : UserControl
     {
         if (_isSyncingSelection)
             return;
+        
+        if (ExplorerGrid.Items[0] is FileClass)
+        {
+            foreach (var file in e.RemovedItems.Cast<FileClass>())
+            {
+                var vm = ViewModel.IsIconView ? (FileViewModelBase)file.IconViewModel : file.FolderViewModel;
+                if (vm.IsInEditMode && (ActiveSelectedItems.Count != 1 || ActiveSelectedItems[0] != file))
+                    vm.IsInEditMode = false;
+            }
+        }
 
         if (ActiveSelectedItems.Count > 0 && !RuntimeSettings.IsExplorerLoaded)
         {
