@@ -53,7 +53,11 @@ public static class ShellCommands
     public static void FindCommands(string deviceID)
     {
         if (!Data.Settings.EnableBusyBox)
+        {
+            GetFindPrintF(deviceID);
+
             return;
+        }
 
         int returnCode = 0;
 
@@ -104,14 +108,7 @@ public static class ShellCommands
                                                     [.. Commands.Select(c => FileHelper.ConcatPaths(mainPath, c)), "2>/dev/null"]);
         }
 
-        ADBService.ExecuteDeviceAdbShellCommand(deviceID,
-                                                "find",
-                                                out findResult,
-                                                out _,
-                                                CancellationToken.None,
-                                                "--help");
-
-        FindPrintf = findResult.Contains("-printf FORMAT");
+        GetFindPrintF(deviceID);
 
         var sysBinCmds = findResult.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Select(FileHelper.GetFullName).ToList();
         var missingCmds = Commands.Except(sysBinCmds).ToList();
@@ -171,5 +168,17 @@ public static class ShellCommands
         }
 
         DeviceCommands.Add(deviceID, deviceDict);
+    }
+
+    private static void GetFindPrintF(string deviceID)
+    {
+        ADBService.ExecuteDeviceAdbShellCommand(deviceID,
+                                                BusyBoxExists ? "busybox find" : "find",
+                                                out var findHelp,
+                                                out _,
+                                                CancellationToken.None,
+                                                "--help");
+
+        FindPrintf = findHelp.Contains("-printf FORMAT");
     }
 }
