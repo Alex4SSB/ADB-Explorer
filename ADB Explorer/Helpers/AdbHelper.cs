@@ -1,5 +1,6 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
 using AdvancedSharpAdbClient;
 
@@ -191,20 +192,21 @@ public static class AdbHelper
     public static void ApplyMountInfo(LogicalDeviceViewModel device, CancellationToken cancellationToken)
     {
         var infos = GetMountInfo(device, cancellationToken);
-        var driveList = device.Drives.OfType<LogicalDriveViewModel>();
-        foreach (var drive in driveList)
+
+        foreach (var drive in device.Drives.OfType<LogicalDriveViewModel>())
         {
             if (cancellationToken.IsCancellationRequested)
                 break;
 
             if (drive.Type is AbstractDrive.DriveType.Root)
             {
-                drive.FSInfo = infos.FirstOrDefault(i => i.MountPoint == "/");
+                var rootInfo = infos.FirstOrDefault(i => i.MountPoint == "/");
+                App.SafeInvoke(() => drive.FSInfo = rootInfo);
             }
             else
             {
-                var path = string.IsNullOrEmpty(drive.LinkTargetPath) 
-                    ? drive.Path 
+                var path = string.IsNullOrEmpty(drive.LinkTargetPath)
+                    ? drive.Path
                     : drive.LinkTargetPath;
 
                 Models.FileSystemInfo? info = null;
@@ -223,6 +225,22 @@ public static class AdbHelper
                 App.SafeInvoke(() => drive.FSInfo = info);
             }
         }
+
+        foreach (var drive in device.Drives.OfType<VirtualDriveViewModel>().Where(d => d.Type is AbstractDrive.DriveType.Temp))
+        {
+            if (cancellationToken.IsCancellationRequested)
+                break;
+
+            Models.FileSystemInfo? info = null;
+            var mountPoint = drive.DfMountPoint;
+
+            if (!string.IsNullOrEmpty(mountPoint))
+                info = infos.FirstOrDefault(i => i.MountPoint == mountPoint);
+
+            App.SafeInvoke(() => drive.FSInfo = info);
+        }
+
+        App.SafeInvoke(FileActionLogic.UpdateFileActions);
     }
 
     private static IEnumerable<Models.FileSystemInfo> GetMountInfo(LogicalDeviceViewModel device, CancellationToken cancellationToken)

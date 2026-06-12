@@ -50,15 +50,6 @@ public class Drive : AbstractDrive
 {
     public string Path { get; protected set; }
 
-    /// <summary>
-    /// Filesystem in USEr space. An emulated / virtual filesystem on Android.<br /><br />
-    /// Does not support:<br />
-    /// • Symbolic links<br />
-    /// • Special chars in file name (like NTFS)<br />
-    /// • Installing APK from it
-    /// </summary>
-    public virtual bool IsFUSE { get; }
-
     public Drive(string path = "")
     {
         Path = path;

@@ -11,6 +11,8 @@ namespace ADB_Explorer.Controls;
 /// </summary>
 public partial class NavigationBox : UserControl
 {
+    private DriveViewModel? _trackedDrive;
+
     public enum ViewMode
     {
         None,
@@ -73,7 +75,7 @@ public partial class NavigationBox : UserControl
 
                 if (update)
                 {
-                    IsFUSE = DriveHelper.GetCurrentDrive(value)?.IsFUSE is true;
+                    TrackDriveRestrictions(DriveHelper.GetCurrentDrive(value));
                     AddDevice(value);
                 }
             }, DispatcherPriority.Render);
@@ -104,15 +106,35 @@ public partial class NavigationBox : UserControl
         DependencyProperty.Register(nameof(Breadcrumbs), typeof(List<MenuItem>),
           typeof(NavigationBox), new PropertyMetadata(null));
 
-    public bool IsFUSE
+    public bool HasDriveRestrictions
     {
-        get => (bool)GetValue(IsFUSEProperty);
-        set => SetValue(IsFUSEProperty, value);
+        get => (bool)GetValue(HasDriveRestrictionsProperty);
+        set => SetValue(HasDriveRestrictionsProperty, value);
     }
 
-    public static readonly DependencyProperty IsFUSEProperty =
-        DependencyProperty.Register(nameof(IsFUSE), typeof(bool),
+    public static readonly DependencyProperty HasDriveRestrictionsProperty =
+        DependencyProperty.Register(nameof(HasDriveRestrictions), typeof(bool),
           typeof(NavigationBox), new PropertyMetadata(false));
+
+    public string RestrictionsTooltip
+    {
+        get => (string)GetValue(RestrictionsTooltipProperty);
+        set => SetValue(RestrictionsTooltipProperty, value);
+    }
+
+    public static readonly DependencyProperty RestrictionsTooltipProperty =
+        DependencyProperty.Register(nameof(RestrictionsTooltip), typeof(string),
+          typeof(NavigationBox), new PropertyMetadata(""));
+
+    public string RestrictionsIconGlyph
+    {
+        get => (string)GetValue(RestrictionsIconGlyphProperty);
+        set => SetValue(RestrictionsIconGlyphProperty, value);
+    }
+
+    public static readonly DependencyProperty RestrictionsIconGlyphProperty =
+        DependencyProperty.Register(nameof(RestrictionsIconGlyph), typeof(string),
+          typeof(NavigationBox), new PropertyMetadata("\uE7BA"));
 
     public bool IsLoadingProgressVisible
     {
@@ -383,13 +405,59 @@ public partial class NavigationBox : UserControl
         }
     }
 
-    private void FuseIcon_Click(object sender, RoutedEventArgs e)
+    private void TrackDriveRestrictions(DriveViewModel? drive)
     {
-        ((ToolTip)FuseIcon.ToolTip).IsOpen = true;
+        if (_trackedDrive == drive)
+        {
+            ApplyDriveRestrictions();
+            return;
+        }
+
+        _trackedDrive?.PropertyChanged -= OnTrackedDrivePropertyChanged;
+
+        _trackedDrive = drive;
+
+        _trackedDrive?.PropertyChanged += OnTrackedDrivePropertyChanged;
+
+        ApplyDriveRestrictions();
+
+        if (drive?.FSInfo is null && Data.DevicesObject?.Current is LogicalDeviceViewModel device)
+            _ = Task.Run(() => AdbHelper.ApplyMountInfo(device, Data.DeviceCts.Token), Data.DeviceCts.Token);
     }
 
-    private void FuseIcon_MouseLeave(object sender, MouseEventArgs e)
+    private void OnTrackedDrivePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        ((ToolTip)FuseIcon.ToolTip).IsOpen = false;
+        if (e.PropertyName is nameof(DriveViewModel.FSInfo)
+            or nameof(DriveViewModel.HasDriveRestrictions)
+            or nameof(DriveViewModel.RestrictionsTooltip)
+            or nameof(DriveViewModel.Restrictions))
+            App.SafeInvoke(ApplyDriveRestrictions);
+    }
+
+    private void ApplyDriveRestrictions()
+    {
+        var tooltipText = _trackedDrive?.RestrictionsTooltip ?? "";
+        HasDriveRestrictions = _trackedDrive?.HasDriveRestrictions is true;
+        RestrictionsTooltip = tooltipText;
+        RestrictionsIconGlyph = _trackedDrive?.Restrictions.IconGlyph ?? "\uE7BA";
+
+        RestrictionsToolTip.Content = string.IsNullOrEmpty(tooltipText)
+            ? null
+            : new TextBlock
+            {
+                Text = tooltipText,
+                TextWrapping = TextWrapping.Wrap,
+            };
+    }
+
+    private void RestrictionsIcon_Click(object sender, RoutedEventArgs e)
+    {
+        ApplyDriveRestrictions();
+        RestrictionsToolTip.IsOpen = true;
+    }
+
+    private void RestrictionsIcon_MouseLeave(object sender, MouseEventArgs e)
+    {
+        RestrictionsToolTip.IsOpen = false;
     }
 }

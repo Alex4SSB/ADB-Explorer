@@ -256,7 +256,7 @@ public static class FileHelper
     public enum RenameTarget
     {
         Unix,
-        FUSE,
+        RestrictedNaming,
         Windows,
         WinRoot,
     }
@@ -276,7 +276,7 @@ public static class FileHelper
         && name[^1] is not ' ' and not '.'
         && name[0] is not ' ';
 
-    private static readonly Func<string, bool> FileNamePredicateFuse = (name) =>
+    private static readonly Func<string, bool> FileNamePredicateRestrictedNaming = (name) =>
         !name.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Contains(c))
         && name.Length > 0
         && name is not "." and not "..";
@@ -296,7 +296,7 @@ public static class FileHelper
         var predicate = target switch
         {
             RenameTarget.Unix => FileNamePredicateUnix,
-            RenameTarget.FUSE => FileNamePredicateFuse,
+            RenameTarget.RestrictedNaming => FileNamePredicateRestrictedNaming,
             RenameTarget.Windows => FileNamePredicateWindows,
             RenameTarget.WinRoot => FileNamePredicateWinRoot,
             _ => throw new NotSupportedException(),

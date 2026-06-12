@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Models;
+using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
 
@@ -9,11 +10,8 @@ public partial class VirtualDriveViewModel : DriveViewModel
 
     public long? ItemsCount => Drive.ItemsCount;
 
-    // Temp drive is under the root filesystem
-    public override bool IsFUSE => Drive.Type is DriveType.Temp
-        && Data.DevicesObject.Current?.Drives?.Find(d => d.Type is DriveType.Root)?.IsFUSE is true;
+    public string? DfMountPoint => Drive.MountPoint;
 
-    
     public VirtualDriveViewModel(VirtualDrive drive) : base(drive)
     {
         Drive = drive;
@@ -27,6 +25,15 @@ public partial class VirtualDriveViewModel : DriveViewModel
         {
             Drive.ItemsCount = newCount;
             OnPropertyChanged(nameof(ItemsCount));
+        }
+    }
+
+    public void UpdateDrive(DriveSnapshot snapshot)
+    {
+        if (Drive.MountPoint != snapshot.MountPoint)
+        {
+            Drive.MountPoint = snapshot.MountPoint;
+            OnPropertyChanged(nameof(DfMountPoint));
         }
     }
 

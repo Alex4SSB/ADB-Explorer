@@ -8,22 +8,6 @@ public partial class LogicalDriveViewModel : DriveViewModel
     [ObservableProperty]
     protected new partial LogicalDrive Drive { get; set; }
 
-    [ObservableProperty]
-    public partial Models.FileSystemInfo? FSInfo { get; set; }
-
-    partial void OnFSInfoChanged(Models.FileSystemInfo? value)
-    {
-        OnPropertyChanged(nameof(BlockDevice));
-        OnPropertyChanged(nameof(FileSystem));
-        OnPropertyChanged(nameof(MountPoint));
-        OnPropertyChanged(nameof(MountOptions));
-    }
-
-    public string BlockDevice => FSInfo?.BlockDev;
-    public string FileSystem => FSInfo?.FileSystemType;
-    public string MountPoint => FSInfo?.MountPoint;
-    public string[] MountOptions => FSInfo?.Options;
-
     public string Size => Drive.Size;
     public string Used => Drive.Used;
     public string Available => Drive.Available;
@@ -85,10 +69,7 @@ public partial class LogicalDriveViewModel : DriveViewModel
         }
 
         if (Drive.FileSystem != other.FileSystem)
-        {
             Drive.FileSystem = other.FileSystem;
-            OnPropertyChanged(nameof(IsFUSE));
-        }
     }
 
     public void UpdateDrive(DriveSnapshot snapshot)
@@ -118,10 +99,7 @@ public partial class LogicalDriveViewModel : DriveViewModel
         }
 
         if (Drive.FileSystem != snapshot.FileSystem)
-        {
             Drive.FileSystem = snapshot.FileSystem;
-            OnPropertyChanged(nameof(IsFUSE));
-        }
     }
 
     public void SetExtension(bool isMMC = true) => SetType(isMMC ? DriveType.Expansion : DriveType.External);

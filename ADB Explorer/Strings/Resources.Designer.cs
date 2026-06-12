@@ -1954,18 +1954,35 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to FUSE drive.
-        ///• Symbolic links are not supported
+        ///   Looks up a localized string similar to Drive restrictions:.
+        /// </summary>
+        public static string S_DRIVE_RESTRICTIONS_HEADER {
+            get {
+                return ResourceManager.GetString("S_DRIVE_RESTRICTIONS_HEADER", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to • Read-only filesystem.
+        /// </summary>
+        public static string S_RESTRICTION_READ_ONLY {
+            get {
+                return ResourceManager.GetString("S_RESTRICTION_READ_ONLY", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to • Symbolic links are not supported
         ///• File names cannot contain &quot; * / : &lt; &gt; ? \ |
         ///• File names are case insensitive
         ///• Installation of APKs is not supported.
         /// </summary>
-        public static string S_FUSE_DRIVE_TOOLTIP {
+        public static string S_RESTRICTION_NOEXEC {
             get {
-                return ResourceManager.GetString("S_FUSE_DRIVE_TOOLTIP", resourceCulture);
+                return ResourceManager.GetString("S_RESTRICTION_NOEXEC", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to GitHub repository.
         /// </summary>
@@ -2884,11 +2901,11 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A copied file violates FUSE naming rules.
+        ///   Looks up a localized string similar to A copied file violates user space naming rules.
         /// </summary>
-        public static string S_POPUP_COPIED_FUSE_NAMING {
+        public static string S_POPUP_COPIED_RESTRICTED_NAMING {
             get {
-                return ResourceManager.GetString("S_POPUP_COPIED_FUSE_NAMING", resourceCulture);
+                return ResourceManager.GetString("S_POPUP_COPIED_RESTRICTED_NAMING", resourceCulture);
             }
         }
         
@@ -2911,14 +2928,14 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Adheres to FUSE naming rules.
+        ///   Looks up a localized string similar to Adheres to user space naming rules.
         /// </summary>
-        public static string S_POPUP_FUSE_NAMING {
+        public static string S_POPUP_RESTRICTED_NAMING {
             get {
-                return ResourceManager.GetString("S_POPUP_FUSE_NAMING", resourceCulture);
+                return ResourceManager.GetString("S_POPUP_RESTRICTED_NAMING", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to A selected item is not a file / folder.
         /// </summary>
@@ -2938,11 +2955,11 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A selected file violates FUSE naming rules.
+        ///   Looks up a localized string similar to A selected file violates user space naming rules.
         /// </summary>
-        public static string S_POPUP_SELECTED_FUSE {
+        public static string S_POPUP_SELECTED_RESTRICTED_NAMING {
             get {
-                return ResourceManager.GetString("S_POPUP_SELECTED_FUSE", resourceCulture);
+                return ResourceManager.GetString("S_POPUP_SELECTED_RESTRICTED_NAMING", resourceCulture);
             }
         }
         

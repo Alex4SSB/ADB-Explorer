@@ -70,6 +70,9 @@ public partial class ExplorerPageHeader : UserControl
 
     private void ActiveScrollIntoView(object item)
     {
+        if (item is null)
+            return;
+
         if (ViewModel.IsIconView)
             IconView.ScrollIntoView(item);
         else

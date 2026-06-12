@@ -101,10 +101,6 @@
                 </ui:FontIcon>
             </StackPanel>
         </DataTemplate>
-        <ToolTip
-            x:Key="FuseTooltip"
-            MaxWidth="300"
-            Content="{Binding Source={x:Static Member=strings:Resources.S_FUSE_DRIVE_TOOLTIP}}" />
     </UserControl.Resources>
     <Grid
         Height="{Binding Height}"
@@ -178,19 +174,22 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <ui:Button
-                x:Name="FuseIcon"
+                x:Name="RestrictionsIcon"
                 Height="24"
                 Margin="4,0,0,0"
                 Padding="3,0"
                 Appearance="Primary"
-                Click="FuseIcon_Click"
-                MouseLeave="FuseIcon_MouseLeave"
-                ToolTip="{StaticResource FuseTooltip}">
-                <ui:FontIcon FontSize="20" Glyph="&#xF0EF;" />
+                Click="RestrictionsIcon_Click"
+                MouseLeave="RestrictionsIcon_MouseLeave"
+                ToolTipService.InitialShowDelay="0">
+                <ui:Button.ToolTip>
+                    <ToolTip x:Name="RestrictionsToolTip" MaxWidth="300" />
+                </ui:Button.ToolTip>
+                <ui:FontIcon FontSize="16" Glyph="{Binding ElementName=NavBox, Path=RestrictionsIconGlyph}" />
                 <ui:Button.Style>
                     <Style BasedOn="{StaticResource DefaultUiButtonStyle}" TargetType="ui:Button">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding ElementName=NavBox, Path=IsFUSE}" Value="False">
+                            <DataTrigger Binding="{Binding ElementName=NavBox, Path=HasDriveRestrictions}" Value="False">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                         </Style.Triggers>

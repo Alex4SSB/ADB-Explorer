@@ -108,7 +108,11 @@ public static class ShellFileOperation
             var file = Data.DirList.FileList.Find(f => f.FullPath == op.FilePath.FullPath);
 
             // update UI when on current device and current path
-            op.Dispatcher.Invoke(() => file.UpdatePath(op.TargetPath.FullPath));
+            op.Dispatcher.Invoke(() =>
+            {
+                file.UpdatePath(op.TargetPath.FullPath);
+                FileActionLogic.UpdateFileActions();
+            });
 
             if (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First() == file)
                 Data.ItemToSelect.Value = null;

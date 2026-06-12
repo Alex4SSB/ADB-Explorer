@@ -13,6 +13,7 @@ namespace ADB_Explorer.Controls;
 /// </summary>
 public partial class DetailsPane : UserControl
 {
+    private DriveViewModel? _mountOptionsDrive;
 
     public enum SidePaneMode
     {
@@ -296,6 +297,7 @@ public partial class DetailsPane : UserControl
             control.SelectionInfoItems.Clear();
             control.PermissionsItems.Clear();
             control.MountOptionsItems.Clear();
+            control.UnsubscribeMountOptionsDrive();
 
             if (files.Count() == 1)
             {
@@ -548,54 +550,72 @@ public partial class DetailsPane : UserControl
         });
     }
 
+    private void UnsubscribeMountOptionsDrive()
+    {
+        _mountOptionsDrive?.PropertyChanged -= OnMountOptionsDrivePropertyChanged;
+        _mountOptionsDrive = null;
+    }
+
+    private void SubscribeMountOptionsDrive(DriveViewModel drive)
+    {
+        UnsubscribeMountOptionsDrive();
+        _mountOptionsDrive = drive;
+        _mountOptionsDrive.PropertyChanged += OnMountOptionsDrivePropertyChanged;
+    }
+
+    private void OnMountOptionsDrivePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is not nameof(DriveViewModel.MountOptions))
+            return;
+
+        if (sender is not DriveViewModel drive || drive != _mountOptionsDrive || Drive != drive)
+            return;
+
+        App.SafeInvoke(() =>
+        {
+            MountOptionsItems.Clear();
+            if (drive.MountOptions is { } newOpts)
+            {
+                foreach (var opt in newOpts)
+                    MountOptionsItems.Add(new MountOptionViewModel(opt));
+            }
+        });
+    }
+
+    private void PopulateMountOptions(DriveViewModel drive)
+    {
+        MountOptionsItems.Clear();
+        if (drive.MountOptions is { } opts)
+        {
+            foreach (var opt in opts)
+                MountOptionsItems.Add(new MountOptionViewModel(opt));
+        }
+    }
+
     private void PopulateThumbnailInfoItems(DriveViewModel drive)
     {
         SelectionInfoItems.Clear();
+        UnsubscribeMountOptionsDrive();
         MountOptionsItems.Clear();
 
-        if (drive is LogicalDriveViewModel logicalDrive)
+        if (drive is LogicalDriveViewModel or VirtualDriveViewModel { Type: AbstractDrive.DriveType.Temp })
         {
-            SelectionInfoItems.Add(new ItemDetailsViewModel<LogicalDriveViewModel>(logicalDrive, Strings.Resources.S_MOUNT_POINT, d => d.MountPoint is null ? "" : d.MountPoint, valueIsLtr: true).Init());
+            SelectionInfoItems.Add(new ItemDetailsViewModel<DriveViewModel>(drive, Strings.Resources.S_MOUNT_POINT, d => d.MountPoint is null ? "" : d.MountPoint, valueIsLtr: true).Init());
 
-            SelectionInfoItems.Add(new ItemDetailsViewModel<LogicalDriveViewModel>(logicalDrive, Strings.Resources.S_FILE_SYSTEM, d => d.FileSystem is null ? "" : d.FileSystem.ToUpper(), valueIsLtr: true).Init());
+            SelectionInfoItems.Add(new ItemDetailsViewModel<DriveViewModel>(drive, Strings.Resources.S_FILE_SYSTEM, d => d.FileSystem is null ? "" : d.FileSystem.ToUpper(), valueIsLtr: true).Init());
 
-            SelectionInfoItems.Add(new ItemDetailsViewModel<LogicalDriveViewModel>(logicalDrive, Strings.Resources.S_FILE_BLOCK, d => d.BlockDevice is null ? "" : d.BlockDevice, valueIsLtr: true).Init());
+            SelectionInfoItems.Add(new ItemDetailsViewModel<DriveViewModel>(drive, Strings.Resources.S_FILE_BLOCK, d => d.BlockDevice is null ? "" : d.BlockDevice, valueIsLtr: true).Init());
 
-            if (logicalDrive.MountOptions is { } opts)
-            {
-                foreach (var opt in opts)
-                    MountOptionsItems.Add(new MountOptionViewModel(opt));
-            }
+            PopulateMountOptions(drive);
+            SubscribeMountOptionsDrive(drive);
 
-            logicalDrive.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(LogicalDriveViewModel.MountOptions))
-                {
-                    App.SafeInvoke(() =>
-                    {
-                        MountOptionsItems.Clear();
-                        if (logicalDrive.MountOptions is { } newOpts)
-                        {
-                            foreach (var opt in newOpts)
-                                MountOptionsItems.Add(new MountOptionViewModel(opt));
-                        }
-                    });
-                }
-            };
-
-            if (logicalDrive.FSInfo is null)
+            if (drive.FSInfo is null)
             {
                 var device = Data.DevicesObject.Current;
                 var cts = new CancellationTokenSource();
                 _cancellationToken = cts;
                 _ = Task.Run(() => AdbHelper.ApplyMountInfo(device, cts.Token), cts.Token);
             }
-        }
-        else if (drive is VirtualDriveViewModel virtualDrive)
-        {
-            if (virtualDrive.Type is AbstractDrive.DriveType.Temp)
-                SelectionInfoItems.Add(new ItemDetailsViewModel<VirtualDriveViewModel>(virtualDrive, Strings.Resources.S_ITEM_LOCATION, d => d.Path, valueIsLtr: true));
-
         }
     }
 
@@ -641,7 +661,9 @@ public partial class DetailsPane : UserControl
         if (file.ModifiedTime.HasValue)
         {
             SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_FILE_INFO_MODIFIED, f => f.FolderViewModel.ModifiedTimeWithOffsetString, valueIsLtr: true).Init());
-            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_DATE_ACCESSED, f => f.FolderViewModel.LastAccessTimeString, valueIsLtr: true).Init());
+
+            if (Data.CurrentDrive?.Restrictions.SupportsAccessTime is true)
+                SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_DATE_ACCESSED, f => f.FolderViewModel.LastAccessTimeString, valueIsLtr: true).Init());
 
             SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_CREATION_TIME, f => f.FolderViewModel.CreationTimeString, valueIsLtr: true).Init());
         }

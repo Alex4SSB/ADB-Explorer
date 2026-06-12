@@ -880,6 +880,10 @@ public partial class ADBService
 
         drives.AddRange(extStorage.Where(predicate));
 
+        var tempStorage = ReadDrives(deviceId, deviceType, RE_EMULATED_STORAGE_SINGLE(), cancellationToken, TEMP_PATH);
+        if (tempStorage?.Any() is true)
+            drives.Add(tempStorage.First() with { Type = AbstractDrive.DriveType.Temp });
+
         if (drives.All(d => d.Type != AbstractDrive.DriveType.Internal))
             drives.Insert(0, new(Path: "/sdcard", Type: AbstractDrive.DriveType.Internal, Size: "", Used: "", Available: "", UsageP: -1, FileSystem: "", IsEmulator: false));
 
@@ -1066,15 +1070,15 @@ public readonly record struct DriveSnapshot(
     string Available,
     sbyte UsageP,
     string FileSystem,
-    bool IsEmulator)
+    bool IsEmulator,
+    string MountPoint = "")
 {
     public string ID => Path.Count(c => c == '/') > 1 ? Path[(Path.LastIndexOf('/') + 1)..] : Path;
 
-    public bool IsFUSE => FileSystem.Contains("fuse");
-
     public static DriveSnapshot Parse(GroupCollection groups, bool isEmulator, string forcePath)
     {
-        var path = string.IsNullOrEmpty(forcePath) ? groups["path"].Value : forcePath;
+        var mountPoint = groups["path"].Value.Trim();
+        var path = string.IsNullOrEmpty(forcePath) ? mountPoint : forcePath;
         var type = AbstractDrive.DriveType.Unknown;
 
         // Replicate Drive base ctor: DRIVE_TYPES exact match
@@ -1104,7 +1108,8 @@ public readonly record struct DriveSnapshot(
             Available: (long.Parse(groups["available_kB"].Value) * 1024).BytesToSize(true, 1, 0),
             UsageP: sbyte.Parse(groups["usage_P"].Value),
             FileSystem: groups["FileSystem"].Value,
-            IsEmulator: isEmulator);
+            IsEmulator: isEmulator,
+            MountPoint: mountPoint);
     }
 }
 

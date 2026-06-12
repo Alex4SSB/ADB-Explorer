@@ -281,6 +281,9 @@ internal static class FileActionLogic
 
     public static bool EnableUiPaste()
     {
+        if (Data.CurrentDrive?.Restrictions.ReadOnly is true)
+            return false;
+
         string[] files = Data.CopyPaste.Files;
         if (Data.CopyPaste.IsWindows
             && Data.CopyPaste.IsVirtual
@@ -308,9 +311,9 @@ internal static class FileActionLogic
             targetPath = Data.CurrentPath;
         }
 
-        PastingOnFuse(targetPath, files);
+        UpdatePastingRestrictions(targetPath, files);
 
-        if (Data.FileActions.IsPastingIllegalOnFuse || Data.FileActions.IsPastingConflictingOnFuse)
+        if (Data.FileActions.IsPastingIllegalNaming || Data.FileActions.IsPastingConflictingNames)
             return false;
 
         switch (selected)
@@ -338,6 +341,9 @@ internal static class FileActionLogic
 
     public static bool EnableKeyboardPaste()
     {
+        if (Data.CurrentDrive?.Restrictions.ReadOnly is true)
+            return false;
+
         string[] files = Data.CopyPaste.Files;
         if (Data.CopyPaste.IsWindows
             && Data.CopyPaste.IsVirtual
@@ -365,9 +371,9 @@ internal static class FileActionLogic
             targetPath = Data.CurrentPath;
         }
 
-        PastingOnFuse(targetPath, files);
+        UpdatePastingRestrictions(targetPath, files);
 
-        if (Data.FileActions.IsPastingIllegalOnFuse || Data.FileActions.IsPastingConflictingOnFuse)
+        if (Data.FileActions.IsPastingIllegalNaming || Data.FileActions.IsPastingConflictingNames)
             return false;
 
         switch (selected)
@@ -418,16 +424,16 @@ internal static class FileActionLogic
             _ => target.FullPath,
         };
 
-        PastingOnFuse(targetPath, [.. Data.CopyPaste.CurrentFiles.Select(f => f.FullPath)]);
+        UpdatePastingRestrictions(targetPath, [.. Data.CopyPaste.CurrentFiles.Select(f => f.FullPath)]);
 
         var result = DragDropEffects.Copy;
         if (Data.RuntimeSettings.IsRootActive 
             && Data.CopyPaste.IsSelf
-            && DriveHelper.GetCurrentDrive(targetPath)?.IsFUSE is false
+            && DriveHelper.GetCurrentDrive(targetPath)?.Restrictions.NoSymbolicLinks is not true
             && Data.CopyPaste.CurrentFiles.Count() == 1)
             result |= DragDropEffects.Link;
 
-        if (Data.FileActions.IsPastingIllegalOnFuse || Data.FileActions.IsPastingConflictingOnFuse)
+        if (Data.FileActions.IsPastingIllegalNaming || Data.FileActions.IsPastingConflictingNames)
             return DragDropEffects.None;
 
         if (target is null)
@@ -449,21 +455,22 @@ internal static class FileActionLogic
             : result | DragDropEffects.Move;
     }
 
-    private static void PastingOnFuse(string targetPath, string[] files)
+    private static void UpdatePastingRestrictions(string targetPath, string[] files)
     {
+        var restrictions = DriveHelper.GetCurrentDrive(targetPath)?.Restrictions ?? DriveRestrictions.None;
+
         if (Data.FileActions.IsAppDrive)
         {
-            Data.FileActions.IsPastingIllegalOnFuse = Data.CopyPaste.IsSelf && DriveHelper.GetCurrentDrive(files[0])?.IsFUSE is true;
+            Data.FileActions.IsPastingIllegalNaming = Data.CopyPaste.IsSelf
+                && (DriveHelper.GetCurrentDrive(files[0])?.Restrictions.RestrictedNaming is true);
             return;
         }
-        bool isFuse = DriveHelper.GetCurrentDrive(targetPath)?.IsFUSE is true;
 
-        Data.FileActions.IsPastingIllegalOnFuse = isFuse
-            && !FileHelper.FileNameLegal(files.Select(FileHelper.GetFullName), FileHelper.RenameTarget.FUSE);
+        Data.FileActions.IsPastingIllegalNaming = restrictions.RestrictedNaming
+            && !FileHelper.FileNameLegal(files.Select(FileHelper.GetFullName), FileHelper.RenameTarget.RestrictedNaming);
 
-        Data.FileActions.IsPastingConflictingOnFuse = isFuse
-            && files.Distinct(StringComparer.InvariantCultureIgnoreCase)
-            .Count() != files.Length;
+        Data.FileActions.IsPastingConflictingNames = restrictions.CaseInsensitiveNames
+            && files.Distinct(StringComparer.InvariantCultureIgnoreCase).Count() != files.Length;
     }
 
     public static void PasteFiles(IEnumerable<FileClass> selectedFiles, bool isLink = false)
@@ -516,7 +523,7 @@ internal static class FileActionLogic
         var name = FileHelper.DisplayName(textBox);
 
         if (!vm.IsRenameUnixLegal
-            || (Data.CurrentDrive?.IsFUSE is true && !vm.IsRenameFuseLegal)
+            || (Data.CurrentDrive?.Restrictions.RestrictedNaming is true && !vm.IsRenameNamingLegal)
             || !vm.IsRenameUnique)
         {
             return;
@@ -799,13 +806,17 @@ internal static class FileActionLogic
                                                && Data.SelectedFiles.First().IsLink
                                                && Data.SelectedFiles.First().Type is not FileType.BrokenLink;
 
+        var restrictions = Data.CurrentDrive?.Restrictions ?? DriveRestrictions.None;
+        var isWritable = restrictions.ReadOnly is not true;
+
         if (Data.FileActions.IsRecycleBin)
         {
             TrashHelper.EnableRecycleButtons(Data.SelectedFiles.Any() ? Data.SelectedFiles : Data.DirList.FileList);
         }
         else
         {
-            Data.FileActions.DeleteEnabled = Data.SelectedFiles.Any() && Data.FileActions.IsRegularItem
+            Data.FileActions.DeleteEnabled = isWritable
+                && Data.SelectedFiles.Any() && Data.FileActions.IsRegularItem
                 && (!Data.FileActions.IsFollowLinkEnabled || Data.RuntimeSettings.IsRootActive);
 
             Data.FileActions.RestoreEnabled = false;
@@ -816,21 +827,27 @@ internal static class FileActionLogic
         Data.FileActions.RestoreDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.Resources.S_RESTORE_ALL : Strings.Resources.S_RESTORE_ACTION;
 
         Data.FileActions.IsSelectionIllegalOnWindows = Data.SelectedFiles.Any() && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.Windows);
-        Data.FileActions.IsSelectionIllegalOnFuse = Data.SelectedFiles.Any() && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.FUSE);
+        Data.FileActions.IsSelectionIllegalNaming = !Data.FileActions.IsRecycleBin
+            && !Data.FileActions.IsAppDrive
+            && Data.SelectedFiles.Any()
+            && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.RestrictedNaming);
         Data.FileActions.IsSelectionIllegalOnWinRoot = Data.SelectedFiles.Any() && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.WinRoot);
-        Data.FileActions.IsSelectionConflictingOnFuse = Data.SelectedFiles.Select(f => f.FullName)
-            .Distinct(StringComparer.InvariantCultureIgnoreCase)
-            .Count() != Data.SelectedFiles.Count();
+        Data.FileActions.IsSelectionConflictingNames = restrictions.CaseInsensitiveNames
+            && Data.SelectedFiles.Select(f => f.FullName).Distinct(StringComparer.InvariantCultureIgnoreCase).Count() != Data.SelectedFiles.Count();
 
         Data.FileActions.PullEnabled = !Data.FileActions.IsRecycleBin
                                        && Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
                                        && Data.FileActions.IsRegularItem
                                        && !Data.FileActions.IsSelectionIllegalOnWindows
-                                       && !Data.FileActions.IsSelectionConflictingOnFuse;
+                                       && !Data.FileActions.IsSelectionIllegalNaming
+                                       && !Data.FileActions.IsSelectionConflictingNames;
 
-        Data.FileActions.ContextPushEnabled = !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive && (!Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
+        Data.FileActions.ContextPushEnabled = isWritable
+            && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive
+            && (!Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 
-        Data.FileActions.RenameEnabled = !Data.FileActions.IsRecycleBin
+        Data.FileActions.RenameEnabled = isWritable
+                                         && !Data.FileActions.IsRecycleBin
                                          && Data.SelectedFiles.Count() == 1
                                          && Data.FileActions.IsRegularItem
                                          && (!Data.FileActions.IsFollowLinkEnabled || Data.RuntimeSettings.IsRootActive);
@@ -839,7 +856,8 @@ internal static class FileActionLogic
                                 && Data.CopyPaste.Files.AnyAll(item => Data.SelectedFiles.Any(f => f.FullPath == item))
                                 && Data.CopyPaste.Files.Length == Data.SelectedFiles.Count();
         
-        Data.FileActions.CutEnabled = Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
+        Data.FileActions.CutEnabled = isWritable
+                                      && Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
                                       && !(allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Move)
                                       && Data.FileActions.IsRegularItem
                                       && (!Data.FileActions.IsFollowLinkEnabled || Data.RuntimeSettings.IsRootActive);
@@ -872,16 +890,18 @@ internal static class FileActionLogic
             ? Data.SelectedPackages.Count() == 1
             : Data.SelectedFiles.Count() == 1 && !Data.FileActions.IsRecycleBin;
 
-        Data.FileActions.ContextNewEnabled = !Data.SelectedFiles.Any() && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive;
+        Data.FileActions.ContextNewEnabled = isWritable
+            && !Data.SelectedFiles.Any() && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive;
 
-        Data.FileActions.SubmenuUninstallEnabled = Data.CurrentDrive?.IsFUSE is not true
+        Data.FileActions.SubmenuUninstallEnabled = Data.CurrentDrive?.Restrictions.NoApkInstall is not true
             && Data.SelectedFiles.AnyAll(file => file.IsInstallApk)
             && Data.DevicesObject?.Current?.Type is not DeviceType.Recovery;
 
-        Data.FileActions.UpdateModifiedEnabled = !Data.FileActions.IsRecycleBin
+        Data.FileActions.UpdateModifiedEnabled = isWritable
+            && !Data.FileActions.IsRecycleBin
             && Data.SelectedFiles.AnyAll(file => file.Type is FileType.File && !file.IsApk && !file.IsLink);
 
-        Data.FileActions.IsPasteLinkEnabled = Data.CurrentDrive?.IsFUSE is not true
+        Data.FileActions.IsPasteLinkEnabled = Data.CurrentDrive?.Restrictions.NoSymbolicLinks is not true
             && Data.RuntimeSettings.IsRootActive
             && Data.CopyPaste.Files.Length == 1
             && Data.CopyPaste.IsSelf
@@ -890,7 +910,7 @@ internal static class FileActionLogic
             (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 
         Data.FileActions.InstallPackageEnabled = Data.DevicesObject?.Current?.Type is not DeviceType.Recovery
-            && Data.CurrentDrive?.IsFUSE is not true;
+            && Data.CurrentDrive?.Restrictions.NoApkInstall is not true;
 
         if (!Data.CopyPaste.IsDrag)
             Data.RuntimeSettings.FilterActions = true;

@@ -21,9 +21,33 @@ public partial class DriveViewModel : AbstractDrive, IBrowserItem
     public string? LinkTargetPath => (Drive as LogicalDrive)?.LinkTargetPath;
 
     public new DriveType Type => Drive.Type;
-    public virtual bool IsFUSE => Drive.IsFUSE;
 
     public new string DisplayName => Drive.DisplayName;
+
+    public DriveRestrictions Restrictions => DriveRestrictions.From(FSInfo?.Options);
+
+    public bool HasDriveRestrictions => Restrictions.HasAny;
+
+    public string RestrictionsTooltip => Restrictions.GetTooltipText();
+
+    [ObservableProperty]
+    public partial Models.FileSystemInfo? FSInfo { get; set; }
+
+    partial void OnFSInfoChanged(Models.FileSystemInfo? value)
+    {
+        OnPropertyChanged(nameof(BlockDevice));
+        OnPropertyChanged(nameof(FileSystem));
+        OnPropertyChanged(nameof(MountPoint));
+        OnPropertyChanged(nameof(MountOptions));
+        OnPropertyChanged(nameof(Restrictions));
+        OnPropertyChanged(nameof(HasDriveRestrictions));
+        OnPropertyChanged(nameof(RestrictionsTooltip));
+    }
+
+    public string BlockDevice => FSInfo?.BlockDev;
+    public string FileSystem => FSInfo?.FileSystemType;
+    public string MountPoint => FSInfo?.MountPoint;
+    public string[] MountOptions => FSInfo?.Options;
 
     public string DriveIcon => GetDriveIcon(Type);
 

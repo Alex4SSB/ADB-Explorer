@@ -598,7 +598,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
                                                         DataObjectMethod method = DataObjectMethod.DragDrop)
     {
         Data.FileActions.IsSelectionIllegalOnWindows =
-        Data.FileActions.IsSelectionConflictingOnFuse = false;
+        Data.FileActions.IsSelectionConflictingNames = false;
 
         CopyPasteService.ClearTempFolder();
         VirtualFileDataObject vfdo = new(DragDropEffects.Copy, method);
@@ -618,7 +618,10 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         CopyPasteService.ClearTempFolder();
 
         Data.FileActions.IsSelectionIllegalOnWindows = !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.Windows);
-        Data.FileActions.IsSelectionConflictingOnFuse = Data.SelectedFiles.Select(f => f.FullName)
+        Data.FileActions.IsSelectionIllegalNaming = !Data.FileActions.IsRecycleBin
+            && !Data.FileActions.IsAppDrive
+            && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.RestrictedNaming);
+        Data.FileActions.IsSelectionConflictingNames = Data.SelectedFiles.Select(f => f.FullName)
             .Distinct(StringComparer.InvariantCultureIgnoreCase)
             .Count() != Data.SelectedFiles.Count();
 
@@ -626,7 +629,8 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
 
         var includeContent =
             !Data.FileActions.IsSelectionIllegalOnWindows
-            && !Data.FileActions.IsSelectionConflictingOnFuse
+            && !Data.FileActions.IsSelectionIllegalNaming
+            && !Data.FileActions.IsSelectionConflictingNames
             && !Data.FileActions.IsRecycleBin;
 
         if (includeContent)

@@ -814,9 +814,9 @@ public partial class CopyPasteService : ObservableObject
         // Figure out whether the target is Windows or Android
         var sep = FileHelper.GetSeparator(targetPath);
 
-        // File names on (non virtual) Unix file systems are case sensitive
-        var isUnix = sep is '/' && !DriveHelper.GetCurrentDrive(targetPath).IsFUSE;
-        StringComparer comparer = isUnix
+        // File names on case-sensitive file systems are compared with exact casing
+        var caseSensitive = sep is '/' && DriveHelper.GetCurrentDrive(targetPath)?.Restrictions.CaseInsensitiveNames is not true;
+        StringComparer comparer = caseSensitive
             ? StringComparer.InvariantCulture
             : StringComparer.InvariantCultureIgnoreCase;
 
@@ -834,7 +834,7 @@ public partial class CopyPasteService : ObservableObject
             }
             else
             {
-                var foundFiles = ADBService.FindFilesInPath(Data.DevicesObject.Current.ID, targetPath, includeNames: fileNames, caseSensitive: isUnix);
+                var foundFiles = ADBService.FindFilesInPath(Data.DevicesObject.Current.ID, targetPath, includeNames: fileNames, caseSensitive: caseSensitive);
                 existingItems = foundFiles.Select(FileHelper.GetFullName).ToHashSet(comparer);
             }
         }
@@ -897,9 +897,9 @@ public partial class CopyPasteService : ObservableObject
         // Figure out whether the target is Windows or Android
         var sep = FileHelper.GetSeparator(targetPath);
 
-        // File names on (non virtual) Unix file systems are case sensitive
-        var isUnix = sep is '/' && !DriveHelper.GetCurrentDrive(targetPath).IsFUSE;
-        StringComparer comparer = isUnix
+        // File names on case-sensitive file systems are compared with exact casing
+        var caseSensitive = sep is '/' && DriveHelper.GetCurrentDrive(targetPath)?.Restrictions.CaseInsensitiveNames is not true;
+        StringComparer comparer = caseSensitive
             ? StringComparer.InvariantCulture
             : StringComparer.InvariantCultureIgnoreCase;
 
@@ -917,7 +917,7 @@ public partial class CopyPasteService : ObservableObject
             }
             else
             {
-                var foundFiles = ADBService.FindFilesInPath(Data.DevicesObject.Current.ID, targetPath, includeNames: fileNames, caseSensitive: isUnix);
+                var foundFiles = ADBService.FindFilesInPath(Data.DevicesObject.Current.ID, targetPath, includeNames: fileNames, caseSensitive: caseSensitive);
                 existingItems = foundFiles.Select(FileHelper.GetFullName).ToHashSet(comparer);
             }
         }

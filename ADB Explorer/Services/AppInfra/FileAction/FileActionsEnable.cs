@@ -329,11 +329,11 @@ public partial class FileActionsEnable : ObservableObject
         set => SetProperty(ref selectedFilesCount, value);
     }
 
-    private bool isPastingIllegalOnFuse = false;
-    public bool IsPastingIllegalOnFuse
+    private bool isPastingIllegalNaming = false;
+    public bool IsPastingIllegalNaming
     {
-        get => isPastingIllegalOnFuse;
-        set => SetProperty(ref isPastingIllegalOnFuse, value);
+        get => isPastingIllegalNaming;
+        set => SetProperty(ref isPastingIllegalNaming, value);
     }
 
     private bool isSelectionIllegalOnWindows = false;
@@ -343,11 +343,11 @@ public partial class FileActionsEnable : ObservableObject
         set => SetProperty(ref isSelectionIllegalOnWindows, value);
     }
 
-    private bool isSelectionIllegalOnFuse = false;
-    public bool IsSelectionIllegalOnFuse
+    private bool isSelectionIllegalNaming = false;
+    public bool IsSelectionIllegalNaming
     {
-        get => isSelectionIllegalOnFuse;
-        set => SetProperty(ref isSelectionIllegalOnFuse, value);
+        get => isSelectionIllegalNaming;
+        set => SetProperty(ref isSelectionIllegalNaming, value);
     }
 
     private bool isSelectionIllegalOnWinRoot = false;
@@ -357,18 +357,18 @@ public partial class FileActionsEnable : ObservableObject
         set => SetProperty(ref isSelectionIllegalOnWinRoot, value);
     }
 
-    private bool isSelectionConflictingOnFuse = false;
-    public bool IsSelectionConflictingOnFuse
+    private bool isSelectionConflictingNames = false;
+    public bool IsSelectionConflictingNames
     {
-        get => isSelectionConflictingOnFuse;
-        set => SetProperty(ref isSelectionConflictingOnFuse, value);
+        get => isSelectionConflictingNames;
+        set => SetProperty(ref isSelectionConflictingNames, value);
     }
 
-    private bool isPastingConflictingOnFuse = false;
-    public bool IsPastingConflictingOnFuse
+    private bool isPastingConflictingNames = false;
+    public bool IsPastingConflictingNames
     {
-        get => isPastingConflictingOnFuse;
-        set => SetProperty(ref isPastingConflictingOnFuse, value);
+        get => isPastingConflictingNames;
+        set => SetProperty(ref isPastingConflictingNames, value);
     }
 
     private bool isPastingInDescendant = false;

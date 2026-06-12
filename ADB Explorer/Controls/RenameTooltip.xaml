@@ -73,7 +73,7 @@
                     <ui:FontIcon.Style>
                         <Style BasedOn="{StaticResource RenameStatusIcon}" TargetType="ui:FontIcon">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsRenameFuseLegal}" Value="True">
+                                <DataTrigger Binding="{Binding IsRenameNamingLegal}" Value="True">
                                     <Setter Property="Glyph" Value="&#xF13E;" />
                                     <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
                                 </DataTrigger>
@@ -125,7 +125,7 @@
                     Grid.Row="1"
                     Grid.Column="2"
                     VerticalAlignment="Center"
-                    Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_FUSE_NAMING}}" />
+                    Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_RESTRICTED_NAMING}}" />
                 <TextBlock
                     Grid.Row="2"
                     Grid.Column="2"

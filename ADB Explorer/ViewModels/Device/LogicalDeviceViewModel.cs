@@ -416,6 +416,13 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
         foreach (var snapshot in snapshots)
         {
+            if (snapshot.Type is AbstractDrive.DriveType.Temp)
+            {
+                if (Drives.OfType<VirtualDriveViewModel>().FirstOrDefault(d => d.Type is AbstractDrive.DriveType.Temp) is VirtualDriveViewModel temp)
+                    temp.UpdateDrive(snapshot);
+                continue;
+            }
+
             var selfQ = Drives.Where(d => d.Path == snapshot.Path
                 || (snapshot.Type is AbstractDrive.DriveType.Internal && d.Type is AbstractDrive.DriveType.Internal));
 

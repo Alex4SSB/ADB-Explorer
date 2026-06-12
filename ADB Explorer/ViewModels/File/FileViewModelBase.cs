@@ -98,7 +98,7 @@ public partial class FileViewModelBase : ObservableObject
     public partial bool IsRenameUnixLegal { get; set; }
 
     [ObservableProperty]
-    public partial bool IsRenameFuseLegal { get; set; }
+    public partial bool IsRenameNamingLegal { get; set; }
 
     [ObservableProperty]
     public partial bool IsRenameWindowsLegal { get; set; }
@@ -120,14 +120,14 @@ public partial class FileViewModelBase : ObservableObject
         if (textBox.DataContext is not FileClass file || Data.CurrentDrive is null)
             return;
 
-        textBox.FilterString(Data.CurrentDrive.IsFUSE
+        textBox.FilterString(Data.CurrentDrive.Restrictions.RestrictedNaming
             ? AdbExplorerConst.INVALID_NTFS_CHARS
             : AdbExplorerConst.INVALID_UNIX_CHARS);
 
         var vm = file.ActiveViewModel;
 
         vm.IsRenameUnixLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Unix);
-        vm.IsRenameFuseLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.FUSE);
+        vm.IsRenameNamingLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.RestrictedNaming);
         vm.IsRenameWindowsLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Windows);
         vm.IsRenameDriveRootLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.WinRoot);
 
@@ -135,7 +135,7 @@ public partial class FileViewModelBase : ObservableObject
             ? textBox.Text
             : textBox.Text + file.Extension;
 
-        var comparison = Data.CurrentDrive.IsFUSE
+        var comparison = Data.CurrentDrive.Restrictions.CaseInsensitiveNames
             ? StringComparison.InvariantCultureIgnoreCase
             : StringComparison.InvariantCulture;
 

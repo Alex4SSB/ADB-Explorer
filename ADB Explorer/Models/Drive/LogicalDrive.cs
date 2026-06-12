@@ -19,17 +19,8 @@ public partial class LogicalDrive : Drive
     [ObservableProperty]
     public partial string LinkTargetPath { get; set; }
 
-    public string FileSystem
-    {
-        get;
-        set
-        {
-            if (SetProperty(ref field, value))
-                OnPropertyChanged(nameof(IsFUSE));
-        }
-    } = "";
-
-    public override bool IsFUSE => FileSystem.Contains("fuse");
+    [ObservableProperty]
+    public partial string FileSystem { get; set; } = "";
 
     public string ID => Path.Count(c => c == '/') > 1 ? Path[(Path.LastIndexOf('/') + 1)..] : Path;
 

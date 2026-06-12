@@ -32,6 +32,9 @@
                                 <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalNaming}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
                                 <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
@@ -80,7 +83,7 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionConflictingOnFuse}" Value="False">
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionConflictingNames}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="True">
@@ -107,7 +110,7 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnFuse}" Value="False">
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalNaming}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
@@ -124,17 +127,17 @@
                     <TextBlock
                         Grid.Column="1"
                         VerticalAlignment="Center"
-                        Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_SELECTED_FUSE}}"
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_SELECTED_RESTRICTED_NAMING}}"
                         TextWrapping="Wrap" />
                 </Grid>
                 <Grid d:Visibility="Visible">
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingOnFuse}" Value="False">
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingNames}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalOnFuse}" Value="True">
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalNaming}" Value="True">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -155,7 +158,7 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalOnFuse}" Value="False">
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalNaming}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -169,7 +172,7 @@
                     <TextBlock
                         Grid.Column="1"
                         VerticalAlignment="Center"
-                        Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_COPIED_FUSE_NAMING}}"
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_COPIED_RESTRICTED_NAMING}}"
                         TextWrapping="Wrap" />
                 </Grid>
                 <Grid d:Visibility="Visible">
@@ -213,17 +216,18 @@
                     <MultiDataTrigger>
                         <MultiDataTrigger.Conditions>
                             <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="False" />
+                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalNaming}" Value="False" />
                             <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWinRoot}" Value="False" />
-                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionConflictingOnFuse}" Value="False" />
-                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingOnFuse}" Value="False" />
+                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionConflictingNames}" Value="False" />
+                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingNames}" Value="False" />
                             <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRegularItem}" Value="True" />
                         </MultiDataTrigger.Conditions>
                         <Setter Property="Visibility" Value="Collapsed" />
                     </MultiDataTrigger>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalOnFuse}" Value="True">
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalNaming}" Value="True">
                         <Setter Property="Visibility" Value="Visible" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingOnFuse}" Value="True">
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingNames}" Value="True">
                         <Setter Property="Visibility" Value="Visible" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
