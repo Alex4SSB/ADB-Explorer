@@ -633,14 +633,15 @@ public partial class ExplorerPageHeader : UserControl
             DetailsPane.SelectedFiles = [];
 
         ActiveView.Focus();
-        CurrentPath = realPath;
 
         NavigationBox.Path = realPath == RECYCLE_PATH ? AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin) : realPath;
-        CurrentDrive = DriveHelper.GetCurrentDrive(CurrentPath);
-        FileActions.IsRecycleBin = CurrentPath == RECYCLE_PATH;
-        FileActions.IsAppDrive = CurrentPath == AdbLocation.StringFromLocation(Navigation.SpecialLocation.PackageDrive);
-        FileActions.IsTemp = CurrentPath == TEMP_PATH;
-        FileActions.ParentEnabled = CurrentPath != ParentPath && !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
+        CurrentDrive = DriveHelper.GetCurrentDrive(realPath);
+        FileActions.IsRecycleBin = realPath == RECYCLE_PATH;
+        FileActions.IsAppDrive = realPath == AdbLocation.StringFromLocation(Navigation.SpecialLocation.PackageDrive);
+        FileActions.IsTemp = realPath == TEMP_PATH;
+        FileActions.ParentEnabled = realPath != FileHelper.GetParentPath(realPath) && !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
+
+        CurrentPath = realPath;
 
         FileActionLogic.IsPasteEnabled();
 
