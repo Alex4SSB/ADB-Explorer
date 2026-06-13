@@ -1465,4 +1465,136 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_PICK_COLOR" xml:space="preserve">
     <value>Farbe auswählen</value>
   </data>
+  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
+    <value>Diesen Emulator starten</value>
+  </data>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Laufwerksbeschränkungen:</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• Schreibgeschütztes Dateisystem</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• Symbolische Links werden nicht unterstützt
+• Dateinamen dürfen keine der folgenden Zeichen enthalten: „ * / : &lt; &gt; ? \ |“
+• Bei Dateinamen wird die Groß-/Kleinschreibung nicht berücksichtigt
+• Die Installation von APKs wird nicht unterstützt</value>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Absturzbericht-Dialog anzeigen</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Fehlerberichterstattung</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Eine ausgewählte Datei verstößt gegen die Namenskonventionen im Benutzerbereich</value>
+  </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Eine kopierte Datei verstößt gegen die Namenskonventionen im Benutzerbereich</value>
+  </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>BusyBox verwenden, falls verfügbar</value>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>WSA automatisch verbinden, falls verfügbar</value>
+  </data>
+  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
+    <value>Android-Emulatoren entdecken</value>
+  </data>
+  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
+    <value>Emulator starten</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>Miniaturansichten werden abgerufen</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>Auf Aktualisierungen der Miniaturansichten wird geprüft</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>Speicherorte von Miniaturansichten und die Mediendatenbank werden gelesen</value>
+  </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>und {0} weitere …</value>
+  </data>
+  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
+    <value>Details und Vorschaufenster ein- oder ausblenden.</value>
+  </data>
+  <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
+    <value>Vorschau</value>
+  </data>
+  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
+    <value>Max. Dateigröße für die Vorschau</value>
+  </data>
+  <data name="S_ITEM_LOCATION" xml:space="preserve">
+    <value>Speicherort</value>
+  </data>
+  <data name="S_IMAGE_F_STOP" xml:space="preserve">
+    <value>Blendenstufe</value>
+  </data>
+  <data name="S_IMAGE_ISO" xml:space="preserve">
+    <value>ISO-Empfindlichkeit</value>
+  </data>
+  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
+    <value>Belichtungszeit</value>
+  </data>
+  <data name="S_VIDEO_BITRATE" xml:space="preserve">
+    <value>Bitrate</value>
+  </data>
+  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
+    <value>Datei zur Vorschau auswählen.</value>
+  </data>
+  <data name="S_PREVIEW_INVALID" xml:space="preserve">
+    <value>Keine Vorschau verfügbar.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
+    <value>Dieses PDF ist passwortgeschützt.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
+    <value>Falsches Passwort.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
+    <value>Entsperren</value>
+  </data>
+  <data name="S_FILE_PERMISSIONS" xml:space="preserve">
+    <value>Berechtigungen</value>
+  </data>
+  <data name="S_FILE_PERM_USER" xml:space="preserve">
+    <value>Benutzer</value>
+  </data>
+  <data name="S_FILE_PERM_GROUP" xml:space="preserve">
+    <value>Gruppe</value>
+  </data>
+  <data name="S_FILE_PERM_OTHER" xml:space="preserve">
+    <value>Andere</value>
+  </data>
+  <data name="S_DATE_ACCESSED" xml:space="preserve">
+    <value>Zugegriffen</value>
+  </data>
+  <data name="S_CREATION_TIME" xml:space="preserve">
+    <value>Erstellt</value>
+  </data>
+  <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
+    <value>Geändert</value>
+  </data>
+  <data name="S_FILE_SYSTEM" xml:space="preserve">
+    <value>Dateisystem</value>
+  </data>
+  <data name="S_MOUNT_POINT" xml:space="preserve">
+    <value>Einhängepunkt</value>
+  </data>
+  <data name="S_MOUNT_OPTIONS" xml:space="preserve">
+    <value>Einhängeoptionen</value>
+  </data>
+  <data name="S_COLOR_RED" xml:space="preserve">
+    <value>Rot</value>
+  </data>
+  <data name="S_COLOR_GREEN" xml:space="preserve">
+    <value>Grün</value>
+  </data>
+  <data name="S_COLOR_BLUE" xml:space="preserve">
+    <value>Blau</value>
+  </data>
+  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
+    <value>ADB konnte im System-PATH nicht gefunden werden. Bitte „{0}” verwenden, um es zu finden.</value>
+  </data>
 </root>
