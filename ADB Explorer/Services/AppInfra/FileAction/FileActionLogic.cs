@@ -1050,8 +1050,10 @@ internal static class FileActionLogic
 
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
                 return;
-
+           
             targetPath = dialog.FileName;
+            if (!Directory.Exists(targetPath) && FileHelper.GetFullName(targetPath) == pullItems.First().FullName)
+                targetPath = FileHelper.GetParentPath(targetPath);
         }
 
         PullFiles(targetPath, pullItems, true);
