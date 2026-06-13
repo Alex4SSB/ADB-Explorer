@@ -1044,13 +1044,13 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>选中的文件违反了 Windows 驱动器命名规则</value>
   </data>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
-    <value>某些选中的文件在 FUSE / Windows 上具有冲突的名称</value>
+    <value>某些选中的文件有相冲突的不区分大小写的名称</value>
   </data>
   <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
     <value>所选文件违反了 FUSE 命名规则</value>
   </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
-    <value>一些复制的文件在 FUSE 上有冲突的名称</value>
+    <value>一些已复制的文件有相冲突的不区分大小写的名称</value>
   </data>
   <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
     <value>复制的文件违反了 FUSE 命名规则</value>
@@ -1599,5 +1599,38 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
     <value>崩溃后可以选择发送诊断报告帮助我们修复它。仅在单击“发送报告”时发送报告，报告内容通常包括异常信息、堆栈踪迹、应用和 Windows 版本、打开的页面。数据由 Grafana Labs (Grafana Cloud) 处理。见上方的隐私政策链接。</value>
+  </data>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>驱动器限制：</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• 只读文件系统</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• 不支持符号链接
+• 文件名不能包含 " * / : &lt; &gt; ? \ |
+• 文件名不区分大小写
+• 不支持安装 APK</value>
+  </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>遵守用户空间命名规则</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>所选文件违反用户空间命名规则</value>
+  </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>已复制文件违反用户空间命名规则</value>
+  </data>
+  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
+    <value>发现 Android 模拟器</value>
+  </data>
+  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
+    <value>启动模拟器</value>
+  </data>
+  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
+    <value>启动模拟器</value>
+  </data>
+  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
+    <value>未找到 Android SDK 模拟器。安装 Android SDK 模拟器包或设置 ANDROID_SDK_ROOT。</value>
   </data>
 </root>
