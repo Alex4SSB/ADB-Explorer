@@ -368,6 +368,14 @@ public partial class ExplorerPageHeader : UserControl
             DetailsPane.SelectedFiles = FileActions.IsAppDrive ? SelectedPackages : SelectedFiles;
         }
 
+        if (DevicesObject.Current.AndroidVersion < 11)
+        {
+            foreach (var file in SelectedFiles.Where(f => f.IsRegularFile && f.ShellLsSize is null))
+            {
+                file.UpdateSizeFromShell(CancellationToken.None);
+            }
+        }
+
         ViewModel.NotifySelectedFilesTotalSize();
 
         FileActionLogic.UpdateFileActions();

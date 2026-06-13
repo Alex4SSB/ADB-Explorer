@@ -50,17 +50,22 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     {
         get
         {
-            // to prevent displaying [Service] for offline connect services acquired via adb devices -l upon first contact
-            if (string.IsNullOrEmpty(Device.Name) && DiscoverTime - DateTime.Now < AdbExplorerConst.SERVICE_DISPLAY_DELAY)
-                return " ";
-
             if (Device.Type is DeviceType.Emulator && !string.IsNullOrEmpty(Device.AvdName))
                 return Device.AvdName;
 
             if (!UseIdForName && !string.IsNullOrEmpty(BrandName))
                 return BrandName;
 
-            return UseIdForName ? Device.ID : Device.Name;
+            // Prevent displaying [Service] for offline connect services acquired via adb devices -l upon first contact
+            if (Device.Type is DeviceType.Service
+                && string.IsNullOrEmpty(Device.Name)
+                && DateTime.Now - DiscoverTime < AdbExplorerConst.SERVICE_DISPLAY_DELAY)
+                return " ";
+
+            if (UseIdForName)
+                return Device.ID;
+
+            return string.IsNullOrEmpty(Device.Name) ? Device.ID : Device.Name;
         }
     }
 

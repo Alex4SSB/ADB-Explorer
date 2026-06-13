@@ -10,9 +10,7 @@ public static class FolderHelper
     public static void CombineDisplayNames()
     {
         var driveView = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
-        string name = Data.DevicesObject.Current.Name;
-        if (!string.IsNullOrEmpty(Data.DevicesObject.Current.BrandName))
-            name = Data.DevicesObject.Current.BrandName;
+        var name = Data.DevicesObject.Current.Name;
 
         if (!Data.CurrentDisplayNames.TryAdd(driveView, name))
             Data.CurrentDisplayNames[driveView] = name;

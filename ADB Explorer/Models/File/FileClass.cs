@@ -25,6 +25,16 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         _iconViewModel?.OnSizeChanged();
     }
 
+    public long? ShellLsSize
+    {
+        get;
+        set
+        {
+            if (Set(ref field, value) && value > -1)
+                OnSizeChanged(value);
+        }
+    } = null;
+
     [ObservableProperty]
     public partial UnixFileMode? Permissions { get; set; }
 
@@ -68,33 +78,31 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     [ObservableProperty]
     public partial DateTimeOffset? CreationTime { get; set; }
 
-    private DateTime? modifiedTime;
     public DateTime? ModifiedTime
     {
-        get => modifiedTime;
+        get;
         set
         {
-            if (Set(ref modifiedTime, value))
+            if (Set(ref field, value))
             {
                 _folderViewModel?.OnModifiedTimeChanged();
                 _iconViewModel?.OnModifiedTimeChanged();
             }
         }
-    }
+    } = null;
 
-    private DateTimeOffset? modifiedTimeWithOffset;
     public DateTimeOffset? ModifiedTimeWithOffset
     {
-        get => modifiedTimeWithOffset;
+        get;
         set
         {
-            if (Set(ref modifiedTimeWithOffset, value))
+            if (Set(ref field, value))
             {
                 _folderViewModel?.OnModifiedTimeChanged();
                 _iconViewModel?.OnModifiedTimeChanged();
             }
         }
-    }
+    } = null;
 
     public double? UnixTime => ModifiedTime.ToUnixTime();
 
@@ -362,6 +370,23 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             LastAccessTime = info?.AccessTime;
             CreationTime = info?.CreationTime;
             ModifiedTimeWithOffset = info?.ModifiedTime;
+        });
+    }
+
+    public void UpdateSizeFromShell(CancellationToken cancellationToken)
+    {
+        var res = ADBService.ExecuteDeviceAdbShellCommand(Data.DevicesObject.Current.ID, "stat", out string stdout, out _, cancellationToken, 
+            [ "-c", "%s", ADBService.EscapeAdbShellString(FullPath)]);
+
+        if (res != 0 || string.IsNullOrEmpty(stdout))
+        {
+            ShellLsSize = -1; // Indicate failure to retrieve size
+            return;
+        }
+
+        App.SafeInvoke(() =>
+        {
+            ShellLsSize = long.Parse(stdout);
         });
     }
 

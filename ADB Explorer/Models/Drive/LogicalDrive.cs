@@ -68,23 +68,30 @@ public partial class LogicalDrive : Drive
         if (Type is not DriveType.Internal)
             return;
 
-        const string storage = "echo $EXTERNAL_STORAGE";
         string path = "", target = "";
+
+        var echo = ShellCommands.TranslateCommand("echo");
+        var readlink = ShellCommands.TranslateCommand("readlink");
+
+        // readlink -f/-e is unreliable on some devices (e.g. OnePlus Android 9); follow symlink chains manually.
+        var resolveScript =
+            $"i=0;l=$EXTERNAL_STORAGE;" +
+            $"while [ -L \"$l\" ] && [ $i -lt 10 ];do t=$({readlink} \"$l\");case \"$t\" in /*)l=\"$t\";;*)l=\"$(dirname \"$l\")/$t\";;esac;i=$((i+1));done;" +
+            $"{echo} \"$l{AdbExplorerConst.ADB_FIELD_SEP}$EXTERNAL_STORAGE\"";
 
         var task = Task.Run(() =>
         {
             var result = ADBService.ExecuteDeviceAdbShellCommand(deviceId,
-                                                                "readlink",
+                                                                resolveScript,
                                                                 out string stdout,
                                                                 out string stderr,
-                                                                CancellationToken.None,
-                                                                "-fe",
-                                                                $"`{storage}`",
-                                                                ";", storage);
+                                                                CancellationToken.None);
 
             if (result == 0)
             {
-                var items = stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+                var items = stdout.TrimEnd('\r', '\n')
+                                  .Split(AdbExplorerConst.ADB_FIELD_SEP, StringSplitOptions.RemoveEmptyEntries);
+
                 if (items.Length == 2 && !string.IsNullOrEmpty(items[1]))
                 {
                     target = items[0].Trim();

@@ -34,7 +34,20 @@ public partial class FileViewModelBase : ObservableObject
     public string CreationTimeString => TabularDateFormatter.Format(_file.CreationTime, Data.Settings.ActualFormatCulture);
     public string LastAccessTimeString => TabularDateFormatter.Format(_file.LastAccessTime, Data.Settings.ActualFormatCulture);
 
-    public string SizeString => _file.IsDirectory ? "" : _file.Size?.BytesToSize(true);
+    public string SizeString
+    {
+        get
+        {
+            if (_file.IsDirectory)
+            {
+                return "";
+            }
+            else
+            {
+                return _file.ShellLsSize?.BytesToSize(true) ?? _file.Size?.BytesToSize(true);
+            }
+        }
+    }
 
     public string ShortExtension
     {
