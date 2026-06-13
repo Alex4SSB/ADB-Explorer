@@ -25,15 +25,11 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         _iconViewModel?.OnSizeChanged();
     }
 
-    public long? ShellLsSize
+    protected override void OnShellLsSizeChanged(long? value)
     {
-        get;
-        set
-        {
-            if (Set(ref field, value) && value > -1)
-                OnSizeChanged(value);
-        }
-    } = null;
+        if (value > -1)
+            App.SafeInvoke(() => OnSizeChanged(value));
+    }
 
     [ObservableProperty]
     public partial UnixFileMode? Permissions { get; set; }
@@ -370,23 +366,6 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             LastAccessTime = info?.AccessTime;
             CreationTime = info?.CreationTime;
             ModifiedTimeWithOffset = info?.ModifiedTime;
-        });
-    }
-
-    public void UpdateSizeFromShell(CancellationToken cancellationToken)
-    {
-        var res = ADBService.ExecuteDeviceAdbShellCommand(Data.DevicesObject.Current.ID, "stat", out string stdout, out _, cancellationToken, 
-            [ "-c", "%s", ADBService.EscapeAdbShellString(FullPath)]);
-
-        if (res != 0 || string.IsNullOrEmpty(stdout))
-        {
-            ShellLsSize = -1; // Indicate failure to retrieve size
-            return;
-        }
-
-        App.SafeInvoke(() =>
-        {
-            ShellLsSize = long.Parse(stdout);
         });
     }
 

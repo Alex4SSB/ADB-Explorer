@@ -14,6 +14,10 @@ public class FileSyncOperation : FileOperation
     public ObservableList<FileOpProgressInfo> ProgressUpdates;
 
     private readonly ConcurrentDictionary<string, long> lastReportedBytes = new();
+    private readonly ConcurrentDictionary<string, ulong> lastRawReceivedBytes = new();
+    private readonly ConcurrentDictionary<string, long> receivedBytesCarry = new();
+
+    private bool useSyncV2;
 
     public override SyncFile FilePath { get; }
 
@@ -86,6 +90,9 @@ public class FileSyncOperation : FileOperation
 
         ProgressUpdates = [];
         ProgressUpdates.CollectionChanged += ProgressUpdates_CollectionChanged;
+        lastReportedBytes.Clear();
+        lastRawReceivedBytes.Clear();
+        receivedBytesCarry.Clear();
 
         if (OperationName is OperationType.Push &&
             !File.Exists(FilePath.FullPath) && !Directory.Exists(FilePath.FullPath))
@@ -130,7 +137,7 @@ public class FileSyncOperation : FileOperation
             {
                 MaxDegreeOfParallelism = MaxThreads.Value
             };
-            bool useV2 = Device.AndroidVersion >= 11;
+            useSyncV2 = Device.SupportsSyncV2;
 
             Parallel.ForEach(Files.Where(f => !f.IsDirectory), options, (item) =>
             {
@@ -154,7 +161,7 @@ public class FileSyncOperation : FileOperation
                     {
                         // target = [Android parent folder]\[relative path from Windows parent folder to current item]
                         using var stream = new FileStream(item.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        service.Push(stream, targetPath, fileMode, lastWriteTime, SyncProgressCallback, useV2, in isCanceled);
+                        service.Push(stream, targetPath, fileMode, lastWriteTime, SyncProgressCallback, useSyncV2, in isCanceled);
                     }
                     catch (Exception e)
                     {
@@ -168,9 +175,12 @@ public class FileSyncOperation : FileOperation
 
                     try
                     {
+                        if (!useSyncV2)
+                            ResolvePullFileSize(item);
+
                         // target = [Windows parent folder]\[relative path from Android parent folder to current item]
                         using var stream = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.Read);
-                        service.Pull(item.FullPath, stream, SyncProgressCallback, useV2, in isCanceled);
+                        service.Pull(item.FullPath, stream, SyncProgressCallback, useSyncV2, in isCanceled);
 
                         if (item.DateModified is not null)
                             File.SetLastWriteTime(targetPath, item.DateModified.Value);
@@ -249,9 +259,10 @@ public class FileSyncOperation : FileOperation
 
     private void AddUpdates(SyncFile item, SyncProgressChangedEventArgs eventArgs, Mutex mutex)
     {
-        item.Size ??= (long)eventArgs.TotalBytesToReceive;
+        if (item.Size is null && useSyncV2 && eventArgs.TotalBytesToReceive > 0)
+            item.Size = (long)eventArgs.TotalBytesToReceive;
 
-        var currentBytes = (long)eventArgs.ReceivedBytesSize;
+        var currentBytes = CorrectReceivedBytes(item.FullPath, eventArgs.ReceivedBytesSize);
         var previousBytes = lastReportedBytes.GetOrAdd(item.FullPath, 0L);
         lastReportedBytes[item.FullPath] = currentBytes;
         var deltaBytes = currentBytes - previousBytes;
@@ -263,8 +274,12 @@ public class FileSyncOperation : FileOperation
                 SyncTransferTracker.AddPushBytes(deltaBytes);
         }
 
+        double? filePercentage = item.Size is > 0
+            ? Math.Min(100, currentBytes * 100.0 / item.Size.Value)
+            : null;
+
         mutex.WaitOne();
-        var progressInfo = new AdbSyncProgressInfo(item.FullPath, null, eventArgs.ProgressPercentage, currentBytes);
+        var progressInfo = new AdbSyncProgressInfo(item.FullPath, null, filePercentage, currentBytes);
 
         // Update the individual SyncFile's progress so that Files.Sum(f => f.BytesTransferred)
         // in ProgressUpdates_CollectionChanged returns the correct running total.
@@ -275,6 +290,35 @@ public class FileSyncOperation : FileOperation
         mutex.ReleaseMutex();
 
         TransferEnd = DateTime.Now;
+    }
+
+    private long CorrectReceivedBytes(string path, ulong rawReceived)
+    {
+        var lastRaw = lastRawReceivedBytes.GetOrAdd(path, 0);
+        var carry = receivedBytesCarry.GetOrAdd(path, 0L);
+
+        if (rawReceived < lastRaw)
+            receivedBytesCarry[path] = carry += 1L << 32;
+
+        lastRawReceivedBytes[path] = rawReceived;
+        return carry + (long)rawReceived;
+    }
+
+    private static void ResolvePullFileSize(SyncFile item)
+    {
+        if (item.ShellLsSize is > 0)
+        {
+            item.Size = item.ShellLsSize;
+            return;
+        }
+
+        var file = Data.DirList?.FileList?.FirstOrDefault(f => f.FullPath == item.FullPath)
+            ?? new FileClass(item);
+
+        file.UpdateSizeFromShell(CancellationToken.None);
+
+        if (file.ShellLsSize is > 0)
+            item.Size = item.ShellLsSize = file.ShellLsSize;
     }
 
     private void ProgressUpdates_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

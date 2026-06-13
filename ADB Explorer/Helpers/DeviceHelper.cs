@@ -701,8 +701,10 @@ public static class DeviceHelper
 
         // Run both ADB calls concurrently on background threads instead of blocking the UI thread.
         // Props (getprop) is needed by CombineDisplayNames (BrandName) and SetAndroidVersion.
+        // AdbFeatures is needed for sync/list size capability checks.
         // GetInternalStorage (readlink) is independent and updates the internal drive path.
         var propsTask = Task.Run(() => device.Props);
+        var featuresTask = Task.Run(() => device.AdbFeatures);
 
         internalDrive.UpdateInternalStorage(device.ID);
 
@@ -714,6 +716,7 @@ public static class DeviceHelper
         // CombineDisplayNames and DriveViewNav must run after Props so that
         // BrandName and CurrentDisplayNames are populated before breadcrumbs render.
         await propsTask;
+        await featuresTask;
 
         if (Data.DevicesObject.Current != device)
             return;

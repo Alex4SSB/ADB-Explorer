@@ -53,7 +53,8 @@ public class SyncFile : FilePath
     public SyncFile(FileClass fileClass, IEnumerable<FolderTree> tree = null)
         : base(fileClass.FullPath, fileClass.FullName, fileClass.Type)
     {
-        Size = fileClass.Size;
+        ShellLsSize = fileClass.ShellLsSize is > 0 ? fileClass.ShellLsSize : null;
+        Size = ShellLsSize ?? fileClass.Size;
         UnixTime = fileClass.ModifiedTime.ToUnixTime();
 
         if (tree is not null && IsDirectory)

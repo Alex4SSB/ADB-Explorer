@@ -368,7 +368,7 @@ public partial class ExplorerPageHeader : UserControl
             DetailsPane.SelectedFiles = FileActions.IsAppDrive ? SelectedPackages : SelectedFiles;
         }
 
-        if (DevicesObject.Current.AndroidVersion < 11)
+        if (!DevicesObject.Current.SupportsLsV2)
         {
             foreach (var file in SelectedFiles.Where(f => f.IsRegularFile && f.ShellLsSize is null))
             {

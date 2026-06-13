@@ -197,6 +197,19 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         }
     } = "";
 
+    public HashSet<string> AdbFeatures
+    {
+        get
+        {
+            field ??= ADBService.GetDeviceFeatures(DeviceData);
+            return field;
+        }
+    }
+
+    public bool SupportsSyncV2 => AdbFeatures.Contains(ADBService.FEATURE_SEND_RECV_V2);
+
+    public bool SupportsLsV2 => AdbFeatures.Contains(ADBService.FEATURE_LS_V2);
+
     #endregion
 
     public static implicit operator string(LogicalDeviceViewModel vm) => vm?.ID;

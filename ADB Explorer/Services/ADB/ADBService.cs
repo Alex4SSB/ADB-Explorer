@@ -2,6 +2,7 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
+using AdvancedSharpAdbClient;
 using AdvancedSharpAdbClient.Models;
 using static ADB_Explorer.Models.AbstractFile;
 using static ADB_Explorer.Models.AdbExplorerConst;
@@ -592,6 +593,26 @@ public partial class ADBService
     public const string HOST_NAME = "net.hostname";
     public const string QEMU_BOOT_AVD_NAME = "ro.boot.qemu.avd_name";
     public const string QEMU_KERNEL_AVD_NAME = "ro.kernel.qemu.avd_name";
+
+    public const string FEATURE_SEND_RECV_V2 = "sendrecv_v2";
+    public const string FEATURE_LS_V2 = "ls_v2";
+
+    public static HashSet<string> GetDeviceFeatures(DeviceData deviceData)
+    {
+        static IEnumerable<string> SplitTokens(IEnumerable<string> tokens) =>
+            tokens.SelectMany(t => t.Split([' ', '\t', '\n', '\r', ','], StringSplitOptions.RemoveEmptyEntries));
+
+        try
+        {
+            return [.. SplitTokens(new AdbClient().GetFeatureSet(deviceData))];
+        }
+        catch
+        {
+            return deviceData.Features?.Length > 0
+                ? [.. SplitTokens(deviceData.Features)]
+                : [];
+        }
+    }
 
     // First partition of MMC block device 0 / 1
     private static readonly string[] MMC_BLOCK_DEVICES = ["/dev/block/mmcblk0p1", "/dev/block/mmcblk1p1"];

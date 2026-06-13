@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
 using Vanara.Windows.Shell;
 
@@ -141,6 +142,41 @@ public class FilePath : AbstractFile, IBaseFile
     /// Returns an empty string if file has no extension.
     /// </summary>
     public virtual string Extension => FileHelper.GetExtension(FullName);
+
+    public long? ShellLsSize
+    {
+        get;
+        set
+        {
+            if (Set(ref field, value))
+                OnShellLsSizeChanged(value);
+        }
+    } = null;
+
+    protected virtual void OnShellLsSizeChanged(long? value) { }
+
+    public void UpdateSizeFromShell(CancellationToken cancellationToken)
+    {
+        if (PathType is not FilePathType.Android)
+            return;
+
+        var res = ADBService.ExecuteDeviceAdbShellCommand(Data.DevicesObject.Current.ID,
+                                                          "stat",
+                                                          out string stdout,
+                                                          out _,
+                                                          cancellationToken,
+                                                          "-c",
+                                                          "%s",
+                                                          ADBService.EscapeAdbShellString(FullPath));
+
+        if (res != 0 || string.IsNullOrEmpty(stdout))
+        {
+            ShellLsSize = -1;
+            return;
+        }
+
+        ShellLsSize = long.Parse(stdout);
+    }
 
     public FilePath(ShellItem windowsPath)
     {

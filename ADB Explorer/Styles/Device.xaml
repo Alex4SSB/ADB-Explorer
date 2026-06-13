@@ -295,13 +295,13 @@
     </DataTemplate>
     <helpers:DeviceTemplateSelector
         x:Key="DeviceTemplateSelector"
+        EmulatorPackageDeviceTemplate="{StaticResource EmulatorPackageDeviceTemplate}"
         HistoryDeviceTemplate="{StaticResource HistoryDeviceTemplate}"
         LogicalDeviceTemplate="{StaticResource LogicalDeviceTemplate}"
         MdnsDeviceTemplate="{StaticResource MdnsDeviceTemplate}"
         NewDeviceTemplate="{StaticResource NewDeviceTemplate}"
         ServiceDeviceTemplate="{StaticResource ServiceDeviceTemplate}"
-        WsaPkgDeviceTemplate="{StaticResource WsaPkgDeviceTemplate}"
-        EmulatorPackageDeviceTemplate="{StaticResource EmulatorPackageDeviceTemplate}" />
+        WsaPkgDeviceTemplate="{StaticResource WsaPkgDeviceTemplate}" />
     <Style
         x:Key="DeviceContainerStyle"
         BasedOn="{StaticResource StretchListViewItem}"
