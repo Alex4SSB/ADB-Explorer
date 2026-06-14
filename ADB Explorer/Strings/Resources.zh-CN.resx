@@ -1633,4 +1633,11 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
     <value>未找到 Android SDK 模拟器。安装 Android SDK 模拟器包或设置 ANDROID_SDK_ROOT。</value>
   </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>隐私政策已更新</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>此应用版本在隐私政策更新后发布。
+在 GitHub 上查看更改。</value>
+  </data>
 </root>
