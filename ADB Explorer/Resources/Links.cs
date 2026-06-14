@@ -10,6 +10,8 @@ public static class Links
     public static readonly Uri L_CC_LIC = new("https://creativecommons.org/licenses/by-sa/3.0/");
     public static readonly Uri L_APACHE_LIC = new("https://www.apache.org/licenses/LICENSE-2.0");
     public static readonly Uri REPO_RELEASES_URL = new("https://api.github.com/repos/Alex4SSB/ADB-Explorer/releases");
+    public static readonly Uri REPO_PRIVACY_COMMITS_URL = new("https://api.github.com/repos/Alex4SSB/ADB-Explorer/commits?path=Privacy.md&per_page=1");
+    public static Uri RepoReleaseByTagUrl(string version) => new($"https://api.github.com/repos/Alex4SSB/ADB-Explorer/releases/tags/v{version}");
     public static readonly Uri WPF_UI = new("https://github.com/lepoco/wpfui");
     public static readonly Uri ICONS8 = new("https://icons8.com");
     public static readonly Uri ADB_EXPLORER_PRIVACY = new("https://github.com/Alex4SSB/ADB-Explorer/blob/master/Privacy.md");

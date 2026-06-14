@@ -294,6 +294,12 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
 
     public string LastVersion { get; set; } = "0.0.0";
 
+    public string? PrivacyCheckAppVersion { get; set; }
+
+    public DateTime? PendingPrivacyUpdate { get; set; }
+
+    public DateTime? LastAcknowledgedPrivacyUpdate { get; set; }
+
     [ObservableProperty]
     public partial bool ShowLaunchWsaMessage { get; set; } = true;
     

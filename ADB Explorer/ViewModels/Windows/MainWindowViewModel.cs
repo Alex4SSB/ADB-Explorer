@@ -160,7 +160,10 @@ public partial class MainWindowViewModel : ObservableObject
             });
         }
 
-        if (new Version(Properties.AppGlobal.AppVersion) > new Version(Data.Settings.LastVersion))
+        var appVersion = Properties.AppGlobal.AppVersion;
+        var isUpgrade = new Version(appVersion) > new Version(Data.Settings.LastVersion);
+
+        if (isUpgrade)
         {
             App.SafeInvoke(() =>
             {
@@ -173,10 +176,56 @@ public partial class MainWindowViewModel : ObservableObject
                         cancelText: Strings.Resources.S_BUTTON_CLOSE);
 
                     if (res.Item1 is ContentDialogResult.Primary)
-                        Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{Properties.AppGlobal.AppVersion}\"");
+                        Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{appVersion}\"");
 
-                    Data.Settings.LastVersion = Properties.AppGlobal.AppVersion;
+                    Data.Settings.LastVersion = appVersion;
                 }, Strings.Resources.S_NEW_VERSION_TITLE,
+                Notifications));
+            });
+
+            if (Data.Settings.PrivacyCheckAppVersion != appVersion)
+            {
+                var privacyUpdatedTask = Network.GetPrivacyPolicyLastUpdatedAsync();
+                var appVersionReleaseTask = Network.GetReleasePublishedDateAsync(appVersion);
+                await Task.WhenAll(privacyUpdatedTask, appVersionReleaseTask);
+
+                var privacyUpdated = await privacyUpdatedTask;
+                var appVersionRelease = await appVersionReleaseTask;
+
+                if (privacyUpdated is not null && appVersionRelease is not null)
+                {
+                    Data.Settings.PrivacyCheckAppVersion = appVersion;
+
+                    if (appVersionRelease > privacyUpdated
+                        && (Data.Settings.LastAcknowledgedPrivacyUpdate is null || privacyUpdated > Data.Settings.LastAcknowledgedPrivacyUpdate))
+                    {
+                        Data.Settings.PendingPrivacyUpdate = privacyUpdated;
+                    }
+                }
+            }
+        }
+
+        if (Data.Settings.PendingPrivacyUpdate is not null)
+        {
+            var pendingPrivacyUpdate = Data.Settings.PendingPrivacyUpdate.Value;
+
+            App.SafeInvoke(() =>
+            {
+                Notifications.Add(new(async () =>
+                {
+                    var res = await DialogService.ShowConfirmation(
+                        Strings.Resources.S_PRIVACY_UPDATE_MSG,
+                        Strings.Resources.S_PRIVACY_UPDATE_TITLE,
+                        Strings.Resources.S_PRIVACY_POLICY,
+                        cancelText: Strings.Resources.S_BUTTON_CLOSE,
+                        icon: DialogService.DialogIcon.Informational);
+
+                    if (res.Item1 is ContentDialogResult.Primary)
+                        Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"{Links.ADB_EXPLORER_PRIVACY}\"");
+
+                    Data.Settings.LastAcknowledgedPrivacyUpdate = pendingPrivacyUpdate;
+                    Data.Settings.PendingPrivacyUpdate = null;
+                }, Strings.Resources.S_PRIVACY_UPDATE_TITLE,
                 Notifications));
             });
         }

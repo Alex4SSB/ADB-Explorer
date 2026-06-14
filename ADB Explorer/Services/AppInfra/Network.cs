@@ -92,6 +92,46 @@ public static class Network
         return null;
     }
 
+    public static async Task<DateTime?> GetPrivacyPolicyLastUpdatedAsync()
+    {
+        var response = await GetRequestAsync(Resources.Links.REPO_PRIVACY_COMMITS_URL).ConfigureAwait(false);
+        if (response is null)
+            return null;
+
+        try
+        {
+            JArray json = (JArray)JsonConvert.DeserializeObject(response)!;
+            if (!json.HasValues)
+                return null;
+
+            return json[0]["commit"]?["committer"]?["date"]?.ToObject<DateTime>();
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public static async Task<DateTime?> GetReleasePublishedDateAsync(string version)
+    {
+        if (string.IsNullOrEmpty(version) || version == "0.0.0")
+            return null;
+
+        var response = await GetRequestAsync(Resources.Links.RepoReleaseByTagUrl(version)).ConfigureAwait(false);
+        if (response is null)
+            return null;
+
+        try
+        {
+            JObject json = (JObject)JsonConvert.DeserializeObject(response)!;
+            return json["published_at"]?.ToObject<DateTime>();
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     public static string GetWsaIp()
     {
         var wsaInterface = NetworkInterface.GetAllNetworkInterfaces().Where(net => net.Name.Contains(AdbExplorerConst.WSA_INTERFACE_NAME));

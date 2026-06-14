@@ -3034,7 +3034,26 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_PRIVACY_POLICY", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to This app version was released after a privacy policy update.
+        ///Review the changes on GitHub..
+        /// </summary>
+        public static string S_PRIVACY_UPDATE_MSG {
+            get {
+                return ResourceManager.GetString("S_PRIVACY_UPDATE_MSG", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Privacy Policy Updated.
+        /// </summary>
+        public static string S_PRIVACY_UPDATE_TITLE {
+            get {
+                return ResourceManager.GetString("S_PRIVACY_UPDATE_TITLE", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Pull.
         /// </summary>

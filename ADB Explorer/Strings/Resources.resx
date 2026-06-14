@@ -329,6 +329,15 @@ To approve ADB, open WSA advanced settings.</value>
   <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
     <value>Go To Release Notes</value>
   </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Privacy Policy Updated</value>
+    <comment>The title of the notification message about an updated privacy policy</comment>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>This app version was released after a privacy policy update.
+Review the changes on GitHub.</value>
+    <comment>The content of the privacy policy update notification message</comment>
+  </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
     <value>ADB Executable</value>
   </data>
