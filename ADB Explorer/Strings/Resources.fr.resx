@@ -1044,13 +1044,13 @@ Annuler tout en cours</value>
     <value>Un fichier sélectionné viole les règles de dénomination racine du lecteur Windows</value>
   </data>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
-    <value>Certains fichiers sélectionnés ont des noms conflictuels sur FUSE / Windows</value>
+    <value>Certains fichiers sélectionnés ont des noms conflictuels ne respectant pas la case</value>
   </data>
   <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
     <value>Un fichier sélectionné viole les règles de nommage FUSE</value>
   </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
-    <value>Certains fichiers copiés ont des noms conflictuels sur FUSE</value>
+    <value>Certains fichiers copiés ont des noms conflictuels ne respectant pas la case</value>
   </data>
   <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
     <value>Un fichier copié viole les règles de nommage FUSE</value>
@@ -1590,5 +1590,47 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   </data>
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>Apairer</value>
+  </data>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Limites de disque :</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• Les liens symboliques ne sont pas pris en charge
+• Les noms de fichiers ne peuvent contenir " * / :  ? \ |
+• Les noms de fichiers ne tiennent pas compte de la case
+• L’installation d'APK n’est pas prise en charge</value>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Afficher le rapport de plantage</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Signaler un plantage</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>Après un plantage, vous pouvez de manière optionnelle envoyer un rapport de diagnostic pour nous aider à le corriger. Les rapports ne sont envoyés que lorsque vous cliquez sur Envoyer le rapport et comprennent habituellement le message d'exception, la trace de pile, la version de l'application et celle de Windows, et la page qui a été ouverte. Les données sont traitées par Grafana Labs (Grafana Cloud). Voir le lien de politique de confidentialité ci-dessus.</value>
+  </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Se conformer aux règles utilisateur de nommage</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Un fichier sélectionné ne respecte pas les règles de nommage utilisateur</value>
+  </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Un fichier copié viole les règles de nommage utilisateur</value>
+  </data>
+  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
+    <value>Découvrez les émulateurs Android</value>
+  </data>
+  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
+    <value>Lancer cet émulateur</value>
+  </data>
+  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
+    <value>Lancement de l'émulateur</value>
+  </data>
+  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
+    <value>L'émulateur SDK Android n'a pas été trouvé. Installez le paquet d'émulateur SDK Android ou défininissez ANDROID_SDK_ROOT.</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• Système de fichier en lecture seule</value>
   </data>
 </root>
