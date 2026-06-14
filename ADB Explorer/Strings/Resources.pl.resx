@@ -1044,13 +1044,13 @@ Anuluj wszystkie uruchomione</value>
     <value>Wybrany plik narusza reguły nazewnictwa dysków głównych systemu Windows</value>
   </data>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
-    <value>Niektóre wybrane pliki mają sprzeczne nazwy w systemie FUSE/Windows</value>
+    <value>Niektóre wybrane pliki mają nazwy, w których występują sprzeczności związane z wielkością liter</value>
   </data>
   <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
     <value>Wybrany plik narusza zasady nazewnictwa FUSE</value>
   </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
-    <value>Niektóre skopiowane pliki mają sprzeczne nazwy w systemie FUSE</value>
+    <value>Niektóre skopiowane pliki mają nazwy, w których występują sprzeczności związane z wielkością liter</value>
   </data>
   <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
     <value>Skopiowany plik narusza zasady nazewnictwa FUSE</value>
@@ -1611,5 +1611,26 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   </data>
   <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
     <value>Nie znaleziono emulatora Android SDK. Zainstaluj pakiet emulatora Android SDK lub ustaw zmienną ANDROID_SDK_ROOT.</value>
+  </data>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Ograniczenia dotyczące dysku:</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• System plików tylko do odczytu</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• Dowiązania symboliczne nie są obsługiwane
+• Nazwy plików nie mogą zawierać znaków "* / : &lt; &gt; ? \ |
+• W nazwach plików nie rozróżnia się wielkości liter
+• Instalacja plików APK nie jest obsługiwana</value>
+  </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Zgodne z zasadami nazewnictwa przestrzeni użytkownika</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Wybrany plik narusza zasady nazewnictwa w przestrzeni użytkownika</value>
+  </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Skopiowany plik narusza zasady nazewnictwa w przestrzeni użytkownika</value>
   </data>
 </root>
