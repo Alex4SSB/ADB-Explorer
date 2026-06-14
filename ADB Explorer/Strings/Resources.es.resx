@@ -1035,13 +1035,13 @@ Cancelar Todas las Activas</value>
     <value>Un archivo seleccionado viola las reglas de nombrado de unidad raíz de Windows</value>
   </data>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
-    <value>Algunos archivos seleccionados tienen conflicto con nombres en FUSE / Windows</value>
+    <value>Algunos archivos seleccionados tienen conflicto con nombres sin distinción de capitalinas</value>
   </data>
   <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
     <value>Un archivo seleccionado viola las reglas de nombrado FUSE</value>
   </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
-    <value>Algunos archivos copiados tienen un conflicto con los nombres en FUSE</value>
+    <value>Algunos archivos copiados tienen un conflicto con los nombres sin distinción de capitalinas</value>
   </data>
   <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
     <value>Un archivo copiado viola las reglas de nombrado de FUSE</value>
@@ -1599,5 +1599,38 @@ Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
   </data>
   <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
     <value>Después de un cuelgue, puede enviar un informe de diagnóstico opcional para ayudarnos a solucionarlo. Los informes se envían sólo cuando pulse en Enviar Informe y generalmente incluyen el mensaje de excepción, la traza de pila, la aplicación y la versión de Windows, y la página que estaba abierta. Los datos son procesados por Grafana Labs (Grafana Cloud). Consulte el enlace de Política de Privacidad arriba.</value>
+  </data>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Restricciones de unidad:</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• Solo lectura para sistema de archivos</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• No se admiten enlaces simbólicos
+• Los nombres de los archivos no pueden contener " * / : &lt; &gt; ? \ |
+• Los nombres de archivos son insensibles a capitalinas
+• No se admite la instalación de APK</value>
+  </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Adheridos a reglas de nombres de espacio de usuario</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Un archivo seleccionado viola reglas de nombres de espacio de usuario</value>
+  </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Un archivo copiado viola las reglas del nombre del espacio de usuario</value>
+  </data>
+  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
+    <value>Descubre Emuladores de Androide</value>
+  </data>
+  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
+    <value>Lanza este emulador</value>
+  </data>
+  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
+    <value>Lanzar Emulador</value>
+  </data>
+  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
+    <value>Emulador del SDK de Android no fue encontrado. Instala el paquete emulador SDK de Android o establezca ANDROID_SDK_ROOT.</value>
   </data>
 </root>
