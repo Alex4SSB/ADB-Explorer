@@ -1633,4 +1633,11 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
     <value>אנדרואיד SDK לא נמצא. התקן את חבילת הסימולטור של Android SDK או הגדר ANDROID_SDK_ROOT.</value>
   </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>מדיניות הפרטיות עודכנה</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>גרסה זו שוחררה לאחר עדכון מדיניות הפרטיות.
+נא לעיין בשינויים ב GitHub.</value>
+  </data>
 </root>
