@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -117,4 +117,1511 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>ஆண்ட்ராய்டு ரோபோ ஐகான்(கள்)</value>
+  </data>
+  <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
+    <value>ஆண்ட்ராய்டு ரோபோ, Google ஆல் உருவாக்கப்பட்ட மற்றும் பகிர்ந்த பணியிலிருந்து மீண்டும் உருவாக்கப்படுகிறது அல்லது மாற்றியமைக்கப்படுகிறது மற்றும் கிரியேட்டிவ் காமன்ச் 3.0 பண்புக்கூறு உரிமத்தில் விவரிக்கப்பட்டுள்ள விதிமுறைகளின்படி பயன்படுத்தப்படுகிறது.</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>APK படவுரு Apache உரிமம், பதிப்பு 2.0 இன் கீழ் உரிமம் பெற்றது.</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>வழங்கப்பட்ட பாதையிலிருந்து ADB பதிப்பைப் பெற முடியவில்லை.</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>வழங்கப்பட்ட பாதையிலிருந்து ADB பதிப்பு மிகவும் குறைவாக உள்ளது.</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>ADB இயங்கக்கூடியதைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>பயன்பாட்டு அமைப்புகளை மீட்டமைக்கவும்</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>புதிய ஆப் பதிப்பு</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>வழிசெலுத்தல் பிழை</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>தொகுப்பின் பெயரை நகலெடுக்கவும்</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>பொருள் பாதையை நகலெடு</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>அனைத்து பொருட்களையும் மீட்டெடுக்கவும்</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>வெறுமை மறுசுழற்சி தொட்டி</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>நீக்கு</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>இலக்கு பாதை பிழை</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>இணைக்க முடியவில்லை</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>இணைப்புப் பிழை</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>துண்டிப்பு பிழை</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>இணைத்தல் பிழை</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>தேர்ந்தெடுக்கப்பட்ட சாதனத்தில் ரூட் அணுகலை இயக்க முடியாது.</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>ரூட் அணுகல்</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>நீக்குவதை உறுதிப்படுத்தவும்</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>நிரந்தரமாக நீக்கு</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>பிழையை உருவாக்கு</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>மோதல்களை மீட்டெடுக்கவும்</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>நிறுவல் நீக்குவதை உறுதிப்படுத்தவும்</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>நிறுவுவதற்கு தொகுப்புகளைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>கில் எமுலேட்டர்</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>சாதனத்தை அகற்று</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>சாதனத்தைத் துண்டிக்கவும்</value>
+  </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>கோப்பு செயல்பாடுகள்</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>தொகுப்புகளை நிறுவவும்</value>
+  </data>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>வைஃபை சாதனத்தை இணைக்கவும் மற்றும்/அல்லது இணைக்கவும் (mDNS ஐப் பயன்படுத்தாமல்)</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>மாற்றங்கள் நடைமுறைக்கு வர, பயன்பாட்டை மறுதொடக்கம் செய்யவும்</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>கோப்பைப் படிப்பதில் பிழை</value>
+  </data>
+  <data name="S_READ_FILE_ERROR" xml:space="preserve">
+    <value>அதைப் படிக்க கோப்பை இழுக்க முடியவில்லை.</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>கோப்பு எழுதுவதில் பிழை</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>கோப்பை மீண்டும் சாதனத்திற்குத் தள்ள முடியவில்லை.</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>mDNS ஐ முடக்க, ADB சேவையகத்தை மறுதொடக்கம் செய்ய வேண்டும்.</value>
+  </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>mDNS ஐ முடக்கு</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>பின்னணியில் WSA ஐ இயக்கவும்</value>
+  </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>இழு</value>
+  </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>இழு (இணைப்பு இலக்கு)</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>மீட்டமை</value>
+  </data>
+  <data name="S_LS_ERROR_TITLE" xml:space="preserve">
+    <value>பட்டியல் கோப்பகப் பிழை</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>சாளரங்கள் இயக்கி ரூட்டிற்கு இழுக்கவும்</value>
+  </data>
+  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
+    <value>புதிய ADB Explorer பதிப்பிற்கு வரவேற்கிறோம்! 
+வெளியீட்டு குறிப்புகள் GitHub இல் கிடைக்கின்றன.</value>
+  </data>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>இயக்கி கட்டுப்பாடுகள்:</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• படிக்க-மட்டும் கோப்பு முறைமை</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• குறியீட்டு இணைப்புகள் ஆதரிக்கப்படவில்லை 
+• கோப்பு பெயர்களில் " * / : &lt; &gt; ? \ | இருக்கக்கூடாது 
+• கோப்புப் பெயர்கள் உணர்ச்சியற்றவை 
+• APKகளை நிறுவுவது ஆதரிக்கப்படவில்லை</value>
+  </data>
+  <data name="S_RESET_SETTINGS" xml:space="preserve">
+    <value>பயன்பாட்டை மூடியதும் அனைத்து ஆப்ச் அமைப்புகளும் மீட்டமைக்கப்படும். 
+இதை செயல்தவிர்க்க முடியாது. நீங்கள் உறுதியாக இருக்கிறீர்களா?</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>ADB ஏற்கனவே WSA இல் அங்கீகரிக்கப்பட்டிருந்தால், தொடங்கு என்பதைத் தேர்ந்தெடுக்கவும். 
+ADBஐ அங்கீகரிக்க, WSA மேம்பட்ட அமைப்புகளைத் திறக்கவும்.</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
+    <value>தேர்ந்தெடுக்கப்பட்ட கோப்புகளில் {0}ஐ சாளரங்கள் இயக்கி ரூட்டின் கீழ் உருவாக்க முடியாது.</value>
+  </data>
+  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
+    <value>ADB பற்றி மேலும் அறிக</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>ADB ஐப் பதிவிறக்கவும்</value>
+  </data>
+  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
+    <value>ADB ஐக் கண்டறிக (v{0} குறைந்தது):</value>
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value>மாற்றம்</value>
+  </data>
+  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
+    <value>ADB பாதையைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value>தொடரவும்</value>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>மேலும் செய்தி</value>
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value>இயக்கப்பட்டது</value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value>முடக்கப்பட்டது</value>
+  </data>
+  <data name="S_NEW_VERSION" xml:space="preserve">
+    <value>புதிய {0}, பதிப்பு {1} கிடைக்கிறது</value>
+  </data>
+  <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
+    <value>பதிப்புப் பக்கத்திற்குச் செல்லவும்</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>மூடு</value>
+  </data>
+  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
+    <value>வெளியீட்டுக் குறிப்புகளுக்குச் செல்லவும்</value>
+  </data>
+  <data name="S_ADB_EXECUTABLE" xml:space="preserve">
+    <value>ADB செயல்படுத்தக்கூடியது</value>
+  </data>
+  <data name="S_HELP_ON_ADB" xml:space="preserve">
+    <value>இந்த ஆப்ச் ADBக்கான இடைமுகம் - ஆண்ட்ராய்டு Debug Bridge. 
+பயன்பாட்டைப் பயன்படுத்த, உங்கள் கணினியில் ADB இருக்க வேண்டும். 
+ADB ஆனது ஆண்ட்ராய்டு SDK இயங்குதளக் கருவிகளின் ஒரு பகுதியாகக் கிடைக்கிறது. 
+SDK இயங்குதளக் கருவிகளைப் பதிவிறக்க, வழங்கப்பட்ட இணைப்பைப் பயன்படுத்தலாம். 
+எதிர்பாராதவிதமாக, உரிமக் கட்டுப்பாடுகள் காரணமாக எங்களால் ADB க்கு பயன்பாட்டை வழங்க முடியாது.</value>
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value>ADB இல் உதவி</value>
+  </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value>இப்போது ADB ஐ மீண்டும் தொடங்கவும்</value>
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value>பின்னர் மறுதொடக்கம் செய்யுங்கள்</value>
+  </data>
+  <data name="S_ITEM_DESTINATION" xml:space="preserve">
+    <value>{0}க்கான இலக்கைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
+    <value>பல உருப்படிகளுக்கான இலக்கைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
+    <value>பின்வருபவை நீக்கப்படும்: 
+{0}</value>
+  </data>
+  <data name="S_DELETE_PERMANENT" xml:space="preserve">
+    <value>பின்வருபவை நிரந்தரமாக நீக்கப்படும்: 
+{0}</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>புதிய கோப்பு</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>புதிய கோப்புறை</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>கிரியேட்டிவ் காமன்ச்</value>
+  </data>
+  <data name="S_LS_ERROR" xml:space="preserve">
+    <value>இந்தக் கோப்புறையின் உள்ளடக்கங்களை பட்டியலிட முயற்சிக்கும்போது பிழை ஏற்பட்டது. 
+காணக்கூடிய உள்ளடக்கம் முழுமையடையாமல் இருக்கலாம்.</value>
+  </data>
+  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
+    <value>{0} இலக்கு கோப்புறையின் மூதாதையர்.</value>
+  </data>
+  <data name="S_KILL_EMULATOR" xml:space="preserve">
+    <value>இந்த எமுலேட்டரை நிச்சயமாகக் கொல்ல விரும்புகிறீர்களா?</value>
+  </data>
+  <data name="S_REM_DEVICE" xml:space="preserve">
+    <value>இந்தச் சாதனத்தை நிச்சயமாக அகற்ற விரும்புகிறீர்களா?</value>
+  </data>
+  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
+    <value>அகற்று {0}</value>
+  </data>
+  <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
+    <value>கொல்லு {0}</value>
+  </data>
+  <data name="S_REM_APK" xml:space="preserve">
+    <value>பின்வருபவை அகற்றப்படும்: 
+{0}</value>
+  </data>
+  <data name="S_REM_APK_PLURAL" xml:space="preserve">
+    <value>பின்வருபவை அகற்றப்படும்: 
+{0} தொகுப்புகள்</value>
+  </data>
+  <data name="S_UNINSTALL" xml:space="preserve">
+    <value>நிறுவல் நீக்கவும்</value>
+  </data>
+  <data name="S_CANCEL" xml:space="preserve">
+    <value>ரத்துசெய்</value>
+  </data>
+  <data name="S_CONFIRM" xml:space="preserve">
+    <value>உறுதிப்படுத்தவும்</value>
+  </data>
+  <data name="S_SKIP" xml:space="preserve">
+    <value>தவிர்</value>
+  </data>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value>மாற்றவும்</value>
+  </data>
+  <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
+    <value>ஒன்றிணைக்கவும் அல்லது மாற்றவும்</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
+    <value>1 முரண்பாடான உருப்படி உள்ளது</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
+    <value>{0} இல் 1 முரண்பாடான உருப்படி உள்ளது</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
+    <value>{0} முரண்பட்ட உருப்படிகள் உள்ளன</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
+    <value>{1} இல் {0} முரண்பட்ட உருப்படிகள் உள்ளன</value>
+  </data>
+  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
+    <value>முரண்பாடுகளை ஒட்டவும்</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
+    <value>தள்ளுவதற்கு கோப்புறைகளைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
+    <value>{0} இல் தள்ள கோப்புறைகளைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
+    <value>தள்ள கோப்புகளைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
+    <value>{0} இல் தள்ள கோப்புகளைத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="S_BUTTON_CLEAR" xml:space="preserve">
+    <value>தெளிவு</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
+    <value>mDNS</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
+    <value>சாதனங்களுக்கான வாக்கெடுப்பு</value>
+  </data>
+  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
+    <value>பேட்டரி நிலைக்கான வாக்கெடுப்பு</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
+    <value>தானாக ரூட்டை இயக்கவும்</value>
+  </data>
+  <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
+    <value>கைமுறையாக இணைக்கப்பட்ட சாதனங்களைச் சேமிக்கவும்</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
+    <value>உலாவலுக்காக தானாகத் திறக்கவும்</value>
+  </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value>புச்/புல் ஆன் வாக்கெடுப்பை நிறுத்துங்கள்</value>
+  </data>
+  <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
+    <value>ஒரே நேரத்தில் செயல்பாடுகள்</value>
+  </data>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value>புச் ஆன் ஃபோர்ச் மீடியா ரீச்கேன்</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
+    <value>டிரைவ்களுக்கான வாக்குப்பதிவு</value>
+  </data>
+  <data name="S_SETTINGS_APK" xml:space="preserve">
+    <value>APK உதவி</value>
+  </data>
+  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
+    <value>கோப்பு பெயர் நீட்டிப்புகளைக் காட்டு</value>
+  </data>
+  <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
+    <value>மறைக்கப்பட்ட பொருட்களைக் காட்டு</value>
+  </data>
+  <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
+    <value>கணினி பயன்பாடுகளைக் காட்டு</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
+    <value>கோப்பை இருமுறை சொடுக்கு செய்யவும்</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
+    <value>எதுவுமில்லை</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
+    <value>இயல்புநிலை கோப்புறைக்கு இழுக்கவும்</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
+    <value>எடிட்டரில் திற</value>
+  </data>
+  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
+    <value>ADB பாதையை மேலெழுதவும்</value>
+  </data>
+  <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
+    <value>இயல்புநிலை கோப்புறை</value>
+  </data>
+  <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
+    <value>ஒளி</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
+    <value>இருள்</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
+    <value>சாளரங்கள் இயல்புநிலை</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
+    <value>கருப்பொருள்</value>
+  </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>தனிப்பயன் உச்சரிப்பு நிறம்</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>உச்சரிப்பு நிறம்</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>ஒரு வண்ணத்தைத் தேர்ந்தெடுங்கள்</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
+    <value>வன்பொருள் முடுக்கத்தை முடக்கு</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES" xml:space="preserve">
+    <value>புதுப்பிப்புகளை சரிபார்க்கவும்</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
+    <value>கிராபிக்ச்</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
+    <value>வேலை செய்யும் கோப்பகங்கள்</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
+    <value>எக்ச்ப்ளோரர்</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
+    <value>இயக்கிகள் மற்றும் நற்பொருத்தங்கள்</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
+    <value>சாதனம்</value>
+  </data>
+  <data name="S_DONATE" xml:space="preserve">
+    <value>நன்கொடை அல்லது ஒப்புரவாளர்</value>
+  </data>
+  <data name="S_APP_DATA_FOLDER" xml:space="preserve">
+    <value>பயன்பாட்டு தரவு கோப்புறை</value>
+  </data>
+  <data name="S_GITHUB_REPO" xml:space="preserve">
+    <value>அறிவிலிவேள்வி களஞ்சியம்</value>
+  </data>
+  <data name="S_PRIVACY_POLICY" xml:space="preserve">
+    <value>தனியுரிமைக் கொள்கை</value>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>செயலிழப்பு அறிக்கை உரையாடலைக் காட்டு</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>செயலிழப்பு அறிக்கை</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>செயலிழந்த பிறகு, அதைச் சரிசெய்ய எங்களுக்கு உதவ, நீங்கள் விருப்பமாக ஒரு கண்டறியும் அறிக்கையை அனுப்பலாம். அறிக்கையை அனுப்பு என்பதைக் சொடுக்கு செய்து, வழக்கமாக விதிவிலக்கு செய்தி, அடுக்கு ட்ரேச், ஆப்ச் மற்றும் சாளரங்கள் பதிப்பு மற்றும் திறந்திருக்கும் பக்கம் ஆகியவற்றை உள்ளடக்கிய போது மட்டுமே அறிக்கைகள் அனுப்பப்படும். கிராஃபானா லேப்ச் (கிராஃபானா கிளவுட்) மூலம் தரவு செயலாக்கப்படுகிறது. மேலே உள்ள தனியுரிமைக் கொள்கை இணைப்பைப் பார்க்கவும்.</value>
+  </data>
+  <data name="S_ATTRIBUTIONS" xml:space="preserve">
+    <value>பண்புக்கூறுகள் &amp; மூன்றாம் தரப்பு உரிமங்கள்</value>
+  </data>
+  <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
+    <value>[அமைக்கப்படவில்லை]</value>
+  </data>
+  <data name="S_SEARCH_SETTINGS" xml:space="preserve">
+    <value>தேடல் அமைப்புகள்</value>
+  </data>
+  <data name="S_EXIT_SEARCH" xml:space="preserve">
+    <value>தேடலில் இருந்து வெளியேறு</value>
+  </data>
+  <data name="S_SEARCH_VIEW" xml:space="preserve">
+    <value>தேடல் பார்வை</value>
+  </data>
+  <data name="S_COLLAPSE_ALL" xml:space="preserve">
+    <value>அனைத்தையும் சுருக்கு</value>
+  </data>
+  <data name="S_EXPAND_ALL" xml:space="preserve">
+    <value>அனைத்தையும் விரிவாக்கு</value>
+  </data>
+  <data name="S_SETTINGS_TITLE" xml:space="preserve">
+    <value>அமைப்புகள்</value>
+  </data>
+  <data name="S_ACTION_HIDE" xml:space="preserve">
+    <value>மறை</value>
+  </data>
+  <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
+    <value>மொழி</value>
+  </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>சரி</value>
+  </data>
+  <data name="S_FILTER_FILE_OPS" xml:space="preserve">
+    <value>கோப்பு செயல்பாடுகளை வடிகட்டி</value>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>ஆட்டோ ப்ளேவை இயக்கு</value>
+  </data>
+  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
+    <value>ஆட்டோ ப்ளேவை முடக்கு 
+அனைத்து இயக்கத்தையும் நீக்கறல்</value>
+  </data>
+  <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
+    <value>பதிவு புதுப்பிப்புகள் இடைநிறுத்தப்பட்டுள்ளன</value>
+  </data>
+  <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
+    <value>பதிவு புதுப்பிப்புகளை இடைநிறுத்தவும்</value>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>கட்டளை பதிவு</value>
+  </data>
+  <data name="S_BUTTON_DRIVES" xml:space="preserve">
+    <value>சாதன இயக்கிகள்</value>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value>பின்</value>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value>முன்னோக்கி</value>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>மேலே</value>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>வடிப்பி</value>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>சாதனங்கள்</value>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>தள்ளு</value>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>கோப்புறைகள்</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>கோப்புகள்</value>
+  </data>
+  <data name="S_MENU_REFRESH" xml:space="preserve">
+    <value>புதுப்பிப்பு</value>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>நகலெடு</value>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>மேலும்</value>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>தொகு</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>புதிய</value>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value>கோப்புறை</value>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value>கோப்பு</value>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value>அனைத்தையும் தெரிவுசெய்</value>
+  </data>
+  <data name="S_MENU_CUT" xml:space="preserve">
+    <value>வெட்டு</value>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value>இணைப்பை ஒட்டவும்</value>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value>மறுபெயரிடவும்</value>
+  </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value>தொகுப்பு</value>
+  </data>
+  <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
+    <value>புதுப்பிப்பு நேரம் மாற்றப்பட்டது</value>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>மாற்றங்களைச் சேமிக்கவும்</value>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>நிறுவவும்</value>
+  </data>
+  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
+    <value>தற்காலிகமாக நகலெடுக்கவும்</value>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>கட்டளை பதிவை அழிக்கவும்</value>
+  </data>
+  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
+    <value>உருப்படி இருப்பிடத்தைத் திறக்கவும்</value>
+  </data>
+  <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
+    <value>உலாவியில் தேடவும்</value>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value>இடைநிலைப்பலகைக்கு நகலெடுக்கவும்</value>
+  </data>
+  <data name="S_ADB_DISK_USAGE" xml:space="preserve">
+    <value>ADB வட்டு பயன்பாடு</value>
+  </data>
+  <data name="S_DISK_USAGE_READ" xml:space="preserve">
+    <value>படிக்க: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
+    <value>எழுது: {0}</value>
+  </data>
+  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
+    <value>ஒவ்வொரு வெளியீட்டின் புதுப்பிப்புகளையும் சரிபார்க்கிறது</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
+    <value>பற்றி</value>
+  </data>
+  <data name="S_BROWSER_ITEMS" xml:space="preserve">
+    <value>பொருள்</value>
+  </data>
+  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
+    <value>பொருட்கள்</value>
+  </data>
+  <data name="S_FOLDER_EMPTY" xml:space="preserve">
+    <value>இந்தக் கோப்புறை காலியாக உள்ளது.</value>
+  </data>
+  <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
+    <value>பட்டியலைப் பெற முடியவில்லை.</value>
+  </data>
+  <data name="S_EMPTY_FILTER" xml:space="preserve">
+    <value>தற்போதைய வடிப்பானுடன் எந்த உருப்படிகளும் பொருந்தவில்லை.</value>
+  </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value>&lt;Span&gt;இந்தக் கோப்புறை &lt;Italic&gt;தோன்றுகிறது&lt;/Italic&gt;&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… நிர்வாணக் கண்ணுக்கு&lt;/Span&gt;&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ITEMS_SELECTED" xml:space="preserve">
+    <value>உருப்படி தேர்ந்தெடுக்கப்பட்டது</value>
+  </data>
+  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
+    <value>தேர்ந்தெடுக்கப்பட்ட பொருட்கள்</value>
+  </data>
+  <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
+    <value>செயல்பாட்டு வகை</value>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>கோப்பு பெயர்</value>
+  </data>
+  <data name="S_COLUMN_PROGRESS" xml:space="preserve">
+    <value>முன்னேற்றம்</value>
+  </data>
+  <data name="S_COLUMN_SOURCE" xml:space="preserve">
+    <value>மூலம்</value>
+  </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value>இலக்கு</value>
+  </data>
+  <data name="S_COLUMN_ADDED" xml:space="preserve">
+    <value>சேர்க்கப்பட்டது</value>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>படவுரு</value>
+  </data>
+  <data name="S_COLUMN_NAME" xml:space="preserve">
+    <value>பெயர்</value>
+  </data>
+  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
+    <value>அசல் இடம்</value>
+  </data>
+  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
+    <value>தேதி மாற்றப்பட்டது</value>
+  </data>
+  <data name="S_COLUMN_TYPE" xml:space="preserve">
+    <value>வகை</value>
+  </data>
+  <data name="S_COLUMN_SIZE" xml:space="preserve">
+    <value>அளவு</value>
+  </data>
+  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
+    <value>தேதி நீக்கப்பட்டது</value>
+  </data>
+  <data name="S_COLUMN_USER_ID" xml:space="preserve">
+    <value>பயனர் அடையாளம்</value>
+  </data>
+  <data name="S_COLUMN_VERSION" xml:space="preserve">
+    <value>பதிப்பு</value>
+  </data>
+  <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
+    <value>ADB சர்வர் பதிலளிக்கவில்லை</value>
+  </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value>கடைசி சர்வர் மறுமொழியிலிருந்து நேரம்</value>
+  </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}வி</value>
+  </data>
+  <data name="S_KILL_SERVER" xml:space="preserve">
+    <value>கில் சர்வர்</value>
+  </data>
+  <data name="S_KILL_PROCESS" xml:space="preserve">
+    <value>கொலை செயல்முறை</value>
+  </data>
+  <data name="S_REFRESH_DEVICES" xml:space="preserve">
+    <value>சாதனங்களைப் புதுப்பிக்கவும்</value>
+  </data>
+  <data name="S_RESTART_ADB" xml:space="preserve">
+    <value>ADB ஐ மீண்டும் தொடங்கவும்</value>
+  </data>
+  <data name="S_SERVER_DOWN" xml:space="preserve">
+    <value>mDNS சேவையகம் செயலிழந்தது</value>
+  </data>
+  <data name="S_AWAITING_RESPONSE" xml:space="preserve">
+    <value>பதிலுக்காக காத்திருக்கிறது: {0}</value>
+  </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0}மி.வி</value>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0}மீ</value>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value>{0}ம</value>
+  </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>mDNS சேவையகம் இயங்குகிறது</value>
+  </data>
+  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
+    <value>வரையறுக்கப்பட்ட உதவி</value>
+  </data>
+  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
+    <value>சில செயல்பாடுகள் தோல்வியடைந்தன</value>
+  </data>
+  <data name="S_ROOT_ENABLED" xml:space="preserve">
+    <value>ரூட் அணுகல் இயக்கப்பட்டது</value>
+  </data>
+  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
+    <value>ரூட்டை இயக்கலாம்</value>
+  </data>
+  <data name="S_RECOVERY_MODE" xml:space="preserve">
+    <value>மீட்பு</value>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value>மின்னழுத்தம்: {0}v</value>
+  </data>
+  <data name="S_BAT_TEMP" xml:space="preserve">
+    <value>வெப்பநிலை: {0}°C</value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>தற்போதைய இருப்பு: {0}A</value>
+  </data>
+  <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
+    <value>மீண்டும் துவக்கவும்</value>
+  </data>
+  <data name="S_REBOOT_SYSTEM" xml:space="preserve">
+    <value>கணினி படம்</value>
+  </data>
+  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
+    <value>துவக்க ஏற்றி</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
+    <value>பக்கவாட்டு</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
+    <value>பக்கச்சுமை (தானியங்கு மறுதொடக்கம்)</value>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - இணைப்பில்லாத</value>
+  </data>
+  <data name="S_STATUS_UNAUTH" xml:space="preserve">
+    <value>{0} - அங்கீகரிக்கப்படாதது</value>
+  </data>
+  <data name="S_TYPE_EMULATOR" xml:space="preserve">
+    <value>போன்றி</value>
+  </data>
+  <data name="S_TYPE_SERVICE" xml:space="preserve">
+    <value>mDNS பணி</value>
+  </data>
+  <data name="S_TYPE_USB" xml:space="preserve">
+    <value>USB</value>
+  </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value>வைஃபை</value>
+  </data>
+  <data name="S_TYPE_WSA" xml:space="preserve">
+    <value>WSA</value>
+  </data>
+  <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
+    <value>பேட்டரி நிலை தெரியவில்லை</value>
+  </data>
+  <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
+    <value>{0}%, செருகப்பட்டது</value>
+  </data>
+  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
+    <value>கம்பியில்லா</value>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>ஏசி</value>
+  </data>
+  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
+    <value>எதுவுமில்லை</value>
+  </data>
+  <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
+    <value>தெரியவில்லை</value>
+  </data>
+  <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
+    <value>சார்ச் செய்கிறது</value>
+  </data>
+  <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
+    <value>வெளியேற்றுகிறது</value>
+  </data>
+  <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
+    <value>சார்ச் செய்யவில்லை</value>
+  </data>
+  <data name="S_BAT_STATE_FULL" xml:space="preserve">
+    <value>முழு</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>நிலை: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH" xml:space="preserve">
+    <value>உடல்நலம்: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
+    <value>நல்லது</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
+    <value>அதிக வெப்பம்</value>
+  </data>
+  <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
+    <value>இறந்து போனது</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
+    <value>ஓவர் வோல்டேச்</value>
+  </data>
+  <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
+    <value>குறிப்பிடப்படாத தோல்வி</value>
+  </data>
+  <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
+    <value>குளிர்</value>
+  </data>
+  <data name="S_BUTTON_LAUNCH" xml:space="preserve">
+    <value>துவக்கவும்</value>
+  </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value>WSA வெளியீடு</value>
+  </data>
+  <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
+    <value>இதை மீண்டும் காட்ட வேண்டாம்.</value>
+  </data>
+  <data name="S_BUTTON_ABORT" xml:space="preserve">
+    <value>கைவிடு</value>
+  </data>
+  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
+    <value>செல்லுக்கு அனுப்புகிறது</value>
+  </data>
+  <data name="S_PASTE_CONFLICT" xml:space="preserve">
+    <value>{0} மோதல்</value>
+  </data>
+  <data name="S_PASTE" xml:space="preserve">
+    <value>ஒட்டு</value>
+  </data>
+  <data name="S_DROP" xml:space="preserve">
+    <value>கைவிடு</value>
+  </data>
+  <data name="S_ACTION_OPERATION" xml:space="preserve">
+    <value>செயல்பாடு</value>
+  </data>
+  <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
+    <value>செயல்பாடுகள்</value>
+  </data>
+  <data name="S_ACTION_VALIDATE" xml:space="preserve">
+    <value>{0}ஐச் சரிபார்</value>
+  </data>
+  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
+    <value>இணைப்பு</value>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} (இணைப்பு)</value>
+  </data>
+  <data name="S_FILE_TYPE_APK" xml:space="preserve">
+    <value>ஆண்ட்ராய்டு பயன்பாட்டு தொகுப்பு</value>
+  </data>
+  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
+    <value>சாளரங்கள் இயங்கக்கூடியது</value>
+  </data>
+  <data name="S_DRIVE_TRASH" xml:space="preserve">
+    <value>மறுசுழற்சி தொட்டி</value>
+  </data>
+  <data name="S_BUTTON_YES" xml:space="preserve">
+    <value>ஆம்</value>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>மூலம்</value>
+  </data>
+  <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
+    <value>உள் சேமிப்பு</value>
+  </data>
+  <data name="S_DRIVE_APPS" xml:space="preserve">
+    <value>நிறுவப்பட்ட பயன்பாடுகள்</value>
+  </data>
+  <data name="S_DRIVE_SD" xml:space="preserve">
+    <value>µSD அட்டை</value>
+  </data>
+  <data name="S_DRIVE_OTG" xml:space="preserve">
+    <value>OTG இயக்கி</value>
+  </data>
+  <data name="S_DRIVE_EMULATED" xml:space="preserve">
+    <value>எமுலேட்டட் இயக்கி</value>
+  </data>
+  <data name="S_DRIVE_TEMP" xml:space="preserve">
+    <value>வெப்பநிலை</value>
+  </data>
+  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
+    <value>இலக்கு கோப்பு முறைமையில் கோப்பு பெயர் சட்டவிரோதமானது: {0}</value>
+  </data>
+  <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
+    <value>உள்ளடக்கம் பொருந்தவில்லை</value>
+  </data>
+  <data name="S_VALIDATE_MISSING" xml:space="preserve">
+    <value>இலக்கு இடத்திலிருந்து காணவில்லை</value>
+  </data>
+  <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
+    <value>நிரந்தர நீக்கம்</value>
+  </data>
+  <data name="S_LOCATION_NA" xml:space="preserve">
+    <value>இதற்கில்லை</value>
+  </data>
+  <data name="S_PATH_INVALID" xml:space="preserve">
+    <value>புதிய அல்லது ஏற்கனவே உள்ள அமைப்புகள் கோப்பின் முழு பாதையையும் உரையாடல் குறிப்பிட வேண்டும்.</value>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>தனிப்பயன் பயன்பாட்டு அமைப்புகள் பாதை</value>
+  </data>
+  <data name="S_MENU_EMPTY" xml:space="preserve">
+    <value>பட்டியல் காலியாக உள்ளது</value>
+  </data>
+  <data name="S_ITEM_COPY" xml:space="preserve">
+    <value>{0} - நகல்</value>
+  </data>
+  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
+    <value>யூனிக்ச் பெயரிடும் விதிகளை கடைபிடிக்கிறது (ADB வழியாக)</value>
+  </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>பயனர் இடம் பெயரிடும் விதிகளுக்கு இணங்குகிறது</value>
+  </data>
+  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
+    <value>சாளரங்கள் பெயரிடும் விதிகளுக்கு இணங்குகிறது</value>
+  </data>
+  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
+    <value>சாளரங்கள் இயக்கி ரூட் பெயரிடும் விதிகளுக்கு இணங்குகிறது</value>
+  </data>
+  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
+    <value>தற்போதைய இடத்தில் தனித்துவமானது</value>
+  </data>
+  <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
+    <value>தேர்ந்தெடுக்கப்பட்ட கோப்பு சாளரங்கள் பெயரிடும் விதிகளை மீறுகிறது</value>
+  </data>
+  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
+    <value>தேர்ந்தெடுக்கப்பட்ட கோப்பு சாளரங்கள் இயக்கி ரூட் பெயரிடும் விதிகளை மீறுகிறது</value>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>தேர்ந்தெடுக்கப்பட்ட சில கோப்புகளில் முரண்பட்ட கேச்-சென்சிட்டிவ் பெயர்கள் உள்ளன</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>தேர்ந்தெடுக்கப்பட்ட கோப்பு பயனர் இடத்தை பெயரிடும் விதிகளை மீறுகிறது</value>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>சில நகலெடுக்கப்பட்ட கோப்புகள் முரண்பட்ட கேச்-சென்சிட்டிவ் பெயர்களைக் கொண்டுள்ளன</value>
+  </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>நகலெடுக்கப்பட்ட கோப்பு பயனர் இடத்தை பெயரிடும் விதிகளை மீறுகிறது</value>
+  </data>
+  <data name="S_POPUP_NON_FILE" xml:space="preserve">
+    <value>தேர்ந்தெடுக்கப்பட்ட உருப்படி ஒரு கோப்பு / கோப்புறை அல்ல</value>
+  </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value>WSA ஆப்</value>
+  </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>ரூட் நிலை: {0}</value>
+  </data>
+  <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
+    <value>தேர்வு செய்யப்படவில்லை</value>
+  </data>
+  <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
+    <value>தடை செய்யப்பட்டுள்ளது</value>
+  </data>
+  <data name="S_BUTTON_ENABLE" xml:space="preserve">
+    <value>இயக்கு</value>
+  </data>
+  <data name="S_BUTTON_DISABLE" xml:space="preserve">
+    <value>முடக்கு</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>இணைத்தல் குறியீடு</value>
+  </data>
+  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
+    <value>ஐபி முகவரி / புரவலன் பெயர்</value>
+  </data>
+  <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
+    <value>துறைமுகம்</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
+    <value>இணைத்தல் துறைமுகம்</value>
+  </data>
+  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
+    <value>இணைத்து இணைக்கவும்</value>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value>சேமிக்கப்பட்ட சாதனம்</value>
+  </data>
+  <data name="S_DEVICE_QR" xml:space="preserve">
+    <value>QR இணைத்தல்</value>
+  </data>
+  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
+    <value>இணைக்க ஆயத்தம்</value>
+  </data>
+  <data name="S_CLEAR_ALL" xml:space="preserve">
+    <value>அனைத்தையும் அழி</value>
+  </data>
+  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
+    <value>புதிய சாதனத்தைச் சேர்க்கவும்</value>
+  </data>
+  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
+    <value>[அங்கீகரிக்கப்படாத]</value>
+  </data>
+  <data name="S_SERVICE_NONAME" xml:space="preserve">
+    <value>[சேவை]</value>
+  </data>
+  <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
+    <value>தற்போது உலாவுகிறது</value>
+  </data>
+  <data name="S_BUTTON_BROWSE" xml:space="preserve">
+    <value>உலாவவும்</value>
+  </data>
+  <data name="S_BUTTON_CONNECT" xml:space="preserve">
+    <value>இணை</value>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value>{1} இல் {0} இலவசம்</value>
+  </data>
+  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
+    <value>காலி</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
+    <value>APK நிறுவி</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
+    <value>APK நிறுவிகள்</value>
+  </data>
+  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
+    <value>தொகுப்பு</value>
+  </data>
+  <data name="S_FILEOP_ERROR" xml:space="preserve">
+    <value>பிழை: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATED" xml:space="preserve">
+    <value>சரிபார்க்கப்பட்டது</value>
+  </data>
+  <data name="S_FILEOP_COMPLETED" xml:space="preserve">
+    <value>முடிந்தது</value>
+  </data>
+  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
+    <value>{0} தோல்வியடைந்தது</value>
+  </data>
+  <data name="S_FILEOP_TOTAL" xml:space="preserve">
+    <value>மொத்தம்:</value>
+  </data>
+  <data name="S_FILEOP_PREV" xml:space="preserve">
+    <value>முந்தைய செயல்பாடு</value>
+  </data>
+  <data name="S_FILEOP_RUNNING" xml:space="preserve">
+    <value>ஓடுகிறது</value>
+  </data>
+  <data name="S_FILEOP_WAITING" xml:space="preserve">
+    <value>வரிசையில் நிற்கிறது</value>
+  </data>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>தோல்வியடைந்தது</value>
+  </data>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value>ரத்து செய்யப்பட்டது</value>
+  </data>
+  <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
+    <value>முந்தைய</value>
+  </data>
+  <data name="S_ACTION_MOVE" xml:space="preserve">
+    <value>நகர்த்தவும்</value>
+  </data>
+  <data name="S_ACTION_RECYCLE" xml:space="preserve">
+    <value>மறுசுழற்சி</value>
+  </data>
+  <data name="S_ACTION_UPDATE" xml:space="preserve">
+    <value>புதுப்பிப்பு</value>
+  </data>
+  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
+    <value>{0}% பயன்படுத்தப்பட்டது</value>
+  </data>
+  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
+    <value>இங்கே உருட்டவும்</value>
+  </data>
+  <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
+    <value>மேலே</value>
+  </data>
+  <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
+    <value>கீழே</value>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>பக்கம் மேலே</value>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>பக்கம் கீழே</value>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>மேலே உருட்டவும்</value>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>கீழே உருட்டவும்</value>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>இடது விளிம்பு</value>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>வலது விளிம்பு</value>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>பக்கம் இடது</value>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>பக்கம் வலது</value>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>இடதுபுறமாக உருட்டவும்</value>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>வலதுபுறமாக உருட்டவும்</value>
+  </data>
+  <data name="S_MENU_UNDO" xml:space="preserve">
+    <value>செயல்தவிர்</value>
+  </data>
+  <data name="S_MENU_REDO" xml:space="preserve">
+    <value>மீண்டும்செய்</value>
+  </data>
+  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
+    <value>அறிவிப்புகள்</value>
+  </data>
+  <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
+    <value>மேலும் தகவலைக் காட்ட சொடுக்கு செய்யவும்</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
+    <value>பயன்பாட்டு மொழி</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION" xml:space="preserve">
+    <value>அமைப்புகளில் உங்களுக்கு விருப்பமான பயன்பாட்டு மொழியைத் தேர்ந்தெடுக்கவும். 
+தேர்ந்தெடுக்கப்பட்ட மொழிக்கு மொழிபெயர்ப்பு முன்னேற்றம் காட்டப்படும். 
+Weblate இல் உங்கள் மொழியில் பயன்பாட்டை உள்ளூர்மயமாக்க எங்களுக்கு உதவவும்.</value>
+  </data>
+  <data name="S_GOTO_WEBLATE" xml:space="preserve">
+    <value>வலைபெயர்ப்பு க்குச் செல்லவும்</value>
+  </data>
+  <data name="S_FILE_SOCKET" xml:space="preserve">
+    <value>மாட்டி</value>
+  </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>சாதனத்தைத் தடு</value>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>சார் சாதனம்</value>
+  </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
+  </data>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>தெரியவில்லை</value>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>உடைந்த இணைப்பு</value>
+  </data>
+  <data name="S_NAV_HISTORY" xml:space="preserve">
+    <value>வழிசெலுத்தல் வரலாறு</value>
+  </data>
+  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
+    <value>தற்போதைய இருப்பிடத்தைச் சேர்க்கவும்</value>
+  </data>
+  <data name="S_REMOVE" xml:space="preserve">
+    <value>அகற்று</value>
+  </data>
+  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
+    <value>சேமிக்கப்பட்ட இடங்கள்</value>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} கி.பை</value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} மெ.பை</value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} சிபி</value>
+  </data>
+  <data name="TERA" xml:space="preserve">
+    <value>{0} TB</value>
+  </data>
+  <data name="PETA" xml:space="preserve">
+    <value>{0} PB</value>
+  </data>
+  <data name="EXA" xml:space="preserve">
+    <value>{0} EB</value>
+  </data>
+  <data name="MILLI" xml:space="preserve">
+    <value>மீ</value>
+  </data>
+  <data name="MICRO" xml:space="preserve">
+    <value>உ</value>
+  </data>
+  <data name="NANO" xml:space="preserve">
+    <value>n</value>
+  </data>
+  <data name="BYTES" xml:space="preserve">
+    <value>{0} பி</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>{0} உருப்படிகளை நகலெடுக்கவும்</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
+    <value>{0} உருப்படிகளை {1} க்கு நகலெடுக்கவும்</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
+    <value>{0} உருப்படிகளை {1} க்கு நகர்த்து</value>
+  </data>
+  <data name="S_DRAGDROP_LINK" xml:space="preserve">
+    <value>{0} இல் இணைப்பை உருவாக்கவும்</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>{0} உருப்படிகளை நகர்த்தவும்</value>
+  </data>
+  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
+    <value>1 வெட்டு உருப்படியை ஒட்டவும்</value>
+  </data>
+  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
+    <value>1 நகலெடுக்கப்பட்ட உருப்படியை ஒட்டவும்</value>
+  </data>
+  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
+    <value>நகலெடுக்கப்பட்ட {0} உருப்படிகளை ஒட்டவும்</value>
+  </data>
+  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
+    <value>{0} வெட்டு உருப்படிகளை ஒட்டவும்</value>
+  </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{1} இல் {0} ({2})</value>
+  </data>
+  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
+    <value>{1} இல் {0}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
+    <value>நகலெடு {0}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
+    <value>{0} ஐ {1} க்கு நகலெடு</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
+    <value>நகர்த்து {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>{0} ஐ {1} க்கு நகர்த்து</value>
+  </data>
+  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
+    <value>கோப்பு கிடைக்கவில்லை</value>
+  </data>
+  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
+    <value>உறுதிப்படுத்தல் இல்லாமல் முடிந்தது</value>
+  </data>
+  <data name="S_VALIDATION_ERROR" xml:space="preserve">
+    <value>சரிபார்ப்பு பிழை: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATING" xml:space="preserve">
+    <value>சரிபார்க்கிறது…</value>
+  </data>
+  <data name="S_FILES_PLURAL" xml:space="preserve">
+    <value>{0} கோப்புகள்</value>
+  </data>
+  <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
+    <value>பக்கச்சுமைக்கு ROM ஐத் தேர்ந்தெடுக்கவும்</value>
+  </data>
+  <data name="S_ROM_FILE" xml:space="preserve">
+    <value>ROM கோப்பு</value>
+  </data>
+  <data name="S_TERMINAL" xml:space="preserve">
+    <value>முனையத்தில்</value>
+  </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>கோப்பு தேதி மாற்றப்பட்டது</value>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>நிறுவு {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>{0} APKகளை நிறுவவும்</value>
+  </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value>அன்று</value>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value>அணை</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>mDNS சேவையக நிலையைச் சரிபார்க்கிறது…</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value>சின்னங்கள்</value>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>சிறுபடங்களை இழுத்து காட்சிப்படுத்தவும்</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>படவுரு காட்சியில் மட்டும்</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>புகைப்பட கோப்பகங்களில் மட்டும்</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value>இணைப்பில்</value>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>அமர்வுகளுக்கு இடையில் சிறுபடங்களைத் தொடரவும்</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>சிறு உருவங்களை இழுக்கும் வேகத்தை வரம்பிடவும்</value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>சிறப்பு கோப்புறைகளுக்கான ஐகான்களைக் காட்டு</value>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>வீடியோ சிறுபடங்களைச் சேர்க்கவும்</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>நீளம்</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>பரிமாணங்கள்</value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>ஒரு மாதம்</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>ஒரு வாரம்</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>ஒரு நாள்</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>ஒரு மணி நேரம்</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>உள்ளக சிறுபடங்கள் புதுப்பிக்கும் நேரம்</value>
+  </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>BusyBox இருந்தால் பயன்படுத்தவும்</value>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>WSA இருந்தால் தானாக இணைக்கவும்</value>
+  </data>
+  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
+    <value>ஆண்ட்ராய்டு எமுலேட்டர்களைக் கண்டறியவும்</value>
+  </data>
+  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
+    <value>இந்த முன்மாதிரியை இயக்கவும்</value>
+  </data>
+  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
+    <value>எமுலேட்டர் துவக்கம்</value>
+  </data>
+  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
+    <value>ஆண்ட்ராய்டு SDK எமுலேட்டர் கிடைக்கவில்லை. ஆண்ட்ராய்டு SDK முன்மாதிரி தொகுப்பை நிறுவவும் அல்லது ANDROID_SDK_ROOT ஐ அமைக்கவும்.</value>
+  </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>ஒட்டு</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>சிறுபட புதுப்பிப்புகளைச் சரிபார்க்கிறது</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>சிறுபடங்களை இழுத்தல்</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>சிறுபட இருப்பிடங்கள் மற்றும் மீடியா தரவுத்தளத்தைப் படித்தல்</value>
+  </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value>விவரங்கள்</value>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value>பார்வை</value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>நடுத்தர சின்னங்கள்</value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>பெரிய சின்னங்கள்</value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>கூடுதல் பெரிய சின்னங்கள்</value>
+  </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value>தளவமைப்பு மற்றும் பார்வை விருப்பங்கள்</value>
+  </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value>ஒவ்வொரு இடத்திற்கும் சிறுபட அளவு சேமிக்கப்பட்டது</value>
+  </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value>வரிசைப்படுத்து</value>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value>ஏறுதல்</value>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value>இறங்கு</value>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>ஒவ்வொரு இடத்திற்கும் வரிசைப்படுத்தல் நெடுவரிசை &amp; வரிசை சேமிக்கப்பட்டது</value>
+  </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>அதன் சொந்த சிறுபடமாக பயன்படுத்த அதிகபட்ச பட அளவு (0 - முடக்கப்பட்டது)</value>
+  </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>மேலும் {0}…</value>
+  </data>
+  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
+    <value>விவரங்கள் மற்றும் முன்னோட்டப் பலகத்தைக் காட்டவும் அல்லது மறைக்கவும்.</value>
+  </data>
+  <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
+    <value>முன்னோட்டம்</value>
+  </data>
+  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
+    <value>முன்னோட்டத்திற்கான அதிகபட்ச கோப்பு அளவு</value>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>கோப்பில் உள்ள இயல்புநிலை கோப்புறைக்கு இழுக்கவும் இருமுறை சொடுக்கு செய்யவும்</value>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value>கூடுதல் தகவலைப் பெற, ஒரு பொருளைத் தேர்ந்தெடுக்கவும்.</value>
+  </data>
+  <data name="S_ITEM_LOCATION" xml:space="preserve">
+    <value>இடம்</value>
+  </data>
+  <data name="S_IMAGE_F_STOP" xml:space="preserve">
+    <value>எஃப்-ச்டாப்</value>
+  </data>
+  <data name="S_IMAGE_ISO" xml:space="preserve">
+    <value>ISO விரைவு</value>
+  </data>
+  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
+    <value>நேரிடுதல் காலம்</value>
+  </data>
+  <data name="S_VIDEO_BITRATE" xml:space="preserve">
+    <value>பிட்ரேட்</value>
+  </data>
+  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
+    <value>மாதிரிக்காட்சிக்கு ஒரு கோப்பைத் தேர்ந்தெடுக்கவும்.</value>
+  </data>
+  <data name="S_PREVIEW_INVALID" xml:space="preserve">
+    <value>முன்னோட்டம் இல்லை.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
+    <value>இந்த PDF கடவுச்சொல் பாதுகாக்கப்பட்டுள்ளது.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
+    <value>தவறான கடவுச்சொல்.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
+    <value>திறக்கவும்</value>
+  </data>
+  <data name="S_FILE_PERMISSIONS" xml:space="preserve">
+    <value>அனுமதிகள்</value>
+  </data>
+  <data name="S_FILE_PERM_USER" xml:space="preserve">
+    <value>பயனர்</value>
+  </data>
+  <data name="S_FILE_PERM_GROUP" xml:space="preserve">
+    <value>குழு</value>
+  </data>
+  <data name="S_FILE_PERM_OTHER" xml:space="preserve">
+    <value>மற்றவை</value>
+  </data>
+  <data name="S_DATE_ACCESSED" xml:space="preserve">
+    <value>அணுகப்பட்டது</value>
+  </data>
+  <data name="S_CREATION_TIME" xml:space="preserve">
+    <value>உருவாக்கப்பட்டது</value>
+  </data>
+  <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
+    <value>மாற்றியமைக்கப்பட்ட</value>
+  </data>
+  <data name="S_FILE_SYSTEM" xml:space="preserve">
+    <value>கோப்பு முறைமை</value>
+  </data>
+  <data name="S_MOUNT_POINT" xml:space="preserve">
+    <value>மவுண்ட் பாயிண்ட்</value>
+  </data>
+  <data name="S_MOUNT_OPTIONS" xml:space="preserve">
+    <value>ஏற்ற விருப்பங்கள்</value>
+  </data>
+  <data name="S_COLOR_RED" xml:space="preserve">
+    <value>சிவப்பு</value>
+  </data>
+  <data name="S_COLOR_GREEN" xml:space="preserve">
+    <value>பச்சை</value>
+  </data>
+  <data name="S_COLOR_BLUE" xml:space="preserve">
+    <value>நீலம்</value>
+  </data>
+  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
+    <value>அமைப்பு பாதை இலிருந்து ADB ஐக் கண்டறிய முடியவில்லை. அதைக் கண்டுபிடிக்க "{0}" ஐப் பயன்படுத்தவும்.</value>
+  </data>
+  <data name="S_ADB_PATH_INVALID" xml:space="preserve">
+    <value>வழங்கப்பட்ட {0} பாதையானது சாளரங்கள் சார்ட்கட் அல்லது UNC (ரிமோட்) பாதையாகும், இது அனுமதிக்கப்படாது.</value>
+  </data>
+  <data name="S_ADB_COMPROMISED" xml:space="preserve">
+    <value>வழங்கப்பட்ட செயல்படுத்தக்கூடியவை ADB என சரிபார்க்க முடியாது. Google இலிருந்து அதிகாரப்பூர்வ ஆண்ட்ராய்டு இயங்குதளக் கருவிகளை மட்டும் பதிவிறக்குவதை உறுதிசெய்யவும்.</value>
+  </data>
+  <data name="S_BUTTON_PAIR" xml:space="preserve">
+    <value>பேரிக்காய்</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>தனியுரிமைக் கொள்கை புதுப்பிக்கப்பட்டது</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>இந்த பயன்பாட்டு பதிப்பு தனியுரிமைக் கொள்கை புதுப்பித்தலுக்குப் பிறகு வெளியிடப்பட்டது.
+GitHub இல் மாற்றங்களை மதிப்பாய்வு செய்யவும்.</value>
+  </data>
 </root>
