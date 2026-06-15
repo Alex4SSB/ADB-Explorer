@@ -1185,6 +1185,6 @@ internal static class FileActionLogic
     {
         var apk = Data.SelectedPackages.First();
         
-        Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"? {apk.Name}\"");
+        Network.OpenBrowserSearch(apk.Name, Data.RuntimeSettings.DefaultBrowserPath);
     }
 }

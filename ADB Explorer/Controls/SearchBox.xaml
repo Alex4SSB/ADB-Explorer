@@ -42,7 +42,7 @@
                 <ui:FontIcon
                     Margin="10"
                     Glyph="{Binding Icon}"
-                    Style="{StaticResource GlyphFont}" />
+                    Style="{StaticResource DisabledGlyphStyle}" />
             </Expander.Header>
             <ui:TextBox
                 x:Name="ContentBox"

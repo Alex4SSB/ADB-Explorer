@@ -139,7 +139,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.Off)
                 return null;
 
-            if (_cacheThumbnail is null && Data.DevicesObject.Current.Type 
+            if (_cacheThumbnail is null && Data.DevicesObject.Current?.Type 
                 is DeviceType.Local 
                 or DeviceType.Remote
                 or DeviceType.Service)

@@ -405,7 +405,7 @@ public class LinkSetting : AbstractSetting
         if (Url.IsFile)
             Process.Start("explorer.exe", Url.LocalPath);
         else
-            Process.Start(RuntimeSettings.DefaultBrowserPath, $"\"{Url}\"");
+            Network.OpenUrl(Url.ToString(), RuntimeSettings.DefaultBrowserPath);
     });
 
     public string ToolTip => Url.IsFile ? Url.LocalPath : Url.ToString();

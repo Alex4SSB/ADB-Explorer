@@ -105,7 +105,7 @@ public partial class AppRuntimeSettings : ViewModelBase
         }
     }
 
-    public string DefaultBrowserPath { get; set; }
+    public string? DefaultBrowserPath { get; set; }
 
     public string TempDragPath
     {

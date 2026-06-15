@@ -152,7 +152,7 @@ public partial class MainWindowViewModel : ObservableObject
                         icon: DialogService.DialogIcon.Informational);
 
                     if (res.Item1 is ContentDialogResult.Primary)
-                        Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"{Links.WEBLATE}\"");
+                        Network.OpenUrl(Links.WEBLATE.ToString(), Data.RuntimeSettings.DefaultBrowserPath);
 
                     Data.Settings.ShowLanguageNotification = false;
                 }, Strings.Resources.S_LANG_NOTIFICATION_TITLE,
@@ -176,7 +176,7 @@ public partial class MainWindowViewModel : ObservableObject
                         cancelText: Strings.Resources.S_BUTTON_CLOSE);
 
                     if (res.Item1 is ContentDialogResult.Primary)
-                        Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{appVersion}\"");
+                        Network.OpenUrl($"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{appVersion}", Data.RuntimeSettings.DefaultBrowserPath);
 
                     Data.Settings.LastVersion = appVersion;
                 }, Strings.Resources.S_NEW_VERSION_TITLE,
@@ -221,7 +221,7 @@ public partial class MainWindowViewModel : ObservableObject
                         icon: DialogService.DialogIcon.Informational);
 
                     if (res.Item1 is ContentDialogResult.Primary)
-                        Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"{Links.ADB_EXPLORER_PRIVACY}\"");
+                        Network.OpenUrl(Links.ADB_EXPLORER_PRIVACY.ToString(), Data.RuntimeSettings.DefaultBrowserPath);
 
                     Data.Settings.LastAcknowledgedPrivacyUpdate = pendingPrivacyUpdate;
                     Data.Settings.PendingPrivacyUpdate = null;
@@ -247,7 +247,7 @@ public partial class MainWindowViewModel : ObservableObject
                         icon: DialogService.DialogIcon.Informational);
 
                     if (res.Item1 is ContentDialogResult.Primary)
-                        Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{latestVersion}\"");
+                        Network.OpenUrl($"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{latestVersion}", Data.RuntimeSettings.DefaultBrowserPath);
                 }, Strings.Resources.S_NEW_VERSION_TITLE,
                 Notifications));
             });

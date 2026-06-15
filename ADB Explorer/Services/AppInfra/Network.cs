@@ -149,17 +149,34 @@ public static class Network
         return ipv4.First().Address.ToString();
     }
 
-    public static string GetDefaultBrowser()
+    public static string? GetDefaultBrowser()
     {
         try
         {
             var browserName = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice");
             var browserCommand = Registry.ClassesRoot.OpenSubKey($@"{browserName.GetValue("Progid")}\shell\open\command").GetValue(null);
-            return AdbRegEx.RE_EXE_FROM_REG().Match($"{browserCommand}").Value;
+            var path = AdbRegEx.RE_EXE_FROM_REG().Match($"{browserCommand}").Value;
+            return string.IsNullOrEmpty(path) ? null : path;
         }
         catch
         {
             return null;
         }
+    }
+
+    public static void OpenUrl(string url, string? browserPath)
+    {
+        if (!string.IsNullOrEmpty(browserPath))
+            Process.Start(browserPath, $"\"{url}\"");
+        else
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+    }
+
+    public static void OpenBrowserSearch(string query, string? browserPath)
+    {
+        if (!string.IsNullOrEmpty(browserPath))
+            Process.Start(browserPath, $"\"? {query}\"");
+        else
+            OpenUrl($"https://www.google.com/search?q={Uri.EscapeDataString(query)}", browserPath);
     }
 }
