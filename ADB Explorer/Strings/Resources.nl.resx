@@ -189,4 +189,16 @@
   <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
     <value>Bestand Operaties</value>
   </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>Herstel Alle Items</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Leeg Afvalbak</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>Bestemming pad Error</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>Verbinding maken met {device} is mislukt</value>
+  </data>
 </root>
