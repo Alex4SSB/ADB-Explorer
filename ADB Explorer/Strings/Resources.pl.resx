@@ -1496,7 +1496,7 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
     <value>oraz {0} więcej…</value>
   </data>
   <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
-    <value>Pokaż lub ukryj szczegóły i panel podglądu.</value>
+    <value>Pokaż lub ukryj panel szczegółów i podglądu.</value>
   </data>
   <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
     <value>Podgląd</value>
@@ -1529,7 +1529,7 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
     <value>Wybierz plik, żeby wyświetlić podgląd.</value>
   </data>
   <data name="S_PREVIEW_INVALID" xml:space="preserve">
-    <value>Podgląd nie jest dostępny.</value>
+    <value>Brak podglądu.</value>
   </data>
   <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
     <value>Ten plik PDF jest chroniony hasłem.</value>
