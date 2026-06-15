@@ -126,4 +126,67 @@
   <data name="S_CANCEL" xml:space="preserve">
     <value>Annuleren</value>
   </data>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>De Android Robot icoon(en)</value>
+  </data>
+  <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
+    <value>De Android robot is opnieuw gemaakt of bewerkt van het werk gemaakt an gedeeld door Google en is gebruikt door de voorwaarden in de Creative Commons 3.0 Attribution License.</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>De APK icoon is gelicenst onder de Apache License, Version 2.0.</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>Kon de ADB versie niet krijgen van het opgegeven pad.</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>ADB versie van het opgegeven pad is te laag.</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>Selecteer de ADB uitvoerbare bestand</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>Reset App instellingen</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>Nieuwe App Versie</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>Navigatie Error</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>Kopieer Pakket Naam</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>Kopieer Item pad</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Bevestig verwijderen</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>Verwijder Permanent</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>Maak Error</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>herstel error</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>Bevestig Verwijderen Programma</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>Selecteer Pakketten om te installeren</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>Dood Emulator</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>Verwijder Apparaat</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>ontkoppel Apperaat</value>
+  </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>Bestand Operaties</value>
+  </data>
 </root>
