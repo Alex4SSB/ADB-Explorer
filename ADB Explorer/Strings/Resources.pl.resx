@@ -1633,4 +1633,11 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
     <value>Skopiowany plik narusza zasady nazewnictwa w przestrzeni użytkownika</value>
   </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Zaktualizowana polityka prywatności</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>Ta wersja aplikacji została wydana po aktualizacji polityki prywatności.
+Zapoznaj się ze zmianami na GitHubie.</value>
+  </data>
 </root>
