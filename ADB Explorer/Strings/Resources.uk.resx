@@ -175,7 +175,7 @@
     <value>Помилка сполучення</value>
   </data>
   <data name="S_ROOT_FORBID" xml:space="preserve">
-    <value>Root-доступ неможливо ввімкнути на вибраному пристрої.</value>
+    <value>Root-доступ неможливо увімкнути на вибраному пристрої.</value>
   </data>
   <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
     <value>Root-доступ</value>
@@ -257,5 +257,20 @@
   </data>
   <data name="S_THUMBSIZE_XL" xml:space="preserve">
     <value>Додатково великі Іконки</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>Creative Commons</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
+    <value>Автовключення root</value>
+  </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value>Час від останньої відповіді сервера</value>
+  </data>
+  <data name="S_ROOT_ENABLED" xml:space="preserve">
+    <value>Root-доступ увімкнено</value>
+  </data>
+  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
+    <value>Root може бути увімкнено</value>
   </data>
 </root>
