@@ -175,10 +175,10 @@
     <value>Ошибка соединения</value>
   </data>
   <data name="S_ROOT_FORBID" xml:space="preserve">
-    <value>ROOT доступ не может быть включен на этом устройстве.</value>
+    <value>Root-доступ невозможно включить на выбранном устройстве.</value>
   </data>
   <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
-    <value>ROOT доступ</value>
+    <value>Root-доступ</value>
   </data>
   <data name="S_DEL_CONF_TITLE" xml:space="preserve">
     <value>Подтвердите Удаление</value>
@@ -356,7 +356,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Новая папка</value>
   </data>
   <data name="S_CC_NAME" xml:space="preserve">
-    <value>Лицензия Creative Commons (CC)</value>
+    <value>Creative Commons</value>
   </data>
   <data name="S_LS_ERROR" xml:space="preserve">
     <value>Во время чтения этой папки произошла ошибка.
@@ -366,7 +366,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>{0} является родительской папкой для целевой директории.</value>
   </data>
   <data name="S_KILL_EMULATOR" xml:space="preserve">
-    <value>Вы действительно хотите завершить эмулятор?</value>
+    <value>Вы уверены, что хотите убить этот эмулятор?</value>
   </data>
   <data name="S_REM_DEVICE" xml:space="preserve">
     <value>Вы уверены, что хотите удалить это устройство?</value>
@@ -375,7 +375,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Удалить {0}</value>
   </data>
   <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
-    <value>Отключить {0}</value>
+    <value>Убить {0}</value>
   </data>
   <data name="S_REM_APK" xml:space="preserve">
     <value>Следующие элементы будут удалены:
@@ -443,7 +443,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Запрос статуса батареи</value>
   </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
-    <value>Автоматически включить ROOT</value>
+    <value>Автовключение root</value>
   </data>
   <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
     <value>Сохранять устройства подключённые вручную</value>
@@ -765,16 +765,16 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>ADB не отвечает</value>
   </data>
   <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
-    <value>Время последнего ответа ADB</value>
+    <value>Время от последнего ответа сервера</value>
   </data>
   <data name="S_SECONDS_SHORT" xml:space="preserve">
     <value>{0}сек.</value>
   </data>
   <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>Отключить сервер ADB</value>
+    <value>Убить сервер</value>
   </data>
   <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>Отключить процесс ADB</value>
+    <value>Убить процесс</value>
   </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>Обновить устройства</value>
@@ -807,10 +807,10 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Некоторые операции не выполнены</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
-    <value>ROOT доступ включен</value>
+    <value>Root-доступ включен</value>
   </data>
   <data name="S_ROOT_POSSIBLE" xml:space="preserve">
-    <value>ROOT может быть включен</value>
+    <value>Root может быть включен</value>
   </data>
   <data name="S_RECOVERY_MODE" xml:space="preserve">
     <value>Режим Восстановления</value>
