@@ -118,13 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>Иконка(ы) Работа Android</value>
+    <value>Иконка(и) Работа Android</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Робот Android воспроизводится или модифицируется на основе работы, созданной и распространяемой Google, и используется в соответствии с условиями, описанными в лицензии Creative Commons 3.0 с указанием авторства.</value>
   </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
-    <value>Иконка APK лицензирована Apache License, Version 2.0.</value>
+    <value>Иконка APK лицензирована по лицензии Apache версии 2.0.</value>
   </data>
   <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
     <value>Не удалось получить версию ADB с заданного пути.</value>
@@ -136,7 +136,7 @@
     <value>Выберите исполняемый файл ADB</value>
   </data>
   <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
-    <value>Обнулить Настройки Программы</value>
+    <value>Сбросить настройки приложения</value>
   </data>
   <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
     <value>Новая версия программы</value>
@@ -145,7 +145,7 @@
     <value>Ошибка навигации</value>
   </data>
   <data name="S_COPY_APK_NAME" xml:space="preserve">
-    <value>Скопировать имя Пакета</value>
+    <value>Скопировать имя пакета</value>
   </data>
   <data name="S_COPY_PATH" xml:space="preserve">
     <value>Скопировать путь объекта</value>
@@ -160,7 +160,7 @@
     <value>Удалить</value>
   </data>
   <data name="S_DEST_ERR" xml:space="preserve">
-    <value>Ошибка пути</value>
+    <value>Ошибка пути назначения</value>
   </data>
   <data name="S_FAILED_CONN" xml:space="preserve">
     <value>не удалось подключиться к</value>
@@ -169,7 +169,7 @@
     <value>Ошибка подключения</value>
   </data>
   <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
-    <value>Ошибка при отключении</value>
+    <value>Ошибка отключения</value>
   </data>
   <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
     <value>Ошибка сопряжения</value>
@@ -181,19 +181,19 @@
     <value>Root-доступ</value>
   </data>
   <data name="S_DEL_CONF_TITLE" xml:space="preserve">
-    <value>Подтвердите Удаление</value>
+    <value>Подтвердить удаление</value>
   </data>
   <data name="S_PERM_DEL" xml:space="preserve">
     <value>Удалить навсегда</value>
   </data>
   <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
-    <value>Ошибка при создании</value>
+    <value>Ошибка создания</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>Ошибки при восстановлении</value>
+    <value>Конфликт восстановления</value>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
-    <value>Подтвердите удаление</value>
+    <value>Подтвердить деинсталляцию</value>
   </data>
   <data name="S_INSTALL_APK" xml:space="preserve">
     <value>Выбрать пакеты для установки</value>
@@ -217,7 +217,7 @@
     <value>Сопряжение и/или подключение устройства Wi-Fi (без использования mDNS)</value>
   </data>
   <data name="S_RESTART_APP" xml:space="preserve">
-    <value>Перезапустить программу, чтобы изменения вступили в силу</value>
+    <value>Перезапустите приложение, чтобы изменения вступили в силу</value>
   </data>
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Ошибка чтения файла</value>
@@ -250,7 +250,7 @@
     <value>Восстановить</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>Ошибка директории</value>
+    <value>Ошибка списка каталогов</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Извлечь в корень диска Windows</value>
@@ -342,7 +342,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Выберите назначение для нескольких элементов</value>
   </data>
   <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>Следующие элементы будут стерты:
+    <value>Следующее будет удалено:
 {0}</value>
   </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
@@ -1400,7 +1400,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Ограничение дисков:</value>
   </data>
   <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
-    <value>Файловая система только для чтения</value>
+    <value>• Файловая система только для чтения</value>
   </data>
   <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
     <value>• Символические ссылки не поддерживаются.
