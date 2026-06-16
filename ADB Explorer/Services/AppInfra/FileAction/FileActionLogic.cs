@@ -177,7 +177,7 @@ internal static class FileActionLogic
         Clipboard.SetText(path);
     }
 
-    public static void CreateNewItem(FileClass file, string newName = null)
+    public static async Task CreateNewItem(FileClass file, string newName = null)
     {
         if (!string.IsNullOrEmpty(newName))
             file.UpdatePath($"{Data.CurrentPath}{(Data.CurrentPath == "/" ? "" : "/")}{newName}");
@@ -188,9 +188,9 @@ internal static class FileActionLogic
         try
         {
             if (file.Type is FileType.Folder)
-                ShellFileOperation.MakeDir(Data.DevicesObject.Current, file.FullPath);
+                await ShellFileOperation.MakeDir(Data.DevicesObject.Current, file.FullPath);
             else if (file.Type is FileType.File)
-                ShellFileOperation.MakeFile(Data.DevicesObject.Current, file.FullPath);
+                await ShellFileOperation.MakeFile(Data.DevicesObject.Current, file.FullPath);
             else
                 throw new NotSupportedException();
         }
@@ -198,7 +198,7 @@ internal static class FileActionLogic
         {
             DialogService.ShowMessage(e.Message, Strings.Resources.S_CREATE_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
             Data.DirList.FileList.Remove(file);
-            throw;
+            return;
         }
 
         file.IsTemp = false;
@@ -537,15 +537,7 @@ internal static class FileActionLogic
                 return;
             }
             
-            try
-            {
-                CreateNewItem(file, textBox.Text);
-            }
-            catch (Exception e)
-            {
-                if (e is NotImplementedException)
-                    throw;
-            }
+            _ = CreateNewItem(file, textBox.Text);
         }
         else if (!string.IsNullOrEmpty(textBox.Text) && textBox.Text != name)
         {
@@ -604,7 +596,7 @@ internal static class FileActionLogic
 
         if (!Data.FileActions.IsRecycleBin && Data.Settings.EnableRecycle && !result.Item2)
         {
-            await Task.Run(() => ShellFileOperation.MakeDir(Data.DevicesObject.Current, AdbExplorerConst.RECYCLE_PATH));
+            await ShellFileOperation.MakeDir(Data.DevicesObject.Current, AdbExplorerConst.RECYCLE_PATH);
 
             ShellFileOperation.MoveItems(Data.DevicesObject.Current,
                                          itemsToDelete,
@@ -1006,7 +998,7 @@ internal static class FileActionLogic
                 foreach (var folder in empty)
                 {
                     string relative = FileHelper.ExtractRelativePath(folder.FileSystemPath, op.FilePath.FullPath).Replace('\\', '/');
-                    ShellFileOperation.MakeDir(op.Device, FileHelper.ConcatPaths(op.TargetPath.FullPath, relative));
+                    _ = ShellFileOperation.TryMakeDir(op.Device, FileHelper.ConcatPaths(op.TargetPath.FullPath, relative));
                 }
             }
 

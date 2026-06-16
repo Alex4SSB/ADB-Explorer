@@ -318,7 +318,7 @@ public static class ShellFileOperation
         }
     }
 
-    public static async void MakeDir(LogicalDeviceViewModel device, string fullPath)
+    public static async Task MakeDir(LogicalDeviceViewModel device, string fullPath)
     {
         var result = await ADBService.ExecuteVoidShellCommand(device.ID,
                                                               CancellationToken.None,
@@ -326,24 +326,32 @@ public static class ShellFileOperation
                                                               ["-p", ADBService.EscapeAdbShellString(fullPath)]);
 
         if (!string.IsNullOrEmpty(result))
-        {
             throw new Exception(result);
+    }
+
+    public static async Task TryMakeDir(LogicalDeviceViewModel device, string fullPath)
+    {
+        try
+        {
+            await MakeDir(device, fullPath);
+        }
+        catch
+        {
         }
     }
 
-    public static async void MakeDirs(LogicalDeviceViewModel device, IEnumerable<string> paths)
+    public static async Task MakeDirs(LogicalDeviceViewModel device, IEnumerable<string> paths)
     {
         var result = await ADBService.ExecuteVoidShellCommand(device.ID,
                                                               CancellationToken.None,
                                                               "mkdir",
                                                               ["-p", .. paths.Select(path => ADBService.EscapeAdbShellString(path))]);
+
         if (!string.IsNullOrEmpty(result))
-        {
             throw new Exception(result);
-        }
     }
 
-    public static async void MakeFile(LogicalDeviceViewModel device, string fullPath)
+    public static async Task MakeFile(LogicalDeviceViewModel device, string fullPath)
     {
         var result = await ADBService.ExecuteVoidShellCommand(device.ID,
                                                               CancellationToken.None,
@@ -351,9 +359,7 @@ public static class ShellFileOperation
                                                               ADBService.EscapeAdbShellString(fullPath));
 
         if (!string.IsNullOrEmpty(result))
-        {
             throw new Exception(result);
-        }
     }
 
     public static async void WriteLine(LogicalDeviceViewModel device, string fullPath, string newLine)

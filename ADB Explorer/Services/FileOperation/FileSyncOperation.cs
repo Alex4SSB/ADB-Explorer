@@ -107,7 +107,7 @@ public class FileSyncOperation : FileOperation
 
         Mutex mutex = new();
 
-        var task = Task.Run(() =>
+        var task = Task.Run(async () =>
         {
             TransferStart = DateTime.Now;
 
@@ -117,7 +117,7 @@ public class FileSyncOperation : FileOperation
                     .Select(f => FileHelper.ConcatPaths(TargetPath.FullPath, FileHelper.ExtractRelativePath(f.FullPath, FilePath.FullPath, false)));
 
                 if (paths.Any())
-                    ShellFileOperation.MakeDirs(Device, paths);
+                    await ShellFileOperation.MakeDirs(Device, paths);
             }
             else
             {

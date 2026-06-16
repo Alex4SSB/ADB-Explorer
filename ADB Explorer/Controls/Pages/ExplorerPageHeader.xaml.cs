@@ -545,7 +545,7 @@ public partial class ExplorerPageHeader : UserControl
 
         IsInEditMode = true;
         if (!IsInEditMode) // in case the editing element was not acquired
-            FileActionLogic.CreateNewItem(newItem);
+            _ = FileActionLogic.CreateNewItem(newItem);
     }
 
     private void InitLister()
