@@ -294,4 +294,31 @@
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>Збереження мініатюр між сеансами</value>
   </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>Вимкнути mDNS</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
+    <value>mDNS</value>
+  </data>
+  <data name="S_SERVER_DOWN" xml:space="preserve">
+    <value>mDNS сервер вимкнено</value>
+  </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>mDNS сервер запущено та працює</value>
+  </data>
+  <data name="S_TYPE_SERVICE" xml:space="preserve">
+    <value>mDNS сервис</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>Перевірка стану сервера mDNS…</value>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>Свій шлях до налаштувань програми</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>Обмежити швидкість витягування мініатюр</value>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>Увімкнути мініатюри відео</value>
+  </data>
 </root>
