@@ -9,6 +9,8 @@ namespace ADB_Explorer.ViewModels.Pages;
 
 public partial class ExplorerViewModel : ObservableObject, INavigationAware
 {
+    private bool _isInitialized;
+    private bool _devicesSubscribed;
 
     [ObservableProperty]
     public partial ICollectionView ExplorerItemsSource { get; set; }
@@ -175,9 +177,9 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         }
     } = null;
 
-    public LogicalDeviceViewModel? CurrentDevice => Data.DevicesObject.Current;
+    public LogicalDeviceViewModel? CurrentDevice => Data.DevicesObject?.Current;
 
-    public Battery? CurrentDeviceBattery => Data.DevicesObject.Current?.Battery;
+    public Battery? CurrentDeviceBattery => Data.DevicesObject?.Current?.Battery;
 
     public Action RequestModeRefresh { get; set; }
 
@@ -196,26 +198,47 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
             _filterDebounceTimer.Stop();
             RefreshExplorerFilter();
         };
+    }
 
+    public Task OnNavigatedToAsync()
+    {
+        if (!_isInitialized)
+            InitializeViewModel();
+        else
+            EnsureDevicesSubscription();
+
+        Data.CurrentPage.Value = typeof(Views.Pages.ExplorerPage);
+
+        return Task.CompletedTask;
+    }
+
+    private void InitializeViewModel()
+    {
+        Data.Settings.SavedLocations ??= [];
         Data.Settings.SavedLocations.CollectionChanged += SavedLocations_CollectionChanged;
         SavedLocations_CollectionChanged(null, null);
 
         Data.FileActions.PropertyChanged += FileActions_PropertyChanged;
         Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
         Data.Settings.PropertyChanged += Settings_PropertyChanged;
-        Data.DevicesObject.PropertyChanged += DevicesObject_PropertyChanged;
+
+        EnsureDevicesSubscription();
 
         Data.CurrentPathO.PropertyChanged += (s, e) =>
         {
             RequestModeRefresh?.Invoke();
         };
+
+        _isInitialized = true;
     }
 
-    public Task OnNavigatedToAsync()
+    private void EnsureDevicesSubscription()
     {
-        Data.CurrentPage.Value = typeof(Views.Pages.ExplorerPage);
+        if (_devicesSubscribed || Data.DevicesObject is null)
+            return;
 
-        return Task.CompletedTask;
+        Data.DevicesObject.PropertyChanged += DevicesObject_PropertyChanged;
+        _devicesSubscribed = true;
     }
 
     public Task OnNavigatedFromAsync() => Task.CompletedTask;
@@ -408,7 +431,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
     private void UpdateDriveView()
     {
-        var source = Data.DevicesObject.Current?.Drives;
+        var source = Data.DevicesObject?.Current?.Drives;
         if (source is null)
             return;
 
