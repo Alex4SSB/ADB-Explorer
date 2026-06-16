@@ -261,25 +261,55 @@ public partial class App
                 }
 
                 if (result is Wpf.Ui.Controls.ContentDialogResult.Primary)
-                {
-                    var sent = await CrashReportService.SendAsync(exception);
-                    var sentMessage = CrashReportService.UsesLocalCollector
-                        ? CrashDialog.SentDebug
-                        : CrashDialog.SentRelease;
-                    var failedMessage = CrashReportService.UsesLocalCollector
-                        ? CrashDialog.SendFailedDebug
-                        : CrashDialog.SendFailedRelease;
-                    var feedbackDialog = AdbContentDialog.StringDialog(
-                        sent ? sentMessage : failedMessage,
-                        sent ? DialogService.DialogIcon.Informational : DialogService.DialogIcon.Exclamation);
-                    await DialogService.ShowDialog(feedbackDialog, CrashDialog.Title);
-                }
+                    await ShowSendCrashReportDialogAsync(exception);
             }
             finally
             {
                 RethrowAfterCrashDialog(exception);
             }
         });
+    }
+
+    private static async Task ShowSendCrashReportDialogAsync(Exception exception)
+    {
+        var progress = new CrashReportSendProgress();
+        var content = AdbContentDialog.CustomContentDialog(progress, DialogService.DialogIcon.Informational);
+
+        var dialog = new Wpf.Ui.Controls.ContentDialog
+        {
+            Title = CrashDialog.SendingTitle,
+            Content = content,
+            IsFooterVisible = false,
+            FlowDirection = Data.RuntimeSettings.IsRTL ? FlowDirection.RightToLeft : FlowDirection.LeftToRight,
+        };
+
+        var showTask = App.Services
+            .GetRequiredService<IContentDialogService>()
+            .ShowAsync(dialog, CancellationToken.None);
+
+        progress.Start(CrashDialog.Sending);
+        var sendResult = await CrashReportService.SendAsync(exception);
+
+        var sentMessage = CrashReportService.UsesLocalCollector
+            ? CrashDialog.SentDebug
+            : CrashDialog.SentRelease;
+        var failedMessage = CrashReportService.UsesLocalCollector
+            ? CrashDialog.SendFailedDebug
+            : CrashDialog.SendFailedRelease;
+#if DEBUG
+        if (!sendResult.Success && !string.IsNullOrWhiteSpace(sendResult.Error))
+            failedMessage += $"\n\n{sendResult.Error}";
+#endif
+
+        progress.Complete(sendResult.Success ? sentMessage : failedMessage);
+        content.SetDialogIcon(sendResult.Success
+            ? DialogService.DialogIcon.Informational
+            : DialogService.DialogIcon.Exclamation);
+        dialog.Title = CrashDialog.Title;
+        dialog.IsFooterVisible = true;
+        dialog.CloseButtonText = CrashDialog.Dismiss;
+
+        await showTask;
     }
 
     private static void RethrowAfterCrashDialog(Exception exception)
@@ -302,15 +332,17 @@ public partial class App
         public const string Title = "Unhandled Exception";
         public const string Send = "Send Report";
         public const string Dismiss = "Dismiss";
+        public const string SendingTitle = "Sending crash report";
+        public const string Sending = "Sending crash report...";
 
         public const string SentDebug =
-            "Thank you. The crash report was sent successfully.\n\n" +
+            "Thank you. Your crash report is being sent.\n\n" +
             "In Grafana Explore → Loki, run:\n" +
-            "{source=\"adb-explorer\", kind=\"exception\"}";
+            "{service_name=\"ADB Explorer\", kind=\"exception\"}";
 
         public const string SentRelease =
             """
-            Thank you. The crash report was sent to Grafana Cloud.
+            Thank you. Your crash report is being sent to Grafana Cloud.
             
             Task failed successfully...
             """;

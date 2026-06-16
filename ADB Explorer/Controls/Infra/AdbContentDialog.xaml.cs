@@ -66,7 +66,7 @@ public partial class AdbContentDialog : UserControl
     {
         var dialog = new AdbContentDialog();
 
-        dialog.Icon.Glyph = GetIcon(icon);
+        dialog.SetDialogIcon(icon);
         dialog.ContentPresenter.Visibility = Visibility.Visible;
         dialog.DialogContent.Visibility = Visibility.Collapsed;
         dialog.ContentPresenter.Content = content;
@@ -74,4 +74,6 @@ public partial class AdbContentDialog : UserControl
 
         return dialog;
     }
+
+    public void SetDialogIcon(DialogIcon icon) => Icon.Glyph = GetIcon(icon);
 }

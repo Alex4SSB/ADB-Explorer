@@ -32,6 +32,10 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup Condition="Exists('FaroCollector.url') And '$(Configuration)' == 'Debug'">
+    <Content Include="FaroCollector.url" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <Target Name="WarnMissingFaroCollectorUrl" BeforeTargets="Build" Condition="'$(Configuration)' != 'Debug' And !Exists('FaroCollector.url')">
     <Warning Text="FaroCollector.url not found; this $(Configuration) build will not send crash reports to Grafana Cloud." />
   </Target>

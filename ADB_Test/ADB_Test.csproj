@@ -30,4 +30,8 @@
     <ProjectReference Include="..\ADB Explorer\ADB Explorer.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="Exists('..\ADB Explorer\FaroCollector.url')">
+    <Content Include="..\ADB Explorer\FaroCollector.url" Link="FaroCollector.url" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

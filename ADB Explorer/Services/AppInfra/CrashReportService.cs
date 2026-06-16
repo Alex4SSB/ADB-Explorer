@@ -18,35 +18,39 @@ public static class CrashReportService
 
     public static bool IsConfigured => CollectorUrl.Value is not null;
 
-    /// <summary>True when crash reports are sent to local Grafana Alloy (Debug builds only).</summary>
-    public static bool UsesLocalCollector
-    {
-        get
-        {
-#if DEBUG
-            return true;
-#else
-            return false;
-#endif
-        }
-    }
+    /// <summary>True when crash reports are sent to local Grafana Alloy.</summary>
+    public static bool UsesLocalCollector =>
+        CollectorUrl.Value is { IsLoopback: true };
 
-    public static async Task<bool> SendAsync(Exception exception)
+    public readonly record struct SendResult(bool Success, int? StatusCode, string? Error);
+
+    public static async Task<SendResult> SendAsync(Exception exception)
     {
         if (!IsConfigured)
-            return false;
+            return new(false, null, "Crash reporting is not configured");
+
+        var collectorUrl = CollectorUrl.Value!;
+        var ping = await Network.PingCollectorAsync(collectorUrl).ConfigureAwait(false);
+        if (!ping.IsReachable)
+            return new(false, ping.StatusCode, ping.Error);
 
         var json = BuildPayloadJson(exception);
         var headers = new Dictionary<string, string> { ["X-Faro-Session-Id"] = SessionId };
-        return await Network.PostJsonAsync(CollectorUrl.Value!, json, headers).ConfigureAwait(false);
+        Network.PostJsonFireAndForget(collectorUrl, json, headers);
+        return new(true, ping.StatusCode, null);
     }
 
     private static Uri? ResolveCollectorUrl()
     {
         foreach (var candidate in EnumerateCollectorUrlCandidates())
         {
-            if (Uri.TryCreate(candidate, UriKind.Absolute, out var uri))
-                return uri;
+            if (!Uri.TryCreate(candidate, UriKind.Absolute, out var uri))
+                continue;
+
+            if (uri.Scheme is not ("http" or "https"))
+                continue;
+
+            return uri;
         }
 
         return null;
@@ -55,6 +59,10 @@ public static class CrashReportService
     private static IEnumerable<string> EnumerateCollectorUrlCandidates()
     {
 #if DEBUG
+        var devOverride = ReadAdjacentCollectorUrl();
+        if (!string.IsNullOrWhiteSpace(devOverride))
+            yield return devOverride;
+
         yield return LocalAlloyCollectorUrl;
 #else
 #if DEPLOY
@@ -64,6 +72,26 @@ public static class CrashReportService
         var embedded = ReadEmbeddedCollectorUrl();
         if (!string.IsNullOrWhiteSpace(embedded))
             yield return embedded;
+#endif
+    }
+
+    private static string? ReadAdjacentCollectorUrl()
+    {
+#if DEBUG
+        try
+        {
+            var path = Path.Combine(AppContext.BaseDirectory, "FaroCollector.url");
+            if (!File.Exists(path))
+                return null;
+
+            return NormalizeCollectorUrl(File.ReadAllText(path));
+        }
+        catch
+        {
+            return null;
+        }
+#else
+        return null;
 #endif
     }
 
@@ -154,6 +182,12 @@ public static class CrashReportService
                     ["userAgent"] = $"ADB-Explorer/{Properties.AppGlobal.AppVersion} ({RuntimeInformation.OSArchitecture})",
                 },
             },
+            ["events"] = new JArray(new JObject
+            {
+                ["name"] = "session_start",
+                ["domain"] = "session",
+                ["timestamp"] = timestamp,
+            }),
             ["exceptions"] = new JArray(exceptionObject),
         };
 
@@ -236,9 +270,6 @@ public static class CrashReportService
 
         if (exception.InnerException is not null)
             context["innerException"] = FormatExceptionChain(exception.InnerException);
-
-        if (!string.IsNullOrWhiteSpace(exception.StackTrace))
-            context["stackTrace"] = exception.StackTrace;
 
         return context;
     }

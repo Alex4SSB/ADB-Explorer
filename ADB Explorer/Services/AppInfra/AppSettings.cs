@@ -34,6 +34,10 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
 
     void IJsonOnDeserialized.OnDeserialized()
     {
+        _locationThumbSize ??= [];
+        _locationSorting ??= [];
+        SavedLocations ??= [];
+
         LocationThumbSize = _locationThumbSize;
         LocationSorting = _locationSorting;
     }

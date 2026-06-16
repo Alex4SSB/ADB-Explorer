@@ -362,7 +362,14 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /ADB Explorer/Properties/launchSettings.json
+
+# Agent instructions and helpers
 /.github/copilot-instructions.md
+*.mdc
+*.ps1
+*.example
 
 # Grafana Faro collector URL (contains app key; copy from FaroCollector.url.example)
 ADB Explorer/FaroCollector.url
+scripts/.grafana-token
+crashes/

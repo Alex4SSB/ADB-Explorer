@@ -9,32 +9,136 @@ namespace ADB_Explorer.Services;
 
 public static class Network
 {
-    private static readonly HttpClient Client = new(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.All });
+    public readonly record struct PostJsonResult(bool Success, int? StatusCode, string? Error);
+
+    public readonly record struct HttpReachabilityResult(bool IsReachable, int? StatusCode, string? Error);
+
+    private static readonly SocketsHttpHandler Handler = new()
+    {
+        AutomaticDecompression = DecompressionMethods.All,
+        ConnectTimeout = TimeSpan.FromSeconds(15),
+        PooledConnectionLifetime = TimeSpan.FromMinutes(10),
+    };
+
+    private static readonly HttpClient Client = new(Handler)
+    {
+        Timeout = TimeSpan.FromSeconds(60),
+    };
+
+    private static readonly HttpClient BackgroundClient = new(new SocketsHttpHandler
+    {
+        AutomaticDecompression = DecompressionMethods.All,
+        ConnectTimeout = TimeSpan.FromSeconds(15),
+        PooledConnectionLifetime = TimeSpan.FromMinutes(10),
+    })
+    {
+        // Grafana Cloud Faro can take 30+ seconds to return 202 Accepted.
+        Timeout = TimeSpan.FromSeconds(60),
+    };
 
     static Network()
     {
         Client.DefaultRequestHeaders.UserAgent.ParseAdd("ADB-Explorer");
-        Client.Timeout = TimeSpan.FromSeconds(20);
+        BackgroundClient.DefaultRequestHeaders.UserAgent.ParseAdd("ADB-Explorer");
     }
 
-    public static async Task<bool> PostJsonAsync(Uri url, string json, IReadOnlyDictionary<string, string>? headers = null)
+    /// <summary>
+    /// Checks that the Faro collector endpoint responds. Any HTTP status means the server is reachable.
+    /// </summary>
+    public static async Task<HttpReachabilityResult> PingCollectorAsync(Uri url, TimeSpan? timeout = null)
+    {
+        timeout ??= TimeSpan.FromSeconds(10);
+
+        try
+        {
+            using var cts = new CancellationTokenSource(timeout.Value);
+            using var content = new StringContent("{}", Encoding.UTF8, "application/json");
+            using var request = new HttpRequestMessage(HttpMethod.Post, url) { Content = content };
+            request.Version = HttpVersion.Version11;
+            request.VersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
+            request.Headers.ExpectContinue = false;
+
+            using var response = await Client
+                .SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token)
+                .ConfigureAwait(false);
+
+            return new(true, (int)response.StatusCode, null);
+        }
+        catch (TaskCanceledException)
+        {
+            return new(false, null, "Request timed out");
+        }
+        catch (Exception ex)
+        {
+            return new(false, null, ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Sends JSON in the background without waiting for the caller.
+    /// </summary>
+    public static void PostJsonFireAndForget(Uri url, string json, IReadOnlyDictionary<string, string>? headers = null)
+    {
+        _ = PostJsonInBackgroundAsync(url, json, headers);
+    }
+
+    private static async Task PostJsonInBackgroundAsync(Uri url, string json, IReadOnlyDictionary<string, string>? headers)
     {
         try
         {
             using var content = new StringContent(json, Encoding.UTF8, "application/json");
             using var request = new HttpRequestMessage(HttpMethod.Post, url) { Content = content };
+            request.Version = HttpVersion.Version11;
+            request.VersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
+            request.Headers.ExpectContinue = false;
+
             if (headers is not null)
             {
                 foreach (var (name, value) in headers)
                     request.Headers.TryAddWithoutValidation(name, value);
             }
 
-            using var response = await Client.SendAsync(request).ConfigureAwait(false);
-            return response.IsSuccessStatusCode;
+            using var response = await BackgroundClient.SendAsync(request).ConfigureAwait(false);
         }
-        catch (Exception)
+        catch
         {
-            return false;
+            // Best-effort after the UI has already confirmed reachability.
+        }
+    }
+
+    public static async Task<PostJsonResult> PostJsonAsync(Uri url, string json, IReadOnlyDictionary<string, string>? headers = null)
+    {
+        try
+        {
+            using var content = new StringContent(json, Encoding.UTF8, "application/json");
+            using var request = new HttpRequestMessage(HttpMethod.Post, url) { Content = content };
+            request.Version = HttpVersion.Version11;
+            request.VersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
+            request.Headers.ExpectContinue = false;
+
+            if (headers is not null)
+            {
+                foreach (var (name, value) in headers)
+                    request.Headers.TryAddWithoutValidation(name, value);
+            }
+
+            using var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            if (response.IsSuccessStatusCode)
+                return new(true, (int)response.StatusCode, null);
+
+            var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var error = string.IsNullOrWhiteSpace(body)
+                ? response.ReasonPhrase
+                : $"{response.ReasonPhrase}: {body}";
+            return new(false, (int)response.StatusCode, error);
+        }
+        catch (TaskCanceledException)
+        {
+            return new(false, null, "Request timed out");
+        }
+        catch (Exception ex)
+        {
+            return new(false, null, ex.Message);
         }
     }
 
