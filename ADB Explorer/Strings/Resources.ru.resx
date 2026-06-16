@@ -172,7 +172,7 @@
     <value>Ошибка при отключении</value>
   </data>
   <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
-    <value>Ошибка соединения</value>
+    <value>Ошибка сопряжения</value>
   </data>
   <data name="S_ROOT_FORBID" xml:space="preserve">
     <value>Root-доступ невозможно включить на выбранном устройстве.</value>
@@ -214,7 +214,7 @@
     <value>Установить пакеты</value>
   </data>
   <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
-    <value>Соединить и/или подключить Wi-Fi устройство (не используя mDNS)</value>
+    <value>Сопряжение и/или подключение устройства Wi-Fi (без использования mDNS)</value>
   </data>
   <data name="S_RESTART_APP" xml:space="preserve">
     <value>Перезапустить программу, чтобы изменения вступили в силу</value>
@@ -232,7 +232,7 @@
     <value>Не удалось отправить файл обратно на устройство.</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>ADB-сервер необходимо перезапустить, чтобы отключить mDNS.</value>
+    <value>Чтобы отключить mDNS, необходимо перезапустить сервер ADB.</value>
   </data>
   <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
     <value>Отключить mDNS</value>
@@ -798,7 +798,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>{0}час</value>
   </data>
   <data name="S_MDNS_ON" xml:space="preserve">
-    <value>mDNS-сервер работает</value>
+    <value>mDNS-сервер запущен и работает</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Ограниченная поддержка</value>
@@ -849,7 +849,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Эмулятор</value>
   </data>
   <data name="S_TYPE_SERVICE" xml:space="preserve">
-    <value>mDNS Сервис</value>
+    <value>mDNS сервис</value>
   </data>
   <data name="S_TYPE_USB" xml:space="preserve">
     <value>USB</value>
@@ -1005,7 +1005,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Аргумент должен указать полный путь нового или существующего файла настроек.</value>
   </data>
   <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
-    <value>Произвольный путь</value>
+    <value>Свой путь к настройкам приложения</value>
   </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Пусто</value>
@@ -1068,7 +1068,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Отключено</value>
   </data>
   <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
-    <value>Код соединения</value>
+    <value>Код сопряжения</value>
   </data>
   <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
     <value>IP Адрес / Имя хоста</value>
@@ -1077,19 +1077,19 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Порт</value>
   </data>
   <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
-    <value>Порт соединения</value>
+    <value>Порт сопряжения</value>
   </data>
   <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
-    <value>Соединить и подключить</value>
+    <value>Сопрячь и подключить</value>
   </data>
   <data name="S_DEVICE_SAVED" xml:space="preserve">
     <value>Сохраненное устройство</value>
   </data>
   <data name="S_DEVICE_QR" xml:space="preserve">
-    <value>Соединение по QR</value>
+    <value>QR Сопряжение</value>
   </data>
   <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
-    <value>Готово к соединению</value>
+    <value>Готово к сопряжению</value>
   </data>
   <data name="S_CLEAR_ALL" xml:space="preserve">
     <value>Отчистить всё</value>
@@ -1379,7 +1379,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Выкл.</value>
   </data>
   <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
-    <value>Проверка статуса mDNS-сервера…</value>
+    <value>Проверка состояния сервера mDNS…</value>
   </data>
   <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
     <value>При подключении</value>
@@ -1468,5 +1468,176 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>Сохранение миниатюр между сеансами</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>Ограничить скорость извлечения миниатюр</value>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>Включить миниатюры видео</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>Длина</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>Размеры</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>Время обновления локальных миниатюр</value>
+  </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>Используйте BusyBox, если он доступен</value>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>Автоподключение WSA, если доступно</value>
+  </data>
+  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
+    <value>Обнаружить эмуляторы андроид</value>
+  </data>
+  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
+    <value>Запустите этот эмулятор</value>
+  </data>
+  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
+    <value>Запуск эмулятора</value>
+  </data>
+  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
+    <value>Android SDK эмулятор не найден. Установите Android SDK набор эмулятора или устанровить ANDROID_SDK_ROOT.</value>
+  </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>Вставить</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>Проверка обновлений миниатюр</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>Вытягивание миниатюр</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>Чтение местоположений миниатюр и базы данных мультимедиа</value>
+  </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value>Подробности</value>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value>Просмотреть</value>
+  </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value>Макет и просмотр опций</value>
+  </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value>Размер миниатюры сохраняется для каждого местоположения</value>
+  </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value>Сортировать</value>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value>По возрастанию</value>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value>По убыванию</value>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>Столбец сортировки и порядок сохраняются для каждого местоположения</value>
+  </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>Максимальный размер изображения используеться как собственная миниатюра (0 - Отключено)</value>
+  </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>и {0} еще…</value>
+  </data>
+  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
+    <value>Показать или скрыть панель подробностей из предварительного просмотра.</value>
+  </data>
+  <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
+    <value>Предпросмотр</value>
+  </data>
+  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
+    <value>Максимальный размер файла для предпросмотра</value>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>Перетащите файл в папку по умолчанию, дважды щелкнув по нему</value>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value>Выберите один элемент, чтобы получить дополнительную информацию.</value>
+  </data>
+  <data name="S_ITEM_LOCATION" xml:space="preserve">
+    <value>Расположение</value>
+  </data>
+  <data name="S_IMAGE_F_STOP" xml:space="preserve">
+    <value>F-стоп</value>
+  </data>
+  <data name="S_IMAGE_ISO" xml:space="preserve">
+    <value>ISO скорость</value>
+  </data>
+  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
+    <value>Время контакта</value>
+  </data>
+  <data name="S_VIDEO_BITRATE" xml:space="preserve">
+    <value>Битрейт</value>
+  </data>
+  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
+    <value>Выберите файл для предпросмотра.</value>
+  </data>
+  <data name="S_PREVIEW_INVALID" xml:space="preserve">
+    <value>Предпросмотр не доступен.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
+    <value>Этот PDF защищен паролем.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
+    <value>Неправильный пароль.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
+    <value>Разблокировать</value>
+  </data>
+  <data name="S_FILE_PERMISSIONS" xml:space="preserve">
+    <value>Разрешения</value>
+  </data>
+  <data name="S_FILE_PERM_USER" xml:space="preserve">
+    <value>Пользователь</value>
+  </data>
+  <data name="S_FILE_PERM_GROUP" xml:space="preserve">
+    <value>Группа</value>
+  </data>
+  <data name="S_FILE_PERM_OTHER" xml:space="preserve">
+    <value>Другие</value>
+  </data>
+  <data name="S_DATE_ACCESSED" xml:space="preserve">
+    <value>Доступ</value>
+  </data>
+  <data name="S_CREATION_TIME" xml:space="preserve">
+    <value>Созданный</value>
+  </data>
+  <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
+    <value>Модифицированный</value>
+  </data>
+  <data name="S_FILE_SYSTEM" xml:space="preserve">
+    <value>Файловая система</value>
+  </data>
+  <data name="S_MOUNT_POINT" xml:space="preserve">
+    <value>Точка монтирования</value>
+  </data>
+  <data name="S_MOUNT_OPTIONS" xml:space="preserve">
+    <value>Опции монтирования</value>
+  </data>
+  <data name="S_COLOR_RED" xml:space="preserve">
+    <value>Красный</value>
+  </data>
+  <data name="S_COLOR_GREEN" xml:space="preserve">
+    <value>Зеленый</value>
+  </data>
+  <data name="S_COLOR_BLUE" xml:space="preserve">
+    <value>Синий</value>
+  </data>
+  <data name="S_ADB_PATH_INVALID" xml:space="preserve">
+    <value>Указанный путь {0} представляет собой либо ярлык Windows, либо UNC (удаленный путь), что недопустимо.</value>
+  </data>
+  <data name="S_ADB_COMPROMISED" xml:space="preserve">
+    <value>Предоставленный исполняемый файл невозможно проверить как ADB. Убедитесь, что вы загружаете только официальные инструменты платформы Android от Google.</value>
+  </data>
+  <data name="S_BUTTON_PAIR" xml:space="preserve">
+    <value>Сопряжение</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>После сбоя вы можете по желанию прислать диагностический отчет, чтобы помочь нам его исправить. Отчеты отправляются только после нажатия кнопки "Отправить отчет" и обычно содержат сообщения об исключении, трассировке стека, версии программы и Windows, а также открытой странице. Данные обрабатываются Grafana Labs (Grafana Cloud). См. раздел ссылку на Политику конфиденциальности выше.</value>
   </data>
 </root>
