@@ -452,7 +452,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Авто открытие для обзора</value>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
-    <value>Прекращать опрос при передаче файлов</value>
+    <value>Прекратить опрос при отправке/получении</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
     <value>Одновременные операции</value>
@@ -1364,7 +1364,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Терминал</value>
   </data>
   <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
-    <value>Сохранение дату изменения файла</value>
+    <value>Сохранить дату изменения файла</value>
   </data>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
     <value>Установить {0}</value>
@@ -1437,5 +1437,36 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_THUMBSIZE_XL" xml:space="preserve">
     <value>Дополнительно большие иконки</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>Эта версия приложения была выпущена после обновления политики конфиденциальности.
+Просмотрите изменения на GitHub.</value>
+  </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Свой акцент цвета</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Акцент цвета</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Выберите цвет</value>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Показать диалог отчёта о сбое</value>
+  </data>
+  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
+    <value>Невозможно найти ADB из системного ПУТИ. Пожалуйста, используйте "{0}" чтобы обнаружить его.</value>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>Извлечь и отобразить миниатюры</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>Только в просмотре иконок</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>Только в фотокаталогах</value>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>Сохранение миниатюр между сеансами</value>
   </data>
 </root>
