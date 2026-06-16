@@ -816,7 +816,7 @@ Cancelar Todas las Activas</value>
     <value>Recuperación</value>
   </data>
   <data name="S_BAT_VOLT" xml:space="preserve">
-    <value>Voltage: {0}v</value>
+    <value>Voltaje: {0}v</value>
   </data>
   <data name="S_BAT_TEMP" xml:space="preserve">
     <value>Temperatura: {0}°C</value>
@@ -1632,5 +1632,12 @@ Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
   </data>
   <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
     <value>Emulador del SDK de Android no fue encontrado. Instala el paquete emulador SDK de Android o establezca ANDROID_SDK_ROOT.</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Directiva de privacidad actualizada</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>Esta versión fue publicada después de una actualización de directiva de privacidad.
+Revisa los cambios en GitHub.</value>
   </data>
 </root>
