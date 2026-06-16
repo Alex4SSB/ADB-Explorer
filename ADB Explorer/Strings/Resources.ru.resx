@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>Символ(ы) Робота Андроид</value>
+    <value>Иконка(ы) Работа Android</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Робот Android воспроизводится или модифицируется на основе работы, созданной и распространяемой Google, и используется в соответствии с условиями, описанными в лицензии Creative Commons 3.0 с указанием авторства.</value>
@@ -588,7 +588,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Остановить логирование</value>
   </data>
   <data name="S_BUTTON_LOG" xml:space="preserve">
-    <value>Логи</value>
+    <value>Журнал команд</value>
   </data>
   <data name="S_BUTTON_DRIVES" xml:space="preserve">
     <value>Накопители устройств</value>
@@ -1035,13 +1035,13 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Выбранный файл нарушает правила именования корня диска Windows</value>
   </data>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
-    <value>Некоторые выбранные файлы имеют противоречивые имена в FUSE / Windows</value>
+    <value>Некоторые выбранные файлы имеют конфликт имен без учета регистра</value>
   </data>
   <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
     <value>Выбранный файл нарушает правила именования FUSE</value>
   </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
-    <value>Некоторые скопированные файлы имеют противоречивые имена в FUSE</value>
+    <value>Некоторые скопированные файлы имеют конфликт имен без учета регистра</value>
   </data>
   <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
     <value>Скопированный файл нарушает правила именования FUSE</value>
@@ -1395,5 +1395,47 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_ONE_HOUR" xml:space="preserve">
     <value>Один час</value>
+  </data>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Ограничение дисков:</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>Файловая система только для чтения</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• Символические ссылки не поддерживаются.
+• Имена файлов не могут содержать " * / : &lt; &gt; ? \ |
+• Имена файлов не учитывают регистр
+• Установка APKs не поддерживается</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Политика конфиденциальности обновлена</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Отчеты о сбоях</value>
+  </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Соблюдает правила именования пространства пользователя</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Выбранный файл нарушает правила наименования пространства пользователя</value>
+  </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Скопированный файл нарушает правила наименования пространства пользователя</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value>Иконки</value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>Показывать Иконки для специальных папок</value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>Средние иконки</value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>Большие иконки</value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>Дополнительно большие иконки</value>
   </data>
 </root>
