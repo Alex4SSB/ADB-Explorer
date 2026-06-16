@@ -124,7 +124,7 @@
     <value>Робота Android відтворено або змінено з роботи, створеної та поширеної Google, і використовується відповідно до умов, описаних у ліцензії Creative Commons 3.0 Attribution.</value>
   </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
-    <value>Піктограма APK ліцензована за ліцензією Apache версії 2.0.</value>
+    <value>Іконка APK ліцензована за ліцензією Apache версії 2.0.</value>
   </data>
   <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
     <value>Не вдалося отримати версію ADB з наданого шляху.</value>
@@ -151,7 +151,7 @@
     <value>Скопіювати шлях об'єкта</value>
   </data>
   <data name="S_RESTORE_ALL" xml:space="preserve">
-    <value>Відновити всі об'єкти</value>
+    <value>Відновити всі елементи</value>
   </data>
   <data name="S_EMPTY_TRASH" xml:space="preserve">
     <value>Очистити кошик</value>
@@ -160,16 +160,16 @@
     <value>Видалити</value>
   </data>
   <data name="S_DEST_ERR" xml:space="preserve">
-    <value>Помилка призначення шляху</value>
+    <value>Помилка шляху призначення</value>
   </data>
   <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>помилка приєднання до</value>
+    <value>не вдалося підключитися до</value>
   </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
-    <value>Помилка під'єднання</value>
+    <value>Помилка підключення</value>
   </data>
   <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
-    <value>Помилка від'єднання</value>
+    <value>Помилка відключення</value>
   </data>
   <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
     <value>Помилка сполучення</value>
@@ -181,7 +181,7 @@
     <value>Root-доступ</value>
   </data>
   <data name="S_DEL_CONF_TITLE" xml:space="preserve">
-    <value>Підтвердити Видалення</value>
+    <value>Підтвердити видалення</value>
   </data>
   <data name="S_PERM_DEL" xml:space="preserve">
     <value>Видалити назавжди</value>
@@ -190,10 +190,10 @@
     <value>Помилка створення</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>Конфлікт Відновлення</value>
+    <value>Конфлікт відновлення</value>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
-    <value>Підтвердити інсталяцію</value>
+    <value>Підтвердити деінсталяцію</value>
   </data>
   <data name="S_INSTALL_APK" xml:space="preserve">
     <value>Виберіть пакет для встановлення</value>
@@ -217,19 +217,19 @@
     <value>Сполучення та/або підключення пристрою Wi-Fi (без використання mDNS)</value>
   </data>
   <data name="S_RESTART_APP" xml:space="preserve">
-    <value>Перезапустіть програму для набутя чинності</value>
+    <value>Перезапустіть програму, щоб зміни набули чинності</value>
   </data>
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
-    <value>Помилка Читання Файлу</value>
+    <value>Помилка читання файлу</value>
   </data>
   <data name="S_READ_FILE_ERROR" xml:space="preserve">
     <value>Не вдалося витягнути файл для читання.</value>
   </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
-    <value>Помилка Запису Файлу</value>
+    <value>Помилка запису файла</value>
   </data>
   <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>Не вдалося відправити обратно файл на пристрій.</value>
+    <value>Не вдалося надіслати файл назад на пристрій.</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>Щоб вимкнути mDNS, потрібно перезапустити сервер ADB.</value>
@@ -320,5 +320,21 @@
   </data>
   <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
     <value>Увімкнути мініатюри відео</value>
+  </data>
+  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
+    <value>Наступне буде видалено:
+{0}</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>Запустити WSA у фоні</value>
+  </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value>Запустити WSA</value>
+  </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value>WSA додаток</value>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>Автопідключення WSA, якщо доступне</value>
   </data>
 </root>
