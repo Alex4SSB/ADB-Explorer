@@ -273,4 +273,25 @@
   <data name="S_ROOT_POSSIBLE" xml:space="preserve">
     <value>Root може бути увімкнено</value>
   </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Свій акцент кольору</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Акцент кольору</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Виберіть колір</value>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Показати діалог звіту про збій</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>Тільки у перегляді іконок</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>Тільки у фотокаталогах</value>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>Збереження мініатюр між сеансами</value>
+  </data>
 </root>
