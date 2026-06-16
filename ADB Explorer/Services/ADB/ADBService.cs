@@ -327,9 +327,9 @@ public partial class ADBService
 
     public static bool CheckMDNS()
     {
-        var res = ExecuteAdbCommandAsync("mdns", CancellationToken.None, "check");
+        var exitCode = ExecuteAdbCommand("mdns", out string stdout, out _, CancellationToken.None, "check");
 
-        return res.First().Contains("mdns daemon version");
+        return exitCode == 0 && stdout.Contains("mdns daemon version");
     }
 
     public static void KillAdbServer(bool restart = false)

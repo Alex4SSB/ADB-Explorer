@@ -95,7 +95,16 @@ public class MDNS : ViewModelBase
     {
         Task.Run(() =>
         {
-            var newState = ADBService.CheckMDNS() ? MdnsState.Running : MdnsState.NotRunning;
+            MdnsState newState;
+            try
+            {
+                newState = ADBService.CheckMDNS() ? MdnsState.Running : MdnsState.NotRunning;
+            }
+            catch
+            {
+                newState = MdnsState.NotRunning;
+            }
+
             App.SafeInvoke(() => State = newState);
         });
         Task.Run(async () =>
