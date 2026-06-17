@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>Иконка(и) Работа Android</value>
+    <value>Иконка робота Android</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Робот Android воспроизводится или модифицируется на основе работы, созданной и распространяемой Google, и используется в соответствии с условиями, описанными в лицензии Creative Commons 3.0 с указанием авторства.</value>
@@ -500,7 +500,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Темная</value>
   </data>
   <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
-    <value>Как в Windows</value>
+    <value>Системный</value>
   </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>Тема</value>
@@ -762,7 +762,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Версия</value>
   </data>
   <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
-    <value>ADB не отвечает</value>
+    <value>ADB Сервер не отвечает</value>
   </data>
   <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
     <value>Время от последнего ответа сервера</value>
@@ -828,7 +828,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Перезагрузить в</value>
   </data>
   <data name="S_REBOOT_SYSTEM" xml:space="preserve">
-    <value>Образ системы</value>
+    <value>System Image</value>
   </data>
   <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
     <value>Bootloader</value>
@@ -837,7 +837,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Sideload</value>
   </data>
   <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
-    <value>Sideload (Автоперезагрузка)</value>
+    <value>Sideload (Auto Reboot)</value>
   </data>
   <data name="S_STATUS_OFFLINE" xml:space="preserve">
     <value>{0} - Оффлайн</value>
@@ -909,10 +909,10 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Перенапряжение</value>
   </data>
   <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
-    <value>Нетипичный сбой</value>
+    <value>Неустановленная неисправность</value>
   </data>
   <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
-    <value>Переохлаждение</value>
+    <value>Холодный</value>
   </data>
   <data name="S_BUTTON_LAUNCH" xml:space="preserve">
     <value>Запустить</value>
@@ -921,13 +921,13 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Запуск WSA</value>
   </data>
   <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
-    <value>Не показывать снова.</value>
+    <value>Больше этого не показывать.</value>
   </data>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Прервать</value>
   </data>
   <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
-    <value>Отправка</value>
+    <value>Отправка в Shell</value>
   </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
     <value>{0} конфликт</value>
@@ -945,7 +945,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Операции</value>
   </data>
   <data name="S_ACTION_VALIDATE" xml:space="preserve">
-    <value>Сверить {0}</value>
+    <value>Проверить {0}</value>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>Ссылка</value>
@@ -1122,7 +1122,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Установщик APK</value>
   </data>
   <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
-    <value>Установщики APK</value>
+    <value>Установщиков APK</value>
   </data>
   <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
     <value>Пакеты</value>
@@ -1355,7 +1355,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>{0} файлов</value>
   </data>
   <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
-    <value>Выберите ROM для боковой загрузки</value>
+    <value>Выберите ROM для sideload</value>
   </data>
   <data name="S_ROM_FILE" xml:space="preserve">
     <value>ROM-файл</value>
