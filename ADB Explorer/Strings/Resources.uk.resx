@@ -148,7 +148,7 @@
     <value>Скопіювати ім'я пакету</value>
   </data>
   <data name="S_COPY_PATH" xml:space="preserve">
-    <value>Скопіювати шлях об'єкта</value>
+    <value>Копіювати шлях елемента</value>
   </data>
   <data name="S_RESTORE_ALL" xml:space="preserve">
     <value>Відновити всі елементи</value>
@@ -336,5 +336,47 @@
   </data>
   <data name="S_SETTINGS_WSA" xml:space="preserve">
     <value>Автопідключення WSA, якщо доступне</value>
+  </data>
+  <data name="S_NEW_VERSION" xml:space="preserve">
+    <value>Доступна нова {0}, версія {1}</value>
+  </data>
+  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
+    <value>Вас вітає нова версія ADB Explorer!
+Список змін доступний на GitHub.</value>
+  </data>
+  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
+    <value>Перейти до нотаток випуску</value>
+  </data>
+  <data name="S_HELP_ON_ADB" xml:space="preserve">
+    <value>Цей додаток є UI для ADB - Android Debug Bridge.
+Для використання програми потрібно встановити ADB на свій PC.
+ADB доступний як частина Android SDK Platform Tools.
+Ви можете використати надане посилання для завантаження SDK Platform Tools.
+На жаль, ми не можемо надати ADB з додатком через ліцензійні обмеження.</value>
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value>Допомога з ADB</value>
+  </data>
+  <data name="S_DELETE_PERMANENT" xml:space="preserve">
+    <value>Наступні елементи будуть безповоротно видалені:
+{0}</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
+    <value>Є 1 конфліктний елемент</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
+    <value>Є 1 конфліктний елемент у {0}</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
+    <value>Є {0} конфліктуючих елементів</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
+    <value>Є {0} конфліктуючих елементів у {1}</value>
+  </data>
+  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
+    <value>Конфлікти вставки</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
+    <value>Опитування від пристроїв</value>
   </data>
 </root>
