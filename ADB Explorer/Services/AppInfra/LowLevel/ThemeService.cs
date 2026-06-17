@@ -41,9 +41,10 @@ internal class AdbThemeService
             dictionaries.Remove(currentTheme);
         }
 
+        var themeResource = ApplicationThemeManager.GetAppTheme() == ApplicationTheme.Dark ? "Dark" : "Light";
         dictionaries.Insert(0, new ResourceDictionary
         {
-            Source = new($"/Themes/{actualTheme}.xaml", UriKind.Relative)
+            Source = new($"/Themes/{themeResource}.xaml", UriKind.Relative)
         });
     }
 
