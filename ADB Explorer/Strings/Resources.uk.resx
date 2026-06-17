@@ -377,6 +377,21 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Конфлікти вставки</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
-    <value>Опитування від пристроїв</value>
+    <value>Запит від пристроїв</value>
+  </data>
+  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
+    <value>Запит статусу батареї</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
+    <value>Автовідкриття для перегляду</value>
+  </data>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value>Примусовий повторний скан медіафайлів під час відправлення</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
+    <value>Запит для дисків</value>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value>Вольтаж: {0}v</value>
   </data>
 </root>
