@@ -148,7 +148,7 @@
     <value>Скопировать имя пакета</value>
   </data>
   <data name="S_COPY_PATH" xml:space="preserve">
-    <value>Скопировать путь объекта</value>
+    <value>Копировать путь элемента</value>
   </data>
   <data name="S_RESTORE_ALL" xml:space="preserve">
     <value>Восстановить все элементы</value>
@@ -305,7 +305,7 @@
     <value>Выключено</value>
   </data>
   <data name="S_NEW_VERSION" xml:space="preserve">
-    <value>Для {0} доступна новая версия {1}</value>
+    <value>Доступна новая {0}, версия {1}</value>
   </data>
   <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
     <value>Перейти на страницу версии</value>
@@ -314,20 +314,20 @@
     <value>Закрыть</value>
   </data>
   <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
-    <value>Перейти к списку изменений</value>
+    <value>Перейти к заметкам выпуска</value>
   </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
     <value>Исполняемый файл ADB</value>
   </data>
   <data name="S_HELP_ON_ADB" xml:space="preserve">
-    <value>Это приложение - Графический интерфейс для ADB - Android Debug Bridge.
-Для его использования на вашем компьютере должны быть установлены ADB.
+    <value>Это приложение представляет собой UI для ADB - Android Debug Bridge.
+Для использования приложения вам потребуется установить ADB на свой PC.
 ADB доступен как часть Android SDK Platform Tools.
-Используйте предоставленную ссылку для скачивания Android SDK Platform Tools.
-К сожалению мы не можем предоставить ADB с приложением ввиду лицензионных ограничений.</value>
+Вы можете использовать предоставленную ссылку для загрузки SDK Platform Tools.
+К сожалению, мы не можем предоставить ADB с приложением из-за лицензионных ограничений.</value>
   </data>
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
-    <value>Помощь с ADB</value>
+    <value>Помощь по ADB</value>
   </data>
   <data name="S_RESTART_ADB_NOW" xml:space="preserve">
     <value>Перезапустить ADB Сейчас</value>
@@ -404,19 +404,19 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Объединить или заменить</value>
   </data>
   <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value>Конфликтует 1 элемент</value>
+    <value>Есть 1 конфликтный элемент</value>
   </data>
   <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>Конфликтует 1 элемент 1 в {0}</value>
+    <value>Имеется 1 конфликтный элемент в {0}</value>
   </data>
   <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value>{0} конфликтующих элементов</value>
+    <value>Имеется {0} конфликтующих элементов</value>
   </data>
   <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value>{0} конфликтующих элементов в {1}</value>
+    <value>Есть {0} конфликтующих элементов в {1}</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Ошибка копирования</value>
+    <value>Конфликты вставки</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Выберите папки для отправки</value>
@@ -437,7 +437,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
-    <value>Опрос по устройствам</value>
+    <value>Опрос от устройств</value>
   </data>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
     <value>Запрос статуса батареи</value>
