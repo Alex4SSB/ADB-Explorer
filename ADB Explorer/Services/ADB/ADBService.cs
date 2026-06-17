@@ -567,16 +567,24 @@ public partial class ADBService
 
         // Update the path in case we got it from environment PATH
         var match = RE_ADB_VERSION().Match(stdout);
+        if (!match.Success)
+        {
+            AdbHelper.CurrentAdbState.Status = AdbHelper.AdbStatus.VersionUnknown;
+            return;
+        }
+
         AdbHelper.CurrentAdbState.Path = match.Groups["Path"].Value.Trim();
 
         string version = match.Groups["version"].Value;
-        if (!string.IsNullOrEmpty(version))
+        if (!string.IsNullOrEmpty(version) && Version.TryParse(version, out Version parsedVersion))
         {
-            AdbHelper.CurrentAdbState.Version = new(version);
+            AdbHelper.CurrentAdbState.Version = parsedVersion;
             AdbHelper.CurrentAdbState.Status = AdbHelper.CurrentAdbState.Version < MIN_ADB_VERSION
                 ? AdbHelper.AdbStatus.Outdated
                 : AdbHelper.AdbStatus.Valid;
         }
+        else
+            AdbHelper.CurrentAdbState.Status = AdbHelper.AdbStatus.VersionUnknown;
     }
 
     #region Former AdbDevice members
