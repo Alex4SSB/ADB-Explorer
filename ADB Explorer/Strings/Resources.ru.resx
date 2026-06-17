@@ -521,7 +521,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Проводник</value>
   </data>
   <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
-    <value>Приводы &amp; Функции</value>
+    <value>Диски и функции</value>
   </data>
   <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
     <value>Устройство</value>
@@ -539,10 +539,10 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Политика конфиденциальности</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
-    <value>Сторонние лицензии</value>
+    <value>Лицензии третьих лиц</value>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
-    <value>[не назначено]</value>
+    <value>[не установлено]</value>
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
     <value>Поиск настроек</value>
@@ -551,7 +551,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Закрыть поиск</value>
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
-    <value>Поиск</value>
+    <value>Просмотр поиска</value>
   </data>
   <data name="S_COLLAPSE_ALL" xml:space="preserve">
     <value>Свернуть все</value>
@@ -572,26 +572,26 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Ок</value>
   </data>
   <data name="S_FILTER_FILE_OPS" xml:space="preserve">
-    <value>Фильтр операций</value>
+    <value>Фильтрация файловых операций</value>
   </data>
   <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
-    <value>Включить авто воспроизведение</value>
+    <value>Включить автовоспроизведение</value>
   </data>
   <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
-    <value>Отключить авто воспроизведение
+    <value>Отключить автовоспроизведение
 Отмена всех запусков</value>
   </data>
   <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
-    <value>Логирование остановлено</value>
+    <value>Обновление журналов приостановлено</value>
   </data>
   <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
-    <value>Остановить логирование</value>
+    <value>Приостановить обновление журнала</value>
   </data>
   <data name="S_BUTTON_LOG" xml:space="preserve">
     <value>Журнал команд</value>
   </data>
   <data name="S_BUTTON_DRIVES" xml:space="preserve">
-    <value>Накопители устройств</value>
+    <value>Диски устройств</value>
   </data>
   <data name="S_BUTTON_BACK" xml:space="preserve">
     <value>Назад</value>
@@ -654,7 +654,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Пакет</value>
   </data>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
-    <value>Время изменения</value>
+    <value>Время обновления изменено</value>
   </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Сохранить изменения</value>
@@ -666,7 +666,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Копировать во временную папку</value>
   </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
-    <value>Отчистить лог</value>
+    <value>Очистить журнал команд</value>
   </data>
   <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
     <value>Открыть расположение элемента</value>
@@ -678,7 +678,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Копировать в буфер</value>
   </data>
   <data name="S_ADB_DISK_USAGE" xml:space="preserve">
-    <value>Использование диска</value>
+    <value>Использование диска ADB</value>
   </data>
   <data name="S_DISK_USAGE_READ" xml:space="preserve">
     <value>Чтение: {0}</value>
