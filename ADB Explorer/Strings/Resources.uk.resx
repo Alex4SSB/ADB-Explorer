@@ -202,10 +202,10 @@
     <value>Вбити Емулятор</value>
   </data>
   <data name="S_REM_HIST_DEV" xml:space="preserve">
-    <value>Прибрати Пристрій</value>
+    <value>Видалити пристрій</value>
   </data>
   <data name="S_REM_DEV" xml:space="preserve">
-    <value>Вийняти Пристрій</value>
+    <value>Відключити пристрій</value>
   </data>
   <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
     <value>Файлові операції</value>
