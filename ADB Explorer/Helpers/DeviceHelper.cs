@@ -543,7 +543,7 @@ public static class DeviceHelper
                 if (AdbExplorerConst.LOOPBACK_ADDRESSES.Contains(dev.IpAddress))
                     return true;
 
-                if (ex.Message.Contains(Strings.Resources.S_FAILED_CONN + dev.ConnectAddress)
+                if (ex.Message.Contains("failed to connect to " + dev.ConnectAddress)
                     && !dev.IsPairingEnabled)
                 {
                     Data.DevicesObject.CurrentNewDevice.EnablePairing();
