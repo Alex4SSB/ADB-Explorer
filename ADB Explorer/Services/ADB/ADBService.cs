@@ -826,21 +826,10 @@ public partial class ADBService
 
     public static void ListDirectory(string deviceId, string path, ref ConcurrentQueue<FileStat> output, Dispatcher dispatcher, CancellationToken cancellationToken)
     {
-        IEnumerable<string> stdout;
-
         try
         {
-            stdout = ExecuteDeviceAdbCommandAsync(deviceId, "ls", cancellationToken, EscapeAdbString(path));
-
-            foreach (string stdoutLine in stdout)
-            {
-                var item = CreateFile(path, stdoutLine);
-
-                if (item is null)
-                    continue;
-
-                output.Enqueue(item.Value);
-            }
+            foreach (var item in ListDirectoryEntries(deviceId, path, cancellationToken))
+                output.Enqueue(item);
         }
         catch (Exception e)
         {
@@ -853,7 +842,46 @@ public partial class ADBService
                                                               DialogService.DialogIcon.Critical,
                                                               true,
                                                               copyToClipboard: true));
-            return;
+        }
+    }
+
+    public static IEnumerable<FileStat> ListDirectoryEntries(string deviceId, string path, CancellationToken cancellationToken)
+    {
+        foreach (string stdoutLine in ExecuteDeviceAdbCommandAsync(deviceId, "ls", cancellationToken, EscapeAdbString(path)))
+        {
+            var item = CreateFile(path, stdoutLine);
+
+            if (item is not null)
+                yield return item.Value;
+        }
+    }
+
+    public static IEnumerable<FileStat> ListDirectoryRecursive(string deviceId, string path, CancellationToken cancellationToken)
+    {
+        var queue = new Queue<string>();
+        queue.Enqueue(path);
+
+        while (queue.Count > 0)
+        {
+            var current = queue.Dequeue();
+
+            IEnumerable<FileStat> entries;
+            try
+            {
+                entries = ListDirectoryEntries(deviceId, current, cancellationToken);
+            }
+            catch (ProcessFailedException)
+            {
+                continue;
+            }
+
+            foreach (var entry in entries)
+            {
+                yield return entry;
+
+                if (entry.Type is FileType.Folder)
+                    queue.Enqueue(entry.FullPath);
+            }
         }
     }
 

@@ -339,11 +339,16 @@ public static class FileHelper
         if (Data.DevicesObject.Current is null)
             return [];
 
+        var deviceId = Data.DevicesObject.Current.ID;
+
+        if (!ShellCommands.FindExists(deviceId))
+            return GetFolderTreeViaAdbLs(deviceId, paths, isFolder, cancellationToken);
+
         string stdout = "";
         var files = string.Join(" ", paths.Select(p => ADBService.EscapeAdbShellString(p)));
         var depth = isFolder ? "-mindepth 1" : "";
 
-        if (ShellCommands.FindPrintf)
+        if (ShellCommands.FindPrintf(deviceId))
         {
             // get absolute paths, sizes and dates of all files, directries are marked with 'd'
             string[] args =
@@ -356,7 +361,7 @@ public static class FileHelper
                 "2>&1"
             ];
 
-            ADBService.ExecuteDeviceAdbShellCommand(Data.DevicesObject.Current.ID, "find", out stdout, out _, cancellationToken, args);
+            ADBService.ExecuteDeviceAdbShellCommand(deviceId, "find", out stdout, out _, cancellationToken, args);
         }
         else // when find does not support -printf
         {
@@ -372,7 +377,7 @@ public static class FileHelper
                 """fi; done;"""
             ];
 
-            ADBService.ExecuteDeviceAdbShellCommand(Data.DevicesObject.Current.ID, "find", out stdout, out _, cancellationToken, args);
+            ADBService.ExecuteDeviceAdbShellCommand(deviceId, "find", out stdout, out _, cancellationToken, args);
         }
 
         return [.. stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries)
@@ -380,6 +385,38 @@ public static class FileHelper
             .Where(line => line.HasValue)
             .Select(line => line!.Value)];
     }
+
+    private static FolderTree[] GetFolderTreeViaAdbLs(string deviceId, IEnumerable<string> paths, bool isFolder, CancellationToken cancellationToken)
+    {
+        List<FolderTree> results = [];
+
+        foreach (var path in paths)
+        {
+            if (isFolder)
+            {
+                foreach (var entry in ADBService.ListDirectoryRecursive(deviceId, path, cancellationToken))
+                    results.Add(FileStatToFolderTree(entry));
+            }
+            else
+            {
+                var parent = GetParentPath(path);
+                var name = GetFullName(path);
+
+                foreach (var entry in ADBService.ListDirectoryEntries(deviceId, parent, cancellationToken))
+                {
+                    if (entry.FullName == name)
+                        results.Add(FileStatToFolderTree(entry));
+                }
+            }
+        }
+
+        return [.. results];
+    }
+
+    private static FolderTree FileStatToFolderTree(FileStat stat)
+        => new(stat.FullPath,
+               stat.Type is FileType.Folder ? null : stat.Size,
+               Data.Settings.KeepDateModified ? stat.ModifiedTime.ToUnixTime() : null);
 
     private static FolderTree? ParseFolderTreeLine(string line)
     {

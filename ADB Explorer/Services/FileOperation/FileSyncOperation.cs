@@ -312,6 +312,9 @@ public class FileSyncOperation : FileOperation
             return;
         }
 
+        if (Data.DevicesObject.Current is null || !ShellCommands.StatExists(Data.DevicesObject.Current.ID))
+            return;
+
         var file = Data.DirList?.FileList?.FirstOrDefault(f => f.FullPath == item.FullPath)
             ?? new FileClass(item);
 
