@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>Іконка(и) Робота Android</value>
+    <value>Іконка робота Android</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Робота Android відтворено або змінено з роботи, створеної та поширеної Google, і використовується відповідно до умов, описаних у ліцензії Creative Commons 3.0 Attribution.</value>
