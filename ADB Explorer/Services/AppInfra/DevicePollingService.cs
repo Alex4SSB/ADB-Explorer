@@ -28,7 +28,8 @@ public class DevicePollingService : BackgroundService
             try
             {
                 if (!Data.RuntimeSettings.IsPollingStopped
-                    && AdbHelper.CurrentAdbState.Status is AdbHelper.AdbStatus.Valid)
+                    && AdbHelper.CurrentAdbState.Status is AdbHelper.AdbStatus.Valid
+                    && Data.DevicesObject is not null)
                 {
                     await PollAsync(stoppingToken);
                 }
@@ -61,6 +62,9 @@ public class DevicePollingService : BackgroundService
 
     public static void RefreshDevices(CancellationToken cancellationToken)
     {
+        if (Data.DevicesObject is null)
+            return;
+
         var snapshots = ADBService.GetDevices(cancellationToken)?.ToList();
         if (snapshots is null)
             return;

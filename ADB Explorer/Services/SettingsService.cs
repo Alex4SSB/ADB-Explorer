@@ -40,6 +40,8 @@ public class SettingsService
             var json = File.ReadAllText(_path);
             Data.Settings = JsonSerializer.Deserialize<AppSettings>(json, _options) ?? new AppSettings();
         }
+
+        ADBService.IsMdnsEnabled = Data.Settings.EnableMdns;
     }
 
     public void Save()
