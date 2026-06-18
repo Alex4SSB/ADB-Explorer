@@ -40,10 +40,9 @@ public partial class LogViewModel : ObservableObject, INavigationAware
     {
         Data.CommandLog.CollectionChanged += CommandLog_CollectionChanged;
 
-        foreach (var entry in Data.CommandLog)
-        {
-            LogEntryAdded?.Invoke(entry);
-        }
+        var count = Data.CommandLog.Count;
+        for (var i = 0; i < count; i++)
+            LogEntryAdded?.Invoke(Data.CommandLog[i]);
 
         _isInitialized = true;
     }
