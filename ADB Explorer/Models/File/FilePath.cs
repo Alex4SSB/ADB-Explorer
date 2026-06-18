@@ -172,13 +172,14 @@ public class FilePath : AbstractFile, IBaseFile
                                                           "%s",
                                                           ADBService.EscapeAdbShellString(FullPath));
 
-        if (res != 0 || string.IsNullOrEmpty(stdout))
+        if (res != 0 || string.IsNullOrEmpty(stdout)
+            || !long.TryParse(stdout.Trim(), out long size))
         {
             ShellLsSize = -1;
             return;
         }
 
-        ShellLsSize = long.Parse(stdout);
+        ShellLsSize = size;
     }
 
     public FilePath(ShellItem windowsPath)

@@ -63,6 +63,9 @@ public static class FolderHelper
 
     public static IEnumerable<ShellItem> GetEmptySubfoldersRecursively(ShellFolder rootFolder)
     {
+        if (rootFolder is null)
+            return [];
+
         var emptyFolders = new List<ShellItem>();
         FindEmptySubfolders(rootFolder, emptyFolders);
         return emptyFolders.Where(f => f.ParsingName != rootFolder.ParsingName);
@@ -70,13 +73,16 @@ public static class FolderHelper
 
     private static bool FindEmptySubfolders(ShellFolder folder, List<ShellItem> result)
     {
-        if (!folder.IsFolder) return false;
+        if (folder is null || !folder.IsFolder) return false;
 
         bool hasNonFolder = false;
         bool hasNonEmptyFolder = false;
 
         foreach (var child in folder)
         {
+            if (child is null)
+                continue;
+
             if (!child.IsFolder)
             {
                 hasNonFolder = true;

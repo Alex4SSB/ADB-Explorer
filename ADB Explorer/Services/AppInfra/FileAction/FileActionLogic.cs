@@ -992,9 +992,10 @@ internal static class FileActionLogic
                     Data.DirList.FileList.Add(new(op.TargetPath) { ModifiedTime = op.FilePath.DateModified }));
             }
 
-            if (op.FilePath.IsDirectory)
+            if (op.FilePath.IsDirectory
+                && op.FilePath.ShellItem is ShellFolder shellFolder)
             {
-                var empty = FolderHelper.GetEmptySubfoldersRecursively((ShellFolder)op.FilePath.ShellItem);
+                var empty = FolderHelper.GetEmptySubfoldersRecursively(shellFolder);
                 foreach (var folder in empty)
                 {
                     string relative = FileHelper.ExtractRelativePath(folder.FileSystemPath, op.FilePath.FullPath).Replace('\\', '/');
