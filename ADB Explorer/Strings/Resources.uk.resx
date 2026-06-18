@@ -319,7 +319,7 @@
     <value>Обмежити швидкість витягування мініатюр</value>
   </data>
   <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
-    <value>Увімкнути мініатюри відео</value>
+    <value>Додати мініатюри відео</value>
   </data>
   <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
     <value>Наступне буде видалено:
@@ -393,5 +393,41 @@ ADB доступний як частина Android SDK Platform Tools.
   </data>
   <data name="S_BAT_VOLT" xml:space="preserve">
     <value>Вольтаж: {0}v</value>
+  </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value>Місце призначення</value>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>Надіслати</value>
+  </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>Витягти</value>
+  </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>Витягти (Цільове посилання)</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>Вийняти в корінь диска Windows</value>
+  </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value>Припинити запит під час відправлення/вилучення</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
+    <value>Витягнути до папки за замовчуванням</value>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>Витягнути та відобразити мініатюри</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>Вилучення мініатюр</value>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>Витягнути файл до папки за замовчуванням, двічі клацнувши по ньому</value>
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value>Змінити</value>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>Зберегти зміни</value>
   </data>
 </root>
