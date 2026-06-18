@@ -452,7 +452,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Автооткрытие для просмотра</value>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
-    <value>Прекратить запрос при отправке/получении</value>
+    <value>Прекратить запрос при отправке/извлечении</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
     <value>Одновременные операции</value>
@@ -954,7 +954,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>{0} (Ссылка)</value>
   </data>
   <data name="S_FILE_TYPE_APK" xml:space="preserve">
-    <value>Приложение Android</value>
+    <value>Пакет приложения Android</value>
   </data>
   <data name="S_FILE_TYPE_EXE" xml:space="preserve">
     <value>Исполняемый файл Windows</value>
@@ -984,13 +984,13 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Эмулируемое устройство</value>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
-    <value>Временная Папка</value>
+    <value>Временная папка</value>
   </data>
   <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
     <value>Имя файла недопустимо в конечной файловой системе: {0}</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
-    <value>Ошибка сверки</value>
+    <value>Несоответствие содержимого</value>
   </data>
   <data name="S_VALIDATE_MISSING" xml:space="preserve">
     <value>Отсутствующие элементы</value>
@@ -1008,7 +1008,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Свой путь к настройкам приложения</value>
   </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">
-    <value>Пусто</value>
+    <value>Меню пустое</value>
   </data>
   <data name="S_ITEM_COPY" xml:space="preserve">
     <value>{0} - Копировать</value>
@@ -1101,7 +1101,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>[Не авторизовано]</value>
   </data>
   <data name="S_SERVICE_NONAME" xml:space="preserve">
-    <value>[сервис]</value>
+    <value>[Сервис]</value>
   </data>
   <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
     <value>Сейчас просматривается</value>
@@ -1152,7 +1152,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>На очереди</value>
   </data>
   <data name="S_FILEOP_FAILED" xml:space="preserve">
-    <value>Провалено</value>
+    <value>Не удалось</value>
   </data>
   <data name="S_FILEOP_CANCELED" xml:space="preserve">
     <value>Отменено</value>
@@ -1238,10 +1238,10 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Сокет</value>
   </data>
   <data name="S_FILE_BLOCK" xml:space="preserve">
-    <value>Устройство Block</value>
+    <value>Блокировать устройство</value>
   </data>
   <data name="S_FILE_CHAR" xml:space="preserve">
-    <value>Устройство Char</value>
+    <value>Символьное устройство</value>
   </data>
   <data name="S_FILE_FIFO" xml:space="preserve">
     <value>FIFO</value>
@@ -1283,13 +1283,13 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>{0} ЕБ</value>
   </data>
   <data name="MILLI" xml:space="preserve">
-    <value>милли</value>
+    <value>mA</value>
   </data>
   <data name="MICRO" xml:space="preserve">
-    <value>микро</value>
+    <value>uA</value>
   </data>
   <data name="NANO" xml:space="preserve">
-    <value>нано</value>
+    <value>nA</value>
   </data>
   <data name="BYTES" xml:space="preserve">
     <value>{0} Б</value>
@@ -1370,7 +1370,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Установить {0}</value>
   </data>
   <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
-    <value>Установить {0} APK</value>
+    <value>Установить {0} APKs</value>
   </data>
   <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
     <value>Вкл.</value>
@@ -1436,7 +1436,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Большие иконки</value>
   </data>
   <data name="S_THUMBSIZE_XL" xml:space="preserve">
-    <value>Дополнительно большие иконки</value>
+    <value>Екстра большие иконки</value>
   </data>
   <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
     <value>Эта версия приложения была выпущена после обновления политики конфиденциальности.
@@ -1473,7 +1473,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Ограничить скорость извлечения миниатюр</value>
   </data>
   <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
-    <value>Включить миниатюры видео</value>
+    <value>Добавить миниатюры видео</value>
   </data>
   <data name="S_VIDEO_DURATION" xml:space="preserve">
     <value>Длина</value>
@@ -1509,7 +1509,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Проверка обновлений миниатюр</value>
   </data>
   <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
-    <value>Вытягивание миниатюр</value>
+    <value>Извлечение миниатюр</value>
   </data>
   <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
     <value>Чтение местоположений миниатюр и базы данных мультимедиа</value>
@@ -1536,7 +1536,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>По убыванию</value>
   </data>
   <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
-    <value>Столбец сортировки и порядок сохраняются для каждого местоположения</value>
+    <value>Столбик сортировки и порядок сохраняются для каждого местоположения</value>
   </data>
   <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
     <value>Максимальный размер изображения используеться как собственная миниатюра (0 - Отключено)</value>
