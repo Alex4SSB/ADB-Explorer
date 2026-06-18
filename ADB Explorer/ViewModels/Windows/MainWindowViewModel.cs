@@ -230,7 +230,7 @@ public partial class MainWindowViewModel : ObservableObject
             });
         }
 
-        if (!Data.RuntimeSettings.IsAppDeployed && Data.Settings.CheckForUpdates)
+        if (!Data.RuntimeSettings.IsAppPackaged && Data.Settings.CheckForUpdates)
         {
             var latestVersion = await Network.LatestAppReleaseAsync();
             if (latestVersion is null || latestVersion <= Data.AppVersion)

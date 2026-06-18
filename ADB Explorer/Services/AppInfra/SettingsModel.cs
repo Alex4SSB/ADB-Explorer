@@ -112,9 +112,13 @@ public static class UISettings
             new LinkSetting(Strings.Resources.S_GITHUB_REPO, Resources.Links.ADB_EXPLORER_GITHUB, pathData: GitHubGeometry),
             new LinkSetting(Strings.Resources.S_GOTO_WEBLATE, Resources.Links.WEBLATE, imageSource: WeblateLogo),
             new LinkSetting(Strings.Resources.S_PRIVACY_POLICY, Resources.Links.ADB_EXPLORER_PRIVACY, "\uE72E"),
-            new LinkSetting(RuntimeSettings.IsAppDeployed ? Strings.Resources.S_ADB_LEARN_MORE : Strings.Resources.S_ADB_DOWNLOAD, Resources.Links.L_ADB_PAGE, imageSource: FileToIconConverter.LoadBitmap(AppGlobal.icons8_android_os_94)),
-            new BoolSetting(() => Settings.CheckForUpdates, Strings.Resources.S_SETTINGS_UPDATES, icon: "\uE895"),
+            new LinkSetting(RuntimeSettings.IsAppPackaged ? Strings.Resources.S_ADB_LEARN_MORE : Strings.Resources.S_ADB_DOWNLOAD, Resources.Links.L_ADB_PAGE, imageSource: FileToIconConverter.LoadBitmap(AppGlobal.icons8_android_os_94)),
         };
+
+        if (!RuntimeSettings.IsAppPackaged)
+        {
+            settings.Add(new BoolSetting(() => Settings.CheckForUpdates, Strings.Resources.S_SETTINGS_UPDATES, icon: "\uE895"));
+        }
 
         if (CrashReportService.IsConfigured)
         {

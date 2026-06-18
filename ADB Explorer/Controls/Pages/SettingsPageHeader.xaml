@@ -701,7 +701,7 @@
                                     <Style BasedOn="{StaticResource DefaultUiHyperlinkButtonStyle}" TargetType="ui:HyperlinkButton">
                                         <Setter Property="Content" Value="{Binding Source={x:Static Member=strings:Resources.S_ADB_DOWNLOAD}}" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsAppDeployed}" Value="True">
+                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsAppPackaged}" Value="True">
                                                 <Setter Property="Content" Value="{Binding Source={x:Static Member=strings:Resources.S_ADB_LEARN_MORE}}" />
                                             </DataTrigger>
                                         </Style.Triggers>

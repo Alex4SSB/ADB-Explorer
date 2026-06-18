@@ -113,8 +113,8 @@ public partial class App
         // Read to force it to be set to system display language
         _ = Data.Settings.OriginalUICulture;
 
-        // Similar to %LocalAppData%\ADB Explorer (but avoids virtualization for Store versions)
-        Data.AppDataPath = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "AppData", "Local", AdbExplorerConst.APP_DATA_FOLDER);
+        // UserDataPaths returns the real %LocalAppData% path (not the MSIX redirected Packages\...\LocalState copy).
+        Data.AppDataPath = Path.Combine(global::Windows.Storage.UserDataPaths.GetDefault().LocalAppData, AdbExplorerConst.APP_DATA_FOLDER);
 
         string settingsPath = "", oldPath = "";
         if (e.Args.Length > 0)
@@ -141,6 +141,8 @@ public partial class App
         }
         else
         {
+            AppDataHelper.MigrateVirtualizedAppData(Data.AppDataPath);
+
             settingsPath = FileHelper.ConcatPaths(Data.AppDataPath, AdbExplorerConst.APP_SETTINGS_FILE, '\\');
             oldPath = FileHelper.ConcatPaths(Data.AppDataPath, "App.txt", '\\');
         }

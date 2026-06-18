@@ -4,7 +4,7 @@ namespace ADB_Explorer.Resources;
 
 public static class Links
 {
-    public static readonly Uri L_ADB_PAGE = Data.RuntimeSettings.IsAppDeployed
+    public static readonly Uri L_ADB_PAGE = Data.RuntimeSettings.IsAppPackaged
         ? new("https://developer.android.com/tools/adb")
         : new("https://developer.android.com/tools/releases/platform-tools");
     public static readonly Uri L_CC_LIC = new("https://creativecommons.org/licenses/by-sa/3.0/");

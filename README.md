@@ -43,10 +43,6 @@ Help with translation is most welcome - please visit our translation project on 
 
 `%LocalAppData%\AdbExplorer`
 
-
-### ℹ️ For Store version: <br />To be able to see these files, create `%LocalAppData%\AdbExplorer\settings.json` <br /> *before installing*, otherwise the files are stored in an unknown location.
-
-
 * settings.json - persistent settings file.
 
 The settings file contains user app settings as well as other settings not directly accessible.

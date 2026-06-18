@@ -769,6 +769,22 @@ public static partial class NativeMethods
 
     public static void ThrowExceptionForHR(HResult hr)
         => Marshal.ThrowExceptionForHR((int)hr);
+
+    private const int PACKAGE_FAMILY_NAME_MAX_LENGTH = 64;
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern uint GetCurrentPackageFamilyName(ref int packageFamilyNameLength, StringBuilder packageFamilyName);
+
+    private static readonly Lazy<string?> PackageFamilyName = new(ReadPackageFamilyName);
+
+    public static string? GetCurrentPackageFamilyName() => PackageFamilyName.Value;
+
+    private static string? ReadPackageFamilyName()
+    {
+        var builder = new StringBuilder(PACKAGE_FAMILY_NAME_MAX_LENGTH + 1);
+        int length = builder.Capacity;
+        return GetCurrentPackageFamilyName(ref length, builder) == 0 ? builder.ToString() : null;
+    }
 }
 
 /// <summary>

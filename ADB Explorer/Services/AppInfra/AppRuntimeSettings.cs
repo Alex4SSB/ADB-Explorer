@@ -117,7 +117,15 @@ public partial class AppRuntimeSettings : ViewModelBase
         }
     } = null;
 
-    public bool IsAppDeployed => Environment.CurrentDirectory.Equals(@"C:\WINDOWS\SYSTEM32", StringComparison.InvariantCultureIgnoreCase);
+    private bool? isAppPackaged = null;
+    public bool IsAppPackaged
+    {
+        get
+        {
+            isAppPackaged ??= NativeMethods.GetCurrentPackageFamilyName() is not null;
+            return isAppPackaged.Value;
+        }
+    }
 
     public bool Is22H2 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_22H2;
 

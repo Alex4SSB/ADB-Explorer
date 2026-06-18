@@ -7,7 +7,7 @@ namespace ADB_Explorer.Services;
 /// <summary>
 /// Sends unhandled exception reports via the Faro collector API.
 /// Debug builds use local Grafana Alloy. Release builds use an embedded <c>FaroCollector.url</c> when present.
-/// Deploy builds only report when <see cref="AppRuntimeSettings.IsAppDeployed"/> is true (Store install).
+/// Deploy builds only report when <see cref="AppRuntimeSettings.IsAppPackaged"/> is true (Store install).
 /// </summary>
 public static class CrashReportService
 {
@@ -66,7 +66,7 @@ public static class CrashReportService
         yield return LocalAlloyCollectorUrl;
 #else
 #if DEPLOY
-        if (!Data.RuntimeSettings.IsAppDeployed)
+        if (!Data.RuntimeSettings.IsAppPackaged)
             yield break;
 #endif
         var embedded = ReadEmbeddedCollectorUrl();
@@ -166,7 +166,7 @@ public static class CrashReportService
                 {
                     ["name"] = Properties.AppGlobal.AppDisplayName,
                     ["version"] = Properties.AppGlobal.AppVersion,
-                    ["environment"] = Data.RuntimeSettings.IsAppDeployed ? "store" : "portable",
+                    ["environment"] = Data.RuntimeSettings.IsAppPackaged ? "store" : "portable",
                 },
                 ["session"] = new JObject { ["id"] = SessionId },
                 ["page"] = new JObject
