@@ -2,6 +2,7 @@ using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using AdvancedSharpAdbClient.Models;
+using System.Net;
 
 namespace ADB_Explorer.ViewModels;
 
@@ -73,7 +74,20 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
     public string BaseID => Type is DeviceType.Service ? ID.Split('.')[0] : ID;
 
-    public string LogicalID => Type is DeviceType.Service && ID.Count(c => c is '-') > 1 ? ID.Split('-')[1] : ID;
+    /// <summary>
+    /// Stable device identifier used for comparison and on-disk storage (USB ID, <c>ro.serialno</c>, mDNS serial, or AVD name).
+    /// </summary>
+    public string SerialNumber
+    {
+        get
+        {
+            if (Type is DeviceType.Remote && string.IsNullOrEmpty(field))
+                RefreshSerialNumber();
+
+            return field;
+        }
+        protected set;
+    } = "";
 
     public RootStatus Root => Device.Root;
 
@@ -135,6 +149,8 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
                         l => l[0] == '[' && l[^1] == ']').TryToDictionary(
                             line => line.Split(':')[0].Trim('[', ']', ' '),
                             line => line.Split(':')[1].Trim('[', ']', ' '));
+
+                    RefreshSerialNumber();
                 }
                 // Do not cache on failure so subsequent attempts can retry
                 else
@@ -233,6 +249,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         Device = device;
 
         InitDeviceDrives();
+        RefreshSerialNumber(notify: false, allowPropLookup: false);
 
         BrowseCommand = new(() => !IsOpen && device.Status is DeviceStatus.Ok && device.Type is not DeviceType.Sideload,
                             () => DeviceHelper.BrowseDeviceAction(this));
@@ -296,6 +313,8 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
         if (other.Status is DeviceStatus.Offline)
             SetAvdName(null);
+
+        RefreshSerialNumber();
     }
 
     public string? GetAvdNameFromProps()
@@ -315,7 +334,50 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         Device.AvdName = avdName;
         OnPropertyChanged(nameof(AvdName));
         OnPropertyChanged(nameof(BrandName));
+
         UpdateName();
+        RefreshSerialNumber();
+    }
+
+    private void RefreshSerialNumber(bool notify = true, bool allowPropLookup = true)
+    {
+        var next = ResolveSerialNumber(allowPropLookup);
+        if (SerialNumber == next)
+            return;
+
+        SerialNumber = next;
+        if (notify)
+            OnPropertyChanged(nameof(SerialNumber));
+    }
+
+    private string ResolveSerialNumber(bool allowPropLookup) => Type switch
+    {
+        DeviceType.Local or DeviceType.Recovery or DeviceType.Sideload or DeviceType.WSA => ID,
+        DeviceType.Service => ParseMdnsSerial(ID),
+        DeviceType.Remote when !allowPropLookup => GetRemoteSerialFallback(ID),
+        DeviceType.Remote => Props.GetValueOrDefault(ADBService.SERIAL_NO) ?? GetRemoteSerialFallback(ID),
+        DeviceType.Emulator => !string.IsNullOrEmpty(AvdName) ? AvdName : ID,
+        _ => ID,
+    };
+
+    private static string ParseMdnsSerial(string id)
+    {
+        var baseId = id.Split('.')[0];
+        if (!baseId.StartsWith("adb-", StringComparison.Ordinal))
+            return baseId;
+
+        var withoutPrefix = baseId["adb-".Length..];
+        var lastDash = withoutPrefix.LastIndexOf('-');
+        return lastDash > 0 ? withoutPrefix[..lastDash] : withoutPrefix;
+    }
+
+    private static string GetRemoteSerialFallback(string id)
+    {
+        if (!id.Contains(':'))
+            return "";
+
+        var host = id.Split(':')[0];
+        return IPAddress.TryParse(host, out _) ? "" : host;
     }
 
     public void EnableRoot(bool enable)

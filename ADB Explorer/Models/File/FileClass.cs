@@ -144,7 +144,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
                 or DeviceType.Remote
                 or DeviceType.Service)
             {
-                if (!ThumbnailService.IsInitialized(Data.DevicesObject.Current.LogicalID))
+                if (!ThumbnailService.IsInitialized(Data.DevicesObject.Current.SerialNumber))
                 {
                     Task.Run(() => ThumbnailService.ForceLoad(Data.DevicesObject.Current));
                 }

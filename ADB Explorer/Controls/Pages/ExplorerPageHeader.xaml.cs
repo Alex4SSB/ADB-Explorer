@@ -600,7 +600,7 @@ public partial class ExplorerPageHeader : UserControl
                         ActiveScrollIntoView(ActiveView.Items[0]);
 
                         if (Settings.ThumbsMode is AppSettings.ThumbnailMode.OnPhotoDir
-                            && !ThumbnailService.IsInitialized(DevicesObject.Current.LogicalID)
+                            && !ThumbnailService.IsInitialized(DevicesObject.Current.SerialNumber)
                             && FileHelper.IsPhotoDir())
                         {
                             Task.Run(() => ThumbnailService.ForceLoad(DevicesObject.Current));

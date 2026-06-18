@@ -134,11 +134,10 @@ public static partial class ThumbnailService
 
     private record struct DeviceThumbnailInfo
     {
-        public DeviceThumbnailInfo(string deviceId)
+        public DeviceThumbnailInfo(string serialNumber, string physicalId)
         {
-            DeviceId = deviceId;
-
-            PhysicalId = Data.DevicesObject.LogicalDeviceViewModels.FirstOrDefault(d => d.LogicalID == deviceId)?.ID ?? deviceId;
+            DeviceId = serialNumber;
+            PhysicalId = physicalId;
         }
 
         /// <summary>
@@ -147,8 +146,7 @@ public static partial class ThumbnailService
         public string PhysicalId { get; }
 
         /// <summary>
-        /// Logical Device ID, mDNS identifier is omitted. <br />
-        /// Might still not match USB ID.
+        /// Device serial number used for on-disk storage and device comparison.
         /// </summary>
         public string DeviceId { get; init; }
         public string DevicePicturesThumbnailDir { get; set; }
@@ -167,14 +165,18 @@ public static partial class ThumbnailService
     [GeneratedRegex(@"Row: \d+ _id=(?<ID>\d+), _data=(?<Path>.+), resolution=(?:(?:(?<ResX>\d+).(?<ResY>\d+))|NULL), duration=(?:(?<Dur>\d+)|NULL), bitrate=(?:(?<Bitrate>\d+)|NULL)", RegexOptions.Multiline)]
     private static partial Regex RE_VIDEO_METADATA();
 
-    private static DeviceThumbnailInfo? GetDeviceThumbsInfo(string logicalDeviceId)
+    private static DeviceThumbnailInfo? GetDeviceThumbsInfo(string serialNumber)
     {
-        if (_deviceInfoCache.FirstOrDefault(d => d.DeviceId == logicalDeviceId) is DeviceThumbnailInfo info && !string.IsNullOrEmpty(info.DeviceId))
+        if (_deviceInfoCache.FirstOrDefault(d => d.DeviceId == serialNumber) is DeviceThumbnailInfo info && !string.IsNullOrEmpty(info.DeviceId))
         {
             return info;
         }
 
-        info = new(logicalDeviceId);
+        var device = Data.DevicesObject.LogicalDeviceViewModels.FirstOrDefault(d => d.SerialNumber == serialNumber);
+        if (device is null)
+            return null;
+
+        info = new(serialNumber, device.ID);
 
         var existingDirs = ADBService.PathsExist(info.PhysicalId, DCIM_THUMBNAILS, PICTURES_THUMBNAILS, MOVIES_THUMBNAILS);
         if (existingDirs.Length == 0)
@@ -191,8 +193,8 @@ public static partial class ThumbnailService
         return info;
     }
 
-    public static void InvalidateThumbnailDirCache(string logicalDeviceId)
-        => _deviceInfoCache.RemoveAll(d => d.DeviceId == logicalDeviceId);
+    public static void InvalidateThumbnailDirCache(string serialNumber)
+        => _deviceInfoCache.RemoveAll(d => d.DeviceId == serialNumber);
 
     /// <summary>
     /// Cancels any in-progress thumbnail loading and hides the progress tooltip.
@@ -208,7 +210,7 @@ public static partial class ThumbnailService
         if (!_mutex.WaitOne(0))
             return false;
 
-        GetThumbnailName(device.LogicalID, "");
+        GetThumbnailName(device.SerialNumber, "");
         var localPath = GetLocalThumbPath(device);
 
         _mutex.ReleaseMutex();
@@ -235,7 +237,7 @@ public static partial class ThumbnailService
         if (!AdbExplorerConst.COMMON_PHOTO_EXT.Contains(file.Extension, StringComparer.InvariantCultureIgnoreCase))
             return;
 
-        var deviceInfo = _deviceInfoCache.FirstOrDefault(d => d.DeviceId == device.LogicalID);
+        var deviceInfo = _deviceInfoCache.FirstOrDefault(d => d.DeviceId == device.SerialNumber);
         if (string.IsNullOrEmpty(deviceInfo.DeviceId) || deviceInfo.ThumbnailPathCache is null)
             return;
 
@@ -300,9 +302,9 @@ public static partial class ThumbnailService
         }
     }
 
-    public static bool IsInitialized(string logicalDeviceId)
+    public static bool IsInitialized(string serialNumber)
     {
-        return _deviceInfoCache.FirstOrDefault(d => d.DeviceId == logicalDeviceId) is DeviceThumbnailInfo info
+        return _deviceInfoCache.FirstOrDefault(d => d.DeviceId == serialNumber) is DeviceThumbnailInfo info
             && !string.IsNullOrEmpty(info.LocalThumbnailDir);
     }
 
@@ -311,12 +313,12 @@ public static partial class ThumbnailService
         _mutex.WaitOne();
         _mutex.ReleaseMutex();
 
-        if (GetThumbnailName(device.LogicalID, filePath) is not ThumbnailInfo info)
+        if (GetThumbnailName(device.SerialNumber, filePath) is not ThumbnailInfo info)
             return null;
 
         string? localThumbnailDir = string.IsNullOrEmpty(info.LocalFolder)
             ? GetLocalThumbPath(device)
-            : Path.Combine(Data.AppDataPath, device.LogicalID, info.LocalFolder);
+            : Path.Combine(Data.AppDataPath, device.SerialNumber, info.LocalFolder);
 
         if (localThumbnailDir is null)
             return null;
@@ -371,14 +373,14 @@ public static partial class ThumbnailService
         File.WriteAllText(savePath, csvContent, CsvEncoding);
     }
 
-    private static ThumbnailInfo? GetThumbnailName(string logicalDeviceId, string filePath)
+    private static ThumbnailInfo? GetThumbnailName(string serialNumber, string filePath)
     {
-        if (GetDeviceThumbsInfo(logicalDeviceId) is not DeviceThumbnailInfo deviceInfo)
+        if (GetDeviceThumbsInfo(serialNumber) is not DeviceThumbnailInfo deviceInfo)
             return null;
 
         UpdateDeviceCache(deviceInfo);
 
-        _deviceInfoCache.First(d => d.DeviceId == logicalDeviceId).ThumbnailPathCache.TryGetValue(filePath, out var thumbnailPath);
+        _deviceInfoCache.First(d => d.DeviceId == serialNumber).ThumbnailPathCache.TryGetValue(filePath, out var thumbnailPath);
 
         return thumbnailPath;
     }
@@ -487,9 +489,9 @@ public static partial class ThumbnailService
         return combined.ToDictionary();
     }
 
-    private static void UpdateThumbnailInfo(string logicalDeviceId, string id, Size? resolution = null)
+    private static void UpdateThumbnailInfo(string serialNumber, string id, Size? resolution = null)
     {
-        if (GetDeviceThumbsInfo(logicalDeviceId) is not DeviceThumbnailInfo deviceInfo)
+        if (GetDeviceThumbsInfo(serialNumber) is not DeviceThumbnailInfo deviceInfo)
             return;
 
         var thumbnailPathCache = deviceInfo.ThumbnailPathCache;
@@ -509,7 +511,7 @@ public static partial class ThumbnailService
         UpdateCache(deviceInfo);
 
         if (updatedFilePath is not null)
-            ThumbnailUpdated?.Invoke(logicalDeviceId, updatedFilePath);
+            ThumbnailUpdated?.Invoke(serialNumber, updatedFilePath);
     }
 
     private static Size? ReadImageResolution(string filePath)
@@ -528,7 +530,7 @@ public static partial class ThumbnailService
 
     private static string? GetLocalThumbPath(LogicalDeviceViewModel device)
     {
-        if (GetDeviceThumbsInfo(device.LogicalID) is not DeviceThumbnailInfo deviceInfo)
+        if (GetDeviceThumbsInfo(device.SerialNumber) is not DeviceThumbnailInfo deviceInfo)
             return null;
 
         if (!string.IsNullOrEmpty(deviceInfo.LocalThumbnailDir))
@@ -575,7 +577,7 @@ public static partial class ThumbnailService
             : new("", deviceInfo.DeviceMoviesThumbnailDir, AbstractFile.FileType.Folder);
 
         var deviceDir = FileHelper.GetParentPath(deviceInfo.LocalThumbnailDir);
-        var device = Data.DevicesObject.LogicalDeviceViewModels.FirstOrDefault(d => d.LogicalID == deviceInfo.DeviceId);
+        var device = Data.DevicesObject.LogicalDeviceViewModels.FirstOrDefault(d => d.SerialNumber == deviceInfo.DeviceId);
         if (device is null)
             return;
 

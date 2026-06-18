@@ -65,7 +65,7 @@ public partial class FileIconViewModel : FileViewModelBase
             || Data.DevicesObject.Current is null)
             return;
 
-        var logicalDeviceId = Data.DevicesObject.Current.LogicalID;
+        var serialNumber = Data.DevicesObject.Current.SerialNumber;
         _cts = new CancellationTokenSource();
         var token = _cts.Token;
 
@@ -74,7 +74,7 @@ public partial class FileIconViewModel : FileViewModelBase
             if (token.IsCancellationRequested)
                 return;
 
-            if (!ThumbnailService.IsInitialized(logicalDeviceId))
+            if (!ThumbnailService.IsInitialized(serialNumber))
                 ThumbnailService.ForceLoad(Data.DevicesObject.Current);
 
             if (token.IsCancellationRequested)
@@ -111,7 +111,7 @@ public partial class FileIconViewModel : FileViewModelBase
 
         _thumbnailUpdatedHandler = (updatedDeviceId, updatedFilePath) =>
         {
-            if (updatedDeviceId != logicalDeviceId || updatedFilePath != _file.ParsedFullPath)
+            if (updatedDeviceId != serialNumber || updatedFilePath != _file.ParsedFullPath)
                 return;
 
             Task.Run(() =>

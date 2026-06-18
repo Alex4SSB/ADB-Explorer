@@ -4,7 +4,6 @@ using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
 using ADB_Explorer.Views.Pages;
 using Windows.Management.Deployment;
-using Wpf.Ui;
 
 namespace ADB_Explorer.Helpers;
 
@@ -305,10 +304,10 @@ public static class DeviceHelper
                 return devicesObject.ServiceDeviceViewModels.All(s => s.IpAddress != device.IpAddress);
             }
 
-            // if there's a logical service and a remote device with the same IP - hide the logical service
-            var res = !devicesObject.LogicalDeviceViewModels.Any(l => l.IpAddress == device.IpAddress
-                                                    && l.Type is DeviceType.Remote or DeviceType.Local
-                                                    && l.Status is DeviceStatus.Ok);
+            // if a USB device with the same serial is online - hide the mDNS service
+            var res = !devicesObject.LogicalDeviceViewModels.Any(l => l.Type is DeviceType.Local
+                                                    && l.Status is DeviceStatus.Ok
+                                                    && logDev.SerialNumber == l.SerialNumber);
 
             if (res)
                 logDev.UseIdForName = false;
@@ -316,13 +315,14 @@ public static class DeviceHelper
             return res;
         }
 
-        if (device is LogicalDeviceViewModel && device.Type is DeviceType.Remote)
+        if (device is LogicalDeviceViewModel remote && device.Type is DeviceType.Remote)
         {
-            // if a remote device is also connected by USB and both are authorized - hide the remote device
-            return !devicesObject.LogicalDeviceViewModels.Any(usb => usb.Type is DeviceType.Local
-                && usb.Status is DeviceStatus.Ok
-                && (device.ID.Contains(usb.ID)
-                    || usb.IpAddress == device.IpAddress));
+            // hide WiFi when the same device is connected over USB or mDNS
+            return !devicesObject.LogicalDeviceViewModels.Any(other => 
+                other.Status is DeviceStatus.Ok
+                && (remote.SerialNumber == other.SerialNumber || remote.IpAddress == other.IpAddress)
+                && (other.Type is DeviceType.Local or DeviceType.Service)
+            );
         }
 
         if (device is HistoryDeviceViewModel hist)

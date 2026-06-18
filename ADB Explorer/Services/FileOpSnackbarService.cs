@@ -125,7 +125,7 @@ public class FileOpSnackbarService(ISnackbarService snackbarService, HashSet<str
         _content.OperationsSource = operations;
 
         if (operations.FirstOrDefault() is { } firstOp)
-            suppressedDevices.Add(firstOp.Device.LogicalID);
+            suppressedDevices.Add(firstOp.Device.SerialNumber);
 
         if (!_isShowing)
         {

@@ -505,13 +505,14 @@ namespace ADB_Test
         }
 
         [TestMethod]
-        public void ServiceLogical_Online_DuplicateRemoteOnline_Hidden()
+        public void ServiceLogical_Online_DuplicateRemoteOnline_Shown()
         {
             var remote = MakeLogical("192.168.1.20:5555", "Phone", DeviceType.Remote, DeviceStatus.Ok, "192.168.1.20");
-            var svcLogical = MakeLogical("svc.3", "Svc", DeviceType.Service, DeviceStatus.Ok, "192.168.1.20");
+            var svcLogical = MakeLogical("adb-SERIALABC-QXjCrW._adb-tls-connect._tcp.", "Phone", DeviceType.Service, DeviceStatus.Ok, "192.168.1.20");
             Data.DevicesObject.UIList.Add(remote);
             Data.DevicesObject.UIList.Add(svcLogical);
-            Assert.IsFalse(Eval(svcLogical));
+            Assert.IsTrue(Eval(svcLogical));
+            Assert.IsFalse(Eval(remote));
         }
 
         // ── DeviceType.Remote ─────────────────────────────────────────────────
