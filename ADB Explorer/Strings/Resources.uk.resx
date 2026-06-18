@@ -430,4 +430,470 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Зберегти зміни</value>
   </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>Відновити</value>
+  </data>
+  <data name="S_LS_ERROR_TITLE" xml:space="preserve">
+    <value>Помилка списку каталогів</value>
+  </data>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Обмеження дисків:</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• Файлова система лише для читання</value>
+  </data>
+  <data name="S_RESET_SETTINGS" xml:space="preserve">
+    <value>Усі налаштування будуть скинуті під час закриття програми.
+Цю дію не можна скасувати. Ви впевнені?</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>Виберіть Запустити, якщо ADB вже авторизовано у WSA.
+Щоб дозволити ADB, відкрийте розширені налаштування WSA.</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
+    <value>{0} вибрані файли не можуть бути створені в корені диска Windows.</value>
+  </data>
+  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
+    <value>Дізнайтесь більше про ADB</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>Завантажити ADB</value>
+  </data>
+  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
+    <value>Виявити ADB (v{0} як мінімум):</value>
+  </data>
+  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
+    <value>Виберіть шлях до ADB</value>
+  </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value>Продовжити</value>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>Більше інформації</value>
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value>Увімкнено</value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value>Вимкнено</value>
+  </data>
+  <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
+    <value>Перейти на сторінку версії</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>Закрити</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Політику конфіденційності оновлено</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>Ця версія додатка була випущена після оновлення політики конфіденційності.
+Перегляньте зміни на GitHub.</value>
+  </data>
+  <data name="S_ADB_EXECUTABLE" xml:space="preserve">
+    <value>Виконуваний файл ADB</value>
+  </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value>Перезапустити ADB Зараз</value>
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value>Перезапустити пізніше</value>
+  </data>
+  <data name="S_ITEM_DESTINATION" xml:space="preserve">
+    <value>Виберіть призначення для {0}</value>
+  </data>
+  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
+    <value>Виберіть призначення для кількох елементів</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>Новый файл</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>Нова папка</value>
+  </data>
+  <data name="S_LS_ERROR" xml:space="preserve">
+    <value>Під час читання цієї папки сталася помилка.
+Контент може відображатися неправильно.</value>
+  </data>
+  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
+    <value>{0} є батьківською папкою для цільової директорії.</value>
+  </data>
+  <data name="S_KILL_EMULATOR" xml:space="preserve">
+    <value>Ви впевнені, що хочете вбити цей емулятор?</value>
+  </data>
+  <data name="S_REM_DEVICE" xml:space="preserve">
+    <value>Ви впевнені, що хочете видалити цей пристрій?</value>
+  </data>
+  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
+    <value>Видалити {0}</value>
+  </data>
+  <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
+    <value>Вбити {0}</value>
+  </data>
+  <data name="S_REM_APK" xml:space="preserve">
+    <value>Наступні елементи будуть видалені:
+{0}</value>
+  </data>
+  <data name="S_REM_APK_PLURAL" xml:space="preserve">
+    <value>Наступні елементи будуть видалені:
+{0} пакетів</value>
+  </data>
+  <data name="S_UNINSTALL" xml:space="preserve">
+    <value>Деінсталювати</value>
+  </data>
+  <data name="S_CANCEL" xml:space="preserve">
+    <value>Скасувати</value>
+  </data>
+  <data name="S_CONFIRM" xml:space="preserve">
+    <value>Підтвердити</value>
+  </data>
+  <data name="S_SKIP" xml:space="preserve">
+    <value>Пропустити</value>
+  </data>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value>Замінити</value>
+  </data>
+  <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
+    <value>Об'єднати чи замінити</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
+    <value>Виберіть папки для надсилання</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
+    <value>Виберіть папки для надсилання {0}</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
+    <value>Виберіть файли для надсилання</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
+    <value>Виберіть файли для надсилання {0}</value>
+  </data>
+  <data name="S_BUTTON_CLEAR" xml:space="preserve">
+    <value>Очистити</value>
+  </data>
+  <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
+    <value>Зберігати пристрої, підключені вручну</value>
+  </data>
+  <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
+    <value>Одночасні операції</value>
+  </data>
+  <data name="S_SETTINGS_APK" xml:space="preserve">
+    <value>Підтримка APK</value>
+  </data>
+  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
+    <value>Показати розширення імен файлів</value>
+  </data>
+  <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
+    <value>Показати приховані елементи</value>
+  </data>
+  <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
+    <value>Показати системні додатки</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
+    <value>Подвійне клацання по файлу</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
+    <value>Жоден</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
+    <value>Відкрити в редакторі</value>
+  </data>
+  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
+    <value>Перевизначити шлях до ADB</value>
+  </data>
+  <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
+    <value>Папка за замовчуванням</value>
+  </data>
+  <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
+    <value>Світла</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
+    <value>Темна</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
+    <value>За замовчуванням</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
+    <value>Вимкнути апаратне прискорення</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES" xml:space="preserve">
+    <value>Перевіряти наявність оновлень</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
+    <value>Зовнішній вигляд</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
+    <value>Робочі директорії</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
+    <value>Провідник</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
+    <value>Диски та функції</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
+    <value>Пристрій</value>
+  </data>
+  <data name="S_DONATE" xml:space="preserve">
+    <value>Пожертвувати або Спонсорувати</value>
+  </data>
+  <data name="S_APP_DATA_FOLDER" xml:space="preserve">
+    <value>Папка даних додатка</value>
+  </data>
+  <data name="S_GITHUB_REPO" xml:space="preserve">
+    <value>Репозиторій GitHub</value>
+  </data>
+  <data name="S_PRIVACY_POLICY" xml:space="preserve">
+    <value>Політика конфіденційності</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Звіти про збої</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>Після збою ви можете за бажанням надіслати діагностичний звіт, щоб допомогти нам його виправити. Звіти надсилаються тільки після натискання кнопки "Надіслати звіт" і зазвичай містять повідомлення про виключення, трасування стека, версії програми та Windows, а також на відкритій сторінці. Дані обробляються Grafana Labs (Grafana Cloud). розділ посилання на Політику конфіденційності вище.</value>
+  </data>
+  <data name="S_ATTRIBUTIONS" xml:space="preserve">
+    <value>Attributions &amp; Third Party Licenses</value>
+  </data>
+  <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
+    <value>[не встановлено]</value>
+  </data>
+  <data name="S_SEARCH_SETTINGS" xml:space="preserve">
+    <value>Пошук налаштувань</value>
+  </data>
+  <data name="S_EXIT_SEARCH" xml:space="preserve">
+    <value>Закрити пошук</value>
+  </data>
+  <data name="S_SEARCH_VIEW" xml:space="preserve">
+    <value>Перегляд пошуку</value>
+  </data>
+  <data name="S_COLLAPSE_ALL" xml:space="preserve">
+    <value>Згорнути все</value>
+  </data>
+  <data name="S_EXPAND_ALL" xml:space="preserve">
+    <value>Розгорнути все</value>
+  </data>
+  <data name="S_SETTINGS_TITLE" xml:space="preserve">
+    <value>Налаштування</value>
+  </data>
+  <data name="S_ACTION_HIDE" xml:space="preserve">
+    <value>Приховати</value>
+  </data>
+  <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
+    <value>Мова</value>
+  </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>Ок</value>
+  </data>
+  <data name="S_FILTER_FILE_OPS" xml:space="preserve">
+    <value>Фільтрування файлових операцій</value>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>Увімкнути автовідтворення</value>
+  </data>
+  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
+    <value>Вимкнути автовідтворення
+Скасування всіх запусків</value>
+  </data>
+  <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
+    <value>Оновлення журналів призупинено</value>
+  </data>
+  <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
+    <value>Призупинити оновлення журналу</value>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>Журнал команд</value>
+  </data>
+  <data name="S_BUTTON_DRIVES" xml:space="preserve">
+    <value>Диски пристроїв</value>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value>Вперед</value>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>Вгору</value>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>Фільтр</value>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>Пристрої</value>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>Папки</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>Файли</value>
+  </data>
+  <data name="S_MENU_REFRESH" xml:space="preserve">
+    <value>Оновити</value>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>Копіювати</value>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>Більше</value>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>Редагувати</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>Створити</value>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value>Папка</value>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value>Файл</value>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value>Вибрати все</value>
+  </data>
+  <data name="S_MENU_CUT" xml:space="preserve">
+    <value>Вирізати</value>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value>Вставити посилання</value>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value>Перейменувати</value>
+  </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value>Пакет</value>
+  </data>
+  <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
+    <value>Час оновлення змінено</value>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>Встановити</value>
+  </data>
+  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
+    <value>Копіювати у тимчасову папку</value>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>Очистити журнал команд</value>
+  </data>
+  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
+    <value>Відкрити розташування елемента</value>
+  </data>
+  <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
+    <value>Знайти в інтернеті</value>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value>Копіювати в буфер</value>
+  </data>
+  <data name="S_ADB_DISK_USAGE" xml:space="preserve">
+    <value>Використання диска ADB</value>
+  </data>
+  <data name="S_DISK_USAGE_READ" xml:space="preserve">
+    <value>Читання: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
+    <value>Запис: {0}</value>
+  </data>
+  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
+    <value>Перевіряти оновлення під час запуску</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
+    <value>Про додаток</value>
+  </data>
+  <data name="S_BROWSER_ITEMS" xml:space="preserve">
+    <value>Елемент</value>
+  </data>
+  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
+    <value>Елементи</value>
+  </data>
+  <data name="S_FOLDER_EMPTY" xml:space="preserve">
+    <value>Ця папка порожня.</value>
+  </data>
+  <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
+    <value>Неможливо одержати список.</value>
+  </data>
+  <data name="S_EMPTY_FILTER" xml:space="preserve">
+    <value>Нема відповідних елементів.</value>
+  </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value>&lt;Span&gt;Ця папка &lt;Italic&gt;виглядає&lt;/Italic&gt; порожнйою&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… принаймні неозброєним поглядом&lt;/Span&gt;&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ITEMS_SELECTED" xml:space="preserve">
+    <value>Вибраний елемент</value>
+  </data>
+  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
+    <value>Вибрані елементи</value>
+  </data>
+  <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
+    <value>Тип операції</value>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>Ім'я файлу</value>
+  </data>
+  <data name="S_COLUMN_PROGRESS" xml:space="preserve">
+    <value>Прогрес</value>
+  </data>
+  <data name="S_COLUMN_SOURCE" xml:space="preserve">
+    <value>Джерело</value>
+  </data>
+  <data name="S_COLUMN_ADDED" xml:space="preserve">
+    <value>Додано</value>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>Іконка</value>
+  </data>
+  <data name="S_COLUMN_NAME" xml:space="preserve">
+    <value>Ім'я</value>
+  </data>
+  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
+    <value>Початкове розташування</value>
+  </data>
+  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
+    <value>Дата зміни</value>
+  </data>
+  <data name="S_COLUMN_TYPE" xml:space="preserve">
+    <value>Тип</value>
+  </data>
+  <data name="S_COLUMN_SIZE" xml:space="preserve">
+    <value>Розмір</value>
+  </data>
+  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
+    <value>Дата видалення</value>
+  </data>
+  <data name="S_COLUMN_USER_ID" xml:space="preserve">
+    <value>ID користувача</value>
+  </data>
+  <data name="S_COLUMN_VERSION" xml:space="preserve">
+    <value>Версія</value>
+  </data>
+  <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
+    <value>ADB Сервер не відповідає</value>
+  </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}сек.</value>
+  </data>
+  <data name="S_KILL_SERVER" xml:space="preserve">
+    <value>Вбити сервер</value>
+  </data>
+  <data name="S_KILL_PROCESS" xml:space="preserve">
+    <value>Вбити процес</value>
+  </data>
+  <data name="S_REFRESH_DEVICES" xml:space="preserve">
+    <value>Оновити пристрої</value>
+  </data>
+  <data name="S_RESTART_ADB" xml:space="preserve">
+    <value>Перезапустити ADB</value>
+  </data>
+  <data name="S_AWAITING_RESPONSE" xml:space="preserve">
+    <value>Очікування відповіді: {0}</value>
+  </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0}мс</value>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0}хв</value>
+  </data>
 </root>
