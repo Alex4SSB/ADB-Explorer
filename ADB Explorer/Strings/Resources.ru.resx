@@ -244,7 +244,7 @@
     <value>Извлечь</value>
   </data>
   <data name="S_PULL_ACTION_LINK" xml:space="preserve">
-    <value>Извлечь (Ссылка)</value>
+    <value>Извлечь (Целевую ссылку)</value>
   </data>
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Восстановить</value>
@@ -488,7 +488,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Открыть в редакторе</value>
   </data>
   <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
-    <value>Переопределить путь ADB</value>
+    <value>Переопределить путь к ADB</value>
   </data>
   <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
     <value>Папка по умолчанию</value>
@@ -497,10 +497,10 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Светлая</value>
   </data>
   <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
-    <value>Темная</value>
+    <value>Тёмная</value>
   </data>
   <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
-    <value>Системный</value>
+    <value>По умолчанию</value>
   </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>Тема</value>
@@ -509,7 +509,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Отключить аппаратное ускорение</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
-    <value>Проверить наличие обновлений</value>
+    <value>Проверять наличие обновлений</value>
   </data>
   <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
     <value>Внешний вид</value>
@@ -539,7 +539,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Политика конфиденциальности</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
-    <value>Лицензии третьих лиц</value>
+    <value>Attributions &amp; Third Party Licenses</value>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
     <value>[не установлено]</value>
