@@ -2,6 +2,7 @@
     x:Class="ADB_Explorer.Views.EmulatorPackageDeviceControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:ADB_Explorer.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -39,7 +40,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <ui:FontIcon Glyph="{Binding TypeIcon}" Style="{StaticResource DeviceStatusFontSizeStyle}" />
+                <controls:DeviceTypeIcon />
                 <TextBlock
                     Grid.Column="1"
                     Margin="4"

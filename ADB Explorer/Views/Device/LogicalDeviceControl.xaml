@@ -22,10 +22,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid>
-                    <Grid.Resources>
-                        <Style BasedOn="{StaticResource DeviceStatusFontSizeStyle}" TargetType="ui:FontIcon" />
-                    </Grid.Resources>
-                    <ui:FontIcon Glyph="{Binding TypeIcon}" />
+                    <controls:DeviceTypeIcon />
                     <Grid Style="{StaticResource DeviceStatusGridStyle}">
                         <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
                         <ui:FontIcon

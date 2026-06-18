@@ -22,10 +22,7 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <Grid>
-                    <Grid.Resources>
-                        <Style BasedOn="{StaticResource DeviceStatusFontSizeStyle}" TargetType="ui:FontIcon" />
-                    </Grid.Resources>
-                    <ui:FontIcon Glyph="{Binding TypeIcon}" />
+                    <controls:DeviceTypeIcon />
                     <Grid Style="{StaticResource DeviceStatusGridStyle}">
                         <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
                         <ui:FontIcon Foreground="{Binding RelativeSource={RelativeSource AncestorType=Border, Mode=FindAncestor, AncestorLevel=2}, Path=Background}" Glyph="{Binding StatusIcon}" />

@@ -46,7 +46,7 @@
                         <ColumnDefinition />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <ui:FontIcon Glyph="{Binding TypeIcon}" Style="{StaticResource DeviceStatusFontSizeStyle}" />
+                    <controls:DeviceTypeIcon />
                     <TextBlock Grid.Column="1" Margin="4">
                         <TextBlock.Style>
                             <Style BasedOn="{StaticResource DeviceNameTextBlockStyle}" TargetType="TextBlock">

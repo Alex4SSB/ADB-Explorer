@@ -39,7 +39,7 @@ public abstract class DeviceViewModel : ViewModelBase
 
     public string TypeIcon => Type switch
     {
-        DeviceType.Local => "\uE839",
+        DeviceType.Local => "",
         DeviceType.Remote => "\uEE77",
         DeviceType.Emulator => "\uE99A",
         DeviceType.EmulatorPackage => "\uE99A",
