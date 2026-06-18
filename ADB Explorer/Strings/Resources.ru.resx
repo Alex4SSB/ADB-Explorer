@@ -936,7 +936,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Вставить</value>
   </data>
   <data name="S_DROP" xml:space="preserve">
-    <value>Сброс</value>
+    <value>Перетащить</value>
   </data>
   <data name="S_ACTION_OPERATION" xml:space="preserve">
     <value>Операция</value>
@@ -993,7 +993,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Несоответствие содержимого</value>
   </data>
   <data name="S_VALIDATE_MISSING" xml:space="preserve">
-    <value>Отсутствующие элементы</value>
+    <value>Отсутствует в целевом месте</value>
   </data>
   <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
     <value>Безвозвратное удаление</value>
@@ -1131,13 +1131,13 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Ошибка: {0}</value>
   </data>
   <data name="S_FILEOP_VALIDATED" xml:space="preserve">
-    <value>Сверено</value>
+    <value>Проверено</value>
   </data>
   <data name="S_FILEOP_COMPLETED" xml:space="preserve">
-    <value>Завершено</value>
+    <value>Завершенный</value>
   </data>
   <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
-    <value>{0} провалено</value>
+    <value>{0} Не удалось</value>
   </data>
   <data name="S_FILEOP_TOTAL" xml:space="preserve">
     <value>Всего:</value>
@@ -1149,7 +1149,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>В процессе</value>
   </data>
   <data name="S_FILEOP_WAITING" xml:space="preserve">
-    <value>На очереди</value>
+    <value>В очереди</value>
   </data>
   <data name="S_FILEOP_FAILED" xml:space="preserve">
     <value>Не удалось</value>
@@ -1188,10 +1188,10 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Страница вниз</value>
   </data>
   <data name="ScrollBar_LineUpCommand" xml:space="preserve">
-    <value>Листать вверх</value>
+    <value>Прокрутить вверх</value>
   </data>
   <data name="ScrollBar_LineDownCommand" xml:space="preserve">
-    <value>Листать вниз</value>
+    <value>Прокрутите вниз</value>
   </data>
   <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
     <value>Левый край</value>
@@ -1200,16 +1200,16 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Правый край</value>
   </data>
   <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
-    <value>Страница влево</value>
+    <value>Страница слева</value>
   </data>
   <data name="ScrollBar_PageRightCommand" xml:space="preserve">
-    <value>Страница вправо</value>
+    <value>Страница справа</value>
   </data>
   <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
-    <value>Листать влево</value>
+    <value>Прокрутите влево</value>
   </data>
   <data name="ScrollBar_LineRightCommand" xml:space="preserve">
-    <value>Листать вправо</value>
+    <value>Прокрутить вправо</value>
   </data>
   <data name="S_MENU_UNDO" xml:space="preserve">
     <value>Отменить</value>
@@ -1235,7 +1235,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Перейти на Weblate</value>
   </data>
   <data name="S_FILE_SOCKET" xml:space="preserve">
-    <value>Сокет</value>
+    <value>Socket</value>
   </data>
   <data name="S_FILE_BLOCK" xml:space="preserve">
     <value>Блокировать устройство</value>
@@ -1322,7 +1322,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Вставить {0} вырезанных элементов</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
-    <value>{0} за {1} ({2})</value>
+    <value>{0} в {1} ({2})</value>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} из {1}</value>
@@ -1605,7 +1605,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Доступ</value>
   </data>
   <data name="S_CREATION_TIME" xml:space="preserve">
-    <value>Созданный</value>
+    <value>Создано</value>
   </data>
   <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
     <value>Модифицированный</value>
