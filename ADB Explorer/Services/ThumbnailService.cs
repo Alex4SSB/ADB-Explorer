@@ -188,13 +188,18 @@ public static partial class ThumbnailService
         if (Data.Settings.MovieThumbsEnabled && existingDirs.Length > 1)
             info.DeviceMoviesThumbnailDir = existingDirs[1].TrimEnd('/');
         
-        _deviceInfoCache.Add(info);
+        _listMutex.WaitOne();
+        try
+        {
+            _deviceInfoCache.Add(info);
+        }
+        finally
+        {
+            _listMutex.ReleaseMutex();
+        }
 
         return info;
     }
-
-    public static void InvalidateThumbnailDirCache(string serialNumber)
-        => _deviceInfoCache.RemoveAll(d => d.DeviceId == serialNumber);
 
     /// <summary>
     /// Cancels any in-progress thumbnail loading and hides the progress tooltip.
@@ -351,7 +356,18 @@ public static partial class ThumbnailService
 
     public static void SaveAllThumbsToCsv()
     {
-        foreach (var item in _deviceInfoCache)
+        DeviceThumbnailInfo[] snapshot;
+        _listMutex.WaitOne();
+        try
+        {
+            snapshot = [.. _deviceInfoCache];
+        }
+        finally
+        {
+            _listMutex.ReleaseMutex();
+        }
+
+        foreach (var item in snapshot)
         {
             DeviceThumbsToCsv(item);
         }
@@ -366,7 +382,7 @@ public static partial class ThumbnailService
         if (!Directory.Exists(deviceDir))
             Directory.CreateDirectory(deviceDir);
 
-        var csvLines = info.ThumbnailPathCache.Select(kvp => $"{kvp.Key}|{kvp.Value.ToCsv()}");
+        var csvLines = info.ThumbnailPathCache.ToArray().Select(kvp => $"{kvp.Key}|{kvp.Value.ToCsv()}");
         var csvContent = string.Join(Environment.NewLine, csvLines);
         var savePath = Path.Combine(deviceDir, CSV_CACHE_FILE);
 
