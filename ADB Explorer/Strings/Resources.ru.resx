@@ -431,7 +431,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Выберите файлы для отправки в {0}</value>
   </data>
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
-    <value>Отчистить</value>
+    <value>Очистить</value>
   </data>
   <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
     <value>mDNS</value>
