@@ -415,7 +415,7 @@ public static class DeviceHelper
         if (DateTime.Now - Data.DevicesObject.LastUpdate <= AdbExplorerConst.BATTERY_UPDATE_INTERVAL && Data.CurrentPage.Value != typeof(DevicesPage))
             return;
 
-        var items = Data.DevicesObject.LogicalDeviceViewModels.Where(device => !device.IsOpen);
+        var items = Data.DevicesObject.LogicalDeviceViewModels.Where(device => !device.IsOpen).ToList();
         foreach (var item in items)
         {
             item.UpdateBattery(cancellationToken);
@@ -1061,7 +1061,8 @@ public static class DeviceHelper
     public static void UpdateLogicalEmulatorAvdNames()
     {
         foreach (var device in Data.DevicesObject.LogicalDeviceViewModels
-            .Where(d => d.Type is DeviceType.Emulator && d.Status is not DeviceStatus.Offline && string.IsNullOrEmpty(d.AvdName)))
+            .Where(d => d.Type is DeviceType.Emulator && d.Status is not DeviceStatus.Offline && string.IsNullOrEmpty(d.AvdName))
+            .ToList())
         {
             try
             {

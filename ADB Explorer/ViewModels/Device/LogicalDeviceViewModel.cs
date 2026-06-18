@@ -74,6 +74,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
     public string BaseID => Type is DeviceType.Service ? ID.Split('.')[0] : ID;
 
+    private string serialNumber;
     /// <summary>
     /// Stable device identifier used for comparison and on-disk storage (USB ID, <c>ro.serialno</c>, mDNS serial, or AVD name).
     /// </summary>
@@ -81,13 +82,12 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     {
         get
         {
-            if (Type is DeviceType.Remote && string.IsNullOrEmpty(field))
+            if (Type is DeviceType.Remote && string.IsNullOrEmpty(serialNumber))
                 RefreshSerialNumber();
 
-            return field;
+            return serialNumber;
         }
-        protected set;
-    } = "";
+    }
 
     public RootStatus Root => Device.Root;
 
@@ -342,10 +342,10 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     private void RefreshSerialNumber(bool notify = true, bool allowPropLookup = true)
     {
         var next = ResolveSerialNumber(allowPropLookup);
-        if (SerialNumber == next)
+        if (serialNumber == next)
             return;
 
-        SerialNumber = next;
+        serialNumber = next;
         if (notify)
             OnPropertyChanged(nameof(SerialNumber));
     }

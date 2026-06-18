@@ -125,9 +125,9 @@ public partial class Devices : ObservableObject
 
     #region History device handling
 
-    public static IEnumerable<HistoryDeviceViewModel> RetrieveHistoryDevices()
+    public IEnumerable<HistoryDeviceViewModel> RetrieveHistoryDevices()
     {
-        return Data.Settings.StorageDevices?.Select(d => HistoryDeviceViewModel.FromStorage(d)) ?? [];
+        return Data.Settings.StorageDevices?.Select(d => HistoryDeviceViewModel.FromStorage(d, this)) ?? [];
     }
 
     public void StoreHistoryDevices() => StoreHistoryDevices(UIList.OfType<HistoryDeviceViewModel>());

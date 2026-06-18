@@ -109,7 +109,7 @@ public class DevicePollingService : BackgroundService
         if (!Data.Settings.AutoRoot)
             return;
 
-        foreach (var item in Data.DevicesObject.LogicalDeviceViewModels.Where(device => device.Root is RootStatus.Unchecked))
+        foreach (var item in Data.DevicesObject.LogicalDeviceViewModels.Where(device => device.Root is RootStatus.Unchecked).ToList())
         {
             item.EnableRoot(true);
         }

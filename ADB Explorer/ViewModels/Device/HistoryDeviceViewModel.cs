@@ -26,7 +26,7 @@ public class HistoryDeviceViewModel : NewDeviceViewModel
 
     public DeviceAction RemoveCommand { get; }
 
-    public HistoryDeviceViewModel(HistoryDevice device) : base(device)
+    public HistoryDeviceViewModel(HistoryDevice device, Devices devicesObject = null) : base(device, devicesObject)
     {
         Device = device;
 
@@ -40,14 +40,14 @@ public class HistoryDeviceViewModel : NewDeviceViewModel
         ConnectPort = device.ConnectPort
     });
 
-    public static HistoryDeviceViewModel FromStorage(StorageDevice device)
+    public static HistoryDeviceViewModel FromStorage(StorageDevice device, Devices devicesObject = null)
     {
         HistoryDeviceViewModel historyDevice = new(new HistoryDevice()
         {
             DeviceName = device.DeviceName,
             IpAddress = device.IpAddress,
             ConnectPort = device.ConnectPort
-        });
+        }, devicesObject);
 
         if (!historyDevice.IsIpAddressValid)
         {
