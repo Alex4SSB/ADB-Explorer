@@ -148,11 +148,7 @@ public partial class App
         var settings = Services.GetRequiredService<SettingsService>();
         settings.Load(settingsPath, oldPath);
 
-        if (!Data.Settings.UICulture.Equals(CultureInfo.InvariantCulture))
-        {
-            Thread.CurrentThread.CurrentCulture = Data.Settings.ActualFormatCulture;
-            Thread.CurrentThread.CurrentUICulture = Data.Settings.UICulture;
-        }
+        AppCulture.ApplyThreadCultures();
 
 #if !DEPLOY
         if (!File.Exists(ADB_Explorer.Properties.AppGlobal.DragDropLogPath))

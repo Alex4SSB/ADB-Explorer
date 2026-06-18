@@ -357,6 +357,8 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
         // thread accesses the resource strings (e.g. context menus outside the visual tree).
         Strings.Resources.Culture = actual;
 
+        AppCulture.ApplyThreadCultures();
+
         string? percent = actual.Name == "en" || actual.Parent.Name == "en"
                          ? null
                          : $"\u200E{SettingsHelper.GetCurrentPercentageTranslated(actual) * 100:f0}%";

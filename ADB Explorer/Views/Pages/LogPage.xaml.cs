@@ -11,7 +11,6 @@ public partial class LogPage : INavigableView<LogViewModel>
     public LogPage(LogViewModel viewModel)
     {
         Thread.CurrentThread.CurrentCulture = Data.Settings.ActualFormatCulture;
-        Thread.CurrentThread.CurrentUICulture = Data.Settings.ActualUICulture;
 
         ViewModel = viewModel;
         DataContext = this;

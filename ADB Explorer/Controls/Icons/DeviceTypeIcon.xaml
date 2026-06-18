@@ -24,7 +24,10 @@
                 </Style>
             </ui:FontIcon.Style>
         </ui:FontIcon>
-        <Viewbox d:Visibility="Visible" Stretch="Uniform">
+        <Viewbox
+            d:Visibility="Visible"
+            FlowDirection="LeftToRight"
+            Stretch="Uniform">
             <Viewbox.Style>
                 <Style TargetType="Viewbox">
                     <Setter Property="Visibility" Value="Collapsed" />

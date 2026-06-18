@@ -11,7 +11,6 @@ namespace ADB_Explorer.Views.Pages
         public OperationsPage(OperationsViewModel viewModel)
         {
             Thread.CurrentThread.CurrentCulture = Data.Settings.ActualFormatCulture;
-            Thread.CurrentThread.CurrentUICulture = Data.Settings.ActualUICulture;
 
             ViewModel = viewModel;
             DataContext = this;

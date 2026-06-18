@@ -9,10 +9,6 @@ public partial class TerminalPage : INavigableView<TerminalViewModel>
 
     public TerminalPage(TerminalViewModel viewModel)
     {
-        // Terminal page is not localized
-        Thread.CurrentThread.CurrentCulture =
-        Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
-
         ViewModel = viewModel;
         DataContext = this;
 
