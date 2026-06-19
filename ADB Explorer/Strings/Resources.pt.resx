@@ -457,4 +457,61 @@ O conteúdo visível pode estar incompleto.</value>
 • Nome dos ficheiros não diferenciam maiúsculas de minúsculas
 • Instalações de APKs não são suportadas</value>
   </data>
+  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ACTION_HIDE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_GITHUB_REPO" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_UPDATES" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SEARCH_SETTINGS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DONATE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_EXIT_SEARCH" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_TITLE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_APP_DATA_FOLDER" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
+    <value></value>
+  </data>
 </root>
