@@ -1548,4 +1548,46 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_ADB_NOT_FOUND" xml:space="preserve">
     <value>ADB konnte im System-PATH nicht gefunden werden. Bitte „{0}” verwenden, um es zu finden.</value>
   </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BUTTON_PAIR" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ADB_COMPROMISED" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ADB_PATH_INVALID" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value></value>
+  </data>
 </root>
