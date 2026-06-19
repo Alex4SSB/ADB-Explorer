@@ -458,60 +458,99 @@ O conteúdo visível pode estar incompleto.</value>
 • Instalações de APKs não são suportadas</value>
   </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_ACTION_HIDE" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_GITHUB_REPO" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_DONATE" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_APP_DATA_FOLDER" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_EXPAND_ALL" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_COLLAPSE_ALL" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ATTRIBUTIONS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_PRIVACY_POLICY" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SEARCH_VIEW" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
     <value></value>
   </data>
 </root>
