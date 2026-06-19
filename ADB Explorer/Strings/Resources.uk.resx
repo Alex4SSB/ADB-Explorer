@@ -1624,4 +1624,7 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>Сполучення</value>
   </data>
+  <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
+    <value>Завершити процес ADB під час закриття додатка</value>
+  </data>
 </root>
