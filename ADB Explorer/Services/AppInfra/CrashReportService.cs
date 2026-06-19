@@ -22,7 +22,24 @@ public static class CrashReportService
     public static bool UsesLocalCollector =>
         CollectorUrl.Value is { IsLoopback: true };
 
+    public static string LocalCrashLogPath =>
+        Path.Combine(Data.AppDataPath, AdbExplorerConst.LAST_CRASH_FILE);
+
     public readonly record struct SendResult(bool Success, int? StatusCode, string? Error);
+
+    public static void WriteLocalCrashLog(Exception exception)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(Data.AppDataPath))
+                return;
+
+            Directory.CreateDirectory(Data.AppDataPath);
+            File.WriteAllText(LocalCrashLogPath, exception.ToString());
+        }
+        catch
+        { }
+    }
 
     public static async Task<SendResult> SendAsync(Exception exception)
     {

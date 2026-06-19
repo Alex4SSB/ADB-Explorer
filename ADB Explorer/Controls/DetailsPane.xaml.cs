@@ -396,7 +396,7 @@ public partial class DetailsPane : UserControl
                 }
                 else if (Data.FileActions.IsDriveViewVisible)
                 {
-                    control.FileNameTextBlock.Text = Data.DevicesObject.Current.Name;
+                    control.FileNameTextBlock.Text = Data.DevicesObject.Current?.Name ?? "";
                     control.LargeFileIcon.Source = Phone.DragImage;
                     control.FileNameTextBlock.FlowDirection = FlowDirection.LeftToRight;
                 }

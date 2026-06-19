@@ -9,13 +9,16 @@ public static class FolderHelper
 {
     public static void CombineDisplayNames()
     {
+        if (Data.DevicesObject?.Current is not LogicalDeviceViewModel device)
+            return;
+
         var driveView = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
-        var name = Data.DevicesObject.Current.Name;
+        var name = device.Name;
 
         if (!Data.CurrentDisplayNames.TryAdd(driveView, name))
             Data.CurrentDisplayNames[driveView] = name;
 
-        foreach (var drive in Data.DevicesObject.Current.Drives.OfType<LogicalDriveViewModel>().Where(d => d.Type 
+        foreach (var drive in device.Drives.OfType<LogicalDriveViewModel>().Where(d => d.Type 
             is not AbstractDrive.DriveType.Root 
             and not AbstractDrive.DriveType.Internal))
         {

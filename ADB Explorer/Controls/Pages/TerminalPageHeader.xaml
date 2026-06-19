@@ -13,7 +13,17 @@
     d:DesignWidth="800"
     FlowDirection="LeftToRight"
     mc:Ignorable="d">
-    <Grid Margin="20,10">
+    <Grid>
+        <Grid Margin="20,10">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ViewModel.ServerUnresponsive, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                            <Setter Property="IsEnabled" Value="False" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition />
@@ -76,5 +86,6 @@
             Margin="4"
             ClearButtonEnabled="False"
             FontFamily="Consolas" />
+        </Grid>
     </Grid>
 </UserControl>

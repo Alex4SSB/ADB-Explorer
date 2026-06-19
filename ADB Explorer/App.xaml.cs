@@ -8,6 +8,7 @@ using ADB_Explorer.Views.Pages;
 using ADB_Explorer.Views.Windows;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using System.Runtime.ExceptionServices;
 using Wpf.Ui;
 using Wpf.Ui.DependencyInjection;
 
@@ -223,6 +224,8 @@ public partial class App
             return;
         }
 
+        CrashReportService.WriteLocalCrashLog(e.Exception);
+
         if (Data.Settings.ShowMessageOnCrash)
         {
             // Mark handled so WPF does not terminate before the queued dialog can run.
@@ -321,7 +324,7 @@ public partial class App
         if (dispatcher is null || dispatcher.HasShutdownStarted)
             return;
 
-        dispatcher.BeginInvoke(() => throw exception, DispatcherPriority.Send);
+        dispatcher.BeginInvoke(() => ExceptionDispatchInfo.Capture(exception).Throw(), DispatcherPriority.Send);
     }
 
     // Crash report strings are not translated
@@ -358,11 +361,14 @@ public partial class App
                 ? "To disable this dialog, turn off \"Show crash report dialog\" in Settings → About."
                 : $"To disable this message, set '\"ShowMessageOnCrash\": false' in %LocalAppData%\\AdbExplorer\\settings.json";
 
+            var portableCrashLogHint = GetPortableCrashLogHint();
+
             if (!CrashReportService.IsConfigured)
             {
                 return $"""
 An unhandled exception occurred, and the application has crashed.
 {optOutHint}
+{portableCrashLogHint}
 
 {exceptionMessage}
 """;
@@ -373,10 +379,26 @@ An unhandled exception occurred, and the application has crashed.
 
 If you choose Send Report, diagnostic data is sent to Grafana Cloud (Grafana Labs) to help fix bugs. This may include the exception message, stack trace, app and Windows version, and which view was open. Sending is optional — choose Dismiss to send nothing.
 Privacy Policy: {privacyUrl}
+{portableCrashLogHint}
 
 {optOutHint}
 
 {exceptionMessage}
+""";
+        }
+
+        private static string GetPortableCrashLogHint()
+        {
+            if (Data.RuntimeSettings.IsAppPackaged)
+                return "";
+
+            var crashLogPath = CrashReportService.LocalCrashLogPath;
+            return $"""
+
+A full stack trace has been saved to:
+{crashLogPath}
+
+The Windows Event Log entry for this crash may only show the crash-dialog handler, not the original failure. Use the file above when reporting bugs without Grafana.
 """;
         }
     }

@@ -391,7 +391,8 @@ public partial class ExplorerPageHeader : UserControl
                     break;
 
                 case nameof(AppRuntimeSettings.DriveViewNav):
-                    DriveViewNav();
+                    if (!DiskUsagePollingService.ServerUnresponsive)
+                        DriveViewNav();
                     break;
 
                 case nameof(AppRuntimeSettings.InitLister):
@@ -764,6 +765,9 @@ public partial class ExplorerPageHeader : UserControl
 
         if (location.Location is Navigation.SpecialLocation.DriveView)
         {
+            if (DiskUsagePollingService.ServerUnresponsive || DevicesObject?.Current is null)
+                return;
+
             FileActions.IsRecycleBin = false;
             PathBoxFocus(false);
             RaiseUnfocusSearchBox();
@@ -810,6 +814,9 @@ public partial class ExplorerPageHeader : UserControl
 
     private void DriveViewNav()
     {
+        if (DiskUsagePollingService.ServerUnresponsive || DevicesObject?.Current is null)
+            return;
+
         DeviceCts.Cancel();
         DeviceCts.Dispose();
         DeviceCts = new();

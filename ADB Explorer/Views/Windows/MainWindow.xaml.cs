@@ -240,12 +240,18 @@ public partial class MainWindow : INavigationWindow
 
     private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        if (DiskUsagePollingService.ServerUnresponsive)
+            return;
+
         if (Data.CurrentPage.Value == typeof(ExplorerPage))
             ExplorerPageHeader.HandlePreviewKeyDown(e);
     }
 
     private void MainWindow_PreviewKeyUp(object sender, KeyEventArgs e)
     {
+        if (DiskUsagePollingService.ServerUnresponsive)
+            return;
+
         if (Data.CurrentPage.Value == typeof(ExplorerPage))
             ExplorerPageHeader.HandlePreviewKeyUp(e);
     }

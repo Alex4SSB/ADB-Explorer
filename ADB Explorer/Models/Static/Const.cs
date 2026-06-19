@@ -4,6 +4,7 @@ public static class AdbExplorerConst
 {
     public const string ADB_PROCESS = "adb";
     public const string APP_DATA_FOLDER = "AdbExplorer";
+    public const string LAST_CRASH_FILE = "last-crash.txt";
     public const string ADB_DRAG_FORMAT = "ADB Explorer Drag List";
 
     public const string DEFAULT_PATH = "/sdcard";
