@@ -225,6 +225,9 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     [ObservableProperty]
     public partial bool EnableLog { get; set; } = false;
 
+    [ObservableProperty]
+    public partial bool KillAdbOnExit { get; set; } = true;
+
     #endregion
 
     #region File Ops

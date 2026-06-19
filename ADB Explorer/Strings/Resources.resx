@@ -2022,4 +2022,8 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Pair</value>
     <comment>The button for pairing a device</comment>
   </data>
+  <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
+    <value>Kill ADB When App Closes</value>
+    <comment>The setting that enables killing ADB server when closing the app</comment>
+  </data>
 </root>

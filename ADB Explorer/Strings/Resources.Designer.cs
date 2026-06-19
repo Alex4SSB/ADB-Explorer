@@ -1486,6 +1486,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Drive restrictions:.
+        /// </summary>
+        public static string S_DRIVE_RESTRICTIONS_HEADER {
+            get {
+                return ResourceManager.GetString("S_DRIVE_RESTRICTIONS_HEADER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Root.
         /// </summary>
         public static string S_DRIVE_ROOT {
@@ -1953,36 +1962,6 @@ namespace ADB_Explorer.Strings {
             }
         }
         
-        /// <summary>
-        ///   Looks up a localized string similar to Drive restrictions:.
-        /// </summary>
-        public static string S_DRIVE_RESTRICTIONS_HEADER {
-            get {
-                return ResourceManager.GetString("S_DRIVE_RESTRICTIONS_HEADER", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to • Read-only filesystem.
-        /// </summary>
-        public static string S_RESTRICTION_READ_ONLY {
-            get {
-                return ResourceManager.GetString("S_RESTRICTION_READ_ONLY", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to • Symbolic links are not supported
-        ///• File names cannot contain &quot; * / : &lt; &gt; ? \ |
-        ///• File names are case insensitive
-        ///• Installation of APKs is not supported.
-        /// </summary>
-        public static string S_RESTRICTION_NOEXEC {
-            get {
-                return ResourceManager.GetString("S_RESTRICTION_NOEXEC", resourceCulture);
-            }
-        }
-
         /// <summary>
         ///   Looks up a localized string similar to GitHub repository.
         /// </summary>
@@ -2910,7 +2889,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Some copied files have conflicting names on FUSE.
+        ///   Looks up a localized string similar to Some copied files have conflicting case-insensitive names.
         /// </summary>
         public static string S_POPUP_COPIED_UNIQUE {
             get {
@@ -2928,20 +2907,20 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Adheres to user space naming rules.
-        /// </summary>
-        public static string S_POPUP_RESTRICTED_NAMING {
-            get {
-                return ResourceManager.GetString("S_POPUP_RESTRICTED_NAMING", resourceCulture);
-            }
-        }
-
-        /// <summary>
         ///   Looks up a localized string similar to A selected item is not a file / folder.
         /// </summary>
         public static string S_POPUP_NON_FILE {
             get {
                 return ResourceManager.GetString("S_POPUP_NON_FILE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adheres to user space naming rules.
+        /// </summary>
+        public static string S_POPUP_RESTRICTED_NAMING {
+            get {
+                return ResourceManager.GetString("S_POPUP_RESTRICTED_NAMING", resourceCulture);
             }
         }
         
@@ -2964,7 +2943,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Some selected files have conflicting names on FUSE / Windows.
+        ///   Looks up a localized string similar to Some selected files have conflicting case-insensitive names.
         /// </summary>
         public static string S_POPUP_SELECTED_UNIQUE {
             get {
@@ -3034,7 +3013,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_PRIVACY_POLICY", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to This app version was released after a privacy policy update.
         ///Review the changes on GitHub..
@@ -3044,7 +3023,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_PRIVACY_UPDATE_MSG", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Privacy Policy Updated.
         /// </summary>
@@ -3053,7 +3032,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_PRIVACY_UPDATE_TITLE", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Pull.
         /// </summary>
@@ -3315,6 +3294,27 @@ namespace ADB_Explorer.Strings {
         public static string S_RESTORE_CONF_TITLE {
             get {
                 return ResourceManager.GetString("S_RESTORE_CONF_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to • Symbolic links are not supported
+        ///• File names cannot contain &quot; * / : &lt; &gt; ? \ |
+        ///• File names are case insensitive
+        ///• Installation of APKs is not supported.
+        /// </summary>
+        public static string S_RESTRICTION_NOEXEC {
+            get {
+                return ResourceManager.GetString("S_RESTRICTION_NOEXEC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to • Read-only filesystem.
+        /// </summary>
+        public static string S_RESTRICTION_READ_ONLY {
+            get {
+                return ResourceManager.GetString("S_RESTRICTION_READ_ONLY", resourceCulture);
             }
         }
         
@@ -3729,6 +3729,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_KEEP_MODIFIED_DATE {
             get {
                 return ResourceManager.GetString("S_SETTINGS_KEEP_MODIFIED_DATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Kill ADB When App Closes.
+        /// </summary>
+        public static string S_SETTINGS_KILL_ADB_ON_EXIT {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_KILL_ADB_ON_EXIT", resourceCulture);
             }
         }
         

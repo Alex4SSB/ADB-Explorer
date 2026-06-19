@@ -157,6 +157,7 @@ public static class UISettings
                 new BoolSetting(() => Settings.EnableMdns, Strings.Resources.S_SETTINGS_ENABLE_MDNS, icon: "\uED14"),
                 new BoolSetting(() => Settings.PollDevices, Strings.Resources.S_SETTINGS_POLL_DEVICES, icon: "\uEBDE"),
                 new BoolSetting(() => Settings.PollBattery, Strings.Resources.S_SETTINGS_POLL_BATTERY, icon: "\uEE63"),
+                new BoolSetting(() => Settings.KillAdbOnExit, Strings.Resources.S_SETTINGS_KILL_ADB_ON_EXIT, icon: "\uF71D"),
                 new BoolSetting(() => Settings.EnableLog, Strings.Resources.S_BUTTON_LOG, icon: "\uE9A4"),
             ], "\uE8CC"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_DEVICE,

@@ -27,6 +27,8 @@ public partial class ADBService
     private static int _activeCommandCount = 0;
     public static bool IsCommandActive => _activeCommandCount > 0;
 
+    private static readonly ConcurrentDictionary<int, Process> ActiveCommandProcesses = new();
+
     public static event Action<bool> CommandActiveChanged;
 
     private static void UpdateCommandActive(int delta)
@@ -92,6 +94,7 @@ public partial class ADBService
     {
         UpdateCommandActive(1);
         using var cmdProcess = StartCommandProcess(file, cmd, encoding, args: args);
+        ActiveCommandProcesses[cmdProcess.Id] = cmdProcess;
 
         var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync();
         var stderrTask = cmdProcess.StandardError.ReadToEndAsync();
@@ -108,6 +111,8 @@ public partial class ADBService
         }
         catch (OperationCanceledException)
         {
+            KillTrackedProcess(cmdProcess);
+
             processTask = null;
             stdoutTask = null;
             stderrTask = null;
@@ -119,6 +124,7 @@ public partial class ADBService
         }
         finally
         {
+            ActiveCommandProcesses.TryRemove(cmdProcess.Id, out _);
             UpdateCommandActive(-1);
         }
     }
@@ -153,10 +159,13 @@ public partial class ADBService
         string file, string cmd, Encoding encoding, CancellationToken cancellationToken, bool redirect = true, Process process = null, string workingDir = null, params string[] args)
     {
         UpdateCommandActive(1);
+        var processId = -1;
         try
         {
         using var cmdProcess = StartCommandProcess(file, cmd, encoding, redirect, process, workingDir, args: args);
-        cancellationToken.Register(() => ProcessHandling.KillProcess(cmdProcess));
+        processId = cmdProcess.Id;
+        ActiveCommandProcesses[processId] = cmdProcess;
+        cancellationToken.Register(() => KillTrackedProcess(cmdProcess));
 
         BlockingCollection<string> outputQueue = [];
         string stderr = "";
@@ -217,6 +226,8 @@ public partial class ADBService
         }
         finally
         {
+            if (processId >= 0)
+                ActiveCommandProcesses.TryRemove(processId, out _);
             UpdateCommandActive(-1);
         }
     }
@@ -340,9 +351,75 @@ public partial class ADBService
             ExecuteAdbCommand("start-server", out _, out _, CancellationToken.None);
     }
 
+    public static void WaitForCommands(TimeSpan timeout)
+    {
+        var deadline = DateTime.UtcNow + timeout;
+        while (IsCommandActive && DateTime.UtcNow < deadline)
+            Thread.Sleep(50);
+    }
+
+    public static void CancelAllCommands()
+    {
+        foreach (var pair in ActiveCommandProcesses.ToArray())
+        {
+            KillTrackedProcess(pair.Value);
+        }
+    }
+
+    private static void KillTrackedProcess(Process process)
+    {
+        try
+        {
+            if (process is { HasExited: false })
+                ProcessHandling.KillProcess(process);
+        }
+        catch
+        {
+        }
+    }
+
     public static bool KillAdbProcess()
     {
-        return ExecuteCommand("taskkill", "/f", out _, out _, Encoding.UTF8, CancellationToken.None, "/im", "\"adb.exe\"") == 0;
+        KillAllAdbProcesses();
+        return Process.GetProcessesByName(ADB_PROCESS).Length == 0;
+    }
+
+    public static void KillAllAdbProcesses()
+    {
+        try
+        {
+            KillAdbServer();
+        }
+        catch
+        {
+            // Server may already be gone or ADB path may be invalid.
+        }
+
+        for (var attempt = 0; attempt < 3; attempt++)
+        {
+            ExecuteCommand("taskkill", "/f", out _, out _, Encoding.UTF8, CancellationToken.None, "/im", $"{ADB_PROCESS}.exe");
+
+            foreach (var process in Process.GetProcessesByName(ADB_PROCESS))
+            {
+                try
+                {
+                    if (!process.HasExited)
+                        process.Kill(entireProcessTree: true);
+                }
+                catch
+                {
+                }
+                finally
+                {
+                    process.Dispose();
+                }
+            }
+
+            if (Process.GetProcessesByName(ADB_PROCESS).Length == 0)
+                return;
+
+            Thread.Sleep(100);
+        }
     }
 
     const string magiskRootArgs = """

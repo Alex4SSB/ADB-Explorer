@@ -23,7 +23,7 @@ public class DevicePollingService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        while (!stoppingToken.IsCancellationRequested && !App.IsShuttingDown)
         {
             try
             {
@@ -42,6 +42,9 @@ public class DevicePollingService : BackgroundService
 
     private static Task PollAsync(CancellationToken cancellationToken)
     {
+        if (cancellationToken.IsCancellationRequested || App.IsShuttingDown)
+            return Task.CompletedTask;
+
         if (Data.Settings.PollDevices)
         {
             RefreshDevices(cancellationToken);

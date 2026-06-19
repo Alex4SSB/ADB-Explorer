@@ -35,6 +35,15 @@ public partial class App
     /// </summary>
     private static bool s_crashDialogCompleted;
 
+    private static bool s_adbKillHandled;
+
+    private static readonly TimeSpan HostStopTimeout = TimeSpan.FromSeconds(1);
+
+    static App()
+    {
+        AppDomain.CurrentDomain.ProcessExit += (_, _) => EnsureAdbKilledOnExit();
+    }
+
     // The.NET Generic Host provides dependency injection, configuration, logging, and other services.
     // https://docs.microsoft.com/dotnet/core/extensions/generic-host
     // https://docs.microsoft.com/dotnet/core/extensions/dependency-injection
@@ -168,9 +177,10 @@ public partial class App
     /// <summary>
     /// Occurs when the application is closing.
     /// </summary>
-    private async void OnExit(object sender, ExitEventArgs e)
+    private void OnExit(object sender, ExitEventArgs e)
     {
         IsShuttingDown = true;
+        Data.RuntimeSettings.IsPollingStopped = true;
 
         ThumbnailService.SaveAllThumbsToCsv();
 
@@ -185,9 +195,47 @@ public partial class App
 
         ClearFoldersInAppData();
 
-        await _host.StopAsync();
+        if (Data.Settings.KillAdbOnExit is true)
+        {
+            ADBService.CancelAllCommands();
+            ADBService.KillAllAdbProcesses();
+            ADBService.WaitForCommands(TimeSpan.FromSeconds(1));
+        }
+
+        StopHost();
+
+        EnsureAdbKilledOnExit();
 
         _host.Dispose();
+    }
+
+    private static void StopHost()
+    {
+        try
+        {
+            Task.Run(() => _host.StopAsync()).Wait(HostStopTimeout);
+        }
+        catch
+        {
+        }
+    }
+
+    private static void EnsureAdbKilledOnExit()
+    {
+        if (s_adbKillHandled || Data.Settings?.KillAdbOnExit is not true)
+            return;
+
+        try
+        {
+            ADBService.KillAllAdbProcesses();
+        }
+        catch
+        {
+        }
+        finally
+        {
+            s_adbKillHandled = true;
+        }
     }
 
     private static void ClearFoldersInAppData()
