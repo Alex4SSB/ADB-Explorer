@@ -1189,27 +1189,36 @@
     <value />
   </data>
   <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
     <value></value>
   </data>
 </root>
