@@ -142,6 +142,17 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     [ObservableProperty]
     public partial string ManualAdbPath { get; set; } = "";
 
+    [JsonIgnore]
+    public bool DisableAdbRestrictions
+    {
+        get => CredentialVaultStore.Get(nameof(DisableAdbRestrictions)) == "True";
+        set
+        {
+            CredentialVaultStore.Set(nameof(DisableAdbRestrictions), value ? "True" : "False");
+            OnPropertyChanged();
+        }
+    }
+
     #endregion
 
     #region File Behavior

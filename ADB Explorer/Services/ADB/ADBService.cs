@@ -559,26 +559,16 @@ public partial class ADBService
         }
     }
 
-    /// <summary>
-    /// Verifies ADB.exe hash against known valid versions and its version.<br/>
-    /// AdbPath and AdbVersion in RuntimeSettings are set accordingly based on the results of the verification.
-    /// </summary>
-    /// <remarks>
-    /// Sets AdbVersion to: <br/>
-    /// • null if the ADB executable is not recognized as valid <br/>
-    /// • 0.0.0 if ADB is valid but the version cannot be determined <br/>
-    /// • the actual version if it can be determined
-    /// </remarks>
     public static void VerifyAdbVersion(string adbPath)
     {
-        if (string.IsNullOrEmpty(adbPath) || adbPath.StartsWith(@"\\"))   // Forbid UNC paths for security reasons
+        if (string.IsNullOrEmpty(adbPath))
         {
             AdbHelper.CurrentAdbState.Status = AdbHelper.AdbStatus.NotFound;
             return;
         }
 
         // Forbid UNC paths for security reasons
-        if (adbPath.StartsWith(@"\\"))                                                
+        if (!Settings.DisableAdbRestrictions && adbPath.StartsWith(@"\\"))
         {
             AdbHelper.CurrentAdbState.Status = AdbHelper.AdbStatus.PathInvalid;
             return;
@@ -589,7 +579,7 @@ public partial class ADBService
         if (file.Exists)
         {
             // Forbid symlinks for security reasons
-            if (file.Attributes.HasFlag(FileAttributes.ReparsePoint))
+            if (!Settings.DisableAdbRestrictions && file.Attributes.HasFlag(FileAttributes.ReparsePoint))
             {
                 AdbHelper.CurrentAdbState.Status = AdbHelper.AdbStatus.PathInvalid;
                 return;
@@ -606,28 +596,31 @@ public partial class ADBService
             }
         }
 
-        bool isHashValid = false;
-        var adbSHA = Security.CalculateWindowsFileHash(adbPath, true);
-        if (adbSHA is not null)
+        if (!Settings.DisableAdbRestrictions)
         {
-            // First check against the hardcoded list of known ADB versions
-            isHashValid = AdbVersions.HashList.Contains(adbSHA);
+            bool isHashValid = false;
+            var adbSHA = Security.CalculateWindowsFileHash(adbPath, true);
+            if (adbSHA is not null)
+            {
+                // First check against the hardcoded list of known ADB versions
+                isHashValid = AdbVersions.HashList.Contains(adbSHA);
 
-            // If not found, verify the certificate is valid and is from Google. ADB is signed since 34.0.5
+                // If not found, verify the certificate is valid and is from Google. ADB is signed since 34.0.5
+                if (!isHashValid)
+                    isHashValid = Security.VerifyAuthenticode(adbPath, "Google LLC");
+
+                // As a last resort, check against the list retrieved from the repository (which is updated more frequently)
+                if (!isHashValid)
+                    isHashValid = RepoHashList.Contains(adbSHA);
+            }
+
             if (!isHashValid)
-                isHashValid = Security.VerifyAuthenticode(adbPath, "Google LLC");
-
-            // As a last resort, check against the list retrieved from the repository (which is updated more frequently)
-            if (!isHashValid)
-                isHashValid = RepoHashList.Contains(adbSHA);
+            {
+                AdbHelper.CurrentAdbState.Status = AdbHelper.AdbStatus.Compromised;
+                return;
+            }
         }
-
-        if (!isHashValid)
-        {
-            AdbHelper.CurrentAdbState.Status = AdbHelper.AdbStatus.Compromised;
-            return;
-        }
-
+        
         int exitCode = 1;
         string stdout = "";
         try
