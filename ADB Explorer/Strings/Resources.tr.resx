@@ -447,4 +447,10 @@ Görünen içerik eksik olabilir.</value>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
     <value>Dosya Adı Uzantılarını Göster</value>
   </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value></value>
+  </data>
 </root>
