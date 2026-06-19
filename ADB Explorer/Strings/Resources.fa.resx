@@ -132,4 +132,13 @@
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>نسخه ADB از مسیر داده شده خیلی کم است.</value>
   </data>
+  <data name="MEGA" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value></value>
+  </data>
 </root>
