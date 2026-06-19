@@ -11,10 +11,20 @@
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:ServiceDeviceViewModel}"
     mc:Ignorable="d">
-    <ui:CardControl>
-        <ui:CardControl.Style>
-            <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="ui:CardControl" />
-        </ui:CardControl.Style>
+    <ui:CardControl Style="{StaticResource DeviceExpanderStyle}">
+        <helpers:ExpanderHelper.HeaderBottomContent>
+            <ProgressBar>
+                <ProgressBar.Style>
+                    <Style BasedOn="{StaticResource ExpanderHeaderProgressBarStyle}" TargetType="ProgressBar">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasPairingError}" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCriticalBrush}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ProgressBar.Style>
+            </ProgressBar>
+        </helpers:ExpanderHelper.HeaderBottomContent>
         <ui:CardControl.Header>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -28,11 +38,24 @@
                         <ui:FontIcon Foreground="{Binding RelativeSource={RelativeSource AncestorType=Border, Mode=FindAncestor, AncestorLevel=2}, Path=Background}" Glyph="{Binding StatusIcon}" />
                     </Grid>
                 </Grid>
-                <TextBlock
-                    Grid.Column="1"
-                    Margin="4"
-                    Style="{StaticResource DeviceNameTextBlockStyle}"
-                    Text="{Binding IpAddress}" />
+                <StackPanel Grid.Column="1" Margin="4">
+                    <TextBlock Style="{StaticResource DeviceNameTextBlockStyle}" Text="{Binding IpAddress}" />
+                    <TextBlock
+                        FontSize="12"
+                        Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                        Text="{Binding PairingError}"
+                        TextWrapping="Wrap">
+                        <TextBlock.Style>
+                            <Style BasedOn="{StaticResource DeviceNameTextBlockStyle}" TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasPairingError}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
             </Grid>
         </ui:CardControl.Header>
         <Grid>

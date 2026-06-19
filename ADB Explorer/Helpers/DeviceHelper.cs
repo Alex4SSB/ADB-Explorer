@@ -446,7 +446,9 @@ public static class DeviceHelper
 
         if (qrServices.Any())
         {
-            await PairService(qrServices.First(), cancellationToken);
+            var qrService = qrServices.First();
+            if (!qrService.IsPairingInProgress)
+                await PairService(qrService, cancellationToken);
         }
     }
 
@@ -456,23 +458,29 @@ public static class DeviceHelper
             ? Data.MdnsService?.QrClass?.Password
             : service.PairingCode;
 
-        if (string.IsNullOrEmpty(code))
+        if (string.IsNullOrEmpty(code) || service.IsPairingInProgress)
             return false;
 
-        return await Task.Run(() =>
-        {
-            try
-            {
-                ADBService.PairNetworkDevice(service.ID, code, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                App.SafeInvoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
-                return false;
-            }
+        App.SafeInvoke(service.BeginPairing);
 
-            return true;
-        });
+        var success = false;
+        string error = null;
+
+        try
+        {
+            await Task.Run(() => ADBService.PairNetworkDevice(service.ID, code, cancellationToken), cancellationToken);
+            success = true;
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            App.SafeInvoke(() => service.EndPairing(success, error));
+        }
+
+        return success;
     }
 
     public static void UpdateDevicesRootAccess()

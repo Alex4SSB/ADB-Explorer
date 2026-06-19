@@ -25,9 +25,29 @@ public class ServiceDeviceViewModel : PairingDeviceViewModel
         }
     }
 
+    private bool isPairingInProgress;
+    public bool IsPairingInProgress
+    {
+        get => isPairingInProgress;
+        private set => Set(ref isPairingInProgress, value);
+    }
+
+    private string pairingError;
+    public string PairingError
+    {
+        get => pairingError;
+        private set
+        {
+            if (Set(ref pairingError, value))
+                OnPropertyChanged(nameof(HasPairingError));
+        }
+    }
+
     #endregion
 
     #region Read only properties
+
+    public bool HasPairingError => !string.IsNullOrEmpty(PairingError);
 
     public ServiceDevice.PairingMode MdnsType => Device.MdnsType;
 
@@ -55,7 +75,7 @@ public class ServiceDeviceViewModel : PairingDeviceViewModel
 
         UpdateServiceStatus();
 
-        PairCommand = new(() => IsPairingCodeValid && device.Status is DeviceStatus.Unauthorized,
+        PairCommand = new(() => !IsPairingInProgress && IsPairingCodeValid && device.Status is DeviceStatus.Unauthorized,
                           () => _ = DeviceHelper.PairService(this, CancellationToken.None));
     }
 
@@ -83,5 +103,24 @@ public class ServiceDeviceViewModel : PairingDeviceViewModel
         }
 
         return changed;
+    }
+
+    public void BeginPairing()
+    {
+        PairingError = null;
+        IsPairingInProgress = true;
+        PairCommand.NotifyIsEnabledChanged();
+        CommandManager.InvalidateRequerySuggested();
+    }
+
+    public void EndPairing(bool success, string error = null)
+    {
+        IsPairingInProgress = false;
+
+        if (!success && !string.IsNullOrEmpty(error))
+            PairingError = error;
+
+        PairCommand.NotifyIsEnabledChanged();
+        CommandManager.InvalidateRequerySuggested();
     }
 }
