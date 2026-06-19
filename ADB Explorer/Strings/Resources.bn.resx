@@ -1203,4 +1203,13 @@
   <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
     <value></value>
   </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
+    <value></value>
+  </data>
 </root>
