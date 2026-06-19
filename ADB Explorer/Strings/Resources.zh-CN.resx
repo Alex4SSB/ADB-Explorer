@@ -1607,4 +1607,28 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
     <value>复制的文件违反了 FUSE 命名规则</value>
   </data>
+  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
+    <value></value>
+  </data>
 </root>
