@@ -136,7 +136,7 @@
     <value>Виберіть виконуваний файл ADB</value>
   </data>
   <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
-    <value>Скинути налаштування програми</value>
+    <value>Скинути налаштування додатка</value>
   </data>
   <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
     <value>Нова версія додатку</value>
@@ -217,7 +217,7 @@
     <value>Сполучення та/або підключення пристрою Wi-Fi (без використання mDNS)</value>
   </data>
   <data name="S_RESTART_APP" xml:space="preserve">
-    <value>Перезапустіть програму, щоб зміни набули чинності</value>
+    <value>Перезапустіть додаток, щоб зміни набули чинності</value>
   </data>
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Помилка читання файлу</value>
@@ -349,7 +349,7 @@
   </data>
   <data name="S_HELP_ON_ADB" xml:space="preserve">
     <value>Цей додаток є UI для ADB - Android Debug Bridge.
-Для використання програми потрібно встановити ADB на свій PC.
+Для використання додатка потрібно встановити ADB на свій PC.
 ADB доступний як частина Android SDK Platform Tools.
 Ви можете використати надане посилання для завантаження SDK Platform Tools.
 На жаль, ми не можемо надати ADB з додатком через ліцензійні обмеження.</value>
@@ -443,7 +443,7 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>• Файлова система лише для читання</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
-    <value>Усі налаштування будуть скинуті під час закриття програми.
+    <value>Усі налаштування будуть скинуті під час закриття додатка.
 Цю дію не можна скасувати. Ви впевнені?</value>
   </data>
   <data name="S_WSA_LAUNCH" xml:space="preserve">
@@ -653,7 +653,7 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Звіти про збої</value>
   </data>
   <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
-    <value>Після збою ви можете за бажанням надіслати діагностичний звіт, щоб допомогти нам його виправити. Звіти надсилаються тільки після натискання кнопки "Надіслати звіт" і зазвичай містять повідомлення про виключення, трасування стека, версії програми та Windows, а також на відкритій сторінці. Дані обробляються Grafana Labs (Grafana Cloud). розділ посилання на Політику конфіденційності вище.</value>
+    <value>Після збою ви можете за бажанням надіслати діагностичний звіт, щоб допомогти нам його виправити. Звіти надсилаються тільки після натискання кнопки "Надіслати звіт" і зазвичай містять повідомлення про виключення, трасування стека, версії додатка та Windows, а також на відкритій сторінці. Дані обробляються Grafana Labs (Grafana Cloud). розділ посилання на Політику конфіденційності вище.</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>Attributions &amp; Third Party Licenses</value>
