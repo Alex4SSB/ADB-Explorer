@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -227,5 +227,149 @@
   </data>
   <data name="S_CANCEL" xml:space="preserve">
     <value>Annuleren</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ACTION_HIDE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ITEM_DESTINATION" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_GITHUB_REPO" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SKIP" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_UPDATES" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_NEW_VERSION" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SEARCH_SETTINGS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DONATE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_EXIT_SEARCH" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_UNINSTALL" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BUTTON_CLEAR" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_TITLE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_CONFIRM" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_RESET_SETTINGS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_APP_DATA_FOLDER" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value></value>
   </data>
 </root>
