@@ -553,4 +553,406 @@ O conteúdo visível pode estar incompleto.</value>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
     <value />
   </data>
+  <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_TERMINAL" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MENU_UNDO" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ACTION_UPDATE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_FILEOP_TOTAL" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_COLUMN_PROGRESS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_COLUMN_TYPE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_COLUMN_ADDED" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_FOLDER_EMPTY" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_PASTE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BUTTON_YES" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_TYPE_USB" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ITEM_COPY" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_GOTO_WEBLATE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_TYPE_SERVICE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BUTTON_BROWSE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ADB_DISK_USAGE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BAT_TEMP" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DRIVE_TEMP" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_LOCATION_NA" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_COLUMN_VERSION" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BAT_HEALTH" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_COLUMN_SIZE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BAT_STATE_FULL" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ACTION_RECYCLE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_APK" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_COLUMN_SOURCE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_FILEOP_PREV" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DISK_USAGE_READ" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MENU_REDO" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_FILEOP_COMPLETED" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_COLUMN_NAME" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_FILEOP_VALIDATING" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DEVICE_QR" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BUTTON_LAUNCH" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MENU_EMPTY" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_AWAITING_RESPONSE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ITEMS_SELECTED" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BUTTON_CONNECT" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BROWSER_ITEMS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ACTION_MOVE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DRIVE_TRASH" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_RESTART_ADB" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_FILEOP_RUNNING" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_FILES_PLURAL" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_REMOVE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_COLUMN_USER_ID" xml:space="preserve">
+    <value></value>
+  </data>
 </root>
