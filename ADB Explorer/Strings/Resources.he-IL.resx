@@ -1643,4 +1643,24 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
     <value>הרוג את ADB בסגירה</value>
   </data>
+  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
+    <value>מיקום נתוני התוכנה</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
+    <value>גרס תוכנה זו שומרת נתונים במיקום וירטואלי (וקשה לאיתור), שנמחק עם הסרת התוכנה.
+
+בחר מותאם אישית כדי להשתמש במיקום שלא יימחק עם הסרת התוכנה. המיקום לא יכול להיות תחת C:\Users\…\AppData</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
+    <value>ברירת מחדל</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
+    <value>מותאם אישית</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
+    <value>בחר תיקייה לנתוני התוכנה</value>
+  </data>
+  <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
+    <value>המיקום המותאם אישית לא יכול להיות תחת C:\Users\…\AppData - אנא בחר מיקום אחר</value>
+  </data>
 </root>
