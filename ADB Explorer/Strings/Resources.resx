@@ -2049,7 +2049,11 @@ Please help us localize the app to your language on Weblate.</value>
     <comment>The setting that enables killing ADB server when closing the app</comment>
   </data>
   <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
-    <value>The custom location cannot be under %AppData% - please select another location</value>
+    <value>The custom location cannot be under C:\Users\…\AppData - please select another location</value>
     <comment>An error displayed when choosing a wrong custom app data location</comment>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
+    <value>Allow ADB From Untrusted Sources</value>
+    <comment>The setting that allows using ADB without integrity checks and without path restrictions</comment>
   </data>
 </root>

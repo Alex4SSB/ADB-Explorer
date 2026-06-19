@@ -1153,7 +1153,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The custom location cannot be under %AppData% - please select another location.
+        ///   Looks up a localized string similar to The custom location cannot be under C:\Users\…\AppData - please select another location.
         /// </summary>
         public static string S_CUSTOM_LOCATION_INVALID {
             get {
@@ -3623,6 +3623,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_DEFAULT_FOLDER {
             get {
                 return ResourceManager.GetString("S_SETTINGS_DEFAULT_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Allow ADB From Untrusted Sources.
+        /// </summary>
+        public static string S_SETTINGS_DISABLE_ADB_LIMITATIONS {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_DISABLE_ADB_LIMITATIONS", resourceCulture);
             }
         }
         
