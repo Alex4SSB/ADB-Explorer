@@ -68,17 +68,11 @@ public partial class DragWindow : INotifyPropertyChanged
     private void DragTimer_Tick(object sender, EventArgs e)
     {
         if (Data.CopyPaste.DragBitmap is not null)
-        {
-            if (imageEmpty)
-                UpdateMouse(InterceptMouse.MousePosition);
-
             GetPathUnderMouse();
-        }
     }
 
     private DateTime lastUpdate;
     private bool waitingForUpdate = false;
-    private bool imageEmpty = false;
     private readonly SolidColorBrush blueBrush = new(Colors.DodgerBlue);
 
     private void GetPathUnderMouse()
@@ -243,6 +237,18 @@ public partial class DragWindow : INotifyPropertyChanged
 
         Data.CopyPaste.PropertyChanged += (s, e) =>
         {
+            // The mouse hook and drag timer only run while a drag is in progress.
+            // A drag begins when DragBitmap is set and ends when it is cleared.
+            if (e.PropertyName == nameof(Data.CopyPaste.DragBitmap))
+            {
+                if (Data.CopyPaste.DragBitmap is not null)
+                    BeginDrag();
+                else
+                    EndDrag();
+
+                return;
+            }
+
             if ((e.PropertyName == nameof(Data.CopyPaste.DragFiles)
                 || e.PropertyName == nameof(Data.CopyPaste.DropTarget)
                 || e.PropertyName == nameof(Data.CopyPaste.MouseWithinApp))
@@ -259,6 +265,16 @@ public partial class DragWindow : INotifyPropertyChanged
         }
 
         startingScaling = MonitorInfo.DpiToScalingFactor(MonitorInfo.PrimaryMonitorDpi());
+    }
+
+    /// <summary>
+    /// Begins tracking a drag. The window is positioned at the cursor before becoming visible so it
+    /// never appears at its previous location first, then the mouse hook is installed to follow the
+    /// cursor for the duration of the drag.
+    /// </summary>
+    private void BeginDrag()
+    {
+        UpdatePosition(InterceptMouse.GetCursorPosition());
 
 #if DEBUG
         Data.CopyPaste.MouseWithinApp = true;
@@ -269,23 +285,56 @@ public partial class DragWindow : INotifyPropertyChanged
         DragTimer.Start();
     }
 
+    /// <summary>
+    /// Ends drag tracking and removes the mouse hook so it no longer adds latency to every mouse
+    /// message once the drag is over.
+    /// </summary>
+    private void EndDrag()
+    {
+        DragTimer.Stop();
+
+#if !DEBUG
+        InterceptMouse.Close();
+#endif
+    }
+
     private void CancelDrag() => Data.CopyPaste.DragBitmap = null;
+
+    /// <summary>
+    /// Places the drag window relative to the given screen point. Image dimensions are derived from
+    /// the bitmap rather than the rendered element, so the window can be positioned correctly even
+    /// before its first layout pass - i.e. the instant a drag begins, or when the cursor leaves the
+    /// app before the image has had a chance to render.
+    /// </summary>
+    private void UpdatePosition(POINT point)
+    {
+        var bitmap = Data.CopyPaste.DragBitmap;
+        if (bitmap is null)
+            return;
+
+        ViewModel.DragImageHeight = 96 * (1 / MonitorInfo.GetScalingFromWindow(dragWindowHandle));
+        var actualPoint = MonitorInfo.MousePositionToDpi(point, startingScaling);
+
+        double imageHeight = DragImage.ActualHeight >= 1
+            ? DragImage.ActualHeight
+            : ViewModel.DragImageHeight;
+
+        double imageWidth = DragImage.ActualWidth >= 1
+            ? DragImage.ActualWidth
+            : bitmap.PixelHeight > 0
+                ? imageHeight * bitmap.PixelWidth / bitmap.PixelHeight
+                : imageHeight;
+
+        VerticalOffset = actualPoint.Y - imageHeight - VERTICAL_OFFSET;
+        HorizontalOffset = actualPoint.X - imageWidth / HORIZONTAL_OFFSET;
+    }
 
     private void UpdateMouse(POINT point)
     {
         if (Data.CopyPaste.DragBitmap is null)
             return;
 
-        ViewModel.DragImageHeight = 96 * (1 / MonitorInfo.GetScalingFromWindow(dragWindowHandle));
-        var actualPoint = MonitorInfo.MousePositionToDpi(point, startingScaling);
-
-        imageEmpty = DragImage.ActualHeight < 1;
-        if (!imageEmpty)
-        {
-            VerticalOffset = actualPoint.Y - DragImage.ActualHeight - VERTICAL_OFFSET;
-
-            HorizontalOffset = actualPoint.X - DragImage.ActualWidth / HORIZONTAL_OFFSET;
-        }
+        UpdatePosition(point);
 
         hwndUnderMouse = InterceptMouse.GetWindowUnderMouse();
 

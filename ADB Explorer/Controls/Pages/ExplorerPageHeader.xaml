@@ -619,6 +619,7 @@
                 <StackPanel
                     Margin="0,1,0,0"
                     DataContext="{Binding CurrentDevice}"
+                    FlowDirection="LeftToRight"
                     Orientation="Horizontal">
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">

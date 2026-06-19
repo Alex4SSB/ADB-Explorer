@@ -18,6 +18,7 @@ public static partial class NativeMethods
 
         private static readonly LowLevelMouseProc _mouseProc = HookCallback;
         private static HANDLE _mouseHookID = IntPtr.Zero;
+        private static bool _isHooked;
         private static Action<POINT> _mouseMoveAction;
         private static Action _rButtonAction;
         public static POINT MousePosition { get; private set; }
@@ -26,17 +27,43 @@ public static partial class NativeMethods
 
         private delegate HANDLE LowLevelMouseProc(int nCode, MouseMessages wParam, HANDLE lParam);
 
+        /// <summary>
+        /// Installs the low-level mouse hook. The hook is only needed while a drag is in progress,
+        /// since a system-wide <see cref="WinHooks.WH_MOUSE_LL"/> hook adds latency to every mouse
+        /// message and causes stutter while the UI thread is busy. Safe to call repeatedly.
+        /// </summary>
         public static void Init(Action<POINT> mouseMoveAction, Action rButtonAction)
         {
             _mouseMoveAction = mouseMoveAction;
             _rButtonAction = rButtonAction;
 
+            if (_isHooked)
+                return;
+
             _mouseHookID = SetHook(_mouseProc);
+            _isHooked = true;
         }
 
         public static void Close()
         {
+            if (!_isHooked)
+                return;
+
             UnhookWindowsHookEx(_mouseHookID);
+            _mouseHookID = IntPtr.Zero;
+            _isHooked = false;
+        }
+
+        /// <summary>
+        /// Returns the current cursor position without relying on the hook, and refreshes
+        /// <see cref="MousePosition"/>. Used to place the drag window before the hook is installed.
+        /// </summary>
+        public static POINT GetCursorPosition()
+        {
+            if (GetCursorPos(out var point))
+                MousePosition = point;
+
+            return MousePosition;
         }
 
         public void Dispose() => Close();
@@ -66,9 +93,12 @@ public static partial class NativeMethods
             {
                 POINT newPoint = hookStruct.pt;
                 if (newPoint != MousePosition)
-                    _mouseMoveAction?.Invoke(MousePosition);
-
-                MousePosition = newPoint;
+                {
+                    // Update before invoking so the callback (and GetWindowUnderMouse) sees the
+                    // fresh position. This matters when the cursor moves quickly out of the app.
+                    MousePosition = newPoint;
+                    _mouseMoveAction?.Invoke(newPoint);
+                }
             }
             
             return CallNextHookEx(_mouseHookID, nCode, wParam, lParam);
@@ -94,6 +124,10 @@ public static partial class NativeMethods
 
         [LibraryImport("Kernel32.dll", EntryPoint = "GetModuleHandleW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
         private static partial HANDLE GetModuleHandle(string lpModuleName);
+
+        [LibraryImport("User32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static partial bool GetCursorPos(out POINT lpPoint);
 
         [LibraryImport("User32.dll")]
         private static partial HANDLE WindowFromPoint(POINT Point);
