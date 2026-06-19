@@ -453,7 +453,7 @@ O conteúdo visível pode estar incompleto.</value>
     <comment>The setting used to toggle battery status polling</comment>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
-    <value>Stop Polling On Push/Pull</value>
+    <value></value>
     <comment>The setting used to stop device and battery polling when there are active push or pull operations</comment>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
@@ -461,7 +461,7 @@ O conteúdo visível pode estar incompleto.</value>
     <comment>The setting used to allow performing simultaneous operations on separate devices</comment>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
-    <value>Force Media Rescan On Push</value>
+    <value></value>
     <comment>The setting used to enable forcing the device to perform a media rescan after a successful push operation batch</comment>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
@@ -473,122 +473,122 @@ O conteúdo visível pode estar incompleto.</value>
     <comment>The setting used to enable everything related to APK</comment>
   </data>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
-    <value>Show File Name Extensions</value>
+    <value></value>
     <comment>The setting used to enable showing file name extension</comment>
   </data>
   <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
-    <value>Show Hidden Items</value>
+    <value></value>
     <comment>The setting used to enable showing hidden items in the browser</comment>
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
-    <value>Show System Apps</value>
+    <value></value>
     <comment>The setting used to allow displaying system apps in package view</comment>
   </data>
   <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
-    <value>Override ADB Path</value>
+    <value></value>
     <comment>The setting used to override the system default ADB path</comment>
   </data>
   <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
-    <value>Default Folder</value>
+    <value></value>
     <comment>The setting used to set the app's default folder for browsing and double click pull</comment>
   </data>
   <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
-    <value>Light</value>
+    <value></value>
     <comment>The setting used to force light theme in the app</comment>
   </data>
   <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
-    <value>Dark</value>
+    <value></value>
     <comment>The setting used to force dark theme in the app</comment>
   </data>
   <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
-    <value>Windows Default</value>
+    <value></value>
     <comment>The setting to use the default theme set by Windows</comment>
   </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
-    <value>Theme</value>
+    <value></value>
     <comment>The title of the settings group used to control the app theme</comment>
   </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
-    <value>Disable Hardware Acceleration</value>
+    <value></value>
     <comment>The setting used to disable HW / GPU acceleration</comment>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
-    <value>Check For Updates</value>
+    <value></value>
     <comment>The setting used to enable checking for updates in non MS Store installs</comment>
   </data>
   <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
-    <value>Graphics</value>
+    <value></value>
     <comment>The title of the settings group for graphics settings</comment>
   </data>
   <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
-    <value>Working Directories</value>
+    <value></value>
     <comment>The title of the settings group that defines the working directories</comment>
   </data>
   <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
-    <value>Explorer</value>
+    <value></value>
     <comment>The title of the settings group that defines the explorer / browser behavior</comment>
   </data>
   <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
-    <value>Drives &amp; Features</value>
+    <value></value>
     <comment>The title of the settings group for settings of drives and similar features</comment>
   </data>
   <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
-    <value>Device</value>
+    <value></value>
     <comment>The title of the settings group for (Android) device settings</comment>
   </data>
   <data name="S_DONATE" xml:space="preserve">
-    <value>Donate or Sponsor</value>
+    <value></value>
     <comment>The content of the button that redirects to our GitHub Sponsors page</comment>
   </data>
   <data name="S_APP_DATA_FOLDER" xml:space="preserve">
-    <value>App Data Folder</value>
+    <value></value>
   </data>
   <data name="S_GITHUB_REPO" xml:space="preserve">
-    <value>GitHub repository</value>
+    <value></value>
     <comment>The title of the hyperlink to our GitHub repository</comment>
   </data>
   <data name="S_PRIVACY_POLICY" xml:space="preserve">
-    <value>Privacy Policy</value>
+    <value></value>
     <comment>The title of the hyperlink to our privacy policy</comment>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
-    <value>Attributions &amp; Third Party Licenses</value>
+    <value></value>
     <comment>The title of the about section listing licenses</comment>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
-    <value>[not set]</value>
+    <value></value>
     <comment>The placeholder text for a textbox whose value hasn't been set</comment>
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
-    <value>Search Settings</value>
+    <value></value>
     <comment>The placeholder of the textbox used to search through the settings</comment>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
-    <value>Exit Search</value>
+    <value></value>
     <comment>The tooltip of the button used to hide the settings search textbox</comment>
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
-    <value>Search View</value>
+    <value></value>
     <comment>The tooltip of the button used to show the settings search textbox</comment>
   </data>
   <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>Collapse All</value>
+    <value></value>
     <comment>The tooltip of the button used to collapse all settings groups</comment>
   </data>
   <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>Expand All</value>
+    <value></value>
     <comment>The tooltip of the button used to expand all settings groups</comment>
   </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
-    <value>Settings</value>
+    <value></value>
     <comment>The title of the settings view</comment>
   </data>
   <data name="S_ACTION_HIDE" xml:space="preserve">
-    <value>Hide</value>
+    <value></value>
     <comment>The tooltip of a button used to hide a view</comment>
   </data>
   <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
-    <value>Language</value>
+    <value></value>
     <comment>The setting used to set the UI language to a language different than Windows</comment>
   </data>
   <data name="S_FILTER_FILE_OPS" xml:space="preserve">
