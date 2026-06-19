@@ -515,42 +515,42 @@ O conteúdo visível pode estar incompleto.</value>
     <value />
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_PRIVACY_POLICY" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
 </root>
