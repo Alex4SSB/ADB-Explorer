@@ -136,7 +136,7 @@
     <value>בחירת קובץ הרצה של ADB</value>
   </data>
   <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
-    <value>איפוס הגדרות היישום</value>
+    <value>איפוס הגדרות התוכנה</value>
   </data>
   <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
     <value>גרסת תוכנה חדשה</value>
@@ -217,7 +217,7 @@
     <value>צַמד או חבּר מכשיר WiFi (ללא mDNS)</value>
   </data>
   <data name="S_RESTART_APP" xml:space="preserve">
-    <value>הפעל את היישום מחדש להחלת השינויים</value>
+    <value>הפעל את התוכנה מחדש להחלת השינויים</value>
   </data>
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>שגיאה בקריאת קובץ</value>
@@ -284,10 +284,10 @@
     <value>הורד את ADB</value>
   </data>
   <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>אתר את ADB (גרסה {0} לכל הפחות):</value>
+    <value>אתר את ADB (גרסה {0} לפחות):</value>
   </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
-    <value>שנֵה</value>
+    <value>ערוך</value>
   </data>
   <data name="S_SELECT_ADB_PATH" xml:space="preserve">
     <value>בחר נתיב ADB</value>
@@ -443,7 +443,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>סריקת מצב סוללה</value>
   </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
-    <value>הפעל גישת Root אוטומטית</value>
+    <value>הפעל גישת root אוטומטית</value>
   </data>
   <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
     <value>שמור מכשירים שחוברו ידנית</value>
@@ -741,7 +741,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>יעד</value>
   </data>
   <data name="S_COLUMN_ADDED" xml:space="preserve">
-    <value>התווסף</value>
+    <value>זמן הוספה</value>
   </data>
   <data name="S_COLUMN_ICON" xml:space="preserve">
     <value>אייקון</value>
@@ -798,13 +798,13 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>ממתין לתשובה: {0}</value>
   </data>
   <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
-    <value>{0}מילי'</value>
+    <value>{0} מילי'</value>
   </data>
   <data name="S_MINUTES_SHORT" xml:space="preserve">
-    <value>{0}דק'</value>
+    <value>{0} דק'</value>
   </data>
   <data name="S_HOURS_SHORT" xml:space="preserve">
-    <value>­{0}שע'</value>
+    <value>­{0} שע'</value>
   </data>
   <data name="S_MDNS_ON" xml:space="preserve">
     <value>שרת ה-mDNS פועל</value>
@@ -1631,7 +1631,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>הפעלת אימולטור</value>
   </data>
   <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
-    <value>אנדרואיד SDK לא נמצא. התקן את חבילת הסימולטור של Android SDK או הגדר ANDROID_SDK_ROOT.</value>
+    <value>אנדרואיד SDK לא נמצא. התקן את חבילת האימולטור של Android SDK או הגדר ANDROID_SDK_ROOT.</value>
   </data>
   <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
     <value>מדיניות הפרטיות עודכנה</value>
@@ -1639,5 +1639,8 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
     <value>גרסה זו שוחררה לאחר עדכון מדיניות הפרטיות.
 נא לעיין בשינויים ב GitHub.</value>
+  </data>
+  <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
+    <value>הרוג את ADB בסגירה</value>
   </data>
 </root>
