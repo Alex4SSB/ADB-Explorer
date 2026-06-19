@@ -162,9 +162,6 @@
   <data name="S_DEST_ERR" xml:space="preserve">
     <value>Hedef Yol Hatası</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>Bağlanmada hata oluştu</value>
-  </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>Bağlantı Hatası</value>
   </data>
@@ -222,14 +219,8 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Dosya Okuma Hatası</value>
   </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>Dosya okumak için çekilemedi.</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Dosya Yazma Hatası</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>Dosya cihaza geri gönderilemedi.</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>mDNS'yi devre dışı bırakmak için ADB sunucusunun yeniden başlatılması gerekir.</value>
@@ -259,13 +250,6 @@
     <value>Yeni ADB Explorer sürümüne hoş geldiniz!
 Sürüm notları GitHub'da mevcuttur.</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSE sürücüsü.
-• Sembolik bağlantılar desteklenmez
-• Dosya adları " * / : &lt; &gt; ? \ | içeremez
-• Dosya adları büyük/küçük harfe duyarlı değildir
-• APK'ların yüklenmesi desteklenmez</value>
-  </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>Uygulama kapatıldığında tüm uygulama ayarları sıfırlanacaktır.
 Bu işlem geri alınamaz. Emin misiniz?</value>
@@ -283,14 +267,8 @@ ADB'yi onaylamak için WSA gelişmiş ayarlarını açın.</value>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>ADB'yi indir</value>
   </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>ADB'yi bulun (en az v{0}):</value>
-  </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>Değiştir</value>
-  </data>
-  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>ADB yolunu seçin</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>Devam</value>
@@ -468,5 +446,12 @@ Görünen içerik eksik olabilir.</value>
   </data>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
     <value>Dosya Adı Uzantılarını Göster</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>FUSE sürücüsü.
+• Sembolik bağlantılar desteklenmez
+• Dosya adları " * / : &lt; &gt; ? \ | içeremez
+• Dosya adları büyük/küçük harfe duyarlı değildir
+• APK'ların yüklenmesi desteklenmez</value>
   </data>
 </root>

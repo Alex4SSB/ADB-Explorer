@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -162,9 +162,6 @@
   <data name="S_DEST_ERR" xml:space="preserve">
     <value>Ошибка пути назначения</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>не удалось подключиться к</value>
-  </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>Ошибка подключения</value>
   </data>
@@ -222,14 +219,8 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Ошибка чтения файла</value>
   </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>Не удалось извлечь файл для его чтения.</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Ошибка записи файла</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>Не удалось отправить файл обратно на устройство.</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>Чтобы отключить mDNS, необходимо перезапустить сервер ADB.</value>
@@ -259,12 +250,17 @@
     <value>Вас приветствует новая версия ADB Explorer!
 Список изменений доступен на GitHub.</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSE устройство.
-• Ссылки с символами не поддерживаются
-• Имя файла не может содержать следующие символы " * / : &lt; &gt; ? \ |
-• Имена файлов нечувствительны к регистру
-• Установка APK не поддерживается</value>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Ограничение дисков:</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• Файловая система только для чтения</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• Символические ссылки не поддерживаются.
+• Имена файлов не могут содержать " * / : &lt; &gt; ? \ |
+• Имена файлов не учитывают регистр
+• Установка APKs не поддерживается</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>Все настройки будут сброшены при закрытии приложения.
@@ -283,14 +279,8 @@
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>Скачать ADB</value>
   </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>Обнаружить ADB (v{0} как минимум):</value>
-  </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>Изменить</value>
-  </data>
-  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>Выберите путь к ADB</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>Продолжить</value>
@@ -315,6 +305,13 @@
   </data>
   <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
     <value>Перейти к заметкам выпуска</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Политика конфиденциальности обновлена</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>Эта версия приложения была выпущена после обновления политики конфиденциальности.
+Просмотрите изменения на GitHub.</value>
   </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
     <value>Исполняемый файл ADB</value>
@@ -475,18 +472,6 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>Показать системные приложения</value>
   </data>
-  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
-    <value>Двойной щелчок по файлу</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
-    <value>Ни один</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
-    <value>Извлечь в папку по умолчанию</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
-    <value>Открыть в редакторе</value>
-  </data>
   <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
     <value>Переопределить путь к ADB</value>
   </data>
@@ -504,6 +489,15 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>Тема</value>
+  </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Свой акцент цвета</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Акцент цвета</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Выберите цвет</value>
   </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>Отключить аппаратное ускорение</value>
@@ -537,6 +531,15 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_PRIVACY_POLICY" xml:space="preserve">
     <value>Политика конфиденциальности</value>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Показать диалог отчёта о сбое</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Отчеты о сбоях</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>После сбоя вы можете по желанию прислать диагностический отчет, чтобы помочь нам его исправить. Отчеты отправляются только после нажатия кнопки "Отправить отчет" и обычно содержат сообщения об исключении, трассировке стека, версии программы и Windows, а также открытой странице. Данные обрабатываются Grafana Labs (Grafana Cloud). См. раздел ссылку на Политику конфиденциальности выше.</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>Attributions &amp; Third Party Licenses</value>
@@ -685,9 +688,6 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>Запись: {0}</value>
-  </data>
-  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
-    <value>Проверять обновление при запуске</value>
   </data>
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>О программе</value>
@@ -926,9 +926,6 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Прервать</value>
   </data>
-  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
-    <value>Отправка в Shell</value>
-  </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
     <value>{0} конфликт</value>
   </data>
@@ -1016,8 +1013,8 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Соблюдение правил именования Unix (через ADB)</value>
   </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>Соблюдайте правила именования FUSE</value>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Соблюдает правила именования пространства пользователя</value>
   </data>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
     <value>Соблюдайте правила именования Windows</value>
@@ -1037,14 +1034,14 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
     <value>Некоторые выбранные файлы имеют конфликт имен без учета регистра</value>
   </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>Выбранный файл нарушает правила именования FUSE</value>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Выбранный файл нарушает правила наименования пространства пользователя</value>
   </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
     <value>Некоторые скопированные файлы имеют конфликт имен без учета регистра</value>
   </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>Скопированный файл нарушает правила именования FUSE</value>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Скопированный файл нарушает правила наименования пространства пользователя</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>Выбранный элемент не является файлом/папкой</value>
@@ -1381,8 +1378,38 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
     <value>Проверка состояния сервера mDNS…</value>
   </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value>Иконки</value>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>Извлечь и отобразить миниатюры</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>Только в просмотре иконок</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>Только в фотокаталогах</value>
+  </data>
   <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
     <value>При подключении</value>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>Сохранение миниатюр между сеансами</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>Ограничить скорость извлечения миниатюр</value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>Показывать Иконки для специальных папок</value>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>Добавить миниатюры видео</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>Длина</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>Размеры</value>
   </data>
   <data name="S_ONE_MONTH" xml:space="preserve">
     <value>Один месяц</value>
@@ -1395,91 +1422,6 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_ONE_HOUR" xml:space="preserve">
     <value>Один час</value>
-  </data>
-  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
-    <value>Ограничение дисков:</value>
-  </data>
-  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
-    <value>• Файловая система только для чтения</value>
-  </data>
-  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
-    <value>• Символические ссылки не поддерживаются.
-• Имена файлов не могут содержать " * / : &lt; &gt; ? \ |
-• Имена файлов не учитывают регистр
-• Установка APKs не поддерживается</value>
-  </data>
-  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
-    <value>Политика конфиденциальности обновлена</value>
-  </data>
-  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
-    <value>Отчеты о сбоях</value>
-  </data>
-  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Соблюдает правила именования пространства пользователя</value>
-  </data>
-  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Выбранный файл нарушает правила наименования пространства пользователя</value>
-  </data>
-  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Скопированный файл нарушает правила наименования пространства пользователя</value>
-  </data>
-  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
-    <value>Иконки</value>
-  </data>
-  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
-    <value>Показывать Иконки для специальных папок</value>
-  </data>
-  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
-    <value>Средние иконки</value>
-  </data>
-  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
-    <value>Большие иконки</value>
-  </data>
-  <data name="S_THUMBSIZE_XL" xml:space="preserve">
-    <value>Екстра большие иконки</value>
-  </data>
-  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
-    <value>Эта версия приложения была выпущена после обновления политики конфиденциальности.
-Просмотрите изменения на GitHub.</value>
-  </data>
-  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
-    <value>Свой акцент цвета</value>
-  </data>
-  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
-    <value>Акцент цвета</value>
-  </data>
-  <data name="S_PICK_COLOR" xml:space="preserve">
-    <value>Выберите цвет</value>
-  </data>
-  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
-    <value>Показать диалог отчёта о сбое</value>
-  </data>
-  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
-    <value>Невозможно найти ADB из системного ПУТИ. Пожалуйста, используйте "{0}" чтобы обнаружить его.</value>
-  </data>
-  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
-    <value>Извлечь и отобразить миниатюры</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
-    <value>Только в просмотре иконок</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
-    <value>Только в фотокаталогах</value>
-  </data>
-  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
-    <value>Сохранение миниатюр между сеансами</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>Ограничить скорость извлечения миниатюр</value>
-  </data>
-  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
-    <value>Добавить миниатюры видео</value>
-  </data>
-  <data name="S_VIDEO_DURATION" xml:space="preserve">
-    <value>Длина</value>
-  </data>
-  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
-    <value>Размеры</value>
   </data>
   <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
     <value>Время обновления локальных миниатюр</value>
@@ -1519,6 +1461,15 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
     <value>Просмотреть</value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>Средние иконки</value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>Большие иконки</value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>Екстра большие иконки</value>
   </data>
   <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
     <value>Макет и просмотр опций</value>
@@ -1628,6 +1579,9 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_COLOR_BLUE" xml:space="preserve">
     <value>Синий</value>
   </data>
+  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
+    <value>Невозможно найти ADB из системного ПУТИ. Пожалуйста, используйте "{0}" чтобы обнаружить его.</value>
+  </data>
   <data name="S_ADB_PATH_INVALID" xml:space="preserve">
     <value>Указанный путь {0} представляет собой либо ярлык Windows, либо UNC (удаленный путь), что недопустимо.</value>
   </data>
@@ -1637,10 +1591,23 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>Сопряжение</value>
   </data>
-  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
-    <value>После сбоя вы можете по желанию прислать диагностический отчет, чтобы помочь нам его исправить. Отчеты отправляются только после нажатия кнопки "Отправить отчет" и обычно содержат сообщения об исключении, трассировке стека, версии программы и Windows, а также открытой странице. Данные обрабатываются Grafana Labs (Grafana Cloud). См. раздел ссылку на Политику конфиденциальности выше.</value>
-  </data>
   <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
     <value>Завершить процесс ADB при закрытии приложения</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>FUSE устройство.
+• Ссылки с символами не поддерживаются
+• Имя файла не может содержать следующие символы " * / : &lt; &gt; ? \ |
+• Имена файлов нечувствительны к регистру
+• Установка APK не поддерживается</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>Соблюдайте правила именования FUSE</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>Выбранный файл нарушает правила именования FUSE</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>Скопированный файл нарушает правила именования FUSE</value>
   </data>
 </root>

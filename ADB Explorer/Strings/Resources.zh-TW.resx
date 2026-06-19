@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -162,9 +162,6 @@
   <data name="S_DEST_ERR" xml:space="preserve">
     <value>目標路徑錯誤</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>無法連接到</value>
-  </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>連接錯誤</value>
   </data>
@@ -222,14 +219,8 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>讀取檔案時出錯</value>
   </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>無法複製檔案進來讀。</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>寫入檔案時出錯</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>無法複製檔案回裝置。</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>需要重啓 ADB 服務以停用 mDNS。</value>
@@ -259,13 +250,6 @@
     <value>歡迎使用 ADB Explorer 的新版本！
 發行説明見 Github。</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSE 檔案系統磁碟機。
-• 不支援符號連結
-• 檔名不能包含 " * / : &lt; &gt; ? \ |
-• 檔名不區分大小寫
-• 不支援安裝 APK</value>
-  </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>關閉應用程式後，所有設定將被重設。
 此操作無法還原，您確定嗎？</value>
@@ -283,14 +267,8 @@
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>下載 ADB</value>
   </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>找到 ADB (至少 v{0}):</value>
-  </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>變更</value>
-  </data>
-  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>選擇 ADB 路徑</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>繼續</value>
@@ -474,18 +452,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>顯示系統應用程式</value>
-  </data>
-  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
-    <value>雙擊檔案</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
-    <value>無</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
-    <value>複製進到預設資料夾</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
-    <value>在編輯器中打開</value>
   </data>
   <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
     <value>覆蓋 ADB 路徑</value>
@@ -685,9 +651,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>寫入速度: {0}</value>
-  </data>
-  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
-    <value>每次啓動時檢查更新</value>
   </data>
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>關於</value>
@@ -926,9 +889,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>中斷</value>
   </data>
-  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
-    <value>發送到 Shell</value>
-  </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
     <value>{0} 衝突</value>
   </data>
@@ -1016,9 +976,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>遵循 Unix 命名規則 (通過 ADB)</value>
   </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>遵循 FUSE 命名規則</value>
-  </data>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
     <value>遵循 Windows 命名規則</value>
   </data>
@@ -1037,14 +994,8 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
     <value>一些所選檔在 FUSE/Windows 上有彼此衝突的名稱</value>
   </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>一個所選檔違背了 FUSE 命名規則</value>
-  </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
     <value>一些複製的檔案在 FUSE 上有衝突的名稱</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>複製的檔案違背了 FUSE 命名規則</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>一個所選項目不是檔案/資料夾</value>
@@ -1428,5 +1379,21 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
     <value>本機縮圖重整時間</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>FUSE 檔案系統磁碟機。
+• 不支援符號連結
+• 檔名不能包含 " * / : &lt; &gt; ? \ |
+• 檔名不區分大小寫
+• 不支援安裝 APK</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>遵循 FUSE 命名規則</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>一個所選檔違背了 FUSE 命名規則</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>複製的檔案違背了 FUSE 命名規則</value>
   </data>
 </root>

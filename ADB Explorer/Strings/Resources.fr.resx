@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -162,9 +162,6 @@
   <data name="S_DEST_ERR" xml:space="preserve">
     <value>Erreur de chemin de destination</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>Échec de la connexion à</value>
-  </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>Erreur de connexion</value>
   </data>
@@ -222,14 +219,8 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Erreur de lecture du fichier</value>
   </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>Impossible de récupérer le fichier pour le lire.</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Erreur d'écriture du fichier</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>Impossible de renvoyer le fichier sur l'appareil.</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>Le serveur ADB doit être redémarré pour désactiver mDNS.</value>
@@ -259,12 +250,17 @@
     <value>Bienvenue dans cette nouvelle version d’ADB Explorer!
 Les notes de version sont disponibles sur GitHub.</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>Lecteur FUSE
-• Les liens symboliques ne sont pas pris en charge
-• Les noms de fichiers ne peuvent pas contenir " * / : &lt; &gt; ? \ |
-• Les noms de fichiers ne tiennent pas compte de la casse
-• L’installation de fichiers APK n’est pas prise en charge</value>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Limites de disque :</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• Système de fichier en lecture seule</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• Les liens symboliques ne sont pas pris en charge
+• Les noms de fichiers ne peuvent contenir " * / :  ? \ |
+• Les noms de fichiers ne tiennent pas compte de la case
+• L’installation d'APK n’est pas prise en charge</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>Tous les paramètres de l’application seront réinitialisés à la fermeture.
@@ -283,14 +279,8 @@ Pour autoriser ADB, ouvrez les paramètres avancés de WSA.</value>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>Télécharger ADB</value>
   </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>Localiser ADB (v{0} minimum) :</value>
-  </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>Changer</value>
-  </data>
-  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>Sélectionner le chemin d'accès à ADB</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>Continuer</value>
@@ -475,18 +465,6 @@ Le contenu visible peut être incomplet.</value>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>Afficher apps système</value>
   </data>
-  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
-    <value>Double-clic sur fichier</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
-    <value>Aucune</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
-    <value>Tirer vers dossier par défaut</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
-    <value>Ouvrir dans éditeur</value>
-  </data>
   <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
     <value>Forçage du chemin d'ADB</value>
   </data>
@@ -546,6 +524,15 @@ Le contenu visible peut être incomplet.</value>
   </data>
   <data name="S_PRIVACY_POLICY" xml:space="preserve">
     <value>Politique de confidentialité</value>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Afficher le rapport de plantage</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Signaler un plantage</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>Après un plantage, vous pouvez de manière optionnelle envoyer un rapport de diagnostic pour nous aider à le corriger. Les rapports ne sont envoyés que lorsque vous cliquez sur Envoyer le rapport et comprennent habituellement le message d'exception, la trace de pile, la version de l'application et celle de Windows, et la page qui a été ouverte. Les données sont traitées par Grafana Labs (Grafana Cloud). Voir le lien de politique de confidentialité ci-dessus.</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>Attributions et Licences de tiers</value>
@@ -694,9 +681,6 @@ Annuler tout en cours</value>
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>Écriture : {0}</value>
-  </data>
-  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
-    <value>Vérifier mises à jour à chaque lancement</value>
   </data>
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>À propos</value>
@@ -935,9 +919,6 @@ Annuler tout en cours</value>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Abandonner</value>
   </data>
-  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
-    <value>Envoi au terminal</value>
-  </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
     <value>Conflit {0}</value>
   </data>
@@ -1025,8 +1006,8 @@ Annuler tout en cours</value>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Adhère aux règles de nommage Unix (via ADB)</value>
   </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>Adhère aux règles de nommage FUSE</value>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Se conformer aux règles utilisateur de nommage</value>
   </data>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
     <value>Adhère aux règles de nommage de Windows</value>
@@ -1046,14 +1027,14 @@ Annuler tout en cours</value>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
     <value>Certains fichiers sélectionnés ont des noms conflictuels ne respectant pas la case</value>
   </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>Un fichier sélectionné viole les règles de nommage FUSE</value>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Un fichier sélectionné ne respecte pas les règles de nommage utilisateur</value>
   </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
     <value>Certains fichiers copiés ont des noms conflictuels ne respectant pas la case</value>
   </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>Un fichier copié viole les règles de nommage FUSE</value>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Un fichier copié viole les règles de nommage utilisateur</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>Un élément sélectionné n’est pas un fichier / dossier</value>
@@ -1444,6 +1425,18 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="S_SETTINGS_WSA" xml:space="preserve">
     <value>Connecter automatiquement en WSA si disponible</value>
   </data>
+  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
+    <value>Découvrez les émulateurs Android</value>
+  </data>
+  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
+    <value>Lancer cet émulateur</value>
+  </data>
+  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
+    <value>Lancement de l'émulateur</value>
+  </data>
+  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
+    <value>L'émulateur SDK Android n'a pas été trouvé. Installez le paquet d'émulateur SDK Android ou défininissez ANDROID_SDK_ROOT.</value>
+  </data>
   <data name="S_STRING_PASTE" xml:space="preserve">
     <value>Coller</value>
   </data>
@@ -1591,46 +1584,20 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>Apairer</value>
   </data>
-  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
-    <value>Limites de disque :</value>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>Lecteur FUSE
+• Les liens symboliques ne sont pas pris en charge
+• Les noms de fichiers ne peuvent pas contenir " * / : &lt; &gt; ? \ |
+• Les noms de fichiers ne tiennent pas compte de la casse
+• L’installation de fichiers APK n’est pas prise en charge</value>
   </data>
-  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
-    <value>• Les liens symboliques ne sont pas pris en charge
-• Les noms de fichiers ne peuvent contenir " * / :  ? \ |
-• Les noms de fichiers ne tiennent pas compte de la case
-• L’installation d'APK n’est pas prise en charge</value>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>Adhère aux règles de nommage FUSE</value>
   </data>
-  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
-    <value>Afficher le rapport de plantage</value>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>Un fichier sélectionné viole les règles de nommage FUSE</value>
   </data>
-  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
-    <value>Signaler un plantage</value>
-  </data>
-  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
-    <value>Après un plantage, vous pouvez de manière optionnelle envoyer un rapport de diagnostic pour nous aider à le corriger. Les rapports ne sont envoyés que lorsque vous cliquez sur Envoyer le rapport et comprennent habituellement le message d'exception, la trace de pile, la version de l'application et celle de Windows, et la page qui a été ouverte. Les données sont traitées par Grafana Labs (Grafana Cloud). Voir le lien de politique de confidentialité ci-dessus.</value>
-  </data>
-  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Se conformer aux règles utilisateur de nommage</value>
-  </data>
-  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Un fichier sélectionné ne respecte pas les règles de nommage utilisateur</value>
-  </data>
-  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Un fichier copié viole les règles de nommage utilisateur</value>
-  </data>
-  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
-    <value>Découvrez les émulateurs Android</value>
-  </data>
-  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
-    <value>Lancer cet émulateur</value>
-  </data>
-  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
-    <value>Lancement de l'émulateur</value>
-  </data>
-  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
-    <value>L'émulateur SDK Android n'a pas été trouvé. Installez le paquet d'émulateur SDK Android ou défininissez ANDROID_SDK_ROOT.</value>
-  </data>
-  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
-    <value>• Système de fichier en lecture seule</value>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>Un fichier copié viole les règles de nommage FUSE</value>
   </data>
 </root>

@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -162,9 +162,6 @@
   <data name="S_DEST_ERR" xml:space="preserve">
     <value>대상 경로 오류</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>연결 실패</value>
-  </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>연결 오류</value>
   </data>
@@ -222,14 +219,8 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>파일 읽기 오류</value>
   </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>파일을 읽기 위해 가져올 수 없습니다.</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>파일 쓰기 오류</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>파일을 장치로 다시 전송할 수 없습니다.</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>mDNS를 비활성화하려면 ADB 서버를 다시 시작해야 합니다.</value>
@@ -259,13 +250,6 @@
     <value>새로운 ADB Explorer 버전에 오신 것을 환영합니다!
 릴리스 노트는 GitHub에서 확인하실 수 있습니다.</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSE 드라이브.
-• 심볼릭 링크는 지원되지 않습니다.
-• 파일 이름에 " * / : &lt; &gt; ? \ | "를 포함할 수 없습니다.
-• 파일 이름은 대소문자를 구분하지 않습니다.
-• APK 설치는 지원되지 않습니다</value>
-  </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>앱을 종료하면 모든 앱 설정이 초기화됩니다.
 이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?</value>
@@ -283,14 +267,8 @@ ADB를 승인하려면 WSA 고급 설정을 여십시오.</value>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>ADB 다운로드</value>
   </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>ADB 찾기 (최소 v{0}):</value>
-  </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>변경</value>
-  </data>
-  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>ADB 경로 선택</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>계속</value>
@@ -475,18 +453,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>시스템 앱 표시</value>
   </data>
-  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
-    <value>파일 더블 클릭</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
-    <value>없음</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
-    <value>기본 폴더로 가져오기</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
-    <value>편집기에서 열기</value>
-  </data>
   <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
     <value>ADB 경로 재정의</value>
   </data>
@@ -504,6 +470,15 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>테마</value>
+  </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>사용자 지정 강조색</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>사용자 지정 강조색 선택</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>색깔 선택</value>
   </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>하드웨어 가속 비활성화</value>
@@ -685,9 +660,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>쓰기: {0}</value>
-  </data>
-  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
-    <value>앱 실행 시마다 업데이트 확인</value>
   </data>
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>정보</value>
@@ -926,9 +898,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>중단</value>
   </data>
-  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
-    <value>셸로 전송 중</value>
-  </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
     <value>{0} 충돌</value>
   </data>
@@ -1016,9 +985,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Unix 명명 규칙 준수 (ADB 통해)</value>
   </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>FUSE 명명 규칙 준수</value>
-  </data>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
     <value>Windows 명명 규칙 준수</value>
   </data>
@@ -1037,14 +1003,8 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
     <value>일부 선택한 파일이 FUSE / Windows에서 충돌하는 이름을 가지고 있습니다</value>
   </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>선택한 파일이 FUSE 명명 규칙을 위반합니다</value>
-  </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
     <value>일부 복사된 파일이 FUSE에서 충돌하는 이름을 가지고 있습니다</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>복사된 파일이 FUSE 명명 규칙을 위반합니다</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>선택한 항목이 파일/폴더가 아닙니다</value>
@@ -1393,23 +1353,14 @@ Weblate에서 앱을 해당 언어로 현지화하는 데 도움을 주세요.</
   <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
     <value>사진 디렉토리만</value>
   </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value>연결되었습니다</value>
+  </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>세션 간 썸네일 유지</value>
   </data>
   <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
     <value>썸네일 pull 속도 제한</value>
-  </data>
-  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
-    <value>사용자 지정 강조색</value>
-  </data>
-  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
-    <value>사용자 지정 강조색 선택</value>
-  </data>
-  <data name="S_PICK_COLOR" xml:space="preserve">
-    <value>색깔 선택</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
-    <value>연결되었습니다</value>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>특수 폴더 아이콘 표시</value>
@@ -1440,5 +1391,21 @@ Weblate에서 앱을 해당 언어로 현지화하는 데 도움을 주세요.</
   </data>
   <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
     <value>가능한 경우 BusyBox 사용</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>FUSE 드라이브.
+• 심볼릭 링크는 지원되지 않습니다.
+• 파일 이름에 " * / : &lt; &gt; ? \ | "를 포함할 수 없습니다.
+• 파일 이름은 대소문자를 구분하지 않습니다.
+• APK 설치는 지원되지 않습니다</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>FUSE 명명 규칙 준수</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>선택한 파일이 FUSE 명명 규칙을 위반합니다</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>복사된 파일이 FUSE 명명 규칙을 위반합니다</value>
   </data>
 </root>

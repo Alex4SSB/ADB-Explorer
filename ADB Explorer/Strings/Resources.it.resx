@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -162,9 +162,6 @@
   <data name="S_DEST_ERR" xml:space="preserve">
     <value>Errore nel percorso di destinazione</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>errore nella connessione a</value>
-  </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>Errore nella connessione</value>
   </data>
@@ -222,14 +219,8 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Errore nella lettura del file</value>
   </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>Non sono riuscito a scaricare il file per leggerlo.</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Errore nella scrittura del file</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>Impossibile ri-spostare il file sul dispositivo.</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>Il server ADB deve essere riavviato per disabilitare mDNS.</value>
@@ -259,13 +250,6 @@
     <value>Benvenuto in una nuova versione di ADB Explorer!
 Le note di rilascio sono disponibili su GitHub.</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>Disco FUSE.
-- I collegamenti simbolici non sono supportati
-- I nomi dei file non possono contenere " * / : &lt; &gt; ? \ |
-- I nomi dei file sono case insensitive (non c'è differenza tra maiuscole e minuscole)
-- L'installazione di APK non è supportata</value>
-  </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>Tutte le impostazioni dell'applicazione verranno ripristinate alla chiusura dell'applicazione.
 Non potrai annullare l'operazione. Vuoi procedere comunque?</value>
@@ -283,14 +267,8 @@ Per approvare ADB, apri le impostazioni avanzate di WSA.</value>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>Scarica ADB</value>
   </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>Posizione di ADB (versione minima: {0}):</value>
-  </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>Cambia</value>
-  </data>
-  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>Seleziona il percorso di ADB</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>Continua</value>
@@ -474,18 +452,6 @@ Il contenuto che vedi potrebbe essere incompleto.</value>
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>Mostra app di sistema</value>
-  </data>
-  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
-    <value>Doppio click su file</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
-    <value>Non fare niente</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
-    <value>Copialo nella cartella predefinita</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
-    <value>Aprilo nell'editor</value>
   </data>
   <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
     <value>Sovrascrivi il percorso di ADB</value>
@@ -685,9 +651,6 @@ Annulla tutte le operazioni in corso</value>
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>Scrittura: {0}</value>
-  </data>
-  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
-    <value>Cerca aggiornamenti all'apertura</value>
   </data>
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>Informazioni</value>
@@ -926,9 +889,6 @@ Annulla tutte le operazioni in corso</value>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Annulla</value>
   </data>
-  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
-    <value>Invio alla shell</value>
-  </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
     <value>Conflitto durante {0}</value>
   </data>
@@ -1016,9 +976,6 @@ Annulla tutte le operazioni in corso</value>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Rispetta le regole di Unix sul nome (tramite ADB)</value>
   </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>Rispetta le regole di FUSE sul nome</value>
-  </data>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
     <value>Rispetta le regole di Windows sul nome</value>
   </data>
@@ -1037,14 +994,8 @@ Annulla tutte le operazioni in corso</value>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
     <value>Alcuni file selezionati hanno nomi in conflitto tra FUSE e Windows</value>
   </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>Un file selezionato non rispetta le regole di FUSE sul nome</value>
-  </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
     <value>Alcuni file selezionati hanno nomi in conflitto su FUSE</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>Un file copiato viola le regole di FUSE sul nome</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>Un file selezionato non è un file / cartella</value>
@@ -1428,5 +1379,21 @@ Aiutaci a localizzare l'app nella vostra lingua su Weblate.</value>
   </data>
   <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
     <value>Orario aggiornamento delle miniature locali</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>Disco FUSE.
+- I collegamenti simbolici non sono supportati
+- I nomi dei file non possono contenere " * / : &lt; &gt; ? \ |
+- I nomi dei file sono case insensitive (non c'è differenza tra maiuscole e minuscole)
+- L'installazione di APK non è supportata</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>Rispetta le regole di FUSE sul nome</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>Un file selezionato non rispetta le regole di FUSE sul nome</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>Un file copiato viola le regole di FUSE sul nome</value>
   </data>
 </root>

@@ -162,9 +162,6 @@
   <data name="S_DEST_ERR" xml:space="preserve">
     <value>Erro na destinação do caminho</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>falha ao conectar com</value>
-  </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>Erro de Conexão</value>
   </data>
@@ -222,14 +219,8 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Erro ao ler o ficheiro</value>
   </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>Não foi possível puxar o ficheiro para lê-lo.</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Erro ao gravar o ficheiro</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>Não foi possível implementar o ficheiro de volta ao dispositivo.</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>O servidor do ADB precisa ser reinicializado para desativar o mDNS.</value>
@@ -259,13 +250,6 @@
     <value>Bem-Vindo à nova versão do ADB Explorer!
 As notas de lançamento estão disponíveis no GitHub.</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSE drive.
-• Ligaçoes simbólicas não são suportadas
-• Nome dos ficheiros não podem conter " * / : &lt; &gt; ? \ |
-• Nome dos ficheiros não diferenciam maiúsculas de minúsculas
-• Instalações de APKs não são suportadas</value>
-  </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>Todas as opções da app serão resetadas ao fechar a app.
 Esta ação não poderá ser desfeita. Tem certeza?</value>
@@ -283,14 +267,8 @@ Para aprovar o ADB, abra as opções avançada do WSA.</value>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>Descarregar ADB</value>
   </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>Localizar ADB (v{0} pelo menos):</value>
-  </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>Mudar</value>
-  </data>
-  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>Selecione o Caminho do ADB</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>Continuar</value>
@@ -471,5 +449,12 @@ O conteúdo visível pode estar incompleto.</value>
   </data>
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>Instalar</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>FUSE drive.
+• Ligaçoes simbólicas não são suportadas
+• Nome dos ficheiros não podem conter " * / : &lt; &gt; ? \ |
+• Nome dos ficheiros não diferenciam maiúsculas de minúsculas
+• Instalações de APKs não são suportadas</value>
   </data>
 </root>

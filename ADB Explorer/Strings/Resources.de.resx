@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -162,9 +162,6 @@
   <data name="S_DEST_ERR" xml:space="preserve">
     <value>Zielpfadfehler</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>Verbindung fehlgeschlagen an</value>
-  </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>Verbindungsfehler</value>
   </data>
@@ -222,14 +219,8 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Fehler beim Lesen der Datei</value>
   </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>Konnte die Datei nicht herunterladen, um sie zu lesen.</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Fehler beim Schreiben der Datei</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>Konnte die Datei nicht zurück auf das Gerät schicken.</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>Der ADB-Server muss neu gestartet werden, um mDNS zu deaktivieren.</value>
@@ -259,11 +250,16 @@
     <value>Willkommen zur neuen Version von ADB Explorer!
 Die Versionshinweise sind auf GitHub verfügbar.</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSE-Laufwerk.
-• Symbolische Links werden nicht unterstützt
-• Dateinamen dürfen keine der folgenden Zeichen enthalten: " * / : &lt; &gt; ? \ |
-• Bei Dateinamen wird nicht zwischen Groß- und Kleinschreibung unterschieden
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Laufwerksbeschränkungen:</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• Schreibgeschütztes Dateisystem</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• Symbolische Links werden nicht unterstützt
+• Dateinamen dürfen keine der folgenden Zeichen enthalten: „ * / : &lt; &gt; ? \ |“
+• Bei Dateinamen wird die Groß-/Kleinschreibung nicht berücksichtigt
 • Die Installation von APKs wird nicht unterstützt</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
@@ -283,14 +279,8 @@ Um ADB zu genehmigen, öffnen Sie die erweiterten Einstellungen von WSA.</value>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>ADB herunterladen</value>
   </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>ADB (v{0} mindestens) finden:</value>
-  </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>Ändern</value>
-  </data>
-  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>ADB-Pfad auswählen</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>Fortsetzen</value>
@@ -475,18 +465,6 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>System-Apps anzeigen</value>
   </data>
-  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
-    <value>Datei-Doppelklick</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
-    <value>Kein</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
-    <value>In Standard Ordner ziehen</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
-    <value>Im Editor öffnen</value>
-  </data>
   <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
     <value>ADB-Pfad überschreiben</value>
   </data>
@@ -504,6 +482,15 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
   </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>Thema</value>
+  </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Benutzerdefinierte Akzentfarbe</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Akzentfarbe</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Farbe auswählen</value>
   </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>Hardwarebeschleunigung deaktivieren</value>
@@ -537,6 +524,12 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
   </data>
   <data name="S_PRIVACY_POLICY" xml:space="preserve">
     <value>Datenschutzerklärung</value>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Absturzbericht-Dialog anzeigen</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Fehlerberichterstattung</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>Quellenangaben und Lizenzen von Drittanbietern</value>
@@ -685,9 +678,6 @@ Alle laufenden Vorgänge abbrechen</value>
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>Schreiben: {0}</value>
-  </data>
-  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
-    <value>Prüft bei jedem Start auf Aktualisierungen</value>
   </data>
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>Über</value>
@@ -926,9 +916,6 @@ Alle laufenden Vorgänge abbrechen</value>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
-  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
-    <value>Wird an die Shell gesendet</value>
-  </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
     <value>{0} Konflikt</value>
   </data>
@@ -1016,9 +1003,6 @@ Alle laufenden Vorgänge abbrechen</value>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Hält sich an die Unix-Namenskonventionen (über ADB)</value>
   </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>Hält sich an die FUSE-Namenskonventionen</value>
-  </data>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
     <value>Hält sich an die Windows-Namenskonventionen</value>
   </data>
@@ -1037,14 +1021,14 @@ Alle laufenden Vorgänge abbrechen</value>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
     <value>Manche ausgewählten Dateien haben auf FUSE / Windows miteinander in Konflikt stehende Namen</value>
   </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>Eine ausgewählte Datei verstößt gegen die FUSE-Namenskonventionen</value>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Eine ausgewählte Datei verstößt gegen die Namenskonventionen im Benutzerbereich</value>
   </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
     <value>Manche kopierten Dateien haben auf FUSE miteinander in Konflikt stehende Namen</value>
   </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>Eine kopierte Datei verstößt gegen die FUSE-Namenskonventionen</value>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Eine kopierte Datei verstößt gegen die Namenskonventionen im Benutzerbereich</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>Ein ausgewähltes Element ist keine Datei/kein Ordner</value>
@@ -1429,8 +1413,32 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
     <value>Auffrischungszeit für lokale Miniaturansichten</value>
   </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>BusyBox verwenden, falls verfügbar</value>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>WSA automatisch verbinden, falls verfügbar</value>
+  </data>
+  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
+    <value>Android-Emulatoren entdecken</value>
+  </data>
+  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
+    <value>Diesen Emulator starten</value>
+  </data>
+  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
+    <value>Emulator starten</value>
+  </data>
   <data name="S_STRING_PASTE" xml:space="preserve">
     <value>Einfügen</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>Auf Aktualisierungen der Miniaturansichten wird geprüft</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>Miniaturansichten werden abgerufen</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>Speicherorte von Miniaturansichten und die Mediendatenbank werden gelesen</value>
   </data>
   <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
     <value>Details</value>
@@ -1455,63 +1463,6 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_SORT_DESCENDING" xml:space="preserve">
     <value>Absteigend</value>
-  </data>
-  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
-    <value>Benutzerdefinierte Akzentfarbe</value>
-  </data>
-  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
-    <value>Akzentfarbe</value>
-  </data>
-  <data name="S_PICK_COLOR" xml:space="preserve">
-    <value>Farbe auswählen</value>
-  </data>
-  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
-    <value>Diesen Emulator starten</value>
-  </data>
-  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
-    <value>Laufwerksbeschränkungen:</value>
-  </data>
-  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
-    <value>• Schreibgeschütztes Dateisystem</value>
-  </data>
-  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
-    <value>• Symbolische Links werden nicht unterstützt
-• Dateinamen dürfen keine der folgenden Zeichen enthalten: „ * / : &lt; &gt; ? \ |“
-• Bei Dateinamen wird die Groß-/Kleinschreibung nicht berücksichtigt
-• Die Installation von APKs wird nicht unterstützt</value>
-  </data>
-  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
-    <value>Absturzbericht-Dialog anzeigen</value>
-  </data>
-  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
-    <value>Fehlerberichterstattung</value>
-  </data>
-  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Eine ausgewählte Datei verstößt gegen die Namenskonventionen im Benutzerbereich</value>
-  </data>
-  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Eine kopierte Datei verstößt gegen die Namenskonventionen im Benutzerbereich</value>
-  </data>
-  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
-    <value>BusyBox verwenden, falls verfügbar</value>
-  </data>
-  <data name="S_SETTINGS_WSA" xml:space="preserve">
-    <value>WSA automatisch verbinden, falls verfügbar</value>
-  </data>
-  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
-    <value>Android-Emulatoren entdecken</value>
-  </data>
-  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
-    <value>Emulator starten</value>
-  </data>
-  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
-    <value>Miniaturansichten werden abgerufen</value>
-  </data>
-  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
-    <value>Auf Aktualisierungen der Miniaturansichten wird geprüft</value>
-  </data>
-  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
-    <value>Speicherorte von Miniaturansichten und die Mediendatenbank werden gelesen</value>
   </data>
   <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
     <value>und {0} weitere …</value>
@@ -1596,5 +1547,21 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_ADB_NOT_FOUND" xml:space="preserve">
     <value>ADB konnte im System-PATH nicht gefunden werden. Bitte „{0}” verwenden, um es zu finden.</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>FUSE-Laufwerk.
+• Symbolische Links werden nicht unterstützt
+• Dateinamen dürfen keine der folgenden Zeichen enthalten: " * / : &lt; &gt; ? \ |
+• Bei Dateinamen wird nicht zwischen Groß- und Kleinschreibung unterschieden
+• Die Installation von APKs wird nicht unterstützt</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>Hält sich an die FUSE-Namenskonventionen</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>Eine ausgewählte Datei verstößt gegen die FUSE-Namenskonventionen</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>Eine kopierte Datei verstößt gegen die FUSE-Namenskonventionen</value>
   </data>
 </root>

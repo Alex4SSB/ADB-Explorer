@@ -1695,15 +1695,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to failed to connect to.
-        /// </summary>
-        public static string S_FAILED_CONN {
-            get {
-                return ResourceManager.GetString("S_FAILED_CONN", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Connection Error.
         /// </summary>
         public static string S_FAILED_CONN_TITLE {
@@ -2246,15 +2237,6 @@ namespace ADB_Explorer.Strings {
         public static string S_LIMITED_SUPPORT {
             get {
                 return ResourceManager.GetString("S_LIMITED_SUPPORT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Locate ADB (v{0} at least):.
-        /// </summary>
-        public static string S_LOCATE_ADB_TITLE {
-            get {
-                return ResourceManager.GetString("S_LOCATE_ADB_TITLE", resourceCulture);
             }
         }
         
@@ -3117,15 +3099,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not pull file in order to read it..
-        /// </summary>
-        public static string S_READ_FILE_ERROR {
-            get {
-                return ResourceManager.GetString("S_READ_FILE_ERROR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Error Reading File.
         /// </summary>
         public static string S_READ_FILE_ERROR_TITLE {
@@ -3465,15 +3438,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select ADB Path.
-        /// </summary>
-        public static string S_SELECT_ADB_PATH {
-            get {
-                return ResourceManager.GetString("S_SELECT_ADB_PATH", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Select files to push.
         /// </summary>
         public static string S_SELECT_FILE_PUSH {
@@ -3506,15 +3470,6 @@ namespace ADB_Explorer.Strings {
         public static string S_SELECT_FOLDER_PUSH_DESTINATION {
             get {
                 return ResourceManager.GetString("S_SELECT_FOLDER_PUSH_DESTINATION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Sending To Shell.
-        /// </summary>
-        public static string S_SEND_TO_SHELL_TITLE {
-            get {
-                return ResourceManager.GetString("S_SEND_TO_SHELL_TITLE", resourceCulture);
             }
         }
         
@@ -3645,33 +3600,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to None.
-        /// </summary>
-        public static string S_SETTINGS_DOUBLE_CLICK_NONE {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_DOUBLE_CLICK_NONE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Open In Editor.
-        /// </summary>
-        public static string S_SETTINGS_DOUBLE_CLICK_OPEN {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_DOUBLE_CLICK_OPEN", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Pull To Default Folder.
-        /// </summary>
-        public static string S_SETTINGS_DOUBLE_CLICK_PULL {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_DOUBLE_CLICK_PULL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Discover Android Emulators.
         /// </summary>
         public static string S_SETTINGS_EMULATOR_DISCOVERY {
@@ -3704,15 +3632,6 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_GROUP_DEVICE {
             get {
                 return ResourceManager.GetString("S_SETTINGS_GROUP_DEVICE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to File Double Click.
-        /// </summary>
-        public static string S_SETTINGS_GROUP_DOUBLE_CLICK {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_GROUP_DOUBLE_CLICK", resourceCulture);
             }
         }
         
@@ -4320,15 +4239,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Checks for updates on each launch.
-        /// </summary>
-        public static string S_TOOLTIP_UPDATES {
-            get {
-                return ResourceManager.GetString("S_TOOLTIP_UPDATES", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Emulator.
         /// </summary>
         public static string S_TYPE_EMULATOR {
@@ -4442,15 +4352,6 @@ namespace ADB_Explorer.Strings {
         public static string S_WIN_ROOT_ILLEGAL_TITLE {
             get {
                 return ResourceManager.GetString("S_WIN_ROOT_ILLEGAL_TITLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not push file back to device..
-        /// </summary>
-        public static string S_WRITE_FILE_ERROR {
-            get {
-                return ResourceManager.GetString("S_WRITE_FILE_ERROR", resourceCulture);
             }
         }
         

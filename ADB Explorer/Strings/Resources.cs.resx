@@ -156,9 +156,6 @@
   <data name="S_DELETE_ACTION" xml:space="preserve">
     <value>Smazat</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>připojení selhalo</value>
-  </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>Chyba připojení</value>
   </data>
@@ -219,9 +216,6 @@
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Chyba zápisu souboru</value>
   </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>Nepodařilo se odeslat soubor zpět do zařízení.</value>
-  </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>Je třeba restartovat server ADB, aby se deaktivovala služba mDNS.</value>
   </data>
@@ -248,14 +242,8 @@ Chcete-li ADB povolit, otevřete pokročilá nastavení WSA.</value>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>Stáhnout ADB</value>
   </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>Najděte ADB (alespoň verzi {0}):</value>
-  </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>Změnit</value>
-  </data>
-  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>Vybrat cestu ADB</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>Pokračovat</value>
@@ -325,9 +313,6 @@ Chcete-li ADB povolit, otevřete pokročilá nastavení WSA.</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
     <value>Podpora APK</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
-    <value>Otevřít v editoru</value>
   </data>
   <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
     <value>Přepsat cestu ADB</value>
@@ -466,9 +451,6 @@ Chcete-li ADB povolit, otevřete pokročilá nastavení WSA.</value>
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>Zápis: {0}</value>
-  </data>
-  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
-    <value>Zkontrolovat aktualizace po každém zapnutí</value>
   </data>
   <data name="S_BROWSER_ITEMS" xml:space="preserve">
     <value>položka</value>

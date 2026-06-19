@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -162,9 +162,6 @@
   <data name="S_DEST_ERR" xml:space="preserve">
     <value>目标路径错误</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>无法连接到</value>
-  </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>连接错误</value>
   </data>
@@ -222,14 +219,8 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>文件读取错误</value>
   </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>无法拉取文件以读取内容。</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>文件写入错误</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>无法将文件推送回设备。</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>需要重启 ADB 服务以禁用 mDNS。</value>
@@ -259,10 +250,15 @@
     <value>欢迎来到 ADB Explorer 的新版本！
 发行说明已在 Github 上发布。</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSE 驱动器。
-• 不支持符号链接
-• 文件名不能包含 " * / : &lt;&gt; ? \ |
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>驱动器限制：</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• 只读文件系统</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• 不支持符号链接
+• 文件名不能包含 " * / : &lt; &gt; ? \ |
 • 文件名不区分大小写
 • 不支持安装 APK</value>
   </data>
@@ -283,14 +279,8 @@
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>下载 ADB</value>
   </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>指定 ADB（至少 v{0}）：</value>
-  </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>更改</value>
-  </data>
-  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>选择 ADB 路径</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>继续</value>
@@ -315,6 +305,13 @@
   </data>
   <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
     <value>转到发行说明</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>隐私政策已更新</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>此应用版本在隐私政策更新后发布。
+在 GitHub 上查看更改。</value>
   </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
     <value>ADB 可执行文件</value>
@@ -475,18 +472,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>显示系统应用</value>
   </data>
-  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
-    <value>双击文件时</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
-    <value>无</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
-    <value>拉取到默认文件夹</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
-    <value>在编辑器中打开</value>
-  </data>
   <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
     <value>覆盖 ADB 路径</value>
   </data>
@@ -546,6 +531,15 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_PRIVACY_POLICY" xml:space="preserve">
     <value>隐私政策</value>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>显示崩溃报告对话框</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>崩溃报告</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>崩溃后可以选择发送诊断报告帮助我们修复它。仅在单击“发送报告”时发送报告，报告内容通常包括异常信息、堆栈踪迹、应用和 Windows 版本、打开的页面。数据由 Grafana Labs (Grafana Cloud) 处理。见上方的隐私政策链接。</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>归属及第三方许可</value>
@@ -694,9 +688,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>写入速度: {0}</value>
-  </data>
-  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
-    <value>每次启动时检查更新</value>
   </data>
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>关于</value>
@@ -935,9 +926,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>关于</value>
   </data>
-  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
-    <value>发送到 Shell</value>
-  </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
     <value>{0} 冲突</value>
   </data>
@@ -1025,8 +1013,8 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>遵循 Unix 命名规则（通过 ADB）</value>
   </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>遵循 FUSE 命名规则</value>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>遵守用户空间命名规则</value>
   </data>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
     <value>遵循 Windows 命名规则</value>
@@ -1046,14 +1034,14 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
     <value>某些选中的文件有相冲突的不区分大小写的名称</value>
   </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>所选文件违反了 FUSE 命名规则</value>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>所选文件违反用户空间命名规则</value>
   </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
     <value>一些已复制的文件有相冲突的不区分大小写的名称</value>
   </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>复制的文件违反了 FUSE 命名规则</value>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>已复制文件违反用户空间命名规则</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>选中的项目不是文件/文件夹</value>
@@ -1444,6 +1432,18 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SETTINGS_WSA" xml:space="preserve">
     <value>如果可用自动连接 Windows 安卓子系统</value>
   </data>
+  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
+    <value>发现 Android 模拟器</value>
+  </data>
+  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
+    <value>启动模拟器</value>
+  </data>
+  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
+    <value>启动模拟器</value>
+  </data>
+  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
+    <value>未找到 Android SDK 模拟器。安装 Android SDK 模拟器包或设置 ANDROID_SDK_ROOT。</value>
+  </data>
   <data name="S_STRING_PASTE" xml:space="preserve">
     <value>粘贴</value>
   </data>
@@ -1591,53 +1591,20 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>配对</value>
   </data>
-  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
-    <value>显示崩溃报告对话框</value>
-  </data>
-  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
-    <value>崩溃报告</value>
-  </data>
-  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
-    <value>崩溃后可以选择发送诊断报告帮助我们修复它。仅在单击“发送报告”时发送报告，报告内容通常包括异常信息、堆栈踪迹、应用和 Windows 版本、打开的页面。数据由 Grafana Labs (Grafana Cloud) 处理。见上方的隐私政策链接。</value>
-  </data>
-  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
-    <value>驱动器限制：</value>
-  </data>
-  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
-    <value>• 只读文件系统</value>
-  </data>
-  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
-    <value>• 不支持符号链接
-• 文件名不能包含 " * / : &lt; &gt; ? \ |
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>FUSE 驱动器。
+• 不支持符号链接
+• 文件名不能包含 " * / : &lt;&gt; ? \ |
 • 文件名不区分大小写
 • 不支持安装 APK</value>
   </data>
-  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
-    <value>遵守用户空间命名规则</value>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>遵循 FUSE 命名规则</value>
   </data>
-  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>所选文件违反用户空间命名规则</value>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>所选文件违反了 FUSE 命名规则</value>
   </data>
-  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>已复制文件违反用户空间命名规则</value>
-  </data>
-  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
-    <value>发现 Android 模拟器</value>
-  </data>
-  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
-    <value>启动模拟器</value>
-  </data>
-  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
-    <value>启动模拟器</value>
-  </data>
-  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
-    <value>未找到 Android SDK 模拟器。安装 Android SDK 模拟器包或设置 ANDROID_SDK_ROOT。</value>
-  </data>
-  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
-    <value>隐私政策已更新</value>
-  </data>
-  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
-    <value>此应用版本在隐私政策更新后发布。
-在 GitHub 上查看更改。</value>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>复制的文件违反了 FUSE 命名规则</value>
   </data>
 </root>

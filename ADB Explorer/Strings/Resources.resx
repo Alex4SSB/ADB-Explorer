@@ -163,9 +163,6 @@
   <data name="S_DEST_ERR" xml:space="preserve">
     <value>Destination Path Error</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>failed to connect to</value>
-  </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>Connection Error</value>
   </data>
@@ -223,14 +220,8 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Error Reading File</value>
   </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>Could not pull file in order to read it.</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Error Writing File</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>Could not push file back to device.</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>ADB server needs to be restarted in order to disable mDNS.</value>
@@ -291,15 +282,9 @@ To approve ADB, open WSA advanced settings.</value>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>Download ADB</value>
   </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>Locate ADB (v{0} at least):</value>
-  </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>Change</value>
     <comment>The content of a button used to change a path</comment>
-  </data>
-  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>Select ADB Path</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>Continue</value>
@@ -517,22 +502,6 @@ Visible content may be incomplete.</value>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>Show System Apps</value>
     <comment>The setting used to allow displaying system apps in package view</comment>
-  </data>
-  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
-    <value>File Double Click</value>
-    <comment>The title of the settings group used to control what happens when a non-folder item is double clicked in the browser</comment>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
-    <value>None</value>
-    <comment>The setting used to disable any action when double clicking a non-folder item in the browser</comment>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
-    <value>Pull To Default Folder</value>
-    <comment>The setting used to pull a non-folder item to the default folder when double clicking it in the browser</comment>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
-    <value>Open In Editor</value>
-    <comment>The setting used to open a non-folder item in the text editor when double clicking it in the browser</comment>
   </data>
   <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
     <value>Override ADB Path</value>
@@ -843,10 +812,6 @@ Cancel All Running</value>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>Write: {0}</value>
     <comment>ADB disk write speed. 0 = the speed including MB/s</comment>
-  </data>
-  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
-    <value>Checks for updates on each launch</value>
-    <comment>The tooltip of the setting that enables checking for updates</comment>
   </data>
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>About</value>
@@ -1163,10 +1128,6 @@ Cancel All Running</value>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Abort</value>
     <comment>The content of the button used to abort the extraction process</comment>
-  </data>
-  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
-    <value>Sending To Shell</value>
-    <comment>The title of a dialog displayed when data of files is being sent to the shell</comment>
   </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
     <value>{0} Conflict</value>

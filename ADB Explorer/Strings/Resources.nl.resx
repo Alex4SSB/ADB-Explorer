@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -117,15 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="S_DELETE_ACTION" xml:space="preserve">
-    <value>Verwijderen</value>
-  </data>
-  <data name="S_BUTTON_CLOSE" xml:space="preserve">
-    <value>Sluiten</value>
-  </data>
-  <data name="S_CANCEL" xml:space="preserve">
-    <value>Annuleren</value>
-  </data>
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
     <value>De Android Robot icoon(en)</value>
   </data>
@@ -159,6 +150,33 @@
   <data name="S_COPY_PATH" xml:space="preserve">
     <value>Kopieer Item pad</value>
   </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>Herstel Alle Items</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Leeg Afvalbak</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Verwijderen</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>Bestemming pad Error</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Verbinding Probleem</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Losgekoppeld Error</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>Koppeling error</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>Root toegang kan niet worden ingeschakeld op het geselecteerde apparaat.</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>Root Toegang</value>
+  </data>
   <data name="S_DEL_CONF_TITLE" xml:space="preserve">
     <value>Bevestig verwijderen</value>
   </data>
@@ -189,33 +207,6 @@
   <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
     <value>Bestand Operaties</value>
   </data>
-  <data name="S_RESTORE_ALL" xml:space="preserve">
-    <value>Herstel Alle Items</value>
-  </data>
-  <data name="S_EMPTY_TRASH" xml:space="preserve">
-    <value>Leeg Afvalbak</value>
-  </data>
-  <data name="S_DEST_ERR" xml:space="preserve">
-    <value>Bestemming pad Error</value>
-  </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>Verbinding maken met {device} is mislukt</value>
-  </data>
-  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
-    <value>Verbinding Probleem</value>
-  </data>
-  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
-    <value>Losgekoppeld Error</value>
-  </data>
-  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
-    <value>Koppeling error</value>
-  </data>
-  <data name="S_ROOT_FORBID" xml:space="preserve">
-    <value>Root toegang kan niet worden ingeschakeld op het geselecteerde apparaat.</value>
-  </data>
-  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
-    <value>Root Toegang</value>
-  </data>
   <data name="S_PUSH_PKG" xml:space="preserve">
     <value>Installeer Pakketen</value>
   </data>
@@ -228,10 +219,13 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Error tijdens lezen bestand</value>
   </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>het bestand niet worden opgehaald om te lezen.</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Error bestand schrijven</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>Sluiten</value>
+  </data>
+  <data name="S_CANCEL" xml:space="preserve">
+    <value>Annuleren</value>
   </data>
 </root>

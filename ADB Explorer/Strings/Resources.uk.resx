@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -162,9 +162,6 @@
   <data name="S_DEST_ERR" xml:space="preserve">
     <value>Помилка шляху призначення</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>не вдалося підключитися до</value>
-  </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>Помилка підключення</value>
   </data>
@@ -222,183 +219,17 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Помилка читання файлу</value>
   </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>Не вдалося витягнути файл для читання.</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Помилка запису файла</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>Не вдалося надіслати файл назад на пристрій.</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>Щоб вимкнути mDNS, потрібно перезапустити сервер ADB.</value>
   </data>
-  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
-    <value>• Символічні посилання не підтримуються
-• Імена файлів не можуть містити " * / : &lt; &gt; ? \ |
-• Імена файлів не враховують регістр
-• Встановлення APKs не підтримується</value>
-  </data>
-  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Скопійований файл порушує правила іменування простору користувача</value>
-  </data>
-  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
-    <value>Іконки</value>
-  </data>
-  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
-    <value>Показувати Іконки для спеціальних папок</value>
-  </data>
-  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
-    <value>Середні іконки</value>
-  </data>
-  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
-    <value>Великі іконки</value>
-  </data>
-  <data name="S_THUMBSIZE_XL" xml:space="preserve">
-    <value>Екстра великі іконки</value>
-  </data>
-  <data name="S_CC_NAME" xml:space="preserve">
-    <value>Creative Commons</value>
-  </data>
-  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
-    <value>Автовключення root</value>
-  </data>
-  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
-    <value>Час від останньої відповіді сервера</value>
-  </data>
-  <data name="S_ROOT_ENABLED" xml:space="preserve">
-    <value>Root-доступ увімкнено</value>
-  </data>
-  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
-    <value>Root може бути увімкнено</value>
-  </data>
-  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
-    <value>Свій акцент кольору</value>
-  </data>
-  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
-    <value>Акцент кольору</value>
-  </data>
-  <data name="S_PICK_COLOR" xml:space="preserve">
-    <value>Виберіть колір</value>
-  </data>
-  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
-    <value>Показати діалог звіту про збій</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
-    <value>Тільки у перегляді іконок</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
-    <value>Тільки у фотокаталогах</value>
-  </data>
-  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
-    <value>Збереження мініатюр між сеансами</value>
-  </data>
   <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
     <value>Вимкнути mDNS</value>
   </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>mDNS</value>
-  </data>
-  <data name="S_SERVER_DOWN" xml:space="preserve">
-    <value>mDNS сервер вимкнено</value>
-  </data>
-  <data name="S_MDNS_ON" xml:space="preserve">
-    <value>mDNS сервер запущено та працює</value>
-  </data>
-  <data name="S_TYPE_SERVICE" xml:space="preserve">
-    <value>mDNS сервис</value>
-  </data>
-  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
-    <value>Перевірка стану сервера mDNS…</value>
-  </data>
-  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
-    <value>Свій шлях до налаштувань додатка</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>Обмежити швидкість витягування мініатюр</value>
-  </data>
-  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
-    <value>Додати мініатюри відео</value>
-  </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>Наступне буде видалено:
-{0}</value>
-  </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
     <value>Запустити WSA у фоні</value>
-  </data>
-  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
-    <value>Запустити WSA</value>
-  </data>
-  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
-    <value>WSA додаток</value>
-  </data>
-  <data name="S_SETTINGS_WSA" xml:space="preserve">
-    <value>Автопідключення WSA, якщо доступне</value>
-  </data>
-  <data name="S_NEW_VERSION" xml:space="preserve">
-    <value>Доступна нова {0}, версія {1}</value>
-  </data>
-  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
-    <value>Вас вітає нова версія ADB Explorer!
-Список змін доступний на GitHub.</value>
-  </data>
-  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
-    <value>Перейти до нотаток випуску</value>
-  </data>
-  <data name="S_HELP_ON_ADB" xml:space="preserve">
-    <value>Цей додаток є UI для ADB - Android Debug Bridge.
-Для використання додатка потрібно встановити ADB на свій PC.
-ADB доступний як частина Android SDK Platform Tools.
-Ви можете використати надане посилання для завантаження SDK Platform Tools.
-На жаль, ми не можемо надати ADB з додатком через ліцензійні обмеження.</value>
-  </data>
-  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
-    <value>Допомога з ADB</value>
-  </data>
-  <data name="S_DELETE_PERMANENT" xml:space="preserve">
-    <value>Наступні елементи будуть безповоротно видалені:
-{0}</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value>Є 1 конфліктний елемент</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>Є 1 конфліктний елемент у {0}</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value>Є {0} конфліктуючих елементів</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value>Є {0} конфліктуючих елементів у {1}</value>
-  </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Конфлікти вставки</value>
-  </data>
-  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
-    <value>Запит від пристроїв</value>
-  </data>
-  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
-    <value>Запит статусу батареї</value>
-  </data>
-  <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
-    <value>Автовідкриття для перегляду</value>
-  </data>
-  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
-    <value>Примусовий повторний скан медіафайлів під час відправлення</value>
-  </data>
-  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
-    <value>Запит для дисків</value>
-  </data>
-  <data name="S_BAT_VOLT" xml:space="preserve">
-    <value>Вольтаж: {0}v</value>
-  </data>
-  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
-    <value>Місце призначення</value>
-  </data>
-  <data name="S_BUTTON_PUSH" xml:space="preserve">
-    <value>Надіслати</value>
   </data>
   <data name="S_PULL_ACTION" xml:space="preserve">
     <value>Витягти</value>
@@ -406,41 +237,30 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_PULL_ACTION_LINK" xml:space="preserve">
     <value>Витягти (Цільове посилання)</value>
   </data>
-  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
-    <value>Вийняти в корінь диска Windows</value>
-  </data>
-  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
-    <value>Припинити запит під час відправлення/вилучення</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
-    <value>Витягнути до папки за замовчуванням</value>
-  </data>
-  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
-    <value>Витягнути та відобразити мініатюри</value>
-  </data>
-  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
-    <value>Вилучення мініатюр</value>
-  </data>
-  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
-    <value>Витягнути файл до папки за замовчуванням, двічі клацнувши по ньому</value>
-  </data>
-  <data name="S_BUTTON_CHANGE" xml:space="preserve">
-    <value>Змінити</value>
-  </data>
-  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
-    <value>Зберегти зміни</value>
-  </data>
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Відновити</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>Помилка списку каталогів</value>
   </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>Вийняти в корінь диска Windows</value>
+  </data>
+  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
+    <value>Вас вітає нова версія ADB Explorer!
+Список змін доступний на GitHub.</value>
+  </data>
   <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
     <value>Обмеження дисків:</value>
   </data>
   <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
     <value>• Файлова система лише для читання</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• Символічні посилання не підтримуються
+• Імена файлів не можуть містити " * / : &lt; &gt; ? \ |
+• Імена файлів не враховують регістр
+• Встановлення APKs не підтримується</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>Усі налаштування будуть скинуті під час закриття додатка.
@@ -459,11 +279,8 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>Завантажити ADB</value>
   </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>Виявити ADB (v{0} як мінімум):</value>
-  </data>
-  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>Виберіть шлях до ADB</value>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value>Змінити</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>Продовжити</value>
@@ -477,11 +294,17 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_DISABLED" xml:space="preserve">
     <value>Вимкнено</value>
   </data>
+  <data name="S_NEW_VERSION" xml:space="preserve">
+    <value>Доступна нова {0}, версія {1}</value>
+  </data>
   <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
     <value>Перейти на сторінку версії</value>
   </data>
   <data name="S_BUTTON_CLOSE" xml:space="preserve">
     <value>Закрити</value>
+  </data>
+  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
+    <value>Перейти до нотаток випуску</value>
   </data>
   <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
     <value>Політику конфіденційності оновлено</value>
@@ -492,6 +315,16 @@ ADB доступний як частина Android SDK Platform Tools.
   </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
     <value>Виконуваний файл ADB</value>
+  </data>
+  <data name="S_HELP_ON_ADB" xml:space="preserve">
+    <value>Цей додаток є UI для ADB - Android Debug Bridge.
+Для використання додатка потрібно встановити ADB на свій PC.
+ADB доступний як частина Android SDK Platform Tools.
+Ви можете використати надане посилання для завантаження SDK Platform Tools.
+На жаль, ми не можемо надати ADB з додатком через ліцензійні обмеження.</value>
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value>Допомога з ADB</value>
   </data>
   <data name="S_RESTART_ADB_NOW" xml:space="preserve">
     <value>Перезапустити ADB Зараз</value>
@@ -505,11 +338,22 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>Виберіть призначення для кількох елементів</value>
   </data>
+  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
+    <value>Наступне буде видалено:
+{0}</value>
+  </data>
+  <data name="S_DELETE_PERMANENT" xml:space="preserve">
+    <value>Наступні елементи будуть безповоротно видалені:
+{0}</value>
+  </data>
   <data name="S_NEW_ITEM" xml:space="preserve">
     <value>Новый файл</value>
   </data>
   <data name="S_NEW_FOLDER" xml:space="preserve">
     <value>Нова папка</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>Creative Commons</value>
   </data>
   <data name="S_LS_ERROR" xml:space="preserve">
     <value>Під час читання цієї папки сталася помилка.
@@ -556,6 +400,21 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Об'єднати чи замінити</value>
   </data>
+  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
+    <value>Є 1 конфліктний елемент</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
+    <value>Є 1 конфліктний елемент у {0}</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
+    <value>Є {0} конфліктуючих елементів</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
+    <value>Є {0} конфліктуючих елементів у {1}</value>
+  </data>
+  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
+    <value>Конфлікти вставки</value>
+  </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Виберіть папки для надсилання</value>
   </data>
@@ -571,11 +430,35 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
     <value>Очистити</value>
   </data>
+  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
+    <value>mDNS</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
+    <value>Запит від пристроїв</value>
+  </data>
+  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
+    <value>Запит статусу батареї</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
+    <value>Автовключення root</value>
+  </data>
   <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
     <value>Зберігати пристрої, підключені вручну</value>
   </data>
+  <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
+    <value>Автовідкриття для перегляду</value>
+  </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value>Припинити запит під час відправлення/вилучення</value>
+  </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
     <value>Одночасні операції</value>
+  </data>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value>Примусовий повторний скан медіафайлів під час відправлення</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
+    <value>Запит для дисків</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
     <value>Підтримка APK</value>
@@ -588,15 +471,6 @@ ADB доступний як частина Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>Показати системні додатки</value>
-  </data>
-  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
-    <value>Подвійне клацання по файлу</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
-    <value>Жоден</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
-    <value>Відкрити в редакторі</value>
   </data>
   <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
     <value>Перевизначити шлях до ADB</value>
@@ -615,6 +489,15 @@ ADB доступний як частина Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>Тема</value>
+  </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Свій акцент кольору</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Акцент кольору</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Виберіть колір</value>
   </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>Вимкнути апаратне прискорення</value>
@@ -648,6 +531,9 @@ ADB доступний як частина Android SDK Platform Tools.
   </data>
   <data name="S_PRIVACY_POLICY" xml:space="preserve">
     <value>Політика конфіденційності</value>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Показати діалог звіту про збій</value>
   </data>
   <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
     <value>Звіти про збої</value>
@@ -725,6 +611,9 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_BUTTON_DEVICES" xml:space="preserve">
     <value>Пристрої</value>
   </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>Надіслати</value>
+  </data>
   <data name="S_MENU_FOLDERS" xml:space="preserve">
     <value>Папки</value>
   </data>
@@ -770,6 +659,9 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
     <value>Час оновлення змінено</value>
   </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>Зберегти зміни</value>
+  </data>
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>Встановити</value>
   </data>
@@ -796,9 +688,6 @@ ADB доступний як частина Android SDK Platform Tools.
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>Запис: {0}</value>
-  </data>
-  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
-    <value>Перевіряти оновлення під час запуску</value>
   </data>
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>Про додаток</value>
@@ -839,6 +728,9 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_COLUMN_SOURCE" xml:space="preserve">
     <value>Джерело</value>
   </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value>Місце призначення</value>
+  </data>
   <data name="S_COLUMN_ADDED" xml:space="preserve">
     <value>Додано</value>
   </data>
@@ -872,6 +764,9 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
     <value>ADB Сервер не відповідає</value>
   </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value>Час від останньої відповіді сервера</value>
+  </data>
   <data name="S_SECONDS_SHORT" xml:space="preserve">
     <value>{0}сек.</value>
   </data>
@@ -887,6 +782,9 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_RESTART_ADB" xml:space="preserve">
     <value>Перезапустити ADB</value>
   </data>
+  <data name="S_SERVER_DOWN" xml:space="preserve">
+    <value>mDNS сервер вимкнено</value>
+  </data>
   <data name="S_AWAITING_RESPONSE" xml:space="preserve">
     <value>Очікування відповіді: {0}</value>
   </data>
@@ -899,14 +797,26 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_HOURS_SHORT" xml:space="preserve">
     <value>{0}h</value>
   </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>mDNS сервер запущено та працює</value>
+  </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Обмежена підтримка</value>
   </data>
   <data name="S_FAILED_OPERATIONS" xml:space="preserve">
     <value>Деякі операції не виконані</value>
   </data>
+  <data name="S_ROOT_ENABLED" xml:space="preserve">
+    <value>Root-доступ увімкнено</value>
+  </data>
+  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
+    <value>Root може бути увімкнено</value>
+  </data>
   <data name="S_RECOVERY_MODE" xml:space="preserve">
     <value>Recovery</value>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value>Вольтаж: {0}v</value>
   </data>
   <data name="S_BAT_TEMP" xml:space="preserve">
     <value>Температура: {0}°C</value>
@@ -937,6 +847,9 @@ ADB доступний як частина Android SDK Platform Tools.
   </data>
   <data name="S_TYPE_EMULATOR" xml:space="preserve">
     <value>Емулятор</value>
+  </data>
+  <data name="S_TYPE_SERVICE" xml:space="preserve">
+    <value>mDNS сервис</value>
   </data>
   <data name="S_TYPE_USB" xml:space="preserve">
     <value>USB</value>
@@ -1004,14 +917,14 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_BUTTON_LAUNCH" xml:space="preserve">
     <value>Запустити</value>
   </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value>Запустити WSA</value>
+  </data>
   <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
     <value>Більше цього не показувати.</value>
   </data>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Перервати</value>
-  </data>
-  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
-    <value>Відправити до Shell</value>
   </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
     <value>{0} конфлікт</value>
@@ -1088,6 +1001,9 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_PATH_INVALID" xml:space="preserve">
     <value>Аргумент повинен вказати повний шлях нового або наявного файлу налаштувань.</value>
   </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>Свій шлях до налаштувань додатка</value>
+  </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Меню порожнє</value>
   </data>
@@ -1124,8 +1040,14 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
     <value>Деякі скопійовані файли мають конфлікт імен без урахування регістру</value>
   </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Скопійований файл порушує правила іменування простору користувача</value>
+  </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>Вибраний елемент не є файлом/папкою</value>
+  </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value>WSA додаток</value>
   </data>
   <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
     <value>Root статус: {0}</value>
@@ -1453,8 +1375,35 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
     <value>Вимк.</value>
   </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>Перевірка стану сервера mDNS…</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value>Іконки</value>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>Витягнути та відобразити мініатюри</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>Тільки у перегляді іконок</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>Тільки у фотокаталогах</value>
+  </data>
   <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
     <value>При підключенні</value>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>Збереження мініатюр між сеансами</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>Обмежити швидкість витягування мініатюр</value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>Показувати Іконки для спеціальних папок</value>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>Додати мініатюри відео</value>
   </data>
   <data name="S_VIDEO_DURATION" xml:space="preserve">
     <value>Довжина</value>
@@ -1480,6 +1429,9 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
     <value>Використовуйте BusyBox, якщо він доступний</value>
   </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>Автопідключення WSA, якщо доступне</value>
+  </data>
   <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
     <value>Виявити емулятори андроїд</value>
   </data>
@@ -1498,6 +1450,9 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
     <value>Перевірка оновлень мініатюр</value>
   </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>Вилучення мініатюр</value>
+  </data>
   <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
     <value>Читання розташування мініатюр та бази даних мультимедіа</value>
   </data>
@@ -1506,6 +1461,15 @@ ADB доступний як частина Android SDK Platform Tools.
   </data>
   <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
     <value>Переглянути</value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>Середні іконки</value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>Великі іконки</value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>Екстра великі іконки</value>
   </data>
   <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
     <value>Макет та перегляд опцій</value>
@@ -1539,6 +1503,9 @@ ADB доступний як частина Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
     <value>Максимальний розмір файлу для перегляду</value>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>Витягнути файл до папки за замовчуванням, двічі клацнувши по ньому</value>
   </data>
   <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
     <value>Виберіть один елемент, щоб отримати додаткову інформацію.</value>

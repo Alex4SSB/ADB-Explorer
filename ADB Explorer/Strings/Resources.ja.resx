@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -162,9 +162,6 @@
   <data name="S_DEST_ERR" xml:space="preserve">
     <value>宛先パスエラー</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>接続に失敗しました</value>
-  </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>接続エラー</value>
   </data>
@@ -222,14 +219,8 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>ファイルの読み取りエラー</value>
   </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>ファイルを読み取るために取得できませんでした。</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>ファイルの書き込みエラー</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>ファイルをデバイスに送信できませんでした。</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>mDNS を無効にするには、ADB サーバーを再起動する必要があります。</value>
@@ -259,13 +250,6 @@
     <value>新しいバージョンの ADB Explorer へようこそ！
 リリースノートは GitHub でご覧いただけます。</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSEドライブ。
-• シンボリックリンクはサポートされていません
-• ファイル名に " * / : &lt; &gt; ? \ | を含めることはできません
-• ファイル名は大文字と小文字を区別しません
-• APKのインストールはサポートされていません</value>
-  </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>アプリを閉じると、すべてのアプリ設定がリセットされます。
 元に戻すことはできません。よろしいですか？</value>
@@ -283,14 +267,8 @@ ADBを承認するには、WSAの詳細設定を開きます。</value>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>ADBをダウンロード</value>
   </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>ADB の場所 (v{0} 以上):</value>
-  </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>変更</value>
-  </data>
-  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>ADBパスを選択</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>続行</value>
@@ -474,18 +452,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>システムアプリを表示</value>
-  </data>
-  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
-    <value>ファイルダブルクリック時の動作</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
-    <value>何もしない</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
-    <value>デフォルトフォルダに受信</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
-    <value>エディターで開く</value>
   </data>
   <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
     <value>ADBパスを上書きする</value>
@@ -685,9 +651,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>書き込み: {0}</value>
-  </data>
-  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
-    <value>起動ごとにアップデートをチェックします</value>
   </data>
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>このアプリについて</value>
@@ -926,9 +889,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>中断</value>
   </data>
-  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
-    <value>シェルに送信中</value>
-  </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
     <value>{0} 競合</value>
   </data>
@@ -1016,9 +976,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Unix の命名規則に準拠 (ADB 経由)</value>
   </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>FUSE命名規則に準拠</value>
-  </data>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
     <value>Windowsの命名規則に準拠</value>
   </data>
@@ -1037,14 +994,8 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
     <value>選択されたファイルの一部は、FUSE / Windows 上で名前が競合しています</value>
   </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>選択されたファイルはFUSE命名規則に違反しています</value>
-  </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
     <value>コピーされたファイルの一部にFUSE上で競合する名前があります</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>コピーされたファイルはFUSEの命名規則に違反しています</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>選択された項目はファイル/フォルダではありません</value>
@@ -1371,5 +1322,21 @@ Weblate でアプリをあなたの言語にローカライズできるよう、
   </data>
   <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
     <value>{0} 個のAPKをインストールする</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>FUSEドライブ。
+• シンボリックリンクはサポートされていません
+• ファイル名に " * / : &lt; &gt; ? \ | を含めることはできません
+• ファイル名は大文字と小文字を区別しません
+• APKのインストールはサポートされていません</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>FUSE命名規則に準拠</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>選択されたファイルはFUSE命名規則に違反しています</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>コピーされたファイルはFUSEの命名規則に違反しています</value>
   </data>
 </root>

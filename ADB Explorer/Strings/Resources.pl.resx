@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -162,9 +162,6 @@
   <data name="S_DEST_ERR" xml:space="preserve">
     <value>Błąd ścieżki docelowej</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>nie udało się połączyć z</value>
-  </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>Błąd połączenia</value>
   </data>
@@ -222,14 +219,8 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Błąd odczytu pliku</value>
   </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>Nie można ściągnąć pliku w celu jego odczytania.</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Błąd przy zapisywaniu pliku</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>Nie można przesłać pliku z powrotem na urządzenie.</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>Serwer ADB musi zostać uruchomiony ponownie, żeby wyłączyć mDNS.</value>
@@ -259,11 +250,16 @@
     <value>Witamy w nowej wersji ADB Explorer!
 Informacje o wydaniu są dostępne na GitHubie.</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>Napęd FUSE.
-• Dowiązania symboliczne nie są obsługiwane
-• Nazwy plików nie mogą zawierać znaków " * / : &lt; &gt; ? \ |
-• Nazwy plików nie uwzględniają wielkości liter
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Ograniczenia dotyczące dysku:</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• System plików tylko do odczytu</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• Dowiązania symboliczne nie są obsługiwane
+• Nazwy plików nie mogą zawierać znaków "* / : &lt; &gt; ? \ |
+• W nazwach plików nie rozróżnia się wielkości liter
 • Instalacja plików APK nie jest obsługiwana</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
@@ -283,14 +279,8 @@ Aby zatwierdzić ADB, otwórz ustawienia zaawansowane WSA.</value>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>Pobierz ADB</value>
   </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>Zlokalizuj ADB (v{0} przynajmniej):</value>
-  </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>Zmień</value>
-  </data>
-  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>Wybierz lokalizacje ADB</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>Kontynuuj</value>
@@ -315,6 +305,13 @@ Aby zatwierdzić ADB, otwórz ustawienia zaawansowane WSA.</value>
   </data>
   <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
     <value>Przejdź do informacji o wydaniu</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Zaktualizowana polityka prywatności</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>Ta wersja aplikacji została wydana po aktualizacji polityki prywatności.
+Zapoznaj się ze zmianami na GitHubie.</value>
   </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
     <value>Plik wykonywalny ADB</value>
@@ -475,18 +472,6 @@ Widoczna zawartość może być niekompletna.</value>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>Pokaż aplikacje systemowe</value>
   </data>
-  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
-    <value>Wybór elementu podwójnym kliknięciem</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
-    <value>Nic</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
-    <value>Pobierz do domyślnego folderu</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
-    <value>Otwórz w edytorze</value>
-  </data>
   <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
     <value>Zastąp ścieżkę ADB</value>
   </data>
@@ -546,6 +531,15 @@ Widoczna zawartość może być niekompletna.</value>
   </data>
   <data name="S_PRIVACY_POLICY" xml:space="preserve">
     <value>Polityka prywatności</value>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Pokaż okno dialogowe raportu o awarii</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Zgłaszanie awarii</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>W przypadku awarii możesz opcjonalnie przesłać raport diagnostyczny, aby pomóc nam w jej usunięciu. Raporty są wysyłane wyłącznie po kliknięciu przycisku „Wyślij raport” i zazwyczaj zawierają komunikat o wyjątku, ślad stosu, wersję aplikacji i systemu Windows oraz informacje o otwartej stronie. Dane są przetwarzane przez firmę Grafana Labs (Grafana Cloud). Zapoznaj się z Polityką prywatności, do której link znajduje się powyżej.</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>Atrybucje i licencje stron trzecich</value>
@@ -694,9 +688,6 @@ Anuluj wszystkie uruchomione</value>
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>Zapis: {0}</value>
-  </data>
-  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
-    <value>Sprawdza aktualizacje przy każdym uruchomieniu</value>
   </data>
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>Informacje</value>
@@ -935,9 +926,6 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Porzuć</value>
   </data>
-  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
-    <value>Wysyłanie do Powłoki</value>
-  </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
     <value>{0} Konflikt</value>
   </data>
@@ -1025,8 +1013,8 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Przestrzega zasad nazewnictwa systemu Unix (za pośrednictwem ADB)</value>
   </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>Przestrzega zasad nazewnictwa FUSE</value>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Zgodne z zasadami nazewnictwa przestrzeni użytkownika</value>
   </data>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
     <value>Przestrzega zasad nazewnictwa systemu Windows</value>
@@ -1046,14 +1034,14 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
     <value>Niektóre wybrane pliki mają nazwy, w których występują sprzeczności związane z wielkością liter</value>
   </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>Wybrany plik narusza zasady nazewnictwa FUSE</value>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Wybrany plik narusza zasady nazewnictwa w przestrzeni użytkownika</value>
   </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
     <value>Niektóre skopiowane pliki mają nazwy, w których występują sprzeczności związane z wielkością liter</value>
   </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>Skopiowany plik narusza zasady nazewnictwa FUSE</value>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Skopiowany plik narusza zasady nazewnictwa w przestrzeni użytkownika</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>Wybrany element nie jest plikiem/folderem</value>
@@ -1444,6 +1432,18 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   <data name="S_SETTINGS_WSA" xml:space="preserve">
     <value>Automatyczne połączenie z WSA, jeśli jest dostępne</value>
   </data>
+  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
+    <value>Odkryj emulatory systemu Android</value>
+  </data>
+  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
+    <value>Uruchom ten emulator</value>
+  </data>
+  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
+    <value>Uruchomienie emulatora</value>
+  </data>
+  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
+    <value>Nie znaleziono emulatora Android SDK. Zainstaluj pakiet emulatora Android SDK lub ustaw zmienną ANDROID_SDK_ROOT.</value>
+  </data>
   <data name="S_STRING_PASTE" xml:space="preserve">
     <value>Wklej</value>
   </data>
@@ -1591,53 +1591,20 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>Sparuj</value>
   </data>
-  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
-    <value>Pokaż okno dialogowe raportu o awarii</value>
-  </data>
-  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
-    <value>Zgłaszanie awarii</value>
-  </data>
-  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
-    <value>W przypadku awarii możesz opcjonalnie przesłać raport diagnostyczny, aby pomóc nam w jej usunięciu. Raporty są wysyłane wyłącznie po kliknięciu przycisku „Wyślij raport” i zazwyczaj zawierają komunikat o wyjątku, ślad stosu, wersję aplikacji i systemu Windows oraz informacje o otwartej stronie. Dane są przetwarzane przez firmę Grafana Labs (Grafana Cloud). Zapoznaj się z Polityką prywatności, do której link znajduje się powyżej.</value>
-  </data>
-  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
-    <value>Odkryj emulatory systemu Android</value>
-  </data>
-  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
-    <value>Uruchom ten emulator</value>
-  </data>
-  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
-    <value>Uruchomienie emulatora</value>
-  </data>
-  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
-    <value>Nie znaleziono emulatora Android SDK. Zainstaluj pakiet emulatora Android SDK lub ustaw zmienną ANDROID_SDK_ROOT.</value>
-  </data>
-  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
-    <value>Ograniczenia dotyczące dysku:</value>
-  </data>
-  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
-    <value>• System plików tylko do odczytu</value>
-  </data>
-  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
-    <value>• Dowiązania symboliczne nie są obsługiwane
-• Nazwy plików nie mogą zawierać znaków "* / : &lt; &gt; ? \ |
-• W nazwach plików nie rozróżnia się wielkości liter
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>Napęd FUSE.
+• Dowiązania symboliczne nie są obsługiwane
+• Nazwy plików nie mogą zawierać znaków " * / : &lt; &gt; ? \ |
+• Nazwy plików nie uwzględniają wielkości liter
 • Instalacja plików APK nie jest obsługiwana</value>
   </data>
-  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Zgodne z zasadami nazewnictwa przestrzeni użytkownika</value>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>Przestrzega zasad nazewnictwa FUSE</value>
   </data>
-  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Wybrany plik narusza zasady nazewnictwa w przestrzeni użytkownika</value>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>Wybrany plik narusza zasady nazewnictwa FUSE</value>
   </data>
-  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Skopiowany plik narusza zasady nazewnictwa w przestrzeni użytkownika</value>
-  </data>
-  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
-    <value>Zaktualizowana polityka prywatności</value>
-  </data>
-  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
-    <value>Ta wersja aplikacji została wydana po aktualizacji polityki prywatności.
-Zapoznaj się ze zmianami na GitHubie.</value>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>Skopiowany plik narusza zasady nazewnictwa FUSE</value>
   </data>
 </root>

@@ -162,9 +162,6 @@
   <data name="S_DEST_ERR" xml:space="preserve">
     <value>خطأ في مسار الوجهه</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>خطأ في الاتصال مع</value>
-  </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>فشل في الاتصال</value>
   </data>
@@ -222,14 +219,8 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>خطأ في قراءة الملف</value>
   </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>لا يمكن سحب الملف لطلب قرأته.</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>خطأ في كتابه الملف</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>لا يمكن ارجاع الملف للجهاز.</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>خادم ADB يحتاج لاعاده التشغيل لتعطيل mDNS.</value>

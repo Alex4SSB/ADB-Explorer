@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -162,9 +162,6 @@
   <data name="S_DEST_ERR" xml:space="preserve">
     <value>Kesalahan Jalur Tujuan</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>gagal terhubung ke</value>
-  </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>Kesalahan Koneksi</value>
   </data>
@@ -222,14 +219,8 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Kesalahan Membaca Berkas</value>
   </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>Tidak dapat menarik berkas untuk membacanya.</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Kesalahan Menulis Berkas</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>Tidak dapat mendorong kembali berkas ke perangkat.</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>Server ADB perlu dimulai ulang untuk menonaktifkan mDNS.</value>
@@ -259,13 +250,6 @@
     <value>Selamat datang di versi baru ADB Explorer!
 Catatan rilis tersedia di GitHub.</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>Drive FUSE.
--  Tautan simbolik tidak didukung
--  Nama berkas tidak boleh berisi " * / : &lt; &gt; ? \ |
--  Nama berkas tidak peka huruf besar/kecil
--  Instalasi APK tidak didukung</value>
-  </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>Semua pengaturan aplikasi akan diatur ulang saat aplikasi ditutup.
 Ini tidak dapat dibatalkan. Apakah Anda yakin?</value>
@@ -283,14 +267,8 @@ Untuk menyetujui ADB, buka pengaturan lanjutan WSA.</value>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>Unduh ADB</value>
   </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>Temukan ADB (minimal v{0}):</value>
-  </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>Ubah</value>
-  </data>
-  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>Pilih Jalur ADB</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>Lanjutkan</value>
@@ -474,18 +452,6 @@ Konten yang terlihat mungkin tidak lengkap.</value>
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>Tampilkan Aplikasi Sistem</value>
-  </data>
-  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
-    <value>Klik Ganda Berkas</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
-    <value>Tidak ada</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
-    <value>Tarik ke Folder Default</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
-    <value>Buka di Editor</value>
   </data>
   <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
     <value>Ganti Jalur ADB</value>
@@ -694,9 +660,6 @@ Batalkan Semua yang Sedang Berjalan</value>
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
     <value>Tulis: {0}</value>
-  </data>
-  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
-    <value>Memeriksa pembaruan setiap kali diluncurkan</value>
   </data>
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>Tentang</value>
@@ -935,9 +898,6 @@ Batalkan Semua yang Sedang Berjalan</value>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Batalkan</value>
   </data>
-  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
-    <value>Mengirim ke Shell</value>
-  </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
     <value>{0} Konflik</value>
   </data>
@@ -1025,9 +985,6 @@ Batalkan Semua yang Sedang Berjalan</value>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Mematuhi aturan penamaan Unix (melalui ADB)</value>
   </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>Mematuhi aturan penamaan FUSE</value>
-  </data>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
     <value>Mematuhi aturan penamaan Windows</value>
   </data>
@@ -1046,14 +1003,8 @@ Batalkan Semua yang Sedang Berjalan</value>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
     <value>Beberapa berkas yang dipilih memiliki nama yang konflik di FUSE / Windows</value>
   </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>Berkas yang dipilih melanggar aturan penamaan FUSE</value>
-  </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
     <value>Beberapa berkas yang disalin memiliki nama yang konflik di FUSE</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>Berkas yang disalin melanggar aturan penamaan FUSE</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>Item yang dipilih bukan berkas / folder</value>
@@ -1587,5 +1538,21 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
   </data>
   <data name="S_ADB_COMPROMISED" xml:space="preserve">
     <value>Eksekutabel yang diberikan tidak dapat diverifikasi sebagai ADB. Pastikan Anda hanya mengunduh Android Platform Tools resmi dari Google.</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>Drive FUSE.
+-  Tautan simbolik tidak didukung
+-  Nama berkas tidak boleh berisi " * / : &lt; &gt; ? \ |
+-  Nama berkas tidak peka huruf besar/kecil
+-  Instalasi APK tidak didukung</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>Mematuhi aturan penamaan FUSE</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>Berkas yang dipilih melanggar aturan penamaan FUSE</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>Berkas yang disalin melanggar aturan penamaan FUSE</value>
   </data>
 </root>
