@@ -705,6 +705,7 @@ public static class DeviceHelper
     public static async void InitDevice()
     {
         var device = Data.DevicesObject.Current;
+        device.EnsureDefaultDrives();
         var internalDrive = device.Drives.First(d => d.Type is AbstractDrive.DriveType.Internal).Drive as LogicalDrive;
 
         // Run both ADB calls concurrently on background threads instead of blocking the UI thread.

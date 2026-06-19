@@ -429,6 +429,17 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         Drives.Add(new VirtualDriveViewModel(new(path: AdbLocation.StringFromLocation(Navigation.SpecialLocation.PackageDrive))));
     }
 
+    internal void EnsureDefaultDrives()
+    {
+        if (Drives.Any(d => d.Type is AbstractDrive.DriveType.Internal))
+            return;
+
+        if (Drives.Count == 0)
+            InitDeviceDrives();
+        else
+            Drives.Add(new LogicalDriveViewModel(new(path: AdbExplorerConst.DRIVE_TYPES.First(d => d.Value is AbstractDrive.DriveType.Internal).Key)));
+    }
+
     public async Task<bool> UpdateDrives(IEnumerable<DriveSnapshot> snapshots, Dispatcher dispatcher, bool asyncClassify = false)
     {
         bool collectionChanged;
