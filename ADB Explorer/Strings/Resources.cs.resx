@@ -930,12 +930,12 @@ Chcete-li ADB povolit, otevřete pokročilá nastavení WSA.</value>
     <value />
   </data>
   <data name="MEGA" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="GIGA" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
 </root>
