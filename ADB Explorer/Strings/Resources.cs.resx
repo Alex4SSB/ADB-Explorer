@@ -783,144 +783,144 @@ Chcete-li ADB povolit, otevřete pokročilá nastavení WSA.</value>
     <value>Sestupně</value>
   </data>
   <data name="S_REM_DEVICE" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_LS_ERROR" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_PASTE_ANCESTOR" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_KILL_EMULATOR" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_PULL_ACTION" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_HELP_ON_ADB" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_PRIVACY_POLICY" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_DEST_ERR" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_PULL_ACTION_LINK" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_REM_APK" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_NEW_VERSION_MSG" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_REM_APK_PLURAL" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
-    <value></value>
+    <value />
   </data>
 </root>
