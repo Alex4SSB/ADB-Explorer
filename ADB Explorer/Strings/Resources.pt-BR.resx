@@ -1218,4 +1218,10 @@ O conteúdo visível pode estar incompleto.</value>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value></value>
   </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value></value>
+  </data>
 </root>
