@@ -1323,4 +1323,61 @@ Weblate でアプリをあなたの言語にローカライズできるよう、
   <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
     <value>{0} 個のAPKをインストールする</value>
   </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value></value>
+  </data>
 </root>
