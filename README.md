@@ -41,7 +41,9 @@ Help with translation is most welcome - please visit our translation project on 
 <br></br>
 <h2 align="left"/>App Files</h2>
 
-`%LocalAppData%\AdbExplorer`
+`%LocalAppData%\AdbExplorer` (portable installs)
+
+The Microsoft Store version uses a package-private folder by default. You can keep using that location or choose a custom folder that remains on your PC after uninstall.
 
 * settings.json - persistent settings file.
 

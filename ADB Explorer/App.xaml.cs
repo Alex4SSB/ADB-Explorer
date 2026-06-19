@@ -123,9 +123,6 @@ public partial class App
         // Read to force it to be set to system display language
         _ = Data.Settings.OriginalUICulture;
 
-        // UserDataPaths returns the real %LocalAppData% path (not the MSIX redirected Packages\...\LocalState copy).
-        Data.AppDataPath = Path.Combine(global::Windows.Storage.UserDataPaths.GetDefault().LocalAppData, AdbExplorerConst.APP_DATA_FOLDER);
-
         string settingsPath = "", oldPath = "";
         if (e.Args.Length > 0)
         {
@@ -148,10 +145,11 @@ public partial class App
             }
 
             settingsPath = Path.GetFullPath(e.Args[0]);
+            Data.AppDataPath = Path.GetDirectoryName(settingsPath)!;
         }
         else
         {
-            AppDataHelper.MigrateVirtualizedAppData(Data.AppDataPath);
+            Data.AppDataPath = AppDataHelper.ResolveAppDataPath();
 
             settingsPath = FileHelper.ConcatPaths(Data.AppDataPath, AdbExplorerConst.APP_SETTINGS_FILE, '\\');
             oldPath = FileHelper.ConcatPaths(Data.AppDataPath, "App.txt", '\\');
@@ -188,7 +186,14 @@ public partial class App
 
         Services.GetService<OperationsViewModel>()?.StoreColumns();
 
-        Services.GetService<SettingsService>().Save();
+        var settingsService = Services.GetService<SettingsService>();
+        if (Data.RuntimeSettings.ResetAppSettings)
+        {
+            settingsService?.DeleteSettingsFile();
+            CredentialVaultStore.ClearAll();
+        }
+        else
+            settingsService?.Save();
 
         if (Data.Settings.UnrootOnDisconnect is true)
             ADBService.Unroot(Data.DevicesObject.Current.ID);

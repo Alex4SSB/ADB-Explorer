@@ -1,17 +1,133 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using Wpf.Ui.Controls;
 
 namespace ADB_Explorer.Helpers;
 
 public static class AppDataHelper
 {
+    private const string AppDataLocationVaultKey = "AppDataLocation";
+    private const string DefaultAppDataMarker = "[DEFAULT]";
+
+    public static bool IsAppDataLocationChoiceMade() => CredentialVaultStore.Exists(AppDataLocationVaultKey);
+
     /// <summary>
-    /// Moves MSIX-virtualized app data into the real %LocalAppData%\AdbExplorer folder on first launch after unvirtualization.
+    /// Resolves the app data folder for the current launch (portable default or packaged virtualized/custom).
     /// </summary>
-    public static void MigrateVirtualizedAppData(string targetPath)
+    public static string ResolveAppDataPath()
     {
-        var sourcePath = GetVirtualizedAppDataPath();
-        if (sourcePath is null || !Directory.Exists(sourcePath))
+        if (!Data.RuntimeSettings.IsAppPackaged)
+        {
+            return Path.Combine(
+                global::Windows.Storage.UserDataPaths.GetDefault().LocalAppData,
+                AdbExplorerConst.APP_DATA_FOLDER);
+        }
+
+        var customPath = GetCustomAppDataPath();
+        if (customPath is not null)
+            return customPath;
+
+        return GetVirtualizedAppDataPath();
+    }
+
+    private static string? GetCustomAppDataPath()
+    {
+        var value = CredentialVaultStore.Get(AppDataLocationVaultKey);
+        return value is null || value == DefaultAppDataMarker ? null : value;
+    }
+
+    private static void SaveAppDataLocationChoice(string value)
+        => CredentialVaultStore.Set(AppDataLocationVaultKey, value);
+
+    /// <summary>
+    /// Shows the app data location dialog. Returns a custom path when selected, otherwise null.
+    /// </summary>
+    public static async Task<string?> PromptAppDataLocationChoiceAsync()
+    {
+        while (true)
+        {
+            var result = await DialogService.ShowDialog(
+                Strings.Resources.S_APP_DATA_LOCATION_MESSAGE,
+                Strings.Resources.S_APP_DATA_LOCATION_TITLE,
+                Strings.Resources.S_APP_DATA_LOCATION_VIRTUALIZED,
+                Strings.Resources.S_APP_DATA_LOCATION_CUSTOM,
+                Strings.Resources.S_CANCEL);
+
+            if (result == ContentDialogResult.Primary)
+            {
+                SaveAppDataLocationChoice(DefaultAppDataMarker);
+                return null;
+            }
+
+            if (result == ContentDialogResult.Secondary)
+            {
+                var folder = PickCustomAppDataFolder();
+                if (folder is null)
+                    continue;
+
+                Directory.CreateDirectory(folder);
+                MigrateToCustomLocation(GetVirtualizedAppDataPath(), folder);
+                SaveAppDataLocationChoice(folder);
+                return folder;
+            }
+
+            return null;
+        }
+    }
+
+    public static void ApplyAppDataPath(string appDataPath, IServiceProvider services)
+    {
+        Data.AppDataPath = appDataPath;
+        var settingsPath = FileHelper.ConcatPaths(appDataPath, AdbExplorerConst.APP_SETTINGS_FILE, '\\');
+        services.GetRequiredService<SettingsService>().Load(settingsPath);
+    }
+
+    public static string GetVirtualizedAppDataPath()
+    {
+        var familyName = NativeMethods.GetCurrentPackageFamilyName();
+        if (familyName is not null)
+        {
+            return Path.Combine(
+                global::Windows.Storage.UserDataPaths.GetDefault().LocalAppData,
+                "Packages", familyName, "LocalCache", "Local", AdbExplorerConst.APP_DATA_FOLDER);
+        }
+
+        return Path.Combine(
+            global::Windows.Storage.UserDataPaths.GetDefault().LocalAppData,
+            AdbExplorerConst.APP_DATA_FOLDER);
+    }
+
+    private static string? PickCustomAppDataFolder()
+    {
+        var dialog = new CommonOpenFileDialog
+        {
+            IsFolderPicker = true,
+            Multiselect = false,
+            AllowNonFileSystemItems = false,
+            DefaultDirectory = "C:\\",
+            EnsurePathExists = false,
+            Title = Strings.Resources.S_APP_DATA_LOCATION_BROWSE,
+        };
+
+        if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+            return null;
+
+        string appData = FileHelper.GetParentPath(Windows.Storage.UserDataPaths.GetDefault().LocalAppData);
+        if (dialog.FileName.StartsWith(appData))
+        {
+            DialogService.ShowMessage(Strings.Resources.S_CUSTOM_LOCATION_INVALID, 
+                Strings.Resources.S_APP_DATA_LOCATION_TITLE,
+                DialogService.DialogIcon.Exclamation);
+
+            return null;
+        }
+
+        return Path.GetFullPath(dialog.FileName);
+    }
+
+    private static void MigrateToCustomLocation(string sourcePath, string targetPath)
+    {
+        if (!Directory.Exists(sourcePath))
             return;
 
         try
@@ -22,23 +138,7 @@ public static class AppDataHelper
                 TryDeleteDirectory(sourcePath);
         }
         catch
-        {
-            // Best-effort migration; don't block startup.
-        }
-    }
-
-    /// <summary>
-    /// Returns the legacy MSIX-virtualized app-data folder, if the process has package identity.
-    /// Pre-unvirtualization writes were redirected to Packages\{family}\LocalCache\Local under real %LocalAppData%.
-    /// </summary>
-    private static string? GetVirtualizedAppDataPath()
-    {
-        var familyName = NativeMethods.GetCurrentPackageFamilyName();
-        if (familyName is null)
-            return null;
-
-        var localAppData = global::Windows.Storage.UserDataPaths.GetDefault().LocalAppData;
-        return Path.Combine(localAppData, "Packages", familyName, "LocalCache", "Local", AdbExplorerConst.APP_DATA_FOLDER);
+        { }
     }
 
     private static void MergeDirectory(string sourceDir, string targetDir)

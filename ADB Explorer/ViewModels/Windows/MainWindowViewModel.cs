@@ -230,6 +230,20 @@ public partial class MainWindowViewModel : ObservableObject
             });
         }
 
+        if (Data.RuntimeSettings.IsAppPackaged && !AppDataHelper.IsAppDataLocationChoiceMade())
+        {
+            App.SafeInvoke(() =>
+            {
+                Notifications.Add(new(async () =>
+                {
+                    var customPath = await AppDataHelper.PromptAppDataLocationChoiceAsync();
+                    if (customPath is not null)
+                        AppDataHelper.ApplyAppDataPath(customPath, App.Services);
+                }, Strings.Resources.S_APP_DATA_LOCATION_TITLE,
+                Notifications));
+            });
+        }
+
         if (!Data.RuntimeSettings.IsAppPackaged && Data.Settings.CheckForUpdates)
         {
             var latestVersion = await Network.LatestAppReleaseAsync();

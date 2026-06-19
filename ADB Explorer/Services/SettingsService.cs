@@ -50,4 +50,10 @@ public class SettingsService
         
         File.WriteAllText(_path, JsonSerializer.Serialize(Data.Settings, _options));
     }
+
+    public void DeleteSettingsFile()
+    {
+        if (File.Exists(_path))
+            File.Delete(_path);
+    }
 }

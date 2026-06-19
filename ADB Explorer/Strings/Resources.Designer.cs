@@ -331,6 +331,53 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Choose App Data Folder.
+        /// </summary>
+        public static string S_APP_DATA_LOCATION_BROWSE {
+            get {
+                return ResourceManager.GetString("S_APP_DATA_LOCATION_BROWSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Custom.
+        /// </summary>
+        public static string S_APP_DATA_LOCATION_CUSTOM {
+            get {
+                return ResourceManager.GetString("S_APP_DATA_LOCATION_CUSTOM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This app distribution saves data in a virtualized (and hard to reach) location, which is cleared on app uninstall.
+        ///
+        ///Select Custom to use a location that will not be removed on uninstall. The custom location cannot be under C:\Users\…\AppData.
+        /// </summary>
+        public static string S_APP_DATA_LOCATION_MESSAGE {
+            get {
+                return ResourceManager.GetString("S_APP_DATA_LOCATION_MESSAGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to App Data Location.
+        /// </summary>
+        public static string S_APP_DATA_LOCATION_TITLE {
+            get {
+                return ResourceManager.GetString("S_APP_DATA_LOCATION_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use Default.
+        /// </summary>
+        public static string S_APP_DATA_LOCATION_VIRTUALIZED {
+            get {
+                return ResourceManager.GetString("S_APP_DATA_LOCATION_VIRTUALIZED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Attributions &amp; Third Party Licenses.
         /// </summary>
         public static string S_ATTRIBUTIONS {
@@ -1102,6 +1149,15 @@ namespace ADB_Explorer.Strings {
         public static string S_CUSTOM_DATA_PATH {
             get {
                 return ResourceManager.GetString("S_CUSTOM_DATA_PATH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The custom location cannot be under %AppData% - please select another location.
+        /// </summary>
+        public static string S_CUSTOM_LOCATION_INVALID {
+            get {
+                return ResourceManager.GetString("S_CUSTOM_LOCATION_INVALID", resourceCulture);
             }
         }
         

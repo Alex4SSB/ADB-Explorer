@@ -108,7 +108,7 @@ public static class UISettings
         {
             new InfoSetting(AppGlobal.AppDisplayName, null, (FontFamily)App.Current.Resources["Nunito"], 18, $"v{AppGlobal.AppVersion}", TextAlignment.Center),
             new LinkSetting(Strings.Resources.S_DONATE, Resources.Links.SPONSOR, "\uEB51", "SponsorIconBrush"),
-            new LinkSetting(Strings.Resources.S_APP_DATA_FOLDER, new(AppDataPath), "\uE62F"),
+            new LinkSetting(Strings.Resources.S_APP_DATA_FOLDER, new(AppDataPath), "\uE62F", resolveFilePath: () => AppDataPath),
             new LinkSetting(Strings.Resources.S_GITHUB_REPO, Resources.Links.ADB_EXPLORER_GITHUB, pathData: GitHubGeometry),
             new LinkSetting(Strings.Resources.S_GOTO_WEBLATE, Resources.Links.WEBLATE, imageSource: WeblateLogo),
             new LinkSetting(Strings.Resources.S_PRIVACY_POLICY, Resources.Links.ADB_EXPLORER_PRIVACY, "\uE72E"),
@@ -400,6 +400,8 @@ public class MultiLinkSetting : AbstractSetting
 
 public class LinkSetting : AbstractSetting
 {
+    private readonly Func<string>? _resolveFilePath;
+
     public Uri Url { get; set; }
     public string AltText { get; set; }
 
@@ -407,17 +409,21 @@ public class LinkSetting : AbstractSetting
 
     public BaseAction Command => new(() => true, () =>
     {
-        if (Url.IsFile)
+        if (_resolveFilePath is not null)
+            Process.Start("explorer.exe", _resolveFilePath());
+        else if (Url.IsFile)
             Process.Start("explorer.exe", Url.LocalPath);
         else
             Network.OpenUrl(Url.ToString(), RuntimeSettings.DefaultBrowserPath);
     });
 
-    public string ToolTip => Url.IsFile ? Url.LocalPath : Url.ToString();
+    public string ToolTip => _resolveFilePath?.Invoke()
+        ?? (Url.IsFile ? Url.LocalPath : Url.ToString());
 
-    public LinkSetting(string description, Uri url, string icon = null, string iconBrush = null, string altText = null, ImageSource imageSource = null, Geometry pathData = null)
+    public LinkSetting(string description, Uri url, string icon = null, string iconBrush = null, string altText = null, ImageSource imageSource = null, Geometry pathData = null, Func<string>? resolveFilePath = null)
         : base(null, description, icon: icon)
     {
+        _resolveFilePath = resolveFilePath;
         Url = url;
         AltText = altText;
 
