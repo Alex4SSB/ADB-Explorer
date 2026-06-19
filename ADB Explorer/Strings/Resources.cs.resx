@@ -920,4 +920,7 @@ Chcete-li ADB povolit, otevřete pokročilá nastavení WSA.</value>
   <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
     <value></value>
   </data>
+  <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
+    <value></value>
+  </data>
 </root>
