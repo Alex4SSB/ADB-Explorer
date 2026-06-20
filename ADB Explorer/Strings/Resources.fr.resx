@@ -1584,4 +1584,47 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>Apairer</value>
   </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Privacy Policy Updated</value>
+    <comment>The title of the notification message about an updated privacy policy</comment>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>This app version was released after a privacy policy update.
+Review the changes on GitHub.</value>
+    <comment>The content of the privacy policy update notification message</comment>
+  </data>
+  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
+    <value>App Data Location</value>
+    <comment>Title of the dialog asking packaged users where to store app data</comment>
+  </data>
+  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
+    <value>This app distribution saves data in a virtualized (and hard to reach) location, which is cleared on app uninstall.
+
+Select Custom to use a location that will not be removed on uninstall. The custom location cannot be under C:\Users\…\AppData</value>
+    <comment>Explains virtualized vs custom app data location for packaged installs</comment>
+  </data>
+  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
+    <value>Use Default</value>
+    <comment>Button to keep the MSIX virtualized app data folder</comment>
+  </data>
+  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
+    <value>Custom</value>
+    <comment>Button to pick a non-virtualized custom app data folder</comment>
+  </data>
+  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
+    <value>Choose App Data Folder</value>
+    <comment>Title of the folder picker for custom app data location</comment>
+  </data>
+  <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
+    <value>Kill ADB When App Closes</value>
+    <comment>The setting that enables killing ADB server when closing the app</comment>
+  </data>
+  <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
+    <value>The custom location cannot be under C:\Users\…\AppData - please select another location</value>
+    <comment>An error displayed when choosing a wrong custom app data location</comment>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
+    <value>Allow ADB From Untrusted Sources</value>
+    <comment>The setting that allows using ADB without integrity checks and without path restrictions</comment>
+  </data>
 </root>
