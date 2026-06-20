@@ -1595,24 +1595,26 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Завершити процес ADB під час закриття додатка</value>
   </data>
   <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
-    <value></value>
+    <value>Користувача</value>
   </data>
   <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
-    <value></value>
+    <value>Цей дистрибутив додатка зберігає дані у віртуалізованому (і важкодоступному) місці, яке очищається під час видалення додатка.
+
+Виберіть Користувацьке місце для використання, яке не буде видалено під час деінсталяції. Користувацьке розташування не може бути під C:\Users\…\AppData</value>
   </data>
   <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
-    <value></value>
+    <value>Розташування користувача не може бути під C:\Users\…\AppData - будь ласка, виберіть інше місце</value>
   </data>
   <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
-    <value></value>
+    <value>Розташування даних додатка</value>
   </data>
   <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value></value>
+    <value>Використовувати за замовчуванням</value>
   </data>
   <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
-    <value></value>
+    <value>Виберіть папку даних додатка</value>
   </data>
   <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
-    <value></value>
+    <value>Дозволити ADB з ненадійних джерел</value>
   </data>
 </root>
