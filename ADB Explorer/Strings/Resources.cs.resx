@@ -1097,9 +1097,6 @@ Cancel All Running</value>
     <value>No items match current filter.</value>
     <comment>The notification displayed when a non empty folder / package view is filtered such that no items match</comment>
   </data>
-  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
-    <value></value>
-  </data>
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
     <value>Operation Type</value>
     <comment>File operations detailed data grid column name for the type of the operation icon</comment>
@@ -1135,9 +1132,6 @@ Cancel All Running</value>
   <data name="S_RECOVERY_MODE" xml:space="preserve">
     <value>Recovery</value>
     <comment>The Android recovery mode</comment>
-  </data>
-  <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value></value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>Reboot Into</value>
