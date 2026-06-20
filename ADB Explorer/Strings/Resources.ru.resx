@@ -1580,7 +1580,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Синий</value>
   </data>
   <data name="S_ADB_NOT_FOUND" xml:space="preserve">
-    <value>Невозможно найти ADB из системного ПУТИ. Пожалуйста, используйте "{0}" чтобы обнаружить его.</value>
+    <value>Невозможно найти ADB из системного пути "PATH". Пожалуйста, используйте "{0}" чтобы обнаружить его.</value>
   </data>
   <data name="S_ADB_PATH_INVALID" xml:space="preserve">
     <value>Указанный путь {0} представляет собой либо ярлык Windows, либо UNC (удаленный путь), что недопустимо.</value>
