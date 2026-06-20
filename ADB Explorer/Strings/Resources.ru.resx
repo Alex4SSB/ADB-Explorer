@@ -1611,24 +1611,26 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Скопированный файл нарушает правила именования FUSE</value>
   </data>
   <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
-    <value></value>
+    <value>Пользователя</value>
   </data>
   <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
-    <value></value>
+    <value>Этот дистрибутив приложения хранит данные в виртуализированном (и труднодоступном) месте, которое очищается при удалении приложения.
+
+Выберите Пользовательское местоположение для использования, которое не будет удалено при деинсталляции. Пользовательское расположение не может быть под C:\Users\…\AppData</value>
   </data>
   <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
-    <value></value>
+    <value>Расположение пользователя не может быть под C:\Users\…\AppData - пожалуйста, выберите другое место</value>
   </data>
   <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
-    <value></value>
+    <value>Расположение данных приложения</value>
   </data>
   <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value></value>
+    <value>Использовать по умолчанию</value>
   </data>
   <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
-    <value></value>
+    <value>Выберите папку данных программы</value>
   </data>
   <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
-    <value></value>
+    <value>Разрешить ADB из ненадежных источников</value>
   </data>
 </root>
