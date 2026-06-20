@@ -292,7 +292,7 @@
     <value>Включено</value>
   </data>
   <data name="S_DISABLED" xml:space="preserve">
-    <value>Выключено</value>
+    <value>Отключено</value>
   </data>
   <data name="S_NEW_VERSION" xml:space="preserve">
     <value>Доступна новая {0}, версия {1}</value>
@@ -1062,7 +1062,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Включить</value>
   </data>
   <data name="S_BUTTON_DISABLE" xml:space="preserve">
-    <value>Отключено</value>
+    <value>Отключить</value>
   </data>
   <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
     <value>Код сопряжения</value>
