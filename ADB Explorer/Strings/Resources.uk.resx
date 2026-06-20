@@ -1062,7 +1062,7 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Увімкнути</value>
   </data>
   <data name="S_BUTTON_DISABLE" xml:space="preserve">
-    <value>Вимкнено</value>
+    <value>Вимкнути</value>
   </data>
   <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
     <value>Код сполучення</value>
