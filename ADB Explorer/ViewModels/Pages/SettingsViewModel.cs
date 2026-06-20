@@ -88,9 +88,7 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
         if (navEnabled)
             SelectedGroup = (SettingsGroup)UISettings.SettingsList.FirstOrDefault();
         else
-        {
-            SelectedGroup = UISettings.SettingsList.OfType<SettingsGroup>().FirstOrDefault(group => group.Name == Strings.Resources.S_SETTINGS_GROUP_WORK_DIRS);
-        }
+            ShowWorkingDirectoriesGroup();
 
         SortedSettings = CollectionViewSource.GetDefaultView(UISettings.SortSettings);
         SortedSettings.Filter = SettingsFilterPredicate;
@@ -106,6 +104,20 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
         TranslateAdbStatus();
 
         _isInitialized = true;
+    }
+
+    public void ShowWorkingDirectoriesGroup()
+    {
+        SelectedGroup = UISettings.SettingsList.OfType<SettingsGroup>()
+            .FirstOrDefault(group => group.Name == Strings.Resources.S_SETTINGS_GROUP_WORK_DIRS);
+    }
+
+    public void EnsureWorkingDirectoriesVisible()
+    {
+        if (!_isInitialized)
+            InitializeViewModel();
+        else
+            ShowWorkingDirectoriesGroup();
     }
 
     private void TranslateAdbStatus()

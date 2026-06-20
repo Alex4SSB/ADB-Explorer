@@ -81,6 +81,8 @@ public abstract class DeviceViewModel : ViewModelBase
     private DeviceViewModel(Devices devicesObject = null)
     {
         devicesObject ??= Data.DevicesObject;
+        if (devicesObject is null)
+            return;
 
         devicesObject.PropertyChanged += DevicesObject_PropertyChanged;
     }

@@ -2,6 +2,7 @@ using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
+using ADB_Explorer.ViewModels.Pages;
 using AdvancedSharpAdbClient;
 
 namespace ADB_Explorer.Helpers;
@@ -53,6 +54,21 @@ public static class AdbHelper
 
         return CurrentAdbState.Status is AdbStatus.Valid;
     });
+
+    public static void EnterAdbSetupMode()
+    {
+        string adbPath = string.IsNullOrEmpty(Data.Settings.ManualAdbPath)
+            ? AdbExplorerConst.ADB_PROCESS
+            : Data.Settings.ManualAdbPath;
+
+        ADBService.VerifyAdbVersion(adbPath);
+
+        App.SafeInvoke(() =>
+        {
+            App.Services.GetService<SettingsViewModel>()?.EnsureWorkingDirectoriesVisible();
+            Data.CurrentPage.Value = typeof(Views.Pages.SettingsPage);
+        });
+    }
 
     public static void EnableMdns() => App.SafeInvoke(async () =>
     {

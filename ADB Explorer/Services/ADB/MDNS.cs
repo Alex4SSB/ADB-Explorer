@@ -87,6 +87,9 @@ public class MDNS : ViewModelBase
     public void Restart()
     {
         ADBService.KillAdbServer();
+        if (AdbHelper.CurrentAdbState.Status is not AdbHelper.AdbStatus.Valid)
+            return;
+
         State = MdnsState.Disabled;
         Enable();
     }

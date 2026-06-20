@@ -345,10 +345,17 @@ public partial class ADBService
 
     public static void KillAdbServer(bool restart = false)
     {
-        ExecuteAdbCommand("kill-server", out _, out _, CancellationToken.None);
+        try
+        {
+            ExecuteAdbCommand("kill-server", out _, out _, CancellationToken.None);
 
-        if (restart)
-            ExecuteAdbCommand("start-server", out _, out _, CancellationToken.None);
+            if (restart)
+                ExecuteAdbCommand("start-server", out _, out _, CancellationToken.None);
+        }
+        catch (Win32Exception)
+        {
+            AdbHelper.EnterAdbSetupMode();
+        }
     }
 
     public static void WaitForCommands(TimeSpan timeout)
