@@ -1580,7 +1580,7 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Синій</value>
   </data>
   <data name="S_ADB_NOT_FOUND" xml:space="preserve">
-    <value>Неможливо знайти ADB із системного ШЛЯХУ. Будь ласка, використовуйте "{0}", щоб виявити його.</value>
+    <value>Неможливо знайти ADB із системного шляху "PATH". Будь ласка, використовуйте "{0}", щоб виявити його.</value>
   </data>
   <data name="S_ADB_PATH_INVALID" xml:space="preserve">
     <value>Зазначений шлях {0} є або ярлик Windows, або UNC (віддалений шлях), що неприпустимо.</value>
