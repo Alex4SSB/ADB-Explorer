@@ -1608,27 +1608,29 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>复制的文件违反了 FUSE 命名规则</value>
   </data>
   <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
-    <value></value>
+    <value>自定义</value>
   </data>
   <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
-    <value></value>
+    <value>此应用分发在虚拟化（难以访问）位置保存数据，卸载时会删除该位置。
+
+选择自定义以使用不会在卸载时被删除的位置。自定义位置不能在 C:\Users\…\AppData 下</value>
   </data>
   <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
-    <value></value>
+    <value>自定义位置不能在 C:\Users\…\AppData 下 − 请另选位置</value>
   </data>
   <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
-    <value></value>
+    <value>应用数据位置</value>
   </data>
   <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
-    <value></value>
+    <value>关闭应用时终止 ADB</value>
   </data>
   <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value></value>
+    <value>使用默认</value>
   </data>
   <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
-    <value></value>
+    <value>选择应用数据文件夹</value>
   </data>
   <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
-    <value></value>
+    <value>允许来自未信任源来源的 ADB</value>
   </data>
 </root>
