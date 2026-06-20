@@ -450,11 +450,4 @@ O conteúdo visível pode estar incompleto.</value>
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>Instalar</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSE drive.
-• Ligaçoes simbólicas não são suportadas
-• Nome dos ficheiros não podem conter " * / : &lt; &gt; ? \ |
-• Nome dos ficheiros não diferenciam maiúsculas de minúsculas
-• Instalações de APKs não são suportadas</value>
-  </data>
 </root>

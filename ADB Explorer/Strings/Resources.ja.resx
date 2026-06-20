@@ -1323,20 +1323,4 @@ Weblate でアプリをあなたの言語にローカライズできるよう、
   <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
     <value>{0} 個のAPKをインストールする</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSEドライブ。
-• シンボリックリンクはサポートされていません
-• ファイル名に " * / : &lt; &gt; ? \ | を含めることはできません
-• ファイル名は大文字と小文字を区別しません
-• APKのインストールはサポートされていません</value>
-  </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>FUSE命名規則に準拠</value>
-  </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>選択されたファイルはFUSE命名規則に違反しています</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>コピーされたファイルはFUSEの命名規則に違反しています</value>
-  </data>
 </root>

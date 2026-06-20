@@ -1614,22 +1614,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
     <value>המיקום המותאם אישית לא יכול להיות תחת C:\Users\…\AppData - אנא בחר מיקום אחר</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>כונן FUSE.
-• אין תמיכה בקישורים (קיצורי דרך)
-• שמות קבצים לא יכולים להכיל " * / : &lt; &gt; ? \ |
-• אין משמעות לאותיות גדולות/קטנות בשמות קבצים
-• אין תמיכה בהרצת קבצי התקנה APK</value>
-  </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>חוקי בתור שם קובץ על FUSE</value>
-  </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>קובץ שנבחר אינו עומד בחוקי שם קובץ FUSE</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>קובץ שהועתקו אינו עומד בחוקי שם קובץ FUSE</value>
-  </data>
   <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
     <value>אַפשר שימוש ב-ADB ממקורות לא בטוחים</value>
   </data>

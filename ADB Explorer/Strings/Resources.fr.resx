@@ -1584,20 +1584,4 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>Apairer</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>Lecteur FUSE
-• Les liens symboliques ne sont pas pris en charge
-• Les noms de fichiers ne peuvent pas contenir " * / : &lt; &gt; ? \ |
-• Les noms de fichiers ne tiennent pas compte de la casse
-• L’installation de fichiers APK n’est pas prise en charge</value>
-  </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>Adhère aux règles de nommage FUSE</value>
-  </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>Un fichier sélectionné viole les règles de nommage FUSE</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>Un fichier copié viole les règles de nommage FUSE</value>
-  </data>
 </root>

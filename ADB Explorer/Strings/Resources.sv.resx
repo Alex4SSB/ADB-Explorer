@@ -1512,20 +1512,4 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
   <data name="S_MOUNT_OPTIONS" xml:space="preserve">
     <value>Monteringsalternativ</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSE drive.
-• Symboliska länkar stöds inte
-• Filnamn kan inte innehålla "* / : &lt;&gt; | |
-• Filnamn är skiftlägesokänslig
-• Installation av APK stöds inte</value>
-  </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>Håller sig till FUSE namnregler</value>
-  </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>En utvald fil bryter mot FUSE namngivningsregler</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>En kopierad fil bryter mot FUSE namnregler</value>
-  </data>
 </root>

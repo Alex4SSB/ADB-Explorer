@@ -1591,20 +1591,4 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>Sparuj</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>Napęd FUSE.
-• Dowiązania symboliczne nie są obsługiwane
-• Nazwy plików nie mogą zawierać znaków " * / : &lt; &gt; ? \ |
-• Nazwy plików nie uwzględniają wielkości liter
-• Instalacja plików APK nie jest obsługiwana</value>
-  </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>Przestrzega zasad nazewnictwa FUSE</value>
-  </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>Wybrany plik narusza zasady nazewnictwa FUSE</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>Skopiowany plik narusza zasady nazewnictwa FUSE</value>
-  </data>
 </root>

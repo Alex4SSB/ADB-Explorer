@@ -1380,20 +1380,4 @@ Aiutaci a localizzare l'app nella vostra lingua su Weblate.</value>
   <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
     <value>Orario aggiornamento delle miniature locali</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>Disco FUSE.
-- I collegamenti simbolici non sono supportati
-- I nomi dei file non possono contenere " * / : &lt; &gt; ? \ |
-- I nomi dei file sono case insensitive (non c'è differenza tra maiuscole e minuscole)
-- L'installazione di APK non è supportata</value>
-  </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>Rispetta le regole di FUSE sul nome</value>
-  </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>Un file selezionato non rispetta le regole di FUSE sul nome</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>Un file copiato viola le regole di FUSE sul nome</value>
-  </data>
 </root>

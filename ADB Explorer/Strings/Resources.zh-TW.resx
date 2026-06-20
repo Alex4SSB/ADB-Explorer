@@ -1380,20 +1380,4 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
     <value>本機縮圖重整時間</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSE 檔案系統磁碟機。
-• 不支援符號連結
-• 檔名不能包含 " * / : &lt; &gt; ? \ |
-• 檔名不區分大小寫
-• 不支援安裝 APK</value>
-  </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>遵循 FUSE 命名規則</value>
-  </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>一個所選檔違背了 FUSE 命名規則</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>複製的檔案違背了 FUSE 命名規則</value>
-  </data>
 </root>

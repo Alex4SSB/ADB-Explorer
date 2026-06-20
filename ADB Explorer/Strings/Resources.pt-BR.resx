@@ -444,11 +444,4 @@ O conteúdo visível pode estar incompleto.</value>
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>Instalar</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSE drive.
-• Links simbólicos não são suportados
-• Nome dos arquivos não podem conter " * / : &lt; &gt; ? \ |
-• Nome dos arquivos não diferenciam maiúsculas de minúsculas
-• Instalações de APKs não são suportadas</value>
-  </data>
 </root>

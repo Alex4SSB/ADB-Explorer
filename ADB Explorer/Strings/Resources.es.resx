@@ -1591,20 +1591,4 @@ Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>Pareja</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>Unidad FUSE.
-• No se admiten enlaces simbólicos
-• Los nombres de archivo no pueden contener " * / : &lt; &gt; ? \ |
-• Los nombres de archivo no distinguen entre mayúsculas y minúsculas
-• No se admite la instalación de APK</value>
-  </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>Adhiere a reglas de nombrado FUSE</value>
-  </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>Un archivo seleccionado viola las reglas de nombrado FUSE</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>Un archivo copiado viola las reglas de nombrado de FUSE</value>
-  </data>
 </root>

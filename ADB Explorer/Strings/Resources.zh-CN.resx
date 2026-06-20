@@ -1591,22 +1591,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>配对</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSE 驱动器。
-• 不支持符号链接
-• 文件名不能包含 " * / : &lt;&gt; ? \ |
-• 文件名不区分大小写
-• 不支持安装 APK</value>
-  </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>遵循 FUSE 命名规则</value>
-  </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>所选文件违反了 FUSE 命名规则</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>复制的文件违反了 FUSE 命名规则</value>
-  </data>
   <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
     <value>自定义</value>
   </data>

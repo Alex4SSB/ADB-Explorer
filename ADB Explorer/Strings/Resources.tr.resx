@@ -447,11 +447,4 @@ Görünen içerik eksik olabilir.</value>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
     <value>Dosya Adı Uzantılarını Göster</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSE sürücüsü.
-• Sembolik bağlantılar desteklenmez
-• Dosya adları " * / : &lt; &gt; ? \ | içeremez
-• Dosya adları büyük/küçük harfe duyarlı değildir
-• APK'ların yüklenmesi desteklenmez</value>
-  </data>
 </root>

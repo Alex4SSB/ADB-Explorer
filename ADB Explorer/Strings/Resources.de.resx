@@ -1548,20 +1548,4 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_ADB_NOT_FOUND" xml:space="preserve">
     <value>ADB konnte im System-PATH nicht gefunden werden. Bitte „{0}” verwenden, um es zu finden.</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSE-Laufwerk.
-• Symbolische Links werden nicht unterstützt
-• Dateinamen dürfen keine der folgenden Zeichen enthalten: " * / : &lt; &gt; ? \ |
-• Bei Dateinamen wird nicht zwischen Groß- und Kleinschreibung unterschieden
-• Die Installation von APKs wird nicht unterstützt</value>
-  </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>Hält sich an die FUSE-Namenskonventionen</value>
-  </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>Eine ausgewählte Datei verstößt gegen die FUSE-Namenskonventionen</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>Eine kopierte Datei verstößt gegen die FUSE-Namenskonventionen</value>
-  </data>
 </root>

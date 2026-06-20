@@ -1539,20 +1539,4 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
   <data name="S_ADB_COMPROMISED" xml:space="preserve">
     <value>Eksekutabel yang diberikan tidak dapat diverifikasi sebagai ADB. Pastikan Anda hanya mengunduh Android Platform Tools resmi dari Google.</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>Drive FUSE.
--  Tautan simbolik tidak didukung
--  Nama berkas tidak boleh berisi " * / : &lt; &gt; ? \ |
--  Nama berkas tidak peka huruf besar/kecil
--  Instalasi APK tidak didukung</value>
-  </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>Mematuhi aturan penamaan FUSE</value>
-  </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>Berkas yang dipilih melanggar aturan penamaan FUSE</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>Berkas yang disalin melanggar aturan penamaan FUSE</value>
-  </data>
 </root>

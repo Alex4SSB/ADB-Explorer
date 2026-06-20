@@ -1392,20 +1392,4 @@ Weblate에서 앱을 해당 언어로 현지화하는 데 도움을 주세요.</
   <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
     <value>가능한 경우 BusyBox 사용</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSE 드라이브.
-• 심볼릭 링크는 지원되지 않습니다.
-• 파일 이름에 " * / : &lt; &gt; ? \ | "를 포함할 수 없습니다.
-• 파일 이름은 대소문자를 구분하지 않습니다.
-• APK 설치는 지원되지 않습니다</value>
-  </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>FUSE 명명 규칙 준수</value>
-  </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>선택한 파일이 FUSE 명명 규칙을 위반합니다</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>복사된 파일이 FUSE 명명 규칙을 위반합니다</value>
-  </data>
 </root>

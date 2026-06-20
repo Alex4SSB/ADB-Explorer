@@ -1594,22 +1594,6 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
     <value>Завершить процесс ADB при закрытии приложения</value>
   </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>FUSE устройство.
-• Ссылки с символами не поддерживаются
-• Имя файла не может содержать следующие символы " * / : &lt; &gt; ? \ |
-• Имена файлов нечувствительны к регистру
-• Установка APK не поддерживается</value>
-  </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>Соблюдайте правила именования FUSE</value>
-  </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>Выбранный файл нарушает правила именования FUSE</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>Скопированный файл нарушает правила именования FUSE</value>
-  </data>
   <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
     <value>Пользователя</value>
   </data>
