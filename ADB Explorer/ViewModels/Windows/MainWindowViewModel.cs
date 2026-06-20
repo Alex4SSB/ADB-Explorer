@@ -230,7 +230,9 @@ public partial class MainWindowViewModel : ObservableObject
             });
         }
 
-        if (Data.RuntimeSettings.IsAppPackaged && !AppDataHelper.IsAppDataLocationChoiceMade())
+        if (Data.RuntimeSettings.IsAppPackaged 
+            && !Data.RuntimeSettings.SkipAppDataNotification
+            && !AppDataHelper.IsAppDataLocationChoiceMade())
         {
             App.SafeInvoke(() =>
             {

@@ -16,18 +16,22 @@ public static class AppDataHelper
     /// </summary>
     public static string ResolveAppDataPath()
     {
-        if (!Data.RuntimeSettings.IsAppPackaged)
+        string localAppData = Path.Combine(Windows.Storage.UserDataPaths.GetDefault().LocalAppData, AdbExplorerConst.APP_DATA_FOLDER);
+        string virtualizedAppData = GetVirtualizedAppDataPath();
+
+        if (!Data.RuntimeSettings.IsAppPackaged 
+            || (!File.Exists(Path.Combine(virtualizedAppData, AdbExplorerConst.APP_SETTINGS_FILE)) 
+                && File.Exists(Path.Combine(localAppData, AdbExplorerConst.APP_SETTINGS_FILE))))
         {
-            return Path.Combine(
-                global::Windows.Storage.UserDataPaths.GetDefault().LocalAppData,
-                AdbExplorerConst.APP_DATA_FOLDER);
+            Data.RuntimeSettings.SkipAppDataNotification = true;
+            return localAppData;
         }
 
         var customPath = GetCustomAppDataPath();
         if (customPath is not null)
             return customPath;
 
-        return GetVirtualizedAppDataPath();
+        return virtualizedAppData;
     }
 
     private static string? GetCustomAppDataPath()
