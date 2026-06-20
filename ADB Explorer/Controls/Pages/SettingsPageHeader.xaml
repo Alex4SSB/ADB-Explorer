@@ -18,6 +18,7 @@
     d:DesignWidth="600"
     mc:Ignorable="d">
     <UserControl.Resources>
+        <converters:ControlAppearanceToCardBrushConverter x:Key="ControlAppearanceToCardBrushConverter" />
         <Style x:Key="CollapsedTextBlock" TargetType="TextBlock">
             <Style.Triggers>
                 <Trigger Property="Text" Value="">
@@ -92,6 +93,22 @@
             TargetType="ui:CardControl">
             <Setter Property="MinHeight" Value="70" />
             <Setter Property="Header" Value="{StaticResource SettingsCardHeader}" />
+            <Setter Property="Background">
+                <Setter.Value>
+                    <Binding Converter="{StaticResource ControlAppearanceToCardBrushConverter}" Path="CardAppearance" />
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BorderBrush">
+                <Setter.Value>
+                    <Binding Converter="{StaticResource ControlAppearanceToCardBrushConverter}" ConverterParameter="Border" Path="CardAppearance" />
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding CardAppearance}" Value="{x:Null}">
+                    <Setter Property="Background" Value="{DynamicResource CardBackground}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
         <Style
             x:Key="SettingsCardActionStyle"

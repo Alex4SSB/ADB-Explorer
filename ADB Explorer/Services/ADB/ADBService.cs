@@ -548,16 +548,28 @@ public partial class ADBService
         return CountFiles(deviceID, TEMP_PATH, includeNames: INSTALL_APK.Select(name => "*" + name));
     }
 
-    static IEnumerable<string> _repoHashList = null;
+    static IEnumerable<string> _repoHashList;
     static IEnumerable<string> RepoHashList
     {
         get
         {
-            _repoHashList ??= Network.GetAdbVersionListAsync().Result;
+            if (_repoHashList is not null)
+                return _repoHashList;
+
+            try
+            {
+                _repoHashList = Network.GetAdbVersionListAsync().GetAwaiter().GetResult() ?? [];
+            }
+            catch
+            {
+                _repoHashList = [];
+            }
 
             return _repoHashList;
         }
     }
+
+    private static readonly TimeSpan AdbVersionCheckTimeout = TimeSpan.FromSeconds(15);
 
     public static void VerifyAdbVersion(string adbPath)
     {
@@ -625,8 +637,10 @@ public partial class ADBService
         string stdout = "";
         try
         {
-            exitCode = ExecuteCommand($"\"{adbPath}\"", "version", out stdout, out _, Encoding.UTF8, CancellationToken.None);
+            using var cts = new CancellationTokenSource(AdbVersionCheckTimeout);
+            exitCode = ExecuteCommand($"\"{adbPath}\"", "version", out stdout, out _, Encoding.UTF8, cts.Token);
         }
+        catch (OperationCanceledException) { }
         catch { }
 
         if (exitCode != 0)

@@ -5,6 +5,7 @@ using ADB_Explorer.ViewModels;
 using System.Linq.Expressions;
 using static ADB_Explorer.Models.Data;
 using static ADB_Explorer.Services.SettingsAction;
+using ControlAppearance = Wpf.Ui.Controls.ControlAppearance;
 
 namespace ADB_Explorer.Services;
 
@@ -158,7 +159,8 @@ public static class UISettings
                 new BoolSetting(() => Settings.PollDevices, Strings.Resources.S_SETTINGS_POLL_DEVICES, icon: "\uEBDE"),
                 new BoolSetting(() => Settings.PollBattery, Strings.Resources.S_SETTINGS_POLL_BATTERY, icon: "\uEE63"),
                 new BoolSetting(() => Settings.KillAdbOnExit, Strings.Resources.S_SETTINGS_KILL_ADB_ON_EXIT, icon: "\uF71D"),
-                new BoolSetting(() => Settings.EnableLog, Strings.Resources.S_BUTTON_LOG, icon: "\uE9A4"),
+                new BoolSetting(() => Settings.EnableLog, Strings.Resources.S_BUTTON_LOG, icon: "\uE9A4")
+                    { CardAppearance = ControlAppearance.Caution },
             ], "\uE8CC"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_DEVICE,
             [
@@ -237,7 +239,8 @@ public static class UISettings
                                       SettingsActions.Find(a => a.Name is ActionType.ClearAdbPath),
                                       SettingsActions.Find(a => a.Name is ActionType.ResetApp),
                                   ]),
-                                  new BoolSetting(() => Settings.DisableAdbRestrictions, Strings.Resources.S_SETTINGS_DISABLE_ADB_LIMITATIONS, icon: "\uE1DE"),
+                                  new BoolSetting(() => Settings.DisableAdbRestrictions, Strings.Resources.S_SETTINGS_DISABLE_ADB_LIMITATIONS, icon: "\uE1DE")
+                                    { CardAppearance = ControlAppearance.Danger },
                 new TextboxSetting(() => Settings.DefaultFolder,
                                   Strings.Resources.S_SETTINGS_DEFAULT_FOLDER,
                                   commands: [
@@ -304,6 +307,11 @@ public abstract class AbstractSetting : SettingsBase
     public string Description { get; private set; }
     public string Icon { get; set; }
     public TextAlignment HeaderAlignment { get; protected set; }
+
+    /// <summary>
+    /// Optional WPF UI appearance accent for the settings card background and border.
+    /// </summary>
+    public ControlAppearance? CardAppearance { get; init; }
 
     public Visibility Visibility
     {

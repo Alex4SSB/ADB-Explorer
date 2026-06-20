@@ -41,6 +41,7 @@ public class SettingsService
             Data.Settings = JsonSerializer.Deserialize<AppSettings>(json, _options) ?? new AppSettings();
         }
 
+        Data.Settings.LoadVaultSettings();
         ADBService.IsMdnsEnabled = Data.Settings.EnableMdns;
     }
 

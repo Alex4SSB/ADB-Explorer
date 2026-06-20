@@ -142,14 +142,45 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     [ObservableProperty]
     public partial string ManualAdbPath { get; set; } = "";
 
+    private bool _disableAdbRestrictionsLoaded;
+    private bool _disableAdbRestrictions;
+
+    /// <summary>
+    /// Loads vault-backed settings on the UI thread before background ADB validation runs.
+    /// </summary>
+    public void LoadVaultSettings()
+    {
+        _disableAdbRestrictions = CredentialVaultStore.Get(nameof(DisableAdbRestrictions)) == "True";
+        _disableAdbRestrictionsLoaded = true;
+    }
+
+    public void ClearVaultSettings()
+    {
+        _disableAdbRestrictions = false;
+        _disableAdbRestrictionsLoaded = true;
+    }
+
     [JsonIgnore]
     public bool DisableAdbRestrictions
     {
-        get => CredentialVaultStore.Get(nameof(DisableAdbRestrictions)) == "True";
+        get
+        {
+            return _disableAdbRestrictionsLoaded
+                ? _disableAdbRestrictions
+                : CredentialVaultStore.Get(nameof(DisableAdbRestrictions)) == "True";
+        }
+
         set
         {
+            if (_disableAdbRestrictionsLoaded && _disableAdbRestrictions == value)
+                return;
+
+            _disableAdbRestrictions = value;
+            _disableAdbRestrictionsLoaded = true;
             CredentialVaultStore.Set(nameof(DisableAdbRestrictions), value ? "True" : "False");
             OnPropertyChanged();
+
+            _ = AdbHelper.CheckAdbVersion();
         }
     }
 

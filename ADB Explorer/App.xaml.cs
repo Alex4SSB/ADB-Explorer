@@ -191,6 +191,7 @@ public partial class App
         {
             settingsService?.DeleteSettingsFile();
             CredentialVaultStore.ClearAll();
+            Data.Settings?.ClearVaultSettings();
         }
         else
             settingsService?.Save();
