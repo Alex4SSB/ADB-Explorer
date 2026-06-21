@@ -15,7 +15,10 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
 
     #region Operations
 
-    public ICollectionView Operations { get; }
+    private readonly CollectionViewSource _operationsSource = new();
+    private bool _isInitialized;
+
+    public ICollectionView Operations => _operationsSource.View;
 
     #endregion
 
@@ -136,6 +139,45 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
         if (App.IsShuttingDown)
             return;
 
+        _operationsSource.Source = Array.Empty<FileOperation>();
+
+        RemoveOpAction = new(() => false, () => { });
+        ValidateOpAction = new(() => false, () => { });
+        AddTestOpAction = new(() => false, () => { });
+
+        InitColumns();
+    }
+
+    public Task OnNavigatedToAsync()
+    {
+        if (!_isInitialized)
+            InitializeViewModel();
+
+        Data.CurrentPage.Value = typeof(Views.Pages.OperationsPage);
+
+        return Task.CompletedTask;
+    }
+
+    public Task OnNavigatedFromAsync() => Task.CompletedTask;
+
+    private void InitializeViewModel()
+    {
+        if (_isInitialized || Data.FileOpQ is null)
+            return;
+
+        _operationsSource.Source = Data.FileOpQ.Operations;
+        Operations.Filter = op => op is FileOperation fileOp && Data.Settings.FileOpFilters.Contains(fileOp.Filter);
+
+        if (Operations is ICollectionViewLiveShaping liveShaping)
+        {
+            liveShaping.LiveFilteringProperties.Add(nameof(FileOperation.Status));
+            liveShaping.LiveFilteringProperties.Add(nameof(FileOperation.IsValidated));
+            liveShaping.LiveFilteringProperties.Add(nameof(FileOperation.IsPastOp));
+            liveShaping.IsLiveFiltering = true;
+        }
+
+        FileOpFilters.CheckedFilterCount.PropertyChanged += (_, _) => Operations.Refresh();
+
         RemoveOpAction = new(() => Data.FileOpQ.Operations.Count > 0, () =>
         {
             if (SelectedFileOps.Any())
@@ -159,25 +201,12 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
             Data.FileOpQ.Operations.Add(op);
         });
 
-        Operations = new CollectionViewSource { Source = Data.FileOpQ.Operations }.View;
-        Operations.Filter = op => op is FileOperation fileOp && Data.Settings.FileOpFilters.Contains(fileOp.Filter);
-        
-        if (Operations is ICollectionViewLiveShaping liveShaping)
-        {
-            liveShaping.LiveFilteringProperties.Add(nameof(FileOperation.Status));
-            liveShaping.LiveFilteringProperties.Add(nameof(FileOperation.IsValidated));
-            liveShaping.LiveFilteringProperties.Add(nameof(FileOperation.IsPastOp));
-            liveShaping.IsLiveFiltering = true;
-        }
-
-        FileOpFilters.CheckedFilterCount.PropertyChanged += (_, _) => Operations.Refresh();
-
-        InitColumns();
-
         Data.FileOpQ.Operations.CollectionChanged += (_, _) =>
         {
             UpdateTooltips();
         };
+
+        _isInitialized = true;
     }
 
     public void UpdateTooltips()
@@ -190,13 +219,4 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
         RemoveTooltip = string.Format(Strings.Resources.S_REM_DEVICE_TITLE, opString);
         ValidateTooltip = string.Format(Strings.Resources.S_ACTION_VALIDATE, opString);
     }
-
-    public Task OnNavigatedToAsync()
-    {
-        Data.CurrentPage.Value = typeof(Views.Pages.OperationsPage);
-
-        return Task.CompletedTask;
-    }
-
-    public Task OnNavigatedFromAsync() => Task.CompletedTask;
 }

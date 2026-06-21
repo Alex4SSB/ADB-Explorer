@@ -92,11 +92,11 @@ public class SyncFile : FilePath
         if (!tree.Any())
             yield break;
 
-        var groups = tree.GroupBy(f => f.Name.Split(parent)[1].Trim('/').Split('/')[0]);
+        var groups = tree.GroupBy(f => FileHelper.DirectChildPath(parent, f.Name));
 
         foreach (var group in groups.Where(g => g.Key is not null))
         {
-            var fullPath = FileHelper.ConcatPaths(parent, group.Key);
+            var fullPath = group.Key;
 
             if (group.First().IsFolder)
             {

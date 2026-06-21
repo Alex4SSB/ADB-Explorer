@@ -35,7 +35,8 @@ public static partial class ThumbnailService
                                        double? FNumber = null,
                                        int? ISO = null,
                                        double? ExposureTime = null,
-                                       int? Bitrate = null)
+                                       int? Bitrate = null,
+                                       long? FileSize = null)
     {
         const string CsvDateFormat = "yyyy-MM-dd_HH:mm";
 
@@ -46,7 +47,7 @@ public static partial class ThumbnailService
         public readonly string ExposureTimeString => ExposureTime.HasValue ? $"1/{(int)(1 / ExposureTime.Value)} {Strings.Resources.S_SECONDS_SHORT.Trim("{0}")}" : "";
         public readonly string BitrateString => Bitrate.HasValue ? string.Format(Strings.Resources.S_SECONDS_SHORT,$"{string.Format(Strings.Resources.KILO, Bitrate.Value / 1024)}/") : "";
 
-        public readonly string ToCsv() => $"{Id}|{Type}|{Resolution?.Width}|{Resolution?.Height}|{Duration?.TotalMilliseconds}|{(LastUpdate == DateTime.MinValue ? null : LastUpdate.ToString(CsvDateFormat))}|{LocalFolder}|{FNumber}|{ISO}|{ExposureTime}|{Bitrate}";
+        public readonly string ToCsv() => $"{Id}|{Type}|{Resolution?.Width}|{Resolution?.Height}|{Duration?.TotalMilliseconds}|{(LastUpdate == DateTime.MinValue ? null : LastUpdate.ToString(CsvDateFormat))}|{LocalFolder}|{FNumber}|{ISO}|{ExposureTime}|{Bitrate}|{FileSize}";
 
         public static ThumbnailInfo? FromCsv(string csv)
         {
@@ -73,8 +74,9 @@ public static partial class ThumbnailService
             int? iso = parts.Length > 8 && int.TryParse(parts[8], out int i) ? i : null;
             double? exposureTime = parts.Length > 9 && double.TryParse(parts[9], out double e) ? e : null;
             int? bitrate = parts.Length > 10 && int.TryParse(parts[10], out int b) ? b : null;
+            long? fileSize = parts.Length > 11 && long.TryParse(parts[11], out long bytes) ? bytes : null;
 
-            return new(id, type, resolution, duration, lastUpdate, localFolder, fNumber, iso, exposureTime, bitrate);
+            return new(id, type, resolution, duration, lastUpdate, localFolder, fNumber, iso, exposureTime, bitrate, fileSize);
         }
 
         public readonly bool IsOverdue
@@ -270,7 +272,8 @@ public static partial class ThumbnailService
                 if (e.PropertyName == nameof(FileOperation.Status) && op.Status is FileOperation.OperationStatus.Completed)
                 {
                     Size? resolution = cachedInfo.Resolution ?? ReadImageResolution(Path.Combine(localDir, id));
-                    UpdateThumbnailInfo(deviceInfo.DeviceId, id, resolution);
+                    long? fileSize = File.Exists(Path.Combine(localDir, id)) ? new FileInfo(Path.Combine(localDir, id)).Length : null;
+                    UpdateThumbnailInfo(deviceInfo.DeviceId, id, resolution, fileSize);
                 }
             };
 
@@ -299,7 +302,8 @@ public static partial class ThumbnailService
                 if (e.PropertyName == nameof(FileOperation.Status) && op.Status is FileOperation.OperationStatus.Completed)
                 {
                     var resolution = ReadImageResolution(Path.Combine(targetDir, id));
-                    UpdateThumbnailInfo(deviceInfo.DeviceId, id, resolution);
+                    long? fileSize = File.Exists(Path.Combine(targetDir, id)) ? new FileInfo(Path.Combine(targetDir, id)).Length : null;
+                    UpdateThumbnailInfo(deviceInfo.DeviceId, id, resolution, fileSize);
                 }
             };
 
@@ -318,22 +322,30 @@ public static partial class ThumbnailService
         _mutex.WaitOne();
         _mutex.ReleaseMutex();
 
-        if (GetThumbnailName(device.SerialNumber, filePath) is not ThumbnailInfo info)
+        if (GetDeviceThumbsInfo(device.SerialNumber) is not DeviceThumbnailInfo deviceInfo)
             return null;
 
-        string? localThumbnailDir = string.IsNullOrEmpty(info.LocalFolder)
-            ? GetLocalThumbPath(device)
-            : Path.Combine(Data.AppDataPath, device.SerialNumber, info.LocalFolder);
+        UpdateDeviceCache(deviceInfo);
 
-        if (localThumbnailDir is null)
+        if (!deviceInfo.ThumbnailPathCache.TryGetValue(filePath, out var info))
             return null;
+
+        var localThumbnailDir = GetLocalThumbDirectory(deviceInfo, info);
+        if (string.IsNullOrEmpty(info.LocalFolder) && string.IsNullOrEmpty(localThumbnailDir))
+            localThumbnailDir = GetLocalThumbPath(device);
+
+        if (string.IsNullOrEmpty(localThumbnailDir))
+            return null;
+
+        var fullPath = Path.Combine(localThumbnailDir, info.Id);
+        if (NeedsThumbnailRefresh(info, fullPath))
+        {
+            TryPullStaleThumbnail(device, deviceInfo, info);
+            return new(null, info);
+        }
 
         try
         {
-            var fullPath = Path.Combine(localThumbnailDir, info.Id);
-            if (!File.Exists(fullPath))
-                return new(null, info);
-
             var decodePixelWidth = Data.RuntimeSettings.MainWindowScalingFactor > 0
                 ? (int)Math.Ceiling((int)size / Data.RuntimeSettings.MainWindowScalingFactor)
                 : (int)size * 2;
@@ -505,7 +517,7 @@ public static partial class ThumbnailService
         return combined.ToDictionary();
     }
 
-    private static void UpdateThumbnailInfo(string serialNumber, string id, Size? resolution = null)
+    private static void UpdateThumbnailInfo(string serialNumber, string id, Size? resolution = null, long? fileSize = null)
     {
         if (GetDeviceThumbsInfo(serialNumber) is not DeviceThumbnailInfo deviceInfo)
             return;
@@ -515,10 +527,18 @@ public static partial class ThumbnailService
         string? updatedFilePath = null;
         if (existingEntry.HasValue)
         {
+            if (fileSize is null)
+            {
+                var localPath = GetLocalThumbFilePath(deviceInfo, existingEntry.Value.Value);
+                if (localPath is not null && File.Exists(localPath))
+                    fileSize = new FileInfo(localPath).Length;
+            }
+
             var updatedEntry = existingEntry.Value.Value with
             {
                 LastUpdate = DateTime.Now,
                 Resolution = resolution ?? existingEntry.Value.Value.Resolution,
+                FileSize = fileSize ?? existingEntry.Value.Value.FileSize,
             };
             deviceInfo.ThumbnailPathCache[existingEntry.Value.Key] = updatedEntry;
             updatedFilePath = existingEntry.Value.Key;
@@ -528,6 +548,61 @@ public static partial class ThumbnailService
 
         if (updatedFilePath is not null)
             ThumbnailUpdated?.Invoke(serialNumber, updatedFilePath);
+    }
+
+    private static string? GetLocalThumbDirectory(DeviceThumbnailInfo deviceInfo, ThumbnailInfo info)
+        => string.IsNullOrEmpty(info.LocalFolder)
+            ? deviceInfo.LocalThumbnailDir
+            : Path.Combine(Data.AppDataPath, deviceInfo.DeviceId, info.LocalFolder);
+
+    private static string? GetLocalThumbFilePath(DeviceThumbnailInfo deviceInfo, ThumbnailInfo info)
+    {
+        var dir = GetLocalThumbDirectory(deviceInfo, info);
+        return dir is null ? null : Path.Combine(dir, info.Id);
+    }
+
+    private static string? GetDeviceThumbDirectory(DeviceThumbnailInfo deviceInfo, ThumbnailInfo info)
+        => info.Type is MediaType.video ? deviceInfo.DeviceMoviesThumbnailDir : deviceInfo.DevicePicturesThumbnailDir;
+
+    private static bool NeedsThumbnailRefresh(ThumbnailInfo info, string localPath)
+    {
+        if (!File.Exists(localPath))
+            return true;
+
+        var localSize = new FileInfo(localPath).Length;
+        if (info.FileSize is long expected && expected > 0)
+            return localSize < expected;
+
+        return localSize == 0;
+    }
+
+    private static void TryPullStaleThumbnail(LogicalDeviceViewModel device, DeviceThumbnailInfo deviceInfo, ThumbnailInfo info)
+    {
+        var androidDir = GetDeviceThumbDirectory(deviceInfo, info);
+        var localDir = GetLocalThumbDirectory(deviceInfo, info);
+        if (string.IsNullOrEmpty(androidDir) || string.IsNullOrEmpty(localDir))
+            return;
+
+        Directory.CreateDirectory(localDir);
+
+        var androidPath = FileHelper.ConcatPaths(androidDir, info.Id);
+        var localPath = Path.Combine(localDir, info.Id);
+        var source = new SyncFile(androidPath, AbstractFile.FileType.File);
+        var target = SyncFile.MergeToWindowsPath(source, localDir);
+        target.UpdatePath(localPath);
+        var id = info.Id;
+
+        var op = FileSyncOperation.PullFile(source, target, device, App.AppDispatcher);
+        op.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(FileOperation.Status) && op.Status is FileOperation.OperationStatus.Completed)
+            {
+                long? size = File.Exists(localPath) ? new FileInfo(localPath).Length : null;
+                UpdateThumbnailInfo(device.SerialNumber, id, fileSize: size);
+            }
+        };
+
+        op.Start();
     }
 
     private static Size? ReadImageResolution(string filePath)

@@ -55,7 +55,7 @@ public static class FileHelper
 
     public static bool IsHiddenRecycleItem(FileClass file)
     {
-        if (AdbExplorerConst.POSSIBLE_RECYCLE_PATHS.Contains(file.FullPath) || file.Extension == AdbExplorerConst.RECYCLE_INDEX_SUFFIX)
+        if (POSSIBLE_RECYCLE_PATHS.Contains(file.FullPath) || file.Extension == RECYCLE_INDEX_SUFFIX)
             return true;
         
         if (!string.IsNullOrEmpty(Data.FileActions.ExplorerFilter) && !file.ToString().Contains(Data.FileActions.ExplorerFilter, StringComparison.OrdinalIgnoreCase))
@@ -262,22 +262,22 @@ public static class FileHelper
     }
 
     private static readonly Func<string, bool> FileNamePredicateWindows = (name) => 
-        !AdbExplorerConst.INVALID_WINDOWS_FILENAMES.Contains(name)
-        && !name.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Any(chr => chr == c))
+        !INVALID_WINDOWS_FILENAMES.Contains(name)
+        && !name.Any(c => INVALID_NTFS_CHARS.Any(chr => chr == c))
         && name.Length > 0
         && name[^1] is not ' ' and not '.'
         && name[0] is not ' ';
 
     private static readonly Func<string, bool> FileNamePredicateWinRoot = (name) =>
-        !AdbExplorerConst.INVALID_WINDOWS_ROOT_PATHS.Contains(name)
-        && !AdbExplorerConst.INVALID_WINDOWS_FILENAMES.Contains(name)
-        && !name.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Any(chr => chr == c))
+        !INVALID_WINDOWS_ROOT_PATHS.Contains(name)
+        && !INVALID_WINDOWS_FILENAMES.Contains(name)
+        && !name.Any(c => INVALID_NTFS_CHARS.Any(chr => chr == c))
         && name.Length > 0
         && name[^1] is not ' ' and not '.'
         && name[0] is not ' ';
 
     private static readonly Func<string, bool> FileNamePredicateRestrictedNaming = (name) =>
-        !name.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Contains(c))
+        !name.Any(c => INVALID_NTFS_CHARS.Contains(c))
         && name.Length > 0
         && name is not "." and not "..";
 
@@ -305,7 +305,7 @@ public static class FileHelper
         return names.AnyAll(predicate);
     }
 
-    public static string[] ApkExtensions => [.. AdbExplorerConst.APK_NAMES.Select(n => n[1..])];
+    public static string[] ApkExtensions => [.. APK_NAMES.Select(n => n[1..])];
 
     public static bool AllFilesAreApks(string[] items) =>
         items.AnyAll(i => i.Contains('.') && ApkExtensions.Any(n => n == i.Split('.').Last().ToUpper()));
@@ -458,10 +458,10 @@ public static class FileHelper
 
     public static bool IsPhotoDir()
     {
-        float photos = Data.DirList.FileList.Count(f => 
-            AdbExplorerConst.COMMON_PHOTO_EXT.Contains(f.Extension, StringComparer.InvariantCultureIgnoreCase));
+        float photos = Data.DirList.FileList.Count(f =>
+            COMMON_PHOTO_EXT.Contains(f.Extension, StringComparer.InvariantCultureIgnoreCase));
 
-        return photos / Data.DirList.FileList.Count > AdbExplorerConst.PHOTO_DIR_THRESHOLD;
+        return photos / Data.DirList.FileList.Count > PHOTO_DIR_THRESHOLD;
     }
 
     /// <summary>

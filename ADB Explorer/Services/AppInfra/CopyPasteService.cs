@@ -785,12 +785,15 @@ public partial class CopyPasteService : ObservableObject
         if (children is null || children.Length == 0)
             return folder.GetSyncFile();
 
-        var existingPaths = Directory.EnumerateFiles(targetPath, "*", SearchOption.AllDirectories);
-
         var parent = folder.ParentPath;
 
-        var remote = existingPaths.Select(f => FileHelper.ConcatPaths(parent, FileHelper.ExtractRelativePath(f, targetPath)));
-        var tree = children.Where(c => !remote.Contains(c.Name, comparer) || filesToReplace.Contains(c.Name, comparer));
+        var remote = Directory.EnumerateFiles(targetPath, "*", SearchOption.AllDirectories)
+            .Select(f => FileHelper.ConcatPaths(parent, FileHelper.ExtractRelativePath(f, targetPath)))
+            .ToHashSet(comparer);
+
+        var filesToReplaceSet = filesToReplace.ToHashSet(comparer);
+
+        var tree = children.Where(c => !remote.Contains(c.Name) || filesToReplaceSet.Contains(c.Name)).ToList();
 
         return new(folder, tree);
     }
