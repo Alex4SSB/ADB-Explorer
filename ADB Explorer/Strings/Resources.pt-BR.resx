@@ -689,7 +689,7 @@ Cancela Tudo Rodando</value>
     <comment>The tooltip of a button to save the changes made in the text editor</comment>
   </data>
   <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>Copiar para Temp</value>
+    <value>Copiar para o Diretório Temporário</value>
     <comment>The menu used to copy selected APK files to the temp drive</comment>
   </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
@@ -1104,11 +1104,11 @@ Cancela Tudo Rodando</value>
     <comment>The user space temp drive - /data/local/tmp</comment>
   </data>
   <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>File name illegal on target file system: {0}</value>
+    <value>Nome de arquivo inválido no sistema de arquivos de destino: {0}</value>
     <comment>0 = file name</comment>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
-    <value>Content mismatch</value>
+    <value>Incompatibilidade de conteúdo</value>
     <comment>The error displayed when validation of a file operation resulted in different MD5 checksums of the source and target</comment>
   </data>
   <data name="S_VALIDATE_MISSING" xml:space="preserve">
