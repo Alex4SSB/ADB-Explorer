@@ -587,7 +587,7 @@ public partial class ADBService
         }
 
         // Forbid UNC paths for security reasons
-        if (!Settings.DisableAdbRestrictions && adbPath.StartsWith(@"\\"))
+        if (!Settings.DisableAdbRestrictionsActive && adbPath.StartsWith(@"\\"))
         {
             AdbHelper.CurrentAdbState.Status = AdbHelper.AdbStatus.PathInvalid;
             return;
@@ -598,7 +598,7 @@ public partial class ADBService
         if (file.Exists)
         {
             // Forbid symlinks for security reasons
-            if (!Settings.DisableAdbRestrictions && file.Attributes.HasFlag(FileAttributes.ReparsePoint))
+            if (!Settings.DisableAdbRestrictionsActive && file.Attributes.HasFlag(FileAttributes.ReparsePoint))
             {
                 AdbHelper.CurrentAdbState.Status = AdbHelper.AdbStatus.PathInvalid;
                 return;
@@ -615,7 +615,7 @@ public partial class ADBService
             }
         }
 
-        if (!Settings.DisableAdbRestrictions)
+        if (!Settings.DisableAdbRestrictionsActive)
         {
             bool isHashValid = false;
             var adbSHA = Security.CalculateWindowsFileHash(adbPath, true);

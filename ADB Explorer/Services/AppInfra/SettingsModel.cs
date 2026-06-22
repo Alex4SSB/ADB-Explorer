@@ -239,8 +239,10 @@ public static class UISettings
                                       SettingsActions.Find(a => a.Name is ActionType.ClearAdbPath),
                                       SettingsActions.Find(a => a.Name is ActionType.ResetApp),
                                   ]),
-                                  new BoolSetting(() => Settings.DisableAdbRestrictions, Strings.Resources.S_SETTINGS_DISABLE_ADB_LIMITATIONS, icon: "\uE1DE")
-                                    { CardAppearance = ControlAppearance.Danger },
+                                  new BoolSetting(() => Settings.DisableAdbRestrictions, Strings.Resources.S_SETTINGS_DISABLE_ADB_LIMITATIONS, icon: "\uE1DE", commands: [
+                                      SettingsActions.Find(a => a.Name is ActionType.ResetApp),
+                                  ])
+                                  { CardAppearance = ControlAppearance.Danger },
                 new TextboxSetting(() => Settings.DefaultFolder,
                                   Strings.Resources.S_SETTINGS_DEFAULT_FOLDER,
                                   commands: [

@@ -48,7 +48,8 @@ public class SettingsService
     public void Save()
     {
         Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
-        
+
+        Data.Settings.PersistVaultSettings();
         File.WriteAllText(_path, JsonSerializer.Serialize(Data.Settings, _options));
     }
 

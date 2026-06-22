@@ -144,6 +144,13 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
 
     private bool _disableAdbRestrictionsLoaded;
     private bool _disableAdbRestrictions;
+    private bool _disableAdbRestrictionsActive;
+
+    /// <summary>
+    /// Whether ADB security restrictions are disabled for this session. Set only at launch from the vault.
+    /// </summary>
+    [JsonIgnore]
+    public bool DisableAdbRestrictionsActive => _disableAdbRestrictionsActive;
 
     /// <summary>
     /// Loads vault-backed settings on the UI thread before background ADB validation runs.
@@ -151,13 +158,26 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     public void LoadVaultSettings()
     {
         _disableAdbRestrictions = CredentialVaultStore.Get(nameof(DisableAdbRestrictions)) == "True";
+        _disableAdbRestrictionsActive = _disableAdbRestrictions;
         _disableAdbRestrictionsLoaded = true;
     }
 
     public void ClearVaultSettings()
     {
         _disableAdbRestrictions = false;
+        _disableAdbRestrictionsActive = false;
         _disableAdbRestrictionsLoaded = true;
+    }
+
+    /// <summary>
+    /// Persists vault-backed settings. Called on normal app exit so toggles do not touch the vault on the UI thread.
+    /// </summary>
+    public void PersistVaultSettings()
+    {
+        if (!_disableAdbRestrictionsLoaded)
+            return;
+
+        CredentialVaultStore.Set(nameof(DisableAdbRestrictions), _disableAdbRestrictions ? "True" : "False");
     }
 
     [JsonIgnore]
@@ -177,10 +197,7 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
 
             _disableAdbRestrictions = value;
             _disableAdbRestrictionsLoaded = true;
-            CredentialVaultStore.Set(nameof(DisableAdbRestrictions), value ? "True" : "False");
             OnPropertyChanged();
-
-            _ = AdbHelper.CheckAdbVersion();
         }
     }
 
