@@ -26,9 +26,9 @@
                     <Grid Style="{StaticResource DeviceStatusGridStyle}">
                         <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
                         <ui:FontIcon
-                            Margin="0,0,1,0"
                             Foreground="{DynamicResource FlyoutBackground}"
-                            Glyph="{Binding StatusIcon}" />
+                            Glyph="{Binding StatusIcon}"
+                            Style="{StaticResource DeviceStatusFontSizeStyle}" />
                     </Grid>
                 </Grid>
                 <TextBlock

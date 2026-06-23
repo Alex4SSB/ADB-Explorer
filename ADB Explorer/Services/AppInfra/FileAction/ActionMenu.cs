@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
+using Wpf.Ui.Controls;
 
 namespace ADB_Explorer.Services;
 
@@ -288,6 +289,8 @@ public class CompoundIconMenu : ActionMenu
 public class TextMenu : ActionMenu
 {
     public bool IsLast { get; set; } = false;
+
+    public ControlAppearance Appearance { get; set; } = ControlAppearance.Secondary;
 
     public FlowDirection FlowDirection => TextHelper.ContainsRtl(Action.Description)
         ? FlowDirection.RightToLeft

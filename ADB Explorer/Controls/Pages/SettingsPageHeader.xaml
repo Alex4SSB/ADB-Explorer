@@ -100,7 +100,10 @@
             </Setter>
             <Setter Property="BorderBrush">
                 <Setter.Value>
-                    <Binding Converter="{StaticResource ControlAppearanceToCardBrushConverter}" ConverterParameter="Border" Path="CardAppearance" />
+                    <Binding
+                        Converter="{StaticResource ControlAppearanceToCardBrushConverter}"
+                        ConverterParameter="Border"
+                        Path="CardAppearance" />
                 </Setter.Value>
             </Setter>
             <Style.Triggers>

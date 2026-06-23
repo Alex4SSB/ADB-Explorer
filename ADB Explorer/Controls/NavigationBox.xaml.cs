@@ -318,6 +318,10 @@ public partial class NavigationBox : UserControl
 
         locations = SeparatePath(path);
         breadcrumbs = [.. locations.Select(item => item.NameSubMenu)];
+
+        if (Data.DevicesObject.Current.Root is RootStatus.Enabled)
+            breadcrumbs[0].Appearance = Wpf.Ui.Controls.ControlAppearance.Caution;
+
         breadcrumbs[^1].IsLast = true;
 
         var template = (DataTemplate)Resources["BreadcrumbTemplate"];

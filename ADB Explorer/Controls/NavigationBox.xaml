@@ -32,17 +32,15 @@
                     Height="24"
                     Margin="2,0"
                     Padding="8,0"
+                    Appearance="{Binding Appearance}"
                     Click="BreadcrumbButton_Click"
                     Command="{Binding Action.Command.Command}"
                     FlowDirection="LeftToRight">
                     <ui:Button.Content>
                         <Grid>
-                            <emoji:TextBlock
-                                FlowDirection="{Binding FlowDirection}"
-                                Text="{Binding Action.Description}"
-                                TextOptions.TextFormattingMode="Display">
-                                <emoji:TextBlock.Style>
-                                    <Style TargetType="TextBlock">
+                            <Grid>
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Children}" Value="{x:Null}">
@@ -50,8 +48,41 @@
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
-                                </emoji:TextBlock.Style>
-                            </emoji:TextBlock>
+                                </Grid.Style>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <ui:FontIcon
+                                    Margin="0,0,6,0"
+                                    Foreground="{DynamicResource AccentButtonForeground}"
+                                    Glyph="&#xE7EF;">
+                                    <ui:FontIcon.Style>
+                                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Appearance}" Value="Secondary">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:FontIcon.Style>
+                                </ui:FontIcon>
+                                <emoji:TextBlock
+                                    Grid.Column="1"
+                                    FlowDirection="{Binding FlowDirection}"
+                                    Text="{Binding Action.Description}"
+                                    TextOptions.TextFormattingMode="Display">
+                                    <emoji:TextBlock.Style>
+                                        <Style TargetType="emoji:TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Appearance}" Value="Caution">
+                                                    <Setter Property="Foreground" Value="{DynamicResource AccentButtonForeground}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </emoji:TextBlock.Style>
+                                </emoji:TextBlock>
+                            </Grid>
                             <ui:FontIcon FontSize="18" Glyph="{Binding Action.Description}">
                                 <ui:FontIcon.Style>
                                     <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
@@ -73,10 +104,17 @@
                                 </Setter.Value>
                             </Setter>
                             <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="False">
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="False" />
+                                        <Condition Binding="{Binding Appearance}" Value="Secondary" />
+                                    </MultiDataTrigger.Conditions>
                                     <Setter Property="BorderBrush" Value="Transparent" />
                                     <Setter Property="Background" Value="Transparent" />
-                                </Trigger>
+                                </MultiDataTrigger>
+                                <DataTrigger Binding="{Binding Appearance}" Value="Caution">
+                                    <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_ROOT_ENABLED}}" />
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </ui:Button.Style>
