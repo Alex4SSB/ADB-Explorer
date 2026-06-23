@@ -491,7 +491,7 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Тема</value>
   </data>
   <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
-    <value>Свій акцент кольору</value>
+    <value>Свій колір акценту</value>
   </data>
   <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
     <value>Акцент кольору</value>
