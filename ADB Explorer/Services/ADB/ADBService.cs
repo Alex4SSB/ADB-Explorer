@@ -941,7 +941,8 @@ public partial class ADBService
                                                               Strings.Resources.S_LS_ERROR_TITLE,
                                                               DialogService.DialogIcon.Critical,
                                                               true,
-                                                              copyToClipboard: true));
+                                                              copyToClipboard: true,
+                                                              error: DialogError.ListDirectoryFailed));
         }
     }
 

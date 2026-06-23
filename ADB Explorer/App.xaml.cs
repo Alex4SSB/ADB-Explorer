@@ -307,11 +307,15 @@ public partial class App
                         contentDialog,
                         CrashDialog.Title,
                         primaryText: CrashReportService.IsConfigured ? CrashDialog.Send : "",
-                        closeText: CrashDialog.Dismiss);
+                        closeText: CrashDialog.Dismiss,
+                        error: DialogError.UnhandledException);
                 }
                 catch
                 {
-                    MessageBox.Show(message, CrashDialog.Title, MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(message,
+                                    DialogService.FormatTitleString(CrashDialog.Title, DialogError.UnhandledException),
+                                    MessageBoxButton.OK,
+                                    MessageBoxImage.Error);
                     return;
                 }
 
@@ -360,7 +364,10 @@ public partial class App
         content.SetDialogIcon(sendResult.Success
             ? DialogService.DialogIcon.Informational
             : DialogService.DialogIcon.Exclamation);
-        dialog.Title = CrashDialog.Title;
+
+        dialog.Title = DialogService.CreateTitle(CrashDialog.Title,
+            sendResult.Success ? DialogError.UnhandledException : DialogError.CrashReportSendFailed);
+
         dialog.IsFooterVisible = true;
         dialog.CloseButtonText = CrashDialog.Dismiss;
 

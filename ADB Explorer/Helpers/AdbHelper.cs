@@ -103,7 +103,11 @@ public static class AdbHelper
         catch (Exception e)
         {
             App.SafeInvoke(() =>
-                DialogService.ShowMessage(e.Message, Strings.Resources.S_WRITE_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true));
+                DialogService.ShowMessage(e.Message,
+                                          Strings.Resources.S_WRITE_FILE_ERROR_TITLE,
+                                          DialogService.DialogIcon.Exclamation,
+                                          copyToClipboard: true,
+                                          error: DialogError.WriteFileFailed));
 
             return false;
         }
@@ -125,7 +129,11 @@ public static class AdbHelper
             if (e is OperationCanceledException) return null;
 
             App.SafeInvoke(() =>
-                DialogService.ShowMessage(e.Message, Strings.Resources.S_READ_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true));
+                DialogService.ShowMessage(e.Message,
+                                          Strings.Resources.S_READ_FILE_ERROR_TITLE,
+                                          DialogService.DialogIcon.Exclamation,
+                                          copyToClipboard: true,
+                                          error: DialogError.ReadFileFailed));
 
             return "";
         }

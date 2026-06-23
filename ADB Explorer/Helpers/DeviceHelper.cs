@@ -139,7 +139,8 @@ public static class DeviceHelper
         DialogService.ShowMessage(string.Join('\n', stdout, stderr),
                                   Strings.Resources.S_REBOOT_SIDELOAD,
                                   res == 0 ? DialogService.DialogIcon.Informational
-                                           : DialogService.DialogIcon.Critical);
+                                           : DialogService.DialogIcon.Critical,
+                                  error: res == 0 ? null : DialogError.SideloadFailed);
     }
 
     private static async void RemoveDeviceAction(DeviceViewModel device)
@@ -172,7 +173,11 @@ public static class DeviceHelper
             }
             catch (Exception ex)
             {
-                DialogService.ShowMessage(ex.Message, Strings.Resources.S_DISCONN_FAILED_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
+                DialogService.ShowMessage(ex.Message,
+                                          Strings.Resources.S_DISCONN_FAILED_TITLE,
+                                          DialogService.DialogIcon.Critical,
+                                          copyToClipboard: true,
+                                          error: DialogError.DisconnectFailed);
                 return;
             }
         }
@@ -184,7 +189,11 @@ public static class DeviceHelper
             }
             catch (Exception ex)
             {
-                DialogService.ShowMessage(ex.Message, Strings.Resources.S_DISCONN_FAILED_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
+                DialogService.ShowMessage(ex.Message,
+                                          Strings.Resources.S_DISCONN_FAILED_TITLE,
+                                          DialogService.DialogIcon.Critical,
+                                          copyToClipboard: true,
+                                          error: DialogError.DisconnectFailed);
                 return;
             }
         }
@@ -225,7 +234,11 @@ public static class DeviceHelper
 
         if (device.Root is RootStatus.Forbidden)
         {
-            App.SafeInvoke(() => DialogService.ShowMessage(Strings.Resources.S_ROOT_FORBID, Strings.Resources.S_ROOT_FORBID_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
+            App.SafeInvoke(() => DialogService.ShowMessage(Strings.Resources.S_ROOT_FORBID,
+                                                           Strings.Resources.S_ROOT_FORBID_TITLE,
+                                                           DialogService.DialogIcon.Critical,
+                                                           copyToClipboard: true,
+                                                           error: DialogError.RootForbidden));
         }
     }
 
@@ -282,7 +295,8 @@ public static class DeviceHelper
                 DialogService.ShowMessage(ex.Message,
                                           Strings.Resources.S_EMULATOR_DIALOG_TITLE,
                                           DialogService.DialogIcon.Critical,
-                                          copyToClipboard: true);
+                                          copyToClipboard: true,
+                                          error: DialogError.EmulatorLaunchFailed);
             }
         });
 
@@ -514,7 +528,11 @@ public static class DeviceHelper
             }
             catch (Exception ex)
             {
-                App.SafeInvoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
+                App.SafeInvoke(() => DialogService.ShowMessage(ex.Message,
+                                                               Strings.Resources.S_PAIR_ERR_TITLE,
+                                                               DialogService.DialogIcon.Critical,
+                                                               copyToClipboard: true,
+                                                               error: DialogError.PairingFailed));
                 return false;
             }
         }).ContinueWith(t =>
@@ -557,7 +575,11 @@ public static class DeviceHelper
                     Data.DevicesObject.CurrentNewDevice.EnablePairing();
                 }
                 else
-                    App.SafeInvoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_FAILED_CONN_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
+                    App.SafeInvoke(() => DialogService.ShowMessage(ex.Message,
+                                                                   Strings.Resources.S_FAILED_CONN_TITLE,
+                                                                   DialogService.DialogIcon.Critical,
+                                                                   copyToClipboard: true,
+                                                                   error: DialogError.ConnectionFailed));
 
                 return false;
             }

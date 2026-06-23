@@ -196,7 +196,11 @@ internal static class FileActionLogic
         }
         catch (Exception e)
         {
-            DialogService.ShowMessage(e.Message, Strings.Resources.S_CREATE_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
+            DialogService.ShowMessage(e.Message,
+                                      Strings.Resources.S_CREATE_ERR_TITLE,
+                                      DialogService.DialogIcon.Critical,
+                                      copyToClipboard: true,
+                                      error: DialogError.CreateFileFailed);
             Data.DirList.FileList.Remove(file);
             return;
         }
@@ -1065,7 +1069,8 @@ internal static class FileActionLogic
             var result = await DialogService.ShowConfirmation(string.Format(Strings.Resources.S_WIN_ROOT_ILLEGAL, invalidFiles.Count()),
                                                  Strings.Resources.S_WIN_ROOT_ILLEGAL_TITLE,
                                                  primaryText: Strings.Resources.S_SKIP,
-                                                 icon: DialogService.DialogIcon.Exclamation);
+                                                 icon: DialogService.DialogIcon.Exclamation,
+                                                 error: DialogError.WinRootIllegalPath);
 
             if (result.Item1 is not Wpf.Ui.Controls.ContentDialogResult.Primary)
                 return;
@@ -1081,7 +1086,11 @@ internal static class FileActionLogic
             }
             catch (Exception e)
             {
-                DialogService.ShowMessage(e.Message, Strings.Resources.S_DEST_ERR, DialogService.DialogIcon.Critical, copyToClipboard: true);
+                DialogService.ShowMessage(e.Message,
+                                          Strings.Resources.S_DEST_ERR,
+                                          DialogService.DialogIcon.Critical,
+                                          copyToClipboard: true,
+                                          error: DialogError.DestinationPathFailed);
                 return;
             }
         }

@@ -121,7 +121,8 @@ public static class AppDataHelper
         {
             DialogService.ShowMessage(Strings.Resources.S_CUSTOM_LOCATION_INVALID, 
                 Strings.Resources.S_APP_DATA_LOCATION_TITLE,
-                DialogService.DialogIcon.Exclamation);
+                DialogService.DialogIcon.Exclamation,
+                error: DialogError.InvalidAppDataLocation);
 
             return null;
         }

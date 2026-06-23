@@ -58,7 +58,11 @@ public static class FolderHelper
         catch (Exception e)
         {
             if (path != AdbExplorerConst.RECYCLE_PATH)
-                DialogService.ShowMessage(e.Message, Strings.Resources.S_NAV_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
+                DialogService.ShowMessage(e.Message,
+                                          Strings.Resources.S_NAV_ERR_TITLE,
+                                          DialogService.DialogIcon.Critical,
+                                          copyToClipboard: true,
+                                          error: DialogError.NavigationFailed);
 
             return null;
         }

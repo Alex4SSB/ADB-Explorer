@@ -33,7 +33,10 @@ public static class SettingsHelper
                 string message = string.Format(Strings.Resources.S_ADB_PATH_INVALID, "");
                 message = message.Replace("  ", " ");
 
-                DialogService.ShowMessage(message);
+                DialogService.ShowMessage(message,
+                                          Strings.Resources.S_SETTINGS_DEFAULT_FOLDER,
+                                          DialogService.DialogIcon.Exclamation,
+                                          error: DialogError.InvalidDefaultFolder);
                 return;
             }
 

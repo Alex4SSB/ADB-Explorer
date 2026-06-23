@@ -17,31 +17,51 @@ public static class DialogService
         Delete,
     }
 
-    public static async void ShowMessage(string content, string title = "", DialogIcon icon = DialogIcon.None, bool censorContent = true, bool copyToClipboard = false)
+    public static object CreateTitle(string title, DialogError? error) =>
+        error is null ? title : new DialogTitle(title, error.Value);
+
+    public static string FormatTitleString(string title, DialogError? error) =>
+        error switch
+        {
+            null => title,
+            _ when string.IsNullOrEmpty(title) => ((int)error).ToString(),
+            _ => $"{title} ({(int)error})",
+        };
+
+    public static async void ShowMessage(string content,
+                                       string title = "",
+                                       DialogIcon icon = DialogIcon.None,
+                                       bool censorContent = true,
+                                       bool copyToClipboard = false,
+                                       DialogError? error = null)
     {
         var contentDialog = AdbContentDialog.StringDialog(content, icon, censorContent, copyToClipboard);
 
-        await ShowDialog(contentDialog, title);
+        await ShowDialog(contentDialog, title, error: error);
     }
 
-    public static async void ShowContent(UIElement content, string title = "", DialogIcon icon = DialogIcon.None)
+    public static async void ShowContent(UIElement content,
+                                         string title = "",
+                                         DialogIcon icon = DialogIcon.None,
+                                         DialogError? error = null)
     {
         var contentDialog = AdbContentDialog.CustomContentDialog(content, icon);
 
-        await ShowDialog(contentDialog, title);
+        await ShowDialog(contentDialog, title, error: error);
     }
 
     public static async Task<ContentDialogResult> ShowDialog(object content,
                                                  string title,
                                                  string primaryText = "",
                                                  string secondaryText = "",
-                                                 string? closeText = null)
+                                                 string? closeText = null,
+                                                 DialogError? error = null)
     {
         closeText ??= Strings.Resources.S_BUTTON_OK;
 
         var dialog = new ContentDialog
         {
-            Title = title,
+            Title = CreateTitle(title, error),
             Content = content,
             PrimaryButtonText = primaryText,
             SecondaryButtonText = secondaryText,
@@ -62,7 +82,8 @@ public static class DialogService
                                                                            string checkBoxText = "",
                                                                            DialogIcon icon = DialogIcon.None,
                                                                            bool censorContent = true,
-                                                                           bool copyToClipboard = false)
+                                                                           bool copyToClipboard = false,
+                                                                           DialogError? error = null)
     {
         var contentDialog = AdbContentDialog.StringDialog(content, icon, censorContent, copyToClipboard, checkBoxText);
 
@@ -74,7 +95,8 @@ public static class DialogService
                                       title,
                                       primaryText,
                                       secondaryText,
-                                      cancelText);
+                                      cancelText,
+                                      error);
 
         return (result, contentDialog.IsChecked);
     }
