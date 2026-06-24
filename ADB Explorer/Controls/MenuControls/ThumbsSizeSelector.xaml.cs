@@ -134,7 +134,7 @@ public partial class ThumbsSizeSelector : UserControl
         {
             Name = name;
             Icon = Icons[size];
-            Action = new(() => true, () => selector.SetThumbnailSize(size));
+            Action = new(() => Data.Settings.ThumbsMode > AppSettings.ThumbnailMode.Off, () => selector.SetThumbnailSize(size));
             selector.PropertyChanged += (_, e) =>
             {
                 if (e.PropertyName == nameof(ThumbnailSize))
