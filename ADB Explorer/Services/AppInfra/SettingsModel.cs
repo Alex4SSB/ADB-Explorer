@@ -149,6 +149,13 @@ public static class UISettings
         return settings;
     }
 
+    private static string[] sizes => [
+        Strings.Resources.BYTES.Trim('{', '}', '0', ' ', TextHelper.LTR_MARK, TextHelper.RTL_MARK), 
+        Strings.Resources.KILO.Trim('{', '}', '0', ' ', TextHelper.LTR_MARK, TextHelper.RTL_MARK), 
+        Strings.Resources.MEGA.Trim('{', '}', '0', ' ', TextHelper.LTR_MARK, TextHelper.RTL_MARK), 
+        Strings.Resources.GIGA.Trim('{', '}', '0', ' ', TextHelper.LTR_MARK, TextHelper.RTL_MARK)
+        ];
+
     public static void Init()
     {
         SettingsList =
@@ -197,8 +204,19 @@ public static class UISettings
                                    Strings.Resources.S_SETTINGS_PREVIEW_MAX_SIZE,
                                    0,
                                    100000,
-                                   Strings.Resources.KILO.Replace("{0}", "").Trim(),
+                                   sizes[1],
                                    icon: "\uE1A5"),
+                new SimpleComboSetting<AppSettings.FileSizeDisplay>(() => Settings.FileSizeMode, Strings.Resources.S_SETTINGS_FILE_SIZE_MODE,
+                [
+                    new(AppSettings.FileSizeDisplay.B, sizes[0]),
+                    new(AppSettings.FileSizeDisplay.K, sizes[1]),
+                    new(AppSettings.FileSizeDisplay.KM, $"{sizes[1]}/{sizes[2]}"),
+                    new(AppSettings.FileSizeDisplay.KMG, $"{sizes[1]}/{sizes[2]}/{sizes[3]}"),
+                    ]),
+                new NumericSetting(() => Settings.FileSizeDecimal, 
+                                   Strings.Resources.S_SETTINGS_FILE_SIZE_DECIMAL,
+                                   0,
+                                   9),
                 new BoolSetting(() => Settings.DoubleClickToPull, Strings.Resources.S_SETTINGS_PULL_ON_DOUBLE_CLICK, AbstractSetting.ExtractPropertyInfo(() => Settings.DefaultFolder), "\uE7C9"),
             ], "\uEC50"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_ICONS,
@@ -224,7 +242,7 @@ public static class UISettings
                                    Strings.Resources.S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT,
                                    0,
                                    1000,
-                                   Strings.Resources.KILO.Replace("{0}", "").Trim(),
+                                   sizes[1],
                                    AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode),
                                    "\uEE71"),
                 new BoolSetting(() => Settings.LimitThumbsPullSpeed, Strings.Resources.S_SETTINGS_THUMBS_THROTTLE, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uEC48"),

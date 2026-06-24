@@ -1,4 +1,6 @@
-﻿namespace ADB_Explorer.Converters
+﻿using ADB_Explorer.Models;
+
+namespace ADB_Explorer.Converters
 {
     public static class UnitConverter
     {
@@ -8,36 +10,55 @@
             { 1, Strings.Resources.KILO },
             { 2, Strings.Resources.MEGA },
             { 3, Strings.Resources.GIGA },
-            { 4, Strings.Resources.TERA },
-            { 5, Strings.Resources.PETA },
-            { 6, Strings.Resources.EXA }
         };
 
-        /// <summary>
-        /// Converts a byte value to a human-readable size string with appropriate units.
-        /// </summary>
-        /// <remarks>The method uses a logarithmic scale to determine the appropriate unit (e.g., KB, MB,
-        /// GB) based on the input size. The result is formatted with the specified rounding rules and optional spacing
-        /// between the value and the unit.</remarks>
-        /// <param name="bytes">The size in bytes to be converted. Must be a non-negative value.</param>
-        /// <param name="scaleSpace">A boolean value indicating whether to include a space between the numeric value and the unit. <see
-        /// langword="true"/> to include a space; otherwise, <see langword="false"/>.</param>
-        /// <param name="bigRound">The number of decimal places to round to when the numeric value is less than 100.</param>
-        /// <param name="smallRound">The number of decimal places to round to when the numeric value is 100 or greater.</param>
-        /// <returns>A string representing the size in a human-readable format, including the appropriate unit (e.g., KB, MB,
-        /// GB).</returns>
-        public static string BytesToSize(this long bytes, bool scaleSpace = false, int bigRound = 1, int smallRound = 0)
+        public static string BytesToSize(this long bytes,
+                                         bool scaleSpace = false,
+                                         Services.AppSettings.FileSizeDisplay? fileSizeMode = null,
+                                         int? fileSizeDecimal = null)
         {
             if (bytes < 0)
                 return "";
 
-            int scale = (bytes == 0) ? 0 : Convert.ToInt32(Math.Floor(Math.Round(Math.Log(bytes, 1024), 2))); // 0 <= scale <= 6
+            var mode = fileSizeMode ?? Data.Settings.FileSizeMode;
+            int scale = 0;
+            int round = 0;
+
+            if (bytes == 0 || mode is Services.AppSettings.FileSizeDisplay.B)
+            {
+
+            }
+            else if (mode is Services.AppSettings.FileSizeDisplay.K)
+            {
+                scale = 1;
+            }
+            else if (mode > Services.AppSettings.FileSizeDisplay.K)
+            {
+                scale = Convert.ToInt32(Math.Floor(Math.Round(Math.Log(bytes, 1024), 2)));
+                var max = Math.Min(byteScaleTable.Keys.Last(), (int)mode);
+
+                scale = Math.Clamp(scale, 0, max);
+                round = fileSizeDecimal ?? Data.Settings.FileSizeDecimal;
+            }
+
             double value = bytes / Math.Pow(1024, scale);
             var format = scaleSpace
                 ? byteScaleTable[scale]
                 : byteScaleTable[scale].Replace(" ", "");
 
-            return string.Format(format, Math.Round(value, value < 100 ? bigRound : smallRound));
+            return string.Format(format, FormatFileSizeNumber(Math.Round(value, round), round));
+        }
+
+        public static string BytesToDriveSize(this long bytes, bool scaleSpace = false) =>
+            bytes.BytesToSize(scaleSpace, Services.AppSettings.FileSizeDisplay.KMG, 1);
+
+        private static string FormatFileSizeNumber(double value, int decimalPlaces)
+        {
+            var pattern = decimalPlaces == 0
+                ? "#,##0"
+                : $"#,##0.{new string('#', decimalPlaces)}";
+
+            return value.ToString(pattern, Data.Settings.ActualFormatCulture);
         }
 
         private static readonly Dictionary<int, string> ampScaleTable = new()

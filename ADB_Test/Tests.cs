@@ -19,6 +19,8 @@ namespace ADB_Test
         [TestMethod]
         public void ToSizeTest()
         {
+            Data.Settings = new AppSettings { UILanguage = "en-US" };
+
             var testVals = new Dictionary<long, string>()
             {
                 { 0, "0B" },
@@ -28,14 +30,24 @@ namespace ADB_Test
                 { 1024204, "1MB" }, // 1.0002
                 { 1200100, "1.1MB" }, // 1.145
                 { 3400200100, "3.2GB" }, // 1.667
-                { 1200300400500, "1.1TB" } // 1.092
+                { 1200300400500, "1,117.9GB" } // 1117.86
             };
 
             foreach (var item in testVals)
             {
-                Assert.IsTrue(item.Key.BytesToSize() == item.Value);
+                string v = item.Key.BytesToSize();
+                Assert.IsTrue(v == item.Value);
             }
 
+        }
+
+        [TestMethod]
+        public void ToDriveSizeTest()
+        {
+            Data.Settings = new AppSettings { UILanguage = "en-US" };
+
+            Assert.AreEqual("32 GB", (32L * 1024 * 1024 * 1024).BytesToDriveSize(true));
+            Assert.AreEqual("1,117.9 GB", 1200300400500L.BytesToDriveSize(true));
         }
 
         [TestMethod]

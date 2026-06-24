@@ -2017,4 +2017,12 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Allow ADB From Untrusted Sources</value>
     <comment>The setting that allows using ADB without integrity checks and without path restrictions</comment>
   </data>
+  <data name="S_SETTINGS_FILE_SIZE_MODE" xml:space="preserve">
+    <value>File Size Display</value>
+    <comment>The setting that controls in which unit are file sizes displayed (B/K/M/G)</comment>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
+    <value>File Size Decimal Places</value>
+    <comment>The setting that controls how many decimal places are displayed in file sizes</comment>
+  </data>
 </root>

@@ -3618,6 +3618,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File Size Decimal Places.
+        /// </summary>
+        public static string S_SETTINGS_FILE_SIZE_DECIMAL {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_FILE_SIZE_DECIMAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File Size Display.
+        /// </summary>
+        public static string S_SETTINGS_FILE_SIZE_MODE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_FILE_SIZE_MODE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to About.
         /// </summary>
         public static string S_SETTINGS_GROUP_ABOUT {

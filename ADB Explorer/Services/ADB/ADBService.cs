@@ -1253,9 +1253,9 @@ public readonly record struct DriveSnapshot(
         return new(
             Path: path,
             Type: type,
-            Size: (long.Parse(groups["size_kB"].Value) * 1024).BytesToSize(true, 1, 0),
-            Used: (long.Parse(groups["used_kB"].Value) * 1024).BytesToSize(true, 1, 0),
-            Available: (long.Parse(groups["available_kB"].Value) * 1024).BytesToSize(true, 1, 0),
+            Size: (long.Parse(groups["size_kB"].Value) * 1024).BytesToDriveSize(true),
+            Used: (long.Parse(groups["used_kB"].Value) * 1024).BytesToDriveSize(true),
+            Available: (long.Parse(groups["available_kB"].Value) * 1024).BytesToDriveSize(true),
             UsageP: sbyte.Parse(groups["usage_P"].Value),
             FileSystem: groups["FileSystem"].Value,
             IsEmulator: isEmulator,

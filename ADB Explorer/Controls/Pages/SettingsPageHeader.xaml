@@ -418,8 +418,18 @@
                         Maximum="{Binding MaxValue}"
                         Minimum="{Binding MinValue}"
                         SmallChange="1"
-                        Value="{Binding Value}" />
-                    <TextBlock VerticalAlignment="Center" Text="{Binding Unit}" />
+                        Value="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock VerticalAlignment="Center" Text="{Binding Unit}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <Trigger Property="Text" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </local:SimpleStackPanel>
             </ui:CardControl>
         </DataTemplate>

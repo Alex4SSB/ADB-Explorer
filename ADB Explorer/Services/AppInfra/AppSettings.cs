@@ -32,6 +32,14 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
         OneHour,
     }
 
+    public enum FileSizeDisplay
+    {
+        B,
+        K,
+        KM,
+        KMG,
+    }
+
     void IJsonOnDeserialized.OnDeserialized()
     {
         _locationThumbSize ??= [];
@@ -119,6 +127,12 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
 
     [ObservableProperty]
     public partial bool ShowMessageOnCrash { get; set; } = true;
+
+    [ObservableProperty]
+    public partial FileSizeDisplay FileSizeMode { get; set; } = FileSizeDisplay.KMG;
+
+    [ObservableProperty]
+    public partial int FileSizeDecimal { get; set; } = 1;
 
     #region paths
 
