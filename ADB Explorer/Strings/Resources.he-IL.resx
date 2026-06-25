@@ -1617,4 +1617,10 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
     <value>אַפשר שימוש ב-ADB ממקורות לא בטוחים</value>
   </data>
+  <data name="S_SETTINGS_FILE_SIZE_MODE" xml:space="preserve">
+    <value>תצוגת גודל קובץ</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
+    <value>ספרות אחרי הנקודה העשרונית בגדול קובץ</value>
+  </data>
 </root>
