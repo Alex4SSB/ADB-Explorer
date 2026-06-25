@@ -1617,4 +1617,10 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
     <value>Разрешить ADB из ненадежных источников</value>
   </data>
+  <data name="S_SETTINGS_FILE_SIZE_MODE" xml:space="preserve">
+    <value>Отображение размера файла в (B/Kb/Mb/Gb)</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
+    <value>Размер файла в десятичных знаках</value>
+  </data>
 </root>
