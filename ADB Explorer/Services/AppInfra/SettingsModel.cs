@@ -109,7 +109,7 @@ public static class UISettings
         {
             new InfoSetting(AppGlobal.AppDisplayName, null, (FontFamily)App.Current.Resources["Nunito"], 18, $"v{AppGlobal.AppVersion}", TextAlignment.Center),
             new LinkSetting(Strings.Resources.S_DONATE, Resources.Links.SPONSOR, "\uEB51", "SponsorIconBrush"),
-            new LinkSetting(Strings.Resources.S_APP_DATA_FOLDER, new(AppDataPath), "\uE62F", resolveFilePath: () => AppDataPath),
+            new LinkSetting(Strings.Resources.S_APP_DATA_FOLDER, new(AppDataPath), pathData: FluentPathGeometries.AppDataPath, resolveFilePath: () => AppDataPath),
             new LinkSetting(Strings.Resources.S_GITHUB_REPO, Resources.Links.ADB_EXPLORER_GITHUB, pathData: GitHubGeometry),
             new LinkSetting(Strings.Resources.S_GOTO_WEBLATE, Resources.Links.WEBLATE, imageSource: WeblateLogo),
             new LinkSetting(Strings.Resources.S_PRIVACY_POLICY, Resources.Links.ADB_EXPLORER_PRIVACY, "\uE72E"),
@@ -137,6 +137,7 @@ public static class UISettings
             new("CommunityToolkit.Mvvm", Resources.Links.MVVM_TOOLKIT),
             new("WindowsAPICodePack", Resources.Links.API_CODEPACK),
             new("Newtonsoft.Json", Resources.Links.JSON),
+            new("Fluent System Icons", Resources.Links.FLUENT_SYSTEM_ICONS),
             new("Icons8", Resources.Links.ICONS8),
             new("Vecteezy", Resources.Links.VECTEEZY),
             new("Grafana Labs", Resources.Links.GRAFANA_LABS),
@@ -267,7 +268,7 @@ public static class UISettings
                                       SettingsActions.Find(a => a.Name is ActionType.ChangeDefaultPath),
                                       SettingsActions.Find(a => a.Name is ActionType.ClearDefaultPath),
                                   ]),
-            ], "\uE62F"),
+            ], pathData: FluentPathGeometries.FolderBriefcase),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_GRAPHICS,
             [
                 new ComboSetting<CultureInfo>(() => Settings.UICulture,
@@ -309,13 +310,40 @@ public class SettingsGroup : AbstractGroup
 {
     public string Name { get; set; }
 
-    public string Icon { get; }
+    //public string Icon { get; }
 
-    public SettingsGroup(string name, List<AbstractSetting> children, string icon = "")
+    public object IconContent { get; set; }
+
+    public SettingsGroup(string name, List<AbstractSetting> children, string? icon = null, Geometry? pathData = null)
     {
         Name = name;
         Children = children;
-        Icon = icon;
+
+        if (icon is not null)
+        {
+            Wpf.Ui.Controls.FontIcon fontIcon = new()
+            {
+                Glyph = icon,
+                FontSize = 22,
+                Style = (Style)App.Current.Resources["GlyphFont"],
+            };
+            fontIcon.SetResourceReference(Control.ForegroundProperty, "TextFillColorPrimaryBrush");
+
+            IconContent = fontIcon;
+        }
+        else if (pathData is not null)
+        {
+            System.Windows.Shapes.Path path = new()
+            {
+                Data = pathData,
+                Height = 22,
+                Width = 22,
+                Stretch = Stretch.Uniform,
+            };
+            path.SetResourceReference(System.Windows.Shapes.Shape.FillProperty, "TextFillColorPrimaryBrush");
+
+            IconContent = path;
+        }
     }
 }
 
@@ -449,7 +477,7 @@ public class LinkSetting : AbstractSetting
     public string ToolTip => _resolveFilePath?.Invoke()
         ?? (Url.IsFile ? Url.LocalPath : Url.ToString());
 
-    public LinkSetting(string description, Uri url, string icon = null, string iconBrush = null, string altText = null, ImageSource imageSource = null, Geometry pathData = null, Func<string>? resolveFilePath = null)
+    public LinkSetting(string description, Uri url, string? icon = null, string? iconBrush = null, string altText = null, ImageSource? imageSource = null, Geometry? pathData = null, Func<string>? resolveFilePath = null)
         : base(null, description, icon: icon)
     {
         _resolveFilePath = resolveFilePath;

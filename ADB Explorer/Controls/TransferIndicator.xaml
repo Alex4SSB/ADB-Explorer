@@ -132,31 +132,44 @@
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
-                        <ui:FontIcon Glyph="&#xEDD7;">
-                            <ui:FontIcon.Style>
-                                <Style BasedOn="{StaticResource TransferIndicatorIconStyle}" TargetType="ui:FontIcon">
+                        <Path
+                            Width="10"
+                            Height="10"
+                            d:Stroke="White"
+                            Data="M5.21367 1.45866C5.56266 0.847113 6.43733 0.847113 6.78633 1.45866L10.8776 8.62781C11.2259 9.23809 10.7893 10 10.0913 10H1.9087C1.2107 10 0.774094 9.23809 1.12237 8.62781L5.21367 1.45866ZM6 2.11928L2.08308 8.98286H9.91692L6 2.11928Z"
+                            Stretch="Uniform"
+                            Stroke="{DynamicResource TextFillColorPrimaryBrush}"
+                            StrokeThickness="1">
+                            <Path.Style>
+                                <Style TargetType="Path">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsUpVisible, ElementName=transferIndicator}" Value="True">
                                             <Setter Property="Visibility" Value="Collapsed" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </ui:FontIcon.Style>
-                        </ui:FontIcon>
-                        <ui:FontIcon
-                            d:Foreground="#4CC2FF"
-                            Foreground="{DynamicResource AccentButtonBackground}"
-                            Glyph="&#xEDDB;">
-                            <ui:FontIcon.Style>
-                                <Style BasedOn="{StaticResource TransferIndicatorIconStyle}" TargetType="ui:FontIcon">
+                            </Path.Style>
+                        </Path>
+                        <Path
+                            Width="10"
+                            Height="10"
+                            d:Fill="#4CC2FF"
+                            d:Stroke="#4CC2FF"
+                            Data="M6.78633 1.45866C6.43733 0.847113 5.56266 0.847113 5.21367 1.45866L1.12237 8.62781C0.774094 9.23809 1.2107 10 1.9087 10H1.9365L1.94138 10H10.0576L10.0625 10H10.0913C10.7893 10 11.2259 9.23809 10.8776 8.62781L6.78633 1.45866Z"
+                            Fill="{DynamicResource AccentButtonBackground}"
+                            Stretch="Uniform"
+                            Stroke="{DynamicResource AccentButtonBackground}"
+                            StrokeThickness="1">
+                            <Path.Style>
+                                <Style TargetType="Path">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsUpVisible, ElementName=transferIndicator}" Value="False">
                                             <Setter Property="Visibility" Value="Collapsed" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </ui:FontIcon.Style>
-                        </ui:FontIcon>
+                            </Path.Style>
+                        </Path>
                     </Grid>
                     <Grid Margin="26,0,0,0">
                         <Grid.Style>
@@ -168,31 +181,44 @@
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
-                        <ui:FontIcon Glyph="&#xEDD8;">
-                            <ui:FontIcon.Style>
-                                <Style BasedOn="{StaticResource TransferIndicatorIconStyle}" TargetType="ui:FontIcon">
+                        <Path
+                            Width="10"
+                            Height="10"
+                            d:Stroke="White"
+                            Data="M6.78633 10.5413C6.43733 11.1529 5.56266 11.1529 5.21367 10.5413L1.12237 3.37219C0.774094 2.76191 1.21071 2 1.9087 2L10.0913 2C10.7893 2 11.2259 2.76191 10.8776 3.37219L6.78633 10.5413ZM6 9.88072L9.91692 3.01714L2.08308 3.01714L6 9.88072Z"
+                            Stretch="Uniform"
+                            Stroke="{DynamicResource TextFillColorPrimaryBrush}"
+                            StrokeThickness="1">
+                            <Path.Style>
+                                <Style TargetType="Path">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsDownVisible, ElementName=transferIndicator}" Value="True">
                                             <Setter Property="Visibility" Value="Collapsed" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </ui:FontIcon.Style>
-                        </ui:FontIcon>
-                        <ui:FontIcon
-                            d:Foreground="#4CC2FF"
-                            Foreground="{DynamicResource AccentButtonBackground}"
-                            Glyph="&#xEDDC;">
-                            <ui:FontIcon.Style>
-                                <Style BasedOn="{StaticResource TransferIndicatorIconStyle}" TargetType="ui:FontIcon">
+                            </Path.Style>
+                        </Path>
+                        <Path
+                            Width="10"
+                            Height="10"
+                            d:Fill="#4CC2FF"
+                            d:Stroke="#4CC2FF"
+                            Data="M5.21367 10.5414C5.56266 11.1529 6.43733 11.1529 6.78633 10.5414L10.8776 3.37221C11.2259 2.76192 10.7893 2.00001 10.0913 2.00001L10.0635 2.00001L10.0586 2L1.94235 2L1.93748 2.00001L1.9087 2.00001C1.21071 2.00001 0.774094 2.76192 1.12237 3.3722L5.21367 10.5414Z"
+                            Fill="{DynamicResource AccentButtonBackground}"
+                            Stretch="Uniform"
+                            Stroke="{DynamicResource AccentButtonBackground}"
+                            StrokeThickness="1">
+                            <Path.Style>
+                                <Style TargetType="Path">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsDownVisible, ElementName=transferIndicator}" Value="False">
                                             <Setter Property="Visibility" Value="Collapsed" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </ui:FontIcon.Style>
-                        </ui:FontIcon>
+                            </Path.Style>
+                        </Path>
                     </Grid>
                 </Grid>
             </local:AdbMenuItem.Header>

@@ -36,19 +36,17 @@ public partial class ThumbsSizeSelector : UserControl
 
     static Dictionary<DetailsPane.SidePaneMode, UIElement> SidePaneModeIcons => new()
     {
-        { DetailsPane.SidePaneMode.Details, new FontIcon()
+        { DetailsPane.SidePaneMode.Details, new DetailsAndPreviewIcon()
         {
-            Glyph = "\uE99C",
-            FontSize = 16,
-            RenderTransformOrigin = new(0.5, 0.5),
-            RenderTransform = Data.RuntimeSettings.IsRTL ? null : new ScaleTransform(-1, 1)
+            Size = 16,
+            Mode = DetailsPane.SidePaneMode.Details,
+            Stretch = Stretch.Uniform,
         } },
-        { DetailsPane.SidePaneMode.Preview, new FontIcon()
+        { DetailsPane.SidePaneMode.Preview, new DetailsAndPreviewIcon()
         {
-            Glyph = "\uE1AC",
-            FontSize = 16,
-            RenderTransformOrigin = new(0.5, 0.5),
-            RenderTransform = Data.RuntimeSettings.IsRTL ? null : new ScaleTransform(-1, 1)
+            Size = 16,
+            Mode = DetailsPane.SidePaneMode.Preview,
+            Stretch = Stretch.Uniform,
         } },
     };
 

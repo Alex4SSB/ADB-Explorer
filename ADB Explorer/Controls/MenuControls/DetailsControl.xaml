@@ -27,26 +27,8 @@
             ToolTip="{Binding Source={x:Static Member=strings:Resources.S_DETAILS_PANE_TOOLTIP}}">
             <local:AdbMenuItem.Header>
                 <local:SimpleStackPanel Orientation="Horizontal" Spacing="6">
-                    <ui:FontIcon RenderTransformOrigin="0.5,0.5">
-                        <ui:FontIcon.Style>
-                            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                                <Setter Property="Glyph" Value="&#xE99C;" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL}" Value="False">
-                                        <Setter Property="RenderTransform">
-                                            <Setter.Value>
-                                                <ScaleTransform ScaleX="-1" />
-                                            </Setter.Value>
-                                        </Setter>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Mode}" Value="Preview">
-                                        <Setter Property="Glyph" Value="&#xE1AC;" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ui:FontIcon.Style>
-                    </ui:FontIcon>
-                    <TextBlock Margin="0,0,0,1">
+                    <local:DetailsAndPreviewIcon Margin="0,-1,0,0" Mode="{Binding Mode}" />
+                    <TextBlock Margin="0,2,0,0">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_THUMBSIZE_DETAILS}}" />

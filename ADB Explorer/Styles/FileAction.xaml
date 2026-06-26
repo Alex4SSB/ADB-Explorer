@@ -379,7 +379,12 @@
         TargetType="controls:AdbMenuItem">
         <Setter Property="Header" Value="{Binding Action.Description}" />
         <Setter Property="InputGestureText" Value="{Binding Action.GestureString}" />
-        <Setter Property="Icon" Value="{StaticResource MenuIcon}" />
+        <Setter Property="Icon" Value="{Binding IconContent}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IconContent}" Value="{x:Null}">
+                <Setter Property="Icon" Value="{StaticResource MenuIcon}" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="DummySubMenuStyle"

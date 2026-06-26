@@ -31,6 +31,8 @@ public abstract class ActionBase : ViewModelBase, IMenuItem
         protected set => Set(ref icon, value);
     }
 
+    public object IconContent { get; set; }
+
     public int IconSize { get; }
 
     public StyleHelper.ContentAnimation Animation { get; }
@@ -58,17 +60,15 @@ public abstract class ActionBase : ViewModelBase, IMenuItem
     public bool MirrorInRTL { get; }
 
     protected ActionBase(FileAction action,
-                         string icon,
                          int iconSize,
+                         string? icon = null,
                          StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                          AnimationSource animationSource = AnimationSource.Command,
                          FileAction altAction = null,
                          ObservableProperty<bool> isVisible = null,
-                         bool mirrorInRTL = false)
+                         bool mirrorInRTL = false,
+                         Geometry? pathData = null)
     {
-        if (!string.IsNullOrEmpty(icon))
-            StyleHelper.VerifyIcon(icon);
-
         Action = action;
         Icon = icon;
         IconSize = iconSize;
@@ -76,6 +76,19 @@ public abstract class ActionBase : ViewModelBase, IMenuItem
         ActionAnimationSource = animationSource;
         AltAction = altAction;
         MirrorInRTL = mirrorInRTL;
+
+        if (pathData is not null)
+        {
+            System.Windows.Shapes.Path path = new()
+            {
+                Data = pathData,
+                Height = iconSize,
+                Stretch = Stretch.Uniform,
+            };
+            path.SetResourceReference(System.Windows.Shapes.Shape.FillProperty, "TextFillColorPrimaryBrush");
+
+            IconContent = path;
+        }
 
         if (animationSource is AnimationSource.Command)
         {
@@ -115,7 +128,7 @@ public abstract class ActionMenu : ActionBase
     public bool IsChevronVisible { get; set; }
 
     protected ActionMenu(FileAction fileAction,
-                         string icon,
+                         string? icon = null,
                          IEnumerable<SubMenu> children = null,
                          StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                          int iconSize = 18,
@@ -123,8 +136,9 @@ public abstract class ActionMenu : ActionBase
                          FileAction altAction = null,
                          ObservableProperty<bool> isVisible = null,
                          bool mirrorInRTL = false,
-                         bool isChevronVisible = false)
-        : base(fileAction, icon, iconSize, animation, animationSource, altAction, isVisible, mirrorInRTL)
+                         bool isChevronVisible = false,
+                         Geometry? pathData = null)
+        : base(fileAction, iconSize, icon, animation, animationSource, altAction, isVisible, mirrorInRTL, pathData)
     {
         Children = children;
         IsChevronVisible = isChevronVisible;
@@ -306,8 +320,8 @@ public class SubMenu : ActionMenu
     public SubMenu()
     { }
 
-    public SubMenu(FileAction fileAction, string icon, IEnumerable<SubMenu> children = null, int iconSize = 16, FileAction altAction = null, ObservableProperty<bool> isVisible = null)
-        : base(fileAction, icon, children, iconSize: iconSize, altAction: altAction, isVisible: isVisible)
+    public SubMenu(FileAction fileAction, string? icon = null, IEnumerable<SubMenu> children = null, int iconSize = 16, FileAction altAction = null, ObservableProperty<bool> isVisible = null, Geometry? pathData = null)
+        : base(fileAction, icon, children, iconSize: iconSize, altAction: altAction, isVisible: isVisible, pathData: pathData)
     { }
 }
 

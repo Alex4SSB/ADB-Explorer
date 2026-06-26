@@ -32,4 +32,5 @@ public static class Links
     public static readonly Uri GRAFANA_INSTANCE = new("https://adbexplorer.grafana.net");
     public static readonly Uri GRAFANA_LABS = new("https://grafana.com/");
     public static readonly Uri GRAFANA_PRIVACY_POLICY = new("https://grafana.com/legal/privacy-policy/");
+    public static readonly Uri FLUENT_SYSTEM_ICONS = new("https://github.com/microsoft/fluentui-system-icons/tree/main");
 }

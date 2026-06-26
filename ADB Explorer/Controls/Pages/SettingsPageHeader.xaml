@@ -631,10 +631,10 @@
                         <ui:ListView.ItemTemplate>
                             <DataTemplate DataType="services:SettingsGroup">
                                 <StackPanel Margin="4,0,10,0" Orientation="Horizontal">
-                                    <ui:FontIcon
+                                    <ContentPresenter
                                         Margin="0,0,10,0"
-                                        FontSize="22"
-                                        Glyph="{Binding Icon}" />
+                                        Content="{Binding IconContent}"
+                                        FlowDirection="LeftToRight" />
                                     <TextBlock Text="{Binding Name}" />
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel.Style>

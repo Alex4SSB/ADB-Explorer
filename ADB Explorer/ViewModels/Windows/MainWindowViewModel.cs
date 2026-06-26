@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
@@ -15,7 +16,7 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly NavigationViewItem _logItem = new()
     {
         Content = new Wpf.Ui.Controls.TextBlock() { FontSize = 12, Text = Strings.Resources.S_BUTTON_LOG, TextTrimming = TextTrimming.CharacterEllipsis },
-        Icon = new FontIcon { Glyph = "\uE9A4" },
+        Icon = new FluentPathIcon { Data = FluentPathGeometries.TextBulletListSquare },
         TargetPageType = typeof(Views.Pages.LogPage),
         ToolTip = Strings.Resources.S_BUTTON_LOG,
         Visibility = Data.Settings.EnableLog ? Visibility.Visible : Visibility.Collapsed
