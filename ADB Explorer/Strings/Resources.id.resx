@@ -415,10 +415,10 @@ Konten yang terlihat mungkin tidak lengkap.</value>
     <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
-    <value>Memeriksa Perangkat Secara Berkala</value>
+    <value>Pemindaian Perangkat</value>
   </data>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
-    <value>Memeriksa Status Baterai Secara Berkala</value>
+    <value>Pemindaian Status Baterai</value>
   </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>Aktifkan Root Secara Otomatis</value>
@@ -433,13 +433,13 @@ Konten yang terlihat mungkin tidak lengkap.</value>
     <value>Hentikan Pemantauan Berkala Saat Push/Pull</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>Operasi Serentak</value>
+    <value>Operasi Simultan</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
     <value>Paksa Pindai Ulang Media Saat Push</value>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
-    <value>Memeriksa Drive Secara Berkala</value>
+    <value>Pemindaian Drive</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
     <value>Dukungan APK</value>
@@ -547,7 +547,7 @@ Konten yang terlihat mungkin tidak lengkap.</value>
     <value>OK</value>
   </data>
   <data name="S_FILTER_FILE_OPS" xml:space="preserve">
-    <value>Filter Operasi Berkas</value>
+    <value>Filter Operasi File</value>
   </data>
   <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
     <value>Aktifkan Putar Otomatis</value>
@@ -584,16 +584,16 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Perangkat</value>
   </data>
   <data name="S_BUTTON_PUSH" xml:space="preserve">
-    <value>Dorong</value>
+    <value>Kirim</value>
   </data>
   <data name="S_MENU_FOLDERS" xml:space="preserve">
     <value>Folder</value>
   </data>
   <data name="S_MENU_FILES" xml:space="preserve">
-    <value>Berkas</value>
+    <value>File</value>
   </data>
   <data name="S_MENU_REFRESH" xml:space="preserve">
-    <value>Muat Ulang</value>
+    <value>Segarkan</value>
   </data>
   <data name="S_MENU_COPY" xml:space="preserve">
     <value>Salin</value>
@@ -602,7 +602,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Lainnya</value>
   </data>
   <data name="S_MENU_EDIT" xml:space="preserve">
-    <value>Sunting</value>
+    <value>Edit</value>
   </data>
   <data name="S_MENU_NEW" xml:space="preserve">
     <value>Baru</value>
@@ -611,7 +611,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Folder</value>
   </data>
   <data name="S_MENU_FILE" xml:space="preserve">
-    <value>Berkas</value>
+    <value>File</value>
   </data>
   <data name="S_MENU_SELECT_ALL" xml:space="preserve">
     <value>Pilih Semua</value>
@@ -641,7 +641,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Salin ke Temp</value>
   </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
-    <value>Hapus Log Perintah</value>
+    <value>Bersihkan Log Perintah</value>
   </data>
   <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
     <value>Buka Lokasi Item</value>
@@ -674,13 +674,13 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Folder ini kosong.</value>
   </data>
   <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
-    <value>Tidak dapat memperoleh daftar.</value>
+    <value>Tidak dapat mengambil daftar.</value>
   </data>
   <data name="S_EMPTY_FILTER" xml:space="preserve">
     <value>Tidak ada item yang cocok dengan filter saat ini.</value>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
-    <value>&lt;Span&gt;Folder ini &lt;Italic&gt;tampak&lt;/Italic&gt; kosong&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… bagi mata telanjang&lt;/Span&gt;&lt;/Span&gt;</value>
+    <value>&lt;Span&gt;Folder ini &lt;Italic&gt;terlihat&lt;/Italic&gt; kosong&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… bagi mata telanjang&lt;/Span&gt;&lt;/Span&gt;</value>
   </data>
   <data name="S_ITEMS_SELECTED" xml:space="preserve">
     <value>item dipilih</value>
@@ -692,7 +692,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Jenis Operasi</value>
   </data>
   <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
-    <value>Nama Berkas</value>
+    <value>Nama File</value>
   </data>
   <data name="S_COLUMN_PROGRESS" xml:space="preserve">
     <value>Progres</value>
@@ -713,10 +713,10 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Nama</value>
   </data>
   <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
-    <value>Lokasi Asli</value>
+    <value>Lokasi Asal</value>
   </data>
   <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
-    <value>Tanggal Dimodifikasi</value>
+    <value>Tanggal Modifikasi</value>
   </data>
   <data name="S_COLUMN_TYPE" xml:space="preserve">
     <value>Jenis</value>
@@ -740,7 +740,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Waktu sejak respons server terakhir</value>
   </data>
   <data name="S_SECONDS_SHORT" xml:space="preserve">
-    <value>{0} dtk</value>
+    <value>{0}d</value>
   </data>
   <data name="S_KILL_SERVER" xml:space="preserve">
     <value>Matikan Server</value>
@@ -749,25 +749,25 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Matikan Proses</value>
   </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
-    <value>Muat Ulang Perangkat</value>
+    <value>Segarkan Perangkat</value>
   </data>
   <data name="S_RESTART_ADB" xml:space="preserve">
     <value>Mulai Ulang ADB</value>
   </data>
   <data name="S_SERVER_DOWN" xml:space="preserve">
-    <value>Server mDNS sedang down</value>
+    <value>Server mDNS sedang tidak aktif</value>
   </data>
   <data name="S_AWAITING_RESPONSE" xml:space="preserve">
     <value>Menunggu respons: {0}</value>
   </data>
   <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
-    <value>{0} md</value>
+    <value>{0}md</value>
   </data>
   <data name="S_MINUTES_SHORT" xml:space="preserve">
-    <value>{0} mnt</value>
+    <value>{0}m</value>
   </data>
   <data name="S_HOURS_SHORT" xml:space="preserve">
-    <value>{0} j</value>
+    <value>{0}j</value>
   </data>
   <data name="S_MDNS_ON" xml:space="preserve">
     <value>Server mDNS aktif dan berjalan</value>
@@ -779,7 +779,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Beberapa operasi gagal</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
-    <value>Akses Root Diaktifkan</value>
+    <value>Akses Root Aktif</value>
   </data>
   <data name="S_ROOT_POSSIBLE" xml:space="preserve">
     <value>Root Dapat Diaktifkan</value>
@@ -794,13 +794,13 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Suhu: {0}°C</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>Arus: {0}A</value>
+    <value>Keseimbangan Arus: {0}A</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
-    <value>Reboot ke</value>
+    <value>Mulai Ulang ke</value>
   </data>
   <data name="S_REBOOT_SYSTEM" xml:space="preserve">
-    <value>Citra Sistem</value>
+    <value>System Image</value>
   </data>
   <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
     <value>Bootloader</value>
@@ -809,7 +809,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Sideload</value>
   </data>
   <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
-    <value>Sideload (Reboot Otomatis)</value>
+    <value>Sideload (Mulai Ulang Otomatis)</value>
   </data>
   <data name="S_STATUS_OFFLINE" xml:space="preserve">
     <value>{0} - Offline</value>
@@ -845,16 +845,16 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>AC</value>
   </data>
   <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
-    <value>Tidak ada</value>
+    <value>Tidak Ada</value>
   </data>
   <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
-    <value>Tidak diketahui</value>
+    <value>Tidak Diketahui</value>
   </data>
   <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
-    <value>Mengisi daya</value>
+    <value>Mengisi Daya</value>
   </data>
   <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
-    <value>Menguras daya</value>
+    <value>Mengosongkan Daya</value>
   </data>
   <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
     <value>Tidak Mengisi Daya</value>
@@ -866,7 +866,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Status: {0}</value>
   </data>
   <data name="S_BAT_HEALTH" xml:space="preserve">
-    <value>Kesehatan: {0}</value>
+    <value>Kondisi: {0}</value>
   </data>
   <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
     <value>Baik</value>
@@ -899,7 +899,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Batalkan</value>
   </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>{0} Konflik</value>
+    <value>Konflik {0}</value>
   </data>
   <data name="S_PASTE" xml:space="preserve">
     <value>Tempel</value>
@@ -926,10 +926,10 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Paket Aplikasi Android</value>
   </data>
   <data name="S_FILE_TYPE_EXE" xml:space="preserve">
-    <value>File Eksekusi Windows</value>
+    <value>Berkas Eksekusi Windows</value>
   </data>
   <data name="S_DRIVE_TRASH" xml:space="preserve">
-    <value>Tong Sampah</value>
+    <value>Tempat Sampah</value>
   </data>
   <data name="S_BUTTON_YES" xml:space="preserve">
     <value>Ya</value>
@@ -941,7 +941,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Penyimpanan Internal</value>
   </data>
   <data name="S_DRIVE_APPS" xml:space="preserve">
-    <value>Aplikasi Terinstal</value>
+    <value>Aplikasi Terpasang</value>
   </data>
   <data name="S_DRIVE_SD" xml:space="preserve">
     <value>Kartu µSD</value>
@@ -950,37 +950,37 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Drive OTG</value>
   </data>
   <data name="S_DRIVE_EMULATED" xml:space="preserve">
-    <value>Drive Tereplikasi</value>
+    <value>Drive Emulasi</value>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>Temp</value>
   </data>
   <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>Nama berkas tidak valid pada sistem berkas target: {0}</value>
+    <value>Nama file tidak valid pada sistem file tujuan: {0}</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>Konten tidak cocok</value>
   </data>
   <data name="S_VALIDATE_MISSING" xml:space="preserve">
-    <value>Tidak ada di lokasi target</value>
+    <value>Tidak ditemukan di lokasi tujuan</value>
   </data>
   <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
     <value>Penghapusan Permanen</value>
   </data>
   <data name="S_LOCATION_NA" xml:space="preserve">
-    <value>N/A</value>
+    <value>T/A</value>
   </data>
   <data name="S_PATH_INVALID" xml:space="preserve">
-    <value>Argumen harus menyebutkan jalur lengkap dari berkas pengaturan baru atau yang sudah ada.</value>
+    <value>Argumen harus menentukan path lengkap dari file pengaturan baru atau yang sudah ada.</value>
   </data>
   <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
-    <value>Jalur Kustom Pengaturan Aplikasi</value>
+    <value>Path Pengaturan Aplikasi Kustom</value>
   </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Menu Kosong</value>
   </data>
   <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - Salin</value>
+    <value>{0} - Salinan</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Mematuhi aturan penamaan Unix (melalui ADB)</value>
@@ -989,25 +989,25 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Mematuhi aturan penamaan Windows</value>
   </data>
   <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
-    <value>Mematuhi aturan penamaan akar drive Windows</value>
+    <value>Mematuhi aturan penamaan root drive Windows</value>
   </data>
   <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
     <value>Unik di lokasi saat ini</value>
   </data>
   <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
-    <value>Berkas yang dipilih melanggar aturan penamaan Windows</value>
+    <value>File yang dipilih melanggar aturan penamaan Windows</value>
   </data>
   <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
-    <value>Berkas yang dipilih melanggar aturan penamaan akar drive Windows</value>
+    <value>File yang dipilih melanggar aturan penamaan root drive Windows</value>
   </data>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
-    <value>Beberapa berkas yang dipilih memiliki nama yang konflik di FUSE / Windows</value>
+    <value>Beberapa file yang dipilih memiliki nama yang bentrok secara case-insensitive</value>
   </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
-    <value>Beberapa berkas yang disalin memiliki nama yang konflik di FUSE</value>
+    <value>Beberapa file yang disalin memiliki nama yang bentrok secara case-insensitive</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
-    <value>Item yang dipilih bukan berkas / folder</value>
+    <value>Item yang dipilih bukan file/folder</value>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>Aplikasi WSA</value>
@@ -1016,7 +1016,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Status Root: {0}</value>
   </data>
   <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
-    <value>Tidak dicentang</value>
+    <value>Belum Diperiksa</value>
   </data>
   <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
     <value>Dilarang</value>
@@ -1028,7 +1028,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Nonaktifkan</value>
   </data>
   <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
-    <value>Kode Penyandingan</value>
+    <value>Kode Pairing</value>
   </data>
   <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
     <value>Alamat IP / Nama Host</value>
@@ -1037,25 +1037,25 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Port</value>
   </data>
   <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
-    <value>Port Penyandingan</value>
+    <value>Port Pairing</value>
   </data>
   <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
-    <value>Pasangkan &amp; Hubungkan</value>
+    <value>Pair &amp; Hubungkan</value>
   </data>
   <data name="S_DEVICE_SAVED" xml:space="preserve">
     <value>Perangkat Tersimpan</value>
   </data>
   <data name="S_DEVICE_QR" xml:space="preserve">
-    <value>Penyandingan QR</value>
+    <value>Pairing QR</value>
   </data>
   <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
-    <value>Siap untuk Dipasangkan</value>
+    <value>Siap untuk Pairing</value>
   </data>
   <data name="S_CLEAR_ALL" xml:space="preserve">
     <value>Hapus Semua</value>
   </data>
   <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
-    <value>Tambahkan Perangkat Baru</value>
+    <value>Tambah Perangkat Baru</value>
   </data>
   <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
     <value>[Tidak Diotorisasi]</value>
@@ -1064,16 +1064,16 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>[Layanan]</value>
   </data>
   <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
-    <value>Sedang Menjelajah</value>
+    <value>Sedang Dijelajahi</value>
   </data>
   <data name="S_BUTTON_BROWSE" xml:space="preserve">
-    <value>Jelajah</value>
+    <value>Jelajahi</value>
   </data>
   <data name="S_BUTTON_CONNECT" xml:space="preserve">
     <value>Hubungkan</value>
   </data>
   <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
-    <value>{0} tersedia dari {1}</value>
+    <value>{0} kosong dari {1}</value>
   </data>
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
     <value>Kosong</value>
@@ -1124,7 +1124,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Pindahkan</value>
   </data>
   <data name="S_ACTION_RECYCLE" xml:space="preserve">
-    <value>Pindahkan ke Tong Sampah</value>
+    <value>Buang ke Tempat Sampah</value>
   </data>
   <data name="S_ACTION_UPDATE" xml:space="preserve">
     <value>Perbarui</value>
@@ -1133,7 +1133,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>{0}% Digunakan</value>
   </data>
   <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
-    <value>Gulir di Sini</value>
+    <value>Gulir ke Sini</value>
   </data>
   <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
     <value>Atas</value>
@@ -1142,10 +1142,10 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Bawah</value>
   </data>
   <data name="ScrollBar_PageUpCommand" xml:space="preserve">
-    <value>Page Up</value>
+    <value>Halaman Atas</value>
   </data>
   <data name="ScrollBar_PageDownCommand" xml:space="preserve">
-    <value>Page Down</value>
+    <value>Halaman Bawah</value>
   </data>
   <data name="ScrollBar_LineUpCommand" xml:space="preserve">
     <value>Gulir ke Atas</value>
@@ -1160,10 +1160,10 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Tepi Kanan</value>
   </data>
   <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
-    <value>Page Left</value>
+    <value>Halaman Kiri</value>
   </data>
   <data name="ScrollBar_PageRightCommand" xml:space="preserve">
-    <value>Page Right</value>
+    <value>Halaman Kanan</value>
   </data>
   <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
     <value>Gulir ke Kiri</value>
@@ -1172,7 +1172,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Gulir ke Kanan</value>
   </data>
   <data name="S_MENU_UNDO" xml:space="preserve">
-    <value>Batalkan</value>
+    <value>Urungkan</value>
   </data>
   <data name="S_MENU_REDO" xml:space="preserve">
     <value>Ulangi</value>
@@ -1181,7 +1181,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Notifikasi</value>
   </data>
   <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
-    <value>Klik untuk menampilkan info selengkapnya</value>
+    <value>Klik untuk menampilkan info lebih lanjut</value>
   </data>
   <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
     <value>Bahasa Aplikasi</value>
@@ -1189,13 +1189,13 @@ Batalkan Semua yang Sedang Berjalan</value>
   <data name="S_LANG_NOTIFICATION" xml:space="preserve">
     <value>Pilih bahasa aplikasi yang Anda inginkan di pengaturan.
 Progres terjemahan ditampilkan untuk bahasa yang dipilih.
-Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
+Bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
   </data>
   <data name="S_GOTO_WEBLATE" xml:space="preserve">
     <value>Buka Weblate</value>
   </data>
   <data name="S_FILE_SOCKET" xml:space="preserve">
-    <value>Soket</value>
+    <value>Socket</value>
   </data>
   <data name="S_FILE_BLOCK" xml:space="preserve">
     <value>Perangkat Blok</value>
@@ -1207,7 +1207,7 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
     <value>FIFO</value>
   </data>
   <data name="S_FILE_UNKNOWN" xml:space="preserve">
-    <value>Tidak diketahui</value>
+    <value>Tidak Diketahui</value>
   </data>
   <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
     <value>Tautan Rusak</value>
@@ -1300,7 +1300,7 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
     <value>Pindahkan {0} ke {1}</value>
   </data>
   <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
-    <value>Berkas tidak ditemukan</value>
+    <value>File tidak ditemukan</value>
   </data>
   <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
     <value>Selesai tanpa konfirmasi</value>
@@ -1312,19 +1312,19 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
     <value>Memvalidasi…</value>
   </data>
   <data name="S_FILES_PLURAL" xml:space="preserve">
-    <value>{0} berkas</value>
+    <value>{0} file</value>
   </data>
   <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
     <value>Pilih ROM untuk sideload</value>
   </data>
   <data name="S_ROM_FILE" xml:space="preserve">
-    <value>Berkas ROM</value>
+    <value>File ROM</value>
   </data>
   <data name="S_TERMINAL" xml:space="preserve">
     <value>Terminal</value>
   </data>
   <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
-    <value>Pertahankan Tanggal Modifikasi Berkas</value>
+    <value>Pertahankan Tanggal Modifikasi File</value>
   </data>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
     <value>Instal {0}</value>
@@ -1342,22 +1342,22 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
     <value>Memeriksa status server mDNS…</value>
   </data>
   <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
-    <value>ikon</value>
+    <value>Ikon</value>
   </data>
   <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
-    <value>Ambil &amp; Tampilkan Thumbnail</value>
+    <value>Tarik &amp; Tampilkan Thumbnail</value>
   </data>
   <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
-    <value>Hanya di Tampilan Ikon</value>
+    <value>Hanya dalam Tampilan Ikon</value>
   </data>
   <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
-    <value>Hanya di Direktori Foto</value>
+    <value>Hanya dalam Direktori Foto</value>
   </data>
   <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
     <value>Saat Terhubung</value>
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
-    <value>Simpan Thumbnail Antar Sesi</value>
+    <value>Pertahankan Thumbnail Antar Sesi</value>
   </data>
   <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
     <value>Batasi Kecepatan Pengambilan Thumbnail</value>
@@ -1426,7 +1426,7 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
     <value>Opsi tata letak dan tampilan</value>
   </data>
   <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
-    <value>Ukuran Thumbnail Disimpan Untuk Setiap Lokasi</value>
+    <value>Ukuran Thumbnail Disimpan untuk Tiap Lokasi</value>
   </data>
   <data name="S_SORT" xml:space="preserve">
     <value>Urutkan</value>
@@ -1438,10 +1438,10 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
     <value>Turun</value>
   </data>
   <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
-    <value>Kolom pengurutan &amp; urutan disimpan untuk setiap lokasi</value>
+    <value>Kolom dan urutan pengurutan disimpan untuk tiap lokasi</value>
   </data>
   <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
-    <value>Ukuran Gambar Maksimal untuk Digunakan sebagai Thumbnail Sendiri (0 - Dinonaktifkan)</value>
+    <value>Ukuran Gambar Maksimum untuk Digunakan sebagai Thumbnail Sendiri (0 - Dinonaktifkan)</value>
   </data>
   <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
     <value>dan {0} lainnya…</value>
@@ -1453,13 +1453,13 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
     <value>Pratinjau</value>
   </data>
   <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
-    <value>Ukuran File Maksimal untuk Pratinjau</value>
+    <value>Ukuran File Maksimum untuk Pratinjau</value>
   </data>
   <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
-    <value>Tarik ke Folder Default saat Klik Dua Kali File</value>
+    <value>Tarik ke Folder Default saat File Diklik Ganda</value>
   </data>
   <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
-    <value>Pilih satu item untuk mendapatkan informasi lebih lanjut.</value>
+    <value>Pilih satu item untuk melihat informasi lebih lanjut.</value>
   </data>
   <data name="S_ITEM_LOCATION" xml:space="preserve">
     <value>Lokasi</value>
@@ -1471,16 +1471,16 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
     <value>Kecepatan ISO</value>
   </data>
   <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
-    <value>Waktu eksposur</value>
+    <value>Waktu pencahayaan</value>
   </data>
   <data name="S_VIDEO_BITRATE" xml:space="preserve">
     <value>Bitrate</value>
   </data>
   <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
-    <value>Pilih file untuk pratinjau.</value>
+    <value>Pilih file untuk dipratinjau.</value>
   </data>
   <data name="S_PREVIEW_INVALID" xml:space="preserve">
-    <value>Tidak ada pratinjau tersedia.</value>
+    <value>Pratinjau tidak tersedia.</value>
   </data>
   <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
     <value>PDF ini dilindungi kata sandi.</value>
@@ -1489,7 +1489,7 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
     <value>Kata sandi salah.</value>
   </data>
   <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
-    <value>Buka kunci</value>
+    <value>Buka Kunci</value>
   </data>
   <data name="S_FILE_PERMISSIONS" xml:space="preserve">
     <value>Izin</value>
@@ -1513,13 +1513,13 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
     <value>Dimodifikasi</value>
   </data>
   <data name="S_FILE_SYSTEM" xml:space="preserve">
-    <value>Sistem berkas</value>
+    <value>Sistem file</value>
   </data>
   <data name="S_MOUNT_POINT" xml:space="preserve">
-    <value>Titik kait (mount point)</value>
+    <value>Titik kait</value>
   </data>
   <data name="S_MOUNT_OPTIONS" xml:space="preserve">
-    <value>Opsi kait (mount options)</value>
+    <value>Opsi kait</value>
   </data>
   <data name="S_COLOR_RED" xml:space="preserve">
     <value>Merah</value>
@@ -1531,13 +1531,13 @@ Silakan bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
     <value>Biru</value>
   </data>
   <data name="S_ADB_NOT_FOUND" xml:space="preserve">
-    <value>Tidak dapat menemukan ADB dari PATH sistem. Silakan gunakan "{0}" untuk menemukannya.</value>
+    <value>Tidak dapat menemukan ADB dari PATH sistem. Gunakan "{0}" untuk menemukannya.</value>
   </data>
   <data name="S_ADB_PATH_INVALID" xml:space="preserve">
-    <value>Jalur {0} yang diberikan adalah pintasan Windows atau jalur UNC (remote), yang tidak diizinkan.</value>
+    <value>Path {0} yang diberikan adalah pintasan Windows atau path UNC (jarak jauh), yang tidak diizinkan.</value>
   </data>
   <data name="S_ADB_COMPROMISED" xml:space="preserve">
-    <value>Eksekutabel yang diberikan tidak dapat diverifikasi sebagai ADB. Pastikan Anda hanya mengunduh Android Platform Tools resmi dari Google.</value>
+    <value>Berkas eksekusi yang diberikan tidak dapat diverifikasi sebagai ADB. Pastikan Anda hanya mengunduh Android Platform Tools resmi dari Google.</value>
   </data>
   <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
     <value>Drive restrictions:</value>
@@ -1639,5 +1639,11 @@ Select Custom to use a location that will not be removed on uninstall. The custo
   <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
     <value>Allow ADB From Untrusted Sources</value>
     <comment>The setting that allows using ADB without integrity checks and without path restrictions</comment>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_MODE" xml:space="preserve">
+    <value>Tampilan Ukuran File</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
+    <value>Jumlah Angka Desimal Ukuran File</value>
   </data>
 </root>
