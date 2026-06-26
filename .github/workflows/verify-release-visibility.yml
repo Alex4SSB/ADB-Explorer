@@ -1,0 +1,103 @@
+name: Verify release visibility
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  verify:
+    if: github.event.release.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify release is indexed in the releases list
+        id: verify
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          max_attempts=30
+          sleep_seconds=60
+          latest_tag=""
+
+          for attempt in $(seq 1 "$max_attempts"); do
+            list_tags=$(gh api "repos/$REPO/releases?per_page=30" --jq '.[].tag_name')
+            latest_tag=$(gh api "repos/$REPO/releases/latest" --jq '.tag_name')
+
+            if echo "$list_tags" | grep -Fxq "$TAG"; then
+              echo "Release $TAG is visible in the releases list (attempt $attempt)."
+              if [ "$latest_tag" != "$TAG" ] && [ "${{ github.event.release.prerelease }}" = "false" ]; then
+                echo "::warning::Release $TAG is in the list but /releases/latest is $latest_tag."
+              fi
+              exit 0
+            fi
+
+            echo "Attempt $attempt/$max_attempts: $TAG missing from releases list."
+            echo "  /releases/latest currently returns: $latest_tag"
+            if [ "$latest_tag" = "$TAG" ]; then
+              echo "  Release exists at /releases/latest but is not indexed in the list yet."
+            fi
+
+            if [ "$attempt" -lt "$max_attempts" ]; then
+              sleep "$sleep_seconds"
+            fi
+          done
+
+          echo "latest_tag=$latest_tag" >> "$GITHUB_OUTPUT"
+          echo "::error::Release $TAG was not indexed in GET /repos/$REPO/releases after $((max_attempts * sleep_seconds)) seconds."
+          exit 1
+
+      - name: Open issue on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+          REPO: ${{ github.repository }}
+          LATEST_TAG: ${{ steps.verify.outputs.latest_tag }}
+          RELEASE_URL: ${{ github.event.release.html_url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          IS_PRERELEASE: ${{ github.event.release.prerelease }}
+        run: |
+          set -euo pipefail
+
+          title="Release $TAG not visible in GitHub releases list"
+          existing=$(gh issue list --repo "$REPO" --state open --limit 100 --json title --jq "[.[] | select(.title == \"$title\")] | length")
+
+          if [ "$existing" != "0" ]; then
+            echo "Open issue already exists: $title"
+            exit 0
+          fi
+
+          body_file=$(mktemp)
+          {
+            echo "## Summary"
+            echo
+            echo "Release **${TAG}** was published but did not appear in the public releases list API within 30 minutes."
+            echo
+            echo "This means users browsing [the releases page](https://github.com/${REPO}/releases) may not see the latest version, and the in-app update check will not detect it."
+            echo
+            echo "## Details"
+            echo
+            echo "| | |"
+            echo "| --- | --- |"
+            echo "| Release | [${TAG}](${RELEASE_URL}) |"
+            echo "| Direct URL | https://github.com/${REPO}/releases/tag/${TAG} |"
+            echo "| \`/releases/latest\` | \`${LATEST_TAG:-unknown}\` |"
+            echo "| Workflow run | [${RUN_URL}](${RUN_URL}) |"
+            echo "| Prerelease | ${IS_PRERELEASE} |"
+            echo
+            echo "## Suggested actions"
+            echo
+            echo "1. Edit and re-save the release on GitHub to re-trigger indexing"
+            echo "2. If still missing, delete and recreate the GitHub Release (keep the tag)"
+            echo "3. Contact [GitHub Support](https://support.github.com/) if the problem persists"
+          } > "$body_file"
+
+          gh issue create --repo "$REPO" --title "$title" --body-file "$body_file"
+          rm -f "$body_file"
