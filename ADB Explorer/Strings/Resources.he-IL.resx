@@ -1623,4 +1623,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
     <value>ספרות אחרי הנקודה העשרונית בגדול קובץ</value>
   </data>
+  <data name="S_OPEN_FOLDER" xml:space="preserve">
+    <value>פתח</value>
+  </data>
 </root>
