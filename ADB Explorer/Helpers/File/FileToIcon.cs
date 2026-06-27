@@ -30,7 +30,7 @@ public class FileToIconConverter
     private const string Imageres = "imageres.dll";
 
     private static readonly SpecialIcon FolderIcon = new(Shell32, 3);
-    private static readonly SpecialIcon DriveIcon = new(Shell32, 7);
+    private static readonly SpecialIcon DriveIcon = new(Shell32, 79);
     private static readonly SpecialIcon LinkOverlayIcon = new(Shell32, 29);
     private static readonly SpecialIcon EmptyTrashIcon = new(Shell32, 31);
     private static readonly SpecialIcon FullTrashIcon = new(Shell32, 32);
@@ -44,8 +44,11 @@ public class FileToIconConverter
     private static readonly SpecialIcon MultipleFilesIcon = new(Imageres, 142);
     private static readonly SpecialIcon DownloadsFolderIcon = new(Imageres, 175);
     private static readonly SpecialIcon VideosFolderIcon = new(Imageres, 178);
-    
+    private static readonly SpecialIcon EnterFolderIcon = new(Imageres, 265);
+
     private static readonly System.Drawing.Color Gray232 = System.Drawing.Color.FromArgb(232, 232, 232);
+
+    private static bool IsWindows10 => Environment.OSVersion.Version < AdbExplorerConst.WIN11_VERSION;
 
     private readonly record struct IconCacheKey(string IconId, IconSize Size, int DesiredSize);
     private static readonly Dictionary<IconCacheKey, BitmapSource> iconDic = [];
@@ -327,6 +330,7 @@ public class FileToIconConverter
                     "Downloads" or "Download" => DownloadsFolderIcon,
                     "Videos" or "Movies" => VideosFolderIcon,
                     "Pictures" => PicturesFolderIcon,
+                    "DCIM" when IsWindows10 => PicturesFolderIcon,
                     "DCIM" => GalleryIcon,
                     _ => FolderIcon,
                 };
@@ -345,7 +349,9 @@ public class FileToIconConverter
             AbstractFile.SpecialFileType.EmptyTrash => EmptyTrashIcon,
             AbstractFile.SpecialFileType.FullTrash => FullTrashIcon,
             AbstractFile.SpecialFileType.Phone => PhoneIcon,
+            AbstractFile.SpecialFileType.Gallery when IsWindows10 => PicturesFolderIcon,
             AbstractFile.SpecialFileType.Gallery => GalleryIcon,
+            AbstractFile.SpecialFileType.EnterFolder => EnterFolderIcon,
             _ => SpecialIcon.None,
         };
     }

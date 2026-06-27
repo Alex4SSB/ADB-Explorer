@@ -56,7 +56,7 @@ internal static class MainToolBar
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFiles), AppActions.Icon(FileAction.FileActionType.NewFile, 16)),
                 new SubMenuSeparator(Data.FileActions.IsApkActionsVisible),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushPackages),
-                    AppActions.Icon(FileAction.FileActionType.Package, 16),
+                    new(FluentPathGeometries.BoxArrowUp, 16),
                     isVisible: Data.FileActions.IsApkActionsVisible),
             ]),
         new MenuSeparator(),
@@ -164,7 +164,12 @@ internal static class ExplorerContextMenu
         });
     }
 
+    private static FileClass enterFolder = new("/EnterFolder", "EnterFolder", AbstractFile.FileType.EnterFolder);
+
     public static ObservableList<SubMenu> List { get; } = [
+        new SubMenu(
+            AppActions.List.Find(a => a.Name is FileAction.FileActionType.Enter),
+            new(enterFolder.Icon, 16)),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Pull),
             new(new PullIcon())),
@@ -201,7 +206,7 @@ internal static class ExplorerContextMenu
         new SubMenuSeparator(),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Package),
-            AppActions.Icon(FileAction.FileActionType.Package, 16),
+            new(FluentPathGeometries.Box, 16),
             children:
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Install), AppActions.Icon(FileAction.FileActionType.Install, 16)),
@@ -212,7 +217,7 @@ internal static class ExplorerContextMenu
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.SearchApkOnWeb), AppActions.Icon(FileAction.FileActionType.SearchApkOnWeb, 16)),
         new SubMenuSeparator(),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Delete), AppActions.Icon(FileAction.FileActionType.Delete, 16)),
-        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPushPackages), AppActions.Icon(FileAction.FileActionType.Package, 16)),
+        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPushPackages), new(FluentPathGeometries.BoxArrowUp, 16)),
         new DummySubMenu(),
     ];
 }

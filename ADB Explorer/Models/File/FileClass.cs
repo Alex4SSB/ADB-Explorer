@@ -343,6 +343,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             FileType.FullTrash => SpecialFileType.FullTrash,
             FileType.Phone => SpecialFileType.Phone,
             FileType.Gallery => SpecialFileType.Gallery,
+            FileType.EnterFolder => SpecialFileType.EnterFolder,
             _ => SpecialFileType.Regular
         };
 

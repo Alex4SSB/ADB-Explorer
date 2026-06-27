@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Controls;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Models
 {
@@ -140,8 +141,18 @@ namespace ADB_Explorer.Models
                 if (Location is SpecialLocation.DriveView)
                     return AppActions.Icon(FileAction.FileActionType.Home, 16);
 
-                var glyph = Data.DevicesObject.Current?.Drives.FirstOrDefault(d => d.Path == Path)?.DriveIcon;
-                return glyph is not null ? new BaseIcon(glyph, 16) : null;
+                const int size = 16;
+                var lookupKey = !string.IsNullOrEmpty(Path)
+                    ? Path
+                    : Location is not SpecialLocation.None
+                        ? StringFromLocation(Location)
+                        : null;
+
+                if (lookupKey is not null && AdbExplorerConst.DRIVE_TYPES.TryGetValue(lookupKey, out var driveType))
+                    return DriveViewModel.GetDriveIcon(driveType, size);
+
+                var drive = Data.DevicesObject.Current?.Drives.FirstOrDefault(d => d.Path == Path);
+                return drive is null ? null : DriveViewModel.GetDriveIcon(drive.Type, size);
             }
         }
 

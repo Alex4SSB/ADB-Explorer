@@ -51,9 +51,7 @@
             TargetType="ToolTip">
             <Setter Property="FlowDirection" Value="LeftToRight" />
         </Style>
-        <Style
-            x:Key="SettingsIconPresenterStyle"
-            TargetType="ContentPresenter">
+        <Style x:Key="SettingsIconPresenterStyle" TargetType="ContentPresenter">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IconContent}" Value="{x:Null}">
                     <Setter Property="Visibility" Value="Collapsed" />

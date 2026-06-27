@@ -19,7 +19,7 @@
             <local:AdbMenuItem
                 Margin="2"
                 Command="{Binding Action.Command.Command}"
-                Icon="{StaticResource MenuIcon}"
+                Icon="{Binding IconContent}"
                 Style="{StaticResource WpfUiMenuItem}">
                 <local:AdbMenuItem.Header>
                     <TextBlock Text="{Binding Action.Description}" TextOptions.TextFormattingMode="Display" />

@@ -627,6 +627,23 @@ internal static class FileActionLogic
         }
     }
 
+    public static void Refresh()
+    {
+        if (Data.FileActions.IsAppDrive)
+        {
+            UpdatePackages(true);
+            return;
+        }
+
+        if (Data.FileActions.IsDriveViewVisible)
+        {
+            Data.RuntimeSettings.LocationToNavigate = new(Navigation.SpecialLocation.DriveView);
+            return;
+        }
+
+        Data.RuntimeSettings.LocationToNavigate = new(Data.CurrentPath);
+    }
+
     public static void RefreshDrives(bool asyncClassify, CancellationToken cancellationToken)
     {
         if (Data.DevicesObject.Current is null)
@@ -796,6 +813,8 @@ internal static class FileActionLogic
 
         Data.FileActions.IsRegularItem = !Data.SelectedFiles.Any() || Data.RuntimeSettings.IsRootActive
             || Data.SelectedFiles.AnyAll(item => item.Type is FileType.File or FileType.Folder);
+
+        Data.FileActions.IsSingleFolder = Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory;
 
         Data.FileActions.IsFollowLinkEnabled = !Data.FileActions.IsRecycleBin
                                                && Data.SelectedFiles.Count() == 1
@@ -1174,6 +1193,14 @@ internal static class FileActionLogic
         var file = Data.DirList.FileList.FirstOrDefault(f => f.FullPath == target);
         if (file is not null)
             Data.ItemToSelect.Value = file;
+    }
+
+    public static void EnterFolder()
+    {
+        if (Data.SelectedFiles?.Count() != 1)
+            return;
+
+        Data.RuntimeSettings.LocationToNavigate = new(Data.SelectedFiles.First().FullPath);
     }
 
     public static void OpenApkLocation(Package apk = null)

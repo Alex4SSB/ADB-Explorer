@@ -18,7 +18,7 @@
         PreviewMouseLeftButtonDown="Card_PreviewMouseLeftButtonDown"
         Style="{StaticResource DriveCardActionStyle}">
         <ui:CardAction.Icon>
-            <ui:FontIcon Style="{StaticResource DriveIconStyle}" />
+            <Binding Path="DriveIcon.IconContent" />
         </ui:CardAction.Icon>
         <Grid>
             <Grid.RowDefinitions>

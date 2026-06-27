@@ -552,19 +552,6 @@
         </Style.Triggers>
     </Style>
     <Style
-        x:Key="DriveIconStyle"
-        BasedOn="{StaticResource GlyphFont}"
-        TargetType="ui:FontIcon">
-        <Setter Property="Glyph" Value="{Binding DriveIcon}" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="FontSize" Value="32" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Type}" Value="Unknown">
-                <Setter Property="Visibility" Value="Hidden" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
         x:Key="DriveNameTextBlockStyle"
         BasedOn="{StaticResource TextBlockStyle}"
         TargetType="TextBlock">

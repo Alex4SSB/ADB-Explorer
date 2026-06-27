@@ -109,7 +109,7 @@ public static class UISettings
         {
             new InfoSetting(AppGlobal.AppDisplayName, null, (FontFamily)App.Current.Resources["Nunito"], 18, $"v{AppGlobal.AppVersion}", TextAlignment.Center),
             new LinkSetting(Strings.Resources.S_DONATE, Resources.Links.SPONSOR, new("\uEB51", brush: "SponsorIconBrush")),
-            new LinkSetting(Strings.Resources.S_APP_DATA_FOLDER, new(AppDataPath), new(FluentPathGeometries.AppDataPath), resolveFilePath: () => AppDataPath),
+            new LinkSetting(Strings.Resources.S_APP_DATA_FOLDER, new(AppDataPath), new(FluentPathGeometries.ItemPath, flowDirection: FlowDirection.LeftToRight), resolveFilePath: () => AppDataPath),
             new LinkSetting(Strings.Resources.S_GITHUB_REPO, Resources.Links.ADB_EXPLORER_GITHUB, new(GitHubGeometry)),
             new LinkSetting(Strings.Resources.S_GOTO_WEBLATE, Resources.Links.WEBLATE, new(WeblateLogo)),
             new LinkSetting(Strings.Resources.S_PRIVACY_POLICY, Resources.Links.ADB_EXPLORER_PRIVACY, new("\uE72E")),
@@ -193,9 +193,9 @@ public static class UISettings
             ], new("\uE8CE")),
             new SettingsGroup("APK",
             [
-                new BoolSetting(() => Settings.EnableApk, Strings.Resources.S_SETTINGS_APK, icon: new("\uE7B8")),
-                new BoolSetting(() => Settings.ShowSystemPackages, Strings.Resources.S_SETTINGS_SYSTEM_APPS, visibleProp: AbstractSetting.ExtractPropertyInfo(() => Settings.EnableApk), icon: new("\uE835")),
-            ], new("\uE7B8")),
+                new BoolSetting(() => Settings.EnableApk, Strings.Resources.S_SETTINGS_APK, icon: new(FluentPathGeometries.BoxCheckmark, flowDirection: FlowDirection.LeftToRight)),
+                new BoolSetting(() => Settings.ShowSystemPackages, Strings.Resources.S_SETTINGS_SYSTEM_APPS, visibleProp: AbstractSetting.ExtractPropertyInfo(() => Settings.EnableApk), icon: new(FluentPathGeometries.BoxToolbox)),
+            ], new(FluentPathGeometries.Box)),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_EXPLORER,
             [
                 new BoolSetting(() => Settings.ShowExtensions, Strings.Resources.S_SETTINGS_SHOW_EXTENSIONS, icon: new("\uE8AC")),

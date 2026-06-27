@@ -72,8 +72,7 @@
                                             <Setter Property="Glyph" Value="&#xE711;" />
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="Running">
-                                            <Setter Property="Glyph" Value="&#xE65F;" />
-                                            <Setter Property="FontWeight" Value="Regular" />
+                                            <Setter Property="Glyph" Value="&#xE73E;" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>

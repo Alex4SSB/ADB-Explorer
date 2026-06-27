@@ -2025,4 +2025,8 @@ Please help us localize the app to your language on Weblate.</value>
     <value>File Size Decimal Places</value>
     <comment>The setting that controls how many decimal places are displayed in file sizes</comment>
   </data>
+  <data name="S_OPEN_FOLDER" xml:space="preserve">
+    <value>Open</value>
+    <comment>The name of the action to enter a folder</comment>
+  </data>
 </root>

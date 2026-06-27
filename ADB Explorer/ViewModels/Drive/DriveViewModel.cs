@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 
 namespace ADB_Explorer.ViewModels;
@@ -49,19 +50,19 @@ public partial class DriveViewModel : AbstractDrive, IBrowserItem
     public string MountPoint => FSInfo?.MountPoint;
     public string[] MountOptions => FSInfo?.Options;
 
-    public string DriveIcon => GetDriveIcon(Type);
+    public BaseIcon? DriveIcon => GetDriveIcon(Type);
 
-    public static string GetDriveIcon(DriveType type) => type switch
+    public static BaseIcon? GetDriveIcon(DriveType type, double size = 32) => type switch
     {
-        DriveType.Root => "\uF259",
-        DriveType.Internal => "\uEDA2",
-        DriveType.Expansion => "\uE7F1",
-        DriveType.External => "\uE88E",
+        DriveType.Root => new("\uF259", size),
+        DriveType.Internal => new("\uEDA2", size),
+        DriveType.Expansion => new("\uE7F1", size),
+        DriveType.External => new("\uE88E", size),
         DriveType.Unknown => null,
-        DriveType.Emulated => "\uEDA2",
-        DriveType.Trash => "\uE74D",
-        DriveType.Temp => "\uE912",
-        DriveType.Package => "\uE7B8",
+        DriveType.Emulated => new("\uEDA2", size),
+        DriveType.Trash => new("\uE74D", size),
+        DriveType.Temp => new("\uE912", size),
+        DriveType.Package => new(FluentPathGeometries.Apps, size),
         _ => throw new NotImplementedException(),
     };
 
@@ -86,6 +87,7 @@ public partial class DriveViewModel : AbstractDrive, IBrowserItem
         {
             Drive.Type = type;
             OnPropertyChanged(nameof(Type));
+            OnPropertyChanged(nameof(DriveIcon));
         }
     }
 }

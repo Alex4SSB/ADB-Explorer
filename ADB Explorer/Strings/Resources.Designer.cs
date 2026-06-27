@@ -2720,6 +2720,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open.
+        /// </summary>
+        public static string S_OPEN_FOLDER {
+            get {
+                return ResourceManager.GetString("S_OPEN_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select ADB Executable.
         /// </summary>
         public static string S_OVERRIDE_ADB_BROWSE {

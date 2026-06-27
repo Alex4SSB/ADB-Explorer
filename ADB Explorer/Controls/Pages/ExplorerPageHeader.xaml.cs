@@ -778,10 +778,14 @@ public partial class ExplorerPageHeader : UserControl
         }
         else
         {
+            var path = string.IsNullOrEmpty(location.Path)
+                ? location.StringFromLocation()
+                : location.Path;
+
             if (!FileActions.IsExplorerVisible)
-                InitNavigation(location.DisplayName);
+                InitNavigation(path);
             else
-                NavigateToPath(location.DisplayName);
+                NavigateToPath(path);
         }
     }
 

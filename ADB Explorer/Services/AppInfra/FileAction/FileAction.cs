@@ -54,7 +54,7 @@ public static class AppActions
 
     public static BaseIcon Icon(FileActionType type, double size = 18) => type switch
     {
-        FileActionType.CopyItemPath => new(FluentPathGeometries.AppDataPath, size),
+        FileActionType.CopyItemPath => new(FluentPathGeometries.ItemPath, size, flowDirection: FlowDirection.LeftToRight),
         _ => new(Icons[type], size),
     };
 
@@ -142,7 +142,7 @@ public static class AppActions
             clearClipboard: true),
         new(FileActionType.Refresh,
             () => Data.FileActions.IsRefreshEnabled && !Data.FileActions.ListingInProgress,
-            () => Data.RuntimeSettings.LocationToNavigate = new(Data.CurrentPath),
+            FileActionLogic.Refresh,
             Strings.Resources.S_MENU_REFRESH,
             new(Key.F5),
             true),
@@ -336,6 +336,11 @@ public static class AppActions
             Strings.Resources.S_MENU_OPEN_LOCATION,
             new(Key.Enter),
             true),
+        new(FileActionType.Enter,
+            () => Data.FileActions.IsSingleFolder,
+            FileActionLogic.EnterFolder,
+            Strings.Resources.S_OPEN_FOLDER,
+            new(Key.Enter))
     ];
 
     public static List<KeyBinding> Bindings =>
@@ -402,6 +407,7 @@ public class FileAction : ViewModelBase
         SearchApkOnWeb,
         NavHistory,
         OpenPackageLocation,
+        Enter,
     }
 
     public FileActionType Name { get; }

@@ -165,6 +165,9 @@ public partial class FileActionsEnable : ObservableObject
         set => SetProperty(ref isRegularItem, value);
     }
 
+    [ObservableProperty]
+    public partial bool IsSingleFolder { get; set; }
+
     private bool pullEnabled;
     public bool PullEnabled
     {

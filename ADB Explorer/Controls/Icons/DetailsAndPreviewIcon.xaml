@@ -9,19 +9,9 @@
     x:Name="root"
     mc:Ignorable="d">
     <Grid DataContext="{Binding ElementName=root}" RenderTransformOrigin="0.5,0.5">
-        <Grid.Style>
-            <Style TargetType="Grid">
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL}" Value="False">
-                        <Setter Property="RenderTransform">
-                            <Setter.Value>
-                                <ScaleTransform ScaleX="-1" />
-                            </Setter.Value>
-                        </Setter>
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Grid.Style>
+        <Grid.RenderTransform>
+            <ScaleTransform ScaleX="-1" />
+        </Grid.RenderTransform>
         <Path
             Width="{Binding Size}"
             Height="{Binding Size}"

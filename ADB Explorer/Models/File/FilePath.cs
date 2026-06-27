@@ -37,6 +37,7 @@ public abstract class AbstractFile : ViewModelBase
         FullTrash,
         Phone,
         Gallery,
+        EnterFolder,
     }
 
     [Flags]
@@ -55,6 +56,7 @@ public abstract class AbstractFile : ViewModelBase
         FullTrash = 1024,
         Phone = 2048,
         Gallery = 4096,
+        EnterFolder = 8192,
     }
 
     public static string GetFileTypeName(FileType type) => type switch
