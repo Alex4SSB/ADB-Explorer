@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Converters;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Converters;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Models;
@@ -250,20 +251,14 @@ public class Battery : ViewModelBase
         }
     }
 
-    public string BatteryIcon
+    public Geometry BatteryIcon
     {
         get
         {
             if (ChargeState == ChargingState.Unknown || Level is null)
-                return Data.RuntimeSettings.Is22H2 ? "\uEC02" : "\uF608";
+                return FluentBatteryGeometries.Unknown;
 
-            var level = Data.RuntimeSettings.Is22H2 ? 0xEBA0 : 0xF5F2;
-            if (ChargeState == ChargingState.Charging)
-                level += 11;
-
-            level += Level.Value / 10;
-
-            return $"{Convert.ToChar(level)}";
+            return FluentBatteryGeometries.Get(Level.Value, ChargeState == ChargingState.Charging);
         }
     }
 

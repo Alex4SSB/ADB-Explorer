@@ -53,28 +53,13 @@
             <TextBlock Text="{Binding Level}" />
             <TextBlock Text="%" />
         </StackPanel>
-        <ui:FontIcon
-            Margin="0,0,0,-2"
+        <controls:FluentPathIcon
+            Width="24"
             VerticalAlignment="Center"
-            FontSize="18"
-            Glyph="{Binding BatteryIcon}">
-            <ui:FontIcon.Style>
-                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                    <Style.Resources>
-                        <Style TargetType="TextBlock">
-                            <Style.Triggers>
-                                <Trigger Property="Text" Value="">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </Trigger>
-                                <DataTrigger Binding="{Binding FullyCharged}" Value="True">
-                                    <Setter Property="Foreground" Value="#FF1DB159" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding BatteryLow}" Value="True">
-                                    <Setter Property="Foreground" Value="#FFF44336" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Style.Resources>
+            Data="{Binding BatteryIcon}"
+            Stretch="Uniform">
+            <controls:FluentPathIcon.Style>
+                <Style BasedOn="{StaticResource DeviceHeaderPathIcon}" TargetType="controls:FluentPathIcon">
                     <Style.Triggers>
                         <Trigger Property="DataContext" Value="{x:Null}">
                             <Setter Property="Visibility" Value="Collapsed" />
@@ -85,9 +70,18 @@
                         <DataTrigger Binding="{Binding ChargeState}" Value="Unknown">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
+                        <DataTrigger Binding="{Binding FullyCharged}" Value="True">
+                            <Setter Property="Foreground" Value="#FF107C0F" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding BatteryLow}" Value="True">
+                            <Setter Property="Foreground" Value="#FFF44336" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding ChargeState}" Value="Charging">
+                            <Setter Property="Margin" Value="0,-5,0,0" />
+                        </DataTrigger>
                     </Style.Triggers>
                 </Style>
-            </ui:FontIcon.Style>
-        </ui:FontIcon>
+            </controls:FluentPathIcon.Style>
+        </controls:FluentPathIcon>
     </controls:SimpleStackPanel>
 </UserControl>
