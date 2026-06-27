@@ -1623,4 +1623,7 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
     <value>Розмір файлу в десяткових знаках</value>
   </data>
+  <data name="S_OPEN_FOLDER" xml:space="preserve">
+    <value>Відкрити</value>
+  </data>
 </root>
