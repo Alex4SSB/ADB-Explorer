@@ -1,5 +1,5 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.ViewModels;
 using Wpf.Ui.Controls;
 
@@ -24,16 +24,14 @@ public abstract class ActionBase : ViewModelBase, IMenuItem
 
     public FileAction AltAction { get; }
 
-    private string icon = "";
-    public string Icon
+    private object? iconContent;
+    public object? IconContent
     {
-        get => icon;
-        protected set => Set(ref icon, value);
+        get => iconContent;
+        protected set => Set(ref iconContent, value);
     }
 
-    public object IconContent { get; set; }
-
-    public int IconSize { get; }
+    public int IconSize { get; protected set; }
 
     public StyleHelper.ContentAnimation Animation { get; }
 
@@ -60,35 +58,20 @@ public abstract class ActionBase : ViewModelBase, IMenuItem
     public bool MirrorInRTL { get; }
 
     protected ActionBase(FileAction action,
-                         int iconSize,
-                         string? icon = null,
+                         BaseIcon? icon = null,
                          StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                          AnimationSource animationSource = AnimationSource.Command,
                          FileAction altAction = null,
                          ObservableProperty<bool> isVisible = null,
-                         bool mirrorInRTL = false,
-                         Geometry? pathData = null)
+                         bool mirrorInRTL = false)
     {
         Action = action;
-        Icon = icon;
-        IconSize = iconSize;
+        IconSize = icon is null ? 16 : (int)icon.Size;
+        IconContent = icon?.IconContent;
         Animation = animation;
         ActionAnimationSource = animationSource;
         AltAction = altAction;
         MirrorInRTL = mirrorInRTL;
-
-        if (pathData is not null)
-        {
-            System.Windows.Shapes.Path path = new()
-            {
-                Data = pathData,
-                Height = iconSize,
-                Stretch = Stretch.Uniform,
-            };
-            path.SetResourceReference(System.Windows.Shapes.Shape.FillProperty, "TextFillColorPrimaryBrush");
-
-            IconContent = path;
-        }
 
         if (animationSource is AnimationSource.Command)
         {
@@ -128,17 +111,15 @@ public abstract class ActionMenu : ActionBase
     public bool IsChevronVisible { get; set; }
 
     protected ActionMenu(FileAction fileAction,
-                         string? icon = null,
+                         BaseIcon? icon = null,
                          IEnumerable<SubMenu> children = null,
                          StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                         int iconSize = 18,
                          AnimationSource animationSource = AnimationSource.Command,
                          FileAction altAction = null,
                          ObservableProperty<bool> isVisible = null,
                          bool mirrorInRTL = false,
-                         bool isChevronVisible = false,
-                         Geometry? pathData = null)
-        : base(fileAction, iconSize, icon, animation, animationSource, altAction, isVisible, mirrorInRTL, pathData)
+                         bool isChevronVisible = false)
+        : base(fileAction, icon, animation, animationSource, altAction, isVisible, mirrorInRTL)
     {
         Children = children;
         IsChevronVisible = isChevronVisible;
@@ -170,16 +151,15 @@ public class AltTextMenu : ActionMenu
     public bool IsTooltipVisible { get; }
 
     public AltTextMenu(FileAction fileAction,
-                       string icon,
+                       BaseIcon icon,
                        string altText = null,
                        IEnumerable<SubMenu> children = null,
                        StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                       int iconSize = 18,
                        AnimationSource animationSource = AnimationSource.Command,
                        bool isTooltipVisible = true,
                        FileAction altAction = null,
                        ObservableProperty<bool> isVisible = null)
-        : base(fileAction, icon, children, animation, iconSize, animationSource, altAction, isVisible: isVisible)
+        : base(fileAction, icon, children, animation, animationSource, altAction, isVisible: isVisible)
     {
         if (children is not null && children.Any())
             altText = fileAction.Description;
@@ -193,12 +173,11 @@ public class DynamicAltTextMenu : AltTextMenu
 {
     public DynamicAltTextMenu(FileAction fileAction,
                               ObservableProperty<string> altText,
-                              string icon,
+                              BaseIcon icon,
                               StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                              int iconSize = 20,
                               AnimationSource animationSource = AnimationSource.Command,
                               FileAction altAction = null)
-        : base(fileAction, icon, altText, animation: animation, iconSize: iconSize, animationSource: animationSource, altAction: altAction)
+        : base(fileAction, icon, altText, animation: animation, animationSource: animationSource, altAction: altAction)
     {
         altText.PropertyChanged += (sender, e) => AltText = e.NewValue;
     }
@@ -216,33 +195,29 @@ public class IconMenu : ActionMenu
     //public new ObservableList<SubMenu> Children { get; }
 
     public IconMenu(FileAction fileAction,
-                    string icon,
+                    BaseIcon icon,
                     ObservableProperty<IEnumerable<SubMenu>> children,
                     StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                    int iconSize = 16)
-        : base(fileAction, icon, animation: animation, iconSize: iconSize)
+                    bool isChevronVisible = false)
+        : base(fileAction, icon, animation: animation, isChevronVisible: isChevronVisible)
     {
-        if (children is not null)
+        children?.PropertyChanged += (sender, e) =>
         {
-            children.PropertyChanged += (sender, e) =>
-            {
-                Children = children.Value;
+            Children = children.Value;
 
-                OnPropertyChanged(nameof(Children));
-            };
-        }
+            OnPropertyChanged(nameof(Children));
+        };
     }
 
     public IconMenu(FileAction fileAction,
-                    string icon,
+                    BaseIcon icon,
                     StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                    int iconSize = 16,
                     ObservableProperty<bool> selectionBar = null,
                     IEnumerable<SubMenu> children = null,
                     FileAction altAction = null,
                     ObservableProperty<bool> isVisible = null,
                     bool mirrorInRTL = false)
-        : base(fileAction, icon, children, animation, iconSize: iconSize, altAction: altAction, isVisible: isVisible, mirrorInRTL: mirrorInRTL)
+        : base(fileAction, icon, children, animation, altAction: altAction, isVisible: isVisible, mirrorInRTL: mirrorInRTL)
     {
         if (selectionBar is not null)
         {
@@ -253,49 +228,32 @@ public class IconMenu : ActionMenu
 
     public IconMenu(IEnumerable<SubMenu> children,
                     string description,
-                    string icon,
+                    BaseIcon icon,
                     StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                    int iconSize = 16,
                     ObservableProperty<bool> selectionBar = null,
                     FileAction altAction = null,
                     ObservableProperty<bool> isVisible = null)
         : this(new(FileAction.FileActionType.More,
                    () => children.Any(c => c is not SubMenuSeparator && c.Action.Command.IsEnabled),
                    () => { },
-                   description), icon, animation, iconSize, selectionBar, children, altAction, isVisible)
-    { }
-}
-
-public class AnimatedNotifyMenu : DynamicAltTextMenu
-{
-    public AnimatedNotifyMenu(FileAction fileAction,
-                              ObservableProperty<string> altText,
-                              string icon,
-                              StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.Pulsate,
-                              int iconSize = 18,
-                              AnimationSource animationSource = AnimationSource.External,
-                              FileAction altAction = null)
-        : base(fileAction, altText, icon, animation, iconSize, animationSource, altAction)
+                   description), icon, animation, selectionBar, children, altAction, isVisible)
     { }
 }
 
 public class CompoundIconMenu : ActionMenu
 {
-    public UserControl CompoundIcon { get; }
-
     public bool IsNameDisplayed { get; }
 
     public CompoundIconMenu(FileAction fileAction,
-                       UserControl icon,
+                       BaseIcon icon,
                        IEnumerable<SubMenu> children = null,
                        StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                        FileAction altAction = null,
                        ObservableProperty<bool> isVisible = null,
                        bool isNameDisplayed = false,
                        bool isChevronVisible = false)
-        : base(fileAction, null, children, animation, altAction: altAction, isVisible: isVisible, isChevronVisible: isChevronVisible)
+        : base(fileAction, icon, children, animation, altAction: altAction, isVisible: isVisible, isChevronVisible: isChevronVisible)
     {
-        CompoundIcon = icon;
         IsNameDisplayed = isNameDisplayed;
     }
 }
@@ -320,44 +278,9 @@ public class SubMenu : ActionMenu
     public SubMenu()
     { }
 
-    public SubMenu(FileAction fileAction, string? icon = null, IEnumerable<SubMenu> children = null, int iconSize = 16, FileAction altAction = null, ObservableProperty<bool> isVisible = null, Geometry? pathData = null)
-        : base(fileAction, icon, children, iconSize: iconSize, altAction: altAction, isVisible: isVisible, pathData: pathData)
+    public SubMenu(FileAction fileAction, BaseIcon? icon = null, IEnumerable<SubMenu> children = null, FileAction altAction = null, ObservableProperty<bool> isVisible = null)
+        : base(fileAction, icon, children, altAction: altAction, isVisible: isVisible)
     { }
-}
-
-public class GeneralSubMenu : SubMenu
-{
-    public object Content { get; }
-
-    public bool IsEnabled { get; private set; } = true;
-
-    public bool IsDropDown { get; }
-
-    public GeneralSubMenu(object content, bool isDropDown = false)
-        : base(new(FileAction.FileActionType.None, () => true, () => { }), null)
-    {
-        Content = content;
-        IsDropDown = isDropDown;
-        
-        if (content is CheckBox cb)
-        {
-            cb.IsEnabledChanged += (sender, e) => IsEnabled = cb.IsEnabled;
-        }
-    }
-}
-
-public class CompoundIconSubMenu : SubMenu
-{
-    public UserControl CompoundIcon { get; }
-
-    public CompoundIconSubMenu(FileAction fileAction,
-                          UserControl icon,
-                          IEnumerable<SubMenu> children = null,
-                          FileAction altAction = null)
-        : base(fileAction, null, children, altAction: altAction)
-    {
-        CompoundIcon = icon;
-    }
 }
 
 public class DummySubMenu : SubMenu
@@ -377,7 +300,7 @@ public class DummySubMenu : SubMenu
     }
 
     public DummySubMenu()
-        : base(new(FileAction.FileActionType.None, () => true, dummyAction, Strings.Resources.S_MENU_EMPTY), "\uF141")
+        : base(new(FileAction.FileActionType.None, () => true, dummyAction, Strings.Resources.S_MENU_EMPTY), new("\uF141", 16))
     { }
 }
 
@@ -399,13 +322,13 @@ public class SubMenuSeparator : SubMenu
     }
 
     public SubMenuSeparator(Func<bool> canExecute = null)
-        : base(new(FileAction.FileActionType.None, canExecute, () => { }), "")
+        : base(new(FileAction.FileActionType.None, canExecute, () => { }))
     {
         externalVisibility = canExecute is null;
     }
 
     public SubMenuSeparator(ObservableProperty<bool> isVisible)
-        : base(new(FileAction.FileActionType.None, () => isVisible.Value, () => { }), "", isVisible: isVisible)
+        : base(new(FileAction.FileActionType.None, () => isVisible.Value, () => { }), isVisible: isVisible)
     { }
 }
 
@@ -438,15 +361,14 @@ public class DualActionButton : IconMenu
     /// Toggle Button / Menu Item with modifiable background and dynamic icon
     /// </summary>
     public DualActionButton(FileAction action,
-                            ObservableProperty<string> icon,
+                            ObservableProperty<BaseIcon> icon,
                             ObservableProperty<bool> isChecked = null,
-                            int iconSize = 20,
                             StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                             Brush checkBackground = null,
                             IEnumerable<SubMenu> children = null,
                             ObservableProperty<bool> isVisible = null,
                             bool isCheckable = true)
-        : base(action, icon, animation, iconSize, children: children, isVisible: isVisible)
+        : base(action, icon.Value, animation, children: children, isVisible: isVisible)
     {
         CheckBackground = checkBackground;
         observableIsChecked = isChecked;
@@ -455,39 +377,14 @@ public class DualActionButton : IconMenu
         IsChecked = isChecked;
         observableIsChecked.PropertyChanged += (sender, e) => IsChecked = e.NewValue;
 
-        icon.PropertyChanged += (sender, e) => Icon = icon;
-    }
-
-    /// <summary>
-    /// Accent Button / Menu Item with modifiable background
-    /// </summary>
-    public DualActionButton(FileAction action,
-                            string icon,
-                            StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                            int iconSize = 20,
-                            Brush checkBackground = null,
-                            ObservableProperty<bool> isVisible = null)
-        : base(action, icon, animation, iconSize, isVisible: isVisible)
-    {
-        IsChecked = true;
-        CheckBackground = checkBackground;
-    }
-}
-
-public class CompoundDualAction : DualActionButton
-{
-    public UserControl CompoundIcon { get; }
-
-    /// <summary>
-    /// Accent Button / Menu Item with modifiable background
-    /// </summary>
-    public CompoundDualAction(FileAction action,
-                              UserControl icon,
-                              StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                              Brush checkBackground = null,
-                              ObservableProperty<bool> isVisible = null)
-        : base(action, null, animation, checkBackground: checkBackground, isVisible: isVisible)
-    {
-        CompoundIcon = icon;
+        icon.PropertyChanged += (sender, e) =>
+        {
+            IconContent = icon.Value?.IconContent;
+            if (icon.Value is not null)
+            {
+                IconSize = (int)icon.Value.Size;
+                OnPropertyChanged(nameof(IconSize));
+            }
+        };
     }
 }

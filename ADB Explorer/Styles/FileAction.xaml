@@ -14,7 +14,6 @@
         BasedOn="{StaticResource DisabledGlyphStyle}"
         TargetType="ui:FontIcon">
         <Setter Property="FontSize" Value="{Binding IconSize}" />
-        <Setter Property="Glyph" Value="{Binding Icon}" />
     </Style>
     <Style
         x:Key="MenuSelectionBarStyle"
@@ -39,46 +38,10 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-    <Style
-        x:Key="OperationsIconStyle"
-        BasedOn="{StaticResource MenuIconStyle}"
-        TargetType="ui:FontIcon">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsFileOpRingVisible}" Value="True">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="OperationsProgressRingStyle"
-        BasedOn="{StaticResource FluentProgressRingStyle}"
-        TargetType="ui:ProgressRing">
-        <!--<Setter Property="IsActive" Value="True" />-->
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsFileOpRingVisible}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <ui:FontIcon
-        x:Key="MenuIcon"
-        x:Shared="False"
-        Style="{StaticResource MenuIconStyle}" />
     <DataTemplate x:Key="IconMenuTemplate">
         <Grid>
-            <ui:FontIcon Style="{StaticResource MenuIconStyle}" />
+            <ContentPresenter Content="{Binding IconContent}" />
             <ui:FontIcon Style="{StaticResource MenuSelectionBarStyle}" />
-        </Grid>
-    </DataTemplate>
-    <DataTemplate x:Key="AnimatedNotifyTemplate">
-        <Grid>
-            <ui:FontIcon Style="{StaticResource MenuIconStyle}" />
-            <TextBlock
-                Margin="0,0,-10,-12"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Bottom"
-                Style="{StaticResource DisabledTextBlockStyle}"
-                Text="{Binding AltText}" />
         </Grid>
     </DataTemplate>
     <DataTemplate x:Key="DynamicAltTextTemplate">
@@ -87,7 +50,7 @@
                 <ColumnDefinition />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <ui:FontIcon Glyph="{Binding Icon}" Style="{StaticResource MenuIconStyle}" />
+            <ContentPresenter Content="{Binding IconContent}" />
             <TextBlock
                 Grid.Column="1"
                 Height="{Binding IconSize}"
@@ -106,7 +69,7 @@
     </DataTemplate>
     <DataTemplate x:Key="CompoundIconMenuTemplate">
         <controls:SimpleStackPanel Orientation="Horizontal" Spacing="6">
-            <ContentPresenter Content="{Binding CompoundIcon}" />
+            <ContentPresenter Content="{Binding IconContent}" />
             <TextBlock
                 Grid.Column="1"
                 Height="{Binding IconSize}"
@@ -121,7 +84,7 @@
         </controls:SimpleStackPanel>
     </DataTemplate>
     <DataTemplate x:Key="DualActionButtonTemplate">
-        <ui:FontIcon Style="{StaticResource MenuIconStyle}" />
+        <ContentPresenter Content="{Binding IconContent}" />
     </DataTemplate>
     <DataTemplate x:Key="SubMenuTemplate">
         <TextBlock Text="{Binding}" TextOptions.TextFormattingMode="Display" />
@@ -131,13 +94,9 @@
     </DataTemplate>
     <helpers:MenuTemplateSelector
         x:Key="MenuTemplateSelector"
-        AnimatedNotifyTemplate="{StaticResource AnimatedNotifyTemplate}"
-        CompoundDualActionTemplate="{StaticResource CompoundIconMenuTemplate}"
         CompoundIconMenuTemplate="{StaticResource CompoundIconMenuTemplate}"
-        CompoundIconSubMenuTemplate="{x:Null}"
         DualActionButtonTemplate="{StaticResource DualActionButtonTemplate}"
         DynamicAltTextTemplate="{StaticResource DynamicAltTextTemplate}"
-        GeneralSubMenuTemplate="{x:Null}"
         IconMenuTemplate="{StaticResource IconMenuTemplate}"
         SeparatorTemplate="{StaticResource MenuSeparatorTemplate}"
         SubMenuSeparatorTemplate="{StaticResource SubMenuSeparatorTemplate}"
@@ -326,10 +285,6 @@
         <Setter Property="ToolTipService.IsEnabled" Value="{Binding IsTooltipVisible}" />
     </Style>
     <Style
-        x:Key="AnimatedNotifyStyle"
-        BasedOn="{StaticResource IconMenuStyle}"
-        TargetType="controls:AdbMenuItem" />
-    <Style
         x:Key="MenuSeparatorStyle"
         BasedOn="{StaticResource WpfUiMenuItem}"
         TargetType="controls:AdbMenuItem">
@@ -380,11 +335,6 @@
         <Setter Property="Header" Value="{Binding Action.Description}" />
         <Setter Property="InputGestureText" Value="{Binding Action.GestureString}" />
         <Setter Property="Icon" Value="{Binding IconContent}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding IconContent}" Value="{x:Null}">
-                <Setter Property="Icon" Value="{StaticResource MenuIcon}" />
-            </DataTrigger>
-        </Style.Triggers>
     </Style>
     <Style
         x:Key="DummySubMenuStyle"
@@ -395,12 +345,6 @@
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="CompoundIconSubMenuStyle"
-        BasedOn="{StaticResource SubMenuItemStyle}"
-        TargetType="controls:AdbMenuItem">
-        <Setter Property="Icon" Value="{Binding CompoundIcon}" />
     </Style>
     <Style
         x:Key="DualActionButtonStyle"
@@ -426,14 +370,10 @@
     </Style>
     <helpers:MenuStyleSelector
         x:Key="MenuStyleSelector"
-        AnimatedNotifyStyle="{StaticResource AnimatedNotifyStyle}"
-        CompoundDualActionStyle="{StaticResource DualActionButtonStyle}"
         CompoundIconMenuStyle="{StaticResource CompoundIconMenuStyle}"
-        CompoundIconSubMenuStyle="{StaticResource CompoundIconSubMenuStyle}"
         DualActionButtonStyle="{StaticResource DualActionButtonStyle}"
         DummySubMenuStyle="{StaticResource DummySubMenuStyle}"
         DynamicAltTextStyle="{StaticResource DynamicAltTextStyle}"
-        GeneralSubMenuStyle="{StaticResource GeneralSubMenuStyle}"
         IconMenuStyle="{StaticResource IconMenuStyle}"
         SeparatorStyle="{StaticResource MenuSeparatorStyle}"
         SubMenuSeparatorStyle="{StaticResource SubMenuSeparatorStyle}"

@@ -46,6 +46,25 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+    <Style
+        x:Key="BaseIconFontStyle"
+        BasedOn="{StaticResource GlyphFont}"
+        TargetType="ui:FontIcon">
+        <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{DynamicResource TextFillColorDisabledBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="BaseIconPathStyle" TargetType="controls:FluentPathIcon">
+        <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{DynamicResource TextFillColorDisabledBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
     <Style x:Key="BorderStyle" TargetType="Border">
         <Setter Property="CornerRadius" Value="5" />
         <Setter Property="BorderThickness" Value="1" />

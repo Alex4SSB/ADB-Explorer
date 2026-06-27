@@ -52,13 +52,10 @@
             <Setter Property="FlowDirection" Value="LeftToRight" />
         </Style>
         <Style
-            x:Key="SettingsIconStyle"
-            BasedOn="{StaticResource GlyphFont}"
-            TargetType="ui:FontIcon">
-            <Setter Property="Glyph" Value="{Binding Icon}" />
-            <Setter Property="FontSize" Value="22" />
+            x:Key="SettingsIconPresenterStyle"
+            TargetType="ContentPresenter">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding Icon}" Value="{x:Null}">
+                <DataTrigger Binding="{Binding IconContent}" Value="{x:Null}">
                     <Setter Property="Visibility" Value="Collapsed" />
                 </DataTrigger>
             </Style.Triggers>
@@ -76,13 +73,7 @@
             x:Key="SettingsCardHeader"
             MinHeight="37"
             x:Shared="False">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <ui:FontIcon Margin="0,0,10,0" Style="{StaticResource SettingsIconStyle}" />
             <TextBlock
-                Grid.Column="1"
                 VerticalAlignment="Center"
                 Text="{Binding Description}"
                 TextWrapping="Wrap" />
@@ -92,6 +83,7 @@
             BasedOn="{StaticResource DefaultUiCardControlStyle}"
             TargetType="ui:CardControl">
             <Setter Property="MinHeight" Value="70" />
+            <Setter Property="Icon" Value="{Binding IconContent}" />
             <Setter Property="Header" Value="{StaticResource SettingsCardHeader}" />
             <Setter Property="Background">
                 <Setter.Value>
@@ -114,6 +106,13 @@
             </Style.Triggers>
         </Style>
         <Style
+            x:Key="SettingsCardExpanderStyle"
+            BasedOn="{StaticResource DefaultUiCardExpanderStyle}"
+            TargetType="ui:CardExpander">
+            <Setter Property="Icon" Value="{Binding IconContent}" />
+            <Setter Property="Header" Value="{StaticResource SettingsCardHeader}" />
+        </Style>
+        <Style
             x:Key="SettingsCardActionStyle"
             BasedOn="{StaticResource DefaultUiCardActionStyle}"
             TargetType="ui:CardAction">
@@ -130,40 +129,31 @@
             <ui:CardControl Style="{StaticResource SettingsCardHeaderStyle}">
                 <ui:CardControl.Header>
                     <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <ui:FontIcon Margin="0,0,10,0" Style="{StaticResource SettingsIconStyle}" />
-                        <Grid>
-                            <Grid.Style>
-                                <Style TargetType="Grid">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding HeaderAlignment}" Value="Center">
-                                            <Setter Property="Grid.ColumnSpan" Value="2" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Grid.Style>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <TextBlock
-                                Grid.Column="1"
-                                VerticalAlignment="Center"
-                                FontFamily="{Binding FontFamily}"
-                                FontSize="{Binding FontSize}"
-                                Text="{Binding Description}"
-                                TextAlignment="{Binding HeaderAlignment}"
-                                TextWrapping="Wrap" />
-                            <TextBlock
-                                Grid.Row="1"
-                                Grid.Column="1"
-                                Style="{StaticResource CollapsedTextBlock}"
-                                Text="{Binding AltText}"
-                                TextAlignment="{Binding HeaderAlignment}" />
-                        </Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HeaderAlignment}" Value="Center">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontFamily="{Binding FontFamily}"
+                            FontSize="{Binding FontSize}"
+                            Text="{Binding Description}"
+                            TextAlignment="{Binding HeaderAlignment}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Style="{StaticResource CollapsedTextBlock}"
+                            Text="{Binding AltText}"
+                            TextAlignment="{Binding HeaderAlignment}" />
                     </Grid>
                 </ui:CardControl.Header>
             </ui:CardControl>
@@ -220,7 +210,7 @@
             </ui:CardAction>
         </DataTemplate>
         <DataTemplate x:Key="MultiLinkSettingTemplate" DataType="services:MultiLinkSetting">
-            <ui:CardExpander Header="{StaticResource SettingsCardHeader}">
+            <ui:CardExpander Style="{StaticResource SettingsCardExpanderStyle}">
                 <ItemsControl FlowDirection="LeftToRight" ItemsSource="{Binding Links}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -246,7 +236,7 @@
             </ui:CardExpander>
         </DataTemplate>
         <DataTemplate x:Key="LongDescriptionSettingTemplate" DataType="services:LongDescriptionSetting">
-            <ui:CardExpander Header="{StaticResource SettingsCardHeader}">
+            <ui:CardExpander Style="{StaticResource SettingsCardExpanderStyle}">
                 <TextBlock Text="{Binding AltText}" TextWrapping="Wrap" />
             </ui:CardExpander>
         </DataTemplate>

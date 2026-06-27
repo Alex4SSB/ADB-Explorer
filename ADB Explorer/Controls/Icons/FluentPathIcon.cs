@@ -71,6 +71,73 @@ public class FluentPathIcon : IconElement
     }
 }
 
+public class BaseIcon
+{
+    private const string DefaultForegroundBrush = "TextFillColorPrimaryBrush";
+
+    public object IconContent { get; private set; }
+
+    public double Size { get; }
+
+    public BaseIcon(string glyph, double fontSize = 22, string? brush = null)
+    {
+        Size = fontSize;
+        FontIcon fontIcon = new()
+        {
+            Glyph = glyph,
+            FontSize = fontSize,
+            Style = CreateForegroundStyle(typeof(FontIcon), "BaseIconFontStyle", brush ?? DefaultForegroundBrush),
+        };
+
+        IconContent = fontIcon;
+    }
+
+    public BaseIcon(Geometry data, double height = 22, string? brush = null, Stretch stretch = Stretch.Uniform)
+    {
+        Size = height;
+        FluentPathIcon icon = new()
+        {
+            Data = data,
+            Stretch = stretch,
+            Width = height,
+            Height = height,
+            Style = CreateForegroundStyle(typeof(FluentPathIcon), "BaseIconPathStyle", brush ?? DefaultForegroundBrush),
+        };
+
+        IconContent = icon;
+    }
+
+    public BaseIcon(ImageSource imageSource, double height = 22, Stretch stretch = Stretch.Uniform)
+    {
+        Size = height;
+        IconContent = new System.Windows.Controls.Image()
+        {
+            Source = imageSource,
+            Height = height,
+            Stretch = stretch,
+        };
+    }
+
+    public BaseIcon(UserControl content, double size = 18)
+    {
+        Size = size;
+        IconContent = content;
+    }
+
+    public static BaseIcon NewItem() => new(new NewItemIcon());
+
+    private static Style CreateForegroundStyle(Type targetType, string baseStyleKey, string enabledBrushKey)
+    {
+        var baseStyle = (Style)App.Current.Resources[baseStyleKey];
+        if (enabledBrushKey == DefaultForegroundBrush)
+            return baseStyle;
+
+        var style = new Style(targetType, baseStyle);
+        style.Setters.Add(new Setter(Control.ForegroundProperty, new DynamicResourceExtension(enabledBrushKey)));
+        return style;
+    }
+}
+
 public static class FluentPathGeometries
 {
     // ic_fluent_text_bullet_list_square_20_regular

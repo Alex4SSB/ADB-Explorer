@@ -108,23 +108,23 @@ public static class UISettings
         var settings = new List<AbstractSetting>
         {
             new InfoSetting(AppGlobal.AppDisplayName, null, (FontFamily)App.Current.Resources["Nunito"], 18, $"v{AppGlobal.AppVersion}", TextAlignment.Center),
-            new LinkSetting(Strings.Resources.S_DONATE, Resources.Links.SPONSOR, "\uEB51", "SponsorIconBrush"),
-            new LinkSetting(Strings.Resources.S_APP_DATA_FOLDER, new(AppDataPath), pathData: FluentPathGeometries.AppDataPath, resolveFilePath: () => AppDataPath),
-            new LinkSetting(Strings.Resources.S_GITHUB_REPO, Resources.Links.ADB_EXPLORER_GITHUB, pathData: GitHubGeometry),
-            new LinkSetting(Strings.Resources.S_GOTO_WEBLATE, Resources.Links.WEBLATE, imageSource: WeblateLogo),
-            new LinkSetting(Strings.Resources.S_PRIVACY_POLICY, Resources.Links.ADB_EXPLORER_PRIVACY, "\uE72E"),
-            new LinkSetting(RuntimeSettings.IsAppPackaged ? Strings.Resources.S_ADB_LEARN_MORE : Strings.Resources.S_ADB_DOWNLOAD, Resources.Links.L_ADB_PAGE, imageSource: FileToIconConverter.LoadBitmap(AppGlobal.icons8_android_os_94)),
+            new LinkSetting(Strings.Resources.S_DONATE, Resources.Links.SPONSOR, new("\uEB51", brush: "SponsorIconBrush")),
+            new LinkSetting(Strings.Resources.S_APP_DATA_FOLDER, new(AppDataPath), new(FluentPathGeometries.AppDataPath), resolveFilePath: () => AppDataPath),
+            new LinkSetting(Strings.Resources.S_GITHUB_REPO, Resources.Links.ADB_EXPLORER_GITHUB, new(GitHubGeometry)),
+            new LinkSetting(Strings.Resources.S_GOTO_WEBLATE, Resources.Links.WEBLATE, new(WeblateLogo)),
+            new LinkSetting(Strings.Resources.S_PRIVACY_POLICY, Resources.Links.ADB_EXPLORER_PRIVACY, new("\uE72E")),
+            new LinkSetting(RuntimeSettings.IsAppPackaged ? Strings.Resources.S_ADB_LEARN_MORE : Strings.Resources.S_ADB_DOWNLOAD, Resources.Links.L_ADB_PAGE, new(FileToIconConverter.LoadBitmap(AppGlobal.icons8_android_os_94))),
         };
 
         if (!RuntimeSettings.IsAppPackaged)
         {
-            settings.Add(new BoolSetting(() => Settings.CheckForUpdates, Strings.Resources.S_SETTINGS_UPDATES, icon: "\uE895"));
+            settings.Add(new BoolSetting(() => Settings.CheckForUpdates, Strings.Resources.S_SETTINGS_UPDATES, icon: new("\uE895")));
         }
 
         if (CrashReportService.IsConfigured)
         {
-            settings.Add(new BoolSetting(() => Settings.ShowMessageOnCrash, Strings.Resources.S_SETTINGS_CRASH_DIALOG, icon: "\uE783"));
-            settings.Add(new LongDescriptionSetting(Strings.Resources.S_CRASH_REPORTING_TITLE, Strings.Resources.S_CRASH_REPORTING_NOTICE, "\uE783"));
+            settings.Add(new BoolSetting(() => Settings.ShowMessageOnCrash, Strings.Resources.S_SETTINGS_CRASH_DIALOG, icon: new("\uE783")));
+            settings.Add(new LongDescriptionSetting(Strings.Resources.S_CRASH_REPORTING_TITLE, Strings.Resources.S_CRASH_REPORTING_NOTICE, new("\uE783")));
         }
 
         settings.Add(new MultiLinkSetting(Strings.Resources.S_ATTRIBUTIONS, [
@@ -144,8 +144,8 @@ public static class UISettings
             new("LGPL v3", Resources.Links.LGPL3),
             new("Apache", Resources.Links.L_APACHE_LIC),
             new(Strings.Resources.S_CC_NAME, Resources.Links.L_CC_LIC),
-        ], "\uE90F"));
-        settings.Add(new LongDescriptionSetting(Strings.Resources.S_ANDROID_ICONS_TITLE, $"{Strings.Resources.S_ANDROID_ROBOT_LIC}\n\n{Strings.Resources.S_APK_ICON_LIC}", "\uE946"));
+        ], new("\uE90F")));
+        settings.Add(new LongDescriptionSetting(Strings.Resources.S_ANDROID_ICONS_TITLE, $"{Strings.Resources.S_ANDROID_ROBOT_LIC}\n\n{Strings.Resources.S_APK_ICON_LIC}", new("\uE946")));
 
         return settings;
     }
@@ -163,50 +163,50 @@ public static class UISettings
         [
             new SettingsGroup("ADB",
             [
-                new BoolSetting(() => Settings.EnableMdns, Strings.Resources.S_SETTINGS_ENABLE_MDNS, icon: "\uED14"),
-                new BoolSetting(() => Settings.PollDevices, Strings.Resources.S_SETTINGS_POLL_DEVICES, icon: "\uEBDE"),
-                new BoolSetting(() => Settings.PollBattery, Strings.Resources.S_SETTINGS_POLL_BATTERY, icon: "\uEE63"),
-                new BoolSetting(() => Settings.KillAdbOnExit, Strings.Resources.S_SETTINGS_KILL_ADB_ON_EXIT, icon: "\uF71D"),
-                new BoolSetting(() => Settings.EnableLog, Strings.Resources.S_BUTTON_LOG, icon: "\uE9A4")
+                new BoolSetting(() => Settings.EnableMdns, Strings.Resources.S_SETTINGS_ENABLE_MDNS, icon: new("\uED14")),
+                new BoolSetting(() => Settings.PollDevices, Strings.Resources.S_SETTINGS_POLL_DEVICES, icon: new("\uEBDE")),
+                new BoolSetting(() => Settings.PollBattery, Strings.Resources.S_SETTINGS_POLL_BATTERY, icon: new("\uEE63")),
+                new BoolSetting(() => Settings.KillAdbOnExit, Strings.Resources.S_SETTINGS_KILL_ADB_ON_EXIT, icon: new("\uF71D")),
+                new BoolSetting(() => Settings.EnableLog, Strings.Resources.S_BUTTON_LOG, icon: new(FluentPathGeometries.TextBulletListSquare))
                     { CardAppearance = ControlAppearance.Caution },
-            ], "\uE8CC"),
+            ], new("\uE8CC")),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_DEVICE,
             [
-                new BoolSetting(() => Settings.AutoRoot, Strings.Resources.S_SETTINGS_AUTO_ROOT, icon: "\uE7EF"),
-                new BoolSetting(() => Settings.SaveDevices, Strings.Resources.S_SETTINGS_SAVE_DEVICES, icon: "\uE78C"),
-                new BoolSetting(() => Settings.AutoOpen, Strings.Resources.S_SETTINGS_AUTO_OPEN, icon: "\uE838"),
-            ], "\uE8EA"),
+                new BoolSetting(() => Settings.AutoRoot, Strings.Resources.S_SETTINGS_AUTO_ROOT, icon: new("\uE7EF")),
+                new BoolSetting(() => Settings.SaveDevices, Strings.Resources.S_SETTINGS_SAVE_DEVICES, icon: new("\uE78C")),
+                new BoolSetting(() => Settings.AutoOpen, Strings.Resources.S_SETTINGS_AUTO_OPEN, icon: new("\uE838")),
+            ], new("\uE8EA")),
             new SettingsGroup(Strings.Resources.S_FILE_OP_TOOLTIP,
             [
-                new BoolSetting(() => Settings.StopPollingOnSync, Strings.Resources.S_SETTINGS_STOP_ON_SYNC, icon: "\uE8D8"),
-                new BoolSetting(() => Settings.AllowMultiOp, Strings.Resources.S_SETTINGS_PARALLEL_OPERATIONS, icon: "\uE762"),
-                new BoolSetting(() => Settings.RescanOnPush, Strings.Resources.S_SETTINGS_MEDIA_RESCAN, icon: "\uE7C5"),
-                new BoolSetting(() => Settings.KeepDateModified, Strings.Resources.S_SETTINGS_KEEP_MODIFIED_DATE, icon: "\uEC92"),
-            ], "\uEADF"),
+                new BoolSetting(() => Settings.StopPollingOnSync, Strings.Resources.S_SETTINGS_STOP_ON_SYNC, icon: new("\uE8D8")),
+                new BoolSetting(() => Settings.AllowMultiOp, Strings.Resources.S_SETTINGS_PARALLEL_OPERATIONS, icon: new("\uE762")),
+                new BoolSetting(() => Settings.RescanOnPush, Strings.Resources.S_SETTINGS_MEDIA_RESCAN, icon: new("\uE7C5")),
+                new BoolSetting(() => Settings.KeepDateModified, Strings.Resources.S_SETTINGS_KEEP_MODIFIED_DATE, icon: new("\uEC92")),
+            ], new("\uEADF")),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_DRIVES,
             [
-                new BoolSetting(() => Settings.PollDrives, Strings.Resources.S_SETTINGS_POLL_DRIVES, icon: "\uEBC4"),
-                new BoolSetting(() => Settings.EnableRecycle, Strings.Resources.S_DRIVE_TRASH, icon: "\uE74D"),
-                new BoolSetting(() => Settings.EnableBusyBox, Strings.Resources.S_SETTINGS_BUSYBOX, icon: "\uF133"),
-                new BoolSetting(() => Settings.EnableWsa, Strings.Resources.S_SETTINGS_WSA, icon: "\uE78A"),
-                new BoolSetting(() => Settings.EnableEmulatorDiscovery, Strings.Resources.S_SETTINGS_EMULATOR_DISCOVERY, icon: "\uE99A"),
-            ], "\uE8CE"),
+                new BoolSetting(() => Settings.PollDrives, Strings.Resources.S_SETTINGS_POLL_DRIVES, icon: new("\uEBC4")),
+                new BoolSetting(() => Settings.EnableRecycle, Strings.Resources.S_DRIVE_TRASH, icon: new("\uE74D")),
+                new BoolSetting(() => Settings.EnableBusyBox, Strings.Resources.S_SETTINGS_BUSYBOX, icon: new("\uF133")),
+                new BoolSetting(() => Settings.EnableWsa, Strings.Resources.S_SETTINGS_WSA, icon: new("\uE78A")),
+                new BoolSetting(() => Settings.EnableEmulatorDiscovery, Strings.Resources.S_SETTINGS_EMULATOR_DISCOVERY, icon: new("\uE99A")),
+            ], new("\uE8CE")),
             new SettingsGroup("APK",
             [
-                new BoolSetting(() => Settings.EnableApk, Strings.Resources.S_SETTINGS_APK, icon: "\uE7B8"),
-                new BoolSetting(() => Settings.ShowSystemPackages, Strings.Resources.S_SETTINGS_SYSTEM_APPS, visibleProp: AbstractSetting.ExtractPropertyInfo(() => Settings.EnableApk), icon: "\uE835"),
-            ], "\uE7B8"),
+                new BoolSetting(() => Settings.EnableApk, Strings.Resources.S_SETTINGS_APK, icon: new("\uE7B8")),
+                new BoolSetting(() => Settings.ShowSystemPackages, Strings.Resources.S_SETTINGS_SYSTEM_APPS, visibleProp: AbstractSetting.ExtractPropertyInfo(() => Settings.EnableApk), icon: new("\uE835")),
+            ], new("\uE7B8")),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_EXPLORER,
             [
-                new BoolSetting(() => Settings.ShowExtensions, Strings.Resources.S_SETTINGS_SHOW_EXTENSIONS, icon: "\uE8AC"),
-                new BoolSetting(() => Settings.ShowHiddenItems, Strings.Resources.S_SETTINGS_HIDDEN_ITEMS, icon: "\uE8FF"),
-                new BoolSetting(() => Settings.SortingPerLocation, Strings.Resources.S_SETTINGS_SORTING_PER_LOCATION, icon: "\uE8CB"),
+                new BoolSetting(() => Settings.ShowExtensions, Strings.Resources.S_SETTINGS_SHOW_EXTENSIONS, icon: new("\uE8AC")),
+                new BoolSetting(() => Settings.ShowHiddenItems, Strings.Resources.S_SETTINGS_HIDDEN_ITEMS, icon: new("\uE8FF")),
+                new BoolSetting(() => Settings.SortingPerLocation, Strings.Resources.S_SETTINGS_SORTING_PER_LOCATION, icon: new("\uE8CB")),
                 new NumericSetting(() => Settings.MaxPreviewFileSize,
                                    Strings.Resources.S_SETTINGS_PREVIEW_MAX_SIZE,
                                    0,
                                    100000,
                                    sizes[1],
-                                   icon: "\uE1A5"),
+                                   icon: new("\uE1A5")),
                 new SimpleComboSetting<AppSettings.FileSizeDisplay>(() => Settings.FileSizeMode, Strings.Resources.S_SETTINGS_FILE_SIZE_MODE,
                 [
                     new(AppSettings.FileSizeDisplay.B, sizes[0]),
@@ -218,8 +218,8 @@ public static class UISettings
                                    Strings.Resources.S_SETTINGS_FILE_SIZE_DECIMAL,
                                    0,
                                    9),
-                new BoolSetting(() => Settings.DoubleClickToPull, Strings.Resources.S_SETTINGS_PULL_ON_DOUBLE_CLICK, AbstractSetting.ExtractPropertyInfo(() => Settings.DefaultFolder), "\uE7C9"),
-            ], "\uEC50"),
+                new BoolSetting(() => Settings.DoubleClickToPull, Strings.Resources.S_SETTINGS_PULL_ON_DOUBLE_CLICK, AbstractSetting.ExtractPropertyInfo(() => Settings.DefaultFolder), new("\uE7C9")),
+            ], new("\uEC50")),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_ICONS,
             [
                 new SimpleComboSetting<AppSettings.ThumbnailMode>(() => Settings.ThumbsMode, Strings.Resources.S_SETTINGS_THUMBNAIL_MODE, [
@@ -227,10 +227,10 @@ public static class UISettings
                     new(AppSettings.ThumbnailMode.IconViewOnly, Strings.Resources.S_SETTINGS_THUMBS_ICON_VIEW),
                     new(AppSettings.ThumbnailMode.OnPhotoDir, Strings.Resources.S_SETTINGS_THUMBS_PHOTO_DIR),
                     new(AppSettings.ThumbnailMode.OnConnect, Strings.Resources.S_SETTINGS_THUMBS_CONNECT) ],
-                    icon: "\uE15A"),
-                new BoolSetting(() => Settings.MovieThumbsEnabled, Strings.Resources.S_SETTINGS_VIDEO_THUMBNAILS, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uE8B2"),
-                new BoolSetting(() => Settings.ThumbSizePerLocation, Strings.Resources.S_SETTINGS_THUMB_SIZE_PER_LOCATION, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uEFFF"),
-                new BoolSetting(() => Settings.PersistThumbs, Strings.Resources.S_SETTINGS_PERSIST_THUMBS, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uE78C"),
+                    icon: new("\uE15A")),
+                new BoolSetting(() => Settings.MovieThumbsEnabled, Strings.Resources.S_SETTINGS_VIDEO_THUMBNAILS, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), new("\uE8B2")),
+                new BoolSetting(() => Settings.ThumbSizePerLocation, Strings.Resources.S_SETTINGS_THUMB_SIZE_PER_LOCATION, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), new("\uEFFF")),
+                new BoolSetting(() => Settings.PersistThumbs, Strings.Resources.S_SETTINGS_PERSIST_THUMBS, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), new("\uE78C")),
                 new SimpleComboSetting<AppSettings.ThumbnailAge>(() => Settings.ThumbsAge, Strings.Resources.S_SETTINGS_THUMBS_AGE, [
                     new(AppSettings.ThumbnailAge.Disabled, Strings.Resources.S_SETTINGS_INACTIVE),
                     new(AppSettings.ThumbnailAge.OneMonth, Strings.Resources.S_ONE_MONTH),
@@ -238,17 +238,17 @@ public static class UISettings
                     new(AppSettings.ThumbnailAge.OneDay, Strings.Resources.S_ONE_DAY),
                     new(AppSettings.ThumbnailAge.OneHour, Strings.Resources.S_ONE_HOUR)],
                     visibleProp: AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode),
-                    icon: "\uE823"),
+                    icon: new("\uE823")),
                 new NumericSetting(() => Settings.MaxCustomThumbWeight,
                                    Strings.Resources.S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT,
                                    0,
                                    1000,
                                    sizes[1],
                                    AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode),
-                                   "\uEE71"),
-                new BoolSetting(() => Settings.LimitThumbsPullSpeed, Strings.Resources.S_SETTINGS_THUMBS_THROTTLE, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), "\uEC48"),
-                new BoolSetting(() => Settings.SpecialFolderIcons, Strings.Resources.S_SETTINGS_SPECIAL_DIR_ICONS, icon: "\uEC25"),
-            ], "\uE8B9"),
+                                   new("\uEE71")),
+                new BoolSetting(() => Settings.LimitThumbsPullSpeed, Strings.Resources.S_SETTINGS_THUMBS_THROTTLE, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), new("\uEC48")),
+                new BoolSetting(() => Settings.SpecialFolderIcons, Strings.Resources.S_SETTINGS_SPECIAL_DIR_ICONS, icon: new("\uEC25")),
+            ], new("\uE8B9")),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_WORK_DIRS,
             [
                 new TextboxSetting(() => Settings.ManualAdbPath,
@@ -258,7 +258,7 @@ public static class UISettings
                                       SettingsActions.Find(a => a.Name is ActionType.ClearAdbPath),
                                       SettingsActions.Find(a => a.Name is ActionType.ResetApp),
                                   ]),
-                                  new BoolSetting(() => Settings.DisableAdbRestrictions, Strings.Resources.S_SETTINGS_DISABLE_ADB_LIMITATIONS, icon: "\uE1DE", commands: [
+                                  new BoolSetting(() => Settings.DisableAdbRestrictions, Strings.Resources.S_SETTINGS_DISABLE_ADB_LIMITATIONS, icon: new("\uE1DE"), commands: [
                                       SettingsActions.Find(a => a.Name is ActionType.ResetApp),
                                   ])
                                   { CardAppearance = ControlAppearance.Danger },
@@ -268,30 +268,30 @@ public static class UISettings
                                       SettingsActions.Find(a => a.Name is ActionType.ChangeDefaultPath),
                                       SettingsActions.Find(a => a.Name is ActionType.ClearDefaultPath),
                                   ]),
-            ], pathData: FluentPathGeometries.FolderBriefcase),
+            ], new(FluentPathGeometries.FolderBriefcase)),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_GRAPHICS,
             [
                 new ComboSetting<CultureInfo>(() => Settings.UICulture,
                                  Strings.Resources.S_SETTINGS_LANGUAGE,
                                  SettingsHelper.GetAvailableLanguages(),
                                  Settings.CultureTranslationProgress,
-                                 "\uF2B7",
+                                 new("\uF2B7"),
                                  SettingsActions.Find(a => a.Name is ActionType.ResetApp)),
                 new SimpleComboSetting<AppSettings.AppTheme>(() => Settings.Theme, Strings.Resources.S_SETTINGS_GROUP_THEME, [
                     new(AppSettings.AppTheme.Light, Strings.Resources.S_SETTINGS_THEME_LIGHT),
                     new(AppSettings.AppTheme.Dark, Strings.Resources.S_SETTINGS_THEME_DARK),
                     new(AppSettings.AppTheme.WindowsDefault, Strings.Resources.S_SETTINGS_THEME_DEFAULT)], 
-                    icon: "\uE2B1"),
+                    icon: new("\uE2B1")),
                 new BoolSetting(() => Settings.UseCustomAccent,
                                 Strings.Resources.S_SETTINGS_CUSTOM_ACCENT,
-                                icon: "\uE790"),
+                                icon: new("\uE790")),
                 new ColorSetting(() => Settings.AccentColor,
                                        Strings.Resources.S_SETTINGS_ACCENT_COLOR,
                                        visibleProp: AbstractSetting.ExtractPropertyInfo(() => Settings.UseCustomAccent),
-                                       icon: "\uE771"),
-                new BoolSetting(() => Settings.SwRender, Strings.Resources.S_SETTINGS_DISABLE_HW, icon: "\uF211"),
-            ], "\uE2B1"),
-            new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_ABOUT, BuildAboutSettings(), "\uE946"),
+                                       icon: new("\uE771")),
+                new BoolSetting(() => Settings.SwRender, Strings.Resources.S_SETTINGS_DISABLE_HW, icon: new("\uF211")),
+            ], new("\uE2B1")),
+            new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_ABOUT, BuildAboutSettings(), new("\uE946")),
         ];
     }
 }
@@ -310,40 +310,13 @@ public class SettingsGroup : AbstractGroup
 {
     public string Name { get; set; }
 
-    //public string Icon { get; }
+    public object? IconContent { get; set; }
 
-    public object IconContent { get; set; }
-
-    public SettingsGroup(string name, List<AbstractSetting> children, string? icon = null, Geometry? pathData = null)
+    public SettingsGroup(string name, List<AbstractSetting> children, BaseIcon? icon = null)
     {
         Name = name;
         Children = children;
-
-        if (icon is not null)
-        {
-            Wpf.Ui.Controls.FontIcon fontIcon = new()
-            {
-                Glyph = icon,
-                FontSize = 22,
-                Style = (Style)App.Current.Resources["GlyphFont"],
-            };
-            fontIcon.SetResourceReference(Control.ForegroundProperty, "TextFillColorPrimaryBrush");
-
-            IconContent = fontIcon;
-        }
-        else if (pathData is not null)
-        {
-            System.Windows.Shapes.Path path = new()
-            {
-                Data = pathData,
-                Height = 22,
-                Width = 22,
-                Stretch = Stretch.Uniform,
-            };
-            path.SetResourceReference(System.Windows.Shapes.Shape.FillProperty, "TextFillColorPrimaryBrush");
-
-            IconContent = path;
-        }
+        IconContent = icon?.IconContent;
     }
 }
 
@@ -353,7 +326,7 @@ public abstract class AbstractSetting : SettingsBase
     protected readonly PropertyInfo visibleProp;
 
     public string Description { get; private set; }
-    public string Icon { get; set; }
+    public object? IconContent { get; set; }
     public TextAlignment HeaderAlignment { get; protected set; }
 
     /// <summary>
@@ -386,13 +359,13 @@ public abstract class AbstractSetting : SettingsBase
         }
     }
 
-    protected AbstractSetting(PropertyInfo valueProp, string description, PropertyInfo visibleProp = null, string icon = null, params BaseAction[] commands)
+    protected AbstractSetting(PropertyInfo valueProp, string description, PropertyInfo visibleProp = null, BaseIcon? icon = null, params BaseAction[] commands)
     {
         this.visibleProp = visibleProp;
         this.valueProp = valueProp;
         Description = description;
         Commands = commands;
-        Icon = icon;
+        IconContent = icon?.IconContent;
 
         Settings.PropertyChanged += Settings_PropertyChanged;
     }
@@ -424,7 +397,7 @@ public class InfoSetting : AbstractSetting
     public int FontSize { get; set; }
     public string AltText { get; set; }
 
-    public InfoSetting(string description, string icon = null, FontFamily fontFamily = null, int fontSize = 14, string altText = null, TextAlignment headerAlignment = TextAlignment.Left)
+    public InfoSetting(string description, BaseIcon? icon = null, FontFamily fontFamily = null, int fontSize = 14, string altText = null, TextAlignment headerAlignment = TextAlignment.Left)
         : base(null, description, icon: icon)
     {
         FontFamily = fontFamily ?? new("Segoe UI");
@@ -438,7 +411,7 @@ public class LongDescriptionSetting : AbstractSetting
 {
     public string AltText { get; set; }
 
-    public LongDescriptionSetting(string description, string altText, string icon = null) 
+    public LongDescriptionSetting(string description, string altText, BaseIcon? icon = null) 
         : base(null, description, null, icon)
     {
         AltText = altText;
@@ -448,7 +421,7 @@ public class LongDescriptionSetting : AbstractSetting
 public class MultiLinkSetting : AbstractSetting
 {
     public List<LinkSetting> Links { get; set; } = [];
-    public MultiLinkSetting(string description, List<LinkSetting> links, string icon = null)
+    public MultiLinkSetting(string description, List<LinkSetting> links, BaseIcon? icon = null)
         : base(null, description, icon: icon)
     {
         Links = links;
@@ -461,8 +434,6 @@ public class LinkSetting : AbstractSetting
 
     public Uri Url { get; set; }
     public string AltText { get; set; }
-
-    public object IconContent { get; set; }
 
     public BaseAction Command => new(() => true, () =>
     {
@@ -477,46 +448,13 @@ public class LinkSetting : AbstractSetting
     public string ToolTip => _resolveFilePath?.Invoke()
         ?? (Url.IsFile ? Url.LocalPath : Url.ToString());
 
-    public LinkSetting(string description, Uri url, string? icon = null, string? iconBrush = null, string altText = null, ImageSource? imageSource = null, Geometry? pathData = null, Func<string>? resolveFilePath = null)
-        : base(null, description, icon: icon)
+    public LinkSetting(string description, Uri url, BaseIcon? iconBase = null, string altText = null, Func<string>? resolveFilePath = null)
+        : base(null, description)
     {
         _resolveFilePath = resolveFilePath;
         Url = url;
         AltText = altText;
-
-        if (icon is not null)
-        {
-            Wpf.Ui.Controls.FontIcon fontIcon = new()
-            {
-                Glyph = icon,
-                FontSize = 22,
-                Style = (Style)App.Current.Resources["GlyphFont"],
-            };
-            fontIcon.SetResourceReference(Control.ForegroundProperty, iconBrush ?? "TextFillColorPrimaryBrush");
-
-            IconContent = fontIcon;
-        }
-        else if (pathData is not null)
-        {
-            System.Windows.Shapes.Path path = new()
-            {
-                Data = pathData,
-                Height = 22,
-                Stretch = Stretch.Uniform,
-            };
-            path.SetResourceReference(System.Windows.Shapes.Shape.FillProperty, "TextFillColorPrimaryBrush");
-
-            IconContent = path;
-        }
-        else if (imageSource is not null)
-        {
-            IconContent = new Image()
-            {
-                Source = imageSource,
-                Height = 22,
-                Stretch = Stretch.Uniform,
-            };
-        }
+        IconContent = iconBase?.IconContent;
     }
 }
 
@@ -540,7 +478,7 @@ public class NumericSetting : AbstractSetting
                           int maxValue = int.MaxValue,
                           string unit = "",
                           PropertyInfo visibleProp = null,
-                          string icon = null,
+                          BaseIcon? icon = null,
                           params BaseAction[] commands)
         : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
     {
@@ -571,7 +509,7 @@ public class BoolSetting : AbstractSetting
 
     public string Label => Value ? Strings.Resources.S_SETTINGS_ACTIVE : Strings.Resources.S_SETTINGS_INACTIVE;
 
-    public BoolSetting(Expression<Func<bool>> propertyExpr, string description, PropertyInfo visibleProp = null, string icon = null, params BaseAction[] commands)
+    public BoolSetting(Expression<Func<bool>> propertyExpr, string description, PropertyInfo visibleProp = null, BaseIcon? icon = null, params BaseAction[] commands)
         : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
     { }
 
@@ -591,7 +529,7 @@ public class TextboxSetting : AbstractSetting
         set => valueProp.SetValue(Settings, value);
     }
 
-    public TextboxSetting(Expression<Func<string>> propertyExpr, string description, PropertyInfo visibleProp = null, string icon = null, params BaseAction[] commands)
+    public TextboxSetting(Expression<Func<string>> propertyExpr, string description, PropertyInfo visibleProp = null, BaseIcon? icon = null, params BaseAction[] commands)
         : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
     { }
 
@@ -613,7 +551,7 @@ public class SimpleComboSetting<T> : AbstractSetting
 
     public IEnumerable<EnumComboboxItem> Options { get; } = [];
 
-    public SimpleComboSetting(Expression<Func<T>> propertyExpr, string description, IEnumerable<EnumComboboxItem> options, PropertyInfo visibleProp = null, string icon = null, params BaseAction[] commands)
+    public SimpleComboSetting(Expression<Func<T>> propertyExpr, string description, IEnumerable<EnumComboboxItem> options, PropertyInfo visibleProp = null, BaseIcon? icon = null, params BaseAction[] commands)
         : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
     {
         Options = options;
@@ -634,7 +572,7 @@ public class ComboSetting<T> : AbstractSetting
 
     public string AltLabel { get; private set; } = null;
 
-    public ComboSetting(Expression<Func<T>> propertyExpr, string description, IEnumerable<T> options, ObservableProperty<string> altLabel = null, string icon = null, params BaseAction[] commands)
+    public ComboSetting(Expression<Func<T>> propertyExpr, string description, IEnumerable<T> options, ObservableProperty<string> altLabel = null, BaseIcon? icon = null, params BaseAction[] commands)
         : base(ExtractPropertyInfo(propertyExpr), description, null, icon, commands)
     {
         Options = options;
@@ -673,7 +611,7 @@ public class ColorSetting : AbstractSetting
     public ColorSetting(Expression<Func<Color>> propertyExpr,
                         string description,
                         PropertyInfo visibleProp = null,
-                        string icon = null)
+                        BaseIcon? icon = null)
         : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon)
     {
         PickColorCommand = new AsyncRelayCommand(async () =>

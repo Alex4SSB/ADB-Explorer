@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
@@ -51,15 +52,21 @@ public static class AppActions
         { FileActionType.FileOpStop, "\uE768" },
     };
 
+    public static BaseIcon Icon(FileActionType type, double size = 18) => type switch
+    {
+        FileActionType.CopyItemPath => new(FluentPathGeometries.AppDataPath, size),
+        _ => new(Icons[type], size),
+    };
+
     public static List<ToggleMenu> ToggleActions { get; } =
     [
         new(FileActionType.PauseLogs,
             () => true,
             Strings.Resources.S_LOG_UPDATES_PAUSE,
-            Icons[FileActionType.FileOpStop],
+            Icon(FileActionType.FileOpStop, 20),
             () => Data.IsLogPaused.Value ^= true,
             Strings.Resources.S_LOG_UPDATES_ALT,
-            Icons[FileActionType.PauseLogs]),
+            Icon(FileActionType.PauseLogs, 20)),
     ];
 
     public static List<FileAction> List { get; } =

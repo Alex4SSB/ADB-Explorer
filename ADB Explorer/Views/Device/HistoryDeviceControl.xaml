@@ -70,7 +70,6 @@
                     <ui:Button
                         Grid.Column="2"
                         Command="{Binding RemoveCommand.Command}"
-                        Opacity="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.ExpansionProgress)}"
                         Style="{StaticResource RestartAppButtonStyle}"
                         ToolTip="{Binding Source={x:Static Member=strings:Resources.S_REM_HIST_DEV}}">
                         <ui:FontIcon Glyph="&#xE74D;" />

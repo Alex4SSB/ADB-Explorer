@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Models
@@ -132,15 +133,15 @@ namespace ADB_Explorer.Models
             }
         }
 
-        public string Icon
+        public BaseIcon? Icon
         {
             get
             {
                 if (Location is SpecialLocation.DriveView)
-                    return AppActions.Icons[FileAction.FileActionType.Home];
+                    return AppActions.Icon(FileAction.FileActionType.Home, 16);
 
-                return Data.DevicesObject.Current?.Drives.FirstOrDefault(d => d.Path == Path)?.DriveIcon
-                    ?? null;
+                var glyph = Data.DevicesObject.Current?.Drives.FirstOrDefault(d => d.Path == Path)?.DriveIcon;
+                return glyph is not null ? new BaseIcon(glyph, 16) : null;
             }
         }
 

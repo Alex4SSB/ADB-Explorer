@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
@@ -9,7 +10,7 @@ public class ToggleMenu : ViewModelBase
 
     public ObservableProperty<string> Description { get; private set; } = new();
 
-    public ObservableProperty<string> Icon { get; private set; } = new();
+    public ObservableProperty<BaseIcon> Icon { get; private set; } = new();
 
     public FileAction FileAction { get; }
 
@@ -18,10 +19,10 @@ public class ToggleMenu : ViewModelBase
     public ToggleMenu(FileAction.FileActionType type,
                       Func<bool> canExecute,
                       string checkedDescription,
-                      string checkedIcon,
+                      BaseIcon checkedIcon,
                       Action action,
                       string uncheckedDescription = "",
-                      string uncheckedIcon = "",
+                      BaseIcon uncheckedIcon = null,
                       KeyGesture gesture = null,
                       Brush checkBackground = null,
                       IEnumerable<SubMenu> children = null,
@@ -30,7 +31,7 @@ public class ToggleMenu : ViewModelBase
                       bool clearClipboard = false)
     {
         uncheckedDescription = string.IsNullOrEmpty(uncheckedDescription) ? checkedDescription : uncheckedDescription;
-        uncheckedIcon = string.IsNullOrEmpty(uncheckedIcon) ? checkedIcon : uncheckedIcon;
+        uncheckedIcon ??= checkedIcon;
 
         IsChecked.Value = false;
         Description.Value = uncheckedDescription;
