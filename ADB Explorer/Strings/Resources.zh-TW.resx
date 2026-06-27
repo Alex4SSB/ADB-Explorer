@@ -412,7 +412,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>清空</value>
   </data>
   <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>開關 mDNS</value>
+    <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>對裝置輪詢</value>
