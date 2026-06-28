@@ -1591,4 +1591,19 @@ Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>Pareja</value>
   </data>
+  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
+    <value>Lugar para Datos de App</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
+    <value>Personalizar</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
+    <value>Elegir Carpeta de App Data</value>
+  </data>
+  <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
+    <value>Matar ADB cuando APP cierra</value>
+  </data>
+  <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
+    <value>El lugar personal no puede estar debajo de C:\Users\…\AppData; seleccione otro lugar</value>
+  </data>
 </root>
