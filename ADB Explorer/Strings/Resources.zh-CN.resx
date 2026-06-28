@@ -1623,4 +1623,7 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
     <value>文件大小小数位数</value>
   </data>
+  <data name="S_OPEN_FOLDER" xml:space="preserve">
+    <value>打开</value>
+  </data>
 </root>
