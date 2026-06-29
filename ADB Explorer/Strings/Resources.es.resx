@@ -1621,7 +1621,7 @@ Seleccione Personalizada para usar una ubicación que no se eliminará al desins
     <value>Exhibir tamaño del archivo</value>
   </data>
   <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
-    <value>Tamaño del Archivo en Lugares Decimales</value>
+    <value>Tamaño del archivo en lugares decimales</value>
   </data>
   <data name="S_OPEN_FOLDER" xml:space="preserve">
     <value>Abrir</value>
