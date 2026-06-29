@@ -1606,4 +1606,24 @@ Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
   <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
     <value>El lugar personal no puede estar debajo de C:\Users\…\AppData; seleccione otro lugar</value>
   </data>
+  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
+    <value>Esta distribución de la aplicación guarda los datos en una ubicación virtualizada (y de difícil acceso), que se borra al desinstalar la aplicación.
+
+Seleccione Personalizada para usar una ubicación que no se eliminará al desinstalar. La ubicación personalizada no puede estar debajo de C:\Users\…\AppData</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
+    <value>Usar valores predeterminados</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
+    <value>Permitir ADB desde orígenes no confiables</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_MODE" xml:space="preserve">
+    <value>Exhibir tamaño del archivo</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
+    <value>Tamaño del Archivo en Lugares Decimales</value>
+  </data>
+  <data name="S_OPEN_FOLDER" xml:space="preserve">
+    <value>Abrir</value>
+  </data>
 </root>
