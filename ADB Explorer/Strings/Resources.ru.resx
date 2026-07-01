@@ -139,7 +139,7 @@
     <value>Сбросить настройки приложения</value>
   </data>
   <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
-    <value>Новая версия программы</value>
+    <value>Новая версия приложения</value>
   </data>
   <data name="S_NAV_ERR_TITLE" xml:space="preserve">
     <value>Ошибка навигации</value>
