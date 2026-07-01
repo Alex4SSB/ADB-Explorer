@@ -1661,4 +1661,154 @@ Selecione "Personalizar" para usar um local que não será removido ao desinstal
   <data name="S_BAT_BALANCE" xml:space="preserve">
     <value>Corrente Atual: {0}A</value>
   </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Adere as regras de nomenclatura do espaço do usuário</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Um arquivo selecionado viola as regras de nomenclatura do espaço do usuário</value>
+  </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Um arquivo copiado viola as regras de nomenclatura do espaço do usuário</value>
+  </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value>Ativado</value>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value>Desativado</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>Verificando o status do servidor mDNS…</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value>Ícones</value>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>Puxar e Visualizar Miniaturas</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>Duração</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>Resolução</value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>Um Mês</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>Uma semana</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>Um dia</value>
+  </data>
+  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
+    <value>Encontre emuladores Android</value>
+  </data>
+  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
+    <value>Inicie este emulador</value>
+  </data>
+  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
+    <value>Iniciar emulador</value>
+  </data>
+  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
+    <value>O emulador do SDK do Android não foi encontrado. Instale o pacote do emulador do SDK do Android ou defina ANDROID_SDK_ROOT.</value>
+  </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>Colar</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>Verificando se há atualizações nas miniaturas</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>Baixando miniaturas</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>Lendo os locais das miniaturas e o banco de dados de mídia</value>
+  </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value>Detalhes</value>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value>Visualizar</value>
+  </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>Tamanho máximo da imagem a ser usada como sua própria miniatura (0 - Desativado)</value>
+  </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>e {0} mais…</value>
+  </data>
+  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
+    <value>Mostrar ou ocultar os detalhes e o painel de visualização prévia.</value>
+  </data>
+  <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
+    <value>Visualização</value>
+  </data>
+  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
+    <value>Tamanho máximo do arquivo para visualização</value>
+  </data>
+  <data name="S_IMAGE_ISO" xml:space="preserve">
+    <value>Velocidade ISO</value>
+  </data>
+  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
+    <value>Tempo de exposição</value>
+  </data>
+  <data name="S_VIDEO_BITRATE" xml:space="preserve">
+    <value>Taxa de bits</value>
+  </data>
+  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
+    <value>Selecione um arquivo para visualizar.</value>
+  </data>
+  <data name="S_PREVIEW_INVALID" xml:space="preserve">
+    <value>Não há pré-visualização disponível.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
+    <value>Este PDF está protegido por senha.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
+    <value>Senha incorreta.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
+    <value>Desbloquear</value>
+  </data>
+  <data name="S_FILE_SYSTEM" xml:space="preserve">
+    <value>Sistema de arquivos</value>
+  </data>
+  <data name="S_MOUNT_POINT" xml:space="preserve">
+    <value>Ponto de Montagem</value>
+  </data>
+  <data name="S_MOUNT_OPTIONS" xml:space="preserve">
+    <value>Opções de montagem</value>
+  </data>
+  <data name="S_COLOR_RED" xml:space="preserve">
+    <value>Vermelho</value>
+  </data>
+  <data name="S_COLOR_GREEN" xml:space="preserve">
+    <value>Verde</value>
+  </data>
+  <data name="S_COLOR_BLUE" xml:space="preserve">
+    <value>Azul</value>
+  </data>
+  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
+    <value>Não foi possível localizar o ADB no PATH do sistema. Por favor use “{0}” para localizá-lo.</value>
+  </data>
+  <data name="S_ADB_PATH_INVALID" xml:space="preserve">
+    <value>O caminho {0} proporcionado é um atalho do Windows ou um caminho UNC (remoto), o que não é permitido.</value>
+  </data>
+  <data name="S_ADB_COMPROMISED" xml:space="preserve">
+    <value>Não é possível verificar se o executável fornecido é o ADB. Certifique-se de baixar apenas as Ferramentas Oficiais da Android Platform Tools da Google.</value>
+  </data>
+  <data name="S_BUTTON_PAIR" xml:space="preserve">
+    <value>Parear</value>
+  </data>
+  <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
+    <value>Matar o ADB quando o aplicativo for fechado</value>
+  </data>
+  <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
+    <value>O local personalizado não pode estar na pasta C:\Users\…\AppData — por favor selecione outro local</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
+    <value>Permitir ADB de fontes não confiáveis</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_MODE" xml:space="preserve">
+    <value>Exibição do tamanho do arquivo</value>
+  </data>
 </root>
