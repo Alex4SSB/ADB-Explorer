@@ -367,7 +367,7 @@ public partial class ExplorerPageHeader : UserControl
             DetailsPane.SelectedFiles = FileActions.IsAppDrive ? SelectedPackages : SelectedFiles;
         }
 
-        if (!DevicesObject.Current.SupportsLsV2)
+        if (DevicesObject.Current is { SupportsLsV2: false })
         {
             foreach (var file in SelectedFiles.Where(f => f.IsRegularFile && f.ShellLsSize is null))
             {
@@ -1309,7 +1309,7 @@ public partial class ExplorerPageHeader : UserControl
                             ? CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1])
                             : null;
 
-        if (IsInEditMode)
+        if (IsInEditMode && cell is not null)
         {
             withinEditingCell = VisualTreeHelper.GetDescendantBounds(cell).Contains(e.GetPosition(cell));
         }

@@ -23,9 +23,14 @@ public static class CredentialVaultStore
 
     public static void Set(string userName, string value)
     {
-        Remove(userName);
-        new global::Windows.Security.Credentials.PasswordVault()
-            .Add(new global::Windows.Security.Credentials.PasswordCredential(Resource, userName, value));
+        try
+        {
+            Remove(userName);
+            new global::Windows.Security.Credentials.PasswordVault()
+                .Add(new global::Windows.Security.Credentials.PasswordCredential(Resource, userName, value));
+        }
+        catch
+        { }
     }
 
     public static void Remove(string userName)

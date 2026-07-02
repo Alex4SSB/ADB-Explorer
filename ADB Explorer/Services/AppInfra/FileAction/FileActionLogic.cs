@@ -1039,9 +1039,13 @@ internal static class FileActionLogic
                 && op.FilePath.ShellItem is ShellFolder shellFolder)
             {
                 var empty = FolderHelper.GetEmptySubfoldersRecursively(shellFolder);
+                var parentPath = op.FilePath?.FullPath;
                 foreach (var folder in empty)
                 {
-                    string relative = FileHelper.ExtractRelativePath(folder.FileSystemPath, op.FilePath.FullPath).Replace('\\', '/');
+                    if (string.IsNullOrEmpty(folder.FileSystemPath) || string.IsNullOrEmpty(parentPath))
+                        continue;
+
+                    string relative = FileHelper.ExtractRelativePath(folder.FileSystemPath, parentPath).Replace('\\', '/');
                     _ = ShellFileOperation.TryMakeDir(op.Device, FileHelper.ConcatPaths(op.TargetPath.FullPath, relative));
                 }
             }
