@@ -187,6 +187,7 @@ public partial class ExplorerPageHeader : UserControl
     private void ExplorerPageHeader_PreviewTextInput(object sender, TextCompositionEventArgs e)
     {
         if (SearchBox.IsFocused || SearchBox.IsKeyboardFocusWithin
+            || DetailsPane.IsEditorFocused
             || NavigationBox.Mode is NavigationBox.ViewMode.Path
             || FileActions.IsExplorerEditing)
             return;
