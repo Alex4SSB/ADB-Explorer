@@ -198,6 +198,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
             _filterDebounceTimer.Stop();
             RefreshExplorerFilter();
         };
+        Data.DevicesObjectCreated += (_, _) => App.SafeInvoke(EnsureDevicesSubscription);
     }
 
     public Task OnNavigatedToAsync()

@@ -289,14 +289,15 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         SideloadCommand = new(() => Device.Type is DeviceType.Sideload or DeviceType.Recovery && device.Status is DeviceStatus.Ok,
                               () => DeviceHelper.SideloadDeviceAction(this));
 
-        Data.DevicesObject.PropertyChanged += DevicesObject_PropertyChanged;
+        if (Data.DevicesObject is not null)
+            Data.DevicesObject.PropertyChanged += DevicesObject_PropertyChanged;
     }
 
     private void DevicesObject_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(Devices.DeviceToOpen))
         {
-            IsOpen = Data.DevicesObject.DeviceToOpen?.ID == ID;
+            IsOpen = Data.DevicesObject?.DeviceToOpen?.ID == ID;
 
             if (!IsOpen)
                 OnPropertyChanged(nameof(AndroidVersion));

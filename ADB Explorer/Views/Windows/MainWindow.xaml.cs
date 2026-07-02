@@ -58,6 +58,8 @@ public partial class MainWindow : INavigationWindow
         };
     }
 
+    private bool _adbStateHandlerAttached;
+
     private async void Initialize()
     {
         SystemThemeWatcher.Watch(this);
@@ -66,12 +68,43 @@ public partial class MainWindow : INavigationWindow
 
         ADBService.IsMdnsEnabled = Data.Settings.EnableMdns;
 
+        AttachAdbStateHandler();
+
         if (!await AdbHelper.CheckAdbVersion())
-        {
             return;
-        }
+
+        TryCompleteAdbDependentInitialization();
+    }
+
+    private void AttachAdbStateHandler()
+    {
+        if (_adbStateHandlerAttached)
+            return;
+
+        _adbStateHandlerAttached = true;
+        AdbHelper.CurrentAdbState.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(AdbState.Status)
+                && AdbHelper.CurrentAdbState.Status is AdbHelper.AdbStatus.Valid)
+            {
+                TryCompleteAdbDependentInitialization();
+            }
+        };
+    }
+
+    internal void TryCompleteAdbDependentInitialization() =>
+        App.SafeInvoke(CompleteAdbDependentInitializationCore);
+
+    private void CompleteAdbDependentInitializationCore()
+    {
+        if (Data.DevicesObject is not null)
+            return;
+
+        if (AdbHelper.CurrentAdbState.Status is not AdbHelper.AdbStatus.Valid)
+            return;
 
         Data.DevicesObject = new();
+        Data.RaiseDevicesObjectCreated();
 
         if (Data.Settings.EnableMdns)
             Data.MdnsService.Enable();

@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.Views.Windows;
 
 namespace ADB_Explorer.Helpers;
 
@@ -69,6 +70,9 @@ public static class SettingsHelper
         {
             ADBService.VerifyAdbVersion(dialog.FileName);
             Data.Settings.ManualAdbPath = dialog.FileName;
+
+            if (Application.Current.MainWindow is MainWindow mainWindow)
+                mainWindow.TryCompleteAdbDependentInitialization();
         }
     }
 

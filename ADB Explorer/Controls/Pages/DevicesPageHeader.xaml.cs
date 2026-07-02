@@ -9,15 +9,27 @@ namespace ADB_Explorer.Controls.Pages;
 /// </summary>
 public partial class DevicesPageHeader : UserControl
 {
+    private bool _devicesHandlersAttached;
+
     public DevicesPageHeader()
     {
         Thread.CurrentThread.CurrentCulture = Data.Settings.ActualFormatCulture;
 
         InitializeComponent();
 
+        Loaded += (_, _) => AttachDevicesHandlers();
+        Data.DevicesObjectCreated += (_, _) => AttachDevicesHandlers();
+        Data.Settings.PropertyChanged += Settings_PropertyChanged;
+    }
+
+    private void AttachDevicesHandlers()
+    {
+        if (_devicesHandlersAttached || Data.DevicesObject is null)
+            return;
+
+        _devicesHandlersAttached = true;
         Data.DevicesObject.UIList.CollectionChanged += UIList_CollectionChanged;
         Data.DevicesObject.PropertyChanged += DevicesObject_PropertyChanged;
-        Data.Settings.PropertyChanged += Settings_PropertyChanged;
     }
 
     private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)

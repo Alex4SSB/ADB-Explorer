@@ -21,7 +21,7 @@
             </Style.Triggers>
         </Style>
     </UserControl.Style>
-    <controls:FluentPathIcon Margin="0,1,0,0" Data="{Binding BatteryIcon}">
+    <controls:FluentPathIcon VerticalAlignment="Center" Data="{Binding BatteryIcon}">
         <controls:FluentPathIcon.Style>
             <Style BasedOn="{StaticResource DeviceHeaderPathIcon}" TargetType="controls:FluentPathIcon">
                 <Setter Property="ToolTip">

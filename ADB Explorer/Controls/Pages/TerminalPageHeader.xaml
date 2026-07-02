@@ -24,68 +24,68 @@
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-            <RowDefinition Height="5*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <TextBlock
-            Margin="4"
-            VerticalAlignment="Center"
-            FontFamily="Consolas"
-            Text="Target" />
-        <ComboBox
-            Grid.Column="1"
-            Margin="4"
-            HorizontalAlignment="Left"
-            DisplayMemberPath="Name"
-            FlowDirection="LeftToRight"
-            ItemsSource="{Binding DevicesView}"
-            SelectedItem="{Binding SelectedDevice, Mode=TwoWay}" />
-        <TextBlock
-            Grid.Row="1"
-            Margin="4"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            FontFamily="Consolas"
-            Text="stdin" />
-        <TextBlock
-            Grid.Row="2"
-            Margin="4"
-            VerticalAlignment="Center"
-            FontFamily="Consolas"
-            Text="stdout" />
-        <TextBlock
-            Grid.Row="3"
-            Margin="4"
-            VerticalAlignment="Center"
-            FontFamily="Consolas"
-            Text="stderr" />
-        <ui:TextBox
-            x:Name="Input"
-            Grid.Row="1"
-            Grid.Column="1"
-            Margin="4"
-            FontFamily="Consolas"
-            KeyUp="Input_KeyUp" />
-        <ui:RichTextBox
-            x:Name="StdOut"
-            Grid.Row="2"
-            Grid.Column="1"
-            Margin="4"
-            FontFamily="Consolas" />
-        <ui:TextBox
-            x:Name="StdErr"
-            Grid.Row="3"
-            Grid.Column="1"
-            Margin="4"
-            ClearButtonEnabled="False"
-            FontFamily="Consolas" />
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+                <RowDefinition Height="5*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock
+                Margin="4"
+                VerticalAlignment="Center"
+                FontFamily="Consolas"
+                Text="Target" />
+            <ComboBox
+                Grid.Column="1"
+                Margin="4"
+                HorizontalAlignment="Left"
+                DisplayMemberPath="Name"
+                FlowDirection="LeftToRight"
+                ItemsSource="{Binding DevicesView}"
+                SelectedItem="{Binding SelectedDevice, Mode=TwoWay}" />
+            <TextBlock
+                Grid.Row="1"
+                Margin="4"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontFamily="Consolas"
+                Text="stdin" />
+            <TextBlock
+                Grid.Row="2"
+                Margin="4"
+                VerticalAlignment="Center"
+                FontFamily="Consolas"
+                Text="stdout" />
+            <TextBlock
+                Grid.Row="3"
+                Margin="4"
+                VerticalAlignment="Center"
+                FontFamily="Consolas"
+                Text="stderr" />
+            <ui:TextBox
+                x:Name="Input"
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="4"
+                FontFamily="Consolas"
+                KeyUp="Input_KeyUp" />
+            <ui:RichTextBox
+                x:Name="StdOut"
+                Grid.Row="2"
+                Grid.Column="1"
+                Margin="4"
+                FontFamily="Consolas" />
+            <ui:TextBox
+                x:Name="StdErr"
+                Grid.Row="3"
+                Grid.Column="1"
+                Margin="4"
+                ClearButtonEnabled="False"
+                FontFamily="Consolas" />
         </Grid>
     </Grid>
 </UserControl>

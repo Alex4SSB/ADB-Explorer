@@ -1,5 +1,4 @@
 using ADB_Explorer.Models;
-using ADB_Explorer.ViewModels;
 using Wpf.Ui.Abstractions.Controls;
 
 namespace ADB_Explorer.ViewModels.Pages;
@@ -7,8 +6,14 @@ namespace ADB_Explorer.ViewModels.Pages;
 public partial class TerminalViewModel : ObservableObject, INavigationAware
 {
     private bool _isInitialized = false;
+    private bool _devicesAttached;
 
     public AdbTerminalDevice AdbEntry { get; } = new();
+
+    public TerminalViewModel()
+    {
+        Data.DevicesObjectCreated += (_, _) => App.SafeInvoke(AttachToDevicesObject);
+    }
 
     public ObservableCollection<object> DevicesView { get; } = [];
 
@@ -17,8 +22,7 @@ public partial class TerminalViewModel : ObservableObject, INavigationAware
 
     public Task OnNavigatedToAsync()
     {
-        if (!_isInitialized)
-            InitializeViewModel();
+        InitializeViewModel();
 
         Data.CurrentPage.Value = typeof(Views.Pages.TerminalPage);
 
@@ -29,24 +33,35 @@ public partial class TerminalViewModel : ObservableObject, INavigationAware
 
     private void InitializeViewModel()
     {
-        DevicesView.Add(AdbEntry);
-
-        if (Data.DevicesObject?.UIList is not null)
+        if (!_isInitialized)
         {
-            foreach (var device in Data.DevicesObject.UIList.OfType<LogicalDeviceViewModel>()
-                         .Where(d => d.Status is DeviceStatus.Ok))
-                DevicesView.Add(device);
-
-            foreach (var item in Data.DevicesObject.UIList)
-                item.PropertyChanged += DeviceItem_PropertyChanged;
-
-            Data.DevicesObject.UIList.CollectionChanged += UIList_CollectionChanged;
+            DevicesView.Add(AdbEntry);
+            _isInitialized = true;
         }
+
+        AttachToDevicesObject();
 
         SelectedDevice = DevicesView.OfType<LogicalDeviceViewModel>().FirstOrDefault();
         SelectedDevice ??= AdbEntry;
+    }
 
-        _isInitialized = true;
+    private void AttachToDevicesObject()
+    {
+        if (_devicesAttached || Data.DevicesObject?.UIList is null)
+            return;
+
+        _devicesAttached = true;
+
+        foreach (var device in Data.DevicesObject.UIList.OfType<LogicalDeviceViewModel>()
+                     .Where(d => d.Status is DeviceStatus.Ok))
+            DevicesView.Add(device);
+
+        foreach (var item in Data.DevicesObject.UIList)
+            item.PropertyChanged += DeviceItem_PropertyChanged;
+
+        Data.DevicesObject.UIList.CollectionChanged += UIList_CollectionChanged;
+
+        RefreshDeviceList();
     }
 
     private void UIList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -70,6 +85,9 @@ public partial class TerminalViewModel : ObservableObject, INavigationAware
 
     private void RefreshDeviceList()
     {
+        if (Data.DevicesObject?.UIList is null)
+            return;
+
         var activeDevices = Data.DevicesObject.UIList
             .OfType<LogicalDeviceViewModel>()
             .Where(d => d.Status is DeviceStatus.Ok)

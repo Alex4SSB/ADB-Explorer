@@ -72,7 +72,7 @@ public abstract class DeviceViewModel : ViewModelBase
                                     && IpAddress.Count(c => c == '.') == 3
                                     && IpAddress.Split('.').Count(i => byte.TryParse(i, out _)) == 4;
 
-    public bool IsDeviceConnectionInProgress => Data.DevicesObject.DeviceToConnect?.Equals(this) is true;
+    public bool IsDeviceConnectionInProgress => Data.DevicesObject?.DeviceToConnect?.Equals(this) is true;
 
     #endregion
 
@@ -133,7 +133,7 @@ public abstract class DeviceViewModel : ViewModelBase
             }
 
             if (status is DeviceStatus.Offline)
-                Data.FileOpQ.MoveOperationsToPast(true, this);
+                Data.FileOpQ?.MoveOperationsToPast(true, this);
 
             return true;
         }

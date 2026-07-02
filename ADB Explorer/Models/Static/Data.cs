@@ -47,6 +47,10 @@ public static class Data
 
     public static Devices DevicesObject { get; set; }
 
+    public static event EventHandler? DevicesObjectCreated;
+
+    internal static void RaiseDevicesObjectCreated() => DevicesObjectCreated?.Invoke(null, EventArgs.Empty);
+
     public static MDNS MdnsService { get; } = new();
 
     public static IEnumerable<FileClass> SelectedFiles { get; set; } = [];

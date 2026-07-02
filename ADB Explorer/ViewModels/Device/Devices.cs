@@ -360,6 +360,9 @@ public partial class Devices : ObservableObject
 
     public static bool SetOpenDevice(LogicalDeviceViewModel? device)
     {
+        if (Data.DevicesObject is null)
+            return false;
+
         if (Data.DevicesObject.DeviceToOpen is null && device is null)
             return false;
 

@@ -302,6 +302,8 @@ public static class DeviceHelper
 
     public static bool EvaluateDevicePredicate(DeviceViewModel device, Devices devicesObject)
     {
+        if (devicesObject is null)
+            return false;
         // The mDNS device cannot hide itself when in a listview
         if (device is MdnsDeviceViewModel)
             return Data.Settings.EnableMdns;

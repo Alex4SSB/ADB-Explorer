@@ -17,14 +17,24 @@ public partial class DevicesViewModel : ObservableObject, INavigationAware
     [ObservableProperty]
     public partial ICollectionView EmulatorDevicesView { get; set; }
 
+    public DevicesViewModel()
+    {
+        Data.DevicesObjectCreated += (_, _) => App.SafeInvoke(TryInitializeViewModel);
+    }
+
     public Task OnNavigatedToAsync()
     {
-        if (!_isInitialized)
-            InitializeViewModel();
-        else
+        if (Data.DevicesObject is null)
+            return Task.CompletedTask;
+
+        if (_isInitialized)
         {
             PrimaryDevicesView.Refresh();
             EmulatorDevicesView?.Refresh();
+        }
+        else
+        {
+            TryInitializeViewModel();
         }
 
         Data.CurrentPage.Value = typeof(Views.Pages.DevicesPage);
@@ -33,6 +43,14 @@ public partial class DevicesViewModel : ObservableObject, INavigationAware
     }
 
     public Task OnNavigatedFromAsync() => Task.CompletedTask;
+
+    private void TryInitializeViewModel()
+    {
+        if (_isInitialized || Data.DevicesObject is null)
+            return;
+
+        InitializeViewModel();
+    }
 
     private void InitializeViewModel()
     {

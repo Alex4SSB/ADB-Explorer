@@ -146,12 +146,13 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
         AddTestOpAction = new(() => false, () => { });
 
         InitColumns();
+
+        Data.DevicesObjectCreated += (_, _) => App.SafeInvoke(TryInitializeViewModel);
     }
 
     public Task OnNavigatedToAsync()
     {
-        if (!_isInitialized)
-            InitializeViewModel();
+        TryInitializeViewModel();
 
         Data.CurrentPage.Value = typeof(Views.Pages.OperationsPage);
 
@@ -159,6 +160,12 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
     }
 
     public Task OnNavigatedFromAsync() => Task.CompletedTask;
+
+    private void TryInitializeViewModel()
+    {
+        if (!_isInitialized)
+            InitializeViewModel();
+    }
 
     private void InitializeViewModel()
     {
@@ -194,10 +201,14 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
             }
         });
 
-        AddTestOpAction = new(() => true, () =>
+        AddTestOpAction = new(() => Data.DevicesObject?.Current is not null, () =>
         {
+            var device = Data.DevicesObject?.Current;
+            if (device is null)
+                return;
+
             var percentage = Random.Shared.Next(1, 30);
-            var op = FileSyncOperation.CreateTestPullOp(Data.DevicesObject.Current, percentage);
+            var op = FileSyncOperation.CreateTestPullOp(device, percentage);
             Data.FileOpQ.Operations.Add(op);
         });
 
