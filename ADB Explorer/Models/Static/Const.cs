@@ -35,6 +35,14 @@ public static class AdbExplorerConst
         { "/", AbstractDrive.DriveType.Root },
     };
 
+    /// <summary>
+    /// Per-device <c>{internal storage}/Android</c> paths whose directory entry FUSE forbids renaming or deleting.
+    /// Contents under these paths remain writable.
+    /// </summary>
+    public static readonly string[] FUSE_PROTECTED_ANDROID_ROOT_PATHS =
+        [.. DRIVE_TYPES.Where(kv => kv.Value is AbstractDrive.DriveType.Internal)
+            .Select(kv => $"{kv.Key.TrimEnd('/')}/Android")];
+
     public const int DIR_LIST_START_COUNT = 100;
     public const int DIR_LIST_UPDATE_THRESHOLD_MIN = 100;
     public const int DIR_LIST_UPDATE_START_THRESHOLD_MIN = 10;

@@ -34,6 +34,20 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     [ObservableProperty]
     public partial UnixFileMode? Permissions { get; set; }
 
+    [ObservableProperty]
+    public partial int? OwnerUid { get; set; }
+
+    [ObservableProperty]
+    public partial int? OwnerGid { get; set; }
+
+    [ObservableProperty]
+    public partial AccessMask? ProbedAccess { get; set; }
+
+    [ObservableProperty]
+    public partial AccessMask EffectiveAccess { get; set; }
+
+    public bool CanWriteLocation => EffectiveAccess.HasFlag(AccessMask.Write);
+
     private bool isLink;
     public bool IsLink
     {
@@ -262,8 +276,19 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     }
 
     public FileClass(FileClass other)
-        : this(other.FullName, other.FullPath, other.Type, other.IsLink, other.Size, other.ModifiedTime, other.IsTemp)
-    { }
+        : this(other.FullName, other.FullPath, other.Type, other.IsLink, other.Size, other.ModifiedTime, other.IsTemp, other.Permissions)
+    {
+        User = other.User;
+        Group = other.Group;
+        OwnerUid = other.OwnerUid;
+        OwnerGid = other.OwnerGid;
+        ProbedAccess = other.ProbedAccess;
+        EffectiveAccess = other.EffectiveAccess;
+        LastAccessTime = other.LastAccessTime;
+        CreationTime = other.CreationTime;
+        ModifiedTimeWithOffset = other.ModifiedTimeWithOffset;
+        LinkTarget = other.LinkTarget;
+    }
 
     public FileClass(FilePath other)
         : this(other.FullName, other.FullPath, other.IsDirectory ? FileType.Folder : FileType.File)
@@ -304,6 +329,65 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         modifiedTime: fileStat.ModifiedTime,
         permissions: fileStat.Permissions
     );
+
+    public static FileClass BuildCurrentLocation(
+        string path,
+        LocationInfo? info,
+        FileClass? source,
+        ShellIdentity? identity,
+        DriveRestrictions restrictions)
+    {
+        FileClass location;
+        if (source is not null && (source.FullPath == path || source.LinkTarget == path))
+        {
+            location = source;
+        }
+        else
+        {
+            location = new FileClass(
+                FileHelper.GetFullName(path),
+                path,
+                FileType.Folder,
+                permissions: info?.Permissions ?? source?.Permissions);
+        }
+
+        ApplyLocationInfo(location, info, identity, restrictions);
+        return location;
+    }
+
+    public static void ApplyLocationInfo(
+        FileClass location,
+        LocationInfo? info,
+        ShellIdentity? identity,
+        DriveRestrictions restrictions)
+    {
+        if (info is null)
+        {
+            if (location.Permissions is UnixFileMode mode
+                && location.OwnerUid is int ownerUid
+                && location.OwnerGid is int ownerGid
+                && identity is not null)
+            {
+                location.EffectiveAccess = ShellAccessHelper.ApplyRestrictions(
+                    ShellAccessHelper.ResolveEffective(mode, ownerUid, ownerGid, identity),
+                    restrictions);
+            }
+
+            return;
+        }
+
+        location.User = info.Value.User ?? location.User;
+        location.Group = info.Value.Group ?? location.Group;
+        location.OwnerUid = info.Value.OwnerUid ?? location.OwnerUid;
+        location.OwnerGid = info.Value.OwnerGid ?? location.OwnerGid;
+        location.Permissions = info.Value.Permissions ?? location.Permissions;
+        location.ProbedAccess = info.Value.ProbedAccess;
+        location.LastAccessTime = info.Value.AccessTime ?? location.LastAccessTime;
+        location.CreationTime = info.Value.CreationTime ?? location.CreationTime;
+        location.ModifiedTimeWithOffset = info.Value.ModifiedTime ?? location.ModifiedTimeWithOffset;
+        location.ModifiedTime = info.Value.ModifiedTime?.DateTime.ToLocalTime() ?? location.ModifiedTime;
+        location.EffectiveAccess = ShellAccessHelper.ResolveLocationAccess(location.FullPath, info, identity, restrictions);
+    }
 
     private void OnSettingsPropertyChanged(object sender, PropertyChangedEventArgs args)
     {

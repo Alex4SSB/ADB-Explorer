@@ -9,6 +9,11 @@ namespace ADB_Explorer.Services.AppInfra;
 
 internal static class FileActionLogic
 {
+    private static bool HasRootShell => Data.DevicesObject.Current?.HasRootShell == true;
+
+    private static bool SelectionIsFuseProtectedAndroidRoot =>
+        Data.SelectedFiles.Any(f => ShellAccessHelper.IsFuseProtectedAndroidRoot(f.FullPath));
+
     private static string RemoveApkMessage(IEnumerable<IBrowserItem> objects)
     {
         var count = objects.Count();
@@ -431,7 +436,7 @@ internal static class FileActionLogic
         UpdatePastingRestrictions(targetPath, [.. Data.CopyPaste.CurrentFiles.Select(f => f.FullPath)]);
 
         var result = DragDropEffects.Copy;
-        if (Data.RuntimeSettings.IsRootActive 
+        if (HasRootShell
             && Data.CopyPaste.IsSelf
             && DriveHelper.GetCurrentDrive(targetPath)?.Restrictions.NoSymbolicLinks is not true
             && Data.CopyPaste.CurrentFiles.Count() == 1)
@@ -505,8 +510,8 @@ internal static class FileActionLogic
 
     public static void CutFiles(IEnumerable<FileClass> items, bool isCopy = false)
     {
-        var itemsToCut = Data.DevicesObject.Current.Root is not RootStatus.Enabled
-                    ? items.Where(file => file.Type is FileType.File or FileType.Folder) : items;
+        var itemsToCut = HasRootShell
+                    ? items : items.Where(file => file.Type is FileType.File or FileType.Folder);
 
         Data.FileActions.CopyEnabled = !isCopy;
         Data.FileActions.CutEnabled = isCopy;
@@ -567,9 +572,9 @@ internal static class FileActionLogic
         }
         else
         {
-            itemsToDelete = [.. Data.DevicesObject.Current.Root != RootStatus.Enabled
-                ? Data.SelectedFiles.Where(file => file.Type is FileType.File or FileType.Folder)
-                : Data.SelectedFiles];
+            itemsToDelete = [.. HasRootShell
+                ? Data.SelectedFiles
+                : Data.SelectedFiles.Where(file => file.Type is FileType.File or FileType.Folder)];
         }
         
         string deletedString;
@@ -788,6 +793,7 @@ internal static class FileActionLogic
             {
                 Data.CurrentDisplayNames.Clear();
                 Data.CurrentPath = null;
+                Data.DirList?.ClearCurrentLocation();
                 Data.RaiseClearNavigationBox();
 
                 UpdateFileActions();
@@ -811,7 +817,7 @@ internal static class FileActionLogic
         Data.FileActions.IsOpenApkLocationEnabled = Data.FileActions.IsAppDrive && Data.SelectedPackages.Count() == 1;
         Data.FileActions.IsApkWebSearchEnabled = Data.FileActions.IsOpenApkLocationEnabled && !string.IsNullOrEmpty(Data.RuntimeSettings.DefaultBrowserPath);
 
-        Data.FileActions.IsRegularItem = !Data.SelectedFiles.Any() || Data.RuntimeSettings.IsRootActive
+        Data.FileActions.IsRegularItem = !Data.SelectedFiles.Any() || HasRootShell
             || Data.SelectedFiles.AnyAll(item => item.Type is FileType.File or FileType.Folder);
 
         Data.FileActions.IsSingleFolder = Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory;
@@ -822,7 +828,18 @@ internal static class FileActionLogic
                                                && Data.SelectedFiles.First().Type is not FileType.BrokenLink;
 
         var restrictions = Data.CurrentDrive?.Restrictions ?? DriveRestrictions.None;
-        var isWritable = restrictions.ReadOnly is not true;
+        var isWritable = restrictions.ReadOnly is not true
+            && Data.DirList?.CurrentLocation?.CanWriteLocation == true;
+        var isExplorerFolder = Data.FileActions.IsExplorerVisible
+            && !Data.FileActions.IsRecycleBin
+            && !Data.FileActions.IsAppDrive;
+
+        Data.FileActions.IsCurrentLocationReadOnly = isExplorerFolder && !isWritable;
+        Data.FileActions.IsSelectionFuseProtectedAndroidRoot = Data.SelectedFiles.Any()
+            && SelectionIsFuseProtectedAndroidRoot;
+
+        Data.FileActions.PushFilesFoldersEnabled = isWritable && isExplorerFolder;
+        Data.FileActions.NewEnabled = isWritable && isExplorerFolder;
 
         if (Data.FileActions.IsRecycleBin)
         {
@@ -831,8 +848,9 @@ internal static class FileActionLogic
         else
         {
             Data.FileActions.DeleteEnabled = isWritable
+                && !SelectionIsFuseProtectedAndroidRoot
                 && Data.SelectedFiles.Any() && Data.FileActions.IsRegularItem
-                && (!Data.FileActions.IsFollowLinkEnabled || Data.RuntimeSettings.IsRootActive);
+                && (!Data.FileActions.IsFollowLinkEnabled || HasRootShell);
 
             Data.FileActions.RestoreEnabled = false;
         }
@@ -862,20 +880,22 @@ internal static class FileActionLogic
             && (!Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 
         Data.FileActions.RenameEnabled = isWritable
+                                         && !SelectionIsFuseProtectedAndroidRoot
                                          && !Data.FileActions.IsRecycleBin
                                          && Data.SelectedFiles.Count() == 1
                                          && Data.FileActions.IsRegularItem
-                                         && (!Data.FileActions.IsFollowLinkEnabled || Data.RuntimeSettings.IsRootActive);
+                                         && (!Data.FileActions.IsFollowLinkEnabled || HasRootShell);
 
         var allSelectedAreCut = Data.CopyPaste.IsSelf
                                 && Data.CopyPaste.Files.AnyAll(item => Data.SelectedFiles.Any(f => f.FullPath == item))
                                 && Data.CopyPaste.Files.Length == Data.SelectedFiles.Count();
         
         Data.FileActions.CutEnabled = isWritable
+                                      && !SelectionIsFuseProtectedAndroidRoot
                                       && Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
                                       && !(allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Move)
                                       && Data.FileActions.IsRegularItem
-                                      && (!Data.FileActions.IsFollowLinkEnabled || Data.RuntimeSettings.IsRootActive);
+                                      && (!Data.FileActions.IsFollowLinkEnabled || HasRootShell);
 
         if (Data.FileActions.IsAppDrive)
         {
@@ -917,7 +937,7 @@ internal static class FileActionLogic
             && Data.SelectedFiles.AnyAll(file => file.Type is FileType.File && !file.IsApk && !file.IsLink);
 
         Data.FileActions.IsPasteLinkEnabled = Data.CurrentDrive?.Restrictions.NoSymbolicLinks is not true
-            && Data.RuntimeSettings.IsRootActive
+            && HasRootShell
             && Data.CopyPaste.Files.Length == 1
             && Data.CopyPaste.IsSelf
             && Data.CopyPaste.PasteState is DragDropEffects.Copy

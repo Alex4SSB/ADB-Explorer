@@ -405,6 +405,14 @@ public partial class DetailsPane : UserControl
                     control.FileNameTextBlock.Text = $"{Data.CurrentDrive.DisplayName}\n{TextHelper.LTR_MARK}({Data.CurrentDrive.Path}){TextHelper.LTR_MARK}";
                     control.LargeFileIcon.Source = DriveIcon.DragImage;
                 }
+                else if (Data.DirList?.CurrentLocation is { } location)
+                {
+                    control.File = location;
+                    control.FileNameTextBlock.Text = location.DisplayName;
+                    control.LargeFileIcon.Source = location.DragImage;
+                    control.InvalidSelectionBorder.Visibility = Visibility.Collapsed;
+                    control.PopulateThumbnailInfoItems(location);
+                }
                 else
                 {
                     control.FileNameTextBlock.Text = FileHelper.GetFullName(Data.CurrentPath);

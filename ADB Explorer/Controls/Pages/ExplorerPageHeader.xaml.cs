@@ -631,7 +631,7 @@ public partial class ExplorerPageHeader : UserControl
         return _navigateToPath(realPath);
     }
 
-    private bool _navigateToPath(string realPath)
+    private bool _navigateToPath(string realPath, FileClass? locationSource = null)
     {
         DeviceCts.Cancel();
         DeviceCts.Dispose();
@@ -663,19 +663,11 @@ public partial class ExplorerPageHeader : UserControl
 
         FileActionLogic.IsPasteEnabled();
 
-        if (!RuntimeSettings.IsRootActive && DevicesObject.Current.Root is RootStatus.Enabled)
-            RuntimeSettings.IsRootActive = true;
-
         FileActions.PushPackageEnabled = Settings.EnableApk && DevicesObject?.Current?.Type is not DeviceType.Recovery;
         FileActions.UninstallPackageEnabled = false;
 
         FileActions.ContextPushPackagesEnabled =
         FileActions.IsUninstallVisible.Value = FileActions.IsAppDrive;
-
-        FileActions.PushFilesFoldersEnabled =
-        FileActions.ContextNewEnabled =
-        FileActions.ContextPushEnabled =
-        FileActions.NewEnabled = !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
 
         FileActions.CopyPathDescription.Value = FileActions.IsAppDrive ? Strings.Resources.S_COPY_APK_NAME : Strings.Resources.S_COPY_PATH;
 
@@ -710,7 +702,7 @@ public partial class ExplorerPageHeader : UserControl
                 return true;
             }
 
-            DirList.Navigate(realPath);
+            DirList.Navigate(realPath, locationSource);
 
             FileActions.DeleteDescription.Value = Strings.Resources.S_DELETE_ACTION;
         }
@@ -801,7 +793,7 @@ public partial class ExplorerPageHeader : UserControl
             ? file.LinkTarget
             : file.FullPath;
 
-        return realPath is not null && _navigateToPath(realPath);
+        return realPath is not null && _navigateToPath(realPath, file);
     }
 
     public bool NavigateToPath(string path)
@@ -813,7 +805,8 @@ public partial class ExplorerPageHeader : UserControl
         //    prevPath = path;
 
         var realPath = FolderHelper.FolderExists(path);
-        return realPath is not null && _navigateToPath(realPath);
+        var locationSource = DirList?.FileList.FirstOrDefault(f => f.IsDirectory && f.FullPath == realPath);
+        return realPath is not null && _navigateToPath(realPath, locationSource);
     }
 
     private void DriveViewNav()
@@ -1027,7 +1020,7 @@ public partial class ExplorerPageHeader : UserControl
 
     private void MouseUpOnName(DataGridCell cell)
     {
-        if (DevicesObject.Current.Root is not RootStatus.Enabled
+        if (!DevicesObject.Current.HasRootShell
             && ((FileClass)cell.DataContext).Type is not (FileType.File or FileType.Folder))
             return;
 

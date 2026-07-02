@@ -466,12 +466,32 @@ public partial class ADBService
         return result;
     }
 
-    public static bool WhoAmI(string deviceId)
+    public static ShellIdentity? GetShellIdentity(string deviceId)
     {
-        if (ExecuteDeviceAdbShellCommand(deviceId, "whoami", out string stdout, out _, CancellationToken.None) != 0)
-            return false;
+        if (ExecuteDeviceAdbShellCommand(deviceId, "whoami; id", out string stdout, out _, CancellationToken.None) != 0)
+            return null;
 
-        return stdout.Trim() == "root";
+        return ShellAccessHelper.ParseShellIdentity(stdout);
+    }
+
+    public static LocationInfo? GetLocationInfo(string deviceId, string path, CancellationToken cancellationToken)
+    {
+        var stat = ShellCommands.TranslateCommand("stat");
+        var escapedPath = EscapeAdbShellString(path);
+        var statFormat = $"%U{ADB_FIELD_SEP}%G{ADB_FIELD_SEP}%u{ADB_FIELD_SEP}%g{ADB_FIELD_SEP}%a{ADB_FIELD_SEP}%x{ADB_FIELD_SEP}%z{ADB_FIELD_SEP}%y";
+        var script =
+            $"p={escapedPath};" +
+            $"{stat} -c {EscapeAdbShellString(statFormat)} \"$p\";" +
+            "r=0;w=0;x=0;test -r \"$p\"&&r=1;test -w \"$p\"&&w=1;test -x \"$p\"&&x=1;" +
+            $"echo {ShellAccessHelper.AccessMarker}${{r}}${{w}}${{x}}";
+
+        if (ExecuteDeviceAdbShellCommand(deviceId, script, out string stdout, out _, cancellationToken) != 0
+            || string.IsNullOrWhiteSpace(stdout))
+        {
+            return null;
+        }
+
+        return ShellAccessHelper.ParseLocationInfo(stdout);
     }
 
     public static ulong CountFiles(string deviceID, string path, IEnumerable<string> includeNames = null, IEnumerable<string> excludeNames = null)

@@ -2954,6 +2954,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The current location is read-only.
+        /// </summary>
+        public static string S_POPUP_LOCATION_READ_ONLY {
+            get {
+                return ResourceManager.GetString("S_POPUP_LOCATION_READ_ONLY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A selected item is not a file / folder.
         /// </summary>
         public static string S_POPUP_NON_FILE {
@@ -2968,6 +2977,15 @@ namespace ADB_Explorer.Strings {
         public static string S_POPUP_RESTRICTED_NAMING {
             get {
                 return ResourceManager.GetString("S_POPUP_RESTRICTED_NAMING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A selected item cannot be modified.
+        /// </summary>
+        public static string S_POPUP_SELECTED_ANDROID_PROTECTED {
+            get {
+                return ResourceManager.GetString("S_POPUP_SELECTED_ANDROID_PROTECTED", resourceCulture);
             }
         }
         

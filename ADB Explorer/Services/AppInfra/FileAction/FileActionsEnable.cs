@@ -38,6 +38,20 @@ public partial class FileActionsEnable : ObservableObject
         set => SetProperty(ref contextPushPackagesEnabled, value);
     }
 
+    private bool isCurrentLocationReadOnly;
+    public bool IsCurrentLocationReadOnly
+    {
+        get => isCurrentLocationReadOnly;
+        set => SetProperty(ref isCurrentLocationReadOnly, value);
+    }
+
+    private bool isSelectionFuseProtectedAndroidRoot;
+    public bool IsSelectionFuseProtectedAndroidRoot
+    {
+        get => isSelectionFuseProtectedAndroidRoot;
+        set => SetProperty(ref isSelectionFuseProtectedAndroidRoot, value);
+    }
+
     [ObservableProperty]
     public partial bool IsCopyItemPathEnabled { get; set; }
 

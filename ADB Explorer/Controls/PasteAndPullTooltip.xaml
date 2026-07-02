@@ -29,6 +29,51 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsCurrentLocationReadOnly}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <local:WarningIcon />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_LOCATION_READ_ONLY}}"
+                        TextWrapping="Wrap" />
+                </Grid>
+                <Grid d:Visibility="Visible">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionFuseProtectedAndroidRoot}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <local:WarningIcon />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_SELECTED_ANDROID_PROTECTED}}"
+                        TextWrapping="Wrap" />
+                </Grid>
+                <Grid d:Visibility="Visible">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
                                 <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
@@ -215,6 +260,8 @@
                 <Style.Triggers>
                     <MultiDataTrigger>
                         <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsCurrentLocationReadOnly}" Value="False" />
+                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionFuseProtectedAndroidRoot}" Value="False" />
                             <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="False" />
                             <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalNaming}" Value="False" />
                             <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWinRoot}" Value="False" />
@@ -224,6 +271,12 @@
                         </MultiDataTrigger.Conditions>
                         <Setter Property="Visibility" Value="Collapsed" />
                     </MultiDataTrigger>
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsCurrentLocationReadOnly}" Value="True">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionFuseProtectedAndroidRoot}" Value="True">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
                     <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalNaming}" Value="True">
                         <Setter Property="Visibility" Value="Visible" />
                     </DataTrigger>

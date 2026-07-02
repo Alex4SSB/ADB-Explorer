@@ -69,19 +69,6 @@ public static class StyleHelper
             typeof(StyleHelper),
             null);
 
-    public static Brush GetPressedForeground(Control control) =>
-        (Brush)control.GetValue(PressedForegroundProperty);
-
-    public static void SetPressedForeground(Control control, Brush value) =>
-        control.SetValue(PressedForegroundProperty, value);
-
-    public static readonly DependencyProperty PressedForegroundProperty =
-        DependencyProperty.RegisterAttached(
-            "PressedForeground",
-            typeof(Brush),
-            typeof(StyleHelper),
-            null);
-
     public static Brush GetAltBorderBrush(UIElement control) =>
         (Brush)control.GetValue(AltBorderBrushProperty);
 

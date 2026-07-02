@@ -1288,6 +1288,14 @@ Cancel All Running</value>
     <value>A selected item is not a file / folder</value>
     <comment>Will show when selecting an item that can't be copied</comment>
   </data>
+  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
+    <value>The current location is read-only</value>
+    <comment>Shown when the open folder does not allow write operations</comment>
+  </data>
+  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
+    <value>A selected item cannot be modified</value>
+    <comment>Shown when an item like /sdcard/Android is selected</comment>
+  </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>WSA App</value>
     <comment>Represents the WSA app, not the device itself</comment>

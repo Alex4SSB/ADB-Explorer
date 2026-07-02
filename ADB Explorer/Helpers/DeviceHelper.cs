@@ -502,10 +502,12 @@ public static class DeviceHelper
         var devices = Data.DevicesObject.LogicalDeviceViewModels.Where(d => d.Root is RootStatus.Unchecked).ToList();
         foreach (var device in devices)
         {
-            bool root = ADBService.WhoAmI(device.ID);
+            var identity = ADBService.GetShellIdentity(device.ID);
+            bool root = identity?.IsRoot ?? false;
             bool rootDisabled = Data.DevicesObject.RootDevices.Contains(device.ID);
             App.SafeInvoke(() =>
             {
+                device.SetShellIdentity(identity);
                 device.SetRootStatus(root ? RootStatus.Enabled
                     : rootDisabled ? RootStatus.Disabled
                         : RootStatus.Unchecked);
@@ -736,6 +738,7 @@ public static class DeviceHelper
         // GetInternalStorage (readlink) is independent and updates the internal drive path.
         var propsTask = Task.Run(() => device.Props);
         var featuresTask = Task.Run(() => device.AdbFeatures);
+        var shellTask = Task.Run(() => device.GetOrLoadShellIdentity());
 
         internalDrive.UpdateInternalStorage(device.ID);
 
@@ -748,6 +751,7 @@ public static class DeviceHelper
         // BrandName and CurrentDisplayNames are populated before breadcrumbs render.
         await propsTask;
         await featuresTask;
+        await shellTask;
 
         if (Data.DevicesObject.Current != device)
             return;

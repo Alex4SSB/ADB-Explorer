@@ -1,5 +1,6 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
+using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Models.AbstractFile;
 using static ADB_Explorer.Models.AdbExplorerConst;
@@ -50,10 +51,28 @@ public class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewModel devic
 
     private ConcurrentQueue<FileStat> currentFileQueue;
 
-    public void Navigate(string path)
+    private FileClass? locationSource;
+    public FileClass? CurrentLocation { get; private set; }
+
+    public void Navigate(string path, FileClass? locationSource = null)
     {
+        this.locationSource = locationSource;
         StartDirectoryList(path);
     }
+
+    public void RefreshLocationAccess()
+    {
+        if (string.IsNullOrEmpty(currentPath))
+            return;
+
+        var path = currentPath;
+        var source = CurrentLocation;
+        var token = LinkListCancellation?.Token ?? Data.DeviceCts.Token;
+
+        Task.Run(() => UpdateLocationAccess(path, source, token), token);
+    }
+
+    public void ClearCurrentLocation() => CurrentLocation = null;
 
     public void Stop()
     {
@@ -64,6 +83,7 @@ public class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewModel devic
 
     private void StartDirectoryList(string path)
     {
+        FileClass? source;
         Dispatcher.BeginInvoke(() =>
         {
             IsLinkListingFinished = false;
@@ -75,13 +95,22 @@ public class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewModel devic
             InProgress = true;
             IsProgressVisible = false;
             CurrentPath = path;
+
+            source = locationSource;
+            locationSource = null;
+
+            var restrictions = DriveHelper.GetCurrentDrive(path)?.Restrictions ?? DriveRestrictions.None;
+            var preliminary = FileClass.BuildCurrentLocation(path, null, source, Device.ShellIdentity, restrictions);
+            CurrentLocation = preliminary;
         }).Wait();
 
         CurrentCancellationToken = new();
         LinkListCancellation = new();
         currentFileQueue = new ConcurrentQueue<FileStat>();
 
-        ReadTask = Task.Run(() => ADBService.ListDirectory(Device.ID, CurrentPath, ref currentFileQueue, Dispatcher, CurrentCancellationToken.Token), CurrentCancellationToken.Token);
+        ReadTask = Task.Run(() =>
+            ADBService.ListDirectory(Device.ID, path, ref currentFileQueue, Dispatcher, CurrentCancellationToken.Token),
+            CurrentCancellationToken.Token);
         ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(() => StopDirectoryList()), CurrentCancellationToken.Token);
 
         Task.Delay(DIR_LIST_VISIBLE_PROGRESS_DELAY).ContinueWith((t) => Dispatcher.BeginInvoke(() => IsProgressVisible = InProgress), CurrentCancellationToken.Token);
@@ -169,53 +198,89 @@ public class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewModel devic
         ReadTask = null;
         CurrentCancellationToken = null;
 
+        var path = currentPath;
+        var source = CurrentLocation;
+        var token = LinkListCancellation.Token;
+
         if (currentFileQueue.IsEmpty && !FileList.Any())
         {
-            isLinkListingFinished = true;
+            IsLinkListingFinished = true;
+            Task.Run(() => UpdateLocationAccess(path, source, token), token);
             return;
         }
 
-        Task.Run(ListLinks, LinkListCancellation.Token);
+        Task.Run(async () =>
+        {
+            try
+            {
+                await Task.WhenAll(
+                    ListLinksAsync(token),
+                    Task.Run(() => UpdateLocationAccess(path, source, token), token));
+            }
+            catch (OperationCanceledException)
+            { }
+        }, token);
     }
 
-    private async void ListLinks()
+    private void UpdateLocationAccess(string path, FileClass? source, CancellationToken cancellationToken)
     {
-        await AsyncHelper.WaitUntil(() => FileList.Count > 0, DIR_LIST_UPDATE_INTERVAL, TimeSpan.FromMilliseconds(20), LinkListCancellation.Token);
-
-        var items = FileList.Where(f => f.IsLink && f.Type is FileType.Unknown).ToList();
-        if (items.Count < 1)
-        {
-            IsLinkListingFinished = true;
+        if (cancellationToken.IsCancellationRequested)
             return;
-        }
 
-        List<(string, FileType)> result = null;
+        var identity = Device.GetOrLoadShellIdentity();
+        var restrictions = DriveHelper.GetCurrentDrive(path)?.Restrictions ?? DriveRestrictions.None;
+        var info = ADBService.GetLocationInfo(Device.ID, path, cancellationToken);
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
+        var location = FileClass.BuildCurrentLocation(path, info, source, identity, restrictions);
+
+        Dispatcher.Invoke(() =>
+        {
+            if (path != currentPath)
+                return;
+
+            CurrentLocation = location;
+            FileActionLogic.UpdateFileActions();
+        });
+    }
+
+    private async Task ListLinksAsync(CancellationToken cancellationToken)
+    {
         try
         {
-            result = [.. ADBService.GetLinkType(Device.ID, items.Select(f => f.FullPath), LinkListCancellation.Token)];
-        }
-        catch (AggregateException e) when (e.InnerException is TaskCanceledException)
-        { }
+            await AsyncHelper.WaitUntil(() => FileList.Count > 0, DIR_LIST_UPDATE_INTERVAL, TimeSpan.FromMilliseconds(20), cancellationToken);
 
-        if (result is null)
-        {
-            IsLinkListingFinished = true;
-            return;
-        }
+            var items = FileList.Where(f => f.IsLink && f.Type is FileType.Unknown).ToList();
+            if (items.Count < 1)
+                return;
 
-        for (var i = 0; i < items.Count; i++)
-        {
-            var file = items[i];
-            var target = result[i];
-
-            Dispatcher.Invoke(() =>
+            List<(string, FileType)> result;
+            try
             {
-                file.LinkTarget = target.Item1;
-                file.Type = target.Item2;
-                file.UpdateType();
-            });
-        }
+                result = [.. ADBService.GetLinkType(Device.ID, items.Select(f => f.FullPath), cancellationToken)];
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
 
-        IsLinkListingFinished = true;
+            for (var i = 0; i < items.Count; i++)
+            {
+                var file = items[i];
+                var target = result[i];
+
+                Dispatcher.Invoke(() =>
+                {
+                    file.LinkTarget = target.Item1;
+                    file.Type = target.Item2;
+                    file.UpdateType();
+                });
+            }
+        }
+        finally
+        {
+            Dispatcher.BeginInvoke(() => IsLinkListingFinished = true);
+        }
     }
 }

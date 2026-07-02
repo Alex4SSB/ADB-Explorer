@@ -447,7 +447,6 @@
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="Padding" Value="8,1,8,2" />
-        <Setter Property="helpers:StyleHelper.PressedForeground" Value="{DynamicResource DriveForegroundPressed}" />
     </Style>
     <Style
         x:Key="HomeSavedLocationsListStyle"

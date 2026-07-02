@@ -47,13 +47,6 @@ public partial class AppRuntimeSettings : ViewModelBase
         }
     }
 
-    private bool isRootActive = false;
-    public bool IsRootActive
-    {
-        get => isRootActive;
-        set => Set(ref isRootActive, value);
-    }
-
     public bool IsDebug
     {
         get

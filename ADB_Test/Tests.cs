@@ -779,5 +779,78 @@ namespace ADB_Test
             Assert.IsNull(ADBService.ParseBatteryPropertyValue("Result: Parcel(00000000    '....')"));
             Assert.IsNull(ADBService.ParseBatteryPropertyValue("Result: Parcel(Error: 0xffffffffffffffb6 \"Not a data message\")"));
         }
+
+        [TestMethod]
+        public void ParseShellIdentityTest()
+        {
+            var stdout = """
+                shell
+                uid=2000(shell) gid=2000(shell) groups=2000(shell),1003(graphics),1015(sdcard_rw),1023(media_rw)
+                """;
+
+            var identity = ShellAccessHelper.ParseShellIdentity(stdout);
+            Assert.IsNotNull(identity);
+            Assert.AreEqual("shell", identity.UserName);
+            Assert.AreEqual(2000, identity.Uid);
+            Assert.AreEqual(2000, identity.Gid);
+            Assert.IsFalse(identity.IsRoot);
+            CollectionAssert.IsSubsetOf(new[] { 1003, 1015, 1023 }, identity.Groups.ToArray());
+
+            var rootStdout = """
+                root
+                uid=0(root) gid=0(root) groups=0(root)
+                """;
+            var root = ShellAccessHelper.ParseShellIdentity(rootStdout);
+            Assert.IsNotNull(root);
+            Assert.IsTrue(root.IsRoot);
+        }
+
+        [TestMethod]
+        public void ParseLocationInfoTest()
+        {
+            var stdout = """
+                media_rw§media_rw§1023§1023§771§2024-01-02 03:04:05.000000000 +0000§2024-01-02 03:04:05.000000000 +0000§2024-01-02 03:04:05.000000000 +0000
+                ADB_ACCESS:101
+                """.Replace('§', AdbExplorerConst.ADB_FIELD_SEP);
+
+            var info = ShellAccessHelper.ParseLocationInfo(stdout);
+            Assert.IsNotNull(info);
+            Assert.AreEqual("media_rw", info.Value.User);
+            Assert.AreEqual(1023, info.Value.OwnerUid);
+            var expectedMode = (System.IO.UnixFileMode)Convert.ToInt32("771", 8);
+            Assert.AreEqual(expectedMode, info.Value.Permissions);
+            Assert.AreEqual(AccessMask.Read | AccessMask.Execute, info.Value.ProbedAccess);
+        }
+
+        [TestMethod]
+        public void ResolveEffectiveAccessTest()
+        {
+            var identity = new ShellIdentity("shell", 2000, 2000, new HashSet<int> { 2000, 1023 });
+            var mode = (System.IO.UnixFileMode)Convert.ToInt32("771", 8);
+
+            var effective = ShellAccessHelper.ResolveEffective(mode, 1023, 1023, identity);
+            Assert.AreEqual(AccessMask.Read | AccessMask.Write | AccessMask.Execute, effective);
+
+            var otherOnly = ShellAccessHelper.ResolveEffective(mode, 0, 0, identity);
+            Assert.AreEqual(AccessMask.Execute, otherOnly);
+        }
+
+        [TestMethod]
+        public void FuseProtectedAndroidRootTest()
+        {
+            Assert.IsTrue(ShellAccessHelper.IsFuseProtectedAndroidRoot("/sdcard/Android"));
+            Assert.IsTrue(ShellAccessHelper.IsFuseProtectedAndroidRoot("/sdcard/Android/"));
+            Assert.IsTrue(ShellAccessHelper.IsFuseProtectedAndroidRoot("/storage/emulated/0/Android"));
+            Assert.IsFalse(ShellAccessHelper.IsFuseProtectedAndroidRoot("/sdcard/Android/data"));
+
+            var access = ShellAccessHelper.ResolveLocationAccess(
+                "/sdcard/Android",
+                new LocationInfo(null, null, null, null, null, AccessMask.Read | AccessMask.Write | AccessMask.Execute, null, null, null),
+                new ShellIdentity("shell", 2000, 2000, new HashSet<int> { 2000 }),
+                DriveRestrictions.None);
+
+            Assert.IsTrue(access.HasFlag(AccessMask.Write));
+            Assert.IsTrue(access.HasFlag(AccessMask.Read));
+        }
     }
 }

@@ -26,9 +26,6 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
             {
                 if (!value && Data.Settings.UnrootOnDisconnect is true)
                     ADBService.Unroot(Device.ID);
-
-                if (value)
-                    Data.RuntimeSettings.IsRootActive = true;
             }
         }
     }
@@ -90,6 +87,29 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     }
 
     public RootStatus Root => Device.Root;
+
+    private ShellIdentity? shellIdentity;
+    public ShellIdentity? ShellIdentity => shellIdentity;
+
+    public ShellIdentity? GetOrLoadShellIdentity()
+    {
+        shellIdentity ??= ADBService.GetShellIdentity(ID);
+        return shellIdentity;
+    }
+
+    public void RefreshShellIdentity()
+    {
+        shellIdentity = ADBService.GetShellIdentity(ID);
+        OnPropertyChanged(nameof(HasRootShell));
+    }
+
+    public void SetShellIdentity(ShellIdentity? identity)
+    {
+        shellIdentity = identity;
+        OnPropertyChanged(nameof(HasRootShell));
+    }
+
+    public bool HasRootShell => ShellIdentity?.IsRoot == true;
 
     public string RootString => Root switch
     {
@@ -385,8 +405,10 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
             ? ADBService.Root(Device.ID) ? RootStatus.Enabled : RootStatus.Forbidden
             : ADBService.Unroot(Device.ID) ? RootStatus.Disabled : RootStatus.Unchecked;
 
+        RefreshShellIdentity();
+
         if (Data.DevicesObject.Current?.ID == ID)
-            Data.RuntimeSettings.IsRootActive = Root is RootStatus.Enabled;
+            Data.DirList?.RefreshLocationAccess();
 
         OnPropertyChanged(nameof(Root));
     }
@@ -400,7 +422,11 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
             OnPropertyChanged(nameof(RootString));
 
             if (IsOpen)
-                Data.RuntimeSettings.IsRootActive = status is RootStatus.Enabled;
+            {
+                RefreshShellIdentity();
+                if (Data.DevicesObject.Current?.ID == ID)
+                    Data.DirList?.RefreshLocationAccess();
+            }
 
             return true;
         }

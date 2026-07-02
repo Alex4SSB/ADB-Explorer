@@ -366,8 +366,6 @@ public partial class Devices : ObservableObject
         if (Data.DevicesObject.DeviceToOpen?.Equals(device) is not true)
             Data.DevicesObject.DeviceToOpen = device;
 
-        Data.RuntimeSettings.IsRootActive = device?.Root is RootStatus.Enabled;
-
         if (device is not null)
         {
             Data.Settings.LastDevice = device.Name;
