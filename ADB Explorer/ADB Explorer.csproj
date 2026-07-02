@@ -23,6 +23,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="ADB_Test" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Assets\app_icon_2023_combined.ico" />
   </ItemGroup>
 

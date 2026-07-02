@@ -46,16 +46,36 @@ public static class CrashReportService
         if (!IsConfigured)
             return new(false, null, "Crash reporting is not configured");
 
+        var reportable = GetReportableException(exception);
         var collectorUrl = CollectorUrl.Value!;
         var ping = await Network.PingCollectorAsync(collectorUrl).ConfigureAwait(false);
         if (!ping.IsReachable)
             return new(false, ping.StatusCode, ping.Error);
 
-        var json = BuildPayloadJson(exception);
+        var json = BuildPayloadJson(exception, reportable);
         var headers = new Dictionary<string, string> { ["X-Faro-Session-Id"] = SessionId };
         Network.PostJsonFireAndForget(collectorUrl, json, headers);
         return new(true, ping.StatusCode, null);
     }
+
+    /// <summary>
+    /// Returns the exception that should be reported to telemetry. Unwraps reflection/dispatch
+    /// wrappers that hide the real failure (e.g. <see cref="TargetInvocationException"/>).
+    /// </summary>
+    internal static Exception GetReportableException(Exception exception)
+    {
+        ArgumentNullException.ThrowIfNull(exception);
+
+        var current = exception;
+        while (ShouldUnwrap(current) && current.InnerException is not null)
+            current = current.InnerException;
+
+        return current;
+    }
+
+    private static bool ShouldUnwrap(Exception exception) =>
+        exception is TargetInvocationException
+        or AggregateException { InnerExceptions.Count: 1 };
 
     private static Uri? ResolveCollectorUrl()
     {
@@ -149,24 +169,24 @@ public static class CrashReportService
         return string.IsNullOrWhiteSpace(url) ? null : url;
     }
 
-    private static string BuildPayloadJson(Exception exception)
+    private static string BuildPayloadJson(Exception original, Exception reportable)
     {
         var timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
-        var viewName = GetCurrentViewName(exception);
+        var viewName = GetCurrentViewName(reportable);
         var pageId = GetPageId(viewName);
 
         var exceptionObject = new JObject
         {
-            ["type"] = exception.GetType().FullName ?? exception.GetType().Name,
-            ["value"] = exception.Message,
+            ["type"] = reportable.GetType().FullName ?? reportable.GetType().Name,
+            ["value"] = reportable.Message,
             ["timestamp"] = timestamp,
         };
 
-        var stacktrace = BuildStacktraceJObject(exception);
+        var stacktrace = BuildStacktraceJObject(reportable);
         if (stacktrace is not null)
             exceptionObject["stacktrace"] = stacktrace;
 
-        var context = BuildContextJObject(exception);
+        var context = BuildContextJObject(original, reportable);
         if (context.HasValues)
             exceptionObject["context"] = context;
 
@@ -277,7 +297,7 @@ public static class CrashReportService
         return new JObject { ["frames"] = frameObjects };
     }
 
-    private static JObject BuildContextJObject(Exception exception)
+    private static JObject BuildContextJObject(Exception original, Exception reportable)
     {
         var context = new JObject
         {
@@ -285,8 +305,19 @@ public static class CrashReportService
             ["osArchitecture"] = RuntimeInformation.OSArchitecture.ToString(),
         };
 
-        if (exception.InnerException is not null)
-            context["innerException"] = FormatExceptionChain(exception.InnerException);
+        if (!ReferenceEquals(original, reportable))
+        {
+            context["wrapperException"] = new JObject
+            {
+                ["type"] = original.GetType().FullName ?? original.GetType().Name,
+                ["value"] = original.Message,
+            };
+        }
+
+        if (reportable.InnerException is not null)
+            context["innerException"] = FormatExceptionChain(reportable.InnerException);
+
+        context["fullException"] = original.ToString();
 
         return context;
     }
