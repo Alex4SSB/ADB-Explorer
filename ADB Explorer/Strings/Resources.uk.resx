@@ -1626,4 +1626,10 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_OPEN_FOLDER" xml:space="preserve">
     <value>Відкрити</value>
   </data>
+  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
+    <value>Поточне розташування доступне лише для читання</value>
+  </data>
+  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
+    <value>Вибраний елемент не може бути змінено</value>
+  </data>
 </root>
