@@ -587,24 +587,28 @@ public partial class ExplorerPageHeader : UserControl
             case nameof(DirectoryLister.IsLinkListingFinished) when ActiveView.Items.Count < 1 || !DirList.IsLinkListingFinished:
                 return;
 
-            case nameof(DirectoryLister.IsLinkListingFinished) when bfNavigation
-                    && !string.IsNullOrEmpty(prevPath) && DirList.FileList.FirstOrDefault(item => item.FullPath == prevPath) is var prevItem and not null:
-                ItemToSelect.Value = prevItem;
-
-                break;
-
             case nameof(DirectoryLister.IsLinkListingFinished):
                 {
                     if (ActiveView.Items.Count > 0)
                     {
                         SortExplorer();
-                        ActiveScrollIntoView(ActiveView.Items[0]);
 
-                        if (Settings.ThumbsMode is AppSettings.ThumbnailMode.OnPhotoDir
-                            && !ThumbnailService.IsInitialized(DevicesObject.Current.SerialNumber)
-                            && FileHelper.IsPhotoDir())
+                        if (bfNavigation
+                            && !string.IsNullOrEmpty(prevPath)
+                            && DirList.FileList.FirstOrDefault(item => item.FullPath == prevPath) is { } prevItem)
                         {
-                            Task.Run(() => ThumbnailService.ForceLoad(DevicesObject.Current));
+                            ItemToSelect.Value = prevItem;
+                        }
+                        else
+                        {
+                            ActiveScrollIntoView(ActiveView.Items[0]);
+
+                            if (Settings.ThumbsMode is AppSettings.ThumbnailMode.OnPhotoDir
+                                && !ThumbnailService.IsInitialized(DevicesObject.Current.SerialNumber)
+                                && FileHelper.IsPhotoDir())
+                            {
+                                Task.Run(() => ThumbnailService.ForceLoad(DevicesObject.Current));
+                            }
                         }
                     }
 
