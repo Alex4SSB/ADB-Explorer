@@ -1626,4 +1626,10 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_OPEN_FOLDER" xml:space="preserve">
     <value>打开</value>
   </data>
+  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
+    <value>当前位置为只读</value>
+  </data>
+  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
+    <value>无法更改所选项目</value>
+  </data>
 </root>
