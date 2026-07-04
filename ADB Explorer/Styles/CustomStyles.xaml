@@ -171,10 +171,10 @@
         <Setter Property="Visibility" Value="Visible" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="0">
-                <Setter Property="Visibility" Value="Hidden" />
+                <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
             <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="">
-                <Setter Property="Visibility" Value="Hidden" />
+                <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -185,7 +185,7 @@
                     <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False" />
                     <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsDriveViewVisible}" Value="False" />
                 </MultiDataTrigger.Conditions>
-                <Setter Property="Visibility" Value="Hidden" />
+                <Setter Property="Visibility" Value="Collapsed" />
             </MultiDataTrigger>
         </Style.Triggers>
     </Style>

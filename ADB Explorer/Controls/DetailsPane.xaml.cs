@@ -298,6 +298,7 @@ public partial class DetailsPane : UserControl
             control.PermissionsItems.Clear();
             control.MountOptionsItems.Clear();
             control.UnsubscribeMountOptionsDrive();
+            control.InvalidSelectionBorder.Visibility = Visibility.Visible;
 
             if (files.Count() == 1)
             {
@@ -421,7 +422,6 @@ public partial class DetailsPane : UserControl
 
                 control.LargeFileIcon.MaxHeight = 128;
                 control.SmallFileIcon.Source = null;
-                control.InvalidSelectionBorder.Visibility = Visibility.Visible;
             }
         }
     }, DispatcherPriority.Render);
