@@ -559,6 +559,11 @@ public partial class ExplorerPageHeader : UserControl
     {
         switch (e.PropertyName)
         {
+            case nameof(DirectoryLister.CurrentLocation):
+                if (DetailsPane.IsOpen && ActiveSelectedItems.Count == 0)
+                    DetailsPane.RefreshSelection();
+                break;
+
             case nameof(DirectoryLister.IsProgressVisible):
                 UnfinishedBlock.Visible(DirList.IsProgressVisible);
                 NavigationBox.IsLoadingProgressVisible = DirList.IsProgressVisible;

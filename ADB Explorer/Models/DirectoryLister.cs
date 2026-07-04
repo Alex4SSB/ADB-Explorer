@@ -52,7 +52,9 @@ public class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewModel devic
     private ConcurrentQueue<FileStat> currentFileQueue;
 
     private FileClass? locationSource;
-    public FileClass? CurrentLocation { get; private set; }
+
+    [ObservableProperty]
+    public partial FileClass? CurrentLocation { get; private set; }
 
     public void Navigate(string path, FileClass? locationSource = null)
     {

@@ -371,6 +371,9 @@ public partial class DetailsPane : UserControl
             }
             else
             {
+                if (control.File is FileClass previousFile)
+                    previousFile.PropertyChanged -= control.OnFileFullPathChanged;
+
                 control.File = null;
                 control.Package = null;
                 control.Drive = null;
@@ -409,6 +412,7 @@ public partial class DetailsPane : UserControl
                 else if (Data.DirList?.CurrentLocation is { } location)
                 {
                     control.File = location;
+                    location.PropertyChanged += control.OnFileFullPathChanged;
                     control.FileNameTextBlock.Text = location.DisplayName;
                     control.LargeFileIcon.Source = location.DragImage;
                     control.InvalidSelectionBorder.Visibility = Visibility.Collapsed;
@@ -426,11 +430,21 @@ public partial class DetailsPane : UserControl
         }
     }, DispatcherPriority.Render);
 
-    private void OnFileFullPathChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    public void RefreshSelection() =>
+        OnSelectedFilesChanged(this, new DependencyPropertyChangedEventArgs(SelectedFilesProperty, SelectedFiles, SelectedFiles));
+
+    private void OnFileFullPathChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => App.SafeBeginInvoke(() =>
     {
         if (e.PropertyName == nameof(FileClass.DisplayName))
-            OnSelectedFilesChanged(this, new DependencyPropertyChangedEventArgs(SelectedFilesProperty, SelectedFiles, SelectedFiles));
+            RefreshSelection();
+        else if (e.PropertyName is nameof(FileClass.Permissions) or nameof(FileClass.User) or nameof(FileClass.Group)
+            && sender is FileClass file
+            && ReferenceEquals(File, file)
+            && !SelectedFiles.Any())
+        {
+            PopulateThumbnailInfoItems(file);
     }
+    });
 
     public DetailsPane()
     {
