@@ -336,7 +336,9 @@ public partial class ExplorerPageHeader : UserControl
                 if (ExplorerGrid.SelectedCells.Count < 1 || IsInEditMode)
                     return false;
 
-                if (ActiveSelectedItems.Count == 1 && ((FilePath)ActiveView.SelectedItem).IsDirectory)
+                if (ActiveSelectedItems.Count == 1
+                    && ActiveView.SelectedItem is FileClass selected
+                    && FileActionLogic.CanEnterSelection(selected))
                     DoubleClick(ActiveView.SelectedItem);
                 break;
 
@@ -587,6 +589,13 @@ public partial class ExplorerPageHeader : UserControl
                         TrashHelper.EnableRecycleButtons();
                     }
 
+                    if (!DirList.InProgress
+                        && DetailsPane.IsOpen
+                        && ActiveSelectedItems.Count == 0)
+                    {
+                        DetailsPane.RefreshSelection();
+                    }
+
                     break;
                 }
             case nameof(DirectoryLister.IsLinkListingFinished) when ActiveView.Items.Count < 1 || !DirList.IsLinkListingFinished:
@@ -647,6 +656,14 @@ public partial class ExplorerPageHeader : UserControl
         DeviceCts.Dispose();
         DeviceCts = new();
 
+        DirList?.Stop();
+
+        ArchivePath.InvalidateCache();
+
+        var deviceId = DevicesObject.Current?.ID;
+        var isArchive = ArchivePath.IsArchivePath(realPath, deviceId);
+        var devicePath = isArchive ? ArchivePath.GetArchivePath(realPath, deviceId) : realPath;
+
         FileActions.ListingInProgress = true;
 
         FileActions.WasInAppDrive = FileActions.IsAppDrive;
@@ -663,11 +680,13 @@ public partial class ExplorerPageHeader : UserControl
         ActiveView.Focus();
 
         NavigationBox.Path = realPath == RECYCLE_PATH ? AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin) : realPath;
-        CurrentDrive = DriveHelper.GetCurrentDrive(realPath);
+        CurrentDrive = DriveHelper.GetCurrentDrive(devicePath);
         FileActions.IsRecycleBin = realPath == RECYCLE_PATH;
         FileActions.IsAppDrive = realPath == AdbLocation.StringFromLocation(Navigation.SpecialLocation.PackageDrive);
+        FileActions.IsArchive = isArchive;
         FileActions.IsTemp = realPath == TEMP_PATH;
-        FileActions.ParentEnabled = realPath != FileHelper.GetParentPath(realPath) && !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
+        FileActions.ParentEnabled = realPath != FileHelper.GetParentPath(realPath)
+            && !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
 
         CurrentPath = realPath;
 
@@ -901,6 +920,7 @@ public partial class ExplorerPageHeader : UserControl
         if (ClickCount > 1)
         {
             DoubleClick(cell.DataContext);
+            ClickCount = -1;
             return;
         }
 
@@ -946,6 +966,19 @@ public partial class ExplorerPageHeader : UserControl
         }
         else if (file.Type is not FileType.File)
             return;
+
+        if (!FileActions.IsAppDrive
+            && DevicesObject.Current is { } device
+            && ArchiveHelper.CanNavigateIntoArchive(file.FullPath, file.FullName, device.ID, FileActions.IsArchive))
+        {
+            if (!FileActions.ListingInProgress)
+            {
+                bfNavigation = false;
+                _navigateToPath(ArchivePath.Join(file.FullPath, ""), file);
+            }
+
+            return;
+        }
 
         if (Settings.DoubleClickToPull
             && Settings.IsPullOnDoubleClickEnabled
@@ -1121,7 +1154,10 @@ public partial class ExplorerPageHeader : UserControl
     private void ItemContainer_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         if (e.ChangedButton == MouseButton.Left && !FileActions.IsAppDrive && SelectedFiles.Count() == 1 && !IsInEditMode)
+        {
+            ClickCount = -1;
             DoubleClick(ActiveView.SelectedItem);
+        }
     }
 
     private void DataGridRow_KeyDown(object sender, KeyEventArgs e)
@@ -1136,7 +1172,9 @@ public partial class ExplorerPageHeader : UserControl
                 return;
             case Key.Enter:
                 {
-                    if (ExplorerGrid.SelectedItems.Count == 1 && ExplorerGrid.SelectedItem is FilePath { IsDirectory: true })
+                    if (ExplorerGrid.SelectedItems.Count == 1
+                        && ExplorerGrid.SelectedItem is FileClass selected
+                        && FileActionLogic.CanEnterSelection(selected))
                         DoubleClick(ExplorerGrid.SelectedItem);
                     break;
                 }

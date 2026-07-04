@@ -61,6 +61,10 @@ namespace ADB_Explorer.Models
             }
         }
 
+        public string BreadcrumbLabel => !string.IsNullOrEmpty(Path) && ArchivePath.IsArchivePath(Path, Data.DevicesObject?.Current?.ID)
+            ? ArchivePath.GetBreadcrumbLabel(Path, Data.DevicesObject?.Current?.ID)
+            : NavigationName;
+
         public bool IsNavigable
         {
             get
@@ -163,7 +167,7 @@ namespace ADB_Explorer.Models
             new SubMenu(new FileAction(FileAction.FileActionType.None, new(() => true, () => Data.RuntimeSettings.LocationToNavigate = this), NavigationName), Icon);
 
         public TextMenu NameSubMenu =>
-            new TextMenu(new FileAction(FileAction.FileActionType.None, new(() => true, () => Data.RuntimeSettings.LocationToNavigate = this), NavigationName));
+            new TextMenu(new FileAction(FileAction.FileActionType.None, new(() => true, () => Data.RuntimeSettings.LocationToNavigate = this), BreadcrumbLabel));
 
         public override bool Equals(object other)
         {

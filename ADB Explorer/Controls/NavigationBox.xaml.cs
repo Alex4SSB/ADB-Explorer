@@ -294,20 +294,50 @@ public partial class NavigationBox : UserControl
         if (current.Length == index)
             yield break;
 
-        while (index >= 0)
+        var tail = current[index..].TrimStart('/');
+        if (string.IsNullOrEmpty(tail))
+            yield break;
+
+        var deviceId = Data.DevicesObject?.Current?.ID;
+        var fullPath = FileHelper.ConcatPaths(drive.Key, tail);
+        var prefix = drive.Key;
+
+        if (ArchivePath.TryParse(fullPath, out var archivePath, out var internalPath, deviceId))
         {
-            if (current.Length <= index)
-                break;
+            var afterDrive = archivePath[drive.Key.Length..].TrimStart('/');
+            var deviceSegments = afterDrive.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
-            var next = current.IndexOf('/', index + 1);
+            foreach (var segment in deviceSegments[..Math.Max(0, deviceSegments.Length - 1)])
+            {
+                prefix = $"{prefix}/{segment}";
+                yield return new(prefix);
+            }
 
-            yield return new(current[..(next < 0 ? ^0 : next)]);
+            yield return new(ArchivePath.Join(archivePath, ""));
 
-            index = next;
+            if (!string.IsNullOrEmpty(internalPath))
+            {
+                var internalPrefix = "";
+                foreach (var segment in internalPath.Split('/', StringSplitOptions.RemoveEmptyEntries))
+                {
+                    internalPrefix = string.IsNullOrEmpty(internalPrefix)
+                        ? segment
+                        : $"{internalPrefix}/{segment}";
+                    yield return new(ArchivePath.Join(archivePath, internalPrefix));
+                }
+            }
+
+            yield break;
+        }
+
+        foreach (var segment in tail.Split('/', StringSplitOptions.RemoveEmptyEntries))
+        {
+            prefix = $"{prefix}/{segment}";
+            yield return new(prefix);
         }
     }
 
-    IEnumerable<AdbLocation> locations = [];
+    List<AdbLocation> locations = [];
     List<TextMenu> breadcrumbs = [];
     List<double> itemWidths = [];
 
@@ -316,7 +346,7 @@ public partial class NavigationBox : UserControl
         if (string.IsNullOrEmpty(path))
             return;
 
-        locations = SeparatePath(path);
+        locations = SeparatePath(path).ToList();
         breadcrumbs = [.. locations.Select(item => item.NameSubMenu)];
 
         if (Data.DevicesObject.Current.Root is RootStatus.Enabled)
@@ -352,7 +382,7 @@ public partial class NavigationBox : UserControl
             var excessButton = new TextMenu(
                 new FileAction(FileAction.FileActionType.None, () => true, () => { }, "\uE712"))
             {
-                Children = locations.ToList()[1..(lastHiddenIndex + 1)].Select(item => item.ExcessSubMenu)
+                Children = locations[1..(lastHiddenIndex + 1)].Select(item => item.ExcessSubMenu)
             };
 
             var itemsControl = OverflowItemsControl;
@@ -440,10 +470,32 @@ public partial class NavigationBox : UserControl
 
     private void ApplyDriveRestrictions()
     {
-        var tooltipText = _trackedDrive?.RestrictionsTooltip ?? "";
-        HasDriveRestrictions = _trackedDrive?.HasDriveRestrictions is true;
+        var driveRestrictions = _trackedDrive?.Restrictions ?? DriveRestrictions.None;
+        var deviceId = Data.DevicesObject?.Current?.ID;
+        var isArchive = ArchivePath.IsArchivePath(Path, deviceId);
+
+        string tooltipText;
+        string iconGlyph;
+
+        if (isArchive)
+        {
+            var archiveDevicePath = ArchivePath.GetArchivePath(Path, deviceId);
+            tooltipText = ArchiveHelper.GetArchiveModificationTooltip(
+                FileHelper.GetFullName(archiveDevicePath),
+                Data.DevicesObject?.Current?.ID ?? "");
+
+            iconGlyph = "\uF012";
+            HasDriveRestrictions = true;
+        }
+        else
+        {
+            tooltipText = _trackedDrive?.RestrictionsTooltip ?? "";
+            iconGlyph = driveRestrictions.IconGlyph;
+            HasDriveRestrictions = driveRestrictions.HasAny;
+        }
+
         RestrictionsTooltip = tooltipText;
-        RestrictionsIconGlyph = _trackedDrive?.Restrictions.IconGlyph ?? "\uE7BA";
+        RestrictionsIconGlyph = string.IsNullOrEmpty(iconGlyph) ? "\uE7BA" : iconGlyph;
 
         RestrictionsToolTip.Content = string.IsNullOrEmpty(tooltipText)
             ? null

@@ -6,4 +6,8 @@ public record struct FileStat(string FullName,
                        bool IsLink,
                        long? Size,
                        DateTime? ModifiedTime,
-                       UnixFileMode? Permissions) : IBaseFile, IFileStat;
+                       UnixFileMode? Permissions,
+                       long? CompressedSize = null,
+                       string? CompressionMethod = null,
+                       string? CompressionRatio = null,
+                       string? Crc32 = null) : IBaseFile, IFileStat;

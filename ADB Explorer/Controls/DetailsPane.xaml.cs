@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Converters;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
@@ -443,7 +444,7 @@ public partial class DetailsPane : UserControl
             && !SelectedFiles.Any())
         {
             PopulateThumbnailInfoItems(file);
-    }
+        }
     });
 
     public DetailsPane()
@@ -675,20 +676,59 @@ public partial class DetailsPane : UserControl
         if (Data.FileActions.IsRecycleBin)
             SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COLUMN_ORIGINAL_LOCATION, f => f.TrashIndex.OriginalPath, valueIsLtr: true));
         else
-            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_ITEM_LOCATION, f => f.ParentPath, valueIsLtr: true));
+            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_ITEM_LOCATION, FormatArchiveLocation, valueIsLtr: true));
 
-        if (file.Type is AbstractFile.FileType.File && file.Size.HasValue)
-            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COLUMN_SIZE, f => f.FolderViewModel.SizeString));
+        var archiveSummaryPath = TryGetArchiveSummaryPath(file);
+
+        if (archiveSummaryPath is not null
+            && ArchiveListing.TryGetArchiveSummary(archiveSummaryPath, out var archiveSummary))
+        {
+            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(
+                file, Strings.Resources.S_COMPRESSED_SIZE, _ => archiveSummary.CompressedSize.BytesToSize(true), valueIsLtr: true));
+
+            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(
+                file, Strings.Resources.S_PACKED_SIZE, _ => archiveSummary.UncompressedSize.BytesToSize(true), valueIsLtr: true));
+
+            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(
+                file, Strings.Resources.S_COMPRESSION_RATIO, _ => archiveSummary.Ratio, valueIsLtr: true));
+
+            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(
+                file, Strings.Resources.S_MENU_FILES, _ => $"{archiveSummary.FileCount}", valueIsLtr: true));
+        }
+        else if (archiveSummaryPath is not null && ArchiveHelper.IsTarFamily(archiveSummaryPath))
+        {
+            if (file.ShellLsSize is >= 0 || file.Size.HasValue)
+            {
+                SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(
+                    file, Strings.Resources.S_COLUMN_SIZE, f => f.FolderViewModel.SizeString, valueIsLtr: true));
+            }
+        }
+        else
+        {
+            if (file.Type is AbstractFile.FileType.File && file.Size.HasValue)
+                SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COLUMN_SIZE, f => f.FolderViewModel.SizeString));
+
+            if (file.CompressedSize is long compressedSize)
+                SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COMPRESSED_SIZE, _ => compressedSize.BytesToSize(true), valueIsLtr: true));
+
+            if (!string.IsNullOrEmpty(file.CompressionRatio))
+                SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COMPRESSION_RATIO, f => f.CompressionRatio!, valueIsLtr: true));
+        }
+
+        if (archiveSummaryPath is null && !string.IsNullOrEmpty(file.CompressionMethod))
+            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COMPRESSION_METHOD, f => ArchiveHelper.GetZipMethodDisplayName(f.CompressionMethod!), valueIsLtr: true));
+
+        if (!string.IsNullOrEmpty(file.Crc32))
+            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, "CRC-32", f => f.Crc32!.ToUpperInvariant(), valueIsLtr: true, useConsoleFont: true));
 
         if (file.ModifiedTime.HasValue)
-        {
             SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_FILE_INFO_MODIFIED, f => f.FolderViewModel.ModifiedTimeWithOffsetString, valueIsLtr: true).Init());
 
-            if (Data.CurrentDrive?.Restrictions.SupportsAccessTime is true)
-                SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_DATE_ACCESSED, f => f.FolderViewModel.LastAccessTimeString, valueIsLtr: true).Init());
+        if (file.LastAccessTime.HasValue && Data.CurrentDrive?.Restrictions.SupportsAccessTime is true)
+            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_DATE_ACCESSED, f => f.FolderViewModel.LastAccessTimeString, valueIsLtr: true).Init());
 
+        if (file.CreationTime.HasValue)
             SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_CREATION_TIME, f => f.FolderViewModel.CreationTimeString, valueIsLtr: true).Init());
-        }
 
         if (Data.FileActions.IsRecycleBin)
             SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COLUMN_DATE_DELETED, f => f.TrashIndex.ModifiedTimeString));
@@ -757,11 +797,35 @@ public partial class DetailsPane : UserControl
             var cts = new CancellationTokenSource();
             _cancellationToken = cts;
 
-            if (file.User is null || file.Group is null)
+            if (!ArchivePath.IsArchivePath(file.FullPath, Data.DevicesObject?.Current?.ID) && (file.User is null || file.Group is null))
             {
                 _ = Task.Run(() => file.UpdateExtraInfo(cts.Token), cts.Token);
             }
         }
+    }
+
+    private static string FormatArchiveLocation(FileClass file)
+        => ArchivePath.IsArchivePath(file.ParentPath, Data.DevicesObject?.Current?.ID)
+            ? ArchivePath.FormatDetailsLocation(file.ParentPath, Data.DevicesObject?.Current?.ID)
+            : file.ParentPath;
+
+    private static string? TryGetArchiveSummaryPath(FileClass file)
+    {
+        var deviceId = Data.DevicesObject?.Current?.ID;
+        if (ArchivePath.TryParse(file.FullPath, out var archivePath, out var internalPath, deviceId)
+            && string.IsNullOrEmpty(internalPath))
+        {
+            return archivePath;
+        }
+
+        if (file.Type is AbstractFile.FileType.File
+            && file.SpecialType.HasFlag(AbstractFile.SpecialFileType.Archive)
+            && !ArchivePath.IsArchivePath(file.FullPath, deviceId))
+        {
+            return file.FullPath;
+        }
+
+        return null;
     }
 
     private void GridSplitter_DragDelta(object sender, DragDeltaEventArgs e)

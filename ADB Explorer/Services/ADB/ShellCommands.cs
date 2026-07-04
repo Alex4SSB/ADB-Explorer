@@ -14,6 +14,14 @@ public sealed class DeviceShellCommands
     public bool FindExists { get; init; } = true;
 
     public bool StatExists { get; init; } = true;
+
+    public bool TarExists { get; init; }
+
+    public bool UnzipExists { get; init; }
+
+    public bool ZipExists { get; init; }
+
+    public bool TarAppendSupported { get; init; }
 }
 
 public static class ShellCommands
@@ -40,7 +48,9 @@ public static class ShellCommands
         stat,
         tar,
         touch,
+        unzip,
         whoami,
+        zip,
     }
 
     public static string[] Commands => Enum.GetNames<ShellCmd>();
@@ -58,6 +68,18 @@ public static class ShellCommands
 
     public static bool BusyBoxExists(string deviceId)
         => DeviceCommands.TryGetValue(deviceId, out var commands) && commands.BusyBoxExists;
+
+    public static bool TarExists(string deviceId)
+        => DeviceCommands.TryGetValue(deviceId, out var commands) && commands.TarExists;
+
+    public static bool UnzipExists(string deviceId)
+        => DeviceCommands.TryGetValue(deviceId, out var commands) && commands.UnzipExists;
+
+    public static bool ZipExists(string deviceId)
+        => DeviceCommands.TryGetValue(deviceId, out var commands) && commands.ZipExists;
+
+    public static bool TarAppendSupported(string deviceId)
+        => DeviceCommands.TryGetValue(deviceId, out var commands) && commands.TarAppendSupported;
 
     public static string TranslateCommand(string cmd)
     {
@@ -187,6 +209,8 @@ public static class ShellCommands
                   .ForEach(c => deviceDict.TryAdd(c.Item1.Value, $"busybox {c.Item2}"));
         }
 
+        var archiveProbe = ProbeArchiveCapabilities(deviceID, busyBoxExists);
+
         DeviceCommands[deviceID] = new()
         {
             Commands = deviceDict,
@@ -194,6 +218,10 @@ public static class ShellCommands
             FindPrintf = findPrintf,
             FindExists = deviceDict.ContainsKey(ShellCmd.find),
             StatExists = deviceDict.ContainsKey(ShellCmd.stat),
+            TarExists = archiveProbe.TarExists,
+            UnzipExists = archiveProbe.UnzipExists,
+            ZipExists = archiveProbe.ZipExists,
+            TarAppendSupported = archiveProbe.TarAppendSupported,
         };
     }
 
@@ -212,12 +240,18 @@ public static class ShellCommands
                                                                  "%s",
                                                                  ADBService.EscapeAdbShellString("/")) == 0;
 
+        var archiveProbe = ProbeArchiveCapabilities(deviceID, busyBoxExists);
+
         DeviceCommands[deviceID] = new()
         {
             BusyBoxExists = busyBoxExists,
             FindPrintf = findPrintf,
             FindExists = findExists,
             StatExists = statExists,
+            TarExists = archiveProbe.TarExists,
+            UnzipExists = archiveProbe.UnzipExists,
+            ZipExists = archiveProbe.ZipExists,
+            TarAppendSupported = archiveProbe.TarAppendSupported,
         };
     }
 
@@ -232,4 +266,82 @@ public static class ShellCommands
 
         return (exitCode == 0, findHelp.Contains("-printf FORMAT"));
     }
+
+    private static ArchiveProbeResult ProbeArchiveCapabilities(string deviceID, bool busyBoxExists)
+    {
+        ADBService.ExecuteDeviceAdbShellCommand(deviceID,
+                                                BuildArchiveProbeScript(busyBoxExists),
+                                                out string stdout,
+                                                out _,
+                                                CancellationToken.None);
+
+        return ParseArchiveProbeOutput(stdout);
+    }
+
+    private static readonly string TAR_MARK = $"{AdbExplorerConst.ADB_UNIT_SEP}TAR{AdbExplorerConst.ADB_UNIT_SEP}";
+    private static readonly string UNZIP_MARK = $"{AdbExplorerConst.ADB_UNIT_SEP}UNZIP{AdbExplorerConst.ADB_UNIT_SEP}";
+    private static readonly string ZIP_MARK = $"{AdbExplorerConst.ADB_UNIT_SEP}ZIP{AdbExplorerConst.ADB_UNIT_SEP}";
+
+    private static string BuildArchiveProbeScript(bool busyBoxExists)
+    {
+        // Single echo + $() substitution; markers use ADB_UNIT_SEP, sections use ADB_FIELD_SEP.
+        var tar = busyBoxExists ? "busybox tar" : "tar";
+        var unzip = busyBoxExists ? "busybox unzip" : "unzip";
+        var zip = busyBoxExists ? "busybox zip" : "zip";
+        var fs = AdbExplorerConst.ADB_FIELD_SEP;
+
+        return "echo " +
+               TAR_MARK +
+               "$(" + tar + " --help 2>/dev/null)" +
+               fs + UNZIP_MARK +
+               "$(" + unzip + " --help 2>/dev/null)" +
+               fs + ZIP_MARK +
+               "$(" + zip + " --help 2>/dev/null)";
+    }
+
+    internal static ArchiveProbeResult ParseArchiveProbeOutput(string stdout)
+    {
+        if (string.IsNullOrWhiteSpace(stdout))
+            return default;
+
+        var tarHelp = ExtractProbeSection(stdout, TAR_MARK);
+        var unzipHelp = ExtractProbeSection(stdout, UNZIP_MARK);
+        var zipHelp = ExtractProbeSection(stdout, ZIP_MARK);
+
+        return new(
+            !string.IsNullOrWhiteSpace(tarHelp),
+            !string.IsNullOrWhiteSpace(unzipHelp),
+            !string.IsNullOrWhiteSpace(zipHelp),
+            !string.IsNullOrWhiteSpace(tarHelp) && TarHelpSupportsAppend(tarHelp));
+    }
+
+    private static string ExtractProbeSection(string stdout, string label)
+    {
+        var start = stdout.IndexOf(label, StringComparison.Ordinal);
+        if (start < 0)
+            return "";
+
+        var end = stdout.IndexOf(AdbExplorerConst.ADB_FIELD_SEP, start + label.Length);
+        if (end < 0)
+            end = stdout.Length;
+
+        return stdout[(start + label.Length)..end].Trim(AdbExplorerConst.ADB_FIELD_SEP, ' ', '\r', '\n');
+    }
+
+    internal static bool TarHelpSupportsAppend(string help)
+    {
+        if (string.IsNullOrWhiteSpace(help))
+            return false;
+
+        if (help.Contains("--append", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (help.Contains("-r,", StringComparison.Ordinal))
+            return true;
+
+        return AdbRegEx.RE_TAR_APPEND_BUSYBOX().IsMatch(help)
+            || AdbRegEx.RE_TAR_APPEND_TOYBOX().IsMatch(help);
+    }
 }
+
+internal readonly record struct ArchiveProbeResult(bool TarExists, bool UnzipExists, bool ZipExists, bool TarAppendSupported);

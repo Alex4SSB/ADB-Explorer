@@ -1,0 +1,355 @@
+using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
+using ADB_Explorer.Services;
+using ADB_Explorer.Strings;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
+using System.Linq;
+using static ADB_Explorer.Models.AbstractFile;
+
+namespace ADB_Test;
+
+[TestClass]
+public class ArchiveCapabilityTests
+{
+    private const string DeviceId = "test-device";
+
+    [TestInitialize]
+    public void Setup()
+    {
+        ShellCommands.DeviceCommands.Clear();
+        ArchivePath.ClearCachesForTests();
+        ArchivePath.TestResolveIsRegularFile = (_, path) =>
+            path != "/sdcard/folder.zip"
+            && ArchiveHelper.GetFamily(FileHelper.GetFullName(path)) is not ArchiveFamily.None;
+    }
+
+    [TestCleanup]
+    public void Cleanup()
+    {
+        ShellCommands.DeviceCommands.Clear();
+        ArchivePath.TestResolveIsRegularFile = null;
+        ArchivePath.ClearCachesForTests();
+    }
+
+    private static DeviceShellCommands MakeCommands(
+        bool tarExists = false,
+        bool unzipExists = false,
+        bool zipExists = false,
+        bool tarAppendSupported = false) => new()
+    {
+        TarExists = tarExists,
+        UnzipExists = unzipExists,
+        ZipExists = zipExists,
+        TarAppendSupported = tarAppendSupported,
+    };
+
+    [TestMethod]
+    public void GetFamily_ClassifiesTarAndZipExtensions()
+    {
+        Assert.AreEqual(ArchiveFamily.Tar, ArchiveHelper.GetFamily("backup.tar"));
+        Assert.AreEqual(ArchiveFamily.Tar, ArchiveHelper.GetFamily("backup.tar.gz"));
+        Assert.AreEqual(ArchiveFamily.Tar, ArchiveHelper.GetFamily("backup.tgz"));
+        Assert.AreEqual(ArchiveFamily.Zip, ArchiveHelper.GetFamily("archive.zip"));
+        Assert.AreEqual(ArchiveFamily.Zip, ArchiveHelper.GetFamily("app.apk"));
+        Assert.AreEqual(ArchiveFamily.Zip, ArchiveHelper.GetFamily("bundle.xapk"));
+        Assert.AreEqual(ArchiveFamily.None, ArchiveHelper.GetFamily("notes.txt"));
+        Assert.AreEqual(ArchiveFamily.None, ArchiveHelper.GetFamily("image.gz"));
+        Assert.AreEqual(ArchiveFamily.None, ArchiveHelper.GetFamily("package.rar"));
+    }
+
+    [TestMethod]
+    public void IsCompressedTar_DistinguishesPlainAndCompressed()
+    {
+        Assert.IsFalse(ArchiveHelper.IsCompressedTar("backup.tar"));
+        Assert.IsTrue(ArchiveHelper.IsCompressedTar("backup.tar.gz"));
+        Assert.IsTrue(ArchiveHelper.IsCompressedTar("backup.tgz"));
+    }
+
+    [TestMethod]
+    public void CanBrowse_RequiresVerifiedCommands()
+    {
+        Assert.IsFalse(ArchiveHelper.CanBrowse("backup.tar", DeviceId));
+
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(tarExists: true);
+        Assert.IsTrue(ArchiveHelper.CanBrowse("backup.tar", DeviceId));
+        Assert.IsFalse(ArchiveHelper.CanBrowse("archive.zip", DeviceId));
+
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(unzipExists: true);
+        Assert.IsTrue(ArchiveHelper.CanBrowse("archive.zip", DeviceId));
+        Assert.IsTrue(ArchiveHelper.CanBrowse("app.apk", DeviceId));
+    }
+
+    [TestMethod]
+    public void CanModify_ZipRequiresZipAndUnzip()
+    {
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(unzipExists: true);
+        Assert.IsFalse(ArchiveHelper.CanModify("archive.zip", DeviceId));
+
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(unzipExists: true, zipExists: true);
+        Assert.IsTrue(ArchiveHelper.CanModify("archive.zip", DeviceId));
+    }
+
+    [TestMethod]
+    public void CanModify_TarRequiresAppendSupportAndUncompressedArchive()
+    {
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(tarExists: true, tarAppendSupported: true);
+        Assert.AreEqual(Resources.S_ARCHIVE_CAN_MODIFY, ArchiveHelper.GetArchiveModificationTooltip("backup.tar", DeviceId));
+        Assert.IsTrue(ArchiveHelper.CanModify("backup.tar", DeviceId));
+        Assert.AreEqual(Resources.S_ARCHIVE_READ_ONLY, ArchiveHelper.GetArchiveModificationTooltip("backup.tar.gz", DeviceId));
+        Assert.IsFalse(ArchiveHelper.CanModify("backup.tar.gz", DeviceId));
+
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(tarExists: true, tarAppendSupported: false);
+        Assert.AreEqual(Resources.S_ARCHIVE_READ_ONLY, ArchiveHelper.GetArchiveModificationTooltip("backup.tar", DeviceId));
+        Assert.IsFalse(ArchiveHelper.CanModify("backup.tar", DeviceId));
+    }
+
+    [TestMethod]
+    public void GetArchiveModificationTooltip_ZipDependsOnZipCommand()
+    {
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(unzipExists: true);
+        Assert.AreEqual(Resources.S_ARCHIVE_READ_ONLY, ArchiveHelper.GetArchiveModificationTooltip("archive.zip", DeviceId));
+
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(unzipExists: true, zipExists: true);
+        Assert.AreEqual(Resources.S_ARCHIVE_CAN_MODIFY, ArchiveHelper.GetArchiveModificationTooltip("archive.zip", DeviceId));
+    }
+
+    [TestMethod]
+    public void CanNavigateIntoArchive_SkipsDirectoryNamedLikeArchive()
+    {
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(unzipExists: true);
+        Assert.IsFalse(ArchiveHelper.CanNavigateIntoArchive("/sdcard/folder.zip", "folder.zip", DeviceId, isInsideArchive: false));
+    }
+
+    [TestMethod]
+    public void IsModificationAllowedAt_ReadOnlyArchivePath_ReturnsFalse()
+    {
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(unzipExists: true);
+        var path = ArchivePath.Join("/sdcard/archive.zip", "docs");
+
+        Assert.IsFalse(ArchiveHelper.IsModificationAllowedAt(path, DeviceId));
+        Assert.IsTrue(ArchiveHelper.IsModificationAllowedAt("/sdcard/Download", DeviceId));
+    }
+
+    [TestMethod]
+    public void TarHelpSupportsAppend_ParsesCommonHelpFormats()
+    {
+        const string gnuHelp = "  -r, --append              append files to the end of an archive";
+        const string busyboxHelp = " -r        Append files to archive";
+        const string toyboxHelp = """
+            usage: tar [-cxt] [-fvohmjkOS] [-XTCf NAME] [--selinux] [FILE...]
+
+            Options:
+            c  Create                x  Extract               t  Test (list)
+            f  tar FILE (default -)  C  Change to DIR first   v  Verbose display
+            --restrict       All under one dir    --numeric-owner  Use numeric uid/gid
+            """;
+
+        Assert.IsTrue(ShellCommands.TarHelpSupportsAppend(gnuHelp));
+        Assert.IsTrue(ShellCommands.TarHelpSupportsAppend(busyboxHelp));
+        Assert.IsFalse(ShellCommands.TarHelpSupportsAppend(toyboxHelp));
+        Assert.IsFalse(ShellCommands.TarHelpSupportsAppend("List files in archive"));
+    }
+
+    [TestMethod]
+    public void ParseArchiveProbeOutput_ReadsFlagsAndTarHelp()
+    {
+        var us = AdbExplorerConst.ADB_UNIT_SEP;
+        var fs = AdbExplorerConst.ADB_FIELD_SEP;
+        var stdout = $"{us}TAR{us}  -r, --append              append files to the end of an archive{fs}{us}UNZIP{us}{fs}{us}ZIP{us}Copyright (c) 1990-2008 Info-ZIP";
+
+        var result = ShellCommands.ParseArchiveProbeOutput(stdout);
+
+        Assert.IsTrue(result.TarExists);
+        Assert.IsFalse(result.UnzipExists);
+        Assert.IsTrue(result.ZipExists);
+        Assert.IsTrue(result.TarAppendSupported);
+    }
+}
+
+[TestClass]
+public class ArchivePathTests
+{
+    [TestInitialize]
+    public void InitArchivePathTests()
+    {
+        ArchivePath.ClearCachesForTests();
+        ArchivePath.TestResolveIsRegularFile = (_, _) => true;
+    }
+
+    [TestCleanup]
+    public void CleanupArchivePathTests()
+    {
+        ArchivePath.TestResolveIsRegularFile = null;
+        ArchivePath.ClearCachesForTests();
+    }
+
+        [TestMethod]
+        public void IsArchivePath_TreatsFolderZipSubdirAsDeviceFolder()
+        {
+            ArchivePath.TestResolveIsRegularFile = (_, path) => path == "/sdcard/folder.zip" ? false : true;
+
+            Assert.IsFalse(ArchivePath.IsArchivePath("/sdcard/folder.zip/subdir", "device"));
+        }
+
+        [TestMethod]
+        public void TryParse_SkipsDirectoryNamedLikeArchive()
+    {
+        ArchivePath.TestResolveIsRegularFile = (_, path) => path == "/sdcard/folder.zip" ? false : true;
+
+        Assert.IsFalse(ArchivePath.TryParse("/sdcard/folder.zip/readme.txt", out _, out _));
+        Assert.IsTrue(ArchivePath.TryParse("/sdcard/folder.zip/backup.zip/docs/readme.txt", out var archive, out var inner));
+        Assert.AreEqual("/sdcard/folder.zip/backup.zip", archive);
+        Assert.AreEqual("docs/readme.txt", inner);
+    }
+
+    [TestMethod]
+    public void TryParse_SplitsArchiveAndInternalPath()
+    {
+        Assert.IsFalse(ArchivePath.TryParse("/sdcard/backup.tar.gz", out _, out _));
+        Assert.IsTrue(ArchivePath.TryParse("/sdcard/backup.tar.gz/docs/readme.txt", out var archive, out var inner));
+        Assert.AreEqual("/sdcard/backup.tar.gz", archive);
+        Assert.AreEqual("docs/readme.txt", inner);
+    }
+
+    [TestMethod]
+    public void Join_AndGetParent_WalkArchiveHierarchy()
+    {
+        var root = ArchivePath.Join("/sdcard/backup.zip", "");
+        Assert.AreEqual("/sdcard/backup.zip/", root);
+        Assert.AreEqual("/sdcard", ArchivePath.GetParent(root));
+
+        var nested = ArchivePath.Join("/sdcard/backup.zip", "docs/readme.txt");
+        Assert.AreEqual("/sdcard/backup.zip/docs", ArchivePath.GetParent(nested));
+    }
+
+    [TestMethod]
+    public void GetFileStats_GroupsNestedTarEntries()
+    {
+        var entries = new List<ArchiveEntry>
+        {
+            new("docs/readme.txt", false, 10, null),
+            new("docs/images/pic.png", false, 20, null),
+            new("root.txt", false, 5, null),
+        };
+
+        var children = ArchiveListing.GetFileStats("/sdcard/a.zip", "", entries).Select(c => c.FullName).ToList();
+        CollectionAssert.AreEquivalent(new[] { "docs", "root.txt" }, children);
+        Assert.IsTrue(ArchiveListing.GetFileStats("/sdcard/a.zip", "", entries).First(c => c.FullName == "docs").Type is FileType.Folder);
+    }
+
+    [TestMethod]
+    public void GetFileStats_SkipsDirectoryMarkerInsideFolder()
+    {
+        var entries = new List<ArchiveEntry>
+        {
+            new("folder/", true, 0, null),
+            new("folder/file.txt", false, 10, null),
+        };
+
+        var inside = ArchiveListing.GetFileStats("/sdcard/a.zip", "folder", entries).Select(f => f.FullName).ToList();
+        CollectionAssert.AreEquivalent(new[] { "file.txt" }, inside);
+
+        var root = ArchiveListing.GetFileStats("/sdcard/a.zip", "", entries).Select(f => f.FullName).ToList();
+        CollectionAssert.AreEquivalent(new[] { "folder" }, root);
+    }
+
+    [TestMethod]
+    public void SeparatePath_ArchiveRoot_IsSingleDashedCrumbForZip()
+    {
+        Data.CurrentDisplayNames["/sdcard"] = "Internal";
+
+        var driveView = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
+        var crumbs = NavigationBox.SeparatePath($"{driveView}/sdcard/Download/app.zip/WpfApp2/WpfApp2")
+            .Select(l => l.Path)
+            .ToList();
+
+        CollectionAssert.DoesNotContain(crumbs, "/sdcard/Download/app.zip");
+        Assert.IsTrue(crumbs.Contains("/sdcard/Download/app.zip/"));
+        Assert.IsTrue(crumbs.Contains("/sdcard/Download/app.zip/WpfApp2/WpfApp2"));
+    }
+
+    [TestMethod]
+    public void ParseTar_ReadsPermissions()
+    {
+        const string stdout = "-rw-r--r-- root/root     4408 1989-10-02 14:45 file.c\n";
+
+        var entries = ArchiveListing.ParseListing(stdout, ArchiveFamily.Tar);
+
+        Assert.HasCount(1, entries);
+        Assert.IsTrue(entries[0].Permissions.HasValue);
+        var expected = System.IO.UnixFileMode.UserRead | System.IO.UnixFileMode.UserWrite | System.IO.UnixFileMode.GroupRead | System.IO.UnixFileMode.OtherRead;
+        Assert.AreEqual(expected, entries[0].Permissions.Value);
+
+        var stat = ArchiveListing.GetFileStats("/sdcard/a.tar", "", entries).First();
+        Assert.AreEqual(expected, stat.Permissions);
+    }
+
+    [TestMethod]
+    public void CanNavigateIntoArchive_BlocksNestedArchives()
+    {
+        const string DeviceId = "device";
+
+        Assert.IsFalse(ArchiveHelper.CanNavigateIntoArchive("/sdcard/app.zip/nested.zip", "nested.zip", DeviceId, isInsideArchive: true));
+        Assert.IsFalse(ArchiveHelper.CanNavigateIntoArchive("/sdcard/app.zip/nested.zip", "nested.zip", DeviceId, isInsideArchive: false));
+    }
+
+    [TestMethod]
+    public void FormatDetailsLocation_ReplacesArchiveSeparatorWithArrow()
+    {
+        Assert.AreEqual("/sdcard/app.zip", ArchivePath.FormatDetailsLocation("/sdcard/app.zip/"));
+        Assert.AreEqual("/sdcard/app.zip\n→ inner/path", ArchivePath.FormatDetailsLocation("/sdcard/app.zip/inner/path"));
+    }
+
+    [TestMethod]
+    public void ParseZipVerbose_ReadsEntriesSummaryAndMetadata()
+    {
+        const string stdout = """
+            Archive:  app.zip
+             Length   Method    Size  Cmpr    Date    Time   CRC-32   Name
+            --------  ------  ------- ---- ---------- ----- --------  ----
+                4408  Defl:N    1382  69% 1989-10-02 14:45 5a73bcd7  file.c
+                2771  Defl:N     934  66% 1989-10-02 15:17 694a1f6c  file.h
+            --------          -------  ---
+                7189              2316  68%                            2 files
+            """;
+
+        var toc = ArchiveListing.ParseToc(stdout, ArchiveFamily.Zip);
+
+        Assert.AreEqual(2, toc.Entries.Count);
+        Assert.IsTrue(toc.Summary.HasValue);
+        var summary = toc.Summary.Value;
+        Assert.AreEqual(7189, summary.UncompressedSize);
+        Assert.AreEqual(2316, summary.CompressedSize);
+        Assert.AreEqual("68%", summary.Ratio);
+        Assert.AreEqual(2, summary.FileCount);
+
+        var file = toc.Entries.First(e => e.Path == "file.c");
+        Assert.AreEqual(4408, file.Size);
+        Assert.AreEqual(1382, file.CompressedSize);
+        Assert.AreEqual("Defl:N", file.Method);
+        Assert.AreEqual("69%", file.Ratio);
+        Assert.AreEqual("5a73bcd7", file.Crc);
+
+        var stats = ArchiveListing.GetFileStats("/sdcard/app.zip", "", toc.Entries).ToList();
+        var stat = stats.First(s => s.FullName == "file.c");
+        Assert.AreEqual(1382, stat.CompressedSize);
+        Assert.AreEqual("Defl:N", stat.CompressionMethod);
+        Assert.AreEqual("Deflate (normal)", ArchiveHelper.GetZipMethodDisplayName(stat.CompressionMethod!));
+    }
+
+    [TestMethod]
+    public void GetZipMethodDisplayName_MapsInfoZipCodes()
+    {
+        Assert.AreEqual("Deflate (normal)", ArchiveHelper.GetZipMethodDisplayName("Defl:N"));
+        Assert.AreEqual("Deflate (maximum)", ArchiveHelper.GetZipMethodDisplayName("Defl:X"));
+        Assert.AreEqual("Deflate (fast)", ArchiveHelper.GetZipMethodDisplayName("Defl:F"));
+        Assert.AreEqual("Deflate (super fast)", ArchiveHelper.GetZipMethodDisplayName("Defl:S"));
+        Assert.AreEqual("Deflate (normal)", ArchiveHelper.GetZipMethodDisplayName("defN"));
+        Assert.AreEqual("Stored", ArchiveHelper.GetZipMethodDisplayName("Stor"));
+        Assert.AreEqual("Stored", ArchiveHelper.GetZipMethodDisplayName("Stored"));
+        Assert.AreEqual("Reduced (level 2)", ArchiveHelper.GetZipMethodDisplayName("Re:2"));
+        Assert.AreEqual("Shrunk", ArchiveHelper.GetZipMethodDisplayName("Shrk"));
+    }
+}

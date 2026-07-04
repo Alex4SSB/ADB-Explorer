@@ -77,7 +77,10 @@ public static class AdbExplorerConst
     public const string PAIRING_SERVICE_PREFIX = "adbexplorer-";
 
     public static readonly char[] ESCAPE_ADB_SHELL_CHARS = ['(', ')', '<', '>', '|', ';', '&', '*', '\\', '~', '"', '\'', ' ', '$', '`'];
+
+    public const char ADB_UNIT_SEP = '\u001E';
     public const char ADB_FIELD_SEP = '\u001F';
+
     public static readonly char[] INVALID_NTFS_CHARS = ['"', '*', '/', ':', '<', '>', '?', '\\', '|'];
     public static readonly char[] INVALID_UNIX_CHARS = ['/', '\\'];
     public static readonly string[] INVALID_WINDOWS_FILENAMES = ["CON", "PRN", "AUX", "NUL", "COM0", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "COM¹", "COM²", "COM³", "LPT0", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9", "LPT¹", "LPT²", "LPT³"];

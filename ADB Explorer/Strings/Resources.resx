@@ -1970,6 +1970,30 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Created</value>
     <comment>File info - creation time</comment>
   </data>
+  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
+    <value>Archive contents can be modified</value>
+    <comment>Restrictions icon tooltip when archive modification is supported</comment>
+  </data>
+  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
+    <value>Archive contents are read-only</value>
+    <comment>Restrictions icon tooltip when archive modification is not supported</comment>
+  </data>
+  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
+    <value>Compressed size</value>
+    <comment>ZIP entry compressed size in details pane</comment>
+  </data>
+  <data name="S_PACKED_SIZE" xml:space="preserve">
+    <value>Packed size</value>
+    <comment>ZIP archive total uncompressed size from unzip summary</comment>
+  </data>
+  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
+    <value>Ratio</value>
+    <comment>ZIP entry compression ratio in details pane</comment>
+  </data>
+  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
+    <value>Method</value>
+    <comment>ZIP entry compression method in details pane</comment>
+  </data>
   <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
     <value>Modified</value>
     <comment>File info - date modified (but without "date")</comment>

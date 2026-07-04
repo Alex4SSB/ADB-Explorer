@@ -88,6 +88,18 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     [ObservableProperty]
     public partial DateTimeOffset? CreationTime { get; set; }
 
+    [ObservableProperty]
+    public partial long? CompressedSize { get; set; }
+
+    [ObservableProperty]
+    public partial string? CompressionMethod { get; set; }
+
+    [ObservableProperty]
+    public partial string? CompressionRatio { get; set; }
+
+    [ObservableProperty]
+    public partial string? Crc32 { get; set; }
+
     public DateTime? ModifiedTime
     {
         get;
@@ -288,6 +300,10 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         CreationTime = other.CreationTime;
         ModifiedTimeWithOffset = other.ModifiedTimeWithOffset;
         LinkTarget = other.LinkTarget;
+        CompressedSize = other.CompressedSize;
+        CompressionMethod = other.CompressionMethod;
+        CompressionRatio = other.CompressionRatio;
+        Crc32 = other.Crc32;
     }
 
     public FileClass(FilePath other)
@@ -320,32 +336,60 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         Type = fileDescriptor.IsDirectory ? FileType.Folder : FileType.File;
     }
 
-    public static FileClass GenerateAndroidFile(FileStat fileStat) => new(
-        fileName: fileStat.FullName,
-        path: fileStat.FullPath,
-        type: fileStat.Type,
-        isLink: fileStat.IsLink,
-        size: fileStat.Size,
-        modifiedTime: fileStat.ModifiedTime,
-        permissions: fileStat.Permissions
-    );
+    public static FileClass GenerateAndroidFile(FileStat fileStat)
+    {
+        return new(
+            fileName: fileStat.FullName,
+            path: fileStat.FullPath,
+            type: fileStat.Type,
+            isLink: fileStat.IsLink,
+            size: fileStat.Size,
+            modifiedTime: fileStat.ModifiedTime,
+            permissions: fileStat.Permissions)
+        {
+            CompressedSize = fileStat.CompressedSize,
+            CompressionMethod = fileStat.CompressionMethod,
+            CompressionRatio = fileStat.CompressionRatio,
+            Crc32 = fileStat.Crc32
+        };
+    }
 
     public static FileClass BuildCurrentLocation(
         string path,
         LocationInfo? info,
         FileClass? source,
         ShellIdentity? identity,
-        DriveRestrictions restrictions)
+        DriveRestrictions restrictions,
+        string? deviceId = null)
     {
         FileClass location;
         if (source is not null && (source.FullPath == path || source.LinkTarget == path))
         {
             location = source;
         }
-        else
+        else if (ArchivePath.TryParse(path, out var archivePath, out var internalPath, deviceId) && string.IsNullOrEmpty(internalPath))
         {
             location = new FileClass(
-                FileHelper.GetFullName(path),
+                FileHelper.GetFullName(archivePath),
+                path,
+                FileType.File);
+
+            if (source is not null && source.FullPath == archivePath)
+            {
+                if (source.ShellLsSize is long shellLsSize && shellLsSize >= 0)
+                    location.ShellLsSize = shellLsSize;
+
+                location.Size = source.ShellLsSize is >= 0 ? source.ShellLsSize : source.Size;
+            }
+        }
+        else
+        {
+            var name = ArchivePath.IsArchivePath(path, deviceId)
+                ? ArchivePath.GetBreadcrumbLabel(path, deviceId)
+                : FileHelper.GetFullName(path);
+
+            location = new FileClass(
+                name,
                 path,
                 FileType.Folder,
                 permissions: info?.Permissions ?? source?.Permissions);
@@ -371,6 +415,11 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
                 location.EffectiveAccess = ShellAccessHelper.ApplyRestrictions(
                     ShellAccessHelper.ResolveEffective(mode, ownerUid, ownerGid, identity),
                     restrictions);
+            }
+            else
+            {
+                location.EffectiveAccess = ShellAccessHelper.ResolveLocationAccess(
+                    location.FullPath, null, identity, restrictions);
             }
 
             return;
@@ -433,6 +482,9 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
         if (IsApk)
             SpecialType |= SpecialFileType.Apk;
+
+        if (Type is FileType.File && AdbExplorerConst.ARCHIVE_NAMES.Contains(Extension.ToUpperInvariant()))
+            SpecialType |= SpecialFileType.Archive;
 
         if (IsLink && Type is not FileType.BrokenLink)
             SpecialType |= SpecialFileType.LinkOverlay;

@@ -351,9 +351,11 @@ public partial class CopyPasteService : ObservableObject
         }
         else if (file is null || file.IsDirectory)
         {
-            Data.CopyPaste.DropTarget = file is null
-                ? Data.CurrentPath
-                : file.FullPath;
+            var targetPath = file is null ? Data.CurrentPath : file.FullPath;
+            Data.CopyPaste.DropTarget = targetPath;
+
+            if (!DriveHelper.IsModificationAllowedAt(targetPath, Data.DevicesObject.Current?.ID ?? ""))
+                return DragDropEffects.None;
 
             if (CurrentSource.HasFlag(DataSource.Android))
             {
@@ -498,6 +500,9 @@ public partial class CopyPasteService : ObservableObject
 
     public void AcceptDataObject(IDataObject dataObject, string targetFolder, bool isLink = false)
     {
+        if (!DriveHelper.IsModificationAllowedAt(targetFolder, Data.DevicesObject.Current?.ID ?? ""))
+            return;
+
         void ReadObject()
         {
             // For all cases where the files aren't immediately available on disk

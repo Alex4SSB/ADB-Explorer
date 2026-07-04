@@ -110,8 +110,11 @@ public static class FileHelper
         return result.TrimStart('/', '\\');
     }
 
-    public static string GetParentPath(string fullPath)
+    public static string GetParentPath(string fullPath, string? deviceId = null)
     {
+        if (ArchivePath.IsArchivePath(fullPath, deviceId))
+            return ArchivePath.GetParent(fullPath, deviceId);
+
         var index = LastSeparatorIndex(fullPath);
         if (index.Value == 0)
             index = 1;

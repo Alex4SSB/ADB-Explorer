@@ -25,4 +25,12 @@ internal class DriveHelper
 
         return nonRoot;
     }
+
+    public static bool IsModificationAllowedAt(string path, string deviceId)
+    {
+        if (GetCurrentDrive(path)?.Restrictions.ReadOnly is true)
+            return false;
+
+        return ArchiveHelper.IsModificationAllowedAt(path, deviceId);
+    }
 }

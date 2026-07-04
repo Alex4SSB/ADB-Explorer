@@ -433,6 +433,9 @@ internal static class FileActionLogic
             _ => target.FullPath,
         };
 
+        if (!DriveHelper.IsModificationAllowedAt(targetPath, Data.DevicesObject.Current?.ID ?? ""))
+            return DragDropEffects.None;
+
         UpdatePastingRestrictions(targetPath, [.. Data.CopyPaste.CurrentFiles.Select(f => f.FullPath)]);
 
         var result = DragDropEffects.Copy;
@@ -820,7 +823,8 @@ internal static class FileActionLogic
         Data.FileActions.IsRegularItem = !Data.SelectedFiles.Any() || HasRootShell
             || Data.SelectedFiles.AnyAll(item => item.Type is FileType.File or FileType.Folder);
 
-        Data.FileActions.IsSingleFolder = Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory;
+        Data.FileActions.IsSingleFolder = Data.SelectedFiles.Count() == 1
+            && CanEnterSelection(Data.SelectedFiles.First());
 
         Data.FileActions.IsFollowLinkEnabled = !Data.FileActions.IsRecycleBin
                                                && Data.SelectedFiles.Count() == 1
@@ -828,11 +832,16 @@ internal static class FileActionLogic
                                                && Data.SelectedFiles.First().Type is not FileType.BrokenLink;
 
         var restrictions = Data.CurrentDrive?.Restrictions ?? DriveRestrictions.None;
+        var deviceId = Data.DevicesObject?.Current?.ID;
+        if (deviceId is not null && Data.DirList?.CurrentPath is { } currentPath)
+            Data.FileActions.IsArchive = ArchivePath.IsArchivePath(currentPath, deviceId);
+
         var isWritable = restrictions.ReadOnly is not true
             && Data.DirList?.CurrentLocation?.CanWriteLocation == true;
         var isExplorerFolder = Data.FileActions.IsExplorerVisible
             && !Data.FileActions.IsRecycleBin
-            && !Data.FileActions.IsAppDrive;
+            && !Data.FileActions.IsAppDrive
+            && !Data.FileActions.IsArchive;
 
         Data.FileActions.IsCurrentLocationReadOnly = isExplorerFolder && !isWritable;
         Data.FileActions.IsSelectionFuseProtectedAndroidRoot = Data.SelectedFiles.Any()
@@ -862,6 +871,7 @@ internal static class FileActionLogic
         Data.FileActions.IsSelectionIllegalOnWindows = Data.SelectedFiles.Any() && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.Windows);
         Data.FileActions.IsSelectionIllegalNaming = !Data.FileActions.IsRecycleBin
             && !Data.FileActions.IsAppDrive
+            && !Data.FileActions.IsArchive
             && Data.SelectedFiles.Any()
             && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.RestrictedNaming);
         Data.FileActions.IsSelectionIllegalOnWinRoot = Data.SelectedFiles.Any() && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.WinRoot);
@@ -869,6 +879,7 @@ internal static class FileActionLogic
             && Data.SelectedFiles.Select(f => f.FullName).Distinct(StringComparer.InvariantCultureIgnoreCase).Count() != Data.SelectedFiles.Count();
 
         Data.FileActions.PullEnabled = !Data.FileActions.IsRecycleBin
+                                       && !Data.FileActions.IsArchive
                                        && Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
                                        && Data.FileActions.IsRegularItem
                                        && !Data.FileActions.IsSelectionIllegalOnWindows
@@ -876,7 +887,7 @@ internal static class FileActionLogic
                                        && !Data.FileActions.IsSelectionConflictingNames;
 
         Data.FileActions.ContextPushEnabled = isWritable
-            && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive
+            && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive && !Data.FileActions.IsArchive
             && (!Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 
         Data.FileActions.RenameEnabled = isWritable
@@ -1224,8 +1235,19 @@ internal static class FileActionLogic
         if (Data.SelectedFiles?.Count() != 1)
             return;
 
-        Data.RuntimeSettings.LocationToNavigate = new(Data.SelectedFiles.First().FullPath);
+        var file = Data.SelectedFiles.First();
+        var path = Data.DevicesObject.Current is { } device
+            && ArchiveHelper.CanNavigateIntoArchive(file.FullPath, file.FullName, device.ID, Data.FileActions.IsArchive)
+            ? ArchivePath.Join(file.FullPath, "")
+            : file.FullPath;
+
+        Data.RuntimeSettings.LocationToNavigate = new(path);
     }
+
+    internal static bool CanEnterSelection(FileClass file)
+        => file.IsDirectory
+        || (Data.DevicesObject.Current is { } device
+            && ArchiveHelper.CanNavigateIntoArchive(file.FullPath, file.FullName, device.ID, Data.FileActions.IsArchive));
 
     public static void OpenApkLocation(Package apk = null)
     {

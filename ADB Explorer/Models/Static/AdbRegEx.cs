@@ -59,8 +59,14 @@
         [GeneratedRegex(@"[\d.]+")]
         public static partial Regex RE_GITHUB_VERSION();
 
-        [GeneratedRegex(@" +(?<Size>\d+) +(?<Date>\d{4}-\d\d-\d\d \d\d:\d\d) +(?<Name>.+)")]
-        public static partial Regex RE_UNZIP_LIST();
+        [GeneratedRegex(@"^\s*(?<Length>\d+)\s+(?<Method>\S+)\s+(?<Compressed>\d+)\s+(?<Ratio>\d+%)\s+(?<Date>[\d-]+ [\d:]+)\s+(?<Crc>[0-9a-f]+)\s+(?<Name>\S+)", RegexOptions.Multiline)]
+        public static partial Regex RE_UNZIP_VERBOSE_ENTRY();
+
+        [GeneratedRegex(@"^\s*(?<Length>\d+)\s+(?<Compressed>\d+)\s+(?<Ratio>\d+%)\s+(?<Count>\d+)\s+files?\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase)]
+        public static partial Regex RE_UNZIP_VERBOSE_SUMMARY();
+
+        [GeneratedRegex(@"^(?<Mode>[\w-]+)\s+\S+\s+(?<Size>\d+)\s+(?<Date>[\d-]+ [\d:]+)\s+(?<Name>\S+)$")]
+        public static partial Regex RE_TAR_LIST();
 
         [GeneratedRegex(@"^\s*versionName=(?<VersionName>.+?)\s*$", RegexOptions.Multiline)]
         public static partial Regex RE_DUMPSYS_VERSION_NAME();
@@ -73,5 +79,13 @@
 
         [GeneratedRegex(@"\b([0-9a-fA-F]{8})\b")]
         public static partial Regex RE_SERVICE_CALL_WORD();
+
+        /// <summary>Busybox/GNU style: <c>-r</c> followed by an Append description.</summary>
+        [GeneratedRegex(@"-r\s+Append", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+        public static partial Regex RE_TAR_APPEND_BUSYBOX();
+
+        /// <summary>Toybox tabular help: <c>r</c> column with an Append description (no leading dash).</summary>
+        [GeneratedRegex(@"(?m)^r\s{2,}Append\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+        public static partial Regex RE_TAR_APPEND_TOYBOX();
     }
 }

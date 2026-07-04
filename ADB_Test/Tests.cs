@@ -1,7 +1,9 @@
+using ADB_Explorer.Controls;
 using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.Strings;
 using ADB_Explorer.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -10,6 +12,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace ADB_Test
 {
@@ -833,6 +836,32 @@ namespace ADB_Test
 
             var otherOnly = ShellAccessHelper.ResolveEffective(mode, 0, 0, identity);
             Assert.AreEqual(AccessMask.Execute, otherOnly);
+        }
+
+        [TestMethod]
+        public void ResolveLocationAccess_AssumesFullAccessWhenNothingKnown()
+        {
+            var identity = new ShellIdentity("shell", 2000, 2000, new HashSet<int> { 2000 });
+
+            var noInfo = ShellAccessHelper.ResolveLocationAccess("/sdcard/Download/folder.zip/New Folder", null, identity, DriveRestrictions.None);
+            Assert.AreEqual(AccessMask.All, noInfo);
+
+            var emptyInfo = new LocationInfo(null, null, null, null, null, AccessMask.None, null, null, null);
+            var withEmpty = ShellAccessHelper.ResolveLocationAccess("/sdcard/Download/folder.zip/New Folder", emptyInfo, identity, DriveRestrictions.None);
+            Assert.AreEqual(AccessMask.All, withEmpty);
+        }
+
+        [TestMethod]
+        public void ResolveLocationAccess_UsesPermissionsWhenProbeLacksWrite()
+        {
+            var identity = new ShellIdentity("shell", 2000, 2000, new HashSet<int> { 1023 });
+            var mode = (System.IO.UnixFileMode)Convert.ToInt32("771", 8);
+            var info = new LocationInfo("media_rw", "media_rw", 1023, 1023, mode, AccessMask.Read | AccessMask.Execute, null, null, null);
+
+            var access = ShellAccessHelper.ResolveLocationAccess("/sdcard/folder.zip/subdir", info, identity, DriveRestrictions.None);
+
+            Assert.IsTrue(access.HasFlag(AccessMask.Write));
+            Assert.IsTrue(access.HasFlag(AccessMask.Read));
         }
 
         [TestMethod]

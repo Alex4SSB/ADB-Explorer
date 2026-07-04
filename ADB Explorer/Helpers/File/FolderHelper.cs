@@ -51,6 +51,9 @@ public static class FolderHelper
         if (path == AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin))
             return AdbExplorerConst.RECYCLE_PATH;
 
+        if (ArchivePath.IsArchivePath(path, Data.DevicesObject?.Current?.ID))
+            return path;
+
         try
         {
             return ADBService.TranslateDevicePath(Data.DevicesObject.Current.ID, path);

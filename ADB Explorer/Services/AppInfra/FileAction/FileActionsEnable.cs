@@ -205,7 +205,7 @@ public partial class FileActionsEnable : ObservableObject
             if (SetProperty(ref isRecycleBin, value))
             {
                 OnPropertyChanged(nameof(EmptyTrash));
-                IsNewMenuVisible.Value = !IsExplorerVisible || (!IsRecycleBin && !IsAppDrive);
+                IsNewMenuVisible.Value = !IsExplorerVisible || (!IsRecycleBin && !IsAppDrive && !IsArchive);
                 IsRestoreMenuVisible.Value = value;
             }
         }
@@ -218,7 +218,18 @@ public partial class FileActionsEnable : ObservableObject
         set
         {
             if (SetProperty(ref isAppDrive, value))
-                IsNewMenuVisible.Value = !IsExplorerVisible || (!IsRecycleBin && !IsAppDrive);
+                IsNewMenuVisible.Value = !IsExplorerVisible || (!IsRecycleBin && !IsAppDrive && !IsArchive);
+        }
+    }
+
+    private bool isArchive;
+    public bool IsArchive
+    {
+        get => isArchive;
+        set
+        {
+            if (SetProperty(ref isArchive, value))
+                IsNewMenuVisible.Value = !IsExplorerVisible || (!IsRecycleBin && !IsAppDrive && !IsArchive);
         }
     }
 
@@ -239,7 +250,7 @@ public partial class FileActionsEnable : ObservableObject
         set
         {
             if (SetProperty(ref isExplorerVisible, value))
-                IsNewMenuVisible.Value = !IsExplorerVisible || (!IsRecycleBin && !IsAppDrive);
+                IsNewMenuVisible.Value = !IsExplorerVisible || (!IsRecycleBin && !IsAppDrive && !IsArchive);
         }
     }
 

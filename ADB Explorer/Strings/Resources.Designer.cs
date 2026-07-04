@@ -378,6 +378,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Archive contents can be modified.
+        /// </summary>
+        public static string S_ARCHIVE_CAN_MODIFY {
+            get {
+                return ResourceManager.GetString("S_ARCHIVE_CAN_MODIFY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Archive contents are read-only.
+        /// </summary>
+        public static string S_ARCHIVE_READ_ONLY {
+            get {
+                return ResourceManager.GetString("S_ARCHIVE_READ_ONLY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Attributions &amp; Third Party Licenses.
         /// </summary>
         public static string S_ATTRIBUTIONS {
@@ -1032,6 +1050,33 @@ namespace ADB_Explorer.Strings {
         public static string S_COMPLETED_FILES_NUM {
             get {
                 return ResourceManager.GetString("S_COMPLETED_FILES_NUM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Compressed size.
+        /// </summary>
+        public static string S_COMPRESSED_SIZE {
+            get {
+                return ResourceManager.GetString("S_COMPRESSED_SIZE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Method.
+        /// </summary>
+        public static string S_COMPRESSION_METHOD {
+            get {
+                return ResourceManager.GetString("S_COMPRESSION_METHOD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ratio.
+        /// </summary>
+        public static string S_COMPRESSION_RATIO {
+            get {
+                return ResourceManager.GetString("S_COMPRESSION_RATIO", resourceCulture);
             }
         }
         
@@ -2734,6 +2779,15 @@ namespace ADB_Explorer.Strings {
         public static string S_OVERRIDE_ADB_BROWSE {
             get {
                 return ResourceManager.GetString("S_OVERRIDE_ADB_BROWSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Packed size.
+        /// </summary>
+        public static string S_PACKED_SIZE {
+            get {
+                return ResourceManager.GetString("S_PACKED_SIZE", resourceCulture);
             }
         }
         

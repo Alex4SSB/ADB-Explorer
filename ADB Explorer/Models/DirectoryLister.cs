@@ -7,7 +7,7 @@ using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Models;
 
-public class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewModel device, Func<FileClass, FileClass> fileManipulator = null) : ViewModelBase
+public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewModel device, Func<FileClass, FileClass> fileManipulator = null) : ViewModelBase
 {
     public LogicalDeviceViewModel Device { get; } = device;
     public ObservableList<FileClass> FileList { get; } = [];
@@ -52,12 +52,14 @@ public class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewModel devic
     private ConcurrentQueue<FileStat> currentFileQueue;
 
     private FileClass? locationSource;
-
+    
     [ObservableProperty]
     public partial FileClass? CurrentLocation { get; private set; }
 
     public void Navigate(string path, FileClass? locationSource = null)
     {
+        ArchivePath.InvalidateCache();
+
         this.locationSource = locationSource;
         StartDirectoryList(path);
     }
@@ -101,8 +103,9 @@ public class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewModel devic
             source = locationSource;
             locationSource = null;
 
-            var restrictions = DriveHelper.GetCurrentDrive(path)?.Restrictions ?? DriveRestrictions.None;
-            var preliminary = FileClass.BuildCurrentLocation(path, null, source, Device.ShellIdentity, restrictions);
+            var drivePath = ArchivePath.IsArchivePath(path, Device.ID) ? ArchivePath.GetArchivePath(path, Device.ID) : path;
+            var restrictions = DriveHelper.GetCurrentDrive(drivePath)?.Restrictions ?? DriveRestrictions.None;
+            var preliminary = FileClass.BuildCurrentLocation(path, null, source, Device.ShellIdentity, restrictions, Device.ID);
             CurrentLocation = preliminary;
         }).Wait();
 
@@ -204,7 +207,7 @@ public class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewModel devic
         var source = CurrentLocation;
         var token = LinkListCancellation.Token;
 
-        if (currentFileQueue.IsEmpty && !FileList.Any())
+        if ((currentFileQueue.IsEmpty && !FileList.Any()) || ArchivePath.IsArchivePath(path, Device.ID))
         {
             IsLinkListingFinished = true;
             Task.Run(() => UpdateLocationAccess(path, source, token), token);
@@ -230,17 +233,35 @@ public class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewModel devic
             return;
 
         var identity = Device.GetOrLoadShellIdentity();
-        var restrictions = DriveHelper.GetCurrentDrive(path)?.Restrictions ?? DriveRestrictions.None;
-        var info = ADBService.GetLocationInfo(Device.ID, path, cancellationToken);
+        var drivePath = ArchivePath.IsArchivePath(path, Device.ID) ? ArchivePath.GetArchivePath(path, Device.ID) : path;
+        var restrictions = DriveHelper.GetCurrentDrive(drivePath)?.Restrictions ?? DriveRestrictions.None;
+
+        LocationInfo? info = null;
+        if (!ArchivePath.IsArchivePath(path, Device.ID))
+            info = ADBService.GetLocationInfo(Device.ID, path, cancellationToken);
+
         if (cancellationToken.IsCancellationRequested)
             return;
 
-        var location = FileClass.BuildCurrentLocation(path, info, source, identity, restrictions);
+        var location = FileClass.BuildCurrentLocation(path, info, source, identity, restrictions, Device.ID);
 
         Dispatcher.Invoke(() =>
         {
             if (path != currentPath)
                 return;
+
+            if (ArchivePath.IsArchivePath(path, Device.ID))
+            {
+                location.EffectiveAccess = AccessMask.Read;
+
+                if (ArchivePath.TryParse(path, out var archivePath, out var internalPath, Device.ID)
+                    && string.IsNullOrEmpty(internalPath)
+                    && ArchiveListing.TryGetArchiveSummary(archivePath, out var summary))
+                {
+                    location.CompressedSize = summary.CompressedSize;
+                    location.CompressionRatio = summary.Ratio;
+                }
+            }
 
             CurrentLocation = location;
             FileActionLogic.UpdateFileActions();

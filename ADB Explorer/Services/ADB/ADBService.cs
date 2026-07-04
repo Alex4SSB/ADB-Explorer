@@ -494,6 +494,42 @@ public partial class ADBService
         return ShellAccessHelper.ParseLocationInfo(stdout);
     }
 
+    /// <summary>Returns whether <paramref name="path"/> is a regular file, or <see langword="null"/> if unknown.</summary>
+    public static bool? TryGetIsRegularFile(string deviceId, string path, CancellationToken cancellationToken = default)
+        => TryGetPathKind(deviceId, path, cancellationToken) switch
+        {
+            DevicePathKind.RegularFile => true,
+            DevicePathKind.Directory => false,
+            _ => null,
+        };
+
+    public static DevicePathKind? TryGetPathKind(string deviceId, string path, CancellationToken cancellationToken = default)
+    {
+        if (!ShellCommands.StatExists(deviceId))
+            return null;
+
+        var stat = ShellCommands.TranslateCommand("stat");
+        var exitCode = ExecuteDeviceAdbShellCommand(
+            deviceId,
+            stat,
+            out string stdout,
+            out _,
+            cancellationToken,
+            "-c",
+            "%F",
+            EscapeAdbShellString(path));
+
+        if (exitCode != 0 || string.IsNullOrWhiteSpace(stdout))
+            return null;
+
+        return stdout.Trim() switch
+        {
+            "regular file" => DevicePathKind.RegularFile,
+            "directory" => DevicePathKind.Directory,
+            _ => DevicePathKind.Unknown,
+        };
+    }
+
     public static ulong CountFiles(string deviceID, string path, IEnumerable<string> includeNames = null, IEnumerable<string> excludeNames = null)
     {
         string[] args = PrepFindArgs(path, includeNames, excludeNames, true);
@@ -948,8 +984,16 @@ public partial class ADBService
     {
         try
         {
-            foreach (var item in ListDirectoryEntries(deviceId, path, cancellationToken))
-                output.Enqueue(item);
+            if (ArchivePath.TryParse(path, out var archivePath, out var internalPath, deviceId))
+            {
+                foreach (var item in ArchiveListing.ListEntries(deviceId, archivePath, internalPath, cancellationToken))
+                    output.Enqueue(item);
+            }
+            else
+            {
+                foreach (var item in ListDirectoryEntries(deviceId, path, cancellationToken))
+                    output.Enqueue(item);
+            }
         }
         catch (Exception e)
         {

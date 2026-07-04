@@ -12,6 +12,13 @@ public enum AccessMask
     All = Read | Write | Execute,
 }
 
+public enum DevicePathKind
+{
+    Unknown,
+    Directory,
+    RegularFile,
+}
+
 public readonly record struct LocationInfo(
     string? User,
     string? Group,
@@ -207,28 +214,31 @@ public static partial class ShellAccessHelper
         ShellIdentity? identity,
         DriveRestrictions restrictions)
     {
-        AccessMask access;
+        AccessMask fromMode = AccessMask.None;
 
-        if (info?.ProbedAccess is AccessMask probed && probed != AccessMask.None)
+        if (info is { } location
+            && location.Permissions is UnixFileMode mode
+            && location.OwnerUid is int ownerUid
+            && location.OwnerGid is int ownerGid
+            && identity is not null)
         {
-            access = probed;
-        }
-        else if (info is { } location
-                 && location.Permissions is UnixFileMode mode
-                 && location.OwnerUid is int ownerUid
-                 && location.OwnerGid is int ownerGid
-                 && identity is not null)
-        {
-            access = ResolveEffective(mode, ownerUid, ownerGid, identity);
+            fromMode = ResolveEffective(mode, ownerUid, ownerGid, identity);
         }
         else if (identity?.IsRoot == true)
         {
-            access = AccessMask.All;
+            fromMode = AccessMask.All;
         }
-        else
+
+        var probed = info?.ProbedAccess ?? AccessMask.None;
+        AccessMask access = (probed, fromMode) switch
         {
-            access = AccessMask.Read | AccessMask.Execute;
-        }
+            (not AccessMask.None, not AccessMask.None) => probed | fromMode,
+            (not AccessMask.None, _) => probed,
+            (_, not AccessMask.None) => fromMode,
+            // Nothing known about this location: assume no restrictions (full access).
+            // Actual limitations are applied below via drive restrictions.
+            _ => AccessMask.All,
+        };
 
         return ApplyRestrictions(access, restrictions);
     }
