@@ -865,6 +865,29 @@ namespace ADB_Test
         }
 
         [TestMethod]
+        public void IsInternalStoragePath_RecognizesEmulatedAliases()
+        {
+            Assert.IsTrue(AdbExplorerConst.IsInternalStoragePath("/storage/emulated/0"));
+            Assert.IsTrue(AdbExplorerConst.IsInternalStoragePath("/storage/emulated/0/Download"));
+            Assert.IsTrue(AdbExplorerConst.IsInternalStoragePath("/sdcard/Music"));
+            Assert.IsFalse(AdbExplorerConst.IsInternalStoragePath("/storage/ABCD-1234"));
+        }
+
+        [TestMethod]
+        public void GoBack_PendingSelectionPath_IsDepartedLocation()
+        {
+            NavHistory.Reset();
+            NavHistory.Navigate("/sdcard/Download");
+            NavHistory.Navigate("/sdcard/Download/archive.zip/");
+
+            var back = NavHistory.GoBack();
+
+            Assert.AreEqual("/sdcard/Download", back.Path);
+            Assert.AreEqual("/sdcard/Download/archive.zip/", NavHistory.TakePendingSelectionPath());
+            Assert.IsNull(NavHistory.TakePendingSelectionPath());
+        }
+
+        [TestMethod]
         public void FuseProtectedAndroidRootTest()
         {
             Assert.IsTrue(ShellAccessHelper.IsFuseProtectedAndroidRoot("/sdcard/Android"));

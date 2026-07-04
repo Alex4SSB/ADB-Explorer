@@ -88,6 +88,10 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     [ObservableProperty]
     public partial DateTimeOffset? CreationTime { get; set; }
 
+    /// <summary>True after <c>stat</c> has been run for creation time (whether or not a value was parsed).</summary>
+    [ObservableProperty]
+    public partial bool IsCreationTimeResolved { get; set; }
+
     [ObservableProperty]
     public partial long? CompressedSize { get; set; }
 
@@ -493,16 +497,19 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     public void UpdateExtraInfo(CancellationToken cancellationToken)
     {
         var info = ADBService.GetFileExtraInfo(Data.DevicesObject.Current, FullPath, cancellationToken);
-        if (info is null)
-            return;
 
         App.SafeInvoke(() =>
         {
-            User = info?.User;
-            Group = info?.Group;
-            LastAccessTime = info?.AccessTime;
-            CreationTime = info?.CreationTime;
-            ModifiedTimeWithOffset = info?.ModifiedTime;
+            IsCreationTimeResolved = true;
+
+            if (info is null)
+                return;
+
+            User = info.Value.User;
+            Group = info.Value.Group;
+            LastAccessTime = info.Value.AccessTime;
+            CreationTime = info.Value.CreationTime;
+            ModifiedTimeWithOffset = info.Value.ModifiedTime;
         });
     }
 

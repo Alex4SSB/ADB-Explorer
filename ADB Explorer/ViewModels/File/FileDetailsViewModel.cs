@@ -1,5 +1,7 @@
 namespace ADB_Explorer.ViewModels;
 
+using System.Windows;
+
 public interface IDetailsViewModel
 {
     string Label { get; }
@@ -7,6 +9,7 @@ public interface IDetailsViewModel
     bool ValueIsLtr { get; }
     bool ValueConsoleFont { get; }
     bool LabelConsoleFont { get; }
+    Visibility RowVisibility { get; }
 }
 
 public class MountOptionViewModel(string option) : IDetailsViewModel
@@ -20,12 +23,14 @@ public class MountOptionViewModel(string option) : IDetailsViewModel
     public bool ValueIsLtr { get; } = true;
     public bool ValueConsoleFont { get; } = true;
     public bool LabelConsoleFont { get; } = true;
+    public Visibility RowVisibility { get; } = Visibility.Visible;
 }
 
-public class ItemDetailsViewModel<T>(T item, string label, Func<T, string> valueSelector, bool valueIsLtr = false, bool useConsoleFont = false)
+public class ItemDetailsViewModel<T>(T item, string label, Func<T, string> valueSelector, bool valueIsLtr = false, bool useConsoleFont = false, Func<T, Visibility>? rowVisibility = null)
     : ObservableObject, IDetailsViewModel where T : INotifyPropertyChanged
 {
     private readonly Func<T, string> _valueSelector = valueSelector;
+    private readonly Func<T, Visibility>? _rowVisibility = rowVisibility;
 
     public string Label { get; } = label;
 
@@ -37,9 +42,17 @@ public class ItemDetailsViewModel<T>(T item, string label, Func<T, string> value
 
     public bool LabelConsoleFont { get; } = false;
 
+    public Visibility RowVisibility => _rowVisibility?.Invoke(item)
+        ?? (string.IsNullOrEmpty(Value) ? Visibility.Collapsed : Visibility.Visible);
+
     public ItemDetailsViewModel<T> Init()
     {
-        item.PropertyChanged += (s, e) => OnPropertyChanged(nameof(Value));
+        item.PropertyChanged += (s, e) =>
+        {
+            OnPropertyChanged(nameof(Value));
+            if (_rowVisibility is not null)
+                OnPropertyChanged(nameof(RowVisibility));
+        };
         return this;
     }
 }

@@ -20,8 +20,6 @@ namespace ADB_Explorer.Controls.Pages;
 public partial class ExplorerPageHeader : UserControl
 {
 
-    private string prevPath = "";
-
     /// <summary>
     /// Back / Forward Navigation
     /// </summary>
@@ -135,6 +133,9 @@ public partial class ExplorerPageHeader : UserControl
         }
         set
         {
+            if (value && !FileActions.RenameEnabled)
+                return;
+
             if (ActiveView.SelectedItem is not FileClass file)
                 return;
 
@@ -475,7 +476,8 @@ public partial class ExplorerPageHeader : UserControl
                     break;
 
                 case nameof(AppRuntimeSettings.Rename):
-                    IsInEditMode ^= true;
+                    if (FileActions.RenameEnabled)
+                        IsInEditMode ^= true;
                     break;
 
                 case nameof(AppRuntimeSettings.SelectAll):
@@ -557,6 +559,22 @@ public partial class ExplorerPageHeader : UserControl
         DirList.PropertyChanged += DirectoryLister_PropertyChanged;
     }
 
+    private bool TrySelectBackNavigationItem()
+    {
+        if (!bfNavigation)
+            return false;
+
+        var path = NavHistory.TakePendingSelectionPath();
+        if (string.IsNullOrEmpty(path))
+            return false;
+
+        if (NavHistory.FindBackNavigationItem(path) is not { } prevItem)
+            return false;
+
+        ItemToSelect.Value = prevItem;
+        return true;
+    }
+
     private void DirectoryLister_PropertyChanged(object sender, PropertyChangedEventArgs e) => App.SafeInvoke(() =>
     {
         switch (e.PropertyName)
@@ -598,22 +616,16 @@ public partial class ExplorerPageHeader : UserControl
 
                     break;
                 }
-            case nameof(DirectoryLister.IsLinkListingFinished) when ActiveView.Items.Count < 1 || !DirList.IsLinkListingFinished:
+            case nameof(DirectoryLister.IsLinkListingFinished) when !DirList.IsLinkListingFinished:
                 return;
 
             case nameof(DirectoryLister.IsLinkListingFinished):
                 {
-                    if (ActiveView.Items.Count > 0)
+                    if (DirList.FileList.Count > 0)
                     {
                         SortExplorer();
 
-                        if (bfNavigation
-                            && !string.IsNullOrEmpty(prevPath)
-                            && DirList.FileList.FirstOrDefault(item => item.FullPath == prevPath) is { } prevItem)
-                        {
-                            ItemToSelect.Value = prevItem;
-                        }
-                        else
+                        if (!TrySelectBackNavigationItem())
                         {
                             ActiveScrollIntoView(ActiveView.Items[0]);
 
@@ -815,8 +827,12 @@ public partial class ExplorerPageHeader : UserControl
         if (file is null)
             return false;
 
-        if (!bfNavigation)
-            prevPath = file.FullPath;
+        if (!FileActions.IsAppDrive
+            && DevicesObject.Current is { } device
+            && ArchiveHelper.CanNavigateIntoArchive(file.FullPath, file.FullName, device.ID, FileActions.IsArchive))
+        {
+            return _navigateToPath(ArchivePath.Join(file.FullPath, ""), file);
+        }
 
         string realPath = !string.IsNullOrEmpty(file.LinkTarget)
             ? file.LinkTarget
@@ -830,12 +846,12 @@ public partial class ExplorerPageHeader : UserControl
         if (path is null)
             return false;
 
-        //if (!bfNavigation)
-        //    prevPath = path;
-
         var realPath = FolderHelper.FolderExists(path);
+        if (realPath is null)
+            return false;
+
         var locationSource = DirList?.FileList.FirstOrDefault(f => f.IsDirectory && f.FullPath == realPath);
-        return realPath is not null && _navigateToPath(realPath, locationSource);
+        return _navigateToPath(realPath, locationSource);
     }
 
     private void DriveViewNav()
@@ -974,7 +990,7 @@ public partial class ExplorerPageHeader : UserControl
             if (!FileActions.ListingInProgress)
             {
                 bfNavigation = false;
-                _navigateToPath(ArchivePath.Join(file.FullPath, ""), file);
+                NavigateToPath(file);
             }
 
             return;
@@ -1065,6 +1081,9 @@ public partial class ExplorerPageHeader : UserControl
     {
         if (!DevicesObject.Current.HasRootShell
             && ((FileClass)cell.DataContext).Type is not (FileType.File or FileType.Folder))
+            return;
+
+        if (!FileActions.RenameEnabled)
             return;
 
         var file = (FileClass)ExplorerGrid.SelectedItem;
@@ -1195,7 +1214,8 @@ public partial class ExplorerPageHeader : UserControl
                 break;
 
             case Key.F2:
-                AppActions.List.First(action => action.Name is FileActionType.Rename).Command.Execute();
+                if (FileActions.RenameEnabled)
+                    AppActions.List.First(action => action.Name is FileActionType.Rename).Command.Execute();
                 break;
 
             default:

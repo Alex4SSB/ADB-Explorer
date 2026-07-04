@@ -31,7 +31,7 @@
     </UserControl.Style>
     <UserControl.Resources>
         <DataTemplate x:Key="FileDetailsTemplate" DataType="{x:Type viewmodels:IDetailsViewModel}">
-            <Grid Margin="0,3">
+            <Grid Margin="0,3" Visibility="{Binding RowVisibility}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="20" />

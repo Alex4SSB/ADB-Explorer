@@ -245,6 +245,9 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
 
         var location = FileClass.BuildCurrentLocation(path, info, source, identity, restrictions, Device.ID);
 
+        if (!ArchivePath.IsArchivePath(path, Device.ID))
+            location.IsCreationTimeResolved = true;
+
         Dispatcher.Invoke(() =>
         {
             if (path != currentPath)

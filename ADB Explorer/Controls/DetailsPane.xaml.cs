@@ -438,13 +438,10 @@ public partial class DetailsPane : UserControl
     {
         if (e.PropertyName == nameof(FileClass.DisplayName))
             RefreshSelection();
-        else if (e.PropertyName is nameof(FileClass.Permissions) or nameof(FileClass.User) or nameof(FileClass.Group)
-            && sender is FileClass file
-            && ReferenceEquals(File, file)
-            && !SelectedFiles.Any())
-        {
+        else if (e.PropertyName is nameof(FileClass.CreationTime) or nameof(FileClass.IsCreationTimeResolved))
+            return;
+        else if (sender is FileClass file && ReferenceEquals(File, file))
             PopulateThumbnailInfoItems(file);
-        }
     });
 
     public DetailsPane()
@@ -727,8 +724,18 @@ public partial class DetailsPane : UserControl
         if (file.LastAccessTime.HasValue && Data.CurrentDrive?.Restrictions.SupportsAccessTime is true)
             SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_DATE_ACCESSED, f => f.FolderViewModel.LastAccessTimeString, valueIsLtr: true).Init());
 
-        if (file.CreationTime.HasValue)
-            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_CREATION_TIME, f => f.FolderViewModel.CreationTimeString, valueIsLtr: true).Init());
+        if (!Data.FileActions.IsRecycleBin
+            && !ArchivePath.IsArchivePath(file.FullPath, Data.DevicesObject?.Current?.ID))
+        {
+            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(
+                file,
+                Strings.Resources.S_CREATION_TIME,
+                f => f.CreationTime.HasValue ? f.FolderViewModel.CreationTimeString : "",
+                valueIsLtr: true,
+                rowVisibility: static f => f.IsCreationTimeResolved && !f.CreationTime.HasValue
+                    ? Visibility.Hidden
+                    : Visibility.Visible).Init());
+        }
 
         if (Data.FileActions.IsRecycleBin)
             SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COLUMN_DATE_DELETED, f => f.TrashIndex.ModifiedTimeString));
@@ -756,6 +763,18 @@ public partial class DetailsPane : UserControl
 
             if (info.Bitrate.HasValue)
                 SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_VIDEO_BITRATE, f => f.CacheThumbnail!.Value.Info.BitrateString, valueIsLtr: true));
+        }
+
+        var deviceId = Data.DevicesObject?.Current?.ID;
+        var probeExtraInfo = !Data.FileActions.IsRecycleBin
+            && !ArchivePath.IsArchivePath(file.FullPath, deviceId)
+            && (!file.IsCreationTimeResolved || file.User is null || file.Group is null);
+
+        if (probeExtraInfo)
+        {
+            var cts = new CancellationTokenSource();
+            _cancellationToken = cts;
+            _ = Task.Run(() => file.UpdateExtraInfo(cts.Token), cts.Token);
         }
 
         if (file.Permissions.HasValue)
@@ -793,14 +812,6 @@ public partial class DetailsPane : UserControl
                                                                      useConsoleFont: true).Init());
 
             PermissionsItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_FILE_PERM_OTHER, f => $"{f.FolderViewModel.OtherPermissionsString}", valueIsLtr: true, useConsoleFont: true));
-
-            var cts = new CancellationTokenSource();
-            _cancellationToken = cts;
-
-            if (!ArchivePath.IsArchivePath(file.FullPath, Data.DevicesObject?.Current?.ID) && (file.User is null || file.Group is null))
-            {
-                _ = Task.Run(() => file.UpdateExtraInfo(cts.Token), cts.Token);
-            }
         }
     }
 

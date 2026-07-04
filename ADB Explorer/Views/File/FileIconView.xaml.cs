@@ -57,6 +57,9 @@ public partial class FileIconView : UserControl
             && file.Type is not (AbstractFile.FileType.File or AbstractFile.FileType.Folder))
             return;
 
+        if (!FileActions.RenameEnabled)
+            return;
+
         var path = file.FullPath;
 
         Task.Run(() =>

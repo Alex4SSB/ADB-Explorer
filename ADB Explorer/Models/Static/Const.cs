@@ -13,9 +13,6 @@ public static class AdbExplorerConst
     public const string RECYCLE_PATH = $"/sdcard/{RECYCLE_FOLDER}";
     public const string RECYCLE_INDEX_SUFFIX = ".index";
 
-    public static List<string> POSSIBLE_RECYCLE_PATHS =>
-        [.. DRIVE_TYPES.Where(kv => kv.Value is AbstractDrive.DriveType.Internal).Select(kv => $"{kv.Key}/{RECYCLE_FOLDER}")];
-
     public static readonly Dictionary<string, AbstractDrive.DriveType> DRIVE_TYPES = new()
     {
         { "/sdcard", AbstractDrive.DriveType.Internal },
@@ -35,13 +32,26 @@ public static class AdbExplorerConst
         { "/", AbstractDrive.DriveType.Root },
     };
 
+    private static readonly Dictionary<string, AbstractDrive.DriveType> inetrnalDrivePaths 
+        = DRIVE_TYPES.Where(kv => kv.Value is AbstractDrive.DriveType.Internal).ToDictionary();
+
+    public static bool IsInternalStoragePath(string path)
+    {
+        if (string.IsNullOrEmpty(path))
+            return false;
+
+        return inetrnalDrivePaths.Any(kv => path == kv.Key || path.StartsWith($"{kv.Key}/", StringComparison.Ordinal));
+    }
+
+    public static List<string> POSSIBLE_RECYCLE_PATHS =>
+        [.. inetrnalDrivePaths.Select(kv => $"{kv.Key}/{RECYCLE_FOLDER}")];
+
     /// <summary>
     /// Per-device <c>{internal storage}/Android</c> paths whose directory entry FUSE forbids renaming or deleting.
     /// Contents under these paths remain writable.
     /// </summary>
     public static readonly string[] FUSE_PROTECTED_ANDROID_ROOT_PATHS =
-        [.. DRIVE_TYPES.Where(kv => kv.Value is AbstractDrive.DriveType.Internal)
-            .Select(kv => $"{kv.Key.TrimEnd('/')}/Android")];
+        [.. inetrnalDrivePaths.Select(kv => $"{kv.Key.TrimEnd('/')}/Android")];
 
     public const int DIR_LIST_START_COUNT = 100;
     public const int DIR_LIST_UPDATE_THRESHOLD_MIN = 100;

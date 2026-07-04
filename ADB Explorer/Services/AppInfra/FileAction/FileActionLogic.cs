@@ -288,8 +288,11 @@ internal static class FileActionLogic
         }
     }
 
-    public static bool EnableUiPaste()
+  public static bool EnableUiPaste()
     {
+        if (Data.FileActions.IsArchive)
+            return false;
+
         if (Data.CurrentDrive?.Restrictions.ReadOnly is true)
             return false;
 
@@ -345,11 +348,15 @@ internal static class FileActionLogic
                 return false;
         }
 
-        return !Data.FileActions.IsPastingInDescendant;
+        return !Data.FileActions.IsPastingInDescendant
+            && DriveHelper.IsModificationAllowedAt(targetPath, Data.DevicesObject?.Current?.ID ?? "");
     }
 
     public static bool EnableKeyboardPaste()
     {
+        if (Data.FileActions.IsArchive)
+            return false;
+
         if (Data.CurrentDrive?.Restrictions.ReadOnly is true)
             return false;
 
@@ -395,7 +402,7 @@ internal static class FileActionLogic
             case 1:
                 // When duplicating a file multiple times using the keyboard, the selection is the previous copy
                 if (Data.CopyPaste.PasteState is DragDropEffects.Copy && Data.DirList.FileList.Any(f => f.FullPath == files[0]))
-                    return true;
+                    return DriveHelper.IsModificationAllowedAt(targetPath, Data.DevicesObject?.Current?.ID ?? "");
 
                 var item = Data.SelectedFiles.First();
                 if (!item.IsDirectory)
@@ -409,7 +416,8 @@ internal static class FileActionLogic
                 return false;
         }
 
-        return !Data.FileActions.IsPastingInDescendant;
+        return !Data.FileActions.IsPastingInDescendant
+            && DriveHelper.IsModificationAllowedAt(targetPath, Data.DevicesObject?.Current?.ID ?? "");
     }
 
     public static DragDropEffects EnableDropPaste(FileClass target = null)
@@ -891,6 +899,7 @@ internal static class FileActionLogic
             && (!Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 
         Data.FileActions.RenameEnabled = isWritable
+                                         && !Data.FileActions.IsArchive
                                          && !SelectionIsFuseProtectedAndroidRoot
                                          && !Data.FileActions.IsRecycleBin
                                          && Data.SelectedFiles.Count() == 1

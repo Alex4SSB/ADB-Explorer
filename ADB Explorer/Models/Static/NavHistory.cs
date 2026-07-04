@@ -200,6 +200,35 @@ namespace ADB_Explorer.Models
 
         private static int historyIndex = -1;
 
+        /// <summary>
+        /// Device path left when navigating back; consumed to restore selection in the parent listing.
+        /// </summary>
+        private static string? pendingSelectionPath;
+
+        /// <summary>Returns and clears the path to select after a back-navigation completes.</summary>
+        public static string? TakePendingSelectionPath()
+        {
+            var path = pendingSelectionPath;
+            pendingSelectionPath = null;
+            return path;
+        }
+
+        public static FileClass? FindBackNavigationItem(string path)
+        {
+            if (Data.DirList.FileList.FirstOrDefault(item => item.FullPath == path) is { } exact)
+                return exact;
+
+            var deviceId = Data.DevicesObject.Current?.ID;
+            if (deviceId is null || ArchivePath.IsArchivePath(Data.CurrentPath, deviceId))
+                return null;
+
+            if (!ArchivePath.IsArchivePath(path, deviceId))
+                return null;
+
+            var archivePath = ArchivePath.GetArchivePath(path, deviceId);
+            return Data.DirList.FileList.FirstOrDefault(item => item.FullPath == archivePath);
+        }
+
         public static bool BackAvailable { get { return historyIndex > 0; } }
         public static bool ForwardAvailable { get { return historyIndex < PathHistory.Count - 1; } }
 
@@ -233,6 +262,9 @@ namespace ADB_Explorer.Models
         {
             if (!BackAvailable) return null;
 
+            var departed = PathHistory[historyIndex].Path;
+            pendingSelectionPath = string.IsNullOrEmpty(departed) ? null : departed;
+
             historyIndex--;
 
             UpdateMenuHistory();
@@ -243,6 +275,8 @@ namespace ADB_Explorer.Models
         public static AdbLocation GoForward()
         {
             if (!ForwardAvailable) return null;
+
+            pendingSelectionPath = null;
 
             historyIndex++;
 
@@ -267,6 +301,8 @@ namespace ADB_Explorer.Models
             {
                 return;
             }
+
+            pendingSelectionPath = null;
             
             if (ForwardAvailable)
             {
@@ -283,6 +319,7 @@ namespace ADB_Explorer.Models
         {
             PathHistory.Clear();
             historyIndex = -1;
+            pendingSelectionPath = null;
 
             UpdateMenuHistory();
         }

@@ -19,11 +19,20 @@ internal class DriveHelper
             return null;
 
         // First search for a non-root drive that matches the path
-        var nonRoot = Data.DevicesObject.Current?.Drives.FirstOrDefault(d => d.Type is not AbstractDrive.DriveType.Root && path.StartsWith(d.Path));
+        var nonRoot = Data.DevicesObject.Current?.Drives.FirstOrDefault(d =>
+            d.Type is not AbstractDrive.DriveType.Root && IsOnDrive(path, d));
         if (nonRoot is null)
             return Data.DevicesObject.Current?.Drives.FirstOrDefault(d => d.Type is AbstractDrive.DriveType.Root);
 
         return nonRoot;
+    }
+
+    private static bool IsOnDrive(string path, DriveViewModel drive)
+    {
+        if (path == drive.Path || path.StartsWith($"{drive.Path.TrimEnd('/')}/", StringComparison.Ordinal))
+            return true;
+
+        return drive.Type is AbstractDrive.DriveType.Internal && AdbExplorerConst.IsInternalStoragePath(path);
     }
 
     public static bool IsModificationAllowedAt(string path, string deviceId)
