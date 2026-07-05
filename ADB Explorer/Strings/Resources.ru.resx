@@ -1632,4 +1632,22 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
     <value>Выбранный элемент не может бить изменён</value>
   </data>
+  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
+    <value>Содержимое архива можно изменять</value>
+  </data>
+  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
+    <value>Содержимое архива доступно только для чтения</value>
+  </data>
+  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
+    <value>Сжатый размер</value>
+  </data>
+  <data name="S_PACKED_SIZE" xml:space="preserve">
+    <value>Размер пакета</value>
+  </data>
+  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
+    <value>Соотношение</value>
+  </data>
+  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
+    <value>Метод</value>
+  </data>
 </root>
