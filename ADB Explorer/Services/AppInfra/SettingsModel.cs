@@ -229,7 +229,7 @@ public static class UISettings
                     new(AppSettings.ThumbnailMode.OnConnect, Strings.Resources.S_SETTINGS_THUMBS_CONNECT) ],
                     icon: new("\uE15A")),
                 new BoolSetting(() => Settings.MovieThumbsEnabled, Strings.Resources.S_SETTINGS_VIDEO_THUMBNAILS, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), new("\uE8B2")),
-                new BoolSetting(() => Settings.ThumbSizePerLocation, Strings.Resources.S_SETTINGS_THUMB_SIZE_PER_LOCATION, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), new("\uEFFF")),
+                new BoolSetting(() => Settings.ThumbSizePerLocation, Strings.Resources.S_SETTINGS_THUMB_SIZE_PER_LOCATION, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), new(FluentPathGeometries.ResizeImage)),
                 new BoolSetting(() => Settings.PersistThumbs, Strings.Resources.S_SETTINGS_PERSIST_THUMBS, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), new("\uE78C")),
                 new SimpleComboSetting<AppSettings.ThumbnailAge>(() => Settings.ThumbsAge, Strings.Resources.S_SETTINGS_THUMBS_AGE, [
                     new(AppSettings.ThumbnailAge.Disabled, Strings.Resources.S_SETTINGS_INACTIVE),
