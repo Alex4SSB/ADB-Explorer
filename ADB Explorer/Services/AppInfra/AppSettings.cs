@@ -161,20 +161,45 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     private bool _disableAdbRestrictionsActive;
 
     /// <summary>
-    /// Whether ADB security restrictions are disabled for this session. Set only at launch from the vault.
+    /// Whether ADB security restrictions are disabled for this session. Defaults to the safe state
+    /// (restrictions enabled) and is set only at launch, once the vault load completes.
     /// </summary>
     [JsonIgnore]
     public bool DisableAdbRestrictionsActive => _disableAdbRestrictionsActive;
 
     /// <summary>
-    /// Loads vault-backed settings on the UI thread before background ADB validation runs.
+    /// Loads vault-backed settings on a background thread so a slow or unresponsive Credential Vault
+    /// cannot freeze startup (issue #329). Until this completes the app stays in the safe, restricted
+    /// state. If the feature turns out to be enabled but ADB was already rejected while the value was
+    /// still unknown, ADB verification is re-run so a legitimately-allowed ADB is accepted.
     /// </summary>
-    public void LoadVaultSettings()
+    public Task LoadVaultSettingsAsync() => Task.Run(() =>
     {
-        _disableAdbRestrictions = CredentialVaultStore.Get(nameof(DisableAdbRestrictions)) == "True";
-        _disableAdbRestrictionsActive = _disableAdbRestrictions;
-        _disableAdbRestrictionsLoaded = true;
-    }
+        if (!CredentialVaultStore.TryGet(nameof(DisableAdbRestrictions), out var value))
+            return; // Vault unavailable/slow: keep safe defaults and try again on the next launch.
+
+        bool stored = value == "True";
+
+        // The session ("active") value always reflects what the vault held at launch, even if the user
+        // has already toggled the pending setting this session (that change only applies after restart).
+        _disableAdbRestrictionsActive = stored;
+
+        // Adopt the stored value as the current setting only if the user has not changed it yet.
+        if (!_disableAdbRestrictionsLoaded)
+        {
+            _disableAdbRestrictions = stored;
+            _disableAdbRestrictionsLoaded = true;
+            App.SafeInvoke(() => OnPropertyChanged(nameof(DisableAdbRestrictions)));
+        }
+
+        // The initial verification may have run under the default restricted state and flagged a
+        // user-approved ADB as invalid. Now that the setting is known, re-evaluate.
+        if (_disableAdbRestrictionsActive
+            && AdbHelper.CurrentAdbState.Status is not AdbHelper.AdbStatus.Valid)
+        {
+            _ = AdbHelper.CheckAdbVersion();
+        }
+    });
 
     public void ClearVaultSettings()
     {
@@ -184,7 +209,8 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     }
 
     /// <summary>
-    /// Persists vault-backed settings. Called on normal app exit so toggles do not touch the vault on the UI thread.
+    /// Persists vault-backed settings. Called on normal app exit; the vault write is timeout-protected
+    /// so it cannot hang shutdown even on an unresponsive vault.
     /// </summary>
     public void PersistVaultSettings()
     {
@@ -197,12 +223,7 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     [JsonIgnore]
     public bool DisableAdbRestrictions
     {
-        get
-        {
-            return _disableAdbRestrictionsLoaded
-                ? _disableAdbRestrictions
-                : CredentialVaultStore.Get(nameof(DisableAdbRestrictions)) == "True";
-        }
+        get => _disableAdbRestrictions;
 
         set
         {

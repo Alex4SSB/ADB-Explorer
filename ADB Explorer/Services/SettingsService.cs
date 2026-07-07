@@ -41,7 +41,8 @@ public class SettingsService
             Data.Settings = JsonSerializer.Deserialize<AppSettings>(json, _options) ?? new AppSettings();
         }
 
-        Data.Settings.LoadVaultSettings();
+        // Load vault-backed settings off the UI thread; a slow/unresponsive vault must not block startup.
+        _ = Data.Settings.LoadVaultSettingsAsync();
         ADBService.IsMdnsEnabled = Data.Settings.EnableMdns;
     }
 
