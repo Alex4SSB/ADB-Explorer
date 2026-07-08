@@ -1632,4 +1632,22 @@ Seleccione Personalizada para usar una ubicación que no se eliminará al desins
   <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
     <value>Un elemento seleccionad no puede ser modificado</value>
   </data>
+  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
+    <value>El contenido del archivo puede ser modificado</value>
+  </data>
+  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
+    <value>El contenido del archivo es sólo lectura</value>
+  </data>
+  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
+    <value>Tamaño comprimido</value>
+  </data>
+  <data name="S_PACKED_SIZE" xml:space="preserve">
+    <value>Tamaño empaquetado</value>
+  </data>
+  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
+    <value>Tasa de compresión</value>
+  </data>
+  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
+    <value>Método de compresión</value>
+  </data>
 </root>
