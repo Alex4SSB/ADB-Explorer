@@ -574,8 +574,10 @@ internal static class FileActionLogic
         }
     }
 
-    public static async void DeleteFiles()
+    public static async void DeleteFiles(bool? permanent = null)
     {
+        permanent ??= Keyboard.Modifiers is ModifierKeys.Shift;
+
         List<FileClass> itemsToDelete;
         if (Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any())
         {
@@ -602,19 +604,19 @@ internal static class FileActionLogic
                 deletedString += Strings.Resources.S_BROWSER_ITEMS_PLURAL;
         }
 
+        if (!Data.Settings.EnableRecycle || permanent.Value)
+        {
         var result = await DialogService.ShowConfirmation(
-            string.Format(Data.FileActions.IsRecycleBin
-                ? Strings.Resources.S_DELETE_PERMANENT
-                : Strings.Resources.S_DELETE_CONFIRMATION, deletedString),
+            string.Format(Strings.Resources.S_DELETE_PERMANENT, deletedString),
             Strings.Resources.S_DEL_CONF_TITLE,
             Strings.Resources.S_DELETE_ACTION,
-            checkBoxText: Data.Settings.EnableRecycle && !Data.FileActions.IsRecycleBin ? Strings.Resources.S_PERM_DEL : "",
             icon: DialogService.DialogIcon.Delete);
 
         if (result.Item1 is not Wpf.Ui.Controls.ContentDialogResult.Primary)
             return;
+        }
 
-        if (!Data.FileActions.IsRecycleBin && Data.Settings.EnableRecycle && !result.Item2)
+        if (!Data.FileActions.IsRecycleBin && Data.Settings.EnableRecycle && !permanent.Value)
         {
             await ShellFileOperation.MakeDir(Data.DevicesObject.Current, AdbExplorerConst.RECYCLE_PATH);
 
@@ -873,7 +875,20 @@ internal static class FileActionLogic
         }
 
         Data.FileActions.PullDescription.Value = Data.FileActions.IsFollowLinkEnabled ? Strings.Resources.S_PULL_ACTION_LINK : Strings.Resources.S_PULL_ACTION;
-        Data.FileActions.DeleteDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.Resources.S_EMPTY_TRASH : Strings.Resources.S_DELETE_ACTION;
+        if (Data.FileActions.IsRecycleBin)
+        {
+            Data.FileActions.DeleteDescription.Value = Data.SelectedFiles.Any()
+                ? Strings.Resources.S_PERM_DEL
+                : Strings.Resources.S_EMPTY_TRASH;
+        }
+        else
+        {
+            Data.FileActions.DeleteDescription.Value = Strings.Resources.S_DELETE_ACTION;
+            Data.FileActions.ContextDeleteDescription.Value = Keyboard.Modifiers is ModifierKeys.Shift
+                ? Strings.Resources.S_PERM_DEL
+                : Strings.Resources.S_DELETE_ACTION;
+        }
+
         Data.FileActions.RestoreDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.Resources.S_RESTORE_ALL : Strings.Resources.S_RESTORE_ACTION;
 
         Data.FileActions.IsSelectionIllegalOnWindows = Data.SelectedFiles.Any() && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.Windows);

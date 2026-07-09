@@ -414,6 +414,7 @@
         x:Key="ExplorerGridStyle"
         BasedOn="{StaticResource AdbDataGridStyle}"
         TargetType="ui:DataGrid">
+        <Setter Property="CanUserDeleteRows" Value="False" />
         <Setter Property="MinRowHeight" Value="32" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">

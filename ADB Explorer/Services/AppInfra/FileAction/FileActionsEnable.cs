@@ -424,6 +424,8 @@ public partial class FileActionsEnable : ObservableObject
 
     public ObservableProperty<string> DeleteDescription = new();
 
+    public ObservableProperty<string> ContextDeleteDescription = new();
+
     public ObservableProperty<string> RestoreDescription = new();
 
     public ObservableProperty<string> PasteDescription = new();

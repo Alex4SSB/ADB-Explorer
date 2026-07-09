@@ -235,7 +235,15 @@ public partial class ExplorerPageHeader : UserControl
 
             return;
         }
-        else if (!NAVIGATION_KEYS.Contains(e.Key))
+        
+        if (e.Key is Key.Delete && FileActions.DeleteEnabled)
+        {
+            FileActionLogic.DeleteFiles();
+            e.Handled = true;
+            return;
+        }
+
+        if (!NAVIGATION_KEYS.Contains(e.Key))
             return;
 
         if (FileActions.IsExplorerVisible)

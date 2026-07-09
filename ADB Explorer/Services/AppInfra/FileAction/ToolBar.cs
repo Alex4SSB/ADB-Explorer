@@ -216,7 +216,7 @@ internal static class ExplorerContextMenu
             ]),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.SearchApkOnWeb), AppActions.Icon(FileAction.FileActionType.SearchApkOnWeb, 16)),
         new SubMenuSeparator(),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Delete), AppActions.Icon(FileAction.FileActionType.Delete, 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextDelete), AppActions.Icon(FileAction.FileActionType.Delete, 16)),
         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPushPackages), new(FluentPathGeometries.BoxArrowUp, 16)),
         new DummySubMenu(),
     ];
