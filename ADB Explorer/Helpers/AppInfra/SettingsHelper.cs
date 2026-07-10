@@ -8,6 +8,12 @@ public static class SettingsHelper
 {
     public static void ResetAppAction()
     {
+        // Flush settings.json before launching the new instance. OnExit also saves, but that runs after
+        // Process.Start — and PersistVaultSettings can block for seconds on a hung vault, so the new
+        // process would otherwise race ahead and load a stale settings file. Skip the vault here; OnExit
+        // still persists it (timeout-protected) without delaying the restart.
+        App.Services.GetService<SettingsService>()?.SaveSettingsFile();
+
         Process.Start(Environment.ProcessPath);
         Application.Current.Shutdown();
     }

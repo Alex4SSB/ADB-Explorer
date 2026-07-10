@@ -41,16 +41,28 @@ public class SettingsService
             Data.Settings = JsonSerializer.Deserialize<AppSettings>(json, _options) ?? new AppSettings();
         }
 
+        // Set the mDNS flag before starting the vault load: that load may re-evaluate ADB on a background
+        // thread (running "adb version", which can start the ADB server). Assigning it first ensures the
+        // Task.Run happens-before edge makes the correct value visible, so a server we start carries mDNS.
+        ADBService.IsMdnsEnabled = Data.Settings.EnableMdns;
+
         // Load vault-backed settings off the UI thread; a slow/unresponsive vault must not block startup.
         _ = Data.Settings.LoadVaultSettingsAsync();
-        ADBService.IsMdnsEnabled = Data.Settings.EnableMdns;
     }
 
     public void Save()
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
-
+        SaveSettingsFile();
         Data.Settings.PersistVaultSettings();
+    }
+
+    /// <summary>
+    /// Writes <c>settings.json</c> only. Use when the settings file must hit disk before a restart
+    /// without waiting on the Credential Vault (which can block for seconds when unresponsive).
+    /// </summary>
+    public void SaveSettingsFile()
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
         File.WriteAllText(_path, JsonSerializer.Serialize(Data.Settings, _options));
     }
 
