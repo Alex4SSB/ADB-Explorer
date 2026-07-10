@@ -1297,10 +1297,10 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>未確認而離開了</value>
   </data>
   <data name="S_VALIDATION_ERROR" xml:space="preserve">
-    <value>檔案有效性出錯: {0}</value>
+    <value>有效性有誤: {0}</value>
   </data>
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
-    <value>檔案有效性檢查中…</value>
+    <value>有效性檢查中…</value>
   </data>
   <data name="S_FILES_PLURAL" xml:space="preserve">
     <value>{0} 個檔案</value>
@@ -1309,7 +1309,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>選擇 ROM 以進行非官方載入</value>
   </data>
   <data name="S_ROM_FILE" xml:space="preserve">
-    <value>ROM 檔案</value>
+    <value>ROM 檔</value>
   </data>
   <data name="S_TERMINAL" xml:space="preserve">
     <value>終端機</value>
@@ -1318,16 +1318,16 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>保留檔案修改日</value>
   </data>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
-    <value>安裝 {0} 個</value>
+    <value>安裝 {0}</value>
   </data>
   <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
     <value>安裝 {0} 個 APK</value>
   </data>
   <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
-    <value>啟用</value>
+    <value>啟用態</value>
   </data>
   <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
-    <value>停用</value>
+    <value>停用態</value>
   </data>
   <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
     <value>檢查 mDNS 伺服器狀態…</value>
@@ -1345,7 +1345,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>僅在相片目錄</value>
   </data>
   <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
-    <value>於連接時</value>
+    <value>於連線時</value>
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>儲存各工作態的圖示</value>
@@ -1357,7 +1357,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>顯示特殊資料夾的圖示</value>
   </data>
   <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
-    <value>包括影音縮圖</value>
+    <value>包括影片縮圖</value>
   </data>
   <data name="S_VIDEO_DURATION" xml:space="preserve">
     <value>長度</value>
@@ -1385,17 +1385,17 @@ ADB 包含在 Android SDK Platform Tools 中。
     <comment>Header for the drive restrictions tooltip in the navigation bar</comment>
   </data>
   <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
-    <value>• Read-only filesystem</value>
+    <value>•唯讀檔案系統</value>
   </data>
   <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
-    <value>• Symbolic links are not supported
-• File names cannot contain " * / : &lt; &gt; ? \ |
-• File names are case insensitive
-• Installation of APKs is not supported</value>
+    <value>• 不支援符號連結
+• 檔名不可使用 " * / : &lt; &gt; ? \ |
+• 檔名不區分大小寫
+• 不支援安裝 APK</value>
     <comment>Restrictions bundled under the noexec mount option</comment>
   </data>
   <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
-    <value>Privacy Policy Updated</value>
+    <value>已更新隱私政策</value>
     <comment>The title of the notification message about an updated privacy policy</comment>
   </data>
   <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
@@ -1697,5 +1697,32 @@ Select Custom to use a location that will not be removed on uninstall. The custo
   </data>
   <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
     <value>無法修改所選項目</value>
+  </data>
+  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
+    <value>可修改壓縮檔內容</value>
+  </data>
+  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
+    <value>壓縮檔內容係唯讀</value>
+  </data>
+  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
+    <value>壓縮過的大小</value>
+  </data>
+  <data name="S_PACKED_SIZE" xml:space="preserve">
+    <value>未壓縮的大小</value>
+  </data>
+  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
+    <value>壓縮比</value>
+  </data>
+  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
+    <value>方式</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_MODE" xml:space="preserve">
+    <value>檔案大小顯示</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
+    <value>檔案大小的小數點位數</value>
+  </data>
+  <data name="S_OPEN_FOLDER" xml:space="preserve">
+    <value>開啟</value>
   </data>
 </root>
