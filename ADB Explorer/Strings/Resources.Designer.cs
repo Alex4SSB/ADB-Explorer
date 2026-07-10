@@ -70,15 +70,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} EB.
-        /// </summary>
-        public static string EXA {
-            get {
-                return ResourceManager.GetString("EXA", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to {0} GB.
         /// </summary>
         public static string GIGA {
@@ -129,15 +120,6 @@ namespace ADB_Explorer.Strings {
         public static string NANO {
             get {
                 return ResourceManager.GetString("NANO", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} PB.
-        /// </summary>
-        public static string PETA {
-            get {
-                return ResourceManager.GetString("PETA", resourceCulture);
             }
         }
         

@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -306,6 +306,15 @@ Um ADB zu genehmigen, öffnen Sie die erweiterten Einstellungen von WSA.</value>
   <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
     <value>Zu den Versionshinweisen gehen</value>
   </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Privacy Policy Updated</value>
+    <comment>The title of the notification message about an updated privacy policy</comment>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>This app version was released after a privacy policy update.
+Review the changes on GitHub.</value>
+    <comment>The content of the privacy policy update notification message</comment>
+  </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
     <value>Ausführbare ADB-Datei</value>
   </data>
@@ -519,6 +528,28 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
   <data name="S_APP_DATA_FOLDER" xml:space="preserve">
     <value>App-Datenordner</value>
   </data>
+  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
+    <value>App Data Location</value>
+    <comment>Title of the dialog asking packaged users where to store app data</comment>
+  </data>
+  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
+    <value>This app distribution saves data in a virtualized (and hard to reach) location, which is cleared on app uninstall.
+
+Select Custom to use a location that will not be removed on uninstall. The custom location cannot be under C:\Users\…\AppData</value>
+    <comment>Explains virtualized vs custom app data location for packaged installs</comment>
+  </data>
+  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
+    <value>Use Default</value>
+    <comment>Button to keep the MSIX virtualized app data folder</comment>
+  </data>
+  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
+    <value>Custom</value>
+    <comment>Button to pick a non-virtualized custom app data folder</comment>
+  </data>
+  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
+    <value>Choose App Data Folder</value>
+    <comment>Title of the folder picker for custom app data location</comment>
+  </data>
   <data name="S_GITHUB_REPO" xml:space="preserve">
     <value>GitHub-Repository</value>
   </data>
@@ -530,6 +561,10 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
   </data>
   <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
     <value>Fehlerberichterstattung</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>After a crash, you may optionally send a diagnostic report to help us fix it. Reports are sent only when you click Send Report and usually include the exception message, stack trace, app and Windows version, and the page that was open. The data is processed by Grafana Labs (Grafana Cloud). See the Privacy Policy link above.</value>
+    <comment>About settings notice describing optional crash reporting and Grafana as processor</comment>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>Quellenangaben und Lizenzen von Drittanbietern</value>
@@ -1003,6 +1038,10 @@ Alle laufenden Vorgänge abbrechen</value>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Hält sich an die Unix-Namenskonventionen (über ADB)</value>
   </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Adheres to user space naming rules</value>
+    <comment>Will show if a file name doesn't meet user space naming rules</comment>
+  </data>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
     <value>Hält sich an die Windows-Namenskonventionen</value>
   </data>
@@ -1260,12 +1299,6 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="TERA" xml:space="preserve">
     <value>{0} TB</value>
   </data>
-  <data name="PETA" xml:space="preserve">
-    <value>{0} PB</value>
-  </data>
-  <data name="EXA" xml:space="preserve">
-    <value>{0} EB</value>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
   </data>
@@ -1428,6 +1461,10 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
     <value>Emulator starten</value>
   </data>
+  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
+    <value>Android SDK emulator was not found. Install the Android SDK emulator package or set ANDROID_SDK_ROOT.</value>
+    <comment>Error message when the SDK emulator executable cannot be located</comment>
+  </data>
   <data name="S_STRING_PASTE" xml:space="preserve">
     <value>Einfügen</value>
   </data>
@@ -1455,6 +1492,14 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_THUMBSIZE_XL" xml:space="preserve">
     <value>Extragroße Symbole</value>
   </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value>Layout and view options</value>
+    <comment>The tooltip of the thumbnail size selector. view = icon view / details view</comment>
+  </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value>Thumbnail Size Saved For Each Location</value>
+    <comment>The setting that enables keeping track of the last thumbnail size selected for each location / folder</comment>
+  </data>
   <data name="S_SORT" xml:space="preserve">
     <value>Sortieren</value>
   </data>
@@ -1463,6 +1508,14 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_SORT_DESCENDING" xml:space="preserve">
     <value>Absteigend</value>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>Sorting column &amp; order saved for each location</value>
+    <comment>The setting that enables keeping track of the last sorted column and direction selected for each location / folder</comment>
+  </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>Max Image Size To Use As Its Own Thumbnail (0 - Disabled)</value>
+    <comment>The name of the setting that enables using images for their own thumbnail display, and the maximum size for such images</comment>
   </data>
   <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
     <value>und {0} weitere …</value>
@@ -1475,6 +1528,14 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
     <value>Max. Dateigröße für die Vorschau</value>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>Pull To Default Folder On File Double Click</value>
+    <comment>The setting that enables pulling a file to the default folder on double click</comment>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value>Select a single item to get more information.</value>
+    <comment>The tip displayed in the details pane when multiple (or none) files are selected</comment>
   </data>
   <data name="S_ITEM_LOCATION" xml:space="preserve">
     <value>Speicherort</value>
@@ -1547,73 +1608,6 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_ADB_NOT_FOUND" xml:space="preserve">
     <value>ADB konnte im System-PATH nicht gefunden werden. Bitte „{0}” verwenden, um es zu finden.</value>
-  </data>
-  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
-    <value>Privacy Policy Updated</value>
-    <comment>The title of the notification message about an updated privacy policy</comment>
-  </data>
-  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
-    <value>This app version was released after a privacy policy update.
-Review the changes on GitHub.</value>
-    <comment>The content of the privacy policy update notification message</comment>
-  </data>
-  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
-    <value>App Data Location</value>
-    <comment>Title of the dialog asking packaged users where to store app data</comment>
-  </data>
-  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
-    <value>This app distribution saves data in a virtualized (and hard to reach) location, which is cleared on app uninstall.
-
-Select Custom to use a location that will not be removed on uninstall. The custom location cannot be under C:\Users\…\AppData</value>
-    <comment>Explains virtualized vs custom app data location for packaged installs</comment>
-  </data>
-  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value>Use Default</value>
-    <comment>Button to keep the MSIX virtualized app data folder</comment>
-  </data>
-  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
-    <value>Custom</value>
-    <comment>Button to pick a non-virtualized custom app data folder</comment>
-  </data>
-  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
-    <value>Choose App Data Folder</value>
-    <comment>Title of the folder picker for custom app data location</comment>
-  </data>
-  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
-    <value>After a crash, you may optionally send a diagnostic report to help us fix it. Reports are sent only when you click Send Report and usually include the exception message, stack trace, app and Windows version, and the page that was open. The data is processed by Grafana Labs (Grafana Cloud). See the Privacy Policy link above.</value>
-    <comment>About settings notice describing optional crash reporting and Grafana as processor</comment>
-  </data>
-  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Adheres to user space naming rules</value>
-    <comment>Will show if a file name doesn't meet user space naming rules</comment>
-  </data>
-  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
-    <value>Android SDK emulator was not found. Install the Android SDK emulator package or set ANDROID_SDK_ROOT.</value>
-    <comment>Error message when the SDK emulator executable cannot be located</comment>
-  </data>
-  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
-    <value>Layout and view options</value>
-    <comment>The tooltip of the thumbnail size selector. view = icon view / details view</comment>
-  </data>
-  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
-    <value>Thumbnail Size Saved For Each Location</value>
-    <comment>The setting that enables keeping track of the last thumbnail size selected for each location / folder</comment>
-  </data>
-  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
-    <value>Sorting column &amp; order saved for each location</value>
-    <comment>The setting that enables keeping track of the last sorted column and direction selected for each location / folder</comment>
-  </data>
-  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
-    <value>Max Image Size To Use As Its Own Thumbnail (0 - Disabled)</value>
-    <comment>The name of the setting that enables using images for their own thumbnail display, and the maximum size for such images</comment>
-  </data>
-  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
-    <value>Pull To Default Folder On File Double Click</value>
-    <comment>The setting that enables pulling a file to the default folder on double click</comment>
-  </data>
-  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
-    <value>Select a single item to get more information.</value>
-    <comment>The tip displayed in the details pane when multiple (or none) files are selected</comment>
   </data>
   <data name="S_ADB_PATH_INVALID" xml:space="preserve">
     <value>Provided {0} path is either a Windows shortcut or a UNC (remote) path, which is not allowed.</value>

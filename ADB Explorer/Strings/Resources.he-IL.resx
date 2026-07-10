@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1063,6 +1063,12 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>פריט שנבחר אינו קובץ / תיקייה</value>
   </data>
+  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
+    <value>המיקום הנוכחי הוא לקריאה בלבד</value>
+  </data>
+  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
+    <value>פריט שנבחר אינו ניתן לעריכה</value>
+  </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>תוכנת WSA</value>
   </data>
@@ -1289,12 +1295,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="TERA" xml:space="preserve">
     <value>‎{0} TB</value>
-  </data>
-  <data name="PETA" xml:space="preserve">
-    <value>‎{0} PB</value>
-  </data>
-  <data name="EXA" xml:space="preserve">
-    <value>‎{0} EB</value>
   </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
@@ -1575,6 +1575,24 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_CREATION_TIME" xml:space="preserve">
     <value>נוצר</value>
   </data>
+  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
+    <value>תוכן הארכיון ניתן לשינוי</value>
+  </data>
+  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
+    <value>תוכן הארכיון הינו לקריאה בלבד</value>
+  </data>
+  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
+    <value>גודל מקווץ</value>
+  </data>
+  <data name="S_PACKED_SIZE" xml:space="preserve">
+    <value>גודל ארוז</value>
+  </data>
+  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
+    <value>יחס</value>
+  </data>
+  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
+    <value>שיטה</value>
+  </data>
   <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
     <value>השתנה</value>
   </data>
@@ -1625,29 +1643,5 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_OPEN_FOLDER" xml:space="preserve">
     <value>פתח</value>
-  </data>
-  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
-    <value>המיקום הנוכחי הוא לקריאה בלבד</value>
-  </data>
-  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
-    <value>פריט שנבחר אינו ניתן לעריכה</value>
-  </data>
-  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
-    <value>תוכן הארכיון ניתן לשינוי</value>
-  </data>
-  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
-    <value>תוכן הארכיון הינו לקריאה בלבד</value>
-  </data>
-  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
-    <value>גודל מקווץ</value>
-  </data>
-  <data name="S_PACKED_SIZE" xml:space="preserve">
-    <value>גודל ארוז</value>
-  </data>
-  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
-    <value>יחס</value>
-  </data>
-  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
-    <value>שיטה</value>
   </data>
 </root>

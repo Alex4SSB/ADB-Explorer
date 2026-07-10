@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -250,6 +250,20 @@
     <value>Bem-Vindo à nova versão do ADB Explorer!
 As notas de lançamento estão disponíveis no GitHub.</value>
   </data>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Drive restrictions:</value>
+    <comment>Header for the drive restrictions tooltip in the navigation bar</comment>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• Read-only filesystem</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• Symbolic links are not supported
+• File names cannot contain " * / : &lt; &gt; ? \ |
+• File names are case insensitive
+• Installation of APKs is not supported</value>
+    <comment>Restrictions bundled under the noexec mount option</comment>
+  </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>Todas as opções da app serão resetadas ao fechar a app.
 Esta ação não poderá ser desfeita. Tem certeza?</value>
@@ -293,6 +307,15 @@ Para aprovar o ADB, abra as opções avançada do WSA.</value>
   </data>
   <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
     <value>Ir às Notas de Lançamento</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Privacy Policy Updated</value>
+    <comment>The title of the notification message about an updated privacy policy</comment>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>This app version was released after a privacy policy update.
+Review the changes on GitHub.</value>
+    <comment>The content of the privacy policy update notification message</comment>
   </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
     <value>ADB Executável</value>
@@ -428,50 +451,6 @@ O conteúdo visível pode estar incompleto.</value>
   </data>
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
     <value>Abre Automaticamente para Pesquisas</value>
-  </data>
-  <data name="S_BUTTON_OK" xml:space="preserve">
-    <value>Ok</value>
-  </data>
-  <data name="S_MENU_FOLDERS" xml:space="preserve">
-    <value>Pastas</value>
-  </data>
-  <data name="S_MENU_FILES" xml:space="preserve">
-    <value>Ficheiros</value>
-  </data>
-  <data name="S_MENU_COPY" xml:space="preserve">
-    <value>Copiar</value>
-  </data>
-  <data name="S_MENU_EDIT" xml:space="preserve">
-    <value>Editar</value>
-  </data>
-  <data name="S_MENU_NEW" xml:space="preserve">
-    <value>Novo</value>
-  </data>
-  <data name="S_MENU_INSTALL" xml:space="preserve">
-    <value>Instalar</value>
-  </data>
-  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
-    <value>Drive restrictions:</value>
-    <comment>Header for the drive restrictions tooltip in the navigation bar</comment>
-  </data>
-  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
-    <value>• Read-only filesystem</value>
-  </data>
-  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
-    <value>• Symbolic links are not supported
-• File names cannot contain " * / : &lt; &gt; ? \ |
-• File names are case insensitive
-• Installation of APKs is not supported</value>
-    <comment>Restrictions bundled under the noexec mount option</comment>
-  </data>
-  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
-    <value>Privacy Policy Updated</value>
-    <comment>The title of the notification message about an updated privacy policy</comment>
-  </data>
-  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
-    <value>This app version was released after a privacy policy update.
-Review the changes on GitHub.</value>
-    <comment>The content of the privacy policy update notification message</comment>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>Stop Polling On Push/Pull</value>
@@ -658,6 +637,9 @@ Select Custom to use a location that will not be removed on uninstall. The custo
     <value>Language</value>
     <comment>The setting used to set the UI language to a language different than Windows</comment>
   </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>Ok</value>
+  </data>
   <data name="S_FILTER_FILE_OPS" xml:space="preserve">
     <value>Filter File Operations</value>
     <comment>The content of a button used to toggle file operations filtering</comment>
@@ -711,13 +693,28 @@ Cancel All Running</value>
     <value>Push</value>
     <comment>The tooltip of the button used to initiate a push operation</comment>
   </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>Pastas</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>Ficheiros</value>
+  </data>
   <data name="S_MENU_REFRESH" xml:space="preserve">
     <value>Refresh</value>
     <comment>The menu item used to refresh the current location in the file browser</comment>
   </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>Copiar</value>
+  </data>
   <data name="S_MENU_MORE" xml:space="preserve">
     <value>More</value>
     <comment>The menu item hiding more options under it</comment>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>Editar</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>Novo</value>
   </data>
   <data name="S_MENU_FOLDER" xml:space="preserve">
     <value>Folder</value>
@@ -754,6 +751,9 @@ Cancel All Running</value>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Save Changes</value>
     <comment>The tooltip of a button to save the changes made in the text editor</comment>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>Instalar</value>
   </data>
   <data name="S_MENU_COPY_TEMP" xml:space="preserve">
     <value>Copy To Temp</value>
@@ -1555,14 +1555,6 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="TERA" xml:space="preserve">
     <value>{0} TB</value>
     <comment>The notation for TeraBytes when displaying file size or drive usage</comment>
-  </data>
-  <data name="PETA" xml:space="preserve">
-    <value>{0} PB</value>
-    <comment>The notation for PetaBytes when displaying file size or drive usage</comment>
-  </data>
-  <data name="EXA" xml:space="preserve">
-    <value>{0} EB</value>
-    <comment>The notation for ExaBytes when displaying file size or drive usage</comment>
   </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>

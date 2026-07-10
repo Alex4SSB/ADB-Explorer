@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -525,6 +525,23 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_APP_DATA_FOLDER" xml:space="preserve">
     <value>应用数据文件夹</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
+    <value>应用数据位置</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
+    <value>此应用分发在虚拟化（难以访问）位置保存数据，卸载时会删除该位置。
+
+选择自定义以使用不会在卸载时被删除的位置。自定义位置不能在 C:\Users\…\AppData 下</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
+    <value>使用默认</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
+    <value>自定义</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
+    <value>选择应用数据文件夹</value>
   </data>
   <data name="S_GITHUB_REPO" xml:space="preserve">
     <value>GitHub 仓库</value>
@@ -1046,6 +1063,12 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>选中的项目不是文件/文件夹</value>
   </data>
+  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
+    <value>当前位置为只读</value>
+  </data>
+  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
+    <value>无法更改所选项目</value>
+  </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>WSA 应用</value>
   </data>
@@ -1272,12 +1295,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="TERA" xml:space="preserve">
     <value>{0} TB</value>
-  </data>
-  <data name="PETA" xml:space="preserve">
-    <value>{0} PB</value>
-  </data>
-  <data name="EXA" xml:space="preserve">
-    <value>{0} EB</value>
   </data>
   <data name="MILLI" xml:space="preserve">
     <value>毫安</value>
@@ -1558,6 +1575,24 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_CREATION_TIME" xml:space="preserve">
     <value>创建</value>
   </data>
+  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
+    <value>可修改压缩包内容</value>
+  </data>
+  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
+    <value>压缩包内容只读</value>
+  </data>
+  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
+    <value>压缩后大小</value>
+  </data>
+  <data name="S_PACKED_SIZE" xml:space="preserve">
+    <value>解压后大小</value>
+  </data>
+  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
+    <value>比率</value>
+  </data>
+  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
+    <value>方式</value>
+  </data>
   <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
     <value>修改</value>
   </data>
@@ -1591,28 +1626,11 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>配对</value>
   </data>
-  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
-    <value>自定义</value>
-  </data>
-  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
-    <value>此应用分发在虚拟化（难以访问）位置保存数据，卸载时会删除该位置。
-
-选择自定义以使用不会在卸载时被删除的位置。自定义位置不能在 C:\Users\…\AppData 下</value>
-  </data>
-  <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
-    <value>自定义位置不能在 C:\Users\…\AppData 下 − 请另选位置</value>
-  </data>
-  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
-    <value>应用数据位置</value>
-  </data>
   <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
     <value>关闭应用时终止 ADB</value>
   </data>
-  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value>使用默认</value>
-  </data>
-  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
-    <value>选择应用数据文件夹</value>
+  <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
+    <value>自定义位置不能在 C:\Users\…\AppData 下 − 请另选位置</value>
   </data>
   <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
     <value>允许来自未信任源来源的 ADB</value>
@@ -1625,29 +1643,5 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_OPEN_FOLDER" xml:space="preserve">
     <value>打开</value>
-  </data>
-  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
-    <value>当前位置为只读</value>
-  </data>
-  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
-    <value>无法更改所选项目</value>
-  </data>
-  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
-    <value>可修改压缩包内容</value>
-  </data>
-  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
-    <value>压缩包内容只读</value>
-  </data>
-  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
-    <value>压缩后大小</value>
-  </data>
-  <data name="S_PACKED_SIZE" xml:space="preserve">
-    <value>解压后大小</value>
-  </data>
-  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
-    <value>比率</value>
-  </data>
-  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
-    <value>方式</value>
   </data>
 </root>

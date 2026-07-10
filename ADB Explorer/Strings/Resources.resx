@@ -1598,25 +1598,17 @@ Please help us localize the app to your language on Weblate.</value>
     <value>{0} TB</value>
     <comment>The notation for TeraBytes when displaying file size or drive usage</comment>
   </data>
-  <data name="PETA" xml:space="preserve">
-    <value>{0} PB</value>
-    <comment>The notation for PetaBytes when displaying file size or drive usage</comment>
-  </data>
-  <data name="EXA" xml:space="preserve">
-    <value>{0} EB</value>
-    <comment>The notation for ExaBytes when displaying file size or drive usage</comment>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
-    <comment>The notation for milli (Ampere) when displaying battery usage</comment>
+    <comment>milli. Used for units like Ampere in battery current</comment>
   </data>
   <data name="MICRO" xml:space="preserve">
     <value>u</value>
-    <comment>The notation for micro (Ampere) when displaying battery usage</comment>
+    <comment>micro. Used for units like Ampere in battery current</comment>
   </data>
   <data name="NANO" xml:space="preserve">
     <value>n</value>
-    <comment>The notation for nano (Ampere) when displaying battery usage</comment>
+    <comment>nano. Ued for units like Ampere in battery current</comment>
   </data>
   <data name="BYTES" xml:space="preserve">
     <value>{0} B</value>

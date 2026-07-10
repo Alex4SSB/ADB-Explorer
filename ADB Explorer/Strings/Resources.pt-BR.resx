@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -250,6 +250,18 @@
     <value>Bem-Vindo à nova versão do ADB Explorer!
 As notas de lançamento estão disponíveis no GitHub.</value>
   </data>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Restrições de Disco:</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• Sistema de arquivos apenas leitura</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• Links simbólicos não são suportados
+• Nome de arquivos não podem conter " * / : &lt; &gt; ? \ |
+• Nomes dos arquivos não diferenciam maiúsculas de minúsculas.
+• Instalação de APK não é suportada</value>
+  </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>Todas as opções do app serão resetadas ao fechar o app.
 Essa ação não poderá ser desfeita. Você tem certeza?</value>
@@ -293,6 +305,13 @@ Para aprovar o ADB, abra as opções avançada do WSA.</value>
   </data>
   <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
     <value>Ir às Notas de Lançamento</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Política de Privacidade Atualizada</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>Esta versão do aplicativo foi lançada após uma atualização da política de privacidade.
+Veja as mudanças no Github.</value>
   </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
     <value>ADB Executável</value>
@@ -414,6 +433,14 @@ O conteúdo visível pode estar incompleto.</value>
   <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
     <value>mDNS</value>
   </data>
+  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
+    <value>Consultando os Dispositivos</value>
+    <comment>The setting used to toggle polling for devices</comment>
+  </data>
+  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
+    <value>Consultando o Status da Bateria</value>
+    <comment>The setting used to toggle battery status polling</comment>
+  </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>Ativar Root Automaticamente</value>
   </data>
@@ -422,35 +449,6 @@ O conteúdo visível pode estar incompleto.</value>
   </data>
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
     <value>Abre Automaticamente para Pesquisas</value>
-  </data>
-  <data name="S_BUTTON_OK" xml:space="preserve">
-    <value>Ok</value>
-  </data>
-  <data name="S_MENU_FOLDERS" xml:space="preserve">
-    <value>Pastas</value>
-  </data>
-  <data name="S_MENU_FILES" xml:space="preserve">
-    <value>Arquivos</value>
-  </data>
-  <data name="S_MENU_COPY" xml:space="preserve">
-    <value>Copiar</value>
-  </data>
-  <data name="S_MENU_EDIT" xml:space="preserve">
-    <value>Editar</value>
-  </data>
-  <data name="S_MENU_NEW" xml:space="preserve">
-    <value>Novo</value>
-  </data>
-  <data name="S_MENU_INSTALL" xml:space="preserve">
-    <value>Instalar</value>
-  </data>
-  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
-    <value>Consultando os Dispositivos</value>
-    <comment>The setting used to toggle polling for devices</comment>
-  </data>
-  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
-    <value>Consultando o Status da Bateria</value>
-    <comment>The setting used to toggle battery status polling</comment>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>Parar a Consulta de Puxar/Empurrar</value>
@@ -508,6 +506,15 @@ O conteúdo visível pode estar incompleto.</value>
     <value>Tema</value>
     <comment>The title of the settings group used to control the app theme</comment>
   </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Cor de Destaque Personalizada</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Destaque Personalizado</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Escolha uma cor</value>
+  </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>Desativar Aceleração de Hardware</value>
     <comment>The setting used to disable HW / GPU acceleration</comment>
@@ -543,6 +550,23 @@ O conteúdo visível pode estar incompleto.</value>
   <data name="S_APP_DATA_FOLDER" xml:space="preserve">
     <value>Pasta de Dados dos Apps</value>
   </data>
+  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
+    <value>Localização dos Dados dos Apps</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
+    <value>Esta distribuição de aplicativos salva dados em um local virtualizado (e de difícil acesso), que é apagado ao desinstalar o aplicativo.
+
+Selecione "Personalizar" para usar um local que não será removido ao desinstalar o aplicativo. O local personalizado não pode estar em C:\Users\…\AppData</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
+    <value>Usar o Padrão</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
+    <value>Personalizar</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
+    <value>Escolha a Pasta de Dados do App</value>
+  </data>
   <data name="S_GITHUB_REPO" xml:space="preserve">
     <value>Repositório do Github</value>
     <comment>The title of the hyperlink to our GitHub repository</comment>
@@ -550,6 +574,15 @@ O conteúdo visível pode estar incompleto.</value>
   <data name="S_PRIVACY_POLICY" xml:space="preserve">
     <value>Políticas de Privacidade</value>
     <comment>The title of the hyperlink to our privacy policy</comment>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Mostrar Diálogo de Relatório de Falha</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Relatório de Falha</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>Após uma falha, você pode escolher mandar o diálogo de relatório para nos ajudar a consertar. Relatórios somente serão enviados ao clicar em "Enviar Relatório" e normalmente incluem a mensagem de exceção, rastreamento da pilha de chamadas, versão do aplicativo e do Windows, e a página que estava aberta. Os dados são processados pelo Grafana Labs (Grafana Cloud). Veja a Política de Privacidade pelo link acima.</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>Atribuições e Licenças de Terceiros</value>
@@ -590,6 +623,9 @@ O conteúdo visível pode estar incompleto.</value>
   <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
     <value>Idioma</value>
     <comment>The setting used to set the UI language to a language different than Windows</comment>
+  </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>Ok</value>
   </data>
   <data name="S_FILTER_FILE_OPS" xml:space="preserve">
     <value>Filtrar Operações de Arquivo</value>
@@ -644,13 +680,28 @@ Cancela Tudo Rodando</value>
     <value>Empurrar (Enviar)</value>
     <comment>The tooltip of the button used to initiate a push operation</comment>
   </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>Pastas</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>Arquivos</value>
+  </data>
   <data name="S_MENU_REFRESH" xml:space="preserve">
     <value>Atualizar</value>
     <comment>The menu item used to refresh the current location in the file browser</comment>
   </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>Copiar</value>
+  </data>
   <data name="S_MENU_MORE" xml:space="preserve">
     <value>Mais</value>
     <comment>The menu item hiding more options under it</comment>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>Editar</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>Novo</value>
   </data>
   <data name="S_MENU_FOLDER" xml:space="preserve">
     <value>Pasta</value>
@@ -687,6 +738,9 @@ Cancela Tudo Rodando</value>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Salvar Mudanças</value>
     <comment>The tooltip of a button to save the changes made in the text editor</comment>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>Instalar</value>
   </data>
   <data name="S_MENU_COPY_TEMP" xml:space="preserve">
     <value>Copiar para o Diretório Temporário</value>
@@ -743,6 +797,9 @@ Cancela Tudo Rodando</value>
   <data name="S_EMPTY_FILTER" xml:space="preserve">
     <value>Nenhum item bate com o filtro atual.</value>
     <comment>The notification displayed when a non empty folder / package view is filtered such that no items match</comment>
+  </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value>&lt;Span&gt;Essa pasta &lt;Italic&gt;aparenta&lt;/Italic&gt; vazia&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… a olho nu&lt;/Span&gt;&lt;/Span&gt;</value>
   </data>
   <data name="S_ITEMS_SELECTED" xml:space="preserve">
     <value>item selecionado</value>
@@ -891,6 +948,9 @@ Cancela Tudo Rodando</value>
   <data name="S_BAT_TEMP" xml:space="preserve">
     <value>Temperatura: {0}ºC</value>
     <comment>The battery temperature indicator</comment>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>Corrente Atual: {0}A</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>Reiniciar para</value>
@@ -1143,6 +1203,9 @@ Cancela Tudo Rodando</value>
     <value>Adheres to Unix naming rules (via ADB)</value>
     <comment>Will be shown if a file name doesn't meet Unix naming rules</comment>
   </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Adere as regras de nomenclatura do espaço do usuário</value>
+  </data>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
     <value>Adheres to Windows naming rules</value>
     <comment>Will show if a file name doesn't meet Windows naming rules</comment>
@@ -1167,9 +1230,15 @@ Cancela Tudo Rodando</value>
     <value>Some selected files have conflicting case-insensitive names</value>
     <comment>Will show when selected file names differ only by upper / lower case</comment>
   </data>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Um arquivo selecionado viola as regras de nomenclatura do espaço do usuário</value>
+  </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
     <value>Some copied files have conflicting case-insensitive names</value>
     <comment>Will show when copied files' names differ only by upper / lower case</comment>
+  </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Um arquivo copiado viola as regras de nomenclatura do espaço do usuário</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>A selected item is not a file / folder</value>
@@ -1477,14 +1546,6 @@ Please help us localize the app to your language on Weblate.</value>
     <value>{0} TB</value>
     <comment>The notation for TeraBytes when displaying file size or drive usage</comment>
   </data>
-  <data name="PETA" xml:space="preserve">
-    <value>{0} PB</value>
-    <comment>The notation for PetaBytes when displaying file size or drive usage</comment>
-  </data>
-  <data name="EXA" xml:space="preserve">
-    <value>{0} EB</value>
-    <comment>The notation for ExaBytes when displaying file size or drive usage</comment>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
     <comment>The notation for milli (Ampere) when displaying battery usage</comment>
@@ -1600,75 +1661,6 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
     <value>Install {0} APKs</value>
     <comment>The drag tooltip when dragging multiple APK files over the installed apps view. 0 - number of APKs being dragged</comment>
-  </data>
-  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
-    <value>Restrições de Disco:</value>
-  </data>
-  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
-    <value>• Sistema de arquivos apenas leitura</value>
-  </data>
-  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
-    <value>• Links simbólicos não são suportados
-• Nome de arquivos não podem conter " * / : &lt; &gt; ? \ |
-• Nomes dos arquivos não diferenciam maiúsculas de minúsculas.
-• Instalação de APK não é suportada</value>
-  </data>
-  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
-    <value>Política de Privacidade Atualizada</value>
-  </data>
-  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
-    <value>Esta versão do aplicativo foi lançada após uma atualização da política de privacidade.
-Veja as mudanças no Github.</value>
-  </data>
-  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
-    <value>Cor de Destaque Personalizada</value>
-  </data>
-  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
-    <value>Destaque Personalizado</value>
-  </data>
-  <data name="S_PICK_COLOR" xml:space="preserve">
-    <value>Escolha uma cor</value>
-  </data>
-  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
-    <value>Localização dos Dados dos Apps</value>
-  </data>
-  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
-    <value>Esta distribuição de aplicativos salva dados em um local virtualizado (e de difícil acesso), que é apagado ao desinstalar o aplicativo.
-
-Selecione "Personalizar" para usar um local que não será removido ao desinstalar o aplicativo. O local personalizado não pode estar em C:\Users\…\AppData</value>
-  </data>
-  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value>Usar o Padrão</value>
-  </data>
-  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
-    <value>Personalizar</value>
-  </data>
-  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
-    <value>Escolha a Pasta de Dados do App</value>
-  </data>
-  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
-    <value>Mostrar Diálogo de Relatório de Falha</value>
-  </data>
-  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
-    <value>Relatório de Falha</value>
-  </data>
-  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
-    <value>Após uma falha, você pode escolher mandar o diálogo de relatório para nos ajudar a consertar. Relatórios somente serão enviados ao clicar em "Enviar Relatório" e normalmente incluem a mensagem de exceção, rastreamento da pilha de chamadas, versão do aplicativo e do Windows, e a página que estava aberta. Os dados são processados pelo Grafana Labs (Grafana Cloud). Veja a Política de Privacidade pelo link acima.</value>
-  </data>
-  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
-    <value>&lt;Span&gt;Essa pasta &lt;Italic&gt;aparenta&lt;/Italic&gt; vazia&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… a olho nu&lt;/Span&gt;&lt;/Span&gt;</value>
-  </data>
-  <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>Corrente Atual: {0}A</value>
-  </data>
-  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Adere as regras de nomenclatura do espaço do usuário</value>
-  </data>
-  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Um arquivo selecionado viola as regras de nomenclatura do espaço do usuário</value>
-  </data>
-  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Um arquivo copiado viola as regras de nomenclatura do espaço do usuário</value>
   </data>
   <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
     <value>Ativado</value>

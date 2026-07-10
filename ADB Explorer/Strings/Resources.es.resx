@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -525,6 +525,23 @@ El contenido visible puede estar incompleto.</value>
   </data>
   <data name="S_APP_DATA_FOLDER" xml:space="preserve">
     <value>Carpeta de los Datos de App</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
+    <value>Lugar para Datos de App</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
+    <value>Esta distribución de la aplicación guarda los datos en una ubicación virtualizada (y de difícil acceso), que se borra al desinstalar la aplicación.
+
+Seleccione Personalizada para usar una ubicación que no se eliminará al desinstalar. La ubicación personalizada no puede estar debajo de C:\Users\…\AppData</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
+    <value>Usar valores predeterminados</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
+    <value>Personalizar</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
+    <value>Elegir Carpeta de App Data</value>
   </data>
   <data name="S_GITHUB_REPO" xml:space="preserve">
     <value>Repo de GitHub</value>
@@ -1046,6 +1063,12 @@ Cancelar Todas las Activas</value>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>Un ítem seleccionado no es un archivo / carpeta</value>
   </data>
+  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
+    <value>El lugar actual es de solo lectura</value>
+  </data>
+  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
+    <value>Un elemento seleccionad no puede ser modificado</value>
+  </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>App WSA</value>
   </data>
@@ -1272,12 +1295,6 @@ Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
   </data>
   <data name="TERA" xml:space="preserve">
     <value>{0} TB</value>
-  </data>
-  <data name="PETA" xml:space="preserve">
-    <value>{0} PB</value>
-  </data>
-  <data name="EXA" xml:space="preserve">
-    <value>{0} EB</value>
   </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
@@ -1558,6 +1575,24 @@ Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
   <data name="S_CREATION_TIME" xml:space="preserve">
     <value>Creado</value>
   </data>
+  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
+    <value>El contenido del archivo puede ser modificado</value>
+  </data>
+  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
+    <value>El contenido del archivo es sólo lectura</value>
+  </data>
+  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
+    <value>Tamaño comprimido</value>
+  </data>
+  <data name="S_PACKED_SIZE" xml:space="preserve">
+    <value>Tamaño empaquetado</value>
+  </data>
+  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
+    <value>Tasa de compresión</value>
+  </data>
+  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
+    <value>Método de compresión</value>
+  </data>
   <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
     <value>Modificado</value>
   </data>
@@ -1591,28 +1626,11 @@ Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>Pareja</value>
   </data>
-  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
-    <value>Lugar para Datos de App</value>
-  </data>
-  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
-    <value>Personalizar</value>
-  </data>
-  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
-    <value>Elegir Carpeta de App Data</value>
-  </data>
   <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
     <value>Matar ADB cuando APP cierra</value>
   </data>
   <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
     <value>El lugar personal no puede estar debajo de C:\Users\…\AppData; seleccione otro lugar</value>
-  </data>
-  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
-    <value>Esta distribución de la aplicación guarda los datos en una ubicación virtualizada (y de difícil acceso), que se borra al desinstalar la aplicación.
-
-Seleccione Personalizada para usar una ubicación que no se eliminará al desinstalar. La ubicación personalizada no puede estar debajo de C:\Users\…\AppData</value>
-  </data>
-  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value>Usar valores predeterminados</value>
   </data>
   <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
     <value>Permitir ADB desde orígenes no confiables</value>
@@ -1625,29 +1643,5 @@ Seleccione Personalizada para usar una ubicación que no se eliminará al desins
   </data>
   <data name="S_OPEN_FOLDER" xml:space="preserve">
     <value>Abrir</value>
-  </data>
-  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
-    <value>El lugar actual es de solo lectura</value>
-  </data>
-  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
-    <value>Un elemento seleccionad no puede ser modificado</value>
-  </data>
-  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
-    <value>El contenido del archivo puede ser modificado</value>
-  </data>
-  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
-    <value>El contenido del archivo es sólo lectura</value>
-  </data>
-  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
-    <value>Tamaño comprimido</value>
-  </data>
-  <data name="S_PACKED_SIZE" xml:space="preserve">
-    <value>Tamaño empaquetado</value>
-  </data>
-  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
-    <value>Tasa de compresión</value>
-  </data>
-  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
-    <value>Método de compresión</value>
   </data>
 </root>

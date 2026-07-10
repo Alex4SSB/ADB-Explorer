@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -222,12 +222,6 @@
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Error bestand schrijven</value>
   </data>
-  <data name="S_BUTTON_CLOSE" xml:space="preserve">
-    <value>Sluiten</value>
-  </data>
-  <data name="S_CANCEL" xml:space="preserve">
-    <value>Annuleren</value>
-  </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>ADB server needs to be restarted in order to disable mDNS.</value>
   </data>
@@ -311,6 +305,9 @@ To approve ADB, open WSA advanced settings.</value>
   </data>
   <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
     <value>Go To Version Page</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>Sluiten</value>
   </data>
   <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
     <value>Go To Release Notes</value>
@@ -397,6 +394,9 @@ Visible content may be incomplete.</value>
   </data>
   <data name="S_UNINSTALL" xml:space="preserve">
     <value>Uninstall</value>
+  </data>
+  <data name="S_CANCEL" xml:space="preserve">
+    <value>Annuleren</value>
   </data>
   <data name="S_CONFIRM" xml:space="preserve">
     <value>Confirm</value>
@@ -1578,14 +1578,6 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="TERA" xml:space="preserve">
     <value>{0} TB</value>
     <comment>The notation for TeraBytes when displaying file size or drive usage</comment>
-  </data>
-  <data name="PETA" xml:space="preserve">
-    <value>{0} PB</value>
-    <comment>The notation for PetaBytes when displaying file size or drive usage</comment>
-  </data>
-  <data name="EXA" xml:space="preserve">
-    <value>{0} EB</value>
-    <comment>The notation for ExaBytes when displaying file size or drive usage</comment>
   </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>

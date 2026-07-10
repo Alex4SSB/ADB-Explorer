@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -250,6 +250,20 @@
     <value>새로운 ADB Explorer 버전에 오신 것을 환영합니다!
 릴리스 노트는 GitHub에서 확인하실 수 있습니다.</value>
   </data>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Drive restrictions:</value>
+    <comment>Header for the drive restrictions tooltip in the navigation bar</comment>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• Read-only filesystem</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• Symbolic links are not supported
+• File names cannot contain " * / : &lt; &gt; ? \ |
+• File names are case insensitive
+• Installation of APKs is not supported</value>
+    <comment>Restrictions bundled under the noexec mount option</comment>
+  </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>앱을 종료하면 모든 앱 설정이 초기화됩니다.
 이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?</value>
@@ -293,6 +307,15 @@ ADB를 승인하려면 WSA 고급 설정을 여십시오.</value>
   </data>
   <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
     <value>릴리스 노트로 이동</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Privacy Policy Updated</value>
+    <comment>The title of the notification message about an updated privacy policy</comment>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>This app version was released after a privacy policy update.
+Review the changes on GitHub.</value>
+    <comment>The content of the privacy policy update notification message</comment>
   </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
     <value>ADB 실행 파일</value>
@@ -507,11 +530,45 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_APP_DATA_FOLDER" xml:space="preserve">
     <value>앱 데이터 폴더</value>
   </data>
+  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
+    <value>App Data Location</value>
+    <comment>Title of the dialog asking packaged users where to store app data</comment>
+  </data>
+  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
+    <value>This app distribution saves data in a virtualized (and hard to reach) location, which is cleared on app uninstall.
+
+Select Custom to use a location that will not be removed on uninstall. The custom location cannot be under C:\Users\…\AppData</value>
+    <comment>Explains virtualized vs custom app data location for packaged installs</comment>
+  </data>
+  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
+    <value>Use Default</value>
+    <comment>Button to keep the MSIX virtualized app data folder</comment>
+  </data>
+  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
+    <value>Custom</value>
+    <comment>Button to pick a non-virtualized custom app data folder</comment>
+  </data>
+  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
+    <value>Choose App Data Folder</value>
+    <comment>Title of the folder picker for custom app data location</comment>
+  </data>
   <data name="S_GITHUB_REPO" xml:space="preserve">
     <value>GitHub 저장소</value>
   </data>
   <data name="S_PRIVACY_POLICY" xml:space="preserve">
     <value>개인정보 처리방침</value>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Show Crash Report Dialog</value>
+    <comment>Toggle in About settings to show or hide the optional crash report dialog after an unhandled exception</comment>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Crash Reporting</value>
+    <comment>Title of the About settings notice describing optional crash reporting</comment>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>After a crash, you may optionally send a diagnostic report to help us fix it. Reports are sent only when you click Send Report and usually include the exception message, stack trace, app and Windows version, and the page that was open. The data is processed by Grafana Labs (Grafana Cloud). See the Privacy Policy link above.</value>
+    <comment>About settings notice describing optional crash reporting and Grafana as processor</comment>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>저작자 표시 및 타사 라이선스</value>
@@ -985,6 +1042,10 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Unix 명명 규칙 준수 (ADB 통해)</value>
   </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Adheres to user space naming rules</value>
+    <comment>Will show if a file name doesn't meet user space naming rules</comment>
+  </data>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
     <value>Windows 명명 규칙 준수</value>
   </data>
@@ -1003,8 +1064,16 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
     <value>일부 선택한 파일이 FUSE / Windows에서 충돌하는 이름을 가지고 있습니다</value>
   </data>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>A selected file violates user space naming rules</value>
+    <comment>Will show if a selected file doesn't meet user space naming rules</comment>
+  </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
     <value>일부 복사된 파일이 FUSE에서 충돌하는 이름을 가지고 있습니다</value>
+  </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>A copied file violates user space naming rules</value>
+    <comment>Will show if a copied file doesn't meet user space naming rules</comment>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>선택한 항목이 파일/폴더가 아닙니다</value>
@@ -1236,12 +1305,6 @@ Weblate에서 앱을 해당 언어로 현지화하는 데 도움을 주세요.</
   <data name="TERA" xml:space="preserve">
     <value>{0} TB</value>
   </data>
-  <data name="PETA" xml:space="preserve">
-    <value>{0} PB</value>
-  </data>
-  <data name="EXA" xml:space="preserve">
-    <value>{0} EB</value>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
   </data>
@@ -1391,75 +1454,6 @@ Weblate에서 앱을 해당 언어로 현지화하는 데 도움을 주세요.</
   </data>
   <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
     <value>가능한 경우 BusyBox 사용</value>
-  </data>
-  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
-    <value>Drive restrictions:</value>
-    <comment>Header for the drive restrictions tooltip in the navigation bar</comment>
-  </data>
-  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
-    <value>• Read-only filesystem</value>
-  </data>
-  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
-    <value>• Symbolic links are not supported
-• File names cannot contain " * / : &lt; &gt; ? \ |
-• File names are case insensitive
-• Installation of APKs is not supported</value>
-    <comment>Restrictions bundled under the noexec mount option</comment>
-  </data>
-  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
-    <value>Privacy Policy Updated</value>
-    <comment>The title of the notification message about an updated privacy policy</comment>
-  </data>
-  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
-    <value>This app version was released after a privacy policy update.
-Review the changes on GitHub.</value>
-    <comment>The content of the privacy policy update notification message</comment>
-  </data>
-  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
-    <value>App Data Location</value>
-    <comment>Title of the dialog asking packaged users where to store app data</comment>
-  </data>
-  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
-    <value>This app distribution saves data in a virtualized (and hard to reach) location, which is cleared on app uninstall.
-
-Select Custom to use a location that will not be removed on uninstall. The custom location cannot be under C:\Users\…\AppData</value>
-    <comment>Explains virtualized vs custom app data location for packaged installs</comment>
-  </data>
-  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value>Use Default</value>
-    <comment>Button to keep the MSIX virtualized app data folder</comment>
-  </data>
-  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
-    <value>Custom</value>
-    <comment>Button to pick a non-virtualized custom app data folder</comment>
-  </data>
-  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
-    <value>Choose App Data Folder</value>
-    <comment>Title of the folder picker for custom app data location</comment>
-  </data>
-  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
-    <value>Show Crash Report Dialog</value>
-    <comment>Toggle in About settings to show or hide the optional crash report dialog after an unhandled exception</comment>
-  </data>
-  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
-    <value>Crash Reporting</value>
-    <comment>Title of the About settings notice describing optional crash reporting</comment>
-  </data>
-  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
-    <value>After a crash, you may optionally send a diagnostic report to help us fix it. Reports are sent only when you click Send Report and usually include the exception message, stack trace, app and Windows version, and the page that was open. The data is processed by Grafana Labs (Grafana Cloud). See the Privacy Policy link above.</value>
-    <comment>About settings notice describing optional crash reporting and Grafana as processor</comment>
-  </data>
-  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Adheres to user space naming rules</value>
-    <comment>Will show if a file name doesn't meet user space naming rules</comment>
-  </data>
-  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>A selected file violates user space naming rules</value>
-    <comment>Will show if a selected file doesn't meet user space naming rules</comment>
-  </data>
-  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>A copied file violates user space naming rules</value>
-    <comment>Will show if a copied file doesn't meet user space naming rules</comment>
   </data>
   <data name="S_SETTINGS_WSA" xml:space="preserve">
     <value>Auto Connect WSA If Available</value>

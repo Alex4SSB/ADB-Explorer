@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -250,6 +250,20 @@
     <value>歡迎使用 ADB Explorer 的新版本！
 發行説明見 Github。</value>
   </data>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Drive restrictions:</value>
+    <comment>Header for the drive restrictions tooltip in the navigation bar</comment>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>•唯讀檔案系統</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• 不支援符號連結
+• 檔名不可使用 " * / : &lt; &gt; ? \ |
+• 檔名不區分大小寫
+• 不支援安裝 APK</value>
+    <comment>Restrictions bundled under the noexec mount option</comment>
+  </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>關閉應用程式後，所有設定將被重設。
 此操作無法還原，您確定嗎？</value>
@@ -293,6 +307,15 @@
   </data>
   <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
     <value>轉到發行説明</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>已更新隱私政策</value>
+    <comment>The title of the notification message about an updated privacy policy</comment>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>This app version was released after a privacy policy update.
+Review the changes on GitHub.</value>
+    <comment>The content of the privacy policy update notification message</comment>
   </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
     <value>ADB 可執行檔</value>
@@ -471,6 +494,18 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>主題</value>
   </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Custom Accent Color</value>
+    <comment>The setting to enable a custom accent color instead of the system accent</comment>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Accent Color</value>
+    <comment>The setting to choose a custom accent color</comment>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Pick a color</value>
+    <comment>Title of the color picker dialog</comment>
+  </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>停用硬體加速</value>
   </data>
@@ -498,11 +533,45 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_APP_DATA_FOLDER" xml:space="preserve">
     <value>應用程式資料的資料夾</value>
   </data>
+  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
+    <value>App Data Location</value>
+    <comment>Title of the dialog asking packaged users where to store app data</comment>
+  </data>
+  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
+    <value>This app distribution saves data in a virtualized (and hard to reach) location, which is cleared on app uninstall.
+
+Select Custom to use a location that will not be removed on uninstall. The custom location cannot be under C:\Users\…\AppData</value>
+    <comment>Explains virtualized vs custom app data location for packaged installs</comment>
+  </data>
+  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
+    <value>Use Default</value>
+    <comment>Button to keep the MSIX virtualized app data folder</comment>
+  </data>
+  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
+    <value>Custom</value>
+    <comment>Button to pick a non-virtualized custom app data folder</comment>
+  </data>
+  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
+    <value>Choose App Data Folder</value>
+    <comment>Title of the folder picker for custom app data location</comment>
+  </data>
   <data name="S_GITHUB_REPO" xml:space="preserve">
     <value>GitHub 儲存庫</value>
   </data>
   <data name="S_PRIVACY_POLICY" xml:space="preserve">
     <value>隱私政策</value>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Show Crash Report Dialog</value>
+    <comment>Toggle in About settings to show or hide the optional crash report dialog after an unhandled exception</comment>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Crash Reporting</value>
+    <comment>Title of the About settings notice describing optional crash reporting</comment>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>After a crash, you may optionally send a diagnostic report to help us fix it. Reports are sent only when you click Send Report and usually include the exception message, stack trace, app and Windows version, and the page that was open. The data is processed by Grafana Labs (Grafana Cloud). See the Privacy Policy link above.</value>
+    <comment>About settings notice describing optional crash reporting and Grafana as processor</comment>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>歸屬及第三方許可</value>
@@ -976,6 +1045,10 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>請遵循 Unix 命名規則 (透過 ADB)</value>
   </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Adheres to user space naming rules</value>
+    <comment>Will show if a file name doesn't meet user space naming rules</comment>
+  </data>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
     <value>請遵循 Windows 命名規則</value>
   </data>
@@ -994,11 +1067,25 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
     <value>一些所選檔有同名衝突，儘管大小寫不同</value>
   </data>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>A selected file violates user space naming rules</value>
+    <comment>Will show if a selected file doesn't meet user space naming rules</comment>
+  </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
     <value>一些複製的檔案有同名衝突，儘管大小寫不同</value>
   </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>A copied file violates user space naming rules</value>
+    <comment>Will show if a copied file doesn't meet user space naming rules</comment>
+  </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>一個所選項目不是檔案/資料夾</value>
+  </data>
+  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
+    <value>目前資料夾係唯讀</value>
+  </data>
+  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
+    <value>無法修改所選項目</value>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>WSA 應用程式</value>
@@ -1227,12 +1314,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="TERA" xml:space="preserve">
     <value>{0} TB</value>
   </data>
-  <data name="PETA" xml:space="preserve">
-    <value>{0} PB</value>
-  </data>
-  <data name="EXA" xml:space="preserve">
-    <value>{0} EB</value>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>毫(m)</value>
   </data>
@@ -1379,87 +1460,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
     <value>本機縮圖重整時間</value>
-  </data>
-  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
-    <value>Drive restrictions:</value>
-    <comment>Header for the drive restrictions tooltip in the navigation bar</comment>
-  </data>
-  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
-    <value>•唯讀檔案系統</value>
-  </data>
-  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
-    <value>• 不支援符號連結
-• 檔名不可使用 " * / : &lt; &gt; ? \ |
-• 檔名不區分大小寫
-• 不支援安裝 APK</value>
-    <comment>Restrictions bundled under the noexec mount option</comment>
-  </data>
-  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
-    <value>已更新隱私政策</value>
-    <comment>The title of the notification message about an updated privacy policy</comment>
-  </data>
-  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
-    <value>This app version was released after a privacy policy update.
-Review the changes on GitHub.</value>
-    <comment>The content of the privacy policy update notification message</comment>
-  </data>
-  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
-    <value>Custom Accent Color</value>
-    <comment>The setting to enable a custom accent color instead of the system accent</comment>
-  </data>
-  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
-    <value>Accent Color</value>
-    <comment>The setting to choose a custom accent color</comment>
-  </data>
-  <data name="S_PICK_COLOR" xml:space="preserve">
-    <value>Pick a color</value>
-    <comment>Title of the color picker dialog</comment>
-  </data>
-  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
-    <value>App Data Location</value>
-    <comment>Title of the dialog asking packaged users where to store app data</comment>
-  </data>
-  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
-    <value>This app distribution saves data in a virtualized (and hard to reach) location, which is cleared on app uninstall.
-
-Select Custom to use a location that will not be removed on uninstall. The custom location cannot be under C:\Users\…\AppData</value>
-    <comment>Explains virtualized vs custom app data location for packaged installs</comment>
-  </data>
-  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value>Use Default</value>
-    <comment>Button to keep the MSIX virtualized app data folder</comment>
-  </data>
-  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
-    <value>Custom</value>
-    <comment>Button to pick a non-virtualized custom app data folder</comment>
-  </data>
-  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
-    <value>Choose App Data Folder</value>
-    <comment>Title of the folder picker for custom app data location</comment>
-  </data>
-  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
-    <value>Show Crash Report Dialog</value>
-    <comment>Toggle in About settings to show or hide the optional crash report dialog after an unhandled exception</comment>
-  </data>
-  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
-    <value>Crash Reporting</value>
-    <comment>Title of the About settings notice describing optional crash reporting</comment>
-  </data>
-  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
-    <value>After a crash, you may optionally send a diagnostic report to help us fix it. Reports are sent only when you click Send Report and usually include the exception message, stack trace, app and Windows version, and the page that was open. The data is processed by Grafana Labs (Grafana Cloud). See the Privacy Policy link above.</value>
-    <comment>About settings notice describing optional crash reporting and Grafana as processor</comment>
-  </data>
-  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Adheres to user space naming rules</value>
-    <comment>Will show if a file name doesn't meet user space naming rules</comment>
-  </data>
-  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>A selected file violates user space naming rules</value>
-    <comment>Will show if a selected file doesn't meet user space naming rules</comment>
-  </data>
-  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>A copied file violates user space naming rules</value>
-    <comment>Will show if a copied file doesn't meet user space naming rules</comment>
   </data>
   <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
     <value>Use BusyBox If Available</value>
@@ -1637,6 +1637,24 @@ Select Custom to use a location that will not be removed on uninstall. The custo
     <value>Created</value>
     <comment>File info - creation time</comment>
   </data>
+  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
+    <value>可修改壓縮檔內容</value>
+  </data>
+  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
+    <value>壓縮檔內容係唯讀</value>
+  </data>
+  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
+    <value>壓縮過的大小</value>
+  </data>
+  <data name="S_PACKED_SIZE" xml:space="preserve">
+    <value>未壓縮的大小</value>
+  </data>
+  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
+    <value>壓縮比</value>
+  </data>
+  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
+    <value>方式</value>
+  </data>
   <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
     <value>Modified</value>
     <comment>File info - date modified (but without "date")</comment>
@@ -1691,30 +1709,6 @@ Select Custom to use a location that will not be removed on uninstall. The custo
   <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
     <value>Allow ADB From Untrusted Sources</value>
     <comment>The setting that allows using ADB without integrity checks and without path restrictions</comment>
-  </data>
-  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
-    <value>目前資料夾係唯讀</value>
-  </data>
-  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
-    <value>無法修改所選項目</value>
-  </data>
-  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
-    <value>可修改壓縮檔內容</value>
-  </data>
-  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
-    <value>壓縮檔內容係唯讀</value>
-  </data>
-  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
-    <value>壓縮過的大小</value>
-  </data>
-  <data name="S_PACKED_SIZE" xml:space="preserve">
-    <value>未壓縮的大小</value>
-  </data>
-  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
-    <value>壓縮比</value>
-  </data>
-  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
-    <value>方式</value>
   </data>
   <data name="S_SETTINGS_FILE_SIZE_MODE" xml:space="preserve">
     <value>檔案大小顯示</value>
