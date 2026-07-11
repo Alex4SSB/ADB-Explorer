@@ -132,9 +132,12 @@ public static class ArchiveListing
 
     public static IEnumerable<FileStat> ListEntries(string deviceId, string archivePath, string internalPath, CancellationToken cancellationToken)
     {
-        var toc = TocCache.GetOrAdd(archivePath, key => FetchTableOfContents(deviceId, key, cancellationToken));
+        var toc = GetOrFetchToc(deviceId, archivePath, cancellationToken);
         return GetFileStats(archivePath, internalPath, toc.Entries);
     }
+
+    public static ArchiveToc GetOrFetchToc(string deviceId, string archivePath, CancellationToken cancellationToken)
+        => TocCache.GetOrAdd(archivePath, key => FetchTableOfContents(deviceId, key, cancellationToken));
 
     private static List<ArchiveEntry> ParseTar(string stdout)
     {

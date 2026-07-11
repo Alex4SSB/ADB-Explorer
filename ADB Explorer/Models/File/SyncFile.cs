@@ -98,9 +98,15 @@ public class SyncFile : FilePath
         {
             var fullPath = group.Key;
 
-            if (group.First().IsFolder)
+            // Nested content under this path (or an explicit dir marker) means a folder — not an empty file.
+            var isFolder = group.Any(g => g.IsFolder)
+                || group.Any(g => g.Name.Length > fullPath.Length);
+
+            if (isFolder)
             {
-                var children = GetFolderTree(group.Skip(1), fullPath);
+                var children = GetFolderTree(
+                    group.Where(g => !g.Name.Equals(fullPath, StringComparison.Ordinal)),
+                    fullPath);
 
                 yield return new(fullPath, FileType.Folder)
                 {

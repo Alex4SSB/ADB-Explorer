@@ -51,6 +51,7 @@
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="QRCoder.Xaml" Version="1.8.0" />
+    <PackageReference Include="System.IO.Hashing" Version="10.0.0" />
     <PackageReference Include="System.Management" Version="10.0.9" />
     <PackageReference Include="Vanara.Windows.Shell.Common" Version="5.0.5" />
     <PackageReference Include="WPF-UI" Version="4.3.0" />

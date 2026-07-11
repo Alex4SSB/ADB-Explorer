@@ -3,6 +3,13 @@ using ADB_Explorer.Models;
 
 namespace ADB_Explorer.Services;
 
+public enum ValidationHashMode
+{
+    None,
+    Md5,
+    Crc32,
+}
+
 public sealed class DeviceShellCommands
 {
     public Dictionary<ShellCommands.ShellCmd, string> Commands { get; init; } = [];
@@ -22,6 +29,24 @@ public sealed class DeviceShellCommands
     public bool ZipExists { get; init; }
 
     public bool TarAppendSupported { get; init; }
+
+    /// <summary>Device <c>tar</c> supports <c>--to-command</c> (GNU/toybox archive hash validation).</summary>
+    public bool TarToCommandSupported { get; init; }
+
+    /// <summary>Device <c>tar</c> supports <c>-O</c> / extract-to-stdout (Android toybox; hash via pipe).</summary>
+    public bool TarToStdoutSupported { get; init; }
+
+    /// <summary>IEEE CRC-32 via toybox <c>cksum -HNPL</c>.</summary>
+    public bool Crc32Exists { get; init; }
+
+    /// <summary>Shell <c>md5sum</c> or <c>busybox md5sum</c>.</summary>
+    public bool Md5SumExists { get; init; }
+
+    /// <summary>Resolved command, e.g. <c>cksum -HNPL</c>.</summary>
+    public string? Crc32Command { get; init; }
+
+    /// <summary>Resolved command, e.g. <c>md5sum</c> or <c>busybox md5sum</c>.</summary>
+    public string? Md5SumCommand { get; init; }
 }
 
 public static class ShellCommands
@@ -80,6 +105,43 @@ public static class ShellCommands
 
     public static bool TarAppendSupported(string deviceId)
         => DeviceCommands.TryGetValue(deviceId, out var commands) && commands.TarAppendSupported;
+
+    public static bool TarToCommandSupported(string deviceId)
+        => DeviceCommands.TryGetValue(deviceId, out var commands) && commands.TarToCommandSupported;
+
+    public static bool TarToStdoutSupported(string deviceId)
+        => DeviceCommands.TryGetValue(deviceId, out var commands) && commands.TarToStdoutSupported;
+
+    /// <summary>Whether tar can feed member bytes to a hash tool (<c>--to-command</c> or <c>-O</c>).</summary>
+    public static bool TarHashPipelineSupported(string deviceId)
+        => TarToCommandSupported(deviceId) || TarToStdoutSupported(deviceId);
+
+    public static bool Crc32Exists(string deviceId)
+        => DeviceCommands.TryGetValue(deviceId, out var commands) && commands.Crc32Exists;
+
+    public static bool Md5SumExists(string deviceId)
+        => DeviceCommands.TryGetValue(deviceId, out var commands) && commands.Md5SumExists;
+
+    /// <summary>Prefer IEEE CRC-32 (<c>cksum -HNPL</c>) for all validation; otherwise MD5 when available.</summary>
+    public static ValidationHashMode GetValidationHashMode(string deviceId)
+    {
+        if (!DeviceCommands.TryGetValue(deviceId, out var commands))
+            return ValidationHashMode.None;
+
+        if (commands.Crc32Exists)
+            return ValidationHashMode.Crc32;
+
+        if (commands.Md5SumExists)
+            return ValidationHashMode.Md5;
+
+        return ValidationHashMode.None;
+    }
+
+    public static string? GetCrc32Command(string deviceId)
+        => DeviceCommands.TryGetValue(deviceId, out var commands) ? commands.Crc32Command : null;
+
+    public static string? GetMd5SumCommand(string deviceId)
+        => DeviceCommands.TryGetValue(deviceId, out var commands) ? commands.Md5SumCommand : null;
 
     public static string TranslateCommand(string cmd)
     {
@@ -210,6 +272,7 @@ public static class ShellCommands
         }
 
         var archiveProbe = ProbeArchiveCapabilities(deviceID, busyBoxExists);
+        var hashProbe = ProbeHashCommands(deviceID, busyBoxExists);
 
         DeviceCommands[deviceID] = new()
         {
@@ -222,6 +285,12 @@ public static class ShellCommands
             UnzipExists = archiveProbe.UnzipExists,
             ZipExists = archiveProbe.ZipExists,
             TarAppendSupported = archiveProbe.TarAppendSupported,
+            TarToCommandSupported = archiveProbe.TarToCommandSupported,
+            TarToStdoutSupported = archiveProbe.TarToStdoutSupported,
+            Crc32Exists = hashProbe.Crc32Exists,
+            Md5SumExists = hashProbe.Md5SumExists,
+            Crc32Command = hashProbe.Crc32Command,
+            Md5SumCommand = hashProbe.Md5SumCommand,
         };
     }
 
@@ -241,6 +310,7 @@ public static class ShellCommands
                                                                  ADBService.EscapeAdbShellString("/")) == 0;
 
         var archiveProbe = ProbeArchiveCapabilities(deviceID, busyBoxExists);
+        var hashProbe = ProbeHashCommands(deviceID, busyBoxExists);
 
         DeviceCommands[deviceID] = new()
         {
@@ -252,7 +322,59 @@ public static class ShellCommands
             UnzipExists = archiveProbe.UnzipExists,
             ZipExists = archiveProbe.ZipExists,
             TarAppendSupported = archiveProbe.TarAppendSupported,
+            TarToCommandSupported = archiveProbe.TarToCommandSupported,
+            TarToStdoutSupported = archiveProbe.TarToStdoutSupported,
+            Crc32Exists = hashProbe.Crc32Exists,
+            Md5SumExists = hashProbe.Md5SumExists,
+            Crc32Command = hashProbe.Crc32Command,
+            Md5SumCommand = hashProbe.Md5SumCommand,
         };
+    }
+
+    private static HashProbeResult ProbeHashCommands(string deviceID, bool busyBoxExists)
+    {
+        ADBService.ExecuteDeviceAdbShellCommand(deviceID,
+                                                BuildHashProbeScript(busyBoxExists),
+                                                out string stdout,
+                                                out _,
+                                                CancellationToken.None);
+
+        return ParseHashProbeOutput(stdout, busyBoxExists);
+    }
+
+    private static readonly string CKSUM_MARK = $"{AdbExplorerConst.ADB_UNIT_SEP}CKSUM{AdbExplorerConst.ADB_UNIT_SEP}";
+    private static readonly string MD5_MARK = $"{AdbExplorerConst.ADB_UNIT_SEP}MD5{AdbExplorerConst.ADB_UNIT_SEP}";
+
+    private static string BuildHashProbeScript(bool busyBoxExists)
+    {
+        // Single echo + $() substitution; markers use ADB_UNIT_SEP, sections use ADB_FIELD_SEP.
+        var cksum = busyBoxExists ? "busybox cksum" : "cksum";
+        var md5 = busyBoxExists ? "busybox md5sum" : "md5sum";
+        var fs = AdbExplorerConst.ADB_FIELD_SEP;
+
+        return "echo " +
+               CKSUM_MARK +
+               "$(" + cksum + " --help 2>/dev/null)" +
+               fs + MD5_MARK +
+               "$(" + md5 + " --help 2>/dev/null)";
+    }
+
+    /// <summary>
+    /// <c>cksum</c> (used as <c>cksum -HNPL</c> for IEEE CRC-32) and <c>md5sum</c> independently.
+    /// </summary>
+    internal static HashProbeResult ParseHashProbeOutput(string stdout, bool busyBoxExists = false)
+    {
+        if (string.IsNullOrWhiteSpace(stdout))
+            return default;
+
+        var prefix = busyBoxExists ? "busybox " : "";
+        var cksumHelp = ExtractProbeSection(stdout, CKSUM_MARK);
+        var md5Help = ExtractProbeSection(stdout, MD5_MARK);
+
+        string? crcCmd = !string.IsNullOrWhiteSpace(cksumHelp) ? $"{prefix}cksum -HNPL" : null;
+        string? md5Cmd = !string.IsNullOrWhiteSpace(md5Help) ? $"{prefix}md5sum" : null;
+
+        return new(crcCmd is not null, md5Cmd is not null, crcCmd, md5Cmd);
     }
 
     private static (bool FindExists, bool FindPrintf) ProbeFind(string deviceID, bool busyBoxExists)
@@ -308,11 +430,14 @@ public static class ShellCommands
         var unzipHelp = ExtractProbeSection(stdout, UNZIP_MARK);
         var zipHelp = ExtractProbeSection(stdout, ZIP_MARK);
 
+        var tarExists = !string.IsNullOrWhiteSpace(tarHelp);
         return new(
-            !string.IsNullOrWhiteSpace(tarHelp),
+            tarExists,
             !string.IsNullOrWhiteSpace(unzipHelp),
             !string.IsNullOrWhiteSpace(zipHelp),
-            !string.IsNullOrWhiteSpace(tarHelp) && TarHelpSupportsAppend(tarHelp));
+            tarExists && TarHelpSupportsAppend(tarHelp),
+            tarExists && TarHelpSupportsToCommand(tarHelp),
+            tarExists && TarHelpSupportsToStdout(tarHelp));
     }
 
     private static string ExtractProbeSection(string stdout, string label)
@@ -336,12 +461,55 @@ public static class ShellCommands
         if (help.Contains("--append", StringComparison.OrdinalIgnoreCase))
             return true;
 
+        // GNU: -r, --append
         if (help.Contains("-r,", StringComparison.Ordinal))
             return true;
 
         return AdbRegEx.RE_TAR_APPEND_BUSYBOX().IsMatch(help)
             || AdbRegEx.RE_TAR_APPEND_TOYBOX().IsMatch(help);
     }
+
+    internal static bool TarHelpSupportsToCommand(string help)
+    {
+        if (string.IsNullOrWhiteSpace(help))
+            return false;
+
+        return help.Contains("--to-command", StringComparison.OrdinalIgnoreCase)
+            || help.Contains("to-command", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Android toybox: <c>O  Extract to stdout</c>; GNU: <c>-O, --to-stdout</c>.
+    /// </summary>
+    internal static bool TarHelpSupportsToStdout(string help)
+    {
+        if (string.IsNullOrWhiteSpace(help))
+            return false;
+
+        if (help.Contains("--to-stdout", StringComparison.OrdinalIgnoreCase)
+            || help.Contains("to-stdout", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        // Toybox 0.8.x Android help: "O  Extract to stdout"
+        if (help.Contains("Extract to stdout", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        // GNU long form: -O, --to-stdout
+        return help.Contains("-O,", StringComparison.Ordinal)
+            && help.Contains("stdout", StringComparison.OrdinalIgnoreCase);
+    }
 }
 
-internal readonly record struct ArchiveProbeResult(bool TarExists, bool UnzipExists, bool ZipExists, bool TarAppendSupported);
+internal readonly record struct ArchiveProbeResult(
+    bool TarExists,
+    bool UnzipExists,
+    bool ZipExists,
+    bool TarAppendSupported,
+    bool TarToCommandSupported,
+    bool TarToStdoutSupported);
+
+internal readonly record struct HashProbeResult(
+    bool Crc32Exists,
+    bool Md5SumExists,
+    string? Crc32Command,
+    string? Md5SumCommand);

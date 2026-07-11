@@ -1432,7 +1432,14 @@ public partial class ExplorerPageHeader : UserControl
         else
         {
             selectedItems = ActiveSelectedItems.Cast<FileClass>();
-            vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems, DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
+            // Archive extract is copy-only (no cut / symlink from inside an archive).
+            var effects = FileActions.IsArchive
+                ? DragDropEffects.Copy
+                : DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link;
+
+            vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems, effects);
+            if (FileActions.IsArchive && vfdo is not null)
+                vfdo.PreferredDropEffect = DragDropEffects.Copy;
         }
 
         if (vfdo is not null)

@@ -80,6 +80,43 @@ public static class ArchiveHelper
             ? Strings.Resources.S_ARCHIVE_CAN_MODIFY
             : Strings.Resources.S_ARCHIVE_READ_ONLY;
 
+    /// <summary>
+    /// Whether archive members can be validated with the device's preferred hash mode
+    /// (IEEE CRC-32 via <c>cksum -HNPL</c> if available, otherwise MD5).
+    /// Zip uses TOC CRC-32 (needs shell <c>cksum</c> on Android dest); tar uses <c>--to-command</c> or <c>-O</c>.
+    /// </summary>
+    public static bool SupportsHashValidation(string archivePath, string deviceId)
+        => SupportsHashValidation(archivePath, deviceId, androidDestination: true);
+
+    /// <param name="androidDestination">
+    /// When <see langword="false"/> (pull to Windows), zip TOC CRC can be checked without shell <c>cksum</c>.
+    /// </param>
+    public static bool SupportsHashValidation(string archivePath, string deviceId, bool androidDestination)
+    {
+        var mode = ShellCommands.GetValidationHashMode(deviceId);
+
+        return GetFamily(archivePath) switch
+        {
+            ArchiveFamily.Zip when !ShellCommands.UnzipExists(deviceId) => false,
+            // Zip TOC is CRC-32; Windows dest can CRC locally; Android dest needs shell cksum.
+            ArchiveFamily.Zip => !androidDestination || mode is ValidationHashMode.Crc32,
+            ArchiveFamily.Tar => mode is not ValidationHashMode.None
+                && ShellCommands.TarExists(deviceId)
+                && ShellCommands.TarHashPipelineSupported(deviceId),
+            _ => false,
+        };
+    }
+
+    /// <summary>Whether validation should use CRC-32 (device preference or zip TOC / Windows pull).</summary>
+    public static bool UsesCrc32Validation(string archivePath, string deviceId, bool androidDestination = true)
+    {
+        if (ShellCommands.GetValidationHashMode(deviceId) is ValidationHashMode.Crc32)
+            return true;
+
+        // Zip pull to Windows: TOC CRC vs local CRC without shell cksum.
+        return GetFamily(archivePath) is ArchiveFamily.Zip && !androidDestination;
+    }
+
     /// <summary>Maps Info-ZIP <c>unzip -lv</c> method codes to readable labels.</summary>
     public static string GetZipMethodDisplayName(string method)
     {

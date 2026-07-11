@@ -304,25 +304,45 @@ public partial class CopyPasteService : ObservableObject
         UpdateUI();
     }
 
-    public void UpdateSelfVFDO(bool isDrag)
+    public void UpdateSelfVFDO(bool isDrag, DragDropEffects pasteEffect = DragDropEffects.None)
     {
         if (VirtualFileDataObject.SelfFiles is null || !VirtualFileDataObject.SelfFiles.Any())
             return;
 
         if (isDrag)
         {
-            DragPasteSource |= DataSource.Android | DataSource.Self;
+            DragPasteSource = (DragPasteSource | DataSource.Android | DataSource.Self) & ~DataSource.None;
         }
         else
         {
-            PasteSource |= DataSource.Android | DataSource.Self;
+            PasteSource = (PasteSource | DataSource.Android | DataSource.Self) & ~DataSource.None;
+            if (pasteEffect is not DragDropEffects.None)
+                PasteState = pasteEffect;
         }
 
         SourceDevice = Data.DevicesObject.Current;
         MasterPid = Environment.ProcessId;
         DragParent = VirtualFileDataObject.SelfFiles.First().ParentPath;
-        DragFiles = [.. VirtualFileDataObject.SelfFileGroup.FileDescriptors.Select(d => d.Name)];
-        Descriptors = [.. VirtualFileDataObject.SelfFileGroup.FileDescriptors];
+
+        // FileDescriptors may still be the empty placeholder while PrepareDescriptors runs
+        // (especially archive extract-to-tmp). Fall back to SelfFiles until they are ready.
+        var descriptors = VirtualFileDataObject.SelfFileGroup?.FileDescriptors?.ToArray();
+        if (descriptors is { Length: > 0 })
+        {
+            DragFiles = [.. descriptors.Select(d => d.Name)];
+            Descriptors = descriptors;
+        }
+        else
+        {
+            DragFiles = [.. VirtualFileDataObject.SelfFiles.Select(f => f.FullName)];
+            Descriptors = [];
+        }
+
+        if (!isDrag)
+        {
+            Files = [.. VirtualFileDataObject.SelfFiles.Select(f => f.FullPath)];
+            ParentFolder = DragParent;
+        }
 
         UpdateUI();
     }
@@ -341,7 +361,21 @@ public partial class CopyPasteService : ObservableObject
         if (DragFiles.Length < 1)
             return DragDropEffects.None;
 
-        var dataContext = sender?.DataContext;
+        // Clipboard evaluation (no drop target): keep the paste payload even when the
+        // current location cannot accept it (e.g. still inside a read-only archive).
+        // EnableUiPaste / EnableKeyboardPaste re-check the real destination on navigate.
+        if (sender is null)
+        {
+            if (Data.FileActions.IsAppDrive)
+                return FileHelper.AllFilesAreApks(DragFiles) ? DragDropEffects.Copy : DragDropEffects.None;
+
+            if (CurrentSource.HasFlag(DataSource.Virtual) && !CurrentSource.HasFlag(DataSource.Android))
+                return DragDropEffects.Copy;
+
+            return DragDropEffects.Move | DragDropEffects.Copy;
+        }
+
+        var dataContext = sender.DataContext;
         FileClass file = dataContext is FileClass fc ? fc : null;
 
         if (Data.FileActions.IsAppDrive)
@@ -355,6 +389,9 @@ public partial class CopyPasteService : ObservableObject
             Data.CopyPaste.DropTarget = targetPath;
 
             if (!DriveHelper.IsModificationAllowedAt(targetPath, Data.DevicesObject.Current?.ID ?? ""))
+                return DragDropEffects.None;
+
+            if (ArchivePath.IsArchivePath(targetPath, Data.DevicesObject.Current?.ID))
                 return DragDropEffects.None;
 
             if (CurrentSource.HasFlag(DataSource.Android))
@@ -408,10 +445,26 @@ public partial class CopyPasteService : ObservableObject
 
             if (dataObject.GetDataPresent(AdbDataFormats.FileDescriptor))
             {
-                Task.Run(() =>
+                // Descriptors are filled asynchronously (and for archives only after extract-to-tmp).
+                // Retry until ready; empty placeholder bytes must not be treated as a real group.
+                Task.Run(async () =>
                 {
-                    Task.Delay(500);
-                    App.SafeInvoke(() => GetDescriptors(dataObject));
+                    for (var attempt = 0; attempt < 40; attempt++)
+                    {
+                        await Task.Delay(250).ConfigureAwait(false);
+
+                        FileDescriptor[]? fds = null;
+                        App.SafeInvoke(() => fds = FileDescriptor.GetDescriptors(dataObject));
+                        if (fds is not { Length: > 0 })
+                            continue;
+
+                        App.SafeInvoke(() =>
+                        {
+                            Descriptors = fds;
+                            UpdateUI();
+                        });
+                        return;
+                    }
                 });
             }
         }
@@ -772,6 +825,22 @@ public partial class CopyPasteService : ObservableObject
         if (!pasteItems.Any())
             return;
 
+        // Archive sources: extract selected members (copy only — no in-archive cut yet).
+        if (ArchiveExtract.IsArchiveSource(pasteItems, device.ID))
+        {
+            if (ArchivePath.IsArchivePath(targetPath, device.ID))
+                return;
+
+            ShellFileOperation.ExtractItems(device: device,
+                      items: pasteItems,
+                      targetPath: targetPath,
+                      currentPath: currentPath,
+                      existingItems: Data.DirList.FileList.Select(f => f.FullName),
+                      dispatcher: dispatcher,
+                      masterPid: masterPid);
+            return;
+        }
+
         ShellFileOperation.MoveItems(device: device,
                   items: pasteItems,
                   targetPath: targetPath,
@@ -1004,5 +1073,8 @@ public partial class CopyPasteService : ObservableObject
         { }
 
         Directory.CreateDirectory(Data.RuntimeSettings.TempDragPath);
+
+        // Drop leftover archive extract staging from a previous clipboard/drag that was never pulled.
+        Task.Run(() => ArchiveExtract.CleanupAllStaging());
     }
 }

@@ -238,11 +238,32 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     public FileNameSort SortName { get; private set; }
 
-    public FolderTree[]? Children => !IsDirectory
-        ? null 
-        : FileHelper.GetFolderTree([FullPath], cancellationToken: Data.DeviceCts.Token);
+    public FolderTree[]? Children
+    {
+        get
+        {
+            if (!IsDirectory)
+                return null;
+
+            var deviceId = Data.DevicesObject?.Current?.ID;
+            if (deviceId is not null
+                && ArchivePath.TryParse(FullPath, out var archivePath, out var internalPath, deviceId))
+            {
+                return ArchiveExtract.GetArchiveFolderTree(
+                    deviceId,
+                    archivePath,
+                    internalPath,
+                    Data.DeviceCts.Token);
+            }
+
+            return FileHelper.GetFolderTree([FullPath], cancellationToken: Data.DeviceCts.Token);
+        }
+    }
 
     public IEnumerable<FileDescriptor> Descriptors { get; private set; }
+
+    /// <summary>Device temp root used when staging archive extract for pull; cleaned after VFDO completes.</summary>
+    private string? archivePullStagingRoot;
 
     #region Read Only Properties
 
@@ -524,9 +545,46 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         SyncFile target = new(FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, name, '\\'))
             { PathType = FilePathType.Windows };
 
-        var children = Children;
+        var device = Data.DevicesObject.Current;
+        var deviceId = device.ID;
+        SyncFile pullSource;
+        FolderTree[]? children;
+        string descriptorParent;
+        string sourcePathLabel = FullPath;
+        string? stagingRoot = null;
 
-        var fileOp = FileSyncOperation.PullFile(new(this, children), target, Data.DevicesObject.Current, App.AppDispatcher);
+        if (ArchivePath.TryParse(FullPath, out string? archivePath, out string? internalPath, deviceId))
+        {
+            // Extract selected member(s) to /data/local/tmp, then pull from the real paths.
+            // Files are flattened to basename; directories keep their internal tree.
+            string extractedPath;
+            FolderTree[] tree;
+            (stagingRoot, extractedPath, tree) = ArchiveExtract.ExtractSelectionForPull(
+                deviceId,
+                archivePath,
+                internalPath,
+                IsDirectory,
+                Data.DeviceCts.Token);
+
+            archivePullStagingRoot = stagingRoot;
+            children = tree;
+            descriptorParent = FileHelper.GetParentPath(extractedPath);
+
+            var extractedClass = new FileClass(name, extractedPath, Type, size: Size, modifiedTime: ModifiedTime);
+            pullSource = new SyncFile(extractedClass, children);
+            sourcePathLabel = extractedPath;
+        }
+        else
+        {
+            children = Children;
+            descriptorParent = ParentPath;
+            pullSource = new SyncFile(this, children);
+        }
+
+        var fileOp = FileSyncOperation.PullFile(pullSource, target, device, App.AppDispatcher);
+        if (stagingRoot is not null)
+            fileOp.SetArchivePullSource(archivePath!, internalPath!, stagingRoot, FullPath);
+
         vfdo.OperationCompleted += VFDO_OperationCompleted;
 
         FolderTree[] items = [new(name, Size, UnixTime)];
@@ -535,89 +593,96 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             items = [.. items, .. children];
         }
 
-        Descriptors = items.Select(item => new FileDescriptor
+        Descriptors = items.Select(item =>
         {
-            Name = FileHelper.ExtractRelativePath(item.Name, ParentPath),
-            SourcePath = FullPath,
-            IsDirectory = item.IsFolder,
-            Length = item.Size,
-            ChangeTimeUtc = item.Date.FromUnixTime(),
-            Stream = () =>
+            var relativeName = FileHelper.ExtractRelativePath(item.Name, descriptorParent).Replace('/', '\\');
+
+            return new FileDescriptor
             {
-                var isActive = App.AppDispatcher?.Invoke(() => App.Current?.MainWindow?.IsActive == true) == true;
-                var operations = vfdo.Operations.Where(op => op.Status is FileOperation.OperationStatus.None);
-
-                // When a VFDO that does not contain folders is sent to the clipboard, the shell immediately requests the file contents.
-                // To prevent this, we refuse to give data when the app is focused.
-                // When a legitimate request for data is made, the app can't be focused during the first file, but it can become focused again for the next files.
-                if ((Data.CopyPaste.IsClipboard && isActive && operations.Any())
-                    || !includeContent)
-                {
-                    return null;
-                }
-
-#if !DEPLOY
-                DebugLog.PrintLine($"Total uninitiated operations: {operations.Count()}");
-#endif
-
-                // Add all uninitiated operations to the queue.
-                // For all consecutive files this list will be empty.
-                foreach (var op in operations)
-                {
-                    App.Current.Dispatcher.Invoke(() => Data.FileOpQ.AddOperation(op));
-                }
-
-                // Wait for the operation to complete.
-                // When called on the UI thread (clipboard path), pump the dispatcher on each iteration
-                // so that queued BeginInvoke items (StatusInfo progress updates) are processed and
-                // visible in the UI during the transfer. Thread.Sleep alone would block the dispatcher
-                // queue, causing all progress notifications to arrive only after the transfer finishes.
-                while (fileOp.Status is FileOperation.OperationStatus.InProgress or FileOperation.OperationStatus.Waiting)
-                {
-                    if (App.AppDispatcher?.CheckAccess() == true)
-                    {
-                        // Push a short-lived nested message pump that exits at Background priority
-                        // (i.e., after all pending Normal-priority BeginInvoke items have run).
-                        var frame = new DispatcherFrame();
-                        App.AppDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => frame.Continue = false));
-                        Dispatcher.PushFrame(frame);
-                        Thread.Sleep(16); // brief yield (~60 fps) before next pump to avoid busy-spinning
-                    }
-                    else
-                    {
-                        Thread.Sleep(100);
-                    }
-                }
-
-                var file = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, FileHelper.ExtractRelativePath(item.Name, ParentPath), '\\');
-
-                // Try 10 times to read from the file and write to the stream,
-                // in case the file is still in use by ADB or hasn't appeared yet
-                for (int i = 0; i < 10; i++)
-                {
-                    try
-                    {
-                        var stream = NativeMethods.GetComStreamFromFile(file);
-
-                        if (stream is not null)
-                            return stream;
-                    }
-                    catch (Exception e)
-                    {
-#if !DEPLOY
-                        DebugLog.PrintLine($"Failed to open stream on {file}: {e.Message}");
-#endif
-
-                        Thread.Sleep(100);
-                        continue;
-                    }
-                }
-
-                return null;
-            }
+                Name = relativeName,
+                SourcePath = sourcePathLabel,
+                IsDirectory = item.IsFolder,
+                Length = item.Size,
+                ChangeTimeUtc = item.Date.FromUnixTime(),
+                Stream = () => CreateDescriptorStream(vfdo, fileOp, relativeName, includeContent),
+            };
         });
 
         return fileOp;
+    }
+
+    private static System.Runtime.InteropServices.ComTypes.IStream? CreateDescriptorStream(VirtualFileDataObject vfdo, FileSyncOperation fileOp, string relativeName, bool includeContent)
+    {
+        var isActive = App.AppDispatcher?.Invoke(() => App.Current?.MainWindow?.IsActive == true) == true;
+        var operations = vfdo.Operations.Where(op => op.Status is FileOperation.OperationStatus.None);
+
+        // When a VFDO that does not contain folders is sent to the clipboard, the shell immediately requests the file contents.
+        // To prevent this, we refuse to give data when the app is focused.
+        // When a legitimate request for data is made, the app can't be focused during the first file, but it can become focused again for the next files.
+        if ((Data.CopyPaste.IsClipboard && isActive && operations.Any())
+            || !includeContent)
+        {
+            return null;
+        }
+
+#if !DEPLOY
+        DebugLog.PrintLine($"Total uninitiated operations: {operations.Count()}");
+#endif
+
+        // Add all uninitiated operations to the queue.
+        // For all consecutive files this list will be empty.
+        foreach (var op in operations)
+        {
+            App.Current.Dispatcher.Invoke(() => Data.FileOpQ.AddOperation(op));
+        }
+
+        // Wait for the operation to complete.
+        // When called on the UI thread (clipboard path), pump the dispatcher on each iteration
+        // so that queued BeginInvoke items (StatusInfo progress updates) are processed and
+        // visible in the UI during the transfer. Thread.Sleep alone would block the dispatcher
+        // queue, causing all progress notifications to arrive only after the transfer finishes.
+        while (fileOp.Status is FileOperation.OperationStatus.InProgress or FileOperation.OperationStatus.Waiting)
+        {
+            if (App.AppDispatcher?.CheckAccess() == true)
+            {
+                // Push a short-lived nested message pump that exits at Background priority
+                // (i.e., after all pending Normal-priority BeginInvoke items have run).
+                var frame = new DispatcherFrame();
+                App.AppDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => frame.Continue = false));
+                Dispatcher.PushFrame(frame);
+                Thread.Sleep(16); // brief yield (~60 fps) before next pump to avoid busy-spinning
+            }
+            else
+            {
+                Thread.Sleep(100);
+            }
+        }
+
+        var file = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, relativeName, '\\');
+
+        // Try 10 times to read from the file and write to the stream,
+        // in case the file is still in use by ADB or hasn't appeared yet
+        for (int i = 0; i < 10; i++)
+        {
+            try
+            {
+                var stream = NativeMethods.GetComStreamFromFile(file);
+
+                if (stream is not null)
+                    return stream;
+            }
+            catch (Exception e)
+            {
+#if !DEPLOY
+                DebugLog.PrintLine($"Failed to open stream on {file}: {e.Message}");
+#endif
+
+                Thread.Sleep(100);
+                continue;
+            }
+        }
+
+        return null;
     }
 
     private void VFDO_OperationCompleted(object sender, NativeMethods.HResult hResult)
@@ -625,9 +690,18 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         if (sender is not VirtualFileDataObject vfdo)
             return;
 
+        // Clean device-side archive extract staging regardless of success.
+        if (archivePullStagingRoot is not null && vfdo.Operations?.FirstOrDefault()?.Device is { } stagingDevice)
+        {
+            var root = archivePullStagingRoot;
+            archivePullStagingRoot = null;
+            Task.Run(() => ArchiveExtract.CleanupStaging(stagingDevice.ID, root));
+        }
+
         if (hResult is NativeMethods.HResult.Ok)
         {
-            if (vfdo.CurrentEffect.HasFlag(DragDropEffects.Move))
+            if (vfdo.CurrentEffect.HasFlag(DragDropEffects.Move)
+                && !ArchivePath.IsArchivePath(FullPath, Data.DevicesObject?.Current?.ID))
             {
                 var device = vfdo.Operations.First().Device;
 

@@ -31,7 +31,6 @@ public abstract class FileOperation : ViewModelBase
         Install,
         Update,
         Rename,
-        //Archive,
     }
 
     #region Notifiable Properties
@@ -155,7 +154,8 @@ public abstract class FileOperation : ViewModelBase
     {
         get
         {
-            if (AltSource.Location is not Navigation.SpecialLocation.None)
+            // Path-based AltSource (e.g. archive member) has Location=None; still prefer it over FilePath (staging).
+            if (AltSource.Location is not Navigation.SpecialLocation.None || !string.IsNullOrEmpty(AltSource.Path))
                 return AltSource.DisplayName;
 
             if (FilePath is null)
@@ -186,7 +186,7 @@ public abstract class FileOperation : ViewModelBase
     {
         get
         {
-            if (AltTarget.Location is not Navigation.SpecialLocation.None)
+            if (AltTarget.Location is not Navigation.SpecialLocation.None || !string.IsNullOrEmpty(AltTarget.Path))
                 return AltTarget.DisplayName;
 
             if (TargetPath is null)
@@ -238,10 +238,44 @@ public abstract class FileOperation : ViewModelBase
             if (Status is not OperationStatus.Completed)
                 return false;
 
-            return StatusInfo is null 
-                || (!StatusInfo.IsValidationInProgress 
-                && Device.Status is DeviceStatus.Ok);
+            if (StatusInfo is not null
+                && (StatusInfo.IsValidationInProgress || Device.Status is not DeviceStatus.Ok))
+                return false;
+
+            // Archive pull / extract-to-device: prefer cksum -HNPL (IEEE CRC), else MD5.
+            if (TryGetArchiveValidationSource(out var archivePath, out _, out _))
+            {
+                var androidDest = TargetPath?.PathType is AbstractFile.FilePathType.Android;
+                return ArchiveHelper.SupportsHashValidation(archivePath, Device.ID, androidDest);
+            }
+
+            return ShellCommands.GetValidationHashMode(Device.ID) is not ValidationHashMode.None;
         }
+    }
+
+    /// <summary>Archive pull or copy-extract ops that can be validated against the original archive.</summary>
+    public bool TryGetArchiveValidationSource(out string archivePath, out string internalPath, out bool isDirectory)
+    {
+        if (this is FileSyncOperation { IsArchivePull: true, ArchiveSourcePath: { } pullArchive } pullOp)
+        {
+            archivePath = pullArchive;
+            internalPath = pullOp.ArchiveInternalPath ?? "";
+            isDirectory = pullOp.FilePath.IsDirectory;
+            return true;
+        }
+
+        if (this is FileExtractOperation extractOp)
+        {
+            archivePath = extractOp.ArchiveSourcePath;
+            internalPath = extractOp.ArchiveInternalPath;
+            isDirectory = extractOp.IsArchiveDirectory;
+            return true;
+        }
+
+        archivePath = "";
+        internalPath = "";
+        isDirectory = false;
+        return false;
     }
 
     public bool IsSourceNavigable => FilePath?.PathType is AbstractFile.FilePathType.Windows
@@ -291,21 +325,25 @@ public abstract class FileOperation : ViewModelBase
             }
             else
             {
-                if (!Device.IsOpen)
-                    Data.DevicesObject.DeviceToOpen = Device;
-
-                Data.RuntimeSettings.LocationToNavigate = new(file.ParentPath);
+                NavigateDeviceLocation(new(file.ParentPath));
             }
         }
         else if (location is AdbLocation loc)
         {
-            if (!Device.IsOpen)
-                Data.DevicesObject.DeviceToOpen = Device;
-
-            Data.RuntimeSettings.LocationToNavigate = loc;
+            NavigateDeviceLocation(loc);
         }
         else
             throw new NotSupportedException();
+    }
+
+    private void NavigateDeviceLocation(AdbLocation location)
+    {
+        if (!Device.IsOpen)
+            Data.DevicesObject.DeviceToOpen = Device;
+        else if (Data.CurrentPage.Value != typeof(Views.Pages.ExplorerPage))
+            Data.CurrentPage.Value = typeof(Views.Pages.ExplorerPage);
+
+        Data.RuntimeSettings.LocationToNavigate = location;
     }
 
     public void SetValidation(bool value)

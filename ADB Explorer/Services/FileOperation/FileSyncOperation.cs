@@ -47,6 +47,17 @@ public class FileSyncOperation : FileOperation
 
     public int? MaxThreads { get; set; }
 
+    /// <summary>Device temp root used when pulling from an archive; cleaned when the op finishes.</summary>
+    public string? ArchivePullStagingRoot { get; set; }
+
+    /// <summary>Original archive file path for hash validation (<c>tar --to-command</c> / <c>-O</c>).</summary>
+    public string? ArchiveSourcePath { get; set; }
+
+    /// <summary>Internal archive path of the selected member (empty = archive root).</summary>
+    public string? ArchiveInternalPath { get; set; }
+
+    public bool IsArchivePull => !string.IsNullOrEmpty(ArchiveSourcePath);
+
     IEnumerable<SyncFile> Files => [FilePath, .. FilePath.AllChildren()];
     private long? TotalBytes => Files.Sum(f => f.Size);
     private IEnumerable<SyncFile> ActiveFiles => Files.Where(f => f.CurrentPercentage is > 0 and < 100);
@@ -204,7 +215,7 @@ public class FileSyncOperation : FileOperation
         {
             var files = Files.Where(f => !f.IsDirectory);
             int filesCount = files.Count();
-            var completed = files.Count(f => f.CurrentPercentage == 100);
+            var completed = files.Count(IsSyncFileCompleted);
             if (filesCount == 0 && Files.First().IsDirectory)
             {
                 filesCount = 1;
@@ -274,9 +285,12 @@ public class FileSyncOperation : FileOperation
                 SyncTransferTracker.AddPushBytes(deltaBytes);
         }
 
-        double? filePercentage = item.Size is > 0
-            ? Math.Min(100, currentBytes * 100.0 / item.Size.Value)
-            : null;
+        double? filePercentage = null;
+        if (item.Size is > 0)
+            filePercentage = Math.Min(100, currentBytes * 100.0 / item.Size.Value);
+        else if (item.Size is 0)
+            // Empty files have nothing to transfer; avoid leaving percentage null (counted as skipped).
+            filePercentage = 100.0;
 
         mutex.WaitOne();
         var progressInfo = new AdbSyncProgressInfo(item.FullPath, null, filePercentage, currentBytes);
@@ -290,6 +304,20 @@ public class FileSyncOperation : FileOperation
         mutex.ReleaseMutex();
 
         TransferEnd = DateTime.Now;
+    }
+
+    /// <summary>
+    /// Empty files never reach 100% via byte ratio (denominator is 0); treat size 0 without error as complete.
+    /// </summary>
+    private static bool IsSyncFileCompleted(SyncFile file)
+    {
+        if (file.LastUpdate is SyncErrorInfo)
+            return false;
+
+        if (file.CurrentPercentage >= 100)
+            return true;
+
+        return file.Size is 0;
     }
 
     private long CorrectReceivedBytes(string path, ulong rawReceived)
@@ -398,6 +426,19 @@ public class FileSyncOperation : FileOperation
             disposable.Dispose();
             OriginalShellItem = null;
         }
+
+        CleanupArchiveStaging();
+    }
+
+    private void CleanupArchiveStaging()
+    {
+        if (string.IsNullOrEmpty(ArchivePullStagingRoot))
+            return;
+
+        var root = ArchivePullStagingRoot;
+        ArchivePullStagingRoot = null;
+        var deviceId = Device.ID;
+        Task.Run(() => ArchiveExtract.CleanupStaging(deviceId, root));
     }
 
     public override void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
@@ -408,6 +449,14 @@ public class FileSyncOperation : FileOperation
 
     public static FileSyncOperation PullFile(SyncFile sourcePath, SyncFile targetPath, LogicalDeviceViewModel device, Dispatcher dispatcher)
         => new(OperationType.Pull, sourcePath, targetPath, device, dispatcher);
+
+    public void SetArchivePullSource(string archivePath, string internalPath, string stagingRoot, string displayPath)
+    {
+        ArchiveSourcePath = archivePath;
+        ArchiveInternalPath = internalPath;
+        ArchivePullStagingRoot = stagingRoot;
+        AltSource = new(displayPath);
+    }
 
     public static FileSyncOperation PushFile(SyncFile sourcePath, SyncFile targetPath, LogicalDeviceViewModel device, Dispatcher dispatcher)
         => new(OperationType.Push, sourcePath, targetPath, device, dispatcher);

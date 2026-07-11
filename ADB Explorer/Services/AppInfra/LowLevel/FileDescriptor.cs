@@ -79,7 +79,8 @@ public class FileDescriptor
         {
             try
             {
-                return VirtualFileDataObject.SelfFileGroup?.FileDescriptors?.ToArray();
+                var self = VirtualFileDataObject.SelfFileGroup?.FileDescriptors?.ToArray();
+                return self is { Length: > 0 } ? self : null;
             }
             catch (Exception)
             {
@@ -93,7 +94,11 @@ public class FileDescriptor
                 return null;
 
             var fileGroup = FILEGROUPDESCRIPTOR.FromStream(fdStream);
-            return fileGroup.descriptors.Select(FILEDESCRIPTOR.GetFile)?.ToArray();
+            // Placeholder empty descriptor bytes (set before PrepareDescriptors finishes) leave descriptors null.
+            if (fileGroup.descriptors is null || fileGroup.cItems == 0)
+                return null;
+
+            return [.. fileGroup.descriptors.Select(FILEDESCRIPTOR.GetFile)];
         }
         catch (COMException)
         {
@@ -154,6 +159,13 @@ struct FILEGROUPDESCRIPTOR : IByteStruct
         }
         catch (Exception)
         {
+            fgd.descriptors = [];
+            return fgd;
+        }
+
+        if (fgd.cItems == 0)
+        {
+            fgd.descriptors = [];
             return fgd;
         }
 

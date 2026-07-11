@@ -643,9 +643,27 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
                 return fileSnapshot.Select(f => f.PrepareDescriptors(vfdo)).ToList();
             }).ContinueWith(t =>
             {
+                if (t.IsFaulted)
+                {
+#if !DEPLOY
+                    DebugLog.PrintLine($"PrepareDescriptors failed: {t.Exception?.GetBaseException().Message}");
+#endif
+                    App.SafeInvoke(() => Data.RuntimeSettings.MainCursor = Cursors.Arrow);
+                    return;
+                }
+
                 App.SafeInvoke(() =>
                 {
-                    vfdo.SetFileDescriptors(fileSnapshot.SelectMany(f => f.Descriptors));
+                    var descriptors = fileSnapshot
+                        .Where(f => f.Descriptors is not null)
+                        .SelectMany(f => f.Descriptors)
+                        .ToList();
+
+                    vfdo.SetFileDescriptors(descriptors);
+                    // Refresh self clipboard/drag UI now that real descriptors exist.
+                    if (Data.CopyPaste.IsSelf)
+                        Data.CopyPaste.UpdateSelfVFDO(Data.CopyPaste.IsDrag);
+
                     Data.RuntimeSettings.MainCursor = Cursors.Arrow;
                 });
 

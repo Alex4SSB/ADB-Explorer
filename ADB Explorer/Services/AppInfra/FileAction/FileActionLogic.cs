@@ -290,6 +290,7 @@ internal static class FileActionLogic
 
   public static bool EnableUiPaste()
     {
+        // Paste into an archive is not supported yet; paste from archive clipboard into a normal folder is.
         if (Data.FileActions.IsArchive)
             return false;
 
@@ -444,10 +445,17 @@ internal static class FileActionLogic
         if (!DriveHelper.IsModificationAllowedAt(targetPath, Data.DevicesObject.Current?.ID ?? ""))
             return DragDropEffects.None;
 
+        // Dropping into an archive is not supported yet.
+        if (ArchivePath.IsArchivePath(targetPath, Data.DevicesObject.Current?.ID))
+            return DragDropEffects.None;
+
         UpdatePastingRestrictions(targetPath, [.. Data.CopyPaste.CurrentFiles.Select(f => f.FullPath)]);
 
+        var fromArchive = ArchiveExtract.IsArchiveSource(Data.CopyPaste.CurrentFiles, Data.DevicesObject.Current?.ID);
+
         var result = DragDropEffects.Copy;
-        if (HasRootShell
+        if (!fromArchive
+            && HasRootShell
             && Data.CopyPaste.IsSelf
             && DriveHelper.GetCurrentDrive(targetPath)?.Restrictions.NoSymbolicLinks is not true
             && Data.CopyPaste.CurrentFiles.Count() == 1)
@@ -470,9 +478,11 @@ internal static class FileActionLogic
                 || (Data.CopyPaste.DragParent == target.FullPath);
         }
 
-        return pastingInDescendant
-            ? DragDropEffects.None
-            : result | DragDropEffects.Move;
+        if (pastingInDescendant)
+            return DragDropEffects.None;
+
+        // Archive extract is copy-only.
+        return fromArchive ? result : result | DragDropEffects.Move;
     }
 
     private static void UpdatePastingRestrictions(string targetPath, string[] files)
@@ -516,7 +526,11 @@ internal static class FileActionLogic
         IsPasteEnabled();
 
         var vfdo = VirtualFileDataObject.PrepareTransfer(items, VirtualFileDataObject.DataObjectMethod.Clipboard);
-        vfdo?.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.Clipboard, allowedEffects: DragDropEffects.Copy);
+        if (vfdo is null)
+            return;
+
+        Data.CopyPaste.UpdateSelfVFDO(isDrag: false, pasteEffect: DragDropEffects.Copy);
+        vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.Clipboard, allowedEffects: DragDropEffects.Copy);
     }
 
     public static void CutFiles(IEnumerable<FileClass> items, bool isCopy = false)
@@ -531,7 +545,13 @@ internal static class FileActionLogic
 
         var dropEffect = isCopy ? DragDropEffects.Copy : DragDropEffects.Move;
         var vfdo = VirtualFileDataObject.PrepareTransfer(itemsToCut, dropEffect, VirtualFileDataObject.DataObjectMethod.Clipboard);
-        vfdo?.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.Clipboard, allowedEffects: dropEffect);
+        if (vfdo is null)
+            return;
+
+        // Mark clipboard as self immediately so paste enablement works while descriptors
+        // (and archive extract staging) finish asynchronously.
+        Data.CopyPaste.UpdateSelfVFDO(isDrag: false, pasteEffect: dropEffect);
+        vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.Clipboard, allowedEffects: dropEffect);
     }
 
     public static void Rename(TextBox textBox)
@@ -606,14 +626,14 @@ internal static class FileActionLogic
 
         if (!Data.Settings.EnableRecycle || permanent.Value)
         {
-        var result = await DialogService.ShowConfirmation(
+            var result = await DialogService.ShowConfirmation(
             string.Format(Strings.Resources.S_DELETE_PERMANENT, deletedString),
             Strings.Resources.S_DEL_CONF_TITLE,
             Strings.Resources.S_DELETE_ACTION,
             icon: DialogService.DialogIcon.Delete);
 
-        if (result.Item1 is not Wpf.Ui.Controls.ContentDialogResult.Primary)
-            return;
+            if (result.Item1 is not Wpf.Ui.Controls.ContentDialogResult.Primary)
+                return;
         }
 
         if (!Data.FileActions.IsRecycleBin && Data.Settings.EnableRecycle && !permanent.Value)
@@ -901,13 +921,17 @@ internal static class FileActionLogic
         Data.FileActions.IsSelectionConflictingNames = restrictions.CaseInsensitiveNames
             && Data.SelectedFiles.Select(f => f.FullName).Distinct(StringComparer.InvariantCultureIgnoreCase).Count() != Data.SelectedFiles.Count();
 
+        // Pull from archive extracts selected members to /data/local/tmp then pulls (same as PrepareDescriptors).
         Data.FileActions.PullEnabled = !Data.FileActions.IsRecycleBin
-                                       && !Data.FileActions.IsArchive
                                        && Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
                                        && Data.FileActions.IsRegularItem
                                        && !Data.FileActions.IsSelectionIllegalOnWindows
                                        && !Data.FileActions.IsSelectionIllegalNaming
-                                       && !Data.FileActions.IsSelectionConflictingNames;
+                                       && !Data.FileActions.IsSelectionConflictingNames
+                                       && (!Data.FileActions.IsArchive
+                                           || Data.SelectedFiles.AnyAll(f =>
+                                               ArchivePath.TryParse(f.FullPath, out _, out var inner, deviceId)
+                                               && !string.IsNullOrEmpty(inner)));
 
         Data.FileActions.ContextPushEnabled = isWritable
             && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive && !Data.FileActions.IsArchive
@@ -925,7 +949,9 @@ internal static class FileActionLogic
                                 && Data.CopyPaste.Files.AnyAll(item => Data.SelectedFiles.Any(f => f.FullPath == item))
                                 && Data.CopyPaste.Files.Length == Data.SelectedFiles.Count();
         
+        // Cut from archive is not supported (extract is copy-only).
         Data.FileActions.CutEnabled = isWritable
+                                      && !Data.FileActions.IsArchive
                                       && !SelectionIsFuseProtectedAndroidRoot
                                       && Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
                                       && !(allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Move)
@@ -1173,16 +1199,35 @@ internal static class FileActionLogic
             }
         }
 
-        var files = await CopyPasteService.MergeFiles(pullItems.Select(f => f.FullPath), targetPath);
+        // MergeFiles expects source paths; for archives pass a Windows-style path under target for conflict check.
+        var conflictSources = pullItems.Select(f =>
+            ArchivePath.IsArchivePath(f.FullPath, Data.DevicesObject?.Current?.ID)
+                ? FileHelper.ConcatPaths(targetPath, f.FullName, '\\')
+                : f.FullPath).ToList();
+
+        var files = await CopyPasteService.MergeFiles(conflictSources, targetPath);
         if (files.Count() < pullItems.Count())
         {
-            pullItems = pullItems.Where(f => files.Contains(f.FullPath));
+            var allowedNames = files.Select(FileHelper.GetFullName).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            pullItems = pullItems.Where(f =>
+                ArchivePath.IsArchivePath(f.FullPath, Data.DevicesObject?.Current?.ID)
+                    ? allowedNames.Contains(f.FullName)
+                    : files.Contains(f.FullPath));
         }
 
-        await Task.Run(() =>
+        try
         {
-            App.SafeInvoke(() => Data.FileOpQ.AddOperations(GeneratePullOps(targetPath, pullItems, notify)));
-        });
+            var ops = await Task.Run(() => GeneratePullOps(targetPath, pullItems, notify).ToList());
+            Data.FileOpQ.AddOperations(ops);
+        }
+        catch (Exception e)
+        {
+            DialogService.ShowMessage(e.Message,
+                                      Strings.Resources.S_DEST_ERR,
+                                      DialogService.DialogIcon.Critical,
+                                      copyToClipboard: true,
+                                      error: DialogError.DestinationPathFailed);
+        }
     }
 
     public static IEnumerable<FileSyncOperation> SilentPullFiles(LogicalDeviceViewModel device, string target, bool disableParallel, IEnumerable<string> filesToReplace, params IEnumerable<FileClass> pullItems)
@@ -1208,11 +1253,62 @@ internal static class FileActionLogic
     private static IEnumerable<FileSyncOperation> GeneratePullOps(string targetPath, IEnumerable<FileClass> pullItems, bool notify, LogicalDeviceViewModel? device = null)
     {
         device ??= Data.DevicesObject.Current;
+        var deviceId = device.ID;
 
-        foreach (var item in pullItems.Select(f => f.GetSyncFile()))
+        foreach (var item in pullItems)
         {
-            yield return GeneratePullOp(targetPath, item, notify, device);
+            if (ArchivePath.TryParse(item.FullPath, out var archivePath, out var internalPath, deviceId)
+                && !string.IsNullOrEmpty(internalPath))
+            {
+                yield return GenerateArchivePullOp(targetPath, item, archivePath, internalPath, notify, device);
+            }
+            else
+            {
+                yield return GeneratePullOp(targetPath, item.GetSyncFile(), notify, device);
+            }
         }
+    }
+
+    private static FileSyncOperation GenerateArchivePullOp(
+        string targetPath,
+        FileClass item,
+        string archivePath,
+        string internalPath,
+        bool notify,
+        LogicalDeviceViewModel device)
+    {
+        string stagingRoot;
+        string extractedPath;
+        FolderTree[] tree;
+        try
+        {
+            (stagingRoot, extractedPath, tree) = ArchiveExtract.ExtractSelectionForPull(
+                device.ID,
+                archivePath,
+                internalPath,
+                item.IsDirectory,
+                Data.DeviceCts.Token);
+        }
+        catch (Exception e)
+        {
+#if !DEPLOY
+            DebugLog.PrintLine($"Archive extract for pull failed: {e.Message}");
+#endif
+            throw;
+        }
+
+        var extractedClass = new FileClass(item.FullName, extractedPath, item.Type, size: item.Size, modifiedTime: item.ModifiedTime);
+        var pullSource = new SyncFile(extractedClass, tree);
+        var target = SyncFile.MergeToWindowsPath(pullSource, targetPath);
+        var fileOp = FileSyncOperation.PullFile(pullSource, target, device, App.AppDispatcher);
+
+        // Keep UI navigation pointing at the archive member, not the temp extract path.
+        fileOp.SetArchivePullSource(archivePath, internalPath, stagingRoot, item.FullPath);
+
+        if (notify)
+            fileOp.PropertyChanged += PullOperation_PropertyChanged;
+
+        return fileOp;
     }
 
     private static FileSyncOperation GeneratePullOp(string targetPath, SyncFile item, bool notify, LogicalDeviceViewModel device)

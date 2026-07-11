@@ -160,6 +160,70 @@ public static class ShellFileOperation
                      dispatcher,
                      cutType);
 
+    /// <summary>
+    /// Extracts archive selections to <paramref name="targetPath"/> (device paste from archive clipboard).
+    /// </summary>
+    public static void ExtractItems(LogicalDeviceViewModel device,
+                                    IEnumerable<FileClass> items,
+                                    string targetPath,
+                                    string currentPath,
+                                    IEnumerable<string> existingItems,
+                                    Dispatcher dispatcher,
+                                    int masterPid = 0)
+    {
+        items = [.. items];
+        List<FileExtractOperation> fileops = [];
+
+        foreach (var item in items)
+        {
+            if (!ArchivePath.TryParse(item.FullPath, out _, out _, device.ID))
+                continue;
+
+            var targetName = item.FullName;
+            if (currentPath == targetPath)
+                targetName = FileHelper.DuplicateFile(existingItems, targetName, DragDropEffects.Copy);
+
+            SyncFile target = new(FileHelper.ConcatPaths(targetPath, targetName), item.Type);
+            fileops.Add(new(item, target, device, dispatcher) { MasterPid = masterPid });
+        }
+
+        if (fileops.Count == 0)
+            return;
+
+        dispatcher.Invoke(() =>
+        {
+            fileops.ForEach(op => op.PropertyChanged += ExtractFileOp_PropertyChanged);
+            Data.FileOpQ.AddOperations(fileops);
+        });
+    }
+
+    private static void ExtractFileOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (sender is not FileExtractOperation op)
+            return;
+
+        if (e.PropertyName is not nameof(FileOperation.Status)
+            || op.Status is not FileOperation.OperationStatus.Completed)
+            return;
+
+        op.FilePath.CutState = DragDropEffects.None;
+
+        if (op.Device.ID == Data.DevicesObject.Current.ID
+            && op.TargetPath.ParentPath == Data.CurrentPath)
+        {
+            FileClass newFile = new(op.FilePath);
+            newFile.UpdatePath(op.TargetPath.FullPath);
+            Data.DirList.FileList.Add(newFile);
+
+            if (Data.FileOpQ.TotalCount == 1)
+                Data.ItemToSelect.Value = newFile;
+
+            FileActionLogic.UpdateFileActions();
+        }
+
+        op.PropertyChanged -= ExtractFileOp_PropertyChanged;
+    }
+
     public static void MoveItems(LogicalDeviceViewModel device,
                                  IEnumerable<FileClass> items,
                                  string targetPath,
@@ -319,15 +383,7 @@ public static class ShellFileOperation
     }
 
     public static async Task MakeDir(LogicalDeviceViewModel device, string fullPath)
-    {
-        var result = await ADBService.ExecuteVoidShellCommand(device.ID,
-                                                              CancellationToken.None,
-                                                              "mkdir",
-                                                              ["-p", ADBService.EscapeAdbShellString(fullPath)]);
-
-        if (!string.IsNullOrEmpty(result))
-            throw new Exception(result);
-    }
+        => await MakeDirs(device.ID, [fullPath]);
 
     public static async Task TryMakeDir(LogicalDeviceViewModel device, string fullPath)
     {
@@ -341,8 +397,11 @@ public static class ShellFileOperation
     }
 
     public static async Task MakeDirs(LogicalDeviceViewModel device, IEnumerable<string> paths)
+        => await MakeDirs(device.ID, paths);
+
+    public static async Task MakeDirs(string deviceId, IEnumerable<string> paths)
     {
-        var result = await ADBService.ExecuteVoidShellCommand(device.ID,
+        var result = await ADBService.ExecuteVoidShellCommand(deviceId,
                                                               CancellationToken.None,
                                                               "mkdir",
                                                               ["-p", .. paths.Select(path => ADBService.EscapeAdbShellString(path))]);
