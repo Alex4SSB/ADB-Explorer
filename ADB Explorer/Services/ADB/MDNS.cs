@@ -98,14 +98,22 @@ public class MDNS : ViewModelBase
     {
         Task.Run(() =>
         {
-            MdnsState newState;
-            try
+            MdnsState newState = ProbeMdnsState();
+
+            // Settings want mDNS, but the server was started without it (or with a backend that failed).
+            // Restart ADB once so the next server inherits ADB_MDNS_OPENSCREEN, instead of showing "down".
+            if (newState is MdnsState.NotRunning && Data.Settings.EnableMdns)
             {
-                newState = ADBService.CheckMDNS() ? MdnsState.Running : MdnsState.NotRunning;
-            }
-            catch
-            {
-                newState = MdnsState.NotRunning;
+                try
+                {
+                    ADBService.IsMdnsEnabled = true;
+                    ADBService.KillAdbServer(restart: true);
+                    newState = ProbeMdnsState();
+                }
+                catch
+                {
+                    newState = MdnsState.NotRunning;
+                }
             }
 
             App.SafeInvoke(() => State = newState);
@@ -118,6 +126,18 @@ public class MDNS : ViewModelBase
                 await Task.Delay(AdbExplorerConst.MDNS_STATUS_UPDATE_INTERVAL);
             }
         });
+    }
+
+    private static MdnsState ProbeMdnsState()
+    {
+        try
+        {
+            return ADBService.CheckMDNS() ? MdnsState.Running : MdnsState.NotRunning;
+        }
+        catch
+        {
+            return MdnsState.NotRunning;
+        }
     }
 
     public class PairingQrClass
