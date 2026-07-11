@@ -105,7 +105,10 @@
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <local:AdbAvalonEditor x:Name="EditorTextBox" EditorText="{Binding EditorText, Mode=TwoWay}" />
+                    <local:AdbAvalonEditor
+                        x:Name="EditorTextBox"
+                        EditorText="{Binding EditorText, Mode=TwoWay}"
+                        IsReadOnly="{Binding IsEditorReadOnly}" />
                     <local:AdbMenu
                         Margin="0,0,12,0"
                         HorizontalAlignment="Right"

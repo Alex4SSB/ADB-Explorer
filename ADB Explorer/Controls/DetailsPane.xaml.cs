@@ -103,6 +103,16 @@ public partial class DetailsPane : UserControl
         DependencyProperty.Register(nameof(EditorText), typeof(string),
           typeof(DetailsPane), new PropertyMetadata(null));
 
+    public bool IsEditorReadOnly
+    {
+        get => (bool)GetValue(IsEditorReadOnlyProperty);
+        set => SetValue(IsEditorReadOnlyProperty, value);
+    }
+
+    public static readonly DependencyProperty IsEditorReadOnlyProperty =
+        DependencyProperty.Register(nameof(IsEditorReadOnly), typeof(bool),
+          typeof(DetailsPane), new PropertyMetadata(false));
+
     public bool IsEditorFocused
     {
         get => (bool)GetValue(IsEditorFocusedProperty);
@@ -225,6 +235,7 @@ public partial class DetailsPane : UserControl
         }
 
         control.EditorText = null;
+        control.IsEditorReadOnly = false;
         control.PdfScrollViewer.Visibility = Visibility.Collapsed;
         control.PdfPagesControl.ItemsSource = null;
         control.IsPdfPasswordPromptVisible = false;
@@ -247,16 +258,20 @@ public partial class DetailsPane : UserControl
                 && file.Type is AbstractFile.FileType.File
                 && !AdbExplorerConst.COMMON_PHOTO_EXT.Contains(file.Extension, StringComparer.OrdinalIgnoreCase)
                 && !file.IsApk
+                && ArchiveHelper.GetFamily(file.FullName) is ArchiveFamily.None
                 && !file.IsLink
                 && file.Size / 1000 < Data.Settings.MaxPreviewFileSize)
             {
                 control.NoPreviewTextBlock.Visibility = Visibility.Collapsed;
 
+                var device = Data.DevicesObject.Current;
+                var deviceId = device?.ID ?? "";
+                control.IsEditorReadOnly = ArchiveHelper.IsMemberPreviewReadOnly(file.FullPath, deviceId);
+
                 if (file.Extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase))
                 {
                     var cts = new CancellationTokenSource();
                     control._cancellationToken = cts;
-                    var device = Data.DevicesObject.Current;
                     var fullPath = file.FullPath;
 
                     _ = Task.Run(async () =>
@@ -277,8 +292,7 @@ public partial class DetailsPane : UserControl
                 {
                     var cts = new CancellationTokenSource();
                     control._cancellationToken = cts;
-                    var device = Data.DevicesObject.Current;
-                    var fullPath = Data.SelectedFiles.First().FullPath;
+                    var fullPath = file.FullPath;
 
                     _ = Task.Run(async () =>
                     {
@@ -448,6 +462,9 @@ public partial class DetailsPane : UserControl
     {
         SaveCommand = new AsyncRelayCommand(async () =>
         {
+            if (IsEditorReadOnly)
+                return;
+
             var file = SelectedFiles.First() as FileClass;
             var result = await AdbHelper.WriteTextFileAsync(Data.DevicesObject.Current, file, EditorText, _cancellationToken.Token);
 

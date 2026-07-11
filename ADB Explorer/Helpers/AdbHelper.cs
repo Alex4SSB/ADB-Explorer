@@ -126,7 +126,8 @@ public static class AdbHelper
         }
         catch (Exception e)
         {
-            if (e is OperationCanceledException) return null;
+            if (e is OperationCanceledException || cancellationToken.IsCancellationRequested)
+                return null;
 
             App.SafeInvoke(() =>
                 DialogService.ShowMessage(e.Message,
@@ -140,6 +141,52 @@ public static class AdbHelper
     });
 
     public static async Task<MemoryStream?> ReadFileAsStreamAsync(LogicalDeviceViewModel device, string path, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (ArchivePath.TryParse(path, out var archivePath, out var internalPath, device.ID)
+                && !string.IsNullOrEmpty(internalPath))
+            {
+                return await ReadArchiveMemberAsStreamAsync(device, archivePath, internalPath, cancellationToken);
+            }
+
+            return await PullPathAsStreamAsync(device, path, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            return null;
+        }
+    }
+
+    private static async Task<MemoryStream?> ReadArchiveMemberAsStreamAsync(
+        LogicalDeviceViewModel device,
+        string archivePath,
+        string internalPath,
+        CancellationToken cancellationToken)
+    {
+        string? stagingRoot = null;
+        try
+        {
+            var (root, extractedPath, _) = ArchiveExtract.ExtractSelectionForPull(
+                device.ID,
+                archivePath,
+                internalPath,
+                isDirectory: false,
+                cancellationToken);
+            stagingRoot = root;
+            return await PullPathAsStreamAsync(device, extractedPath, cancellationToken);
+        }
+        finally
+        {
+            if (stagingRoot is not null)
+                ArchiveExtract.CleanupStaging(device.ID, stagingRoot, cancellationToken);
+        }
+    }
+
+    private static async Task<MemoryStream?> PullPathAsStreamAsync(
+        LogicalDeviceViewModel device,
+        string path,
+        CancellationToken cancellationToken)
     {
         MemoryStream stream = new();
         using (SyncService service = new(device.Device.DeviceData))
@@ -161,6 +208,14 @@ public static class AdbHelper
 
     public static MemoryStream? ReadFileAsStream(LogicalDeviceViewModel device, string path)
     {
+        if (ArchivePath.TryParse(path, out var archivePath, out var internalPath, device.ID)
+            && !string.IsNullOrEmpty(internalPath))
+        {
+            return ReadArchiveMemberAsStreamAsync(device, archivePath, internalPath, CancellationToken.None)
+                .GetAwaiter()
+                .GetResult();
+        }
+
         MemoryStream stream = new();
         using (SyncService service = new(device.Device.DeviceData))
         {
@@ -187,9 +242,56 @@ public static class AdbHelper
         await writer.FlushAsync(cancellationToken);
         stream.Position = 0;
 
+        if (ArchivePath.TryParse(file.FullPath, out var archivePath, out var internalPath, device.ID)
+            && !string.IsNullOrEmpty(internalPath))
+        {
+            await WriteArchiveMemberAsync(device, archivePath, internalPath, stream, file, cancellationToken);
+            return;
+        }
+
         using SyncService service = new(device.Device.DeviceData);
         await service.PushAsync(stream, file.FullPath, file.Permissions ?? (UnixFileMode)0x1ED, DateTime.Now, cancellationToken: cancellationToken); // 0x1ED = 0777 in octal
         SyncTransferTracker.AddPushBytes(stream.Length);
+    }
+
+    private static async Task WriteArchiveMemberAsync(
+        LogicalDeviceViewModel device,
+        string archivePath,
+        string internalPath,
+        MemoryStream content,
+        FileClass file,
+        CancellationToken cancellationToken)
+    {
+        if (ArchiveHelper.IsMemberPreviewReadOnly(file.FullPath, device.ID))
+            throw new InvalidOperationException(Strings.Resources.S_ARCHIVE_READ_ONLY);
+
+        var stagingRoot = ArchiveExtract.CreateStagingRoot(device.ID, cancellationToken);
+        try
+        {
+            var contentRoot = FileHelper.ConcatPaths(stagingRoot, "content");
+            var memberPath = FileHelper.ConcatPaths(contentRoot, internalPath);
+            var memberParent = FileHelper.GetParentPath(memberPath);
+            await ShellFileOperation.MakeDirs(device.ID, [memberParent]);
+
+            content.Position = 0;
+            using (SyncService service = new(device.Device.DeviceData))
+            {
+                await service.PushAsync(
+                    content,
+                    memberPath,
+                    file.Permissions ?? (UnixFileMode)0x1ED,
+                    DateTime.Now,
+                    cancellationToken: cancellationToken);
+                SyncTransferTracker.AddPushBytes(content.Length);
+            }
+
+            ArchiveExtract.UpdateZipMember(device.ID, archivePath, internalPath, contentRoot, cancellationToken);
+            ArchiveListing.InvalidateToc(archivePath);
+        }
+        finally
+        {
+            ArchiveExtract.CleanupStaging(device.ID, stagingRoot, cancellationToken);
+        }
     }
 
     public static async Task FetchDumpsysInfoAsync(LogicalDeviceViewModel device, Package package, CancellationToken cancellationToken = default)

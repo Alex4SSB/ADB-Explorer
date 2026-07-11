@@ -23,6 +23,24 @@ public partial class AdbAvalonEditor : UserControl
         DependencyProperty.Register("HasUnsavedChanges", typeof(bool),
           typeof(AdbAvalonEditor), new PropertyMetadata(false));
 
+    public bool IsReadOnly
+    {
+        get => (bool)GetValue(IsReadOnlyProperty);
+        set => SetValue(IsReadOnlyProperty, value);
+    }
+
+    public static readonly DependencyProperty IsReadOnlyProperty =
+        DependencyProperty.Register(nameof(IsReadOnly), typeof(bool),
+          typeof(AdbAvalonEditor), new PropertyMetadata(false, OnIsReadOnlyChanged));
+
+    private static void OnIsReadOnlyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var control = (AdbAvalonEditor)d;
+        control.EditorTextBox.IsReadOnly = (bool)e.NewValue;
+        if ((bool)e.NewValue)
+            control.HasUnsavedChanges = false;
+    }
+
     public string EditorText
     {
         get => (string)GetValue(EditorTextProperty);
@@ -112,7 +130,7 @@ public partial class AdbAvalonEditor : UserControl
 
     private void EditorTextBox_TextChanged(object sender, EventArgs e)
     {
-        if (_updatingText)
+        if (_updatingText || IsReadOnly)
             return;
 
         _updatingText = true;

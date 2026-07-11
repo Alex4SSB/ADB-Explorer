@@ -4,6 +4,7 @@ using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.Strings;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using static ADB_Explorer.Models.AbstractFile;
@@ -123,6 +124,32 @@ public class ArchiveCapabilityTests
 
         ShellCommands.DeviceCommands[DeviceId] = MakeCommands(unzipExists: true, zipExists: true);
         Assert.AreEqual(Resources.S_ARCHIVE_CAN_MODIFY, ArchiveHelper.GetArchiveModificationTooltip("archive.zip", DeviceId));
+    }
+
+    [TestMethod]
+    public void IsMemberPreviewReadOnly_MatchesArchiveWritability()
+    {
+        const string zipMember = "/sdcard/archive.zip/readme.txt";
+        const string tarMember = "/sdcard/backup.tar/readme.txt";
+        const string tgzMember = "/sdcard/backup.tgz/readme.txt";
+
+        Assert.IsFalse(ArchiveHelper.IsMemberPreviewReadOnly("/sdcard/readme.txt", DeviceId));
+
+        // Zip without zip tool → archive RO → preview RO
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(unzipExists: true);
+        Assert.IsTrue(ArchiveHelper.IsMemberPreviewReadOnly(zipMember, DeviceId));
+
+        // Zip with zip+unzip → editable preview
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(unzipExists: true, zipExists: true);
+        Assert.IsFalse(ArchiveHelper.IsMemberPreviewReadOnly(zipMember, DeviceId));
+
+        // Tar append-capable still cannot replace members from preview
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(tarExists: true, tarAppendSupported: true);
+        Assert.IsTrue(ArchiveHelper.IsMemberPreviewReadOnly(tarMember, DeviceId));
+
+        // Compressed tar is RO
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(tarExists: true, tarAppendSupported: true);
+        Assert.IsTrue(ArchiveHelper.IsMemberPreviewReadOnly(tgzMember, DeviceId));
     }
 
     [TestMethod]
@@ -425,6 +452,30 @@ public class ArchivePathTests
 
         var stat = ArchiveListing.GetFileStats("/sdcard/a.tar", "", entries).First();
         Assert.AreEqual(expected, stat.Permissions);
+    }
+
+    [TestMethod]
+    public void ParseTar_ReadsDateWithSeconds()
+    {
+        // Older Android/BusyBox tar -tv always includes seconds (newer toybox needs --full-time).
+        const string stdout = "-rw-r--r-- root/root      1234 2025-11-01 16:40:16 README\n";
+
+        var entries = ArchiveListing.ParseListing(stdout, ArchiveFamily.Tar);
+
+        Assert.HasCount(1, entries);
+        Assert.AreEqual(new DateTime(2025, 11, 1, 16, 40, 16), entries[0].Modified);
+        Assert.AreEqual("README", entries[0].Path);
+    }
+
+    [TestMethod]
+    public void ParseTar_ReadsDateWithoutSeconds()
+    {
+        const string stdout = "-rw-r--r-- root/root      1234 2025-11-01 16:40 README\n";
+
+        var entries = ArchiveListing.ParseListing(stdout, ArchiveFamily.Tar);
+
+        Assert.HasCount(1, entries);
+        Assert.AreEqual(new DateTime(2025, 11, 1, 16, 40, 0), entries[0].Modified);
     }
 
     [TestMethod]

@@ -66,6 +66,24 @@ public static class ArchiveHelper
         => !ArchivePath.IsArchivePath(path, deviceId)
         || CanModify(FileHelper.GetFullName(ArchivePath.GetArchivePath(path, deviceId)), deviceId);
 
+    /// <summary>
+    /// Whether preview of an archive member should be read-only.
+    /// True when the archive/drive is read-only, or when member update is unsupported (non-zip).
+    /// Non-archive paths always return <see langword="false"/>.
+    /// </summary>
+    public static bool IsMemberPreviewReadOnly(string path, string deviceId)
+    {
+        if (!ArchivePath.TryParse(path, out var archivePath, out var internalPath, deviceId)
+            || string.IsNullOrEmpty(internalPath))
+            return false;
+
+        if (!DriveHelper.IsModificationAllowedAt(path, deviceId))
+            return true;
+
+        // Zip can replace a member (<c>zip -u</c>); tar append cannot update in place.
+        return GetFamily(archivePath) is not ArchiveFamily.Zip;
+    }
+
     public static bool IsNavigableArchive(string fileName, string deviceId)
         => GetFamily(fileName) is not ArchiveFamily.None && CanBrowse(fileName, deviceId);
 

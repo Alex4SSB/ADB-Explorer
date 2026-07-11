@@ -125,6 +125,47 @@ public static class ArchiveExtract
     }
 
     /// <summary>
+    /// Replaces a zip archive member from a file under <paramref name="contentRoot"/> whose
+    /// relative path is <paramref name="internalPath"/> (<c>cd contentRoot &amp;&amp; zip -uq archive member</c>).
+    /// </summary>
+    public static void UpdateZipMember(
+        string deviceId,
+        string archivePath,
+        string internalPath,
+        string contentRoot,
+        CancellationToken cancellationToken = default)
+    {
+        internalPath = ArchivePath.NormalizeInternal(internalPath);
+        if (string.IsNullOrEmpty(internalPath))
+            throw new InvalidOperationException("Cannot update the archive root.");
+
+        if (ArchiveHelper.GetFamily(archivePath) is not ArchiveFamily.Zip)
+            throw new InvalidOperationException($"Cannot update member in non-zip archive: {archivePath}");
+
+        if (!ArchiveHelper.CanModify(FileHelper.GetFullName(archivePath), deviceId))
+            throw new InvalidOperationException($"Archive is read-only: {archivePath}");
+
+        var zip = ShellCommands.TranslateCommand("zip");
+        var archiveEsc = ADBService.EscapeAdbShellString(archivePath);
+        var rootEsc = ADBService.EscapeAdbShellString(contentRoot);
+        var memberEsc = ADBService.EscapeAdbShellString(internalPath);
+
+        // Info-ZIP: update (or add) member from a file whose path relative to cwd matches the archive path.
+        var script = $"cd {rootEsc} && {zip} -uq {archiveEsc} {memberEsc}";
+        var exitCode = ADBService.ExecuteDeviceAdbShellCommand(
+            deviceId,
+            "sh",
+            out var stdout,
+            out var stderr,
+            cancellationToken,
+            "-c",
+            ADBService.EscapeAdbShellString(script));
+
+        if (exitCode != 0)
+            throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
+    }
+
+    /// <summary>
     /// Extracts a selection into a staging folder as <c>{stagingOutDir}/{outputName}</c>
     /// and returns that path plus a <see cref="FolderTree"/> listing for pull descriptors.
     /// Caller must <see cref="CleanupStaging"/> the returned staging root.
@@ -145,37 +186,45 @@ public static class ArchiveExtract
             throw new InvalidOperationException($"Unsupported archive: {archivePath}");
 
         var stagingRoot = CreateStagingRoot(deviceId, cancellationToken);
-        var contentRoot = FileHelper.ConcatPaths(stagingRoot, "content");
-        var outRoot = FileHelper.ConcatPaths(stagingRoot, "out");
-        ShellFileOperation.MakeDirs(deviceId, [contentRoot, outRoot]).GetAwaiter().GetResult();
-
-        ExtractMembers(deviceId, family, archivePath, internalPath, isDirectory, contentRoot, cancellationToken);
-
-        var extractedContent = FileHelper.ConcatPaths(contentRoot, internalPath);
-        var outputName = GetOutputName(internalPath);
-        var extractedPath = FileHelper.ConcatPaths(outRoot, outputName);
-
-        var moveResult = ADBService.ExecuteDeviceAdbShellCommand(
-            deviceId,
-            "mv",
-            out var stdout,
-            out var stderr,
-            cancellationToken,
-            ADBService.EscapeAdbShellString(extractedContent),
-            ADBService.EscapeAdbShellString(extractedPath));
-
-        if (moveResult != 0)
+        try
         {
-            CleanupStaging(deviceId, stagingRoot, cancellationToken);
-            throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
+            var contentRoot = FileHelper.ConcatPaths(stagingRoot, "content");
+            var outRoot = FileHelper.ConcatPaths(stagingRoot, "out");
+            ShellFileOperation.MakeDirs(deviceId, [contentRoot, outRoot]).GetAwaiter().GetResult();
+
+            ExtractMembers(deviceId, family, archivePath, internalPath, isDirectory, contentRoot, cancellationToken);
+
+            var extractedContent = FileHelper.ConcatPaths(contentRoot, internalPath);
+            var outputName = GetOutputName(internalPath);
+            var extractedPath = FileHelper.ConcatPaths(outRoot, outputName);
+
+            var moveResult = ADBService.ExecuteDeviceAdbShellCommand(
+                deviceId,
+                "mv",
+                out var stdout,
+                out var stderr,
+                cancellationToken,
+                ADBService.EscapeAdbShellString(extractedContent),
+                ADBService.EscapeAdbShellString(extractedPath));
+
+            if (moveResult != 0)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
+            }
+
+            // Prefer listing the extracted filesystem so nested dirs are not mistaken for empty files.
+            var tree = isDirectory
+                ? FileHelper.GetFolderTree([extractedPath], cancellationToken: cancellationToken)
+                : [];
+
+            return (stagingRoot, extractedPath, tree);
         }
-
-        // Prefer listing the extracted filesystem so nested dirs are not mistaken for empty files.
-        var tree = isDirectory
-            ? FileHelper.GetFolderTree([extractedPath], cancellationToken: cancellationToken)
-            : [];
-
-        return (stagingRoot, extractedPath, tree);
+        catch
+        {
+            CleanupStaging(deviceId, stagingRoot, CancellationToken.None);
+            throw;
+        }
     }
 
     public static FolderTree[] GetArchiveFolderTree(
@@ -243,7 +292,11 @@ public static class ArchiveExtract
         };
 
         if (exitCode != 0)
+        {
+            // ExecuteCommand returns -1 on cancel instead of throwing; don't surface that as extract failure.
+            cancellationToken.ThrowIfCancellationRequested();
             throw new IOException($"Failed to extract from {archivePath}");
+        }
     }
 
     private static int ExtractTar(

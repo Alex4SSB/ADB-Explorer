@@ -18,11 +18,16 @@ internal class DriveHelper
         if (AdbLocation.LocationFromString(path) is not Navigation.SpecialLocation.None)
             return null;
 
+        var drives = Data.DevicesObject?.Current?.Drives;
+        if (drives is null)
+            return null;
+
         // First search for a non-root drive that matches the path
-        var nonRoot = Data.DevicesObject.Current?.Drives.FirstOrDefault(d =>
+        var nonRoot = drives.FirstOrDefault(d =>
             d.Type is not AbstractDrive.DriveType.Root && IsOnDrive(path, d));
+
         if (nonRoot is null)
-            return Data.DevicesObject.Current?.Drives.FirstOrDefault(d => d.Type is AbstractDrive.DriveType.Root);
+            return drives.FirstOrDefault(d => d.Type is AbstractDrive.DriveType.Root);
 
         return nonRoot;
     }

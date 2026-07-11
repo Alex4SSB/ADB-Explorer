@@ -139,6 +139,9 @@ public static class ArchiveListing
     public static ArchiveToc GetOrFetchToc(string deviceId, string archivePath, CancellationToken cancellationToken)
         => TocCache.GetOrAdd(archivePath, key => FetchTableOfContents(deviceId, key, cancellationToken));
 
+    public static void InvalidateToc(string archivePath)
+        => TocCache.TryRemove(archivePath, out _);
+
     private static List<ArchiveEntry> ParseTar(string stdout)
     {
         var result = new List<ArchiveEntry>();
@@ -153,14 +156,28 @@ public static class ArchiveListing
             var isDirectory = mode[0] is 'd' || rawName.EndsWith('/');
 
             long.TryParse(match.Groups["Size"].Value, out var size);
-            DateTime? modified = DateTime.TryParseExact(match.Groups["Date"].Value, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt) 
-                ? dt : null;
+            var modified = TryParseListDate(match.Groups["Date"].Value);
             var permissions = ParseTarMode(mode);
 
             result.Add(new ArchiveEntry(rawName.TrimEnd('/'), isDirectory, size, modified, Permissions: permissions));
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Toybox without <c>--full-time</c>: <c>yyyy-MM-dd HH:mm</c>.
+    /// Older Android/BusyBox and toybox with <c>--full-time</c>: <c>yyyy-MM-dd HH:mm:ss</c>.
+    /// </summary>
+    private static DateTime? TryParseListDate(string text)
+    {
+        if (DateTime.TryParseExact(text, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out var withSeconds))
+            return withSeconds;
+
+        if (DateTime.TryParseExact(text, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var withoutSeconds))
+            return withoutSeconds;
+
+        return null;
     }
 
     private static ArchiveToc ParseZip(string stdout)
@@ -185,10 +202,7 @@ public static class ArchiveListing
             var method = match.Groups["Method"].Value;
             var ratio = match.Groups["Ratio"].Value;
             var crc = match.Groups["Crc"].Value;
-            var dateText = match.Groups["Date"].Value;
-            DateTime? modified = DateTime.TryParseExact(dateText, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt) 
-                ? dt 
-                : null;
+            var modified = TryParseListDate(match.Groups["Date"].Value);
 
             result.Add(new ArchiveEntry(
                 rawName.TrimEnd('/'),
