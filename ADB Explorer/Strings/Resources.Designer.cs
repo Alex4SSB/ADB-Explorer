@@ -3107,6 +3107,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Syntax.
+        /// </summary>
+        public static string S_PREVIEW_SYNTAX {
+            get {
+                return ResourceManager.GetString("S_PREVIEW_SYNTAX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatic.
+        /// </summary>
+        public static string S_PREVIEW_SYNTAX_AUTOMATIC {
+            get {
+                return ResourceManager.GetString("S_PREVIEW_SYNTAX_AUTOMATIC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Privacy Policy.
         /// </summary>
         public static string S_PRIVACY_POLICY {

@@ -3,6 +3,7 @@ using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
+using ICSharpCode.AvalonEdit.Highlighting;
 using System.Windows.Media.Animation;
 using Windows.Data.Pdf;
 using Windows.Storage.Streams;
@@ -14,7 +15,20 @@ namespace ADB_Explorer.Controls;
 /// </summary>
 public partial class DetailsPane : UserControl
 {
+    public sealed class PreviewSyntaxOption(string displayName, string? highlightingName, bool disableHighlighting = false)
+    {
+        public string DisplayName { get; } = displayName;
+
+        /// <summary>Null means Automatic (pick by file extension) unless <see cref="DisableHighlighting"/>.</summary>
+        public string? HighlightingName { get; } = highlightingName;
+
+        /// <summary>When true, no syntax highlighting is applied (the None option).</summary>
+        public bool DisableHighlighting { get; } = disableHighlighting;
+    }
+
     private DriveViewModel? _mountOptionsDrive;
+    private string? _previewFileExtension;
+    private bool _updatingSyntaxSelection;
 
     public enum SidePaneMode
     {
@@ -101,7 +115,16 @@ public partial class DetailsPane : UserControl
 
     public static readonly DependencyProperty EditorTextProperty =
         DependencyProperty.Register(nameof(EditorText), typeof(string),
-          typeof(DetailsPane), new PropertyMetadata(null));
+          typeof(DetailsPane), new PropertyMetadata(null, OnEditorTextChanged));
+
+    private static void OnEditorTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is not DetailsPane pane)
+            return;
+
+        pane.UpdateSyntaxSelectorVisibility();
+        pane.ApplyPreviewSyntaxHighlighting();
+    }
 
     public bool IsEditorReadOnly
     {
@@ -112,6 +135,46 @@ public partial class DetailsPane : UserControl
     public static readonly DependencyProperty IsEditorReadOnlyProperty =
         DependencyProperty.Register(nameof(IsEditorReadOnly), typeof(bool),
           typeof(DetailsPane), new PropertyMetadata(false));
+
+    public PreviewSyntaxOption? SelectedSyntax
+    {
+        get => (PreviewSyntaxOption?)GetValue(SelectedSyntaxProperty);
+        set => SetValue(SelectedSyntaxProperty, value);
+    }
+
+    public static readonly DependencyProperty SelectedSyntaxProperty =
+        DependencyProperty.Register(nameof(SelectedSyntax), typeof(PreviewSyntaxOption),
+          typeof(DetailsPane), new PropertyMetadata(null, OnSelectedSyntaxChanged));
+
+    public bool IsSyntaxSelectorVisible
+    {
+        get => (bool)GetValue(IsSyntaxSelectorVisibleProperty);
+        private set => SetValue(IsSyntaxSelectorVisibleProperty, value);
+    }
+
+    public static readonly DependencyProperty IsSyntaxSelectorVisibleProperty =
+        DependencyProperty.Register(nameof(IsSyntaxSelectorVisible), typeof(bool),
+          typeof(DetailsPane), new PropertyMetadata(false));
+
+    public IReadOnlyList<PreviewSyntaxOption> SyntaxOptions { get; } = BuildSyntaxOptions();
+
+    private static IReadOnlyList<PreviewSyntaxOption> BuildSyntaxOptions()
+    {
+        var automatic = new PreviewSyntaxOption(Strings.Resources.S_PREVIEW_SYNTAX_AUTOMATIC, null);
+        var none = new PreviewSyntaxOption(Strings.Resources.S_DISABLED, null, disableHighlighting: true);
+        var named = HighlightingManager.Instance.HighlightingDefinitions
+            .OrderBy(d => d.Name, StringComparer.OrdinalIgnoreCase)
+            .Select(d => new PreviewSyntaxOption(d.Name, d.Name));
+        return [automatic, none, .. named];
+    }
+
+    private static void OnSelectedSyntaxChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is not DetailsPane pane || pane._updatingSyntaxSelection)
+            return;
+
+        pane.ApplyPreviewSyntaxHighlighting();
+    }
 
     public bool IsEditorFocused
     {
@@ -236,6 +299,10 @@ public partial class DetailsPane : UserControl
 
         control.EditorText = null;
         control.IsEditorReadOnly = false;
+        control.ResetSyntaxToAutomatic();
+        control._previewFileExtension = null;
+        control.UpdateSyntaxSelectorVisibility();
+        control.ApplyPreviewSyntaxHighlighting();
         control.PdfScrollViewer.Visibility = Visibility.Collapsed;
         control.PdfPagesControl.ItemsSource = null;
         control.IsPdfPasswordPromptVisible = false;
@@ -267,9 +334,13 @@ public partial class DetailsPane : UserControl
                 var device = Data.DevicesObject.Current;
                 var deviceId = device?.ID ?? "";
                 control.IsEditorReadOnly = ArchiveHelper.IsMemberPreviewReadOnly(file.FullPath, deviceId);
+                control._previewFileExtension = file.Extension;
+                control.UpdateSyntaxSelectorVisibility();
+                control.ApplyPreviewSyntaxHighlighting();
 
                 if (file.Extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase))
                 {
+                    control.IsSyntaxSelectorVisible = false;
                     var cts = new CancellationTokenSource();
                     control._cancellationToken = cts;
                     var fullPath = file.FullPath;
@@ -493,6 +564,8 @@ public partial class DetailsPane : UserControl
 
         InitializeComponent();
 
+        SelectedSyntax = SyntaxOptions[0];
+
         ContentBox.Width = Data.Settings.DetailsPaneWidth;
 
         EditorTextBox.IsKeyboardFocusWithinChanged += (s, e) =>
@@ -510,6 +583,38 @@ public partial class DetailsPane : UserControl
         };
 
         OnSelectedFilesChanged(this, new DependencyPropertyChangedEventArgs(SelectedFilesProperty, null, SelectedFiles));
+    }
+
+    private void ResetSyntaxToAutomatic()
+    {
+        _updatingSyntaxSelection = true;
+        SelectedSyntax = SyntaxOptions[0];
+        _updatingSyntaxSelection = false;
+    }
+
+    private void UpdateSyntaxSelectorVisibility()
+    {
+        IsSyntaxSelectorVisible = EditorText is not null && Mode is SidePaneMode.Preview;
+    }
+
+    private void ApplyPreviewSyntaxHighlighting()
+    {
+        if (EditorTextBox is null)
+            return;
+
+        if (EditorText is null || SelectedSyntax?.DisableHighlighting is true)
+        {
+            EditorTextBox.SetSyntaxHighlighting(null);
+            return;
+        }
+
+        IHighlightingDefinition? definition = null;
+        if (SelectedSyntax?.HighlightingName is { } name)
+            definition = HighlightingManager.Instance.GetDefinition(name);
+        else if (!string.IsNullOrEmpty(_previewFileExtension))
+            definition = HighlightingManager.Instance.GetDefinitionByExtension(_previewFileExtension);
+
+        EditorTextBox.SetSyntaxHighlighting(definition);
     }
 
     public static bool IsPreviewAllowed() => !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive && !Data.FileActions.IsDriveViewVisible;

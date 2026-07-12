@@ -1890,6 +1890,14 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Max File Size For Preview</value>
     <comment>The maximum size of a file for preview</comment>
   </data>
+  <data name="S_PREVIEW_SYNTAX" xml:space="preserve">
+    <value>Syntax</value>
+    <comment>Label for the syntax highlighting language selector in the preview pane</comment>
+  </data>
+  <data name="S_PREVIEW_SYNTAX_AUTOMATIC" xml:space="preserve">
+    <value>Automatic</value>
+    <comment>Combo box item that picks highlighting from the file extension</comment>
+  </data>
   <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
     <value>Pull To Default Folder On File Double Click</value>
     <comment>The setting that enables pulling a file to the default folder on double click</comment>

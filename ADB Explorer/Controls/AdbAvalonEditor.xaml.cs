@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
+using ICSharpCode.AvalonEdit.Highlighting;
 using Wpf.Ui.Appearance;
 
 namespace ADB_Explorer.Controls;
@@ -81,6 +82,9 @@ public partial class AdbAvalonEditor : UserControl
     {
         InitializeComponent();
 
+        EditorTextBox.Options.EnableHyperlinks = false;
+        EditorTextBox.Options.EnableEmailHyperlinks = false;
+
         EditorTextBox.TextChanged += EditorTextBox_TextChanged;
         EditorTextBox.TextArea.ContextMenu = (ContextMenu)FindResource("TextBoxContextMenu");
         EditorTextBox.TextArea.ContextMenuOpening += EditorTextBox_ContextMenuOpening;
@@ -94,12 +98,18 @@ public partial class AdbAvalonEditor : UserControl
         ApplicationThemeManager.Changed += (_, _) => ApplyEditorTheme(ApplicationThemeManager.GetAppTheme());
     }
 
+    public void SetSyntaxHighlighting(IHighlightingDefinition? definition)
+        => EditorTextBox.SyntaxHighlighting = definition;
+
     private void ApplyEditorTheme(ApplicationTheme theme)
     {
         bool isDark = theme == ApplicationTheme.Dark;
         EditorTextBox.TextArea.SelectionBrush = new SolidColorBrush(
             isDark ? Color.FromArgb(0x7F, 0x77, 0x77, 0x77) : Color.FromArgb(0xFF, 0xCC, 0xE8, 0xFF));
         EditorTextBox.TextArea.SelectionForeground = null;
+
+        // ThemeAwareHighlightingColorizer reads the theme per paint; force a redraw.
+        EditorTextBox.TextArea.TextView.Redraw();
     }
 
     private void EditorTextBox_ContextMenuOpening(object sender, ContextMenuEventArgs e)
