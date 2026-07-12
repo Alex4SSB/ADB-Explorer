@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -307,7 +307,7 @@ Aby zatwierdzić ADB, otwórz ustawienia zaawansowane WSA.</value>
     <value>Przejdź do informacji o wydaniu</value>
   </data>
   <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
-    <value>Zaktualizowana polityka prywatności</value>
+    <value>Zaktualizowano polityke prywatności</value>
   </data>
   <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
     <value>Ta wersja aplikacji została wydana po aktualizacji polityki prywatności.
@@ -531,9 +531,9 @@ Widoczna zawartość może być niekompletna.</value>
     <comment>Title of the dialog asking packaged users where to store app data</comment>
   </data>
   <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
-    <value>This app distribution saves data in a virtualized (and hard to reach) location, which is cleared on app uninstall.
+    <value>Ta dystrybucja aplikacji zapisuje dane w wirtualizowanej (i ciężko do dostania się) lokalizacji, which is cleared on app uninstall.
 
-Select Custom to use a location that will not be removed on uninstall. The custom location cannot be under C:\Users\…\AppData</value>
+Zaznacz Niestandardową lokalizacje która nie będzie usunięta podczas dezinstalacji. Niestandardowa lokalizacja nie może być w C:\Users\…\AppData</value>
     <comment>Explains virtualized vs custom app data location for packaged installs</comment>
   </data>
   <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
@@ -1608,15 +1608,24 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
     <value>Sparuj</value>
   </data>
   <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
-    <value>Kill ADB When App Closes</value>
+    <value>Zabij process ADB przy zamknięciu aplikacji</value>
     <comment>The setting that enables killing ADB server when closing the app</comment>
   </data>
   <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
-    <value>The custom location cannot be under C:\Users\…\AppData - please select another location</value>
+    <value>Niestandardowa lokalizacja nie może być w C:\Users\…\AppData - proszę zaznaczyć inną lokalizacje</value>
     <comment>An error displayed when choosing a wrong custom app data location</comment>
   </data>
   <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
     <value>Allow ADB From Untrusted Sources</value>
     <comment>The setting that allows using ADB without integrity checks and without path restrictions</comment>
+  </data>
+  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
+    <value>Zaznaczony element nie może zostać zmodyfikowany</value>
+  </data>
+  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
+    <value>Metoda</value>
+  </data>
+  <data name="S_OPEN_FOLDER" xml:space="preserve">
+    <value>Otwórz</value>
   </data>
 </root>
