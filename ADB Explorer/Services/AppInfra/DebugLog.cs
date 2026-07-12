@@ -4,13 +4,28 @@ public static class DebugLog
 {
     private static readonly Mutex mutex = new();
 
+    // usable only on a dev machine, where the log dir exists
+    private static readonly bool logPathUsable =
+        !string.IsNullOrEmpty(Properties.AppGlobal.DragDropLogPath)
+        && Directory.Exists(Path.GetDirectoryName(Properties.AppGlobal.DragDropLogPath));
+
     public static void PrintLine(string message)
     {
-        mutex.WaitOne();
-        
-        if (!string.IsNullOrEmpty(Properties.AppGlobal.DragDropLogPath))
-            File.AppendAllText(Properties.AppGlobal.DragDropLogPath, $"{DateTime.Now:HH:mm:ss:fff} | {message}\n");
+        if (!logPathUsable)
+            return;
 
-        mutex.ReleaseMutex();
+        mutex.WaitOne();
+        try
+        {
+            File.AppendAllText(Properties.AppGlobal.DragDropLogPath, $"{DateTime.Now:HH:mm:ss:fff} | {message}\n");
+        }
+        catch (SystemException)
+        {
+            // never crash over a log write
+        }
+        finally
+        {
+            mutex.ReleaseMutex();
+        }
     }
 }

@@ -127,6 +127,7 @@
                     <local:SearchBox
                         x:Name="SearchBox"
                         Grid.Column="2"
+                        Committed="SearchBox_Committed"
                         IsExpanded="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsSearchBoxFocused, Mode=TwoWay}"
                         Style="{StaticResource SearchBoxStyle}" />
                 </Grid>
@@ -403,6 +404,20 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
+                            <DataGridTextColumn
+                                x:Name="SearchLocation"
+                                Width="240"
+                                Binding="{Binding ParentPath}"
+                                FontSize="{Binding Source={StaticResource FontSize}}"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_LOCATION}}"
+                                IsReadOnly="True"
+                                Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.SearchColumnVisibility}">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
+                                        <Setter Property="FlowDirection" Value="LeftToRight" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
                             <DataGridTextColumn
                                 x:Name="OriginalPath"
                                 Width="180"

@@ -161,10 +161,17 @@ public partial class App
         AppCulture.ApplyThreadCultures();
 
 #if !DEPLOY
-        if (!File.Exists(ADB_Explorer.Properties.AppGlobal.DragDropLogPath))
+        // the drag-drop log dir only exists on a dev machine; don't let it block startup
+        try
         {
-            File.WriteAllText(ADB_Explorer.Properties.AppGlobal.DragDropLogPath, "");
+            if (Directory.Exists(Path.GetDirectoryName(ADB_Explorer.Properties.AppGlobal.DragDropLogPath))
+                && !File.Exists(ADB_Explorer.Properties.AppGlobal.DragDropLogPath))
+            {
+                File.WriteAllText(ADB_Explorer.Properties.AppGlobal.DragDropLogPath, "");
+            }
         }
+        catch (SystemException)
+        { }
 #endif
 
         ClearFoldersInAppData();

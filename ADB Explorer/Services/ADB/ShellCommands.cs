@@ -80,7 +80,9 @@ public static class ShellCommands
 
     public static string[] Commands => Enum.GetNames<ShellCmd>();
 
-    public static Dictionary<string, DeviceShellCommands> DeviceCommands { get; set; } = [];
+    // Concurrent: written on thread-pool threads by FindCommands and read concurrently elsewhere (incl. the
+    // auto-open capability-probe wait), so a plain Dictionary would risk torn reads / corruption on connect.
+    public static ConcurrentDictionary<string, DeviceShellCommands> DeviceCommands { get; set; } = new();
 
     public static bool FindExists(string deviceId)
         => !DeviceCommands.TryGetValue(deviceId, out var commands) || commands.FindExists;

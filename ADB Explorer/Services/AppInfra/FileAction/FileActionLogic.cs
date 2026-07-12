@@ -294,7 +294,7 @@ internal static class FileActionLogic
         if (Data.FileActions.IsArchive)
             return false;
 
-        if (Data.CurrentDrive?.Restrictions.ReadOnly is true)
+        if (CurrentPathRestrictions().ReadOnly)
             return false;
 
         string[] files = Data.CopyPaste.Files;
@@ -358,7 +358,7 @@ internal static class FileActionLogic
         if (Data.FileActions.IsArchive)
             return false;
 
-        if (Data.CurrentDrive?.Restrictions.ReadOnly is true)
+        if (CurrentPathRestrictions().ReadOnly)
             return false;
 
         string[] files = Data.CopyPaste.Files;
@@ -485,14 +485,26 @@ internal static class FileActionLogic
         return fromArchive ? result : result | DragDropEffects.Move;
     }
 
+    /// <summary>Restrictions of the current location (archive-aware), falling back to the drive.</summary>
+    public static DriveRestrictions CurrentPathRestrictions()
+        => Data.DirList?.CurrentPath is { } path
+            ? DriveHelper.GetPathRestrictions(path, Data.DevicesObject?.Current?.ID)
+            : Data.CurrentDrive?.Restrictions ?? DriveRestrictions.None;
+
+    /// <summary>Restrictions of the selection's own mount, which in search results can differ from the folder's.</summary>
+    private static DriveRestrictions SelectionRestrictions()
+        => Data.FileActions.IsExplorerSearchResults && Data.SelectedFiles.FirstOrDefault() is { } selected
+            ? DriveHelper.GetPathRestrictions(selected.ParentPath, Data.DevicesObject?.Current?.ID)
+            : CurrentPathRestrictions();
+
     private static void UpdatePastingRestrictions(string targetPath, string[] files)
     {
-        var restrictions = DriveHelper.GetCurrentDrive(targetPath)?.Restrictions ?? DriveRestrictions.None;
+        var restrictions = DriveHelper.GetPathRestrictions(targetPath);
 
         if (Data.FileActions.IsAppDrive)
         {
             Data.FileActions.IsPastingIllegalNaming = Data.CopyPaste.IsSelf
-                && (DriveHelper.GetCurrentDrive(files[0])?.Restrictions.RestrictedNaming is true);
+                && DriveHelper.GetPathRestrictions(files[0]).RestrictedNaming;
             return;
         }
 
@@ -563,7 +575,7 @@ internal static class FileActionLogic
         var name = FileHelper.DisplayName(textBox);
 
         if (!vm.IsRenameUnixLegal
-            || (Data.CurrentDrive?.Restrictions.RestrictedNaming is true && !vm.IsRenameNamingLegal)
+            || (SelectionRestrictions().RestrictedNaming && !vm.IsRenameNamingLegal)
             || !vm.IsRenameUnique)
         {
             return;
@@ -682,10 +694,19 @@ internal static class FileActionLogic
         Data.RuntimeSettings.LocationToNavigate = new(Data.CurrentPath);
     }
 
+    private static long _lastDriveRefreshTick;
+
     public static void RefreshDrives(bool asyncClassify, CancellationToken cancellationToken)
     {
         if (Data.DevicesObject.Current is null)
             return;
+
+        // Debounce overlapping refreshes: at startup the device poll and the navigation both trigger this
+        // within milliseconds, doubling every drive command (df/find/pm) and its UI update. They describe the
+        // same drive state, so collapse near-simultaneous calls into one. The 2s poll is never affected.
+        if (Environment.TickCount64 - _lastDriveRefreshTick < 300)
+            return;
+        _lastDriveRefreshTick = Environment.TickCount64;
 
         if (!asyncClassify && Data.DevicesObject.Current.Drives?.Count > 0 && !Data.FileActions.IsExplorerVisible)
             asyncClassify = true;
@@ -861,13 +882,19 @@ internal static class FileActionLogic
                                                && Data.SelectedFiles.First().IsLink
                                                && Data.SelectedFiles.First().Type is not FileType.BrokenLink;
 
-        var restrictions = Data.CurrentDrive?.Restrictions ?? DriveRestrictions.None;
+        var restrictions = CurrentPathRestrictions();
+        var selectionRestrictions = SelectionRestrictions();
         var deviceId = Data.DevicesObject?.Current?.ID;
         if (deviceId is not null && Data.DirList?.CurrentPath is { } currentPath)
             Data.FileActions.IsArchive = ArchivePath.IsArchivePath(currentPath, deviceId);
 
         var isWritable = restrictions.ReadOnly is not true
             && Data.DirList?.CurrentLocation?.CanWriteLocation == true;
+
+        // in search results, gate on the selected item's mount (its access isn't probed per-item)
+        var isSelectionWritable = Data.FileActions.IsExplorerSearchResults && Data.SelectedFiles.Any()
+            ? !selectionRestrictions.ReadOnly
+            : isWritable;
         var isExplorerFolder = Data.FileActions.IsExplorerVisible
             && !Data.FileActions.IsRecycleBin
             && !Data.FileActions.IsAppDrive
@@ -886,7 +913,7 @@ internal static class FileActionLogic
         }
         else
         {
-            Data.FileActions.DeleteEnabled = isWritable
+            Data.FileActions.DeleteEnabled = isSelectionWritable
                 && !SelectionIsFuseProtectedAndroidRoot
                 && Data.SelectedFiles.Any() && Data.FileActions.IsRegularItem
                 && (!Data.FileActions.IsFollowLinkEnabled || HasRootShell);
@@ -918,7 +945,7 @@ internal static class FileActionLogic
             && Data.SelectedFiles.Any()
             && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.RestrictedNaming);
         Data.FileActions.IsSelectionIllegalOnWinRoot = Data.SelectedFiles.Any() && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.WinRoot);
-        Data.FileActions.IsSelectionConflictingNames = restrictions.CaseInsensitiveNames
+        Data.FileActions.IsSelectionConflictingNames = selectionRestrictions.CaseInsensitiveNames
             && Data.SelectedFiles.Select(f => f.FullName).Distinct(StringComparer.InvariantCultureIgnoreCase).Count() != Data.SelectedFiles.Count();
 
         // Pull from archive extracts selected members to /data/local/tmp then pulls (same as PrepareDescriptors).
@@ -937,7 +964,7 @@ internal static class FileActionLogic
             && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive && !Data.FileActions.IsArchive
             && (!Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 
-        Data.FileActions.RenameEnabled = isWritable
+        Data.FileActions.RenameEnabled = isSelectionWritable
                                          && !Data.FileActions.IsArchive
                                          && !SelectionIsFuseProtectedAndroidRoot
                                          && !Data.FileActions.IsRecycleBin
@@ -950,7 +977,7 @@ internal static class FileActionLogic
                                 && Data.CopyPaste.Files.Length == Data.SelectedFiles.Count();
         
         // Cut from archive is not supported (extract is copy-only).
-        Data.FileActions.CutEnabled = isWritable
+        Data.FileActions.CutEnabled = isSelectionWritable
                                       && !Data.FileActions.IsArchive
                                       && !SelectionIsFuseProtectedAndroidRoot
                                       && Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
@@ -989,15 +1016,15 @@ internal static class FileActionLogic
         Data.FileActions.ContextNewEnabled = isWritable
             && !Data.SelectedFiles.Any() && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive;
 
-        Data.FileActions.SubmenuUninstallEnabled = Data.CurrentDrive?.Restrictions.NoApkInstall is not true
+        Data.FileActions.SubmenuUninstallEnabled = !selectionRestrictions.NoApkInstall
             && Data.SelectedFiles.AnyAll(file => file.IsInstallApk)
             && Data.DevicesObject?.Current?.Type is not DeviceType.Recovery;
 
-        Data.FileActions.UpdateModifiedEnabled = isWritable
+        Data.FileActions.UpdateModifiedEnabled = isSelectionWritable
             && !Data.FileActions.IsRecycleBin
             && Data.SelectedFiles.AnyAll(file => file.Type is FileType.File && !file.IsApk && !file.IsLink);
 
-        Data.FileActions.IsPasteLinkEnabled = Data.CurrentDrive?.Restrictions.NoSymbolicLinks is not true
+        Data.FileActions.IsPasteLinkEnabled = !restrictions.NoSymbolicLinks
             && HasRootShell
             && Data.CopyPaste.Files.Length == 1
             && Data.CopyPaste.IsSelf
@@ -1006,7 +1033,7 @@ internal static class FileActionLogic
             (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 
         Data.FileActions.InstallPackageEnabled = Data.DevicesObject?.Current?.Type is not DeviceType.Recovery
-            && Data.CurrentDrive?.Restrictions.NoApkInstall is not true;
+            && !selectionRestrictions.NoApkInstall;
 
         if (!Data.CopyPaste.IsDrag)
             Data.RuntimeSettings.FilterActions = true;
@@ -1143,7 +1170,8 @@ internal static class FileActionLogic
             {
                 IsFolderPicker = true,
                 Multiselect = false,
-                DefaultDirectory = Data.Settings.DefaultFolder,
+                // Skip a stale DefaultFolder so the picker doesn't fail to open on a dead start directory.
+                DefaultDirectory = Directory.Exists(Data.Settings.DefaultFolder) ? Data.Settings.DefaultFolder : null,
                 Title = pullItems.Count() > 1
                     ? Strings.Resources.S_ITEM_DESTINATION_PLURAL
                     : string.Format(Strings.Resources.S_ITEM_DESTINATION, pullItems.First()),

@@ -127,7 +127,7 @@ public abstract class DeviceViewModel : ViewModelBase
 
             if (this is LogicalDeviceViewModel)
             {
-                ShellCommands.DeviceCommands.Remove(ID);
+                ShellCommands.DeviceCommands.TryRemove(ID, out _);
                 if (status is DeviceStatus.Ok)
                     Task.Run(() => ShellCommands.FindCommands(ID));
             }

@@ -161,6 +161,9 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     public Visibility PackageColumnVisibility
         => Data.FileActions.IsAppDrive ? Visibility.Visible : Visibility.Collapsed;
 
+    public Visibility SearchColumnVisibility
+        => Data.FileActions.IsExplorerSearchResults ? Visibility.Visible : Visibility.Collapsed;
+
     public void NotifySelectedFilesTotalSize()
     {
         OnPropertyChanged(nameof(SelectedFilesTotalSize));
@@ -353,6 +356,10 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
             case nameof(FileActionsEnable.ExplorerFilter):
                 _filterDebounceTimer.Stop();
                 _filterDebounceTimer.Start();
+                break;
+
+            case nameof(FileActionsEnable.IsExplorerSearchResults):
+                OnPropertyChanged(nameof(SearchColumnVisibility));
                 break;
 
             default:

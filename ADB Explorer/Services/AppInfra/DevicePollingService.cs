@@ -11,6 +11,29 @@ public class DevicePollingService : BackgroundService
 {
     private static bool isDevicesPage = true;
 
+    // Set while a device is being opened/set up (DeviceHelper.InitDevice); pauses polling so it doesn't
+    // race the setup and pile concurrent UI updates onto the UI thread.
+    private static volatile bool _deviceSetupInProgress;
+    private static long _deviceSetupStartedTick;
+
+    // Safety cap: InitDevice awaits blocking adb calls with no timeout, so if a device wedges its `finally`
+    // may never clear the flag. Never pause polling for longer than this, or the device list would freeze.
+    private const long DeviceSetupPauseCapMs = 10_000;
+
+    public static bool IsDeviceSetupInProgress
+    {
+        get => _deviceSetupInProgress;
+        set
+        {
+            _deviceSetupInProgress = value;
+            if (value)
+                _deviceSetupStartedTick = Environment.TickCount64;
+        }
+    }
+
+    private static bool ShouldPauseForSetup =>
+        _deviceSetupInProgress && Environment.TickCount64 - _deviceSetupStartedTick < DeviceSetupPauseCapMs;
+
     private static int pollingInterval => isDevicesPage ? 500 : 2000;
 
     public DevicePollingService()
@@ -28,6 +51,7 @@ public class DevicePollingService : BackgroundService
             try
             {
                 if (!Data.RuntimeSettings.IsPollingStopped
+                    && !ShouldPauseForSetup
                     && AdbHelper.CurrentAdbState.Status is AdbHelper.AdbStatus.Valid
                     && Data.DevicesObject is not null)
                 {
@@ -55,8 +79,13 @@ public class DevicePollingService : BackgroundService
             DeviceHelper.UpdateDevicesBatInfo(cancellationToken);
         }
 
-        if (Data.FileActions.IsDriveViewVisible && Data.Settings.PollDrives)
+        // Drive tile counts (storage, recycle, installers, packages) change rarely, but refreshing them runs
+        // ~8 adb commands (df/find/pm + the su count fallback) plus a UI update. At the 2s poll rate that is a
+        // constant churn/stutter while the drive view is open, so throttle it well below the base poll rate.
+        if (Data.FileActions.IsDriveViewVisible && Data.Settings.PollDrives
+            && Environment.TickCount64 - _lastDrivePollTick >= DrivePollIntervalMs)
         {
+            _lastDrivePollTick = Environment.TickCount64;
             FileActionLogic.RefreshDrives(true, cancellationToken);
         }
 
@@ -81,6 +110,13 @@ public class DevicePollingService : BackgroundService
         if (!isDevicesPage)
             return;
 
+        // The Devices page polls every 500ms, but the work below (IP lookup, mDNS scan, per-device root
+        // re-check, WSA/emulator status) is expensive and marshals onto the UI thread synchronously - running
+        // it twice a second is what causes the stutter. Throttle it; the device LIST above still updates every poll.
+        if (Environment.TickCount64 - _lastHeavyDevicePollTick < HeavyDevicePollIntervalMs)
+            return;
+        _lastHeavyDevicePollTick = Environment.TickCount64;
+
         Data.DevicesObject.UpdateLogicalIp();
 
         if (Data.MdnsService?.State is MDNS.MdnsState.Running)
@@ -97,6 +133,12 @@ public class DevicePollingService : BackgroundService
         }
     }
 
+    private static long _lastHeavyDevicePollTick;
+    private const long HeavyDevicePollIntervalMs = 2000;
+
+    private static long _lastDrivePollTick;
+    private const long DrivePollIntervalMs = 6000;
+
     private static void ListDevices(IEnumerable<DeviceSnapshot> snapshots)
     {
         if (snapshots is null)
@@ -109,13 +151,9 @@ public class DevicePollingService : BackgroundService
 
         DeviceHelper.DeviceListSetup(deviceVMs);
 
-        if (!Data.Settings.AutoRoot)
-            return;
-
-        foreach (var item in Data.DevicesObject.LogicalDeviceViewModels.Where(device => device.Root is RootStatus.Unchecked).ToList())
-        {
-            item.EnableRoot(true);
-        }
+        // AutoRoot is NOT triggered here: enabling root restarts adbd, and doing that the instant a device
+        // connects collides with the concurrent device setup. It now runs at the end of DeviceHelper.InitDevice,
+        // once setup has completed.
     }
 }
 

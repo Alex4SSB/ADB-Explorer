@@ -946,6 +946,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Location.
+        /// </summary>
+        public static string S_COLUMN_LOCATION {
+            get {
+                return ResourceManager.GetString("S_COLUMN_LOCATION", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Name.
         /// </summary>
         public static string S_COLUMN_NAME {
@@ -953,7 +962,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_COLUMN_NAME", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Operation Type.
         /// </summary>

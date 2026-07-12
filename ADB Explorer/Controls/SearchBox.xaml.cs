@@ -136,12 +136,21 @@ public partial class SearchBox : UserControl
             ContentBox.Width = MinControlWidth;
     }
 
+    /// <summary>Raised on Enter (commit) or Escape (clear).</summary>
+    public event RoutedEventHandler? Committed;
+
     private void ContentBox_KeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key is Key.Escape)
         {
             Text = "";
             Unfocus();
+            Committed?.Invoke(this, new RoutedEventArgs());
+        }
+        else if (e.Key is Key.Enter)
+        {
+            Committed?.Invoke(this, new RoutedEventArgs());
+            e.Handled = true;
         }
     }
 

@@ -881,6 +881,10 @@ Cancel All Running</value>
     <value>Name</value>
     <comment>File browser data grid column name for the file name</comment>
   </data>
+  <data name="S_COLUMN_LOCATION" xml:space="preserve">
+    <value>Location</value>
+    <comment>File browser data grid column name for the parent folder of an item in recursive search results</comment>
+  </data>
   <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
     <value>Original Location</value>
     <comment>File browser data grid column name for the original location of an item in the recycle bin</comment>

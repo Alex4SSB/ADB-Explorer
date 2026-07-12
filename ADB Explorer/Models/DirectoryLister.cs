@@ -64,6 +64,15 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
         StartDirectoryList(path);
     }
 
+    /// <summary>Recursively lists items under path whose name contains query.</summary>
+    public void NavigateToSearch(string path, string query)
+    {
+        ArchivePath.InvalidateCache();
+
+        locationSource = null;
+        StartDirectoryList(path, query);
+    }
+
     public void RefreshLocationAccess()
     {
         if (string.IsNullOrEmpty(currentPath))
@@ -85,7 +94,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
         IsLinkListingFinished = true;
     }
 
-    private void StartDirectoryList(string path)
+    private void StartDirectoryList(string path, string? searchQuery = null)
     {
         FileClass? source;
         Dispatcher.BeginInvoke(() =>
@@ -103,8 +112,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
             source = locationSource;
             locationSource = null;
 
-            var drivePath = ArchivePath.IsArchivePath(path, Device.ID) ? ArchivePath.GetArchivePath(path, Device.ID) : path;
-            var restrictions = DriveHelper.GetCurrentDrive(drivePath)?.Restrictions ?? DriveRestrictions.None;
+            var restrictions = DriveHelper.GetPathRestrictions(path, Device.ID);
             var preliminary = FileClass.BuildCurrentLocation(path, null, source, Device.ShellIdentity, restrictions, Device.ID);
             CurrentLocation = preliminary;
         }).Wait();
@@ -114,8 +122,12 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
         currentFileQueue = new ConcurrentQueue<FileStat>();
 
         ReadTask = Task.Run(() =>
-            ADBService.ListDirectory(Device.ID, path, ref currentFileQueue, Dispatcher, CurrentCancellationToken.Token),
-            CurrentCancellationToken.Token);
+        {
+            if (searchQuery is null)
+                ADBService.ListDirectory(Device.ID, path, ref currentFileQueue, Dispatcher, CurrentCancellationToken.Token);
+            else
+                ADBService.SearchDirectory(Device.ID, path, searchQuery, ref currentFileQueue, Dispatcher, CurrentCancellationToken.Token);
+        }, CurrentCancellationToken.Token);
         ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(() => StopDirectoryList()), CurrentCancellationToken.Token);
 
         Task.Delay(DIR_LIST_VISIBLE_PROGRESS_DELAY).ContinueWith((t) => Dispatcher.BeginInvoke(() => IsProgressVisible = InProgress), CurrentCancellationToken.Token);
@@ -233,8 +245,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
             return;
 
         var identity = Device.GetOrLoadShellIdentity();
-        var drivePath = ArchivePath.IsArchivePath(path, Device.ID) ? ArchivePath.GetArchivePath(path, Device.ID) : path;
-        var restrictions = DriveHelper.GetCurrentDrive(drivePath)?.Restrictions ?? DriveRestrictions.None;
+        var restrictions = DriveHelper.GetPathRestrictions(path, Device.ID);
 
         LocationInfo? info = null;
         if (!ArchivePath.IsArchivePath(path, Device.ID))
@@ -281,32 +292,62 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
             if (items.Count < 1)
                 return;
 
-            List<(string, FileType)> result;
-            try
+            // batch so the readlink script stays under the command-line limit (search can return many links)
+            foreach (var batch in BatchLinkItems(items))
             {
-                result = [.. ADBService.GetLinkType(Device.ID, items.Select(f => f.FullPath), cancellationToken)];
-            }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
-
-            for (var i = 0; i < items.Count; i++)
-            {
-                var file = items[i];
-                var target = result[i];
-
-                Dispatcher.Invoke(() =>
+                List<(string, FileType)> result;
+                try
                 {
-                    file.LinkTarget = target.Item1;
-                    file.Type = target.Item2;
-                    file.UpdateType();
-                });
+                    result = [.. ADBService.GetLinkType(Device.ID, batch.Select(f => f.FullPath), cancellationToken)];
+                }
+                catch (OperationCanceledException)
+                {
+                    return;
+                }
+
+                for (var i = 0; i < batch.Count && i < result.Count; i++)
+                {
+                    var file = batch[i];
+                    var target = result[i];
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        file.LinkTarget = target.Item1;
+                        file.Type = target.Item2;
+                        file.UpdateType();
+                    });
+                }
             }
         }
         finally
         {
             Dispatcher.BeginInvoke(() => IsLinkListingFinished = true);
         }
+    }
+
+    private static IEnumerable<List<FileClass>> BatchLinkItems(List<FileClass> items)
+    {
+        // the script inlines each path twice, plus per-entry overhead
+        const int maxBatchChars = 8000;
+        const int maxBatchCount = 40;
+
+        List<FileClass> batch = [];
+        var chars = 0;
+
+        foreach (var item in items)
+        {
+            batch.Add(item);
+            chars += item.FullPath.Length * 2 + 64;
+
+            if (batch.Count >= maxBatchCount || chars >= maxBatchChars)
+            {
+                yield return batch;
+                batch = [];
+                chars = 0;
+            }
+        }
+
+        if (batch.Count > 0)
+            yield return batch;
     }
 }

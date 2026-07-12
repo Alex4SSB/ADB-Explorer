@@ -233,6 +233,9 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         }
     } = "";
 
+    /// <summary>Cached mount table, used to resolve per-path restrictions on the multi-mount root drive.</summary>
+    public IReadOnlyList<Models.FileSystemInfo> MountPoints { get; set; } = [];
+
     public HashSet<string> AdbFeatures
     {
         get
@@ -412,6 +415,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
             Data.DirList?.RefreshLocationAccess();
 
         OnPropertyChanged(nameof(Root));
+        OnPropertyChanged(nameof(RootString));
     }
 
     public bool SetRootStatus(RootStatus status)

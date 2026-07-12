@@ -25,7 +25,7 @@ public partial class DriveViewModel : AbstractDrive, IBrowserItem
 
     public new string DisplayName => Drive.DisplayName;
 
-    public DriveRestrictions Restrictions => DriveRestrictions.From(FSInfo?.Options);
+    public DriveRestrictions Restrictions => DriveRestrictions.From(FSInfo?.Options, FSInfo?.FileSystemType);
 
     public bool HasDriveRestrictions => Restrictions.HasAny;
 

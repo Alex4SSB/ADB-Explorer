@@ -322,6 +322,14 @@ public partial class FileActionsEnable : ObservableObject
         set => SetProperty(ref isExplorerEditing, value);
     }
 
+    private bool isExplorerSearchResults = false;
+    /// <summary>Explorer is showing search results, not the current folder.</summary>
+    public bool IsExplorerSearchResults
+    {
+        get => isExplorerSearchResults;
+        set => SetProperty(ref isExplorerSearchResults, value);
+    }
+
     private bool isFollowLinkEnabled = false;
     public bool IsFollowLinkEnabled
     {

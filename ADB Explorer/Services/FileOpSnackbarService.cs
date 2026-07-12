@@ -101,11 +101,20 @@ public class FileOpSnackbarService(ISnackbarService snackbarService, HashSet<str
 
     private bool _isShowing = false;
 
+    // Keep the snackbar up at least this long so a fast (small-file) operation doesn't just flash.
+    private static readonly TimeSpan MinDisplay = TimeSpan.FromMilliseconds(1500);
+    private long _shownAtTick;
+    private DispatcherTimer? _hideTimer;
+
     private void ShowSnackbar(ObservableList<FileOperation> operations)
     {
         var presenter = snackbarService.GetSnackbarPresenter();
         if (presenter is null)
             return;
+
+        // A new operation started - cancel any pending minimum-display hide.
+        _hideTimer?.Stop();
+        _hideTimer = null;
 
         if (_snackbar is null || _content is null)
         {
@@ -121,7 +130,7 @@ public class FileOpSnackbarService(ISnackbarService snackbarService, HashSet<str
             };
             _snackbar.ProgressValue = _subscribedQueue?.Progress ?? 0.0;
         }
-        
+
         _content.OperationsSource = operations;
 
         if (operations.FirstOrDefault() is { } firstOp)
@@ -130,16 +139,44 @@ public class FileOpSnackbarService(ISnackbarService snackbarService, HashSet<str
         if (!_isShowing)
         {
             _isShowing = true;
+            _shownAtTick = Environment.TickCount64;
             _ = presenter.ImmediatelyDisplay(_snackbar);
         }
     }
 
     private void HideSnackbar()
     {
-        if (_isShowing && snackbarService.GetSnackbarPresenter() is { } presenter)
+        if (!_isShowing)
+            return;
+
+        // Enforce a minimum on-screen time: if it hasn't been shown long enough, defer the hide.
+        var remaining = MinDisplay.TotalMilliseconds - (Environment.TickCount64 - _shownAtTick);
+        if (remaining > 0)
         {
-            _isShowing = false;
-            _ = presenter.HideCurrent();
+            _hideTimer?.Stop();
+            _hideTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(remaining) };
+            _hideTimer.Tick += (_, _) =>
+            {
+                _hideTimer?.Stop();
+                _hideTimer = null;
+                HideNow();
+            };
+            _hideTimer.Start();
+            return;
         }
+
+        HideNow();
+    }
+
+    private void HideNow()
+    {
+        if (!_isShowing)
+            return;
+
+        // Clear the flag even if the presenter is momentarily unavailable, so the snackbar can't get stuck
+        // "showing" forever and block future operations from displaying.
+        _isShowing = false;
+        if (snackbarService.GetSnackbarPresenter() is { } presenter)
+            _ = presenter.HideCurrent();
     }
 }

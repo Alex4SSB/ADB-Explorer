@@ -769,14 +769,27 @@ public static partial class ThumbnailService
 
     private static string GetThumbsFromDevice(DeviceThumbnailInfo info, MediaType media, CancellationToken cancellationToken)
     {
+        var projection = $"_id:_data:resolution:{(media is MediaType.images ? "f_number:iso:exposure_time" : "duration:bitrate")}";
+        var uri = $"content://media/external/{media}/media";
+
         ADBService.ExecuteDeviceAdbShellCommand(
                     info.PhysicalId, "content",
                     out string stdout, out _,
                     cancellationToken,
                     "query",
-                    "--uri", $"content://media/external/{media}/media",
-                    "--projection", $"_id:_data:resolution:{(media is MediaType.images ? "f_number:iso:exposure_time" : "duration:bitrate")}"
+                    "--uri", uri,
+                    "--projection", projection
                 );
+
+        // content is a binder command; root adbd rejects it. Retry as the shell user so thumbnails still load.
+        if (ADBService.IsBinderShellFailure(stdout))
+        {
+            foreach (var output in ADBService.ShellUserFallbackAttempts(info.PhysicalId, $"content query --uri {uri} --projection {projection}"))
+            {
+                if (!ADBService.IsBinderShellFailure(output))
+                    return output;
+            }
+        }
 
         return stdout;
     }

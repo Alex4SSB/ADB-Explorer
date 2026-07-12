@@ -429,10 +429,11 @@ public partial class ADBService
         }
     }
 
+    // Double quotes (not single) around each policy so the whole script can be single-quoted for su -c below.
     const string magiskRootArgs = """
-                magiskpolicy --live 'allow adbd adbd process setcurrent'
-                magiskpolicy --live 'allow adbd su process dyntransition'
-                magiskpolicy --live 'permissive { su }'
+                magiskpolicy --live "allow adbd adbd process setcurrent"
+                magiskpolicy --live "allow adbd su process dyntransition"
+                magiskpolicy --live "permissive { su }"
                 resetprop ro.secure 0
                 resetprop ro.adb.secure 0
                 resetprop ro.force.debuggable 1
@@ -441,26 +442,84 @@ public partial class ADBService
                 resetprop ctl.restart adbd
                 """;
 
-    static string[] RootArgs => ["shell", "su", "-c", EscapeAdbShellString(string.Join(" && ", magiskRootArgs.Split("\r\n", StringSplitOptions.RemoveEmptyEntries)))];
+    static string RootScript => string.Join(" && ", magiskRootArgs.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
 
-    static string[] UnrootArgs => ["shell", "su", "-c", EscapeAdbShellString("resetprop ro.debuggable 0 && resetprop service.adb.root 0 && setprop ctl.restart adbd")];
+    // The device must receive: su -c '<whole script>'  - single-quoted so the entire && chain runs under su
+    // (root), not just the first command, and so the inner double quotes reach magiskpolicy intact.
+    // Commands are launched via CreateProcess with a joined argument string, so the inner double quotes are
+    // backslash-escaped to survive Windows CommandLineToArgvW as one token. EscapeAdbShellString can't be
+    // used here: it double-quotes the payload, which splits the chain and mangles the policy quoting.
+    static string[] RootArgs => ["shell", "su", "-c", $"\"'{RootScript.Replace("\"", "\\\"")}'\""];
+
+    static string[] UnrootArgs => ["shell", "su", "-c", "\"'resetprop ro.debuggable 0 && resetprop service.adb.root 0 && setprop ctl.restart adbd'\""];
 
     public static bool Root(string deviceId)
     {
-        ExecuteDeviceAdbCommand(deviceId, "", out string stdout, out string stderr, CancellationToken.None, RootArgs);
-        if (stdout != "" || stderr != "")
-            ExecuteDeviceAdbCommand(deviceId, "", out stdout, out _, CancellationToken.None, "root");
+        // The script restarts adbd, so its own output is meaningless. Check the shell identity instead.
+        ExecuteDeviceAdbCommand(deviceId, "", out _, out _, CancellationToken.None, RootArgs);
 
-        return !stdout.Contains("cannot run as root");
+        if (WaitForRootShell(deviceId, wantRoot: true))
+            return true;
+
+        // fall back to stock adb root
+        ExecuteDeviceAdbCommand(deviceId, "", out string stdout, out _, CancellationToken.None, "root");
+        if (stdout.Contains("cannot run as root"))
+            return false;
+
+        return WaitForRootShell(deviceId, wantRoot: true);
     }
+
+    /// <summary>Waits for the shell identity to reach the wanted root state after an adbd restart.</summary>
+    private static bool WaitForRootShell(string deviceId, bool wantRoot, int timeoutMs = 5000)
+    {
+        const int stepMs = 250;
+        for (int waited = 0; waited < timeoutMs; waited += stepMs)
+        {
+            ExecuteDeviceAdbCommand(deviceId, "wait-for-device", out _, out _, CancellationToken.None);
+
+            if (GetShellIdentity(deviceId) is ShellIdentity identity && identity.IsRoot == wantRoot)
+                return true;
+
+            Thread.Sleep(stepMs);
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Re-runs a binder command (pm/cmd/content) as the shell user when root adbd rejects it with
+    /// "Failed transaction". Needs -Z for the SELinux context, and -Z can't return stdout over the
+    /// root pipe, so the output goes through a temp file. Second attempt covers su without -Z.
+    /// Yields each attempt's stdout; the caller must check it, since su exits 0 even on inner failure.
+    /// </summary>
+    public static IEnumerable<string> ShellUserFallbackAttempts(string deviceId, string shellCmd)
+    {
+        var tmp = $"/data/local/tmp/.adbexplorer_{Guid.NewGuid():N}";
+
+        if (ExecuteDeviceAdbShellCommand(deviceId, "su", out string stdout, out _, CancellationToken.None,
+            ["2000", "-Z", "u:r:shell:s0", "-c", $"'{shellCmd} > {tmp} 2>/dev/null'", ";", "cat", tmp, "2>/dev/null", ";", "rm", "-f", tmp]) == 0)
+            yield return stdout;
+
+        if (ExecuteDeviceAdbShellCommand(deviceId, "su", out stdout, out _, CancellationToken.None,
+            ["2000", "-c", $"'{shellCmd}'"]) == 0)
+            yield return stdout;
+    }
+
+    /// <summary>True when a binder command was rejected (empty or the "Failed transaction" error).</summary>
+    public static bool IsBinderShellFailure(string stdout)
+        => string.IsNullOrWhiteSpace(stdout) || stdout.Contains("Failure calling service") || stdout.Contains("Failed transaction");
 
     public static bool Unroot(string deviceId)
     {
-        ExecuteDeviceAdbCommand(deviceId, "", out string stdout, out string stderr, CancellationToken.None, UnrootArgs);
-        if (stdout != "" || stderr != "")
-            ExecuteDeviceAdbCommand(deviceId, "", out stdout, out _, CancellationToken.None, "unroot");
+        ExecuteDeviceAdbCommand(deviceId, "", out _, out _, CancellationToken.None, UnrootArgs);
 
-        var result = stdout.Contains("restarting adbd as non root");
+        var result = WaitForRootShell(deviceId, wantRoot: false);
+        if (!result)
+        {
+            ExecuteDeviceAdbCommand(deviceId, "", out _, out _, CancellationToken.None, "unroot");
+            result = WaitForRootShell(deviceId, wantRoot: false);
+        }
+
         DevicesObject.UpdateDeviceRoot(deviceId, result);
 
         return result;
@@ -1030,24 +1089,294 @@ public partial class ADBService
         {
             var current = queue.Dequeue();
 
-            IEnumerable<FileStat> entries;
-            try
-            {
-                entries = ListDirectoryEntries(deviceId, current, cancellationToken);
-            }
-            catch (ProcessFailedException)
-            {
-                continue;
-            }
+            // wrap MoveNext, not the whole loop: an unreadable dir should skip itself, not stop the walk
+            using var entries = ListDirectoryEntries(deviceId, current, cancellationToken).GetEnumerator();
 
-            foreach (var entry in entries)
+            while (true)
             {
+                FileStat entry;
+                try
+                {
+                    if (!entries.MoveNext())
+                        break;
+
+                    entry = entries.Current;
+                }
+                catch (Exception e) when (e is not OperationCanceledException)
+                {
+                    // unreadable dir (ProcessFailedException) or one malformed ls line: end this dir, keep the walk
+                    break;
+                }
+
                 yield return entry;
 
                 if (entry.Type is FileType.Folder)
                     queue.Enqueue(entry.FullPath);
             }
         }
+    }
+
+    public static void SearchDirectory(string deviceId, string path, string query, ref ConcurrentQueue<FileStat> output, Dispatcher dispatcher, CancellationToken cancellationToken)
+    {
+        IEnumerable<FileStat> entries;
+        var usingFind = false;
+
+        if (ShellCommands.FindExists(deviceId) && ShellCommands.FindPrintf(deviceId))
+        {
+            entries = SearchEntriesWithFindPrintf(deviceId, path, query, cancellationToken);
+            usingFind = true;
+        }
+        else if (ShellCommands.FindExists(deviceId) && ShellCommands.StatExists(deviceId))
+        {
+            entries = SearchEntriesWithFindStat(deviceId, path, query, cancellationToken);
+            usingFind = true;
+        }
+        else
+        {
+            entries = SearchEntriesWithListing(deviceId, path, query, cancellationToken);
+        }
+
+        var produced = false;
+        var findFailed = false;
+        try
+        {
+            foreach (var item in entries)
+            {
+                output.Enqueue(item);
+                produced = true;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        catch (ProcessFailedException)
+        {
+            // find exits non-zero on unreadable dirs; only fall back if it produced nothing at all
+            findFailed = true;
+        }
+        catch (Exception e)
+        {
+            if (cancellationToken.IsCancellationRequested)
+                return;
+
+            var message = e.Message;
+            if (!string.IsNullOrEmpty(message))
+                message += "\n\n";
+
+            dispatcher.Invoke(() => DialogService.ShowMessage(message + Strings.Resources.S_LS_ERROR,
+                                                              Strings.Resources.S_LS_ERROR_TITLE,
+                                                              DialogService.DialogIcon.Critical,
+                                                              true,
+                                                              copyToClipboard: true,
+                                                              error: DialogError.ListDirectoryFailed));
+            return;
+        }
+
+        if (usingFind && findFailed && !produced && !cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                foreach (var item in SearchEntriesWithListing(deviceId, path, query, cancellationToken))
+                    output.Enqueue(item);
+            }
+            catch (OperationCanceledException)
+            { }
+            catch (ProcessFailedException)
+            { }
+        }
+    }
+
+    /// <summary>adb ls fallback, filtered locally, for when find isn't usable.</summary>
+    private static IEnumerable<FileStat> SearchEntriesWithListing(string deviceId, string path, string query, CancellationToken cancellationToken) =>
+        ListDirectoryRecursive(deviceId, path, cancellationToken)
+            .Where(file => file.FullName.Contains(query, StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>Trailing slash so find descends into a symlinked root like /sdcard.</summary>
+    private static string SearchRoot(string path) => path.EndsWith('/') ? path : path + '/';
+
+    /// <summary>Escapes glob chars so the query matches literally, like the view filter.</summary>
+    private static string EscapeSearchGlob(string query) =>
+        query.Replace("\\", "\\\\").Replace("[", "\\[").Replace("]", "\\]").Replace("*", "\\*").Replace("?", "\\?");
+
+    private static IEnumerable<FileStat> SearchEntriesWithFindPrintf(string deviceId, string path, string query, CancellationToken cancellationToken)
+    {
+        var find = ShellCommands.TranslateCommand("find");
+
+        // %M not %y: toybox find has -printf but error-exits on %y. \n stays literal so find emits the newline.
+        var format = EscapeAdbShellString($"%M{ADB_FIELD_SEP}%s{ADB_FIELD_SEP}%T@{ADB_FIELD_SEP}%p\\n");
+
+        foreach (var line in ExecuteDeviceAdbCommandAsync(deviceId,
+                                                          "shell",
+                                                          cancellationToken,
+                                                          find,
+                                                          EscapeAdbShellString(SearchRoot(path)),
+                                                          "-mindepth", "1",
+                                                          "-iname", EscapeAdbShellString($"*{EscapeSearchGlob(query)}*"),
+                                                          "-printf", format,
+                                                          @"2>/dev/null"))
+        {
+            if (CreateFileFromFindPrintf(line) is FileStat item)
+                yield return item;
+        }
+    }
+
+    private static FileStat? CreateFileFromFindPrintf(string stdoutLine)
+    {
+        var parts = stdoutLine.Split(ADB_FIELD_SEP, 4);
+        if (parts.Length < 4 || string.IsNullOrEmpty(parts[3]))
+            return null;
+
+        // "//" can appear after the search root; a relative path is a fragment of a newline filename
+        var fullPath = parts[3].Replace("//", "/");
+        if (!fullPath.StartsWith('/'))
+            return null;
+
+        var name = fullPath[(fullPath.LastIndexOf('/') + 1)..];
+
+        // first char of the mode string, e.g. "drwxr-xr-x"
+        var type = parts[0].FirstOrDefault() switch
+        {
+            'd' => FileType.Folder,
+            '-' => FileType.File,
+            's' => FileType.Socket,
+            'b' => FileType.BlockDevice,
+            'c' => FileType.CharDevice,
+            'p' => FileType.FIFO,
+            _ => FileType.Unknown,
+        };
+        var isLink = parts[0].FirstOrDefault() == 'l';
+
+        long? size = long.TryParse(parts[1], out var parsedSize) ? parsedSize : null;
+        if (type is not FileType.File)
+            size = null;
+
+        // %T@ is epoch seconds, maybe with a fractional part
+        var seconds = parts[2].Split('.')[0];
+        DateTime? modified = long.TryParse(seconds, out var secs) && secs > 0
+            ? DateTimeOffset.FromUnixTimeSeconds(secs).DateTime.ToLocalTime()
+            : null;
+
+        return new(
+            FullName: name,
+            FullPath: fullPath,
+            Type: type,
+            IsLink: isLink,
+            Size: size,
+            ModifiedTime: modified,
+            Permissions: null);
+    }
+
+    private const int SEARCH_STAT_CHUNK_SIZE = 50;
+    // keeps each stat call under the 32767-char Windows command-line limit
+    private const int SEARCH_STAT_CHUNK_CHARS = 16000;
+
+    private static IEnumerable<FileStat> SearchEntriesWithFindStat(string deviceId, string path, string query, CancellationToken cancellationToken)
+    {
+        var find = ShellCommands.TranslateCommand("find");
+
+        using var foundPaths = ExecuteDeviceAdbCommandAsync(deviceId,
+                                                            "shell",
+                                                            cancellationToken,
+                                                            find,
+                                                            EscapeAdbShellString(SearchRoot(path)),
+                                                            "-mindepth", "1",
+                                                            "-iname", EscapeAdbShellString($"*{EscapeSearchGlob(query)}*"),
+                                                            @"2>/dev/null").GetEnumerator();
+
+        List<string> chunk = new(SEARCH_STAT_CHUNK_SIZE);
+        var chunkChars = 0;
+
+        while (true)
+        {
+            bool hasNext;
+            try
+            {
+                hasNext = foundPaths.MoveNext();
+            }
+            catch (ProcessFailedException)
+            {
+                // find exits non-zero on any unreadable dir
+                hasNext = false;
+            }
+
+            if (hasNext && !string.IsNullOrEmpty(foundPaths.Current))
+            {
+                chunk.Add(foundPaths.Current);
+                // escaping at most doubles the length; +3 for quotes and space
+                chunkChars += foundPaths.Current.Length * 2 + 3;
+            }
+
+            if (chunk.Count >= SEARCH_STAT_CHUNK_SIZE || chunkChars >= SEARCH_STAT_CHUNK_CHARS || (!hasNext && chunk.Count > 0))
+            {
+                foreach (var item in StatSearchResults(deviceId, chunk, cancellationToken))
+                    yield return item;
+
+                chunk.Clear();
+                chunkChars = 0;
+            }
+
+            if (!hasNext)
+                yield break;
+        }
+    }
+
+    private static IEnumerable<FileStat> StatSearchResults(string deviceId, IEnumerable<string> paths, CancellationToken cancellationToken)
+    {
+        // %f hex mode, %s size, %Y mtime (epoch), %n name. Exit code ignored: files may vanish before stat runs.
+        ExecuteDeviceAdbShellCommand(deviceId,
+                                     "stat",
+                                     out string stdout,
+                                     out _,
+                                     cancellationToken,
+                                     ["-c", $"%f{ADB_FIELD_SEP}%s{ADB_FIELD_SEP}%Y{ADB_FIELD_SEP}%n", .. paths.Select(item => EscapeAdbShellString(item)), @"2>/dev/null"]);
+
+        foreach (var line in stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (CreateFileFromStat(line) is FileStat item)
+                yield return item;
+        }
+    }
+
+    private static FileStat? CreateFileFromStat(string stdoutLine)
+    {
+        var parts = stdoutLine.Split(ADB_FIELD_SEP, 4);
+        if (parts.Length < 4 || string.IsNullOrEmpty(parts[3]))
+            return null;
+
+        if (!UInt32.TryParse(parts[0], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var modeValue))
+            return null;
+
+        // "//" can appear after the search root; a relative path is a fragment of a newline filename
+        var fullPath = parts[3].Replace("//", "/");
+        if (!fullPath.StartsWith('/'))
+            return null;
+
+        var name = fullPath[(fullPath.LastIndexOf('/') + 1)..];
+
+        var mode = (UnixFileMode)modeValue;
+        var type = ParseFileMode(mode);
+
+        long? size = long.TryParse(parts[1], out var parsedSize) ? parsedSize : null;
+        if (mode is UnixFileMode.None || type is FileType.Folder)
+            size = null;
+
+        DateTime? modified = long.TryParse(parts[2], out var secs) && secs > 0
+            ? DateTimeOffset.FromUnixTimeSeconds(secs).DateTime.ToLocalTime()
+            : null;
+
+        UnixFileMode? permissions = mode is UnixFileMode.None
+            ? null
+            : mode & (UnixFileMode)511;
+
+        return new(
+            FullName: name,
+            FullPath: fullPath,
+            Type: type,
+            IsLink: mode.HasFlag(UnixFileMode.S_IFLNK),
+            Size: size,
+            ModifiedTime: modified,
+            Permissions: (System.IO.UnixFileMode?)permissions);
     }
 
     public static string TranslateDevicePath(string deviceId, string path)

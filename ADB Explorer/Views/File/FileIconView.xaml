@@ -97,6 +97,7 @@
                                 KeyDown="IconViewNameEdit_KeyDown"
                                 Loaded="IconViewNameEdit_Loaded"
                                 LostFocus="IconViewNameEdit_LostFocus"
+                                Unloaded="IconViewNameEdit_Unloaded"
                                 Style="{StaticResource FileNameEditingElementStyle}"
                                 TextChanged="IconViewNameEdit_TextChanged"
                                 TextWrapping="Wrap" />

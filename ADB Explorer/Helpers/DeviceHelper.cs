@@ -711,14 +711,20 @@ public static class DeviceHelper
             if (device is null)
                 return false;
 
-            while (device.Status is not DeviceStatus.Ok)
+            // Also wait for the capability probe (ShellCommands.FindCommands populates DeviceCommands) to finish
+            // before auto-opening. Opening while that probe is still running races the device setup and freezes
+            // the UI - a manual "Browse" click works precisely because by then the probe is already done.
+            while (device.Status is not DeviceStatus.Ok
+                   || !ShellCommands.DeviceCommands.ContainsKey(device.ID))
             {
                 if (DateTime.Now - startTime > TimeSpan.FromSeconds(6))
-                    return false;
+                    break;
 
                 Thread.Sleep(500);
             }
-            return true;
+
+            // Proceed once the device is usable, even if the capability probe was slow to register.
+            return device.Status is DeviceStatus.Ok;
         }).ContinueWith(t => App.SafeInvoke(() =>
         {
             if (!t.Result)
@@ -731,48 +737,67 @@ public static class DeviceHelper
     public static async void InitDevice()
     {
         var device = Data.DevicesObject.Current;
-        device.EnsureDefaultDrives();
-        var internalDrive = device.Drives.First(d => d.Type is AbstractDrive.DriveType.Internal).Drive as LogicalDrive;
 
-        // Run both ADB calls concurrently on background threads instead of blocking the UI thread.
-        // Props (getprop) is needed by CombineDisplayNames (BrandName) and SetAndroidVersion.
-        // AdbFeatures is needed for sync/list size capability checks.
-        // GetInternalStorage (readlink) is independent and updates the internal drive path.
-        var propsTask = Task.Run(() => device.Props);
-        var featuresTask = Task.Run(() => device.AdbFeatures);
-        var shellTask = Task.Run(() => device.GetOrLoadShellIdentity());
+        // Pause the periodic polling while we set the device up. Otherwise the poll (device list, root re-check,
+        // IP, drive counts) hammers the same device concurrently with this setup and all their UI updates land on
+        // the UI thread together - that's the "everything fires at once" freeze on connect. Guaranteed to resume.
+        DevicePollingService.IsDeviceSetupInProgress = true;
+        try
+        {
+            device.EnsureDefaultDrives();
+            var internalDrive = device.Drives.First(d => d.Type is AbstractDrive.DriveType.Internal).Drive as LogicalDrive;
 
-        internalDrive.UpdateInternalStorage(device.ID);
+            // Run both ADB calls concurrently on background threads instead of blocking the UI thread.
+            // Props (getprop) is needed by CombineDisplayNames (BrandName) and SetAndroidVersion.
+            // AdbFeatures is needed for sync/list size capability checks.
+            // GetInternalStorage (readlink) is independent and updates the internal drive path.
+            var propsTask = Task.Run(() => device.Props);
+            var featuresTask = Task.Run(() => device.AdbFeatures);
+            var shellTask = Task.Run(() => device.GetOrLoadShellIdentity());
 
-        // Start drive enumeration and battery update immediately — both are independent of Props
-        FileActionLogic.RefreshDrives(true, CancellationToken.None);
-        Task.Run(() => device.UpdateBattery(CancellationToken.None));
+            internalDrive.UpdateInternalStorage(device.ID);
 
-        // Suspend until Props is loaded without blocking the UI thread.
-        // CombineDisplayNames and DriveViewNav must run after Props so that
-        // BrandName and CurrentDisplayNames are populated before breadcrumbs render.
-        await propsTask;
-        await featuresTask;
-        await shellTask;
+            // Start drive enumeration and battery update immediately — both are independent of Props
+            FileActionLogic.RefreshDrives(true, CancellationToken.None);
+            Task.Run(() => device.UpdateBattery(CancellationToken.None));
 
-        if (Data.DevicesObject.Current != device)
-            return;
+            // Suspend until Props is loaded without blocking the UI thread.
+            // CombineDisplayNames and DriveViewNav must run after Props so that
+            // BrandName and CurrentDisplayNames are populated before breadcrumbs render.
+            await propsTask;
+            await featuresTask;
+            await shellTask;
 
-        device.SetAndroidVersion();
-        FolderHelper.CombineDisplayNames();
-        Data.RuntimeSettings.DriveViewNav = true;
-        NavHistory.Navigate(Navigation.SpecialLocation.DriveView);
+            if (Data.DevicesObject.Current != device)
+                return;
 
-        if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.OnConnect)
-            Task.Run(() => ThumbnailService.ForceLoad(device));
+            device.SetAndroidVersion();
+            FolderHelper.CombineDisplayNames();
+            Data.RuntimeSettings.DriveViewNav = true;
+            NavHistory.Navigate(Navigation.SpecialLocation.DriveView);
 
-        Data.CopyPaste.GetClipboardPasteItems();
-        Data.RuntimeSettings.FilterDrives = true;
+            if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.OnConnect)
+                Task.Run(() => ThumbnailService.ForceLoad(device));
 
-        Data.FileActions.PushPackageEnabled = Data.Settings.EnableApk && device?.Type is not DeviceType.Recovery;
+            Data.CopyPaste.GetClipboardPasteItems();
+            Data.RuntimeSettings.FilterDrives = true;
 
-        Data.FileOpQ.MoveOperationsToPast();
-        FileActionLogic.UpdateFileActions();
+            Data.FileActions.PushPackageEnabled = Data.Settings.EnableApk && device?.Type is not DeviceType.Recovery;
+
+            Data.FileOpQ.MoveOperationsToPast();
+            FileActionLogic.UpdateFileActions();
+
+            // Setup is complete: now it's safe to auto-root. Enabling root restarts adbd, so doing it earlier
+            // (on connect) collides with the setup above. Gate on the ACTUAL shell identity (already loaded above),
+            // not just the Root flag: after the restart the device reconnects and re-runs this setup, and the VM
+            // can come back "Unchecked" - but the shell is now root, so !HasRootShell stops a second fire/restart.
+            if (Data.Settings.AutoRoot && device.Root is RootStatus.Unchecked && !device.HasRootShell)
+                _ = Task.Run(() => device.EnableRoot(true));
+        }
+        finally
+        {
+            DevicePollingService.IsDeviceSetupInProgress = false;
+        }
     }
 
     #region Test device injection (DEBUG only)

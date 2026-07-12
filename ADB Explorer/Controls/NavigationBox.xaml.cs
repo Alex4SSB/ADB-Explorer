@@ -470,7 +470,10 @@ public partial class NavigationBox : UserControl
 
     private void ApplyDriveRestrictions()
     {
-        var driveRestrictions = _trackedDrive?.Restrictions ?? DriveRestrictions.None;
+        // resolve per-path: on the root drive, sub-mounts (rw /data under ro /) differ from the drive
+        var driveRestrictions = string.IsNullOrEmpty(Path)
+            ? _trackedDrive?.Restrictions ?? DriveRestrictions.None
+            : DriveHelper.GetPathRestrictions(Path);
         var deviceId = Data.DevicesObject?.Current?.ID;
         var isArchive = ArchivePath.IsArchivePath(Path, deviceId);
 
@@ -489,7 +492,7 @@ public partial class NavigationBox : UserControl
         }
         else
         {
-            tooltipText = _trackedDrive?.RestrictionsTooltip ?? "";
+            tooltipText = driveRestrictions.GetTooltipText();
             iconGlyph = driveRestrictions.IconGlyph;
             HasDriveRestrictions = driveRestrictions.HasAny;
         }

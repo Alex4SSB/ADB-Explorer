@@ -107,6 +107,14 @@ public partial class FileIconView : UserControl
         RenameEnded?.Invoke(null, EventArgs.Empty);
     }
 
+    private void IconViewNameEdit_Unloaded(object sender, RoutedEventArgs e)
+    {
+        // Edit box removed for any reason (commit, virtualization, interrupted rename) - clear the editing
+        // flag so the shared rename tooltip, bound to it, can't stay stuck on screen.
+        if (FileActions.IsExplorerEditing)
+            FileActions.IsExplorerEditing = false;
+    }
+
     private void IconViewNameEdit_LostFocus(object sender, RoutedEventArgs e)
     {
         if (sender is not System.Windows.Controls.TextBox textBox)

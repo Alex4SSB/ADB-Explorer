@@ -524,19 +524,42 @@ public static class ShellFileOperation
 
     public static ulong? GetPackagesCount(LogicalDeviceViewModel device)
     {
-        var result = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out string stdout, out _, CancellationToken.None, ["list", "packages", "|", "wc", "-l"]);
-        if (result != 0 || !ulong.TryParse(stdout, out ulong value))
-            return null;
+        // Honor "Show system apps": with it off, count third-party packages only (-3) so the tile matches
+        // the listing (~user apps) instead of everything. Runs on the 2s drive poll - kept simple (no cache):
+        // count directly, and if pm is blocked (root adbd) retry once as the shell user, every poll.
+        var listArg = Data.Settings.ShowSystemPackages ? "list packages" : "list packages -3";
 
-        return value;
+        ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out string stdout, out _, CancellationToken.None,
+            [.. listArg.Split(' '), "2>/dev/null", "|", "grep", "-c", "^package:"]);
+
+        if (ulong.TryParse(stdout.Trim(), out ulong value) && value > 0)
+            return value;
+
+        foreach (var output in ADBService.ShellUserFallbackAttempts(device.ID, $"pm {listArg} 2>/dev/null | grep -c ^package:"))
+        {
+            if (ulong.TryParse(output.Trim(), out ulong suValue) && suValue > 0)
+                return suValue;
+        }
+
+        return null;
     }
 
     public static ObservableList<Package> GetPackages(LogicalDeviceViewModel device, bool includeSystem = true, bool optionalParams = true)
     {
+        var packages = ListPackages(device, includeSystem, optionalParams);
+
+        // some devices reject -U / --show-versioncode; retry without them
+        if (packages.Count == 0 && optionalParams)
+            packages = ListPackages(device, includeSystem, false);
+
+        return packages;
+    }
+
+    private static ObservableList<Package> ListPackages(LogicalDeviceViewModel device, bool includeSystem, bool optionalParams)
+    {
         // More package-specific info can be acquired using dumpsys package [package_name]
 
         ObservableList<Package> packages = [];
-        string stdout = "";
         string[] args = ["list", "packages", "-s", "-f"];
         if (optionalParams)
             args = [.. args, "-U", "--show-versioncode"];
@@ -544,20 +567,41 @@ public static class ShellFileOperation
         if (includeSystem)
         {
             // get system packages
-            var systemExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, CancellationToken.None, args);
-
-            if (systemExitCode == 0)
-                packages.AddRange(stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Select(pkg => Package.New(pkg, Package.PackageType.System)));
+            if (RunPmListing(device.ID, args, out string stdout))
+                packages.AddRange(stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries)
+                                        .Select(pkg => Package.New(pkg, Package.PackageType.System))
+                                        .OfType<Package>());
         }
 
         args[2] = "-3";
         // get user packages
-        var userExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, CancellationToken.None, args);
-
-        if (userExitCode == 0)
-            packages.AddRange(stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Select(pkg => Package.New(pkg, Package.PackageType.User)));
+        if (RunPmListing(device.ID, args, out string userStdout))
+            packages.AddRange(userStdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries)
+                                    .Select(pkg => Package.New(pkg, Package.PackageType.User))
+                                    .OfType<Package>());
 
         return packages;
+    }
+
+    /// <summary>Runs a pm listing, retrying as the shell user when root adbd rejects it.</summary>
+    private static bool RunPmListing(string deviceId, string[] args, out string stdout)
+    {
+        // Trust pm's own exit code: 0 means it ran (an empty list is valid). Under root adbd pm exits non-zero.
+        if (ADBService.ExecuteDeviceAdbShellCommand(deviceId, "pm", out stdout, out _, CancellationToken.None, args) == 0)
+            return true;
+
+        foreach (var output in ADBService.ShellUserFallbackAttempts(deviceId, $"pm {string.Join(' ', args)}"))
+        {
+            // A binder error line ("Failure calling service package:") also contains "package:" - exclude it.
+            if (!ADBService.IsBinderShellFailure(output) && output.Contains("package:"))
+            {
+                stdout = output;
+                return true;
+            }
+        }
+
+        stdout = "";
+        return false;
     }
 
     public static void ChangeDateFromName(LogicalDeviceViewModel device, IEnumerable<FileClass> items, Dispatcher dispatcher)

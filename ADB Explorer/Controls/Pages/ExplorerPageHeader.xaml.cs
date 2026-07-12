@@ -688,6 +688,7 @@ public partial class ExplorerPageHeader : UserControl
 
         FileActions.WasInAppDrive = FileActions.IsAppDrive;
         FileActions.ExplorerFilter = "";
+        FileActions.IsExplorerSearchResults = false;
         NavHistory.Navigate(realPath);
 
         ViewModel.FirstSelectedIndex = -1;
@@ -760,6 +761,41 @@ public partial class ExplorerPageHeader : UserControl
         FileActionLogic.UpdateFileActions();
 
         return true;
+    }
+
+    private void SearchBox_Committed(object sender, RoutedEventArgs e)
+    {
+        var query = FileActions.ExplorerFilter;
+
+        if (!FileActions.IsExplorerVisible
+            || FileActions.IsRecycleBin
+            || FileActions.IsAppDrive
+            || FileActions.IsArchive
+            || DirList is null
+            || string.IsNullOrEmpty(CurrentPath))
+        {
+            return;
+        }
+
+        if (string.IsNullOrEmpty(query))
+        {
+            // empty commit (Enter on a blank box, or Escape) leaves search and restores the listing
+            if (FileActions.IsExplorerSearchResults)
+            {
+                FileActions.IsExplorerSearchResults = false;
+                FileActionLogic.Refresh();
+            }
+
+            return;
+        }
+
+        FileActions.IsExplorerSearchResults = true;
+
+        ViewModel.FirstSelectedIndex = -1;
+        ViewModel.CurrentSelectedIndex = -1;
+        ActiveUnselectAll();
+
+        DirList.NavigateToSearch(CurrentPath, query);
     }
 
     private void SortExplorer()
@@ -1624,7 +1660,15 @@ public partial class ExplorerPageHeader : UserControl
     private void NameColumnEdit_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
         if (e.NewValue is not true)
+        {
+            // The edit box was hidden for any reason (clean commit, but also a list refresh, row recycling,
+            // or an interrupted rename). Clear the editing flag so the rename tooltip, bound to it, can't
+            // stay stuck on screen.
+            if (FileActions.IsExplorerEditing)
+                FileActions.IsExplorerEditing = false;
+
             return;
+        }
 
         var textBox = sender as TextBox;
 

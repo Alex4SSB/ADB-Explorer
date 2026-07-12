@@ -3,7 +3,8 @@ namespace ADB_Explorer.Models;
 public readonly record struct DriveRestrictions(
     bool NoExec,
     bool ReadOnly,
-    bool NoAccessTime)
+    bool NoAccessTime,
+    bool FuseFs = false)
 {
     public static readonly DriveRestrictions None = default;
 
@@ -13,12 +14,12 @@ public readonly record struct DriveRestrictions(
 
     public string IconGlyph => ReadOnly ? "\uE72E" : "\uE7BA";
 
-    public bool NoSymbolicLinks => NoExec;
-    public bool RestrictedNaming => NoExec;
-    public bool CaseInsensitiveNames => NoExec;
+    public bool NoSymbolicLinks => FuseFs;
+    public bool RestrictedNaming => FuseFs;
+    public bool CaseInsensitiveNames => FuseFs;
     public bool NoApkInstall => NoExec;
 
-    public static DriveRestrictions From(string[]? mountOptions)
+    public static DriveRestrictions From(string[]? mountOptions, string? fileSystemType = null)
     {
         if (mountOptions is null || mountOptions.Length == 0)
             return None;
@@ -28,10 +29,25 @@ public readonly record struct DriveRestrictions(
             .Where(o => o.Length > 0)
             .ToHashSet();
 
+        var noExec = HasOption(options, "noexec");
+
         return new(
-            NoExec: HasOption(options, "noexec"),
+            NoExec: noExec,
             ReadOnly: HasOption(options, "ro"),
-            NoAccessTime: HasOption(options, "noatime"));
+            NoAccessTime: HasOption(options, "noatime"),
+            // naming/symlink limits come from FUSE/FAT, not noexec; old callers without an fs type keep the noexec guess
+            FuseFs: fileSystemType is null ? noExec : IsFuseLikeFs(fileSystemType));
+    }
+
+    private static bool IsFuseLikeFs(string fileSystemType)
+    {
+        var type = fileSystemType.ToLowerInvariant();
+
+        return type.Contains("fuse")
+            || type.Contains("sdcardfs")
+            || type.Contains("esdfs")
+            || type.Contains("fat")     // vfat / exfat / fat32
+            || type.Contains("msdos");
     }
 
     private static bool HasOption(HashSet<string> options, string name) =>

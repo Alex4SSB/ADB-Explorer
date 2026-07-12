@@ -317,7 +317,14 @@ public static class AdbHelper
 
     public static void ApplyMountInfo(LogicalDeviceViewModel device, CancellationToken cancellationToken)
     {
-        var infos = GetMountInfo(device, cancellationToken);
+        var infos = GetMountInfo(device, cancellationToken).ToList();
+
+        // a cancelled fetch is truncated; don't overwrite a good table with it
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
+        if (infos.Count > 0)
+            device.MountPoints = infos;
 
         foreach (var drive in device.Drives.OfType<LogicalDriveViewModel>())
         {
@@ -366,7 +373,12 @@ public static class AdbHelper
             App.SafeInvoke(() => drive.FSInfo = info);
         }
 
-        App.SafeInvoke(FileActionLogic.UpdateFileActions);
+        App.SafeInvoke(() =>
+        {
+            // recompute access; the first pass may have run before the mount table arrived
+            Data.DirList?.RefreshLocationAccess();
+            FileActionLogic.UpdateFileActions();
+        });
     }
 
     private static IEnumerable<Models.FileSystemInfo> GetMountInfo(LogicalDeviceViewModel device, CancellationToken cancellationToken)

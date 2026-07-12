@@ -12,7 +12,8 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 {
     #region Notify Properties
 
-    public string ParsedFullPath => Data.CurrentDrive?.LinkTargetPath is null
+    // String.Replace throws on an empty oldValue, so skip the remap when the drive path is blank.
+    public string ParsedFullPath => Data.CurrentDrive?.LinkTargetPath is null || string.IsNullOrEmpty(Data.CurrentDrive.Path)
         ? FullPath
         : FullPath.Replace(Data.CurrentDrive.Path, Data.CurrentDrive.LinkTargetPath);
 

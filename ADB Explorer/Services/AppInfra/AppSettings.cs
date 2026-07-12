@@ -150,8 +150,10 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
         }
     }
 
+    // Require the folder to still exist: a stale DefaultFolder (deleted/unmounted after being set) would
+    // otherwise make double-click-to-pull fire at a dead path and fail.
     [JsonIgnore]
-    public bool IsPullOnDoubleClickEnabled => !string.IsNullOrEmpty(DefaultFolder);
+    public bool IsPullOnDoubleClickEnabled => !string.IsNullOrEmpty(DefaultFolder) && Directory.Exists(DefaultFolder);
 
     [ObservableProperty]
     public partial string ManualAdbPath { get; set; } = "";

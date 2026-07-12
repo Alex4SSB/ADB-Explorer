@@ -32,7 +32,8 @@
         [GeneratedRegex(@"(?:INSTALL_FAILED_INVALID_APK.*?)(?<package>com\.[\w.]+)(?:])")]
         public static partial Regex RE_PACKAGE_NAME();
 
-        [GeneratedRegex(@"package:(?<Path>\S+\.apk)=(?<Name>\S+) versionCode:(?<Version>\d+) uid:(?<Uid>\d+)")]
+        // versionCode / uid only appear with --show-versioncode / -U, so keep both groups optional
+        [GeneratedRegex(@"package:(?<Path>\S+\.(?:apk|apex))=(?<Name>\S+)(?: versionCode:(?<Version>\d+))?(?: uid:(?<Uid>\d+))?")]
         public static partial Regex RE_PACKAGE_LISTING();
 
         [GeneratedRegex(@"(?:(?<!\d)(?<Date>\d{8})[^\d](?:(?<=[-_])(?<Time>\d{6}))?[^\d])|(?:(?<!\d)(?<DnT>\d{4}(?:[-_]\d{2}){5})[^\d])")]
