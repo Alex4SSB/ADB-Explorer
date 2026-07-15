@@ -538,9 +538,9 @@ ADB 包含在 Android SDK Platform Tools 中。
     <comment>Title of the dialog asking packaged users where to store app data</comment>
   </data>
   <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
-    <value>This app distribution saves data in a virtualized (and hard to reach) location, which is cleared on app uninstall.
+    <value>此應用程式安裝版儲存資料於虛擬 (且難達到的) 位置，而這會在解除安裝時一併清除。
 
-Select Custom to use a location that will not be removed on uninstall. The custom location cannot be under C:\Users\…\AppData</value>
+選「自訂」以使用一個解除安裝時，不會被清除的位置。但是自訂位置不可在 C:\Users\…\AppData 之下</value>
     <comment>Explains virtualized vs custom app data location for packaged installs</comment>
   </data>
   <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
