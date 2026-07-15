@@ -138,10 +138,9 @@
                             d:Stroke="White"
                             Data="M5.21367 1.45866C5.56266 0.847113 6.43733 0.847113 6.78633 1.45866L10.8776 8.62781C11.2259 9.23809 10.7893 10 10.0913 10H1.9087C1.2107 10 0.774094 9.23809 1.12237 8.62781L5.21367 1.45866ZM6 2.11928L2.08308 8.98286H9.91692L6 2.11928Z"
                             Stretch="Uniform"
-                            Stroke="{DynamicResource TextFillColorPrimaryBrush}"
                             StrokeThickness="1">
                             <Path.Style>
-                                <Style TargetType="Path">
+                                <Style BasedOn="{StaticResource MonochromeIconPathStrokeStyle}" TargetType="Path">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsUpVisible, ElementName=transferIndicator}" Value="True">
                                             <Setter Property="Visibility" Value="Collapsed" />
@@ -187,10 +186,9 @@
                             d:Stroke="White"
                             Data="M6.78633 10.5413C6.43733 11.1529 5.56266 11.1529 5.21367 10.5413L1.12237 3.37219C0.774094 2.76191 1.21071 2 1.9087 2L10.0913 2C10.7893 2 11.2259 2.76191 10.8776 3.37219L6.78633 10.5413ZM6 9.88072L9.91692 3.01714L2.08308 3.01714L6 9.88072Z"
                             Stretch="Uniform"
-                            Stroke="{DynamicResource TextFillColorPrimaryBrush}"
                             StrokeThickness="1">
                             <Path.Style>
-                                <Style TargetType="Path">
+                                <Style BasedOn="{StaticResource MonochromeIconPathStrokeStyle}" TargetType="Path">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsDownVisible, ElementName=transferIndicator}" Value="True">
                                             <Setter Property="Visibility" Value="Collapsed" />

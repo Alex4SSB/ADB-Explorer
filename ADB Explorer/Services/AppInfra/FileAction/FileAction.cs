@@ -26,7 +26,6 @@ public static class AppActions
     {
         { FileActionType.PushFolders, "\uE8B7" },
         { FileActionType.NewFile, "\uE8A5" },
-        { FileActionType.Package, "\uE7B8" },
         { FileActionType.New, "\uECC8" },
         { FileActionType.Cut, "\uE8C6" },
         { FileActionType.Copy, "\uE8C8" },

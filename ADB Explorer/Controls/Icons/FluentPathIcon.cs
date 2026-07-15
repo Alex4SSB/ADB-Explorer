@@ -50,10 +50,10 @@ public class FluentPathIcon : IconElement
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
             Stretch = Stretch,
-            Fill = Foreground,
             Data = Data,
         };
 
+        PathElement.SetBinding(System.Windows.Shapes.Shape.FillProperty, new Binding(nameof(Foreground)) { Source = this });
         PathElement.SetBinding(FrameworkElement.WidthProperty, new Binding(nameof(Width)) { Source = this });
         PathElement.SetBinding(FrameworkElement.HeightProperty, new Binding(nameof(Height)) { Source = this });
 
@@ -67,11 +67,6 @@ public class FluentPathIcon : IconElement
     private Size GetLayoutSize() => new(
         double.IsNaN(Width) ? DefaultSize : Width,
         double.IsNaN(Height) ? DefaultSize : Height);
-
-    protected override void OnForegroundChanged(DependencyPropertyChangedEventArgs args)
-    {
-        PathElement?.SetCurrentValue(System.Windows.Shapes.Path.FillProperty, args.NewValue as Brush);
-    }
 
     private static void OnDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {

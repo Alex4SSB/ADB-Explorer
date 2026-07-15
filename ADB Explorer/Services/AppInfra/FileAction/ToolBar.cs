@@ -126,7 +126,7 @@ internal static class MainToolBar
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), AppActions.Icon(FileAction.FileActionType.UpdateModified, 16)),
                 new SubMenuSeparator(Data.FileActions.IsApkActionsVisible),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Package),
-                    AppActions.Icon(FileAction.FileActionType.Package, 16),
+                    new(FluentPathGeometries.Box, 16),
                     isVisible: Data.FileActions.IsApkActionsVisible,
                     children:
                     [
