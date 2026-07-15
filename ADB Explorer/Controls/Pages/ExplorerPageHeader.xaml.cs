@@ -664,6 +664,7 @@ public partial class ExplorerPageHeader : UserControl
         FileActions.IsExplorerVisible = true;
         FileActions.HomeEnabled = true;
         RuntimeSettings.BrowseDrive = null;
+        RuntimeSettings.SelectedDrive = null;
 
         Task.Delay(EXPLORER_NAV_DELAY).ContinueWith(_ => App.SafeInvoke(() => RuntimeSettings.IsExplorerLoaded = true));
 
@@ -882,7 +883,10 @@ public partial class ExplorerPageHeader : UserControl
         CurrentDrive = null;
 
         if (!bfNavigation)
+        {
             DriveList.SelectedIndex = -1;
+            RuntimeSettings.SelectedDrive = null;
+        }
 
         if (DriveList.SelectedIndex > -1)
         {
@@ -891,6 +895,9 @@ public partial class ExplorerPageHeader : UserControl
             if (DetailsPane.IsOpen)
                 DetailsPane.SelectedFiles = DriveList.SelectedItem is DriveViewModel selectedDrive ? [selectedDrive] : [];
         }
+
+        RuntimeSettings.SelectedDrive = DriveList.SelectedItem as DriveViewModel;
+        FileActionLogic.UpdateFileActions();
     }
 
     private void DataGridCell_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
@@ -1841,7 +1848,9 @@ public partial class ExplorerPageHeader : UserControl
 
     private void DriveList_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        DetailsPane.SelectedFiles = DriveList.SelectedItem is DriveViewModel selectedDrive ? [selectedDrive] : [];
+        RuntimeSettings.SelectedDrive = DriveList.SelectedItem as DriveViewModel;
+        DetailsPane.SelectedFiles = RuntimeSettings.SelectedDrive is DriveViewModel selectedDrive ? [selectedDrive] : [];
+        FileActionLogic.UpdateFileActions();
     }
 
     private void DriveList_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -1859,6 +1868,8 @@ public partial class ExplorerPageHeader : UserControl
         }
 
         DriveList.SelectedIndex = -1;
+        RuntimeSettings.SelectedDrive = null;
+        FileActionLogic.UpdateFileActions();
     }
 
     private void ExplorerHeader_SizeChanged(object sender, SizeChangedEventArgs e)
