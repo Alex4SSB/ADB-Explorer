@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.Services.AppInfra;
 
 namespace ADB_Explorer.ViewModels;
 
@@ -25,6 +26,9 @@ public partial class VirtualDriveViewModel : DriveViewModel
         {
             Drive.ItemsCount = newCount;
             OnPropertyChanged(nameof(ItemsCount));
+
+            if (Data.RuntimeSettings.SelectedDrive == this && Data.FileActions.IsDriveViewVisible)
+                FileActionLogic.UpdateFileActions();
         }
     }
 

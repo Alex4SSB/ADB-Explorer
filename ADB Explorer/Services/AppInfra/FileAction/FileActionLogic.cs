@@ -14,6 +14,15 @@ internal static class FileActionLogic
     private static bool SelectionIsFuseProtectedAndroidRoot =>
         Data.SelectedFiles.Any(f => ShellAccessHelper.IsFuseProtectedAndroidRoot(f.FullPath));
 
+    private static bool IsTrashDriveSelectedInDriveView()
+        => Data.FileActions.IsDriveViewVisible
+           && Data.RuntimeSettings.SelectedDrive?.Type is AbstractDrive.DriveType.Trash;
+
+    private static VirtualDriveViewModel? SelectedTrashDrive()
+        => Data.RuntimeSettings.SelectedDrive is VirtualDriveViewModel { Type: AbstractDrive.DriveType.Trash } trash
+            ? trash
+            : null;
+
     private static string RemoveApkMessage(IEnumerable<IBrowserItem> objects)
     {
         var count = objects.Count();
@@ -598,10 +607,15 @@ internal static class FileActionLogic
     {
         permanent ??= Keyboard.Modifiers is ModifierKeys.Shift;
 
+        var emptyTrashFromDriveView = IsTrashDriveSelectedInDriveView() && !Data.SelectedFiles.Any();
+        var emptyingRecycleBin = (Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any()) || emptyTrashFromDriveView;
+
         List<FileClass> itemsToDelete;
-        if (Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any())
+        if (emptyingRecycleBin)
         {
-            itemsToDelete = [.. Data.DirList.FileList.Where(f => f.Extension != AdbExplorerConst.RECYCLE_INDEX_SUFFIX)];
+            itemsToDelete = emptyTrashFromDriveView
+                ? TrashHelper.GetRecycleBinItems()
+                : [.. Data.DirList.FileList.Where(f => f.Extension != AdbExplorerConst.RECYCLE_INDEX_SUFFIX)];
         }
         else
         {
@@ -624,19 +638,19 @@ internal static class FileActionLogic
                 deletedString += Strings.Resources.S_BROWSER_ITEMS_PLURAL;
         }
 
-        if (!Data.Settings.EnableRecycle || permanent.Value)
+        if (!Data.Settings.EnableRecycle || permanent.Value || emptyingRecycleBin)
         {
             var result = await DialogService.ShowConfirmation(
             string.Format(Strings.Resources.S_DELETE_PERMANENT, deletedString),
             Strings.Resources.S_DEL_CONF_TITLE,
-            Strings.Resources.S_DELETE_ACTION,
+            emptyingRecycleBin ? Strings.Resources.S_EMPTY_TRASH : Strings.Resources.S_DELETE_ACTION,
             icon: DialogService.DialogIcon.Delete);
 
             if (result.Item1 is not Wpf.Ui.Controls.ContentDialogResult.Primary)
                 return;
         }
 
-        if (!Data.FileActions.IsRecycleBin && Data.Settings.EnableRecycle && !permanent.Value)
+        if (!Data.FileActions.IsRecycleBin && !emptyTrashFromDriveView && Data.Settings.EnableRecycle && !permanent.Value)
         {
             await ShellFileOperation.MakeDir(Data.DevicesObject.Current, AdbExplorerConst.RECYCLE_PATH);
 
@@ -661,6 +675,16 @@ internal static class FileActionLogic
                 {
                     _ = Task.Run(() => ShellFileOperation.SilentDelete(Data.DevicesObject.Current, remainingItems));
                 }
+            }
+            else if (emptyTrashFromDriveView)
+            {
+                var indexPaths = ADBService.FindFilesInPath(Data.DevicesObject.Current.ID,
+                                                            AdbExplorerConst.RECYCLE_PATH,
+                                                            includeNames: ["*" + AdbExplorerConst.RECYCLE_INDEX_SUFFIX]);
+                if (indexPaths.Length > 0)
+                    ShellFileOperation.SilentDelete(Data.DevicesObject.Current, indexPaths);
+
+                SelectedTrashDrive()?.SetItemsCount(0);
             }
         }
     }
@@ -884,6 +908,11 @@ internal static class FileActionLogic
         {
             TrashHelper.EnableRecycleButtons(Data.SelectedFiles.Any() ? Data.SelectedFiles : Data.DirList.FileList);
         }
+        else if (SelectedTrashDrive() is { ItemsCount: > 0 })
+        {
+            Data.FileActions.DeleteEnabled = true;
+            Data.FileActions.RestoreEnabled = false;
+        }
         else
         {
             Data.FileActions.DeleteEnabled = isWritable
@@ -900,6 +929,10 @@ internal static class FileActionLogic
             Data.FileActions.DeleteDescription.Value = Data.SelectedFiles.Any()
                 ? Strings.Resources.S_PERM_DEL
                 : Strings.Resources.S_EMPTY_TRASH;
+        }
+        else if (IsTrashDriveSelectedInDriveView())
+        {
+            Data.FileActions.DeleteDescription.Value = Strings.Resources.S_EMPTY_TRASH;
         }
         else
         {

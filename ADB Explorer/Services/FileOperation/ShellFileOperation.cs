@@ -83,6 +83,8 @@ public static class ShellFileOperation
             }
         }
 
+        TrashHelper.SyncDriveViewTrashCountAfterDelete(op);
+
         op.PropertyChanged -= DeleteFileOp_PropertyChanged;
     }
 

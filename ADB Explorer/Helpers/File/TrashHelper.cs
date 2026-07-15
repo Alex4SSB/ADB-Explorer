@@ -15,6 +15,31 @@ internal static class TrashHelper
         Data.FileActions.DeleteEnabled = fileList.Any(item => item.Extension != AdbExplorerConst.RECYCLE_INDEX_SUFFIX);
     }
 
+    public static List<FileClass> GetRecycleBinItems()
+    {
+        if (Data.DevicesObject.Current is null)
+            return [];
+
+        ParseIndexers();
+
+        var paths = ADBService.FindFilesInPath(Data.DevicesObject.Current.ID,
+                                               AdbExplorerConst.RECYCLE_PATH,
+                                               excludeNames: ["*" + AdbExplorerConst.RECYCLE_INDEX_SUFFIX]);
+
+        List<FileClass> items = [];
+        foreach (var path in paths)
+        {
+            var name = FileHelper.GetFullName(path);
+            var item = new FileClass(name, path, AbstractFile.FileType.File);
+            if (Data.RecycleIndex.FirstOrDefault(index => index.RecycleName == name) is TrashIndexer indexer)
+                item.TrashIndex = indexer;
+
+            items.Add(item);
+        }
+
+        return items;
+    }
+
     public static void UpdateRecycledItemsCount(CancellationToken cancellationToken = default)
     {
         var countTask = Task.Run(() => ADBService.CountRecycle(Data.DevicesObject.Current.ID), cancellationToken);
@@ -58,5 +83,21 @@ internal static class TrashHelper
                                                                                           StringSplitOptions.RemoveEmptyEntries);
 
         lines.ToList().ForEach(line => Data.RecycleIndex.Add(new(line)));
+    }
+
+    public static void SyncDriveViewTrashCountAfterDelete(FileDeleteOperation completedOp)
+    {
+        if (!Data.FileActions.IsDriveViewVisible
+            || !completedOp.FilePath.FullPath.StartsWith(AdbExplorerConst.RECYCLE_PATH, StringComparison.Ordinal))
+            return;
+
+        var pendingRecycleDeletes = Data.FileOpQ.Operations.Any(op =>
+            op is FileDeleteOperation deleteOp
+            && deleteOp != completedOp
+            && deleteOp.Status is FileOperation.OperationStatus.Waiting or FileOperation.OperationStatus.InProgress
+            && deleteOp.FilePath.FullPath.StartsWith(AdbExplorerConst.RECYCLE_PATH, StringComparison.Ordinal));
+
+        if (!pendingRecycleDeletes)
+            UpdateRecycledItemsCount();
     }
 }

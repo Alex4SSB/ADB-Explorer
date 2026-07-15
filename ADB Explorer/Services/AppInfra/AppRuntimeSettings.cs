@@ -14,6 +14,13 @@ public partial class AppRuntimeSettings : ViewModelBase
         set => Set(ref browseDrive, value);
     }
 
+    private DriveViewModel selectedDrive = null;
+    public DriveViewModel SelectedDrive
+    {
+        get => selectedDrive;
+        set => Set(ref selectedDrive, value);
+    }
+
     private AdbLocation locationToNavigate = new(Navigation.SpecialLocation.None);
     public AdbLocation LocationToNavigate
     {

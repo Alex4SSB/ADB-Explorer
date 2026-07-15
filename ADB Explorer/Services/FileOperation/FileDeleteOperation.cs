@@ -11,6 +11,10 @@ public class FileDeleteOperation : AbstractShellFileOperation
     {
         OperationName = OperationType.Delete;
         AltTarget = new(Navigation.SpecialLocation.devNull);
+
+        if (path.TrashIndex is not null
+            || path.FullPath.StartsWith(AdbExplorerConst.RECYCLE_PATH, StringComparison.Ordinal))
+            AltSource = new(Navigation.SpecialLocation.RecycleBin);
     }
 
     public override void Start()
