@@ -16,7 +16,7 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly NavigationViewItem _logItem = new()
     {
         Content = new Wpf.Ui.Controls.TextBlock() { FontSize = 12, Text = Strings.Resources.S_BUTTON_LOG, TextTrimming = TextTrimming.CharacterEllipsis },
-        Icon = new FluentPathIcon { Data = FluentPathGeometries.TextBulletListSquare },
+        Icon = new FluentPathIcon { Data = FluentPathGeometries.TextBulletListSquare, Width = 22, Height = 22 },
         TargetPageType = typeof(Views.Pages.LogPage),
         ToolTip = Strings.Resources.S_BUTTON_LOG,
         Visibility = Data.Settings.EnableLog ? Visibility.Visible : Visibility.Collapsed

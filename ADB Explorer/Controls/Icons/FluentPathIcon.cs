@@ -1,3 +1,4 @@
+using System.Windows.Data;
 using Wpf.Ui.Controls;
 
 namespace ADB_Explorer.Controls;
@@ -7,6 +8,15 @@ namespace ADB_Explorer.Controls;
 /// </summary>
 public class FluentPathIcon : IconElement
 {
+    /// <summary>Matches Wpf.Ui <c>DefaultIconFontSize</c> so path icons align with <see cref="FontIcon"/>.</summary>
+    private const double DefaultSize = 16;
+
+    static FluentPathIcon()
+    {
+        WidthProperty.OverrideMetadata(typeof(FluentPathIcon), new FrameworkPropertyMetadata(DefaultSize));
+        HeightProperty.OverrideMetadata(typeof(FluentPathIcon), new FrameworkPropertyMetadata(DefaultSize));
+    }
+
     public static readonly DependencyProperty DataProperty = DependencyProperty.Register(
         nameof(Data),
         typeof(Geometry),
@@ -37,15 +47,26 @@ public class FluentPathIcon : IconElement
     {
         PathElement = new System.Windows.Shapes.Path
         {
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            VerticalAlignment = VerticalAlignment.Stretch,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
             Stretch = Stretch,
             Fill = Foreground,
             Data = Data,
         };
 
+        PathElement.SetBinding(FrameworkElement.WidthProperty, new Binding(nameof(Width)) { Source = this });
+        PathElement.SetBinding(FrameworkElement.HeightProperty, new Binding(nameof(Height)) { Source = this });
+
         return PathElement;
     }
+
+    protected override Size MeasureOverride(Size availableSize) => GetLayoutSize();
+
+    protected override Size ArrangeOverride(Size finalSize) => base.ArrangeOverride(GetLayoutSize());
+
+    private Size GetLayoutSize() => new(
+        double.IsNaN(Width) ? DefaultSize : Width,
+        double.IsNaN(Height) ? DefaultSize : Height);
 
     protected override void OnForegroundChanged(DependencyPropertyChangedEventArgs args)
     {
