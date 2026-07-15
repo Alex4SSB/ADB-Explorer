@@ -282,6 +282,8 @@ public partial class DetailsPane : UserControl
     private static readonly BitmapSource AppIcon = FileToIconConverter.LoadBitmap(new System.Drawing.Icon(Properties.AppGlobal.APK_icon, 128, 128).ToBitmap());
 
     private CancellationTokenSource? _cancellationToken;
+    private CancellationTokenSource? _extraInfoCts;
+    private string? _extraInfoPath;
     private MemoryStream? _pdfMemoryStream;
 
     private static void OnSelectedFilesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => App.SafeBeginInvoke(() =>
@@ -295,7 +297,10 @@ public partial class DetailsPane : UserControl
             && oldFiles.First() is FileClass oldFile)
         {
             oldFile.PropertyChanged -= control.OnFileFullPathChanged;
+            oldFile.CancelCacheThumbnailLoading();
         }
+
+        control.ClearPhotoPreview();
 
         control.EditorText = null;
         control.IsEditorReadOnly = false;
@@ -310,6 +315,9 @@ public partial class DetailsPane : UserControl
         control._pdfMemoryStream = null;
         control._cancellationToken?.Cancel();
         control._cancellationToken = null;
+        control._extraInfoCts?.Cancel();
+        control._extraInfoCts = null;
+        control._extraInfoPath = null;
         if (files.FirstOrDefault() is FileClass fc && string.IsNullOrEmpty(fc.FullName))
             return;
 
@@ -320,6 +328,13 @@ public partial class DetailsPane : UserControl
                 : Strings.Resources.S_PREVIEW_EMPTY_SELECTION;
 
             if (files.Count() == 1
+                && !Data.FileActions.IsRecycleBin
+                && files.First() is FileClass previewFile
+                && ThumbnailService.IsPhotoPaneThumbnailCandidate(previewFile))
+            {
+                control.ShowPhotoPreview(previewFile);
+            }
+            else if (files.Count() == 1
                 && !Data.FileActions.IsRecycleBin
                 && files.First() is FileClass file
                 && file.Type is AbstractFile.FileType.File
@@ -402,6 +417,7 @@ public partial class DetailsPane : UserControl
                     control.LargeFileIcon.MaxHeight = f.CacheThumbnail?.Image is null ? 128 : 192;
                     control.SmallFileIcon.Source = f.CacheThumbnail?.Image is null ? null : f.FileIcon32;
                     control.InvalidSelectionBorder.Visibility = Visibility.Collapsed;
+                    f.BeginLoadCacheThumbnail();
                     control.PopulateThumbnailInfoItems(f);
                 }
                 else if (item is Package p)
@@ -502,6 +518,7 @@ public partial class DetailsPane : UserControl
                     control.FileNameTextBlock.Text = location.DisplayName;
                     control.LargeFileIcon.Source = location.DragImage;
                     control.InvalidSelectionBorder.Visibility = Visibility.Collapsed;
+                    location.BeginLoadCacheThumbnail();
                     control.PopulateThumbnailInfoItems(location);
                 }
                 else
@@ -523,11 +540,56 @@ public partial class DetailsPane : UserControl
     {
         if (e.PropertyName == nameof(FileClass.DisplayName))
             RefreshSelection();
-        else if (e.PropertyName is nameof(FileClass.CreationTime) or nameof(FileClass.IsCreationTimeResolved))
+        else if (e.PropertyName is nameof(FileClass.Size) or nameof(FilePath.ShellLsSize))
+        {
+            if (sender is FileClass file && ReferenceEquals(File, file) && ThumbnailService.IsCustomThumbnailCandidate(file))
+                file.BeginLoadCacheThumbnail();
+        }
+        else if (e.PropertyName is nameof(FileClass.CreationTime)
+            or nameof(FileClass.IsCreationTimeResolved)
+            or nameof(FileClass.User)
+            or nameof(FileClass.Group)
+            or nameof(FileClass.LastAccessTime)
+            or nameof(FileClass.ModifiedTimeWithOffset)
+            or nameof(FileClass.LinkTarget))
             return;
+        else if (e.PropertyName is nameof(FileClass.DragImage) or nameof(FileClass.CacheThumbnail))
+        {
+            if (sender is FileClass file && ReferenceEquals(File, file))
+            {
+                if (Mode is SidePaneMode.Preview && PhotoPreviewScrollViewer.Visibility is Visibility.Visible)
+                    PhotoPreviewImage.Source = file.DragImage;
+                else
+                    UpdateFileThumbnailDisplay(file);
+            }
+        }
         else if (sender is FileClass file && ReferenceEquals(File, file))
             PopulateThumbnailInfoItems(file);
     });
+
+    private void UpdateFileThumbnailDisplay(FileClass file)
+    {
+        LargeFileIcon.Source = file.DragImage;
+        LargeFileIcon.MaxHeight = file.CacheThumbnail?.Image is null ? 128 : 192;
+        SmallFileIcon.Source = file.CacheThumbnail?.Image is null ? null : file.FileIcon32;
+        PopulateThumbnailInfoItems(file);
+    }
+
+    private void ShowPhotoPreview(FileClass file)
+    {
+        File = file;
+        file.PropertyChanged += OnFileFullPathChanged;
+        NoPreviewTextBlock.Visibility = Visibility.Collapsed;
+        PhotoPreviewScrollViewer.Visibility = Visibility.Visible;
+        PhotoPreviewImage.Source = file.DragImage;
+        file.BeginLoadCacheThumbnail();
+    }
+
+    private void ClearPhotoPreview()
+    {
+        PhotoPreviewImage.Source = null;
+        PhotoPreviewScrollViewer.Visibility = Visibility.Collapsed;
+    }
 
     public DetailsPane()
     {
@@ -843,8 +905,15 @@ public partial class DetailsPane : UserControl
         if (file.ModifiedTime.HasValue)
             SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_FILE_INFO_MODIFIED, f => f.FolderViewModel.ModifiedTimeWithOffsetString, valueIsLtr: true).Init());
 
-        if (file.LastAccessTime.HasValue && Data.CurrentDrive?.Restrictions.SupportsAccessTime is true)
-            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_DATE_ACCESSED, f => f.FolderViewModel.LastAccessTimeString, valueIsLtr: true).Init());
+        if (Data.CurrentDrive?.Restrictions.SupportsAccessTime is true)
+            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(
+                file,
+                Strings.Resources.S_DATE_ACCESSED,
+                f => f.LastAccessTime.HasValue ? f.FolderViewModel.LastAccessTimeString : "",
+                valueIsLtr: true,
+                rowVisibility: static f => f.IsCreationTimeResolved && !f.LastAccessTime.HasValue
+                    ? Visibility.Hidden
+                    : Visibility.Visible).Init());
 
         if (!Data.FileActions.IsRecycleBin
             && !ArchivePath.IsArchivePath(file.FullPath, Data.DevicesObject?.Current?.ID))
@@ -890,13 +959,20 @@ public partial class DetailsPane : UserControl
         var deviceId = Data.DevicesObject?.Current?.ID;
         var probeExtraInfo = !Data.FileActions.IsRecycleBin
             && !ArchivePath.IsArchivePath(file.FullPath, deviceId)
-            && (!file.IsCreationTimeResolved || file.User is null || file.Group is null);
+            && !file.IsCreationTimeResolved;
 
-        if (probeExtraInfo)
+        if (probeExtraInfo && _extraInfoPath != file.FullPath)
         {
-            var cts = new CancellationTokenSource();
-            _cancellationToken = cts;
-            _ = Task.Run(() => file.UpdateExtraInfo(cts.Token), cts.Token);
+            _extraInfoCts?.Cancel();
+            _extraInfoCts = new CancellationTokenSource();
+            var probePath = file.FullPath;
+            _extraInfoPath = probePath;
+            var cts = _extraInfoCts;
+            _ = file.UpdateExtraInfoAsync(cts.Token).ContinueWith(_ =>
+            {
+                if (_extraInfoPath == probePath)
+                    _extraInfoPath = null;
+            }, TaskScheduler.Default);
         }
 
         if (file.Permissions.HasValue)

@@ -317,9 +317,12 @@ public static class AdbHelper
 
     public static void ApplyMountInfo(LogicalDeviceViewModel device, CancellationToken cancellationToken)
     {
-        var infos = GetMountInfo(device, cancellationToken);
+        var infos = GetMountInfo(device, cancellationToken).ToList();
 
-        foreach (var drive in device.Drives.OfType<LogicalDriveViewModel>())
+        DriveViewModel[] drives = [];
+        App.SafeInvoke(() => drives = [.. device.Drives]);
+
+        foreach (var drive in drives.OfType<LogicalDriveViewModel>())
         {
             if (cancellationToken.IsCancellationRequested)
                 break;
@@ -352,7 +355,7 @@ public static class AdbHelper
             }
         }
 
-        foreach (var drive in device.Drives.OfType<VirtualDriveViewModel>().Where(d => d.Type is AbstractDrive.DriveType.Temp))
+        foreach (var drive in drives.OfType<VirtualDriveViewModel>().Where(d => d.Type is AbstractDrive.DriveType.Temp))
         {
             if (cancellationToken.IsCancellationRequested)
                 break;

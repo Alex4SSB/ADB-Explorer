@@ -383,6 +383,9 @@ public partial class ExplorerPageHeader : UserControl
         {
             foreach (var file in SelectedFiles.Where(f => f.IsRegularFile && f.ShellLsSize is null))
             {
+                if (DetailsPane.IsOpen && !file.IsCreationTimeResolved)
+                    continue;
+
                 file.UpdateSizeFromShell(CancellationToken.None);
             }
         }

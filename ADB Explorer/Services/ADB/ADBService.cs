@@ -95,6 +95,7 @@ public partial class ADBService
         UpdateCommandActive(1);
         using var cmdProcess = StartCommandProcess(file, cmd, encoding, args: args);
         ActiveCommandProcesses[cmdProcess.Id] = cmdProcess;
+        using var cancellationRegistration = cancellationToken.Register(() => KillTrackedProcess(cmdProcess));
 
         var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync();
         var stderrTask = cmdProcess.StandardError.ReadToEndAsync();
@@ -494,15 +495,6 @@ public partial class ADBService
         return ShellAccessHelper.ParseLocationInfo(stdout);
     }
 
-    /// <summary>Returns whether <paramref name="path"/> is a regular file, or <see langword="null"/> if unknown.</summary>
-    public static bool? TryGetIsRegularFile(string deviceId, string path, CancellationToken cancellationToken = default)
-        => TryGetPathKind(deviceId, path, cancellationToken) switch
-        {
-            DevicePathKind.RegularFile => true,
-            DevicePathKind.Directory => false,
-            _ => null,
-        };
-
     public static DevicePathKind? TryGetPathKind(string deviceId, string path, CancellationToken cancellationToken = default)
     {
         if (!ShellCommands.StatExists(deviceId))
@@ -633,6 +625,7 @@ public partial class ADBService
     }
 
     private static readonly TimeSpan AdbVersionCheckTimeout = TimeSpan.FromSeconds(15);
+    private static readonly SemaphoreSlim ExtraInfoStatGate = new(1, 1);
 
     public static void VerifyAdbVersion(string adbPath)
     {
@@ -877,33 +870,51 @@ public partial class ADBService
         return FileType.Unknown;
     }
 
-    public static FileExtraInfo? GetFileExtraInfo(string deviceId, string path, CancellationToken cancellationToken)
+    public static async Task<FileExtraInfo?> GetFileExtraInfoAsync(string deviceId, string path, CancellationToken cancellationToken)
     {
-        // Get user, group, access time, creation time and modification time using human-readable format to preserve UTC offset
-        var res = ExecuteDeviceAdbShellCommand(deviceId, "stat", out string stdout, out _, cancellationToken, "-c", $"%U{ADB_FIELD_SEP}%G{ADB_FIELD_SEP}%x{ADB_FIELD_SEP}%z{ADB_FIELD_SEP}%y", EscapeAdbShellString(path));
-        if (res != 0 || string.IsNullOrWhiteSpace(stdout))
-        {
-            return null;
-        }
-
-        string user, group;
-        DateTimeOffset accessTime, creationTime, modifiedTime;
-
+        await ExtraInfoStatGate.WaitAsync(cancellationToken);
         try
         {
-            var parts = stdout.Split(ADB_FIELD_SEP);
-            user = parts[0];
-            group = parts[1];
-            accessTime = DateTimeOffset.Parse(parts[2].Trim(), CultureInfo.InvariantCulture);
-            creationTime = DateTimeOffset.Parse(parts[3].Trim(), CultureInfo.InvariantCulture);
-            modifiedTime = DateTimeOffset.Parse(parts[4].Trim(), CultureInfo.InvariantCulture);
-        }
-        catch
-        {
-            return null;
-        }
+            if (cancellationToken.IsCancellationRequested)
+                return null;
 
-        return new FileExtraInfo(user, group, accessTime, creationTime, modifiedTime);
+            return await Task.Run<FileExtraInfo?>(() =>
+            {
+                // Get user, group, access time, creation time and modification time using human-readable format to preserve UTC offset
+                var res = ExecuteDeviceAdbShellCommand(deviceId,
+                                                       "stat",
+                                                       out string stdout,
+                                                       out _,
+                                                       cancellationToken,
+                                                       "-c",
+                                                       $"%s{ADB_FIELD_SEP}%U{ADB_FIELD_SEP}%G{ADB_FIELD_SEP}%x{ADB_FIELD_SEP}%z{ADB_FIELD_SEP}%y",
+                                                       EscapeAdbShellString(path));
+
+                if (res != 0 || string.IsNullOrWhiteSpace(stdout))
+                    return null;
+
+                try
+                {
+                    var parts = stdout.Split(ADB_FIELD_SEP);
+                    long? size = long.TryParse(parts[0].Trim(), out long bytes) ? bytes : null;
+                    return new FileExtraInfo(
+                        parts[1],
+                        parts[2],
+                        DateTimeOffset.Parse(parts[3].Trim(), CultureInfo.InvariantCulture),
+                        DateTimeOffset.Parse(parts[4].Trim(), CultureInfo.InvariantCulture),
+                        DateTimeOffset.Parse(parts[5].Trim(), CultureInfo.InvariantCulture),
+                        size);
+                }
+                catch
+                {
+                    return null;
+                }
+            }, cancellationToken);
+        }
+        finally
+        {
+            ExtraInfoStatGate.Release();
+        }
     }
 
     public static IEnumerable<(string, FileType)> GetLinkType(string deviceId, IEnumerable<string> filePaths, CancellationToken cancellationToken)
@@ -1205,7 +1216,7 @@ public partial class ADBService
                 continue;
 
             BatteryCurrentProbeCache[deviceId] = new(BatteryCurrentProbeSource.Sysfs, SysfsPath: path);
-                return microAmps;
+            return microAmps;
         }
 
         foreach (var transaction in BATTERY_PROPERTIES_TRANSACTIONS)
@@ -1231,16 +1242,16 @@ public partial class ADBService
 
     private static long? TryReadBatteryPropertiesCurrent(string deviceId, int transaction, CancellationToken cancellationToken)
     {
-            if (ExecuteDeviceAdbShellCommand(deviceId,
-                                             "service",
-                                             out string stdout,
-                                             out _,
-                                             cancellationToken,
-                                             "call",
-                                             "batteryproperties",
-                                             transaction.ToString(),
-                                             "i32",
-                                             BATTERY_PROPERTY_CURRENT_NOW.ToString()) != 0)
+        if (ExecuteDeviceAdbShellCommand(deviceId,
+                                         "service",
+                                         out string stdout,
+                                         out _,
+                                         cancellationToken,
+                                         "call",
+                                         "batteryproperties",
+                                         transaction.ToString(),
+                                         "i32",
+                                         BATTERY_PROPERTY_CURRENT_NOW.ToString()) != 0)
             return null;
 
         return ParseBatteryPropertyValue(stdout);
@@ -1395,4 +1406,5 @@ public record struct FileExtraInfo(string User,
                                    string Group,
                                    DateTimeOffset AccessTime,
                                    DateTimeOffset CreationTime,
-                                   DateTimeOffset ModifiedTime);
+                                   DateTimeOffset ModifiedTime,
+                                   long? Size);

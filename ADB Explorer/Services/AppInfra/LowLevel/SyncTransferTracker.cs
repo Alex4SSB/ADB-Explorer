@@ -5,9 +5,30 @@ internal static class SyncTransferTracker
     private static long pullBytes;
     private static long pushBytes;
     private static DateTime lastSnapshot = DateTime.UtcNow;
+    private static DateTime lastTransferUtc = DateTime.MinValue;
 
-    public static void AddPullBytes(long bytes) => Interlocked.Add(ref pullBytes, bytes);
-    public static void AddPushBytes(long bytes) => Interlocked.Add(ref pushBytes, bytes);
+    public static void AddPullBytes(long bytes)
+    {
+        if (bytes > 0)
+            NoteTransfer();
+        Interlocked.Add(ref pullBytes, bytes);
+    }
+
+    public static void AddPushBytes(long bytes)
+    {
+        if (bytes > 0)
+            NoteTransfer();
+        Interlocked.Add(ref pushBytes, bytes);
+    }
+
+    public static bool HasRecentActivity(TimeSpan window) =>
+        lastTransferUtc != DateTime.MinValue && DateTime.UtcNow - lastTransferUtc < window;
+
+    private static void NoteTransfer()
+    {
+        lastTransferUtc = DateTime.UtcNow;
+        DiskUsagePollingService.LastServerResponse = DateTime.Now;
+    }
 
     /// <summary>
     /// Atomically resets the byte counters and returns bytes/s since the last call.

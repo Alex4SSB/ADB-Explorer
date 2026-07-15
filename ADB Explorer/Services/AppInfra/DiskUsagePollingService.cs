@@ -11,7 +11,11 @@ public class DiskUsagePollingService(IServiceProvider serviceProvider) : Backgro
 
     public static DateTime LastServerResponse { get; set; } = DateTime.Now;
 
-    public static bool ServerUnresponsive => Data.Settings.PollDevices && DateTime.Now.Subtract(LastServerResponse) > AdbExplorerConst.SERVER_RESPONSE_TIMEOUT;
+    public static bool ServerUnresponsive =>
+        Data.Settings.PollDevices
+        && DateTime.Now.Subtract(LastServerResponse) > AdbExplorerConst.SERVER_RESPONSE_TIMEOUT
+        && !ADBService.IsCommandActive
+        && !SyncTransferTracker.HasRecentActivity(AdbExplorerConst.SERVER_RESPONSE_TIMEOUT);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -56,6 +60,9 @@ public class DiskUsagePollingService(IServiceProvider serviceProvider) : Backgro
 
     private void OnCommandActiveChanged(bool isActive)
     {
+        if (isActive)
+            LastServerResponse = DateTime.Now;
+
         if (!isActive || ServerUnresponsive)
             return;
 

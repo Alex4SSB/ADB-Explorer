@@ -25,12 +25,6 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         _iconViewModel?.OnSizeChanged();
     }
 
-    protected override void OnShellLsSizeChanged(long? value)
-    {
-        if (value > -1)
-            App.SafeInvoke(() => OnSizeChanged(value));
-    }
-
     [ObservableProperty]
     public partial UnixFileMode? Permissions { get; set; }
 
@@ -151,6 +145,9 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     {
         get
         {
+            if (CacheThumbnail?.Image is BitmapSource cached)
+                return cached;
+
             return Data.Settings.ThumbsMode > AppSettings.ThumbnailMode.IconViewOnly
                 ? LargeIcon
                 : LargeFileIcon;
@@ -161,31 +158,18 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     private BitmapSource LargeFileIcon => FileToIconConverter.GetImage(this, 120).First();
 
-    private ThumbnailService.Thumbnail? _cacheThumbnail = null;
-    public ThumbnailService.Thumbnail? CacheThumbnail
-    {
-        get
-        {
-            if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.Off)
-                return null;
+    public ThumbnailService.Thumbnail? CacheThumbnail => ThumbnailService.GetPaneThumbnail(this);
 
-            if (_cacheThumbnail is null && Data.DevicesObject.Current?.Type 
-                is DeviceType.Local 
-                or DeviceType.Remote
-                or DeviceType.Service)
-            {
-                if (!ThumbnailService.IsInitialized(Data.DevicesObject.Current.SerialNumber))
-                {
-                    Task.Run(() => ThumbnailService.ForceLoad(Data.DevicesObject.Current));
-                }
-                else
-                {
-                    _cacheThumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, ParsedFullPath, ThumbnailService.ThumbnailSize.Drag, false);
-                }
-            }
-            
-            return _cacheThumbnail;
-        }
+    public void BeginLoadCacheThumbnail() =>
+        ThumbnailService.BeginPaneThumbnailLoad(this, ThumbnailService.ThumbnailSize.Drag, scaleWithDpi: false);
+
+    public void CancelCacheThumbnailLoading() => ThumbnailService.CancelPaneThumbnailLoad(this);
+
+    internal void NotifyPaneThumbnailChanged()
+    {
+        OnPropertyChanged(nameof(CacheThumbnail));
+        OnPropertyChanged(nameof(LargeIcon));
+        OnPropertyChanged(nameof(DragImage));
     }
 
     public BitmapSource FileIcon32 => FileToIconConverter.GetImage(this, 32).First();
@@ -198,7 +182,6 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     {
         _iconViewModel?.Dispose();
         _iconViewModel = null;
-        _cacheThumbnail = null;
     }
 
     public void InvalidateIconViewModelThumbnail() => _iconViewModel?.InvalidateThumbnail();
@@ -515,12 +498,19 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             SpecialType |= SpecialFileType.LinkOverlay;
     }
 
-    public void UpdateExtraInfo(CancellationToken cancellationToken)
+    public async Task UpdateExtraInfoAsync(CancellationToken cancellationToken)
     {
-        var info = ADBService.GetFileExtraInfo(Data.DevicesObject.Current, FullPath, cancellationToken);
+        var deviceId = Data.DevicesObject.Current;
+        var path = FullPath;
+        var info = await ADBService.GetFileExtraInfoAsync(deviceId, path, cancellationToken);
+        if (cancellationToken.IsCancellationRequested)
+            return;
 
-        App.SafeInvoke(() =>
+        App.SafeBeginInvoke(() =>
         {
+            if (cancellationToken.IsCancellationRequested || path != FullPath || deviceId != Data.DevicesObject.Current)
+                return;
+
             IsCreationTimeResolved = true;
 
             if (info is null)
@@ -531,6 +521,12 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             LastAccessTime = info.Value.AccessTime;
             CreationTime = info.Value.CreationTime;
             ModifiedTimeWithOffset = info.Value.ModifiedTime;
+
+            if (info.Value.Size is long size && size >= 0)
+            {
+                ShellLsSize = size;
+                Size ??= size;
+            }
         });
     }
 

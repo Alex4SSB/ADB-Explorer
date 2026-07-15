@@ -61,8 +61,12 @@ public partial class FileIconViewModel : FileViewModelBase
         CancelLoading();
         _currentlyLoadingSize = size;
 
-        if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.Off
-            || Data.DevicesObject.Current is null)
+        if (Data.DevicesObject.Current is null)
+            return;
+
+        var useDeviceThumbs = Data.Settings.ThumbsMode is not AppSettings.ThumbnailMode.Off;
+        var useCustomThumbs = Data.Settings.MaxCustomThumbWeight > 0;
+        if (!useDeviceThumbs && !useCustomThumbs)
             return;
 
         var serialNumber = Data.DevicesObject.Current.SerialNumber;
@@ -80,33 +84,49 @@ public partial class FileIconViewModel : FileViewModelBase
             if (token.IsCancellationRequested)
                 return;
 
-            var thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file.ParsedFullPath, size);
+            ThumbnailService.Thumbnail? thumbnail = null;
+            if (useDeviceThumbs)
+                thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file.ParsedFullPath, size);
 
-            if (thumbnail is null)
+            var requestedCustom = useCustomThumbs && ThumbnailService.IsCustomThumbnailCandidate(_file);
+            if ((thumbnail is null || thumbnail.Value.Image is null) && requestedCustom)
                 ThumbnailService.TryPullCustomThumbnail(Data.DevicesObject.Current, _file);
 
             if (token.IsCancellationRequested)
                 return;
 
-            App.SafeBeginInvoke(() =>
+            if (thumbnail is ThumbnailService.Thumbnail { Image: not null } thumb)
             {
-                if (token.IsCancellationRequested)
-                    return;
+                App.SafeBeginInvoke(() =>
+                {
+                    if (token.IsCancellationRequested)
+                        return;
 
-                if (thumbnail is ThumbnailService.Thumbnail thumb)
+                    ApplyLoadedThumbnail(thumb, size);
+                }, DispatcherPriority.Background);
+            }
+            else if (!requestedCustom)
+            {
+                App.SafeBeginInvoke(() =>
                 {
-                    _cachedThumbnail = thumb.Image;
-                    _cachedSize = size;
-                    OnPropertyChanged(nameof(LargeIcon));
-                    UpdateVideoOverlay(thumb);
-                    UpdateTooltip(thumb);
-                }
-                else
+                    if (token.IsCancellationRequested)
+                        return;
+
+                    CancelLoading();
+                    UpdateTooltipNoThumbnail();
+                }, DispatcherPriority.Background);
+            }
+            else
+            {
+                App.SafeBeginInvoke(() =>
                 {
+                    if (token.IsCancellationRequested)
+                        return;
+
                     _currentlyLoadingSize = _cachedSize;
                     UpdateTooltipNoThumbnail();
-                }
-            }, DispatcherPriority.Background);
+                }, DispatcherPriority.Background);
+            }
         }, token);
 
         _thumbnailUpdatedHandler = (updatedDeviceId, updatedFilePath) =>
@@ -119,25 +139,51 @@ public partial class FileIconViewModel : FileViewModelBase
                 if (token.IsCancellationRequested)
                     return;
 
-                var thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file.ParsedFullPath, size);
-                if (thumbnail is not ThumbnailService.Thumbnail thumb)
+                if (ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file.ParsedFullPath, size)
+                    is not ThumbnailService.Thumbnail { Image: not null } thumb)
+                {
+                    App.SafeBeginInvoke(() =>
+                    {
+                        if (token.IsCancellationRequested)
+                            return;
+
+                        _currentlyLoadingSize = _cachedSize;
+                    }, DispatcherPriority.Background);
+
                     return;
+                }
 
                 App.SafeBeginInvoke(() =>
                 {
                     if (token.IsCancellationRequested)
                         return;
 
-                    _cachedThumbnail = thumb.Image;
-                    _cachedSize = size;
-                    OnPropertyChanged(nameof(LargeIcon));
-                    UpdateVideoOverlay(thumb);
-                    UpdateTooltip(thumb);
+                    ApplyLoadedThumbnail(thumb, size);
                 }, DispatcherPriority.Background);
             }, token);
         };
 
         ThumbnailService.ThumbnailUpdated += _thumbnailUpdatedHandler;
+    }
+
+    private void ApplyLoadedThumbnail(ThumbnailService.Thumbnail thumb, ThumbnailService.ThumbnailSize size)
+    {
+        if (_thumbnailUpdatedHandler is not null)
+        {
+            ThumbnailService.ThumbnailUpdated -= _thumbnailUpdatedHandler;
+            _thumbnailUpdatedHandler = null;
+        }
+
+        _cts?.Dispose();
+        _cts = null;
+
+        _cachedThumbnail = thumb.Image;
+        _cachedSize = size;
+        _currentlyLoadingSize = size;
+        OnPropertyChanged(nameof(LargeIcon));
+        UpdateVideoOverlay(thumb);
+        UpdateTooltip(thumb);
+        ThumbnailService.ApplyPaneThumbnail(_file, thumb);
     }
 
     private void UpdateVideoOverlay(ThumbnailService.Thumbnail thumb)
@@ -187,7 +233,6 @@ public partial class FileIconViewModel : FileViewModelBase
                     ? Strings.Resources.S_FILE_BROKEN_LINK
                     : Strings.Resources.S_FILE_TYPE_LINK;
 
-                // explicit hexcode to avoid saving file as unicode
                 result.Add($"{type} \u2192 {_file.LinkTarget}");
             }
         }
@@ -225,6 +270,17 @@ public partial class FileIconViewModel : FileViewModelBase
         base.UpdateType();
         UpdateOverlays();
         OnPropertyChanged(nameof(LargeIcon));
+    }
+
+    public new void OnSizeChanged()
+    {
+        base.OnSizeChanged();
+        if (_cachedThumbnail is null
+            && _cts is null
+            && ThumbnailService.IsCustomThumbnailCandidate(_file))
+        {
+            BeginLoadThumbnail(Data.RuntimeSettings.ThumbsSize);
+        }
     }
 
     public void InvalidateThumbnail()

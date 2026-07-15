@@ -12,6 +12,12 @@ public static partial class ThumbnailService
     private const string MOVIES_THUMBNAILS = "/sdcard/Movies/.thumbnails";
     private const string CSV_CACHE_FILE = "thumbnailInfo.csv";
     private const string CUSTOM_PHOTOS_SUBFOLDER = "CustomThumbs";
+
+    private static readonly (string ThumbDir, string[] MediaPrefixes)[] ImageThumbnailSources =
+    [
+        (DCIM_THUMBNAILS, ["/sdcard/DCIM", "/storage/emulated/0/DCIM"]),
+        (PICTURES_THUMBNAILS, ["/sdcard/Pictures", "/storage/emulated/0/Pictures"]),
+    ];
     
     static readonly TimeSpan MONTH = TimeSpan.FromDays(30);
     static readonly TimeSpan WEEK = TimeSpan.FromDays(7);
@@ -127,8 +133,169 @@ public static partial class ThumbnailService
 
     public static event Action<string, string>? ThumbnailUpdated;
 
+    private sealed class PaneThumbnailState
+    {
+        public Thumbnail? Cache;
+        public ThumbnailSize LoadedSize;
+        public CancellationTokenSource? Cts;
+        public Action<string, string>? UpdatedHandler;
+    }
+
+    private static readonly ConditionalWeakTable<FileClass, PaneThumbnailState> PaneThumbnails = new();
+
+    public static bool IsCustomThumbnailCandidate(FileClass file) =>
+        file.Type is AbstractFile.FileType.File
+        && Data.Settings.MaxCustomThumbWeight > 0
+        && file.Size is long size
+        && size <= (long)Data.Settings.MaxCustomThumbWeight * 1024
+        && AdbExplorerConst.COMMON_PHOTO_EXT.Contains(file.Extension, StringComparer.InvariantCultureIgnoreCase);
+
+    public static bool IsPhotoPaneThumbnailCandidate(FileClass file) =>
+        file.Type is AbstractFile.FileType.File
+        && !file.IsLink
+        && AdbExplorerConst.COMMON_PHOTO_EXT.Contains(file.Extension, StringComparer.InvariantCultureIgnoreCase)
+        && (Data.Settings.ThumbsMode is not AppSettings.ThumbnailMode.Off
+            || Data.Settings.MaxCustomThumbWeight > 0);
+
+    public static Thumbnail? GetPaneThumbnail(FileClass file) =>
+        PaneThumbnails.TryGetValue(file, out var state) ? state.Cache : null;
+
+    public static void BeginPaneThumbnailLoad(FileClass file, ThumbnailSize size, bool scaleWithDpi = true)
+    {
+        if (Data.DevicesObject.Current?.Type is not (DeviceType.Local or DeviceType.Remote or DeviceType.Service))
+            return;
+
+        var useDeviceThumbs = Data.Settings.ThumbsMode is not AppSettings.ThumbnailMode.Off;
+        var useCustomThumbs = Data.Settings.MaxCustomThumbWeight > 0;
+        if (!useDeviceThumbs && !useCustomThumbs)
+            return;
+
+        var state = PaneThumbnails.GetValue(file, static _ => new PaneThumbnailState());
+        if (state.Cache?.Image is not null && state.LoadedSize >= size)
+            return;
+
+        if (state.Cts is not null)
+            return;
+
+        var device = Data.DevicesObject.Current;
+        var serialNumber = device.SerialNumber;
+        var path = file.ParsedFullPath;
+
+        state.Cts = new CancellationTokenSource();
+        var token = state.Cts.Token;
+
+        state.UpdatedHandler = (updatedDeviceId, updatedFilePath) =>
+        {
+            if (updatedDeviceId != serialNumber || updatedFilePath != path)
+                return;
+
+            Task.Run(() =>
+            {
+                if (token.IsCancellationRequested)
+                    return;
+
+                if (LoadThumbnail(device, path, size, scaleWithDpi) is not Thumbnail loaded
+                    || loaded.Image is null)
+                    return;
+
+                App.SafeBeginInvoke(() =>
+                {
+                    if (token.IsCancellationRequested)
+                        return;
+
+                    CompletePaneThumbnailLoad(file, loaded, size);
+                }, System.Windows.Threading.DispatcherPriority.Background);
+            }, token);
+        };
+
+        ThumbnailUpdated += state.UpdatedHandler;
+
+        Task.Run(() =>
+        {
+            if (token.IsCancellationRequested)
+                return;
+
+            if (!IsInitialized(serialNumber))
+                ForceLoad(device);
+
+            if (token.IsCancellationRequested)
+                return;
+
+            Thumbnail? thumbnail = null;
+            if (useDeviceThumbs)
+                thumbnail = LoadThumbnail(device, path, size, scaleWithDpi);
+
+            if ((thumbnail is null || thumbnail.Value.Image is null)
+                && useCustomThumbs
+                && IsCustomThumbnailCandidate(file))
+                TryPullCustomThumbnail(device, file);
+
+            if (token.IsCancellationRequested)
+                return;
+
+            if (thumbnail is Thumbnail { Image: not null } loaded)
+            {
+                App.SafeBeginInvoke(() =>
+                {
+                    if (token.IsCancellationRequested)
+                        return;
+
+                    CompletePaneThumbnailLoad(file, loaded, size);
+                }, System.Windows.Threading.DispatcherPriority.Background);
+            }
+        }, token);
+    }
+
+    public static void CancelPaneThumbnailLoad(FileClass file)
+    {
+        if (!PaneThumbnails.TryGetValue(file, out var state))
+            return;
+
+        if (state.UpdatedHandler is not null)
+        {
+            ThumbnailUpdated -= state.UpdatedHandler;
+            state.UpdatedHandler = null;
+        }
+
+        state.Cts?.Cancel();
+        state.Cts?.Dispose();
+        state.Cts = null;
+    }
+
+    public static void ApplyPaneThumbnail(FileClass file, Thumbnail thumb)
+    {
+        var state = PaneThumbnails.GetValue(file, static _ => new PaneThumbnailState());
+        state.Cache = thumb;
+        state.LoadedSize = ThumbnailSize.Drag;
+        file.NotifyPaneThumbnailChanged();
+    }
+
+    private static void CompletePaneThumbnailLoad(FileClass file, Thumbnail thumb, ThumbnailSize size)
+    {
+        if (!PaneThumbnails.TryGetValue(file, out var state))
+            return;
+
+        if (state.UpdatedHandler is not null)
+        {
+            ThumbnailUpdated -= state.UpdatedHandler;
+            state.UpdatedHandler = null;
+        }
+
+        state.Cts?.Dispose();
+        state.Cts = null;
+        state.Cache = thumb;
+        state.LoadedSize = size;
+        file.NotifyPaneThumbnailChanged();
+    }
+
     private static readonly Mutex _mutex = new(false);
     private static readonly Mutex _listMutex = new(false);
+    private static readonly HashSet<string> PendingCustomPulls = [];
+    private static readonly Lock PendingCustomPullsLock = new();
+    private static readonly Lock ThrottledPullScheduleLock = new();
+    private static readonly Queue<(string PullKey, Action<bool> StartPull)> ThrottledPullQueue = new();
+    private static bool _throttledPullInFlight;
+    private static readonly ConcurrentDictionary<string, Lock> DeviceCsvLocks = new(StringComparer.Ordinal);
 
     private static readonly List<DeviceThumbnailInfo> _deviceInfoCache = [];
 
@@ -152,8 +319,11 @@ public static partial class ThumbnailService
         /// </summary>
         public string DeviceId { get; init; }
         public string DevicePicturesThumbnailDir { get; set; }
+        public string[] DeviceImageThumbnailDirs { get; set; } = [];
         public string? DeviceMoviesThumbnailDir { get; set; }
         public string LocalThumbnailDir { get; set; }
+        public bool IsProbed { get; set; }
+        public bool HasThumbnailSupport { get; set; }
 
         /// <summary>
         /// Key: Original file path on the device, Value: Thumbnail info (including thumbnail ID which corresponds to the local thumbnail file name)
@@ -169,38 +339,44 @@ public static partial class ThumbnailService
 
     private static DeviceThumbnailInfo? GetDeviceThumbsInfo(string serialNumber)
     {
-        if (_deviceInfoCache.FirstOrDefault(d => d.DeviceId == serialNumber) is DeviceThumbnailInfo info && !string.IsNullOrEmpty(info.DeviceId))
-        {
-            return info;
-        }
-
-        var device = Data.DevicesObject.LogicalDeviceViewModels.FirstOrDefault(d => d.SerialNumber == serialNumber);
-        if (device is null)
-            return null;
-
-        info = new(serialNumber, device.ID);
-
-        var existingDirs = ADBService.PathsExist(info.PhysicalId, DCIM_THUMBNAILS, PICTURES_THUMBNAILS, MOVIES_THUMBNAILS);
-        if (existingDirs.Length == 0)
-        {
-            return null;
-        }
-
-        info.DevicePicturesThumbnailDir = existingDirs[0].TrimEnd('/');
-        if (Data.Settings.MovieThumbsEnabled && existingDirs.Length > 1)
-            info.DeviceMoviesThumbnailDir = existingDirs[1].TrimEnd('/');
-        
         _listMutex.WaitOne();
         try
         {
+            var cached = _deviceInfoCache.FirstOrDefault(d => d.DeviceId == serialNumber);
+            if (!string.IsNullOrEmpty(cached.DeviceId) && cached.IsProbed)
+                return cached;
+
+            var device = Data.DevicesObject.LogicalDeviceViewModels.FirstOrDefault(d => d.SerialNumber == serialNumber);
+            if (device is null)
+                return null;
+
+            var info = new DeviceThumbnailInfo(serialNumber, device.ID);
+
+            var existing = new HashSet<string>(
+                ADBService.PathsExist(info.PhysicalId, DCIM_THUMBNAILS, PICTURES_THUMBNAILS, MOVIES_THUMBNAILS),
+                StringComparer.Ordinal);
+
+            var imageDirs = ImageThumbnailSources
+                .Where(s => existing.Contains(s.ThumbDir))
+                .Select(s => s.ThumbDir)
+                .ToArray();
+
+            var hasMovies = Data.Settings.MovieThumbsEnabled && existing.Contains(MOVIES_THUMBNAILS);
+            info.DeviceImageThumbnailDirs = imageDirs;
+            info.DevicePicturesThumbnailDir = imageDirs.Length > 0 ? imageDirs[0] : "";
+            if (hasMovies)
+                info.DeviceMoviesThumbnailDir = MOVIES_THUMBNAILS;
+
+            info.IsProbed = true;
+            info.HasThumbnailSupport = imageDirs.Length > 0 || hasMovies;
             _deviceInfoCache.Add(info);
+
+            return info;
         }
         finally
         {
             _listMutex.ReleaseMutex();
         }
-
-        return info;
     }
 
     /// <summary>
@@ -217,12 +393,21 @@ public static partial class ThumbnailService
         if (!_mutex.WaitOne(0))
             return false;
 
-        GetThumbnailName(device.SerialNumber, "");
-        var localPath = GetLocalThumbPath(device);
+        if (GetDeviceThumbsInfo(device.SerialNumber) is not DeviceThumbnailInfo deviceInfo)
+        {
+            _mutex.ReleaseMutex();
+            return false;
+        }
+
+        UpdateDeviceCache(deviceInfo);
+
+        var success = deviceInfo.HasThumbnailSupport
+            ? GetLocalThumbPath(device) is not null
+            : Data.Settings.MaxCustomThumbWeight > 0 || deviceInfo.ThumbnailPathCache?.Count > 0;
 
         _mutex.ReleaseMutex();
 
-        return localPath is not null;
+        return success;
     }
 
     /// <summary>
@@ -235,97 +420,274 @@ public static partial class ThumbnailService
     /// </summary>
     public static void TryPullCustomThumbnail(LogicalDeviceViewModel device, FileClass file)
     {
-        if (Data.Settings.MaxCustomThumbWeight == 0 || file.Type is not AbstractFile.FileType.File)
+        if (!IsCustomThumbnailCandidate(file))
             return;
 
-        if (file.Size is null || file.Size.Value > (long)Data.Settings.MaxCustomThumbWeight * 1024)
+        if (GetDeviceThumbsInfo(device.SerialNumber) is not DeviceThumbnailInfo deviceInfo)
             return;
 
-        if (!AdbExplorerConst.COMMON_PHOTO_EXT.Contains(file.Extension, StringComparer.InvariantCultureIgnoreCase))
-            return;
+        UpdateDeviceCache(deviceInfo);
 
-        var deviceInfo = _deviceInfoCache.FirstOrDefault(d => d.DeviceId == device.SerialNumber);
+        deviceInfo = GetCachedDeviceInfo(device.SerialNumber);
         if (string.IsNullOrEmpty(deviceInfo.DeviceId) || deviceInfo.ThumbnailPathCache is null)
             return;
 
-        if (deviceInfo.ThumbnailPathCache.TryGetValue(file.FullPath, out var cachedInfo))
+        var filePath = file.ParsedFullPath;
+        var pullKey = $"{device.SerialNumber}|{filePath}";
+
+        lock (PendingCustomPullsLock)
+        {
+            if (!PendingCustomPulls.Add(pullKey))
+                return;
+        }
+
+        if (deviceInfo.ThumbnailPathCache.TryGetValue(filePath, out var cachedInfo))
         {
             if (cachedInfo.LastUpdate != DateTime.MinValue)
+            {
+                CancelCustomPull(pullKey);
                 return;
+            }
 
             var localDir = string.IsNullOrEmpty(cachedInfo.LocalFolder)
                 ? GetLocalThumbPath(device)
                 : Path.Combine(Data.AppDataPath, deviceInfo.DeviceId, cachedInfo.LocalFolder);
 
             if (localDir is null)
+            {
+                CancelCustomPull(pullKey);
                 return;
+            }
+
+            var localFile = Path.Combine(localDir, cachedInfo.Id);
+            if (File.Exists(localFile))
+            {
+                CancelCustomPull(pullKey);
+                var resolution = cachedInfo.Resolution ?? ReadImageResolution(localFile);
+                long? fileSize = new FileInfo(localFile).Length;
+                UpdateThumbnailInfo(deviceInfo.DeviceId, cachedInfo.Id, resolution, fileSize);
+                return;
+            }
 
             var source = new SyncFile(file);
             var target = SyncFile.MergeToWindowsPath(source, localDir);
-            target.UpdatePath(Path.Combine(localDir, cachedInfo.Id));
+            target.UpdatePath(localFile);
 
             var id = cachedInfo.Id;
-            var op = FileSyncOperation.PullFile(source, target, device, App.AppDispatcher);
+            var cachedDeviceId = deviceInfo.DeviceId;
 
-            op.PropertyChanged += (_, e) =>
+            QueueCustomPull(pullKey, throttled =>
             {
-                if (e.PropertyName == nameof(FileOperation.Status) && op.Status is FileOperation.OperationStatus.Completed)
-                {
-                    Size? resolution = cachedInfo.Resolution ?? ReadImageResolution(Path.Combine(localDir, id));
-                    long? fileSize = File.Exists(Path.Combine(localDir, id)) ? new FileInfo(Path.Combine(localDir, id)).Length : null;
-                    UpdateThumbnailInfo(deviceInfo.DeviceId, id, resolution, fileSize);
-                }
-            };
+                var op = FileSyncOperation.PullFile(source, target, device, App.AppDispatcher);
+                if (throttled)
+                    op.MaxThreads = 1;
 
-            op.Start();
+                op.PropertyChanged += (_, e) =>
+                {
+                    if (e.PropertyName != nameof(FileOperation.Status))
+                        return;
+
+                    if (op.Status is FileOperation.OperationStatus.Completed)
+                    {
+                        Size? resolution = cachedInfo.Resolution ?? ReadImageResolution(localFile);
+                        long? pulledSize = File.Exists(localFile) ? new FileInfo(localFile).Length : null;
+                        UpdateThumbnailInfo(cachedDeviceId, id, resolution, pulledSize);
+                    }
+
+                    if (op.Status is FileOperation.OperationStatus.Completed or FileOperation.OperationStatus.Failed or FileOperation.OperationStatus.Canceled)
+                        CompleteCustomPull(pullKey, throttled);
+                };
+
+                op.Start();
+            });
+
+            return;
         }
-        else
+
+        deviceInfo = GetCachedDeviceInfo(device.SerialNumber);
+        if (string.IsNullOrEmpty(deviceInfo.DeviceId))
         {
-            var targetDir = Path.Combine(Data.AppDataPath, deviceInfo.DeviceId, CUSTOM_PHOTOS_SUBFOLDER);
+            CancelCustomPull(pullKey);
+            return;
+        }
+
+        string newId;
+        string deviceId;
+        var targetDir = Path.Combine(Data.AppDataPath, deviceInfo.DeviceId, CUSTOM_PHOTOS_SUBFOLDER);
+        lock (GetDeviceCsvLock(deviceInfo.DeviceId))
+        {
+            deviceInfo = GetCachedDeviceInfo(device.SerialNumber);
+            if (deviceInfo.ThumbnailPathCache is null)
+            {
+                CancelCustomPull(pullKey);
+                return;
+            }
+
+            if (deviceInfo.ThumbnailPathCache.ContainsKey(filePath))
+            {
+                CancelCustomPull(pullKey);
+                return;
+            }
+
             Directory.CreateDirectory(targetDir);
 
             var noExt = file.NoExtName;
             var prefix = noExt[^Math.Min(5, noExt.Length)..];
-            var id = $"{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}_{prefix}.jpg";
+            newId = $"{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}_{prefix}.jpg";
+            deviceId = deviceInfo.DeviceId;
 
-            deviceInfo.ThumbnailPathCache[file.FullPath] = new ThumbnailInfo(id, MediaType.images, null, null, DateTime.MinValue, CUSTOM_PHOTOS_SUBFOLDER);
+            deviceInfo.ThumbnailPathCache[filePath] = new ThumbnailInfo(newId, MediaType.images, null, null, DateTime.MinValue, CUSTOM_PHOTOS_SUBFOLDER);
             UpdateCache(deviceInfo);
+            WriteThumbsCacheToCsvFile(deviceId, deviceInfo.ThumbnailPathCache);
+        }
 
-            SyncFile customSource = new(file);
-            var customTarget = SyncFile.MergeToWindowsPath(customSource, targetDir);
-            customTarget.UpdatePath(Path.Combine(targetDir, id));
+        SyncFile customSource = new(file);
+        var customTarget = SyncFile.MergeToWindowsPath(customSource, targetDir);
+        var customLocalFile = Path.Combine(targetDir, newId);
+        customTarget.UpdatePath(customLocalFile);
 
+        var serial = deviceId;
+        QueueCustomPull(pullKey, throttled =>
+        {
             var op = FileSyncOperation.PullFile(customSource, customTarget, device, App.AppDispatcher);
+            if (throttled)
+                op.MaxThreads = 1;
 
             op.PropertyChanged += (_, e) =>
             {
-                if (e.PropertyName == nameof(FileOperation.Status) && op.Status is FileOperation.OperationStatus.Completed)
+                if (e.PropertyName != nameof(FileOperation.Status))
+                    return;
+
+                if (op.Status is FileOperation.OperationStatus.Completed)
                 {
-                    var resolution = ReadImageResolution(Path.Combine(targetDir, id));
-                    long? fileSize = File.Exists(Path.Combine(targetDir, id)) ? new FileInfo(Path.Combine(targetDir, id)).Length : null;
-                    UpdateThumbnailInfo(deviceInfo.DeviceId, id, resolution, fileSize);
+                    var resolution = ReadImageResolution(customLocalFile);
+                    long? pulledSize = File.Exists(customLocalFile) ? new FileInfo(customLocalFile).Length : null;
+                    UpdateThumbnailInfo(serial, newId, resolution, pulledSize);
                 }
+
+                if (op.Status is FileOperation.OperationStatus.Completed or FileOperation.OperationStatus.Failed or FileOperation.OperationStatus.Canceled)
+                    CompleteCustomPull(pullKey, throttled);
             };
 
             op.Start();
+        });
+    }
+
+    private static void QueueCustomPull(string pullKey, Action<bool> startPull)
+    {
+        if (!Data.Settings.LimitThumbsPullSpeed)
+        {
+            _ = Task.Run(() => RunCustomPull(pullKey, startPull, throttled: false));
+            return;
+        }
+
+        lock (ThrottledPullScheduleLock)
+        {
+            ThrottledPullQueue.Enqueue((pullKey, startPull));
+            TryStartNextThrottledPull();
+        }
+    }
+
+    private static void TryStartNextThrottledPull()
+    {
+        if (_throttledPullInFlight)
+            return;
+
+        while (ThrottledPullQueue.Count > 0)
+        {
+            var (pullKey, startPull) = ThrottledPullQueue.Dequeue();
+            if (!IsPendingCustomPull(pullKey))
+                continue;
+
+            _throttledPullInFlight = true;
+            _ = Task.Run(() => RunCustomPull(pullKey, startPull, throttled: true));
+            return;
+        }
+    }
+
+    private static void RunCustomPull(string pullKey, Action<bool> startPull, bool throttled)
+    {
+        try
+        {
+            if (!IsPendingCustomPull(pullKey))
+            {
+                if (throttled)
+                    ThrottledPullCompleted();
+                return;
+            }
+
+            startPull(throttled);
+        }
+        catch
+        {
+            CompleteCustomPull(pullKey, throttled);
+        }
+    }
+
+    private static bool IsPendingCustomPull(string pullKey)
+    {
+        lock (PendingCustomPullsLock)
+            return PendingCustomPulls.Contains(pullKey);
+    }
+
+    private static void ThrottledPullCompleted()
+    {
+        lock (ThrottledPullScheduleLock)
+        {
+            _throttledPullInFlight = false;
+            TryStartNextThrottledPull();
+        }
+    }
+
+    private static void CancelCustomPull(string pullKey)
+    {
+        lock (PendingCustomPullsLock)
+            PendingCustomPulls.Remove(pullKey);
+    }
+
+    private static void CompleteCustomPull(string pullKey, bool throttled)
+    {
+        CancelCustomPull(pullKey);
+        if (throttled)
+            ThrottledPullCompleted();
+    }
+
+    private static DeviceThumbnailInfo GetCachedDeviceInfo(string serialNumber)
+    {
+        _listMutex.WaitOne();
+        try
+        {
+            return _deviceInfoCache.FirstOrDefault(d => d.DeviceId == serialNumber);
+        }
+        finally
+        {
+            _listMutex.ReleaseMutex();
         }
     }
 
     public static bool IsInitialized(string serialNumber)
     {
-        return _deviceInfoCache.FirstOrDefault(d => d.DeviceId == serialNumber) is DeviceThumbnailInfo info
-            && !string.IsNullOrEmpty(info.LocalThumbnailDir);
+        _listMutex.WaitOne();
+        try
+        {
+            return _deviceInfoCache.FirstOrDefault(d => d.DeviceId == serialNumber) is DeviceThumbnailInfo info
+                && info.IsProbed;
+        }
+        finally
+        {
+            _listMutex.ReleaseMutex();
+        }
     }
 
     public static Thumbnail? LoadThumbnail(LogicalDeviceViewModel device, string filePath, ThumbnailSize size, bool scaleWithDpi = true)
     {
-        _mutex.WaitOne();
-        _mutex.ReleaseMutex();
-
         if (GetDeviceThumbsInfo(device.SerialNumber) is not DeviceThumbnailInfo deviceInfo)
             return null;
 
         UpdateDeviceCache(deviceInfo);
+        deviceInfo = GetCachedDeviceInfo(device.SerialNumber);
+        if (string.IsNullOrEmpty(deviceInfo.DeviceId) || deviceInfo.ThumbnailPathCache is null)
+            return null;
 
         if (!deviceInfo.ThumbnailPathCache.TryGetValue(filePath, out var info))
             return null;
@@ -340,7 +702,9 @@ public static partial class ThumbnailService
         var fullPath = Path.Combine(localThumbnailDir, info.Id);
         if (NeedsThumbnailRefresh(info, fullPath))
         {
-            TryPullStaleThumbnail(device, deviceInfo, info);
+            if (info.LocalFolder != CUSTOM_PHOTOS_SUBFOLDER && deviceInfo.HasThumbnailSupport)
+                TryPullStaleThumbnail(device, deviceInfo, info, filePath);
+
             return new(null, info);
         }
 
@@ -358,6 +722,16 @@ public static partial class ThumbnailService
             bitmapImage.DecodePixelWidth = scaleWithDpi ? decodePixelWidth : (int)size;
             bitmapImage.EndInit();
             bitmapImage.Freeze();
+
+            if (!info.Resolution.HasValue)
+            {
+                info = info with { Resolution = new Size(bitmapImage.PixelWidth, bitmapImage.PixelHeight) };
+                UpdateThumbnailInfo(device.SerialNumber, info.Id, info.Resolution);
+                deviceInfo = GetCachedDeviceInfo(device.SerialNumber);
+                if (deviceInfo.ThumbnailPathCache?.TryGetValue(filePath, out var refreshed) is true)
+                    info = refreshed;
+            }
+
             return new(bitmapImage, info);
         }
         catch
@@ -385,59 +759,98 @@ public static partial class ThumbnailService
         }
     }
 
+    private static Lock GetDeviceCsvLock(string deviceId) => DeviceCsvLocks.GetOrAdd(deviceId, static _ => new Lock());
+
     private static void DeviceThumbsToCsv(DeviceThumbnailInfo? deviceInfo)
     {
         if (deviceInfo is not DeviceThumbnailInfo info || info.ThumbnailPathCache is null || info.ThumbnailPathCache.Count == 0)
             return;
 
-        var deviceDir = Path.Combine(Data.AppDataPath, info.DeviceId);
+        lock (GetDeviceCsvLock(info.DeviceId))
+            WriteThumbsCacheToCsvFile(info.DeviceId, info.ThumbnailPathCache);
+    }
+
+    private static void WriteThumbsCacheToCsvFile(string deviceId, Dictionary<string, ThumbnailInfo> thumbnailPathCache)
+    {
+        if (thumbnailPathCache.Count == 0)
+            return;
+
+        var deviceDir = Path.Combine(Data.AppDataPath, deviceId);
         if (!Directory.Exists(deviceDir))
             Directory.CreateDirectory(deviceDir);
 
-        var csvLines = info.ThumbnailPathCache.ToArray().Select(kvp => $"{kvp.Key}|{kvp.Value.ToCsv()}");
+        var csvLines = thumbnailPathCache.ToArray().Select(kvp => $"{kvp.Key}|{kvp.Value.ToCsv()}");
         var csvContent = string.Join(Environment.NewLine, csvLines);
         var savePath = Path.Combine(deviceDir, CSV_CACHE_FILE);
 
         File.WriteAllText(savePath, csvContent, CsvEncoding);
     }
 
-    private static ThumbnailInfo? GetThumbnailName(string serialNumber, string filePath)
+    private static Dictionary<string, ThumbnailInfo> ReadThumbsCacheFromCsvFile(string deviceId)
     {
-        if (GetDeviceThumbsInfo(serialNumber) is not DeviceThumbnailInfo deviceInfo)
-            return null;
+        var cache = new Dictionary<string, ThumbnailInfo>();
+        var csvPath = Path.Combine(Data.AppDataPath, deviceId, CSV_CACHE_FILE);
+        if (!File.Exists(csvPath))
+            return cache;
 
-        UpdateDeviceCache(deviceInfo);
+        string[] lines;
+        try
+        {
+            lines = File.ReadAllLines(csvPath, CsvEncoding);
+        }
+        catch
+        {
+            return cache;
+        }
 
-        _deviceInfoCache.First(d => d.DeviceId == serialNumber).ThumbnailPathCache.TryGetValue(filePath, out var thumbnailPath);
+        foreach (var line in lines)
+        {
+            var parts = line.Split('|', 2);
+            if (parts.Length != 2)
+                continue;
 
-        return thumbnailPath;
+            var path = parts[0];
+            var infoCsv = parts[1];
+            if (ThumbnailInfo.FromCsv(infoCsv) is ThumbnailInfo info)
+                cache.TryAdd(path, info);
+        }
+
+        return cache;
     }
 
     private static void UpdateDeviceCache(DeviceThumbnailInfo deviceInfo)
     {
-        if (deviceInfo.ThumbnailPathCache is null || deviceInfo.ThumbnailPathCache.Count == 0)
-        {
-            var cache = GetThumbsCacheFromCsv(deviceInfo);
-            
-            if (cache.Count == 0)
-            {
-                deviceInfo.ThumbnailPathCache = GetThumbsCacheFromDevice(deviceInfo);
-                DeviceThumbsToCsv(deviceInfo);
-            }
-            else
-            {
-                deviceInfo.ThumbnailPathCache = cache;
-                deviceInfo = SetDeviceLocalDir(deviceInfo);
+        if (deviceInfo.ThumbnailPathCache is not null)
+            return;
 
+        var cache = GetThumbsCacheFromCsv(deviceInfo);
+
+        if (cache.Count == 0)
+        {
+            deviceInfo.ThumbnailPathCache = deviceInfo.HasThumbnailSupport
+                ? GetThumbsCacheFromDevice(deviceInfo)
+                : [];
+
+            if (deviceInfo.HasThumbnailSupport)
+                DeviceThumbsToCsv(deviceInfo);
+        }
+        else
+        {
+            deviceInfo.ThumbnailPathCache = cache;
+            if (deviceInfo.HasThumbnailSupport)
+            {
+                deviceInfo = SetDeviceLocalDir(deviceInfo);
                 Task.Run(() => MergeDeviceWithLocalCache(deviceInfo));
             }
-
-            UpdateCache(deviceInfo);
         }
+
+        UpdateCache(deviceInfo);
     }
 
     private static void MergeDeviceWithLocalCache(DeviceThumbnailInfo deviceInfo)
     {
+        if (!deviceInfo.HasThumbnailSupport)
+            return;
         var deviceCache = GetThumbsCacheFromDevice(deviceInfo);
 
         foreach (var kvp in deviceCache)
@@ -461,36 +874,8 @@ public static partial class ThumbnailService
 
     private static Dictionary<string, ThumbnailInfo> GetThumbsCacheFromCsv(DeviceThumbnailInfo deviceInfo)
     {
-        var cache = new Dictionary<string, ThumbnailInfo>();
-        var csvPath = Path.Combine(Data.AppDataPath, deviceInfo.DeviceId, CSV_CACHE_FILE);
-        if (!File.Exists(csvPath))
-            return [];
-
-        string[] lines;
-        try
-        {
-            lines = File.ReadAllLines(csvPath, CsvEncoding);
-        }
-        catch
-        {
-            return cache;
-        }
-
-        foreach (var line in lines)
-        {
-            var parts = line.Split('|', 2);
-            if (parts.Length != 2)
-                continue;
-
-            var path = parts[0];
-            var infoCsv = parts[1];
-            if (ThumbnailInfo.FromCsv(infoCsv) is ThumbnailInfo info)
-            {
-                cache.TryAdd(path, info);
-            }
-        }
-
-        return cache;
+        lock (GetDeviceCsvLock(deviceInfo.DeviceId))
+            return ReadThumbsCacheFromCsvFile(deviceInfo.DeviceId);
     }
 
     private static Dictionary<string, ThumbnailInfo> GetThumbsCacheFromDevice(DeviceThumbnailInfo deviceInfo)
@@ -547,7 +932,16 @@ public static partial class ThumbnailService
         UpdateCache(deviceInfo);
 
         if (updatedFilePath is not null)
+        {
+            lock (GetDeviceCsvLock(serialNumber))
+            {
+                var fresh = GetCachedDeviceInfo(serialNumber);
+                if (fresh.ThumbnailPathCache is not null)
+                    WriteThumbsCacheToCsvFile(serialNumber, fresh.ThumbnailPathCache);
+            }
+
             ThumbnailUpdated?.Invoke(serialNumber, updatedFilePath);
+        }
     }
 
     private static string? GetLocalThumbDirectory(DeviceThumbnailInfo deviceInfo, ThumbnailInfo info)
@@ -561,8 +955,27 @@ public static partial class ThumbnailService
         return dir is null ? null : Path.Combine(dir, info.Id);
     }
 
-    private static string? GetDeviceThumbDirectory(DeviceThumbnailInfo deviceInfo, ThumbnailInfo info)
-        => info.Type is MediaType.video ? deviceInfo.DeviceMoviesThumbnailDir : deviceInfo.DevicePicturesThumbnailDir;
+    private static string? GetDeviceThumbDirectory(DeviceThumbnailInfo deviceInfo, ThumbnailInfo info, string originalFilePath)
+    {
+        if (info.Type is MediaType.video)
+            return deviceInfo.DeviceMoviesThumbnailDir;
+
+        foreach (var (thumbDir, prefixes) in ImageThumbnailSources)
+        {
+            if (deviceInfo.DeviceImageThumbnailDirs is null || !deviceInfo.DeviceImageThumbnailDirs.Contains(thumbDir))
+                continue;
+
+            foreach (var prefix in prefixes)
+            {
+                if (originalFilePath.StartsWith(prefix, StringComparison.Ordinal))
+                    return thumbDir;
+            }
+        }
+
+        return string.IsNullOrEmpty(deviceInfo.DevicePicturesThumbnailDir)
+            ? null
+            : deviceInfo.DevicePicturesThumbnailDir;
+    }
 
     private static bool NeedsThumbnailRefresh(ThumbnailInfo info, string localPath)
     {
@@ -576,9 +989,9 @@ public static partial class ThumbnailService
         return localSize == 0;
     }
 
-    private static void TryPullStaleThumbnail(LogicalDeviceViewModel device, DeviceThumbnailInfo deviceInfo, ThumbnailInfo info)
+    private static void TryPullStaleThumbnail(LogicalDeviceViewModel device, DeviceThumbnailInfo deviceInfo, ThumbnailInfo info, string originalFilePath)
     {
-        var androidDir = GetDeviceThumbDirectory(deviceInfo, info);
+        var androidDir = GetDeviceThumbDirectory(deviceInfo, info, originalFilePath);
         var localDir = GetLocalThumbDirectory(deviceInfo, info);
         if (string.IsNullOrEmpty(androidDir) || string.IsNullOrEmpty(localDir))
             return;
@@ -624,6 +1037,9 @@ public static partial class ThumbnailService
         if (GetDeviceThumbsInfo(device.SerialNumber) is not DeviceThumbnailInfo deviceInfo)
             return null;
 
+        if (!deviceInfo.HasThumbnailSupport)
+            return null;
+
         if (!string.IsNullOrEmpty(deviceInfo.LocalThumbnailDir))
         {
             return deviceInfo.LocalThumbnailDir;
@@ -647,6 +1063,9 @@ public static partial class ThumbnailService
 
     private static void PullThumbnails(DeviceThumbnailInfo deviceInfo)
     {
+        if (!deviceInfo.HasThumbnailSupport)
+            return;
+
         ThumbnailProgressChanged?.Invoke(ThumbnailStep.CheckingUpdates, true);
 
         IEnumerable<string> filesToReplace = [];
@@ -661,7 +1080,13 @@ public static partial class ThumbnailService
             Directory.CreateDirectory(deviceInfo.LocalThumbnailDir);
         }
 
-        FileClass pics = new("", deviceInfo.DevicePicturesThumbnailDir, AbstractFile.FileType.Folder);
+        FileClass pics = deviceInfo.DeviceImageThumbnailDirs.Length > 0
+            ? new("", deviceInfo.DeviceImageThumbnailDirs[0], AbstractFile.FileType.Folder)
+            : new("", deviceInfo.DevicePicturesThumbnailDir, AbstractFile.FileType.Folder);
+
+        IEnumerable<FileClass> picFolders = deviceInfo.DeviceImageThumbnailDirs.Length > 0
+            ? deviceInfo.DeviceImageThumbnailDirs.Select(dir => new FileClass("", dir, AbstractFile.FileType.Folder))
+            : [pics];
 
         FileClass movies = deviceInfo.DeviceMoviesThumbnailDir is null
             ? new("", "", AbstractFile.FileType.Unknown)
@@ -674,7 +1099,7 @@ public static partial class ThumbnailService
 
         Task.Run(() =>
         {
-            var opsList = FileActionLogic.SilentPullFiles(device, deviceDir, Data.Settings.LimitThumbsPullSpeed, filesToReplace, pics, movies).ToList();
+            var opsList = FileActionLogic.SilentPullFiles(device, deviceDir, Data.Settings.LimitThumbsPullSpeed, filesToReplace, [.. picFolders, movies]).ToList();
 
             ThumbnailProgressChanged?.Invoke(ThumbnailStep.CheckingUpdates, false);
 

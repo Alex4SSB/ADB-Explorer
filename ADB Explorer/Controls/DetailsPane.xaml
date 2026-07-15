@@ -181,6 +181,18 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
+                <ScrollViewer
+                    x:Name="PhotoPreviewScrollViewer"
+                    Focusable="False"
+                    HorizontalScrollBarVisibility="Auto"
+                    KeyboardNavigation.IsTabStop="False"
+                    VerticalScrollBarVisibility="Auto"
+                    Visibility="Collapsed">
+                    <Image
+                        x:Name="PhotoPreviewImage"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+                </ScrollViewer>
                 <TextBlock
                     x:Name="NoPreviewTextBlock"
                     HorizontalAlignment="Center"
