@@ -179,7 +179,7 @@ public static class AdbHelper
         finally
         {
             if (stagingRoot is not null)
-                ArchiveExtract.CleanupStaging(device.ID, stagingRoot, cancellationToken);
+                ArchiveExtract.CleanupStaging(device.ID, stagingRoot, CancellationToken.None);
         }
     }
 
@@ -290,7 +290,7 @@ public static class AdbHelper
         }
         finally
         {
-            ArchiveExtract.CleanupStaging(device.ID, stagingRoot, cancellationToken);
+            ArchiveExtract.CleanupStaging(device.ID, stagingRoot, CancellationToken.None);
         }
     }
 

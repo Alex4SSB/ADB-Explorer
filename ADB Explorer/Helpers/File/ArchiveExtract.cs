@@ -39,16 +39,25 @@ public static class ArchiveExtract
             || !stagingRoot.StartsWith($"{AdbExplorerConst.TEMP_PATH}/{StagingFolderName}", StringComparison.Ordinal))
             return;
 
+        // Never cancel cleanup — a cancelled extract/pull token must not leave temp dirs behind.
+        _ = cancellationToken;
+        RemoveDeviceTree(deviceId, stagingRoot);
         ActiveStagingRoots.TryRemove(stagingRoot, out _);
+    }
+
+    private static void RemoveDeviceTree(string deviceId, string path)
+    {
+        if (string.IsNullOrEmpty(path))
+            return;
 
         ADBService.ExecuteDeviceAdbShellCommand(
             deviceId,
             "rm",
             out _,
             out _,
-            cancellationToken,
+            CancellationToken.None,
             "-rf",
-            ADBService.EscapeAdbShellString(stagingRoot));
+            ADBService.EscapeAdbShellString(path));
     }
 
     /// <summary>Removes any extract staging left from a previous clipboard/drag that was never consumed.</summary>
@@ -117,10 +126,12 @@ public static class ArchiveExtract
 
             if (moveResult != 0)
                 throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
+
+            RemoveDeviceTree(deviceId, contentRoot);
         }
         finally
         {
-            CleanupStaging(deviceId, stagingRoot, cancellationToken);
+            CleanupStaging(deviceId, stagingRoot, CancellationToken.None);
         }
     }
 
@@ -212,6 +223,9 @@ public static class ArchiveExtract
                 cancellationToken.ThrowIfCancellationRequested();
                 throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
             }
+
+            // Pull reads from out/; drop the tar/unzip tree under content/ immediately.
+            RemoveDeviceTree(deviceId, contentRoot);
 
             // Prefer listing the extracted filesystem so nested dirs are not mistaken for empty files.
             var tree = isDirectory
