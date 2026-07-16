@@ -121,7 +121,7 @@
     <value>Android 機器人圖示</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
-    <value>安卓機器人是由 Google 建立和分享的作品重製或修改而成，並遵循《創用 CC 3.0 授權》中的條款使用。</value>
+    <value>Android 機器人是由 Google 建立和分享的作品重製或修改而成，並遵循《創用 CC 3.0 授權》中的條款使用。</value>
   </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>APK 圖示根據 Apache License，版本 2.0 獲得許可。</value>
@@ -531,7 +531,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>捐贈或資助</value>
   </data>
   <data name="S_APP_DATA_FOLDER" xml:space="preserve">
-    <value>應用程式資料的資料夾</value>
+    <value>應用程式資料 (App Data) 的資料夾</value>
   </data>
   <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
     <value>應用程式資料 (App Data) 位置</value>
@@ -570,7 +570,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <comment>Title of the About settings notice describing optional crash reporting</comment>
   </data>
   <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
-    <value>After a crash, you may optionally send a diagnostic report to help us fix it. Reports are sent only when you click Send Report and usually include the exception message, stack trace, app and Windows version, and the page that was open. The data is processed by Grafana Labs (Grafana Cloud). See the Privacy Policy link above.</value>
+    <value>當掉後，可選擇送出診斷報告以幫助我們修正程式。報告通常須含例外訊息、堆疊追蹤、應用程式 與 Windows 版本，開啟的頁面。點按送出報告，報告才會送出。收到的資料會由 Grafana Labs (Grafana Cloud) 處理。見上方的隱私政策連結。</value>
     <comment>About settings notice describing optional crash reporting and Grafana as processor</comment>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
@@ -878,7 +878,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>{0} - 未授權</value>
   </data>
   <data name="S_TYPE_EMULATOR" xml:space="preserve">
-    <value>安卓裝置模擬器</value>
+    <value>Android 裝置模擬器</value>
   </data>
   <data name="S_TYPE_SERVICE" xml:space="preserve">
     <value>mDNS 服務</value>
@@ -890,7 +890,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>WiFi</value>
   </data>
   <data name="S_TYPE_WSA" xml:space="preserve">
-    <value>WSA (Windows 安卓子系統)</value>
+    <value>WSA (Windows 的 Android 子系統)</value>
   </data>
   <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
     <value>電池狀態未知</value>
@@ -983,7 +983,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>{0} (連結)</value>
   </data>
   <data name="S_FILE_TYPE_APK" xml:space="preserve">
-    <value>安卓應用程式套件</value>
+    <value>Android 應用程式套件</value>
   </data>
   <data name="S_FILE_TYPE_EXE" xml:space="preserve">
     <value>Windows 可執行檔</value>
@@ -998,7 +998,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>根目錄</value>
   </data>
   <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
-    <value>内部存儲體</value>
+    <value>内部儲存體</value>
   </data>
   <data name="S_DRIVE_APPS" xml:space="preserve">
     <value>安裝的應用程式</value>
@@ -1068,7 +1068,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>一些所選檔有同名衝突，儘管大小寫不同</value>
   </data>
   <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>一所選檔案違背使用這空間命名規則</value>
+    <value>一所選檔案違背使用者空間命名規則</value>
     <comment>Will show if a selected file doesn't meet user space naming rules</comment>
   </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
@@ -1470,7 +1470,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <comment>The setting used to enable checking for installed WSA, launching it, and connecting to it automatically</comment>
   </data>
   <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
-    <value>發現安卓模擬器</value>
+    <value>發現 Android 模擬器</value>
     <comment>The setting used to enable listing installed AVDs and launching them from the device list</comment>
   </data>
   <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
@@ -1482,7 +1482,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <comment>The title of the dialog message to launch an emulator</comment>
   </data>
   <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
-    <value>Android SDK emulator was not found. Install the Android SDK emulator package or set ANDROID_SDK_ROOT.</value>
+    <value>未找到 Android SDK 模擬器。安裝 Android SDK 模擬器套件，或設定 ANDROID_SDK_ROOT。</value>
     <comment>Error message when the SDK emulator executable cannot be located</comment>
   </data>
   <data name="S_STRING_PASTE" xml:space="preserve">
@@ -1494,7 +1494,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <comment>A hint displayed for a short time in the snackbar</comment>
   </data>
   <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
-    <value>Pulling thumbnails</value>
+    <value>複製進來縮圖中</value>
     <comment>A hint displayed for a short time in the snackbar</comment>
   </data>
   <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
@@ -1542,15 +1542,15 @@ ADB 包含在 Android SDK Platform Tools 中。
     <comment>File list sort direction - descending</comment>
   </data>
   <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
-    <value>Sorting column &amp; order saved for each location</value>
+    <value>儲存每個位置的欄位排序與次序</value>
     <comment>The setting that enables keeping track of the last sorted column and direction selected for each location / folder</comment>
   </data>
   <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
-    <value>Max Image Size To Use As Its Own Thumbnail (0 - Disabled)</value>
+    <value>用作縮圖的圖像大小上限 (0 - 停用)</value>
     <comment>The name of the setting that enables using images for their own thumbnail display, and the maximum size for such images</comment>
   </data>
   <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
-    <value>and {0} more…</value>
+    <value>與另外 {0} 個…</value>
     <comment>0 - the number of file operations currently not displayed</comment>
   </data>
   <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
@@ -1566,7 +1566,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <comment>The maximum size of a file for preview</comment>
   </data>
   <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
-    <value>Pull To Default Folder On File Double Click</value>
+    <value>雙點按檔案，拉到預設資料夾</value>
     <comment>The setting that enables pulling a file to the default folder on double click</comment>
   </data>
   <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
@@ -1622,11 +1622,11 @@ ADB 包含在 Android SDK Platform Tools 中。
     <comment>Unix file permissions for the selected user</comment>
   </data>
   <data name="S_FILE_PERM_GROUP" xml:space="preserve">
-    <value>Group</value>
+    <value>群組(使用者所屬的)</value>
     <comment>Unix file permissions for the group the user is in</comment>
   </data>
   <data name="S_FILE_PERM_OTHER" xml:space="preserve">
-    <value>Others</value>
+    <value>他人</value>
     <comment>Unix file permissions for users outside the group</comment>
   </data>
   <data name="S_DATE_ACCESSED" xml:space="preserve">
@@ -1684,22 +1684,22 @@ ADB 包含在 Android SDK Platform Tools 中。
     <comment>The label of the blue channel in the color picker</comment>
   </data>
   <data name="S_ADB_NOT_FOUND" xml:space="preserve">
-    <value>Unable to locate ADB from system PATH. Please use "{0}" to locate it.</value>
+    <value>用系統路徑無法定位到 ADB。請用 "{0}" 定位之。</value>
     <comment>0 - the name of the Override ADB Path setting</comment>
   </data>
   <data name="S_ADB_PATH_INVALID" xml:space="preserve">
-    <value>Provided {0} path is either a Windows shortcut or a UNC (remote) path, which is not allowed.</value>
+    <value>提供的 {0} 路徑是一 Windows 捷徑或 UNC (遠端) 路徑，這些都不允許。</value>
     <comment>0 - either "ADB" or nothing</comment>
   </data>
   <data name="S_ADB_COMPROMISED" xml:space="preserve">
-    <value>The provided executable cannot be verified as ADB. Make sure you download only official Android Platform Tools from Google.</value>
+    <value>提供的可執行檔無法驗證是 ADB。請確認您只從 Google 下載官方的 Android Platform Tools。</value>
   </data>
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>配對</value>
     <comment>The button for pairing a device</comment>
   </data>
   <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
-    <value>Kill ADB When App Closes</value>
+    <value>應用程式關閉時，也關閉 ADB</value>
     <comment>The setting that enables killing ADB server when closing the app</comment>
   </data>
   <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
