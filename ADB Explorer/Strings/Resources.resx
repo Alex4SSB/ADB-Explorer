@@ -2061,4 +2061,8 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Open</value>
     <comment>The name of the action to enter a folder</comment>
   </data>
+  <data name="S_RESTART" xml:space="preserve">
+    <value>Restart Now</value>
+    <comment>A restart button</comment>
+  </data>
 </root>

@@ -228,6 +228,8 @@
     </Style>
     <Style x:Key="StretchListViewItem" TargetType="ui:ListViewItem">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ui:ListViewItem">
@@ -431,6 +433,8 @@
     </Style>
     <Style x:Key="ListViewItemContainerStyle" TargetType="ui:ListViewItem">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ui:ListViewItem">

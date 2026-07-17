@@ -3345,6 +3345,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Restart Now.
+        /// </summary>
+        public static string S_RESTART {
+            get {
+                return ResourceManager.GetString("S_RESTART", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Restart ADB.
         /// </summary>
         public static string S_RESTART_ADB {

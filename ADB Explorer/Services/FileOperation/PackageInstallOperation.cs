@@ -16,7 +16,7 @@ public class PackageInstallOperation : AbstractShellFileOperation
         ? Strings.Resources.S_UNINSTALL
         : Strings.Resources.S_MENU_INSTALL;
 
-    public override FrameworkElement OpIcon => new(); // IsUninstall ? new UninstallIcon() : new InstallIcon();
+    public override FrameworkElement OpIcon => new();
 
     public PackageInstallOperation(Dispatcher dispatcher,
                                    LogicalDeviceViewModel device,

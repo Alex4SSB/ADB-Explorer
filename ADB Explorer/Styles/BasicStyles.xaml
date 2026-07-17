@@ -69,29 +69,17 @@
     <Style x:Key="MonochromeIconPathStyle" TargetType="Path">
         <Setter Property="Fill" Value="{DynamicResource TextFillColorPrimaryBrush}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="False">
+            <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Fill" Value="{DynamicResource TextFillColorDisabledBrush}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=controls:AdbMenuItem}}" Value="False">
-                <Setter Property="Fill" Value="{DynamicResource TextFillColorDisabledBrush}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=controls:AdbMenu}}" Value="False">
-                <Setter Property="Fill" Value="{DynamicResource TextFillColorDisabledBrush}" />
-            </DataTrigger>
+            </Trigger>
         </Style.Triggers>
     </Style>
     <Style x:Key="MonochromeIconPathStrokeStyle" TargetType="Path">
         <Setter Property="Stroke" Value="{DynamicResource TextFillColorPrimaryBrush}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="False">
+            <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Stroke" Value="{DynamicResource TextFillColorDisabledBrush}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=controls:AdbMenuItem}}" Value="False">
-                <Setter Property="Stroke" Value="{DynamicResource TextFillColorDisabledBrush}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=controls:AdbMenu}}" Value="False">
-                <Setter Property="Stroke" Value="{DynamicResource TextFillColorDisabledBrush}" />
-            </DataTrigger>
+            </Trigger>
         </Style.Triggers>
     </Style>
     <Style x:Key="BorderStyle" TargetType="Border">

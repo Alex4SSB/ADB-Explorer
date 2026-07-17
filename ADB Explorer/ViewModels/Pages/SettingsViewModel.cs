@@ -153,6 +153,7 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
                         Strings.Resources.S_RESET_SETTINGS,
                         Strings.Resources.S_RESET_SETTINGS_TITLE,
                         primaryText: Strings.Resources.S_CONFIRM,
+                        secondaryText: Strings.Resources.S_RESTART,
                         cancelText: Strings.Resources.S_CANCEL,
                         icon: DialogService.DialogIcon.Exclamation);
 
@@ -160,5 +161,14 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
             return;
 
         Data.RuntimeSettings.ResetAppSettings = true;
+
+        if (result.Item1 == Wpf.Ui.Controls.ContentDialogResult.Secondary)
+        {
+            App.Services.GetService<SettingsService>()?.DeleteSettingsFile();
+            CredentialVaultStore.ClearAll();
+            Data.Settings?.ClearVaultSettings();
+
+            SettingsHelper.ResetAppAction();
+        }
     }
 }
