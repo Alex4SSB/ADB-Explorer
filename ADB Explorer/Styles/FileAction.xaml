@@ -335,6 +335,7 @@
         <Setter Property="Header" Value="{Binding Action.Description}" />
         <Setter Property="InputGestureText" Value="{Binding Action.GestureString}" />
         <Setter Property="Icon" Value="{Binding IconContent}" />
+        <Setter Property="ToolTip" Value="{Binding Info}" />
     </Style>
     <Style
         x:Key="DummySubMenuStyle"

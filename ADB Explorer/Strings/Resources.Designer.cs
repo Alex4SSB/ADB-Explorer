@@ -4401,6 +4401,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Attempts to align the date modified according to the file name.
+        /// </summary>
+        public static string S_UPDATE_MODIFIED_INFO {
+            get {
+                return ResourceManager.GetString("S_UPDATE_MODIFIED_INFO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Content mismatch.
         /// </summary>
         public static string S_VALIDATE_MISMATCH {

@@ -272,8 +272,7 @@ public static class AppActions
             () => Data.FileActions.UpdateModifiedEnabled,
             FileActionLogic.UpdateModifiedDates,
             Strings.Resources.S_MENU_UPDATE_MODIFIED,
-            new(Key.U, ModifierKeys.Control),
-            true),
+            info: Strings.Resources.S_UPDATE_MODIFIED_INFO),
         new(FileActionType.Install,
             () => Data.FileActions.InstallPackageEnabled,
             FileActionLogic.InstallPackages,
@@ -460,17 +459,21 @@ public class FileAction : ViewModelBase
         }
     }
 
+    public string? Info { get; }
+
     public FileAction(FileActionType name,
                       BaseAction command,
                       string description,
                       KeyGesture gesture = null,
                       bool useForGesture = false,
-                      bool clearClipboard = false)
+                      bool clearClipboard = false,
+                      string? info = null)
     {
         Name = name;
         Command = command;
         Gesture = gesture;
         Description = description;
+        Info = info;
 
         if (gesture is not null)
             KeyBinding = new(Command.Command, gesture);
@@ -490,8 +493,9 @@ public class FileAction : ViewModelBase
                       string description = "",
                       KeyGesture gesture = null,
                       bool useForGesture = false,
-                      bool clearClipboard = false)
-        : this(name, new(canExecute, action), description, gesture, useForGesture, clearClipboard)
+                      bool clearClipboard = false,
+                      string? info = null)
+        : this(name, new(canExecute, action), description, gesture, useForGesture, clearClipboard, info)
     { }
 
     public FileAction(FileActionType name,
@@ -500,8 +504,9 @@ public class FileAction : ViewModelBase
                       ObservableProperty<string> description,
                       KeyGesture gesture = null,
                       bool useForGesture = false,
-                      bool clearClipboard = false)
-        : this(name, new(canExecute, action), description.Value, gesture, useForGesture, clearClipboard)
+                      bool clearClipboard = false,
+                      string? info = null)
+        : this(name, new(canExecute, action), description.Value, gesture, useForGesture, clearClipboard, info)
     {
         description.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) =>
         {

@@ -10,7 +10,7 @@ public interface IMenuItem : INotifyPropertyChanged
 
 }
 
-public abstract class ActionBase : ViewModelBase, IMenuItem
+public abstract partial class ActionBase : ViewModelBase, IMenuItem
 {
     public enum AnimationSource
     {
@@ -50,6 +50,9 @@ public abstract class ActionBase : ViewModelBase, IMenuItem
         get => isVisible;
         private set => Set(ref isVisible, value);
     }
+
+    [ObservableProperty]
+    public partial string? Info { get; protected set; }
 
     public string Tooltip => $"{Action.Description}{(string.IsNullOrEmpty(Action.GestureString) ? "" : $" ({Action.GestureString})")}";
 
@@ -280,7 +283,9 @@ public class SubMenu : ActionMenu
 
     public SubMenu(FileAction fileAction, BaseIcon? icon = null, IEnumerable<SubMenu> children = null, FileAction altAction = null, ObservableProperty<bool> isVisible = null)
         : base(fileAction, icon, children, altAction: altAction, isVisible: isVisible)
-    { }
+    { 
+        Info = fileAction.Info;
+    }
 }
 
 public class DummySubMenu : SubMenu
