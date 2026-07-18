@@ -29,7 +29,12 @@ public static class ArchivePath
         if (string.IsNullOrEmpty(internalPath))
             return "";
 
-        return internalPath.Trim('/');
+        var normalized = internalPath.Trim('/');
+        // Toybox/GNU tar may list members with a "./" prefix; strip for stable paths.
+        while (normalized.StartsWith("./", StringComparison.Ordinal))
+            normalized = normalized[2..].TrimStart('/');
+
+        return normalized;
     }
 
     public static bool TryParse(string path, out string archivePath, out string internalPath, string? deviceId = null)

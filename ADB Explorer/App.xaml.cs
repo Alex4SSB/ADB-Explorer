@@ -201,6 +201,10 @@ public partial class App
 
         ClearFoldersInAppData();
 
+        // Best-effort: wipe all /data/local/tmp/.adb-explorer-extract-* before we may kill adb.
+        try { ArchiveExtract.CleanupAllStaging(); }
+        catch { /* ignore */ }
+
         if (Data.Settings.KillAdbOnExit is true)
         {
             ADBService.CancelAllCommands();

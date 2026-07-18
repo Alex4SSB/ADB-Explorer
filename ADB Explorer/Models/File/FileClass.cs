@@ -145,7 +145,8 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     {
         get
         {
-            if (CacheThumbnail?.Image is BitmapSource cached)
+            if (Data.Settings.ThumbsMode is not AppSettings.ThumbnailMode.Off
+                && CacheThumbnail?.Image is BitmapSource cached)
                 return cached;
 
             return Data.Settings.ThumbsMode > AppSettings.ThumbnailMode.IconViewOnly
@@ -154,7 +155,10 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         }
     }
 
-    public BitmapSource LargeIcon => CacheThumbnail?.Image ?? LargeFileIcon;
+    public BitmapSource LargeIcon =>
+        Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.Off
+            ? LargeFileIcon
+            : CacheThumbnail?.Image ?? LargeFileIcon;
 
     private BitmapSource LargeFileIcon => FileToIconConverter.GetImage(this, 120).First();
 

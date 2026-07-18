@@ -18,6 +18,9 @@ public partial class FileIconViewModel : FileViewModelBase
     {
         get
         {
+            if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.Off)
+                return LargeFileIcon;
+
             var size = Data.RuntimeSettings.ThumbsSize;
             if (_cachedThumbnail is not null && _cachedSize >= size)
                 return _cachedThumbnail;
@@ -64,14 +67,51 @@ public partial class FileIconViewModel : FileViewModelBase
         if (Data.DevicesObject.Current is null)
             return;
 
-        var useDeviceThumbs = Data.Settings.ThumbsMode is not AppSettings.ThumbnailMode.Off;
-        var useCustomThumbs = Data.Settings.MaxCustomThumbWeight > 0;
-        if (!useDeviceThumbs && !useCustomThumbs)
+        if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.Off)
             return;
+
+        var useCustomThumbs = Data.Settings.MaxCustomThumbWeight > 0;
 
         var serialNumber = Data.DevicesObject.Current.SerialNumber;
         _cts = new CancellationTokenSource();
         var token = _cts.Token;
+
+        _thumbnailUpdatedHandler = (updatedDeviceId, updatedFilePath) =>
+        {
+            if (updatedDeviceId != serialNumber
+                || (updatedFilePath != _file.ParsedFullPath && updatedFilePath != _file.FullPath))
+                return;
+
+            Task.Run(() =>
+            {
+                if (token.IsCancellationRequested)
+                    return;
+
+                if (ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file, size)
+                    is not ThumbnailService.Thumbnail { Image: not null } thumb)
+                {
+                    App.SafeBeginInvoke(() =>
+                    {
+                        if (token.IsCancellationRequested)
+                            return;
+
+                        _currentlyLoadingSize = _cachedSize;
+                    }, DispatcherPriority.Background);
+
+                    return;
+                }
+
+                App.SafeBeginInvoke(() =>
+                {
+                    if (token.IsCancellationRequested)
+                        return;
+
+                    ApplyLoadedThumbnail(thumb, size);
+                }, DispatcherPriority.Background);
+            }, token);
+        };
+
+        ThumbnailService.ThumbnailUpdated += _thumbnailUpdatedHandler;
 
         Task.Run(() =>
         {
@@ -84,13 +124,14 @@ public partial class FileIconViewModel : FileViewModelBase
             if (token.IsCancellationRequested)
                 return;
 
-            ThumbnailService.Thumbnail? thumbnail = null;
-            if (useDeviceThumbs)
-                thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file.ParsedFullPath, size);
+            var thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file, size);
 
             var requestedCustom = useCustomThumbs && ThumbnailService.IsCustomThumbnailCandidate(_file);
             if ((thumbnail is null || thumbnail.Value.Image is null) && requestedCustom)
+            {
                 ThumbnailService.TryPullCustomThumbnail(Data.DevicesObject.Current, _file);
+                thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file, size);
+            }
 
             if (token.IsCancellationRequested)
                 return;
@@ -128,42 +169,6 @@ public partial class FileIconViewModel : FileViewModelBase
                 }, DispatcherPriority.Background);
             }
         }, token);
-
-        _thumbnailUpdatedHandler = (updatedDeviceId, updatedFilePath) =>
-        {
-            if (updatedDeviceId != serialNumber || updatedFilePath != _file.ParsedFullPath)
-                return;
-
-            Task.Run(() =>
-            {
-                if (token.IsCancellationRequested)
-                    return;
-
-                if (ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file.ParsedFullPath, size)
-                    is not ThumbnailService.Thumbnail { Image: not null } thumb)
-                {
-                    App.SafeBeginInvoke(() =>
-                    {
-                        if (token.IsCancellationRequested)
-                            return;
-
-                        _currentlyLoadingSize = _cachedSize;
-                    }, DispatcherPriority.Background);
-
-                    return;
-                }
-
-                App.SafeBeginInvoke(() =>
-                {
-                    if (token.IsCancellationRequested)
-                        return;
-
-                    ApplyLoadedThumbnail(thumb, size);
-                }, DispatcherPriority.Background);
-            }, token);
-        };
-
-        ThumbnailService.ThumbnailUpdated += _thumbnailUpdatedHandler;
     }
 
     private void ApplyLoadedThumbnail(ThumbnailService.Thumbnail thumb, ThumbnailService.ThumbnailSize size)

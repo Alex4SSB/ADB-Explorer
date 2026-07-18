@@ -164,6 +164,10 @@ public static class AdbHelper
         string internalPath,
         CancellationToken cancellationToken)
     {
+        internalPath = ArchivePath.NormalizeInternal(internalPath);
+        if (string.IsNullOrEmpty(internalPath))
+            return null;
+
         string? stagingRoot = null;
         try
         {
@@ -194,34 +198,6 @@ public static class AdbHelper
             try
             {
                 await service.PullAsync(path, stream, cancellationToken: cancellationToken);
-                SyncTransferTracker.AddPullBytes(stream.Position);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        stream.Position = 0;
-        return stream;
-    }
-
-    public static MemoryStream? ReadFileAsStream(LogicalDeviceViewModel device, string path)
-    {
-        if (ArchivePath.TryParse(path, out var archivePath, out var internalPath, device.ID)
-            && !string.IsNullOrEmpty(internalPath))
-        {
-            return ReadArchiveMemberAsStreamAsync(device, archivePath, internalPath, CancellationToken.None)
-                .GetAwaiter()
-                .GetResult();
-        }
-
-        MemoryStream stream = new();
-        using (SyncService service = new(device.Device.DeviceData))
-        {
-            try
-            {
-                service.Pull(path, stream);
                 SyncTransferTracker.AddPullBytes(stream.Position);
             }
             catch
@@ -285,7 +261,11 @@ public static class AdbHelper
                 SyncTransferTracker.AddPushBytes(content.Length);
             }
 
-            ArchiveExtract.UpdateZipMember(device.ID, archivePath, internalPath, contentRoot, cancellationToken);
+            if (ArchiveHelper.GetFamily(archivePath) is ArchiveFamily.Tar)
+                ArchiveExtract.UpdateTarMember(device.ID, archivePath, internalPath, contentRoot, cancellationToken);
+            else
+                ArchiveExtract.UpdateZipMember(device.ID, archivePath, internalPath, contentRoot, cancellationToken);
+
             ArchiveListing.InvalidateToc(archivePath);
         }
         finally

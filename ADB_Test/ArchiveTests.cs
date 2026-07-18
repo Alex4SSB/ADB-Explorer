@@ -68,6 +68,19 @@ public class ArchiveCapabilityTests
         Assert.AreEqual(ArchiveFamily.None, ArchiveHelper.GetFamily("notes.txt"));
         Assert.AreEqual(ArchiveFamily.None, ArchiveHelper.GetFamily("image.gz"));
         Assert.AreEqual(ArchiveFamily.None, ArchiveHelper.GetFamily("package.rar"));
+
+        // Full device paths must classify by basename (not dots in parent segments).
+        Assert.AreEqual(ArchiveFamily.Tar, ArchiveHelper.GetFamily("/sdcard/Download/backup.tar.gz"));
+        Assert.AreEqual(ArchiveFamily.Tar, ArchiveHelper.GetFamily("/storage/emulated/0/Download/backup.tgz"));
+        Assert.AreEqual(ArchiveFamily.Zip, ArchiveHelper.GetFamily("/sdcard/apps/app.apk"));
+    }
+
+    [TestMethod]
+    public void NormalizeInternal_StripsDotSlashPrefix()
+    {
+        Assert.AreEqual("readme.txt", ArchivePath.NormalizeInternal("./readme.txt"));
+        Assert.AreEqual("dir/file.txt", ArchivePath.NormalizeInternal("./dir/file.txt"));
+        Assert.AreEqual("dir/file.txt", ArchivePath.NormalizeInternal("/dir/file.txt/"));
     }
 
     [TestMethod]
@@ -103,17 +116,32 @@ public class ArchiveCapabilityTests
     }
 
     [TestMethod]
-    public void CanModify_TarRequiresAppendSupportAndUncompressedArchive()
+    public void CanModify_TarRequiresTarOnly_IncludingCompressed()
     {
-        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(tarExists: true, tarAppendSupported: true);
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(tarExists: true);
         Assert.AreEqual(Resources.S_ARCHIVE_CAN_MODIFY, ArchiveHelper.GetArchiveModificationTooltip("backup.tar", DeviceId));
         Assert.IsTrue(ArchiveHelper.CanModify("backup.tar", DeviceId));
-        Assert.AreEqual(Resources.S_ARCHIVE_READ_ONLY, ArchiveHelper.GetArchiveModificationTooltip("backup.tar.gz", DeviceId));
-        Assert.IsFalse(ArchiveHelper.CanModify("backup.tar.gz", DeviceId));
+        Assert.AreEqual(Resources.S_ARCHIVE_CAN_MODIFY, ArchiveHelper.GetArchiveModificationTooltip("backup.tar.gz", DeviceId));
+        Assert.IsTrue(ArchiveHelper.CanModify("backup.tar.gz", DeviceId));
+        Assert.IsTrue(ArchiveHelper.CanModify("backup.tgz", DeviceId));
 
-        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(tarExists: true, tarAppendSupported: false);
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(tarExists: false);
         Assert.AreEqual(Resources.S_ARCHIVE_READ_ONLY, ArchiveHelper.GetArchiveModificationTooltip("backup.tar", DeviceId));
         Assert.IsFalse(ArchiveHelper.CanModify("backup.tar", DeviceId));
+    }
+
+    [TestMethod]
+    public void CanPasteIntoArchive_TarOnly_NotZip()
+    {
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(tarExists: true, unzipExists: true, zipExists: true);
+
+        Assert.IsTrue(ArchiveHelper.CanPasteIntoArchive(ArchivePath.Join("/sdcard/backup.tar", "docs"), DeviceId));
+        Assert.IsTrue(ArchiveHelper.CanPasteIntoArchive(ArchivePath.Join("/sdcard/backup.tgz", ""), DeviceId));
+        Assert.IsFalse(ArchiveHelper.CanPasteIntoArchive(ArchivePath.Join("/sdcard/archive.zip", "docs"), DeviceId));
+        Assert.IsFalse(ArchiveHelper.CanPasteIntoArchive("/sdcard/Download", DeviceId));
+
+        Assert.IsTrue(ArchiveHelper.CanDeleteFromArchive(ArchivePath.Join("/sdcard/backup.tar", "docs"), DeviceId));
+        Assert.IsFalse(ArchiveHelper.CanDeleteFromArchive(ArchivePath.Join("/sdcard/archive.zip", "a"), DeviceId));
     }
 
     [TestMethod]
@@ -143,13 +171,14 @@ public class ArchiveCapabilityTests
         ShellCommands.DeviceCommands[DeviceId] = MakeCommands(unzipExists: true, zipExists: true);
         Assert.IsFalse(ArchiveHelper.IsMemberPreviewReadOnly(zipMember, DeviceId));
 
-        // Tar append-capable still cannot replace members from preview
-        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(tarExists: true, tarAppendSupported: true);
-        Assert.IsTrue(ArchiveHelper.IsMemberPreviewReadOnly(tarMember, DeviceId));
+        // Tar with tar → editable preview (extract+repack)
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(tarExists: true);
+        Assert.IsFalse(ArchiveHelper.IsMemberPreviewReadOnly(tarMember, DeviceId));
+        Assert.IsFalse(ArchiveHelper.IsMemberPreviewReadOnly(tgzMember, DeviceId));
 
-        // Compressed tar is RO
-        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(tarExists: true, tarAppendSupported: true);
-        Assert.IsTrue(ArchiveHelper.IsMemberPreviewReadOnly(tgzMember, DeviceId));
+        // Tar without tar → preview RO
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(tarExists: false);
+        Assert.IsTrue(ArchiveHelper.IsMemberPreviewReadOnly(tarMember, DeviceId));
     }
 
     [TestMethod]
@@ -476,6 +505,52 @@ public class ArchivePathTests
 
         Assert.HasCount(1, entries);
         Assert.AreEqual(new DateTime(2025, 11, 1, 16, 40, 0), entries[0].Modified);
+    }
+
+    [TestMethod]
+    public void ParseTar_DetectsDotSlashMemberPrefix()
+    {
+        const string withPrefix = "-rw-r--r-- root/root      10 2025-11-01 16:40 ./toys/android/log.c\n";
+        const string withoutPrefix = "-rw-r--r-- root/root      10 2025-11-01 16:40 toys/android/log.c\n";
+
+        var dotted = ArchiveListing.ParseToc(withPrefix, ArchiveFamily.Tar);
+        Assert.IsTrue(dotted.UsesDotSlashPrefix);
+        Assert.AreEqual("toys/android/log.c", dotted.Entries[0].Path);
+
+        var plain = ArchiveListing.ParseToc(withoutPrefix, ArchiveFamily.Tar);
+        Assert.IsFalse(plain.UsesDotSlashPrefix);
+        Assert.AreEqual("toys/android/log.c", plain.Entries[0].Path);
+    }
+
+    [TestMethod]
+    public void ParseTar_ReadsNamesWithSpaces()
+    {
+        const string stdout =
+            "-rw-r--r-- root/root      1234 2025-11-01 16:40 Camera Roll/IMG 4006.jpg\n" +
+            "lrwxrwxrwx root/root         0 2025-11-01 16:40 my link -> Camera Roll/IMG 4006.jpg\n";
+
+        var toc = ArchiveListing.ParseToc(stdout, ArchiveFamily.Tar);
+
+        Assert.HasCount(2, toc.Entries);
+        Assert.AreEqual("Camera Roll/IMG 4006.jpg", toc.Entries[0].Path);
+        Assert.AreEqual("my link", toc.Entries[1].Path);
+    }
+
+    [TestMethod]
+    public void ParseZip_ReadsNamesWithSpaces()
+    {
+        const string stdout = """
+             Length   Method    Size  Cmpr    Date    Time   CRC-32   Name
+            --------  ------  ------- ---- ---------- ----- --------  ----
+                 100  Stored     100   0% 2025-11-01 16:40 00000000  Camera Roll/IMG 4006.jpg
+            --------          -------  ---
+                 100               100   0%                            1 file
+            """;
+
+        var toc = ArchiveListing.ParseToc(stdout, ArchiveFamily.Zip);
+
+        Assert.HasCount(1, toc.Entries);
+        Assert.AreEqual("Camera Roll/IMG 4006.jpg", toc.Entries[0].Path);
     }
 
     [TestMethod]

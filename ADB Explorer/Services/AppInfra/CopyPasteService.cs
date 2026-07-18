@@ -249,6 +249,7 @@ public partial class CopyPasteService : ObservableObject
 
         ClearDrag();
         UpdateUI();
+        ArchiveExtract.BeginCleanupAllStaging();
     }
 
     public void ClearDrag()
@@ -264,6 +265,7 @@ public partial class CopyPasteService : ObservableObject
         DragPasteSource = DataSource.None;
         DragFiles = [];
         DragParent = "";
+        ArchiveExtract.BeginCleanupAllStaging();
     }
 
     public void GetClipboardPasteItems()
@@ -283,6 +285,7 @@ public partial class CopyPasteService : ObservableObject
             _currentFiles = [];
 
             UpdateUI();
+            ArchiveExtract.BeginCleanupAllStaging();
             return;
         }
 
@@ -302,6 +305,10 @@ public partial class CopyPasteService : ObservableObject
         ParentFolder = DragParent;
 
         UpdateUI();
+
+        // External clipboard replaced a self archive copy — drop unused extract staging.
+        if (!IsSelf)
+            ArchiveExtract.BeginCleanupAllStaging();
     }
 
     public void UpdateSelfVFDO(bool isDrag, DragDropEffects pasteEffect = DragDropEffects.None)
@@ -391,7 +398,9 @@ public partial class CopyPasteService : ObservableObject
             if (!DriveHelper.IsModificationAllowedAt(targetPath, Data.DevicesObject.Current?.ID ?? ""))
                 return DragDropEffects.None;
 
-            if (ArchivePath.IsArchivePath(targetPath, Data.DevicesObject.Current?.ID))
+            var deviceId = Data.DevicesObject.Current?.ID;
+            if (ArchivePath.IsArchivePath(targetPath, deviceId)
+                && !ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId))
                 return DragDropEffects.None;
 
             if (CurrentSource.HasFlag(DataSource.Android))
@@ -402,6 +411,10 @@ public partial class CopyPasteService : ObservableObject
             else if (CurrentSource.HasFlag(DataSource.Virtual))
                 return DragDropEffects.Copy;
             
+            // Windows filesystem drop: Copy|Move into tar, never Link.
+            if (ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId))
+                return DragDropEffects.Copy | DragDropEffects.Move;
+
             return DragDropEffects.Move | DragDropEffects.Copy;
         }
 
@@ -553,7 +566,12 @@ public partial class CopyPasteService : ObservableObject
 
     public void AcceptDataObject(IDataObject dataObject, string targetFolder, bool isLink = false)
     {
-        if (!DriveHelper.IsModificationAllowedAt(targetFolder, Data.DevicesObject.Current?.ID ?? ""))
+        var deviceId = Data.DevicesObject.Current?.ID ?? "";
+        if (!DriveHelper.IsModificationAllowedAt(targetFolder, deviceId))
+            return;
+
+        // Symlink into archives is not supported.
+        if (isLink && ArchivePath.IsArchivePath(targetFolder, deviceId))
             return;
 
         void ReadObject()
@@ -788,6 +806,12 @@ public partial class CopyPasteService : ObservableObject
             pasteItems = pasteItems.Where(f => files.Contains(f.ParsingName));
         }
 
+        if (ArchiveHelper.CanPasteIntoArchive(targetPath, Data.DevicesObject.Current?.ID ?? ""))
+        {
+            ShellFileOperation.PushItemsToTar(Data.DevicesObject.Current, pasteItems, targetPath, App.AppDispatcher);
+            return;
+        }
+
         FileActionLogic.PushShellObjects(pasteItems, targetPath);
     }
 
@@ -797,6 +821,16 @@ public partial class CopyPasteService : ObservableObject
         if (!pasteItems.Any())
             return;
 
+        if (ArchiveHelper.CanPasteIntoArchive(targetPath, Data.DevicesObject.Current?.ID ?? ""))
+        {
+            ShellFileOperation.PushItemsToTar(
+                Data.DevicesObject.Current,
+                pasteItems.Select(f => f.ShellItem),
+                targetPath,
+                App.AppDispatcher);
+            return;
+        }
+
         FileActionLogic.PushShellObjects(pasteItems.Select(f => f.ShellItem), targetPath, dropEffects);
     }
 
@@ -805,6 +839,16 @@ public partial class CopyPasteService : ObservableObject
         var items = MergeFiles(targetPath, pasteItem).Result;
         if (!items.Any())
             return null;
+
+        if (ArchiveHelper.CanPasteIntoArchive(targetPath, Data.DevicesObject.Current?.ID ?? ""))
+        {
+            ShellFileOperation.PushItemsToTar(
+                Data.DevicesObject.Current,
+                [pasteItem.ShellItem ?? originalShellItem ?? ShellItem.Open(pasteItem.FullPath)],
+                targetPath,
+                App.AppDispatcher);
+            return null;
+        }
 
         return FileActionLogic.PushShellObject(pasteItem.ShellItem, targetPath, dropEffects, originalShellItem);
     }
@@ -838,6 +882,16 @@ public partial class CopyPasteService : ObservableObject
                       existingItems: Data.DirList.FileList.Select(f => f.FullName),
                       dispatcher: dispatcher,
                       masterPid: masterPid);
+            return;
+        }
+
+        // Device paste into a modifiable tar archive.
+        if (ArchiveHelper.CanPasteIntoArchive(targetPath, device.ID))
+        {
+            if (cutType is DragDropEffects.Link)
+                return;
+
+            ShellFileOperation.PasteItemsToTar(device, pasteItems, targetPath, dispatcher, cutType);
             return;
         }
 
@@ -1075,6 +1129,6 @@ public partial class CopyPasteService : ObservableObject
         Directory.CreateDirectory(Data.RuntimeSettings.TempDragPath);
 
         // Drop leftover archive extract staging from a previous clipboard/drag that was never pulled.
-        Task.Run(() => ArchiveExtract.CleanupAllStaging());
+        ArchiveExtract.BeginCleanupAllStaging();
     }
 }

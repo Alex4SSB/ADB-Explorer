@@ -18,7 +18,14 @@ public readonly record struct ArchiveEntry(
 
 public readonly record struct ArchiveSummary(long UncompressedSize, long CompressedSize, string Ratio, int FileCount);
 
-public readonly record struct ArchiveToc(IReadOnlyList<ArchiveEntry> Entries, ArchiveSummary? Summary);
+public readonly record struct ArchiveToc(
+    IReadOnlyList<ArchiveEntry> Entries,
+    ArchiveSummary? Summary,
+    /// <summary>
+    /// Tar members were listed with a <c>./</c> prefix (typical after <c>tar -C dir .</c>).
+    /// Extract-by-name must use the same prefix on toybox.
+    /// </summary>
+    bool UsesDotSlashPrefix = false);
 
 public static class ArchiveListing
 {
@@ -42,7 +49,7 @@ public static class ArchiveListing
     public static ArchiveToc ParseToc(string stdout, ArchiveFamily family)
         => family switch
         {
-            ArchiveFamily.Tar => new(ParseTar(stdout), null),
+            ArchiveFamily.Tar => ParseTarToc(stdout),
             ArchiveFamily.Zip => ParseZip(stdout),
             _ => new([], null),
         };
@@ -142,27 +149,52 @@ public static class ArchiveListing
     public static void InvalidateToc(string archivePath)
         => TocCache.TryRemove(archivePath, out _);
 
-    private static List<ArchiveEntry> ParseTar(string stdout)
+    private static ArchiveToc ParseTarToc(string stdout)
     {
         var result = new List<ArchiveEntry>();
+        var usesDotSlash = false;
+
         foreach (var line in stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries))
         {
             var match = RE_TAR_LIST().Match(line);
             if (!match.Success)
                 continue;
 
-            var rawName = match.Groups["Name"].Value;
+            var rawName = match.Groups["Name"].Value.TrimEnd();
             var mode = match.Groups["Mode"].Value;
+            // Toybox: "name -> target" for symlinks, "name link to target" for hard links.
+            if (mode.Length > 0 && mode[0] is 'l')
+            {
+                var arrow = rawName.IndexOf(" -> ", StringComparison.Ordinal);
+                if (arrow >= 0)
+                    rawName = rawName[..arrow];
+            }
+            else
+            {
+                var linkTo = rawName.IndexOf(" link to ", StringComparison.Ordinal);
+                if (linkTo >= 0)
+                    rawName = rawName[..linkTo];
+            }
+
             var isDirectory = mode[0] is 'd' || rawName.EndsWith('/');
 
             long.TryParse(match.Groups["Size"].Value, out var size);
             var modified = TryParseListDate(match.Groups["Date"].Value);
             var permissions = ParseTarMode(mode);
 
-            result.Add(new ArchiveEntry(rawName.TrimEnd('/'), isDirectory, size, modified, Permissions: permissions));
+            var trimmed = rawName.TrimEnd('/');
+            if (trimmed.StartsWith("./", StringComparison.Ordinal) || trimmed == ".")
+                usesDotSlash = true;
+
+            result.Add(new ArchiveEntry(
+                ArchivePath.NormalizeInternal(trimmed),
+                isDirectory,
+                size,
+                modified,
+                Permissions: permissions));
         }
 
-        return result;
+        return new(result, null, usesDotSlash);
     }
 
     /// <summary>
@@ -194,7 +226,7 @@ public static class ArchiveListing
             if (!match.Success)
                 continue;
 
-            var rawName = match.Groups["Name"].Value;
+            var rawName = match.Groups["Name"].Value.TrimEnd();
             var isDirectory = rawName.EndsWith('/');
 
             long.TryParse(match.Groups["Length"].Value, out var size);
@@ -205,7 +237,7 @@ public static class ArchiveListing
             var modified = TryParseListDate(match.Groups["Date"].Value);
 
             result.Add(new ArchiveEntry(
-                rawName.TrimEnd('/'),
+                ArchivePath.NormalizeInternal(rawName.TrimEnd('/')),
                 isDirectory,
                 size,
                 modified,

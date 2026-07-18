@@ -376,7 +376,10 @@ public partial class ExplorerPageHeader : UserControl
 
         if (DetailsPane.IsOpen)
         {
-            DetailsPane.SelectedFiles = FileActions.IsAppDrive ? SelectedPackages : SelectedFiles;
+            // Snapshot so OldValue isn't a live Where() that re-evaluates after selection changes.
+            DetailsPane.SelectedFiles = FileActions.IsAppDrive
+                ? SelectedPackages.ToList()
+                : SelectedFiles.ToList();
         }
 
         if (DevicesObject.Current is { SupportsLsV2: false })
@@ -591,6 +594,8 @@ public partial class ExplorerPageHeader : UserControl
         switch (e.PropertyName)
         {
             case nameof(DirectoryLister.CurrentLocation):
+                // Empty selection shows CurrentLocation in the details pane. Refresh on location
+                // changes only (preliminary + final). InProgress no longer re-triggers the same load.
                 if (DetailsPane.IsOpen && ActiveSelectedItems.Count == 0)
                     DetailsPane.RefreshSelection();
                 break;
@@ -614,16 +619,7 @@ public partial class ExplorerPageHeader : UserControl
                         return;
 
                     if (FileActions.IsRecycleBin)
-                    {
                         TrashHelper.EnableRecycleButtons();
-                    }
-
-                    if (!DirList.InProgress
-                        && DetailsPane.IsOpen
-                        && ActiveSelectedItems.Count == 0)
-                    {
-                        DetailsPane.RefreshSelection();
-                    }
 
                     break;
                 }

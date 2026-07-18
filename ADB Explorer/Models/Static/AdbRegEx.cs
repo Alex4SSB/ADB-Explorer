@@ -59,13 +59,14 @@
         [GeneratedRegex(@"[\d.]+")]
         public static partial Regex RE_GITHUB_VERSION();
 
-        [GeneratedRegex(@"^\s*(?<Length>\d+)\s+(?<Method>\S+)\s+(?<Compressed>\d+)\s+(?<Ratio>\d+%)\s+(?<Date>[\d-]+ [\d:]+)\s+(?<Crc>[0-9a-f]+)\s+(?<Name>\S+)", RegexOptions.Multiline)]
+        [GeneratedRegex(@"^\s*(?<Length>\d+)\s+(?<Method>\S+)\s+(?<Compressed>\d+)\s+(?<Ratio>\d+%)\s+(?<Date>[\d-]+ [\d:]+)\s+(?<Crc>[0-9a-f]+)\s+(?<Name>.+)", RegexOptions.Multiline)]
         public static partial Regex RE_UNZIP_VERBOSE_ENTRY();
 
         [GeneratedRegex(@"^\s*(?<Length>\d+)\s+(?<Compressed>\d+)\s+(?<Ratio>\d+%)\s+(?<Count>\d+)\s+files?\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase)]
         public static partial Regex RE_UNZIP_VERBOSE_SUMMARY();
 
-        [GeneratedRegex(@"^(?<Mode>[\w-]+)\s+\S+\s+(?<Size>\d+)\s+(?<Date>[\d-]+ [\d:]+)\s+(?<Name>\S+)$")]
+        // Name is ".+" so members with spaces match; link targets are stripped in ParseTarToc.
+        [GeneratedRegex(@"^(?<Mode>[\w-]+)\s+\S+\s+(?<Size>\d+)\s+(?<Date>[\d-]+ [\d:]+)\s+(?<Name>.+)$")]
         public static partial Regex RE_TAR_LIST();
 
         [GeneratedRegex(@"^\s*versionName=(?<VersionName>.+?)\s*$", RegexOptions.Multiline)]

@@ -253,12 +253,14 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
             if (path != currentPath)
                 return;
 
-            if (ArchivePath.IsArchivePath(path, Device.ID))
+            if (ArchivePath.IsArchivePath(path, Device.ID)
+                && ArchivePath.TryParse(path, out var archivePath, out var internalPath, Device.ID))
             {
-                location.EffectiveAccess = AccessMask.Read;
+                location.EffectiveAccess = ArchiveHelper.CanModify(FileHelper.GetFullName(archivePath), Device.ID)
+                    ? AccessMask.Read | AccessMask.Write
+                    : AccessMask.Read;
 
-                if (ArchivePath.TryParse(path, out var archivePath, out var internalPath, Device.ID)
-                    && string.IsNullOrEmpty(internalPath)
+                if (string.IsNullOrEmpty(internalPath)
                     && ArchiveListing.TryGetArchiveSummary(archivePath, out var summary))
                 {
                     location.CompressedSize = summary.CompressedSize;

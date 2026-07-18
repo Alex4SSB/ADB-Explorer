@@ -2,6 +2,8 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
+using AdvancedSharpAdbClient;
+using AdvancedSharpAdbClient.Models;
 using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Services;
@@ -48,13 +50,66 @@ public static class ShellFileOperation
 
     public static void DeleteItems(LogicalDeviceViewModel device, IEnumerable<FileClass> items, Dispatcher dispatcher)
     {
+        var archiveGroups = new Dictionary<string, List<FileClass>>(StringComparer.Ordinal);
+        var regular = new List<FileClass>();
+
         foreach (var item in items)
+        {
+            if (ArchivePath.TryParse(item.FullPath, out var archivePath, out _, device.ID)
+                && ArchiveHelper.CanDeleteFromArchive(item.FullPath, device.ID))
+            {
+                if (!archiveGroups.TryGetValue(archivePath, out var group))
+                    archiveGroups[archivePath] = group = [];
+
+                group.Add(item);
+            }
+            else
+            {
+                regular.Add(item);
+            }
+        }
+
+        foreach (var (archivePath, members) in archiveGroups)
+        {
+            var fileOp = FileArchiveDeleteOperation.Create(members, archivePath, device, dispatcher);
+            fileOp.PropertyChanged += ArchiveDeleteOp_PropertyChanged;
+            Data.FileOpQ.AddOperation(fileOp);
+        }
+
+        foreach (var item in regular)
         {
             var fileOp = new FileDeleteOperation(dispatcher, device, item);
             fileOp.PropertyChanged += DeleteFileOp_PropertyChanged;
 
             Data.FileOpQ.AddOperation(fileOp);
         }
+    }
+
+    private static void ArchiveDeleteOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (sender is not FileArchiveDeleteOperation op)
+            return;
+
+        if (e.PropertyName is not nameof(FileOperation.Status)
+            || op.Status is not FileOperation.OperationStatus.Completed)
+            return;
+
+        if (op.Device.ID == Data.DevicesObject.Current?.ID)
+        {
+            foreach (var member in op.Members)
+                member.CutState = DragDropEffects.None;
+
+            if (ArchivePath.TryParse(Data.CurrentPath, out var currentArchive, out _, op.Device.ID)
+                && currentArchive == op.TarArchivePath)
+            {
+                foreach (var member in op.Members)
+                    Data.DirList.FileList.Remove(member);
+
+                FileActionLogic.UpdateFileActions();
+            }
+        }
+
+        op.PropertyChanged -= ArchiveDeleteOp_PropertyChanged;
     }
 
     private static void DeleteFileOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -147,6 +202,62 @@ public static class ShellFileOperation
         return exitCode == 0;
     }
 
+    /// <summary>
+    /// Pushes a Windows file or folder tree to <paramref name="androidDestPath"/> via AdvancedSharpAdbClient sync
+    /// (no classic <c>adb push</c>).
+    /// </summary>
+    public static void SilentPush(
+        LogicalDeviceViewModel device,
+        ShellItem windowsItem,
+        string androidDestPath,
+        CancellationToken cancellationToken = default)
+    {
+        if (!File.Exists(windowsItem.ParsingName) && !Directory.Exists(windowsItem.ParsingName))
+            throw new FileNotFoundException(Strings.Resources.S_SYNC_FILE_NOT_FOUND, windowsItem.ParsingName);
+        
+        var source = new SyncFile(windowsItem, includeContent: true);
+        try
+        {
+            IEnumerable<SyncFile> files = [source, .. source.AllChildren()];
+
+            if (source.IsDirectory)
+            {
+                var dirPaths = FolderHelper.GetBottomMostFolders(files)
+                    .Select(f => FileHelper.ConcatPaths(
+                        androidDestPath,
+                        FileHelper.ExtractRelativePath(f.FullPath, source.FullPath, false)));
+
+                MakeDirs(device.ID, dirPaths).GetAwaiter().GetResult();
+            }
+
+            UnixFileStatus fileMode = UnixFileStatus.AllPermissions | UnixFileStatus.Regular;
+            var useSyncV2 = device.SupportsSyncV2;
+            var isCanceled = false;
+            using var cancelReg = cancellationToken.Register(() => isCanceled = true);
+
+            foreach (var item in files.Where(f => !f.IsDirectory))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var targetPath = source.IsDirectory
+                    ? FileHelper.ConcatPaths(androidDestPath, FileHelper.ExtractRelativePath(item.FullPath, source.FullPath))
+                    : androidDestPath;
+
+                using SyncService service = new(device.DeviceData);
+                using var stream = new FileStream(item.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+                var lastWriteTime = item.DateModified ?? DateTime.Now;
+                service.Push(stream, targetPath, fileMode, lastWriteTime, _ => { }, useSyncV2, in isCanceled);
+
+                SyncTransferTracker.AddPushBytes(stream.Length);
+            }
+        }
+        finally
+        {
+            source.ClearAll();
+        }
+    }
+
     public static void MoveItems(LogicalDeviceViewModel device,
                                  IEnumerable<FileClass> items,
                                  string targetPath,
@@ -197,6 +308,72 @@ public static class ShellFileOperation
             fileops.ForEach(op => op.PropertyChanged += ExtractFileOp_PropertyChanged);
             Data.FileOpQ.AddOperations(fileops);
         });
+    }
+
+    /// <summary>
+    /// Pastes device files into a modifiable tar archive (extract + overlay + repack).
+    /// </summary>
+    public static void PasteItemsToTar(
+        LogicalDeviceViewModel device,
+        IEnumerable<FileClass> items,
+        string archiveTargetComposite,
+        Dispatcher dispatcher,
+        DragDropEffects cutType = DragDropEffects.Copy)
+    {
+        List<FileClass> list = [.. items];
+        if (list.Count == 0)
+            return;
+
+        var op = FileArchiveModifyOperation.FromDevicePaste(list, archiveTargetComposite, device, dispatcher, cutType);
+        dispatcher.Invoke(() =>
+        {
+            op.PropertyChanged += ArchiveModifyOp_PropertyChanged;
+            Data.FileOpQ.AddOperation(op);
+        });
+    }
+
+    /// <summary>
+    /// Pushes Windows items into a modifiable tar archive (extract + push overlay + repack).
+    /// </summary>
+    public static void PushItemsToTar(
+        LogicalDeviceViewModel device,
+        IEnumerable<ShellItem> items,
+        string archiveTargetComposite,
+        Dispatcher dispatcher)
+    {
+        List<ShellItem> list = [.. items];
+        if (list.Count == 0)
+            return;
+
+        var op = FileArchiveModifyOperation.FromWindowsPush(list, archiveTargetComposite, device, dispatcher);
+        dispatcher.Invoke(() =>
+        {
+            op.PropertyChanged += ArchiveModifyOp_PropertyChanged;
+            Data.FileOpQ.AddOperation(op);
+        });
+    }
+
+    private static void ArchiveModifyOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (sender is not FileArchiveModifyOperation op)
+            return;
+
+        if (e.PropertyName is not nameof(FileOperation.Status)
+            || op.Status is not FileOperation.OperationStatus.Completed)
+            return;
+
+        foreach (var src in op.DeviceSources)
+            src.CutState = DragDropEffects.None;
+
+        if (op.Device.ID == Data.DevicesObject.Current?.ID
+            && ArchivePath.TryParse(Data.CurrentPath, out var currentArchive, out _, op.Device.ID)
+            && currentArchive == op.TarArchivePath)
+        {
+            Data.RuntimeSettings.Refresh = true;
+            FileActionLogic.UpdateFileActions();
+        }
+
+        op.PropertyChanged -= ArchiveModifyOp_PropertyChanged;
     }
 
     private static void ExtractFileOp_PropertyChanged(object sender, PropertyChangedEventArgs e)

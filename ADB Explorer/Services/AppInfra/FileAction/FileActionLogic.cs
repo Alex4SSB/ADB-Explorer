@@ -201,10 +201,22 @@ internal static class FileActionLogic
 
         try
         {
-            if (file.Type is FileType.Folder)
-                await ShellFileOperation.MakeDir(Data.DevicesObject.Current, file.FullPath);
+            var device = Data.DevicesObject.Current;
+            if (ArchivePath.TryParse(file.FullPath, out var archivePath, out var internalPath, device.ID)
+                && !string.IsNullOrEmpty(internalPath)
+                && ArchiveHelper.CanPasteIntoArchive(file.FullPath, device.ID))
+            {
+                await Task.Run(() => ArchiveExtract.CreateTarMember(
+                    device.ID,
+                    archivePath,
+                    internalPath,
+                    file.Type is FileType.Folder,
+                    Data.DeviceCts.Token));
+            }
+            else if (file.Type is FileType.Folder)
+                await ShellFileOperation.MakeDir(device, file.FullPath);
             else if (file.Type is FileType.File)
-                await ShellFileOperation.MakeFile(Data.DevicesObject.Current, file.FullPath);
+                await ShellFileOperation.MakeFile(device, file.FullPath);
             else
                 throw new NotSupportedException();
         }
@@ -299,10 +311,6 @@ internal static class FileActionLogic
 
   public static bool EnableUiPaste()
     {
-        // Paste into an archive is not supported yet; paste from archive clipboard into a normal folder is.
-        if (Data.FileActions.IsArchive)
-            return false;
-
         if (Data.CurrentDrive?.Restrictions.ReadOnly is true)
             return false;
 
@@ -332,6 +340,9 @@ internal static class FileActionLogic
         {
             targetPath = Data.CurrentPath;
         }
+
+        if (!IsPasteIntoTargetAllowed(targetPath))
+            return false;
 
         UpdatePastingRestrictions(targetPath, files);
 
@@ -364,9 +375,6 @@ internal static class FileActionLogic
 
     public static bool EnableKeyboardPaste()
     {
-        if (Data.FileActions.IsArchive)
-            return false;
-
         if (Data.CurrentDrive?.Restrictions.ReadOnly is true)
             return false;
 
@@ -396,6 +404,9 @@ internal static class FileActionLogic
         {
             targetPath = Data.CurrentPath;
         }
+
+        if (!IsPasteIntoTargetAllowed(targetPath))
+            return false;
 
         UpdatePastingRestrictions(targetPath, files);
 
@@ -430,6 +441,15 @@ internal static class FileActionLogic
             && DriveHelper.IsModificationAllowedAt(targetPath, Data.DevicesObject?.Current?.ID ?? "");
     }
 
+    private static bool IsPasteIntoTargetAllowed(string targetPath)
+    {
+        var deviceId = Data.DevicesObject?.Current?.ID ?? "";
+        if (!ArchivePath.IsArchivePath(targetPath, deviceId))
+            return true;
+
+        return ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId);
+    }
+
     public static DragDropEffects EnableDropPaste(FileClass target = null)
     {
         if (!Data.CopyPaste.CurrentFiles.Any())
@@ -454,16 +474,22 @@ internal static class FileActionLogic
         if (!DriveHelper.IsModificationAllowedAt(targetPath, Data.DevicesObject.Current?.ID ?? ""))
             return DragDropEffects.None;
 
-        // Dropping into an archive is not supported yet.
-        if (ArchivePath.IsArchivePath(targetPath, Data.DevicesObject.Current?.ID))
+        var deviceId = Data.DevicesObject.Current?.ID;
+        var intoArchive = ArchivePath.IsArchivePath(targetPath, deviceId);
+        if (intoArchive && !ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId))
             return DragDropEffects.None;
 
         UpdatePastingRestrictions(targetPath, [.. Data.CopyPaste.CurrentFiles.Select(f => f.FullPath)]);
 
-        var fromArchive = ArchiveExtract.IsArchiveSource(Data.CopyPaste.CurrentFiles, Data.DevicesObject.Current?.ID);
+        var fromArchive = ArchiveExtract.IsArchiveSource(Data.CopyPaste.CurrentFiles, deviceId);
+        // Archive → archive not supported.
+        if (intoArchive && fromArchive)
+            return DragDropEffects.None;
 
         var result = DragDropEffects.Copy;
-        if (!fromArchive
+        // Link and archive targets are incompatible; archive extract is copy-only for sources.
+        if (!intoArchive
+            && !fromArchive
             && HasRootShell
             && Data.CopyPaste.IsSelf
             && DriveHelper.GetCurrentDrive(targetPath)?.Restrictions.NoSymbolicLinks is not true
@@ -636,6 +662,16 @@ internal static class FileActionLogic
                 deletedString += Strings.Resources.S_MENU_FILES;
             else
                 deletedString += Strings.Resources.S_BROWSER_ITEMS_PLURAL;
+        }
+
+        if (!Data.FileActions.IsRecycleBin && !emptyTrashFromDriveView && Data.Settings.EnableRecycle && !permanent.Value)
+        {
+            // Archive members cannot be moved to the recycle bin — always permanent-delete them.
+            var deviceId = Data.DevicesObject.Current?.ID ?? "";
+            if (itemsToDelete.Any(f => ArchivePath.IsArchivePath(f.FullPath, deviceId)))
+            {
+                permanent = true;
+            }
         }
 
         if (!Data.Settings.EnableRecycle || permanent.Value || emptyingRecycleBin)
@@ -892,17 +928,24 @@ internal static class FileActionLogic
 
         var isWritable = restrictions.ReadOnly is not true
             && Data.DirList?.CurrentLocation?.CanWriteLocation == true;
+        var canPasteIntoTar = deviceId is not null
+            && ArchiveHelper.CanPasteIntoArchive(Data.CurrentPath ?? "", deviceId);
         var isExplorerFolder = Data.FileActions.IsExplorerVisible
             && !Data.FileActions.IsRecycleBin
             && !Data.FileActions.IsAppDrive
             && !Data.FileActions.IsArchive;
 
-        Data.FileActions.IsCurrentLocationReadOnly = isExplorerFolder && !isWritable;
+        Data.FileActions.IsCurrentLocationReadOnly = (isExplorerFolder || canPasteIntoTar) && !isWritable;
         Data.FileActions.IsSelectionFuseProtectedAndroidRoot = Data.SelectedFiles.Any()
             && SelectionIsFuseProtectedAndroidRoot;
 
-        Data.FileActions.PushFilesFoldersEnabled = isWritable && isExplorerFolder;
-        Data.FileActions.NewEnabled = isWritable && isExplorerFolder;
+        // Push into modifiable tar is allowed; New File/Folder inside modifiable tar is allowed.
+        Data.FileActions.PushFilesFoldersEnabled = isWritable && (isExplorerFolder || canPasteIntoTar);
+        Data.FileActions.NewEnabled = isWritable && (isExplorerFolder || canPasteIntoTar);
+        Data.FileActions.IsNewMenuVisible.Value = Data.FileActions.IsExplorerVisible
+            && !Data.FileActions.IsRecycleBin
+            && !Data.FileActions.IsAppDrive
+            && Data.FileActions.NewEnabled;
 
         if (Data.FileActions.IsRecycleBin)
         {
@@ -918,7 +961,8 @@ internal static class FileActionLogic
             Data.FileActions.DeleteEnabled = isWritable
                 && !SelectionIsFuseProtectedAndroidRoot
                 && Data.SelectedFiles.Any() && Data.FileActions.IsRegularItem
-                && (!Data.FileActions.IsFollowLinkEnabled || HasRootShell);
+                && (!Data.FileActions.IsFollowLinkEnabled || HasRootShell)
+                && (!Data.FileActions.IsArchive || canPasteIntoTar);
 
             Data.FileActions.RestoreEnabled = false;
         }
@@ -937,9 +981,10 @@ internal static class FileActionLogic
         else
         {
             Data.FileActions.DeleteDescription.Value = Strings.Resources.S_DELETE_ACTION;
-            Data.FileActions.ContextDeleteDescription.Value = Keyboard.Modifiers is ModifierKeys.Shift
-                ? Strings.Resources.S_PERM_DEL
-                : Strings.Resources.S_DELETE_ACTION;
+            Data.FileActions.ContextDeleteDescription.Value =
+                Data.FileActions.IsArchive || Keyboard.Modifiers is ModifierKeys.Shift
+                    ? Strings.Resources.S_PERM_DEL
+                    : Strings.Resources.S_DELETE_ACTION;
         }
 
         Data.FileActions.RestoreDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.Resources.S_RESTORE_ALL : Strings.Resources.S_RESTORE_ACTION;
@@ -967,11 +1012,12 @@ internal static class FileActionLogic
                                                && !string.IsNullOrEmpty(inner)));
 
         Data.FileActions.ContextPushEnabled = isWritable
-            && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive && !Data.FileActions.IsArchive
+            && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive
+            && (!Data.FileActions.IsArchive || canPasteIntoTar)
             && (!Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 
         Data.FileActions.RenameEnabled = isWritable
-                                         && !Data.FileActions.IsArchive
+                                         && (!Data.FileActions.IsArchive || canPasteIntoTar)
                                          && !SelectionIsFuseProtectedAndroidRoot
                                          && !Data.FileActions.IsRecycleBin
                                          && Data.SelectedFiles.Count() == 1
@@ -1020,7 +1066,8 @@ internal static class FileActionLogic
             : Data.SelectedFiles.Count() == 1 && !Data.FileActions.IsRecycleBin;
 
         Data.FileActions.ContextNewEnabled = isWritable
-            && !Data.SelectedFiles.Any() && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive;
+            && !Data.SelectedFiles.Any() && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive
+            && (!Data.FileActions.IsArchive || canPasteIntoTar);
 
         Data.FileActions.SubmenuUninstallEnabled = Data.CurrentDrive?.Restrictions.NoApkInstall is not true
             && Data.SelectedFiles.AnyAll(file => file.IsInstallApk)

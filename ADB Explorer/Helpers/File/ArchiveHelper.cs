@@ -56,32 +56,60 @@ public static class ArchiveHelper
     public static bool CanModify(string fileName, string deviceId) => GetFamily(fileName) switch
     {
         ArchiveFamily.Zip => ShellCommands.ZipExists(deviceId) && ShellCommands.UnzipExists(deviceId),
-        ArchiveFamily.Tar => ShellCommands.TarExists(deviceId)
-            && ShellCommands.TarAppendSupported(deviceId)
-            && !IsCompressedTar(fileName),
+        // Tar (including compressed) uses extract+repack; append is not required.
+        ArchiveFamily.Tar => ShellCommands.TarExists(deviceId),
         _ => false,
     };
+
+    /// <summary>
+    /// Throws if <paramref name="archivePath"/> is not a tar-family archive that this device can modify
+    /// (extract+repack). Used by tar write paths in <see cref="ArchiveExtract"/>.
+    /// </summary>
+    public static void EnsureModifiableTar(string archivePath, string deviceId)
+    {
+        if (GetFamily(archivePath) is not ArchiveFamily.Tar)
+            throw new InvalidOperationException($"Cannot modify non-tar archive: {archivePath}");
+
+        if (!CanModify(FileHelper.GetFullName(archivePath), deviceId))
+            throw new InvalidOperationException($"Archive is read-only: {archivePath}");
+    }
 
     public static bool IsModificationAllowedAt(string path, string deviceId)
         => !ArchivePath.IsArchivePath(path, deviceId)
         || CanModify(FileHelper.GetFullName(ArchivePath.GetArchivePath(path, deviceId)), deviceId);
 
     /// <summary>
+    /// Whether paste/drop/push into <paramref name="path"/> is supported.
+    /// Currently tar-family only (extract+repack); zip stays blocked even when <see cref="CanModify"/> is true.
+    /// </summary>
+    public static bool CanPasteIntoArchive(string path, string deviceId)
+    {
+        if (!ArchivePath.TryParse(path, out var archivePath, out _, deviceId))
+            return false;
+
+        return GetFamily(archivePath) is ArchiveFamily.Tar
+            && CanModify(FileHelper.GetFullName(archivePath), deviceId);
+    }
+
+    /// <summary>
+    /// Whether delete of archive members at <paramref name="path"/> is supported.
+    /// Same capability as paste: modifiable tar via extract+repack.
+    /// </summary>
+    public static bool CanDeleteFromArchive(string path, string deviceId)
+        => CanPasteIntoArchive(path, deviceId);
+
+    /// <summary>
     /// Whether preview of an archive member should be read-only.
-    /// True when the archive/drive is read-only, or when member update is unsupported (non-zip).
+    /// True when the archive/drive is read-only, or when member update is unsupported.
     /// Non-archive paths always return <see langword="false"/>.
     /// </summary>
     public static bool IsMemberPreviewReadOnly(string path, string deviceId)
     {
-        if (!ArchivePath.TryParse(path, out var archivePath, out var internalPath, deviceId)
+        if (!ArchivePath.TryParse(path, out _, out var internalPath, deviceId)
             || string.IsNullOrEmpty(internalPath))
             return false;
 
-        if (!DriveHelper.IsModificationAllowedAt(path, deviceId))
-            return true;
-
-        // Zip can replace a member (<c>zip -u</c>); tar append cannot update in place.
-        return GetFamily(archivePath) is not ArchiveFamily.Zip;
+        return !DriveHelper.IsModificationAllowedAt(path, deviceId);
     }
 
     public static bool IsNavigableArchive(string fileName, string deviceId)

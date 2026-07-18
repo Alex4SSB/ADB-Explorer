@@ -291,13 +291,21 @@ public partial class DetailsPane : UserControl
         var control = (DetailsPane)d;
         var files = (IEnumerable<IBrowserItem>)e.NewValue;
 
-        // Unsubscribe from the previous single FileClass selection
-        if (e.OldValue is IEnumerable<IBrowserItem> oldFiles
+        FileClass? oldFile = e.OldValue is IEnumerable<IBrowserItem> oldFiles
             && oldFiles.Count() == 1
-            && oldFiles.First() is FileClass oldFile)
+            && oldFiles.First() is FileClass previous
+            ? previous
+            : null;
+
+        FileClass? newFile = files.Count() == 1 && files.First() is FileClass next ? next : null;
+
+        // Selection refresh rebuilds the SelectedFiles enumerable even when the file is unchanged.
+        // Cancelling an in-flight custom pull then loses ThumbnailUpdated and can miss the UI update.
+        if (oldFile is not null)
         {
             oldFile.PropertyChanged -= control.OnFileFullPathChanged;
-            oldFile.CancelCacheThumbnailLoading();
+            if (!ReferenceEquals(oldFile, newFile))
+                oldFile.CancelCacheThumbnailLoading();
         }
 
         control.ClearPhotoPreview();
@@ -407,6 +415,7 @@ public partial class DetailsPane : UserControl
                 if (item is FileClass f)
                 {
                     control.File = f;
+                    f.PropertyChanged -= control.OnFileFullPathChanged;
                     f.PropertyChanged += control.OnFileFullPathChanged;
                     control.FileNameTextBlock.Text = f.DisplayName;
                     control.FileNameTextBlock.FlowDirection = f.NameIsRtl
@@ -418,6 +427,10 @@ public partial class DetailsPane : UserControl
                     control.SmallFileIcon.Source = f.CacheThumbnail?.Image is null ? null : f.FileIcon32;
                     control.InvalidSelectionBorder.Visibility = Visibility.Collapsed;
                     f.BeginLoadCacheThumbnail();
+                    // BeginLoad is async; if the pane cache was already warm, refresh now.
+                    if (f.CacheThumbnail?.Image is not null)
+                        control.UpdateFileThumbnailDisplay(f);
+
                     control.PopulateThumbnailInfoItems(f);
                 }
                 else if (item is Package p)
@@ -514,11 +527,17 @@ public partial class DetailsPane : UserControl
                 else if (Data.DirList?.CurrentLocation is { } location)
                 {
                     control.File = location;
+                    location.PropertyChanged -= control.OnFileFullPathChanged;
                     location.PropertyChanged += control.OnFileFullPathChanged;
                     control.FileNameTextBlock.Text = location.DisplayName;
                     control.LargeFileIcon.Source = location.DragImage;
                     control.InvalidSelectionBorder.Visibility = Visibility.Collapsed;
-                    location.BeginLoadCacheThumbnail();
+                    // Skip redundant loads when selection refresh is replayed for the same folder.
+                    if (location.CacheThumbnail?.Image is null)
+                        location.BeginLoadCacheThumbnail();
+                    else
+                        control.UpdateFileThumbnailDisplay(location);
+
                     control.PopulateThumbnailInfoItems(location);
                 }
                 else
@@ -542,8 +561,17 @@ public partial class DetailsPane : UserControl
             RefreshSelection();
         else if (e.PropertyName is nameof(FileClass.Size) or nameof(FilePath.ShellLsSize))
         {
-            if (sender is FileClass file && ReferenceEquals(File, file) && ThumbnailService.IsCustomThumbnailCandidate(file))
+            // Size often arrives after the initial pane load request; only retry when still missing.
+            if (sender is FileClass file
+                && ReferenceEquals(File, file)
+                && ThumbnailService.IsCustomThumbnailCandidate(file)
+                && file.CacheThumbnail?.Image is null)
+            {
+                if (Mode is SidePaneMode.Preview)
+                    NoPreviewTextBlock.Visibility = Visibility.Collapsed;
+
                 file.BeginLoadCacheThumbnail();
+            }
         }
         else if (e.PropertyName is nameof(FileClass.CreationTime)
             or nameof(FileClass.IsCreationTimeResolved)
@@ -557,8 +585,8 @@ public partial class DetailsPane : UserControl
         {
             if (sender is FileClass file && ReferenceEquals(File, file))
             {
-                if (Mode is SidePaneMode.Preview && PhotoPreviewScrollViewer.Visibility is Visibility.Visible)
-                    PhotoPreviewImage.Source = file.DragImage;
+                if (Mode is SidePaneMode.Preview)
+                    UpdatePhotoPreviewFromThumbnail(file);
                 else
                     UpdateFileThumbnailDisplay(file);
             }
@@ -578,11 +606,51 @@ public partial class DetailsPane : UserControl
     private void ShowPhotoPreview(FileClass file)
     {
         File = file;
+        file.PropertyChanged -= OnFileFullPathChanged;
         file.PropertyChanged += OnFileFullPathChanged;
+
+        // Never use DragImage here — it falls back to the shell file icon.
+        PhotoPreviewImage.Source = null;
+        PhotoPreviewScrollViewer.Visibility = Visibility.Collapsed;
+        NoPreviewTextBlock.Visibility = Visibility.Collapsed;
+
+        if (file.CacheThumbnail?.Image is BitmapSource cached)
+        {
+            ApplyPhotoPreviewImage(cached);
+            return;
+        }
+
+        file.BeginLoadCacheThumbnail();
+
+        if (file.CacheThumbnail?.Image is BitmapSource afterLoad)
+            ApplyPhotoPreviewImage(afterLoad);
+        else if (!ThumbnailService.IsPaneThumbnailLoading(file))
+            NoPreviewTextBlock.Visibility = Visibility.Visible;
+    }
+
+    private void UpdatePhotoPreviewFromThumbnail(FileClass file)
+    {
+        if (Mode is not SidePaneMode.Preview)
+            return;
+
+        if (file.CacheThumbnail?.Image is BitmapSource image)
+        {
+            ApplyPhotoPreviewImage(image);
+            return;
+        }
+
+        if (ThumbnailService.IsPaneThumbnailLoading(file))
+            return;
+
+        ClearPhotoPreview();
+        NoPreviewTextBlock.Visibility = Visibility.Visible;
+    }
+
+    private void ApplyPhotoPreviewImage(BitmapSource image)
+    {
         NoPreviewTextBlock.Visibility = Visibility.Collapsed;
         PhotoPreviewScrollViewer.Visibility = Visibility.Visible;
-        PhotoPreviewImage.Source = file.DragImage;
-        file.BeginLoadCacheThumbnail();
+        PhotoPreviewImage.Source = image;
     }
 
     private void ClearPhotoPreview()

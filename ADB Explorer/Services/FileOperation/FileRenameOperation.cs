@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
@@ -23,24 +24,53 @@ public class FileRenameOperation : AbstractShellFileOperation
         Status = OperationStatus.InProgress;
         StatusInfo = new InProgShellProgressViewModel();
         CancelTokenSource = new();
-        
-        var operationTask = ADBService.ExecuteVoidShellCommand(Device.ID,
-            CancelTokenSource.Token,
-            "mv",
-            ADBService.EscapeAdbShellString(FilePath.FullPath),
-            ADBService.EscapeAdbShellString(TargetPath.FullPath));
+
+        Task operationTask;
+        if (ArchivePath.TryParse(FilePath.FullPath, out var archivePath, out var oldInternal, Device.ID)
+            && ArchivePath.TryParse(TargetPath.FullPath, out var destArchive, out var newInternal, Device.ID)
+            && archivePath == destArchive
+            && !string.IsNullOrEmpty(oldInternal)
+            && !string.IsNullOrEmpty(newInternal)
+            && ArchiveHelper.CanPasteIntoArchive(FilePath.FullPath, Device.ID))
+        {
+            operationTask = Task.Run(() =>
+            {
+                ArchiveExtract.RenameTarMember(
+                    Device.ID,
+                    archivePath,
+                    oldInternal,
+                    newInternal,
+                    CancelTokenSource.Token);
+            }, CancelTokenSource.Token);
+        }
+        else
+        {
+            operationTask = ADBService.ExecuteVoidShellCommand(Device.ID,
+                CancelTokenSource.Token,
+                "mv",
+                ADBService.EscapeAdbShellString(FilePath.FullPath),
+                ADBService.EscapeAdbShellString(TargetPath.FullPath));
+        }
 
         operationTask.ContinueWith((t) =>
         {
-            if (t.Result == "")
+            if (t is Task<string> shellTask)
             {
-                Status = OperationStatus.Completed;
-                StatusInfo = new CompletedShellProgressViewModel();
+                if (shellTask.Result == "")
+                {
+                    Status = OperationStatus.Completed;
+                    StatusInfo = new CompletedShellProgressViewModel();
+                }
+                else
+                {
+                    Status = OperationStatus.Failed;
+                    StatusInfo = new FailedOpProgressViewModel(shellTask.Result);
+                }
             }
             else
             {
-                Status = OperationStatus.Failed;
-                StatusInfo = new FailedOpProgressViewModel(t.Result);
+                Status = OperationStatus.Completed;
+                StatusInfo = new CompletedShellProgressViewModel();
             }
 
         }, TaskContinuationOptions.OnlyOnRanToCompletion);
@@ -54,7 +84,8 @@ public class FileRenameOperation : AbstractShellFileOperation
         operationTask.ContinueWith((t) =>
         {
             Status = OperationStatus.Failed;
-            StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);
+            var message = t.Exception?.InnerException?.Message ?? t.Exception?.Message ?? "Rename failed";
+            StatusInfo = new FailedOpProgressViewModel(message);
         }, TaskContinuationOptions.OnlyOnFaulted);
     }
 }

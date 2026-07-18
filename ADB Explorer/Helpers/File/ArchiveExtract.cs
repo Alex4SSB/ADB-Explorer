@@ -11,7 +11,7 @@ namespace ADB_Explorer.Helpers;
 /// </summary>
 public static class ArchiveExtract
 {
-    public const string StagingFolderName = "adb-explorer-extract";
+    public const string StagingFolderName = ".adb-explorer-extract";
 
     private static readonly ConcurrentDictionary<string, byte> ActiveStagingRoots = new(StringComparer.Ordinal);
 
@@ -36,7 +36,7 @@ public static class ArchiveExtract
     public static void CleanupStaging(string deviceId, string stagingRoot, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(stagingRoot)
-            || !stagingRoot.StartsWith($"{AdbExplorerConst.TEMP_PATH}/{StagingFolderName}", StringComparison.Ordinal))
+            || !stagingRoot.StartsWith($"{AdbExplorerConst.TEMP_PATH}/{StagingFolderName}-", StringComparison.Ordinal))
             return;
 
         // Never cancel cleanup — a cancelled extract/pull token must not leave temp dirs behind.
@@ -60,18 +60,56 @@ public static class ArchiveExtract
             ADBService.EscapeAdbShellString(path));
     }
 
-    /// <summary>Removes any extract staging left from a previous clipboard/drag that was never consumed.</summary>
+    /// <summary>
+    /// Deletes every staging folder under <see cref="AdbExplorerConst.TEMP_PATH"/> matching the
+    /// current (and legacy) name prefix — used on app shutdown.
+    /// </summary>
     public static void CleanupAllStaging(string? deviceId = null, CancellationToken cancellationToken = default)
     {
+        _ = cancellationToken;
         deviceId ??= Data.DevicesObject?.Current?.ID;
-        if (deviceId is null)
-        {
-            ActiveStagingRoots.Clear();
-            return;
-        }
+        ActiveStagingRoots.Clear();
 
-        foreach (var root in ActiveStagingRoots.Keys.ToArray())
-            CleanupStaging(deviceId, root, cancellationToken);
+        if (deviceId is null)
+            return;
+
+        // Glob wipe: tracked and orphaned dirs (e.g. after a crash).
+        var script = $"rm -rf {AdbExplorerConst.TEMP_PATH}/{StagingFolderName}-*";
+
+        ADBService.ExecuteDeviceAdbShellCommand(
+            deviceId,
+            "sh",
+            out _,
+            out _,
+            CancellationToken.None,
+            "-c",
+            ADBService.EscapeAdbShellString(script));
+    }
+
+    /// <summary>
+    /// Fire-and-forget cleanup of currently tracked staging roots only
+    /// (clipboard/drag lifecycle — avoids glob-wiping a newly created root).
+    /// </summary>
+    public static void BeginCleanupAllStaging(string? deviceId = null)
+    {
+        deviceId ??= Data.DevicesObject?.Current?.ID;
+
+        var roots = ActiveStagingRoots.Keys.ToArray();
+        foreach (var root in roots)
+            ActiveStagingRoots.TryRemove(root, out _);
+
+        if (deviceId is null || roots.Length == 0)
+            return;
+
+        var id = deviceId;
+        _ = Task.Run(() =>
+        {
+            foreach (var root in roots)
+            {
+                try { RemoveDeviceTree(id, root); }
+                catch { /* best-effort */ }
+            }
+        });
     }
 
     /// <summary>
@@ -174,6 +212,378 @@ public static class ArchiveExtract
 
         if (exitCode != 0)
             throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
+    }
+
+    /// <summary>
+    /// Extracts the entire tar archive into <paramref name="contentRoot"/>, then recreates it
+    /// from that tree (preserving compression via the temp filename extension).
+    /// Incoming members must already exist under <paramref name="contentRoot"/> at their archive-relative paths
+    /// before calling this, or call <see cref="UpdateTarMember"/> / overlay helpers first.
+    /// </summary>
+    public static void RepackTarArchive(
+        string deviceId,
+        string archivePath,
+        string contentRoot,
+        CancellationToken cancellationToken = default)
+    {
+        ArchiveHelper.EnsureModifiableTar(archivePath, deviceId);
+
+        var extension = FileHelper.GetExtension(FileHelper.GetFullName(archivePath));
+        if (string.IsNullOrEmpty(extension))
+            extension = ".tar";
+
+        // Keep the original extension so toybox auto-selects gzip/bzip2/xz/zstd from the name.
+        var tempArchive = FileHelper.ConcatPaths(FileHelper.GetParentPath(contentRoot), $"repack-{Guid.NewGuid():N}{extension}");
+        var tar = ShellCommands.TranslateCommand("tar");
+        var rootEsc = ADBService.EscapeAdbShellString(contentRoot);
+        var tempEsc = ADBService.EscapeAdbShellString(tempArchive);
+
+        // Pack top-level names via -T (not ".") so members are stored as "path"
+        // rather than "./path". The latter breaks later extract-by-name on toybox.
+        // -1: one name per line so names with spaces survive the pipe into tar -T.
+        var script = $"cd {rootEsc} && ls -A1 | {tar} -cf {tempEsc} -T -";
+        var createExit = ADBService.ExecuteDeviceAdbShellCommand(
+            deviceId,
+            "sh",
+            out var createStdout,
+            out var createStderr,
+            cancellationToken,
+            "-c",
+            ADBService.EscapeAdbShellString(script));
+
+        if (createExit != 0)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            RemoveDeviceTree(deviceId, tempArchive);
+            throw new IOException(string.IsNullOrWhiteSpace(createStderr) ? createStdout : createStderr);
+        }
+
+        var moveExit = ADBService.ExecuteDeviceAdbShellCommand(
+            deviceId,
+            "mv",
+            out var moveStdout,
+            out var moveStderr,
+            cancellationToken,
+            "-f",
+            ADBService.EscapeAdbShellString(tempArchive),
+            ADBService.EscapeAdbShellString(archivePath));
+
+        if (moveExit != 0)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            RemoveDeviceTree(deviceId, tempArchive);
+            throw new IOException(string.IsNullOrWhiteSpace(moveStderr) ? moveStdout : moveStderr);
+        }
+    }
+
+    /// <summary>
+    /// Full extract of <paramref name="archivePath"/> into <paramref name="contentRoot"/> (must already exist).
+    /// </summary>
+    public static void ExtractEntireTar(
+        string deviceId,
+        string archivePath,
+        string contentRoot,
+        CancellationToken cancellationToken = default)
+    {
+        if (ArchiveHelper.GetFamily(archivePath) is not ArchiveFamily.Tar)
+            throw new InvalidOperationException($"Cannot extract non-tar archive: {archivePath}");
+
+        var exitCode = ExtractTar(deviceId, archivePath, contentRoot, members: [], cancellationToken, out var stdout, out var stderr);
+        if (exitCode != 0)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var detail = string.IsNullOrWhiteSpace(stderr) ? stdout : stderr;
+            throw new IOException(string.IsNullOrWhiteSpace(detail)
+                ? $"Failed to extract from {archivePath}"
+                : $"Failed to extract from {archivePath}: {detail.Trim()}");
+        }
+    }
+
+    /// <summary>
+    /// Replaces or adds a tar member: extract whole archive into <paramref name="contentRoot"/>
+    /// (must already exist and be empty or only contain the incoming member), merge any
+    /// pre-pushed member at <paramref name="internalPath"/>, then repack.
+    /// Prefer extracting first, then writing the member, then <see cref="RepackTarArchive"/>.
+    /// </summary>
+    public static void UpdateTarMember(
+        string deviceId,
+        string archivePath,
+        string internalPath,
+        string contentRoot,
+        CancellationToken cancellationToken = default)
+    {
+        internalPath = ArchivePath.NormalizeInternal(internalPath);
+        if (string.IsNullOrEmpty(internalPath))
+            throw new InvalidOperationException("Cannot update the archive root.");
+
+        ArchiveHelper.EnsureModifiableTar(archivePath, deviceId);
+
+        // Incoming member may already sit under contentRoot; stash it, extract, restore, then pack.
+        var stagingParent = FileHelper.GetParentPath(contentRoot);
+        var incomingRoot = FileHelper.ConcatPaths(stagingParent, "incoming");
+        var memberSource = FileHelper.ConcatPaths(contentRoot, internalPath);
+        var incomingMember = FileHelper.ConcatPaths(incomingRoot, internalPath);
+
+        ShellFileOperation.MakeDirs(deviceId, [FileHelper.GetParentPath(incomingMember)]).GetAwaiter().GetResult();
+
+        var stashExit = ADBService.ExecuteDeviceAdbShellCommand(
+            deviceId,
+            "mv",
+            out var stashStdout,
+            out var stashStderr,
+            cancellationToken,
+            ADBService.EscapeAdbShellString(memberSource),
+            ADBService.EscapeAdbShellString(incomingMember));
+
+        if (stashExit != 0)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            throw new IOException(string.IsNullOrWhiteSpace(stashStderr) ? stashStdout : stashStderr);
+        }
+
+        // Clear leftover empty parents under contentRoot, then extract into it.
+        RemoveDeviceTree(deviceId, contentRoot);
+        ShellFileOperation.MakeDirs(deviceId, [contentRoot]).GetAwaiter().GetResult();
+        ExtractEntireTar(deviceId, archivePath, contentRoot, cancellationToken);
+
+        var memberDest = FileHelper.ConcatPaths(contentRoot, internalPath);
+        ShellFileOperation.MakeDirs(deviceId, [FileHelper.GetParentPath(memberDest)]).GetAwaiter().GetResult();
+        ADBService.ExecuteDeviceAdbShellCommand(
+            deviceId,
+            "rm",
+            out _,
+            out _,
+            cancellationToken,
+            "-rf",
+            ADBService.EscapeAdbShellString(memberDest));
+
+        var restoreExit = ADBService.ExecuteDeviceAdbShellCommand(
+            deviceId,
+            "mv",
+            out var stdout,
+            out var stderr,
+            cancellationToken,
+            ADBService.EscapeAdbShellString(incomingMember),
+            ADBService.EscapeAdbShellString(memberDest));
+
+        if (restoreExit != 0)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
+        }
+
+        RemoveDeviceTree(deviceId, incomingRoot);
+        RepackTarArchive(deviceId, archivePath, contentRoot, cancellationToken);
+    }
+
+    /// <summary>
+    /// Adds or replaces items inside a tar archive (device-side copy/move or Windows push overlay).
+    /// <paramref name="populateOverlay"/> copies/pushes incoming files into
+    /// <c>{contentRoot}/{internalDest}/</c> after the archive is extracted.
+    /// </summary>
+    public static void AddOrUpdateTarMembers(
+        string deviceId,
+        string archivePath,
+        string internalDestDir,
+        Action<string, CancellationToken> populateOverlay,
+        CancellationToken cancellationToken = default)
+    {
+        ArchiveHelper.EnsureModifiableTar(archivePath, deviceId);
+
+        internalDestDir = ArchivePath.NormalizeInternal(internalDestDir);
+
+        var stagingRoot = CreateStagingRoot(deviceId, cancellationToken);
+        try
+        {
+            var contentRoot = FileHelper.ConcatPaths(stagingRoot, "content");
+            ShellFileOperation.MakeDirs(deviceId, [contentRoot]).GetAwaiter().GetResult();
+
+            ExtractEntireTar(deviceId, archivePath, contentRoot, cancellationToken);
+
+            var overlayDest = string.IsNullOrEmpty(internalDestDir)
+                ? contentRoot
+                : FileHelper.ConcatPaths(contentRoot, internalDestDir);
+            ShellFileOperation.MakeDirs(deviceId, [overlayDest]).GetAwaiter().GetResult();
+
+            populateOverlay(overlayDest, cancellationToken);
+
+            RepackTarArchive(deviceId, archivePath, contentRoot, cancellationToken);
+            ArchiveListing.InvalidateToc(archivePath);
+        }
+        finally
+        {
+            CleanupStaging(deviceId, stagingRoot, CancellationToken.None);
+        }
+    }
+
+    /// <summary>
+    /// Removes members from a tar archive (extract entire archive, <c>rm -rf</c> each path, repack).
+    /// </summary>
+    public static void DeleteTarMembers(
+        string deviceId,
+        string archivePath,
+        IReadOnlyList<string> internalPaths,
+        CancellationToken cancellationToken = default)
+    {
+        ArchiveHelper.EnsureModifiableTar(archivePath, deviceId);
+
+        var normalized = internalPaths
+            .Select(ArchivePath.NormalizeInternal)
+            .Where(p => !string.IsNullOrEmpty(p))
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+
+        if (normalized.Count == 0)
+            throw new InvalidOperationException("No archive members to delete.");
+
+        var stagingRoot = CreateStagingRoot(deviceId, cancellationToken);
+        try
+        {
+            var contentRoot = FileHelper.ConcatPaths(stagingRoot, "content");
+            ShellFileOperation.MakeDirs(deviceId, [contentRoot]).GetAwaiter().GetResult();
+
+            ExtractEntireTar(deviceId, archivePath, contentRoot, cancellationToken);
+
+            foreach (var internalPath in normalized)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var target = FileHelper.ConcatPaths(contentRoot, internalPath);
+                var exit = ADBService.ExecuteDeviceAdbShellCommand(
+                    deviceId,
+                    "rm",
+                    out var stdout,
+                    out var stderr,
+                    cancellationToken,
+                    "-rf",
+                    ADBService.EscapeAdbShellString(target));
+
+                if (exit != 0)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var detail = string.IsNullOrWhiteSpace(stderr) ? stdout : stderr;
+                    throw new IOException(string.IsNullOrWhiteSpace(detail)
+                        ? $"Failed to delete {internalPath} from {archivePath}"
+                        : $"Failed to delete {internalPath} from {archivePath}: {detail.Trim()}");
+                }
+            }
+
+            RepackTarArchive(deviceId, archivePath, contentRoot, cancellationToken);
+            ArchiveListing.InvalidateToc(archivePath);
+        }
+        finally
+        {
+            CleanupStaging(deviceId, stagingRoot, CancellationToken.None);
+        }
+    }
+
+    /// <summary>
+    /// Renames a tar member (file or directory tree) via extract + <c>mv</c> + repack.
+    /// </summary>
+    public static void RenameTarMember(
+        string deviceId,
+        string archivePath,
+        string oldInternalPath,
+        string newInternalPath,
+        CancellationToken cancellationToken = default)
+    {
+        ArchiveHelper.EnsureModifiableTar(archivePath, deviceId);
+
+        oldInternalPath = ArchivePath.NormalizeInternal(oldInternalPath);
+        newInternalPath = ArchivePath.NormalizeInternal(newInternalPath);
+        if (string.IsNullOrEmpty(oldInternalPath) || string.IsNullOrEmpty(newInternalPath))
+            throw new InvalidOperationException("Cannot rename the archive root.");
+
+        if (oldInternalPath == newInternalPath)
+            return;
+
+        var stagingRoot = CreateStagingRoot(deviceId, cancellationToken);
+        try
+        {
+            var contentRoot = FileHelper.ConcatPaths(stagingRoot, "content");
+            ShellFileOperation.MakeDirs(deviceId, [contentRoot]).GetAwaiter().GetResult();
+            ExtractEntireTar(deviceId, archivePath, contentRoot, cancellationToken);
+
+            var source = FileHelper.ConcatPaths(contentRoot, oldInternalPath);
+            var dest = FileHelper.ConcatPaths(contentRoot, newInternalPath);
+            ShellFileOperation.MakeDirs(deviceId, [FileHelper.GetParentPath(dest)]).GetAwaiter().GetResult();
+
+            var exit = ADBService.ExecuteDeviceAdbShellCommand(
+                deviceId,
+                "mv",
+                out var stdout,
+                out var stderr,
+                cancellationToken,
+                ADBService.EscapeAdbShellString(source),
+                ADBService.EscapeAdbShellString(dest));
+
+            if (exit != 0)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
+            }
+
+            RepackTarArchive(deviceId, archivePath, contentRoot, cancellationToken);
+            ArchiveListing.InvalidateToc(archivePath);
+        }
+        finally
+        {
+            CleanupStaging(deviceId, stagingRoot, CancellationToken.None);
+        }
+    }
+
+    /// <summary>
+    /// Creates an empty file or directory inside a tar archive via extract + touch/mkdir + repack.
+    /// </summary>
+    public static void CreateTarMember(
+        string deviceId,
+        string archivePath,
+        string internalPath,
+        bool isDirectory,
+        CancellationToken cancellationToken = default)
+    {
+        ArchiveHelper.EnsureModifiableTar(archivePath, deviceId);
+
+        internalPath = ArchivePath.NormalizeInternal(internalPath);
+        if (string.IsNullOrEmpty(internalPath))
+            throw new InvalidOperationException("Cannot create the archive root.");
+
+        var stagingRoot = CreateStagingRoot(deviceId, cancellationToken);
+        try
+        {
+            var contentRoot = FileHelper.ConcatPaths(stagingRoot, "content");
+            ShellFileOperation.MakeDirs(deviceId, [contentRoot]).GetAwaiter().GetResult();
+            ExtractEntireTar(deviceId, archivePath, contentRoot, cancellationToken);
+
+            var target = FileHelper.ConcatPaths(contentRoot, internalPath);
+            if (isDirectory)
+            {
+                ShellFileOperation.MakeDirs(deviceId, [target]).GetAwaiter().GetResult();
+            }
+            else
+            {
+                ShellFileOperation.MakeDirs(deviceId, [FileHelper.GetParentPath(target)]).GetAwaiter().GetResult();
+                var touchExit = ADBService.ExecuteDeviceAdbShellCommand(
+                    deviceId,
+                    "touch",
+                    out var stdout,
+                    out var stderr,
+                    cancellationToken,
+                    ADBService.EscapeAdbShellString(target));
+
+                if (touchExit != 0)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
+                }
+            }
+
+            RepackTarArchive(deviceId, archivePath, contentRoot, cancellationToken);
+            ArchiveListing.InvalidateToc(archivePath);
+        }
+        finally
+        {
+            CleanupStaging(deviceId, stagingRoot, CancellationToken.None);
+        }
     }
 
     /// <summary>
@@ -297,11 +707,21 @@ public static class ArchiveExtract
     {
         var toc = ArchiveListing.GetOrFetchToc(deviceId, archivePath, cancellationToken);
         var members = GetMemberPathsToExtract(toc.Entries, internalPath, isDirectory);
+        if (family is ArchiveFamily.Tar && toc.UsesDotSlashPrefix)
+        {
+            members = [.. members.Select(m =>
+            {
+                var trimmed = m.TrimEnd('/');
+                return trimmed.StartsWith("./", StringComparison.Ordinal) ? trimmed : "./" + trimmed;
+            })];
+        }
 
+        string stdout = "";
+        string stderr = "";
         var exitCode = family switch
         {
-            ArchiveFamily.Tar => ExtractTar(deviceId, archivePath, contentRoot, members, cancellationToken),
-            ArchiveFamily.Zip => ExtractZip(deviceId, archivePath, contentRoot, members, cancellationToken),
+            ArchiveFamily.Tar => ExtractTar(deviceId, archivePath, contentRoot, members, cancellationToken, out stdout, out stderr),
+            ArchiveFamily.Zip => ExtractZip(deviceId, archivePath, contentRoot, members, cancellationToken, out stdout, out stderr),
             _ => -1,
         };
 
@@ -309,7 +729,10 @@ public static class ArchiveExtract
         {
             // ExecuteCommand returns -1 on cancel instead of throwing; don't surface that as extract failure.
             cancellationToken.ThrowIfCancellationRequested();
-            throw new IOException($"Failed to extract from {archivePath}");
+            var detail = string.IsNullOrWhiteSpace(stderr) ? stdout : stderr;
+            throw new IOException(string.IsNullOrWhiteSpace(detail)
+                ? $"Failed to extract from {archivePath}"
+                : $"Failed to extract from {archivePath}: {detail.Trim()}");
         }
     }
 
@@ -318,12 +741,16 @@ public static class ArchiveExtract
         string archivePath,
         string contentRoot,
         IReadOnlyList<string> members,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        out string stdout,
+        out string stderr)
     {
         var tar = ShellCommands.TranslateCommand("tar");
+        // -o / --no-same-owner: skip restoring uid/gid. Rooted adb otherwise tries
+        // chown (e.g. 0:0) and fails with "Operation not permitted" on Android.
         var args = new List<string>
         {
-            "-xf",
+            "-xof",
             ADBService.EscapeAdbShellString(archivePath),
             "-C",
             ADBService.EscapeAdbShellString(contentRoot),
@@ -331,7 +758,7 @@ public static class ArchiveExtract
         foreach (var member in members)
             args.Add(ADBService.EscapeAdbShellString(member.TrimEnd('/')));
 
-        return ADBService.ExecuteDeviceAdbShellCommand(deviceId, tar, out _, out _, cancellationToken, [.. args]);
+        return ADBService.ExecuteDeviceAdbShellCommand(deviceId, tar, out stdout, out stderr, cancellationToken, [.. args]);
     }
 
     private static int ExtractZip(
@@ -339,7 +766,9 @@ public static class ArchiveExtract
         string archivePath,
         string contentRoot,
         IReadOnlyList<string> members,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        out string stdout,
+        out string stderr)
     {
         var unzip = ShellCommands.TranslateCommand("unzip");
         var args = new List<string>
@@ -352,7 +781,7 @@ public static class ArchiveExtract
         };
         args.AddRange(members.Select(m => ADBService.EscapeAdbShellString(m)));
 
-        return ADBService.ExecuteDeviceAdbShellCommand(deviceId, unzip, out _, out _, cancellationToken, [.. args]);
+        return ADBService.ExecuteDeviceAdbShellCommand(deviceId, unzip, out stdout, out stderr, cancellationToken, [.. args]);
     }
 
     /// <summary>
