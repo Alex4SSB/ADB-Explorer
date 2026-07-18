@@ -1650,4 +1650,10 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_PREVIEW_SYNTAX_AUTOMATIC" xml:space="preserve">
     <value>Автоматичний</value>
   </data>
+  <data name="S_RESTART" xml:space="preserve">
+    <value>Перезавантажити зараз</value>
+  </data>
+  <data name="S_UPDATE_MODIFIED_INFO" xml:space="preserve">
+    <value>Намагається вирівняти змінену дату відповідно до імені файлу</value>
+  </data>
 </root>
