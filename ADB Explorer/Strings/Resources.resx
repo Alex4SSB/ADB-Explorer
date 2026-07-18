@@ -2066,7 +2066,9 @@ Please help us localize the app to your language on Weblate.</value>
     <comment>A restart button</comment>
   </data>
   <data name="S_UPDATE_MODIFIED_INFO" xml:space="preserve">
-    <value>Attempts to align the date modified according to the file name.</value>
+    <value>Attempts to align the date modified according to the file name.
+
+Useful for photos that include the date taken in the name and had their date modified overwritten.</value>
   </data>
   <data name="S_PUSH_PACKAGES_INFO" xml:space="preserve">
     <value>Installs APK(s) directly from Windows.</value>

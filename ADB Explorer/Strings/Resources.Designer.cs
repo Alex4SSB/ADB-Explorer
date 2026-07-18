@@ -4432,7 +4432,9 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Attempts to align the date modified according to the file name..
+        ///   Looks up a localized string similar to Attempts to align the date modified according to the file name.
+        ///
+        ///Useful for photos that include the date taken in the name and had their date modified overwritten..
         /// </summary>
         public static string S_UPDATE_MODIFIED_INFO {
             get {
