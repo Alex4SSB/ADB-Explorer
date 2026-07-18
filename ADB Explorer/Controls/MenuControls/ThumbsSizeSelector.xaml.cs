@@ -19,8 +19,8 @@ public partial class ThumbsSizeSelector : UserControl
             new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_LARGE, ThumbnailService.ThumbnailSize.Large, this),
             new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_XL, ThumbnailService.ThumbnailSize.ExtraLarge, this),
             new Separator(),
-            new SidePaneModeItem(Strings.Resources.S_THUMBSIZE_DETAILS, DetailsPane.SidePaneMode.Details),
-            new SidePaneModeItem(Strings.Resources.S_SIDE_PANE_PREVIEW, DetailsPane.SidePaneMode.Preview),
+            new SidePaneModeItem(Strings.Resources.S_THUMBSIZE_DETAILS, DetailsPane.SidePaneMode.Details, Strings.Resources.S_DETAILS_PANE_INFO),
+            new SidePaneModeItem(Strings.Resources.S_SIDE_PANE_PREVIEW, DetailsPane.SidePaneMode.Preview, Strings.Resources.S_PREVIEW_PANE_INFO),
         ];
 
         InitializeComponent();
@@ -76,18 +76,23 @@ public partial class ThumbsSizeSelector : UserControl
         selector.OnPropertyChanged(nameof(ThumbnailSize));
     }
 
-    public partial class SidePaneModeItem : ObservableObject
+    public abstract partial class ThumbSizeBaseItem : ObservableObject
     {
-        public string Name { get; set; }
-        public UIElement Icon { get; set; }
+        public virtual BaseAction Action { get; set; }
+        public virtual UIElement Icon { get; set; }
+        public virtual string? Info { get; set; } = null;
+        public virtual bool IsChecked { get; set; }
+        public virtual string Name { get; set; }
+    }
 
+    public partial class SidePaneModeItem : ThumbSizeBaseItem
+    {
         [ObservableProperty]
-        public partial bool IsChecked { get; set; } = false;
+        public override partial bool IsChecked { get; set; } = false;
 
-        public BaseAction Action { get; set; }
-
-        public SidePaneModeItem(string name, DetailsPane.SidePaneMode mode)
+        public SidePaneModeItem(string name, DetailsPane.SidePaneMode mode, string? info = null)
         {
+            Info = info;
             Name = name;
             Icon = SidePaneModeIcons[mode];
             Action = new(IsPreviewAllowed, () => Data.Settings.SidePane = mode);
@@ -118,15 +123,10 @@ public partial class ThumbsSizeSelector : UserControl
         private static bool IsPreviewAllowed() => !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive && !Data.FileActions.IsDriveViewVisible;
     }
 
-    public partial class ThumbSizeItem : ObservableObject
+    public partial class ThumbSizeItem : ThumbSizeBaseItem
     {
-        public string Name { get; set; }
-        public UIElement Icon { get; set; }
-
         [ObservableProperty]
-        public partial bool IsChecked { get; set; } = false;
-
-        public BaseAction Action { get; set; }
+        public override partial bool IsChecked { get; set; } = false;
 
         public ThumbSizeItem(string name, ThumbnailService.ThumbnailSize size, ThumbsSizeSelector selector)
         {

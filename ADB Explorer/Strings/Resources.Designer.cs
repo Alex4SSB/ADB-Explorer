@@ -1254,6 +1254,17 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sets the side pane to details mode.
+        ///
+        ///Details can include: thumbnail, extended file info, metadata, permissions, and drive mount options..
+        /// </summary>
+        public static string S_DETAILS_PANE_INFO {
+            get {
+                return ResourceManager.GetString("S_DETAILS_PANE_INFO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show or hide the details and preview pane..
         /// </summary>
         public static string S_DETAILS_PANE_TOOLTIP {
@@ -3107,6 +3118,17 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sets the side pane to preview mode.
+        ///
+        ///Supported items: thumbnail, PDF; other files that match the size restriction are displayed as text, with optional syntax highlight, and can be edited &amp; saved if the location allows..
+        /// </summary>
+        public static string S_PREVIEW_PANE_INFO {
+            get {
+                return ResourceManager.GetString("S_PREVIEW_PANE_INFO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Syntax.
         /// </summary>
         public static string S_PREVIEW_SYNTAX {
@@ -3167,6 +3189,15 @@ namespace ADB_Explorer.Strings {
         public static string S_PULL_ACTION_LINK {
             get {
                 return ResourceManager.GetString("S_PULL_ACTION_LINK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installs APK(s) directly from Windows..
+        /// </summary>
+        public static string S_PUSH_PACKAGES_INFO {
+            get {
+                return ResourceManager.GetString("S_PUSH_PACKAGES_INFO", resourceCulture);
             }
         }
         
@@ -4401,7 +4432,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Attempts to align the date modified according to the file name.
+        ///   Looks up a localized string similar to Attempts to align the date modified according to the file name..
         /// </summary>
         public static string S_UPDATE_MODIFIED_INFO {
             get {

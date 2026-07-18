@@ -10,6 +10,14 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     x:Name="tsz"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <ToolTip
+            x:Key="InfoTooltip"
+            MaxWidth="400"
+            Style="{StaticResource FluentTooltipStyle}">
+            <TextBlock Text="{Binding Info}" TextWrapping="Wrap" />
+        </ToolTip>
+    </UserControl.Resources>
     <local:AdbMenu d:Visibility="Visible" DataContext="{Binding ElementName=tsz}">
         <local:AdbMenu.Style>
             <Style BasedOn="{StaticResource AdbMenuStyle}" TargetType="local:AdbMenu">
@@ -56,6 +64,7 @@
                 <Style TargetType="local:AdbMenuItem">
                     <Setter Property="Icon" Value="{StaticResource ThumbCheckedIcon}" />
                     <Setter Property="Command" Value="{Binding Action.Command}" />
+                    <Setter Property="ToolTip" Value="{StaticResource InfoTooltip}" />
                 </Style>
             </local:AdbMenuItem.ItemContainerStyle>
             <local:AdbMenuItem.ItemTemplate>
