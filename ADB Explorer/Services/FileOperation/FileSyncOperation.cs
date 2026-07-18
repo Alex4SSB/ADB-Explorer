@@ -154,38 +154,33 @@ public class FileSyncOperation : FileOperation
             {
                 void SyncProgressCallback(SyncProgressChangedEventArgs eventArgs) => AddUpdates(item, eventArgs, mutex);
 
-                // Open a new connection for each file to allow parallel transfers, maximizing throughput of the medium.
-                // Connecting by both USB and WiFi at the same time causes instability and doesn't seem to improve the speed further.
-                using SyncService service = new(Device.DeviceData);
                 var targetPath = FilePath.IsDirectory
                         ? FileHelper.ConcatPaths(TargetPath, FileHelper.ExtractRelativePath(item.FullPath, FilePath.FullPath))
                         : TargetPath.FullPath;
 
-                if (OperationName is OperationType.Push)
+                try
                 {
-                    if (Data.Settings.EnableLog && !Data.IsLogPaused)
-                        Data.CommandLog.Add(new($"@AdvancedSharpAdbClient: push {item.FullPath} -> {targetPath}"));
+                    // Open a new connection for each file to allow parallel transfers, maximizing throughput of the medium.
+                    // Connecting by both USB and WiFi at the same time causes instability and doesn't seem to improve the speed further.
+                    // SyncService ctor / Open can throw (e.g. device offline) — keep it inside the try so Parallel.ForEach does not fault the task.
+                    using SyncService service = new(Device.DeviceData);
 
-                    var lastWriteTime = item.DateModified ?? DateTime.Now;
-
-                    try
+                    if (OperationName is OperationType.Push)
                     {
+                        if (Data.Settings.EnableLog && !Data.IsLogPaused)
+                            Data.CommandLog.Add(new($"@AdvancedSharpAdbClient: push {item.FullPath} -> {targetPath}"));
+
+                        var lastWriteTime = item.DateModified ?? DateTime.Now;
+
                         // target = [Android parent folder]\[relative path from Windows parent folder to current item]
                         using var stream = new FileStream(item.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
                         service.Push(stream, targetPath, fileMode, lastWriteTime, SyncProgressCallback, useSyncV2, in isCanceled);
                     }
-                    catch (Exception e)
+                    else
                     {
-                        AddUpdates([new SyncErrorInfo(item.FullPath, e.Message)]);
-                    }
-                }
-                else
-                {
-                    if (Data.Settings.EnableLog && !Data.IsLogPaused)
-                        Data.CommandLog.Add(new($"@AdvancedSharpAdbClient: pull {item.FullPath} -> {targetPath}"));
+                        if (Data.Settings.EnableLog && !Data.IsLogPaused)
+                            Data.CommandLog.Add(new($"@AdvancedSharpAdbClient: pull {item.FullPath} -> {targetPath}"));
 
-                    try
-                    {
                         if (!useSyncV2)
                             ResolvePullFileSize(item);
 
@@ -195,12 +190,11 @@ public class FileSyncOperation : FileOperation
 
                         if (item.DateModified is not null)
                             File.SetLastWriteTime(targetPath, item.DateModified.Value);
-
                     }
-                    catch (Exception e)
-                    {
-                        AddUpdates([new SyncErrorInfo(item.FullPath, e.Message)]);
-                    }
+                }
+                catch (Exception e)
+                {
+                    AddUpdates([new SyncErrorInfo(item.FullPath, e.Message)]);
                 }
             });
 
