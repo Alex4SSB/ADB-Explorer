@@ -328,6 +328,12 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    <ToolTip
+        x:Key="SubMenuInfoTooltip"
+        MaxWidth="400"
+        Style="{StaticResource FluentTooltipStyle}">
+        <TextBlock Text="{Binding Info}" TextWrapping="Wrap" />
+    </ToolTip>
     <Style
         x:Key="SubMenuItemStyle"
         BasedOn="{StaticResource ActionMenuItemStyle}"
@@ -335,7 +341,7 @@
         <Setter Property="Header" Value="{Binding Action.Description}" />
         <Setter Property="InputGestureText" Value="{Binding Action.GestureString}" />
         <Setter Property="Icon" Value="{Binding IconContent}" />
-        <Setter Property="ToolTip" Value="{Binding Info}" />
+        <Setter Property="ToolTip" Value="{StaticResource SubMenuInfoTooltip}" />
     </Style>
     <Style
         x:Key="DummySubMenuStyle"
