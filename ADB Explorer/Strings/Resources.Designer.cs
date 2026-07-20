@@ -3716,7 +3716,7 @@ namespace ADB_Explorer.Strings {
         ///
         ///The checks attempt to prevent an unsuspecting user from launching a possibly malicious file masquerading as ADB, and include:
         ///• Path must not be a remote UNC or a symbolic link
-        ///• Executable must be Authenticode-signed or match pre-defined SHA-256 hash list
+        ///• Executable must be Authenticode-signed by Google or match pre-defined SHA-256 hash list
         ///• Must return a legible version string when executed with --version.
         /// </summary>
         public static string S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO {
