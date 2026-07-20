@@ -1650,4 +1650,25 @@ Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
   <data name="S_PREVIEW_SYNTAX_AUTOMATIC" xml:space="preserve">
     <value>Automático</value>
   </data>
+  <data name="S_RESTART" xml:space="preserve">
+    <value>Reiniciar Ahora</value>
+  </data>
+  <data name="S_UPDATE_MODIFIED_INFO" xml:space="preserve">
+    <value>Intenta alinear la fecha de modificación con el nombre del archivo.
+
+Útil para fotos cuyo nombre incluye la fecha de captura y cuya fecha de modificación fue sobrescrita.</value>
+  </data>
+  <data name="S_PUSH_PACKAGES_INFO" xml:space="preserve">
+    <value>Instalar aplicaciones) directamente desde Windows.</value>
+  </data>
+  <data name="S_DETAILS_PANE_INFO" xml:space="preserve">
+    <value>Configura el panel lateral en modo detalles.
+
+Los detalles pueden incluir: miniatura, información extendida del archivo, metadatos, permisos y opciones de montaje de la unidad.</value>
+  </data>
+  <data name="S_PREVIEW_PANE_INFO" xml:space="preserve">
+    <value>Configura el panel lateral en modo de vista previa.
+
+Elementos compatibles: miniaturas, PDF; otros archivos que cumplan con la restricción de tamaño se muestran como texto, con resaltado de sintaxis opcional, y se pueden editar y guardar si la ubicación lo permite.</value>
+  </data>
 </root>
