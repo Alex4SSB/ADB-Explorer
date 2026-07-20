@@ -259,10 +259,10 @@ public static class UISettings
                                       SettingsActions.Find(a => a.Name is ActionType.ClearAdbPath),
                                       SettingsActions.Find(a => a.Name is ActionType.ResetApp),
                                   ]),
-                                  new BoolSetting(() => Settings.DisableAdbRestrictions, Strings.Resources.S_SETTINGS_DISABLE_ADB_LIMITATIONS, icon: new("\uE1DE"), commands: [
+                new BoolSetting(() => Settings.DisableAdbRestrictions, Strings.Resources.S_SETTINGS_DISABLE_ADB_LIMITATIONS, icon: new("\uE1DE"), 
+                                commands: [
                                       SettingsActions.Find(a => a.Name is ActionType.ResetApp),
-                                  ])
-                                  { CardAppearance = ControlAppearance.Danger },
+                                ]) { CardAppearance = ControlAppearance.Danger, Info = Strings.Resources.S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO },
                 new TextboxSetting(() => Settings.DefaultFolder,
                                   Strings.Resources.S_SETTINGS_DEFAULT_FOLDER,
                                   commands: [
@@ -329,6 +329,7 @@ public abstract class AbstractSetting : SettingsBase
     public string Description { get; private set; }
     public object? IconContent { get; set; }
     public TextAlignment HeaderAlignment { get; protected set; }
+    public string? Info { get; init; }
 
     /// <summary>
     /// Optional WPF UI appearance accent for the settings card background and border.

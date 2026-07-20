@@ -2083,4 +2083,12 @@ Details can include: thumbnail, extended file info, metadata, permissions, and d
 
 Supported items: thumbnail, PDF; other files that match the size restriction are displayed as text, with optional syntax highlight, and can be edited &amp; saved if the location allows.</value>
   </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO" xml:space="preserve">
+    <value>Disables ADB path &amp; executable checks.
+
+The checks attempt to prevent an unsuspecting user from launching a possibly malicious file masquerading as ADB, and include:
+• Path must not be a remote UNC or a symbolic link
+• Executable must be Authenticode-signed or match pre-defined SHA-256 hash list
+• Must return a legible version string when executed with --version</value>
+  </data>
 </root>

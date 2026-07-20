@@ -96,10 +96,23 @@
                         Path="CardAppearance" />
                 </Setter.Value>
             </Setter>
+            <Setter Property="ToolTip">
+                <Setter.Value>
+                    <ToolTip MaxWidth="600" Style="{StaticResource FluentTooltipStyle}">
+                        <TextBlock Text="{Binding Info}" TextWrapping="Wrap" />
+                    </ToolTip>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="ToolTipService.InitialShowDelay" Value="0" />
+            <Setter Property="ToolTipService.ShowDuration" Value="60000" />
+            <Setter Property="ToolTipService.Placement" Value="Bottom" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding CardAppearance}" Value="{x:Null}">
                     <Setter Property="Background" Value="{DynamicResource CardBackground}" />
                     <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Info}" Value="{x:Null}">
+                    <Setter Property="ToolTip" Value="{x:Null}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
