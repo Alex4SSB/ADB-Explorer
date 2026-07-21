@@ -1671,4 +1671,30 @@ ADB 包含在 Android SDK Platform Tools 中。
 
 支持的项目：缩略图、PDF；其他符合大小限制的文件将以文本形式显示，可选择语法高亮显示，并且如果位置允许可以编辑和保存文件。</value>
   </data>
+  <data name="S_NEW_VERSION_READY" xml:space="preserve">
+    <value>已下载 {0} 的新版本 {1}，可以安装了。</value>
+  </data>
+  <data name="S_UPDATE_ON_CLOSE" xml:space="preserve">
+    <value>关闭时更新</value>
+  </data>
+  <data name="S_UPDATE_APPLY_FAILED" xml:space="preserve">
+    <value>无法准备更新。确保有处理 .7z 扩展名的程序 （Windows 资源管理器、7-Zip、NanaZip 等），或者手动从 GitHub 下载该版本。</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
+    <value>检查并通知</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_UPDATE" xml:space="preserve">
+    <value>更新并安装</value>
+  </data>
+  <data name="S_UPDATE_SIGNATURE_INVALID" xml:space="preserve">
+    <value>已下载的更新未使用与此安装程序相同的证书进行签名。该更新程序被丢弃。</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO" xml:space="preserve">
+    <value>禁用 ADB 路径和可执行文件检查。
+
+这些检查尝试防止毫无戒心的用户启动伪装成 ADB 的恶意文件，检查内容包括：
+• 路径不能是远程 UNC 路径或符号链接。
+• 可执行文件必须由 Google 进行 Authenticode 签名，或匹配预定义的 SHA-256 哈希列表。
+• 用 --version 执行时，必须返回清晰易读的版本字符串</value>
+  </data>
 </root>
