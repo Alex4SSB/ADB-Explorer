@@ -7,6 +7,11 @@ public partial class AppRuntimeSettings : ViewModelBase
 {
     public bool ResetAppSettings { get; set; } = false;
 
+    /// <summary>
+    /// Portable update archive is staged; apply the file swap when the process exits.
+    /// </summary>
+    public bool ApplyUpdateOnExit { get; set; } = false;
+
     private DriveViewModel browseDrive = null;
     public DriveViewModel BrowseDrive
     {

@@ -33,6 +33,34 @@ public static class Security
         }
     }
 
+    /// <summary>
+    /// Verifies <paramref name="candidatePath"/> has a valid Authenticode signature whose
+    /// certificate thumbprint matches <paramref name="referencePath"/>.
+    /// </summary>
+    public static bool VerifyAuthenticodeMatches(string referencePath, string candidatePath)
+    {
+        try
+        {
+            if (!NativeMethods.WinTrust.VerifyEmbeddedSignature(referencePath)
+                || !NativeMethods.WinTrust.VerifyEmbeddedSignature(candidatePath))
+            {
+                return false;
+            }
+
+            using var referenceCert = X509Certificate.CreateFromSignedFile(referencePath);
+            using var candidateCert = X509Certificate.CreateFromSignedFile(candidatePath);
+
+            return string.Equals(
+                referenceCert.GetCertHashString(),
+                candidateCert.GetCertHashString(),
+                StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public static string CalculateWindowsFileHash(string path, bool useSHA = false)
     {
         try

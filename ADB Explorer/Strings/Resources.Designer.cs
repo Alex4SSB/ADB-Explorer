@@ -2695,6 +2695,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A new {0}, version {1}, has been downloaded and is ready to install..
+        /// </summary>
+        public static string S_NEW_VERSION_READY {
+            get {
+                return ResourceManager.GetString("S_NEW_VERSION_READY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to New App Version.
         /// </summary>
         public static string S_NEW_VERSION_TITLE {
@@ -4140,6 +4149,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Check and notify.
+        /// </summary>
+        public static string S_SETTINGS_UPDATES_CHECK {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_UPDATES_CHECK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update and install.
+        /// </summary>
+        public static string S_SETTINGS_UPDATES_UPDATE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_UPDATES_UPDATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Include Video Thumbnails.
         /// </summary>
         public static string S_SETTINGS_VIDEO_THUMBNAILS {
@@ -4446,6 +4473,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The update could not be prepared. Ensure a .7z handler is available (Windows Explorer, 7-Zip, NanaZip, etc.), or download the release manually from GitHub..
+        /// </summary>
+        public static string S_UPDATE_APPLY_FAILED {
+            get {
+                return ResourceManager.GetString("S_UPDATE_APPLY_FAILED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Attempts to align the date modified according to the file name.
         ///
         ///Useful for photos that include the date taken in the name and had their date modified overwritten..
@@ -4453,6 +4489,24 @@ namespace ADB_Explorer.Strings {
         public static string S_UPDATE_MODIFIED_INFO {
             get {
                 return ResourceManager.GetString("S_UPDATE_MODIFIED_INFO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update on close.
+        /// </summary>
+        public static string S_UPDATE_ON_CLOSE {
+            get {
+                return ResourceManager.GetString("S_UPDATE_ON_CLOSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The downloaded update is not signed with the same certificate as this installation. The update was discarded..
+        /// </summary>
+        public static string S_UPDATE_SIGNATURE_INVALID {
+            get {
+                return ResourceManager.GetString("S_UPDATE_SIGNATURE_INVALID", resourceCulture);
             }
         }
         

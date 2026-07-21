@@ -304,6 +304,18 @@ To approve ADB, open WSA advanced settings.</value>
     <value>A new {0}, version {1}, is available</value>
     <comment>0 = App display name. 1 = new version number</comment>
   </data>
+  <data name="S_NEW_VERSION_READY" xml:space="preserve">
+    <value>A new {0}, version {1}, has been downloaded and is ready to install.</value>
+    <comment>0 = App display name. 1 = new version number. Shown after portable update archive download</comment>
+  </data>
+  <data name="S_UPDATE_ON_CLOSE" xml:space="preserve">
+    <value>Update on close</value>
+    <comment>Dialog button: keep using the app and apply the downloaded update when the app closes</comment>
+  </data>
+  <data name="S_UPDATE_APPLY_FAILED" xml:space="preserve">
+    <value>The update could not be prepared. Ensure a .7z handler is available (Windows Explorer, 7-Zip, NanaZip, etc.), or download the release manually from GitHub.</value>
+    <comment>Shown when the shell cannot browse/extract update.7z or scheduling the file swap fails</comment>
+  </data>
   <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
     <value>Go To Version Page</value>
   </data>
@@ -545,7 +557,15 @@ Visible content may be incomplete.</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>Check For Updates</value>
-    <comment>The setting used to enable checking for updates in non MS Store installs</comment>
+    <comment>The setting used to control update checking / applying in portable (non MS Store) installs</comment>
+  </data>
+  <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
+    <value>Check and notify</value>
+    <comment>Combo option: check for newer releases and notify</comment>
+  </data>
+  <data name="S_SETTINGS_UPDATES_UPDATE" xml:space="preserve">
+    <value>Update and install</value>
+    <comment>Combo option: check for newer releases and update when available</comment>
   </data>
   <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
     <value>Graphics</value>
@@ -2082,6 +2102,10 @@ Details can include: thumbnail, extended file info, metadata, permissions, and d
     <value>Sets the side pane to preview mode.
 
 Supported items: thumbnail, PDF; other files that match the size restriction are displayed as text, with optional syntax highlight, and can be edited &amp; saved if the location allows.</value>
+  </data>
+  <data name="S_UPDATE_SIGNATURE_INVALID" xml:space="preserve">
+    <value>The downloaded update is not signed with the same certificate as this installation. The update was discarded.</value>
+    <comment>Shown when the staged ADB Explorer.exe Authenticode certificate does not match the running app</comment>
   </data>
   <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO" xml:space="preserve">
     <value>Disables ADB path &amp; executable checks.

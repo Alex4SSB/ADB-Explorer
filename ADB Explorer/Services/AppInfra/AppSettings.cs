@@ -40,6 +40,41 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
         KMG,
     }
 
+    /// <summary>
+    /// Portable-build update policy. Legacy JSON bool values map via
+    /// <see cref="CheckForUpdatesJsonConverter"/> (<c>false</c>→<see cref="Off"/>, <c>true</c>→<see cref="Check"/>).
+    /// </summary>
+    public enum UpdatesMode
+    {
+        Off,
+        Check,
+        Update,
+    }
+
+    /// <summary>
+    /// Reads legacy <see cref="bool"/> values and current <see cref="UpdatesMode"/> numbers/names.
+    /// </summary>
+    private sealed class CheckForUpdatesJsonConverter : JsonConverter<UpdatesMode>
+    {
+        public override UpdatesMode Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            return reader.TokenType switch
+            {
+                JsonTokenType.False => UpdatesMode.Off,
+                JsonTokenType.True => UpdatesMode.Check,
+                JsonTokenType.Number when reader.TryGetInt32(out var number)
+                    && Enum.IsDefined(typeof(UpdatesMode), number)
+                    => (UpdatesMode)number,
+                JsonTokenType.String when Enum.TryParse<UpdatesMode>(reader.GetString(), ignoreCase: true, out var named)
+                    => named,
+                _ => UpdatesMode.Check,
+            };
+        }
+
+        public override void Write(Utf8JsonWriter writer, UpdatesMode value, JsonSerializerOptions options)
+            => writer.WriteNumberValue((int)value);
+    }
+
     void IJsonOnDeserialized.OnDeserialized()
     {
         _locationThumbSize ??= [];
@@ -349,10 +384,11 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     #region about
 
     /// <summary>
-    /// GET releases on GitHub repo on each launch
+    /// Portable builds: whether to check for (or apply) updates from GitHub releases on launch.
     /// </summary>
+    [JsonConverter(typeof(CheckForUpdatesJsonConverter))]
     [ObservableProperty]
-    public partial bool CheckForUpdates { get; set; } = true;
+    public partial UpdatesMode CheckForUpdates { get; set; } = UpdatesMode.Check;
 
     #endregion
 

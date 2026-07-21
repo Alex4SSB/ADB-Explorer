@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Last updated: June 2026 (Grafana crash reporting regards versions **after** v1.0.26061)
+Last updated: July 2026 (Grafana crash reporting regards versions **after** v1.0.26061)
 
 ADB Explorer is developed by Alex B. This policy describes what data the application handles and what may be sent over the internet.
 
@@ -92,9 +92,9 @@ If you installed ADB Explorer from the Microsoft Store, Microsoft may collect in
 
 Depending on your settings and build, the app may also contact:
 
-- **GitHub** — check for application updates (non-Store builds, when enabled)
+- **GitHub** — check for application updates and, in **Update** mode, download the new release archive to your app folder and install it locally (non-Store builds, when enabled)
 
-These features do not send crash diagnostics.
+These requests only fetch update information and files from GitHub; they do not send crash diagnostics or any personal data.
 
 ## Your choices
 

@@ -114,6 +114,8 @@ public static class AdbExplorerConst
 
     public const string APP_SETTINGS_FILE = "settings.json";
 
+    public const string UPDATE_ARCHIVE_FILE = "update.7z";
+
     public const int DRIVE_WARNING = 99;
 
     public const string WSA_INTERFACE_NAME = "WSLCore";

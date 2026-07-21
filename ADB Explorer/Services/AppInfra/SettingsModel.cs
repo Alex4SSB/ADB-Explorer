@@ -118,7 +118,11 @@ public static class UISettings
 
         if (!RuntimeSettings.IsAppPackaged)
         {
-            settings.Add(new BoolSetting(() => Settings.CheckForUpdates, Strings.Resources.S_SETTINGS_UPDATES, icon: new("\uE895")));
+            settings.Add(new SimpleComboSetting<AppSettings.UpdatesMode>(() => Settings.CheckForUpdates, Strings.Resources.S_SETTINGS_UPDATES, [
+                new(AppSettings.UpdatesMode.Off, Strings.Resources.S_SETTINGS_INACTIVE),
+                new(AppSettings.UpdatesMode.Check, Strings.Resources.S_SETTINGS_UPDATES_CHECK),
+                new(AppSettings.UpdatesMode.Update, Strings.Resources.S_SETTINGS_UPDATES_UPDATE),
+            ], icon: new("\uE895")));
         }
 
         if (CrashReportService.IsConfigured)
@@ -261,7 +265,7 @@ public static class UISettings
                                   ]),
                 new BoolSetting(() => Settings.DisableAdbRestrictions, Strings.Resources.S_SETTINGS_DISABLE_ADB_LIMITATIONS, icon: new("\uE1DE"), 
                                 commands: [
-                                      SettingsActions.Find(a => a.Name is ActionType.ResetApp),
+                                    SettingsActions.Find(a => a.Name is ActionType.ResetApp),
                                 ]) { CardAppearance = ControlAppearance.Danger, Info = Strings.Resources.S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO },
                 new TextboxSetting(() => Settings.DefaultFolder,
                                   Strings.Resources.S_SETTINGS_DEFAULT_FOLDER,

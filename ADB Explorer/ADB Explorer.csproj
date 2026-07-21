@@ -20,6 +20,8 @@
 
   <PropertyGroup Condition="'$(Configuration)' == 'Deploy'">
     <DefineConstants>$(DefineConstants);DEPLOY</DefineConstants>
+    <SignToolTimestampUrl Condition="'$(SignToolTimestampUrl)' == ''">http://timestamp.digicert.com</SignToolTimestampUrl>
+    <SignToolExe Condition="'$(SignToolExe)' == ''">signtool</SignToolExe>
   </PropertyGroup>
 
   <ItemGroup>
@@ -168,6 +170,19 @@
     <ItemGroup>
       <NativeCopyLocalItems Remove="@(NativeCopyLocalItems)" Condition="'%(Filename)%(Extension)' == 'libSkiaSharp.pdb'" />
     </ItemGroup>
+  </Target>
+
+  <Target Name="AuthenticodeSignDeploy"
+          AfterTargets="Build"
+          Condition="'$(Configuration)' == 'Deploy'">
+    <PropertyGroup>
+      <!-- TargetPath is the managed DLL; sign the apphost exe instead -->
+      <_SignTarget>$(TargetDir)$(TargetName).exe</_SignTarget>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(_SignTarget)')" Text="Deploy signing failed: '$(_SignTarget)' was not found." />
+    <!-- /a: SignTool picks the best code-signing cert from the certificate store -->
+    <Message Importance="high" Text="Authenticode-signing $(_SignTarget)" />
+    <Exec Command="&quot;$(SignToolExe)&quot; sign /a /fd SHA256 /td SHA256 /tr $(SignToolTimestampUrl) &quot;$(_SignTarget)&quot;" />
   </Target>
 
 </Project>

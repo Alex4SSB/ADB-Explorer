@@ -216,6 +216,8 @@ public partial class App
 
         EnsureAdbKilledOnExit();
 
+        AppUpdateHelper.ScheduleSwapOnExitIfNeeded();
+
         _host.Dispose();
     }
 

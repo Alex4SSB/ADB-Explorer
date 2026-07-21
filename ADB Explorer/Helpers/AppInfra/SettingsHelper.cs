@@ -8,6 +8,14 @@ public static class SettingsHelper
 {
     public static void ResetAppAction()
     {
+        // A pending portable update must be applied before any new instance starts, otherwise
+        // robocopy would race a live process locking the app binaries.
+        if (Data.RuntimeSettings.ApplyUpdateOnExit)
+        {
+            AppUpdateHelper.ApplyPendingUpdate(restartAfter: true);
+            return;
+        }
+
         // Flush settings.json before launching the new instance. OnExit also saves, but that runs after
         // Process.Start — and PersistVaultSettings can block for seconds on a hung vault, so the new
         // process would otherwise race ahead and load a stale settings file. Skip the vault here; OnExit

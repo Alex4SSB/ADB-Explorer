@@ -247,27 +247,57 @@ public partial class MainWindowViewModel : ObservableObject
             });
         }
 
-        if (!Data.RuntimeSettings.IsAppPackaged && Data.Settings.CheckForUpdates)
+        if (!Data.RuntimeSettings.IsAppPackaged
+            && Data.Settings.CheckForUpdates is not AppSettings.UpdatesMode.Off)
         {
-            var latestVersion = await Network.LatestAppReleaseAsync();
-            if (latestVersion is null || latestVersion <= Data.AppVersion)
+            var latestRelease = await Network.LatestAppReleaseAsync();
+            if (latestRelease is not { } release || release.Version <= Data.AppVersion)
                 return;
+
+            if (Data.Settings.CheckForUpdates is AppSettings.UpdatesMode.Update
+                && release.PortableArchiveUrl is { } archiveUrl)
+            {
+                var updatePath = Path.Combine(AppContext.BaseDirectory, AdbExplorerConst.UPDATE_ARCHIVE_FILE);
+                if (await Network.DownloadFileAsync(archiveUrl, updatePath))
+                {
+                    App.SafeBeginInvoke(() => _ = PromptDownloadedUpdateAsync(release.Version));
+                    return;
+                }
+            }
 
             App.SafeInvoke(() =>
             {
                 Notifications.Add(new(async () =>
                 {
-                    var res = await DialogService.ShowConfirmation(string.Format(Strings.Resources.S_NEW_VERSION, Properties.AppGlobal.AppDisplayName, latestVersion),
+                    var res = await DialogService.ShowConfirmation(string.Format(Strings.Resources.S_NEW_VERSION, Properties.AppGlobal.AppDisplayName, release.Version),
                         Strings.Resources.S_NEW_VERSION_TITLE,
                         Strings.Resources.S_GO_TO_VERSION_PAGE,
                         cancelText: Strings.Resources.S_BUTTON_CLOSE,
                         icon: DialogService.DialogIcon.Informational);
 
                     if (res.Item1 is ContentDialogResult.Primary)
-                        Network.OpenUrl($"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{latestVersion}", Data.RuntimeSettings.DefaultBrowserPath);
+                        Network.OpenUrl($"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{release.Version}", Data.RuntimeSettings.DefaultBrowserPath);
                 }, Strings.Resources.S_NEW_VERSION_TITLE,
                 Notifications));
             });
+        }
+    }
+
+    private static async Task PromptDownloadedUpdateAsync(Version latestVersion)
+    {
+        var result = await DialogService.ShowDialog(
+            string.Format(Strings.Resources.S_NEW_VERSION_READY, Properties.AppGlobal.AppDisplayName, latestVersion),
+            Strings.Resources.S_NEW_VERSION_TITLE,
+            Strings.Resources.S_RESTART,
+            closeText: Strings.Resources.S_UPDATE_ON_CLOSE);
+
+        var restartNow = result is ContentDialogResult.Primary;
+        if (!AppUpdateHelper.ApplyPendingUpdate(restartNow))
+        {
+            DialogService.ShowMessage(
+                AppUpdateHelper.LastFailureReason ?? Strings.Resources.S_UPDATE_APPLY_FAILED,
+                Strings.Resources.S_NEW_VERSION_TITLE,
+                DialogService.DialogIcon.Exclamation);
         }
     }
 }

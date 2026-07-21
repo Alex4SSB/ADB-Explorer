@@ -13,6 +13,8 @@ public static class Network
 
     public readonly record struct HttpReachabilityResult(bool IsReachable, int? StatusCode, string? Error);
 
+    public readonly record struct AppReleaseInfo(Version Version, string? PortableArchiveUrl);
+
     private static readonly SocketsHttpHandler Handler = new()
     {
         AutomaticDecompression = DecompressionMethods.All,
@@ -36,10 +38,21 @@ public static class Network
         Timeout = TimeSpan.FromSeconds(60),
     };
 
+    private static readonly HttpClient DownloadClient = new(new SocketsHttpHandler
+    {
+        AutomaticDecompression = DecompressionMethods.All,
+        ConnectTimeout = TimeSpan.FromSeconds(15),
+        PooledConnectionLifetime = TimeSpan.FromMinutes(10),
+    })
+    {
+        Timeout = TimeSpan.FromMinutes(10),
+    };
+
     static Network()
     {
         Client.DefaultRequestHeaders.UserAgent.ParseAdd("ADB-Explorer");
         BackgroundClient.DefaultRequestHeaders.UserAgent.ParseAdd("ADB-Explorer");
+        DownloadClient.DefaultRequestHeaders.UserAgent.ParseAdd("ADB-Explorer");
     }
 
     /// <summary>
@@ -165,7 +178,7 @@ public static class Network
         return AdbVersions.ParseFromVersionList(response).ToArray();
     }
 
-    public static async Task<Version> LatestAppReleaseAsync()
+    public static async Task<AppReleaseInfo?> LatestAppReleaseAsync()
     {
         var response = await GetRequestAsync(Resources.Links.REPO_RELEASES_URL).ConfigureAwait(false);
         if (response is null)
@@ -176,24 +189,81 @@ public static class Network
         if (!json.HasValues)
             return null;
 
+        var archSuffix = RuntimeInformation.ProcessArchitecture is Architecture.Arm64 ? "ARM64" : "x64";
+
         foreach (var release in json)
         {
             if (release["prerelease"].ToObject<bool>() || release["draft"].ToObject<bool>())
                 continue;
 
             var match = AdbRegEx.RE_GITHUB_VERSION().Match(release["tag_name"].ToString());
-            if (match.Success)
+            if (!match.Success)
+                continue;
+
+            try
             {
-                try
+                Version version = new(match.Value);
+                string? archiveUrl = null;
+
+                if (release["assets"] is JArray assets)
                 {
-                    return new(match.Value);
+                    foreach (var asset in assets)
+                    {
+                        var name = asset["name"]?.ToString();
+                        if (name is null || !name.EndsWith($"_{archSuffix}.7z", StringComparison.OrdinalIgnoreCase))
+                            continue;
+
+                        archiveUrl = asset["browser_download_url"]?.ToString();
+                        break;
+                    }
                 }
-                catch
-                { }
+
+                return new(version, archiveUrl);
             }
+            catch
+            { }
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Downloads <paramref name="url"/> to <paramref name="targetPath"/> via a temp <c>.partial</c> file, then replaces the target.
+    /// </summary>
+    public static async Task<bool> DownloadFileAsync(string url, string targetPath)
+    {
+        var partialPath = targetPath + ".partial";
+
+        try
+        {
+            using var response = await DownloadClient
+                .GetAsync(url, HttpCompletionOption.ResponseHeadersRead)
+                .ConfigureAwait(false);
+
+            response.EnsureSuccessStatusCode();
+
+            Directory.CreateDirectory(Path.GetDirectoryName(targetPath)!);
+
+            await using (var fs = new FileStream(partialPath, FileMode.Create, FileAccess.Write, FileShare.None, 81920, useAsync: true))
+            {
+                await response.Content.CopyToAsync(fs).ConfigureAwait(false);
+            }
+
+            File.Move(partialPath, targetPath, overwrite: true);
+            return true;
+        }
+        catch
+        {
+            try
+            {
+                if (File.Exists(partialPath))
+                    File.Delete(partialPath);
+            }
+            catch
+            { }
+
+            return false;
+        }
     }
 
     public static async Task<DateTime?> GetPrivacyPolicyLastUpdatedAsync()
