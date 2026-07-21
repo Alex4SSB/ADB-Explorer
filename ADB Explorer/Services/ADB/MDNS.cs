@@ -54,6 +54,13 @@ public class MDNS : ViewModelBase
 
     private void UpdateProgress()
     {
+        // The probe task and this progress loop run concurrently. Once the state has
+        // transitioned out of InProgress (which resets Progress to 0), a stale update
+        // dispatched from the loop must not run - otherwise it would freeze the bar at
+        // the last time-based value instead of clearing it.
+        if (State is not MdnsState.InProgress)
+            return;
+
         timePassed = DateTime.Now.Subtract(checkStart);
 
         Progress = timePassed < AdbExplorerConst.MDNS_DOWN_RESPONSE_TIME
