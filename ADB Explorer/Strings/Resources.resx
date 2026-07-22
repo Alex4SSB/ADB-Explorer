@@ -2114,5 +2114,6 @@ The checks attempt to prevent an unsuspecting user from launching a possibly mal
 • Path must not be a remote UNC or a symbolic link
 • Executable must be Authenticode-signed by Google or match pre-defined SHA-256 hash list
 • Must return a legible version string when executed with --version</value>
+    <comment>Should be read like: "disables ADB path checks, and disables ADB executable checks"</comment>
   </data>
 </root>
