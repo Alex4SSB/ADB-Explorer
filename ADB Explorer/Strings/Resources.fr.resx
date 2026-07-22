@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1653,5 +1653,58 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   </data>
   <data name="S_OPEN_FOLDER" xml:space="preserve">
     <value>Ouvrir</value>
+  </data>
+  <data name="S_NEW_VERSION_READY" xml:space="preserve">
+    <value>{0} nouvelle version {1}, a été téléchargée et est prête à être installée.</value>
+  </data>
+  <data name="S_UPDATE_ON_CLOSE" xml:space="preserve">
+    <value>Mise à jour à la clôture</value>
+  </data>
+  <data name="S_UPDATE_APPLY_FAILED" xml:space="preserve">
+    <value>La mise à jour n’a pas pu être préparée. Assurez-vous qu’un gestionnaire de .7z est disponible (Windows Explorer, 7-Zip, NanaZip, etc.), ou téléchargez la version manuellement depuis GitHub.</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
+    <value>Vérifier et notifier</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_UPDATE" xml:space="preserve">
+    <value>Mettre à jour et installer</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX" xml:space="preserve">
+    <value>Syntaxe</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX_AUTOMATIC" xml:space="preserve">
+    <value>Automatique</value>
+  </data>
+  <data name="S_RESTART" xml:space="preserve">
+    <value>Redémarrer maintenant</value>
+  </data>
+  <data name="S_UPDATE_MODIFIED_INFO" xml:space="preserve">
+    <value>Tente d’aligner la date de modification en fonction du nom de fichier.
+
+Utile pour les photos qui incluent la date prise dans le nom et dont la date de modification a été remplacée.</value>
+  </data>
+  <data name="S_PUSH_PACKAGES_INFO" xml:space="preserve">
+    <value>Installe APK(s) directement depuis Windows.</value>
+  </data>
+  <data name="S_DETAILS_PANE_INFO" xml:space="preserve">
+    <value>Définit le volet latéral en mode détails.
+
+Les détails peuvent inclure : miniatures, informations sur le fichier étendu, métadonnées, autorisations et options de montage du lecteur.</value>
+  </data>
+  <data name="S_PREVIEW_PANE_INFO" xml:space="preserve">
+    <value>Définit le volet latéral en mode aperçu.
+
+Éléments pris en charge : miniature, PDF ; les autres fichiers qui correspondent à la restriction de taille sont affichés sous forme de texte, avec surlignage de syntaxe facultatif, et peuvent être modifiés et enregistrés si l’emplacement le permet.</value>
+  </data>
+  <data name="S_UPDATE_SIGNATURE_INVALID" xml:space="preserve">
+    <value>La mise à jour téléchargée n’est pas signée avec le même certificat que cette installation. La mise à jour a été abandonnée.</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO" xml:space="preserve">
+    <value>Désactive le chemin ADB et les vérifications d’exécutables.
+
+Les vérifications tentent d’empêcher un utilisateur non méfiant de lancer un fichier potentiellement malveillant se faisant passer pour ADB, et comprennent :
+• Le chemin ne doit pas être un UNC distant ni un lien symbolique
+• L’exécutable doit être signé par Authenticode de Google ou correspondre à la liste de hachage prédéfinie SHA-256
+• Doit renvoyer une chaîne de version lisible lorsqu’elle est exécutée avec --version</value>
   </data>
 </root>
