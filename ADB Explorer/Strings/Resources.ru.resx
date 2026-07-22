@@ -1671,4 +1671,30 @@ ADB доступен как часть Android SDK Platform Tools.
 
 Поддерживаемые элементы: миниатюра, PDF; другие файлы, соответствующие ограничению размера, отображаются как текст с дополнительной подсветкой синтаксиса, а также их можно редактировать и сохранять при разрешении местоположения.</value>
   </data>
+  <data name="S_NEW_VERSION_READY" xml:space="preserve">
+    <value>Новая {0}, версия {1}, скачана и готова к установке.</value>
+  </data>
+  <data name="S_UPDATE_ON_CLOSE" xml:space="preserve">
+    <value>Обновление при закрытии</value>
+  </data>
+  <data name="S_UPDATE_APPLY_FAILED" xml:space="preserve">
+    <value>Обновление не удалось подготовить. Убедитесь, что обработчик .7z доступен (Проводник Windows, 7-Zip, NanaZip, и т. д.), или загрузите выпуск вручную с GitHub.</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
+    <value>Проверьте и сообщите</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_UPDATE" xml:space="preserve">
+    <value>Обновить и установить</value>
+  </data>
+  <data name="S_UPDATE_SIGNATURE_INVALID" xml:space="preserve">
+    <value>Загруженное обновление подписано не тем же сертификатом, что и установленное. Обновление было отменено.</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO" xml:space="preserve">
+    <value>Отключает путь ADB &amp; исполняемые проверки.
+
+Проверки направлены на предотвращение запуска ничего не подозревающим пользователем потенциально вредоносного файла, маскирующегося под ADB, и включают в себя:
+• Путь не должен быть удаленным UNC или символической ссылкой.
+• Исполняемый файл должен быть подписан Google Authenticode или соответствовать заранее определенному списку хешей SHA-256
+• Должен возвращать разборчивую строку версии при выполнении вместе с --версией</value>
+  </data>
 </root>
