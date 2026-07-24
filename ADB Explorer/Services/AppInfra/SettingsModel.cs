@@ -263,7 +263,10 @@ public static class UISettings
                                       SettingsActions.Find(a => a.Name is ActionType.ClearAdbPath),
                                       SettingsActions.Find(a => a.Name is ActionType.ResetApp),
                                   ]),
-                new BoolSetting(() => Settings.DisableAdbRestrictions, Strings.Resources.S_SETTINGS_DISABLE_ADB_LIMITATIONS, icon: new("\uE1DE"), 
+                new BoolSetting(() => Settings.DisableAdbRestrictions,
+                                Strings.Resources.S_SETTINGS_DISABLE_ADB_LIMITATIONS,
+                                visibleProp: AbstractSetting.ExtractPropertyInfo(() => Settings.IsCredentialVaultWritable),
+                                icon: new("\uE1DE"),
                                 commands: [
                                     SettingsActions.Find(a => a.Name is ActionType.ResetApp),
                                 ]) { CardAppearance = ControlAppearance.Danger, Info = Strings.Resources.S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO },

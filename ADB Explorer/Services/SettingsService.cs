@@ -53,7 +53,14 @@ public class SettingsService
     public void Save()
     {
         SaveSettingsFile();
+
+        // Vault I/O runs after the settings file write so a hung vault cannot delay regular settings
+        // (important for Restart App). If this call learns the vault is unusable, rewrite the file so
+        // IsCredentialVaultWritable: false is persisted for the next launch.
+        bool wasWritable = Data.Settings.IsCredentialVaultWritable;
         Data.Settings.PersistVaultSettings();
+        if (wasWritable && !Data.Settings.IsCredentialVaultWritable)
+            SaveSettingsFile();
     }
 
     /// <summary>

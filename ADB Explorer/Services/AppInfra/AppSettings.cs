@@ -196,6 +196,14 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     private bool _disableAdbRestrictionsActive;
 
     /// <summary>
+    /// Whether the Windows Credential Vault responds in time for this app. When false, vault-backed
+    /// settings are hidden because their value cannot be persisted. Learned from timed-out or failed
+    /// vault I/O and stored in settings.json (not itself vault-backed).
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsCredentialVaultWritable { get; set; } = true;
+
+    /// <summary>
     /// Whether ADB security restrictions are disabled for this session. Defaults to the safe state
     /// (restrictions enabled) and is set only at launch, once the vault load completes.
     /// </summary>
@@ -210,8 +218,14 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     /// </summary>
     public Task LoadVaultSettingsAsync() => Task.Run(() =>
     {
+        if (!IsCredentialVaultWritable)
+            return;
+
         if (!CredentialVaultStore.TryGet(nameof(DisableAdbRestrictions), out var value))
-            return; // Vault unavailable/slow: keep safe defaults and try again on the next launch.
+        {
+            MarkCredentialVaultUnwritable();
+            return;
+        }
 
         bool stored = value == "True";
 
@@ -249,10 +263,19 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     /// </summary>
     public void PersistVaultSettings()
     {
-        if (!_disableAdbRestrictionsLoaded)
+        if (!_disableAdbRestrictionsLoaded || !IsCredentialVaultWritable)
             return;
 
-        CredentialVaultStore.Set(nameof(DisableAdbRestrictions), _disableAdbRestrictions ? "True" : "False");
+        if (!CredentialVaultStore.TrySet(nameof(DisableAdbRestrictions), _disableAdbRestrictions ? "True" : "False"))
+            MarkCredentialVaultUnwritable();
+    }
+
+    private void MarkCredentialVaultUnwritable()
+    {
+        if (!IsCredentialVaultWritable)
+            return;
+
+        App.SafeInvoke(() => IsCredentialVaultWritable = false);
     }
 
     [JsonIgnore]

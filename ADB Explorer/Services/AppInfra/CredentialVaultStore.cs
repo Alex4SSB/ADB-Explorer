@@ -77,19 +77,26 @@ public static class CredentialVaultStore
         return value;
     }
 
-    public static void Set(string userName, string value) => Run<object?>(() =>
-    {
-        try
+    /// <summary>
+    /// Stores a value in the vault. Returns <see langword="false"/> when the vault timed out or threw.
+    /// </summary>
+    public static bool TrySet(string userName, string value) =>
+        Run(() =>
         {
-            RemoveCore(userName);
-            new global::Windows.Security.Credentials.PasswordVault()
-                .Add(new global::Windows.Security.Credentials.PasswordCredential(Resource, userName, value));
-        }
-        catch
-        { }
+            try
+            {
+                RemoveCore(userName);
+                new global::Windows.Security.Credentials.PasswordVault()
+                    .Add(new global::Windows.Security.Credentials.PasswordCredential(Resource, userName, value));
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }, false, out _);
 
-        return null;
-    }, null, out _);
+    public static void Set(string userName, string value) => TrySet(userName, value);
 
     public static void Remove(string userName) => Run<object?>(() =>
     {
