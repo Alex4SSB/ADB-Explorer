@@ -81,7 +81,7 @@ public partial class ADBService
 
         if (IsMdnsEnabled)
             cmdProcess.StartInfo.EnvironmentVariables[ENABLE_MDNS] = "1";
-        
+
         cmdProcess.Start();
 
         if (Settings.EnableLog && !IsLogPaused)
@@ -89,6 +89,7 @@ public partial class ADBService
 
         return cmdProcess;
     }
+
     public static int ExecuteCommand(
         string file, string cmd, out string stdout, out string stderr, Encoding encoding, CancellationToken cancellationToken, params string[] args)
     {
@@ -99,7 +100,7 @@ public partial class ADBService
 
         var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync();
         var stderrTask = cmdProcess.StandardError.ReadToEndAsync();
-        
+
         var processTask = cmdProcess.WaitForExitAsync(cancellationToken);
 
         try
@@ -132,10 +133,19 @@ public partial class ADBService
 
     public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, CancellationToken cancellationToken, params string[] args)
     {
-        var result = ExecuteCommand(AdbHelper.CurrentAdbState.Path, cmd, out stdout, out stderr, Encoding.UTF8, cancellationToken, args);
-        DiskUsagePollingService.LastServerResponse = DateTime.Now;
-
-        return result;
+        try
+        {
+            var result = ExecuteCommand(AdbHelper.CurrentAdbState.Path, cmd, out stdout, out stderr, Encoding.UTF8, cancellationToken, args);
+            DiskUsagePollingService.LastServerResponse = DateTime.Now;
+            return result;
+        }
+        catch (Win32Exception)
+        {
+            AdbHelper.EnterAdbSetupMode();
+            stdout = "";
+            stderr = "";
+            return -1;
+        }
     }
 
     public static int ExecuteDeviceAdbCommand(string deviceSerial, string cmd, out string stdout, out string stderr, CancellationToken cancellationToken, params string[] args)
@@ -233,8 +243,28 @@ public partial class ADBService
         }
     }
 
-    public static IEnumerable<string> ExecuteAdbCommandAsync(string cmd, CancellationToken cancellationToken, params string[] args) =>
-        ExecuteCommandAsync(AdbHelper.CurrentAdbState.Path, cmd, Encoding.UTF8, cancellationToken, args: args);
+    public static IEnumerable<string> ExecuteAdbCommandAsync(string cmd, CancellationToken cancellationToken, params string[] args)
+    {
+        using var enumerator = ExecuteCommandAsync(AdbHelper.CurrentAdbState.Path, cmd, Encoding.UTF8, cancellationToken, args: args).GetEnumerator();
+        while (true)
+        {
+            bool moved;
+            try
+            {
+                moved = enumerator.MoveNext();
+            }
+            catch (Win32Exception)
+            {
+                AdbHelper.EnterAdbSetupMode();
+                yield break;
+            }
+
+            if (!moved)
+                yield break;
+
+            yield return enumerator.Current;
+        }
+    }
 
     public static IEnumerable<string> ExecuteDeviceAdbCommandAsync(string deviceSerial, string cmd, CancellationToken cancellationToken, params string[] args)
     {
@@ -346,17 +376,10 @@ public partial class ADBService
 
     public static void KillAdbServer(bool restart = false)
     {
-        try
-        {
-            ExecuteAdbCommand("kill-server", out _, out _, CancellationToken.None);
+        ExecuteAdbCommand("kill-server", out _, out _, CancellationToken.None);
 
-            if (restart)
-                ExecuteAdbCommand("start-server", out _, out _, CancellationToken.None);
-        }
-        catch (Win32Exception)
-        {
-            AdbHelper.EnterAdbSetupMode();
-        }
+        if (restart)
+            ExecuteAdbCommand("start-server", out _, out _, CancellationToken.None);
     }
 
     public static void WaitForCommands(TimeSpan timeout)

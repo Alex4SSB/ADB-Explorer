@@ -340,17 +340,47 @@ public static class Network
 
     public static void OpenUrl(string url, string? browserPath)
     {
+        if (string.IsNullOrWhiteSpace(url))
+            return;
+
         if (!string.IsNullOrEmpty(browserPath))
-            Process.Start(browserPath, $"\"{url}\"");
-        else
+        {
+            try
+            {
+                Process.Start(browserPath, $"\"{url}\"");
+                return;
+            }
+            catch
+            {
+                // Stale or broken DefaultBrowserPath — fall through to shell association.
+            }
+        }
+
+        try
+        {
             Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        }
+        catch
+        {
+            // No usable browser association; never crash the app for a link click.
+        }
     }
 
     public static void OpenBrowserSearch(string query, string? browserPath)
     {
         if (!string.IsNullOrEmpty(browserPath))
-            Process.Start(browserPath, $"\"? {query}\"");
-        else
-            OpenUrl($"https://www.google.com/search?q={Uri.EscapeDataString(query)}", browserPath);
+        {
+            try
+            {
+                Process.Start(browserPath, $"\"? {query}\"");
+                return;
+            }
+            catch
+            {
+                // Fall through to URL-based search.
+            }
+        }
+
+        OpenUrl($"https://www.google.com/search?q={Uri.EscapeDataString(query)}", browserPath: null);
     }
 }

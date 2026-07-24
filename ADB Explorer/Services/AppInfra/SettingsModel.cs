@@ -443,12 +443,19 @@ public class LinkSetting : AbstractSetting
 
     public BaseAction Command => new(() => true, () =>
     {
-        if (_resolveFilePath is not null)
-            Process.Start("explorer.exe", _resolveFilePath());
-        else if (Url.IsFile)
-            Process.Start("explorer.exe", Url.LocalPath);
-        else
-            Network.OpenUrl(Url.ToString(), RuntimeSettings.DefaultBrowserPath);
+        try
+        {
+            if (_resolveFilePath is not null)
+                Process.Start("explorer.exe", _resolveFilePath());
+            else if (Url.IsFile)
+                Process.Start("explorer.exe", Url.LocalPath);
+            else
+                Network.OpenUrl(Url.ToString(), RuntimeSettings.DefaultBrowserPath);
+        }
+        catch
+        {
+            // Broken shell association or missing path — never crash from a settings link.
+        }
     });
 
     public string ToolTip => _resolveFilePath?.Invoke()

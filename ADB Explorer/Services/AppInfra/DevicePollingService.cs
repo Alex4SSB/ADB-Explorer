@@ -105,17 +105,20 @@ public class DevicePollingService : BackgroundService
         if (!Data.DevicesObject.DevicesChanged(snapshots))
             return;
 
-        var deviceVMs = snapshots.Select(s => new LogicalDeviceViewModel(LogicalDevice.From(s)));
-
-        DeviceHelper.DeviceListSetup(deviceVMs);
-
-        if (!Data.Settings.AutoRoot)
-            return;
-
-        foreach (var item in Data.DevicesObject.LogicalDeviceViewModels.Where(device => device.Root is RootStatus.Unchecked).ToList())
+        // Construct device VMs on the UI thread so InitDeviceDrives / CollectionViews stay dispatcher-affine.
+        App.SafeInvoke(() =>
         {
-            item.EnableRoot(true);
-        }
+            var deviceVMs = snapshots.Select(s => new LogicalDeviceViewModel(LogicalDevice.From(s))).ToList();
+            DeviceHelper.DeviceListSetup(deviceVMs);
+
+            if (!Data.Settings.AutoRoot)
+                return;
+
+            foreach (var item in Data.DevicesObject.LogicalDeviceViewModels.Where(device => device.Root is RootStatus.Unchecked).ToList())
+            {
+                item.EnableRoot(true);
+            }
+        });
     }
 }
 

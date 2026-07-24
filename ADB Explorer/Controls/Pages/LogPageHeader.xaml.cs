@@ -31,14 +31,34 @@ public partial class LogPageHeader : UserControl
 
     private void OnLogEntryAdded(Log entry)
     {
+        if (entry is null)
+            return;
+
         Dispatcher.Invoke(() =>
         {
+            if (!IsLoaded || LogTextBox is null)
+                return;
+
             LogTextBox.AppendText(entry.ToString() + Environment.NewLine);
             LogTextBox.ScrollToEnd();
         });
     }
 
-    private void OnLogCleared() => Dispatcher.Invoke(LogTextBox.Document.Blocks.Clear);
+    private void OnLogCleared() =>
+        Dispatcher.Invoke(() =>
+        {
+            if (!IsLoaded || LogTextBox is null)
+                return;
 
-    private void RefreshControls() => Dispatcher.Invoke(LogControlsPanel.Items.Refresh);
+            LogTextBox.Document.Blocks.Clear();
+        });
+
+    private void RefreshControls() =>
+        Dispatcher.Invoke(() =>
+        {
+            if (!IsLoaded || LogControlsPanel is null)
+                return;
+
+            LogControlsPanel.Items.Refresh();
+        });
 }
