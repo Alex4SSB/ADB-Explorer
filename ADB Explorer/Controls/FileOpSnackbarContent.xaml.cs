@@ -10,13 +10,17 @@ public partial class FileOpSnackbarContent : UserControl
     public static readonly DependencyProperty OperationsSourceProperty =
         DependencyProperty.Register(
             nameof(OperationsSource),
-            typeof(ObservableList<FileOperation>),
+            typeof(IReadOnlyList<FileOperation>),
             typeof(FileOpSnackbarContent),
             new PropertyMetadata(null, OnOperationsSourceChanged));
 
-    public ObservableList<FileOperation> OperationsSource
+    /// <summary>
+    /// The exact set of operations to display, already curated (in progress + operations still
+    /// within their post-completion grace period) by <see cref="Services.FileOpSnackbarService"/>.
+    /// </summary>
+    public IReadOnlyList<FileOperation> OperationsSource
     {
-        get => (ObservableList<FileOperation>)GetValue(OperationsSourceProperty);
+        get => (IReadOnlyList<FileOperation>)GetValue(OperationsSourceProperty);
         set => SetValue(OperationsSourceProperty, value);
     }
 
@@ -66,45 +70,19 @@ public partial class FileOpSnackbarContent : UserControl
     private const int MaxVisibleDevices = 2;
     private const int MaxVisibleOpsPerDevice = 3;
 
-    public ICollectionView? InProgressOperations { get; private set; }
-
-    private static void OnOperationsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-    {
-        var control = (FileOpSnackbarContent)d;
-        if (e.NewValue is ObservableList<FileOperation> source)
-        {
-            var cvs = new CollectionViewSource { Source = source };
-            var view = cvs.View;
-            view.Filter = o => o is FileOperation op && op.Status is FileOperation.OperationStatus.InProgress;
-
-            if (view is ICollectionViewLiveShaping liveShaping)
-            {
-                liveShaping.LiveFilteringProperties.Add(nameof(FileOperation.Status));
-                liveShaping.IsLiveFiltering = true;
-            }
-
-            control.InProgressOperations = view;
-            view.CollectionChanged += (_, _) => control.RefreshLimitedView();
-        }
-        else
-        {
-            control.InProgressOperations = null;
-        }
-
-        control.RefreshLimitedView();
-    }
+    private static void OnOperationsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+        ((FileOpSnackbarContent)d).RefreshLimitedView();
 
     private void RefreshLimitedView()
     {
-        if (InProgressOperations is null)
+        var all = OperationsSource;
+        if (all is null or { Count: 0 })
         {
             GroupsList.ItemsSource = null;
             OverflowCount = 0;
             IsMultiDevice = false;
             return;
         }
-
-        var all = InProgressOperations.OfType<FileOperation>().ToList();
 
         var byDevice = all
             .GroupBy(op => op.Device.Name)

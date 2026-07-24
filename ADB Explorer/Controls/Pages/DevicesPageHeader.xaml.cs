@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using System.Windows.Media.Animation;
 
 namespace ADB_Explorer.Controls.Pages;
 
@@ -48,7 +49,13 @@ public partial class DevicesPageHeader : UserControl
 
     private void RefreshDevicesButton_Click(object sender, RoutedEventArgs e)
     {
-        DevicePollingService.RefreshDevices(CancellationToken.None);
+        Task.Run(() => DevicePollingService.RefreshDevices(CancellationToken.None));
+
+        var clockwise = !Data.RuntimeSettings.IsRTL;
+        var transform = new RotateTransform();
+        RefreshDevicesIcon.RenderTransform = transform;
+        RefreshDevicesIcon.RenderTransformOrigin = new Point(0.5, 0.5);
+        transform.BeginAnimation(RotateTransform.AngleProperty, new DoubleAnimation(clockwise ? 0 : 360, clockwise ? 360 : 0, TimeSpan.FromMilliseconds(200)));
     }
 
     private void UIList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

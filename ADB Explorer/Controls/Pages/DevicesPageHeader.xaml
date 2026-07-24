@@ -140,7 +140,10 @@
                     Click="RefreshDevicesButton_Click"
                     Style="{StaticResource DevicesManualPollingButtonStyle}"
                     ToolTip="{Binding Source={x:Static Member=strings:Resources.S_REFRESH_DEVICES}}">
-                    <ui:FontIcon FontSize="15" Glyph="&#xE72C;" />
+                    <ui:FontIcon
+                        x:Name="RefreshDevicesIcon"
+                        FontSize="15"
+                        Glyph="&#xE72C;" />
                 </Button>
             </Grid>
             <TextBlock

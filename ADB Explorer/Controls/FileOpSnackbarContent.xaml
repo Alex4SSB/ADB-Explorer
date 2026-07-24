@@ -97,8 +97,32 @@
                 IsIndeterminate="True" />
         </DataTemplate>
 
+        <!--  Shown briefly for operations still within their post-completion grace period  -->
+        <DataTemplate x:Key="CompactCompletedProgressTemplate">
+            <ui:FontIcon
+                Width="20"
+                Height="20"
+                Margin="4,0"
+                FontSize="16"
+                Foreground="{DynamicResource NewDeviceAltBorder}"
+                Glyph="&#xF13E;" />
+        </DataTemplate>
+        <DataTemplate x:Key="CompactFailedOrCanceledProgressTemplate">
+            <ui:FontIcon
+                Width="20"
+                Height="20"
+                Margin="4,0"
+                FontSize="16"
+                Foreground="{DynamicResource TrashDriveAltBorder}"
+                Glyph="&#xF13D;" />
+        </DataTemplate>
+
         <helpers:FileOpProgressTemplateSelector
             x:Key="CompactFileOpProgressTemplateSelector"
+            CanceledOpProgressTemplate="{StaticResource CompactFailedOrCanceledProgressTemplate}"
+            CompletedShellProgressTemplate="{StaticResource CompactCompletedProgressTemplate}"
+            CompletedSyncProgressTemplate="{StaticResource CompactCompletedProgressTemplate}"
+            FailedOpProgressTemplate="{StaticResource CompactFailedOrCanceledProgressTemplate}"
             InProgShellProgressTemplate="{StaticResource InProgShellProgressTemplate}"
             InProgSyncProgressTemplate="{StaticResource CompactInProgSyncProgressTemplate}" />
 

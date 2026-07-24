@@ -57,6 +57,14 @@ public abstract class FileOperation : ViewModelBase
         protected set
         {
             if (status == value) return;
+
+            // Recorded before the volatile write below so it's safely visible to any thread that
+            // observes the new Status (e.g. to know when a finished operation's grace period, for
+            // things like a "just completed" snackbar, is up).
+            FinishedAt = value is OperationStatus.InProgress or OperationStatus.Waiting or OperationStatus.None
+                ? null
+                : DateTime.UtcNow;
+
             status = value; // Immediately visible to any thread reading the volatile field
             CancelTokenSource = value is OperationStatus.InProgress or OperationStatus.Waiting ? new() : null;
 
@@ -70,6 +78,20 @@ public abstract class FileOperation : ViewModelBase
             });
         }
     }
+
+    /// <summary>
+    /// When this operation last left the <see cref="OperationStatus.InProgress"/> state (i.e. when
+    /// it completed, failed, or was canceled). <see langword="null"/> while waiting or in progress.
+    /// </summary>
+    public DateTime? FinishedAt { get; private set; }
+
+    /// <summary>
+    /// Whether this operation should appear in the file-operation snackbar: while actively running,
+    /// or for a short grace period after it finishes.
+    /// </summary>
+    public bool IsSnackbarVisible(TimeSpan gracePeriod) =>
+        Status is OperationStatus.InProgress
+        || (FinishedAt is { } finishedAt && DateTime.UtcNow - finishedAt < gracePeriod);
 
     private FileOpProgressViewModel statusInfo = new WaitingOpProgressViewModel();
     public FileOpProgressViewModel StatusInfo
