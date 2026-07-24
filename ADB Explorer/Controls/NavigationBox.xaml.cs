@@ -387,8 +387,11 @@ public partial class NavigationBox : UserControl
 
             var itemsControl = OverflowItemsControl;
             itemsControl.ItemsSource = excessButton.Children;
+            var remainingCrumbs = breadcrumbs[(lastHiddenIndex + 1)..];
 
-            Items = [breadcrumbs[0], excessButton, .. breadcrumbs[(lastHiddenIndex + 1)..]];
+            excessButton.IsLast = remainingCrumbs.Count == 0;
+
+            Items = [breadcrumbs[0], excessButton, .. remainingCrumbs];
         }
     }
 
