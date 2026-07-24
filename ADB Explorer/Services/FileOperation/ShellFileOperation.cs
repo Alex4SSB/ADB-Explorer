@@ -701,42 +701,73 @@ public static class ShellFileOperation
         op.PropertyChanged -= InstallOp_PropertyChanged;
     }
 
-    public static ulong? GetPackagesCount(LogicalDeviceViewModel device)
+    public static ulong? GetPackagesCount(LogicalDeviceViewModel device, bool includeSystem = true)
     {
-        var result = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out string stdout, out _, CancellationToken.None, ["list", "packages", "|", "wc", "-l"]);
+        string[] args = includeSystem
+            ? ["list", "packages", "|", "wc", "-l"]
+            : ["list", "packages", "-3", "|", "wc", "-l"];
+
+        var result = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out string stdout, out _, CancellationToken.None, args);
         if (result != 0 || !ulong.TryParse(stdout, out ulong value))
             return null;
 
         return value;
     }
 
+    private static readonly string PKG_LIST_SYSTEM = $"{AdbExplorerConst.ADB_UNIT_SEP}SYS{AdbExplorerConst.ADB_UNIT_SEP}";
+    private static readonly string PKG_LIST_USER = $"{AdbExplorerConst.ADB_UNIT_SEP}USER{AdbExplorerConst.ADB_UNIT_SEP}";
+
     public static ObservableList<Package> GetPackages(LogicalDeviceViewModel device, bool includeSystem = true, bool optionalParams = true)
     {
         // More package-specific info can be acquired using dumpsys package [package_name]
 
+        var optional = optionalParams ? " -U --show-versioncode" : "";
+        var userCmd = $"pm list packages -3 -f{optional}";
+        var script = includeSystem
+            ? string.Join("; ",
+                $"echo {PKG_LIST_SYSTEM}",
+                $"pm list packages -s -f{optional}",
+                $"echo {AdbExplorerConst.ADB_FIELD_SEP}",
+                $"echo {PKG_LIST_USER}",
+                userCmd,
+                $"echo {AdbExplorerConst.ADB_FIELD_SEP}")
+            : userCmd;
+
+        var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, script, out string stdout, out _, CancellationToken.None);
+        if (exitCode != 0 || string.IsNullOrWhiteSpace(stdout))
+            return [];
+
         ObservableList<Package> packages = [];
-        string stdout = "";
-        string[] args = ["list", "packages", "-s", "-f"];
-        if (optionalParams)
-            args = [.. args, "-U", "--show-versioncode"];
 
         if (includeSystem)
         {
-            // get system packages
-            var systemExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, CancellationToken.None, args);
-
-            if (systemExitCode == 0)
-                packages.AddRange(stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Select(pkg => Package.New(pkg, Package.PackageType.System)));
+            packages.AddRange(ParsePackageSection(ExtractPackageListSection(stdout, PKG_LIST_SYSTEM), Package.PackageType.System));
+            packages.AddRange(ParsePackageSection(ExtractPackageListSection(stdout, PKG_LIST_USER), Package.PackageType.User));
+        }
+        else
+        {
+            packages.AddRange(ParsePackageSection(stdout, Package.PackageType.User));
         }
 
-        args[2] = "-3";
-        // get user packages
-        var userExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, CancellationToken.None, args);
-
-        if (userExitCode == 0)
-            packages.AddRange(stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Select(pkg => Package.New(pkg, Package.PackageType.User)));
-
         return packages;
+    }
+
+    private static IEnumerable<Package> ParsePackageSection(string section, Package.PackageType type)
+        => section.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries)
+                  .Select(pkg => Package.New(pkg, type))
+                  .OfType<Package>();
+
+    private static string ExtractPackageListSection(string stdout, string label)
+    {
+        var start = stdout.IndexOf(label, StringComparison.Ordinal);
+        if (start < 0)
+            return "";
+
+        var end = stdout.IndexOf(AdbExplorerConst.ADB_FIELD_SEP, start + label.Length);
+        if (end < 0)
+            end = stdout.Length;
+
+        return stdout[(start + label.Length)..end].Trim(AdbExplorerConst.ADB_FIELD_SEP, ' ', '\r', '\n');
     }
 
     public static void ChangeDateFromName(LogicalDeviceViewModel device, IEnumerable<FileClass> items, Dispatcher dispatcher)

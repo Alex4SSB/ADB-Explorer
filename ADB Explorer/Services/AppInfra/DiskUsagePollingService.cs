@@ -26,7 +26,7 @@ public class DiskUsagePollingService(IServiceProvider serviceProvider) : Backgro
         {
             try
             {
-                await Task.Delay(200, stoppingToken);
+                await Task.Delay(AdbExplorerConst.DISK_USAGE_UPDATE_INTERVAL, stoppingToken);
 
                 _mainWindowVM ??= serviceProvider.GetRequiredService<MainWindowViewModel>();
 

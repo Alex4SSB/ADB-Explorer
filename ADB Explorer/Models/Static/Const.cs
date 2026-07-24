@@ -133,6 +133,7 @@ public static class AdbExplorerConst
     public static readonly TimeSpan EXPLORER_NAV_DELAY = TimeSpan.FromMilliseconds(800);
     public static readonly TimeSpan INIT_NAV_HIDE_FILTER_DELAY = TimeSpan.FromMilliseconds(1000);
 
+    public static readonly TimeSpan DISK_USAGE_UPDATE_INTERVAL = TimeSpan.FromSeconds(1);
     public const long DISK_READ_THRESHOLD = 500000;
     public const long DISK_WRITE_THRESHOLD = 500000;
     public const long MAX_DISK_DISPLAY_RATE = 1000000000;

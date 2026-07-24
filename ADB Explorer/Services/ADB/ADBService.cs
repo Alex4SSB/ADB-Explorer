@@ -788,7 +788,15 @@ public partial class ADBService
 
     // First partition of MMC block device 0 / 1
     private static readonly string[] MMC_BLOCK_DEVICES = ["/dev/block/mmcblk0p1", "/dev/block/mmcblk1p1"];
-    private static readonly string[] EMULATED_DRIVES_GREP = ["|", "grep", "-E", "'/mnt/media_rw/|/storage/'"];
+
+    private static readonly string DRIVE_POLL_ROOT = $"{ADB_UNIT_SEP}ROOT{ADB_UNIT_SEP}";
+    private static readonly string DRIVE_POLL_SDCARD = $"{ADB_UNIT_SEP}SDCARD{ADB_UNIT_SEP}";
+    private static readonly string DRIVE_POLL_EXT = $"{ADB_UNIT_SEP}EXT{ADB_UNIT_SEP}";
+    private static readonly string DRIVE_POLL_TEMP = $"{ADB_UNIT_SEP}TEMP{ADB_UNIT_SEP}";
+    private static readonly string DRIVE_POLL_PKG = $"{ADB_UNIT_SEP}PKG{ADB_UNIT_SEP}";
+    private static readonly string DRIVE_POLL_TRASH = $"{ADB_UNIT_SEP}TRASH{ADB_UNIT_SEP}";
+    private static readonly string DRIVE_POLL_TRASH_EXISTS = $"{ADB_UNIT_SEP}TRASH_EXISTS{ADB_UNIT_SEP}";
+    private static readonly string DRIVE_POLL_APK = $"{ADB_UNIT_SEP}APK{ADB_UNIT_SEP}";
 
     private static readonly string[] STAT_LINKMODE_ARGS = ["-c", $"%n{ADB_FIELD_SEP}%f", "2>&1"];
 
@@ -1100,27 +1108,86 @@ public partial class ADBService
         return stdout.TrimEnd(LINE_SEPARATORS);
     }
 
-    public static List<DriveSnapshot> GetDrives(string deviceId, DeviceType deviceType, CancellationToken cancellationToken)
+    /// <summary>
+    /// Polls drive view data in a single <c>adb shell</c> round trip (df + optional item counts).
+    /// </summary>
+    public static DrivePollResult? GetDrives(
+        string deviceId,
+        DeviceType deviceType,
+        CancellationToken cancellationToken,
+        bool countRecycle = false,
+        bool countPackages = false,
+        bool countInstallers = false,
+        bool includeSystemPackages = true)
+    {
+        var script = BuildDrivePollScript(countRecycle, countPackages, countInstallers, includeSystemPackages);
+        int exitCode = ExecuteDeviceAdbShellCommand(deviceId, script, out string stdout, out _, cancellationToken);
+        if (exitCode != 0 && string.IsNullOrWhiteSpace(stdout))
+            return null;
+
+        return ParseDrivePollOutput(stdout, deviceType, countRecycle, countPackages, countInstallers);
+    }
+
+    private static string BuildDrivePollScript(bool countRecycle, bool countPackages, bool countInstallers, bool includeSystemPackages)
+    {
+        List<(string Mark, string Command)> sections =
+        [
+            (DRIVE_POLL_ROOT, "df /"),
+            (DRIVE_POLL_SDCARD, "df /sdcard"),
+            (DRIVE_POLL_EXT, "df | grep -E '/mnt/media_rw/|/storage/'"),
+            (DRIVE_POLL_TEMP, $"df {TEMP_PATH}"),
+        ];
+
+        if (countPackages)
+        {
+            // -3 = third-party only; omit for all packages (matches GetPackages includeSystem).
+            var listPackages = includeSystemPackages ? "pm list packages" : "pm list packages -3";
+            sections.Add((DRIVE_POLL_PKG, $"{listPackages} | wc -l"));
+        }
+
+        if (countRecycle)
+        {
+            sections.Add((DRIVE_POLL_TRASH, BuildFindCountCommand(RECYCLE_PATH, excludeNames: ["*" + RECYCLE_INDEX_SUFFIX])));
+            sections.Add((DRIVE_POLL_TRASH_EXISTS, $"[ -d {EscapeAdbShellString(RECYCLE_PATH)} ] && echo 1 || echo 0"));
+        }
+
+        if (countInstallers)
+            sections.Add((DRIVE_POLL_APK, BuildFindCountCommand(TEMP_PATH, includeNames: INSTALL_APK.Select(name => "*" + name))));
+
+        List<string> parts = [];
+        for (var i = 0; i < sections.Count; i++)
+        {
+            var (mark, command) = sections[i];
+            // First mark alone; later boundaries merge separator + next mark into one echo.
+            parts.Add(i == 0 ? $"echo {mark}" : $"echo {ADB_FIELD_SEP}{mark}");
+            parts.Add(command);
+        }
+
+        parts.Add($"echo {ADB_FIELD_SEP}");
+        return string.Join("; ", parts);
+    }
+
+    private static string BuildFindCountCommand(string path, IEnumerable<string> includeNames = null, IEnumerable<string> excludeNames = null)
+        => "find " + string.Join(' ', PrepFindArgs(path, includeNames, excludeNames, countOnly: true));
+
+    internal static DrivePollResult ParseDrivePollOutput(
+        string stdout,
+        DeviceType deviceType,
+        bool countRecycle,
+        bool countPackages,
+        bool countInstallers)
     {
         List<DriveSnapshot> drives = [];
 
-        // unified df doesn't seem to shorten execution time
+        var root = ParseDriveSection(ExtractDrivePollSection(stdout, DRIVE_POLL_ROOT), deviceType, RE_EMULATED_STORAGE_SINGLE(), "/");
+        if (root.Count > 0)
+            drives.Add(root[0]);
 
-        var root = ReadDrives(deviceId, deviceType, RE_EMULATED_STORAGE_SINGLE(), cancellationToken, "/");
-        if (root is null)
-            return null;
-        else if (root.Any())
-            drives.Add(root.First());
+        var intStorage = ParseDriveSection(ExtractDrivePollSection(stdout, DRIVE_POLL_SDCARD), deviceType, RE_EMULATED_STORAGE_SINGLE(), "");
+        if (intStorage.Count > 0)
+            drives.Add(intStorage[0]);
 
-        var intStorage = ReadDrives(deviceId, deviceType, RE_EMULATED_STORAGE_SINGLE(), cancellationToken, "/sdcard");
-        if (intStorage is null)
-            return drives;
-        if (intStorage.Any())
-            drives.Add(intStorage.First());
-
-        var extStorage = ReadDrives(deviceId, deviceType, RE_EMULATED_ONLY(), cancellationToken, EMULATED_DRIVES_GREP);
-        if (extStorage is null)
-            return drives;
+        var extStorage = ParseDriveSection(ExtractDrivePollSection(stdout, DRIVE_POLL_EXT), deviceType, RE_EMULATED_ONLY(), "");
 
         Func<DriveSnapshot, bool> predicate = drives.Any(d => d.Type is AbstractDrive.DriveType.Internal)
             ? d => d.Type is not AbstractDrive.DriveType.Internal and not AbstractDrive.DriveType.Root
@@ -1128,9 +1195,9 @@ public partial class ADBService
 
         drives.AddRange(extStorage.Where(predicate));
 
-        var tempStorage = ReadDrives(deviceId, deviceType, RE_EMULATED_STORAGE_SINGLE(), cancellationToken, TEMP_PATH);
-        if (tempStorage?.Any() is true)
-            drives.Add(tempStorage.First() with { Type = AbstractDrive.DriveType.Temp });
+        var tempStorage = ParseDriveSection(ExtractDrivePollSection(stdout, DRIVE_POLL_TEMP), deviceType, RE_EMULATED_STORAGE_SINGLE(), "");
+        if (tempStorage.Count > 0)
+            drives.Add(tempStorage[0] with { Type = AbstractDrive.DriveType.Temp });
 
         if (drives.All(d => d.Type != AbstractDrive.DriveType.Internal))
             drives.Insert(0, new(Path: "/sdcard", Type: AbstractDrive.DriveType.Internal, Size: "", Used: "", Available: "", UsageP: -1, FileSystem: "", IsEmulator: false));
@@ -1138,16 +1205,54 @@ public partial class ADBService
         if (drives.All(d => d.Type != AbstractDrive.DriveType.Root))
             drives.Insert(0, new(Path: "/", Type: AbstractDrive.DriveType.Root, Size: "", Used: "", Available: "", UsageP: -1, FileSystem: "", IsEmulator: false));
 
-        return drives;
+        long? recycleCount = null;
+        ulong? packagesCount = null;
+        ulong? installersCount = null;
+
+        if (countRecycle)
+        {
+            var rawCount = ParseUlongSection(ExtractDrivePollSection(stdout, DRIVE_POLL_TRASH));
+            var trashExists = ExtractDrivePollSection(stdout, DRIVE_POLL_TRASH_EXISTS).Trim() == "1";
+            recycleCount = rawCount < 1
+                ? trashExists ? 0 : -1
+                : (long)rawCount;
+        }
+
+        if (countPackages)
+            packagesCount = ParseUlongSection(ExtractDrivePollSection(stdout, DRIVE_POLL_PKG));
+
+        if (countInstallers)
+            installersCount = ParseUlongSection(ExtractDrivePollSection(stdout, DRIVE_POLL_APK));
+
+        return new(drives, recycleCount, packagesCount, installersCount);
     }
 
-    private static IEnumerable<DriveSnapshot> ReadDrives(string deviceId, DeviceType deviceType, Regex re, CancellationToken cancellationToken, params string[] args)
+    private static List<DriveSnapshot> ParseDriveSection(string section, DeviceType deviceType, Regex re, string forcePath)
     {
-        int exitCode = ExecuteDeviceAdbShellCommand(deviceId, "df", out string stdout, out string stderr, cancellationToken, args);
-        if (exitCode != 0)
-            return null;
+        if (string.IsNullOrWhiteSpace(section))
+            return [];
 
-        return re.Matches(stdout).Select(m => DriveSnapshot.Parse(m.Groups, isEmulator: deviceType is DeviceType.Emulator, forcePath: args[0] == "/" ? "/" : ""));
+        // RE_EMULATED_* require a trailing newline on each matched line.
+        if (!section.EndsWith('\n'))
+            section += "\n";
+
+        return [.. re.Matches(section).Select(m => DriveSnapshot.Parse(m.Groups, isEmulator: deviceType is DeviceType.Emulator, forcePath: forcePath))];
+    }
+
+    private static ulong ParseUlongSection(string section)
+        => ulong.TryParse(section.Trim(LINE_SEPARATORS), out var value) ? value : 0;
+
+    private static string ExtractDrivePollSection(string stdout, string label)
+    {
+        var start = stdout.IndexOf(label, StringComparison.Ordinal);
+        if (start < 0)
+            return "";
+
+        var end = stdout.IndexOf(ADB_FIELD_SEP, start + label.Length);
+        if (end < 0)
+            end = stdout.Length;
+
+        return stdout[(start + label.Length)..end].Trim(ADB_FIELD_SEP, ' ', '\r', '\n');
     }
 
     private const int BATTERY_PROPERTY_CURRENT_NOW = 2;
@@ -1373,6 +1478,12 @@ public readonly record struct DeviceSnapshot(
 
     public static implicit operator bool(DeviceSnapshot s) => !string.IsNullOrEmpty(s.ID);
 }
+
+public readonly record struct DrivePollResult(
+    List<DriveSnapshot> Drives,
+    long? RecycleCount = null,
+    ulong? PackagesCount = null,
+    ulong? InstallersCount = null);
 
 public readonly record struct DriveSnapshot(
     string Path,

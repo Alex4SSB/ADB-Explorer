@@ -755,43 +755,73 @@ internal static class FileActionLogic
             if (Data.DevicesObject.Current is null)
                 return null;
 
-            var drives = ADBService.GetDrives(Data.DevicesObject.Current.ID, Data.DevicesObject.Current.Type, cancellationToken);
-
-            if (Data.DevicesObject.Current.Type is DeviceType.Recovery)
+            bool countRecycle = false, countPackages = false, countInstallers = false;
+            if (Data.DevicesObject.Current.Type is not DeviceType.Recovery)
             {
-                foreach (var item in Data.DevicesObject.Current.Drives.OfType<VirtualDriveViewModel>())
-                {
-                    item.SetItemsCount(item.Type is AbstractDrive.DriveType.Package ? -1 : null);
-                }
-            }
-            else
-            {
-                if (Data.Settings.EnableRecycle && Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Trash))
-                    TrashHelper.UpdateRecycledItemsCount(cancellationToken);
-
-                if (Data.Settings.EnableApk && Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Temp))
-                    UpdateInstallersCount(cancellationToken);
-
-                if (Data.Settings.EnableApk && Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Package))
-                    UpdatePackagesCount(cancellationToken);
+                countRecycle = Data.Settings.EnableRecycle && Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Trash);
+                countInstallers = Data.Settings.EnableApk && Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Temp);
+                countPackages = Data.Settings.EnableApk && Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Package);
             }
 
-            return drives;
-        });
+            return ADBService.GetDrives(
+                Data.DevicesObject.Current.ID,
+                Data.DevicesObject.Current.Type,
+                cancellationToken,
+                countRecycle,
+                countPackages,
+                countInstallers,
+                Data.Settings.ShowSystemPackages);
+        }, cancellationToken);
+
         driveTask.ContinueWith((t) =>
         {
             if (t.IsCanceled || t.Result is null)
                 return;
 
+            var result = t.Result.Value;
             App.SafeInvoke(async () =>
             {
-                if (App.AppDispatcher is not null && await Data.DevicesObject.Current?.UpdateDrives(await t, App.AppDispatcher, asyncClassify))
+                if (Data.DevicesObject.Current?.Type is DeviceType.Recovery)
+                {
+                    foreach (var item in Data.DevicesObject.Current.Drives.OfType<VirtualDriveViewModel>())
+                        item.SetItemsCount(item.Type is AbstractDrive.DriveType.Package ? -1 : null);
+                }
+                else
+                {
+                    ApplyVirtualDriveCounts(result);
+                }
+
+                if (App.AppDispatcher is not null && await Data.DevicesObject.Current?.UpdateDrives(result.Drives, App.AppDispatcher, asyncClassify))
                 {
                     Data.RuntimeSettings.FilterDrives = true;
                     FolderHelper.CombineDisplayNames();
                 }
             });
-        });
+        }, cancellationToken);
+    }
+
+    private static void ApplyVirtualDriveCounts(DrivePollResult result)
+    {
+        if (Data.DevicesObject.Current is null)
+            return;
+
+        if (result.RecycleCount is long recycleCount)
+        {
+            var trash = Data.DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Trash);
+            ((VirtualDriveViewModel)trash)?.SetItemsCount(recycleCount);
+        }
+
+        if (result.InstallersCount is ulong installersCount)
+        {
+            var temp = Data.DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Temp);
+            ((VirtualDriveViewModel)temp)?.SetItemsCount((long)installersCount);
+        }
+
+        if (result.PackagesCount is ulong packagesCount)
+        {
+            var package = Data.DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Package);
+            ((VirtualDriveViewModel)package)?.SetItemsCount((int)packagesCount);
+        }
     }
 
     public static void UpdateInstallersCount(CancellationToken cancellationToken = default)
@@ -804,12 +834,12 @@ internal static class FileActionLogic
                 var temp = Data.DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Temp);
                 ((VirtualDriveViewModel)temp)?.SetItemsCount((long)t.Result);
             }
-        }));
+        }), cancellationToken);
     }
 
     public static void UpdatePackagesCount(CancellationToken cancellationToken = default)
     {
-        var packageTask = Task.Run(() => ShellFileOperation.GetPackagesCount(Data.DevicesObject.Current), cancellationToken);
+        var packageTask = Task.Run(() => ShellFileOperation.GetPackagesCount(Data.DevicesObject.Current, Data.Settings.ShowSystemPackages), cancellationToken);
 
         packageTask.ContinueWith((t) =>
         {
