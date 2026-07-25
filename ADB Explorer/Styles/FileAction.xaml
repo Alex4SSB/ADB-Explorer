@@ -342,6 +342,11 @@
         <Setter Property="InputGestureText" Value="{Binding Action.GestureString}" />
         <Setter Property="Icon" Value="{Binding IconContent}" />
         <Setter Property="ToolTip" Value="{StaticResource SubMenuInfoTooltip}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Info}" Value="{x:Null}">
+                <Setter Property="ToolTip" Value="{x:Null}" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="DummySubMenuStyle"
