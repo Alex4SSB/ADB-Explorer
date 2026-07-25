@@ -164,12 +164,10 @@ internal static class ExplorerContextMenu
         });
     }
 
-    private static FileClass enterFolder = new("/EnterFolder", "EnterFolder", AbstractFile.FileType.EnterFolder);
-
     public static ObservableList<SubMenu> List { get; } = [
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Enter),
-            new(enterFolder.Icon, 16)),
+            new("\uE838", 16)),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Pull),
             new(new PullIcon())),

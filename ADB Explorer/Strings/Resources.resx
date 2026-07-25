@@ -649,7 +649,7 @@ Select Custom to use a location that will not be removed on uninstall. The custo
     <comment>The placeholder of the textbox used to search through the settings</comment>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
-    <value>Exit Search</value>
+    <value>Close search</value>
     <comment>The tooltip of the button used to hide the settings search textbox</comment>
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
@@ -744,6 +744,10 @@ Cancel All Running</value>
   <data name="S_MENU_REFRESH" xml:space="preserve">
     <value>Refresh</value>
     <comment>The menu item used to refresh the current location in the file browser</comment>
+  </data>
+  <data name="S_MENU_STOP_LOADING" xml:space="preserve">
+    <value>Stop loading {0}</value>
+    <comment>Refresh menu label while explorer search is streaming results; {0} is the searched folder display name or path</comment>
   </data>
   <data name="S_MENU_COPY" xml:space="preserve">
     <value>Copy</value>
@@ -854,7 +858,7 @@ Cancel All Running</value>
     <comment>The notification displayed when the package view is empty</comment>
   </data>
   <data name="S_EMPTY_FILTER" xml:space="preserve">
-    <value>No items match current filter.</value>
+    <value>No items match your search.</value>
     <comment>The notification displayed when a non empty folder / package view is filtered such that no items match</comment>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
@@ -2115,5 +2119,32 @@ The checks attempt to prevent an unsuspecting user from launching a possibly mal
 • Executable must be Authenticode-signed by Google or match pre-defined SHA-256 hash list
 • Must return a legible version string when executed with --version</value>
     <comment>Should be read like: "disables ADB path checks, and disables ADB executable checks"</comment>
+  </data>
+  <data name="S_SEARCH_OPTIONS" xml:space="preserve">
+    <value>Search options</value>
+    <comment>The menu that controls search options</comment>
+  </data>
+  <data name="S_SEARCH_RESULTS_IN" xml:space="preserve">
+    <value>Search Results in {0}</value>
+    <comment>Breadcrumb label for explorer search mode; {0} is the folder being searched</comment>
+  </data>
+  <data name="S_SEARCH_ALL_SUBFOLDERS" xml:space="preserve">
+    <value>All subfolders</value>
+    <comment>The search option for recursive search</comment>
+  </data>
+  <data name="S_SEARCH_CURRENT_FOLDER" xml:space="preserve">
+    <value>Current folder</value>
+    <comment>The search option for filtering</comment>
+  </data>
+  <data name="S_SEARCH" xml:space="preserve">
+    <value>Search</value>
+    <comment>The placeholder for the searchbox</comment>
+  </data>
+  <data name="S_SEARCH_OPTIONS_INFO" xml:space="preserve">
+    <value>Advanced search options and filtering.</value>
+    <comment>Search options tooltip</comment>
+  </data>
+  <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
+    <value>Exit the search results mode.</value>
   </data>
 </root>

@@ -856,6 +856,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Exit the search results mode..
+        /// </summary>
+        public static string S_CLOSE_SEARCH_INFO {
+            get {
+                return ResourceManager.GetString("S_CLOSE_SEARCH_INFO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Collapse All.
         /// </summary>
         public static string S_COLLAPSE_ALL {
@@ -1652,7 +1661,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No items match current filter..
+        ///   Looks up a localized string similar to No items match your search..
         /// </summary>
         public static string S_EMPTY_FILTER {
             get {
@@ -1715,7 +1724,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Exit Search.
+        ///   Looks up a localized string similar to Close search.
         /// </summary>
         public static string S_EXIT_SEARCH {
             get {
@@ -2546,6 +2555,15 @@ namespace ADB_Explorer.Strings {
         public static string S_MENU_SELECT_ALL {
             get {
                 return ResourceManager.GetString("S_MENU_SELECT_ALL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop loading {0}.
+        /// </summary>
+        public static string S_MENU_STOP_LOADING {
+            get {
+                return ResourceManager.GetString("S_MENU_STOP_LOADING", resourceCulture);
             }
         }
         
@@ -3537,6 +3555,60 @@ namespace ADB_Explorer.Strings {
         public static string S_SAVED_LOCATIONS {
             get {
                 return ResourceManager.GetString("S_SAVED_LOCATIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search.
+        /// </summary>
+        public static string S_SEARCH {
+            get {
+                return ResourceManager.GetString("S_SEARCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All subfolders.
+        /// </summary>
+        public static string S_SEARCH_ALL_SUBFOLDERS {
+            get {
+                return ResourceManager.GetString("S_SEARCH_ALL_SUBFOLDERS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Current folder.
+        /// </summary>
+        public static string S_SEARCH_CURRENT_FOLDER {
+            get {
+                return ResourceManager.GetString("S_SEARCH_CURRENT_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search options.
+        /// </summary>
+        public static string S_SEARCH_OPTIONS {
+            get {
+                return ResourceManager.GetString("S_SEARCH_OPTIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Advanced search options and filtering..
+        /// </summary>
+        public static string S_SEARCH_OPTIONS_INFO {
+            get {
+                return ResourceManager.GetString("S_SEARCH_OPTIONS_INFO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search Results in {0}.
+        /// </summary>
+        public static string S_SEARCH_RESULTS_IN {
+            get {
+                return ResourceManager.GetString("S_SEARCH_RESULTS_IN", resourceCulture);
             }
         }
         

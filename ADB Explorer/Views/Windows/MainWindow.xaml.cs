@@ -15,6 +15,9 @@ namespace ADB_Explorer.Views.Windows;
 
 public partial class MainWindow : INavigationWindow
 {
+    private const double LaunchScreenWidthScale = 0.43;
+    private const double LaunchScreenHeightScale = 0.6;
+
     private readonly DragWindow dw = new();
 
     public MainWindowViewModel ViewModel { get; }
@@ -32,6 +35,7 @@ public partial class MainWindow : INavigationWindow
         Initialize();
 
         InitializeComponent();
+        ApplyLaunchWindowSize();
         AppActions.Bindings.ForEach(binding => InputBindings.Add(binding));
         SetPageService(navigationViewPageProvider);
         contentDialogService.SetDialogHost(RootContentDialog);
@@ -56,6 +60,15 @@ public partial class MainWindow : INavigationWindow
         {
             Data.Settings.WindowMaximized = WindowState is WindowState.Maximized;
         };
+    }
+
+    private void ApplyLaunchWindowSize()
+    {
+        if (Data.Settings.WindowMaximized)
+            return;
+
+        Width = SystemParameters.PrimaryScreenWidth * LaunchScreenWidthScale;
+        Height = SystemParameters.PrimaryScreenHeight * LaunchScreenHeightScale;
     }
 
     private bool _adbStateHandlerAttached;

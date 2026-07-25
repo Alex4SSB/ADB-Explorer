@@ -65,6 +65,11 @@
                     <Setter Property="Icon" Value="{StaticResource ThumbCheckedIcon}" />
                     <Setter Property="Command" Value="{Binding Action.Command}" />
                     <Setter Property="ToolTip" Value="{StaticResource InfoTooltip}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Info}" Value="{x:Null}">
+                            <Setter Property="ToolTip" Value="{x:Null}" />
+                        </DataTrigger>
+                    </Style.Triggers>
                 </Style>
             </local:AdbMenuItem.ItemContainerStyle>
             <local:AdbMenuItem.ItemTemplate>

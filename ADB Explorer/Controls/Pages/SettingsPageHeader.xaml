@@ -515,7 +515,7 @@
                                     <Setter Property="Glyph" Value="&#xE721;" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding SortedView}" Value="True">
-                                            <Setter Property="Glyph" Value="&#xE711;" />
+                                            <Setter Property="Glyph" Value="&#xF78A;" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>

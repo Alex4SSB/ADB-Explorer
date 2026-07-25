@@ -96,6 +96,7 @@ public partial class ThumbsSizeSelector : UserControl
             Name = name;
             Icon = SidePaneModeIcons[mode];
             Action = new(IsPreviewAllowed, () => Data.Settings.SidePane = mode);
+
             Data.Settings.PropertyChanged += (_, e) =>
             {
                 if (e.PropertyName == nameof(AppSettings.SidePane))
@@ -105,6 +106,7 @@ public partial class ThumbsSizeSelector : UserControl
                         : mode == DetailsPane.SidePaneMode.Details;
                 }
             };
+
             Data.FileActions.PropertyChanged += (_, e) =>
             {
                 if (e.PropertyName is nameof(FileActionsEnable.IsDriveViewVisible) or nameof(FileActionsEnable.IsAppDrive) or nameof(FileActionsEnable.IsRecycleBin))
@@ -133,6 +135,7 @@ public partial class ThumbsSizeSelector : UserControl
             Name = name;
             Icon = Icons[size];
             Action = new(() => Data.Settings.ThumbsMode > AppSettings.ThumbnailMode.Off, () => selector.SetThumbnailSize(size));
+
             selector.PropertyChanged += (_, e) =>
             {
                 if (e.PropertyName == nameof(ThumbnailSize))
