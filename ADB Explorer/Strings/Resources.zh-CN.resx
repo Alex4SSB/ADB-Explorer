@@ -139,7 +139,7 @@
     <value>重置应用设置</value>
   </data>
   <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
-    <value>新版本</value>
+    <value>应用新版本</value>
   </data>
   <data name="S_NAV_ERR_TITLE" xml:space="preserve">
     <value>路径导航错误</value>
@@ -172,7 +172,7 @@
     <value>配对错误</value>
   </data>
   <data name="S_ROOT_FORBID" xml:space="preserve">
-    <value>无法在所选设备上启用 Root 权限。</value>
+    <value>无法在选中的设备上启用 Root 权限。</value>
   </data>
   <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
     <value>Root 权限</value>
@@ -184,10 +184,10 @@
     <value>永久删除</value>
   </data>
   <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
-    <value>创建错误</value>
+    <value>创建文件/文件夹错误</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>创建错误</value>
+    <value>恢复文件/文件夹错误</value>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>确认卸载</value>
