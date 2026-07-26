@@ -69,10 +69,17 @@
                     </TextBlock>
                     <ui:Button
                         Grid.Column="2"
+                        Appearance="Caution"
                         Command="{Binding RemoveCommand.Command}"
                         Style="{StaticResource RestartAppButtonStyle}"
                         ToolTip="{Binding Source={x:Static Member=strings:Resources.S_REM_HIST_DEV}}">
-                        <ui:FontIcon Glyph="&#xE74D;" />
+                        <ui:FontIcon Glyph="&#xE74D;">
+                            <ui:FontIcon.Style>
+                                <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
+                                    <Setter Property="Foreground" Value="Black" />
+                                </Style>
+                            </ui:FontIcon.Style>
+                        </ui:FontIcon>
                     </ui:Button>
                 </Grid>
             </Border>

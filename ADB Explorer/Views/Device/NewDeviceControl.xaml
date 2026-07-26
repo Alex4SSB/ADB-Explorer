@@ -10,7 +10,6 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:NewDeviceViewModel}"
-    d:Width="200"
     mc:Ignorable="d">
     <ui:CardControl>
         <ui:CardControl.Style>
@@ -53,7 +52,13 @@
                     Command="{Binding ClearCommand.Command}"
                     Style="{StaticResource RestartAppButtonStyle}"
                     ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_CLEAR_ALL}}">
-                    <ui:FontIcon Glyph="&#xE711;" />
+                    <ui:FontIcon Glyph="&#xF78A;">
+                        <ui:FontIcon.Style>
+                            <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
+                                <Setter Property="Foreground" Value="Black" />
+                            </Style>
+                        </ui:FontIcon.Style>
+                    </ui:FontIcon>
                 </ui:Button>
             </Grid>
         </ui:CardControl.Header>
