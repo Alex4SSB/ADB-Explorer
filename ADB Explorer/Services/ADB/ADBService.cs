@@ -699,10 +699,6 @@ public partial class ADBService
                 // If not found, verify the certificate is valid and is from Google. ADB is signed since 34.0.5
                 if (!isHashValid)
                     isHashValid = Security.VerifyAuthenticode(adbPath, "Google LLC");
-
-                // As a last resort, check against the list retrieved from the repository (which is updated more frequently)
-                if (!isHashValid)
-                    isHashValid = RepoHashList.Contains(adbSHA);
             }
 
             if (!isHashValid)

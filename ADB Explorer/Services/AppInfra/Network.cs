@@ -169,15 +169,6 @@ public static class Network
         }
     }
 
-    public static async Task<IEnumerable<string>> GetAdbVersionListAsync()
-    {
-        var response = await GetRequestAsync(Resources.Links.REPO_ADB_VER_LIST).ConfigureAwait(false);
-        if (response is null)
-            return null;
-
-        return AdbVersions.ParseFromVersionList(response).ToArray();
-    }
-
     public static async Task<AppReleaseInfo?> LatestAppReleaseAsync()
     {
         var response = await GetRequestAsync(Resources.Links.REPO_RELEASES_URL).ConfigureAwait(false);

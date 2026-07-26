@@ -2,18 +2,6 @@ namespace ADB_Explorer.Models;
 
 public static class AdbVersions
 {
-    public static IEnumerable<string> ParseFromVersionList(string versionList)
-    {
-        var matches = AdbRegEx.RE_ADB_LIST_HASH().Matches(versionList);
-
-        foreach (Match match in matches)
-        {
-            if (match.Success)
-            {
-                yield return match.Groups["Hash"].Value.ToUpper();
-            }
-        }
-    }
 
     public static readonly List<string> HashList = new()
     {
