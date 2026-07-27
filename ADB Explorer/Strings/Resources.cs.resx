@@ -175,7 +175,7 @@
     <value>Na vybraném zařízení nelze povolit přístup k root právům.</value>
   </data>
   <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
-    <value>Root přístup</value>
+    <value>Přístup root</value>
   </data>
   <data name="S_DEL_CONF_TITLE" xml:space="preserve">
     <value>Potvrdit smazání</value>
@@ -887,7 +887,7 @@ Zrušit všechny probíhající operace</value>
     <comment>The tooltip displayed when an Android device supports root access</comment>
   </data>
   <data name="S_RECOVERY_MODE" xml:space="preserve">
-    <value>Recovery</value>
+    <value>Režim obnovení</value>
     <comment>The Android recovery mode</comment>
   </data>
   <data name="S_BAT_VOLT" xml:space="preserve">
@@ -1072,7 +1072,7 @@ Zrušit všechny probíhající operace</value>
     <comment>The drive displaying the installed applications</comment>
   </data>
   <data name="S_DRIVE_SD" xml:space="preserve">
-    <value>µSD Card</value>
+    <value>Karta microSD</value>
     <comment>A micro SD card drive</comment>
   </data>
   <data name="S_DRIVE_OTG" xml:space="preserve">
