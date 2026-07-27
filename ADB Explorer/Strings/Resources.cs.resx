@@ -121,7 +121,7 @@
     <value>Ikona(y) robota Android</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
-    <value>The Android robot is reproduced or modified from work created and shared by Google and used according to terms described in the Creative Commons 3.0 Attribution License.</value>
+    <value>Robot Android je reprodukcí nebo úpravou díla vytvořeného a sdíleného společností Google a používá se podle podmínek licence Creative Commons Attribution 3.0.</value>
   </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>Ikona APK je chráněna licencí Apache License, verze 2.0.</value>
@@ -160,7 +160,7 @@
     <value>Smazat</value>
   </data>
   <data name="S_DEST_ERR" xml:space="preserve">
-    <value>Destination Path Error</value>
+    <value>Chyba cílové cesty</value>
   </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>Chyba připojení</value>
@@ -235,7 +235,7 @@
     <value>Pull</value>
   </data>
   <data name="S_PULL_ACTION_LINK" xml:space="preserve">
-    <value>Pull (Link Target)</value>
+    <value>Stáhnout (cíl odkazu)</value>
   </data>
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Obnova ze zálohy</value>
@@ -244,24 +244,24 @@
     <value>List Directory Error</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
-    <value>Pull To Windows Drive Root</value>
+    <value>Stáhnout do kořene jednotky Windows</value>
   </data>
   <data name="S_NEW_VERSION_MSG" xml:space="preserve">
-    <value>Welcome to a new ADB Explorer version!
-The release notes are available on GitHub.</value>
+    <value>Vítejte v nové verzi ADB Exploreru!
+Poznámky k vydání jsou dostupné na GitHubu.</value>
   </data>
   <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
-    <value>Drive restrictions:</value>
+    <value>Omezení jednotky:</value>
     <comment>Header for the drive restrictions tooltip in the navigation bar</comment>
   </data>
   <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
-    <value>• Read-only filesystem</value>
+    <value>• Systém souborů jen pro čtení</value>
   </data>
   <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
-    <value>• Symbolic links are not supported
-• File names cannot contain " * / : &lt; &gt; ? \ |
-• File names are case insensitive
-• Installation of APKs is not supported</value>
+    <value>• Symbolické odkazy nejsou podporovány
+• Názvy souborů nesmí obsahovat „ * / : &lt; &gt; ? \ |
+• V názvech souborů se nerozlišuje velikost písmen
+• Instalace souborů APK není podporována</value>
     <comment>Restrictions bundled under the noexec mount option</comment>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
@@ -273,7 +273,7 @@ Tento krok nelze vrátit zpět. Opravdu chcete pokračovat?</value>
 Chcete-li ADB povolit, otevřete pokročilá nastavení WSA.</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
-    <value>{0} of the selected files cannot be created under a Windows drive root.</value>
+    <value>{0} z vybraných souborů nelze vytvořit v kořeni jednotky Windows.</value>
   </data>
   <data name="S_ADB_LEARN_MORE" xml:space="preserve">
     <value>Dozvěte se více o ADB</value>
@@ -309,23 +309,23 @@ Chcete-li ADB povolit, otevřete pokročilá nastavení WSA.</value>
     <value>Go To Release Notes</value>
   </data>
   <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
-    <value>Privacy Policy Updated</value>
+    <value>Zásady ochrany osobních údajů byly aktualizovány</value>
     <comment>The title of the notification message about an updated privacy policy</comment>
   </data>
   <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
-    <value>This app version was released after a privacy policy update.
-Review the changes on GitHub.</value>
+    <value>Tato verze aplikace byla vydána po aktualizaci zásad ochrany osobních údajů.
+Prohlédněte si změny na GitHubu.</value>
     <comment>The content of the privacy policy update notification message</comment>
   </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
-    <value>ADB Executable</value>
+    <value>Spustitelný soubor ADB</value>
   </data>
   <data name="S_HELP_ON_ADB" xml:space="preserve">
-    <value>This app is a UI for ADB - Android Debug Bridge.
-To use the app, you need to have ADB on your PC.
-ADB is available as part of the Android SDK Platform Tools.
-You can use the provided link to download the SDK Platform Tools.
-Unfortunately, we cannot provide ADB with the app due to licensing restrictions.</value>
+    <value>Tato aplikace je uživatelské rozhraní pro ADB – Android Debug Bridge.
+K jejímu používání je nutné mít ADB v počítači.
+ADB je součástí Android SDK Platform Tools.
+Pomocí uvedeného odkazu si můžete stáhnout SDK Platform Tools.
+Z licenčních důvodů bohužel nemůžeme ADB přibalit k aplikaci.</value>
   </data>
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
     <value>Pomoc pro ADB</value>
@@ -343,11 +343,11 @@ Unfortunately, we cannot provide ADB with the app due to licensing restrictions.
     <value>Zvolte cíl pro více položek</value>
   </data>
   <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>The following will be deleted:
+    <value>Budou odstraněny tyto položky:
 {0}</value>
   </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
-    <value>The following will be permanently deleted:
+    <value>Natrvalo budou odstraněny tyto položky:
 {0}</value>
   </data>
   <data name="S_NEW_ITEM" xml:space="preserve">
@@ -360,20 +360,20 @@ Unfortunately, we cannot provide ADB with the app due to licensing restrictions.
     <value>Creative Commons</value>
   </data>
   <data name="S_LS_ERROR" xml:space="preserve">
-    <value>An error occurred while trying to list the contents of this folder.
-Visible content may be incomplete.</value>
+    <value>Při pokusu o výpis obsahu této složky došlo k chybě.
+Zobrazený obsah nemusí být úplný.</value>
   </data>
   <data name="S_PASTE_ANCESTOR" xml:space="preserve">
-    <value>{0} is an ancestor of the destination folder.</value>
+    <value>{0} je nadřazená složka cílové složky.</value>
   </data>
   <data name="S_KILL_EMULATOR" xml:space="preserve">
-    <value>Are you sure you want to kill this emulator?</value>
+    <value>Opravdu chcete tento emulátor ukončit?</value>
   </data>
   <data name="S_REM_DEVICE" xml:space="preserve">
-    <value>Are you sure you want to remove this device?</value>
+    <value>Opravdu chcete toto zařízení odebrat?</value>
   </data>
   <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
-    <value>Remove {0}</value>
+    <value>Odebrat {0}</value>
     <comment>0 = Device name to remove</comment>
   </data>
   <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
@@ -381,11 +381,11 @@ Visible content may be incomplete.</value>
     <comment>0 = Emulator name to kill</comment>
   </data>
   <data name="S_REM_APK" xml:space="preserve">
-    <value>The following will be removed:
+    <value>Budou odebrány tyto položky:
 {0}</value>
   </data>
   <data name="S_REM_APK_PLURAL" xml:space="preserve">
-    <value>The following will be removed:
+    <value>Budou odebrány tyto položky:
 {0} packages</value>
   </data>
   <data name="S_UNINSTALL" xml:space="preserve">
@@ -407,31 +407,31 @@ Visible content may be incomplete.</value>
     <value>Sloučit nebo nahradit</value>
   </data>
   <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value>There is 1 conflicting item</value>
+    <value>Existuje 1 konfliktní položka</value>
   </data>
   <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>There is 1 conflicting item in {0}</value>
+    <value>V umístění {0} existuje 1 konfliktní položka</value>
   </data>
   <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value>There are {0} conflicting items</value>
+    <value>Existuje {0} konfliktních položek</value>
   </data>
   <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value>There are {0} conflicting items in {1}</value>
+    <value>V umístění {1} existuje {0} konfliktních položek</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Paste Conflicts</value>
+    <value>Konflikty při vkládání</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
-    <value>Select folders to push</value>
+    <value>Vyberte složky k nahrání</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
-    <value>Select folders to push into {0}</value>
+    <value>Vyberte složky k nahrání do {0}</value>
   </data>
   <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
-    <value>Select files to push</value>
+    <value>Vyberte soubory k nahrání</value>
   </data>
   <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
-    <value>Select files to push into {0}</value>
+    <value>Vyberte soubory k nahrání do {0}</value>
   </data>
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
     <value>Vyčistit</value>
@@ -440,54 +440,54 @@ Visible content may be incomplete.</value>
     <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
-    <value>Polling For Devices</value>
+    <value>Pravidelně zjišťovat zařízení</value>
     <comment>The setting used to toggle polling for devices</comment>
   </data>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
-    <value>Polling For Battery Status</value>
+    <value>Pravidelně zjišťovat stav baterie</value>
     <comment>The setting used to toggle battery status polling</comment>
   </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
-    <value>Automatically Enable Root</value>
+    <value>Automaticky povolit přístup root</value>
     <comment>The setting used to enable automatically enabling root when a device connects</comment>
   </data>
   <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
-    <value>Save Manually Connected Devices</value>
+    <value>Ukládat ručně připojená zařízení</value>
     <comment>The setting used to toggle saving devices that were manually added</comment>
   </data>
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
-    <value>Automatically Open For Browsing</value>
+    <value>Automaticky otevřít k procházení</value>
     <comment>The setting used to toggle automatically opening the only connected device or the last connected device</comment>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
-    <value>Stop Polling On Push/Pull</value>
+    <value>Při nahrávání/stahování zastavit pravidelné zjišťování</value>
     <comment>The setting used to stop device and battery polling when there are active push or pull operations</comment>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>Simultaneous Operations</value>
+    <value>Souběžné operace</value>
     <comment>The setting used to allow performing simultaneous operations on separate devices</comment>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
-    <value>Force Media Rescan On Push</value>
+    <value>Po nahrání vynutit opětovné prohledání médií</value>
     <comment>The setting used to enable forcing the device to perform a media rescan after a successful push operation batch</comment>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
-    <value>Polling For Drives</value>
+    <value>Pravidelně zjišťovat jednotky</value>
     <comment>The setting used to toggle polling for device drives when in drive view</comment>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
     <value>Podpora APK</value>
   </data>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
-    <value>Show File Name Extensions</value>
+    <value>Zobrazovat přípony názvů souborů</value>
     <comment>The setting used to enable showing file name extension</comment>
   </data>
   <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
-    <value>Show Hidden Items</value>
+    <value>Zobrazovat skryté položky</value>
     <comment>The setting used to enable showing hidden items in the browser</comment>
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
-    <value>Show System Apps</value>
+    <value>Zobrazovat systémové aplikace</value>
     <comment>The setting used to allow displaying system apps in package view</comment>
   </data>
   <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
@@ -509,15 +509,15 @@ Visible content may be incomplete.</value>
     <value>Vzhled</value>
   </data>
   <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
-    <value>Custom Accent Color</value>
+    <value>Vlastní barva zvýraznění</value>
     <comment>The setting to enable a custom accent color instead of the system accent</comment>
   </data>
   <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
-    <value>Accent Color</value>
+    <value>Barva zvýraznění</value>
     <comment>The setting to choose a custom accent color</comment>
   </data>
   <data name="S_PICK_COLOR" xml:space="preserve">
-    <value>Pick a color</value>
+    <value>Vybrat barvu</value>
     <comment>Title of the color picker dialog</comment>
   </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
@@ -530,7 +530,7 @@ Visible content may be incomplete.</value>
     <value>Grafika</value>
   </data>
   <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
-    <value>Working Directories</value>
+    <value>Pracovní adresáře</value>
     <comment>The title of the settings group that defines the working directories</comment>
   </data>
   <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
@@ -550,48 +550,48 @@ Visible content may be incomplete.</value>
     <value>Složka App Data</value>
   </data>
   <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
-    <value>App Data Location</value>
+    <value>Umístění dat aplikace</value>
     <comment>Title of the dialog asking packaged users where to store app data</comment>
   </data>
   <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
-    <value>This app distribution saves data in a virtualized (and hard to reach) location, which is cleared on app uninstall.
+    <value>Tato distribuce aplikace ukládá data do virtualizovaného (a obtížně dostupného) umístění, které se při odinstalování aplikace vymaže.
 
-Select Custom to use a location that will not be removed on uninstall. The custom location cannot be under C:\Users\…\AppData</value>
+Zvolte Vlastní, chcete-li použít umístění, které se při odinstalování neodstraní. Vlastní umístění nesmí být pod C:\Users\…\AppData</value>
     <comment>Explains virtualized vs custom app data location for packaged installs</comment>
   </data>
   <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value>Use Default</value>
+    <value>Použít výchozí</value>
     <comment>Button to keep the MSIX virtualized app data folder</comment>
   </data>
   <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
-    <value>Custom</value>
+    <value>Vlastní</value>
     <comment>Button to pick a non-virtualized custom app data folder</comment>
   </data>
   <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
-    <value>Choose App Data Folder</value>
+    <value>Zvolte složku dat aplikace</value>
     <comment>Title of the folder picker for custom app data location</comment>
   </data>
   <data name="S_GITHUB_REPO" xml:space="preserve">
     <value>GitHub repozitář</value>
   </data>
   <data name="S_PRIVACY_POLICY" xml:space="preserve">
-    <value>Privacy Policy</value>
+    <value>Zásady ochrany osobních údajů</value>
     <comment>The title of the hyperlink to our privacy policy</comment>
   </data>
   <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
-    <value>Show Crash Report Dialog</value>
+    <value>Zobrazit dialog s hlášením pádu</value>
     <comment>Toggle in About settings to show or hide the optional crash report dialog after an unhandled exception</comment>
   </data>
   <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
-    <value>Crash Reporting</value>
+    <value>Hlášení pádů</value>
     <comment>Title of the About settings notice describing optional crash reporting</comment>
   </data>
   <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
-    <value>After a crash, you may optionally send a diagnostic report to help us fix it. Reports are sent only when you click Send Report and usually include the exception message, stack trace, app and Windows version, and the page that was open. The data is processed by Grafana Labs (Grafana Cloud). See the Privacy Policy link above.</value>
+    <value>Po pádu můžete volitelně odeslat diagnostické hlášení, které nám pomůže problém opravit. Hlášení se odesílají pouze po kliknutí na Odeslat hlášení a obvykle zahrnují zprávu výjimky, trasování zásobníku, verzi aplikace a Windows a otevřenou stránku. Data zpracovává Grafana Labs (Grafana Cloud). Viz odkaz na zásady ochrany osobních údajů výše.</value>
     <comment>About settings notice describing optional crash reporting and Grafana as processor</comment>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
-    <value>Attributions &amp; Third Party Licenses</value>
+    <value>Uvedení autorů a licence třetích stran</value>
     <comment>The title of the about section listing licenses</comment>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
@@ -605,15 +605,15 @@ Select Custom to use a location that will not be removed on uninstall. The custo
     <value>Ukončit hledání</value>
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
-    <value>Search View</value>
+    <value>Vyhledávací zobrazení</value>
     <comment>The tooltip of the button used to show the settings search textbox</comment>
   </data>
   <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>Collapse All</value>
+    <value>Sbalit vše</value>
     <comment>The tooltip of the button used to collapse all settings groups</comment>
   </data>
   <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>Expand All</value>
+    <value>Rozbalit vše</value>
     <comment>The tooltip of the button used to expand all settings groups</comment>
   </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
@@ -629,24 +629,24 @@ Select Custom to use a location that will not be removed on uninstall. The custo
     <value>Ok</value>
   </data>
   <data name="S_FILTER_FILE_OPS" xml:space="preserve">
-    <value>Filter File Operations</value>
+    <value>Filtrovat operace se soubory</value>
     <comment>The content of a button used to toggle file operations filtering</comment>
   </data>
   <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
-    <value>Enable Auto Play</value>
+    <value>Zapnout automatické přehrávání</value>
     <comment>The content of a button used to toggle automatic processing of the file operations</comment>
   </data>
   <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
-    <value>Disable Auto Play
-Cancel All Running</value>
+    <value>Vypnout automatické přehrávání
+Zrušit všechny probíhající operace</value>
     <comment>The tooltip of the file operations auto play button in its alt state</comment>
   </data>
   <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
-    <value>Log Updates Are Paused</value>
+    <value>Aktualizace protokolu jsou pozastavené</value>
     <comment>The tooltip of a button used to pause updates to the command log, in its off state</comment>
   </data>
   <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
-    <value>Pause Log Updates</value>
+    <value>Pozastavit aktualizace protokolu</value>
     <comment>The tooltip of a button used to pause updates to the command log, in its on state</comment>
   </data>
   <data name="S_BUTTON_LOG" xml:space="preserve">
@@ -654,7 +654,7 @@ Cancel All Running</value>
     <comment>The tooltip of a button used to show / hide the command log</comment>
   </data>
   <data name="S_BUTTON_DRIVES" xml:space="preserve">
-    <value>Device Drives</value>
+    <value>Jednotky zařízení</value>
     <comment>The tooltip of a button used to switch to the drive view</comment>
   </data>
   <data name="S_BUTTON_BACK" xml:space="preserve">
@@ -683,7 +683,7 @@ Cancel All Running</value>
     <value>Soubory</value>
   </data>
   <data name="S_MENU_REFRESH" xml:space="preserve">
-    <value>Refresh</value>
+    <value>Obnovit</value>
     <comment>The menu item used to refresh the current location in the file browser</comment>
   </data>
   <data name="S_MENU_COPY" xml:space="preserve">
@@ -708,7 +708,7 @@ Cancel All Running</value>
     <value>Zvolit vše</value>
   </data>
   <data name="S_MENU_CUT" xml:space="preserve">
-    <value>Cut</value>
+    <value>Vyjmout</value>
     <comment>The menu used to cut files</comment>
   </data>
   <data name="S_MENU_PASTE_LINK" xml:space="preserve">
@@ -733,11 +733,11 @@ Cancel All Running</value>
     <value>Uložit do složky Temp</value>
   </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
-    <value>Clear Command Log</value>
+    <value>Vymazat protokol příkazů</value>
     <comment>The button used to clear the command log</comment>
   </data>
   <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
-    <value>Open Item Location</value>
+    <value>Otevřít umístění položky</value>
     <comment>The menu used to open the (source) location to a symbolic link</comment>
   </data>
   <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
@@ -756,7 +756,7 @@ Cancel All Running</value>
     <value>Zápis: {0}</value>
   </data>
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
-    <value>About</value>
+    <value>O aplikaci</value>
     <comment>The title of the settings about group</comment>
   </data>
   <data name="S_BROWSER_ITEMS" xml:space="preserve">
@@ -769,7 +769,7 @@ Cancel All Running</value>
     <value>Tato složka je prázdná.</value>
   </data>
   <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
-    <value>Unable to get list.</value>
+    <value>Seznam se nepodařilo načíst.</value>
     <comment>The notification displayed when the package view is empty</comment>
   </data>
   <data name="S_EMPTY_FILTER" xml:space="preserve">
@@ -783,7 +783,7 @@ Cancel All Running</value>
     <value>položky vybrány</value>
   </data>
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
-    <value>Operation Type</value>
+    <value>Typ operace</value>
     <comment>File operations detailed data grid column name for the type of the operation icon</comment>
   </data>
   <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
@@ -846,14 +846,14 @@ Cancel All Running</value>
     <comment>The content of a button to kill the process of ADB</comment>
   </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
-    <value>Refresh Devices</value>
+    <value>Obnovit zařízení</value>
     <comment>The tooltip of a button to manually refresh the device list</comment>
   </data>
   <data name="S_RESTART_ADB" xml:space="preserve">
     <value>Restartovat ADB</value>
   </data>
   <data name="S_SERVER_DOWN" xml:space="preserve">
-    <value>mDNS server is down</value>
+    <value>Server mDNS neběží</value>
     <comment>A notification indicating that ADB server is down</comment>
   </data>
   <data name="S_AWAITING_RESPONSE" xml:space="preserve">
@@ -869,7 +869,7 @@ Cancel All Running</value>
     <value>{0} h</value>
   </data>
   <data name="S_MDNS_ON" xml:space="preserve">
-    <value>mDNS server is up and running</value>
+    <value>Server mDNS běží</value>
     <comment>A notification indicating mDNS server is on</comment>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
@@ -879,11 +879,11 @@ Cancel All Running</value>
     <value>Některé operace selhaly</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
-    <value>Root Access Enabled</value>
+    <value>Přístup root je povolen</value>
     <comment>The tooltip displayed when root access on the Android device is currently enabled</comment>
   </data>
   <data name="S_ROOT_POSSIBLE" xml:space="preserve">
-    <value>Root Can Be Enabled</value>
+    <value>Přístup root lze povolit</value>
     <comment>The tooltip displayed when an Android device supports root access</comment>
   </data>
   <data name="S_RECOVERY_MODE" xml:space="preserve">
@@ -897,7 +897,7 @@ Cancel All Running</value>
     <value>Teplota: {0}°C</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
-    <value>Reboot Into</value>
+    <value>Restartovat do režimu</value>
     <comment>The title of the menu to select a device reboot option</comment>
   </data>
   <data name="S_REBOOT_SYSTEM" xml:space="preserve">
@@ -913,7 +913,7 @@ Cancel All Running</value>
     <comment>The menu option to reboot the device into side-load mode</comment>
   </data>
   <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
-    <value>Sideload (Auto Reboot)</value>
+    <value>Sideload (automatický restart)</value>
     <comment>The menu option to reboot the device into side-load mode, with auto reboot</comment>
   </data>
   <data name="S_STATUS_OFFLINE" xml:space="preserve">
@@ -921,11 +921,11 @@ Cancel All Running</value>
     <comment>A device that is no longer online</comment>
   </data>
   <data name="S_STATUS_UNAUTH" xml:space="preserve">
-    <value>{0} - Unauthorized</value>
+    <value>{0} – neautorizováno</value>
     <comment>A device that hasn't authorized ADB yet</comment>
   </data>
   <data name="S_TYPE_EMULATOR" xml:space="preserve">
-    <value>Emulator</value>
+    <value>Emulátor</value>
     <comment>An emulated Android device (other than WSA)</comment>
   </data>
   <data name="S_TYPE_SERVICE" xml:space="preserve">
@@ -942,15 +942,15 @@ Cancel All Running</value>
     <comment>Windows Subsystem for Android - an Android emulator by Microsoft, now discontinued</comment>
   </data>
   <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
-    <value>Battery Status Unknown</value>
+    <value>Stav baterie není znám</value>
     <comment>The battery status indicator when the status is unknown</comment>
   </data>
   <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
-    <value>{0}%, Plugged In</value>
+    <value>{0} %, připojeno k napájení</value>
     <comment>Battery percentage when device is charging</comment>
   </data>
   <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
-    <value>Wireless</value>
+    <value>Bezdrátové</value>
     <comment>Battery charging source indicator - wireless charging</comment>
   </data>
   <data name="S_BAT_SOURCE_AC" xml:space="preserve">
@@ -989,7 +989,7 @@ Cancel All Running</value>
     <value>Přehřívání</value>
   </data>
   <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
-    <value>Dead</value>
+    <value>Nefunkční</value>
     <comment>Battery health indicator - dead</comment>
   </data>
   <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
@@ -1011,30 +1011,30 @@ Cancel All Running</value>
     <value>Neukazovat znovu.</value>
   </data>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
-    <value>Abort</value>
+    <value>Přerušit</value>
     <comment>The content of the button used to abort the extraction process</comment>
   </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>{0} Conflict</value>
+    <value>Konflikt: {0}</value>
     <comment>The title of the dialog reporting a merge conflict. 0 = Paste / Drop</comment>
   </data>
   <data name="S_PASTE" xml:space="preserve">
     <value>Vložit</value>
   </data>
   <data name="S_DROP" xml:space="preserve">
-    <value>Drop</value>
+    <value>Upustit</value>
     <comment>The file drop operation</comment>
   </data>
   <data name="S_ACTION_OPERATION" xml:space="preserve">
-    <value>Operation</value>
+    <value>Operace</value>
     <comment>Used for file operation actions</comment>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
-    <value>Operations</value>
+    <value>Operace</value>
     <comment>Used for file operation actions, plural</comment>
   </data>
   <data name="S_ACTION_VALIDATE" xml:space="preserve">
-    <value>Validate {0}</value>
+    <value>Ověřit {0}</value>
     <comment>Validate a file operation, by comparing MD5 of source and target files</comment>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
@@ -1046,11 +1046,11 @@ Cancel All Running</value>
     <comment>A link to a {0} file type</comment>
   </data>
   <data name="S_FILE_TYPE_APK" xml:space="preserve">
-    <value>Android Application Package</value>
+    <value>Balíček aplikace Android</value>
     <comment>The type name for APK files</comment>
   </data>
   <data name="S_FILE_TYPE_EXE" xml:space="preserve">
-    <value>Windows Executable</value>
+    <value>Spustitelný soubor Windows</value>
     <comment>For executable file type</comment>
   </data>
   <data name="S_DRIVE_TRASH" xml:space="preserve">
@@ -1064,11 +1064,11 @@ Cancel All Running</value>
     <comment>The root drive - /</comment>
   </data>
   <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
-    <value>Internal Storage</value>
+    <value>Interní úložiště</value>
     <comment>The home / main user space drive</comment>
   </data>
   <data name="S_DRIVE_APPS" xml:space="preserve">
-    <value>Installed Apps</value>
+    <value>Nainstalované aplikace</value>
     <comment>The drive displaying the installed applications</comment>
   </data>
   <data name="S_DRIVE_SD" xml:space="preserve">
@@ -1076,41 +1076,41 @@ Cancel All Running</value>
     <comment>A micro SD card drive</comment>
   </data>
   <data name="S_DRIVE_OTG" xml:space="preserve">
-    <value>OTG Drive</value>
+    <value>Jednotka OTG</value>
     <comment>A flash drive connected by USB to the device</comment>
   </data>
   <data name="S_DRIVE_EMULATED" xml:space="preserve">
-    <value>Emulated Drive</value>
+    <value>Emulovaná jednotka</value>
     <comment>A drive on an emulator device</comment>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>Dočasné soubory</value>
   </data>
   <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>File name illegal on target file system: {0}</value>
+    <value>Název souboru není v cílovém systému souborů povolen: {0}</value>
     <comment>0 = file name</comment>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
-    <value>Content mismatch</value>
+    <value>Neshoda obsahu</value>
     <comment>The error displayed when validation of a file operation resulted in different MD5 checksums of the source and target</comment>
   </data>
   <data name="S_VALIDATE_MISSING" xml:space="preserve">
-    <value>Missing from target location</value>
+    <value>V cílovém umístění chybí</value>
     <comment>The error displayed when during validation of a file operation the file was not found in the target location</comment>
   </data>
   <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
-    <value>Permanent Deletion</value>
+    <value>Trvalé odstranění</value>
     <comment>The location displayed in the target column of a permanent delete file operation</comment>
   </data>
   <data name="S_LOCATION_NA" xml:space="preserve">
     <value>Není k dispozici</value>
   </data>
   <data name="S_PATH_INVALID" xml:space="preserve">
-    <value>Argument must specify full path of a new or existing settings file.</value>
+    <value>Argument musí určovat úplnou cestu k novému nebo existujícímu souboru nastavení.</value>
     <comment>Displayed when an invalid path argument is provided for app launch</comment>
   </data>
   <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
-    <value>Custom App Settings Path</value>
+    <value>Vlastní cesta k nastavení aplikace</value>
     <comment>The title of the error message when an invalid path argument is provided</comment>
   </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">
@@ -1120,51 +1120,51 @@ Cancel All Running</value>
     <value>{0} - Kopírovat</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
-    <value>Adheres to Unix naming rules (via ADB)</value>
+    <value>Splňuje pravidla pojmenování Unixu (přes ADB)</value>
     <comment>Will be shown if a file name doesn't meet Unix naming rules</comment>
   </data>
   <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Adheres to user space naming rules</value>
+    <value>Splňuje pravidla pojmenování uživatelského prostoru</value>
     <comment>Will show if a file name doesn't meet user space naming rules</comment>
   </data>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
-    <value>Adheres to Windows naming rules</value>
+    <value>Splňuje pravidla pojmenování Windows</value>
     <comment>Will show if a file name doesn't meet Windows naming rules</comment>
   </data>
   <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
-    <value>Adheres to Windows drive root naming rules</value>
+    <value>Splňuje pravidla pojmenování kořene jednotky Windows</value>
     <comment>Will show if a file name doesn't meet Windows drive root naming rules</comment>
   </data>
   <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
-    <value>Unique in current location</value>
+    <value>Jedinečný v aktuálním umístění</value>
     <comment>Will show if a file name isn't unique in the current location, according to the file system naming rules</comment>
   </data>
   <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
-    <value>A selected file violates Windows naming rules</value>
+    <value>Vybraný soubor porušuje pravidla pojmenování Windows</value>
     <comment>Will show if a selected file doesn't meet Windows naming rules</comment>
   </data>
   <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
-    <value>A selected file violates Windows drive root naming rules</value>
+    <value>Vybraný soubor porušuje pravidla pojmenování kořene jednotky Windows</value>
     <comment>Will show if a selected file doesn't meet Windows drive root naming rules</comment>
   </data>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
-    <value>Some selected files have conflicting case-insensitive names</value>
+    <value>Některé vybrané soubory mají konfliktní názvy nerozlišující velikost písmen</value>
     <comment>Will show when selected file names differ only by upper / lower case</comment>
   </data>
   <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>A selected file violates user space naming rules</value>
+    <value>Vybraný soubor porušuje pravidla pojmenování uživatelského prostoru</value>
     <comment>Will show if a selected file doesn't meet user space naming rules</comment>
   </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
-    <value>Some copied files have conflicting case-insensitive names</value>
+    <value>Některé zkopírované soubory mají konfliktní názvy nerozlišující velikost písmen</value>
     <comment>Will show when copied files' names differ only by upper / lower case</comment>
   </data>
   <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>A copied file violates user space naming rules</value>
+    <value>Zkopírovaný soubor porušuje pravidla pojmenování uživatelského prostoru</value>
     <comment>Will show if a copied file doesn't meet user space naming rules</comment>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
-    <value>A selected item is not a file / folder</value>
+    <value>Vybraná položka není soubor ani složka</value>
     <comment>Will show when selecting an item that can't be copied</comment>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
@@ -1175,18 +1175,18 @@ Cancel All Running</value>
     <comment>0 = the status (enabled, forbidden, etc.)</comment>
   </data>
   <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
-    <value>Unchecked</value>
+    <value>Neověřeno</value>
     <comment>Root status - it is yet unknown whether the device supports root access</comment>
   </data>
   <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
     <value>Zakázáno</value>
   </data>
   <data name="S_BUTTON_ENABLE" xml:space="preserve">
-    <value>Enable</value>
+    <value>Povolit</value>
     <comment>Toggle button - enable</comment>
   </data>
   <data name="S_BUTTON_DISABLE" xml:space="preserve">
-    <value>Disable</value>
+    <value>Zakázat</value>
     <comment>Toggle button - disable</comment>
   </data>
   <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
@@ -1201,11 +1201,11 @@ Cancel All Running</value>
     <comment>The placeholder text for the connect port textbox</comment>
   </data>
   <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
-    <value>Pairing Port</value>
+    <value>Port pro párování</value>
     <comment>The placeholder text for the pairing port textbox</comment>
   </data>
   <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
-    <value>Pair &amp; Connect</value>
+    <value>Spárovat a připojit</value>
     <comment>The content of a button to pair and connect a new manually connected device</comment>
   </data>
   <data name="S_DEVICE_SAVED" xml:space="preserve">
@@ -1218,15 +1218,15 @@ Cancel All Running</value>
     <value>Připraveno k párování</value>
   </data>
   <data name="S_CLEAR_ALL" xml:space="preserve">
-    <value>Clear All</value>
+    <value>Vymazat vše</value>
     <comment>The tooltip of a button used to clear all textboxes in the connect new device</comment>
   </data>
   <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
-    <value>Add New Device</value>
+    <value>Přidat nové zařízení</value>
     <comment>The tooltip of the new device icon</comment>
   </data>
   <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
-    <value>[Unauthorized]</value>
+    <value>[Neautorizováno]</value>
     <comment>The name displayed for a device that hasn't authorized ADB yet, and we don't know its name</comment>
   </data>
   <data name="S_SERVICE_NONAME" xml:space="preserve">
@@ -1234,7 +1234,7 @@ Cancel All Running</value>
     <comment>The name displayed for a service device for which we don't have a name yet</comment>
   </data>
   <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
-    <value>Currently Browsing</value>
+    <value>Právě se prochází</value>
     <comment>The tooltip displayed for the device that is currently open for browsing</comment>
   </data>
   <data name="S_BUTTON_BROWSE" xml:space="preserve">
@@ -1257,7 +1257,7 @@ Cancel All Running</value>
     <value>Instalace APK</value>
   </data>
   <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
-    <value>Packages</value>
+    <value>Balíčky</value>
     <comment>The installed apps drive items count display, plural</comment>
   </data>
   <data name="S_FILEOP_ERROR" xml:space="preserve">
@@ -1265,7 +1265,7 @@ Cancel All Running</value>
     <comment>0 = an internal error message</comment>
   </data>
   <data name="S_FILEOP_VALIDATED" xml:space="preserve">
-    <value>Validated</value>
+    <value>Ověřeno</value>
     <comment>A file operation status - validated</comment>
   </data>
   <data name="S_FILEOP_COMPLETED" xml:space="preserve">
@@ -1284,11 +1284,11 @@ Cancel All Running</value>
     <value>Probíhá</value>
   </data>
   <data name="S_FILEOP_WAITING" xml:space="preserve">
-    <value>Queued</value>
+    <value>Ve frontě</value>
     <comment>File operation status - queued (waiting)</comment>
   </data>
   <data name="S_FILEOP_FAILED" xml:space="preserve">
-    <value>Failed</value>
+    <value>Neúspěšné</value>
     <comment>File operation status - failed</comment>
   </data>
   <data name="S_FILEOP_CANCELED" xml:space="preserve">
@@ -1310,7 +1310,7 @@ Cancel All Running</value>
     <value>{0}% využito</value>
   </data>
   <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
-    <value>Scroll Here</value>
+    <value>Posunout sem</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
@@ -1342,7 +1342,7 @@ Cancel All Running</value>
     <value>Pravý roh</value>
   </data>
   <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
-    <value>Page Left</value>
+    <value>Posunout o stránku vlevo</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_PageRightCommand" xml:space="preserve">
@@ -1350,7 +1350,7 @@ Cancel All Running</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
-    <value>Scroll Left</value>
+    <value>Posunout vlevo</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_LineRightCommand" xml:space="preserve">
@@ -1367,17 +1367,17 @@ Cancel All Running</value>
     <value>Upozornění</value>
   </data>
   <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
-    <value>Click to display more info</value>
+    <value>Kliknutím zobrazíte další informace</value>
     <comment>The tooltip of a button used to display a notification message</comment>
   </data>
   <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
-    <value>App Language</value>
+    <value>Jazyk aplikace</value>
     <comment>The title of the notification message about the app language</comment>
   </data>
   <data name="S_LANG_NOTIFICATION" xml:space="preserve">
-    <value>Select your app language of choice in the settings.
-Translation progress is displayed for the selected language.
-Please help us localize the app to your language on Weblate.</value>
+    <value>V nastavení zvolte preferovaný jazyk aplikace.
+U vybraného jazyka se zobrazuje postup překladu.
+Pomozte nám prosím lokalizovat aplikaci do svého jazyka na Weblate.</value>
     <comment>The content of the app language notification message </comment>
   </data>
   <data name="S_GOTO_WEBLATE" xml:space="preserve">
@@ -1388,11 +1388,11 @@ Please help us localize the app to your language on Weblate.</value>
     <comment>The socket Unix file type</comment>
   </data>
   <data name="S_FILE_BLOCK" xml:space="preserve">
-    <value>Block Device</value>
+    <value>Blokové zařízení</value>
     <comment>The block device Unix file type</comment>
   </data>
   <data name="S_FILE_CHAR" xml:space="preserve">
-    <value>Char Device</value>
+    <value>Znakové zařízení</value>
     <comment>The char device Unix file type</comment>
   </data>
   <data name="S_FILE_FIFO" xml:space="preserve">
@@ -1400,26 +1400,26 @@ Please help us localize the app to your language on Weblate.</value>
     <comment>The FIFO (First-In First-Out) Unix file type</comment>
   </data>
   <data name="S_FILE_UNKNOWN" xml:space="preserve">
-    <value>Unknown</value>
+    <value>Neznámý</value>
     <comment>An unknown file type</comment>
   </data>
   <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
-    <value>Broken Link</value>
+    <value>Neplatný odkaz</value>
     <comment>A symbolic link that points to a file that doesn't exist</comment>
   </data>
   <data name="S_NAV_HISTORY" xml:space="preserve">
-    <value>Navigation History</value>
+    <value>Historie navigace</value>
     <comment>The tooltip of the menu that displays the navigation history</comment>
   </data>
   <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
-    <value>Add Current Location</value>
+    <value>Přidat aktuální umístění</value>
     <comment>The button used to add the current location (path) to the saved locations list</comment>
   </data>
   <data name="S_REMOVE" xml:space="preserve">
     <value>Smazat</value>
   </data>
   <data name="S_SAVED_LOCATIONS" xml:space="preserve">
-    <value>Saved Locations</value>
+    <value>Uložená umístění</value>
     <comment>The tooltip of the button used to open the saved locations menu</comment>
   </data>
   <data name="KILO" xml:space="preserve">
@@ -1458,32 +1458,32 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Zkopírovat {0} položek</value>
   </data>
   <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>Copy {0} items to {1}</value>
+    <value>Kopírovat {0} položek do {1}</value>
     <comment>The drag tooltip in copy mode when the target is known. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
   </data>
   <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>Move {0} items to {1}</value>
+    <value>Přesunout {0} položek do {1}</value>
     <comment>The drag tooltip in move mode when the target is known. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
   </data>
   <data name="S_DRAGDROP_LINK" xml:space="preserve">
-    <value>Create link in {0}</value>
+    <value>Vytvořit odkaz v {0}</value>
     <comment>The drag tooltip in link mode. 0 - the destination under the mouse</comment>
   </data>
   <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>Move {0} items</value>
+    <value>Přesunout {0} položek</value>
     <comment>The drag tooltip in move mode. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
   </data>
   <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
-    <value>Paste 1 Cut Item</value>
+    <value>Vložit 1 vyjmutou položku</value>
   </data>
   <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
-    <value>Paste 1 Copied Item</value>
+    <value>Vložit 1 zkopírovanou položku</value>
   </data>
   <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
-    <value>Paste {0} Copied Items</value>
+    <value>Vložit {0} zkopírovaných položek</value>
   </data>
   <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
-    <value>Paste {0} Cut Items</value>
+    <value>Vložit {0} vyjmutých položek</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} in {1} ({2})</value>
@@ -1494,30 +1494,30 @@ Please help us localize the app to your language on Weblate.</value>
     <comment>0 - number of completed files, 1 - total files. ex: 2 of 3</comment>
   </data>
   <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
-    <value>Copy {0}</value>
+    <value>Kopírovat {0}</value>
     <comment>The drag tooltip in copy mode. 0 - the item being dragged</comment>
   </data>
   <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
-    <value>Copy {0} to {1}</value>
+    <value>Kopírovat {0} do {1}</value>
     <comment>The drag tooltip in copy mode when the target is known. 0 - the item being dragged, 1 - the destination under the mouse</comment>
   </data>
   <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
-    <value>Move {0}</value>
+    <value>Přesunout {0}</value>
     <comment>The drag tooltip in move mode. 0 - the item being dragged</comment>
   </data>
   <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
-    <value>Move {0} to {1}</value>
+    <value>Přesunout {0} do {1}</value>
     <comment>The drag tooltip in move mode when the target is known. 0 - the item being dragged, 1 - the destination under the mouse</comment>
   </data>
   <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
     <value>Soubor nenalezen</value>
   </data>
   <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
-    <value>Finished with no confirmation</value>
+    <value>Dokončeno bez potvrzení</value>
     <comment>The error message displayed when a sync operation has finished but ADB did not provide a confirmation</comment>
   </data>
   <data name="S_VALIDATION_ERROR" xml:space="preserve">
-    <value>Validation error: {0}</value>
+    <value>Chyba ověření: {0}</value>
     <comment>The title of the error message displayed on a file operation validation error</comment>
   </data>
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
@@ -1527,18 +1527,18 @@ Please help us localize the app to your language on Weblate.</value>
     <value>{0} souborů</value>
   </data>
   <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
-    <value>Select ROM for sideload</value>
+    <value>Vyberte ROM pro sideload</value>
     <comment>The title of the open file dialog for selecting a ROM image to sideload</comment>
   </data>
   <data name="S_ROM_FILE" xml:space="preserve">
-    <value>ROM file</value>
+    <value>Soubor ROM</value>
     <comment>The filter name displayed in the open file dialog when opening a ROM for sideload</comment>
   </data>
   <data name="S_TERMINAL" xml:space="preserve">
     <value>Příkazový řádek</value>
   </data>
   <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
-    <value>Preserve File Date Modified</value>
+    <value>Zachovat datum změny souboru</value>
     <comment>The name of the setting to enable preserving the "Date Modified" of files on push / pull operations</comment>
   </data>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
@@ -1546,7 +1546,7 @@ Please help us localize the app to your language on Weblate.</value>
     <comment>The drag tooltip when dragging a single APK file over the installed apps view. 0 - the name of the APK</comment>
   </data>
   <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
-    <value>Install {0} APKs</value>
+    <value>Nainstalovat {0} souborů APK</value>
     <comment>The drag tooltip when dragging multiple APK files over the installed apps view. 0 - number of APKs being dragged</comment>
   </data>
   <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
@@ -1556,42 +1556,42 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Vypnuto</value>
   </data>
   <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
-    <value>Checking mDNS server status…</value>
+    <value>Kontroluje se stav serveru mDNS…</value>
     <comment>The notification displayed when waiting for a status response from the server</comment>
   </data>
   <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
     <value>Ikony</value>
   </data>
   <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
-    <value>Pull &amp; Display Thumbnails</value>
+    <value>Stahovat a zobrazovat náhledy</value>
     <comment>The title of the setting that controls thumbnail behavior</comment>
   </data>
   <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
-    <value>Only in Icon View</value>
+    <value>Jen v zobrazení ikon</value>
     <comment>Thumbnails mode setting: icon view mode</comment>
   </data>
   <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
-    <value>Only in Photo Directories</value>
+    <value>Jen ve složkách s fotografiemi</value>
     <comment>Thumbnails mode setting: photo directories mode</comment>
   </data>
   <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
-    <value>Upon Connection</value>
+    <value>Po připojení</value>
     <comment>Thumbnails mode setting: on connection mode</comment>
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
-    <value>Persist Thumbnails Between Sessions</value>
+    <value>Zachovat náhledy mezi relacemi</value>
     <comment>The setting used allow saving thumbnails locally from one app session to another</comment>
   </data>
   <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>Limit Thumbnails Pull Speed</value>
+    <value>Omezit rychlost stahování náhledů</value>
     <comment>The setting used to limit the speed at which thumbnails are pulled in bulk from the device</comment>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
-    <value>Show Icons For Special Folders</value>
+    <value>Zobrazovat ikony zvláštních složek</value>
     <comment>The setting used to allow displaying Windows icons for Windows special folders (Downloads, Documents, etc.)</comment>
   </data>
   <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
-    <value>Include Video Thumbnails</value>
+    <value>Zahrnout náhledy videí</value>
     <comment>The setting to enable video thumbnails (pull &amp; display)</comment>
   </data>
   <data name="S_VIDEO_DURATION" xml:space="preserve">
@@ -1613,46 +1613,46 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Jedna hodina</value>
   </data>
   <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
-    <value>Local Thumbnails Refresh Time</value>
+    <value>Doba obnovení místních náhledů</value>
     <comment>The setting used to control how long local persistent thumbnails should be used before updating them</comment>
   </data>
   <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
-    <value>Use BusyBox If Available</value>
+    <value>Použít BusyBox, je-li k dispozici</value>
     <comment>The setting used to enable checking connected devices for busybox and which shell commands it supports</comment>
   </data>
   <data name="S_SETTINGS_WSA" xml:space="preserve">
-    <value>Auto Connect WSA If Available</value>
+    <value>Automaticky připojit WSA, je-li k dispozici</value>
     <comment>The setting used to enable checking for installed WSA, launching it, and connecting to it automatically</comment>
   </data>
   <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
-    <value>Discover Android Emulators</value>
+    <value>Vyhledávat emulátory Androidu</value>
     <comment>The setting used to enable listing installed AVDs and launching them from the device list</comment>
   </data>
   <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
-    <value>Launch this emulator</value>
+    <value>Spustit tento emulátor</value>
     <comment>Tooltip for an emulator package device tile</comment>
   </data>
   <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
-    <value>Emulator Launch</value>
+    <value>Spuštění emulátoru</value>
     <comment>The title of the dialog message to launch an emulator</comment>
   </data>
   <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
-    <value>Android SDK emulator was not found. Install the Android SDK emulator package or set ANDROID_SDK_ROOT.</value>
+    <value>Emulátor Android SDK nebyl nalezen. Nainstalujte balíček emulátoru Android SDK nebo nastavte ANDROID_SDK_ROOT.</value>
     <comment>Error message when the SDK emulator executable cannot be located</comment>
   </data>
   <data name="S_STRING_PASTE" xml:space="preserve">
     <value>Vložit</value>
   </data>
   <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
-    <value>Checking for thumbnail updates</value>
+    <value>Kontrolují se aktualizace náhledů</value>
     <comment>A hint displayed for a short time in the snackbar</comment>
   </data>
   <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
-    <value>Pulling thumbnails</value>
+    <value>Stahují se náhledy</value>
     <comment>A hint displayed for a short time in the snackbar</comment>
   </data>
   <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
-    <value>Reading thumbnail locations and media database</value>
+    <value>Načítají se umístění náhledů a databáze médií</value>
     <comment>A hint displayed for a short time in the snackbar</comment>
   </data>
   <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
@@ -1671,11 +1671,11 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Největší ikony</value>
   </data>
   <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
-    <value>Layout and view options</value>
+    <value>Volby rozvržení a zobrazení</value>
     <comment>The tooltip of the thumbnail size selector. view = icon view / details view</comment>
   </data>
   <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
-    <value>Thumbnail Size Saved For Each Location</value>
+    <value>Velikost náhledů se ukládá pro každé umístění</value>
     <comment>The setting that enables keeping track of the last thumbnail size selected for each location / folder</comment>
   </data>
   <data name="S_SORT" xml:space="preserve">
@@ -1688,39 +1688,39 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Sestupně</value>
   </data>
   <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
-    <value>Sorting column &amp; order saved for each location</value>
+    <value>Sloupec a pořadí řazení se ukládají pro každé umístění</value>
     <comment>The setting that enables keeping track of the last sorted column and direction selected for each location / folder</comment>
   </data>
   <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
-    <value>Max Image Size To Use As Its Own Thumbnail (0 - Disabled)</value>
+    <value>Maximální velikost obrázku použitého jako vlastní náhled (0 – vypnuto)</value>
     <comment>The name of the setting that enables using images for their own thumbnail display, and the maximum size for such images</comment>
   </data>
   <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
-    <value>and {0} more…</value>
+    <value>a další {0}…</value>
     <comment>0 - the number of file operations currently not displayed</comment>
   </data>
   <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
-    <value>Show or hide the details and preview pane.</value>
+    <value>Zobrazit nebo skrýt podokno podrobností a náhledu.</value>
     <comment>The tooltip of the button that controls the details pane visibility</comment>
   </data>
   <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
-    <value>Preview</value>
+    <value>Náhled</value>
     <comment>Side pane in file preview mode</comment>
   </data>
   <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
-    <value>Max File Size For Preview</value>
+    <value>Maximální velikost souboru pro náhled</value>
     <comment>The maximum size of a file for preview</comment>
   </data>
   <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
-    <value>Pull To Default Folder On File Double Click</value>
+    <value>Po dvojitém kliknutí stáhnout do výchozí složky</value>
     <comment>The setting that enables pulling a file to the default folder on double click</comment>
   </data>
   <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
-    <value>Select a single item to get more information.</value>
+    <value>Chcete-li zobrazit další informace, vyberte jednu položku.</value>
     <comment>The tip displayed in the details pane when multiple (or none) files are selected</comment>
   </data>
   <data name="S_ITEM_LOCATION" xml:space="preserve">
-    <value>Location</value>
+    <value>Umístění</value>
     <comment>Location as in parent path of a file</comment>
   </data>
   <data name="S_IMAGE_F_STOP" xml:space="preserve">
@@ -1728,63 +1728,63 @@ Please help us localize the app to your language on Weblate.</value>
     <comment>The f-stop of an image metadata</comment>
   </data>
   <data name="S_IMAGE_ISO" xml:space="preserve">
-    <value>ISO speed</value>
+    <value>Citlivost ISO</value>
     <comment>The ISO number of the image metadata</comment>
   </data>
   <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
-    <value>Exposure time</value>
+    <value>Doba expozice</value>
     <comment>The exposure time in parts of a second of the image metadata</comment>
   </data>
   <data name="S_VIDEO_BITRATE" xml:space="preserve">
-    <value>Bitrate</value>
+    <value>Datový tok</value>
     <comment>The bitrate from the video file metadata</comment>
   </data>
   <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
-    <value>Select a file to preview.</value>
+    <value>Chcete-li zobrazit náhled, vyberte soubor.</value>
     <comment>The hint displayed in the preview pane when no file is selected</comment>
   </data>
   <data name="S_PREVIEW_INVALID" xml:space="preserve">
-    <value>No preview available.</value>
+    <value>Náhled není dostupný.</value>
     <comment>The hint displayed in the preview pane when the selected file(s) cannot be previewed</comment>
   </data>
   <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
-    <value>This PDF is password protected.</value>
+    <value>Tento soubor PDF je chráněný heslem.</value>
     <comment>The hint displayed in the preview pane when the selected PDF is password protected</comment>
   </data>
   <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
-    <value>Incorrect password.</value>
+    <value>Nesprávné heslo.</value>
     <comment>Error shown in the PDF password prompt when the entered password is wrong</comment>
   </data>
   <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Odemknout</value>
     <comment>Button label to submit the PDF password</comment>
   </data>
   <data name="S_FILE_PERMISSIONS" xml:space="preserve">
-    <value>Permissions</value>
+    <value>Oprávnění</value>
     <comment>The title of the permissions section of a file in the details pane</comment>
   </data>
   <data name="S_FILE_PERM_USER" xml:space="preserve">
-    <value>User</value>
+    <value>Uživatel</value>
     <comment>Unix file permissions for the selected user</comment>
   </data>
   <data name="S_FILE_PERM_GROUP" xml:space="preserve">
-    <value>Group</value>
+    <value>Skupina</value>
     <comment>Unix file permissions for the group the user is in</comment>
   </data>
   <data name="S_FILE_PERM_OTHER" xml:space="preserve">
-    <value>Others</value>
+    <value>Ostatní</value>
     <comment>Unix file permissions for users outside the group</comment>
   </data>
   <data name="S_DATE_ACCESSED" xml:space="preserve">
-    <value>Accessed</value>
+    <value>Poslední přístup</value>
     <comment>File info - last access date</comment>
   </data>
   <data name="S_CREATION_TIME" xml:space="preserve">
-    <value>Created</value>
+    <value>Vytvořeno</value>
     <comment>File info - creation time</comment>
   </data>
   <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
-    <value>Modified</value>
+    <value>Změněno</value>
     <comment>File info - date modified (but without "date")</comment>
   </data>
   <data name="S_FILE_SYSTEM" xml:space="preserve">
@@ -1812,30 +1812,30 @@ Please help us localize the app to your language on Weblate.</value>
     <comment>The label of the blue channel in the color picker</comment>
   </data>
   <data name="S_ADB_NOT_FOUND" xml:space="preserve">
-    <value>Unable to locate ADB from system PATH. Please use "{0}" to locate it.</value>
+    <value>ADB se nepodařilo najít v systémové proměnné PATH. K jeho vyhledání použijte „{0}“.</value>
     <comment>0 - the name of the Override ADB Path setting</comment>
   </data>
   <data name="S_ADB_PATH_INVALID" xml:space="preserve">
-    <value>Provided {0} path is either a Windows shortcut or a UNC (remote) path, which is not allowed.</value>
+    <value>Zadaná cesta {0} je buď zástupce Windows, nebo vzdálená cesta UNC, což není povoleno.</value>
     <comment>0 - either "ADB" or nothing</comment>
   </data>
   <data name="S_ADB_COMPROMISED" xml:space="preserve">
-    <value>The provided executable cannot be verified as ADB. Make sure you download only official Android Platform Tools from Google.</value>
+    <value>Zadaný spustitelný soubor nelze ověřit jako ADB. Ujistěte se, že stahujete pouze oficiální Android Platform Tools od Googlu.</value>
   </data>
   <data name="S_BUTTON_PAIR" xml:space="preserve">
-    <value>Pair</value>
+    <value>Spárovat</value>
     <comment>The button for pairing a device</comment>
   </data>
   <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
-    <value>Kill ADB When App Closes</value>
+    <value>Po zavření aplikace ukončit ADB</value>
     <comment>The setting that enables killing ADB server when closing the app</comment>
   </data>
   <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
-    <value>The custom location cannot be under C:\Users\…\AppData - please select another location</value>
+    <value>Vlastní umístění nesmí být pod C:\Users\…\AppData – vyberte jiné umístění</value>
     <comment>An error displayed when choosing a wrong custom app data location</comment>
   </data>
   <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
-    <value>Allow ADB From Untrusted Sources</value>
+    <value>Povolit ADB z nedůvěryhodných zdrojů</value>
     <comment>The setting that allows using ADB without integrity checks and without path restrictions</comment>
   </data>
   <data name="S_NEW_VERSION_READY" xml:space="preserve">
