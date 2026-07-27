@@ -722,7 +722,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Невозможно получить список.</value>
   </data>
   <data name="S_EMPTY_FILTER" xml:space="preserve">
-    <value>Нет соответствующих элементов.</value>
+    <value>Поисковые запросы не найдены.</value>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
     <value>&lt;Span&gt;Эта папка &lt;Italic&gt;выглядит&lt;/Italic&gt; пустой&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… по крайней мере невооруженным взглядом&lt;/Span&gt;&lt;/Span&gt;</value>
@@ -1696,5 +1696,29 @@ ADB доступен как часть Android SDK Platform Tools.
 • Путь не должен быть удаленным UNC или символической ссылкой.
 • Исполняемый файл должен быть подписан Google Authenticode или соответствовать заранее определенному списку хешей SHA-256
 • Должен возвращать разборчивую строку версии при выполнении вместе с --версией</value>
+  </data>
+  <data name="S_MENU_STOP_LOADING" xml:space="preserve">
+    <value>Остановить загрузку {0}</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS" xml:space="preserve">
+    <value>Параметры поиска</value>
+  </data>
+  <data name="S_SEARCH_RESULTS_IN" xml:space="preserve">
+    <value>Результаты поиска в {0}</value>
+  </data>
+  <data name="S_SEARCH_ALL_SUBFOLDERS" xml:space="preserve">
+    <value>Все вложенные папки</value>
+  </data>
+  <data name="S_SEARCH_CURRENT_FOLDER" xml:space="preserve">
+    <value>Текущая папка</value>
+  </data>
+  <data name="S_SEARCH" xml:space="preserve">
+    <value>Поиск</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS_INFO" xml:space="preserve">
+    <value>Расширенные настройки поиска и фильтрации.</value>
+  </data>
+  <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
+    <value>Выйти из режима результатов поиска.</value>
   </data>
 </root>
