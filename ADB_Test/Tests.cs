@@ -308,6 +308,28 @@ namespace ADB_Test
         }
 
         [TestMethod]
+        public void LowestCommonParentTest()
+        {
+            Assert.AreEqual("/sdcard/a/b", FileHelper.GetLowestCommonParent([
+                "/sdcard/a/b/file1.txt",
+                "/sdcard/a/b/file2.txt",
+            ]));
+            Assert.AreEqual("/sdcard/a", FileHelper.GetLowestCommonParent([
+                "/sdcard/a/b",
+                "/sdcard/a/c/file.txt",
+            ]));
+            Assert.AreEqual("/sdcard/Download", FileHelper.GetLowestCommonParent([
+                "/sdcard/Download/a/file1.txt",
+                "/sdcard/Download/b/file2.txt",
+            ]));
+            Assert.AreEqual("/sdcard/a/b", FileHelper.GetParentPath("/sdcard/a/b/file.txt"));
+            Assert.AreEqual("E:\\foo", FileHelper.GetLowestCommonParent([
+                "E:\\foo\\bar.txt",
+                "E:\\foo\\baz.txt",
+            ]));
+        }
+
+        [TestMethod]
         public void BytePatternTest()
         {
             Assert.AreEqual(-1, ByteHelper.PatternAt(Encoding.Unicode.GetBytes("foobar"), [0, 0]));

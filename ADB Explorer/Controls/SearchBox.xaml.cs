@@ -7,6 +7,12 @@ namespace ADB_Explorer.Controls;
 /// </summary>
 public partial class SearchBox : UserControl
 {
+    public enum SearchBoxMode
+    {
+        CurrentFolder,
+        AllSubfolders
+    }
+
     public SearchBox()
     {
         InitializeComponent();
@@ -38,16 +44,6 @@ public partial class SearchBox : UserControl
         DependencyProperty.Register("Text", typeof(string),
           typeof(SearchBox), new PropertyMetadata(null));
 
-    public string PlaceholderText
-    {
-        get => (string)GetValue(PlaceholderTextProperty);
-        set => SetValue(PlaceholderTextProperty, value);
-    }
-
-    public static readonly DependencyProperty PlaceholderTextProperty =
-        DependencyProperty.Register("PlaceholderText", typeof(string),
-          typeof(SearchBox), new PropertyMetadata(null));
-
     public bool IsActive
     {
         get => (bool)GetValue(IsActiveProperty);
@@ -66,16 +62,6 @@ public partial class SearchBox : UserControl
 
     public static readonly DependencyProperty IsExpandedProperty =
         DependencyProperty.Register("IsExpanded", typeof(bool),
-          typeof(SearchBox), new PropertyMetadata(null));
-
-    public string Icon
-    {
-        get => (string)GetValue(IconProperty);
-        set => SetValue(IconProperty, value);
-    }
-
-    public static readonly DependencyProperty IconProperty =
-        DependencyProperty.Register("Icon", typeof(string),
           typeof(SearchBox), new PropertyMetadata(null));
 
     public bool IsFiltered

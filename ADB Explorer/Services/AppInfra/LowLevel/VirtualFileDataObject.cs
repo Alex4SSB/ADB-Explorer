@@ -627,6 +627,11 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
 
         VirtualFileDataObject vfdo = new(preferredEffect, method);
 
+        var fileList = files.ToList();
+        Data.SearchTransferParent = Data.FileActions.IsSearchMode
+            ? FileHelper.GetSearchTransferParent(fileList)
+            : null;
+
         var includeContent =
             !Data.FileActions.IsSelectionIllegalOnWindows
             && !Data.FileActions.IsSelectionIllegalNaming
@@ -636,7 +641,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         if (includeContent)
         {
             Data.RuntimeSettings.MainCursor = Cursors.AppStarting;
-            var fileSnapshot = files.ToList();
+            var fileSnapshot = fileList;
             Task.Run(() =>
             {
                 // Prepare file ops recursively for folders
@@ -683,12 +688,12 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             // Next we provide the real file descriptors and file contents.
             // File Explorer isn't supposed to use them, but since it's already implemented,
             // might as well leave it for any other app to use.
-            files.ForEach(f => f.PrepareDescriptors(vfdo, false));
-            vfdo.SetFileDescriptors(files.SelectMany(f => f.Descriptors), false);
+            fileList.ForEach(f => f.PrepareDescriptors(vfdo, false));
+            vfdo.SetFileDescriptors(fileList.SelectMany(f => f.Descriptors), false);
         }
 
         // Finally we provide the ADB drag data, which only we recongize
-        vfdo.SetAdbDrag(files, Data.DevicesObject.Current);
+        vfdo.SetAdbDrag(fileList, Data.DevicesObject.Current);
 
         return vfdo;
     }

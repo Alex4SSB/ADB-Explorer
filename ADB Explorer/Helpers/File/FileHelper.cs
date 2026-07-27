@@ -44,6 +44,91 @@ public static class FileHelper
         return !IsHiddenRecycleItem(fileClass);
     };
 
+    public static bool IsSearchLocation(string? path) =>
+        !string.IsNullOrEmpty(path)
+        && AdbLocation.LocationFromString(path) is Navigation.SpecialLocation.SearchMode;
+
+    public static string GetSearchTransferParent(IEnumerable<FileClass> files)
+    {
+        var fileList = files as IList<FileClass> ?? [.. files];
+        if (fileList.Count < 1)
+            return Data.SearchOriginPath ?? "";
+
+        if (!Data.FileActions.IsSearchMode || string.IsNullOrEmpty(Data.SearchOriginPath))
+            return fileList[0].ParentPath;
+
+        var deviceId = Data.DevicesObject.Current?.ID;
+        var parent = GetLowestCommonParent(fileList.Select(f => f.FullPath), deviceId);
+
+        return RelationFrom(Data.SearchOriginPath, parent) is RelationType.Self or RelationType.Descendant
+            ? parent
+            : Data.SearchOriginPath;
+    }
+
+    public static string GetSearchTransferName(FileClass file)
+    {
+        if (!Data.FileActions.IsSearchMode || string.IsNullOrEmpty(Data.SearchOriginPath))
+            return file.FullName;
+
+        var parent = Data.SearchTransferParent
+            ?? GetSearchTransferParent(Data.SelectedFiles.Any() ? Data.SelectedFiles : [file]);
+
+        return ExtractRelativePath(file.FullPath, parent);
+    }
+
+    /// <summary>
+    /// Deepest directory path that contains every supplied path.
+    /// </summary>
+    public static string GetLowestCommonParent(IEnumerable<string> paths, string? deviceId = null)
+    {
+        var list = paths.Where(p => !string.IsNullOrEmpty(p)).ToList();
+        if (list.Count < 1)
+            return "";
+
+        if (list.Count == 1)
+            return GetParentPath(list[0], deviceId);
+
+        return list.Skip(1).Aggregate(list[0], GetCommonPathPrefix);
+    }
+
+    private static string GetCommonPathPrefix(string path1, string path2)
+    {
+        var sep = GetSeparator(path1.Length > 0 ? path1 : path2);
+        var common = PathSegments(path1, sep)
+            .Zip(PathSegments(path2, sep))
+            .TakeWhile(pair => pair.First == pair.Second)
+            .Select(pair => pair.First)
+            .ToList();
+
+        if (common.Count == 0)
+        {
+            if (path1.Length >= 2 && path1[1] == ':')
+                return path1[..Math.Min(3, path1.Length)].TrimEnd('\\');
+
+            return "/";
+        }
+
+        if (common[0].Length >= 2 && common[0][1] == ':')
+            return string.Join(sep, common);
+
+        return sep + string.Join(sep, common);
+    }
+
+    private static IEnumerable<string> PathSegments(string path, char sep)
+    {
+        if (string.IsNullOrEmpty(path))
+            yield break;
+
+        if (sep == '\0')
+        {
+            yield return path;
+            yield break;
+        }
+
+        foreach (var segment in path.Split(sep, StringSplitOptions.RemoveEmptyEntries))
+            yield return segment;
+    }
+
     public static Predicate<object> PkgFilter() => pkg =>
     {
         if (pkg is not Package)
@@ -58,7 +143,9 @@ public static class FileHelper
         if (POSSIBLE_RECYCLE_PATHS.Contains(file.FullPath) || file.Extension == RECYCLE_INDEX_SUFFIX)
             return true;
         
-        if (!string.IsNullOrEmpty(Data.FileActions.ExplorerFilter) && !file.ToString().Contains(Data.FileActions.ExplorerFilter, StringComparison.OrdinalIgnoreCase))
+        if (!string.IsNullOrEmpty(Data.FileActions.ExplorerFilter)
+            && Data.Settings.SearchBox is Controls.SearchBox.SearchBoxMode.CurrentFolder
+            && !file.ToString().Contains(Data.FileActions.ExplorerFilter, StringComparison.OrdinalIgnoreCase))
             return true;
 
         return false;

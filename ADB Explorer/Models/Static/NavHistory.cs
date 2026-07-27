@@ -16,6 +16,7 @@ namespace ADB_Explorer.Models
             Up,
             RecycleBin,
             PackageDrive,
+            SearchMode,
             devNull,
             Unknown,
         }
@@ -54,6 +55,7 @@ namespace ADB_Explorer.Models
                     SpecialLocation.PackageDrive => AbstractDrive.GetDriveDisplayName(AbstractDrive.DriveType.Package),
                     SpecialLocation.Back or SpecialLocation.Forward or SpecialLocation.Up => Location.ToString(),
                     SpecialLocation.DriveView => Strings.Resources.S_BUTTON_DRIVES,
+                    SpecialLocation.SearchMode => SearchResultsLabel(),
                     SpecialLocation.devNull => Strings.Resources.S_LOCATION_PERM_DEL,
                     SpecialLocation.Unknown => Strings.Resources.S_LOCATION_NA,
                     _ => "",
@@ -63,7 +65,9 @@ namespace ADB_Explorer.Models
 
         public string BreadcrumbLabel => !string.IsNullOrEmpty(Path) && ArchivePath.IsArchivePath(Path, Data.DevicesObject?.Current?.ID)
             ? ArchivePath.GetBreadcrumbLabel(Path, Data.DevicesObject?.Current?.ID)
-            : NavigationName;
+            : Location is SpecialLocation.SearchMode
+                ? SearchResultsLabel()
+                : NavigationName;
 
         public bool IsNavigable
         {
@@ -80,6 +84,7 @@ namespace ADB_Explorer.Models
                     SpecialLocation.Up => true,
                     SpecialLocation.RecycleBin => true,
                     SpecialLocation.PackageDrive => true,
+                    SpecialLocation.SearchMode => true,
                     _ => false,
                 };
             }
@@ -111,6 +116,19 @@ namespace ADB_Explorer.Models
             }
             
             return SpecialLocation.None;
+        }
+
+        static string SearchResultsLabel()
+        {
+            var root = Data.SearchOriginPath;
+            if (string.IsNullOrEmpty(root))
+                return Strings.Resources.S_SEARCH;
+
+            var pathLabel = Data.CurrentDisplayNames.TryGetValue(root, out var displayName)
+                ? displayName
+                : FileHelper.GetFullName(root);
+
+            return string.Format(Strings.Resources.S_SEARCH_RESULTS_IN, pathLabel);
         }
 
         public string HistoryName

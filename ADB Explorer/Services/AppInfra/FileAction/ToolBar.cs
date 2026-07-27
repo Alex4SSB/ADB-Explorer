@@ -32,8 +32,8 @@ internal static class NavigationToolBar
             new BaseIcon("\uE197", 16),
             StyleHelper.ContentAnimation.Bounce),
         new IconMenu(
-            AppActions.List.Find(a => a.Name is FileAction.FileActionType.Refresh),
-            AppActions.Icon(FileAction.FileActionType.Refresh, 16),
+            AppActions.List.Find(a => a.Name is FileAction.FileActionType.NavRefresh),
+            Data.FileActions.NavRefreshIcon,
             StyleHelper.ContentAnimation.RotateCW,
             mirrorInRTL: true),
         ];
@@ -50,6 +50,7 @@ internal static class MainToolBar
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Push),
             new(new PushIcon()),
             isChevronVisible: true,
+            isVisible: Data.FileActions.IsPushMenuVisible,
             children: 
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFolders), AppActions.Icon(FileAction.FileActionType.PushFolders, 16)),
@@ -141,6 +142,17 @@ internal static class MainToolBar
 
 internal static class ExplorerContextMenu
 {
+    public static bool IsVisibleInContextMenu(SubMenu menu)
+    {
+        if (menu is SubMenuSeparator or DummySubMenu)
+            return false;
+
+        if (menu.Children is null)
+            return menu.Action.Command.IsEnabled;
+
+        return menu.Action.Command.IsEnabled && menu.Children.Any(child => child.Action.Command.IsEnabled);
+    }
+
     public static void UpdateSeparators()
     {
         var list = List.ToArray();
@@ -156,11 +168,11 @@ internal static class ExplorerContextMenu
                 Index endIndexBefore = separators[i].Item2;
                 Index startIndexAfter = separators[i].Item2 + 1;
 
-                sep.separator.IsEnabled = list[startIndexBefore..endIndexBefore].Any(a => a.Action.Command.IsEnabled)
-                    && list[startIndexAfter..].Any(a => a is not SubMenuSeparator and not DummySubMenu && a.Action.Command.IsEnabled);
+                sep.separator.IsEnabled = list[startIndexBefore..endIndexBefore].Any(IsVisibleInContextMenu)
+                    && list[startIndexAfter..].Any(IsVisibleInContextMenu);
             }
 
-            List.OfType<DummySubMenu>().First().IsEnabled = List.Where(a => a is not SubMenuSeparator and not DummySubMenu).All(a => !a.Action.Command.IsEnabled);
+            List.OfType<DummySubMenu>().First().IsEnabled = !List.OfType<SubMenu>().Any(IsVisibleInContextMenu);
         });
     }
 

@@ -519,6 +519,11 @@ public partial class DetailsPane : UserControl
                     control.LargeFileIcon.Source = Phone.DragImage;
                     control.FileNameTextBlock.FlowDirection = FlowDirection.LeftToRight;
                 }
+                else if (Data.FileActions.IsSearchMode)
+                {
+                    control.FileNameTextBlock.Text = Data.FileActions.ExplorerFilter;
+                    control.LargeFileIcon.Source = MultipleFiles.DragImage;
+                }
                 else if (Data.CurrentDrive?.Path == Data.CurrentPath)
                 {
                     control.FileNameTextBlock.Text = $"{Data.CurrentDrive.DisplayName}\n{TextHelper.LTR_MARK}({Data.CurrentDrive.Path}){TextHelper.LTR_MARK}";

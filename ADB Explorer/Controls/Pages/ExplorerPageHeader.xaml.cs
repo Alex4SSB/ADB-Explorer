@@ -1,4 +1,5 @@
 using ADB_Explorer.Converters;
+using ADB_Explorer.Controls;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
@@ -146,6 +147,7 @@ public partial class ExplorerPageHeader : UserControl
     }
 
     private readonly DispatcherTimer SelectionTimer = new() { Interval = SELECTION_CHANGED_DELAY };
+    private readonly DispatcherTimer _searchDebounceTimer = new() { Interval = TimeSpan.FromMilliseconds(300) };
     private bool _isSyncingSelection = false;
 
     public ExplorerPageHeader(ExplorerViewModel viewModel)
@@ -157,6 +159,16 @@ public partial class ExplorerPageHeader : UserControl
 
         RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
 
+        Data.RunExplorerSearch += (_, _) => App.SafeInvoke(() =>
+        {
+            if (Settings.SearchBox is SearchBox.SearchBoxMode.AllSubfolders)
+            {
+                _searchDebounceTimer.Stop();
+                _searchDebounceTimer.Start();
+            }
+        });
+        Data.ExitSearchMode += (_, _) => App.SafeInvoke(() => ExitSearchMode());
+
         InitializeComponent();
 
         PreviewTextInput += ExplorerPageHeader_PreviewTextInput;
@@ -165,6 +177,11 @@ public partial class ExplorerPageHeader : UserControl
         SearchBox.UnfocusTarget = ActiveView;
 
         SelectionTimer.Tick += SelectionTimer_Tick;
+        _searchDebounceTimer.Tick += (_, _) =>
+        {
+            _searchDebounceTimer.Stop();
+            RunExplorerSearch();
+        };
 
         DriveList.SelectionChanged += DriveList_SelectionChanged;
 
@@ -456,7 +473,10 @@ public partial class ExplorerPageHeader : UserControl
                             break;
                         case Navigation.SpecialLocation.Up:
                             bfNavigation = false;
-                            NavigateToPath(ParentPath);
+                            if (FileActions.IsSearchMode)
+                                ExitSearchMode();
+                            else
+                                NavigateToPath(ParentPath);
                             break;
                         default:
                             bfNavigation = false;
@@ -476,8 +496,8 @@ public partial class ExplorerPageHeader : UserControl
                     });
                     Task.Run(() =>
                     {
-                        FilterExplorerContextMenu();
                         ExplorerContextMenu.UpdateSeparators();
+                        FilterExplorerContextMenu();
                     });
                     break;
 
@@ -537,17 +557,13 @@ public partial class ExplorerPageHeader : UserControl
         if (collectionView is null)
             return;
 
-        Predicate<object> predicate = m =>
+        collectionView.Filter = m => m switch
         {
-            var menu = m as SubMenu;
-
-            if (menu.Children is null)
-                return menu.Action.Command.IsEnabled;
-            else
-                return menu.Action.Command.IsEnabled && menu.Children.Any(child => child.Action.Command.IsEnabled);
+            SubMenuSeparator => true,
+            DummySubMenu => true,
+            SubMenu menu => ExplorerContextMenu.IsVisibleInContextMenu(menu),
+            _ => false,
         };
-
-        collectionView.Filter = predicate;
     });
 
     private void NewItem(bool isFolder)
@@ -612,7 +628,11 @@ public partial class ExplorerPageHeader : UserControl
                         if (!DirList.InProgress)
                             Task.Delay(EMPTY_FOLDER_NOTICE_DELAY);
 
-                        App.SafeInvoke(() => FileActions.ListingInProgress = DirList.InProgress);
+                        App.SafeInvoke(() =>
+                        {
+                            FileActions.ListingInProgress = DirList.InProgress;
+                            FileActionLogic.UpdateFileActions();
+                        });
                     });
 
                     if (DirList.InProgress)
@@ -672,6 +692,11 @@ public partial class ExplorerPageHeader : UserControl
 
     private bool _navigateToPath(string realPath, FileClass? locationSource = null)
     {
+        FileActions.IsSearchMode = false;
+        Data.SearchOriginPath = null;
+        Data.SearchOriginCanWrite = false;
+        Data.SearchTransferParent = null;
+
         DeviceCts.Cancel();
         DeviceCts.Dispose();
         DeviceCts = new();
@@ -762,6 +787,108 @@ public partial class ExplorerPageHeader : UserControl
         return true;
     }
 
+    private void RunExplorerSearch()
+    {
+        if (Settings.SearchBox is not SearchBox.SearchBoxMode.AllSubfolders
+            || !FileActions.IsExplorerVisible
+            || FileActions.IsAppDrive
+            || FileActions.IsRecycleBin
+            || DevicesObject?.Current is null
+            || DirList is null)
+        {
+            return;
+        }
+
+        var query = FileActions.ExplorerFilter?.Trim();
+        if (string.IsNullOrEmpty(query))
+        {
+            if (FileActions.IsSearchMode)
+                ExitSearchMode();
+            return;
+        }
+
+        if (!FileActions.IsSearchMode)
+        {
+            Data.SearchOriginPath = CurrentPath;
+            var deviceId = DevicesObject?.Current?.ID;
+            Data.SearchOriginCanWrite = DirList?.CurrentLocation is { FullPath: var locationPath, CanWriteLocation: true } location
+                && locationPath == CurrentPath
+                || deviceId is not null && DriveHelper.IsModificationAllowedAt(CurrentPath, deviceId);
+        }
+
+        var searchRoot = Data.SearchOriginPath;
+        if (string.IsNullOrEmpty(searchRoot)
+            || AdbLocation.LocationFromString(searchRoot) is not Navigation.SpecialLocation.None)
+        {
+            return;
+        }
+
+        DeviceCts.Cancel();
+        DeviceCts.Dispose();
+        DeviceCts = new();
+
+        DirList.Stop();
+        DisposeFileIcons();
+
+        FileActions.ListingInProgress = true;
+        FileActions.IsSearchMode = true;
+        FileActions.IsDriveViewVisible = false;
+        FileActions.IsExplorerVisible = true;
+        FileActions.HomeEnabled = true;
+        FileActions.IsRecycleBin = false;
+        FileActions.IsAppDrive = false;
+        FileActions.IsArchive = false;
+        FileActions.IsTemp = false;
+        FileActions.ParentEnabled = false;
+
+        var searchPath = AdbLocation.StringFromLocation(Navigation.SpecialLocation.SearchMode);
+        CurrentPath = searchPath;
+        NavigationBox.Path = searchPath;
+        NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
+
+        ViewModel.FirstSelectedIndex = -1;
+        ViewModel.CurrentSelectedIndex = -1;
+        ActiveUnselectAll();
+
+        if (DetailsPane.IsOpen)
+            DetailsPane.SelectedFiles = [];
+
+        if (Settings.ThumbSizePerLocation)
+        {
+            ThumbnailService.ThumbnailSize size = ThumbnailService.ThumbnailSize.Disabled;
+            Settings.LocationThumbSize.TryGetValue(searchPath, out size);
+            ViewModel.CurrentThumbsSize = size;
+        }
+        else
+        {
+            ViewModel.CurrentThumbsSize = ThumbnailService.ThumbnailSize.Disabled;
+        }
+
+        SortExplorer();
+        DirList.Search(searchRoot, query, DeviceCts.Token);
+        ViewModel.ExplorerSource = DirList.FileList;
+        FileActionLogic.UpdateFileActions();
+
+        if (DetailsPane.IsOpen)
+            DetailsPane.RefreshSelection();
+    }
+
+    private void ExitSearchMode()
+    {
+        if (!FileActions.IsSearchMode)
+            return;
+
+        var origin = Data.SearchOriginPath;
+        FileActions.IsSearchMode = false;
+        Data.SearchOriginPath = null;
+        Data.SearchOriginCanWrite = false;
+        Data.SearchTransferParent = null;
+        FileActions.ExplorerFilter = "";
+
+        if (!string.IsNullOrEmpty(origin))
+            NavigateToPath(origin);
+    }
+
     private void SortExplorer()
     {
         if (Settings.SortingPerLocation && Settings.LocationSorting.TryGetValue(CurrentPath, out var sort))
@@ -819,6 +946,13 @@ public partial class ExplorerPageHeader : UserControl
         }
         else
         {
+            if (location.Location is Navigation.SpecialLocation.SearchMode)
+            {
+                if (!string.IsNullOrEmpty(FileActions.ExplorerFilter))
+                    RunExplorerSearch();
+                return;
+            }
+
             var path = string.IsNullOrEmpty(location.Path)
                 ? location.StringFromLocation()
                 : location.Path;
@@ -1330,6 +1464,8 @@ public partial class ExplorerPageHeader : UserControl
 
         ViewModel.IsMenuOpen = true;
         FileActionLogic.UpdateFileActions();
+        ExplorerContextMenu.UpdateSeparators();
+        FilterExplorerContextMenu();
     }
 
     private void ExplorerGrid_MouseDown(object sender, MouseButtonEventArgs e)

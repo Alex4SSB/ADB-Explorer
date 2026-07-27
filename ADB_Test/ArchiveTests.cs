@@ -453,6 +453,22 @@ public class ArchivePathTests
     }
 
     [TestMethod]
+    public void SeparatePath_SearchMode_IsDeviceThenSearchCrumb()
+    {
+        Data.CurrentDisplayNames["/sdcard/Download"] = "Downloads";
+        Data.SearchOriginPath = "/sdcard/Download";
+
+        var driveView = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
+        var searchMode = AdbLocation.StringFromLocation(Navigation.SpecialLocation.SearchMode);
+        var crumbs = NavigationBox.SeparatePath($"{driveView}{searchMode}").ToList();
+
+        Assert.HasCount(2, crumbs);
+        Assert.AreEqual(Navigation.SpecialLocation.DriveView, crumbs[0].Location);
+        Assert.AreEqual(Navigation.SpecialLocation.SearchMode, crumbs[1].Location);
+        StringAssert.Contains(crumbs[1].BreadcrumbLabel, "Downloads");
+    }
+
+    [TestMethod]
     public void SeparatePath_ArchiveRoot_IsSingleDashedCrumbForZip()
     {
         Data.CurrentDisplayNames["/sdcard"] = "Internal";

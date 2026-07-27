@@ -577,7 +577,14 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         else
         {
             children = Children;
-            descriptorParent = ParentPath;
+            if (Data.FileActions.IsSearchMode && !string.IsNullOrEmpty(Data.SearchOriginPath))
+            {
+                IEnumerable<FileClass> transferFiles = Data.SelectedFiles.Any() ? Data.SelectedFiles : [this];
+                descriptorParent = Data.SearchTransferParent ?? FileHelper.GetSearchTransferParent(transferFiles);
+            }
+            else
+                descriptorParent = ParentPath;
+
             pullSource = new SyncFile(this, children);
         }
 
@@ -587,7 +594,8 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
         vfdo.OperationCompleted += VFDO_OperationCompleted;
 
-        FolderTree[] items = [new(name, Size, UnixTime)];
+        var treeName = Data.FileActions.IsSearchMode ? FullPath : name;
+        FolderTree[] items = [new(treeName, Size, UnixTime)];
         if (includeContent && children is not null)
         {
             items = [.. items, .. children];

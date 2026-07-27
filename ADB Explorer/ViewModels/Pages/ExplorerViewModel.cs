@@ -291,6 +291,14 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
                 RequestModeRefresh?.Invoke();
                 break;
 
+            case nameof(AppSettings.SearchBox):
+                if (Data.Settings.SearchBox is SearchBox.SearchBoxMode.CurrentFolder && Data.FileActions.IsSearchMode)
+                    Data.RaiseExitSearchMode();
+                else if (Data.Settings.SearchBox is SearchBox.SearchBoxMode.AllSubfolders
+                         && !string.IsNullOrEmpty(Data.FileActions.ExplorerFilter))
+                    Data.RaiseRunExplorerSearch();
+                break;
+
             default:
                 break;
         }
@@ -351,6 +359,12 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
                 break;
 
             case nameof(FileActionsEnable.ExplorerFilter):
+                if (Data.Settings.SearchBox is SearchBox.SearchBoxMode.AllSubfolders)
+                {
+                    Data.RaiseRunExplorerSearch();
+                    break;
+                }
+
                 _filterDebounceTimer.Stop();
                 _filterDebounceTimer.Start();
                 break;

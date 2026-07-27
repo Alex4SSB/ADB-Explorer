@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 using ADB_Explorer.ViewModels.Pages;
@@ -443,6 +444,9 @@ internal static class FileActionLogic
 
     private static bool IsPasteIntoTargetAllowed(string targetPath)
     {
+        if (Data.FileActions.IsSearchMode && FileHelper.IsSearchLocation(targetPath))
+            return false;
+
         var deviceId = Data.DevicesObject?.Current?.ID ?? "";
         if (!ArchivePath.IsArchivePath(targetPath, deviceId))
             return true;
@@ -459,6 +463,9 @@ internal static class FileActionLogic
             && Data.CopyPaste.CurrentFiles.First().Relation(Data.CurrentPath) is RelationType.Descendant or RelationType.Self;
 
         if (pastingInDescendant || Data.FileActions.IsRecycleBin)
+            return DragDropEffects.None;
+
+        if (target is null && Data.FileActions.IsSearchMode)
             return DragDropEffects.None;
 
         if (FileHelper.RelationFrom(Data.CopyPaste.DragParent, AdbExplorerConst.RECYCLE_PATH) is RelationType.Self or RelationType.Ancestor)
@@ -742,6 +749,26 @@ internal static class FileActionLogic
         Data.RuntimeSettings.LocationToNavigate = new(Data.CurrentPath);
     }
 
+    public static void NavRefresh()
+    {
+        if (Data.FileActions.IsSearchMode && Data.FileActions.ListingInProgress)
+        {
+            StopSearch();
+            return;
+        }
+
+        Refresh();
+    }
+
+    public static void StopSearch()
+    {
+        if (!Data.FileActions.IsSearchMode || !Data.FileActions.ListingInProgress)
+            return;
+
+        Data.DeviceCts.Cancel();
+        Data.DirList?.Stop();
+    }
+
     public static void RefreshDrives(bool asyncClassify, CancellationToken cancellationToken)
     {
         if (Data.DevicesObject.Current is null)
@@ -903,6 +930,7 @@ internal static class FileActionLogic
             Data.FileActions.CutEnabled =
             Data.FileActions.CopyEnabled =
             Data.FileActions.IsExplorerVisible =
+            Data.FileActions.IsSearchMode =
             Data.FileActions.PackageActionsEnabled =
             Data.FileActions.IsCopyItemPathEnabled =
             Data.FileActions.UpdateModifiedEnabled =
@@ -935,7 +963,12 @@ internal static class FileActionLogic
         Data.FileActions.ContextPushPackagesEnabled = Data.FileActions.IsAppDrive && !Data.SelectedPackages.Any();
 
         Data.FileActions.IsRefreshEnabled = Data.FileActions.IsDriveViewVisible || Data.FileActions.IsExplorerVisible;
-        Data.FileActions.IsCopyCurrentPathEnabled = Data.FileActions.IsExplorerVisible && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive;
+        Data.FileActions.IsPushMenuVisible.Value = !Data.FileActions.IsSearchMode;
+        UpdateNavRefreshActionState();
+        Data.FileActions.IsCopyCurrentPathEnabled = Data.FileActions.IsExplorerVisible
+            && !Data.FileActions.IsRecycleBin
+            && !Data.FileActions.IsAppDrive
+            && !Data.FileActions.IsSearchMode;
 
         Data.FileActions.IsOpenApkLocationEnabled = Data.FileActions.IsAppDrive && Data.SelectedPackages.Count() == 1;
         Data.FileActions.IsApkWebSearchEnabled = Data.FileActions.IsOpenApkLocationEnabled && !string.IsNullOrEmpty(Data.RuntimeSettings.DefaultBrowserPath);
@@ -957,20 +990,26 @@ internal static class FileActionLogic
             Data.FileActions.IsArchive = ArchivePath.IsArchivePath(currentPath, deviceId);
 
         var isWritable = restrictions.ReadOnly is not true
-            && Data.DirList?.CurrentLocation?.CanWriteLocation == true;
+            && (Data.FileActions.IsSearchMode
+                ? Data.SearchOriginCanWrite
+                : Data.DirList?.CurrentLocation?.CanWriteLocation == true);
         var canPasteIntoTar = deviceId is not null
             && ArchiveHelper.CanPasteIntoArchive(Data.CurrentPath ?? "", deviceId);
         var isExplorerFolder = Data.FileActions.IsExplorerVisible
             && !Data.FileActions.IsRecycleBin
             && !Data.FileActions.IsAppDrive
-            && !Data.FileActions.IsArchive;
+            && !Data.FileActions.IsArchive
+            && !Data.FileActions.IsSearchMode;
 
         Data.FileActions.IsCurrentLocationReadOnly = (isExplorerFolder || canPasteIntoTar) && !isWritable;
         Data.FileActions.IsSelectionFuseProtectedAndroidRoot = Data.SelectedFiles.Any()
             && SelectionIsFuseProtectedAndroidRoot;
 
         // Push into modifiable tar is allowed; New File/Folder inside modifiable tar is allowed.
-        Data.FileActions.PushFilesFoldersEnabled = isWritable && (isExplorerFolder || canPasteIntoTar);
+        var isSearchFolderTarget = Data.FileActions.IsSearchMode
+            && Data.SelectedFiles.Count() == 1
+            && Data.SelectedFiles.First().IsDirectory;
+        Data.FileActions.PushFilesFoldersEnabled = isWritable && (isExplorerFolder || canPasteIntoTar || isSearchFolderTarget);
         Data.FileActions.NewEnabled = isWritable && (isExplorerFolder || canPasteIntoTar);
         Data.FileActions.IsNewMenuVisible.Value = Data.FileActions.IsExplorerVisible
             && !Data.FileActions.IsRecycleBin
@@ -1044,7 +1083,9 @@ internal static class FileActionLogic
         Data.FileActions.ContextPushEnabled = isWritable
             && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive
             && (!Data.FileActions.IsArchive || canPasteIntoTar)
-            && (!Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
+            && (Data.FileActions.IsSearchMode
+                ? Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory
+                : !Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 
         Data.FileActions.RenameEnabled = isWritable
                                          && (!Data.FileActions.IsArchive || canPasteIntoTar)
@@ -1120,6 +1161,33 @@ internal static class FileActionLogic
 
         if (!Data.CopyPaste.IsDrag)
             Data.RuntimeSettings.FilterActions = true;
+    }
+
+    private static void UpdateNavRefreshActionState()
+    {
+        if (Data.FileActions.IsSearchMode && Data.FileActions.ListingInProgress)
+        {
+            Data.FileActions.NavRefreshDescription.Value = string.Format(
+                Strings.Resources.S_MENU_STOP_LOADING,
+                SearchStopPathLabel());
+            Data.FileActions.NavRefreshIcon.Value = new BaseIcon("\uE711", 16);
+        }
+        else
+        {
+            Data.FileActions.NavRefreshDescription.Value = Strings.Resources.S_MENU_REFRESH;
+            Data.FileActions.NavRefreshIcon.Value = new BaseIcon("\uE72C", 16);
+        }
+    }
+
+    private static string SearchStopPathLabel()
+    {
+        var root = Data.SearchOriginPath;
+        if (string.IsNullOrEmpty(root))
+            return Data.FileActions.ExplorerFilter ?? "";
+
+        return Data.CurrentDisplayNames.TryGetValue(root, out var displayName)
+            ? displayName
+            : FileHelper.GetFullName(root);
     }
 
     public static void PushItems(bool isFolderPicker, bool isContextMenu)

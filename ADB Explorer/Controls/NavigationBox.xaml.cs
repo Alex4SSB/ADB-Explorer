@@ -279,6 +279,35 @@ public partial class NavigationBox : UserControl
         if (current.Length == 0)
             yield break;
 
+        var searchModePath = AdbLocation.StringFromLocation(Navigation.SpecialLocation.SearchMode);
+        if (current.EndsWith(searchModePath, StringComparison.Ordinal))
+        {
+            var pathBeforeSearch = current.Length == searchModePath.Length
+                ? ""
+                : current[..^searchModePath.Length];
+
+            if (!string.IsNullOrEmpty(pathBeforeSearch))
+            {
+                foreach (var loc in SeparatePath($"{driveView}{pathBeforeSearch}"))
+                {
+                    if (loc.Location is Navigation.SpecialLocation.DriveView)
+                        continue;
+
+                    yield return loc;
+                }
+            }
+
+            yield return new(Navigation.SpecialLocation.SearchMode);
+            yield break;
+        }
+
+        if (AdbLocation.LocationFromString(current) is Navigation.SpecialLocation special
+            and not Navigation.SpecialLocation.None)
+        {
+            yield return new(special);
+            yield break;
+        }
+
         var pairs = Data.CurrentDisplayNames.Where(kv => current.StartsWith(kv.Key));
         var drive = pairs.Count() > 1
             ? pairs.OrderBy(kv => kv.Key.Length).Last()
@@ -340,6 +369,7 @@ public partial class NavigationBox : UserControl
     List<AdbLocation> locations = [];
     List<TextMenu> breadcrumbs = [];
     List<double> itemWidths = [];
+    double excessButtonWidth;
 
     private void PopulateButtons(string path)
     {
@@ -355,7 +385,13 @@ public partial class NavigationBox : UserControl
         breadcrumbs[^1].IsLast = true;
 
         var template = (DataTemplate)Resources["BreadcrumbTemplate"];
-        itemWidths = [.. breadcrumbs.Select(item => GetTextWidth(item) + ControlSize.GetWidth(template, item))];
+        itemWidths = [.. breadcrumbs.Select(item => ControlSize.GetWidth(template, item))];
+
+        if (excessButtonWidth <= 0)
+        {
+            var excess = new TextMenu(new FileAction(FileAction.FileActionType.None, () => true, () => { }, "\uE712"));
+            excessButtonWidth = ControlSize.GetWidth(template, excess);
+        }
 
         ArrangeBreadcrumbs();
     }
@@ -368,8 +404,7 @@ public partial class NavigationBox : UserControl
         int lastHiddenIndex = -1;
         for (var i = 1; i < breadcrumbs.Count; i++)
         {
-            var width = PathItemsControl.ActualWidth;
-            if (125 + itemWidths[0] + itemWidths[i..].Sum() > PathItemsControl.ActualWidth)
+            if (excessButtonWidth + itemWidths[0] + itemWidths[i..].Sum() > PathItemsControl.ActualWidth)
             {
                 lastHiddenIndex = i;
             }
@@ -393,12 +428,6 @@ public partial class NavigationBox : UserControl
 
             Items = [breadcrumbs[0], excessButton, .. remainingCrumbs];
         }
-    }
-
-    private static double GetTextWidth(TextMenu textMenu)
-    {
-        TextBlock textBlock = new() { Text = textMenu.Action.Description };
-        return ControlSize.GetWidth(textBlock);
     }
 
     private void PathBox_GotFocus(object sender, RoutedEventArgs e)

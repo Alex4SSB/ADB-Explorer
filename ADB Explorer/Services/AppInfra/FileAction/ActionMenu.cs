@@ -229,6 +229,26 @@ public class IconMenu : ActionMenu
         }
     }
 
+    public IconMenu(FileAction fileAction,
+                    ObservableProperty<BaseIcon> dynamicIcon,
+                    StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
+                    IEnumerable<SubMenu> children = null,
+                    FileAction altAction = null,
+                    ObservableProperty<bool> isVisible = null,
+                    bool mirrorInRTL = false)
+        : base(fileAction, dynamicIcon.Value, children, animation, altAction: altAction, isVisible: isVisible, mirrorInRTL: mirrorInRTL)
+    {
+        dynamicIcon.PropertyChanged += (_, _) =>
+        {
+            IconContent = dynamicIcon.Value?.IconContent;
+            if (dynamicIcon.Value is not null)
+            {
+                IconSize = (int)dynamicIcon.Value.Size;
+                OnPropertyChanged(nameof(IconSize));
+            }
+        };
+    }
+
     public IconMenu(IEnumerable<SubMenu> children,
                     string description,
                     BaseIcon icon,

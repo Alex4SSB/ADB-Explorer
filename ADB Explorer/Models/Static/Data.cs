@@ -17,6 +17,21 @@ public static class Data
     } = "";
     public static string ParentPath => FileHelper.GetParentPath(CurrentPath);
 
+    /// <summary>
+    /// Device path active when the user entered explorer search mode.
+    /// </summary>
+    public static string? SearchOriginPath { get; set; }
+
+    /// <summary>
+    /// Whether the search root allowed modifications when search mode was entered.
+    /// </summary>
+    public static bool SearchOriginCanWrite { get; set; }
+
+    /// <summary>
+    /// Optimized common parent for the current search-mode transfer batch.
+    /// </summary>
+    public static string? SearchTransferParent { get; set; }
+
     public static ObservableProperty<string> CurrentPathO { get; } = new();
 
     public static DriveViewModel CurrentDrive { get; set; } = null;
@@ -71,6 +86,12 @@ public static class Data
 
     public static event EventHandler? UnfocusSearchBox;
     public static void RaiseUnfocusSearchBox() => UnfocusSearchBox?.Invoke(null, EventArgs.Empty);
+
+    public static event EventHandler? RunExplorerSearch;
+    public static void RaiseRunExplorerSearch() => RunExplorerSearch?.Invoke(null, EventArgs.Empty);
+
+    public static event EventHandler? ExitSearchMode;
+    public static void RaiseExitSearchMode() => ExitSearchMode?.Invoke(null, EventArgs.Empty);
 
     public static ObservableProperty<bool> IsLogPaused { get; set; } = new();
 

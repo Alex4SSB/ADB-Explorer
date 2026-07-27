@@ -47,6 +47,7 @@ public static class AppActions
         { FileActionType.SearchApkOnWeb, "\uF6FA" },
         { FileActionType.Home, "\uE80F" },
         { FileActionType.Refresh, "\uE72C" },
+        { FileActionType.NavRefresh, "\uE72C" },
         { FileActionType.CopyItemPath, "\uE62F" },
         { FileActionType.FileOpStop, "\uE768" },
     };
@@ -143,6 +144,12 @@ public static class AppActions
             () => Data.FileActions.IsRefreshEnabled && !Data.FileActions.ListingInProgress,
             FileActionLogic.Refresh,
             Strings.Resources.S_MENU_REFRESH,
+            new(Key.F5)),
+        new(FileActionType.NavRefresh,
+            () => (Data.FileActions.IsSearchMode && Data.FileActions.ListingInProgress)
+                  || (Data.FileActions.IsRefreshEnabled && !Data.FileActions.ListingInProgress),
+            FileActionLogic.NavRefresh,
+            Data.FileActions.NavRefreshDescription,
             new(Key.F5),
             true),
         new(FileActionType.CopyCurrentPath,
@@ -367,6 +374,7 @@ public class FileAction : ViewModelBase
         Forward,
         Up,
         Refresh,
+        NavRefresh,
         CopyCurrentPath,
         EditCurrentPath,
         Filter,

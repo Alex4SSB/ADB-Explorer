@@ -83,6 +83,10 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
 
         LocationThumbSize = _locationThumbSize;
         LocationSorting = _locationSorting;
+
+        LocationThumbSize.TryAdd(
+            AdbLocation.StringFromLocation(Navigation.SpecialLocation.SearchMode),
+            ThumbnailService.ThumbnailSize.Disabled);
     }
 
     void IJsonOnSerializing.OnSerializing()
@@ -144,6 +148,9 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
 
     [ObservableProperty]
     public partial bool EnableEmulatorDiscovery { get; set; } = false;
+
+    [ObservableProperty]
+    public partial SearchBox.SearchBoxMode SearchBox { get; set; } = Controls.SearchBox.SearchBoxMode.CurrentFolder;
 
     [ObservableProperty]
     public partial bool IsDetailsPaneOpen { get; set; } = false;

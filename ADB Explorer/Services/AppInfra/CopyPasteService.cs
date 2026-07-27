@@ -329,7 +329,11 @@ public partial class CopyPasteService : ObservableObject
 
         SourceDevice = Data.DevicesObject.Current;
         MasterPid = Environment.ProcessId;
-        DragParent = VirtualFileDataObject.SelfFiles.First().ParentPath;
+        var transferParent = FileHelper.GetSearchTransferParent(VirtualFileDataObject.SelfFiles);
+        if (Data.FileActions.IsSearchMode)
+            Data.SearchTransferParent = transferParent;
+
+        DragParent = transferParent;
 
         // FileDescriptors may still be the empty placeholder while PrepareDescriptors runs
         // (especially archive extract-to-tmp). Fall back to SelfFiles until they are ready.
@@ -341,7 +345,7 @@ public partial class CopyPasteService : ObservableObject
         }
         else
         {
-            DragFiles = [.. VirtualFileDataObject.SelfFiles.Select(f => f.FullName)];
+            DragFiles = [.. VirtualFileDataObject.SelfFiles.Select(FileHelper.GetSearchTransferName)];
             Descriptors = [];
         }
 
@@ -548,6 +552,11 @@ public partial class CopyPasteService : ObservableObject
         string targetFolder = dataContext is FileClass { IsDirectory: true } file
             ? file.FullPath
             : Data.CurrentPath;
+
+        if (Data.FileActions.IsSearchMode
+            && dataContext is not FileClass { IsDirectory: true }
+            && FileHelper.IsSearchLocation(targetFolder))
+            return;
         
         // Do not perform implicit duplicate by drag (only with Ctrl)
         if (IsSelf && targetFolder == DragParent && e.KeyStates is DragDropKeyStates.None)
@@ -567,6 +576,9 @@ public partial class CopyPasteService : ObservableObject
     public void AcceptDataObject(IDataObject dataObject, string targetFolder, bool isLink = false)
     {
         var deviceId = Data.DevicesObject.Current?.ID ?? "";
+        if (FileHelper.IsSearchLocation(targetFolder))
+            return;
+
         if (!DriveHelper.IsModificationAllowedAt(targetFolder, deviceId))
             return;
 

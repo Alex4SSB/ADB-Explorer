@@ -188,7 +188,12 @@ public partial class ADBService
                 }
                 else
                 {
-                    outputQueue.Add(e.Data, cancellationToken);
+                    try
+                    {
+                        outputQueue.Add(e.Data, cancellationToken);
+                    }
+                    catch (OperationCanceledException)
+                    { }
                 }
 
             DiskUsagePollingService.LastServerResponse = DateTime.Now;
@@ -252,6 +257,10 @@ public partial class ADBService
             try
             {
                 moved = enumerator.MoveNext();
+            }
+            catch (OperationCanceledException)
+            {
+                yield break;
             }
             catch (Win32Exception)
             {
@@ -563,6 +572,29 @@ public partial class ADBService
         return stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries);
     }
 
+    public static IEnumerable<FileStat> SearchResultsStreaming(string deviceID, string path, string query, CancellationToken cancellationToken, bool caseSensitive = false)
+    {
+        string[] args = PrepSearchArgs(deviceID, path, query, caseSensitive);
+        if (args.Length == 0)
+            yield break;
+
+        var actualCmd = ShellCommands.TranslateCommand("find");
+        foreach (var line in ExecuteDeviceAdbCommandAsync(deviceID, "shell", cancellationToken, [actualCmd, ..args]))
+        {
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            if (ParseSearchResultLine(line) is { } fileStat)
+                yield return fileStat;
+        }
+    }
+
+    public static IEnumerable<string> SearchPathsStreaming(string deviceID, string path, string query, CancellationToken cancellationToken, bool caseSensitive = false)
+    {
+        foreach (var result in SearchResultsStreaming(deviceID, path, query, cancellationToken, caseSensitive))
+            yield return result.FullPath;
+    }
+
     /// <summary>
     /// Determines which of the specified file paths exist on a device identified by the given device ID.
     /// </summary>
@@ -616,6 +648,100 @@ public partial class ADBService
         return args;
     }
 
+    private static string[] PrepSearchArgs(string deviceID, string path, string query, bool caseSensitive = false)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            return [];
+
+        if (!path.EndsWith('/'))
+            path += "/";
+
+        var nameArg = caseSensitive ? "-name" : "-iname";
+        var pattern = $"*{EscapeFindPattern(query.Trim())}*";
+        var lineEnd = $"\\n'";
+
+        if (ShellCommands.FindPrintf(deviceID))
+        {
+            var dirPrintf = $"'%p{ADB_FIELD_SEP}d{ADB_FIELD_SEP}d{ADB_FIELD_SEP}{lineEnd}";
+            var filePrintf = $"'%p{ADB_FIELD_SEP}%s{ADB_FIELD_SEP}%T@{ADB_FIELD_SEP}{lineEnd}";
+            var linkPrintf = $"'%p{ADB_FIELD_SEP}l{ADB_FIELD_SEP}%T@{ADB_FIELD_SEP}{lineEnd}";
+
+            return
+            [
+                EscapeAdbShellString(path),
+                "\\(",
+                nameArg,
+                EscapeAdbShellString(pattern),
+                "\\(",
+                "-type", "d", "-printf", dirPrintf,
+                "-o", "-type", "f", "-printf", filePrintf,
+                "-o", "-type", "l", "-printf", linkPrintf,
+                "\\)",
+                "\\)",
+                @"2>/dev/null",
+            ];
+        }
+
+        var stat = ShellCommands.TranslateCommand("stat");
+
+        return
+        [
+            EscapeAdbShellString(path),
+            "\\(",
+            nameArg,
+            EscapeAdbShellString(pattern),
+            "\\)",
+            "2>/dev/null | while IFS= read -r f;",
+            "do if [ -d \\\"$f\\\" ]; then",
+            $"echo \\\"$f{ADB_FIELD_SEP}d{ADB_FIELD_SEP}d{ADB_FIELD_SEP}\\\";",
+            "elif [ -L \\\"$f\\\" ]; then",
+            $"echo \\\"$f{ADB_FIELD_SEP}l{ADB_FIELD_SEP}$({stat} -c '%Y' \\\"$f\\\"){ADB_FIELD_SEP}\\\";",
+            "else",
+            $"echo \\\"$f{ADB_FIELD_SEP}$({stat} -c '%s{ADB_FIELD_SEP}%Y' \\\"$f\\\"){ADB_FIELD_SEP}\\\";",
+            "fi; done;",
+        ];
+    }
+
+    private static FileStat? ParseSearchResultLine(string line)
+    {
+        var parts = line.Split(ADB_FIELD_SEP, StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length < 3)
+            return null;
+
+        var fullPath = parts[0];
+        var name = FileHelper.GetFullName(fullPath);
+        var isDirectory = parts[1] == "d";
+        var isLink = parts[1] == "l";
+
+        long? size = null;
+        if (!isDirectory && !isLink && long.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedSize))
+            size = parsedSize;
+
+        DateTime? modifiedTime = null;
+        if (parts[2] != "d"
+            && double.TryParse(parts[2], NumberStyles.Any, CultureInfo.InvariantCulture, out var unixTime))
+        {
+            modifiedTime = DateTimeOffset.FromUnixTimeSeconds((long)unixTime).LocalDateTime;
+        }
+
+        var type = isDirectory ? FileType.Folder
+            : isLink ? FileType.Unknown
+            : FileType.File;
+
+        return new(name, fullPath, type, isLink, size, modifiedTime, null);
+    }
+
+    private static string EscapeFindPattern(string query) =>
+        string.Concat(query.Select(c =>
+            c switch
+            {
+                '\\' => @"\\",
+                '*' => @"\*",
+                '?' => @"\?",
+                '[' => @"\[",
+                _ => new string(c, 1)
+            }));
+
     public static long CountRecycle(string deviceID)
     {
         return (long)CountFiles(deviceID, RECYCLE_PATH, excludeNames: ["*" + RECYCLE_INDEX_SUFFIX]);
@@ -624,27 +750,6 @@ public partial class ADBService
     public static ulong CountPackages(string deviceID)
     {
         return CountFiles(deviceID, TEMP_PATH, includeNames: INSTALL_APK.Select(name => "*" + name));
-    }
-
-    static IEnumerable<string> _repoHashList;
-    static IEnumerable<string> RepoHashList
-    {
-        get
-        {
-            if (_repoHashList is not null)
-                return _repoHashList;
-
-            try
-            {
-                _repoHashList = Network.GetAdbVersionListAsync().GetAwaiter().GetResult() ?? [];
-            }
-            catch
-            {
-                _repoHashList = [];
-            }
-
-            return _repoHashList;
-        }
     }
 
     private static readonly TimeSpan AdbVersionCheckTimeout = TimeSpan.FromSeconds(15);
@@ -1033,6 +1138,8 @@ public partial class ADBService
                     output.Enqueue(item);
             }
         }
+        catch (OperationCanceledException)
+        { }
         catch (Exception e)
         {
             var message = e.Message;

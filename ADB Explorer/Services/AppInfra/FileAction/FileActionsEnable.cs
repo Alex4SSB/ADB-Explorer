@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 
 namespace ADB_Explorer.Services;
@@ -243,6 +244,13 @@ public partial class FileActionsEnable : ObservableObject
         set => SetProperty(ref isTemp, value);
     }
 
+    private bool isSearchMode = false;
+    public bool IsSearchMode
+    {
+        get => isSearchMode;
+        set => SetProperty(ref isSearchMode, value);
+    }
+
     private bool isExplorerVisible = false;
     public bool IsExplorerVisible
     {
@@ -420,6 +428,8 @@ public partial class FileActionsEnable : ObservableObject
 
     public ObservableProperty<bool> IsApkActionsVisible = new() { Value = Data.Settings.EnableApk };
 
+    public ObservableProperty<bool> IsPushMenuVisible = new() { Value = true };
+
     public ObservableProperty<string> CopyPathDescription = new();
 
     public ObservableProperty<string> DeleteDescription = new();
@@ -433,6 +443,10 @@ public partial class FileActionsEnable : ObservableObject
     public ObservableProperty<string> CutItemsCount = new();
 
     public ObservableProperty<string> PullDescription = new();
+
+    public ObservableProperty<string> NavRefreshDescription = new() { Value = Strings.Resources.S_MENU_REFRESH };
+
+    public ObservableProperty<BaseIcon> NavRefreshIcon = new() { Value = new BaseIcon("\uE72C", 16) };
     
     #endregion
 

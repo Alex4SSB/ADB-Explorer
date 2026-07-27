@@ -51,6 +51,8 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
 
     private ConcurrentQueue<FileStat> currentFileQueue;
 
+    private bool isSearchListing;
+
     private FileClass? locationSource;
     
     [ObservableProperty]
@@ -62,6 +64,58 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
 
         this.locationSource = locationSource;
         StartDirectoryList(path);
+    }
+
+    public void Search(string rootPath, string query, CancellationToken cancellationToken)
+    {
+        ArchivePath.InvalidateCache();
+
+        locationSource = null;
+
+        var searchLocation = AdbLocation.StringFromLocation(Navigation.SpecialLocation.SearchMode);
+
+        Dispatcher.BeginInvoke(() =>
+        {
+            IsLinkListingFinished = false;
+
+            LinkListCancellation?.Cancel();
+            StopDirectoryList();
+            FileList.RemoveAll();
+
+            isSearchListing = true;
+            InProgress = true;
+            IsProgressVisible = false;
+            CurrentPath = searchLocation;
+            CurrentLocation = null;
+        }).Wait();
+
+        CurrentCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        LinkListCancellation = new();
+        currentFileQueue = new ConcurrentQueue<FileStat>();
+
+        ReadTask = Task.Run(() =>
+        {
+            try
+            {
+                foreach (var fileStat in ADBService.SearchResultsStreaming(Device.ID, rootPath, query, CurrentCancellationToken.Token))
+                {
+                    if (CurrentCancellationToken.IsCancellationRequested)
+                        break;
+
+                    currentFileQueue.Enqueue(fileStat);
+                }
+            }
+            catch (OperationCanceledException)
+            { }
+        }, CurrentCancellationToken.Token);
+
+        ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(() => StopDirectoryList()), CurrentCancellationToken.Token);
+
+        Task.Delay(DIR_LIST_VISIBLE_PROGRESS_DELAY).ContinueWith(
+            (t) => Dispatcher.BeginInvoke(() => IsProgressVisible = InProgress),
+            CurrentCancellationToken.Token);
+
+        ScheduleUpdate();
     }
 
     public void RefreshLocationAccess()
@@ -96,6 +150,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
             StopDirectoryList();
             FileList.RemoveAll();
 
+            isSearchListing = false;
             InProgress = true;
             IsProgressVisible = false;
             CurrentPath = path;
@@ -125,7 +180,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
 
     private void ScheduleUpdate()
     {
-        UpdateDelays(currentFileQueue.Count);
+        UpdateDelays(currentFileQueue?.Count ?? 0);
 
         UpdateTask = Task.Delay(UpdateInterval);
         UpdateTask.ContinueWith(
@@ -154,6 +209,9 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
 
     private void UpdateDirectoryList(bool finish)
     {
+        if (currentFileQueue is null)
+            return;
+
         if (finish || (currentFileQueue.Count >= MinUpdateThreshold))
         {
             for (int i = 0; finish || (i < DIR_LIST_UPDATE_THRESHOLD_MAX); i++)
@@ -193,7 +251,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
         {
             ReadTask.Wait();
         }
-        catch (AggregateException e) when (e.InnerException is TaskCanceledException)
+        catch (AggregateException e) when (e.InnerException is OperationCanceledException)
         { }
 
         UpdateDirectoryList(true);
@@ -203,11 +261,20 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
         ReadTask = null;
         CurrentCancellationToken = null;
 
+        if (isSearchListing)
+        {
+            isSearchListing = false;
+            IsLinkListingFinished = true;
+            return;
+        }
+
         var path = currentPath;
         var source = CurrentLocation;
-        var token = LinkListCancellation.Token;
+        var token = LinkListCancellation?.Token ?? CancellationToken.None;
 
-        if ((currentFileQueue.IsEmpty && !FileList.Any()) || ArchivePath.IsArchivePath(path, Device.ID))
+        if (currentFileQueue is null
+            || (currentFileQueue.IsEmpty && !FileList.Any())
+            || ArchivePath.IsArchivePath(path, Device.ID))
         {
             IsLinkListingFinished = true;
             Task.Run(() => UpdateLocationAccess(path, source, token), token);
