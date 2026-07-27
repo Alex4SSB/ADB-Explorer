@@ -232,7 +232,7 @@
     <value>Spustit WSA v pozadí</value>
   </data>
   <data name="S_PULL_ACTION" xml:space="preserve">
-    <value>Pull</value>
+    <value>Stáhnout</value>
   </data>
   <data name="S_PULL_ACTION_LINK" xml:space="preserve">
     <value>Stáhnout (cíl odkazu)</value>
@@ -241,7 +241,7 @@
     <value>Obnova ze zálohy</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>List Directory Error</value>
+    <value>Chyba při výpisu adresáře</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Stáhnout do kořene jednotky Windows</value>
@@ -300,13 +300,13 @@ Chcete-li ADB povolit, otevřete pokročilá nastavení WSA.</value>
     <value>Nový {0} ve verzi {1} je k dispozici</value>
   </data>
   <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
-    <value>Go To Version Page</value>
+    <value>Přejít na stránku verze</value>
   </data>
   <data name="S_BUTTON_CLOSE" xml:space="preserve">
     <value>Zavřít</value>
   </data>
   <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
-    <value>Go To Release Notes</value>
+    <value>Přejít k poznámkám k vydání</value>
   </data>
   <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
     <value>Zásady ochrany osobních údajů byly aktualizovány</value>
@@ -377,7 +377,7 @@ Zobrazený obsah nemusí být úplný.</value>
     <comment>0 = Device name to remove</comment>
   </data>
   <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
-    <value>Kill {0}</value>
+    <value>Ukončit {0}</value>
     <comment>0 = Emulator name to kill</comment>
   </data>
   <data name="S_REM_APK" xml:space="preserve">
@@ -386,7 +386,7 @@ Zobrazený obsah nemusí být úplný.</value>
   </data>
   <data name="S_REM_APK_PLURAL" xml:space="preserve">
     <value>Budou odebrány tyto položky:
-{0} packages</value>
+{0} balíčků</value>
   </data>
   <data name="S_UNINSTALL" xml:space="preserve">
     <value>Odinstalovat</value>
@@ -534,7 +534,7 @@ Zobrazený obsah nemusí být úplný.</value>
     <comment>The title of the settings group that defines the working directories</comment>
   </data>
   <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
-    <value>Explorer</value>
+    <value>Průzkumník</value>
     <comment>The title of the settings group that defines the explorer / browser behavior</comment>
   </data>
   <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
@@ -595,7 +595,7 @@ Zvolte Vlastní, chcete-li použít umístění, které se při odinstalování 
     <comment>The title of the about section listing licenses</comment>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
-    <value>[not set]</value>
+    <value>[nenastaveno]</value>
     <comment>The placeholder text for a textbox whose value hasn't been set</comment>
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
@@ -650,7 +650,7 @@ Zrušit všechny probíhající operace</value>
     <comment>The tooltip of a button used to pause updates to the command log, in its on state</comment>
   </data>
   <data name="S_BUTTON_LOG" xml:space="preserve">
-    <value>Command Log</value>
+    <value>Protokol příkazů</value>
     <comment>The tooltip of a button used to show / hide the command log</comment>
   </data>
   <data name="S_BUTTON_DRIVES" xml:space="preserve">
@@ -673,7 +673,7 @@ Zrušit všechny probíhající operace</value>
     <value>Zařízení</value>
   </data>
   <data name="S_BUTTON_PUSH" xml:space="preserve">
-    <value>Push</value>
+    <value>Nahrát</value>
     <comment>The tooltip of the button used to initiate a push operation</comment>
   </data>
   <data name="S_MENU_FOLDERS" xml:space="preserve">
@@ -838,11 +838,11 @@ Zrušit všechny probíhající operace</value>
     <value>{0} s</value>
   </data>
   <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>Kill Server</value>
+    <value>Ukončit server</value>
     <comment>The content of a button to kill ADB server</comment>
   </data>
   <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>Kill Process</value>
+    <value>Ukončit proces</value>
     <comment>The content of a button to kill the process of ADB</comment>
   </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
@@ -901,7 +901,7 @@ Zrušit všechny probíhající operace</value>
     <comment>The title of the menu to select a device reboot option</comment>
   </data>
   <data name="S_REBOOT_SYSTEM" xml:space="preserve">
-    <value>System Image</value>
+    <value>Systém Android</value>
     <comment>The menu option to reboot the device into the Android system</comment>
   </data>
   <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
@@ -917,7 +917,7 @@ Zrušit všechny probíhající operace</value>
     <comment>The menu option to reboot the device into side-load mode, with auto reboot</comment>
   </data>
   <data name="S_STATUS_OFFLINE" xml:space="preserve">
-    <value>{0} - Offline</value>
+    <value>{0} – offline</value>
     <comment>A device that is no longer online</comment>
   </data>
   <data name="S_STATUS_UNAUTH" xml:space="preserve">
@@ -954,11 +954,11 @@ Zrušit všechny probíhající operace</value>
     <comment>Battery charging source indicator - wireless charging</comment>
   </data>
   <data name="S_BAT_SOURCE_AC" xml:space="preserve">
-    <value>AC</value>
+    <value>Síťové napájení</value>
     <comment>Battery charging source indicator - AC charging</comment>
   </data>
   <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
-    <value>None</value>
+    <value>Žádný</value>
     <comment>Battery charging source indicator - no source of charging</comment>
   </data>
   <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
@@ -1038,11 +1038,11 @@ Zrušit všechny probíhající operace</value>
     <comment>Validate a file operation, by comparing MD5 of source and target files</comment>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
-    <value>Link</value>
+    <value>Odkaz</value>
     <comment>A link to an unknown file type</comment>
   </data>
   <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
-    <value>{0} (Link)</value>
+    <value>{0} (odkaz)</value>
     <comment>A link to a {0} file type</comment>
   </data>
   <data name="S_FILE_TYPE_APK" xml:space="preserve">
@@ -1060,7 +1060,7 @@ Zrušit všechny probíhající operace</value>
     <value>Ano</value>
   </data>
   <data name="S_DRIVE_ROOT" xml:space="preserve">
-    <value>Root</value>
+    <value>Kořenový adresář</value>
     <comment>The root drive - /</comment>
   </data>
   <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
@@ -1171,7 +1171,7 @@ Zrušit všechny probíhající operace</value>
     <value>Aplikace WSA</value>
   </data>
   <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
-    <value>Root Status: {0}</value>
+    <value>Stav přístupu root: {0}</value>
     <comment>0 = the status (enabled, forbidden, etc.)</comment>
   </data>
   <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
@@ -1193,7 +1193,7 @@ Zrušit všechny probíhající operace</value>
     <value>Kód párování</value>
   </data>
   <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
-    <value>IP Address / Host Name</value>
+    <value>IP adresa / název hostitele</value>
     <comment>The placeholder text for the IP address textbox</comment>
   </data>
   <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
@@ -1230,7 +1230,7 @@ Zrušit všechny probíhající operace</value>
     <comment>The name displayed for a device that hasn't authorized ADB yet, and we don't know its name</comment>
   </data>
   <data name="S_SERVICE_NONAME" xml:space="preserve">
-    <value>[Service]</value>
+    <value>[Služba]</value>
     <comment>The name displayed for a service device for which we don't have a name yet</comment>
   </data>
   <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
@@ -1244,7 +1244,7 @@ Zrušit všechny probíhající operace</value>
     <value>Připojit</value>
   </data>
   <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
-    <value>{0} free of {1}</value>
+    <value>{0} volného z {1}</value>
     <comment>0 = free space on drive (in B/KB/MB/GB). 1 = total drive capacity (in B/KB/MB/GB)</comment>
   </data>
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
@@ -1261,7 +1261,7 @@ Zrušit všechny probíhající operace</value>
     <comment>The installed apps drive items count display, plural</comment>
   </data>
   <data name="S_FILEOP_ERROR" xml:space="preserve">
-    <value>Error: {0}</value>
+    <value>Chyba: {0}</value>
     <comment>0 = an internal error message</comment>
   </data>
   <data name="S_FILEOP_VALIDATED" xml:space="preserve">
@@ -1320,19 +1320,19 @@ Zrušit všechny probíhající operace</value>
     <value>Dolů</value>
   </data>
   <data name="ScrollBar_PageUpCommand" xml:space="preserve">
-    <value>Page Up</value>
+    <value>Posunout o stránku nahoru</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_PageDownCommand" xml:space="preserve">
-    <value>Page Down</value>
+    <value>Posunout o stránku dolů</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_LineUpCommand" xml:space="preserve">
-    <value>Scroll Up</value>
+    <value>Posunout nahoru</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_LineDownCommand" xml:space="preserve">
-    <value>Scroll Down</value>
+    <value>Posunout dolů</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
@@ -1346,7 +1346,7 @@ Zrušit všechny probíhající operace</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_PageRightCommand" xml:space="preserve">
-    <value>Page Right</value>
+    <value>Posunout o stránku vpravo</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
@@ -1354,7 +1354,7 @@ Zrušit všechny probíhající operace</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_LineRightCommand" xml:space="preserve">
-    <value>Scroll Right</value>
+    <value>Posunout vpravo</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="S_MENU_UNDO" xml:space="preserve">
@@ -1486,11 +1486,11 @@ Pomozte nám prosím lokalizovat aplikaci do svého jazyka na Weblate.</value>
     <value>Vložit {0} vyjmutých položek</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
-    <value>{0} in {1} ({2})</value>
+    <value>{0} za {1} ({2})</value>
     <comment>0 - file size, 1 - transfer time, 2 - speed. ex: 9MB in 1.2s (7.5MB/s)</comment>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
-    <value>{0} of {1}</value>
+    <value>{0} z {1}</value>
     <comment>0 - number of completed files, 1 - total files. ex: 2 of 3</comment>
   </data>
   <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
@@ -1542,7 +1542,7 @@ Pomozte nám prosím lokalizovat aplikaci do svého jazyka na Weblate.</value>
     <comment>The name of the setting to enable preserving the "Date Modified" of files on push / pull operations</comment>
   </data>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
-    <value>Install {0}</value>
+    <value>Nainstalovat {0}</value>
     <comment>The drag tooltip when dragging a single APK file over the installed apps view. 0 - the name of the APK</comment>
   </data>
   <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
@@ -1724,7 +1724,7 @@ Pomozte nám prosím lokalizovat aplikaci do svého jazyka na Weblate.</value>
     <comment>Location as in parent path of a file</comment>
   </data>
   <data name="S_IMAGE_F_STOP" xml:space="preserve">
-    <value>F-stop</value>
+    <value>Clonové číslo</value>
     <comment>The f-stop of an image metadata</comment>
   </data>
   <data name="S_IMAGE_ISO" xml:space="preserve">
@@ -1788,27 +1788,27 @@ Pomozte nám prosím lokalizovat aplikaci do svého jazyka na Weblate.</value>
     <comment>File info - date modified (but without "date")</comment>
   </data>
   <data name="S_FILE_SYSTEM" xml:space="preserve">
-    <value>File system</value>
+    <value>Systém souborů</value>
     <comment>The file system type of a drive</comment>
   </data>
   <data name="S_MOUNT_POINT" xml:space="preserve">
-    <value>Mount point</value>
+    <value>Přípojný bod</value>
     <comment>The Unix mount point of a drive</comment>
   </data>
   <data name="S_MOUNT_OPTIONS" xml:space="preserve">
-    <value>Mount options</value>
+    <value>Volby připojení</value>
     <comment>The Unix mount options of a drive</comment>
   </data>
   <data name="S_COLOR_RED" xml:space="preserve">
-    <value>Red</value>
+    <value>Červená</value>
     <comment>The label of the red channel in the color picker</comment>
   </data>
   <data name="S_COLOR_GREEN" xml:space="preserve">
-    <value>Green</value>
+    <value>Zelená</value>
     <comment>The label of the green channel in the color picker</comment>
   </data>
   <data name="S_COLOR_BLUE" xml:space="preserve">
-    <value>Blue</value>
+    <value>Modrá</value>
     <comment>The label of the blue channel in the color picker</comment>
   </data>
   <data name="S_ADB_NOT_FOUND" xml:space="preserve">
