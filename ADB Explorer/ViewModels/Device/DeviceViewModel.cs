@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
@@ -47,10 +48,17 @@ public abstract class DeviceViewModel : ViewModelBase
         DeviceType.Service => "\uEDE4",
         DeviceType.Recovery => "\uED10",
         DeviceType.Sideload => "\uE67A",
-        DeviceType.New => "\uE710",
+        DeviceType.New => "",
         DeviceType.History => "\uE823",
         DeviceType.WSA => "\uE78A",
         _ => throw new NotImplementedException(),
+    };
+
+    public object TypeIconContent => Type switch
+    {
+        DeviceType.Local => new BaseIcon(FluentPathGeometries.UsbDevice, 28, flowDirection: FlowDirection.LeftToRight).IconContent,
+        DeviceType.New => new BaseIcon(FluentPathGeometries.PhoneAdd, 28).IconContent,
+        _ => new BaseIcon(TypeIcon, 28).IconContent,
     };
 
     public string StatusIcon => Status switch

@@ -172,7 +172,7 @@
                     Style="{StaticResource DevicesListViewStyle}">
                     <ui:ListView.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <local:MasonryPanel Margin="0,0,6,0" Columns="1" />
+                            <local:MasonryPanel Margin="0,0,6,0" ColumnSpacing="6" Columns="1" />
                         </ItemsPanelTemplate>
                     </ui:ListView.ItemsPanel>
                 </ui:ListView>
@@ -182,7 +182,7 @@
                     Style="{StaticResource DevicesListViewStyle}">
                     <ui:ListView.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <local:MasonryPanel Margin="0,0,6,0" Columns="1" />
+                            <local:MasonryPanel Margin="0,0,6,0" ColumnSpacing="6" Columns="1" />
                         </ItemsPanelTemplate>
                     </ui:ListView.ItemsPanel>
                 </ui:ListView>
@@ -192,7 +192,7 @@
                     Style="{StaticResource DevicesListViewStyle}">
                     <ui:ListView.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <local:MasonryPanel Margin="0,0,6,0">
+                            <local:MasonryPanel Margin="0,0,6,0" ColumnSpacing="6">
                                 <local:MasonryPanel.Style>
                                     <Style TargetType="local:MasonryPanel">
                                         <Setter Property="Columns" Value="1" />

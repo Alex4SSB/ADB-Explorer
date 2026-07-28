@@ -46,7 +46,12 @@
                         <ColumnDefinition />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <controls:DeviceTypeIcon />
+                    <Grid Width="28" Height="28" ToolTip="{Binding Tooltip}">
+                        <ContentPresenter
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Content="{Binding TypeIconContent}" />
+                    </Grid>
                     <TextBlock Grid.Column="1" Margin="4">
                         <TextBlock.Style>
                             <Style BasedOn="{StaticResource DeviceNameTextBlockStyle}" TargetType="TextBlock">

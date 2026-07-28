@@ -22,7 +22,12 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid>
-                    <controls:DeviceTypeIcon />
+                    <Grid Width="28" Height="28" ToolTip="{Binding Tooltip}">
+                        <ContentPresenter
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Content="{Binding TypeIconContent}" />
+                    </Grid>
                     <Grid Style="{StaticResource DeviceStatusGridStyle}">
                         <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
                         <ui:FontIcon
