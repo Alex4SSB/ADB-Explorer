@@ -500,10 +500,6 @@ O conteúdo visível pode estar incompleto.</value>
     <value>Escuro</value>
     <comment>The setting used to force dark theme in the app</comment>
   </data>
-  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
-    <value>Windows Default</value>
-    <comment>The setting to use the default theme set by Windows</comment>
-  </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>Theme</value>
     <comment>The title of the settings group used to control the app theme</comment>
@@ -577,10 +573,6 @@ Selecione "Personalizado" para utilizar uma localização que não será removid
     <value>Escolher uma Pasta para Armazenar os Dados da Aplicação</value>
     <comment>Title of the folder picker for custom app data location</comment>
   </data>
-  <data name="S_GITHUB_REPO" xml:space="preserve">
-    <value>GitHub repository</value>
-    <comment>The title of the hyperlink to our GitHub repository</comment>
-  </data>
   <data name="S_PRIVACY_POLICY" xml:space="preserve">
     <value>Política de Privacidade</value>
     <comment>The title of the hyperlink to our privacy policy</comment>
@@ -600,10 +592,6 @@ Selecione "Personalizado" para utilizar uma localização que não será removid
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>Licenças de Terceiros e Atribuições de Autoria</value>
     <comment>The title of the about section listing licenses</comment>
-  </data>
-  <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
-    <value>[not set]</value>
-    <comment>The placeholder text for a textbox whose value hasn't been set</comment>
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
     <value>Definições de Pesquisa</value>
@@ -660,10 +648,6 @@ Cancelar Todas a Serem Reproduzidas</value>
   <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
     <value>Meter as Atualizações do Registo na Pausa</value>
     <comment>The tooltip of a button used to pause updates to the command log, in its on state</comment>
-  </data>
-  <data name="S_BUTTON_LOG" xml:space="preserve">
-    <value>Command Log</value>
-    <comment>The tooltip of a button used to show / hide the command log</comment>
   </data>
   <data name="S_BUTTON_DRIVES" xml:space="preserve">
     <value>Discos do Dispositivo</value>
@@ -823,10 +807,6 @@ Cancelar Todas a Serem Reproduzidas</value>
     <value>Tipo de Operação</value>
     <comment>File operations detailed data grid column name for the type of the operation icon</comment>
   </data>
-  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
-    <value>File Name</value>
-    <comment>File operations detailed data grid column name for the file name of the operation</comment>
-  </data>
   <data name="S_COLUMN_PROGRESS" xml:space="preserve">
     <value>Progress</value>
     <comment>File operations detailed data grid column name for the progress / status of the operation</comment>
@@ -871,10 +851,6 @@ Cancelar Todas a Serem Reproduzidas</value>
     <value>Data de Eliminação</value>
     <comment>File browser data grid column name for the date a file in the recycle bin was deleted</comment>
   </data>
-  <data name="S_COLUMN_USER_ID" xml:space="preserve">
-    <value>User ID</value>
-    <comment>App view data grid column name for the package owner user ID</comment>
-  </data>
   <data name="S_COLUMN_VERSION" xml:space="preserve">
     <value>Version</value>
     <comment>App view data grid column name for the installed package version</comment>
@@ -891,21 +867,9 @@ Cancelar Todas a Serem Reproduzidas</value>
     <value>{0}s</value>
     <comment>Seconds display (eg. 6s)</comment>
   </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>Kill Server</value>
-    <comment>The content of a button to kill ADB server</comment>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>Kill Process</value>
-    <comment>The content of a button to kill the process of ADB</comment>
-  </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>Recarregar Dispositivos</value>
     <comment>The tooltip of a button to manually refresh the device list</comment>
-  </data>
-  <data name="S_RESTART_ADB" xml:space="preserve">
-    <value>Restart ADB</value>
-    <comment>The content of a button to restart ADB server</comment>
   </data>
   <data name="S_SERVER_DOWN" xml:space="preserve">
     <value>O servidor mDNS está desligado</value>
@@ -963,10 +927,6 @@ Cancelar Todas a Serem Reproduzidas</value>
     <value>Reiniciar Em</value>
     <comment>The title of the menu to select a device reboot option</comment>
   </data>
-  <data name="S_REBOOT_SYSTEM" xml:space="preserve">
-    <value>System Image</value>
-    <comment>The menu option to reboot the device into the Android system</comment>
-  </data>
   <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
     <value>Bootloader</value>
     <comment>The menu option to reboot the device into the bootloader</comment>
@@ -978,10 +938,6 @@ Cancelar Todas a Serem Reproduzidas</value>
   <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
     <value>Sideload (Reiniciar Automaticamente)</value>
     <comment>The menu option to reboot the device into side-load mode, with auto reboot</comment>
-  </data>
-  <data name="S_STATUS_OFFLINE" xml:space="preserve">
-    <value>{0} - Offline</value>
-    <comment>A device that is no longer online</comment>
   </data>
   <data name="S_STATUS_UNAUTH" xml:space="preserve">
     <value>{0} - Não Autorizado</value>
@@ -1046,10 +1002,6 @@ Cancelar Todas a Serem Reproduzidas</value>
   <data name="S_BAT_STATE_FULL" xml:space="preserve">
     <value>Full</value>
     <comment>Battery state is full - done charging</comment>
-  </data>
-  <data name="S_BAT_STATUS" xml:space="preserve">
-    <value>Status: {0}</value>
-    <comment>Battery status indicator title</comment>
   </data>
   <data name="S_BAT_HEALTH" xml:space="preserve">
     <value>Saúde: {0}</value>
@@ -1122,10 +1074,6 @@ Cancelar Todas a Serem Reproduzidas</value>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>Link</value>
     <comment>A link to an unknown file type</comment>
-  </data>
-  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
-    <value>{0} (Link)</value>
-    <comment>A link to a {0} file type</comment>
   </data>
   <data name="S_FILE_TYPE_APK" xml:space="preserve">
     <value>Pacote de Aplicação Android</value>
@@ -1234,34 +1182,6 @@ Cancelar Todas a Serem Reproduzidas</value>
     <value>Um ficheiro selecionado viola as regras de nomenclatura da raiz do disco do Windows</value>
     <comment>Will show if a selected file doesn't meet Windows drive root naming rules</comment>
   </data>
-  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
-    <value>Some selected files have conflicting case-insensitive names</value>
-    <comment>Will show when selected file names differ only by upper / lower case</comment>
-  </data>
-  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>A selected file violates user space naming rules</value>
-    <comment>Will show if a selected file doesn't meet user space naming rules</comment>
-  </data>
-  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
-    <value>Some copied files have conflicting case-insensitive names</value>
-    <comment>Will show when copied files' names differ only by upper / lower case</comment>
-  </data>
-  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
-    <value>A copied file violates user space naming rules</value>
-    <comment>Will show if a copied file doesn't meet user space naming rules</comment>
-  </data>
-  <data name="S_POPUP_NON_FILE" xml:space="preserve">
-    <value>A selected item is not a file / folder</value>
-    <comment>Will show when selecting an item that can't be copied</comment>
-  </data>
-  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
-    <value>WSA App</value>
-    <comment>Represents the WSA app, not the device itself</comment>
-  </data>
-  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
-    <value>Root Status: {0}</value>
-    <comment>0 = the status (enabled, forbidden, etc.)</comment>
-  </data>
   <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
     <value>Unchecked</value>
     <comment>Root status - it is yet unknown whether the device supports root access</comment>
@@ -1278,57 +1198,13 @@ Cancelar Todas a Serem Reproduzidas</value>
     <value>Disable</value>
     <comment>Toggle button - disable</comment>
   </data>
-  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
-    <value>Pairing Code</value>
-    <comment>The placeholder text for the pairing code textbox</comment>
-  </data>
-  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
-    <value>IP Address / Host Name</value>
-    <comment>The placeholder text for the IP address textbox</comment>
-  </data>
   <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
     <value>Port</value>
     <comment>The placeholder text for the connect port textbox</comment>
   </data>
-  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
-    <value>Pairing Port</value>
-    <comment>The placeholder text for the pairing port textbox</comment>
-  </data>
-  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
-    <value>Pair &amp; Connect</value>
-    <comment>The content of a button to pair and connect a new manually connected device</comment>
-  </data>
-  <data name="S_DEVICE_SAVED" xml:space="preserve">
-    <value>Saved Device</value>
-    <comment>A saved device that has been manually connected</comment>
-  </data>
-  <data name="S_DEVICE_QR" xml:space="preserve">
-    <value>QR Pairing</value>
-    <comment>An mDNS service device that is in the process of pairing using the QR code</comment>
-  </data>
-  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
-    <value>Ready To Pair</value>
-    <comment>An mDNS service device that is ready to pair</comment>
-  </data>
-  <data name="S_CLEAR_ALL" xml:space="preserve">
-    <value>Clear All</value>
-    <comment>The tooltip of a button used to clear all textboxes in the connect new device</comment>
-  </data>
-  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
-    <value>Add New Device</value>
-    <comment>The tooltip of the new device icon</comment>
-  </data>
-  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
-    <value>[Unauthorized]</value>
-    <comment>The name displayed for a device that hasn't authorized ADB yet, and we don't know its name</comment>
-  </data>
   <data name="S_SERVICE_NONAME" xml:space="preserve">
     <value>[Service]</value>
     <comment>The name displayed for a service device for which we don't have a name yet</comment>
-  </data>
-  <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
-    <value>Currently Browsing</value>
-    <comment>The tooltip displayed for the device that is currently open for browsing</comment>
   </data>
   <data name="S_BUTTON_BROWSE" xml:space="preserve">
     <value>Browse</value>
@@ -1338,29 +1214,13 @@ Cancelar Todas a Serem Reproduzidas</value>
     <value>Connect</value>
     <comment>The button to try to connect an old / new device manually</comment>
   </data>
-  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
-    <value>{0} free of {1}</value>
-    <comment>0 = free space on drive (in B/KB/MB/GB). 1 = total drive capacity (in B/KB/MB/GB)</comment>
-  </data>
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
     <value>Empty</value>
     <comment>The notification displayed on the recycle bin drive when it is empty</comment>
   </data>
-  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
-    <value>APK Installer</value>
-    <comment>The item count on the temp drive, singular</comment>
-  </data>
-  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
-    <value>APK Installers</value>
-    <comment>The item count on the temp drive, plural</comment>
-  </data>
   <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
     <value>Packages</value>
     <comment>The installed apps drive items count display, plural</comment>
-  </data>
-  <data name="S_FILEOP_ERROR" xml:space="preserve">
-    <value>Error: {0}</value>
-    <comment>0 = an internal error message</comment>
   </data>
   <data name="S_FILEOP_VALIDATED" xml:space="preserve">
     <value>Validated</value>
@@ -1370,17 +1230,9 @@ Cancelar Todas a Serem Reproduzidas</value>
     <value>Completed</value>
     <comment>A file operation status - completed</comment>
   </data>
-  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
-    <value>{0} Failed</value>
-    <comment>File operation sub items failed status. 0 = failed items count</comment>
-  </data>
   <data name="S_FILEOP_TOTAL" xml:space="preserve">
     <value>Total:</value>
     <comment>File operation total sub items count</comment>
-  </data>
-  <data name="S_FILEOP_PREV" xml:space="preserve">
-    <value>Previous Operation</value>
-    <comment>A file operation from a previous batch</comment>
   </data>
   <data name="S_FILEOP_RUNNING" xml:space="preserve">
     <value>Running</value>
@@ -1414,60 +1266,12 @@ Cancelar Todas a Serem Reproduzidas</value>
     <value>Update</value>
     <comment>The action to update the date modified of a file according to its name</comment>
   </data>
-  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
-    <value>{0}% Used</value>
-    <comment>The tooltip for the drive usage percentage progress bar</comment>
-  </data>
-  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
-    <value>Scroll Here</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
   <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
     <value>Top</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
     <value>Bottom</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
-    <value>Page Up</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
-    <value>Page Down</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
-    <value>Scroll Up</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
-    <value>Scroll Down</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
-    <value>Left Edge</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
-    <value>Right Edge</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
-    <value>Page Left</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
-    <value>Page Right</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
-    <value>Scroll Left</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
-    <value>Scroll Right</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="S_MENU_UNDO" xml:space="preserve">
@@ -1478,39 +1282,9 @@ Cancelar Todas a Serem Reproduzidas</value>
     <value>Redo</value>
     <comment>TextBox ContextMenu</comment>
   </data>
-  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
-    <value>Notifications</value>
-    <comment>The title of the notifications area in the settings pane</comment>
-  </data>
-  <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
-    <value>Click to display more info</value>
-    <comment>The tooltip of a button used to display a notification message</comment>
-  </data>
-  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
-    <value>App Language</value>
-    <comment>The title of the notification message about the app language</comment>
-  </data>
-  <data name="S_LANG_NOTIFICATION" xml:space="preserve">
-    <value>Select your app language of choice in the settings.
-Translation progress is displayed for the selected language.
-Please help us localize the app to your language on Weblate.</value>
-    <comment>The content of the app language notification message </comment>
-  </data>
-  <data name="S_GOTO_WEBLATE" xml:space="preserve">
-    <value>Go to Weblate</value>
-    <comment>The content of the button used to open the link to our project on Weblate</comment>
-  </data>
   <data name="S_FILE_SOCKET" xml:space="preserve">
     <value>Socket</value>
     <comment>The socket Unix file type</comment>
-  </data>
-  <data name="S_FILE_BLOCK" xml:space="preserve">
-    <value>Block Device</value>
-    <comment>The block device Unix file type</comment>
-  </data>
-  <data name="S_FILE_CHAR" xml:space="preserve">
-    <value>Char Device</value>
-    <comment>The char device Unix file type</comment>
   </data>
   <data name="S_FILE_FIFO" xml:space="preserve">
     <value>FIFO</value>
@@ -1520,25 +1294,9 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Unknown</value>
     <comment>An unknown file type</comment>
   </data>
-  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
-    <value>Broken Link</value>
-    <comment>A symbolic link that points to a file that doesn't exist</comment>
-  </data>
-  <data name="S_NAV_HISTORY" xml:space="preserve">
-    <value>Navigation History</value>
-    <comment>The tooltip of the menu that displays the navigation history</comment>
-  </data>
-  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
-    <value>Add Current Location</value>
-    <comment>The button used to add the current location (path) to the saved locations list</comment>
-  </data>
   <data name="S_REMOVE" xml:space="preserve">
     <value>Remove</value>
     <comment>The tooltip of the button used to remove a saved location from the list</comment>
-  </data>
-  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
-    <value>Saved Locations</value>
-    <comment>The tooltip of the button used to open the saved locations menu</comment>
   </data>
   <data name="KILO" xml:space="preserve">
     <value>{0} KB</value>
@@ -1572,105 +1330,13 @@ Please help us localize the app to your language on Weblate.</value>
     <value>{0} B</value>
     <comment>The notation for Bytes when displaying file size or drive usage</comment>
   </data>
-  <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>Copy {0} items</value>
-    <comment>The drag tooltip in copy mode. 0 - number of items being dragged</comment>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>Copy {0} items to {1}</value>
-    <comment>The drag tooltip in copy mode when the target is known. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>Move {0} items to {1}</value>
-    <comment>The drag tooltip in move mode when the target is known. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
-  </data>
-  <data name="S_DRAGDROP_LINK" xml:space="preserve">
-    <value>Create link in {0}</value>
-    <comment>The drag tooltip in link mode. 0 - the destination under the mouse</comment>
-  </data>
-  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>Move {0} items</value>
-    <comment>The drag tooltip in move mode. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
-  </data>
-  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
-    <value>Paste 1 Cut Item</value>
-  </data>
-  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
-    <value>Paste 1 Copied Item</value>
-  </data>
-  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
-    <value>Paste {0} Copied Items</value>
-  </data>
-  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
-    <value>Paste {0} Cut Items</value>
-  </data>
-  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
-    <value>{0} in {1} ({2})</value>
-    <comment>0 - file size, 1 - transfer time, 2 - speed. ex: 9MB in 1.2s (7.5MB/s)</comment>
-  </data>
-  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
-    <value>{0} of {1}</value>
-    <comment>0 - number of completed files, 1 - total files. ex: 2 of 3</comment>
-  </data>
-  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
-    <value>Copy {0}</value>
-    <comment>The drag tooltip in copy mode. 0 - the item being dragged</comment>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
-    <value>Copy {0} to {1}</value>
-    <comment>The drag tooltip in copy mode when the target is known. 0 - the item being dragged, 1 - the destination under the mouse</comment>
-  </data>
-  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
-    <value>Move {0}</value>
-    <comment>The drag tooltip in move mode. 0 - the item being dragged</comment>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
-    <value>Move {0} to {1}</value>
-    <comment>The drag tooltip in move mode when the target is known. 0 - the item being dragged, 1 - the destination under the mouse</comment>
-  </data>
-  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
-    <value>File not found</value>
-    <comment>The error message displayed when a sync operation is about to start but the source file is missing</comment>
-  </data>
-  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
-    <value>Finished with no confirmation</value>
-    <comment>The error message displayed when a sync operation has finished but ADB did not provide a confirmation</comment>
-  </data>
-  <data name="S_VALIDATION_ERROR" xml:space="preserve">
-    <value>Validation error: {0}</value>
-    <comment>The title of the error message displayed on a file operation validation error</comment>
-  </data>
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
     <value>Validating…</value>
     <comment>The info displayed in file operation progress during content validation</comment>
   </data>
-  <data name="S_FILES_PLURAL" xml:space="preserve">
-    <value>{0} files</value>
-    <comment>The indication of the number of currently active files (being transferred)</comment>
-  </data>
-  <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
-    <value>Select ROM for sideload</value>
-    <comment>The title of the open file dialog for selecting a ROM image to sideload</comment>
-  </data>
-  <data name="S_ROM_FILE" xml:space="preserve">
-    <value>ROM file</value>
-    <comment>The filter name displayed in the open file dialog when opening a ROM for sideload</comment>
-  </data>
   <data name="S_TERMINAL" xml:space="preserve">
     <value>Terminal</value>
     <comment>The tooltip of the button used to open or close the terminal</comment>
-  </data>
-  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
-    <value>Preserve File Date Modified</value>
-    <comment>The name of the setting to enable preserving the "Date Modified" of files on push / pull operations</comment>
-  </data>
-  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
-    <value>Install {0}</value>
-    <comment>The drag tooltip when dragging a single APK file over the installed apps view. 0 - the name of the APK</comment>
-  </data>
-  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
-    <value>Install {0} APKs</value>
-    <comment>The drag tooltip when dragging multiple APK files over the installed apps view. 0 - number of APKs being dragged</comment>
   </data>
   <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
     <value>On</value>
@@ -1680,45 +1346,9 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Off</value>
     <comment>The label of the switch toggle on a setting when it is off / inactive / disabled</comment>
   </data>
-  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
-    <value>Checking mDNS server status…</value>
-    <comment>The notification displayed when waiting for a status response from the server</comment>
-  </data>
   <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
     <value>Icons</value>
     <comment>The title of the group for settings related to icons</comment>
-  </data>
-  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
-    <value>Pull &amp; Display Thumbnails</value>
-    <comment>The title of the setting that controls thumbnail behavior</comment>
-  </data>
-  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
-    <value>Only in Icon View</value>
-    <comment>Thumbnails mode setting: icon view mode</comment>
-  </data>
-  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
-    <value>Only in Photo Directories</value>
-    <comment>Thumbnails mode setting: photo directories mode</comment>
-  </data>
-  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
-    <value>Upon Connection</value>
-    <comment>Thumbnails mode setting: on connection mode</comment>
-  </data>
-  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
-    <value>Persist Thumbnails Between Sessions</value>
-    <comment>The setting used allow saving thumbnails locally from one app session to another</comment>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>Limit Thumbnails Pull Speed</value>
-    <comment>The setting used to limit the speed at which thumbnails are pulled in bulk from the device</comment>
-  </data>
-  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
-    <value>Show Icons For Special Folders</value>
-    <comment>The setting used to allow displaying Windows icons for Windows special folders (Downloads, Documents, etc.)</comment>
-  </data>
-  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
-    <value>Include Video Thumbnails</value>
-    <comment>The setting to enable video thumbnails (pull &amp; display)</comment>
   </data>
   <data name="S_VIDEO_DURATION" xml:space="preserve">
     <value>Length</value>
@@ -1728,61 +1358,9 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Dimensions</value>
     <comment>Part of the tooltip of a picture file (dimensions = resolution)</comment>
   </data>
-  <data name="S_ONE_MONTH" xml:space="preserve">
-    <value>One Month</value>
-  </data>
-  <data name="S_ONE_WEEK" xml:space="preserve">
-    <value>One Week</value>
-  </data>
-  <data name="S_ONE_DAY" xml:space="preserve">
-    <value>One Day</value>
-  </data>
-  <data name="S_ONE_HOUR" xml:space="preserve">
-    <value>One Hour</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
-    <value>Local Thumbnails Refresh Time</value>
-    <comment>The setting used to control how long local persistent thumbnails should be used before updating them</comment>
-  </data>
-  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
-    <value>Use BusyBox If Available</value>
-    <comment>The setting used to enable checking connected devices for busybox and which shell commands it supports</comment>
-  </data>
-  <data name="S_SETTINGS_WSA" xml:space="preserve">
-    <value>Auto Connect WSA If Available</value>
-    <comment>The setting used to enable checking for installed WSA, launching it, and connecting to it automatically</comment>
-  </data>
-  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
-    <value>Discover Android Emulators</value>
-    <comment>The setting used to enable listing installed AVDs and launching them from the device list</comment>
-  </data>
-  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
-    <value>Launch this emulator</value>
-    <comment>Tooltip for an emulator package device tile</comment>
-  </data>
-  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
-    <value>Emulator Launch</value>
-    <comment>The title of the dialog message to launch an emulator</comment>
-  </data>
-  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
-    <value>Android SDK emulator was not found. Install the Android SDK emulator package or set ANDROID_SDK_ROOT.</value>
-    <comment>Error message when the SDK emulator executable cannot be located</comment>
-  </data>
   <data name="S_STRING_PASTE" xml:space="preserve">
     <value>Paste</value>
     <comment>As in "Paste the copied string"</comment>
-  </data>
-  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
-    <value>Checking for thumbnail updates</value>
-    <comment>A hint displayed for a short time in the snackbar</comment>
-  </data>
-  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
-    <value>Pulling thumbnails</value>
-    <comment>A hint displayed for a short time in the snackbar</comment>
-  </data>
-  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
-    <value>Reading thumbnail locations and media database</value>
-    <comment>A hint displayed for a short time in the snackbar</comment>
   </data>
   <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
     <value>Details</value>
@@ -1791,26 +1369,6 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
     <value>View</value>
     <comment>The title of the thumbnail size selector menu</comment>
-  </data>
-  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
-    <value>Medium Icons</value>
-    <comment>Thumbnail size selector - medium icons</comment>
-  </data>
-  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
-    <value>Large Icons</value>
-    <comment>Thumbnail size selector - large icons</comment>
-  </data>
-  <data name="S_THUMBSIZE_XL" xml:space="preserve">
-    <value>Extra Large Icons</value>
-    <comment>Thumbnail size selector - extra large icons</comment>
-  </data>
-  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
-    <value>Layout and view options</value>
-    <comment>The tooltip of the thumbnail size selector. view = icon view / details view</comment>
-  </data>
-  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
-    <value>Thumbnail Size Saved For Each Location</value>
-    <comment>The setting that enables keeping track of the last thumbnail size selected for each location / folder</comment>
   </data>
   <data name="S_SORT" xml:space="preserve">
     <value>Sort</value>
@@ -1824,37 +1382,9 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Descending</value>
     <comment>File list sort direction - descending</comment>
   </data>
-  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
-    <value>Sorting column &amp; order saved for each location</value>
-    <comment>The setting that enables keeping track of the last sorted column and direction selected for each location / folder</comment>
-  </data>
-  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
-    <value>Max Image Size To Use As Its Own Thumbnail (0 - Disabled)</value>
-    <comment>The name of the setting that enables using images for their own thumbnail display, and the maximum size for such images</comment>
-  </data>
-  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
-    <value>and {0} more…</value>
-    <comment>0 - the number of file operations currently not displayed</comment>
-  </data>
-  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
-    <value>Show or hide the details and preview pane.</value>
-    <comment>The tooltip of the button that controls the details pane visibility</comment>
-  </data>
   <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
     <value>Preview</value>
     <comment>Side pane in file preview mode</comment>
-  </data>
-  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
-    <value>Max File Size For Preview</value>
-    <comment>The maximum size of a file for preview</comment>
-  </data>
-  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
-    <value>Pull To Default Folder On File Double Click</value>
-    <comment>The setting that enables pulling a file to the default folder on double click</comment>
-  </data>
-  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
-    <value>Select a single item to get more information.</value>
-    <comment>The tip displayed in the details pane when multiple (or none) files are selected</comment>
   </data>
   <data name="S_ITEM_LOCATION" xml:space="preserve">
     <value>Location</value>
@@ -1864,33 +1394,9 @@ Please help us localize the app to your language on Weblate.</value>
     <value>F-stop</value>
     <comment>The f-stop of an image metadata</comment>
   </data>
-  <data name="S_IMAGE_ISO" xml:space="preserve">
-    <value>ISO speed</value>
-    <comment>The ISO number of the image metadata</comment>
-  </data>
-  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
-    <value>Exposure time</value>
-    <comment>The exposure time in parts of a second of the image metadata</comment>
-  </data>
   <data name="S_VIDEO_BITRATE" xml:space="preserve">
     <value>Bitrate</value>
     <comment>The bitrate from the video file metadata</comment>
-  </data>
-  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
-    <value>Select a file to preview.</value>
-    <comment>The hint displayed in the preview pane when no file is selected</comment>
-  </data>
-  <data name="S_PREVIEW_INVALID" xml:space="preserve">
-    <value>No preview available.</value>
-    <comment>The hint displayed in the preview pane when the selected file(s) cannot be previewed</comment>
-  </data>
-  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
-    <value>This PDF is password protected.</value>
-    <comment>The hint displayed in the preview pane when the selected PDF is password protected</comment>
-  </data>
-  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
-    <value>Incorrect password.</value>
-    <comment>Error shown in the PDF password prompt when the entered password is wrong</comment>
   </data>
   <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
     <value>Unlock</value>
@@ -1924,18 +1430,6 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Modified</value>
     <comment>File info - date modified (but without "date")</comment>
   </data>
-  <data name="S_FILE_SYSTEM" xml:space="preserve">
-    <value>File system</value>
-    <comment>The file system type of a drive</comment>
-  </data>
-  <data name="S_MOUNT_POINT" xml:space="preserve">
-    <value>Mount point</value>
-    <comment>The Unix mount point of a drive</comment>
-  </data>
-  <data name="S_MOUNT_OPTIONS" xml:space="preserve">
-    <value>Mount options</value>
-    <comment>The Unix mount options of a drive</comment>
-  </data>
   <data name="S_COLOR_RED" xml:space="preserve">
     <value>Red</value>
     <comment>The label of the red channel in the color picker</comment>
@@ -1948,32 +1442,9 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Blue</value>
     <comment>The label of the blue channel in the color picker</comment>
   </data>
-  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
-    <value>Unable to locate ADB from system PATH. Please use "{0}" to locate it.</value>
-    <comment>0 - the name of the Override ADB Path setting</comment>
-  </data>
-  <data name="S_ADB_PATH_INVALID" xml:space="preserve">
-    <value>Provided {0} path is either a Windows shortcut or a UNC (remote) path, which is not allowed.</value>
-    <comment>0 - either "ADB" or nothing</comment>
-  </data>
-  <data name="S_ADB_COMPROMISED" xml:space="preserve">
-    <value>The provided executable cannot be verified as ADB. Make sure you download only official Android Platform Tools from Google.</value>
-  </data>
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>Pair</value>
     <comment>The button for pairing a device</comment>
-  </data>
-  <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
-    <value>Kill ADB When App Closes</value>
-    <comment>The setting that enables killing ADB server when closing the app</comment>
-  </data>
-  <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
-    <value>The custom location cannot be under C:\Users\…\AppData - please select another location</value>
-    <comment>An error displayed when choosing a wrong custom app data location</comment>
-  </data>
-  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
-    <value>Allow ADB From Untrusted Sources</value>
-    <comment>The setting that allows using ADB without integrity checks and without path restrictions</comment>
   </data>
   <data name="S_NEW_VERSION_READY" xml:space="preserve">
     <value>Uma nova {0}, versão {1}, foi transferida e está pronta para ser instalada.</value>

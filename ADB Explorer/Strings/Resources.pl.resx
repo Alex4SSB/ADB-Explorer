@@ -526,27 +526,15 @@ Widoczna zawartość może być niekompletna.</value>
   <data name="S_APP_DATA_FOLDER" xml:space="preserve">
     <value>Folder danych aplikacji</value>
   </data>
-  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
-    <value>App Data Location</value>
-    <comment>Title of the dialog asking packaged users where to store app data</comment>
-  </data>
   <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
     <value>Ta dystrybucja aplikacji zapisuje dane w wirtualizowanej (i ciężko do dostania się) lokalizacji, which is cleared on app uninstall.
 
 Zaznacz Niestandardową lokalizacje która nie będzie usunięta podczas dezinstalacji. Niestandardowa lokalizacja nie może być w C:\Users\…\AppData</value>
     <comment>Explains virtualized vs custom app data location for packaged installs</comment>
   </data>
-  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value>Use Default</value>
-    <comment>Button to keep the MSIX virtualized app data folder</comment>
-  </data>
   <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
     <value>Custom</value>
     <comment>Button to pick a non-virtualized custom app data folder</comment>
-  </data>
-  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
-    <value>Choose App Data Folder</value>
-    <comment>Title of the folder picker for custom app data location</comment>
   </data>
   <data name="S_GITHUB_REPO" xml:space="preserve">
     <value>Repozytorium GitHub</value>
@@ -861,9 +849,6 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
     <value>Tryb Sideload (Automatyczne Uruchomienie)</value>
   </data>
-  <data name="S_STATUS_OFFLINE" xml:space="preserve">
-    <value>{0} - Offline</value>
-  </data>
   <data name="S_STATUS_UNAUTH" xml:space="preserve">
     <value>{0} - Nieautoryzowane</value>
   </data>
@@ -911,9 +896,6 @@ Anuluj wszystkie uruchomione</value>
   </data>
   <data name="S_BAT_STATE_FULL" xml:space="preserve">
     <value>Pełne</value>
-  </data>
-  <data name="S_BAT_STATUS" xml:space="preserve">
-    <value>Status: {0}</value>
   </data>
   <data name="S_BAT_HEALTH" xml:space="preserve">
     <value>Zdrowie: {0}</value>
@@ -968,9 +950,6 @@ Anuluj wszystkie uruchomione</value>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>Link</value>
-  </data>
-  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
-    <value>{0} (Link)</value>
   </data>
   <data name="S_FILE_TYPE_APK" xml:space="preserve">
     <value>Pakiet aplikacji na Androida</value>
@@ -1070,9 +1049,6 @@ Anuluj wszystkie uruchomione</value>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>Aplikacja WSA</value>
-  </data>
-  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
-    <value>Root Status: {0}</value>
   </data>
   <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
     <value>Nie sprawdzony</value>
@@ -1614,10 +1590,6 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
     <value>Niestandardowa lokalizacja nie może być w C:\Users\…\AppData - proszę zaznaczyć inną lokalizacje</value>
     <comment>An error displayed when choosing a wrong custom app data location</comment>
-  </data>
-  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
-    <value>Allow ADB From Untrusted Sources</value>
-    <comment>The setting that allows using ADB without integrity checks and without path restrictions</comment>
   </data>
   <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
     <value>Zaznaczony element nie może zostać zmodyfikowany</value>

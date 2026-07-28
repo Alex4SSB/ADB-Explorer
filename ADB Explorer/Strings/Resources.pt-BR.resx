@@ -972,10 +972,6 @@ Cancela Tudo Rodando</value>
     <value>Carregamento Remoto (Reiniciar Automaticamente)</value>
     <comment>The menu option to reboot the device into side-load mode, with auto reboot</comment>
   </data>
-  <data name="S_STATUS_OFFLINE" xml:space="preserve">
-    <value>{0} - Offline</value>
-    <comment>A device that is no longer online</comment>
-  </data>
   <data name="S_STATUS_UNAUTH" xml:space="preserve">
     <value>{0} - Não Autorizado</value>
     <comment>A device that hasn't authorized ADB yet</comment>
@@ -1039,10 +1035,6 @@ Cancela Tudo Rodando</value>
   <data name="S_BAT_STATE_FULL" xml:space="preserve">
     <value>Cheia</value>
     <comment>Battery state is full - done charging</comment>
-  </data>
-  <data name="S_BAT_STATUS" xml:space="preserve">
-    <value>Status: {0}</value>
-    <comment>Battery status indicator title</comment>
   </data>
   <data name="S_BAT_HEALTH" xml:space="preserve">
     <value>Saúde: {0}</value>
@@ -1116,10 +1108,6 @@ Cancela Tudo Rodando</value>
     <value>Link</value>
     <comment>A link to an unknown file type</comment>
   </data>
-  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
-    <value>{0} (Link)</value>
-    <comment>A link to a {0} file type</comment>
-  </data>
   <data name="S_FILE_TYPE_APK" xml:space="preserve">
     <value>Pacote de Aplicativos Android</value>
     <comment>The type name for APK files</comment>
@@ -1171,86 +1159,18 @@ Cancela Tudo Rodando</value>
     <value>Incompatibilidade de conteúdo</value>
     <comment>The error displayed when validation of a file operation resulted in different MD5 checksums of the source and target</comment>
   </data>
-  <data name="S_VALIDATE_MISSING" xml:space="preserve">
-    <value>Missing from target location</value>
-    <comment>The error displayed when during validation of a file operation the file was not found in the target location</comment>
-  </data>
-  <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
-    <value>Permanent Deletion</value>
-    <comment>The location displayed in the target column of a permanent delete file operation</comment>
-  </data>
   <data name="S_LOCATION_NA" xml:space="preserve">
     <value>N/A</value>
     <comment>Displayed in the source / target of a file operation when those are unknown</comment>
   </data>
-  <data name="S_PATH_INVALID" xml:space="preserve">
-    <value>Argument must specify full path of a new or existing settings file.</value>
-    <comment>Displayed when an invalid path argument is provided for app launch</comment>
-  </data>
-  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
-    <value>Custom App Settings Path</value>
-    <comment>The title of the error message when an invalid path argument is provided</comment>
-  </data>
-  <data name="S_MENU_EMPTY" xml:space="preserve">
-    <value>Menu Is Empty</value>
-    <comment>Displayed when the context menu is empty</comment>
-  </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - Copy</value>
-    <comment>A copy of an item. 0 = item name</comment>
-  </data>
-  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
-    <value>Adheres to Unix naming rules (via ADB)</value>
-    <comment>Will be shown if a file name doesn't meet Unix naming rules</comment>
-  </data>
   <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
     <value>Adere as regras de nomenclatura do espaço do usuário</value>
-  </data>
-  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
-    <value>Adheres to Windows naming rules</value>
-    <comment>Will show if a file name doesn't meet Windows naming rules</comment>
-  </data>
-  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
-    <value>Adheres to Windows drive root naming rules</value>
-    <comment>Will show if a file name doesn't meet Windows drive root naming rules</comment>
-  </data>
-  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
-    <value>Unique in current location</value>
-    <comment>Will show if a file name isn't unique in the current location, according to the file system naming rules</comment>
-  </data>
-  <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
-    <value>A selected file violates Windows naming rules</value>
-    <comment>Will show if a selected file doesn't meet Windows naming rules</comment>
-  </data>
-  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
-    <value>A selected file violates Windows drive root naming rules</value>
-    <comment>Will show if a selected file doesn't meet Windows drive root naming rules</comment>
-  </data>
-  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
-    <value>Some selected files have conflicting case-insensitive names</value>
-    <comment>Will show when selected file names differ only by upper / lower case</comment>
   </data>
   <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
     <value>Um arquivo selecionado viola as regras de nomenclatura do espaço do usuário</value>
   </data>
-  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
-    <value>Some copied files have conflicting case-insensitive names</value>
-    <comment>Will show when copied files' names differ only by upper / lower case</comment>
-  </data>
   <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
     <value>Um arquivo copiado viola as regras de nomenclatura do espaço do usuário</value>
-  </data>
-  <data name="S_POPUP_NON_FILE" xml:space="preserve">
-    <value>A selected item is not a file / folder</value>
-    <comment>Will show when selecting an item that can't be copied</comment>
-  </data>
-  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
-    <value>WSA App</value>
-    <comment>Represents the WSA app, not the device itself</comment>
-  </data>
-  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
-    <value>Root Status: {0}</value>
-    <comment>0 = the status (enabled, forbidden, etc.)</comment>
   </data>
   <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
     <value>Unchecked</value>
@@ -1268,57 +1188,13 @@ Cancela Tudo Rodando</value>
     <value>Disable</value>
     <comment>Toggle button - disable</comment>
   </data>
-  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
-    <value>Pairing Code</value>
-    <comment>The placeholder text for the pairing code textbox</comment>
-  </data>
-  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
-    <value>IP Address / Host Name</value>
-    <comment>The placeholder text for the IP address textbox</comment>
-  </data>
   <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
     <value>Port</value>
     <comment>The placeholder text for the connect port textbox</comment>
   </data>
-  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
-    <value>Pairing Port</value>
-    <comment>The placeholder text for the pairing port textbox</comment>
-  </data>
-  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
-    <value>Pair &amp; Connect</value>
-    <comment>The content of a button to pair and connect a new manually connected device</comment>
-  </data>
-  <data name="S_DEVICE_SAVED" xml:space="preserve">
-    <value>Saved Device</value>
-    <comment>A saved device that has been manually connected</comment>
-  </data>
-  <data name="S_DEVICE_QR" xml:space="preserve">
-    <value>QR Pairing</value>
-    <comment>An mDNS service device that is in the process of pairing using the QR code</comment>
-  </data>
-  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
-    <value>Ready To Pair</value>
-    <comment>An mDNS service device that is ready to pair</comment>
-  </data>
-  <data name="S_CLEAR_ALL" xml:space="preserve">
-    <value>Clear All</value>
-    <comment>The tooltip of a button used to clear all textboxes in the connect new device</comment>
-  </data>
-  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
-    <value>Add New Device</value>
-    <comment>The tooltip of the new device icon</comment>
-  </data>
-  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
-    <value>[Unauthorized]</value>
-    <comment>The name displayed for a device that hasn't authorized ADB yet, and we don't know its name</comment>
-  </data>
   <data name="S_SERVICE_NONAME" xml:space="preserve">
     <value>[Service]</value>
     <comment>The name displayed for a service device for which we don't have a name yet</comment>
-  </data>
-  <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
-    <value>Currently Browsing</value>
-    <comment>The tooltip displayed for the device that is currently open for browsing</comment>
   </data>
   <data name="S_BUTTON_BROWSE" xml:space="preserve">
     <value>Browse</value>
@@ -1328,29 +1204,13 @@ Cancela Tudo Rodando</value>
     <value>Connect</value>
     <comment>The button to try to connect an old / new device manually</comment>
   </data>
-  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
-    <value>{0} free of {1}</value>
-    <comment>0 = free space on drive (in B/KB/MB/GB). 1 = total drive capacity (in B/KB/MB/GB)</comment>
-  </data>
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
     <value>Empty</value>
     <comment>The notification displayed on the recycle bin drive when it is empty</comment>
   </data>
-  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
-    <value>APK Installer</value>
-    <comment>The item count on the temp drive, singular</comment>
-  </data>
-  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
-    <value>APK Installers</value>
-    <comment>The item count on the temp drive, plural</comment>
-  </data>
   <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
     <value>Packages</value>
     <comment>The installed apps drive items count display, plural</comment>
-  </data>
-  <data name="S_FILEOP_ERROR" xml:space="preserve">
-    <value>Error: {0}</value>
-    <comment>0 = an internal error message</comment>
   </data>
   <data name="S_FILEOP_VALIDATED" xml:space="preserve">
     <value>Validated</value>
@@ -1360,17 +1220,9 @@ Cancela Tudo Rodando</value>
     <value>Completed</value>
     <comment>A file operation status - completed</comment>
   </data>
-  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
-    <value>{0} Failed</value>
-    <comment>File operation sub items failed status. 0 = failed items count</comment>
-  </data>
   <data name="S_FILEOP_TOTAL" xml:space="preserve">
     <value>Total:</value>
     <comment>File operation total sub items count</comment>
-  </data>
-  <data name="S_FILEOP_PREV" xml:space="preserve">
-    <value>Previous Operation</value>
-    <comment>A file operation from a previous batch</comment>
   </data>
   <data name="S_FILEOP_RUNNING" xml:space="preserve">
     <value>Running</value>
@@ -1404,60 +1256,12 @@ Cancela Tudo Rodando</value>
     <value>Update</value>
     <comment>The action to update the date modified of a file according to its name</comment>
   </data>
-  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
-    <value>{0}% Used</value>
-    <comment>The tooltip for the drive usage percentage progress bar</comment>
-  </data>
-  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
-    <value>Scroll Here</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
   <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
     <value>Top</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
     <value>Bottom</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
-    <value>Page Up</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
-    <value>Page Down</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
-    <value>Scroll Up</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
-    <value>Scroll Down</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
-    <value>Left Edge</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
-    <value>Right Edge</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
-    <value>Page Left</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
-    <value>Page Right</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
-    <value>Scroll Left</value>
-    <comment>ScrollBar ContextMenu</comment>
-  </data>
-  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
-    <value>Scroll Right</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="S_MENU_UNDO" xml:space="preserve">
@@ -1468,39 +1272,9 @@ Cancela Tudo Rodando</value>
     <value>Redo</value>
     <comment>TextBox ContextMenu</comment>
   </data>
-  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
-    <value>Notifications</value>
-    <comment>The title of the notifications area in the settings pane</comment>
-  </data>
-  <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
-    <value>Click to display more info</value>
-    <comment>The tooltip of a button used to display a notification message</comment>
-  </data>
-  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
-    <value>App Language</value>
-    <comment>The title of the notification message about the app language</comment>
-  </data>
-  <data name="S_LANG_NOTIFICATION" xml:space="preserve">
-    <value>Select your app language of choice in the settings.
-Translation progress is displayed for the selected language.
-Please help us localize the app to your language on Weblate.</value>
-    <comment>The content of the app language notification message </comment>
-  </data>
-  <data name="S_GOTO_WEBLATE" xml:space="preserve">
-    <value>Go to Weblate</value>
-    <comment>The content of the button used to open the link to our project on Weblate</comment>
-  </data>
   <data name="S_FILE_SOCKET" xml:space="preserve">
     <value>Socket</value>
     <comment>The socket Unix file type</comment>
-  </data>
-  <data name="S_FILE_BLOCK" xml:space="preserve">
-    <value>Block Device</value>
-    <comment>The block device Unix file type</comment>
-  </data>
-  <data name="S_FILE_CHAR" xml:space="preserve">
-    <value>Char Device</value>
-    <comment>The char device Unix file type</comment>
   </data>
   <data name="S_FILE_FIFO" xml:space="preserve">
     <value>FIFO</value>
@@ -1510,25 +1284,9 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Unknown</value>
     <comment>An unknown file type</comment>
   </data>
-  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
-    <value>Broken Link</value>
-    <comment>A symbolic link that points to a file that doesn't exist</comment>
-  </data>
-  <data name="S_NAV_HISTORY" xml:space="preserve">
-    <value>Navigation History</value>
-    <comment>The tooltip of the menu that displays the navigation history</comment>
-  </data>
-  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
-    <value>Add Current Location</value>
-    <comment>The button used to add the current location (path) to the saved locations list</comment>
-  </data>
   <data name="S_REMOVE" xml:space="preserve">
     <value>Remove</value>
     <comment>The tooltip of the button used to remove a saved location from the list</comment>
-  </data>
-  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
-    <value>Saved Locations</value>
-    <comment>The tooltip of the button used to open the saved locations menu</comment>
   </data>
   <data name="KILO" xml:space="preserve">
     <value>{0} KB</value>
@@ -1562,105 +1320,13 @@ Please help us localize the app to your language on Weblate.</value>
     <value>{0} B</value>
     <comment>The notation for Bytes when displaying file size or drive usage</comment>
   </data>
-  <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>Copy {0} items</value>
-    <comment>The drag tooltip in copy mode. 0 - number of items being dragged</comment>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>Copy {0} items to {1}</value>
-    <comment>The drag tooltip in copy mode when the target is known. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>Move {0} items to {1}</value>
-    <comment>The drag tooltip in move mode when the target is known. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
-  </data>
-  <data name="S_DRAGDROP_LINK" xml:space="preserve">
-    <value>Create link in {0}</value>
-    <comment>The drag tooltip in link mode. 0 - the destination under the mouse</comment>
-  </data>
-  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>Move {0} items</value>
-    <comment>The drag tooltip in move mode. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
-  </data>
-  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
-    <value>Paste 1 Cut Item</value>
-  </data>
-  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
-    <value>Paste 1 Copied Item</value>
-  </data>
-  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
-    <value>Paste {0} Copied Items</value>
-  </data>
-  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
-    <value>Paste {0} Cut Items</value>
-  </data>
-  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
-    <value>{0} in {1} ({2})</value>
-    <comment>0 - file size, 1 - transfer time, 2 - speed. ex: 9MB in 1.2s (7.5MB/s)</comment>
-  </data>
-  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
-    <value>{0} of {1}</value>
-    <comment>0 - number of completed files, 1 - total files. ex: 2 of 3</comment>
-  </data>
-  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
-    <value>Copy {0}</value>
-    <comment>The drag tooltip in copy mode. 0 - the item being dragged</comment>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
-    <value>Copy {0} to {1}</value>
-    <comment>The drag tooltip in copy mode when the target is known. 0 - the item being dragged, 1 - the destination under the mouse</comment>
-  </data>
-  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
-    <value>Move {0}</value>
-    <comment>The drag tooltip in move mode. 0 - the item being dragged</comment>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
-    <value>Move {0} to {1}</value>
-    <comment>The drag tooltip in move mode when the target is known. 0 - the item being dragged, 1 - the destination under the mouse</comment>
-  </data>
-  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
-    <value>File not found</value>
-    <comment>The error message displayed when a sync operation is about to start but the source file is missing</comment>
-  </data>
-  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
-    <value>Finished with no confirmation</value>
-    <comment>The error message displayed when a sync operation has finished but ADB did not provide a confirmation</comment>
-  </data>
-  <data name="S_VALIDATION_ERROR" xml:space="preserve">
-    <value>Validation error: {0}</value>
-    <comment>The title of the error message displayed on a file operation validation error</comment>
-  </data>
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
     <value>Validating…</value>
     <comment>The info displayed in file operation progress during content validation</comment>
   </data>
-  <data name="S_FILES_PLURAL" xml:space="preserve">
-    <value>{0} files</value>
-    <comment>The indication of the number of currently active files (being transferred)</comment>
-  </data>
-  <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
-    <value>Select ROM for sideload</value>
-    <comment>The title of the open file dialog for selecting a ROM image to sideload</comment>
-  </data>
-  <data name="S_ROM_FILE" xml:space="preserve">
-    <value>ROM file</value>
-    <comment>The filter name displayed in the open file dialog when opening a ROM for sideload</comment>
-  </data>
   <data name="S_TERMINAL" xml:space="preserve">
     <value>Terminal</value>
     <comment>The tooltip of the button used to open or close the terminal</comment>
-  </data>
-  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
-    <value>Preserve File Date Modified</value>
-    <comment>The name of the setting to enable preserving the "Date Modified" of files on push / pull operations</comment>
-  </data>
-  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
-    <value>Install {0}</value>
-    <comment>The drag tooltip when dragging a single APK file over the installed apps view. 0 - the name of the APK</comment>
-  </data>
-  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
-    <value>Install {0} APKs</value>
-    <comment>The drag tooltip when dragging multiple APK files over the installed apps view. 0 - number of APKs being dragged</comment>
   </data>
   <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
     <value>Ativado</value>

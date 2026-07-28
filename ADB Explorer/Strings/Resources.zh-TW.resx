@@ -1509,18 +1509,6 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>View</value>
     <comment>The title of the thumbnail size selector menu</comment>
   </data>
-  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
-    <value>Medium Icons</value>
-    <comment>Thumbnail size selector - medium icons</comment>
-  </data>
-  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
-    <value>Large Icons</value>
-    <comment>Thumbnail size selector - large icons</comment>
-  </data>
-  <data name="S_THUMBSIZE_XL" xml:space="preserve">
-    <value>Extra Large Icons</value>
-    <comment>Thumbnail size selector - extra large icons</comment>
-  </data>
   <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
     <value>版面與檢視選項</value>
     <comment>The tooltip of the thumbnail size selector. view = icon view / details view</comment>
@@ -1658,18 +1646,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
     <value>修改日</value>
     <comment>File info - date modified (but without "date")</comment>
-  </data>
-  <data name="S_FILE_SYSTEM" xml:space="preserve">
-    <value>File system</value>
-    <comment>The file system type of a drive</comment>
-  </data>
-  <data name="S_MOUNT_POINT" xml:space="preserve">
-    <value>Mount point</value>
-    <comment>The Unix mount point of a drive</comment>
-  </data>
-  <data name="S_MOUNT_OPTIONS" xml:space="preserve">
-    <value>Mount options</value>
-    <comment>The Unix mount options of a drive</comment>
   </data>
   <data name="S_COLOR_RED" xml:space="preserve">
     <value>Red</value>
