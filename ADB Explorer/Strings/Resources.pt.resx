@@ -756,7 +756,7 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>The menu used to open the default web browser and search for a package name from the installed apps view</comment>
   </data>
   <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
-    <value>Copiar</value>
+    <value>Copiar para a área de transferência</value>
     <comment>The tooltip of the button in the message dialog used to copy the message to the clipboard</comment>
   </data>
   <data name="S_ADB_DISK_USAGE" xml:space="preserve">
@@ -1056,7 +1056,7 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>As in "Paste Conflict" (a file conflict while pasting)</comment>
   </data>
   <data name="S_DROP" xml:space="preserve">
-    <value>Drop</value>
+    <value>Largar</value>
     <comment>The file drop operation</comment>
   </data>
   <data name="S_ACTION_OPERATION" xml:space="preserve">
@@ -1115,7 +1115,7 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>A drive on an emulator device</comment>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
-    <value>Temp</value>
+    <value>Disco Temporário</value>
     <comment>The user space temp drive - /data/local/tmp</comment>
   </data>
   <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
@@ -1183,19 +1183,19 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>Will show if a selected file doesn't meet Windows drive root naming rules</comment>
   </data>
   <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
-    <value>Unchecked</value>
+    <value>Não Verificado</value>
     <comment>Root status - it is yet unknown whether the device supports root access</comment>
   </data>
   <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
-    <value>Forbidden</value>
+    <value>Proibido</value>
     <comment>Root access - the device does not support root access</comment>
   </data>
   <data name="S_BUTTON_ENABLE" xml:space="preserve">
-    <value>Enable</value>
+    <value>Ativar</value>
     <comment>Toggle button - enable</comment>
   </data>
   <data name="S_BUTTON_DISABLE" xml:space="preserve">
-    <value>Disable</value>
+    <value>Desativar</value>
     <comment>Toggle button - disable</comment>
   </data>
   <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
@@ -1207,27 +1207,27 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>The name displayed for a service device for which we don't have a name yet</comment>
   </data>
   <data name="S_BUTTON_BROWSE" xml:space="preserve">
-    <value>Browse</value>
+    <value>Navegar</value>
     <comment>The content of the button to open a device for browsing</comment>
   </data>
   <data name="S_BUTTON_CONNECT" xml:space="preserve">
-    <value>Connect</value>
+    <value>Conectar</value>
     <comment>The button to try to connect an old / new device manually</comment>
   </data>
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
-    <value>Empty</value>
+    <value>Vazio</value>
     <comment>The notification displayed on the recycle bin drive when it is empty</comment>
   </data>
   <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
-    <value>Packages</value>
+    <value>Pacotes</value>
     <comment>The installed apps drive items count display, plural</comment>
   </data>
   <data name="S_FILEOP_VALIDATED" xml:space="preserve">
-    <value>Validated</value>
+    <value>Validado</value>
     <comment>A file operation status - validated</comment>
   </data>
   <data name="S_FILEOP_COMPLETED" xml:space="preserve">
-    <value>Completed</value>
+    <value>Completado</value>
     <comment>A file operation status - completed</comment>
   </data>
   <data name="S_FILEOP_TOTAL" xml:space="preserve">
@@ -1235,31 +1235,31 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>File operation total sub items count</comment>
   </data>
   <data name="S_FILEOP_RUNNING" xml:space="preserve">
-    <value>Running</value>
+    <value>Em execução</value>
     <comment>File operation status - running (in progress)</comment>
   </data>
   <data name="S_FILEOP_WAITING" xml:space="preserve">
-    <value>Queued</value>
+    <value>Agendado</value>
     <comment>File operation status - queued (waiting)</comment>
   </data>
   <data name="S_FILEOP_FAILED" xml:space="preserve">
-    <value>Failed</value>
+    <value>Falhado</value>
     <comment>File operation status - failed</comment>
   </data>
   <data name="S_FILEOP_CANCELED" xml:space="preserve">
-    <value>Canceled</value>
+    <value>Cancelado</value>
     <comment>File operation status - canceled</comment>
   </data>
   <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
-    <value>Previous</value>
+    <value>Anterior</value>
     <comment>File operation status - A file operation from a previous batch</comment>
   </data>
   <data name="S_ACTION_MOVE" xml:space="preserve">
-    <value>Move</value>
+    <value>Mover</value>
     <comment>The action to move a file (cut-paste)</comment>
   </data>
   <data name="S_ACTION_RECYCLE" xml:space="preserve">
-    <value>Recycle</value>
+    <value>Mover para a Reciclagem</value>
     <comment>The action to recycle an item - send it to the trash</comment>
   </data>
   <data name="S_ACTION_UPDATE" xml:space="preserve">
@@ -1271,15 +1271,15 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
-    <value>Bottom</value>
+    <value>Fundo</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="S_MENU_UNDO" xml:space="preserve">
-    <value>Undo</value>
+    <value>Desfazer</value>
     <comment>TextBox ContextMenu</comment>
   </data>
   <data name="S_MENU_REDO" xml:space="preserve">
-    <value>Redo</value>
+    <value>Refazer</value>
     <comment>TextBox ContextMenu</comment>
   </data>
   <data name="S_FILE_SOCKET" xml:space="preserve">
@@ -1291,11 +1291,11 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>The FIFO (First-In First-Out) Unix file type</comment>
   </data>
   <data name="S_FILE_UNKNOWN" xml:space="preserve">
-    <value>Unknown</value>
+    <value>Desconhecido</value>
     <comment>An unknown file type</comment>
   </data>
   <data name="S_REMOVE" xml:space="preserve">
-    <value>Remove</value>
+    <value>Remover</value>
     <comment>The tooltip of the button used to remove a saved location from the list</comment>
   </data>
   <data name="KILO" xml:space="preserve">
@@ -1331,7 +1331,7 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>The notation for Bytes when displaying file size or drive usage</comment>
   </data>
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
-    <value>Validating…</value>
+    <value>A validar…</value>
     <comment>The info displayed in file operation progress during content validation</comment>
   </data>
   <data name="S_TERMINAL" xml:space="preserve">
@@ -1343,7 +1343,7 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>The label of the switch toggle on a setting when it is on / active / enabled</comment>
   </data>
   <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
-    <value>Off</value>
+    <value>Desligado</value>
     <comment>The label of the switch toggle on a setting when it is off / inactive / disabled</comment>
   </data>
   <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
@@ -1351,15 +1351,15 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>The title of the group for settings related to icons</comment>
   </data>
   <data name="S_VIDEO_DURATION" xml:space="preserve">
-    <value>Length</value>
+    <value>Duração</value>
     <comment>Part of the tooltip of a video file (Length = duration)</comment>
   </data>
   <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
-    <value>Dimensions</value>
+    <value>Resolução</value>
     <comment>Part of the tooltip of a picture file (dimensions = resolution)</comment>
   </data>
   <data name="S_STRING_PASTE" xml:space="preserve">
-    <value>Paste</value>
+    <value>Colar</value>
     <comment>As in "Paste the copied string"</comment>
   </data>
   <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
@@ -1371,23 +1371,23 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>The title of the thumbnail size selector menu</comment>
   </data>
   <data name="S_SORT" xml:space="preserve">
-    <value>Sort</value>
+    <value>Organizar</value>
     <comment>The button to sort files</comment>
   </data>
   <data name="S_SORT_ASCENDING" xml:space="preserve">
-    <value>Ascending</value>
+    <value>Ascendente</value>
     <comment>File list sorting direction - ascending</comment>
   </data>
   <data name="S_SORT_DESCENDING" xml:space="preserve">
-    <value>Descending</value>
+    <value>Descendente</value>
     <comment>File list sort direction - descending</comment>
   </data>
   <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
-    <value>Preview</value>
+    <value>Pré-visualização</value>
     <comment>Side pane in file preview mode</comment>
   </data>
   <data name="S_ITEM_LOCATION" xml:space="preserve">
-    <value>Location</value>
+    <value>Localização</value>
     <comment>Location as in parent path of a file</comment>
   </data>
   <data name="S_IMAGE_F_STOP" xml:space="preserve">
@@ -1399,11 +1399,11 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>The bitrate from the video file metadata</comment>
   </data>
   <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
-    <value>Unlock</value>
+    <value>Desbloquear</value>
     <comment>Button label to submit the PDF password</comment>
   </data>
   <data name="S_FILE_PERMISSIONS" xml:space="preserve">
-    <value>Permissions</value>
+    <value>Permissões</value>
     <comment>The title of the permissions section of a file in the details pane</comment>
   </data>
   <data name="S_FILE_PERM_USER" xml:space="preserve">
@@ -1411,23 +1411,23 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>Unix file permissions for the selected user</comment>
   </data>
   <data name="S_FILE_PERM_GROUP" xml:space="preserve">
-    <value>Group</value>
+    <value>Grupo</value>
     <comment>Unix file permissions for the group the user is in</comment>
   </data>
   <data name="S_FILE_PERM_OTHER" xml:space="preserve">
-    <value>Others</value>
+    <value>Outros</value>
     <comment>Unix file permissions for users outside the group</comment>
   </data>
   <data name="S_DATE_ACCESSED" xml:space="preserve">
-    <value>Accessed</value>
+    <value>Acedido</value>
     <comment>File info - last access date</comment>
   </data>
   <data name="S_CREATION_TIME" xml:space="preserve">
-    <value>Created</value>
+    <value>Criado</value>
     <comment>File info - creation time</comment>
   </data>
   <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
-    <value>Modified</value>
+    <value>Modificado</value>
     <comment>File info - date modified (but without "date")</comment>
   </data>
   <data name="S_COLOR_RED" xml:space="preserve">
@@ -1443,7 +1443,7 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>The label of the blue channel in the color picker</comment>
   </data>
   <data name="S_BUTTON_PAIR" xml:space="preserve">
-    <value>Pair</value>
+    <value>Emparelhar</value>
     <comment>The button for pairing a device</comment>
   </data>
   <data name="S_NEW_VERSION_READY" xml:space="preserve">
@@ -1561,5 +1561,409 @@ Items suportados: miniaturas de imagem, PDF; outros ficheiros cujo tamanho estej
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
     <value>Valor da Corrente Elétrica: {0}A</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
+    <value>Tema Padrão do Windows</value>
+  </data>
+  <data name="S_GITHUB_REPO" xml:space="preserve">
+    <value>Repositório do GitHub</value>
+  </data>
+  <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
+    <value>[não definido]</value>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>Registo de Comandos</value>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>Nome do Ficheiro</value>
+  </data>
+  <data name="S_COLUMN_USER_ID" xml:space="preserve">
+    <value>ID do Utilizador</value>
+  </data>
+  <data name="S_KILL_SERVER" xml:space="preserve">
+    <value>Terminar a Execução do Servidor</value>
+  </data>
+  <data name="S_KILL_PROCESS" xml:space="preserve">
+    <value>Terminar o Processo</value>
+  </data>
+  <data name="S_RESTART_ADB" xml:space="preserve">
+    <value>Reiniciar o ADB</value>
+  </data>
+  <data name="S_REBOOT_SYSTEM" xml:space="preserve">
+    <value>Imagem do Sistema</value>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - Offline</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>Estado: {0}</value>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} (Link)</value>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>Alguns dos ficheiros selecionados têm conflitos entre nomes insensíveis às diferenças entre maiúsculas e minúsculas</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Um ficheiro selecionado viola as regras de nomenclatura do espaço do utilizador</value>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>Alguns dos ficheiros copiados têm conflitos entre nomes insensíveis às diferenças entre maiúsculas e minúsculas</value>
+  </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Um ficheiro copiado viola as regras de nomenclatura do espaço do utilizador</value>
+  </data>
+  <data name="S_POPUP_NON_FILE" xml:space="preserve">
+    <value>Um elemento selecionado não é um ficheiros / pasta</value>
+  </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value>Aplicação WSA</value>
+  </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>Estado Root: {0}</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>Código de Emparelhamento</value>
+  </data>
+  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
+    <value>Endereço IP / Nome do Hospedeiro</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
+    <value>Porta de Emparelhamento</value>
+  </data>
+  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
+    <value>Emparelhar e Conectar</value>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value>Dispositivo Guardado</value>
+  </data>
+  <data name="S_DEVICE_QR" xml:space="preserve">
+    <value>Emparelhamento por Código QR</value>
+  </data>
+  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
+    <value>Pronto para Emparelhar</value>
+  </data>
+  <data name="S_CLEAR_ALL" xml:space="preserve">
+    <value>Limpar Tudo</value>
+  </data>
+  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
+    <value>Adicionar Novo Dispositivo</value>
+  </data>
+  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
+    <value>[Não Autorizado]</value>
+  </data>
+  <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
+    <value>A Navegar</value>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value>{0} disponíveis de {1} totais</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
+    <value>Intalador de Ficheiros APK</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
+    <value>Instaladores de Ficheiros APK</value>
+  </data>
+  <data name="S_FILEOP_ERROR" xml:space="preserve">
+    <value>Erro: {0}</value>
+  </data>
+  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
+    <value>{0} Falhou</value>
+  </data>
+  <data name="S_FILEOP_PREV" xml:space="preserve">
+    <value>Operação Anterior</value>
+  </data>
+  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
+    <value>{0}% Utilizado</value>
+  </data>
+  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
+    <value>Deslocar Aqui</value>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>Página Acima</value>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>Página Abaixo</value>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>Deslocar para Cima</value>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>Deslocar para Baixo</value>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>Limite Esquerdo</value>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>Limite Direito</value>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>Página à Esquerda</value>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>Página à Direita</value>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>Deslocar para a Esquerda</value>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>Deslocar para a Direita</value>
+  </data>
+  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
+    <value>Notificações</value>
+  </data>
+  <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
+    <value>Clique para exibir mais informação</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
+    <value>Idioma da Aplicação</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION" xml:space="preserve">
+    <value>Seleciona o idioma da aplicação que preferir nas definições.
+O progresso na tradução é exibido para o idioma selecionado.
+Ajude-nos a traduzir a aplicação para o seu idioma na plataforma Weblate.</value>
+  </data>
+  <data name="S_GOTO_WEBLATE" xml:space="preserve">
+    <value>Ir para Weblate</value>
+  </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>Dispositivo Block</value>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>Dispositivo Char</value>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>Link Não Funcional</value>
+  </data>
+  <data name="S_NAV_HISTORY" xml:space="preserve">
+    <value>Histórico de Navegação</value>
+  </data>
+  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
+    <value>Adicionar o Diretório Atual</value>
+  </data>
+  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
+    <value>Localizações Guardadas</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Copiar {0} elementos</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
+    <value>Copiar {0} elementos para {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
+    <value>Mover {0} elementos para {1}</value>
+  </data>
+  <data name="S_DRAGDROP_LINK" xml:space="preserve">
+    <value>Criar link em {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>Mover {0} elementos</value>
+  </data>
+  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
+    <value>Colar 1 Elemento Cortado</value>
+  </data>
+  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
+    <value>Colar 1 Elemento Copiado</value>
+  </data>
+  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
+    <value>Colar {0} Elementos Copiados</value>
+  </data>
+  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
+    <value>Colar {0} Elementos Cortados</value>
+  </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{0} em {1} ({2})</value>
+  </data>
+  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
+    <value>{0} de {1}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
+    <value>Copiar {0}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
+    <value>Copiar {0} para {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
+    <value>Mover {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>Mover {0} para {1}</value>
+  </data>
+  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
+    <value>Ficheiro não encontrado</value>
+  </data>
+  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
+    <value>Terminado sem confirmação</value>
+  </data>
+  <data name="S_VALIDATION_ERROR" xml:space="preserve">
+    <value>Erro de validação: {0}</value>
+  </data>
+  <data name="S_FILES_PLURAL" xml:space="preserve">
+    <value>{0} ficheiros</value>
+  </data>
+  <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
+    <value>Selecionar a ROM para executar o sideload</value>
+  </data>
+  <data name="S_ROM_FILE" xml:space="preserve">
+    <value>Ficheiro ROM</value>
+  </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>Preservar a Data de Modificação do Ficheiro</value>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>Instalar {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>Instalar {0} ficheiros APK</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>A verificar o estado do servidor mDNS…</value>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>Transferir e Exibir Miniaturas de Imagem</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>Apenas no Ícone de Visualização</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>Apenas nos Diretórios de Fotografias</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value>Ao Conectar</value>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>Preservar as Miniaturas de Imagem entre Sessões</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>Limitar a Rapidez de Transferência de Miniaturas de Imagem</value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>Mostrar Ícones para Pastas Especiais</value>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>Incluir Miniaturas de Vídeo</value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>Um Mês</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>Uma Semana</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>Um Dia</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>Uma Hora</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>Tempo de Atualização de Miniaturas de Imagem Locais</value>
+  </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>Utilizar BusyBox, caso Disponível</value>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>Conectar Automaticamente ao WSA, caso Disponível</value>
+  </data>
+  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
+    <value>Procurar Emuladores Android</value>
+  </data>
+  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
+    <value>Iniciar este emulador</value>
+  </data>
+  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
+    <value>Inicio do Emulador</value>
+  </data>
+  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
+    <value>O emulador do Android SDK não foi encontrado. Instale o pacote do emulador do Android SDK ou defina ANDROID_SDK_ROOT.</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>A verificar a existência de atualizações das miniaturas de imagem</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>A transferir as miniaturas de imagem</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>A ler as localizações das miniaturas de imagem e base de dados de multimédia</value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>Ícones Médios</value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>Ícones Grandes</value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>Ícones Extremamente Grandes</value>
+  </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value>Opções de disposição e de visualização</value>
+  </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value>Tamanho das Miniaturas de Imagem Guardado para cada Localização</value>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>Coluna e ordem de organização guardadas para cada localização</value>
+  </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>Tamanho Máximo de Imagem para Utilizar como Própria Miniatura de Imagem (0 - Desativado)</value>
+  </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>e mais {0} …</value>
+  </data>
+  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
+    <value>Exibir e esconder os painéis de detalhes e pré-visualização.</value>
+  </data>
+  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
+    <value>Tamanho Máximo do Ficheiro para Pré-visualização</value>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>Transferir para Pasta Padrão ao Clicar Duas Vezes</value>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value>Selecione um único elemento para ver mais informação.</value>
+  </data>
+  <data name="S_IMAGE_ISO" xml:space="preserve">
+    <value>Rapidez ISO</value>
+  </data>
+  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
+    <value>Tempo de exposição</value>
+  </data>
+  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
+    <value>Selecione um ficheiro para pré-visualizar.</value>
+  </data>
+  <data name="S_PREVIEW_INVALID" xml:space="preserve">
+    <value>Não existe qualquer pré-visualização disponível.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
+    <value>O ficheiro PDF está protegido com uma palavra-passe.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
+    <value>Palavra-passe incorreta.</value>
+  </data>
+  <data name="S_FILE_SYSTEM" xml:space="preserve">
+    <value>Sistema de ficheiros</value>
+  </data>
+  <data name="S_MOUNT_POINT" xml:space="preserve">
+    <value>Diretório de montagem</value>
+  </data>
+  <data name="S_MOUNT_OPTIONS" xml:space="preserve">
+    <value>Opções de montagem</value>
+  </data>
+  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
+    <value>Não foi possível localizar o ADB no sistema PATH. Por favor utilize "{0}" para o localizar.</value>
+  </data>
+  <data name="S_ADB_PATH_INVALID" xml:space="preserve">
+    <value>O diretório {0} providenciado é ou um atalho do Windows, ou um diretório (remoto) UNC, o que não é permitido.</value>
+  </data>
+  <data name="S_ADB_COMPROMISED" xml:space="preserve">
+    <value>O ficheiro executável providenciado não pode ser verificado como ADB. Garanta que transfere apenas ferramentas Android Platform Tools oficiais da Google.</value>
+  </data>
+  <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
+    <value>Terminar o ADB ao Fechar a Aplicação</value>
+  </data>
+  <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
+    <value>A localização personalizada não pode estar contida em C:\Users\…\AppData, por favor selecione outra localização</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
+    <value>Permitir ADB de Fontes Não Verificadas</value>
   </data>
 </root>
