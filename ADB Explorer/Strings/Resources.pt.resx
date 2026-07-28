@@ -1975,4 +1975,109 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Allow ADB From Untrusted Sources</value>
     <comment>The setting that allows using ADB without integrity checks and without path restrictions</comment>
   </data>
+  <data name="S_NEW_VERSION_READY" xml:space="preserve">
+    <value>Uma nova {0}, versão {1}, foi transferida e está pronta para ser instalada.</value>
+  </data>
+  <data name="S_UPDATE_ON_CLOSE" xml:space="preserve">
+    <value>Atualizar ao fechar</value>
+  </data>
+  <data name="S_UPDATE_APPLY_FAILED" xml:space="preserve">
+    <value>Não foi possível preparar a atualização. Garanta que uma rotina de serviço .7z está disponível (Explorador de Ficheiros do Windows, 7-Zip, NanaZip, etc...), ou transfira a nova versão manualmente através do GitHub.</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
+    <value>Verificar e notificar</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_UPDATE" xml:space="preserve">
+    <value>Verificar e instalar</value>
+  </data>
+  <data name="S_MENU_STOP_LOADING" xml:space="preserve">
+    <value>Parar de carregar {0}</value>
+  </data>
+  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
+    <value>O diretório atual é só de leitura</value>
+  </data>
+  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
+    <value>O item selecionado não pode ser modificado</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX" xml:space="preserve">
+    <value>Sintaxe</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX_AUTOMATIC" xml:space="preserve">
+    <value>Automático</value>
+  </data>
+  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
+    <value>Conteúdo do ficheiro pode ser modificado</value>
+  </data>
+  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
+    <value>Conteúdo do ficheiro é só de leitura</value>
+  </data>
+  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
+    <value>Tamanho comprimido</value>
+  </data>
+  <data name="S_PACKED_SIZE" xml:space="preserve">
+    <value>Tamanho agrupado</value>
+  </data>
+  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
+    <value>Razão</value>
+  </data>
+  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
+    <value>Método</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_MODE" xml:space="preserve">
+    <value>Visualização do Tamanho dos Ficheiros</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
+    <value>Número de Casas Decimais do Tamanho dos Ficheiros</value>
+  </data>
+  <data name="S_OPEN_FOLDER" xml:space="preserve">
+    <value>Abrir</value>
+  </data>
+  <data name="S_RESTART" xml:space="preserve">
+    <value>Reiniciar Agora</value>
+  </data>
+  <data name="S_UPDATE_MODIFIED_INFO" xml:space="preserve">
+    <value>Tenta definir a data de modificação de acordo com o nome do ficheiro.
+
+Útil para fotografias que incluem a data de captura no nome e que tiveram a sua data de modificação alterada.</value>
+  </data>
+  <data name="S_PUSH_PACKAGES_INFO" xml:space="preserve">
+    <value>Instala ficheiros APK diretamente do Windows.</value>
+  </data>
+  <data name="S_DETAILS_PANE_INFO" xml:space="preserve">
+    <value>Ativa o modo detalhado do painel lateral.
+
+Os detalhes exibidos podem incluir: miniatura de imagem, informação extensa do ficheiro, metadados, permissões e opções de montagem do disco.</value>
+  </data>
+  <data name="S_UPDATE_SIGNATURE_INVALID" xml:space="preserve">
+    <value>A atualização transferida não está assinada com o mesmo certificado que esta instalação. A atualização será descartada.</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO" xml:space="preserve">
+    <value>Desativa verificações do diretório e do executável ADB
+
+As verificações tentam prevenir a execução de um ficheiro possivelmente malicioso mascarado de ADB por um utilizador ingénuo. Estas incluem:
+• Diretório não pode ser de um UNC remoto ou de um link simbólico
+• O ficheiro executável tem de ser assinado pela Google com um código Authenticode ou corresponder a uma lista de valores de dispersão codificados com SHA-256
+• Têm de devolver uma cadeia de caracteres da versão do ficheiro legível quando executado com o argumento --version</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS" xml:space="preserve">
+    <value>Opções de pesquisa</value>
+  </data>
+  <data name="S_SEARCH_RESULTS_IN" xml:space="preserve">
+    <value>Resultados da Pesquisa em {0}</value>
+  </data>
+  <data name="S_SEARCH_ALL_SUBFOLDERS" xml:space="preserve">
+    <value>Todas as subpastas</value>
+  </data>
+  <data name="S_SEARCH_CURRENT_FOLDER" xml:space="preserve">
+    <value>Pasta atual</value>
+  </data>
+  <data name="S_SEARCH" xml:space="preserve">
+    <value>Pesquisar</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS_INFO" xml:space="preserve">
+    <value>Opções de pesquisa avançada e de filtragem.</value>
+  </data>
+  <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
+    <value>Sair do modo de resultados de pesquisa.</value>
+  </data>
 </root>
