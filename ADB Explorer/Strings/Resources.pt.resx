@@ -1088,7 +1088,7 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>The title of the dialog message to launch WSA</comment>
   </data>
   <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
-    <value>Não Mostrar Isto Novamente</value>
+    <value>Não Mostrar Isto Novamente.</value>
     <comment>The content of a checkbox used to silence the WSA launch dialog</comment>
   </data>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
@@ -1151,19 +1151,19 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>The home / main user space drive</comment>
   </data>
   <data name="S_DRIVE_APPS" xml:space="preserve">
-    <value>Installed Apps</value>
+    <value>Aplicações Instaladas</value>
     <comment>The drive displaying the installed applications</comment>
   </data>
   <data name="S_DRIVE_SD" xml:space="preserve">
-    <value>µSD Card</value>
+    <value>Cartão MicroSD</value>
     <comment>A micro SD card drive</comment>
   </data>
   <data name="S_DRIVE_OTG" xml:space="preserve">
-    <value>OTG Drive</value>
+    <value>Disco OTG</value>
     <comment>A flash drive connected by USB to the device</comment>
   </data>
   <data name="S_DRIVE_EMULATED" xml:space="preserve">
-    <value>Emulated Drive</value>
+    <value>Disco Virtual</value>
     <comment>A drive on an emulator device</comment>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
@@ -1171,19 +1171,19 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>The user space temp drive - /data/local/tmp</comment>
   </data>
   <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>File name illegal on target file system: {0}</value>
+    <value>O nome do ficheiro não é permitido no sistema de ficheiros de destino: {0}</value>
     <comment>0 = file name</comment>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
-    <value>Content mismatch</value>
+    <value>Disparidade do conteúdo</value>
     <comment>The error displayed when validation of a file operation resulted in different MD5 checksums of the source and target</comment>
   </data>
   <data name="S_VALIDATE_MISSING" xml:space="preserve">
-    <value>Missing from target location</value>
+    <value>Em falta na localização escolhida</value>
     <comment>The error displayed when during validation of a file operation the file was not found in the target location</comment>
   </data>
   <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
-    <value>Permanent Deletion</value>
+    <value>Eliminação Permanente</value>
     <comment>The location displayed in the target column of a permanent delete file operation</comment>
   </data>
   <data name="S_LOCATION_NA" xml:space="preserve">
@@ -1191,47 +1191,47 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>Displayed in the source / target of a file operation when those are unknown</comment>
   </data>
   <data name="S_PATH_INVALID" xml:space="preserve">
-    <value>Argument must specify full path of a new or existing settings file.</value>
+    <value>O argumento tem de especificar o diretório completo de um novo ou existente ficheiro de configuração.</value>
     <comment>Displayed when an invalid path argument is provided for app launch</comment>
   </data>
   <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
-    <value>Custom App Settings Path</value>
+    <value>Diretório Personalizado do Ficheiro de Configuração da Aplicação</value>
     <comment>The title of the error message when an invalid path argument is provided</comment>
   </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">
-    <value>Menu Is Empty</value>
+    <value>O Menu está Vazio</value>
     <comment>Displayed when the context menu is empty</comment>
   </data>
   <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - Copy</value>
+    <value>{0} - Copiar</value>
     <comment>A copy of an item. 0 = item name</comment>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
-    <value>Adheres to Unix naming rules (via ADB)</value>
+    <value>Adere às regras de nomenclatura Unix (através do ADB)</value>
     <comment>Will be shown if a file name doesn't meet Unix naming rules</comment>
   </data>
   <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
-    <value>Adheres to user space naming rules</value>
+    <value>Adere às regras de nomenclatura do espaço de utilizador</value>
     <comment>Will show if a file name doesn't meet user space naming rules</comment>
   </data>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
-    <value>Adheres to Windows naming rules</value>
+    <value>Adere às regras de nomenclatura do Windows</value>
     <comment>Will show if a file name doesn't meet Windows naming rules</comment>
   </data>
   <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
-    <value>Adheres to Windows drive root naming rules</value>
+    <value>Adere às regras de nomenclatura da raiz do disco do Windows</value>
     <comment>Will show if a file name doesn't meet Windows drive root naming rules</comment>
   </data>
   <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
-    <value>Unique in current location</value>
+    <value>Único no diretório atual</value>
     <comment>Will show if a file name isn't unique in the current location, according to the file system naming rules</comment>
   </data>
   <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
-    <value>A selected file violates Windows naming rules</value>
+    <value>Um ficheiro selecionado viola as regras de nomenclatura do Windows</value>
     <comment>Will show if a selected file doesn't meet Windows naming rules</comment>
   </data>
   <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
-    <value>A selected file violates Windows drive root naming rules</value>
+    <value>Um ficheiro selecionado viola as regras de nomenclatura da raiz do disco do Windows</value>
     <comment>Will show if a selected file doesn't meet Windows drive root naming rules</comment>
   </data>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
