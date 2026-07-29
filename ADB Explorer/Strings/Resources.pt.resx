@@ -1267,7 +1267,7 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>The action to update the date modified of a file according to its name</comment>
   </data>
   <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
-    <value>Top</value>
+    <value>Topo</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">

@@ -577,11 +577,11 @@
     <comment>The action to update the date modified of a file according to its name</comment>
   </data>
   <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
-    <value>Top</value>
+    <value>উপরে</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
-    <value>Bottom</value>
+    <value>নিচে</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="S_MENU_UNDO" xml:space="preserve">
@@ -755,5 +755,49 @@
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>Pair</value>
     <comment>The button for pairing a device</comment>
+  </data>
+  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
+    <value>এখানে স্ক্রল করুন</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>পৃষ্ঠা উপরে</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>পৃষ্ঠা নিচে</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>উপরে স্ক্রল করুন</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>নিচে স্ক্রল করুন</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>বাম প্রান্ত</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>ডান প্রান্ত</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>পৃষ্ঠা বামে</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>পৃষ্ঠা ডানে</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>বামে স্ক্রল করুন</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>ডানে স্ক্রল করুন</value>
+    <comment>ScrollBar ContextMenu</comment>
   </data>
 </root>

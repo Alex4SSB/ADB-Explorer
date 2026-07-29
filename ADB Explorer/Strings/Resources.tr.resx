@@ -519,4 +519,56 @@ Görünen içerik eksik olabilir.</value>
     <value>Install</value>
     <comment>The menu to install app packages</comment>
   </data>
+  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
+    <value>Buraya Kaydır</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
+    <value>Üst</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
+    <value>Alt</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>Yukarı</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>Aşağı</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>Yukarı Kaydır</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>Aşağı Kaydır</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>Sol Kenara</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>Sağ Kenara</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>Sayfanın Soluna</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>Sayfanın Sağına</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>Sola Kaydır</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>Sağa Kaydır</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
 </root>

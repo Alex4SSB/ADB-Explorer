@@ -1257,11 +1257,11 @@ Cancela Tudo Rodando</value>
     <comment>The action to update the date modified of a file according to its name</comment>
   </data>
   <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
-    <value>Top</value>
+    <value>Em Cima</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
-    <value>Bottom</value>
+    <value>Em Baixo</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="S_MENU_UNDO" xml:space="preserve">
@@ -1468,5 +1468,49 @@ Cancela Tudo Rodando</value>
   </data>
   <data name="S_SETTINGS_FILE_SIZE_MODE" xml:space="preserve">
     <value>Exibição do tamanho do arquivo</value>
+  </data>
+  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
+    <value>Rolar aqui</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>Uma página acima</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>Uma página abaixo</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>Rolar para cima</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>Rolar para baixo</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>Borda esquerda</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>Borda direita</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>Uma página à esquerda</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>Uma página à direita</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>Rolar para a esquerda</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>Rolar para a direita</value>
+    <comment>ScrollBar ContextMenu</comment>
   </data>
 </root>

@@ -193,6 +193,24 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+    <!--
+        ui:DynamicScrollBar (used by ui:DynamicScrollViewer, e.g. the Settings page) derives from
+        ScrollBar but WPF UI registers its own implicit style keyed to the exact derived type, which
+        takes precedence over the base-type ScrollBar style above. Without this, it falls back to
+        WPF's own built-in scrollbar context menu, which reads Thread.CurrentUICulture - a culture
+        this app pins to en-US for exception messages (see AppCulture) - so it always renders in
+        English instead of following Strings.Resources.Culture.
+    -->
+    <Style BasedOn="{StaticResource {x:Type ui:DynamicScrollBar}}" TargetType="ui:DynamicScrollBar">
+        <Style.Triggers>
+            <Trigger Property="Orientation" Value="Vertical">
+                <Setter Property="ContextMenu" Value="{StaticResource VScrollBarContextMenu}" />
+            </Trigger>
+            <Trigger Property="Orientation" Value="Horizontal">
+                <Setter Property="ContextMenu" Value="{StaticResource HScrollBarContextMenu}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
     <Style BasedOn="{StaticResource DefaultUiHyperlinkButtonStyle}" TargetType="ui:HyperlinkButton">
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
     </Style>

@@ -698,11 +698,11 @@
     <comment>The action to update the date modified of a file according to its name</comment>
   </data>
   <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
-    <value>Top</value>
+    <value>أعلى</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
-    <value>Bottom</value>
+    <value>أسفل</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
   <data name="S_MENU_UNDO" xml:space="preserve">
@@ -874,5 +874,49 @@
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>Pair</value>
     <comment>The button for pairing a device</comment>
+  </data>
+  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
+    <value>التمرير إلى هنا</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>الصفحة لأعلى</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>الصفحة لأسفل</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>التمرير لأعلى</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>التمرير لأسفل</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>الحافة اليسرى</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>الحافة اليمنى</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>الصفحة لليسار</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>الصفحة لليمين</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>التمرير لليسار</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>التمرير لليمين</value>
+    <comment>ScrollBar ContextMenu</comment>
   </data>
 </root>
