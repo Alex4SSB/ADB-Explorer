@@ -169,7 +169,7 @@
     <value>Erro de Disconexão</value>
   </data>
   <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
-    <value>Erro de Pareamento</value>
+    <value>Erro de Emparelhamento</value>
   </data>
   <data name="S_ROOT_FORBID" xml:space="preserve">
     <value>Acesso root não pode ser ativado no dispositivo selecionado.</value>
@@ -211,7 +211,7 @@
     <value>Instalar Pacotes</value>
   </data>
   <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
-    <value>Parear e/ou conectar a um dispositivo WIFI (sem usar mDNS)</value>
+    <value>Emparelhar e/ou conectar a um dispositivo WIFI (sem usar mDNS)</value>
   </data>
   <data name="S_RESTART_APP" xml:space="preserve">
     <value>Reinicie a app para aplicar as mudanças</value>

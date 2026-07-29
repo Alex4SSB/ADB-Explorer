@@ -463,7 +463,7 @@ O conteúdo visível pode estar incompleto.</value>
     <comment>The setting used to enable forcing the device to perform a media rescan after a successful push operation batch</comment>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
-    <value>Consultando Drivers</value>
+    <value>Consultando Drives</value>
     <comment>The setting used to toggle polling for device drives when in drive view</comment>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
@@ -510,7 +510,7 @@ O conteúdo visível pode estar incompleto.</value>
     <value>Cor de Destaque Personalizada</value>
   </data>
   <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
-    <value>Destaque Personalizado</value>
+    <value>Cor de Destaque</value>
   </data>
   <data name="S_PICK_COLOR" xml:space="preserve">
     <value>Escolha uma cor</value>
@@ -653,7 +653,7 @@ Cancela Tudo Rodando</value>
     <comment>The tooltip of a button used to show / hide the command log</comment>
   </data>
   <data name="S_BUTTON_DRIVES" xml:space="preserve">
-    <value>Drivers do Dispositivo</value>
+    <value>Drives do Dispositivo</value>
     <comment>The tooltip of a button used to switch to the drive view</comment>
   </data>
   <data name="S_BUTTON_BACK" xml:space="preserve">
