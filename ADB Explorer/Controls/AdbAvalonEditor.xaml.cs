@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using ICSharpCode.AvalonEdit.Highlighting;
 using Wpf.Ui.Appearance;
 
@@ -89,6 +90,7 @@ public partial class AdbAvalonEditor : UserControl
         EditorTextBox.TextArea.ContextMenu = (ContextMenu)FindResource("TextBoxContextMenu");
         EditorTextBox.TextArea.ContextMenuOpening += EditorTextBox_ContextMenuOpening;
         EditorTextBox.TextArea.ContextMenuClosing += (_, _) => IsContextMenuOpen = false;
+        EditorTextBox.TextArea.PreviewKeyDown += EditorTextBox_PreviewKeyDown;
         EditorTextBox.TextArea.ClipToBounds = true;
 
         Loaded += AvalonEditor_Loaded;
@@ -118,6 +120,7 @@ public partial class AdbAvalonEditor : UserControl
             return;
 
         IsContextMenuOpen = true;
+        menu.FlowDirection = AppFlowDirection;
 
         bool hasSelection = !EditorTextBox.TextArea.Selection.IsEmpty;
         bool isReadOnly = EditorTextBox.IsReadOnly;
@@ -153,9 +156,48 @@ public partial class AdbAvalonEditor : UserControl
     private void AvalonEditor_Loaded(object sender, RoutedEventArgs e)
     {
         _visualChildren = StyleHelper.EnumerateVisualChildren(this);
+        ApplyDefaultTextFlowDirection();
 
         if (Window.GetWindow(this) is Window window)
             window.PreviewMouseDown += Window_PreviewMouseDown;
+    }
+
+    private void EditorTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (!TryGetTextFlowDirectionFromKey(e, out var flowDirection))
+            return;
+
+        EditorTextBox.TextArea.FlowDirection = flowDirection;
+        e.Handled = true;
+    }
+
+    private static FlowDirection AppFlowDirection =>
+        Data.RuntimeSettings.IsRTL ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
+
+    private void ApplyDefaultTextFlowDirection()
+        => EditorTextBox.TextArea.FlowDirection = FlowDirection.LeftToRight;
+
+    private static bool TryGetTextFlowDirectionFromKey(KeyEventArgs e, out FlowDirection flowDirection)
+    {
+        flowDirection = default;
+        if (e.IsRepeat)
+            return false;
+
+        if ((e.Key == Key.LeftShift && Keyboard.IsKeyDown(Key.LeftCtrl))
+            || (e.Key == Key.LeftCtrl && Keyboard.IsKeyDown(Key.LeftShift)))
+        {
+            flowDirection = FlowDirection.LeftToRight;
+            return true;
+        }
+
+        if ((e.Key == Key.RightShift && Keyboard.IsKeyDown(Key.RightCtrl))
+            || (e.Key == Key.RightCtrl && Keyboard.IsKeyDown(Key.RightShift)))
+        {
+            flowDirection = FlowDirection.RightToLeft;
+            return true;
+        }
+
+        return false;
     }
 
     private void AvalonEditor_Unloaded(object sender, RoutedEventArgs e)
