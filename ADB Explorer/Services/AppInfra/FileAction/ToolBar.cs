@@ -122,7 +122,6 @@ internal static class MainToolBar
                     isVisible: Data.FileActions.IsApkActionsVisible),
                 new SubMenuSeparator(),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.FollowLink), AppActions.Icon(FileAction.FileActionType.FollowLink, 16)),
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PasteLink), AppActions.Icon(FileAction.FileActionType.PasteLink, 16)),
                 new SubMenuSeparator(),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), AppActions.Icon(FileAction.FileActionType.UpdateModified, 16)),
                 new SubMenuSeparator(Data.FileActions.IsApkActionsVisible),
@@ -173,8 +172,45 @@ internal static class ExplorerContextMenu
             }
 
             List.OfType<DummySubMenu>().First().IsEnabled = !List.OfType<SubMenu>().Any(IsVisibleInContextMenu);
+
+            RefreshVisibleList(list);
         });
     }
+
+    /// <summary>
+    /// Menu items whose command becomes disabled must be structurally removed from the bound
+    /// ItemsSource (rather than merely collapsed) so no blank rows are left behind for slots
+    /// that were previously visible but no longer apply to the current selection/location.
+    /// </summary>
+    private static void RefreshVisibleList(SubMenu[] list)
+    {
+        var visible = new List<SubMenu>(list.Length);
+
+        foreach (var item in list)
+        {
+            var show = item switch
+            {
+                SubMenuSeparator sep => !sep.HideSeparator,
+                DummySubMenu dummy => dummy.IsEnabled is true,
+                _ => IsVisibleInContextMenu(item),
+            };
+
+            if (show)
+                visible.Add(item);
+        }
+
+        if (!visible.SequenceEqual(VisibleList))
+        {
+            VisibleList.RemoveAll();
+            VisibleList.AddRange(visible);
+        }
+    }
+
+    /// <summary>
+    /// The actual context menu ItemsSource. Only currently-applicable items are present here -
+    /// see <see cref="RefreshVisibleList"/>.
+    /// </summary>
+    public static ObservableList<SubMenu> VisibleList { get; } = [];
 
     public static ObservableList<SubMenu> List { get; } = [
         new SubMenu(
@@ -203,6 +239,7 @@ internal static class ExplorerContextMenu
         new SubMenuSeparator(),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Cut), AppActions.Icon(FileAction.FileActionType.Cut, 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Copy), AppActions.Icon(FileAction.FileActionType.Copy, 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyLink), AppActions.Icon(FileAction.FileActionType.PasteLink, 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Paste), AppActions.Icon(FileAction.FileActionType.Paste, 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.PasteLink), AppActions.Icon(FileAction.FileActionType.PasteLink, 16)),
         new SubMenuSeparator(),

@@ -359,6 +359,10 @@ public partial class ExplorerPageHeader : UserControl
                 break;
 
             case Key.Enter:
+                // Shift+Enter is bound to FollowLink on the main window; do not swallow it here.
+                if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+                    return false;
+
                 if (ExplorerGrid.SelectedCells.Count < 1 || IsInEditMode)
                     return false;
 
@@ -366,7 +370,7 @@ public partial class ExplorerPageHeader : UserControl
                     && ActiveView.SelectedItem is FileClass selected
                     && FileActionLogic.CanEnterSelection(selected))
                     DoubleClick(ActiveView.SelectedItem);
-                break;
+                return true;
 
             case Key.Apps:
                 ActiveView.ContextMenu.IsOpen = true;
@@ -494,11 +498,7 @@ public partial class ExplorerPageHeader : UserControl
                         if (FileActions.IsAppDrive || FileActions.IsRecycleBin || DevicesObject.Current is null)
                             FilterFileActions();
                     });
-                    Task.Run(() =>
-                    {
-                        ExplorerContextMenu.UpdateSeparators();
-                        FilterExplorerContextMenu();
-                    });
+                    Task.Run(ExplorerContextMenu.UpdateSeparators);
                     break;
 
                 case nameof(AppRuntimeSettings.NewFolder):
@@ -550,21 +550,6 @@ public partial class ExplorerPageHeader : UserControl
     }
 
     private void FilterFileActions() => App.SafeInvoke(() => MainToolBar.Items?.Refresh());
-
-    private void FilterExplorerContextMenu() => App.SafeInvoke(() =>
-    {
-        var collectionView = CollectionViewSource.GetDefaultView(ActiveView.ContextMenu.ItemsSource);
-        if (collectionView is null)
-            return;
-
-        collectionView.Filter = m => m switch
-        {
-            SubMenuSeparator => true,
-            DummySubMenu => true,
-            SubMenu menu => ExplorerContextMenu.IsVisibleInContextMenu(menu),
-            _ => false,
-        };
-    });
 
     private void NewItem(bool isFolder)
     {
@@ -1337,6 +1322,8 @@ public partial class ExplorerPageHeader : UserControl
         {
             case Key.Enter when IsInEditMode:
                 return;
+            case Key.Enter when Keyboard.Modifiers.HasFlag(ModifierKeys.Shift):
+                return;
             case Key.Enter:
                 {
                     if (ExplorerGrid.SelectedItems.Count == 1
@@ -1465,8 +1452,15 @@ public partial class ExplorerPageHeader : UserControl
         ViewModel.IsMenuOpen = true;
         FileActionLogic.UpdateFileActions();
         ExplorerContextMenu.UpdateSeparators();
-        FilterExplorerContextMenu();
+
+        if (e.Source is FrameworkElement target)
+            target.ContextMenu = CreateRowContextMenu();
     }
+
+    private AdbContextMenu CreateRowContextMenu() => new()
+    {
+        Style = TryFindResource("ExplorerContextMenuStyle") as Style,
+    };
 
     private void ExplorerGrid_MouseDown(object sender, MouseButtonEventArgs e)
     {
@@ -1499,7 +1493,8 @@ public partial class ExplorerPageHeader : UserControl
             if (ExplorerGrid.SelectedItems.Count > 0 && IsInEditMode)
                 IsInEditMode = false;
 
-            if (Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
+            if ((e.ChangedButton is MouseButton.Right || !ViewModel.IsMenuOpen)
+                && Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
             {
                 ExplorerGrid.UnselectAll();
                 ExplorerGrid.SelectedIndex =
@@ -1914,7 +1909,8 @@ public partial class ExplorerPageHeader : UserControl
             if (IconView.SelectedItems.Count > 0 && IsInEditMode)
                 IsInEditMode = false;
 
-            if (Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
+            if ((e.ChangedButton is MouseButton.Right || !ViewModel.IsMenuOpen)
+                && Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
             {
                 IconView.UnselectAll();
                 selectionIndex = -1;

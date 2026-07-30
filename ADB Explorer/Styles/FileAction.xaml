@@ -430,7 +430,7 @@
         x:Key="ExplorerContextMenuStyle"
         BasedOn="{StaticResource BaseContextMenuStyle}"
         TargetType="controls:AdbContextMenu">
-        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:ExplorerContextMenu.List}}" />
+        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:ExplorerContextMenu.VisibleList}}" />
     </Style>
     <Style
         x:Key="PathBoxContextMenuStyle"

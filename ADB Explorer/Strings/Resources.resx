@@ -785,6 +785,10 @@ Cancel All Running</value>
     <value>Paste Link</value>
     <comment>The menu used to paste a link of the copied item</comment>
   </data>
+  <data name="S_MENU_COPY_LINK" xml:space="preserve">
+    <value>Copy as link</value>
+    <comment>The menu used to copy a link of the selected item for pasting as a symlink</comment>
+  </data>
   <data name="S_MENU_RENAME" xml:space="preserve">
     <value>Rename</value>
     <comment>The menu used to rename a file or folder</comment>

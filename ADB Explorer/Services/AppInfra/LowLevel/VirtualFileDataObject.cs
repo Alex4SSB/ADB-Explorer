@@ -633,7 +633,8 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             : null;
 
         var includeContent =
-            !Data.FileActions.IsSelectionIllegalOnWindows
+            preferredEffect is not DragDropEffects.Link
+            && !Data.FileActions.IsSelectionIllegalOnWindows
             && !Data.FileActions.IsSelectionIllegalNaming
             && !Data.FileActions.IsSelectionConflictingNames
             && !Data.FileActions.IsRecycleBin;

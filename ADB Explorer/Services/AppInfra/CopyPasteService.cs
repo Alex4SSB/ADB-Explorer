@@ -292,7 +292,9 @@ public partial class CopyPasteService : ObservableObject
         var prefDropEffect = VirtualFileDataObject.GetPreferredDropEffect(CPDO);
 
         // Link is only allowed depending on the target
-        if (prefDropEffect.HasFlag(DragDropEffects.Copy) && allowedEffect.HasFlag(DragDropEffects.Copy))
+        if (prefDropEffect.HasFlag(DragDropEffects.Link))
+            PasteState = DragDropEffects.Link;
+        else if (prefDropEffect.HasFlag(DragDropEffects.Copy) && allowedEffect.HasFlag(DragDropEffects.Copy))
             PasteState = DragDropEffects.Copy;
         else if (prefDropEffect.HasFlag(DragDropEffects.Move) && allowedEffect.HasFlag(DragDropEffects.Move))
             PasteState = DragDropEffects.Move;
@@ -584,6 +586,10 @@ public partial class CopyPasteService : ObservableObject
 
         // Symlink into archives is not supported.
         if (isLink && ArchivePath.IsArchivePath(targetFolder, deviceId))
+            return;
+
+        if ((isLink || CurrentEffect is DragDropEffects.Link)
+            && DriveHelper.GetCurrentDrive(targetFolder)?.Restrictions.NoSymbolicLinks is true)
             return;
 
         void ReadObject()

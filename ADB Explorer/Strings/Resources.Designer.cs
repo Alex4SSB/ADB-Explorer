@@ -2379,6 +2379,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copy as link.
+        /// </summary>
+        public static string S_MENU_COPY_LINK {
+            get {
+                return ResourceManager.GetString("S_MENU_COPY_LINK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Copy To Temp.
         /// </summary>
         public static string S_MENU_COPY_TEMP {

@@ -56,18 +56,24 @@ public class FileMoveOperation : AbstractShellFileOperation
             IndexerPath = FilePath.TrashIndex.IndexerPath;
         }
 
-        var cmd = OperationName is OperationType.Copy ? "cp" : "mv";
+        var cmd = OperationName switch
+        {
+            OperationType.Copy when isLink => "ln",
+            OperationType.Copy => "cp",
+            _ => "mv",
+        };
         var flag = "";
 
-        if (OperationName is OperationType.Copy)
+        if (isLink)
+        {
+            flag += "s";
+        }
+        else if (OperationName is OperationType.Copy)
         {
             flag += "p"; // Preserve timestamps, ownership, and mode
             if (FilePath.IsDirectory)
                 flag += "r"; // Recurse into subdirectories (DEST must be a directory)
         }
-
-        if (isLink)
-            flag += "s"; // Symlink instead of copy
 
         if (flag.Length > 0)
             flag = "-" + flag;

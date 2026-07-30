@@ -344,6 +344,13 @@ public partial class FileActionsEnable : ObservableObject
         set => SetProperty(ref isPasteLinkEnabled, value);
     }
 
+    private bool isCopyLinkEnabled = false;
+    public bool IsCopyLinkEnabled
+    {
+        get => isCopyLinkEnabled;
+        set => SetProperty(ref isCopyLinkEnabled, value);
+    }
+
     private bool isApkWebSearchEnabled = false;
     public bool IsApkWebSearchEnabled
     {

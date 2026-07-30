@@ -305,8 +305,16 @@ internal static class FileActionLogic
         }
         else
         {
-            Data.FileActions.PasteEnabled = EnableUiPaste();
-            Data.FileActions.IsKeyboardPasteEnabled = EnableKeyboardPaste();
+            if (Data.CopyPaste.PasteState is DragDropEffects.Link)
+            {
+                Data.FileActions.PasteEnabled = false;
+                Data.FileActions.IsKeyboardPasteEnabled = false;
+            }
+            else
+            {
+                Data.FileActions.PasteEnabled = EnableUiPaste();
+                Data.FileActions.IsKeyboardPasteEnabled = EnableKeyboardPaste();
+            }
         }
     }
 
@@ -454,6 +462,17 @@ internal static class FileActionLogic
         return ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId);
     }
 
+    private static bool IsSymlinkPasteAllowed(string targetPath)
+    {
+        var deviceId = Data.DevicesObject?.Current?.ID ?? "";
+        return HasRootShell
+            && Data.CopyPaste.Files.Length == 1
+            && Data.CopyPaste.IsSelf
+            && DriveHelper.GetCurrentDrive(targetPath)?.Restrictions.NoSymbolicLinks is not true
+            && DriveHelper.GetCurrentDrive(targetPath)?.Restrictions.ReadOnly is not true
+            && !ArchivePath.IsArchivePath(targetPath, deviceId);
+    }
+
     public static DragDropEffects EnableDropPaste(FileClass target = null)
     {
         if (!Data.CopyPaste.CurrentFiles.Any())
@@ -592,6 +611,24 @@ internal static class FileActionLogic
 
         // Mark clipboard as self immediately so paste enablement works while descriptors
         // (and archive extract staging) finish asynchronously.
+        Data.CopyPaste.UpdateSelfVFDO(isDrag: false, pasteEffect: dropEffect);
+        vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.Clipboard, allowedEffects: dropEffect);
+    }
+
+    public static void CopyLinkFiles(IEnumerable<FileClass> items)
+    {
+        var itemsToCopy = items;
+
+        Data.FileActions.CopyEnabled = true;
+        Data.FileActions.CutEnabled = true;
+
+        IsPasteEnabled();
+
+        var dropEffect = DragDropEffects.Link;
+        var vfdo = VirtualFileDataObject.PrepareTransfer(itemsToCopy, dropEffect, VirtualFileDataObject.DataObjectMethod.Clipboard);
+        if (vfdo is null)
+            return;
+
         Data.CopyPaste.UpdateSelfVFDO(isDrag: false, pasteEffect: dropEffect);
         vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.Clipboard, allowedEffects: dropEffect);
     }
@@ -1116,6 +1153,7 @@ internal static class FileActionLogic
         {
             Data.FileActions.CopyEnabled = Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
                                            && !(allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Copy)
+                                           && !(allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Link)
                                            && Data.FileActions.IsRegularItem
                                            && !Data.FileActions.IsRecycleBin;
         }
@@ -1148,13 +1186,31 @@ internal static class FileActionLogic
             && !Data.FileActions.IsRecycleBin
             && Data.SelectedFiles.AnyAll(file => file.Type is FileType.File && !file.IsApk && !file.IsLink);
 
-        Data.FileActions.IsPasteLinkEnabled = Data.CurrentDrive?.Restrictions.NoSymbolicLinks is not true
-            && HasRootShell
+        string? pasteLinkTarget;
+        if (!Data.SelectedFiles.Any())
+            pasteLinkTarget = Data.CurrentPath;
+        else if (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory)
+        {
+            var selected = Data.SelectedFiles.First();
+            pasteLinkTarget = selected.IsLink ? selected.LinkTarget : selected.FullPath;
+        }
+        else
+            pasteLinkTarget = null;
+
+        Data.FileActions.IsPasteLinkEnabled = !Data.FileActions.IsAppDrive
+            && pasteLinkTarget is not null
             && Data.CopyPaste.Files.Length == 1
             && Data.CopyPaste.IsSelf
-            && Data.CopyPaste.PasteState is DragDropEffects.Copy
-            && (!Data.SelectedFiles.Any() ||
-            (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
+            && Data.CopyPaste.PasteState is DragDropEffects.Copy or DragDropEffects.Link
+            && IsSymlinkPasteAllowed(pasteLinkTarget);
+
+        Data.FileActions.IsCopyLinkEnabled = Data.CurrentDrive?.Restrictions.NoSymbolicLinks is not true
+            && HasRootShell
+            && Data.SelectedFiles.Count() == 1
+            && Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
+            && Data.FileActions.IsRegularItem
+            && !Data.FileActions.IsRecycleBin
+            && !(allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Link);
 
         Data.FileActions.InstallPackageEnabled = Data.DevicesObject?.Current?.Type is not DeviceType.Recovery
             && Data.CurrentDrive?.Restrictions.NoApkInstall is not true;
