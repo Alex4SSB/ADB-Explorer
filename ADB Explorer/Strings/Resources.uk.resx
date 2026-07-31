@@ -1721,4 +1721,7 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
     <value>Вийти з режиму результатів пошуку.</value>
   </data>
+  <data name="S_MENU_COPY_LINK" xml:space="preserve">
+    <value>Копіювати як посилання</value>
+  </data>
 </root>
