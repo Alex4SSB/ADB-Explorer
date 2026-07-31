@@ -63,12 +63,12 @@ internal static class MainToolBar
         new MenuSeparator(),
         new CompoundIconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.New),
-            BaseIcon.NewItem(),
+            new BaseIcon(new AddCircleIcon()),
             isNameDisplayed: true,
             isChevronVisible: true,
             children:
             [
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFolder), new BaseIcon("\uE8F4", 16)),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFolder), AppActions.Icon(FileAction.FileActionType.PushFolders, 16)),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFile), AppActions.Icon(FileAction.FileActionType.NewFile, 16)),
             ],
             isVisible: Data.FileActions.IsNewMenuVisible),
@@ -80,19 +80,19 @@ internal static class MainToolBar
             altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardCut)),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Copy),
-            AppActions.Icon(FileAction.FileActionType.Copy, 18),
+            new BaseIcon(new CopyIcon()),
             StyleHelper.ContentAnimation.Bounce,
             Data.FileActions.IsCopyState,
             altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardCopy)),
         new DynamicAltTextMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Paste),
             Data.FileActions.CutItemsCount,
-            AppActions.Icon(FileAction.FileActionType.Paste, 18),
+            new BaseIcon(new PasteIcon()),
             StyleHelper.ContentAnimation.Bounce,
             altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardPaste)),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Rename),
-            AppActions.Icon(FileAction.FileActionType.Rename, 18),
+            new BaseIcon(new RenameAIcon()),
             StyleHelper.ContentAnimation.Bounce,
             isVisible: Data.FileActions.IsNewMenuVisible),
         new IconMenu(
@@ -218,10 +218,10 @@ internal static class ExplorerContextMenu
             new("\uE838", 16)),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Pull),
-            new(new PullIcon())),
+            new(new PullIcon(), 16)),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPush),
-            new(new PushIcon()),
+            new(new PushIcon(), 16),
             children:
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFolders), AppActions.Icon(FileAction.FileActionType.PushFolders, 16)),
@@ -230,20 +230,20 @@ internal static class ExplorerContextMenu
         new SubMenuSeparator(),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextNew),
-            BaseIcon.NewItem(),
+            new BaseIcon(new AddCircleIcon(), 16),
             children:
             [
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFolder), new BaseIcon("\uE8F4", 16)),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFolder), AppActions.Icon(FileAction.FileActionType.PushFolders, 16)),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFile), AppActions.Icon(FileAction.FileActionType.NewFile, 16)),
             ]),
         new SubMenuSeparator(),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Cut), AppActions.Icon(FileAction.FileActionType.Cut, 16)),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Copy), AppActions.Icon(FileAction.FileActionType.Copy, 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Copy), new BaseIcon(new CopyIcon(), 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyLink), AppActions.Icon(FileAction.FileActionType.PasteLink, 16)),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Paste), AppActions.Icon(FileAction.FileActionType.Paste, 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Paste), new BaseIcon(new PasteIcon(), 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.PasteLink), AppActions.Icon(FileAction.FileActionType.PasteLink, 16)),
         new SubMenuSeparator(),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Rename), AppActions.Icon(FileAction.FileActionType.Rename, 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Rename), new BaseIcon(new RenameAIcon(), 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FollowLink), AppActions.Icon(FileAction.FileActionType.FollowLink, 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenPackageLocation), AppActions.Icon(FileAction.FileActionType.FollowLink, 16)),
         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), AppActions.Icon(FileAction.FileActionType.CopyItemPath, 16)),

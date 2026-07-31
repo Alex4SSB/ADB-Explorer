@@ -1,4 +1,4 @@
-﻿//using ADB_Explorer.Controls;
+﻿using ADB_Explorer.Controls;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 
@@ -16,7 +16,7 @@ public class PackageInstallOperation : AbstractShellFileOperation
         ? Strings.Resources.S_UNINSTALL
         : Strings.Resources.S_MENU_INSTALL;
 
-    public override FrameworkElement OpIcon => new();
+    public override FrameworkElement OpIcon => IsUninstall ? new UninstallIcon() : new InstallIcon();
 
     public PackageInstallOperation(Dispatcher dispatcher,
                                    LogicalDeviceViewModel device,

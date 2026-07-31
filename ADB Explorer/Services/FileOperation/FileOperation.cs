@@ -242,11 +242,11 @@ public abstract class FileOperation : ViewModelBase
         OperationType.Recycle => new RecycleIcon(),
         OperationType.Move => new FontIcon() { Glyph = "\uE8DE" },
         OperationType.Delete => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Delete] },
-        OperationType.Copy => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Copy] },
+        OperationType.Copy => new CopyIcon(),
         OperationType.Restore => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Restore] },
         OperationType.Update => new FontIcon() { Glyph = AppActions.Icons[FileActionType.UpdateModified] },
         OperationType.Install => null, // gets overridden
-        OperationType.Rename => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Rename] },
+        OperationType.Rename => new RenameAIcon(),
         _ => throw new NotSupportedException(),
     };
 

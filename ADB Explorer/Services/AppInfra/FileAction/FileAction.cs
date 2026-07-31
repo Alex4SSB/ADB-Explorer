@@ -26,35 +26,29 @@ public static class AppActions
     {
         { FileActionType.PushFolders, "\uE8B7" },
         { FileActionType.NewFile, "\uE8A5" },
-        { FileActionType.New, "\uECC8" },
-        { FileActionType.Cut, "\uE8C6" },
         { FileActionType.Copy, "\uE8C8" },
-        { FileActionType.Paste, "\uE77F" },
-        { FileActionType.Rename, "\uE8AC" },
         { FileActionType.Restore, "\uE845" },
         { FileActionType.Delete, "\uE74D" },
-        { FileActionType.Uninstall, "\uE25B" },
         { FileActionType.More, "\uE712" },
         { FileActionType.UpdateModified, "\uE787" },
         { FileActionType.EditCurrentPath, "\uE70F" },
-        { FileActionType.Install, "\uE896" },
         { FileActionType.CopyToTemp, "\uF413" },
         { FileActionType.FileOpRemove, "\uE711" },
         { FileActionType.PauseLogs, "\uE769" },
         { FileActionType.FollowLink, "\uE838" },
         { FileActionType.PasteLink, "\uE1A5" },
-        { FileActionType.HideSettings, "\uE761" },
-        { FileActionType.SearchApkOnWeb, "\uF6FA" },
         { FileActionType.Home, "\uE80F" },
         { FileActionType.Refresh, "\uE72C" },
-        { FileActionType.NavRefresh, "\uE72C" },
-        { FileActionType.CopyItemPath, "\uE62F" },
         { FileActionType.FileOpStop, "\uE768" },
     };
 
     public static BaseIcon Icon(FileActionType type, double size = 18) => type switch
     {
-        FileActionType.CopyItemPath => new(FluentPathGeometries.ItemPath, size, flowDirection: FlowDirection.LeftToRight),
+        FileActionType.CopyItemPath => new(new ItemPathIcon(), size),
+        FileActionType.Cut => new(new CutIcon(), size),
+        FileActionType.Install => new(new InstallIcon(), size),
+        FileActionType.Uninstall => new(new UninstallIcon(), size),
+        FileActionType.SearchApkOnWeb => new(new GlobeSearchIcon(), size),
         _ => new(Icons[type], size),
     };
 

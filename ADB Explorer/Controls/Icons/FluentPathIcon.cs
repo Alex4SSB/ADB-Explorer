@@ -1,4 +1,3 @@
-using System.Windows.Data;
 using Wpf.Ui.Controls;
 
 namespace ADB_Explorer.Controls;
@@ -87,6 +86,37 @@ public class FluentPathIcon : IconElement
     }
 }
 
+/// <summary>
+/// Multi-path Fluent icon scaled to <see cref="Size"/> via a shared coordinate space.
+/// </summary>
+public class ScaledPathIcon : UserControl
+{
+    public double Size
+    {
+        get => (double)GetValue(SizeProperty);
+        set => SetValue(SizeProperty, value);
+    }
+
+    public static readonly DependencyProperty SizeProperty = DependencyProperty.Register(
+        nameof(Size),
+        typeof(double),
+        typeof(ScaledPathIcon),
+        new PropertyMetadata(16.0d));
+
+    /// <summary>Fluent SVG viewBox dimension (16, 20, or 24).</summary>
+    public double ArtboardSize
+    {
+        get => (double)GetValue(ArtboardSizeProperty);
+        set => SetValue(ArtboardSizeProperty, value);
+    }
+
+    public static readonly DependencyProperty ArtboardSizeProperty = DependencyProperty.Register(
+        nameof(ArtboardSize),
+        typeof(double),
+        typeof(ScaledPathIcon),
+        new PropertyMetadata(16.0d));
+}
+
 public class BaseIcon
 {
     private const string DefaultForegroundBrush = "TextFillColorPrimaryBrush";
@@ -140,10 +170,14 @@ public class BaseIcon
     public BaseIcon(UserControl content, double size = 18)
     {
         Size = size;
+        if (content is ScaledPathIcon scaledPathIcon)
+            scaledPathIcon.Size = size;
+
+        content.Width = size;
+        content.Height = size;
+
         IconContent = content;
     }
-
-    public static BaseIcon NewItem() => new(new NewItemIcon());
 
     private static Style CreateForegroundStyle(Type targetType, string baseStyleKey, string enabledBrushKey)
     {
