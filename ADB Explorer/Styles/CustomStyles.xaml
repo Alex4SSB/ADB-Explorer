@@ -493,8 +493,6 @@
         BasedOn="{StaticResource DefaultExpanderStyle}"
         TargetType="Expander">
         <Setter Property="helpers:ExpanderHelper.ExpanderArrow" Value="None" />
-        <Setter Property="helpers:ExpanderHelper.IsListItem" Value="True" />
-        <Setter Property="helpers:ExpanderHelper.IsExpandEnabled" Value="True" />
         <Setter Property="IsExpanded" Value="{Binding DeviceSelected, Mode=TwoWay}" />
         <Setter Property="MinHeight" Value="40" />
     </Style>

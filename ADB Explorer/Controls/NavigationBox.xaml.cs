@@ -39,6 +39,7 @@ public partial class NavigationBox : UserControl
     {
         App.SafeInvoke(() =>
         {
+            _arrangeGeneration++;
             Path = null;
             DisplayPath = null;
             Items = [];
@@ -384,23 +385,98 @@ public partial class NavigationBox : UserControl
 
         breadcrumbs[^1].IsLast = true;
 
-        var template = (DataTemplate)Resources["BreadcrumbTemplate"];
-        itemWidths = [.. breadcrumbs.Select(item => ControlSize.GetWidth(template, item))];
-
-        if (excessButtonWidth <= 0)
-        {
-            var excess = new TextMenu(new FileAction(FileAction.FileActionType.None, () => true, () => { }, "\uE712"));
-            excessButtonWidth = ControlSize.GetWidth(template, excess);
-        }
-
-        ArrangeBreadcrumbs();
+        itemWidths = [];
+        _arrangeGeneration++;
+        Items = [.. breadcrumbs];
+        QueueMeasureAndArrange();
     }
+
+    private int _arrangeGeneration;
 
     private void ArrangeBreadcrumbs()
     {
         if (breadcrumbs.Count == 0)
             return;
 
+        if (itemWidths.Count == breadcrumbs.Count && itemWidths.TrueForAll(static w => w > 0))
+        {
+            ApplyCollapseArrangement();
+            return;
+        }
+
+        // Widths are unknown: show every crumb, then measure real containers after layout.
+        if (Items is null || Items.Count != breadcrumbs.Count)
+            Items = [.. breadcrumbs];
+
+        QueueMeasureAndArrange();
+    }
+
+    private void QueueMeasureAndArrange()
+    {
+        var generation = _arrangeGeneration;
+        App.SafeBeginInvoke(() => CompleteMeasureAndArrange(generation), DispatcherPriority.Loaded);
+    }
+
+    private void CompleteMeasureAndArrange(int generation, bool isRetry = false)
+    {
+        if (generation != _arrangeGeneration)
+            return;
+
+        PathItemsControl.UpdateLayout();
+
+        if (!TryCaptureRenderedItemWidths())
+        {
+            if (!isRetry)
+                App.SafeBeginInvoke(() => CompleteMeasureAndArrange(generation, isRetry: true), DispatcherPriority.ContextIdle);
+            return;
+        }
+
+        if (excessButtonWidth <= 0)
+            TryCaptureExcessButtonWidth();
+
+        ApplyCollapseArrangement();
+    }
+
+    private void TryCaptureExcessButtonWidth()
+    {
+        var excess = new TextMenu(new FileAction(FileAction.FileActionType.None, () => true, () => { }, "\uE712"))
+        {
+            Children = [],
+        };
+
+        Items = [.. breadcrumbs, excess];
+        PathItemsControl.UpdateLayout();
+
+        if (PathItemsControl.ItemContainerGenerator.ContainerFromIndex(breadcrumbs.Count) is FrameworkElement container)
+            excessButtonWidth = ControlSize.GetWidth(container);
+
+        Items = [.. breadcrumbs];
+    }
+
+    private bool TryCaptureRenderedItemWidths()
+    {
+        if (breadcrumbs.Count == 0 || PathItemsControl.Items.Count != breadcrumbs.Count)
+            return false;
+
+        var widths = new List<double>(breadcrumbs.Count);
+        for (var i = 0; i < breadcrumbs.Count; i++)
+        {
+            if (PathItemsControl.ItemContainerGenerator.ContainerFromIndex(i) is not FrameworkElement container)
+                return false;
+
+            var width = ControlSize.GetWidth(container);
+            if (width <= 0)
+                return false;
+
+            widths.Add(width);
+        }
+
+        itemWidths = widths;
+        return true;
+    }
+
+    private void ApplyCollapseArrangement()
+    {
         int lastHiddenIndex = -1;
         for (var i = 1; i < breadcrumbs.Count; i++)
         {
