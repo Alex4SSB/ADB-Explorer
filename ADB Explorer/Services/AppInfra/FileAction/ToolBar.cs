@@ -239,7 +239,7 @@ internal static class ExplorerContextMenu
         new SubMenuSeparator(),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Cut), AppActions.Icon(FileAction.FileActionType.Cut, 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Copy), new BaseIcon(new CopyIcon(), 16)),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyLink), AppActions.Icon(FileAction.FileActionType.PasteLink, 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyLink), AppActions.Icon(FileAction.FileActionType.CopyLink, 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Paste), new BaseIcon(new PasteIcon(), 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.PasteLink), AppActions.Icon(FileAction.FileActionType.PasteLink, 16)),
         new SubMenuSeparator(),

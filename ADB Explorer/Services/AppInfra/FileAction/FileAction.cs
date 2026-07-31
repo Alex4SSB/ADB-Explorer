@@ -36,7 +36,6 @@ public static class AppActions
         { FileActionType.FileOpRemove, "\uE711" },
         { FileActionType.PauseLogs, "\uE769" },
         { FileActionType.FollowLink, "\uE838" },
-        { FileActionType.PasteLink, "\uE1A5" },
         { FileActionType.Home, "\uE80F" },
         { FileActionType.Refresh, "\uE72C" },
         { FileActionType.FileOpStop, "\uE768" },
@@ -48,6 +47,8 @@ public static class AppActions
         FileActionType.Cut => new(new CutIcon(), size),
         FileActionType.Install => new(new InstallIcon(), size),
         FileActionType.Uninstall => new(new UninstallIcon(), size),
+        FileActionType.CopyLink => new(new DocumentLinkIcon(), size),
+        FileActionType.PasteLink => new(new DocumentLinkIcon(), size),
         FileActionType.SearchApkOnWeb => new(new GlobeSearchIcon(), size),
         _ => new(Icons[type], size),
     };

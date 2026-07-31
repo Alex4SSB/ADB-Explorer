@@ -237,8 +237,8 @@ public abstract class FileOperation : ViewModelBase
 
     public virtual FrameworkElement OpIcon => OperationName switch
     {
-        OperationType.Pull => new PullIcon(),
-        OperationType.Push => new PushIcon(),
+        OperationType.Pull => CreateOpIcon(new PullIcon()),
+        OperationType.Push => CreateOpIcon(new PushIcon()),
         OperationType.Recycle => new RecycleIcon(),
         OperationType.Move => new FontIcon() { Glyph = "\uE8DE" },
         OperationType.Delete => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Delete] },
@@ -249,6 +249,18 @@ public abstract class FileOperation : ViewModelBase
         OperationType.Rename => new RenameAIcon(),
         _ => throw new NotSupportedException(),
     };
+
+    private const double OpIconSize = 16;
+
+    private static UserControl CreateOpIcon(UserControl icon)
+    {
+        if (icon is ScaledPathIcon scaledPathIcon)
+            scaledPathIcon.Size = OpIconSize;
+
+        icon.Width = OpIconSize;
+        icon.Height = OpIconSize;
+        return icon;
+    }
 
     public bool ValidationAllowed
     {
