@@ -1721,4 +1721,7 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
     <value>退出搜索结果模式。</value>
   </data>
+  <data name="S_MENU_COPY_LINK" xml:space="preserve">
+    <value>复制为链接</value>
+  </data>
 </root>
