@@ -75,6 +75,34 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
             => writer.WriteNumberValue((int)value);
     }
 
+    /// <summary>
+    /// Reads legacy <see cref="bool"/> values for the former AllowMultiOp toggle
+    /// (<c>false</c>→1, <c>true</c>→32) and clamps numeric values to 1–999.
+    /// </summary>
+    private sealed class MaxSimultaneousOpsJsonConverter : JsonConverter<int>
+    {
+        public override int Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            return reader.TokenType switch
+            {
+                JsonTokenType.False => MaxSimultaneousOpsMin,
+                JsonTokenType.True => MaxSimultaneousOpsDefault,
+                JsonTokenType.Number when reader.TryGetInt32(out var number)
+                    => Math.Clamp(number, MaxSimultaneousOpsMin, MaxSimultaneousOpsMax),
+                JsonTokenType.String when int.TryParse(reader.GetString(), out var parsed)
+                    => Math.Clamp(parsed, MaxSimultaneousOpsMin, MaxSimultaneousOpsMax),
+                _ => MaxSimultaneousOpsDefault,
+            };
+        }
+
+        public override void Write(Utf8JsonWriter writer, int value, JsonSerializerOptions options)
+            => writer.WriteNumberValue(Math.Clamp(value, MaxSimultaneousOpsMin, MaxSimultaneousOpsMax));
+    }
+
+    public const int MaxSimultaneousOpsMin = 1;
+    public const int MaxSimultaneousOpsMax = 999;
+    public const int MaxSimultaneousOpsDefault = 32;
+
     void IJsonOnDeserialized.OnDeserialized()
     {
         _locationThumbSize ??= [];
@@ -400,8 +428,14 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     [ObservableProperty]
     public partial bool StopPollingOnSync { get; set; } = false;
 
+    /// <summary>
+    /// Max concurrent file operations (and sync threads). Legacy JSON bool values map via
+    /// <see cref="MaxSimultaneousOpsJsonConverter"/> (<c>false</c>→1, <c>true</c>→32).
+    /// </summary>
+    [JsonPropertyName("AllowMultiOp")]
+    [JsonConverter(typeof(MaxSimultaneousOpsJsonConverter))]
     [ObservableProperty]
-    public partial bool AllowMultiOp { get; set; } = true;
+    public partial int MaxSimultaneousOps { get; set; } = MaxSimultaneousOpsDefault;
 
     [ObservableProperty]
     public partial bool RescanOnPush { get; set; } = true;

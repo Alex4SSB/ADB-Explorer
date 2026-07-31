@@ -488,8 +488,8 @@ Visible content may be incomplete.</value>
     <comment>The setting used to stop device and battery polling when there are active push or pull operations</comment>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>Simultaneous Operations</value>
-    <comment>The setting used to allow performing simultaneous operations on separate devices</comment>
+    <value>Max Simultaneous Operations</value>
+    <comment>The setting used to set the maximum number of simultaneous file operations (1-999)</comment>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
     <value>Force Media Rescan On Push</value>

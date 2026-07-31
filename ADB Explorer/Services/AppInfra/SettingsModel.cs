@@ -183,7 +183,11 @@ public static class UISettings
             new SettingsGroup(Strings.Resources.S_FILE_OP_TOOLTIP,
             [
                 new BoolSetting(() => Settings.StopPollingOnSync, Strings.Resources.S_SETTINGS_STOP_ON_SYNC, icon: new("\uE8D8")),
-                new BoolSetting(() => Settings.AllowMultiOp, Strings.Resources.S_SETTINGS_PARALLEL_OPERATIONS, icon: new("\uE762")),
+                new NumericSetting(() => Settings.MaxSimultaneousOps,
+                                   Strings.Resources.S_SETTINGS_PARALLEL_OPERATIONS,
+                                   AppSettings.MaxSimultaneousOpsMin,
+                                   AppSettings.MaxSimultaneousOpsMax,
+                                   icon: new("\uE762")),
                 new BoolSetting(() => Settings.RescanOnPush, Strings.Resources.S_SETTINGS_MEDIA_RESCAN, icon: new("\uE7C5")),
                 new BoolSetting(() => Settings.KeepDateModified, Strings.Resources.S_SETTINGS_KEEP_MODIFIED_DATE, icon: new("\uEC92")),
             ], new("\uEADF")),

@@ -142,7 +142,7 @@ public class FileSyncOperation : FileOperation
                 }
             }
 
-            MaxThreads ??= Data.Settings.AllowMultiOp ? -1 : 1;
+            MaxThreads ??= Data.Settings.MaxSimultaneousOps;
 
             ParallelOptions options = new()
             {

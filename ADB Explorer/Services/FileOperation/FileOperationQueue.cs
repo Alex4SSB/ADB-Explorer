@@ -234,26 +234,25 @@ public class FileOperationQueue : ViewModelBase
                 var groups = pending.GroupBy(op => op.TypeOnDevice);
                 foreach (var item in groups)
                 {
-                    List<FileOperation> operations = [item.First()];
-                    if (!Data.Settings.AllowMultiOp)
+                    var maxOps = Data.Settings.MaxSimultaneousOps;
+                    var inProgressCount = Operations.Count(op => op.Status
+                        is FileOperation.OperationStatus.InProgress
+                        && op.TypeOnDevice == item.Key);
+                    var availableSlots = maxOps - inProgressCount;
+                    if (availableSlots <= 0)
+                        continue;
+
+                    // AdvancedAdbSharp allows (and boosts performance with) simultaneous sync operations
+                    List<FileOperation> operations;
+                    if (item.First().OperationName
+                        is FileOperation.OperationType.Push
+                        or FileOperation.OperationType.Pull)
                     {
-                        // Skip if there's already an operation in progress on the same device and of the same type
-                        if (Operations.Any(op => op.Status
-                            is FileOperation.OperationStatus.InProgress
-                            && op.TypeOnDevice == item.Key))
-                        {
-                            continue;
-                        }
+                        operations = [.. item.Take(availableSlots)];
                     }
                     else
                     {
-                        // AdvancedAdbSharp allows (and boosts performance with) simultaneous sync operations
-                        if (item.First().OperationName
-                            is FileOperation.OperationType.Push
-                            or FileOperation.OperationType.Pull)
-                        {
-                            operations = [.. item];
-                        }
+                        operations = [item.First()];
                     }
 
                     foreach (var op in operations)

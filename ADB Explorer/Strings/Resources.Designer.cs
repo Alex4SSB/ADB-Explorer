@@ -4005,7 +4005,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Simultaneous Operations.
+        ///   Looks up a localized string similar to Max Simultaneous Operations.
         /// </summary>
         public static string S_SETTINGS_PARALLEL_OPERATIONS {
             get {
