@@ -452,7 +452,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Прекратить запрос при отправке/извлечении</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>Одновременные операции</value>
+    <value>Максимальное количество одновременных операций</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
     <value>Принудительный повторный скан медиафайлов при отправке</value>
