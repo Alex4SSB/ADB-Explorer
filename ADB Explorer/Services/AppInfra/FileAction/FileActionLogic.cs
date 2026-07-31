@@ -66,17 +66,6 @@ internal static class FileActionLogic
         ShellFileOperation.InstallPackages(Data.DevicesObject.Current, packages, App.AppDispatcher);
     }
 
-    public static void CopyToTemp()
-    {
-        Data.CopyPaste.VerifyAndPaste(
-            DragDropEffects.Copy,
-            AdbExplorerConst.TEMP_PATH,
-            Data.SelectedFiles,
-            App.AppDispatcher,
-            Data.DevicesObject.Current,
-            Data.CurrentPath);
-    }
-
     public static void PushPackages()
     {
         var dialog = new CommonOpenFileDialog()
@@ -1162,13 +1151,11 @@ internal static class FileActionLogic
 
         // APK enabled in settings
         // All selected files are installable
-        // Not in trash
-        // If recovery, only enabled outside temp drive (to enable copy to temp, but install is disabled, even in temp drive)
+        // Not in trash or recovery
         Data.FileActions.PackageActionsEnabled = Data.Settings.EnableApk
                                                  && Data.SelectedFiles.AnyAll(file => file.IsInstallApk)
                                                  && !Data.FileActions.IsRecycleBin
-                                                 && !(Data.DevicesObject?.Current?.Type is DeviceType.Recovery
-                                                 && Data.FileActions.IsTemp);
+                                                 && Data.DevicesObject?.Current?.Type is not DeviceType.Recovery;
 
         Data.FileActions.IsCopyItemPathEnabled = Data.FileActions.IsAppDrive
             ? Data.SelectedPackages.Count() == 1
@@ -1212,8 +1199,7 @@ internal static class FileActionLogic
             && !Data.FileActions.IsRecycleBin
             && !(allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Link);
 
-        Data.FileActions.InstallPackageEnabled = Data.DevicesObject?.Current?.Type is not DeviceType.Recovery
-            && Data.CurrentDrive?.Restrictions.NoApkInstall is not true;
+        Data.FileActions.InstallPackageEnabled = Data.DevicesObject?.Current?.Type is not DeviceType.Recovery;
 
         if (!Data.CopyPaste.IsDrag)
             Data.RuntimeSettings.FilterActions = true;

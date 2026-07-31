@@ -65,7 +65,6 @@ public partial class FileActionsEnable : ObservableObject
             if (SetProperty(ref packageActionsEnabled, value))
             {
                 OnPropertyChanged(nameof(InstallUninstallEnabled));
-                OnPropertyChanged(nameof(CopyToTempEnabled));
             }
         }
     }
@@ -79,7 +78,6 @@ public partial class FileActionsEnable : ObservableObject
             if (SetProperty(ref installPackageEnabled, value))
             {
                 OnPropertyChanged(nameof(InstallUninstallEnabled));
-                OnPropertyChanged(nameof(CopyToTempEnabled));
             }
         }
     }
@@ -460,7 +458,6 @@ public partial class FileActionsEnable : ObservableObject
     #region read only
 
     public bool InstallUninstallEnabled => PackageActionsEnabled && InstallPackageEnabled;
-    public bool CopyToTempEnabled => PackageActionsEnabled && !InstallPackageEnabled;
     public bool PushEnabled => PushFilesFoldersEnabled || PushPackageEnabled;
     public bool NameReadOnly => !RenameEnabled;
     public bool EmptyTrash => IsRecycleBin && !DeleteEnabled && !RestoreEnabled;

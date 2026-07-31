@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 
@@ -17,6 +18,8 @@ public class PackageInstallOperation : AbstractShellFileOperation
         : Strings.Resources.S_MENU_INSTALL;
 
     public override FrameworkElement OpIcon => IsUninstall ? new UninstallIcon() : new InstallIcon();
+
+    private string tempInstallPath;
 
     public PackageInstallOperation(Dispatcher dispatcher,
                                    LogicalDeviceViewModel device,
@@ -60,6 +63,22 @@ public class PackageInstallOperation : AbstractShellFileOperation
         // install (pm / adb)
         else
         {
+            var installPath = FilePath.FullPath;
+
+            if (!PushPackage && DriveHelper.RequiresTempForApkInstall(installPath))
+            {
+                tempInstallPath = FileHelper.ConcatPaths(AdbExplorerConst.TEMP_PATH, $"{Guid.NewGuid():N}_{FilePath.FullName}");
+                if (!ShellFileOperation.SilentCopy(Device, installPath, tempInstallPath, out var copyStderr))
+                {
+                    tempInstallPath = null;
+                    Status = OperationStatus.Failed;
+                    StatusInfo = new FailedOpProgressViewModel(copyStderr);
+                    return;
+                }
+
+                installPath = tempInstallPath;
+            }
+
             if (!PushPackage)
             {
                 args = new string[4];
@@ -68,10 +87,11 @@ public class PackageInstallOperation : AbstractShellFileOperation
                 args[2] = "-d";
                 index = 3;
             }
-            args[index] = FilePath.FullPath;
+
+            args[index] = installPath;
         }
 
-        args[index] = PushPackage 
+        args[index] = PushPackage
             ? ADBService.EscapeAdbString(args[index])
             : ADBService.EscapeAdbShellString(args[index]);
 
@@ -81,6 +101,8 @@ public class PackageInstallOperation : AbstractShellFileOperation
 
         operationTask.ContinueWith((t) =>
         {
+            CleanupTempInstallPath();
+
             if (t.Result == "")
             {
                 Status = OperationStatus.Completed;
@@ -95,14 +117,25 @@ public class PackageInstallOperation : AbstractShellFileOperation
 
         operationTask.ContinueWith((t) =>
         {
+            CleanupTempInstallPath();
             Status = OperationStatus.Canceled;
             StatusInfo = new CanceledOpProgressViewModel();
         }, TaskContinuationOptions.OnlyOnCanceled);
 
         operationTask.ContinueWith((t) =>
         {
+            CleanupTempInstallPath();
             Status = OperationStatus.Failed;
             StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);
         }, TaskContinuationOptions.OnlyOnFaulted);
+    }
+
+    private void CleanupTempInstallPath()
+    {
+        if (string.IsNullOrEmpty(tempInstallPath))
+            return;
+
+        ShellFileOperation.SilentDelete(Device, tempInstallPath);
+        tempInstallPath = null;
     }
 }

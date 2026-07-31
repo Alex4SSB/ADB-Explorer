@@ -47,4 +47,13 @@ internal class DriveHelper
 
         return ArchiveHelper.IsModificationAllowedAt(path, deviceId);
     }
+
+    public static bool RequiresTempForApkInstall(string path)
+    {
+        if (path == AdbExplorerConst.TEMP_PATH
+            || path.StartsWith($"{AdbExplorerConst.TEMP_PATH}/", StringComparison.Ordinal))
+            return false;
+
+        return GetCurrentDrive(path)?.Restrictions.NoApkInstall is true;
+    }
 }

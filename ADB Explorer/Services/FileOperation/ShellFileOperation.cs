@@ -182,6 +182,26 @@ public static class ShellFileOperation
         op.PropertyChanged -= RenameFileOp_PropertyChanged;
     }
 
+    public static bool SilentCopy(LogicalDeviceViewModel device, string fullPath, string targetPath, out string stderr, bool throwOnError = false)
+    {
+        var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
+                                                               "cp",
+                                                               out _,
+                                                               out stderr,
+                                                               CancellationToken.None,
+                                                               "-p",
+                                                               ADBService.EscapeAdbShellString(fullPath),
+                                                               ADBService.EscapeAdbShellString(targetPath));
+
+        if (exitCode != 0 && throwOnError)
+            throw new Exception(stderr);
+
+        return exitCode == 0;
+    }
+
+    public static bool SilentCopy(LogicalDeviceViewModel device, string fullPath, string targetPath, bool throwOnError = false)
+        => SilentCopy(device, fullPath, targetPath, out _, throwOnError);
+
     public static bool SilentMove(LogicalDeviceViewModel device, FilePath item, string targetPath) => SilentMove(device, item.FullPath, targetPath);
 
     public static bool SilentMove(LogicalDeviceViewModel device, string fullPath, string targetPath, bool throwOnError = true)
