@@ -159,11 +159,13 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <ContentControl Content="{Binding StatusInfo}" ContentTemplateSelector="{StaticResource CompactFileOpProgressTemplateSelector}" />
-                <ContentPresenter
+                <Border
                     Grid.Column="1"
                     HorizontalAlignment="Center"
-                    Content="{Binding OpIcon}"
-                    ToolTip="{Binding Tooltip}" />
+                    Background="Transparent"
+                    ToolTip="{Binding Tooltip}">
+                    <ContentPresenter Content="{Binding OpIcon}" />
+                </Border>
                 <ContentControl
                     Grid.Column="2"
                     Content="{Binding RelativeSource={RelativeSource Self}, Path=DataContext}"

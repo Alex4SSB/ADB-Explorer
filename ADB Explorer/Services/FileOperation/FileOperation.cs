@@ -31,6 +31,8 @@ public abstract class FileOperation : ViewModelBase
         Install,
         Update,
         Rename,
+        Compress,
+        Extract,
     }
 
     #region Notifiable Properties
@@ -170,7 +172,7 @@ public abstract class FileOperation : ViewModelBase
     /// </summary>
     public string TypeOnDevice => $"{OperationName}@{Device.ID}";
 
-    public ObservableList<SyncFile> Children => AndroidPath.Children;
+    public ObservableList<SyncFile> Children => AndroidPath?.Children;
 
     public string SourcePathString
     {
@@ -232,6 +234,8 @@ public abstract class FileOperation : ViewModelBase
         OperationType.Install => Strings.Resources.S_MENU_INSTALL,
         OperationType.Update => Strings.Resources.S_ACTION_UPDATE,
         OperationType.Rename => Strings.Resources.S_MENU_RENAME,
+        OperationType.Compress => Strings.Resources.S_ACTION_COMPRESS,
+        OperationType.Extract => Strings.Resources.S_ACTION_EXTRACT,
         _ => throw new NotSupportedException(),
     };
 
@@ -241,24 +245,28 @@ public abstract class FileOperation : ViewModelBase
         OperationType.Push => CreateOpIcon(new PushIcon()),
         OperationType.Recycle => new RecycleIcon(),
         OperationType.Move => new FontIcon() { Glyph = "\uE8DE" },
-        OperationType.Delete => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Delete] },
+        OperationType.Delete => CreateOpIcon(new DeleteIcon()),
         OperationType.Copy => new CopyIcon(),
-        OperationType.Restore => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Restore] },
+        OperationType.Restore => CreateOpIcon(new RestoreIcon()),
         OperationType.Update => new FontIcon() { Glyph = AppActions.Icons[FileActionType.UpdateModified] },
         OperationType.Install => null, // gets overridden
         OperationType.Rename => new RenameAIcon(),
+        OperationType.Compress => CreateOpIcon(new ZipIcon()),
+        OperationType.Extract => CreateOpIcon(new FolderArrowRightIcon()),
         _ => throw new NotSupportedException(),
     };
 
     private const double OpIconSize = 16;
 
-    private static UserControl CreateOpIcon(UserControl icon)
+    protected static UserControl CreateOpIcon(UserControl icon)
     {
         if (icon is ScaledPathIcon scaledPathIcon)
             scaledPathIcon.Size = OpIconSize;
 
         icon.Width = OpIconSize;
         icon.Height = OpIconSize;
+        // Transparent fill so the whole icon rect is a tooltip / hit-test target.
+        icon.Background ??= Brushes.Transparent;
         return icon;
     }
 
@@ -266,7 +274,7 @@ public abstract class FileOperation : ViewModelBase
     {
         get
         {
-            if (OperationName is not (OperationType.Push or OperationType.Pull or OperationType.Copy))
+            if (OperationName is not (OperationType.Push or OperationType.Pull or OperationType.Copy or OperationType.Extract))
                 return false;
 
             if (Status is not OperationStatus.Completed)

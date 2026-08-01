@@ -24,6 +24,50 @@ internal static class FileActionLogic
             ? trash
             : null;
 
+    private static IReadOnlyList<string> PendingCompressSourcePaths { get; set; } = [];
+    private static FileClass? PendingCompressTemp { get; set; }
+    public static bool IsPendingCompress { get; private set; }
+
+    public static IReadOnlyList<string> GetPendingCompressSourcePaths() => PendingCompressSourcePaths;
+
+    public static void BeginCompressTo(string extension)
+    {
+        PendingCompressSourcePaths = [.. Data.SelectedFiles.Select(f => f.FullPath)];
+        PendingCompressTemp = null;
+        IsPendingCompress = true;
+        Data.RuntimeSettings.CompressToExtension = extension;
+    }
+
+    public static void SetPendingCompressTemp(FileClass file) => PendingCompressTemp = file;
+
+    public static void CancelPendingCompress(FileClass? file = null)
+    {
+        if (!IsPendingCompress)
+            return;
+
+        if (file is not null
+            && PendingCompressTemp is not null
+            && !ReferenceEquals(file, PendingCompressTemp))
+            return;
+
+        IsPendingCompress = false;
+        PendingCompressTemp = null;
+        PendingCompressSourcePaths = [];
+    }
+
+    private static bool TryConsumePendingCompress(FileClass file, out IReadOnlyList<string> sourcePaths)
+    {
+        sourcePaths = [];
+        if (!IsPendingCompress || !ReferenceEquals(file, PendingCompressTemp))
+            return false;
+
+        sourcePaths = PendingCompressSourcePaths;
+        IsPendingCompress = false;
+        PendingCompressTemp = null;
+        PendingCompressSourcePaths = [];
+        return true;
+    }
+
     private static string RemoveApkMessage(IEnumerable<IBrowserItem> objects)
     {
         var count = objects.Count();
@@ -192,7 +236,20 @@ internal static class FileActionLogic
         try
         {
             var device = Data.DevicesObject.Current;
-            if (ArchivePath.TryParse(file.FullPath, out var archivePath, out var internalPath, device.ID)
+            if (TryConsumePendingCompress(file, out var compressSources))
+            {
+                file.IsTemp = false;
+                file.ModifiedTime = DateTime.Now;
+                file.Size = 0;
+                file.UpdateType();
+
+                RefreshNewItemInList(file);
+                Data.ItemToSelect.Value = file;
+
+                ShellFileOperation.CompressArchive(device, file, compressSources, App.AppDispatcher);
+                return;
+            }
+            else if (ArchivePath.TryParse(file.FullPath, out var archivePath, out var internalPath, device.ID)
                 && !string.IsNullOrEmpty(internalPath)
                 && ArchiveHelper.CanPasteIntoArchive(file.FullPath, device.ID))
             {
@@ -226,10 +283,15 @@ internal static class FileActionLogic
         if (file.Type is FileType.File)
             file.Size = 0;
 
+        RefreshNewItemInList(file);
+        Data.ItemToSelect.Value = file;
+    }
+
+    private static void RefreshNewItemInList(FileClass file)
+    {
         var index = Data.DirList.FileList.IndexOf(file);
         Data.DirList.FileList.Remove(file);
         Data.DirList.FileList.Insert(index, file);
-        Data.ItemToSelect.Value = file;
     }
 
     public static void IsPasteEnabled()
@@ -327,12 +389,14 @@ internal static class FileActionLogic
             return false;
 
         var selected = Data.SelectedFiles?.Count();
+        var deviceId = Data.DevicesObject?.Current?.ID ?? "";
 
         string targetPath;
         if (selected == 1)
         {
             var targetFile = Data.SelectedFiles.First();
-            targetPath = targetFile.IsLink ? targetFile.LinkTarget : targetFile.FullPath;
+            var path = targetFile.IsLink ? targetFile.LinkTarget : targetFile.FullPath;
+            targetPath = ArchiveHelper.ResolvePasteTargetPath(path, deviceId);
         }
         else
         {
@@ -356,7 +420,7 @@ internal static class FileActionLogic
                 break;
             case 1:
                 var item = Data.SelectedFiles.First();
-                if (!item.IsDirectory)
+                if (!ArchiveHelper.IsPasteTargetContainer(item, deviceId))
                     return false;
 
                 Data.FileActions.IsPastingInDescendant = (files.Length == 1 && files[0] == item.FullPath)
@@ -368,7 +432,7 @@ internal static class FileActionLogic
         }
 
         return !Data.FileActions.IsPastingInDescendant
-            && DriveHelper.IsModificationAllowedAt(targetPath, Data.DevicesObject?.Current?.ID ?? "");
+            && DriveHelper.IsModificationAllowedAt(targetPath, deviceId);
     }
 
     public static bool EnableKeyboardPaste()
@@ -391,12 +455,14 @@ internal static class FileActionLogic
             return false;
 
         var selected = Data.SelectedFiles?.Count() > 1 ? 0 : Data.SelectedFiles?.Count();
+        var deviceId = Data.DevicesObject?.Current?.ID ?? "";
 
         string targetPath;
         if (selected == 1)
         {
             var targetFile = Data.SelectedFiles.First();
-            targetPath = targetFile.IsLink ? targetFile.LinkTarget : targetFile.FullPath;
+            var path = targetFile.IsLink ? targetFile.LinkTarget : targetFile.FullPath;
+            targetPath = ArchiveHelper.ResolvePasteTargetPath(path, deviceId);
         }
         else
         {
@@ -421,10 +487,10 @@ internal static class FileActionLogic
             case 1:
                 // When duplicating a file multiple times using the keyboard, the selection is the previous copy
                 if (Data.CopyPaste.PasteState is DragDropEffects.Copy && Data.DirList.FileList.Any(f => f.FullPath == files[0]))
-                    return DriveHelper.IsModificationAllowedAt(targetPath, Data.DevicesObject?.Current?.ID ?? "");
+                    return DriveHelper.IsModificationAllowedAt(targetPath, deviceId);
 
                 var item = Data.SelectedFiles.First();
-                if (!item.IsDirectory)
+                if (!ArchiveHelper.IsPasteTargetContainer(item, deviceId))
                     return false;
 
                 Data.FileActions.IsPastingInDescendant = (files.Length == 1 && files[0] == item.FullPath)
@@ -486,10 +552,12 @@ internal static class FileActionLogic
             _ => target.FullPath,
         };
 
-        if (!DriveHelper.IsModificationAllowedAt(targetPath, Data.DevicesObject.Current?.ID ?? ""))
+        var deviceId = Data.DevicesObject.Current?.ID ?? "";
+        targetPath = ArchiveHelper.ResolvePasteTargetPath(targetPath, deviceId);
+
+        if (!DriveHelper.IsModificationAllowedAt(targetPath, deviceId))
             return DragDropEffects.None;
 
-        var deviceId = Data.DevicesObject.Current?.ID;
         var intoArchive = ArchivePath.IsArchivePath(targetPath, deviceId);
         if (intoArchive && !ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId))
             return DragDropEffects.None;
@@ -521,7 +589,7 @@ internal static class FileActionLogic
         }
         else
         {
-            if (!target.IsDirectory)
+            if (!ArchiveHelper.IsPasteTargetContainer(target, deviceId))
                 return DragDropEffects.None;
 
             pastingInDescendant = (Data.CopyPaste.DragFiles.Length == 1 && Data.CopyPaste.CurrentFiles.First().FullPath == target.FullPath)
@@ -622,6 +690,103 @@ internal static class FileActionLogic
         vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.Clipboard, allowedEffects: dropEffect);
     }
 
+    /// <summary>
+    /// Copies top-level members of the selected archive onto the clipboard (context menu only).
+    /// </summary>
+    public static void CopyArchiveContents()
+    {
+        if (!TryGetSelectedNavigableArchive(out var archive) || archive is null)
+            return;
+
+        var device = Data.DevicesObject.Current;
+        var archivePath = archive.FullPath;
+        var token = Data.DeviceCts.Token;
+
+        Task.Run(() =>
+        {
+            List<FileClass> members;
+            try
+            {
+                members = [.. ArchiveListing.ListEntries(device.ID, archivePath, "", token)
+                    .Select(FileClass.GenerateAndroidFile)];
+            }
+            catch (Exception e)
+            {
+#if !DEPLOY
+                DebugLog.PrintLine($"Copy archive contents failed: {e.Message}");
+#endif
+                return;
+            }
+
+            if (members.Count == 0)
+                return;
+
+            App.SafeInvoke(() =>
+            {
+                CutFiles(members, isCopy: true);
+                UpdateFileActions();
+            });
+        }, token);
+    }
+
+    /// <summary>
+    /// Extracts top-level members of a selected archive, or of a clipboard archive file, into the current folder.
+    /// </summary>
+    public static void ExtractArchiveHere()
+    {
+        if (Data.DevicesObject.Current is not { } device)
+            return;
+
+        string? archivePath = null;
+        var targetFolder = Data.CurrentPath;
+
+        if (TryGetSelectedNavigableArchive(out var selectedArchive))
+        {
+            archivePath = selectedArchive.FullPath;
+            targetFolder = Data.CurrentPath;
+        }
+        else if (IsClipboardSingleArchiveFileCopy())
+        {
+            archivePath = Data.CopyPaste.Files[0];
+            targetFolder = GetUiPasteTargetPath();
+        }
+
+        if (archivePath is null
+            || ArchivePath.IsArchivePath(targetFolder, device.ID)
+            || !DriveHelper.IsModificationAllowedAt(targetFolder, device.ID))
+            return;
+
+        var token = Data.DeviceCts.Token;
+
+        Task.Run(() =>
+        {
+            List<FileClass> members;
+            try
+            {
+                members = [.. ArchiveListing.ListEntries(device.ID, archivePath, "", token)
+                    .Select(FileClass.GenerateAndroidFile)];
+            }
+            catch (Exception e)
+            {
+#if !DEPLOY
+                DebugLog.PrintLine($"Extract archive here failed: {e.Message}");
+#endif
+                return;
+            }
+
+            if (members.Count == 0)
+                return;
+
+            App.SafeInvoke(() => Data.CopyPaste.VerifyAndPaste(
+                DragDropEffects.Copy,
+                targetFolder,
+                members,
+                App.AppDispatcher,
+                device,
+                Data.CurrentPath));
+        }, token);
+    }
+
     public static void Rename(TextBox textBox)
     {
         if (textBox.DataContext is not FileClass file)
@@ -641,11 +806,16 @@ internal static class FileActionLogic
         {
             if (string.IsNullOrEmpty(textBox.Text))
             {
+                CancelPendingCompress(file);
                 Data.DirList.FileList.Remove(file);
                 return;
             }
-            
-            _ = CreateNewItem(file, textBox.Text);
+
+            var newName = textBox.Text;
+            if (!Data.Settings.ShowExtensions)
+                newName += file.Extension;
+
+            _ = CreateNewItem(file, newName);
         }
         else if (!string.IsNullOrEmpty(textBox.Text) && textBox.Text != name)
         {
@@ -964,6 +1134,10 @@ internal static class FileActionLogic
             Data.RuntimeSettings.IsExplorerLoaded =
             Data.FileActions.ParentEnabled = false;
 
+            Data.FileActions.IsCutPasteDeleteVisible.Value = true;
+            Data.FileActions.IsPullCopyVisible.Value = true;
+            Data.FileActions.IsPasteVisible.Value = true;
+
             Data.FileActions.ExplorerFilter = "";
 
             if (clearDevice)
@@ -982,227 +1156,412 @@ internal static class FileActionLogic
 
     public static void UpdateFileActions()
     {
-        Data.FileActions.IsApkActionsVisible.Value = Data.Settings.EnableApk && Data.DevicesObject?.Current;
-        Data.FileActions.PushPackageEnabled = Data.FileActions.IsApkActionsVisible && Data.DevicesObject?.Current?.Type is not DeviceType.Recovery;
+        var actions = Data.FileActions;
+        var selectedFiles = Data.SelectedFiles;
+        var selectedPackages = Data.SelectedPackages;
+        var hasFileSelection = selectedFiles.Any();
+        var hasPackageSelection = selectedPackages.Any();
+        var singleFileSelected = selectedFiles.Count() == 1;
+        var singlePackageSelected = selectedPackages.Count() == 1;
+        var selectedFile = singleFileSelected ? selectedFiles.First() : null;
 
-        Data.FileActions.UninstallPackageEnabled = Data.FileActions.IsAppDrive && Data.SelectedPackages.Any();
-        Data.FileActions.ContextPushPackagesEnabled = Data.FileActions.IsAppDrive && !Data.SelectedPackages.Any();
+        var isAppDrive = actions.IsAppDrive;
+        var isRecycleBin = actions.IsRecycleBin;
+        var isSearchMode = actions.IsSearchMode;
+        var isExplorerVisible = actions.IsExplorerVisible;
+        var isDriveViewVisible = actions.IsDriveViewVisible;
+        var enableApk = Data.Settings.EnableApk;
+        var currentDevice = Data.DevicesObject?.Current;
+        var isNotRecovery = currentDevice?.Type is not DeviceType.Recovery;
+        var hasRoot = HasRootShell;
+        var fuseProtectedRoot = SelectionIsFuseProtectedAndroidRoot;
 
-        Data.FileActions.IsRefreshEnabled = Data.FileActions.IsDriveViewVisible || Data.FileActions.IsExplorerVisible;
-        Data.FileActions.IsPushMenuVisible.Value = !Data.FileActions.IsSearchMode;
+        actions.IsApkActionsVisible.Value = enableApk && currentDevice is not null;
+        actions.PushPackageEnabled = actions.IsApkActionsVisible && isNotRecovery;
+
+        actions.UninstallPackageEnabled = isAppDrive && hasPackageSelection;
+        actions.ContextPushPackagesEnabled = isAppDrive && !hasPackageSelection;
+
+        actions.IsRefreshEnabled = isDriveViewVisible || isExplorerVisible;
+        actions.IsPushMenuVisible.Value = !isSearchMode;
         UpdateNavRefreshActionState();
-        Data.FileActions.IsCopyCurrentPathEnabled = Data.FileActions.IsExplorerVisible
-            && !Data.FileActions.IsRecycleBin
-            && !Data.FileActions.IsAppDrive
-            && !Data.FileActions.IsSearchMode;
+        actions.IsCopyCurrentPathEnabled = isExplorerVisible
+            && !isRecycleBin
+            && !isAppDrive
+            && !isSearchMode;
 
-        Data.FileActions.IsOpenApkLocationEnabled = Data.FileActions.IsAppDrive && Data.SelectedPackages.Count() == 1;
-        Data.FileActions.IsApkWebSearchEnabled = Data.FileActions.IsOpenApkLocationEnabled && !string.IsNullOrEmpty(Data.RuntimeSettings.DefaultBrowserPath);
+        actions.IsOpenApkLocationEnabled = isAppDrive && singlePackageSelected;
+        actions.IsApkWebSearchEnabled = actions.IsOpenApkLocationEnabled
+            && !string.IsNullOrEmpty(Data.RuntimeSettings.DefaultBrowserPath);
 
-        Data.FileActions.IsRegularItem = !Data.SelectedFiles.Any() || HasRootShell
-            || Data.SelectedFiles.AnyAll(item => item.Type is FileType.File or FileType.Folder);
+        actions.IsRegularItem = !hasFileSelection || hasRoot
+            || selectedFiles.AnyAll(item => item.Type is FileType.File or FileType.Folder);
 
-        Data.FileActions.IsSingleFolder = Data.SelectedFiles.Count() == 1
-            && CanEnterSelection(Data.SelectedFiles.First());
+        var isRegularItem = actions.IsRegularItem;
 
-        Data.FileActions.IsFollowLinkEnabled = !Data.FileActions.IsRecycleBin
-                                               && Data.SelectedFiles.Count() == 1
-                                               && Data.SelectedFiles.First().IsLink
-                                               && Data.SelectedFiles.First().Type is not FileType.BrokenLink;
+        actions.IsSingleFolder = singleFileSelected
+            && selectedFile is not null
+            && CanEnterSelection(selectedFile);
+
+        actions.IsFollowLinkEnabled = !isRecycleBin
+            && singleFileSelected
+            && selectedFile is { IsLink: true, Type: not FileType.BrokenLink };
+
+        var isFollowLinkEnabled = actions.IsFollowLinkEnabled;
+        var followLinkAllowsAction = !isFollowLinkEnabled || hasRoot;
 
         var restrictions = Data.CurrentDrive?.Restrictions ?? DriveRestrictions.None;
-        var deviceId = Data.DevicesObject?.Current?.ID;
+        var deviceId = currentDevice?.ID;
         if (deviceId is not null && Data.DirList?.CurrentPath is { } currentPath)
-            Data.FileActions.IsArchive = ArchivePath.IsArchivePath(currentPath, deviceId);
+            actions.IsArchive = ArchivePath.IsArchivePath(currentPath, deviceId);
+
+        var isArchive = actions.IsArchive;
 
         var isWritable = restrictions.ReadOnly is not true
-            && (Data.FileActions.IsSearchMode
+            && (isSearchMode
                 ? Data.SearchOriginCanWrite
                 : Data.DirList?.CurrentLocation?.CanWriteLocation == true);
+
         var canPasteIntoTar = deviceId is not null
             && ArchiveHelper.CanPasteIntoArchive(Data.CurrentPath ?? "", deviceId);
-        var isExplorerFolder = Data.FileActions.IsExplorerVisible
-            && !Data.FileActions.IsRecycleBin
-            && !Data.FileActions.IsAppDrive
-            && !Data.FileActions.IsArchive
-            && !Data.FileActions.IsSearchMode;
 
-        Data.FileActions.IsCurrentLocationReadOnly = (isExplorerFolder || canPasteIntoTar) && !isWritable;
-        Data.FileActions.IsSelectionFuseProtectedAndroidRoot = Data.SelectedFiles.Any()
-            && SelectionIsFuseProtectedAndroidRoot;
+        var archiveAllowsModify = !isArchive || canPasteIntoTar;
+        var isExplorerFolder = isExplorerVisible
+            && !isRecycleBin
+            && !isAppDrive
+            && !isArchive
+            && !isSearchMode;
+
+        actions.IsCurrentLocationReadOnly = (isExplorerFolder || canPasteIntoTar) && !isWritable;
+        actions.IsSelectionFuseProtectedAndroidRoot = hasFileSelection && fuseProtectedRoot;
 
         // Push into modifiable tar is allowed; New File/Folder inside modifiable tar is allowed.
-        var isSearchFolderTarget = Data.FileActions.IsSearchMode
-            && Data.SelectedFiles.Count() == 1
-            && Data.SelectedFiles.First().IsDirectory;
-        Data.FileActions.PushFilesFoldersEnabled = isWritable && (isExplorerFolder || canPasteIntoTar || isSearchFolderTarget);
-        Data.FileActions.NewEnabled = isWritable && (isExplorerFolder || canPasteIntoTar);
-        Data.FileActions.IsNewMenuVisible.Value = Data.FileActions.IsExplorerVisible
-            && !Data.FileActions.IsRecycleBin
-            && !Data.FileActions.IsAppDrive
-            && Data.FileActions.NewEnabled;
+        var isSearchFolderTarget = isSearchMode
+            && singleFileSelected
+            && selectedFile is { IsDirectory: true };
 
-        if (Data.FileActions.IsRecycleBin)
+        actions.PushFilesFoldersEnabled = isWritable && (isExplorerFolder || canPasteIntoTar || isSearchFolderTarget);
+        actions.NewEnabled = isWritable && (isExplorerFolder || canPasteIntoTar);
+        actions.IsNewMenuVisible.Value = isExplorerVisible
+            && !isRecycleBin
+            && !isAppDrive
+            && actions.NewEnabled;
+
+        if (isRecycleBin)
         {
-            TrashHelper.EnableRecycleButtons(Data.SelectedFiles.Any() ? Data.SelectedFiles : Data.DirList.FileList);
+            TrashHelper.EnableRecycleButtons(hasFileSelection ? selectedFiles : Data.DirList.FileList);
         }
         else if (SelectedTrashDrive() is { ItemsCount: > 0 })
         {
-            Data.FileActions.DeleteEnabled = true;
-            Data.FileActions.RestoreEnabled = false;
+            actions.DeleteEnabled = true;
+            actions.RestoreEnabled = false;
         }
         else
         {
-            Data.FileActions.DeleteEnabled = isWritable
-                && !SelectionIsFuseProtectedAndroidRoot
-                && Data.SelectedFiles.Any() && Data.FileActions.IsRegularItem
-                && (!Data.FileActions.IsFollowLinkEnabled || HasRootShell)
-                && (!Data.FileActions.IsArchive || canPasteIntoTar);
+            actions.DeleteEnabled = isWritable
+                && !fuseProtectedRoot
+                && hasFileSelection
+                && isRegularItem
+                && followLinkAllowsAction
+                && archiveAllowsModify;
 
-            Data.FileActions.RestoreEnabled = false;
+            actions.RestoreEnabled = false;
         }
 
-        Data.FileActions.PullDescription.Value = Data.FileActions.IsFollowLinkEnabled ? Strings.Resources.S_PULL_ACTION_LINK : Strings.Resources.S_PULL_ACTION;
-        if (Data.FileActions.IsRecycleBin)
+        actions.PullDescription.Value = isFollowLinkEnabled
+            ? Strings.Resources.S_PULL_ACTION_LINK
+            : Strings.Resources.S_PULL_ACTION;
+
+        if (isRecycleBin)
         {
-            Data.FileActions.DeleteDescription.Value = Data.SelectedFiles.Any()
+            actions.DeleteDescription.Value = hasFileSelection
                 ? Strings.Resources.S_PERM_DEL
                 : Strings.Resources.S_EMPTY_TRASH;
         }
         else if (IsTrashDriveSelectedInDriveView())
         {
-            Data.FileActions.DeleteDescription.Value = Strings.Resources.S_EMPTY_TRASH;
+            actions.DeleteDescription.Value = Strings.Resources.S_EMPTY_TRASH;
         }
         else
         {
-            Data.FileActions.DeleteDescription.Value = Strings.Resources.S_DELETE_ACTION;
-            Data.FileActions.ContextDeleteDescription.Value =
-                Data.FileActions.IsArchive || Keyboard.Modifiers is ModifierKeys.Shift
+            actions.DeleteDescription.Value = Strings.Resources.S_DELETE_ACTION;
+            actions.ContextDeleteDescription.Value =
+                isArchive || Keyboard.Modifiers is ModifierKeys.Shift
                     ? Strings.Resources.S_PERM_DEL
                     : Strings.Resources.S_DELETE_ACTION;
         }
 
-        Data.FileActions.RestoreDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.Resources.S_RESTORE_ALL : Strings.Resources.S_RESTORE_ACTION;
+        actions.RestoreDescription.Value = isRecycleBin && !hasFileSelection
+            ? Strings.Resources.S_RESTORE_ALL
+            : Strings.Resources.S_RESTORE_ACTION;
 
-        Data.FileActions.IsSelectionIllegalOnWindows = Data.SelectedFiles.Any() && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.Windows);
-        Data.FileActions.IsSelectionIllegalNaming = !Data.FileActions.IsRecycleBin
-            && !Data.FileActions.IsAppDrive
-            && !Data.FileActions.IsArchive
-            && Data.SelectedFiles.Any()
-            && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.RestrictedNaming);
-        Data.FileActions.IsSelectionIllegalOnWinRoot = Data.SelectedFiles.Any() && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.WinRoot);
-        Data.FileActions.IsSelectionConflictingNames = restrictions.CaseInsensitiveNames
-            && Data.SelectedFiles.Select(f => f.FullName).Distinct(StringComparer.InvariantCultureIgnoreCase).Count() != Data.SelectedFiles.Count();
+        var noBrokenLinks = selectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink);
+
+        actions.IsSelectionIllegalOnWindows = hasFileSelection
+            && !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.Windows);
+
+        actions.IsSelectionIllegalNaming = !isRecycleBin
+            && !isAppDrive
+            && !isArchive
+            && hasFileSelection
+            && !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.RestrictedNaming);
+
+        actions.IsSelectionIllegalOnWinRoot = hasFileSelection
+            && !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.WinRoot);
+
+        actions.IsSelectionConflictingNames = restrictions.CaseInsensitiveNames
+            && selectedFiles.Select(f => f.FullName).Distinct(StringComparer.InvariantCultureIgnoreCase).Count() != selectedFiles.Count();
 
         // Pull from archive extracts selected members to /data/local/tmp then pulls (same as PrepareDescriptors).
-        Data.FileActions.PullEnabled = !Data.FileActions.IsRecycleBin
-                                       && Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
-                                       && Data.FileActions.IsRegularItem
-                                       && !Data.FileActions.IsSelectionIllegalOnWindows
-                                       && !Data.FileActions.IsSelectionIllegalNaming
-                                       && !Data.FileActions.IsSelectionConflictingNames
-                                       && (!Data.FileActions.IsArchive
-                                           || Data.SelectedFiles.AnyAll(f =>
-                                               ArchivePath.TryParse(f.FullPath, out _, out var inner, deviceId)
-                                               && !string.IsNullOrEmpty(inner)));
-
-        Data.FileActions.ContextPushEnabled = isWritable
-            && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive
-            && (!Data.FileActions.IsArchive || canPasteIntoTar)
-            && (Data.FileActions.IsSearchMode
-                ? Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory
-                : !Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
-
-        Data.FileActions.RenameEnabled = isWritable
-                                         && (!Data.FileActions.IsArchive || canPasteIntoTar)
-                                         && !SelectionIsFuseProtectedAndroidRoot
-                                         && !Data.FileActions.IsRecycleBin
-                                         && Data.SelectedFiles.Count() == 1
-                                         && Data.FileActions.IsRegularItem
-                                         && (!Data.FileActions.IsFollowLinkEnabled || HasRootShell);
-
-        var allSelectedAreCut = Data.CopyPaste.IsSelf
-                                && Data.CopyPaste.Files.AnyAll(item => Data.SelectedFiles.Any(f => f.FullPath == item))
-                                && Data.CopyPaste.Files.Length == Data.SelectedFiles.Count();
-        
-        // Cut from archive is not supported (extract is copy-only).
-        Data.FileActions.CutEnabled = isWritable
-                                      && !Data.FileActions.IsArchive
-                                      && !SelectionIsFuseProtectedAndroidRoot
-                                      && Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
-                                      && !(allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Move)
-                                      && Data.FileActions.IsRegularItem
-                                      && (!Data.FileActions.IsFollowLinkEnabled || HasRootShell);
-
-        if (Data.FileActions.IsAppDrive)
+        if (isAppDrive)
         {
-            Data.FileActions.CopyEnabled = Data.SelectedPackages.Any();
+            actions.PullEnabled = hasPackageSelection;
         }
         else
         {
-            Data.FileActions.CopyEnabled = Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
-                                           && !(allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Copy)
-                                           && !(allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Link)
-                                           && Data.FileActions.IsRegularItem
-                                           && !Data.FileActions.IsRecycleBin;
+            var canPullArchiveMembers = !isArchive
+                || selectedFiles.AnyAll(f =>
+                    ArchivePath.TryParse(f.FullPath, out _, out var inner, deviceId)
+                    && !string.IsNullOrEmpty(inner));
+
+            actions.PullEnabled = !isRecycleBin
+                && noBrokenLinks
+                && isRegularItem
+                && !actions.IsSelectionIllegalOnWindows
+                && !actions.IsSelectionIllegalNaming
+                && !actions.IsSelectionConflictingNames
+                && canPullArchiveMembers;
         }
-        
+
+        var pasteDeviceId = deviceId ?? "";
+        var singlePasteTarget = singleFileSelected
+            && selectedFile is not null
+            && ArchiveHelper.IsPasteTargetContainer(selectedFile, pasteDeviceId);
+
+        actions.ContextPushEnabled = isWritable
+            && !isRecycleBin
+            && !isAppDrive
+            && archiveAllowsModify
+            && (isSearchMode
+                ? singlePasteTarget
+                : !hasFileSelection || singlePasteTarget);
+
+        actions.RenameEnabled = isWritable
+            && archiveAllowsModify
+            && !fuseProtectedRoot
+            && !isRecycleBin
+            && singleFileSelected
+            && isRegularItem
+            && followLinkAllowsAction;
+
+        var allSelectedAreCut = Data.CopyPaste.IsSelf
+            && Data.CopyPaste.Files.AnyAll(item => selectedFiles.Any(f => f.FullPath == item))
+            && Data.CopyPaste.Files.Length == selectedFiles.Count();
+
+        var cutIsMove = allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Move;
+        var cutIsCopy = allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Copy;
+        var cutIsLink = allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Link;
+
+        // Cut from archive is not supported (extract is copy-only).
+        actions.CutEnabled = isWritable
+            && !isArchive
+            && !fuseProtectedRoot
+            && noBrokenLinks
+            && !cutIsMove
+            && isRegularItem
+            && followLinkAllowsAction;
+
+        if (isAppDrive)
+        {
+            actions.CopyEnabled = hasPackageSelection;
+        }
+        else
+        {
+            actions.CopyEnabled = noBrokenLinks
+                && !cutIsCopy
+                && !cutIsLink
+                && isRegularItem
+                && !isRecycleBin;
+        }
+
         IsPasteEnabled();
 
         // APK enabled in settings
         // All selected files are installable
         // Not in trash or recovery
-        Data.FileActions.PackageActionsEnabled = Data.Settings.EnableApk
-                                                 && Data.SelectedFiles.AnyAll(file => file.IsInstallApk)
-                                                 && !Data.FileActions.IsRecycleBin
-                                                 && Data.DevicesObject?.Current?.Type is not DeviceType.Recovery;
+        var allInstallApk = selectedFiles.AnyAll(file => file.IsInstallApk);
+        actions.PackageActionsEnabled = enableApk
+            && allInstallApk
+            && !isRecycleBin
+            && isNotRecovery;
 
-        Data.FileActions.IsCopyItemPathEnabled = Data.FileActions.IsAppDrive
-            ? Data.SelectedPackages.Count() == 1
-            : Data.SelectedFiles.Count() == 1 && !Data.FileActions.IsRecycleBin;
+        if (isAppDrive)
+            actions.IsCopyItemPathEnabled = singlePackageSelected;
+        else
+            actions.IsCopyItemPathEnabled = singleFileSelected && !isRecycleBin;
 
-        Data.FileActions.ContextNewEnabled = isWritable
-            && !Data.SelectedFiles.Any() && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive
-            && (!Data.FileActions.IsArchive || canPasteIntoTar);
+        actions.ContextNewEnabled = isWritable
+            && !hasFileSelection
+            && !isRecycleBin
+            && !isAppDrive
+            && archiveAllowsModify;
 
-        Data.FileActions.SubmenuUninstallEnabled = Data.CurrentDrive?.Restrictions.NoApkInstall is not true
-            && Data.SelectedFiles.AnyAll(file => file.IsInstallApk)
-            && Data.DevicesObject?.Current?.Type is not DeviceType.Recovery;
+        actions.SubmenuUninstallEnabled = allInstallApk && isNotRecovery;
 
-        Data.FileActions.UpdateModifiedEnabled = isWritable
-            && !Data.FileActions.IsRecycleBin
-            && Data.SelectedFiles.AnyAll(file => file.Type is FileType.File && !file.IsApk && !file.IsLink);
+        actions.UpdateModifiedEnabled = isWritable
+            && !isRecycleBin
+            && selectedFiles.AnyAll(file => file.Type is FileType.File && !file.IsApk && !file.IsLink);
 
         string? pasteLinkTarget;
-        if (!Data.SelectedFiles.Any())
+        if (!hasFileSelection)
             pasteLinkTarget = Data.CurrentPath;
-        else if (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory)
-        {
-            var selected = Data.SelectedFiles.First();
-            pasteLinkTarget = selected.IsLink ? selected.LinkTarget : selected.FullPath;
-        }
+        else if (singleFileSelected && selectedFile is { IsDirectory: true })
+            pasteLinkTarget = selectedFile.IsLink ? selectedFile.LinkTarget : selectedFile.FullPath;
         else
             pasteLinkTarget = null;
 
-        Data.FileActions.IsPasteLinkEnabled = !Data.FileActions.IsAppDrive
+        actions.IsPasteLinkEnabled = !isAppDrive
             && pasteLinkTarget is not null
             && Data.CopyPaste.Files.Length == 1
             && Data.CopyPaste.IsSelf
             && Data.CopyPaste.PasteState is DragDropEffects.Copy or DragDropEffects.Link
             && IsSymlinkPasteAllowed(pasteLinkTarget);
 
-        Data.FileActions.IsCopyLinkEnabled = Data.CurrentDrive?.Restrictions.NoSymbolicLinks is not true
-            && HasRootShell
-            && Data.SelectedFiles.Count() == 1
-            && Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
-            && Data.FileActions.IsRegularItem
-            && !Data.FileActions.IsRecycleBin
-            && !(allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Link);
+        actions.IsCopyLinkEnabled = Data.CurrentDrive?.Restrictions.NoSymbolicLinks is not true
+            && hasRoot
+            && singleFileSelected
+            && noBrokenLinks
+            && isRegularItem
+            && !isRecycleBin
+            && !cutIsLink;
 
-        Data.FileActions.InstallPackageEnabled = Data.DevicesObject?.Current?.Type is not DeviceType.Recovery;
+        var clipboardIsSelectedArchiveContents = IsClipboardContentsOfSelectedArchive();
+        actions.IsCopyContentsEnabled =
+            TryGetSelectedNavigableArchive(out _)
+            && !clipboardIsSelectedArchiveContents;
+
+        actions.IsExtractHereEnabled =
+            (CanExtractSelectedArchiveHere() && !clipboardIsSelectedArchiveContents)
+            || CanExtractClipboardArchiveHere();
+
+        var tarAvailable = currentDevice is not null
+            && ShellCommands.TarExists(currentDevice.ID);
+        actions.IsCompressToEnabled = actions.NewEnabled
+            && !isArchive
+            && tarAvailable;
+        actions.IsCompressToContextEnabled = actions.IsCompressToEnabled
+            && hasFileSelection;
+
+        actions.InstallPackageEnabled = isNotRecovery;
 
         if (!Data.CopyPaste.IsDrag)
             Data.RuntimeSettings.FilterActions = true;
+    }
+
+    /// <summary>
+    /// True when the self clipboard holds member paths from <see cref="CopyArchiveContents"/>
+    /// for the currently selected archive.
+    /// </summary>
+    private static bool IsClipboardContentsOfSelectedArchive()
+    {
+        if (!TryGetSelectedNavigableArchive(out var archive)
+            || archive is null
+            || !Data.CopyPaste.IsSelf
+            || Data.CopyPaste.PasteState is not DragDropEffects.Copy
+            || Data.CopyPaste.Files.Length == 0
+            || Data.DevicesObject.Current is not { } device)
+            return false;
+
+        var selectedArchive = archive.FullPath;
+
+        foreach (var path in Data.CopyPaste.Files)
+        {
+            if (!ArchivePath.TryParse(path, out var archivePath, out var internalPath, device.ID)
+                || string.IsNullOrEmpty(internalPath)
+                || !string.Equals(archivePath, selectedArchive, StringComparison.Ordinal))
+                return false;
+        }
+
+        return true;
+    }
+
+    private static bool TryGetSelectedNavigableArchive(out FileClass? archive)
+    {
+        archive = null;
+
+        if (Data.DevicesObject.Current is not { } device
+            || Data.FileActions.IsAppDrive
+            || Data.FileActions.IsRecycleBin
+            || !Data.FileActions.IsRegularItem
+            || Data.SelectedFiles.Count() != 1
+            || Data.SelectedFiles.First() is not { } selected)
+            return false;
+
+        if (!ArchiveHelper.CanNavigateIntoArchive(
+                selected.FullPath,
+                selected.FullName,
+                device.ID,
+                Data.FileActions.IsArchive))
+            return false;
+
+        archive = selected;
+        return true;
+    }
+
+    private static bool CanExtractSelectedArchiveHere()
+    {
+        if (Data.DevicesObject.Current is not { } device
+            || !TryGetSelectedNavigableArchive(out _))
+            return false;
+
+        var target = Data.CurrentPath;
+        return !ArchivePath.IsArchivePath(target, device.ID)
+            && Data.CurrentDrive?.Restrictions.ReadOnly is not true
+            && DriveHelper.IsModificationAllowedAt(target, device.ID);
+    }
+
+    private static bool CanExtractClipboardArchiveHere()
+    {
+        if (!IsClipboardSingleArchiveFileCopy()
+            || Data.DevicesObject.Current is not { } device)
+            return false;
+
+        var target = GetUiPasteTargetPath();
+        return !ArchivePath.IsArchivePath(target, device.ID)
+            && Data.CurrentDrive?.Restrictions.ReadOnly is not true
+            && DriveHelper.IsModificationAllowedAt(target, device.ID);
+    }
+
+    private static string GetUiPasteTargetPath()
+    {
+        if (Data.SelectedFiles?.Count() == 1
+            && Data.SelectedFiles.First() is { } item
+            && Data.DevicesObject.Current is { } device
+            && ArchiveHelper.IsPasteTargetContainer(item, device.ID))
+        {
+            var path = item.IsLink ? item.LinkTarget : item.FullPath;
+            return ArchiveHelper.ResolvePasteTargetPath(path, device.ID);
+        }
+
+        return Data.CurrentPath;
+    }
+
+    /// <summary>
+    /// True when the self clipboard holds one archive <em>file</em> (ordinary Copy), not member paths.
+    /// </summary>
+    private static bool IsClipboardSingleArchiveFileCopy()
+    {
+        if (!Data.CopyPaste.IsSelf
+            || Data.CopyPaste.PasteState is not DragDropEffects.Copy
+            || Data.CopyPaste.Files.Length != 1
+            || Data.DevicesObject.Current is not { } device)
+            return false;
+
+        var path = Data.CopyPaste.Files[0];
+        if (ArchivePath.IsArchivePath(path, device.ID))
+            return false;
+
+        return ArchiveHelper.IsNavigableArchive(FileHelper.GetFullName(path), device.ID);
     }
 
     private static void UpdateNavRefreshActionState()
@@ -1238,10 +1597,13 @@ internal static class FileActionLogic
 
         string targetPath, targetName = "";
         string title = "";
+        var deviceId = Data.DevicesObject.Current?.ID ?? "";
         if (isContextMenu && Data.SelectedFiles.Count() == 1)
         {
-            targetPath = Data.SelectedFiles.First().FullPath;
-            targetName = Data.SelectedFiles.First().FullName;
+            var selected = Data.SelectedFiles.First();
+            var path = selected.IsLink ? selected.LinkTarget : selected.FullPath;
+            targetPath = ArchiveHelper.ResolvePasteTargetPath(path, deviceId);
+            targetName = selected.FullName;
 
             title = isFolderPicker
                 ? Strings.Resources.S_SELECT_FOLDER_PUSH_DESTINATION
@@ -1355,6 +1717,12 @@ internal static class FileActionLogic
     {
         Data.RaiseFocusNavigationBox(false);
 
+        if (Data.FileActions.IsAppDrive)
+        {
+            PullPackages(targetPath);
+            return;
+        }
+
         var pullItems = Data.SelectedFiles;
 
         if (string.IsNullOrEmpty(targetPath))
@@ -1376,6 +1744,38 @@ internal static class FileActionLogic
             if (!Directory.Exists(targetPath) && FileHelper.GetFullName(targetPath) == pullItems.First().FullName)
                 targetPath = FileHelper.GetParentPath(targetPath);
         }
+
+        PullFiles(targetPath, pullItems, true);
+    }
+
+    public static void PullPackages(string targetPath = "")
+    {
+        var packages = Data.SelectedPackages.ToList();
+        if (packages.Count == 0)
+            return;
+
+        if (string.IsNullOrEmpty(targetPath))
+        {
+            var dialog = new CommonOpenFileDialog()
+            {
+                IsFolderPicker = true,
+                Multiselect = false,
+                DefaultDirectory = Data.Settings.DefaultFolder,
+                Title = packages.Count > 1
+                    ? Strings.Resources.S_ITEM_DESTINATION_PLURAL
+                    : string.Format(Strings.Resources.S_ITEM_DESTINATION, packages[0].Name),
+            };
+
+            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+                return;
+
+            targetPath = dialog.FileName;
+            if (!Directory.Exists(targetPath) && FileHelper.GetFullName(targetPath) == packages[0].Name)
+                targetPath = FileHelper.GetParentPath(targetPath);
+        }
+
+        var pullItems = FileHelper.GetFilesFromTree(
+            FileHelper.GetFolderTree(packages.Select(p => p.Path), false, Data.DeviceCts.Token));
 
         PullFiles(targetPath, pullItems, true);
     }

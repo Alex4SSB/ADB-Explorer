@@ -26,15 +26,18 @@ public abstract class AbstractShellFileOperation : FileOperation
 
     public override void ClearChildren()
     {
+        if (AndroidPath is null)
+            return;
+
         AndroidPath.Children.Clear();
         AndroidPath.ProgressUpdates.Clear();
     }
 
     public override void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
-        => AndroidPath.AddUpdates(newUpdates);
+        => AndroidPath?.AddUpdates(newUpdates);
 
     public override void AddUpdates(params FileOpProgressInfo[] newUpdates)
-        => AndroidPath.AddUpdates(newUpdates);
+        => AndroidPath?.AddUpdates(newUpdates);
 }
 
 public static class ShellFileOperation
@@ -295,12 +298,11 @@ public static class ShellFileOperation
 
     /// <summary>
     /// Extracts archive selections to <paramref name="targetPath"/> (device paste from archive clipboard).
+    /// Caller must have already resolved name conflicts (merge/replace/skip); existing targets are replaced.
     /// </summary>
     public static void ExtractItems(LogicalDeviceViewModel device,
                                     IEnumerable<FileClass> items,
                                     string targetPath,
-                                    string currentPath,
-                                    IEnumerable<string> existingItems,
                                     Dispatcher dispatcher,
                                     int masterPid = 0)
     {
@@ -312,11 +314,7 @@ public static class ShellFileOperation
             if (!ArchivePath.TryParse(item.FullPath, out _, out _, device.ID))
                 continue;
 
-            var targetName = item.FullName;
-            if (currentPath == targetPath)
-                targetName = FileHelper.DuplicateFile(existingItems, targetName, DragDropEffects.Copy);
-
-            SyncFile target = new(FileHelper.ConcatPaths(targetPath, targetName), item.Type);
+            SyncFile target = new(FileHelper.ConcatPaths(targetPath, item.FullName), item.Type);
             fileops.Add(new(item, target, device, dispatcher) { MasterPid = masterPid });
         }
 
@@ -423,6 +421,57 @@ public static class ShellFileOperation
         op.PropertyChanged -= ExtractFileOp_PropertyChanged;
     }
 
+    /// <summary>
+    /// Creates a tar-family archive at <paramref name="archiveFile"/> from <paramref name="sourcePaths"/>.
+    /// </summary>
+    public static void CompressArchive(
+        LogicalDeviceViewModel device,
+        FileClass archiveFile,
+        IReadOnlyList<string> sourcePaths,
+        Dispatcher dispatcher)
+    {
+        var op = new FileCompressOperation(archiveFile, sourcePaths, device, dispatcher);
+        dispatcher.Invoke(() =>
+        {
+            op.PropertyChanged += CompressOp_PropertyChanged;
+            Data.FileOpQ.AddOperation(op);
+        });
+    }
+
+    private static void CompressOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (sender is not FileCompressOperation op)
+            return;
+
+        if (e.PropertyName is not nameof(FileOperation.Status))
+            return;
+
+        if (op.Status is FileOperation.OperationStatus.Completed)
+        {
+            if (op.Device.ID == Data.DevicesObject.Current?.ID
+                && op.FilePath.ParentPath == Data.CurrentPath)
+            {
+                op.FilePath.UpdateType();
+                FileActionLogic.UpdateFileActions();
+            }
+
+            op.PropertyChanged -= CompressOp_PropertyChanged;
+            return;
+        }
+
+        if (op.Status is FileOperation.OperationStatus.Failed or FileOperation.OperationStatus.Canceled)
+        {
+            if (op.Device.ID == Data.DevicesObject.Current?.ID
+                && op.FilePath.ParentPath == Data.CurrentPath)
+            {
+                Data.DirList.FileList.Remove(op.FilePath);
+                FileActionLogic.UpdateFileActions();
+            }
+
+            op.PropertyChanged -= CompressOp_PropertyChanged;
+        }
+    }
+
     public static void MoveItems(LogicalDeviceViewModel device,
                                  IEnumerable<FileClass> items,
                                  string targetPath,
@@ -475,7 +524,9 @@ public static class ShellFileOperation
             foreach (var item in items)
             {
                 var targetName = item.FullName;
-                if (currentPath == targetPath)
+                // Same-folder self-copy (Ctrl+C / Ctrl+V in place) gets a unique " - Copy" name.
+                // Paste from elsewhere already went through MergeFiles (replace / skip).
+                if (cutType is DragDropEffects.Copy && item.ParentPath == targetPath)
                     targetName = FileHelper.DuplicateFile(existingItems, targetName, cutType);
 
                 SyncFile target = new(FileHelper.ConcatPaths(targetPath, targetName));

@@ -374,6 +374,9 @@ Unfortunately, we cannot provide ADB with the app due to licensing restrictions.
   <data name="S_NEW_FOLDER" xml:space="preserve">
     <value>New Folder</value>
   </data>
+  <data name="S_NEW_ARCHIVE" xml:space="preserve">
+    <value>New Archive</value>
+  </data>
   <data name="S_CC_NAME" xml:space="preserve">
     <value>Creative Commons</value>
   </data>
@@ -788,6 +791,30 @@ Cancel All Running</value>
   <data name="S_MENU_COPY_LINK" xml:space="preserve">
     <value>Copy as link</value>
     <comment>The menu used to copy a link of the selected item for pasting as a symlink</comment>
+  </data>
+  <data name="S_MENU_COPY_CONTENTS" xml:space="preserve">
+    <value>Copy contents</value>
+    <comment>Context menu: copy top-level members of a selected archive (not the archive file)</comment>
+  </data>
+  <data name="S_MENU_EXTRACT_HERE" xml:space="preserve">
+    <value>Extract here</value>
+    <comment>Context menu: extract top-level members of a selected or copied archive into the current folder</comment>
+  </data>
+  <data name="S_MENU_COMPRESS_TO" xml:space="preserve">
+    <value>Compress to</value>
+    <comment>Menu: create a tar archive; children are format names (tar, tar.gz, …)</comment>
+  </data>
+  <data name="S_ACTION_COMPRESS" xml:space="preserve">
+    <value>Compress</value>
+    <comment>File operation type name for creating an archive</comment>
+  </data>
+  <data name="S_ACTION_EXTRACT" xml:space="preserve">
+    <value>Extract</value>
+    <comment>File operation type name for extracting archive members</comment>
+  </data>
+  <data name="S_MENU_ARCHIVE" xml:space="preserve">
+    <value>Archive</value>
+    <comment>New menu: create an archive (format submenu)</comment>
   </data>
   <data name="S_MENU_RENAME" xml:space="preserve">
     <value>Rename</value>

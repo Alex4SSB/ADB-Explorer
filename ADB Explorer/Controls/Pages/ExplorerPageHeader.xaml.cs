@@ -33,6 +33,15 @@ public partial class ExplorerPageHeader : UserControl
     private Point MouseDownPoint;
     private TextBox? _renameTextBox;
 
+    /// <summary>Open toolbar submenu depth (Main / Navigation / sorting / etc.).</summary>
+    private int _toolbarSubmenuDepth;
+
+    /// <summary>
+    /// True after a toolbar submenu closed while the left button was still down —
+    /// the dismiss click should not start rubber-band selection.
+    /// </summary>
+    private bool _suppressSelectionAfterMenu;
+
     private ExplorerViewModel ViewModel { get; }
 
     /// <summary>
@@ -113,6 +122,30 @@ public partial class ExplorerPageHeader : UserControl
     public ScrollViewer ActiveScrollViewer => ViewModel.IsIconView ? IconScrollViewer : ExplorerScrollViewer;
 
     private static Point NullPoint => new(-1, -1);
+
+    private bool SuppressExplorerSelection =>
+        ViewModel.IsMenuOpen || _toolbarSubmenuDepth > 0 || _suppressSelectionAfterMenu;
+
+    private void HookToolbarMenu(AdbMenu? menu)
+    {
+        if (menu is null)
+            return;
+
+        menu.AddHandler(MenuItem.SubmenuOpenedEvent, new RoutedEventHandler(OnToolbarSubmenuOpened), true);
+        menu.AddHandler(MenuItem.SubmenuClosedEvent, new RoutedEventHandler(OnToolbarSubmenuClosed), true);
+    }
+
+    private void OnToolbarSubmenuOpened(object sender, RoutedEventArgs e) => _toolbarSubmenuDepth++;
+
+    private void OnToolbarSubmenuClosed(object sender, RoutedEventArgs e)
+    {
+        _toolbarSubmenuDepth = Math.Max(0, _toolbarSubmenuDepth - 1);
+
+        // Outside click dismisses with the button still down; Escape does not.
+        if (_toolbarSubmenuDepth == 0 && Mouse.LeftButton is MouseButtonState.Pressed)
+            _suppressSelectionAfterMenu = true;
+    }
+
     private double? RowHeight { get; set; }
     private double ColumnHeaderHeight => (double)FindResource("DataGridColumnHeaderHeight") + ScrollContentPresenterMargin;
     private double ScrollContentPresenterMargin => ((Thickness)FindResource("DataGridScrollContentPresenterMargin")).Top;
@@ -170,6 +203,13 @@ public partial class ExplorerPageHeader : UserControl
         Data.ExitSearchMode += (_, _) => App.SafeInvoke(() => ExitSearchMode());
 
         InitializeComponent();
+
+        HookToolbarMenu(MainToolBar);
+        HookToolbarMenu(NavigationToolBar);
+        HookToolbarMenu(StyleHelper.FindDescendant<AdbMenu>(SortingSelector));
+        HookToolbarMenu(StyleHelper.FindDescendant<AdbMenu>(ThumbsSizeSelector));
+        HookToolbarMenu(StyleHelper.FindDescendant<AdbMenu>(SearchOptionsControl));
+        HookToolbarMenu(StyleHelper.FindDescendant<AdbMenu>(DetailsControl));
 
         PreviewTextInput += ExplorerPageHeader_PreviewTextInput;
 
@@ -509,6 +549,10 @@ public partial class ExplorerPageHeader : UserControl
                     NewItem(false);
                     break;
 
+                case nameof(AppRuntimeSettings.CompressToExtension):
+                    NewCompressItem();
+                    break;
+
                 case nameof(AppRuntimeSettings.Rename):
                     if (FileActions.RenameEnabled)
                         IsInEditMode ^= true;
@@ -565,6 +609,37 @@ public partial class ExplorerPageHeader : UserControl
 
         IsInEditMode = true;
         if (!IsInEditMode) // in case the editing element was not acquired
+            _ = FileActionLogic.CreateNewItem(newItem);
+    }
+
+    private void NewCompressItem()
+    {
+        var extension = RuntimeSettings.CompressToExtension;
+        if (string.IsNullOrEmpty(extension) || !FileActionLogic.IsPendingCompress)
+            return;
+
+        var sources = FileActionLogic.GetPendingCompressSourcePaths();
+        string baseName;
+        if (sources.Count > 0)
+        {
+            var firstName = FileHelper.GetFullName(sources[0]);
+            var firstExt = FileHelper.GetExtension(firstName);
+            baseName = string.IsNullOrEmpty(firstExt) ? firstName : firstName[..^firstExt.Length];
+        }
+        else
+            baseName = Strings.Resources.S_NEW_ARCHIVE;
+
+        var fileName = FileHelper.DuplicateFile(DirList.FileList, $"{baseName}{extension}");
+        FileClass newItem = new(fileName, FileHelper.ConcatPaths(CurrentPath, fileName), FileType.File, isTemp: true);
+        FileActionLogic.SetPendingCompressTemp(newItem);
+
+        DirList.FileList.Insert(0, newItem);
+
+        ActiveScrollIntoView(newItem);
+        ActiveView.SelectedItem = newItem;
+
+        IsInEditMode = true;
+        if (!IsInEditMode)
             _ = FileActionLogic.CreateNewItem(newItem);
     }
 
@@ -727,6 +802,9 @@ public partial class ExplorerPageHeader : UserControl
 
         FileActions.ContextPushPackagesEnabled =
         FileActions.IsUninstallVisible.Value = FileActions.IsAppDrive;
+        FileActions.IsCutPasteDeleteVisible.Value = !FileActions.IsAppDrive;
+        FileActions.IsPullCopyVisible.Value = !FileActions.IsRecycleBin;
+        FileActions.IsPasteVisible.Value = !FileActions.IsAppDrive && !FileActions.IsRecycleBin;
 
         FileActions.CopyPathDescription.Value = FileActions.IsAppDrive ? Strings.Resources.S_COPY_APK_NAME : Strings.Resources.S_COPY_PATH;
 
@@ -1052,8 +1130,7 @@ public partial class ExplorerPageHeader : UserControl
 
         if (e.ChangedButton is MouseButton.Right && !WasSelected)
         {
-            ExplorerGrid.UnselectAll();
-            row.IsSelected = true;
+            SelectOnlyItem(row.Item);
             e.Handled = true;
             return;
         }
@@ -1079,15 +1156,55 @@ public partial class ExplorerPageHeader : UserControl
         if (!row.IsSelected
             && Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
         {
-            ExplorerGrid.UnselectAll();
-            ExplorerGrid.SelectedIndex = -1;
-            row.IsSelected = true;
+            SelectOnlyItem(row.Item);
         }
 
         ViewModel.NextSelectedIndex = current;
         ViewModel.CurrentSelectedIndex = current;
         if (ExplorerGrid.SelectedItems.Count < 1)
             ViewModel.FirstSelectedIndex = current;
+    }
+
+    /// <summary>
+    /// Clears selection on both views and on virtualized <see cref="FilePath.IsSelected"/> flags,
+    /// then selects <paramref name="item"/> alone.
+    /// </summary>
+    private void SelectOnlyItem(object item)
+    {
+        if (Keyboard.Modifiers is ModifierKeys.Control or ModifierKeys.Shift)
+            return;
+
+        ClearDataItemSelectionFlags();
+        ActiveUnselectAll();
+
+        if (item is FilePath filePath)
+            filePath.IsSelected = true;
+        else if (item is Package package)
+            package.IsSelected = true;
+
+        ActiveView.SelectedItem = item;
+    }
+
+    private void ClearDataItemSelectionFlags()
+    {
+        if (FileActions.IsAppDrive)
+        {
+            foreach (var pkg in ExplorerGrid.Items.OfType<Package>())
+            {
+                if (pkg.IsSelected)
+                    pkg.IsSelected = false;
+            }
+            return;
+        }
+
+        if (DirList?.FileList is null)
+            return;
+
+        foreach (var file in DirList.FileList)
+        {
+            if (file.IsSelected)
+                file.IsSelected = false;
+        }
     }
 
     private void DoubleClick(object source)
@@ -1476,7 +1593,7 @@ public partial class ExplorerPageHeader : UserControl
                      : CopyPasteService.DragState.None;
 
         var point = e.GetPosition(ExplorerGrid);
-        MouseDownPoint = point;
+        MouseDownPoint = SuppressExplorerSelection ? NullPoint : point;
 
         int selectionIndex = ExplorerGrid.SelectedIndex;
 
@@ -1493,7 +1610,7 @@ public partial class ExplorerPageHeader : UserControl
             if (ExplorerGrid.SelectedItems.Count > 0 && IsInEditMode)
                 IsInEditMode = false;
 
-            if ((e.ChangedButton is MouseButton.Right || !ViewModel.IsMenuOpen)
+            if ((e.ChangedButton is MouseButton.Right || !SuppressExplorerSelection)
                 && Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
             {
                 ExplorerGrid.UnselectAll();
@@ -1531,7 +1648,7 @@ public partial class ExplorerPageHeader : UserControl
             || !RuntimeSettings.IsExplorerLoaded
             || MouseDownPoint == NullPoint
             || withinEditingCell
-            || ViewModel.IsMenuOpen;
+            || SuppressExplorerSelection;
 
         if (CopyPaste.DragStatus is CopyPasteService.DragState.Pending && (MouseDownPoint - point).LengthSquared >= 25)
         {
@@ -1838,6 +1955,7 @@ public partial class ExplorerPageHeader : UserControl
     private void Window_MouseUp(object sender, MouseButtonEventArgs e)
     {
         MouseDownPoint = NullPoint;
+        _suppressSelectionAfterMenu = false;
 
         if (FileActions.ListingInProgress && e.ChangedButton is MouseButton.XButton1 or MouseButton.XButton2)
         {
@@ -1883,7 +2001,9 @@ public partial class ExplorerPageHeader : UserControl
             return;
 
         WasDragging = false;
-        MouseDownPoint = e.GetPosition(SelectionRect);
+        MouseDownPoint = SuppressExplorerSelection
+            ? NullPoint
+            : e.GetPosition(SelectionRect);
 
         // Walk up from the original source to determine if the click is on an item or empty space
         var source = e.OriginalSource as DependencyObject;
@@ -1897,7 +2017,18 @@ public partial class ExplorerPageHeader : UserControl
 
         int selectionIndex = IconView.SelectedIndex;
 
-        if (hitItem is null)
+        if (hitItem is not null)
+        {
+            if (e.ChangedButton is MouseButton.Right
+                && !hitItem.IsSelected
+                && Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
+            {
+                SelectOnlyItem(hitItem.DataContext);
+                e.Handled = true;
+                selectionIndex = IconView.SelectedIndex;
+            }
+        }
+        else
         {
             // Ignore clicks on scrollbars
             for (var dep = source; dep is not null and not ListView; dep = VisualTreeHelper.GetParent(dep))
@@ -1909,9 +2040,10 @@ public partial class ExplorerPageHeader : UserControl
             if (IconView.SelectedItems.Count > 0 && IsInEditMode)
                 IsInEditMode = false;
 
-            if ((e.ChangedButton is MouseButton.Right || !ViewModel.IsMenuOpen)
+            if ((e.ChangedButton is MouseButton.Right || !SuppressExplorerSelection)
                 && Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
             {
+                ClearDataItemSelectionFlags();
                 IconView.UnselectAll();
                 selectionIndex = -1;
             }
@@ -1936,7 +2068,7 @@ public partial class ExplorerPageHeader : UserControl
         var abortDrag = e.LeftButton == MouseButtonState.Released
             || !RuntimeSettings.IsExplorerLoaded
             || MouseDownPoint == NullPoint
-            || ViewModel.IsMenuOpen;
+            || SuppressExplorerSelection;
 
         if (CopyPaste.DragStatus is CopyPasteService.DragState.Pending && (MouseDownPoint - point).LengthSquared >= 25)
         {

@@ -81,7 +81,7 @@
             BasedOn="{StaticResource GlyphFont}"
             TargetType="ui:FontIcon">
             <Setter Property="Margin" Value="0,0,4,0" />
-            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontSize" Value="18" />
             <Setter Property="Glyph" Value="&#xE8b7;" />
         </Style>
         <DataTemplate x:Key="UninstallOpFileNameTemplate">
@@ -189,7 +189,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <ui:FontIcon Style="{StaticResource SyncProgressIconStyle}" />
+                    <ui:FontIcon FontSize="18" Style="{StaticResource SyncProgressIconStyle}" />
                     <TextBlock
                         Grid.Column="1"
                         Margin="4,0"
@@ -219,7 +219,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <ui:FontIcon>
+                <ui:FontIcon FontSize="18">
                     <ui:FontIcon.Style>
                         <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                             <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
@@ -283,7 +283,10 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <ui:FontIcon Foreground="{DynamicResource TrashDriveAltBorder}" Glyph="&#xF13D;" />
+                <ui:FontIcon
+                    FontSize="18"
+                    Foreground="{DynamicResource TrashDriveAltBorder}"
+                    Glyph="&#xF13D;" />
                 <TextBlock Grid.Column="1" Text="{Binding Name}" />
             </Grid>
         </DataTemplate>
@@ -293,7 +296,10 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <ui:FontIcon Foreground="{DynamicResource TrashDriveAltBorder}" Glyph="&#xF13D;" />
+                <ui:FontIcon
+                    FontSize="18"
+                    Foreground="{DynamicResource TrashDriveAltBorder}"
+                    Glyph="&#xF13D;" />
                 <TextBlock Grid.Column="1" Text="{Binding Error}" />
             </Grid>
         </DataTemplate>
@@ -349,11 +355,13 @@
                     <Setter Property="IsEnabled" Value="True" />
                 </DataTrigger>
             </DataTemplate.Triggers>
-            <ContentPresenter
+            <Border
                 Margin="0,0,4,0"
                 HorizontalAlignment="Center"
-                Content="{Binding OpIcon}"
-                ToolTip="{Binding Tooltip}" />
+                Background="Transparent"
+                ToolTip="{Binding Tooltip}">
+                <ContentPresenter Content="{Binding OpIcon}" />
+            </Border>
         </DataTemplate>
         <HierarchicalDataTemplate x:Key="FileOpTreeFolderTemplate" ItemsSource="{Binding Children}">
             <Grid Margin="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem, Mode=FindAncestor}, Path=(helpers:TreeViewItemHelper.Indentation), Converter={StaticResource TreeViewIndentConverter}}">
@@ -415,6 +423,19 @@
         <DataTemplate x:Key="FileOpRowDetailTemplate">
             <TreeView ItemTemplateSelector="{StaticResource FileOpTreeTemplateSelector}" ItemsSource="{Binding Children}" />
         </DataTemplate>
+        <local:AdbContextMenu
+            x:Key="FailedFileOpContextMenu"
+            x:Shared="False"
+            Style="{StaticResource UiContextMenu}">
+            <local:AdbMenuItem Click="CopyFailedOpError_Click" Header="{x:Static strings:Resources.S_BUTTON_COPY_TO_CLIP}" />
+        </local:AdbContextMenu>
+        <Style
+            x:Key="FileOpRowStyle"
+            BasedOn="{StaticResource DefaultDataGridRowStyle}"
+            TargetType="DataGridRow">
+            <Setter Property="ContextMenu" Value="{StaticResource FailedFileOpContextMenu}" />
+            <EventSetter Event="ContextMenuOpening" Handler="FileOpRow_ContextMenuOpening" />
+        </Style>
         <Style
             x:Key="DetailedFileOpGridStyle"
             BasedOn="{StaticResource AdbDataGridStyle}"
@@ -424,6 +445,7 @@
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Setter Property="HeadersVisibility" Value="Column" />
             <Setter Property="RowDetailsTemplate" Value="{StaticResource FileOpRowDetailTemplate}" />
+            <Setter Property="RowStyle" Value="{StaticResource FileOpRowStyle}" />
             <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
         </Style>
         <DataTemplate x:Key="FileOpColConfigTemplate">

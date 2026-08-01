@@ -283,6 +283,9 @@ public static class FileHelper
     /// </summary>
     public static string GetExtension(string fullName)
     {
+        if (string.IsNullOrEmpty(fullName))
+            return "";
+
         var lastDot = fullName.LastIndexOf('.');
         if (lastDot < 1)
             return "";

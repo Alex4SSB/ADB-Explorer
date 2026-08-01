@@ -179,12 +179,18 @@ public partial class FileViewModelBase : ObservableObject
         if (key is Key.Escape or Key.F2)
         {
             if (file.IsTemp && key is Key.Escape)
+            {
+                FileActionLogic.CancelPendingCompress(file);
                 Data.DirList.FileList.Remove(file);
+            }
             else
             {
                 var name = FileHelper.DisplayName(textBox);
                 if (string.IsNullOrEmpty(name))
+                {
+                    FileActionLogic.CancelPendingCompress(file);
                     Data.DirList.FileList.Remove(file);
+                }
                 else
                     textBox.Text = name;
             }
@@ -249,7 +255,7 @@ public partial class FileViewModelBase : ObservableObject
         }
         else
         {
-            return NativeMethods.GetShellFileType(fileName);
+            return NativeMethods.GetShellFileType(ArchiveHelper.GetShellAssociationName(fileName));
         }
     }
 

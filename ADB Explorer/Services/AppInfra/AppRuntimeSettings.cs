@@ -142,6 +142,21 @@ public partial class AppRuntimeSettings : ViewModelBase
 
     public bool NewFolder { get => false; set => OnPropertyChanged(); }
     public bool NewFile { get => false; set => OnPropertyChanged(); }
+
+    private string compressToExtension = "";
+    /// <summary>
+    /// Setting this to a tar extension (e.g. <c>.tar.gz</c>) starts the Compress-to rename flow.
+    /// </summary>
+    public string CompressToExtension
+    {
+        get => compressToExtension;
+        set
+        {
+            compressToExtension = value;
+            OnPropertyChanged();
+        }
+    }
+
     public bool Rename { get => false; set => OnPropertyChanged(); }
     public bool SelectAll { get => false; set => OnPropertyChanged(); }
     public bool Refresh { get => false; set => OnPropertyChanged(); }

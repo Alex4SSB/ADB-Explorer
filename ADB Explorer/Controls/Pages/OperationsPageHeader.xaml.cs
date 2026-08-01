@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels;
 using ADB_Explorer.ViewModels.Pages;
 
 namespace ADB_Explorer.Controls.Pages;
@@ -39,5 +40,22 @@ public partial class OperationsPageHeader : UserControl
     private void DetailedFileOpDataGrid_MouseDown(object sender, MouseButtonEventArgs e)
     {
         DetailedFileOpDataGrid.UnselectAll();
+    }
+
+    private void FileOpRow_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+    {
+        if (sender is not DataGridRow { DataContext: FileOperation { StatusInfo: FailedOpProgressViewModel } })
+            e.Handled = true;
+    }
+
+    private void CopyFailedOpError_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem { Parent: ContextMenu { PlacementTarget: FrameworkElement { DataContext: FileOperation op } } })
+            return;
+
+        if (op.StatusInfo is not FailedOpProgressViewModel { Error: { Length: > 0 } error })
+            return;
+
+        Clipboard.SetText(error);
     }
 }

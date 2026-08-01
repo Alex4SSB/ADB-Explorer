@@ -6,30 +6,22 @@ using ADB_Explorer.ViewModels;
 namespace ADB_Explorer.Services;
 
 /// <summary>
-/// Extracts a selected archive member (file or directory) to a real device path.
-/// Used when pasting archive clipboard items onto the device.
+/// Creates a tar-family archive on the device from selected paths (or an empty archive).
 /// </summary>
-public class FileExtractOperation : AbstractShellFileOperation
+public class FileCompressOperation : AbstractShellFileOperation
 {
-    public string ArchiveSourcePath { get; }
-    public string ArchiveInternalPath { get; }
-    public bool IsArchiveDirectory { get; }
+    public IReadOnlyList<string> SourcePaths { get; }
 
-    public FileExtractOperation(
-        FileClass source,
-        SyncFile targetPath,
+    public FileCompressOperation(
+        FileClass archiveFile,
+        IReadOnlyList<string> sourcePaths,
         LogicalDeviceViewModel device,
         Dispatcher dispatcher)
-        : base(source, device, dispatcher)
+        : base(archiveFile, device, dispatcher)
     {
-        if (!ArchivePath.TryParse(source.FullPath, out var archivePath, out var internalPath, device.ID))
-            throw new ArgumentException("Source is not an archive path.", nameof(source));
-
-        ArchiveSourcePath = archivePath;
-        ArchiveInternalPath = internalPath;
-        IsArchiveDirectory = source.IsDirectory;
-        TargetPath = targetPath;
-        OperationName = OperationType.Extract;
+        SourcePaths = sourcePaths;
+        TargetPath = new SyncFile(archiveFile);
+        OperationName = OperationType.Compress;
     }
 
     public override void Start()
@@ -42,12 +34,10 @@ public class FileExtractOperation : AbstractShellFileOperation
 
         var operationTask = Task.Run(() =>
         {
-            ArchiveExtract.ExtractSelection(
+            ArchiveExtract.CreateTarArchive(
                 Device.ID,
-                ArchiveSourcePath,
-                ArchiveInternalPath,
-                IsArchiveDirectory,
-                TargetPath.FullPath,
+                FilePath.FullPath,
+                SourcePaths,
                 CancelTokenSource.Token);
         }, CancelTokenSource.Token);
 
@@ -66,7 +56,7 @@ public class FileExtractOperation : AbstractShellFileOperation
         operationTask.ContinueWith(t =>
         {
             Status = OperationStatus.Failed;
-            var message = t.Exception?.InnerException?.Message ?? t.Exception?.Message ?? "Extract failed";
+            var message = t.Exception?.InnerException?.Message ?? t.Exception?.Message ?? "Compress failed";
             StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(
                 typeof(ShellErrorInfo),
                 failed: -1,

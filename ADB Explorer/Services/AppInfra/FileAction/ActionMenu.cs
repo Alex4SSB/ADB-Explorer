@@ -179,8 +179,9 @@ public class DynamicAltTextMenu : AltTextMenu
                               BaseIcon icon,
                               StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                               AnimationSource animationSource = AnimationSource.Command,
-                              FileAction altAction = null)
-        : base(fileAction, icon, altText, animation: animation, animationSource: animationSource, altAction: altAction)
+                              FileAction altAction = null,
+                              ObservableProperty<bool> isVisible = null)
+        : base(fileAction, icon, altText, animation: animation, animationSource: animationSource, altAction: altAction, isVisible: isVisible)
     {
         altText.PropertyChanged += (sender, e) => AltText = e.NewValue;
     }

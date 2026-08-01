@@ -2388,6 +2388,60 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copy contents.
+        /// </summary>
+        public static string S_MENU_COPY_CONTENTS {
+            get {
+                return ResourceManager.GetString("S_MENU_COPY_CONTENTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extract here.
+        /// </summary>
+        public static string S_MENU_EXTRACT_HERE {
+            get {
+                return ResourceManager.GetString("S_MENU_EXTRACT_HERE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Compress to.
+        /// </summary>
+        public static string S_MENU_COMPRESS_TO {
+            get {
+                return ResourceManager.GetString("S_MENU_COMPRESS_TO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Compress.
+        /// </summary>
+        public static string S_ACTION_COMPRESS {
+            get {
+                return ResourceManager.GetString("S_ACTION_COMPRESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extract.
+        /// </summary>
+        public static string S_ACTION_EXTRACT {
+            get {
+                return ResourceManager.GetString("S_ACTION_EXTRACT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Archive.
+        /// </summary>
+        public static string S_MENU_ARCHIVE {
+            get {
+                return ResourceManager.GetString("S_MENU_ARCHIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Copy To Temp.
         /// </summary>
         public static string S_MENU_COPY_TEMP {
@@ -2690,6 +2744,15 @@ namespace ADB_Explorer.Strings {
         public static string S_NEW_FOLDER {
             get {
                 return ResourceManager.GetString("S_NEW_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Archive.
+        /// </summary>
+        public static string S_NEW_ARCHIVE {
+            get {
+                return ResourceManager.GetString("S_NEW_ARCHIVE", resourceCulture);
             }
         }
         

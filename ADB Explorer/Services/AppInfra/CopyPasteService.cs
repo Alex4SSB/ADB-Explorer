@@ -396,15 +396,23 @@ public partial class CopyPasteService : ObservableObject
             if (FileHelper.AllFilesAreApks(DragFiles))
                 return DragDropEffects.Copy;
         }
-        else if (file is null || file.IsDirectory)
+        else if (file is null
+            || file.IsDirectory
+            || ArchiveHelper.CanPasteIntoArchiveFile(file.IsLink ? file.LinkTarget : file.FullPath, Data.DevicesObject.Current?.ID ?? ""))
         {
-            var targetPath = file is null ? Data.CurrentPath : file.FullPath;
+            string rawPath;
+            if (file is null)
+                rawPath = Data.CurrentPath;
+            else
+                rawPath = file.IsLink ? file.LinkTarget : file.FullPath;
+
+            var deviceId = Data.DevicesObject.Current?.ID ?? "";
+            var targetPath = ArchiveHelper.ResolvePasteTargetPath(rawPath, deviceId);
             Data.CopyPaste.DropTarget = targetPath;
 
-            if (!DriveHelper.IsModificationAllowedAt(targetPath, Data.DevicesObject.Current?.ID ?? ""))
+            if (!DriveHelper.IsModificationAllowedAt(targetPath, deviceId))
                 return DragDropEffects.None;
 
-            var deviceId = Data.DevicesObject.Current?.ID;
             if (ArchivePath.IsArchivePath(targetPath, deviceId)
                 && !ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId))
                 return DragDropEffects.None;
@@ -550,13 +558,19 @@ public partial class CopyPasteService : ObservableObject
     public void AcceptDataObject(System.Windows.DragEventArgs e, FrameworkElement sender)
     {
         var dataContext = sender.DataContext;
+        var deviceId = Data.DevicesObject.Current?.ID ?? "";
 
-        string targetFolder = dataContext is FileClass { IsDirectory: true } file
-            ? file.FullPath
-            : Data.CurrentPath;
+        string targetFolder;
+        if (dataContext is FileClass file && ArchiveHelper.IsPasteTargetContainer(file, deviceId))
+        {
+            var path = file.IsLink ? file.LinkTarget : file.FullPath;
+            targetFolder = ArchiveHelper.ResolvePasteTargetPath(path, deviceId);
+        }
+        else
+            targetFolder = Data.CurrentPath;
 
         if (Data.FileActions.IsSearchMode
-            && dataContext is not FileClass { IsDirectory: true }
+            && !(dataContext is FileClass dropTarget && ArchiveHelper.IsPasteTargetContainer(dropTarget, deviceId))
             && FileHelper.IsSearchLocation(targetFolder))
             return;
         
@@ -569,9 +583,18 @@ public partial class CopyPasteService : ObservableObject
 
     public void AcceptDataObject(IDataObject dataObject, IEnumerable<FileClass> selectedFiles, bool isLink = false)
     {
-        string targetFolder = selectedFiles.Count() == 1 && selectedFiles.First().IsDirectory
-            ? selectedFiles.First().FullPath
-            : Data.CurrentPath;
+        var deviceId = Data.DevicesObject.Current?.ID ?? "";
+        string targetFolder;
+        if (selectedFiles.Count() == 1
+            && selectedFiles.First() is { } item
+            && ArchiveHelper.IsPasteTargetContainer(item, deviceId))
+        {
+            var path = item.IsLink ? item.LinkTarget : item.FullPath;
+            targetFolder = ArchiveHelper.ResolvePasteTargetPath(path, deviceId);
+        }
+        else
+            targetFolder = Data.CurrentPath;
+
         AcceptDataObject(dataObject, targetFolder, isLink);
     }
 
@@ -626,7 +649,7 @@ public partial class CopyPasteService : ObservableObject
                             }
 
                             var pushOp = VerifyAndPush(targetFolder, file, CurrentEffect);
-                            if (pushOp is not null || CurrentEffect is not DragDropEffects.Move)
+                            if (pushOp is null || CurrentEffect is not DragDropEffects.Move)
                                 return;
 
                             pushOp.PropertyChanged += (s, e) =>
@@ -815,16 +838,26 @@ public partial class CopyPasteService : ObservableObject
 
     public static async void VerifyAndPush(string targetPath, IEnumerable<ShellItem> pasteItems)
     {
-        var files = await MergeFiles(pasteItems.Select(f => f.ParsingName), targetPath);
-        if (!files.Any())
-            return;
+        var deviceId = Data.DevicesObject.Current?.ID ?? "";
+        var skipMergeForForeignArchive = ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId)
+            && !string.Equals(Data.CurrentPath, targetPath, StringComparison.Ordinal);
+
+        IEnumerable<string> files;
+        if (skipMergeForForeignArchive)
+            files = pasteItems.Select(f => f.ParsingName);
+        else
+        {
+            files = await MergeFiles(pasteItems.Select(f => f.ParsingName), targetPath);
+            if (!files.Any())
+                return;
+        }
 
         if (files.Count() < pasteItems.Count())
         {
             pasteItems = pasteItems.Where(f => files.Contains(f.ParsingName));
         }
 
-        if (ArchiveHelper.CanPasteIntoArchive(targetPath, Data.DevicesObject.Current?.ID ?? ""))
+        if (ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId))
         {
             ShellFileOperation.PushItemsToTar(Data.DevicesObject.Current, pasteItems, targetPath, App.AppDispatcher);
             return;
@@ -835,11 +868,18 @@ public partial class CopyPasteService : ObservableObject
 
     public static async void VerifyAndPush(string targetPath, IEnumerable<FileClass> pasteItems, DragDropEffects dropEffects = DragDropEffects.Copy)
     {
-        pasteItems = await MergeFiles(targetPath, pasteItems);
-        if (!pasteItems.Any())
-            return;
+        var deviceId = Data.DevicesObject.Current?.ID ?? "";
+        var skipMergeForForeignArchive = ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId)
+            && !string.Equals(Data.CurrentPath, targetPath, StringComparison.Ordinal);
 
-        if (ArchiveHelper.CanPasteIntoArchive(targetPath, Data.DevicesObject.Current?.ID ?? ""))
+        if (!skipMergeForForeignArchive)
+        {
+            pasteItems = await MergeFiles(targetPath, pasteItems);
+            if (!pasteItems.Any())
+                return;
+        }
+
+        if (ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId))
         {
             ShellFileOperation.PushItemsToTar(
                 Data.DevicesObject.Current,
@@ -852,11 +892,19 @@ public partial class CopyPasteService : ObservableObject
         FileActionLogic.PushShellObjects(pasteItems.Select(f => f.ShellItem), targetPath, dropEffects);
     }
 
-    public static FileSyncOperation VerifyAndPush(string targetPath, FileClass pasteItem, DragDropEffects dropEffects = DragDropEffects.Copy, ShellItem originalShellItem = null)
+    public static FileSyncOperation? VerifyAndPush(string targetPath, FileClass pasteItem, DragDropEffects dropEffects = DragDropEffects.Copy, ShellItem originalShellItem = null)
     {
-        var items = MergeFiles(targetPath, pasteItem).Result;
-        if (!items.Any())
-            return null;
+        var deviceId = Data.DevicesObject.Current?.ID ?? "";
+        var skipMergeForForeignArchive = ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId)
+            && !string.Equals(Data.CurrentPath, targetPath, StringComparison.Ordinal);
+
+        IEnumerable<FileClass> items;
+        if (!skipMergeForForeignArchive)
+        {
+            items = MergeFiles(targetPath, pasteItem).Result;
+            if (!items.Any())
+                return null;
+        }
 
         if (ArchiveHelper.CanPasteIntoArchive(targetPath, Data.DevicesObject.Current?.ID ?? ""))
         {
@@ -865,6 +913,7 @@ public partial class CopyPasteService : ObservableObject
                 [pasteItem.ShellItem ?? originalShellItem ?? ShellItem.Open(pasteItem.FullPath)],
                 targetPath,
                 App.AppDispatcher);
+
             return null;
         }
 
@@ -883,12 +932,26 @@ public partial class CopyPasteService : ObservableObject
         if (!pasteItems.Any())
             return;
 
-        pasteItems = await MergeFiles(targetPath, pasteItems);
-        if (!pasteItems.Any())
-            return;
+        // Same-folder self-copy keeps the " - Copy" rename path (no conflict dialog).
+        // Archive extract and paste from elsewhere prompt via MergeFiles, then replace in place.
+        // Pasting onto an archive that is not the current listing skips MergeFiles (no DirList TOC).
+        var isArchiveSource = ArchiveExtract.IsArchiveSource(pasteItems, device.ID);
+        var isSameFolderSelfCopy = !isArchiveSource
+            && cutType is DragDropEffects.Copy
+            && pasteItems.All(f => f.ParentPath == targetPath);
+
+        var skipMergeForForeignArchive = ArchiveHelper.CanPasteIntoArchive(targetPath, device.ID)
+            && !string.Equals(Data.CurrentPath, targetPath, StringComparison.Ordinal);
+
+        if (!isSameFolderSelfCopy && !skipMergeForForeignArchive)
+        {
+            pasteItems = await MergeFiles(targetPath, pasteItems);
+            if (!pasteItems.Any())
+                return;
+        }
 
         // Archive sources: extract selected members (copy only — no in-archive cut yet).
-        if (ArchiveExtract.IsArchiveSource(pasteItems, device.ID))
+        if (isArchiveSource)
         {
             if (ArchivePath.IsArchivePath(targetPath, device.ID))
                 return;
@@ -896,8 +959,6 @@ public partial class CopyPasteService : ObservableObject
             ShellFileOperation.ExtractItems(device: device,
                       items: pasteItems,
                       targetPath: targetPath,
-                      currentPath: currentPath,
-                      existingItems: Data.DirList.FileList.Select(f => f.FullName),
                       dispatcher: dispatcher,
                       masterPid: masterPid);
             return;
@@ -979,7 +1040,7 @@ public partial class CopyPasteService : ObservableObject
         {
             if (targetPath == Data.CurrentPath)
             {
-                existingItems = Data.DirList.FileList.Select(f => f.FullPath).Intersect(fileNames).ToHashSet(comparer);
+                existingItems = Data.DirList.FileList.Select(f => f.FullName).Intersect(fileNames).ToHashSet(comparer);
             }
             else
             {
@@ -1062,7 +1123,7 @@ public partial class CopyPasteService : ObservableObject
         {
             if (targetPath == Data.CurrentPath)
             {
-                existingItems = Data.DirList.FileList.Select(f => f.FullPath).Intersect(fileNames).ToHashSet(comparer);
+                existingItems = Data.DirList.FileList.Select(f => f.FullName).Intersect(fileNames).ToHashSet(comparer);
             }
             else
             {

@@ -215,7 +215,10 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         {
             Set(ref trashIndex, value);
             if (value is not null && value.OriginalPath is not null)
+            {
                 FullName = FileHelper.GetFullName(value.OriginalPath);
+                SortName = new(FullName);
+            }
         }
     }
 
@@ -468,6 +471,8 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     public void UpdateType()
     {
+        UpdateSpecialType();
+
         _folderViewModel?.UpdateType();
 
         _iconViewModel?.UpdateType();
@@ -770,12 +775,14 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     protected override bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
     {
-        if (propertyName is nameof(FullName) or nameof(Type) or nameof(IsLink))
-        {
-            UpdateType();
-        }
+        if (!base.Set(ref storage, value, propertyName))
+            return false;
 
-        return base.Set(ref storage, value, propertyName);
+        // Refresh after the new value is stored — UpdateType reads Type / FullName / IsLink.
+        if (propertyName is nameof(FullName) or nameof(Type) or nameof(IsLink))
+            UpdateType();
+
+        return true;
     }
 
     public static explicit operator SyncFile(FileClass self)

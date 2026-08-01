@@ -40,12 +40,25 @@ internal static class NavigationToolBar
 
 }
 
+file static class CompressToMenuHelper
+{
+    public static SubMenu[] CompressToFormatMenus() =>
+    [
+        new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CompressToTar)),
+        new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CompressToTarGz)),
+        new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CompressToTarBz2)),
+        new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CompressToTarXz)),
+        new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CompressToTarZst)),
+    ];
+}
+
 internal static class MainToolBar
 {
     public static ObservableList<IMenuItem> List { get; } = [
         new CompoundIconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Pull),
-            new(new PullIcon())),
+            new(new PullIcon()),
+            isVisible: Data.FileActions.IsPullCopyVisible),
         new CompoundIconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Push),
             new(new PushIcon()),
@@ -57,7 +70,7 @@ internal static class MainToolBar
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFiles), AppActions.Icon(FileAction.FileActionType.NewFile, 16)),
                 new SubMenuSeparator(Data.FileActions.IsApkActionsVisible),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushPackages),
-                    new(FluentPathGeometries.BoxArrowUp, 16),
+                    AppActions.Icon(FileAction.FileActionType.Install, 16),
                     isVisible: Data.FileActions.IsApkActionsVisible),
             ]),
         new MenuSeparator(),
@@ -70,6 +83,11 @@ internal static class MainToolBar
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFolder), AppActions.Icon(FileAction.FileActionType.PushFolders, 16)),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFile), AppActions.Icon(FileAction.FileActionType.NewFile, 16)),
+                new SubMenuSeparator(),
+                new (
+                    AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewCompressTo),
+                    AppActions.Icon(FileAction.FileActionType.NewCompressTo, 16),
+                    children: CompressToMenuHelper.CompressToFormatMenus()),
             ],
             isVisible: Data.FileActions.IsNewMenuVisible),
         new IconMenu(
@@ -77,19 +95,22 @@ internal static class MainToolBar
             AppActions.Icon(FileAction.FileActionType.Cut, 18),
             StyleHelper.ContentAnimation.UpMarquee,
             Data.FileActions.IsCutState,
-            altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardCut)),
+            altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardCut),
+            isVisible: Data.FileActions.IsCutPasteDeleteVisible),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Copy),
             new BaseIcon(new CopyIcon()),
             StyleHelper.ContentAnimation.Bounce,
             Data.FileActions.IsCopyState,
-            altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardCopy)),
+            altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardCopy),
+            isVisible: Data.FileActions.IsPullCopyVisible),
         new DynamicAltTextMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Paste),
             Data.FileActions.CutItemsCount,
             new BaseIcon(new PasteIcon()),
             StyleHelper.ContentAnimation.Bounce,
-            altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardPaste)),
+            altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardPaste),
+            isVisible: Data.FileActions.IsPasteVisible),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Rename),
             new BaseIcon(new RenameAIcon()),
@@ -101,7 +122,8 @@ internal static class MainToolBar
             isVisible: Data.FileActions.IsRestoreMenuVisible),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Delete),
-            AppActions.Icon(FileAction.FileActionType.Delete, 18)),
+            AppActions.Icon(FileAction.FileActionType.Delete, 18),
+            isVisible: Data.FileActions.IsCutPasteDeleteVisible),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenPackageLocation),
             AppActions.Icon(FileAction.FileActionType.FollowLink, 18),
@@ -112,19 +134,25 @@ internal static class MainToolBar
             AppActions.Icon(FileAction.FileActionType.Uninstall, 18),
             StyleHelper.ContentAnimation.DownMarquee,
             isVisible: Data.FileActions.IsUninstallVisible),
+        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.SearchApkOnWeb),
+            AppActions.Icon(FileAction.FileActionType.SearchApkOnWeb, 18),
+            isVisible: Data.FileActions.IsUninstallVisible),
         new IconMenu(description: Strings.Resources.S_MENU_MORE,
             icon: AppActions.Icon(FileAction.FileActionType.More, 20),
             children:
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), AppActions.Icon(FileAction.FileActionType.CopyItemPath, 16)),
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.SearchApkOnWeb),
-                    AppActions.Icon(FileAction.FileActionType.SearchApkOnWeb, 16),
-                    isVisible: Data.FileActions.IsApkActionsVisible),
-                new SubMenuSeparator(),
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.FollowLink), AppActions.Icon(FileAction.FileActionType.FollowLink, 16)),
-                new SubMenuSeparator(),
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), AppActions.Icon(FileAction.FileActionType.UpdateModified, 16)),
-                new SubMenuSeparator(Data.FileActions.IsApkActionsVisible),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.MoreCompress),
+                    AppActions.Icon(FileAction.FileActionType.NewCompressTo, 16),
+                    children:
+                    [
+                        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyContents), new BaseIcon(new CopyArrowRightIcon(), 16)),
+                        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ExtractHere), new BaseIcon(new FolderArrowRightIcon(), 16)),
+                        new SubMenu(
+                            AppActions.List.Find(a => a.Name is FileAction.FileActionType.CompressTo),
+                            AppActions.Icon(FileAction.FileActionType.CompressTo, 16),
+                            children: CompressToMenuHelper.CompressToFormatMenus()),
+                    ]),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Package),
                     new(FluentPathGeometries.Box, 16),
                     isVisible: Data.FileActions.IsApkActionsVisible,
@@ -233,6 +261,11 @@ internal static class ExplorerContextMenu
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFolder), AppActions.Icon(FileAction.FileActionType.PushFolders, 16)),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFile), AppActions.Icon(FileAction.FileActionType.NewFile, 16)),
+                new SubMenuSeparator(),
+                new (
+                    AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewCompressTo),
+                    AppActions.Icon(FileAction.FileActionType.NewCompressTo, 16),
+                    children: CompressToMenuHelper.CompressToFormatMenus()),
             ]),
         new SubMenuSeparator(),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Cut), AppActions.Icon(FileAction.FileActionType.Cut, 16)),
@@ -240,6 +273,13 @@ internal static class ExplorerContextMenu
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyLink), AppActions.Icon(FileAction.FileActionType.CopyLink, 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Paste), new BaseIcon(new PasteIcon(), 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.PasteLink), AppActions.Icon(FileAction.FileActionType.PasteLink, 16)),
+        new SubMenuSeparator(),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyContents), new BaseIcon(new CopyArrowRightIcon(), 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ExtractHere), new BaseIcon(new FolderArrowRightIcon(), 16)),
+        new SubMenu(
+            AppActions.List.Find(a => a.Name is FileAction.FileActionType.CompressTo),
+            AppActions.Icon(FileAction.FileActionType.CompressTo, 16),
+            children: CompressToMenuHelper.CompressToFormatMenus()),
         new SubMenuSeparator(),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Rename), new BaseIcon(new RenameAIcon(), 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FollowLink), AppActions.Icon(FileAction.FileActionType.FollowLink, 16)),
@@ -260,7 +300,7 @@ internal static class ExplorerContextMenu
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.SearchApkOnWeb), AppActions.Icon(FileAction.FileActionType.SearchApkOnWeb, 16)),
         new SubMenuSeparator(),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextDelete), AppActions.Icon(FileAction.FileActionType.Delete, 16)),
-        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPushPackages), new(FluentPathGeometries.BoxArrowUp, 16)),
+        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPushPackages), AppActions.Icon(FileAction.FileActionType.Install, 16)),
         new DummySubMenu(),
     ];
 }

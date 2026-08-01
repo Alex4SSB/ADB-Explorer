@@ -46,6 +46,20 @@ public static class ArchiveHelper
         return !FileHelper.GetExtension(fileName).Equals(".tar", StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Filename used for Windows Shell type/icon association.
+    /// Plain <c>.tar</c> is mapped to <c>.tar.gz</c> so it shares the same Shell treatment
+    /// as compressed tar (Path.GetExtension of <c>.tar.gz</c> is <c>.gz</c>).
+    /// </summary>
+    public static string GetShellAssociationName(string fileName)
+    {
+        var ext = FileHelper.GetExtension(fileName);
+        if (!ext.Equals(".tar", StringComparison.OrdinalIgnoreCase))
+            return fileName;
+
+        return $"{fileName[..^ext.Length]}.tar.gz";
+    }
+
     public static bool CanBrowse(string fileName, string deviceId) => GetFamily(fileName) switch
     {
         ArchiveFamily.Tar => ShellCommands.TarExists(deviceId),
@@ -81,6 +95,7 @@ public static class ArchiveHelper
     /// <summary>
     /// Whether paste/drop/push into <paramref name="path"/> is supported.
     /// Currently tar-family only (extract+repack); zip stays blocked even when <see cref="CanModify"/> is true.
+    /// Accepts composite archive paths (<c>archive/</c> or <c>archive/member</c>).
     /// </summary>
     public static bool CanPasteIntoArchive(string path, string deviceId)
     {
@@ -89,6 +104,44 @@ public static class ArchiveHelper
 
         return GetFamily(archivePath) is ArchiveFamily.Tar
             && CanModify(FileHelper.GetFullName(archivePath), deviceId);
+    }
+
+    /// <summary>
+    /// Whether <paramref name="path"/> is a tar archive <em>file</em> (not a composite member path)
+    /// that can receive paste/push at its root via extract+repack.
+    /// </summary>
+    public static bool CanPasteIntoArchiveFile(string path, string deviceId)
+    {
+        if (string.IsNullOrEmpty(path) || ArchivePath.IsArchivePath(path, deviceId))
+            return false;
+
+        if (!ArchivePath.IsBrowsableArchiveFile(path, deviceId))
+            return false;
+
+        return CanPasteIntoArchive(ArchivePath.Join(path, ""), deviceId);
+    }
+
+    /// <summary>
+    /// Maps an archive file path to its pasteable archive-root composite path; otherwise returns <paramref name="path"/>.
+    /// </summary>
+    public static string ResolvePasteTargetPath(string path, string deviceId)
+    {
+        if (CanPasteIntoArchiveFile(path, deviceId))
+            return ArchivePath.Join(path, "");
+
+        return path;
+    }
+
+    /// <summary>
+    /// Whether <paramref name="file"/> can be a paste/drop container (directory or modifiable tar archive).
+    /// </summary>
+    public static bool IsPasteTargetContainer(FileClass file, string deviceId)
+    {
+        if (file.IsDirectory)
+            return true;
+
+        var path = file.IsLink ? file.LinkTarget : file.FullPath;
+        return !string.IsNullOrEmpty(path) && CanPasteIntoArchiveFile(path, deviceId);
     }
 
     /// <summary>

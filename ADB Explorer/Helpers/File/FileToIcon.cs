@@ -174,7 +174,7 @@ public class FileToIconConverter
     private static string ComputeIconId(string fileName, AbstractFile.SpecialFileType specialType)
     {
         if (specialType.HasFlag(AbstractFile.SpecialFileType.Regular))
-            return Path.GetExtension(fileName).ToLower();
+            return Path.GetExtension(ArchiveHelper.GetShellAssociationName(fileName)).ToLower();
 
         var specialIcon = SpecialTypeIndex(specialType, fileName);
         return specialIcon.IsValid
@@ -282,9 +282,10 @@ public class FileToIconConverter
     {
         Icon icon;
         var specialIcon = SpecialTypeIndex(specialType, fileName);
-        string lookup = specialType.HasFlag(AbstractFile.SpecialFileType.Regular) && Path.GetExtension(fileName) is { Length: > 0 } ext
+        var associationName = ArchiveHelper.GetShellAssociationName(fileName);
+        string lookup = specialType.HasFlag(AbstractFile.SpecialFileType.Regular) && Path.GetExtension(associationName) is { Length: > 0 } ext
             ? $"aaa{ext.ToLower()}"
-            : fileName;
+            : associationName;
 
         switch (size)
         {

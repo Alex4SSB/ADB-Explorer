@@ -828,4 +828,62 @@ public static class ArchiveExtract
 
         return [.. result.Values];
     }
+
+    /// <summary>
+    /// Creates a new tar-family archive at <paramref name="archivePath"/>.
+    /// Compression is selected by toybox from the filename extension (e.g. <c>.tar.gz</c>).
+    /// When <paramref name="sourceFullPaths"/> is empty, creates an empty archive.
+    /// All sources must share the same parent directory.
+    /// </summary>
+    public static void CreateTarArchive(
+        string deviceId,
+        string archivePath,
+        IReadOnlyList<string> sourceFullPaths,
+        CancellationToken cancellationToken = default)
+    {
+        if (!ShellCommands.TarExists(deviceId))
+            throw new InvalidOperationException("tar is not available on this device.");
+
+        var tar = ShellCommands.TranslateCommand("tar");
+        var archiveEsc = ADBService.EscapeAdbShellString(archivePath);
+
+        string script;
+        if (sourceFullPaths.Count == 0)
+        {
+            script = $"{tar} -cf {archiveEsc} -T /dev/null";
+        }
+        else
+        {
+            var parent = FileHelper.GetParentPath(sourceFullPaths[0]);
+            foreach (var path in sourceFullPaths)
+            {
+                if (!string.Equals(FileHelper.GetParentPath(path), parent, StringComparison.Ordinal))
+                    throw new InvalidOperationException("All items to compress must be in the same folder.");
+            }
+
+            var parentEsc = ADBService.EscapeAdbShellString(parent);
+            var printfArgs = string.Join(
+                " ",
+                sourceFullPaths.Select(p => ADBService.EscapeAdbShellString(FileHelper.GetFullName(p))));
+
+            // Pack named members via -T so names with spaces survive; avoid "./name" members.
+            script = $"cd {parentEsc} && printf '%s\\n' {printfArgs} | {tar} -cf {archiveEsc} -T -";
+        }
+
+        var exit = ADBService.ExecuteDeviceAdbShellCommand(
+            deviceId,
+            "sh",
+            out var stdout,
+            out var stderr,
+            cancellationToken,
+            "-c",
+            ADBService.EscapeAdbShellString(script));
+
+        if (exit != 0)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            RemoveDeviceTree(deviceId, archivePath);
+            throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
+        }
+    }
 }

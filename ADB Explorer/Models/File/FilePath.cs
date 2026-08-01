@@ -206,14 +206,26 @@ public class FilePath : AbstractFile, IBaseFile
         FullPath = androidPath;
         FullName = string.IsNullOrEmpty(fullName) ? FileHelper.GetFullName(androidPath) : fullName;
 
-        if (fileType is FileType.Folder)
-            SpecialType = SpecialFileType.Folder;
-        else
+        SpecialType = fileType switch
+        {
+            FileType.Folder => SpecialFileType.Folder,
+            FileType.Unknown => SpecialFileType.Unknown,
+            FileType.BrokenLink => SpecialFileType.BrokenLink,
+            FileType.MultipleFiles => SpecialFileType.MultipleFiles,
+            FileType.Drive => SpecialFileType.Drive,
+            FileType.EmptyTrash => SpecialFileType.EmptyTrash,
+            FileType.FullTrash => SpecialFileType.FullTrash,
+            FileType.Phone => SpecialFileType.Phone,
+            FileType.Gallery => SpecialFileType.Gallery,
+            FileType.EnterFolder => SpecialFileType.EnterFolder,
+            _ => SpecialFileType.Regular,
+        };
+
+        if (fileType is FileType.File)
         {
             var ext = FileHelper.GetExtension(FullName).ToUpper();
-            SpecialType = AdbExplorerConst.APK_NAMES.Contains(ext)
-                ? SpecialFileType.Apk
-                : SpecialFileType.Regular;
+            if (AdbExplorerConst.APK_NAMES.Contains(ext))
+                SpecialType = SpecialFileType.Apk;
 
             if (AdbExplorerConst.ARCHIVE_NAMES.Contains(ext))
                 SpecialType |= SpecialFileType.Archive;

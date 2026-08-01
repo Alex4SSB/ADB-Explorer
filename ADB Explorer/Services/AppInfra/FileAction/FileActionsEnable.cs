@@ -206,6 +206,8 @@ public partial class FileActionsEnable : ObservableObject
                 OnPropertyChanged(nameof(EmptyTrash));
                 IsNewMenuVisible.Value = !IsExplorerVisible || (!IsRecycleBin && !IsAppDrive && !IsArchive);
                 IsRestoreMenuVisible.Value = value;
+                IsPullCopyVisible.Value = !value;
+                IsPasteVisible.Value = !IsAppDrive && !value;
             }
         }
     }
@@ -217,7 +219,11 @@ public partial class FileActionsEnable : ObservableObject
         set
         {
             if (SetProperty(ref isAppDrive, value))
+            {
                 IsNewMenuVisible.Value = !IsExplorerVisible || (!IsRecycleBin && !IsAppDrive && !IsArchive);
+                IsCutPasteDeleteVisible.Value = !value;
+                IsPasteVisible.Value = !value && !IsRecycleBin;
+            }
         }
     }
 
@@ -349,6 +355,18 @@ public partial class FileActionsEnable : ObservableObject
         set => SetProperty(ref isCopyLinkEnabled, value);
     }
 
+    [ObservableProperty]
+    public partial bool IsCopyContentsEnabled { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsExtractHereEnabled { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsCompressToEnabled { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsCompressToContextEnabled { get; set; }
+
     private bool isApkWebSearchEnabled = false;
     public bool IsApkWebSearchEnabled
     {
@@ -430,6 +448,12 @@ public partial class FileActionsEnable : ObservableObject
     public ObservableProperty<bool> IsRestoreMenuVisible = new() { Value = false };
 
     public ObservableProperty<bool> IsUninstallVisible = new() { Value = false };
+
+    public ObservableProperty<bool> IsCutPasteDeleteVisible = new() { Value = true };
+
+    public ObservableProperty<bool> IsPullCopyVisible = new() { Value = true };
+
+    public ObservableProperty<bool> IsPasteVisible = new() { Value = true };
 
     public ObservableProperty<bool> IsApkActionsVisible = new() { Value = Data.Settings.EnableApk };
 
