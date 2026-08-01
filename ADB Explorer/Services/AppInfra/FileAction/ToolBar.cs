@@ -261,10 +261,11 @@ internal static class ExplorerContextMenu
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFolder), AppActions.Icon(FileAction.FileActionType.PushFolders, 16)),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFile), AppActions.Icon(FileAction.FileActionType.NewFile, 16)),
-                new SubMenuSeparator(),
+                new SubMenuSeparator(Data.FileActions.IsCompressToEnabled),
                 new (
                     AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewCompressTo),
                     AppActions.Icon(FileAction.FileActionType.NewCompressTo, 16),
+                    isVisible: Data.FileActions.IsCompressToEnabled,
                     children: CompressToMenuHelper.CompressToFormatMenus()),
             ]),
         new SubMenuSeparator(),

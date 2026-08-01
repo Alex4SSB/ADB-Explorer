@@ -361,8 +361,7 @@ public partial class FileActionsEnable : ObservableObject
     [ObservableProperty]
     public partial bool IsExtractHereEnabled { get; set; }
 
-    [ObservableProperty]
-    public partial bool IsCompressToEnabled { get; set; }
+    public ObservableProperty<bool> IsCompressToEnabled = new();
 
     [ObservableProperty]
     public partial bool IsCompressToContextEnabled { get; set; }

@@ -1446,7 +1446,7 @@ internal static class FileActionLogic
 
         var tarAvailable = currentDevice is not null
             && ShellCommands.TarExists(currentDevice.ID);
-        actions.IsCompressToEnabled = actions.NewEnabled
+        actions.IsCompressToEnabled.Value = actions.NewEnabled
             && !isArchive
             && tarAvailable;
         actions.IsCompressToContextEnabled = actions.IsCompressToEnabled
