@@ -464,7 +464,7 @@ Zobrazený obsah nemusí být úplný.</value>
     <comment>The setting used to stop device and battery polling when there are active push or pull operations</comment>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>Souběžné operace</value>
+    <value>Maximální počet souběžných operací</value>
     <comment>The setting used to allow performing simultaneous operations on separate devices</comment>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
@@ -1953,5 +1953,29 @@ Kontroly se snaží zabránit tomu, aby nic netušící uživatel spustil potenc
   </data>
   <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
     <value>Opustit režim výsledků vyhledávání.</value>
+  </data>
+  <data name="S_NEW_ARCHIVE" xml:space="preserve">
+    <value>Nový archiv</value>
+  </data>
+  <data name="S_MENU_COPY_LINK" xml:space="preserve">
+    <value>Kopírovat jako odkaz</value>
+  </data>
+  <data name="S_MENU_COPY_CONTENTS" xml:space="preserve">
+    <value>Kopírovat obsah</value>
+  </data>
+  <data name="S_MENU_EXTRACT_HERE" xml:space="preserve">
+    <value>Rozbalit sem</value>
+  </data>
+  <data name="S_MENU_COMPRESS_TO" xml:space="preserve">
+    <value>Komprimovat do</value>
+  </data>
+  <data name="S_ACTION_COMPRESS" xml:space="preserve">
+    <value>Komprimovat</value>
+  </data>
+  <data name="S_ACTION_EXTRACT" xml:space="preserve">
+    <value>Rozbalit</value>
+  </data>
+  <data name="S_MENU_ARCHIVE" xml:space="preserve">
+    <value>Archiv</value>
   </data>
 </root>
