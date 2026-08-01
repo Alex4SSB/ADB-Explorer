@@ -452,7 +452,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>עצור סריקות בזמן הורדה/העלאה</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>פעולות מקביליות</value>
+    <value>כמות מירבית של פעולות מקביליות</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
     <value>בצע סריקת מדיה לאחר העלאה</value>
@@ -568,7 +568,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>חפש בהגדרות</value>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
-    <value>צא מהחיפוש</value>
+    <value>סגור חיפוש</value>
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>תצוגת חיפוש</value>
@@ -722,7 +722,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>לא ניתן לקבל את הרשימה.</value>
   </data>
   <data name="S_EMPTY_FILTER" xml:space="preserve">
-    <value>אין פריטים התואמים לסינון.</value>
+    <value>אין פריטים המתאימים לחיפוש שלך.</value>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
     <value>&lt;Span&gt;התיקייה &lt;Italic&gt;נראית&lt;/Italic&gt; ריקה&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;...לעין בלתי מזוינת&lt;/Span&gt;&lt;/Span&gt;</value>
@@ -1649,5 +1649,100 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_PREVIEW_SYNTAX_AUTOMATIC" xml:space="preserve">
     <value>אוטומטי</value>
+  </data>
+  <data name="S_NEW_VERSION_READY" xml:space="preserve">
+    <value>גרסה חדשה של {0}, גרסה {1}, סיימה הורדה ומוכנה להתקנה.</value>
+  </data>
+  <data name="S_UPDATE_ON_CLOSE" xml:space="preserve">
+    <value>עדכן ביציאה</value>
+  </data>
+  <data name="S_UPDATE_APPLY_FAILED" xml:space="preserve">
+    <value>לא ניתן היה להכין את עדכון התוכנה. וודאו כי מותקן כלי לטיפול בקבצי 7z (הסייר של ווינדוס, ‎7-Zip‏, NanaZip‏, וכו'). לחלופין ניתן להוריד את העדכון ידנית מגיטהאב.</value>
+  </data>
+  <data name="S_NEW_ARCHIVE" xml:space="preserve">
+    <value>ארכיון חדש</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
+    <value>בדיקה והודעה</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_UPDATE" xml:space="preserve">
+    <value>עדכון והתקנה</value>
+  </data>
+  <data name="S_MENU_STOP_LOADING" xml:space="preserve">
+    <value>הפסק טעינת {0}</value>
+  </data>
+  <data name="S_MENU_COPY_LINK" xml:space="preserve">
+    <value>העתק כקישור</value>
+  </data>
+  <data name="S_MENU_COPY_CONTENTS" xml:space="preserve">
+    <value>העתק תוכן</value>
+  </data>
+  <data name="S_MENU_EXTRACT_HERE" xml:space="preserve">
+    <value>חלץ כאן</value>
+  </data>
+  <data name="S_MENU_COMPRESS_TO" xml:space="preserve">
+    <value>כווץ לתוך</value>
+  </data>
+  <data name="S_ACTION_COMPRESS" xml:space="preserve">
+    <value>כיווץ</value>
+  </data>
+  <data name="S_ACTION_EXTRACT" xml:space="preserve">
+    <value>חילוץ</value>
+  </data>
+  <data name="S_MENU_ARCHIVE" xml:space="preserve">
+    <value>ארכיון</value>
+  </data>
+  <data name="S_RESTART" xml:space="preserve">
+    <value>הפעל מחדש עכשיו</value>
+  </data>
+  <data name="S_UPDATE_MODIFIED_INFO" xml:space="preserve">
+    <value>מנסה לתקן את תאריך השינוי על פי שם הקובץ.
+
+שימושי עבור תמונות שהשתנה להן תאריך השינוי אבל הן כוללות את תאריך הצילום בשם הקובץ.</value>
+  </data>
+  <data name="S_PUSH_PACKAGES_INFO" xml:space="preserve">
+    <value>מתקין חבילות APK ישירות מווינדוס.</value>
+  </data>
+  <data name="S_DETAILS_PANE_INFO" xml:space="preserve">
+    <value>מגדיר את החלונית הצדדית למצב תצוגת פרטים.
+
+הפרטים יכולים לכלול: תמונת תצוגה מקדימה, מידע קובץ מורחב, מטאדאטא, הרשאות, ואפשרויות mount.</value>
+  </data>
+  <data name="S_PREVIEW_PANE_INFO" xml:space="preserve">
+    <value>מגדיר את החלונית הצדדית למצב תצוגה מקדימה.
+
+פריטים נתמכים: תמונות תצוגה מקדימה, PDF; קבצים אחרים התואמים את מגבלות הגודל מוצגים כטקסט, עם הדגשת סינטקס אופציונלית, וניתנים לעריכה ושמירה אם המיקום מאפשר זאת.</value>
+  </data>
+  <data name="S_UPDATE_SIGNATURE_INVALID" xml:space="preserve">
+    <value>קובץ העדכון אינו חתום באותה חתימה כמו התוכנה המותקנת. העדכון בוטל ונמחק.</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO" xml:space="preserve">
+    <value>מבטל בדיקות נתיב וקובץ הרצה של ADB.
+
+מטרת הבדיקות היא לנסות למנוע ממשתמש תמים להריץ נוזקה פוטנציאלית במסווה ADB. הבדיקות הן:
+• הנתיב לא יכול להיות UNC מרוחק או קיצור דרך
+• קובץ ההרצה חייב להיות חתום ע"י גוגל או להתאים לרשימת חתימות SHA-256 מוגדרת מראש
+• חייב להחזיר מחרוזת גרסה תקנית בהרצה עם ‎--version</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS" xml:space="preserve">
+    <value>אפשרויות חיפוש</value>
+  </data>
+  <data name="S_SEARCH_RESULTS_IN" xml:space="preserve">
+    <value>תוצאות חיפוש ב {0}</value>
+  </data>
+  <data name="S_SEARCH_ALL_SUBFOLDERS" xml:space="preserve">
+    <value>כל תיקיות המשנה</value>
+  </data>
+  <data name="S_SEARCH_CURRENT_FOLDER" xml:space="preserve">
+    <value>תיקיה נוכחית</value>
+  </data>
+  <data name="S_SEARCH" xml:space="preserve">
+    <value>חיפוש</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS_INFO" xml:space="preserve">
+    <value>אפשרויות חיפוש מתקדמות וסינון.</value>
+  </data>
+  <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
+    <value>צא ממצב תוצאות חיפוש.</value>
   </data>
 </root>
