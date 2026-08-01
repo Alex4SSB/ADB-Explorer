@@ -452,7 +452,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>停止 推送 / 拉取 轮询</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>同时操作</value>
+    <value>最多同时进行的操作数</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
     <value>在 Push 时强制媒体重新扫描</value>
