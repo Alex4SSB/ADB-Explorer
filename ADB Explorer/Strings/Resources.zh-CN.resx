@@ -1724,4 +1724,25 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MENU_COPY_LINK" xml:space="preserve">
     <value>复制为链接</value>
   </data>
+  <data name="S_NEW_ARCHIVE" xml:space="preserve">
+    <value>新压缩包</value>
+  </data>
+  <data name="S_MENU_COPY_CONTENTS" xml:space="preserve">
+    <value>复制内容</value>
+  </data>
+  <data name="S_MENU_EXTRACT_HERE" xml:space="preserve">
+    <value>提取到此处</value>
+  </data>
+  <data name="S_MENU_COMPRESS_TO" xml:space="preserve">
+    <value>压缩到</value>
+  </data>
+  <data name="S_ACTION_COMPRESS" xml:space="preserve">
+    <value>压缩</value>
+  </data>
+  <data name="S_ACTION_EXTRACT" xml:space="preserve">
+    <value>提取</value>
+  </data>
+  <data name="S_MENU_ARCHIVE" xml:space="preserve">
+    <value>压缩包</value>
+  </data>
 </root>
