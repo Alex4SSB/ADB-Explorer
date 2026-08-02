@@ -433,7 +433,7 @@ Konten yang terlihat mungkin tidak lengkap.</value>
     <value>Hentikan Pemantauan Berkala Saat Push/Pull</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>Operasi Simultan</value>
+    <value>Operasi Simultan Maksimum</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
     <value>Paksa Pindai Ulang Media Saat Push</value>
@@ -527,7 +527,7 @@ Konten yang terlihat mungkin tidak lengkap.</value>
     <value>Cari Pengaturan</value>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
-    <value>Keluar dari Pencarian</value>
+    <value>Tutup pencarian</value>
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>Tampilan Pencarian</value>
@@ -681,7 +681,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Tidak dapat mengambil daftar.</value>
   </data>
   <data name="S_EMPTY_FILTER" xml:space="preserve">
-    <value>Tidak ada item yang cocok dengan filter saat ini.</value>
+    <value>Tidak ada item yang sesuai dengan pencarian Anda.</value>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
     <value>&lt;Span&gt;Folder ini &lt;Italic&gt;terlihat&lt;/Italic&gt; kosong&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… bagi mata telanjang&lt;/Span&gt;&lt;/Span&gt;</value>
@@ -1537,5 +1537,214 @@ Bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
   </data>
   <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
     <value>Jumlah Angka Desimal Ukuran File</value>
+  </data>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Pembatasan drive:</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• Sistem berkas hanya-baca</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• Tautan simbolik tidak didukung
+• Nama berkas tidak boleh mengandung " * / : &lt; &gt; ? \ |
+• Nama berkas tidak membedakan huruf besar dan kecil
+• Pemasangan APK tidak didukung</value>
+  </data>
+  <data name="S_NEW_VERSION_READY" xml:space="preserve">
+    <value>{0} baru, versi {1}, telah diunduh dan siap dipasang.</value>
+  </data>
+  <data name="S_UPDATE_ON_CLOSE" xml:space="preserve">
+    <value>Perbarui saat ditutup</value>
+  </data>
+  <data name="S_UPDATE_APPLY_FAILED" xml:space="preserve">
+    <value>Pembaruan tidak dapat disiapkan. Pastikan penangan .7z tersedia (Windows Explorer, 7-Zip, NanaZip, dll.), atau unduh rilis secara manual dari GitHub.</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Kebijakan Privasi Diperbarui</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>Versi aplikasi ini dirilis setelah pembaruan kebijakan privasi.
+Tinjau perubahan di GitHub.</value>
+  </data>
+  <data name="S_NEW_ARCHIVE" xml:space="preserve">
+    <value>Arsip Baru</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
+    <value>Periksa dan beri tahu</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_UPDATE" xml:space="preserve">
+    <value>Perbarui dan pasang</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
+    <value>Lokasi Data Aplikasi</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
+    <value>Distribusi aplikasi ini menyimpan data di lokasi tervirtualisasi (dan sulit dijangkau), yang akan dihapus saat aplikasi dihapus instalasinya.
+
+Pilih Kustom untuk menggunakan lokasi yang tidak akan dihapus saat pencopotan pemasangan. Lokasi kustom tidak boleh berada di bawah C:\Users\…\AppData</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
+    <value>Gunakan Bawaan</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
+    <value>Pilih Folder Data Aplikasi</value>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Tampilkan Dialog Laporan Crash</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Pelaporan Crash</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>Setelah crash, Anda dapat secara opsional mengirim laporan diagnostik untuk membantu kami memperbaikinya. Laporan hanya dikirim saat Anda mengeklik Kirim Laporan dan biasanya mencakup pesan pengecualian, stack trace, versi aplikasi dan Windows, serta halaman yang sedang terbuka. Data diproses oleh Grafana Labs (Grafana Cloud). Lihat tautan Kebijakan Privasi di atas.</value>
+  </data>
+  <data name="S_MENU_STOP_LOADING" xml:space="preserve">
+    <value>Hentikan pemuatan {0}</value>
+  </data>
+  <data name="S_MENU_COPY_LINK" xml:space="preserve">
+    <value>Salin sebagai tautan</value>
+  </data>
+  <data name="S_MENU_COPY_CONTENTS" xml:space="preserve">
+    <value>Salin isi</value>
+  </data>
+  <data name="S_MENU_EXTRACT_HERE" xml:space="preserve">
+    <value>Ekstrak di sini</value>
+  </data>
+  <data name="S_MENU_COMPRESS_TO" xml:space="preserve">
+    <value>Kompres ke</value>
+  </data>
+  <data name="S_ACTION_COMPRESS" xml:space="preserve">
+    <value>Kompres</value>
+  </data>
+  <data name="S_ACTION_EXTRACT" xml:space="preserve">
+    <value>Ekstrak</value>
+  </data>
+  <data name="S_MENU_ARCHIVE" xml:space="preserve">
+    <value>Arsip</value>
+  </data>
+  <data name="S_REBOOT_SYSTEM" xml:space="preserve">
+    <value>Citra Sistem</value>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - Luring</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>Status: {0}</value>
+  </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Mematuhi aturan penamaan ruang pengguna</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Berkas yang dipilih melanggar aturan penamaan ruang pengguna</value>
+  </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Berkas yang disalin melanggar aturan penamaan ruang pengguna</value>
+  </data>
+  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
+    <value>Lokasi saat ini hanya-baca</value>
+  </data>
+  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
+    <value>Item yang dipilih tidak dapat dimodifikasi</value>
+  </data>
+  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
+    <value>Temukan Emulator Android</value>
+  </data>
+  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
+    <value>Luncurkan emulator ini</value>
+  </data>
+  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
+    <value>Peluncuran Emulator</value>
+  </data>
+  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
+    <value>Emulator Android SDK tidak ditemukan. Instal paket emulator Android SDK atau atur ANDROID_SDK_ROOT.</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX" xml:space="preserve">
+    <value>Sintaks</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX_AUTOMATIC" xml:space="preserve">
+    <value>Otomatis</value>
+  </data>
+  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
+    <value>Isi arsip dapat dimodifikasi</value>
+  </data>
+  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
+    <value>Isi arsip hanya-baca</value>
+  </data>
+  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
+    <value>Ukuran terkompresi</value>
+  </data>
+  <data name="S_PACKED_SIZE" xml:space="preserve">
+    <value>Ukuran terpaket</value>
+  </data>
+  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
+    <value>Rasio</value>
+  </data>
+  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
+    <value>Metode</value>
+  </data>
+  <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
+    <value>Matikan ADB Saat Aplikasi Ditutup</value>
+  </data>
+  <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
+    <value>Lokasi kustom tidak boleh berada di bawah C:\Users\…\AppData - pilih lokasi lain</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
+    <value>Izinkan ADB Dari Sumber Tidak Tepercaya</value>
+  </data>
+  <data name="S_OPEN_FOLDER" xml:space="preserve">
+    <value>Buka</value>
+  </data>
+  <data name="S_RESTART" xml:space="preserve">
+    <value>Mulai Ulang Sekarang</value>
+  </data>
+  <data name="S_UPDATE_MODIFIED_INFO" xml:space="preserve">
+    <value>Berupaya menyelaraskan tanggal modifikasi berdasarkan nama berkas.
+
+Berguna untuk foto yang menyertakan tanggal pengambilan dalam namanya dan tanggal modifikasinya telah ditimpa.</value>
+  </data>
+  <data name="S_PUSH_PACKAGES_INFO" xml:space="preserve">
+    <value>Memasang APK secara langsung dari Windows.</value>
+  </data>
+  <data name="S_DETAILS_PANE_INFO" xml:space="preserve">
+    <value>Mengatur panel samping ke mode detail.
+
+Detail dapat mencakup: thumbnail, informasi berkas tambahan, metadata, izin, dan opsi pemasangan drive.</value>
+  </data>
+  <data name="S_PREVIEW_PANE_INFO" xml:space="preserve">
+    <value>Mengatur panel samping ke mode pratinjau.
+
+Item yang didukung: thumbnail, PDF; berkas lain yang memenuhi batasan ukuran ditampilkan sebagai teks, dengan penyorotan sintaks opsional, serta dapat diedit dan disimpan jika lokasi mengizinkan.</value>
+  </data>
+  <data name="S_UPDATE_SIGNATURE_INVALID" xml:space="preserve">
+    <value>Pembaruan yang diunduh tidak ditandatangani dengan sertifikat yang sama seperti pemasangan ini. Pembaruan dibuang.</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO" xml:space="preserve">
+    <value>Menonaktifkan pemeriksaan jalur dan berkas eksekusi ADB.
+
+Pemeriksaan ini berupaya mencegah pengguna yang tidak menyadari risiko menjalankan berkas yang mungkin berbahaya dan menyamar sebagai ADB, serta mencakup:
+• Jalur tidak boleh berupa UNC jarak jauh atau tautan simbolik
+• Berkas eksekusi harus ditandatangani dengan Authenticode oleh Google atau cocok dengan daftar hash SHA-256 yang telah ditentukan
+• Harus mengembalikan string versi yang dapat dibaca saat dijalankan dengan --version</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS" xml:space="preserve">
+    <value>Opsi pencarian</value>
+  </data>
+  <data name="S_SEARCH_RESULTS_IN" xml:space="preserve">
+    <value>Hasil Pencarian di {0}</value>
+  </data>
+  <data name="S_SEARCH_ALL_SUBFOLDERS" xml:space="preserve">
+    <value>Semua subfolder</value>
+  </data>
+  <data name="S_SEARCH_CURRENT_FOLDER" xml:space="preserve">
+    <value>Folder saat ini</value>
+  </data>
+  <data name="S_SEARCH" xml:space="preserve">
+    <value>Cari</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS_INFO" xml:space="preserve">
+    <value>Opsi pencarian lanjutan dan pemfilteran.</value>
+  </data>
+  <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
+    <value>Keluar dari mode hasil pencarian.</value>
   </data>
 </root>
