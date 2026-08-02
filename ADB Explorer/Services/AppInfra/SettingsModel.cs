@@ -269,11 +269,15 @@ public static class UISettings
                                   ]),
                 new BoolSetting(() => Settings.DisableAdbRestrictions,
                                 Strings.Resources.S_SETTINGS_DISABLE_ADB_LIMITATIONS,
-                                visibleProp: AbstractSetting.ExtractPropertyInfo(() => Settings.IsCredentialVaultWritable),
                                 icon: new("\uE1DE"),
                                 commands: [
                                     SettingsActions.Find(a => a.Name is ActionType.ResetApp),
-                                ]) { CardAppearance = ControlAppearance.Danger, Info = Strings.Resources.S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO },
+                                ])
+                {
+                    CardAppearance = ControlAppearance.Danger,
+                    Info = Strings.Resources.S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO,
+                    EnableWhen = AbstractSetting.ExtractPropertyInfo(() => Settings.IsCredentialVaultWritable),
+                },
                 new TextboxSetting(() => Settings.DefaultFolder,
                                   Strings.Resources.S_SETTINGS_DEFAULT_FOLDER,
                                   commands: [
@@ -336,6 +340,7 @@ public abstract class AbstractSetting : SettingsBase
 {
     protected readonly PropertyInfo valueProp;
     protected readonly PropertyInfo visibleProp;
+    protected PropertyInfo? enabledProp;
 
     public string Description { get; private set; }
     public object? IconContent { get; set; }
@@ -346,6 +351,14 @@ public abstract class AbstractSetting : SettingsBase
     /// Optional WPF UI appearance accent for the settings card background and border.
     /// </summary>
     public ControlAppearance? CardAppearance { get; init; }
+
+    /// <summary>
+    /// When set, the settings card is enabled only while this boolean settings property is <see langword="true"/>.
+    /// </summary>
+    public PropertyInfo? EnableWhen
+    {
+        init => enabledProp = value;
+    }
 
     public Visibility Visibility
     {
@@ -372,6 +385,17 @@ public abstract class AbstractSetting : SettingsBase
         }
     }
 
+    public bool IsEnabled
+    {
+        get
+        {
+            if (enabledProp is null)
+                return true;
+
+            return enabledProp.GetValue(Settings) is true;
+        }
+    }
+
     protected AbstractSetting(PropertyInfo valueProp, string description, PropertyInfo visibleProp = null, BaseIcon? icon = null, params BaseAction[] commands)
     {
         this.visibleProp = visibleProp;
@@ -388,6 +412,11 @@ public abstract class AbstractSetting : SettingsBase
         if (e.PropertyName == visibleProp?.Name)
         {
             OnPropertyChanged(nameof(Visibility));
+        }
+
+        if (e.PropertyName == enabledProp?.Name)
+        {
+            OnPropertyChanged(nameof(IsEnabled));
         }
     }
 

@@ -103,9 +103,11 @@
                     </ToolTip>
                 </Setter.Value>
             </Setter>
+            <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
             <Setter Property="ToolTipService.InitialShowDelay" Value="0" />
             <Setter Property="ToolTipService.ShowDuration" Value="60000" />
             <Setter Property="ToolTipService.Placement" Value="Bottom" />
+            <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding CardAppearance}" Value="{x:Null}">
                     <Setter Property="Background" Value="{DynamicResource CardBackground}" />
@@ -114,6 +116,11 @@
                 <DataTrigger Binding="{Binding Info}" Value="{x:Null}">
                     <Setter Property="ToolTip" Value="{x:Null}" />
                 </DataTrigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="{DynamicResource CardBackgroundDisabled}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrushDisabled}" />
+                    <Setter Property="Foreground" Value="{DynamicResource CardForegroundDisabled}" />
+                </Trigger>
             </Style.Triggers>
         </Style>
         <Style
@@ -254,22 +261,48 @@
         <DataTemplate x:Key="BoolSettingTemplate" DataType="services:BoolSetting">
             <ui:CardControl Style="{StaticResource SettingsCardHeaderStyle}">
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <ItemsControl
-                        Margin="0,0,0,4"
-                        ItemTemplate="{StaticResource SettingsActionTemplate}"
-                        ItemsSource="{Binding Commands}"
-                        Style="{StaticResource RightHorizontalItemsControlStyle}" />
-                    <local:SimpleStackPanel
-                        Grid.Row="1"
-                        Orientation="Horizontal"
-                        Spacing="10">
-                        <TextBlock Text="{Binding Label}" />
-                        <ui:ToggleSwitch IsChecked="{Binding Value, Mode=TwoWay}" />
-                    </local:SimpleStackPanel>
+                    <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <ItemsControl
+                            Margin="0,0,0,4"
+                            ItemTemplate="{StaticResource SettingsActionTemplate}"
+                            ItemsSource="{Binding Commands}"
+                            Style="{StaticResource RightHorizontalItemsControlStyle}" />
+                        <local:SimpleStackPanel
+                            Grid.Row="1"
+                            Orientation="Horizontal"
+                            Spacing="10">
+                            <TextBlock Text="{Binding Label}" />
+                            <ui:ToggleSwitch IsChecked="{Binding Value, Mode=TwoWay}" />
+                        </local:SimpleStackPanel>
+                    </Grid>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Text="{x:Static strings:Resources.S_SETTINGS_UNAVAILABLE_ON_SYSTEM}"
+                        TextWrapping="Wrap">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </Grid>
             </ui:CardControl>
         </DataTemplate>
@@ -470,16 +503,12 @@
             <Setter Property="Visibility" Value="{Binding Visibility}" />
         </Style>
     </UserControl.Resources>
-    <Grid Margin="42,10">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition
-                Width="4*"
-                MinWidth="400"
-                MaxWidth="1000" />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        <Grid Grid.Column="1">
+    <Grid x:Name="RootGrid" Margin="42,10">
+        <Grid
+            MinWidth="600"
+            MaxWidth="1200"
+            HorizontalAlignment="Center"
+            Width="{Binding ActualWidth, ElementName=RootGrid}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition />

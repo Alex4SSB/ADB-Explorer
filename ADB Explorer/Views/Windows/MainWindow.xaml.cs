@@ -67,8 +67,8 @@ public partial class MainWindow : INavigationWindow
         if (Data.Settings.WindowMaximized)
             return;
 
-        Width = SystemParameters.PrimaryScreenWidth * LaunchScreenWidthScale;
-        Height = SystemParameters.PrimaryScreenHeight * LaunchScreenHeightScale;
+        Width = Math.Max(SystemParameters.PrimaryScreenWidth * LaunchScreenWidthScale, MinWidth);
+        Height = Math.Max(SystemParameters.PrimaryScreenHeight * LaunchScreenHeightScale, MinHeight);
     }
 
     private bool _adbStateHandlerAttached;

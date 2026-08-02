@@ -2104,6 +2104,10 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Allow ADB From Untrusted Sources</value>
     <comment>The setting that allows using ADB without integrity checks and without path restrictions</comment>
   </data>
+  <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
+    <value>Unavailable on this system.</value>
+    <comment>Shown in place of a setting control when the feature cannot be used on the current system (e.g. Credential Vault unavailable)</comment>
+  </data>
   <data name="S_SETTINGS_FILE_SIZE_MODE" xml:space="preserve">
     <value>File Size Display</value>
     <comment>The setting that controls in which unit are file sizes displayed (B/K/M/G)</comment>

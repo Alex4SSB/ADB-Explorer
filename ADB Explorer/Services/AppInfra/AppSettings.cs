@@ -232,7 +232,7 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
 
     /// <summary>
     /// Whether the Windows Credential Vault responds in time for this app. When false, vault-backed
-    /// settings are hidden because their value cannot be persisted. Learned from timed-out or failed
+    /// settings are disabled because their value cannot be persisted. Learned from timed-out or failed
     /// vault I/O and stored in settings.json (not itself vault-backed).
     /// </summary>
     [ObservableProperty]

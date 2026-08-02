@@ -3865,6 +3865,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unavailable on this system..
+        /// </summary>
+        public static string S_SETTINGS_UNAVAILABLE_ON_SYSTEM {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_UNAVAILABLE_ON_SYSTEM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Disables ADB path &amp; executable checks.
         ///
         ///The checks attempt to prevent an unsuspecting user from launching a possibly malicious file masquerading as ADB, and include:
