@@ -232,10 +232,10 @@
     <value>Запустить WSA в фоне</value>
   </data>
   <data name="S_PULL_ACTION" xml:space="preserve">
-    <value>Извлечь</value>
+    <value>Вытащить</value>
   </data>
   <data name="S_PULL_ACTION_LINK" xml:space="preserve">
-    <value>Извлечь (Целевую ссылку)</value>
+    <value>Вытащить (Целевую ссылку)</value>
   </data>
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Восстановить</value>
@@ -244,7 +244,7 @@
     <value>Ошибка списка каталогов</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
-    <value>Извлечь в корень диска Windows</value>
+    <value>Вытащить в корень диска Windows</value>
   </data>
   <data name="S_NEW_VERSION_MSG" xml:space="preserve">
     <value>Вас приветствует новая версия ADB Explorer!
@@ -449,7 +449,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Автооткрытие для просмотра</value>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
-    <value>Прекратить запрос при отправке/извлечении</value>
+    <value>Прекратить запрос при Отправке/Вытягивании</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
     <value>Максимальное количество одновременных операций</value>
@@ -1399,7 +1399,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Иконки</value>
   </data>
   <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
-    <value>Извлечь и отобразить миниатюры</value>
+    <value>Вытащить и отобразить миниатюры</value>
   </data>
   <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
     <value>Только в просмотре иконок</value>
@@ -1414,7 +1414,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Сохранение миниатюр между сеансами</value>
   </data>
   <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>Ограничить скорость извлечения миниатюр</value>
+    <value>Ограничить скорость вытаскивании миниатюр</value>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>Показывать Иконки для специальных папок</value>
@@ -1468,7 +1468,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Проверка обновлений миниатюр</value>
   </data>
   <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
-    <value>Извлечение миниатюр</value>
+    <value>Вытаскивание миниатюр</value>
   </data>
   <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
     <value>Чтение местоположений миниатюр и базы данных мультимедиа</value>
@@ -1522,7 +1522,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Максимальный размер файла для предпросмотра</value>
   </data>
   <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
-    <value>Перетащите файл в папку по умолчанию, дважды щелкнув по нему</value>
+    <value>Вытащить файл в папку по умолчанию, дважды щелкнув по нему</value>
   </data>
   <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
     <value>Выберите один элемент, чтобы получить дополнительную информацию.</value>
@@ -1723,5 +1723,26 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_MENU_COPY_LINK" xml:space="preserve">
     <value>Скопировать как ссылку</value>
+  </data>
+  <data name="S_NEW_ARCHIVE" xml:space="preserve">
+    <value>Новый Архив</value>
+  </data>
+  <data name="S_MENU_COPY_CONTENTS" xml:space="preserve">
+    <value>Копировать содержимое</value>
+  </data>
+  <data name="S_MENU_EXTRACT_HERE" xml:space="preserve">
+    <value>Извлечь здесь</value>
+  </data>
+  <data name="S_MENU_COMPRESS_TO" xml:space="preserve">
+    <value>Сжать в</value>
+  </data>
+  <data name="S_ACTION_COMPRESS" xml:space="preserve">
+    <value>Сжать</value>
+  </data>
+  <data name="S_ACTION_EXTRACT" xml:space="preserve">
+    <value>Извлечь</value>
+  </data>
+  <data name="S_MENU_ARCHIVE" xml:space="preserve">
+    <value>Архив</value>
   </data>
 </root>
