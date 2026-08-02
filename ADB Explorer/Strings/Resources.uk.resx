@@ -232,7 +232,7 @@
     <value>Запустити WSA у фоні</value>
   </data>
   <data name="S_PULL_ACTION" xml:space="preserve">
-    <value>Витягти</value>
+    <value>Витягнути</value>
   </data>
   <data name="S_PULL_ACTION_LINK" xml:space="preserve">
     <value>Витягти (Цільове посилання)</value>
@@ -1723,5 +1723,26 @@ ADB доступний як частина Android SDK Platform Tools.
   </data>
   <data name="S_MENU_COPY_LINK" xml:space="preserve">
     <value>Копіювати як посилання</value>
+  </data>
+  <data name="S_NEW_ARCHIVE" xml:space="preserve">
+    <value>Новий Архів</value>
+  </data>
+  <data name="S_MENU_COPY_CONTENTS" xml:space="preserve">
+    <value>Копіювати вміст</value>
+  </data>
+  <data name="S_MENU_EXTRACT_HERE" xml:space="preserve">
+    <value>Витягти тут</value>
+  </data>
+  <data name="S_MENU_COMPRESS_TO" xml:space="preserve">
+    <value>Стиснути в</value>
+  </data>
+  <data name="S_ACTION_COMPRESS" xml:space="preserve">
+    <value>Стиснути</value>
+  </data>
+  <data name="S_ACTION_EXTRACT" xml:space="preserve">
+    <value>Витягти</value>
+  </data>
+  <data name="S_MENU_ARCHIVE" xml:space="preserve">
+    <value>Архів</value>
   </data>
 </root>
