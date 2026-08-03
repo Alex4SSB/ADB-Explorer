@@ -51,26 +51,34 @@ public class FileDescriptor
 
     public FileDescriptor(ShellItem shellItem)
     {
-        // Remote file
-        if (shellItem.ParsingName.Contains("//uuid:"))
+        try
         {
-            SourcePath = shellItem.ParsingName;
+            // Remote file
+            if (shellItem.ParsingName?.Contains("//uuid:") is true)
+            {
+                SourcePath = shellItem.ParsingName;
 
-            try
-            {
-                shellItem.Properties.TryGetValue<string>(Vanara.PInvoke.Ole32.PROPERTYKEY.System.FileName, out var name);
-                Name = name;
+                try
+                {
+                    shellItem.Properties.TryGetValue<string>(Vanara.PInvoke.Ole32.PROPERTYKEY.System.FileName, out var name);
+                    Name = name;
+                }
+                catch
+                {
+                    Name = shellItem.GetDisplayName(ShellItemDisplayString.ParentRelativeParsing);
+                }
             }
-            catch
-            {
-                Name = shellItem.GetDisplayName(ShellItemDisplayString.ParentRelativeParsing);
-            }
+            else
+                Name = shellItem.ParsingName;
+
+            Name ??= "";
+            Length = shellItem.IsFolder ? null : shellItem.PIDL?.Size;
+            IsDirectory = shellItem.IsFolder;
         }
-        else
-            Name = shellItem.ParsingName;
-
-        Length = shellItem.IsFolder ? null : shellItem.PIDL.Size;
-        IsDirectory = shellItem.IsFolder;
+        catch
+        {
+            Name ??= shellItem?.ParsingName ?? "";
+        }
     }
 
     public static FileDescriptor[] GetDescriptors(IDataObject dataObject)

@@ -155,7 +155,7 @@
             <Grid Margin="0,2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="30" />
+                    <ColumnDefinition Width="40" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <ContentControl Content="{Binding StatusInfo}" ContentTemplateSelector="{StaticResource CompactFileOpProgressTemplateSelector}" />

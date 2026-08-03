@@ -271,7 +271,8 @@ public partial class App
         // Stop mouse interception which causes partial mouse freeze during crashes
         NativeMethods.InterceptMouse.Close();
 
-        if (e.Exception is COMException comException && comException.ErrorCode is (int)NativeMethods.HResult.CLIPBRD_E_CANT_OPEN)
+        if (e.Exception.HResult is (int)NativeMethods.HResult.CLIPBRD_E_CANT_OPEN
+            or (int)NativeMethods.HResult.E_ACCESSDENIED)
             e.Handled = true;
 
         // If application shutdown has started, do not throw exceptions

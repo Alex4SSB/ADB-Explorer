@@ -451,7 +451,7 @@ public static class FileHelper
                 $"""\( -type d -printf '%p{ADB_FIELD_SEP}d{ADB_FIELD_SEP}d{ADB_FIELD_SEP}\n' \)""",
                 "-o",
                 $"""\( -type f -printf '%p{ADB_FIELD_SEP}%s{ADB_FIELD_SEP}{(Data.Settings.KeepDateModified ? "%T@" : "d")}{ADB_FIELD_SEP}\n' \)""",
-                "2>&1"
+                "2>/dev/null"
             ];
 
             ADBService.ExecuteDeviceAdbShellCommand(deviceId, "find", out stdout, out _, cancellationToken, args);
@@ -517,8 +517,22 @@ public static class FileHelper
         if (parts.Length < 3)
             return null;
 
-        long? size = parts[1] == "d" ? null : long.Parse(parts[1], CultureInfo.InvariantCulture);
-        double? date = parts[2] == "d" ? null : double.Parse(parts[2], CultureInfo.InvariantCulture);
+        long? size = null;
+        if (parts[1] != "d")
+        {
+            if (!long.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedSize))
+                return null;
+            size = parsedSize;
+        }
+
+        double? date = null;
+        if (parts[2] != "d")
+        {
+            if (!double.TryParse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture, out var parsedDate))
+                return null;
+            date = parsedDate;
+        }
+
         return new FolderTree(parts[0], size, date);
     }
 

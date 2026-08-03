@@ -61,6 +61,9 @@ public static partial class NativeMethods
         /// <summary>The requested resources is read-only.</summary>
         AccessDenied = -2147287035, // 0x80030005
 
+        /// <summary>E_ACCESSDENIED — general access denied (e.g. clipboard ShellItem enumeration)</summary>
+        E_ACCESSDENIED = -2147024891, // 0x80070005
+
         /// <summary>VS specific error HRESULT for "Unsupported format".</summary>
         OLE_E_ADVISENOTSUPPORTED = -2147221501, // 0x80040003
 

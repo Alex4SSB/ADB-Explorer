@@ -314,6 +314,9 @@ public partial class NavigationBox : UserControl
             ? pairs.OrderBy(kv => kv.Key.Length).Last()
             : pairs.FirstOrDefault();
 
+        if (string.IsNullOrEmpty(drive.Key))
+            yield break;
+
         yield return new(drive.Key);
 
         if (current.Length == 0)
@@ -380,7 +383,10 @@ public partial class NavigationBox : UserControl
         locations = SeparatePath(path).ToList();
         breadcrumbs = [.. locations.Select(item => item.NameSubMenu)];
 
-        if (Data.DevicesObject.Current.Root is RootStatus.Enabled)
+        if (breadcrumbs.Count == 0)
+            return;
+
+        if (Data.DevicesObject?.Current?.Root is RootStatus.Enabled)
             breadcrumbs[0].Appearance = Wpf.Ui.Controls.ControlAppearance.Caution;
 
         breadcrumbs[^1].IsLast = true;
