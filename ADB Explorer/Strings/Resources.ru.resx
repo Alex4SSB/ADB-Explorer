@@ -1745,4 +1745,7 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_MENU_ARCHIVE" xml:space="preserve">
     <value>Архив</value>
   </data>
+  <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
+    <value>Недоступно в этой системе.</value>
+  </data>
 </root>
