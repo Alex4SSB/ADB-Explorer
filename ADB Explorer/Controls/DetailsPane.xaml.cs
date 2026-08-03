@@ -3,6 +3,7 @@ using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
+using ADB_Explorer.ViewModels.Pages;
 using ICSharpCode.AvalonEdit.Highlighting;
 using System.Windows.Media.Animation;
 using Windows.Data.Pdf;
@@ -680,8 +681,12 @@ public partial class DetailsPane : UserControl
                 EditorText = null;
                 EditorText = text;
 
+                var byteCount = Encoding.UTF8.GetByteCount(text);
                 file.ModifiedTime = DateTime.Now;
-                file.Size = Encoding.UTF8.GetByteCount(EditorText);
+                file.ShellLsSize = byteCount;
+                file.Size = byteCount;
+
+                App.Services.GetService<ExplorerViewModel>()?.NotifySelectedFilesTotalSize();
             }
         });
 
@@ -954,13 +959,13 @@ public partial class DetailsPane : UserControl
             if (file.ShellLsSize is >= 0 || file.Size.HasValue)
             {
                 SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(
-                    file, Strings.Resources.S_COLUMN_SIZE, f => f.FolderViewModel.SizeString, valueIsLtr: true));
+                    file, Strings.Resources.S_COLUMN_SIZE, f => f.FolderViewModel.SizeString, valueIsLtr: true).Init());
             }
         }
         else
         {
             if (file.Type is AbstractFile.FileType.File && file.Size.HasValue)
-                SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COLUMN_SIZE, f => f.FolderViewModel.SizeString));
+                SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COLUMN_SIZE, f => f.FolderViewModel.SizeString).Init());
 
             if (file.CompressedSize is long compressedSize)
                 SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COMPRESSED_SIZE, _ => compressedSize.BytesToSize(true), valueIsLtr: true));

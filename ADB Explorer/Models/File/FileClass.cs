@@ -25,6 +25,12 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         _iconViewModel?.OnSizeChanged();
     }
 
+    protected override void OnShellLsSizeChanged(long? value)
+    {
+        _folderViewModel?.OnSizeChanged();
+        _iconViewModel?.OnSizeChanged();
+    }
+
     [ObservableProperty]
     public partial UnixFileMode? Permissions { get; set; }
 
@@ -530,6 +536,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             LastAccessTime = info.Value.AccessTime;
             CreationTime = info.Value.CreationTime;
             ModifiedTimeWithOffset = info.Value.ModifiedTime;
+            Permissions = info.Value.Permissions;
 
             if (info.Value.Size is long size && size >= 0)
             {

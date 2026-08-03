@@ -1012,14 +1012,14 @@ public partial class ADBService
 
             return await Task.Run<FileExtraInfo?>(() =>
             {
-                // Get user, group, access time, creation time and modification time using human-readable format to preserve UTC offset
+                // Size, user, group, mode, access/creation/modified (human-readable for UTC offset)
                 var res = ExecuteDeviceAdbShellCommand(deviceId,
                                                        "stat",
                                                        out string stdout,
                                                        out _,
                                                        cancellationToken,
                                                        "-c",
-                                                       $"%s{ADB_FIELD_SEP}%U{ADB_FIELD_SEP}%G{ADB_FIELD_SEP}%x{ADB_FIELD_SEP}%z{ADB_FIELD_SEP}%y",
+                                                       $"%s{ADB_FIELD_SEP}%U{ADB_FIELD_SEP}%G{ADB_FIELD_SEP}%a{ADB_FIELD_SEP}%x{ADB_FIELD_SEP}%z{ADB_FIELD_SEP}%y",
                                                        EscapeAdbShellString(path));
 
                 if (res != 0 || string.IsNullOrWhiteSpace(stdout))
@@ -1029,12 +1029,15 @@ public partial class ADBService
                 {
                     var parts = stdout.Split(ADB_FIELD_SEP);
                     long? size = long.TryParse(parts[0].Trim(), out long bytes) ? bytes : null;
+                    var permissions = (System.IO.UnixFileMode)Convert.ToInt32(parts[3].Trim(), 8);
+
                     return new FileExtraInfo(
                         parts[1],
                         parts[2],
-                        DateTimeOffset.Parse(parts[3].Trim(), CultureInfo.InvariantCulture),
+                        permissions,
                         DateTimeOffset.Parse(parts[4].Trim(), CultureInfo.InvariantCulture),
                         DateTimeOffset.Parse(parts[5].Trim(), CultureInfo.InvariantCulture),
+                        DateTimeOffset.Parse(parts[6].Trim(), CultureInfo.InvariantCulture),
                         size);
                 }
                 catch
@@ -1641,6 +1644,7 @@ public readonly record struct DriveSnapshot(
 
 public record struct FileExtraInfo(string User,
                                    string Group,
+                                   System.IO.UnixFileMode? Permissions,
                                    DateTimeOffset AccessTime,
                                    DateTimeOffset CreationTime,
                                    DateTimeOffset ModifiedTime,

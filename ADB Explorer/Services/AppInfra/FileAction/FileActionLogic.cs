@@ -241,6 +241,7 @@ internal static class FileActionLogic
                 file.IsTemp = false;
                 file.ModifiedTime = DateTime.Now;
                 file.Size = 0;
+                file.IsCreationTimeResolved = false;
                 file.UpdateType();
 
                 RefreshNewItemInList(file);
@@ -282,6 +283,9 @@ internal static class FileActionLogic
         file.ModifiedTime = DateTime.Now;
         if (file.Type is FileType.File)
             file.Size = 0;
+
+        // Temp rename may have marked this resolved before the path existed on device.
+        file.IsCreationTimeResolved = false;
 
         RefreshNewItemInList(file);
         Data.ItemToSelect.Value = file;
