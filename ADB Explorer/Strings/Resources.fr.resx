@@ -118,10 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>L'icone(s) robot d'Android</value>
+    <value>L'/Les icône(s) du robot d'Android</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
-    <value>Le robot Android est reproduit ou modifié à partir d'une ressource créée et partagée par Google qui est utilisée selon les conditions décrites dans la licence d'attribution Creative Commons 3.0.</value>
+    <value>Le robot Android est reproduit ou modifié à partir d'une ressource créée et partagée par Google et utilisé selon les conditions décrites dans la licence d'attribution Creative Commons 3.0.</value>
   </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>L'icône de l'APK est sous licence Apache version 2.0.</value>
@@ -196,7 +196,7 @@
     <value>Sélectionner les paquets à installer</value>
   </data>
   <data name="S_REM_EMU" xml:space="preserve">
-    <value>Tuer l'émulateur</value>
+    <value>Stopper l'émulateur</value>
   </data>
   <data name="S_REM_HIST_DEV" xml:space="preserve">
     <value>Supprimer l'appareil</value>
@@ -205,7 +205,7 @@
     <value>Déconnecter l'appareil</value>
   </data>
   <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
-    <value>Opérations de fichier</value>
+    <value>Opérations sur le fichier</value>
   </data>
   <data name="S_PUSH_PKG" xml:space="preserve">
     <value>Installer des paquets</value>
@@ -445,7 +445,7 @@ Le contenu visible peut être incomplet.</value>
     <value>Arrêt du rafraichissage de la batterie en push/pull</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>Opérations simultanées</value>
+    <value>Maximum d'opérations en simultané</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
     <value>Forcage du re-scan des média sur un Push</value>
@@ -520,7 +520,7 @@ Le contenu visible peut être incomplet.</value>
     <value>Dossier données d’app</value>
   </data>
   <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
-    <value>Custom</value>
+    <value>Personnalisé</value>
     <comment>Button to pick a non-virtualized custom app data folder</comment>
   </data>
   <data name="S_GITHUB_REPO" xml:space="preserve">
@@ -548,7 +548,7 @@ Le contenu visible peut être incomplet.</value>
     <value>Paramètres recherche</value>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
-    <value>Quitter recherche</value>
+    <value>Quitter la recherche</value>
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>Vue recherche</value>
@@ -702,7 +702,7 @@ Annuler tout en cours</value>
     <value>Impossible d’obtenir la liste.</value>
   </data>
   <data name="S_EMPTY_FILTER" xml:space="preserve">
-    <value>Aucun élément ne correspond au filtre actuel.</value>
+    <value>Aucun élément ne correspond à cette recherche.</value>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
     <value>&lt;Span&gt;Ce dossier &lt;Italic&gt;semble&lt;/Italic&gt; vide&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… à l'oeil nu&lt;/Span&gt;&lt;/Span&gt;</value>
@@ -1565,7 +1565,7 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
     <value>Taille décompressé</value>
   </data>
   <data name="S_COMPRESSION_RATIO" xml:space="preserve">
-    <value>Ratio</value>
+    <value>Rapport</value>
   </data>
   <data name="S_COMPRESSION_METHOD" xml:space="preserve">
     <value>Méthode</value>
@@ -1664,5 +1664,89 @@ Les vérifications tentent d’empêcher un utilisateur non méfiant de lancer u
 • Le chemin ne doit pas être un UNC distant ni un lien symbolique
 • L’exécutable doit être signé par Authenticode de Google ou correspondre à la liste de hachage prédéfinie SHA-256
 • Doit renvoyer une chaîne de version lisible lorsqu’elle est exécutée avec --version</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Politique de confidentialité mise à jour</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>Cette version de l'application a été diffusée après une mise à jour de la politique de confidentialité
+Consultez les changements sur GitHub.</value>
+  </data>
+  <data name="S_NEW_ARCHIVE" xml:space="preserve">
+    <value>Nouvelle archive</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
+    <value>Emplacement des données de l'application</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
+    <value>Cette application enregistre les données dans un emplacement virtualisé (et difficile d'accès), qui est supprimé lors de la désinstallation de l'application.
+
+Séléctionnez Personnalisé pour utiliser un emplacement qui ne sera pas supprimé lors de la désinstallation. L'emplacement personnalisé ne peut se trouver dans C:\Users\…\AppData</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
+    <value>Emplacement par défaut</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
+    <value>Choisir l'emplacement des données de l'application</value>
+  </data>
+  <data name="S_MENU_STOP_LOADING" xml:space="preserve">
+    <value>Arrêter le chargement de {0}</value>
+  </data>
+  <data name="S_MENU_COPY_LINK" xml:space="preserve">
+    <value>Copier en tant que lien</value>
+  </data>
+  <data name="S_MENU_COPY_CONTENTS" xml:space="preserve">
+    <value>Copier le contenu</value>
+  </data>
+  <data name="S_MENU_EXTRACT_HERE" xml:space="preserve">
+    <value>Extraire ici</value>
+  </data>
+  <data name="S_MENU_COMPRESS_TO" xml:space="preserve">
+    <value>Compresser vers</value>
+  </data>
+  <data name="S_ACTION_COMPRESS" xml:space="preserve">
+    <value>Compresser</value>
+  </data>
+  <data name="S_ACTION_EXTRACT" xml:space="preserve">
+    <value>Extraire</value>
+  </data>
+  <data name="S_MENU_ARCHIVE" xml:space="preserve">
+    <value>Archiver</value>
+  </data>
+  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
+    <value>Stopper ADB quand l'application se ferme</value>
+  </data>
+  <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
+    <value>L'emplacement personnalisé ne peut pas être dans C:\Users\…\AppData - merci de sélectionner un autre emplacement</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
+    <value>Autoriser ADB depuis des sources non vérifiées</value>
+  </data>
+  <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
+    <value>Indisponible sur ce système.</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS" xml:space="preserve">
+    <value>Options de recherche</value>
+  </data>
+  <data name="S_SEARCH_RESULTS_IN" xml:space="preserve">
+    <value>Résultats de la recherche dans {}</value>
+  </data>
+  <data name="S_SEARCH_ALL_SUBFOLDERS" xml:space="preserve">
+    <value>Tous les sous-dossiers</value>
+  </data>
+  <data name="S_SEARCH_CURRENT_FOLDER" xml:space="preserve">
+    <value>Dossier actuel</value>
+  </data>
+  <data name="S_SEARCH" xml:space="preserve">
+    <value>Rechercher</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS_INFO" xml:space="preserve">
+    <value>Options de recherche avancée et filtrage.</value>
+  </data>
+  <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
+    <value>Quitter le mode résultats de recherche.</value>
   </data>
 </root>
