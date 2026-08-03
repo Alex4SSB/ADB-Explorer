@@ -1745,4 +1745,7 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MENU_ARCHIVE" xml:space="preserve">
     <value>压缩包</value>
   </data>
+  <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
+    <value>此系统上不可用。</value>
+  </data>
 </root>
