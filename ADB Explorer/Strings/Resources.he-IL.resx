@@ -1745,4 +1745,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
     <value>צא ממצב תוצאות חיפוש.</value>
   </data>
+  <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
+    <value>לא זמין במערכת זו.</value>
+  </data>
 </root>
