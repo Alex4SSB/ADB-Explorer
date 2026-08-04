@@ -61,10 +61,10 @@ public partial class SearchOptionsControl : UserControl
         CommandManager.InvalidateRequerySuggested();
     }
 
-    static Dictionary<SearchBox.SearchBoxMode, FluentPathIcon> SearchBoxModeIcons => new()
+    static Dictionary<SearchBox.SearchBoxMode, UIElement> SearchBoxModeIcons => new()
     {
-        { SearchBox.SearchBoxMode.CurrentFolder, new FluentPathIcon() { Data = FluentPathGeometries.FolderSearch, Width = 16, Height = 16 } },
-        { SearchBox.SearchBoxMode.AllSubfolders, new FluentPathIcon() { Data = FluentPathGeometries.FolderMultiple, Width = 16, Height = 16 } },
+        { SearchBox.SearchBoxMode.CurrentFolder, new FolderSearchIcon() },
+        { SearchBox.SearchBoxMode.AllSubfolders, new FolderMultipleIcon() },
     };
 
     public abstract partial class SearchOptionsBaseItem : ObservableObject

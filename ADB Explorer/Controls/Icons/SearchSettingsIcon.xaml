@@ -1,0 +1,43 @@
+<controls:ScaledPathIcon
+    x:Class="ADB_Explorer.Controls.SearchSettingsIcon"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:ADB_Explorer.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Name="Icon"
+    ArtboardSize="20"
+    mc:Ignorable="d">
+    <Viewbox
+        Width="{Binding Size}"
+        Height="{Binding Size}"
+        DataContext="{Binding ElementName=Icon}"
+        Stretch="Uniform">
+        <Grid
+            Width="{Binding ArtboardSize}"
+            Height="{Binding ArtboardSize}"
+            Margin="-2">
+            <!--  Search glass (monochrome)  -->
+            <Path
+                d:Fill="White"
+                Data="M9.5 3C13.0899 3 16 5.91015 16 9.5C16 11.115 15.4114 12.5927 14.4365 13.7295L17.8535 17.1465C18.0487 17.3417 18.0487 17.6583 17.8535 17.8535C17.68 18.0271 17.4107 18.0461 17.2158 17.9111L17.1465 17.8535L13.7295 14.4365C12.9181 15.1324 11.9324 15.6296 10.8477 15.8584C10.93 15.5146 10.9798 15.1585 10.9941 14.793C11.747 14.5809 12.4348 14.214 13.0195 13.7266C13.276 13.5128 13.5128 13.276 13.7266 13.0195C14.5216 12.0658 15 10.8388 15 9.5C15 6.46243 12.5376 4 9.5 4C6.53636 4 4.12073 6.34406 4.00488 9.2793C3.65582 9.37768 3.3211 9.51002 3.00391 9.67188C3.00242 9.61475 3 9.55748 3 9.5C3 5.91015 5.91015 3 9.5 3Z"
+                Stretch="None"
+                Style="{StaticResource MonochromeIconPathStyle}" />
+            <!--  Settings gear (accent when enabled)  -->
+            <Path
+                d:Fill="#4CC2FF"
+                Data="M4.06934 10.8193C4.85827 11.6564 6.18968 11.6566 6.97949 10.8203L7.30371 10.4766C7.6015 10.6171 7.88145 10.7918 8.13867 10.9951L8.0127 11.417C7.68336 12.5191 8.34933 13.6709 9.46875 13.9355L9.81738 14.0186C9.83897 14.2003 9.85059 14.3855 9.85059 14.5732C9.85058 14.7292 9.84309 14.8833 9.82812 15.0352L9.36719 15.1523C8.27924 15.4303 7.63323 16.5497 7.93652 17.6309L8.09277 18.1875C7.8387 18.3828 7.56293 18.5496 7.27051 18.6846L6.93359 18.3271C6.14479 17.4902 4.81428 17.4893 4.02441 18.3252L3.69922 18.6699C3.40149 18.5294 3.12144 18.3546 2.86426 18.1514L2.99023 17.7285C3.31937 16.6265 2.65352 15.4746 1.53418 15.21L1.18457 15.127C1.16305 14.9455 1.15235 14.7607 1.15234 14.5732C1.15234 14.4173 1.15985 14.2631 1.1748 14.1113L1.63574 13.9932C2.72358 13.7153 3.36948 12.5967 3.06641 11.5156L2.91016 10.958C3.16424 10.7627 3.43999 10.5958 3.73242 10.4609L4.06934 10.8193ZM5.50098 13.5732C4.94887 13.5735 4.50098 14.0211 4.50098 14.5732C4.50105 15.1253 4.94892 15.573 5.50098 15.5732C6.05321 15.5732 6.5009 15.1255 6.50098 14.5732C6.50098 14.021 6.05326 13.5732 5.50098 13.5732Z"
+                Stretch="None">
+                <Path.Style>
+                    <Style BasedOn="{StaticResource MonochromeIconPathStyle}" TargetType="Path">
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="True">
+                                <Setter Property="Fill" Value="{DynamicResource AccentButtonBackground}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Path.Style>
+            </Path>
+        </Grid>
+    </Viewbox>
+</controls:ScaledPathIcon>
