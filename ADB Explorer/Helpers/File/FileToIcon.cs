@@ -42,6 +42,7 @@ public class FileToIconConverter
     private static readonly SpecialIcon DocumentsFolderIcon = new(Imageres, 107);
     private static readonly SpecialIcon PicturesFolderIcon = new(Imageres, 108);
     private static readonly SpecialIcon MultipleFilesIcon = new(Imageres, 142);
+    private static readonly SpecialIcon ArchiveIcon = new(Imageres, 165);
     private static readonly SpecialIcon DownloadsFolderIcon = new(Imageres, 175);
     private static readonly SpecialIcon VideosFolderIcon = new(Imageres, 178);
     private static readonly SpecialIcon EnterFolderIcon = new(Imageres, 265);
@@ -171,8 +172,30 @@ public class FileToIconConverter
         }
     }
 
+    private static bool IsSupportedArchive(string? fileName, AbstractFile.SpecialFileType specialType)
+    {
+        // APKs keep their dedicated icon even when treated as zip-family archives.
+        if (specialType.HasFlag(AbstractFile.SpecialFileType.Apk))
+            return false;
+
+        if (specialType.HasFlag(AbstractFile.SpecialFileType.Archive))
+            return true;
+
+        if (string.IsNullOrEmpty(fileName) || !specialType.HasFlag(AbstractFile.SpecialFileType.Regular))
+            return false;
+
+        // Composite names like .tar.gz often use Path.GetExtension (.gz) for ARCHIVE_NAMES,
+        // while FileHelper.GetExtension returns .tar.gz (not listed).
+        var associationName = ArchiveHelper.GetShellAssociationName(fileName);
+        var ext = Path.GetExtension(associationName).ToUpperInvariant();
+        return ext.Length > 0 && AdbExplorerConst.ARCHIVE_NAMES.Contains(ext);
+    }
+
     private static string ComputeIconId(string fileName, AbstractFile.SpecialFileType specialType)
     {
+        if (IsSupportedArchive(fileName, specialType))
+            return $"{ArchiveIcon.DllPath}_{ArchiveIcon.Index}";
+
         if (specialType.HasFlag(AbstractFile.SpecialFileType.Regular))
             return Path.GetExtension(ArchiveHelper.GetShellAssociationName(fileName)).ToLower();
 
@@ -319,6 +342,9 @@ public class FileToIconConverter
 
     private static SpecialIcon SpecialTypeIndex(AbstractFile.SpecialFileType specialType, string? fileName = null)
     {
+        if (IsSupportedArchive(fileName, specialType))
+            return ArchiveIcon;
+
         if (specialType is AbstractFile.SpecialFileType.Folder)
         {
             if (Data.Settings.SpecialFolderIcons

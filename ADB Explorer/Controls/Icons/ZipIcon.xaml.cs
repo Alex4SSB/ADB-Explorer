@@ -1,7 +1,7 @@
 namespace ADB_Explorer.Controls;
 
 /// <summary>
-/// ic_fluent_zip_20_regular — zip bag and ziplock as separate paths for independent coloring.
+/// ic_fluent_folder_zip_20_regular — bag monochrome; pull (clipped) and ziplock accented.
 /// </summary>
 public partial class ZipIcon : ScaledPathIcon
 {

@@ -27,8 +27,8 @@
             ToolTip="{Binding Source={x:Static Member=strings:Resources.S_DETAILS_PANE_TOOLTIP}}">
             <local:AdbMenuItem.Header>
                 <local:SimpleStackPanel Orientation="Horizontal" Spacing="6">
-                    <local:DetailsAndPreviewIcon Margin="0,-1,0,0" Mode="{Binding Mode}" />
-                    <TextBlock Margin="0,2,0,0">
+                    <local:DetailsAndPreviewIcon Mode="{Binding Mode}" />
+                    <TextBlock Margin="0,3,0,0">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_THUMBSIZE_DETAILS}}" />
