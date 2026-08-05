@@ -503,7 +503,7 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Вимкнути апаратне прискорення</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
-    <value>Перевіряти наявність оновлень</value>
+    <value>Перевірити наявність оновлень</value>
   </data>
   <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
     <value>Зовнішній вигляд</value>
@@ -1390,7 +1390,7 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Увім.</value>
   </data>
   <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
-    <value>Вимк.</value>
+    <value>Вимкнено</value>
   </data>
   <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
     <value>Перевірка стану сервера mDNS…</value>
@@ -1681,7 +1681,7 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Оновлення не вдалось підготувати. Переконайтеся, що обробник .7z доступний (Провідник Windows, 7-Zip, NanaZip, і т.д.), або завантажте випуск вручну з GitHub.</value>
   </data>
   <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
-    <value>Перевірте та повідомте</value>
+    <value>Перевірити та повідомити</value>
   </data>
   <data name="S_SETTINGS_UPDATES_UPDATE" xml:space="preserve">
     <value>Оновити та встановити</value>
