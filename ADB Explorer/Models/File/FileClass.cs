@@ -538,7 +538,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             ModifiedTimeWithOffset = info.Value.ModifiedTime;
             Permissions = info.Value.Permissions;
 
-            if (info.Value.Size is long size && size >= 0)
+            if (!IsDirectory && info.Value.Size is long size && size >= 0)
             {
                 ShellLsSize = size;
                 Size ??= size;
@@ -679,6 +679,9 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         }
 
         var file = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, relativeName, '\\');
+
+        if (Directory.Exists(file))
+            return null;
 
         // Try 10 times to read from the file and write to the stream,
         // in case the file is still in use by ADB or hasn't appeared yet
