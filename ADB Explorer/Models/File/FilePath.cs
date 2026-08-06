@@ -186,15 +186,27 @@ public class FilePath : AbstractFile, IBaseFile
 
     public FilePath(ShellItem windowsPath)
     {
+        ArgumentNullException.ThrowIfNull(windowsPath);
+
         ShellItem = windowsPath;
         PathType = FilePathType.Windows;
 
-        FullPath = windowsPath.ParsingName;
-        FullName = windowsPath.GetDisplayName(ShellItemDisplayString.ParentRelativeParsing);
+        try
+        {
+            FullPath = windowsPath.ParsingName;
+            FullName = windowsPath.GetDisplayName(ShellItemDisplayString.ParentRelativeParsing)
+                ?? FileHelper.GetFullName(FullPath);
 
-        SpecialType = windowsPath.IsNonArchiveFolder()
-            ? SpecialFileType.Folder
-            : SpecialFileType.Regular;
+            SpecialType = windowsPath.IsNonArchiveFolder()
+                ? SpecialFileType.Folder
+                : SpecialFileType.Regular;
+        }
+        catch
+        {
+            FullPath ??= windowsPath.ParsingName ?? "";
+            FullName ??= FileHelper.GetFullName(FullPath);
+            SpecialType = SpecialFileType.Regular;
+        }
     }
 
     public FilePath(string androidPath,

@@ -68,21 +68,31 @@ public class SyncFile : FilePath
     {
         foreach (var child in rootFolder)
         {
-            if (child.IsNonArchiveFolder())
+            SyncFile syncFile;
+            try
             {
-                yield return new(child)
+                if (child.IsNonArchiveFolder())
                 {
-                    Children = [.. GetFolderTree((ShellFolder)child)],
-                    ProgressUpdates = [new AdbSyncProgressInfo(child.ParsingName, null, null, null)]
-                };
+                    syncFile = new(child)
+                    {
+                        Children = [.. GetFolderTree((ShellFolder)child)],
+                        ProgressUpdates = [new AdbSyncProgressInfo(child.ParsingName, null, null, null)]
+                    };
+                }
+                else
+                {
+                    syncFile = new(child)
+                    {
+                        ProgressUpdates = [new AdbSyncProgressInfo(child.ParsingName, null, null, null)]
+                    };
+                }
             }
-            else
+            catch
             {
-                yield return new(child)
-                {
-                    ProgressUpdates = [new AdbSyncProgressInfo(child.ParsingName, null, null, null)]
-                };
+                continue;
             }
+
+            yield return syncFile;
         }
     }
 

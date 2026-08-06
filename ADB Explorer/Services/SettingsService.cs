@@ -69,13 +69,47 @@ public class SettingsService
     /// </summary>
     public void SaveSettingsFile()
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
-        File.WriteAllText(_path, JsonSerializer.Serialize(Data.Settings, _options));
+        if (!EnsureWritablePath())
+            return;
+
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
+            File.WriteAllText(_path, JsonSerializer.Serialize(Data.Settings, _options));
+        }
+        catch (UnauthorizedAccessException)
+        { }
+        catch (IOException)
+        { }
     }
 
     public void DeleteSettingsFile()
     {
-        if (File.Exists(_path))
-            File.Delete(_path);
+        if (!EnsureWritablePath())
+            return;
+
+        try
+        {
+            if (File.Exists(_path))
+                File.Delete(_path);
+        }
+        catch (UnauthorizedAccessException)
+        { }
+        catch (IOException)
+        { }
+    }
+
+    private bool EnsureWritablePath()
+    {
+        if (string.IsNullOrWhiteSpace(_path) || !Path.IsPathRooted(_path))
+        {
+            if (string.IsNullOrWhiteSpace(Data.AppDataPath))
+                return false;
+
+            _path = Path.Combine(Data.AppDataPath, AdbExplorerConst.APP_SETTINGS_FILE);
+        }
+
+        var dir = Path.GetDirectoryName(_path);
+        return !string.IsNullOrEmpty(dir);
     }
 }

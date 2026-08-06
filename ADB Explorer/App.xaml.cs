@@ -273,7 +273,10 @@ public partial class App
 
         if (e.Exception.HResult is (int)NativeMethods.HResult.CLIPBRD_E_CANT_OPEN
             or (int)NativeMethods.HResult.E_ACCESSDENIED)
+        {
             e.Handled = true;
+            return;
+        }
 
         // If application shutdown has started, do not throw exceptions
         if (IsShuttingDown || App.Current is null || App.Current.Dispatcher is null)

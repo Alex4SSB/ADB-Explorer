@@ -1018,7 +1018,11 @@ internal static class FileActionLogic
                     ApplyVirtualDriveCounts(result);
                 }
 
-                if (App.AppDispatcher is not null && await Data.DevicesObject.Current?.UpdateDrives(result.Drives, App.AppDispatcher, asyncClassify))
+                var device = Data.DevicesObject.Current;
+                if (device is null || App.AppDispatcher is null)
+                    return;
+
+                if (await device.UpdateDrives(result.Drives, App.AppDispatcher, asyncClassify))
                 {
                     Data.RuntimeSettings.FilterDrives = true;
                     FolderHelper.CombineDisplayNames();
@@ -1640,8 +1644,23 @@ internal static class FileActionLogic
 
     public static FileSyncOperation PushShellObject(ShellItem item, string targetPath, DragDropEffects dropEffects = DragDropEffects.Copy, ShellItem originalShellItem = null)
     {
+        if (item is null)
+            return null;
+
         FileSyncOperation pushOperation = null;
-        var source = new SyncFile(item, true);
+        SyncFile source;
+        try
+        {
+            source = new SyncFile(item, true);
+        }
+        catch
+        {
+            return null;
+        }
+
+        if (string.IsNullOrEmpty(source.FullName))
+            return null;
+
         var target = new SyncFile(FileHelper.ConcatPaths(targetPath, source.FullName),
             source.IsDirectory ? FileType.Folder : FileType.File)
             { Size = source.Size };
