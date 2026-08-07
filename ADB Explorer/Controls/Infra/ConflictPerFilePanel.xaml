@@ -1,0 +1,226 @@
+<UserControl
+    x:Class="ADB_Explorer.Controls.ConflictPerFilePanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
+    xmlns:local="clr-namespace:ADB_Explorer.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    x:Name="Root"
+    d:DesignHeight="420"
+    d:DesignWidth="640"
+    IsTabStop="False"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style
+            x:Key="ConflictChoiceCardStyle"
+            BasedOn="{StaticResource AdbCardActionStyle}"
+            TargetType="ui:CardAction">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="IsChevronVisible" Value="False" />
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="Margin" Value="0,0,0,0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource SubtleFillColorSecondaryBrush}" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style
+            x:Key="ConflictSourceCardStyle"
+            BasedOn="{StaticResource ConflictChoiceCardStyle}"
+            TargetType="ui:CardAction">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Replace}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource SubtleFillColorSecondaryBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style
+            x:Key="ConflictDestCardStyle"
+            BasedOn="{StaticResource ConflictChoiceCardStyle}"
+            TargetType="ui:CardAction">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Skip}" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource SubtleFillColorSecondaryBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="ConflictCardDetailStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Opacity" Value="0.85" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0,2,0,0" />
+        </Style>
+    </UserControl.Resources>
+
+    <local:SimpleStackPanel
+        Margin="0,-6,0,0"
+        DataContext="{Binding ElementName=Root}"
+        Spacing="12">
+        <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_PER_FILE_CONFLICT_TABLE_TITLE}}" />
+        <Grid Margin="0,0,14,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="4" />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBlock HorizontalAlignment="Center" Text="{x:Static strings:Resources.S_COLUMN_SOURCE}" />
+            <TextBlock
+                Grid.Row="2"
+                HorizontalAlignment="Center"
+                FontFamily="Segoe UI"
+                FontSize="12"
+                Opacity="0.7"
+                Style="{StaticResource TooltipTextBlockStyle}"
+                Text="{Binding SourcePath}" />
+            <Separator Grid.RowSpan="3" Grid.Column="1" />
+            <TextBlock
+                Grid.Column="2"
+                HorizontalAlignment="Center"
+                Text="{x:Static strings:Resources.S_COLUMN_DESTINATION}" />
+            <TextBlock
+                Grid.Row="2"
+                Grid.Column="2"
+                HorizontalAlignment="Center"
+                FontFamily="Segoe UI"
+                FontSize="12"
+                Opacity="0.7"
+                Style="{StaticResource TooltipTextBlockStyle}"
+                Text="{Binding DestinationPath}" />
+            <Separator
+                Grid.Row="3"
+                Grid.ColumnSpan="3"
+                Margin="0,2,0,0"
+                VerticalAlignment="Bottom" />
+        </Grid>
+        <ScrollViewer
+            MaxHeight="300"
+            Margin="0,-10,0,0"
+            VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Items}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <local:SimpleStackPanel Margin="0,0,14,14" Spacing="6">
+                            <local:SimpleStackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock VerticalAlignment="Top" Text="{Binding Index}" />
+                                <emoji:TextBlock
+                                    FontFamily="Segoe UI"
+                                    FontSize="14"
+                                    Style="{StaticResource TooltipTextBlockStyle}"
+                                    Text="{Binding Name}"
+                                    TextWrapping="Wrap" />
+                            </local:SimpleStackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <ui:CardAction
+                                    Click="SourceCard_Click"
+                                    Style="{StaticResource ConflictSourceCardStyle}"
+                                    ToolTip="{Binding Source={x:Static Member=strings:Resources.S_TOOLTIP_REPLACED}}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="8" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Style="{StaticResource ConflictCardDetailStyle}" Text="{Binding SourceSizeText}" />
+                                        <TextBlock
+                                            Grid.Row="1"
+                                            Style="{StaticResource ConflictCardDetailStyle}"
+                                            Text="{Binding SourceModifiedText}" />
+                                        <TextBlock
+                                            Grid.Column="2"
+                                            HorizontalAlignment="Right"
+                                            Style="{StaticResource ConflictCardDetailStyle}"
+                                            Text="{Binding SourceSizeComparison}" />
+                                        <TextBlock
+                                            Grid.Row="1"
+                                            Grid.Column="2"
+                                            HorizontalAlignment="Right"
+                                            Style="{StaticResource ConflictCardDetailStyle}"
+                                            Text="{Binding SourceDateComparison}" />
+                                    </Grid>
+                                </ui:CardAction>
+                                <ui:CardAction
+                                    Grid.Column="2"
+                                    Click="DestCard_Click"
+                                    Style="{StaticResource ConflictDestCardStyle}"
+                                    ToolTip="{Binding Source={x:Static Member=strings:Resources.S_TOOLTIP_SKIPPED}}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="8" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Style="{StaticResource ConflictCardDetailStyle}" Text="{Binding DestSizeText}" />
+                                        <TextBlock
+                                            Grid.Row="1"
+                                            Style="{StaticResource ConflictCardDetailStyle}"
+                                            Text="{Binding DestModifiedText}" />
+                                        <TextBlock
+                                            Grid.Column="2"
+                                            HorizontalAlignment="Right"
+                                            Style="{StaticResource ConflictCardDetailStyle}"
+                                            Text="{Binding DestSizeComparison}" />
+                                        <TextBlock
+                                            Grid.Row="1"
+                                            Grid.Column="2"
+                                            HorizontalAlignment="Right"
+                                            Style="{StaticResource ConflictCardDetailStyle}"
+                                            Text="{Binding DestDateComparison}" />
+                                    </Grid>
+                                </ui:CardAction>
+                                <Grid
+                                    Grid.ColumnSpan="3"
+                                    Margin="0,0,0,-8"
+                                    VerticalAlignment="Bottom">
+                                    <Grid.Style>
+                                        <Style TargetType="Grid">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsLast}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
+                                    <Separator BorderBrush="Gray" />
+                                </Grid>
+                            </Grid>
+                        </local:SimpleStackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </local:SimpleStackPanel>
+</UserControl>

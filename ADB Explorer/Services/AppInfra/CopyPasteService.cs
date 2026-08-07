@@ -843,19 +843,22 @@ public partial class CopyPasteService : ObservableObject
             && !string.Equals(Data.CurrentPath, targetPath, StringComparison.Ordinal);
 
         IEnumerable<string> files;
+        IReadOnlySet<string> replacePaths = EmptyPathSet;
+        IReadOnlySet<string> conflictPaths = EmptyPathSet;
         if (skipMergeForForeignArchive)
             files = pasteItems.Select(f => f.ParsingName);
         else
         {
-            files = await MergeFiles(pasteItems.Select(f => f.ParsingName), targetPath);
+            var outcome = await MergeFiles(pasteItems.Select(f => f.ParsingName), targetPath);
+            files = outcome.Items;
+            replacePaths = outcome.ReplaceRelativePaths;
+            conflictPaths = outcome.ConflictRelativePaths;
             if (!files.Any())
                 return;
         }
 
         if (files.Count() < pasteItems.Count())
-        {
             pasteItems = pasteItems.Where(f => files.Contains(f.ParsingName));
-        }
 
         if (ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId))
         {
@@ -863,7 +866,7 @@ public partial class CopyPasteService : ObservableObject
             return;
         }
 
-        FileActionLogic.PushShellObjects(pasteItems, targetPath);
+        FileActionLogic.PushShellObjects(pasteItems, targetPath, replacePaths: replacePaths, conflictPaths: conflictPaths);
     }
 
     public static async void VerifyAndPush(string targetPath, IEnumerable<FileClass> pasteItems, DragDropEffects dropEffects = DragDropEffects.Copy)
@@ -872,10 +875,15 @@ public partial class CopyPasteService : ObservableObject
         var skipMergeForForeignArchive = ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId)
             && !string.Equals(Data.CurrentPath, targetPath, StringComparison.Ordinal);
 
+        IReadOnlySet<string> replacePaths = EmptyPathSet;
+        IReadOnlySet<string> conflictPaths = EmptyPathSet;
         if (!skipMergeForForeignArchive)
         {
-            pasteItems = await MergeFiles(targetPath, pasteItems);
-            if (!pasteItems.Any())
+            var outcome = await MergeFiles(targetPath, pasteItems);
+            pasteItems = outcome.Items;
+            replacePaths = outcome.ReplaceRelativePaths;
+            conflictPaths = outcome.ConflictRelativePaths;
+            if (outcome.Items.Count == 0)
                 return;
         }
 
@@ -889,7 +897,12 @@ public partial class CopyPasteService : ObservableObject
             return;
         }
 
-        FileActionLogic.PushShellObjects(pasteItems.Select(f => f.ShellItem), targetPath, dropEffects);
+        FileActionLogic.PushShellObjects(
+            pasteItems.Select(f => f.ShellItem),
+            targetPath,
+            dropEffects,
+            replacePaths,
+            conflictPaths);
     }
 
     public static FileSyncOperation? VerifyAndPush(string targetPath, FileClass pasteItem, DragDropEffects dropEffects = DragDropEffects.Copy, ShellItem originalShellItem = null)
@@ -898,12 +911,18 @@ public partial class CopyPasteService : ObservableObject
         var skipMergeForForeignArchive = ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId)
             && !string.Equals(Data.CurrentPath, targetPath, StringComparison.Ordinal);
 
-        IEnumerable<FileClass> items;
+        IReadOnlySet<string> replacePaths = EmptyPathSet;
+        IReadOnlySet<string> conflictPaths = EmptyPathSet;
         if (!skipMergeForForeignArchive)
         {
-            items = MergeFiles(targetPath, pasteItem).Result;
-            if (!items.Any())
+            var outcome = MergeFiles(targetPath, pasteItem).Result;
+            var items = outcome.Items;
+            replacePaths = outcome.ReplaceRelativePaths;
+            conflictPaths = outcome.ConflictRelativePaths;
+            if (items.Count == 0)
                 return null;
+
+            pasteItem = items[0];
         }
 
         if (ArchiveHelper.CanPasteIntoArchive(targetPath, Data.DevicesObject.Current?.ID ?? ""))
@@ -917,7 +936,13 @@ public partial class CopyPasteService : ObservableObject
             return null;
         }
 
-        return FileActionLogic.PushShellObject(pasteItem.ShellItem, targetPath, dropEffects, originalShellItem);
+        return FileActionLogic.PushShellObject(
+            pasteItem.ShellItem,
+            targetPath,
+            dropEffects,
+            originalShellItem,
+            replacePaths,
+            conflictPaths);
     }
 
     public async void VerifyAndPaste(DragDropEffects cutType,
@@ -945,7 +970,8 @@ public partial class CopyPasteService : ObservableObject
 
         if (!isSameFolderSelfCopy && !skipMergeForForeignArchive)
         {
-            pasteItems = await MergeFiles(targetPath, pasteItems);
+            var outcome = await MergeFiles(targetPath, pasteItems);
+            pasteItems = outcome.Items;
             if (!pasteItems.Any())
                 return;
         }
@@ -1006,170 +1032,318 @@ public partial class CopyPasteService : ObservableObject
     }
 
     /// <summary>
-    /// Check for existing top level items in the target location. <br />
-    /// Ask the user whether to abort, continue, or exclude the conflicting items.
+    /// Check for existing items in the target location and resolve conflicts.
+    /// Matching folders are merged; only nested file collisions are prompted.
     /// </summary>
-    /// <param name="filePaths">Full paths of the files to be transferred.</param>
-    /// <param name="targetPath">Full path of the target location.</param>
-    /// <returns>
-    /// An empty list if user selected Cancel. <br />
-    /// The original list if user selected Merge or Replace. <br />
-    /// The file list excluding the top level conflicting items if user selected Skip.
-    /// </returns>
-    public static async Task<IEnumerable<string>> MergeFiles(IEnumerable<string> filePaths, string targetPath)
+    public static async Task<FileMergeHelper.MergeOutcome<string>> MergeFiles(IEnumerable<string> filePaths, string targetPath)
     {
         if (filePaths is null || targetPath is null)
-            return [];
+            return new([], EmptyPathSet, EmptyPathSet);
 
-        // Figure out whether the target is Windows or Android
+        var items = filePaths.ToList();
+        if (items.Count == 0)
+            return new(items, EmptyPathSet, EmptyPathSet);
+
         var sep = FileHelper.GetSeparator(targetPath);
-
-        // File names on case-sensitive file systems are compared with exact casing
         var caseSensitive = sep is '/' && DriveHelper.GetCurrentDrive(targetPath)?.Restrictions.CaseInsensitiveNames is not true;
         StringComparer comparer = caseSensitive
             ? StringComparer.InvariantCulture
             : StringComparer.InvariantCultureIgnoreCase;
 
-        // Prepare a set with file system dependent comparison. Currently we only check for top level conflicts.
-        // We receive full paths of the top level items in AdbDragList and FileDrop.
-
-        HashSet<string> fileNames = new(filePaths.Select(FileHelper.GetFullName), comparer);
-        HashSet<string> existingItems;
-
-        if (sep is '/') // Android
+        Dictionary<string, FileStat>? androidListing = null;
+        var androidListingFailed = false;
+        if (sep is '/' && targetPath != Data.CurrentPath && Data.DevicesObject.Current is not null)
         {
-            if (targetPath == Data.CurrentPath)
+            androidListing = FileMergeHelper.TryListAndroidDirByName(Data.DevicesObject.Current.ID, targetPath, comparer);
+            androidListingFailed = androidListing is null;
+        }
+
+        var candidates = items.Select(path =>
+        {
+            var name = FileHelper.GetFullName(path);
+            var isWindowsSource = path.Contains('\\') || (path.Length >= 2 && path[1] == ':');
+
+            bool isDir;
+            long? size = null;
+            DateTime? mtimeUtc = null;
+
+            if (isWindowsSource)
             {
-                existingItems = Data.DirList.FileList.Select(f => f.FullName).Intersect(fileNames).ToHashSet(comparer);
+                isDir = Directory.Exists(path);
+                if (!isDir)
+                {
+                    try
+                    {
+                        if (File.Exists(path))
+                        {
+                            var info = new FileInfo(path);
+                            size = info.Length;
+                            mtimeUtc = info.LastWriteTimeUtc;
+                        }
+                    }
+                    catch
+                    { }
+                }
             }
             else
             {
-                var foundFiles = ADBService.FindFilesInPath(Data.DevicesObject.Current.ID, targetPath, includeNames: fileNames, caseSensitive: caseSensitive);
-                existingItems = foundFiles.Select(FileHelper.GetFullName).ToHashSet(comparer);
+                var src = Data.DirList?.FileList?.FirstOrDefault(f =>
+                    comparer.Equals(f.FullPath, path) || comparer.Equals(f.FullName, name));
+                isDir = src?.IsDirectory ?? false;
+                if (!isDir)
+                {
+                    size = src?.Size;
+                    mtimeUtc = src?.ModifiedTime?.ToUniversalTime();
+                }
             }
-        }
-        else // Windows
+
+            return new FileMergeHelper.ConflictCandidate(path, name, isDir, size, mtimeUtc);
+        }).ToList();
+
+        FileMergeHelper.DestEntry GetDest(string name) => sep is '/'
+            ? FileMergeHelper.GetAndroidDestEntry(targetPath, name, androidListing)
+            : FileMergeHelper.GetWindowsDestEntry(targetPath, name);
+
+        HashSet<string> existingNames;
+        if (androidListingFailed)
         {
-            var files = Directory.GetFiles(targetPath);
-            var dirs = Directory.GetDirectories(targetPath);
-
-            existingItems = dirs.Concat(files).Select(Path.GetFileName).Intersect(fileNames).ToHashSet(comparer);
+            existingNames = candidates.Select(c => c.Name).ToHashSet(comparer);
         }
-
-        var count = existingItems.Count;
-        if (count < 1)
-            return filePaths;
-
-        string destination = FileHelper.GetFullName(targetPath);
-        if (Data.CurrentDisplayNames.TryGetValue(targetPath, out var drive))
-            destination = drive;
-
-        var message = count == 1
-            ? string.Format(Strings.Resources.S_CONFLICT_ITEMS_DESTINATION, destination)
-            : string.Format(Strings.Resources.S_CONFLICT_ITEMS_PLURAL_DESTINATION, count, destination);
-
-        var result = await DialogService.ShowConfirmation(
-            message,
-            Strings.Resources.S_PASTE_CONFLICTS_TITLE,
-            primaryText: Strings.Resources.S_MERGE_OR_REPLACE,
-            secondaryText: count == filePaths.Count() ? "" : Strings.Resources.S_SKIP,
-            cancelText: Strings.Resources.S_CANCEL,
-            icon: DialogService.DialogIcon.Exclamation);
-
-        if (result.Item1 is Wpf.Ui.Controls.ContentDialogResult.None) // Cancel
+        else
         {
-            return [];
-        }
-        if (result.Item1 is Wpf.Ui.Controls.ContentDialogResult.Secondary) // Skip
-        {
-            filePaths = [.. filePaths.Where(item => !existingItems.Contains(FileHelper.GetFullName(item)))];
+            existingNames = candidates
+                .Select(c => c.Name)
+                .Where(n => GetDest(n).Exists)
+                .ToHashSet(comparer);
         }
 
-        return filePaths;
+        if (existingNames.Count == 0)
+            return new(items, EmptyPathSet, EmptyPathSet);
+
+        var deviceId = Data.DevicesObject.Current?.ID;
+        var comparisons = await Task.Run(() => FileMergeHelper.ExpandConflicts(
+            candidates.Where(c => existingNames.Contains(c.Name)),
+            targetPath,
+            GetDest,
+            sep is '\\',
+            deviceId,
+            comparer));
+
+        if (comparisons.Count == 0)
+            return new(items, EmptyPathSet, EmptyPathSet);
+
+        var conflictNames = comparisons.Select(c => c.Name).ToHashSet(comparer);
+        var sourcePath = GetCommonParentPath(items);
+        var resolution = await PromptConflictResolution(
+            sourcePath, targetPath, conflictNames.Count, comparisons);
+
+        return ApplyPathMergeOutcome(items, candidates, GetDest, conflictNames, resolution, comparer);
     }
 
     /// <summary>
-    /// Check for existing top level items in the target location. <br />
-    /// Ask the user whether to abort, continue, or exclude the conflicting items.
+    /// Check for existing items in the target location and resolve conflicts.
+    /// Matching folders are merged; only nested file collisions are prompted.
     /// </summary>
-    /// <param name="targetPath">Full path of the target location.</param>
-    /// <param name="filePaths">Full paths of the files to be transferred.</param>
-    /// <returns>
-    /// An empty list if user selected Cancel. <br />
-    /// The original list if user selected Merge or Replace. <br />
-    /// The file list excluding the top level conflicting items if user selected Skip.
-    /// </returns>
-    public static async Task<IEnumerable<FileClass>> MergeFiles(string targetPath, params IEnumerable<FileClass> filePaths)
+    public static async Task<FileMergeHelper.MergeOutcome<FileClass>> MergeFiles(string targetPath, params IEnumerable<FileClass> filePaths)
     {
         if (filePaths is null || targetPath is null)
-            return [];
+            return new([], EmptyPathSet, EmptyPathSet);
 
-        // Figure out whether the target is Windows or Android
+        var items = filePaths.ToList();
+        if (items.Count == 0)
+            return new(items, EmptyPathSet, EmptyPathSet);
+
         var sep = FileHelper.GetSeparator(targetPath);
-
-        // File names on case-sensitive file systems are compared with exact casing
         var caseSensitive = sep is '/' && DriveHelper.GetCurrentDrive(targetPath)?.Restrictions.CaseInsensitiveNames is not true;
         StringComparer comparer = caseSensitive
             ? StringComparer.InvariantCulture
             : StringComparer.InvariantCultureIgnoreCase;
 
-        // Prepare a set with file system dependent comparison. Currently we only check for top level conflicts.
-        // We receive full paths of the top level items in AdbDragList and FileDrop.
-
-        HashSet<string> fileNames = new(filePaths.Select(f => f.FullName), comparer);
-        HashSet<string> existingItems;
-
-        if (sep is '/') // Android
+        Dictionary<string, FileStat>? androidListing = null;
+        var androidListingFailed = false;
+        if (sep is '/' && targetPath != Data.CurrentPath && Data.DevicesObject.Current is not null)
         {
-            if (targetPath == Data.CurrentPath)
-            {
-                existingItems = Data.DirList.FileList.Select(f => f.FullName).Intersect(fileNames).ToHashSet(comparer);
-            }
-            else
-            {
-                var foundFiles = ADBService.FindFilesInPath(Data.DevicesObject.Current.ID, targetPath, includeNames: fileNames, caseSensitive: caseSensitive);
-                existingItems = foundFiles.Select(FileHelper.GetFullName).ToHashSet(comparer);
-            }
-        }
-        else // Windows
-        {
-            var files = Directory.GetFiles(targetPath);
-            var dirs = Directory.GetDirectories(targetPath);
-
-            existingItems = dirs.Concat(files).Select(Path.GetFileName).Intersect(fileNames).ToHashSet(comparer);
+            androidListing = FileMergeHelper.TryListAndroidDirByName(Data.DevicesObject.Current.ID, targetPath, comparer);
+            androidListingFailed = androidListing is null;
         }
 
-        var count = existingItems.Count;
-        if (count <= 0)
-            return filePaths;
+        var candidates = items.Select(f =>
+        {
+            long? size = f.Size;
+            DateTime? mtimeUtc = f.IsDirectory ? null : f.ModifiedTime?.ToUniversalTime();
 
+            if (!f.IsDirectory
+                && f.PathType is FilePathType.Windows
+                && File.Exists(f.FullPath))
+            {
+                try
+                {
+                    var info = new FileInfo(f.FullPath);
+                    size ??= info.Length;
+                    mtimeUtc ??= info.LastWriteTimeUtc;
+                }
+                catch
+                { }
+            }
+
+            return new FileMergeHelper.ConflictCandidate(f.FullPath, f.FullName, f.IsDirectory, size, mtimeUtc);
+        }).ToList();
+
+        FileMergeHelper.DestEntry GetDest(string name) => sep is '/'
+            ? FileMergeHelper.GetAndroidDestEntry(targetPath, name, androidListing)
+            : FileMergeHelper.GetWindowsDestEntry(targetPath, name);
+
+        HashSet<string> existingNames;
+        if (androidListingFailed)
+        {
+            existingNames = candidates.Select(c => c.Name).ToHashSet(comparer);
+        }
+        else
+        {
+            existingNames = candidates
+                .Select(c => c.Name)
+                .Where(n => GetDest(n).Exists)
+                .ToHashSet(comparer);
+        }
+
+        if (existingNames.Count == 0)
+            return new(items, EmptyPathSet, EmptyPathSet);
+
+        var deviceId = Data.DevicesObject.Current?.ID;
+        var comparisons = await Task.Run(() => FileMergeHelper.ExpandConflicts(
+            candidates.Where(c => existingNames.Contains(c.Name)),
+            targetPath,
+            GetDest,
+            sep is '\\',
+            deviceId,
+            comparer));
+
+        if (comparisons.Count == 0)
+            return new(items, EmptyPathSet, EmptyPathSet);
+
+        var conflictNames = comparisons.Select(c => c.Name).ToHashSet(comparer);
+        var sourcePath = GetCommonParentPath(items.Select(f => f.FullPath));
+        var resolution = await PromptConflictResolution(
+            sourcePath, targetPath, conflictNames.Count, comparisons);
+
+        return ApplyFileClassMergeOutcome(items, GetDest, conflictNames, resolution, comparer);
+    }
+
+    private static readonly HashSet<string> EmptyPathSet = [];
+
+    private static string GetCommonParentPath(IEnumerable<string> fullPaths)
+    {
+        var parents = fullPaths
+            .Where(p => !string.IsNullOrEmpty(p))
+            .Select(p => FileHelper.GetParentPath(p))
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+
+        return parents.Count == 0 ? string.Empty : parents[0];
+    }
+
+    private static async Task<(FileMergeHelper.ConflictResolution Resolution, IReadOnlyList<string>? ReplaceNames)> PromptConflictResolution(
+        string sourcePath,
+        string targetPath,
+        int conflictCount,
+        IReadOnlyList<FileMergeHelper.ConflictComparisonInfo> comparisons)
+    {
         string destination = FileHelper.GetFullName(targetPath);
         if (Data.CurrentDisplayNames.TryGetValue(targetPath, out var drive))
             destination = drive;
 
-        var message = count == 1
+        var message = conflictCount == 1
             ? string.Format(Strings.Resources.S_CONFLICT_ITEMS_DESTINATION, destination)
-            : string.Format(Strings.Resources.S_CONFLICT_ITEMS_PLURAL_DESTINATION, count, destination);
+            : string.Format(Strings.Resources.S_CONFLICT_ITEMS_PLURAL_DESTINATION, conflictCount, destination);
 
-        var result = await DialogService.ShowConfirmation(
-            message,
-            Strings.Resources.S_PASTE_CONFLICTS_TITLE,
-            primaryText: Strings.Resources.S_MERGE_OR_REPLACE,
-            secondaryText: count == filePaths.Count() ? "" : Strings.Resources.S_SKIP,
-            cancelText: Strings.Resources.S_CANCEL,
-            icon: DialogService.DialogIcon.Exclamation);
+        var choice = await DialogService.ShowConflictResolution(message, Strings.Resources.S_PASTE_CONFLICTS_TITLE);
 
-        if (result.Item1 is Wpf.Ui.Controls.ContentDialogResult.None) // Cancel
+        if (choice is FileMergeHelper.ConflictResolution.PerFile)
         {
-            return [];
-        }
-        if (result.Item1 is Wpf.Ui.Controls.ContentDialogResult.Secondary) // Skip
-        {
-            filePaths = [.. filePaths.Where(item => !existingItems.Contains(item.FullName))];
+            var replaceNames = await DialogService.ShowPerFileConflictResolution(
+                comparisons,
+                string.Format(Strings.Resources.S_CONFLICT_DECIDE_TITLE, comparisons.Count),
+                sourcePath,
+                targetPath);
+
+            if (replaceNames is null)
+                return (FileMergeHelper.ConflictResolution.Cancel, null);
+
+            return (FileMergeHelper.ConflictResolution.PerFile, replaceNames);
         }
 
-        return filePaths;
+        return (choice, null);
     }
+
+    private static FileMergeHelper.MergeOutcome<string> ApplyPathMergeOutcome(
+        List<string> items,
+        List<FileMergeHelper.ConflictCandidate> candidates,
+        Func<string, FileMergeHelper.DestEntry> getDest,
+        HashSet<string> conflictRelativePaths,
+        (FileMergeHelper.ConflictResolution Resolution, IReadOnlyList<string>? ReplaceNames) resolution,
+        StringComparer comparer)
+    {
+        if (resolution.Resolution is FileMergeHelper.ConflictResolution.Cancel)
+            return new([], EmptyPathSet, EmptyPathSet);
+
+        var replaceSet = ResolveReplaceSet(conflictRelativePaths, resolution, comparer);
+        var byName = candidates.ToDictionary(c => c.Name, comparer);
+
+        var kept = items.Where(p =>
+        {
+            var name = FileHelper.GetFullName(p);
+            var dest = getDest(name);
+            if (!dest.Exists)
+                return true;
+
+            if (byName.TryGetValue(name, out var candidate) && candidate.IsDirectory && dest.IsDirectory)
+                return true; // merge folder
+
+            return replaceSet.Contains(name);
+        }).ToList();
+
+        return new(kept, replaceSet, conflictRelativePaths);
+    }
+
+    private static FileMergeHelper.MergeOutcome<FileClass> ApplyFileClassMergeOutcome(
+        List<FileClass> items,
+        Func<string, FileMergeHelper.DestEntry> getDest,
+        HashSet<string> conflictRelativePaths,
+        (FileMergeHelper.ConflictResolution Resolution, IReadOnlyList<string>? ReplaceNames) resolution,
+        StringComparer comparer)
+    {
+        if (resolution.Resolution is FileMergeHelper.ConflictResolution.Cancel)
+            return new([], EmptyPathSet, EmptyPathSet);
+
+        var replaceSet = ResolveReplaceSet(conflictRelativePaths, resolution, comparer);
+
+        var kept = items.Where(f =>
+        {
+            var dest = getDest(f.FullName);
+            if (!dest.Exists)
+                return true;
+
+            if (f.IsDirectory && dest.IsDirectory)
+                return true; // merge folder
+
+            return replaceSet.Contains(f.FullName);
+        }).ToList();
+
+        return new(kept, replaceSet, conflictRelativePaths);
+    }
+
+    private static HashSet<string> ResolveReplaceSet(
+        HashSet<string> conflictRelativePaths,
+        (FileMergeHelper.ConflictResolution Resolution, IReadOnlyList<string>? ReplaceNames) resolution,
+        StringComparer comparer)
+        => resolution.Resolution switch
+        {
+            FileMergeHelper.ConflictResolution.Replace => conflictRelativePaths,
+            FileMergeHelper.ConflictResolution.SkipConflicts => new HashSet<string>(comparer),
+            FileMergeHelper.ConflictResolution.PerFile =>
+                resolution.ReplaceNames?.ToHashSet(comparer) ?? new HashSet<string>(comparer),
+            _ => new HashSet<string>(comparer),
+        };
 
     /// <summary>
     /// Check for pasting in descendant or self

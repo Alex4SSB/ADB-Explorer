@@ -431,6 +431,21 @@ Visible content may be incomplete.</value>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Merge or Replace</value>
   </data>
+  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
+    <value>Replace the files in the destination</value>
+    <comment>Primary action in the paste/pull conflict dialog</comment>
+  </data>
+  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
+    <value>Skip these files</value>
+    <comment>Skip all conflicting items in the conflict dialog</comment>
+  </data>
+  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
+    <value>Let me decide for each file</value>
+    <comment>Open per-file conflict resolution</comment>
+  </data>
+  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
+    <value>Resolve {0} conflicts</value>
+  </data>
   <data name="S_CONFLICT_ITEMS" xml:space="preserve">
     <value>There is 1 conflicting item</value>
   </data>
@@ -444,7 +459,8 @@ Visible content may be incomplete.</value>
     <value>There are {0} conflicting items in {1}</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Paste Conflicts</value>
+    <value>Replace or Skip Files</value>
+    <comment>Title of the paste/pull/push name-conflict dialog (Windows Explorer phrasing)</comment>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Select folders to push</value>
@@ -2181,5 +2197,25 @@ The checks attempt to prevent an unsuspecting user from launching a possibly mal
   </data>
   <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
     <value>Exit the search results mode.</value>
+  </data>
+  <data name="S_NEWER" xml:space="preserve">
+    <value>newer</value>
+    <comment>newer date modified when comparing files</comment>
+  </data>
+  <data name="S_BIGGER" xml:space="preserve">
+    <value>bigger</value>
+    <comment>bigger file by size when comparing</comment>
+  </data>
+  <data name="S_PER_FILE_CONFLICT_TABLE_TITLE" xml:space="preserve">
+    <value>For each conflict, select destination to skip it, or source to replace.</value>
+    <comment>The title of the file conflict resolution table</comment>
+  </data>
+  <data name="S_TOOLTIP_REPLACED" xml:space="preserve">
+    <value>File will be replaced.</value>
+    <comment>Tooltip in the file conflict resolution table</comment>
+  </data>
+  <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
+    <value>File will be skipped.</value>
+    <comment>Tooltip in the file conflict resolution table</comment>
   </data>
 </root>

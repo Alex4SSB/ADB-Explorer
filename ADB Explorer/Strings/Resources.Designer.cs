@@ -124,6 +124,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Compress.
+        /// </summary>
+        public static string S_ACTION_COMPRESS {
+            get {
+                return ResourceManager.GetString("S_ACTION_COMPRESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extract.
+        /// </summary>
+        public static string S_ACTION_EXTRACT {
+            get {
+                return ResourceManager.GetString("S_ACTION_EXTRACT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hide.
         /// </summary>
         public static string S_ACTION_HIDE {
@@ -591,6 +609,15 @@ namespace ADB_Explorer.Strings {
         public static string S_BAT_VOLT {
             get {
                 return ResourceManager.GetString("S_BAT_VOLT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to bigger.
+        /// </summary>
+        public static string S_BIGGER {
+            get {
+                return ResourceManager.GetString("S_BIGGER", resourceCulture);
             }
         }
         
@@ -1090,6 +1117,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Resolve {0} conflicts.
+        /// </summary>
+        public static string S_CONFLICT_DECIDE_TITLE {
+            get {
+                return ResourceManager.GetString("S_CONFLICT_DECIDE_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There is 1 conflicting item.
         /// </summary>
         public static string S_CONFLICT_ITEMS {
@@ -1203,6 +1239,15 @@ namespace ADB_Explorer.Strings {
         public static string S_DATE_ACCESSED {
             get {
                 return ResourceManager.GetString("S_DATE_ACCESSED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Let me decide for each file.
+        /// </summary>
+        public static string S_DECIDE_FOR_EACH_FILE {
+            get {
+                return ResourceManager.GetString("S_DECIDE_FOR_EACH_FILE", resourceCulture);
             }
         }
         
@@ -2361,47 +2406,20 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Archive.
+        /// </summary>
+        public static string S_MENU_ARCHIVE {
+            get {
+                return ResourceManager.GetString("S_MENU_ARCHIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clear Command Log.
         /// </summary>
         public static string S_MENU_CLEAR_LOG {
             get {
                 return ResourceManager.GetString("S_MENU_CLEAR_LOG", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Copy.
-        /// </summary>
-        public static string S_MENU_COPY {
-            get {
-                return ResourceManager.GetString("S_MENU_COPY", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Copy as link.
-        /// </summary>
-        public static string S_MENU_COPY_LINK {
-            get {
-                return ResourceManager.GetString("S_MENU_COPY_LINK", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Copy contents.
-        /// </summary>
-        public static string S_MENU_COPY_CONTENTS {
-            get {
-                return ResourceManager.GetString("S_MENU_COPY_CONTENTS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Extract here.
-        /// </summary>
-        public static string S_MENU_EXTRACT_HERE {
-            get {
-                return ResourceManager.GetString("S_MENU_EXTRACT_HERE", resourceCulture);
             }
         }
         
@@ -2415,29 +2433,29 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Compress.
+        ///   Looks up a localized string similar to Copy.
         /// </summary>
-        public static string S_ACTION_COMPRESS {
+        public static string S_MENU_COPY {
             get {
-                return ResourceManager.GetString("S_ACTION_COMPRESS", resourceCulture);
+                return ResourceManager.GetString("S_MENU_COPY", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Extract.
+        ///   Looks up a localized string similar to Copy contents.
         /// </summary>
-        public static string S_ACTION_EXTRACT {
+        public static string S_MENU_COPY_CONTENTS {
             get {
-                return ResourceManager.GetString("S_ACTION_EXTRACT", resourceCulture);
+                return ResourceManager.GetString("S_MENU_COPY_CONTENTS", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Archive.
+        ///   Looks up a localized string similar to Copy as link.
         /// </summary>
-        public static string S_MENU_ARCHIVE {
+        public static string S_MENU_COPY_LINK {
             get {
-                return ResourceManager.GetString("S_MENU_ARCHIVE", resourceCulture);
+                return ResourceManager.GetString("S_MENU_COPY_LINK", resourceCulture);
             }
         }
         
@@ -2474,6 +2492,15 @@ namespace ADB_Explorer.Strings {
         public static string S_MENU_EMPTY {
             get {
                 return ResourceManager.GetString("S_MENU_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extract here.
+        /// </summary>
+        public static string S_MENU_EXTRACT_HERE {
+            get {
+                return ResourceManager.GetString("S_MENU_EXTRACT_HERE", resourceCulture);
             }
         }
         
@@ -2730,6 +2757,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New Archive.
+        /// </summary>
+        public static string S_NEW_ARCHIVE {
+            get {
+                return ResourceManager.GetString("S_NEW_ARCHIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pair and/or connect a WiFi device (without using mDNS).
         /// </summary>
         public static string S_NEW_DEVICE_TIP {
@@ -2744,15 +2780,6 @@ namespace ADB_Explorer.Strings {
         public static string S_NEW_FOLDER {
             get {
                 return ResourceManager.GetString("S_NEW_FOLDER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to New Archive.
-        /// </summary>
-        public static string S_NEW_ARCHIVE {
-            get {
-                return ResourceManager.GetString("S_NEW_ARCHIVE", resourceCulture);
             }
         }
         
@@ -2799,6 +2826,15 @@ namespace ADB_Explorer.Strings {
         public static string S_NEW_VERSION_TITLE {
             get {
                 return ResourceManager.GetString("S_NEW_VERSION_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to newer.
+        /// </summary>
+        public static string S_NEWER {
+            get {
+                return ResourceManager.GetString("S_NEWER", resourceCulture);
             }
         }
         
@@ -2920,7 +2956,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Paste Conflicts.
+        ///   Looks up a localized string similar to Replace or Skip Files.
         /// </summary>
         public static string S_PASTE_CONFLICTS_TITLE {
             get {
@@ -2997,6 +3033,15 @@ namespace ADB_Explorer.Strings {
         public static string S_PDF_PASSWORD_WRONG {
             get {
                 return ResourceManager.GetString("S_PDF_PASSWORD_WRONG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to For each conflict, select destination to skip it, or source to replace..
+        /// </summary>
+        public static string S_PER_FILE_CONFLICT_TABLE_TITLE {
+            get {
+                return ResourceManager.GetString("S_PER_FILE_CONFLICT_TABLE_TITLE", resourceCulture);
             }
         }
         
@@ -3456,6 +3501,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Replace the files in the destination.
+        /// </summary>
+        public static string S_REPLACE_FILES_IN_DESTINATION {
+            get {
+                return ResourceManager.GetString("S_REPLACE_FILES_IN_DESTINATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to All app settings will be reset upon closing the app.
         ///This cannot be undone. Are you sure?.
         /// </summary>
@@ -3861,15 +3915,6 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_DISABLE_ADB_LIMITATIONS {
             get {
                 return ResourceManager.GetString("S_SETTINGS_DISABLE_ADB_LIMITATIONS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unavailable on this system..
-        /// </summary>
-        public static string S_SETTINGS_UNAVAILABLE_ON_SYSTEM {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_UNAVAILABLE_ON_SYSTEM", resourceCulture);
             }
         }
         
@@ -4293,6 +4338,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unavailable on this system..
+        /// </summary>
+        public static string S_SETTINGS_UNAVAILABLE_ON_SYSTEM {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_UNAVAILABLE_ON_SYSTEM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Check For Updates.
         /// </summary>
         public static string S_SETTINGS_UPDATES {
@@ -4361,6 +4415,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SKIP {
             get {
                 return ResourceManager.GetString("S_SKIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skip these files.
+        /// </summary>
+        public static string S_SKIP_THESE_FILES {
+            get {
+                return ResourceManager.GetString("S_SKIP_THESE_FILES", resourceCulture);
             }
         }
         
@@ -4559,6 +4622,24 @@ namespace ADB_Explorer.Strings {
         public static string S_TOOLTIP_MORE_INFO {
             get {
                 return ResourceManager.GetString("S_TOOLTIP_MORE_INFO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File will be replaced..
+        /// </summary>
+        public static string S_TOOLTIP_REPLACED {
+            get {
+                return ResourceManager.GetString("S_TOOLTIP_REPLACED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File will be skipped..
+        /// </summary>
+        public static string S_TOOLTIP_SKIPPED {
+            get {
+                return ResourceManager.GetString("S_TOOLTIP_SKIPPED", resourceCulture);
             }
         }
         

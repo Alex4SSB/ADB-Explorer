@@ -1642,7 +1642,13 @@ internal static class FileActionLogic
         CopyPasteService.VerifyAndPush(targetPath, shItems);
     }
 
-    public static FileSyncOperation PushShellObject(ShellItem item, string targetPath, DragDropEffects dropEffects = DragDropEffects.Copy, ShellItem originalShellItem = null)
+    public static FileSyncOperation PushShellObject(
+        ShellItem item,
+        string targetPath,
+        DragDropEffects dropEffects = DragDropEffects.Copy,
+        ShellItem originalShellItem = null,
+        IReadOnlySet<string>? replacePaths = null,
+        IReadOnlySet<string>? conflictPaths = null)
     {
         if (item is null)
             return null;
@@ -1661,9 +1667,33 @@ internal static class FileActionLogic
         if (string.IsNullOrEmpty(source.FullName))
             return null;
 
-        var target = new SyncFile(FileHelper.ConcatPaths(targetPath, source.FullName),
+        string androidDest = FileHelper.ConcatPaths(targetPath, source.FullName);
+        var target = new SyncFile(androidDest,
             source.IsDirectory ? FileType.Folder : FileType.File)
             { Size = source.Size };
+
+        if (Data.DevicesObject.Current is null)
+            return null;
+
+        replacePaths ??= EmptyPathSet;
+        conflictPaths ??= EmptyPathSet;
+
+        if (conflictPaths.Count > 0)
+        {
+            if (!FileMergeHelper.FilterSyncTreeByConflictResolution(
+                    source,
+                    source.FullName,
+                    replacePaths,
+                    conflictPaths,
+                    '/'))
+            {
+                return null;
+            }
+        }
+        else if (!FileMergeHelper.FilterIdenticalPushTree(source, androidDest, Data.DevicesObject.Current.ID))
+        {
+            return null;
+        }
 
         App.SafeInvoke(() =>
         {
@@ -1677,8 +1707,13 @@ internal static class FileActionLogic
         return pushOperation;
     }
 
-    public static void PushShellObjects(IEnumerable<ShellItem> items, string targetPath, DragDropEffects dropEffects = DragDropEffects.Copy)
-        => items.ForEach(item => PushShellObject(item, targetPath, dropEffects));
+    public static void PushShellObjects(
+        IEnumerable<ShellItem> items,
+        string targetPath,
+        DragDropEffects dropEffects = DragDropEffects.Copy,
+        IReadOnlySet<string>? replacePaths = null,
+        IReadOnlySet<string>? conflictPaths = null)
+        => items.ForEach(item => PushShellObject(item, targetPath, dropEffects, replacePaths: replacePaths, conflictPaths: conflictPaths));
 
     private static void PushOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
@@ -1746,7 +1781,10 @@ internal static class FileActionLogic
             return;
         }
 
-        var pullItems = Data.SelectedFiles;
+        // Snapshot before the folder picker — SelectedFiles is a live Where(IsSelected).
+        var pullItems = Data.SelectedFiles.ToList();
+        if (pullItems.Count == 0)
+            return;
 
         if (string.IsNullOrEmpty(targetPath))
         {
@@ -1755,16 +1793,16 @@ internal static class FileActionLogic
                 IsFolderPicker = true,
                 Multiselect = false,
                 DefaultDirectory = Data.Settings.DefaultFolder,
-                Title = pullItems.Count() > 1
+                Title = pullItems.Count > 1
                     ? Strings.Resources.S_ITEM_DESTINATION_PLURAL
-                    : string.Format(Strings.Resources.S_ITEM_DESTINATION, pullItems.First()),
+                    : string.Format(Strings.Resources.S_ITEM_DESTINATION, pullItems[0]),
             };
 
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
                 return;
            
             targetPath = dialog.FileName;
-            if (!Directory.Exists(targetPath) && FileHelper.GetFullName(targetPath) == pullItems.First().FullName)
+            if (!Directory.Exists(targetPath) && FileHelper.GetFullName(targetPath) == pullItems[0].FullName)
                 targetPath = FileHelper.GetParentPath(targetPath);
         }
 
@@ -1805,15 +1843,20 @@ internal static class FileActionLogic
 
     public static async void PullFiles(string targetPath, IEnumerable<FileClass> pullItems, bool notify = false)
     {
-        if (pullItems is null || !pullItems.Any())
+        if (pullItems is null)
+            return;
+
+        // Materialize once — callers may pass a live selection query.
+        var items = pullItems as IList<FileClass> ?? pullItems.ToList();
+        if (items.Count == 0)
             return;
 
         var match = AdbRegEx.RE_WINDOWS_DRIVE_ROOT().Match(targetPath);
-        var invalidFiles = pullItems.Where(f => AdbExplorerConst.INVALID_WINDOWS_ROOT_PATHS.Contains(f.FullName));
+        var invalidFiles = items.Where(f => AdbExplorerConst.INVALID_WINDOWS_ROOT_PATHS.Contains(f.FullName)).ToList();
 
-        if (match.Success && invalidFiles.Any())
+        if (match.Success && invalidFiles.Count > 0)
         {
-            var result = await DialogService.ShowConfirmation(string.Format(Strings.Resources.S_WIN_ROOT_ILLEGAL, invalidFiles.Count()),
+            var result = await DialogService.ShowConfirmation(string.Format(Strings.Resources.S_WIN_ROOT_ILLEGAL, invalidFiles.Count),
                                                  Strings.Resources.S_WIN_ROOT_ILLEGAL_TITLE,
                                                  primaryText: Strings.Resources.S_SKIP,
                                                  icon: DialogService.DialogIcon.Exclamation,
@@ -1822,7 +1865,9 @@ internal static class FileActionLogic
             if (result.Item1 is not Wpf.Ui.Controls.ContentDialogResult.Primary)
                 return;
 
-            pullItems = pullItems.Except(invalidFiles);
+            items = items.Except(invalidFiles).ToList();
+            if (items.Count == 0)
+                return;
         }
 
         if (!Directory.Exists(targetPath))
@@ -1842,25 +1887,19 @@ internal static class FileActionLogic
             }
         }
 
-        // MergeFiles expects source paths; for archives pass a Windows-style path under target for conflict check.
-        var conflictSources = pullItems.Select(f =>
-            ArchivePath.IsArchivePath(f.FullPath, Data.DevicesObject?.Current?.ID)
-                ? FileHelper.ConcatPaths(targetPath, f.FullName, '\\')
-                : f.FullPath).ToList();
-
-        var files = await CopyPasteService.MergeFiles(conflictSources, targetPath);
-        if (files.Count() < pullItems.Count())
-        {
-            var allowedNames = files.Select(FileHelper.GetFullName).ToHashSet(StringComparer.OrdinalIgnoreCase);
-            pullItems = pullItems.Where(f =>
-                ArchivePath.IsArchivePath(f.FullPath, Data.DevicesObject?.Current?.ID)
-                    ? allowedNames.Contains(f.FullName)
-                    : files.Contains(f.FullPath));
-        }
+        var outcome = await CopyPasteService.MergeFiles(targetPath, items);
+        items = [.. outcome.Items];
+        if (items.Count == 0)
+            return;
 
         try
         {
-            var ops = await Task.Run(() => GeneratePullOps(targetPath, pullItems, notify).ToList());
+            var ops = await Task.Run(() => GeneratePullOps(
+                targetPath,
+                items,
+                notify,
+                replacePaths: outcome.ReplaceRelativePaths,
+                conflictPaths: outcome.ConflictRelativePaths).ToList());
             Data.FileOpQ.AddOperations(ops);
         }
         catch (Exception e)
@@ -1885,6 +1924,9 @@ internal static class FileActionLogic
                 continue;
 
             var op = GeneratePullOp(target, syncFile, false, device);
+            if (op is null)
+                continue;
+
             if (disableParallel)
                 op.MaxThreads = 1;
 
@@ -1893,26 +1935,40 @@ internal static class FileActionLogic
         }
     }
 
-    private static IEnumerable<FileSyncOperation> GeneratePullOps(string targetPath, IEnumerable<FileClass> pullItems, bool notify, LogicalDeviceViewModel? device = null)
+    private static IEnumerable<FileSyncOperation> GeneratePullOps(
+        string targetPath,
+        IEnumerable<FileClass> pullItems,
+        bool notify,
+        LogicalDeviceViewModel? device = null,
+        IReadOnlySet<string>? replacePaths = null,
+        IReadOnlySet<string>? conflictPaths = null)
     {
         device ??= Data.DevicesObject.Current;
         var deviceId = device.ID;
+        replacePaths ??= EmptyPathSet;
+        conflictPaths ??= EmptyPathSet;
 
         foreach (var item in pullItems)
         {
+            FileSyncOperation? op;
             if (ArchivePath.TryParse(item.FullPath, out var archivePath, out var internalPath, deviceId)
                 && !string.IsNullOrEmpty(internalPath))
             {
-                yield return GenerateArchivePullOp(targetPath, item, archivePath, internalPath, notify, device);
+                op = GenerateArchivePullOp(targetPath, item, archivePath, internalPath, notify, device);
             }
             else
             {
-                yield return GeneratePullOp(targetPath, item.GetSyncFile(), notify, device);
+                op = GeneratePullOp(targetPath, item.GetSyncFile(), notify, device, replacePaths, conflictPaths);
             }
+
+            if (op is not null)
+                yield return op;
         }
     }
 
-    private static FileSyncOperation GenerateArchivePullOp(
+    private static readonly HashSet<string> EmptyPathSet = [];
+
+    private static FileSyncOperation? GenerateArchivePullOp(
         string targetPath,
         FileClass item,
         string archivePath,
@@ -1943,6 +1999,13 @@ internal static class FileActionLogic
         var extractedClass = new FileClass(item.FullName, extractedPath, item.Type, size: item.Size, modifiedTime: item.ModifiedTime);
         var pullSource = new SyncFile(extractedClass, tree);
         var target = SyncFile.MergeToWindowsPath(pullSource, targetPath);
+
+        if (!FileMergeHelper.FilterIdenticalPullTree(pullSource, target.FullPath))
+        {
+            ArchiveExtract.CleanupStaging(device.ID, stagingRoot);
+            return null;
+        }
+
         var fileOp = FileSyncOperation.PullFile(pullSource, target, device, App.AppDispatcher);
 
         // Keep UI navigation pointing at the archive member, not the temp extract path.
@@ -1954,9 +2017,33 @@ internal static class FileActionLogic
         return fileOp;
     }
 
-    private static FileSyncOperation GeneratePullOp(string targetPath, SyncFile item, bool notify, LogicalDeviceViewModel device)
+    private static FileSyncOperation? GeneratePullOp(
+        string targetPath,
+        SyncFile item,
+        bool notify,
+        LogicalDeviceViewModel device,
+        IReadOnlySet<string>? replacePaths = null,
+        IReadOnlySet<string>? conflictPaths = null)
     {
         var target = SyncFile.MergeToWindowsPath(item, targetPath);
+
+        if (conflictPaths is { Count: > 0 })
+        {
+            if (!FileMergeHelper.FilterSyncTreeByConflictResolution(
+                    item,
+                    item.FullName,
+                    replacePaths ?? EmptyPathSet,
+                    conflictPaths,
+                    '\\'))
+            {
+                return null;
+            }
+        }
+        else if (!FileMergeHelper.FilterIdenticalPullTree(item, target.FullPath))
+        {
+            return null;
+        }
+
         var fileOp = FileSyncOperation.PullFile(item, target, device, App.AppDispatcher);
 
         if (notify)

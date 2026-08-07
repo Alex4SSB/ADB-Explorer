@@ -347,6 +347,21 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         IsLink = windowsPath.IsLink;
 
         SortName = new(FullName);
+
+        if (!IsDirectory)
+        {
+            try
+            {
+                var info = new FileInfo(windowsPath.ParsingName);
+                if (info.Exists)
+                {
+                    Size = info.Length;
+                    ModifiedTime = info.LastWriteTime;
+                }
+            }
+            catch
+            { }
+        }
     }
 
     public FileClass(FileDescriptor fileDescriptor)

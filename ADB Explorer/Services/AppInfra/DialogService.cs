@@ -100,4 +100,79 @@ public static class DialogService
 
         return (result, contentDialog.IsChecked);
     }
+
+    /// <summary>
+    /// Conflict dialog: Replace / Skip these files / Decide each (content buttons); Close = Cancel.
+    /// </summary>
+    public static async Task<Helpers.FileMergeHelper.ConflictResolution> ShowConflictResolution(
+        string message,
+        string title)
+    {
+        // Native dialogs (e.g. CommonOpenFileDialog) steal activation; the host needs focus.
+        if (Application.Current?.MainWindow is Window mainWindow)
+        {
+            mainWindow.Activate();
+            await mainWindow.Dispatcher.InvokeAsync(static () => { }, DispatcherPriority.ApplicationIdle);
+        }
+
+        var panel = new ConflictResolutionPanel { Message = message };
+        var host = AdbContentDialog.CustomContentDialog(panel, DialogIcon.None);
+
+        var dialog = new ContentDialog
+        {
+            Title = CreateTitle(title, null),
+            Content = host,
+            PrimaryButtonText = "",
+            SecondaryButtonText = "",
+            CloseButtonText = Strings.Resources.S_CANCEL,
+            MinWidth = 440,
+            FlowDirection = Data.RuntimeSettings.IsRTL ? FlowDirection.RightToLeft : FlowDirection.LeftToRight,
+        };
+
+        panel.Attach(dialog);
+
+        var result = await App.Services
+            .GetRequiredService<IContentDialogService>()
+            .ShowAsync(dialog, CancellationToken.None);
+
+        if (result is ContentDialogResult.None || panel.Choice is null)
+            return Helpers.FileMergeHelper.ConflictResolution.Cancel;
+
+        return panel.Choice.Value;
+    }
+
+    /// <summary>
+    /// Per-file Replace/Skip with source/destination size and date. Returns null if cancelled;
+    /// otherwise names to replace (skip the rest of the conflict set).
+    /// </summary>
+    public static async Task<IReadOnlyList<string>?> ShowPerFileConflictResolution(
+        IEnumerable<Helpers.FileMergeHelper.ConflictComparisonInfo> comparisons,
+        string title,
+        string sourcePath,
+        string destinationPath)
+    {
+        var panel = new ConflictPerFilePanel();
+        panel.SetConflicts(comparisons, sourcePath, destinationPath);
+        var host = AdbContentDialog.CustomContentDialog(panel);
+
+        var dialog = new ContentDialog
+        {
+            Title = CreateTitle(title, null),
+            Content = host,
+            PrimaryButtonText = Strings.Resources.S_CONFIRM,
+            SecondaryButtonText = "",
+            CloseButtonText = Strings.Resources.S_CANCEL,
+            MinWidth = 640,
+            FlowDirection = Data.RuntimeSettings.IsRTL ? FlowDirection.RightToLeft : FlowDirection.LeftToRight,
+        };
+
+        var result = await App.Services
+            .GetRequiredService<IContentDialogService>()
+            .ShowAsync(dialog, CancellationToken.None);
+
+        if (result is not ContentDialogResult.Primary)
+            return null;
+
+        return panel.GetNamesToReplace();
+    }
 }

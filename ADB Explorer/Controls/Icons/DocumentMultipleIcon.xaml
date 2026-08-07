@@ -1,0 +1,32 @@
+<controls:ScaledPathIcon
+    x:Class="ADB_Explorer.Controls.DocumentMultipleIcon"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:ADB_Explorer.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Name="Icon"
+    ArtboardSize="20"
+    mc:Ignorable="d">
+    <Viewbox
+        Width="{Binding Size}"
+        Height="{Binding Size}"
+        DataContext="{Binding ElementName=Icon}"
+        Stretch="Uniform">
+        <Grid
+            Width="{Binding ArtboardSize}"
+            Height="{Binding ArtboardSize}"
+            Margin="-2">
+            <!--  Back document outline (const green)  -->
+            <Path
+                Data="M17 9C17 8.44771 16.5523 8 16 8V14C16 15.6569 14.6569 17 13 17H6C6 17.5523 6.44772 18 7 18H13.0606C15.2363 18 17 16.2363 17 14.0606V9Z"
+                Fill="#0F7B0F"
+                Stretch="None" />
+            <!--  Main document (const blue)  -->
+            <Path
+                Data="M4 4C4 2.89543 4.89543 2 6 2H9.58579C9.98361 2 10.3651 2.15804 10.6464 2.43934L14.5607 6.35355C14.842 6.63486 15 7.01639 15 7.41421V14C15 15.1046 14.1046 16 13 16H6C4.89543 16 4 15.1046 4 14V4ZM6 3C5.44772 3 5 3.44772 5 4V14C5 14.5523 5.44772 15 6 15H13C13.5523 15 14 14.5523 14 14V8H10.5C9.67157 8 9 7.32843 9 6.5V3H6ZM10 3.20711V6.5C10 6.77614 10.2239 7 10.5 7H13.7929L10 3.20711Z"
+                Fill="#0078D4"
+                Stretch="None" />
+        </Grid>
+    </Viewbox>
+</controls:ScaledPathIcon>
