@@ -5,6 +5,7 @@
     xmlns:controls="clr-namespace:ADB_Explorer.Controls"
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
@@ -133,12 +134,12 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <ui:FontIcon Style="{StaticResource FileOpFileNameFolderIconStyle}" />
-                <TextBlock Grid.Column="1" Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
+                <emoji:TextBlock Grid.Column="1" Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
             </Grid>
         </DataTemplate>
 
         <DataTemplate x:Key="RegularOpFileNameTemplate">
-            <TextBlock Margin="4,0,0,0" Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
+            <emoji:TextBlock Margin="4,0,0,0" Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
         </DataTemplate>
 
         <DataTemplate x:Key="UninstallOpFileNameTemplate">
