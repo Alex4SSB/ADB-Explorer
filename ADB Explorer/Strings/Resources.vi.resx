@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -58,4 +58,1630 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>Biểu tượng robot Android</value>
+  </data>
+  <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
+    <value>Robot Android được tái tạo hoặc sửa đổi từ tác phẩm được tạo và chia sẻ bởi Google và sử dụng theo các điều khoản được mô tả trong giấy phép Creative Commons 3.0 Attribution.</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>The APK biểu tượng is licensed under the Apache License, Version 2.0.</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>Could not get ADB version from provided đường dẫn.</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>ADB version from provided đường dẫn is too thấp.</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>Chọn tệp thực thi ADB</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>Đặt lại cài đặt ứng dụng</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>Phiên bản ứng dụng mới</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>Lỗi điều hướng</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>Sao chép tên gói</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>Sao chép đường dẫn mục</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>Khôi phục tất cả mục</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Làm trống thùng rác</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Xóa</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>Lỗi đường dẫn đích</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Lỗi kết nối</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Lỗi ngắt kết nối</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>Lỗi ghép nối</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>Root access cannot be đã bật on selected thiết bị.</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>Quyền root</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Xác nhận xóa</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>Xóa vĩnh viễn</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>Lỗi tạo</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>Xung đột khôi phục</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>Xác nhận gỡ cài đặt</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>Chọn gói để cài đặt</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>Đóng trình giả lập</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>Xóa thiết bị</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>Ngắt kết nối thiết bị</value>
+  </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>Thao tác tệp</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>Cài đặt gói</value>
+  </data>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>Ghép nối and/or connect a WiFi thiết bị (without using mDNS)</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>Khởi động lại ứng dụng để áp dụng thay đổi</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Lỗi đọc tệp</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Lỗi ghi tệp</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>ADB máy chủ needs to be restarted in order to Tắt mDNS.</value>
+  </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>Vô hiệu hóa mDNS</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>Khởi chạy WSA trong nền</value>
+  </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>Kéo</value>
+  </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>Kéo (mục tiêu liên kết)</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>Khôi phục</value>
+  </data>
+  <data name="S_LS_ERROR_TITLE" xml:space="preserve">
+    <value>Lỗi liệt kê thư mục</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>Kéo vào thư mục gốc ổ đĩa Windows</value>
+  </data>
+  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
+    <value>Welcome to a Mới ADB Explorer version! The release notes are có sẵn on GitHub.</value>
+  </data>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Hạn chế ổ đĩa:</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• Read-only filesystem</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• Symbolic links are not supported • Tệp names cannot contain " * / : &lt; &gt; ? \ | • Tệp names are case insensitive • Installation of APKs is not supported</value>
+  </data>
+  <data name="S_RESET_SETTINGS" xml:space="preserve">
+    <value>Tất cả app Cài đặt will be Đặt lại upon closing the app. This cannot be undone. Are you sure?</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>Select Khởi chạy if ADB is already authorized in WSA. To approve ADB, Mở WSA advanced Cài đặt.</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
+    <value>không thể tạo {0} tệp đã chọn dưới thư mục gốc ổ đĩa Windows.</value>
+  </data>
+  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
+    <value>Learn More Giới thiệu ADB</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>Tải xuống ADB</value>
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value>Change</value>
+  </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value>Tiếp tục</value>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>More Thông tin</value>
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value>Đã bật</value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value>Đã tắt</value>
+  </data>
+  <data name="S_NEW_VERSION" xml:space="preserve">
+    <value>A Mới {0}, version {1}, is có sẵn</value>
+  </data>
+  <data name="S_NEW_VERSION_READY" xml:space="preserve">
+    <value>A Mới {0}, version {1}, has been downloaded and is ready to cài đặt.</value>
+  </data>
+  <data name="S_UPDATE_ON_CLOSE" xml:space="preserve">
+    <value>Cập nhật on Đóng</value>
+  </data>
+  <data name="S_UPDATE_APPLY_FAILED" xml:space="preserve">
+    <value>The Cập nhật could not be prepared. Ensure a .7z handler is có sẵn (Windows Explorer, 7-Zip, NanaZip, etc.), or Tải xuống the release manually from GitHub.</value>
+  </data>
+  <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
+    <value>Go To Version Page</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>Đóng</value>
+  </data>
+  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
+    <value>Go To Release Notes</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Privacy Policy Updated</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>This app version was released after a privacy policy Cập nhật. Review the changes on GitHub.</value>
+  </data>
+  <data name="S_ADB_EXECUTABLE" xml:space="preserve">
+    <value>ADB Executable</value>
+  </data>
+  <data name="S_HELP_ON_ADB" xml:space="preserve">
+    <value>This app is a UI for ADB - Android Debug Bridge. To use the app, you need to have ADB on your PC. ADB is có sẵn as part of the Android SDK Platform Tools. You can use the provided liên kết to Tải xuống the SDK Platform Tools. Unfortunately, we cannot provide ADB with the app due to licensing restrictions.</value>
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value>Trợ giúp On ADB</value>
+  </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value>Khởi động lại ADB Now</value>
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value>Khởi động lại Later</value>
+  </data>
+  <data name="S_ITEM_DESTINATION" xml:space="preserve">
+    <value>Select destination for {0}</value>
+  </data>
+  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
+    <value>Select destination for multiple items</value>
+  </data>
+  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
+    <value>The following will be deleted: {0}</value>
+  </data>
+  <data name="S_DELETE_PERMANENT" xml:space="preserve">
+    <value>The following will be permanently deleted: {0}</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>Mới Tệp</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>Mới Thư mục</value>
+  </data>
+  <data name="S_NEW_ARCHIVE" xml:space="preserve">
+    <value>Mới Archive</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>Creative Commons</value>
+  </data>
+  <data name="S_LS_ERROR" xml:space="preserve">
+    <value>An Lỗi occurred while trying to list the contents of this thư mục. Visible Nội dung may be incomplete.</value>
+  </data>
+  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
+    <value>{0} is an ancestor of the destination thư mục.</value>
+  </data>
+  <data name="S_KILL_EMULATOR" xml:space="preserve">
+    <value>Are you sure you want to kill this trình giả lập?</value>
+  </data>
+  <data name="S_REM_DEVICE" xml:space="preserve">
+    <value>Are you sure you want to Xóa this thiết bị?</value>
+  </data>
+  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
+    <value>Xóa {0}</value>
+  </data>
+  <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
+    <value>Kill {0}</value>
+  </data>
+  <data name="S_REM_APK" xml:space="preserve">
+    <value>The following will be removed: {0}</value>
+  </data>
+  <data name="S_REM_APK_PLURAL" xml:space="preserve">
+    <value>The following will be removed: {0} packages</value>
+  </data>
+  <data name="S_UNINSTALL" xml:space="preserve">
+    <value>Gỡ cài đặt</value>
+  </data>
+  <data name="S_CANCEL" xml:space="preserve">
+    <value>Hủy</value>
+  </data>
+  <data name="S_CONFIRM" xml:space="preserve">
+    <value>Xác nhận</value>
+  </data>
+  <data name="S_SKIP" xml:space="preserve">
+    <value>Skip</value>
+  </data>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value>Replace</value>
+  </data>
+  <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
+    <value>Merge or Replace</value>
+  </data>
+  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
+    <value>Replace the tệp in the destination</value>
+  </data>
+  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
+    <value>Skip these tệp</value>
+  </data>
+  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
+    <value>Let me decide for each tệp</value>
+  </data>
+  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
+    <value>Resolve {0} conflicts</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
+    <value>There is 1 conflicting item</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
+    <value>There is 1 conflicting item in {0}</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
+    <value>There are {0} conflicting items</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
+    <value>There are {0} conflicting items in {1}</value>
+  </data>
+  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
+    <value>Replace or Skip Tệp</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
+    <value>Select folders to push</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
+    <value>Select folders to push into {0}</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
+    <value>Select tệp to push</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
+    <value>Select tệp to push into {0}</value>
+  </data>
+  <data name="S_BUTTON_CLEAR" xml:space="preserve">
+    <value>Xóa</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
+    <value>mDNS</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
+    <value>Polling For Devices</value>
+  </data>
+  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
+    <value>Polling For Battery Status</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
+    <value>Automatically Bật Root</value>
+  </data>
+  <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
+    <value>Lưu Manually Connected Devices</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
+    <value>Automatically Mở For Browsing</value>
+  </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value>Stop Polling On Push/Pull</value>
+  </data>
+  <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
+    <value>Tối đa Simultaneous Operations</value>
+  </data>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value>Force Media Rescan On Push</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
+    <value>Polling For Drives</value>
+  </data>
+  <data name="S_SETTINGS_APK" xml:space="preserve">
+    <value>APK Support</value>
+  </data>
+  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
+    <value>Hiện Tệp Name Extensions</value>
+  </data>
+  <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
+    <value>Hiện Hidden Items</value>
+  </data>
+  <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
+    <value>Hiện System Apps</value>
+  </data>
+  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
+    <value>Override ADB Đường dẫn</value>
+  </data>
+  <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
+    <value>Mặc định Thư mục</value>
+  </data>
+  <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
+    <value>Windows Mặc định</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
+    <value>Giao diện</value>
+  </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Tùy chỉnh Accent Color</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Accent Color</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Pick a color</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
+    <value>Tắt Hardware Acceleration</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES" xml:space="preserve">
+    <value>Check For Updates</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
+    <value>Check and notify</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_UPDATE" xml:space="preserve">
+    <value>Cập nhật and cài đặt</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
+    <value>Graphics</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
+    <value>Working Directories</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
+    <value>Explorer</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
+    <value>Drives &amp; Features</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
+    <value>Thiết bị</value>
+  </data>
+  <data name="S_DONATE" xml:space="preserve">
+    <value>Donate or Sponsor</value>
+  </data>
+  <data name="S_APP_DATA_FOLDER" xml:space="preserve">
+    <value>App Data Thư mục</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
+    <value>App Data Location</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
+    <value>This app distribution saves data in a virtualized (and hard to reach) location, which is cleared on app gỡ cài đặt. Select Tùy chỉnh to use a location that will not be removed on gỡ cài đặt. The tùy chỉnh location cannot be under C:\Users\…\AppData</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
+    <value>Use Mặc định</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
+    <value>Tùy chỉnh</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
+    <value>Choose App Data Thư mục</value>
+  </data>
+  <data name="S_GITHUB_REPO" xml:space="preserve">
+    <value>GitHub repository</value>
+  </data>
+  <data name="S_PRIVACY_POLICY" xml:space="preserve">
+    <value>Privacy Policy</value>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Hiện Crash Report Dialog</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Crash Reporting</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>After a crash, you may optionally Gửi a diagnostic report to Trợ giúp us fix it. Reports are sent only when you click Gửi Report and usually include the exception tin nhắn, stack trace, app and Windows version, and the page that was Mở. The data is processed by Grafana Labs (Grafana Cloud). See the Privacy Policy liên kết above.</value>
+  </data>
+  <data name="S_ATTRIBUTIONS" xml:space="preserve">
+    <value>Attributions &amp; Third Party Licenses</value>
+  </data>
+  <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
+    <value>[not set]</value>
+  </data>
+  <data name="S_SEARCH_SETTINGS" xml:space="preserve">
+    <value>Tìm Cài đặt</value>
+  </data>
+  <data name="S_EXIT_SEARCH" xml:space="preserve">
+    <value>Đóng Tìm</value>
+  </data>
+  <data name="S_SEARCH_VIEW" xml:space="preserve">
+    <value>Tìm View</value>
+  </data>
+  <data name="S_COLLAPSE_ALL" xml:space="preserve">
+    <value>Collapse Tất cả</value>
+  </data>
+  <data name="S_EXPAND_ALL" xml:space="preserve">
+    <value>Expand Tất cả</value>
+  </data>
+  <data name="S_SETTINGS_TITLE" xml:space="preserve">
+    <value>Cài đặt</value>
+  </data>
+  <data name="S_ACTION_HIDE" xml:space="preserve">
+    <value>Ẩn</value>
+  </data>
+  <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
+    <value>Ngôn ngữ</value>
+  </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="S_FILTER_FILE_OPS" xml:space="preserve">
+    <value>Lọc Tệp Operations</value>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>Bật Auto Play</value>
+  </data>
+  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
+    <value>Tắt Auto Play Hủy Tất cả Running</value>
+  </data>
+  <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
+    <value>Log Updates Are Paused</value>
+  </data>
+  <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
+    <value>Pause Log Updates</value>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>Command Log</value>
+  </data>
+  <data name="S_BUTTON_DRIVES" xml:space="preserve">
+    <value>Thiết bị Drives</value>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value>Quay lại</value>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value>Forward</value>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>Up</value>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>Lọc</value>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>Devices</value>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>Push</value>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>Folders</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>Tệp</value>
+  </data>
+  <data name="S_MENU_REFRESH" xml:space="preserve">
+    <value>Làm mới</value>
+  </data>
+  <data name="S_MENU_STOP_LOADING" xml:space="preserve">
+    <value>Stop loading {0}</value>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>Sao chép</value>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>More</value>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>Sửa</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>Mới</value>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value>Thư mục</value>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value>Tệp</value>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value>Select Tất cả</value>
+  </data>
+  <data name="S_MENU_CUT" xml:space="preserve">
+    <value>Cắt</value>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value>Dán Liên kết</value>
+  </data>
+  <data name="S_MENU_COPY_LINK" xml:space="preserve">
+    <value>Sao chép as liên kết</value>
+  </data>
+  <data name="S_MENU_COPY_CONTENTS" xml:space="preserve">
+    <value>Sao chép contents</value>
+  </data>
+  <data name="S_MENU_EXTRACT_HERE" xml:space="preserve">
+    <value>Extract here</value>
+  </data>
+  <data name="S_MENU_COMPRESS_TO" xml:space="preserve">
+    <value>Compress to</value>
+  </data>
+  <data name="S_ACTION_COMPRESS" xml:space="preserve">
+    <value>Compress</value>
+  </data>
+  <data name="S_ACTION_EXTRACT" xml:space="preserve">
+    <value>Extract</value>
+  </data>
+  <data name="S_MENU_ARCHIVE" xml:space="preserve">
+    <value>Archive</value>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value>Gói</value>
+  </data>
+  <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
+    <value>Cập nhật Thời gian Modified</value>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>Lưu Changes</value>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>Cài đặt</value>
+  </data>
+  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
+    <value>Sao chép To Temp</value>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>Xóa Command Log</value>
+  </data>
+  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
+    <value>Mở Item Location</value>
+  </data>
+  <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
+    <value>Tìm In Browser</value>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value>Sao chép to clipboard</value>
+  </data>
+  <data name="S_ADB_DISK_USAGE" xml:space="preserve">
+    <value>ADB Disk Usage</value>
+  </data>
+  <data name="S_DISK_USAGE_READ" xml:space="preserve">
+    <value>Read: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
+    <value>Write: {0}</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
+    <value>Giới thiệu</value>
+  </data>
+  <data name="S_BROWSER_ITEMS" xml:space="preserve">
+    <value>item</value>
+  </data>
+  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
+    <value>items</value>
+  </data>
+  <data name="S_FOLDER_EMPTY" xml:space="preserve">
+    <value>This thư mục is trống</value>
+  </data>
+  <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
+    <value>Unable to get list.</value>
+  </data>
+  <data name="S_EMPTY_FILTER" xml:space="preserve">
+    <value>Không items match your Tìm.</value>
+  </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value>&lt;Span&gt;This thư mục &lt;Italic&gt;looks&lt;/Italic&gt; empty&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… to the naked eye&lt;/Span&gt;&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ITEMS_SELECTED" xml:space="preserve">
+    <value>item selected</value>
+  </data>
+  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
+    <value>items selected</value>
+  </data>
+  <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
+    <value>Operation Type</value>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>Tệp Name</value>
+  </data>
+  <data name="S_COLUMN_PROGRESS" xml:space="preserve">
+    <value>Progress</value>
+  </data>
+  <data name="S_COLUMN_SOURCE" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value>Destination</value>
+  </data>
+  <data name="S_COLUMN_ADDED" xml:space="preserve">
+    <value>Added</value>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>Biểu tượng</value>
+  </data>
+  <data name="S_COLUMN_NAME" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
+    <value>Original Location</value>
+  </data>
+  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
+    <value>Ngày Modified</value>
+  </data>
+  <data name="S_COLUMN_TYPE" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="S_COLUMN_SIZE" xml:space="preserve">
+    <value>Kích thước</value>
+  </data>
+  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
+    <value>Ngày Deleted</value>
+  </data>
+  <data name="S_COLUMN_USER_ID" xml:space="preserve">
+    <value>Người dùng ID</value>
+  </data>
+  <data name="S_COLUMN_VERSION" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
+    <value>ADB Máy chủ Unresponsive</value>
+  </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value>Thời gian from Cuối cùng máy chủ response</value>
+  </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}s</value>
+  </data>
+  <data name="S_KILL_SERVER" xml:space="preserve">
+    <value>Kill Máy chủ</value>
+  </data>
+  <data name="S_KILL_PROCESS" xml:space="preserve">
+    <value>Kill Process</value>
+  </data>
+  <data name="S_REFRESH_DEVICES" xml:space="preserve">
+    <value>Làm mới Devices</value>
+  </data>
+  <data name="S_RESTART_ADB" xml:space="preserve">
+    <value>Khởi động lại ADB</value>
+  </data>
+  <data name="S_SERVER_DOWN" xml:space="preserve">
+    <value>mDNS máy chủ is down</value>
+  </data>
+  <data name="S_AWAITING_RESPONSE" xml:space="preserve">
+    <value>Awaiting response: {0}</value>
+  </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0}ms</value>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0}m</value>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value>{0}h</value>
+  </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>mDNS máy chủ is up and running</value>
+  </data>
+  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
+    <value>Limited Support</value>
+  </data>
+  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
+    <value>Some operations have failed</value>
+  </data>
+  <data name="S_ROOT_ENABLED" xml:space="preserve">
+    <value>Root Access Đã bật</value>
+  </data>
+  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
+    <value>Root Can Be Đã bật</value>
+  </data>
+  <data name="S_RECOVERY_MODE" xml:space="preserve">
+    <value>Recovery</value>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value>Voltage: {0}v</value>
+  </data>
+  <data name="S_BAT_TEMP" xml:space="preserve">
+    <value>Temperature: {0}°C</value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>Current Balance: {0}A</value>
+  </data>
+  <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
+    <value>Reboot Into</value>
+  </data>
+  <data name="S_REBOOT_SYSTEM" xml:space="preserve">
+    <value>System Hình ảnh</value>
+  </data>
+  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
+    <value>Bootloader</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
+    <value>Sideload</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
+    <value>Sideload (Auto Reboot)</value>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - Offline</value>
+  </data>
+  <data name="S_STATUS_UNAUTH" xml:space="preserve">
+    <value>{0} - Unauthorized</value>
+  </data>
+  <data name="S_TYPE_EMULATOR" xml:space="preserve">
+    <value>Trình giả lập</value>
+  </data>
+  <data name="S_TYPE_SERVICE" xml:space="preserve">
+    <value>mDNS Dịch vụ</value>
+  </data>
+  <data name="S_TYPE_USB" xml:space="preserve">
+    <value>USB</value>
+  </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value>WiFi</value>
+  </data>
+  <data name="S_TYPE_WSA" xml:space="preserve">
+    <value>WSA</value>
+  </data>
+  <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
+    <value>Battery Status Unknown</value>
+  </data>
+  <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
+    <value>{0}%, Plugged In</value>
+  </data>
+  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
+    <value>Wireless</value>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>AC</value>
+  </data>
+  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
+    <value>Không có</value>
+  </data>
+  <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
+    <value>Charging</value>
+  </data>
+  <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
+    <value>Discharging</value>
+  </data>
+  <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
+    <value>Not Charging</value>
+  </data>
+  <data name="S_BAT_STATE_FULL" xml:space="preserve">
+    <value>Đầy</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>Status: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH" xml:space="preserve">
+    <value>Health: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
+    <value>Good</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
+    <value>Overheat</value>
+  </data>
+  <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
+    <value>Dead</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
+    <value>Over Voltage</value>
+  </data>
+  <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
+    <value>Unspecified failure</value>
+  </data>
+  <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
+    <value>Cold</value>
+  </data>
+  <data name="S_BUTTON_LAUNCH" xml:space="preserve">
+    <value>Khởi chạy</value>
+  </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value>WSA Khởi chạy</value>
+  </data>
+  <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
+    <value>Do Not Hiện This Again.</value>
+  </data>
+  <data name="S_BUTTON_ABORT" xml:space="preserve">
+    <value>Abort</value>
+  </data>
+  <data name="S_PASTE_CONFLICT" xml:space="preserve">
+    <value>{0} Conflict</value>
+  </data>
+  <data name="S_PASTE" xml:space="preserve">
+    <value>Dán</value>
+  </data>
+  <data name="S_DROP" xml:space="preserve">
+    <value>Drop</value>
+  </data>
+  <data name="S_ACTION_OPERATION" xml:space="preserve">
+    <value>Operation</value>
+  </data>
+  <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
+    <value>Operations</value>
+  </data>
+  <data name="S_ACTION_VALIDATE" xml:space="preserve">
+    <value>Validate {0}</value>
+  </data>
+  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
+    <value>Liên kết</value>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} (Link)</value>
+  </data>
+  <data name="S_FILE_TYPE_APK" xml:space="preserve">
+    <value>Android Application Gói</value>
+  </data>
+  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
+    <value>Windows Executable</value>
+  </data>
+  <data name="S_DRIVE_TRASH" xml:space="preserve">
+    <value>Thùng rác</value>
+  </data>
+  <data name="S_BUTTON_YES" xml:space="preserve">
+    <value>Có</value>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>Root</value>
+  </data>
+  <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
+    <value>Internal Storage</value>
+  </data>
+  <data name="S_DRIVE_APPS" xml:space="preserve">
+    <value>Installed Apps</value>
+  </data>
+  <data name="S_DRIVE_SD" xml:space="preserve">
+    <value>µSD Card</value>
+  </data>
+  <data name="S_DRIVE_OTG" xml:space="preserve">
+    <value>OTG Drive</value>
+  </data>
+  <data name="S_DRIVE_EMULATED" xml:space="preserve">
+    <value>Emulated Drive</value>
+  </data>
+  <data name="S_DRIVE_TEMP" xml:space="preserve">
+    <value>Temp</value>
+  </data>
+  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
+    <value>Tệp name illegal on target tệp system: {0}</value>
+  </data>
+  <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
+    <value>Nội dung mismatch</value>
+  </data>
+  <data name="S_VALIDATE_MISSING" xml:space="preserve">
+    <value>Missing from target location</value>
+  </data>
+  <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
+    <value>Permanent Deletion</value>
+  </data>
+  <data name="S_LOCATION_NA" xml:space="preserve">
+    <value>N/A</value>
+  </data>
+  <data name="S_PATH_INVALID" xml:space="preserve">
+    <value>Argument must specify đầy đường dẫn of a Mới or existing Cài đặt tệp.</value>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>Tùy chỉnh App Cài đặt Đường dẫn</value>
+  </data>
+  <data name="S_MENU_EMPTY" xml:space="preserve">
+    <value>Menu Is Trống</value>
+  </data>
+  <data name="S_ITEM_COPY" xml:space="preserve">
+    <value>{0} - Sao chép</value>
+  </data>
+  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
+    <value>Adheres to Unix naming rules (via ADB)</value>
+  </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Adheres to người dùng space naming rules</value>
+  </data>
+  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
+    <value>Adheres to Windows naming rules</value>
+  </data>
+  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
+    <value>Adheres to Windows drive root naming rules</value>
+  </data>
+  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
+    <value>Unique in current location</value>
+  </data>
+  <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
+    <value>A selected tệp violates Windows naming rules</value>
+  </data>
+  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
+    <value>A selected tệp violates Windows drive root naming rules</value>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>Some selected tệp have conflicting case-insensitive names</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>A selected tệp violates người dùng space naming rules</value>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>Some copied tệp have conflicting case-insensitive names</value>
+  </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>A copied tệp violates người dùng space naming rules</value>
+  </data>
+  <data name="S_POPUP_NON_FILE" xml:space="preserve">
+    <value>A selected item is not a tệp / thư mục</value>
+  </data>
+  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
+    <value>The current location is read-only</value>
+  </data>
+  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
+    <value>A selected item cannot be modified</value>
+  </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value>WSA App</value>
+  </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>Root Status: {0}</value>
+  </data>
+  <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
+    <value>Unchecked</value>
+  </data>
+  <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
+    <value>Forbidden</value>
+  </data>
+  <data name="S_BUTTON_ENABLE" xml:space="preserve">
+    <value>Bật</value>
+  </data>
+  <data name="S_BUTTON_DISABLE" xml:space="preserve">
+    <value>Tắt</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>Mã ghép nối</value>
+  </data>
+  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
+    <value>IP Address / Host Name</value>
+  </data>
+  <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
+    <value>Ghép nối Port</value>
+  </data>
+  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
+    <value>Ghép nối &amp; Connect</value>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value>Saved Thiết bị</value>
+  </data>
+  <data name="S_DEVICE_QR" xml:space="preserve">
+    <value>QR Ghép nối</value>
+  </data>
+  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
+    <value>Ready To Ghép nối</value>
+  </data>
+  <data name="S_CLEAR_ALL" xml:space="preserve">
+    <value>Xóa Tất cả</value>
+  </data>
+  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
+    <value>Thêm thiết bị mới</value>
+  </data>
+  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
+    <value>[Unauthorized]</value>
+  </data>
+  <data name="S_SERVICE_NONAME" xml:space="preserve">
+    <value>[Service]</value>
+  </data>
+  <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
+    <value>Currently Browsing</value>
+  </data>
+  <data name="S_BUTTON_BROWSE" xml:space="preserve">
+    <value>Duyệt</value>
+  </data>
+  <data name="S_BUTTON_CONNECT" xml:space="preserve">
+    <value>Connect</value>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value>{0} free of {1}</value>
+  </data>
+  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
+    <value>Trống</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
+    <value>APK Installer</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
+    <value>APK Installers</value>
+  </data>
+  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
+    <value>Packages</value>
+  </data>
+  <data name="S_FILEOP_ERROR" xml:space="preserve">
+    <value>Lỗi {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATED" xml:space="preserve">
+    <value>Validated</value>
+  </data>
+  <data name="S_FILEOP_COMPLETED" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
+    <value>{0} Failed</value>
+  </data>
+  <data name="S_FILEOP_TOTAL" xml:space="preserve">
+    <value>Total:</value>
+  </data>
+  <data name="S_FILEOP_PREV" xml:space="preserve">
+    <value>Trước Operation</value>
+  </data>
+  <data name="S_FILEOP_RUNNING" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="S_FILEOP_WAITING" xml:space="preserve">
+    <value>Queued</value>
+  </data>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value>Canceled</value>
+  </data>
+  <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
+    <value>Trước</value>
+  </data>
+  <data name="S_ACTION_MOVE" xml:space="preserve">
+    <value>Move</value>
+  </data>
+  <data name="S_ACTION_RECYCLE" xml:space="preserve">
+    <value>Recycle</value>
+  </data>
+  <data name="S_ACTION_UPDATE" xml:space="preserve">
+    <value>Cập nhật</value>
+  </data>
+  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
+    <value>{0}% Used</value>
+  </data>
+  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
+    <value>Scroll Here</value>
+  </data>
+  <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
+    <value>Top</value>
+  </data>
+  <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
+    <value>Bottom</value>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>Page Up</value>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>Page Down</value>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>Scroll Up</value>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>Scroll Down</value>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>Left Edge</value>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>Right Edge</value>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>Page Left</value>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>Page Right</value>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>Scroll Left</value>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>Scroll Right</value>
+  </data>
+  <data name="S_MENU_UNDO" xml:space="preserve">
+    <value>Undo</value>
+  </data>
+  <data name="S_MENU_REDO" xml:space="preserve">
+    <value>Redo</value>
+  </data>
+  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
+    <value>Thông báo</value>
+  </data>
+  <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
+    <value>Click to display more thông tin</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
+    <value>App Ngôn ngữ</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION" xml:space="preserve">
+    <value>Select your app Ngôn ngữ of choice in the Cài đặt. Translation progress is displayed for the selected Ngôn ngữ. Please Trợ giúp us localize the app to your Ngôn ngữ on Weblate.</value>
+  </data>
+  <data name="S_GOTO_WEBLATE" xml:space="preserve">
+    <value>Go to Weblate</value>
+  </data>
+  <data name="S_FILE_SOCKET" xml:space="preserve">
+    <value>Socket</value>
+  </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>Block Thiết bị</value>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>Char Thiết bị</value>
+  </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
+  </data>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>Broken Liên kết</value>
+  </data>
+  <data name="S_NAV_HISTORY" xml:space="preserve">
+    <value>Điều hướng History</value>
+  </data>
+  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
+    <value>Thêm Current Location</value>
+  </data>
+  <data name="S_REMOVE" xml:space="preserve">
+    <value>Xóa</value>
+  </data>
+  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
+    <value>Saved Locations</value>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} KB</value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} MB</value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} GB</value>
+  </data>
+  <data name="TERA" xml:space="preserve">
+    <value>{0} TB</value>
+  </data>
+  <data name="MILLI" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="MICRO" xml:space="preserve">
+    <value>u</value>
+  </data>
+  <data name="NANO" xml:space="preserve">
+    <value>n</value>
+  </data>
+  <data name="BYTES" xml:space="preserve">
+    <value>{0} B</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Sao chép {0} items</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
+    <value>Sao chép {0} items to {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
+    <value>Move {0} items to {1}</value>
+  </data>
+  <data name="S_DRAGDROP_LINK" xml:space="preserve">
+    <value>Create liên kết in {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>Move {0} items</value>
+  </data>
+  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
+    <value>Dán 1 Cắt Item</value>
+  </data>
+  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
+    <value>Dán 1 Copied Item</value>
+  </data>
+  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
+    <value>Dán {0} Copied Items</value>
+  </data>
+  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
+    <value>Dán {0} Cắt Items</value>
+  </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{0} in {1} ({2})</value>
+  </data>
+  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
+    <value>{0} of {1}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
+    <value>Sao chép {0}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
+    <value>Sao chép {0} to {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
+    <value>Move {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>Move {0} to {1}</value>
+  </data>
+  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
+    <value>Tệp not found</value>
+  </data>
+  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
+    <value>Finished with Không confirmation</value>
+  </data>
+  <data name="S_VALIDATION_ERROR" xml:space="preserve">
+    <value>Validation Lỗi {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATING" xml:space="preserve">
+    <value>Validating…</value>
+  </data>
+  <data name="S_FILES_PLURAL" xml:space="preserve">
+    <value>{0} tệp</value>
+  </data>
+  <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
+    <value>Select ROM for sideload</value>
+  </data>
+  <data name="S_ROM_FILE" xml:space="preserve">
+    <value>ROM tệp</value>
+  </data>
+  <data name="S_TERMINAL" xml:space="preserve">
+    <value>Terminal</value>
+  </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>Preserve Tệp Ngày Modified</value>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>Cài đặt {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>Cài đặt {0} APKs</value>
+  </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>Checking mDNS máy chủ status…</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value>Icons</value>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>Pull &amp; Display Thumbnails</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>Only in Biểu tượng View</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>Only in Ảnh Directories</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value>Upon Kết nối</value>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>Persist Thumbnails Between Sessions</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
+    <value>Giới hạn Thumbnails Pull Speed</value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>Hiện Icons For Special Folders</value>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>Include Video Thumbnails</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>Length</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>Dimensions</value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>One Month</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>One Week</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>One Day</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>One Giờ</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>Local Thumbnails Làm mới Thời gian</value>
+  </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>Use BusyBox If Có sẵn</value>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>Auto Connect WSA If Có sẵn</value>
+  </data>
+  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
+    <value>Discover Android Emulators</value>
+  </data>
+  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
+    <value>Khởi chạy this trình giả lập</value>
+  </data>
+  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
+    <value>Trình giả lập Khởi chạy</value>
+  </data>
+  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
+    <value>Android SDK trình giả lập was not found. Cài đặt the Android SDK trình giả lập gói or set ANDROID_SDK_ROOT.</value>
+  </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>Dán</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>Checking for thumbnail updates</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>Pulling thumbnails</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>Reading thumbnail locations and media database</value>
+  </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value>View</value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>Medium Icons</value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>Large Icons</value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>Extra Large Icons</value>
+  </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value>Layout and view options</value>
+  </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value>Thumbnail Kích thước Saved For Each Location</value>
+  </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value>Sắp xếp</value>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value>Ascending</value>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value>Descending</value>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>Sorting column &amp; order saved for each location</value>
+  </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>Tối đa Hình ảnh Kích thước To Use As Its Own Thumbnail (0 - Disabled)</value>
+  </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>and {0} more…</value>
+  </data>
+  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
+    <value>Hiện or Ẩn the details and preview pane.</value>
+  </data>
+  <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
+    <value>Tối đa Tệp Kích thước For Preview</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX" xml:space="preserve">
+    <value>Syntax</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX_AUTOMATIC" xml:space="preserve">
+    <value>Automatic</value>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>Pull To Mặc định Thư mục On Tệp Double Click</value>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value>Select a single item to get more information.</value>
+  </data>
+  <data name="S_ITEM_LOCATION" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="S_IMAGE_F_STOP" xml:space="preserve">
+    <value>F-stop</value>
+  </data>
+  <data name="S_IMAGE_ISO" xml:space="preserve">
+    <value>ISO speed</value>
+  </data>
+  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
+    <value>Exposure thời gian</value>
+  </data>
+  <data name="S_VIDEO_BITRATE" xml:space="preserve">
+    <value>Bitrate</value>
+  </data>
+  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
+    <value>Select a tệp to preview.</value>
+  </data>
+  <data name="S_PREVIEW_INVALID" xml:space="preserve">
+    <value>Không preview có sẵn</value>
+  </data>
+  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
+    <value>This PDF is Mật khẩu protected.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
+    <value>Incorrect Mật khẩu</value>
+  </data>
+  <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
+    <value>Unlock</value>
+  </data>
+  <data name="S_FILE_PERMISSIONS" xml:space="preserve">
+    <value>Permissions</value>
+  </data>
+  <data name="S_FILE_PERM_USER" xml:space="preserve">
+    <value>Người dùng</value>
+  </data>
+  <data name="S_FILE_PERM_GROUP" xml:space="preserve">
+    <value>Group</value>
+  </data>
+  <data name="S_FILE_PERM_OTHER" xml:space="preserve">
+    <value>Others</value>
+  </data>
+  <data name="S_DATE_ACCESSED" xml:space="preserve">
+    <value>Accessed</value>
+  </data>
+  <data name="S_CREATION_TIME" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
+    <value>Archive contents can be modified</value>
+  </data>
+  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
+    <value>Archive contents are read-only</value>
+  </data>
+  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
+    <value>Compressed kích thước</value>
+  </data>
+  <data name="S_PACKED_SIZE" xml:space="preserve">
+    <value>Packed kích thước</value>
+  </data>
+  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
+    <value>Ratio</value>
+  </data>
+  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
+    <value>Method</value>
+  </data>
+  <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
+    <value>Modified</value>
+  </data>
+  <data name="S_FILE_SYSTEM" xml:space="preserve">
+    <value>Tệp system</value>
+  </data>
+  <data name="S_MOUNT_POINT" xml:space="preserve">
+    <value>Mount point</value>
+  </data>
+  <data name="S_MOUNT_OPTIONS" xml:space="preserve">
+    <value>Mount options</value>
+  </data>
+  <data name="S_COLOR_RED" xml:space="preserve">
+    <value>Red</value>
+  </data>
+  <data name="S_COLOR_GREEN" xml:space="preserve">
+    <value>Green</value>
+  </data>
+  <data name="S_COLOR_BLUE" xml:space="preserve">
+    <value>Blue</value>
+  </data>
+  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
+    <value>Unable to locate ADB from system Đường dẫn. Please use "{0}" to locate it.</value>
+  </data>
+  <data name="S_ADB_PATH_INVALID" xml:space="preserve">
+    <value>Provided {0} đường dẫn is either a Windows shortcut or a UNC (remote) đường dẫn, which is not allowed.</value>
+  </data>
+  <data name="S_ADB_COMPROMISED" xml:space="preserve">
+    <value>The provided executable cannot be verified as ADB. Make sure you Tải xuống only official Android Platform Tools from Google.</value>
+  </data>
+  <data name="S_BUTTON_PAIR" xml:space="preserve">
+    <value>Ghép nối</value>
+  </data>
+  <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
+    <value>Kill ADB When App Closes</value>
+  </data>
+  <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
+    <value>The tùy chỉnh location cannot be under C:\Users\…\AppData - please select another location</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
+    <value>Allow ADB From Untrusted Sources</value>
+  </data>
+  <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
+    <value>Không có sẵn on this system.</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_MODE" xml:space="preserve">
+    <value>Tệp Kích thước Display</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
+    <value>Tệp Kích thước Decimal Places</value>
+  </data>
+  <data name="S_OPEN_FOLDER" xml:space="preserve">
+    <value>Mở</value>
+  </data>
+  <data name="S_RESTART" xml:space="preserve">
+    <value>Khởi động lại Now</value>
+  </data>
+  <data name="S_UPDATE_MODIFIED_INFO" xml:space="preserve">
+    <value>Attempts to align the ngày modified according to the tệp name. Useful for photos that include the ngày taken in the name and had their ngày modified overwritten.</value>
+  </data>
+  <data name="S_PUSH_PACKAGES_INFO" xml:space="preserve">
+    <value>Installs APK(s) directly from Windows.</value>
+  </data>
+  <data name="S_DETAILS_PANE_INFO" xml:space="preserve">
+    <value>Sets the side pane to details mode. Details can include: thumbnail, extended tệp thông tin, metadata, permissions, and drive mount options.</value>
+  </data>
+  <data name="S_PREVIEW_PANE_INFO" xml:space="preserve">
+    <value>Sets the side pane to preview mode. Supported items: thumbnail, PDF; other tệp that match the kích thước restriction are displayed as text, with tùy chọn syntax highlight, and can be edited &amp; saved if the location allows.</value>
+  </data>
+  <data name="S_UPDATE_SIGNATURE_INVALID" xml:space="preserve">
+    <value>The downloaded Cập nhật is not signed with the same certificate as this installation. The Cập nhật was discarded.</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO" xml:space="preserve">
+    <value>Disables ADB đường dẫn &amp; executable checks. The checks attempt to prevent an unsuspecting người dùng from launching a possibly malicious tệp masquerading as ADB, and include: • Đường dẫn must not be a remote UNC or a symbolic liên kết • Executable must be Authenticode-signed by Google or match pre-defined SHA-256 hash list • Must return a legible version string when executed with --version</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS" xml:space="preserve">
+    <value>Tìm options</value>
+  </data>
+  <data name="S_SEARCH_RESULTS_IN" xml:space="preserve">
+    <value>Tìm Results in {0}</value>
+  </data>
+  <data name="S_SEARCH_ALL_SUBFOLDERS" xml:space="preserve">
+    <value>Tất cả subfolders</value>
+  </data>
+  <data name="S_SEARCH_CURRENT_FOLDER" xml:space="preserve">
+    <value>Current thư mục</value>
+  </data>
+  <data name="S_SEARCH" xml:space="preserve">
+    <value>Tìm</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS_INFO" xml:space="preserve">
+    <value>Advanced Tìm options and filtering.</value>
+  </data>
+  <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
+    <value>Exit the Tìm results mode.</value>
+  </data>
+  <data name="S_NEWER" xml:space="preserve">
+    <value>newer</value>
+  </data>
+  <data name="S_BIGGER" xml:space="preserve">
+    <value>bigger</value>
+  </data>
+  <data name="S_PER_FILE_CONFLICT_TABLE_TITLE" xml:space="preserve">
+    <value>For each conflict, select destination to skip it, or source to replace.</value>
+  </data>
+  <data name="S_TOOLTIP_REPLACED" xml:space="preserve">
+    <value>Tệp will be replaced.</value>
+  </data>
+  <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
+    <value>Tệp will be skipped.</value>
+  </data>
 </root>
