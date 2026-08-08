@@ -413,7 +413,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>在 {1} 中有 {0} 个冲突项</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>粘贴冲突</value>
+    <value>替换或跳过文件</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>选择要推送的文件夹</value>
@@ -1747,5 +1747,32 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
     <value>此系统上不可用。</value>
+  </data>
+  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
+    <value>替换目标位置的文件</value>
+  </data>
+  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
+    <value>跳过这些文件</value>
+  </data>
+  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
+    <value>让我决定每个文件</value>
+  </data>
+  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
+    <value>解决 {0} 个冲突</value>
+  </data>
+  <data name="S_NEWER" xml:space="preserve">
+    <value>较新的</value>
+  </data>
+  <data name="S_BIGGER" xml:space="preserve">
+    <value>较大的</value>
+  </data>
+  <data name="S_PER_FILE_CONFLICT_TABLE_TITLE" xml:space="preserve">
+    <value>对于每个冲突，选择目标位置跳过它或者选择源位置以替换。</value>
+  </data>
+  <data name="S_TOOLTIP_REPLACED" xml:space="preserve">
+    <value>将替换文件。</value>
+  </data>
+  <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
+    <value>将跳过文件。</value>
   </data>
 </root>
