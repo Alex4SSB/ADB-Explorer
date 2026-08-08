@@ -19,6 +19,7 @@ public partial class LogViewModel : ObservableObject, INavigationAware
         Data.IsLogPaused.PropertyChanged += (s, e) => RefreshControls?.Invoke();
         Data.ClearLogs += (s, e) =>
         {
+            Data.CommandLog.Clear();
             LogCleared?.Invoke();
             RefreshControls?.Invoke();
         };
@@ -36,14 +37,23 @@ public partial class LogViewModel : ObservableObject, INavigationAware
 
     public Task OnNavigatedFromAsync() => Task.CompletedTask;
 
-    private void InitializeViewModel()
+    /// <summary>
+    /// Rebuild the log UI from <see cref="Data.CommandLog"/>.
+    /// Call when the log header is loaded — OnNavigatedTo runs before the header is in the visual tree,
+    /// and LogPageHeader ignores appends while unloaded.
+    /// </summary>
+    public void RefreshDisplayedLog()
     {
-        Data.CommandLog.CollectionChanged += CommandLog_CollectionChanged;
+        LogCleared?.Invoke();
 
         var count = Data.CommandLog.Count;
         for (var i = 0; i < count; i++)
             LogEntryAdded?.Invoke(Data.CommandLog[i]);
+    }
 
+    private void InitializeViewModel()
+    {
+        Data.CommandLog.CollectionChanged += CommandLog_CollectionChanged;
         _isInitialized = true;
     }
 

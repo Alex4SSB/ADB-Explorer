@@ -10,6 +10,7 @@ public partial class LogPageHeader : UserControl
         InitializeComponent();
 
         DataContextChanged += LogPageHeader_DataContextChanged;
+        Loaded += OnLoaded;
     }
 
     private void LogPageHeader_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -26,7 +27,16 @@ public partial class LogPageHeader : UserControl
             newVm.LogEntryAdded += OnLogEntryAdded;
             newVm.LogCleared += OnLogCleared;
             newVm.RefreshControls += RefreshControls;
+
+            if (IsLoaded)
+                newVm.RefreshDisplayedLog();
         }
+    }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is LogViewModel vm)
+            vm.RefreshDisplayedLog();
     }
 
     private void OnLogEntryAdded(Log entry)
