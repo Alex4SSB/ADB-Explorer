@@ -413,7 +413,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Есть {0} конфликтующих элементов в {1}</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Конфликты вставки</value>
+    <value>Заменить или пропустить файлы</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Выберите папки для отправки</value>
@@ -1747,5 +1747,32 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
     <value>Недоступно в этой системе.</value>
+  </data>
+  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
+    <value>Замените файлы в месте назначения</value>
+  </data>
+  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
+    <value>Пропустить эти файлы</value>
+  </data>
+  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
+    <value>Позвольте мне решить для каждого файла</value>
+  </data>
+  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
+    <value>Разрешить {0} конфликты</value>
+  </data>
+  <data name="S_NEWER" xml:space="preserve">
+    <value>более новый</value>
+  </data>
+  <data name="S_BIGGER" xml:space="preserve">
+    <value>больший</value>
+  </data>
+  <data name="S_PER_FILE_CONFLICT_TABLE_TITLE" xml:space="preserve">
+    <value>Для каждого конфликта выберите место назначения, чтобы пропустить его, или источник заменить.</value>
+  </data>
+  <data name="S_TOOLTIP_REPLACED" xml:space="preserve">
+    <value>Файл будет заменен.</value>
+  </data>
+  <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
+    <value>Файл будет пропущен.</value>
   </data>
 </root>
