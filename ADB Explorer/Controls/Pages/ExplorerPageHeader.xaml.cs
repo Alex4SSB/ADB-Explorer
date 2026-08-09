@@ -192,6 +192,15 @@ public partial class ExplorerPageHeader : UserControl
 
         RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
 
+        FileActions.PropertyChanged += (_, e) => App.SafeInvoke(() =>
+        {
+            if (e.PropertyName is nameof(FileActionsEnable.ExplorerFilter)
+                && !string.IsNullOrEmpty(FileActions.ExplorerFilter))
+            {
+                ClearSelectionForSearch();
+            }
+        });
+
         Data.RunExplorerSearch += (_, _) => App.SafeInvoke(() =>
         {
             if (Settings.SearchBox is SearchBox.SearchBoxMode.AllSubfolders)
@@ -432,7 +441,9 @@ public partial class ExplorerPageHeader : UserControl
     private void ApplySelectionEffects()
     {
         SelectedFiles = FileActions.IsAppDrive ? [] : (DirList?.FileList?.Where(f => f.IsSelected) ?? []);
-        SelectedPackages = FileActions.IsAppDrive ? ExplorerGrid.Items.OfType<Package>().Where(p => p.IsSelected) : [];
+        SelectedPackages = FileActions.IsAppDrive
+            ? (Data.Packages?.Where(p => p.IsSelected) ?? [])
+            : [];
         FileActions.SelectedItemsCount = FileActions.IsAppDrive ? SelectedPackages.Count() : SelectedFiles.Count();
 
         if (DetailsPane.IsOpen)
@@ -566,10 +577,25 @@ public partial class ExplorerPageHeader : UserControl
                     OnThumbsSizeChanged();
                     break;
 
+                case nameof(AppRuntimeSettings.IsSearchBoxFocused) when RuntimeSettings.IsSearchBoxFocused:
+                    ClearSelectionForSearch();
+                    break;
+
                 default:
                     break;
             }
         });
+    }
+
+    private void ClearSelectionForSearch()
+    {
+        ActiveUnselectAll();
+        ClearDataItemSelectionFlags();
+        FileActions.SelectedItemsCount = 0;
+        SelectedFiles = [];
+        SelectedPackages = [];
+        if (DetailsPane is not null)
+            DetailsPane.SelectedFiles = [];
     }
 
     private void PathBoxFocus(bool isFocused)
@@ -760,6 +786,7 @@ public partial class ExplorerPageHeader : UserControl
         DeviceCts.Cancel();
         DeviceCts.Dispose();
         DeviceCts = new();
+        ApkIconService.CancelPending();
 
         DirList?.Stop();
 
@@ -793,6 +820,9 @@ public partial class ExplorerPageHeader : UserControl
         FileActions.ParentEnabled = realPath != FileHelper.GetParentPath(realPath)
             && !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
 
+        if (FileActions.IsAppDrive && Settings.SearchBox is SearchBox.SearchBoxMode.AllSubfolders)
+            Settings.SearchBox = SearchBox.SearchBoxMode.CurrentFolder;
+
         CurrentPath = realPath;
 
         FileActionLogic.IsPasteEnabled();
@@ -808,7 +838,11 @@ public partial class ExplorerPageHeader : UserControl
 
         FileActions.CopyPathDescription.Value = FileActions.IsAppDrive ? Strings.Resources.S_COPY_APK_NAME : Strings.Resources.S_COPY_PATH;
 
-        if (Settings.ThumbSizePerLocation)
+        if (FileActions.IsAppDriveThumbsLocked)
+        {
+            ViewModel.CurrentThumbsSize = ThumbnailService.ThumbnailSize.Disabled;
+        }
+        else if (Settings.ThumbSizePerLocation)
         {
             ThumbnailService.ThumbnailSize size = ThumbnailService.ThumbnailSize.Disabled;
             Settings.LocationThumbSize.TryGetValue(CurrentPath, out size);
@@ -816,9 +850,7 @@ public partial class ExplorerPageHeader : UserControl
         }
         else
         {
-            ViewModel.CurrentThumbsSize = FileActions.IsAppDrive
-                ? ThumbnailService.ThumbnailSize.Disabled
-                : RuntimeSettings.ThumbsSize;
+            ViewModel.CurrentThumbsSize = RuntimeSettings.ThumbsSize;
         }
 
         SortExplorer();
@@ -889,6 +921,7 @@ public partial class ExplorerPageHeader : UserControl
         DeviceCts.Cancel();
         DeviceCts.Dispose();
         DeviceCts = new();
+        ApkIconService.CancelPending();
 
         DirList.Stop();
         DisposeFileIcons();
@@ -956,7 +989,20 @@ public partial class ExplorerPageHeader : UserControl
     {
         if (Settings.SortingPerLocation && Settings.LocationSorting.TryGetValue(CurrentPath, out var sort))
         {
-            ViewModel.SetSort(sort);
+            if (FileActions.IsAppDrive
+                && sort.Property is SortingSelector.SortingProperty.Date or SortingSelector.SortingProperty.Size)
+            {
+                ViewModel.SetSort(SortingSelector.SortingProperty.Name, sort.Direction);
+            }
+            else if (!FileActions.IsAppDrive
+                && sort.Property is SortingSelector.SortingProperty.UserId or SortingSelector.SortingProperty.Version)
+            {
+                ViewModel.SetSort(SortingSelector.SortingProperty.Name, sort.Direction);
+            }
+            else
+            {
+                ViewModel.SetSort(sort);
+            }
         }
         else
         {
@@ -1067,6 +1113,7 @@ public partial class ExplorerPageHeader : UserControl
         DeviceCts.Cancel();
         DeviceCts.Dispose();
         DeviceCts = new();
+        ApkIconService.CancelPending();
 
         FileActionLogic.ClearExplorer(false);
         FileActions.IsDriveViewVisible = true;
@@ -1189,7 +1236,10 @@ public partial class ExplorerPageHeader : UserControl
     {
         if (FileActions.IsAppDrive)
         {
-            foreach (var pkg in ExplorerGrid.Items.OfType<Package>())
+            // Prefer the full package list — ActiveView.Items may omit filtered/system packages
+            // while their IsSelected flags still linger from virtualization.
+            var packages = Data.Packages ?? ExplorerGrid.Items.OfType<Package>();
+            foreach (var pkg in packages)
             {
                 if (pkg.IsSelected)
                     pkg.IsSelected = false;
@@ -1534,7 +1584,15 @@ public partial class ExplorerPageHeader : UserControl
         CopyPaste.DropEffect =
         CopyPaste.CurrentDropEffect = e.Effects;
 
-        if (CopyPaste.CurrentFiles.Any())
+        if (FileActions.IsAppDrive)
+        {
+            // Keep the parsed launcher icon — CurrentFiles are APK paths whose DragImage is the shell placeholder.
+            var packageIcon = ActiveSelectedItems.OfType<Package>().Select(p => p.Icon).FirstOrDefault(i => i is not null)
+                ?? Data.SelectedPackages.Select(p => p.Icon).FirstOrDefault(i => i is not null);
+            if (packageIcon is not null)
+                CopyPaste.DragBitmap = packageIcon;
+        }
+        else if (CopyPaste.CurrentFiles.Any())
         {
             CopyPaste.DragBitmap = CopyPaste.CurrentFiles.First().DragImage;
         }
@@ -1699,7 +1757,19 @@ public partial class ExplorerPageHeader : UserControl
         if (vfdo is not null)
         {
             CopyPaste.UpdateSelfVFDO(true);
-            CopyPaste.DragBitmap = selectedItems.First().DragImage;
+
+            if (FileActions.IsAppDrive)
+            {
+                var package = ActiveSelectedItems.OfType<Package>().FirstOrDefault();
+                // Prefer the parsed launcher icon already shown in the tile (not APK shell / placeholder).
+                CopyPaste.DragBitmap = package?.Icon
+                    ?? VirtualFileDataObject.SelfFiles?.FirstOrDefault()?.ApkIcon
+                    ?? package?.IconViewModel.LargeIcon;
+            }
+            else
+            {
+                CopyPaste.DragBitmap = selectedItems.First().DragImage;
+            }
 
             vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, dragSource, vfdo.PreferredDropEffect.Value);
         }
@@ -1757,12 +1827,41 @@ public partial class ExplorerPageHeader : UserControl
         {
             // Fix IsSelected on Package items whose containers were recycled by virtualization
             // so UnselectAll() could not propagate through the TwoWay binding.
-            var selectedSet = new HashSet<object>(ExplorerGrid.SelectedItems.Cast<object>());
-            foreach (var item in ExplorerGrid.Items)
+            var selectedSet = new HashSet<object>(ActiveSelectedItems.Cast<object>());
+            var packages = Data.Packages ?? ActiveView.Items.OfType<Package>();
+            foreach (var pkg in packages)
             {
-                if (item is Package pkg && pkg.IsSelected != selectedSet.Contains(item))
-                    pkg.IsSelected = !pkg.IsSelected;
+                var shouldSelect = selectedSet.Contains(pkg);
+                if (pkg.IsSelected != shouldSelect)
+                    pkg.IsSelected = shouldSelect;
             }
+
+            // Keep the hidden view in sync when switching between details / icon view.
+            _isSyncingSelection = true;
+            try
+            {
+                var sourceItems = ActiveSelectedItems.Cast<object>().ToList();
+                System.Collections.IList targetItems = ViewModel.IsIconView
+                    ? ExplorerGrid.SelectedItems
+                    : IconView.SelectedItems;
+
+                var toRemove = targetItems.Cast<object>()
+                    .Where(item => !sourceItems.Contains(item))
+                    .ToList();
+                foreach (var item in toRemove)
+                    targetItems.Remove(item);
+
+                foreach (var item in sourceItems)
+                {
+                    if (!targetItems.Contains(item))
+                        targetItems.Add(item);
+                }
+            }
+            finally
+            {
+                _isSyncingSelection = false;
+            }
+
             return;
         }
 
@@ -1793,10 +1892,12 @@ public partial class ExplorerPageHeader : UserControl
             // that had no container when UnselectAll() was called, and were therefore
             // skipped by the TwoWay binding propagation.
             var sourceSet = new HashSet<object>(sourceItems);
-            foreach (var item in ExplorerGrid.Items)
+            var files = DirList?.FileList ?? ExplorerGrid.Items.OfType<FilePath>();
+            foreach (var item in files)
             {
-                if (item is FilePath fp && fp.IsSelected != sourceSet.Contains(item))
-                    fp.IsSelected = !fp.IsSelected;
+                var shouldSelect = sourceSet.Contains(item);
+                if (item.IsSelected != shouldSelect)
+                    item.IsSelected = shouldSelect;
             }
         }
         finally
@@ -1807,16 +1908,27 @@ public partial class ExplorerPageHeader : UserControl
 
     private void ExplorerGrid_Sorting(object sender, DataGridSortingEventArgs e)
     {
+        SortingSelector.SortingProperty sortedColumn;
         if (FileActions.IsAppDrive)
-            return;
-
-        var sortedColumn = e.Column switch
         {
-            var c when c == DateColumn => SortingSelector.SortingProperty.Date,
-            var c when c == TypeColumn => SortingSelector.SortingProperty.Type,
-            var c when c == SizeColumn => SortingSelector.SortingProperty.Size,
-            _ => SortingSelector.SortingProperty.Name
-        };
+            sortedColumn = e.Column switch
+            {
+                var c when c == PackageType => SortingSelector.SortingProperty.Type,
+                var c when c == PackageUid => SortingSelector.SortingProperty.UserId,
+                var c when c == PackageVersion => SortingSelector.SortingProperty.Version,
+                _ => SortingSelector.SortingProperty.Name,
+            };
+        }
+        else
+        {
+            sortedColumn = e.Column switch
+            {
+                var c when c == DateColumn => SortingSelector.SortingProperty.Date,
+                var c when c == TypeColumn => SortingSelector.SortingProperty.Type,
+                var c when c == SizeColumn => SortingSelector.SortingProperty.Size,
+                _ => SortingSelector.SortingProperty.Name,
+            };
+        }
 
         var currentDirection = sortedColumn == ViewModel.SortedColumn ? ViewModel.SortDirection : null;
         var direction = ListHelper.Invert(currentDirection);
@@ -2019,13 +2131,18 @@ public partial class ExplorerPageHeader : UserControl
 
         if (hitItem is not null)
         {
-            if (e.ChangedButton is MouseButton.Right
-                && !hitItem.IsSelected
-                && Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
+            if (Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
             {
-                SelectOnlyItem(hitItem.DataContext);
-                e.Handled = true;
-                selectionIndex = IconView.SelectedIndex;
+                // Exclusive select on left/right click of an unselected item. ListView UnselectAll
+                // cannot clear IsSelected on recycled (off-screen) containers via TwoWay binding,
+                // which otherwise leaves a second item selected after a single click.
+                if (!hitItem.IsSelected)
+                {
+                    SelectOnlyItem(hitItem.DataContext);
+                    if (e.ChangedButton is MouseButton.Right)
+                        e.Handled = true;
+                    selectionIndex = IconView.SelectedIndex;
+                }
             }
         }
         else

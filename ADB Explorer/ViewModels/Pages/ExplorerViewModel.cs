@@ -50,8 +50,11 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         if (SortDirection is not { } dir || SortedColumn is not { } col || ExplorerItemsSource is not { } view)
             return;
 
-        if (Data.FileActions.IsAppDrive || Data.FileActions.WasInAppDrive)
+        if (Data.FileActions.IsAppDrive)
+        {
+            ApplyPackageSortToView(view, col, dir);
             return;
+        }
 
         view.SortDescriptions.Clear();
         view.SortDescriptions.Add(new(nameof(FileClass.IsTemp), ListSortDirection.Descending));
@@ -78,6 +81,49 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
                 Data.Settings.LocationSorting.Add(Data.CurrentPath, new(col, dir));
             }
         }
+    }
+
+    private void ApplyPackageSortToView(ICollectionView view, SortingSelector.SortingProperty col, ListSortDirection dir)
+    {
+        view.SortDescriptions.Clear();
+
+        var sortProp = col switch
+        {
+            SortingSelector.SortingProperty.Type => nameof(Package.Type),
+            SortingSelector.SortingProperty.UserId => nameof(Package.Uid),
+            SortingSelector.SortingProperty.Version => nameof(Package.Version),
+            _ => nameof(Package.DisplayName),
+        };
+
+        view.SortDescriptions.Add(new(sortProp, dir));
+
+        // Secondary name sort (same direction) when the primary column is not name.
+        if (col is not SortingSelector.SortingProperty.Name)
+            view.SortDescriptions.Add(new(nameof(Package.DisplayName), dir));
+
+        // Live-sort on DisplayName so labels arriving later re-order tiles without
+        // ICollectionView.Refresh() (which resets virtualization and blanks all icons).
+        EnablePackageLiveSorting(view);
+
+        PackageTypeColumnSortDirection = col is SortingSelector.SortingProperty.Type ? dir : null;
+
+        if (Data.Settings.SortingPerLocation)
+        {
+            if (Data.Settings.LocationSorting.ContainsKey(Data.CurrentPath))
+                Data.Settings.LocationSorting[Data.CurrentPath] = new(col, dir);
+            else
+                Data.Settings.LocationSorting.Add(Data.CurrentPath, new(col, dir));
+        }
+    }
+
+    private static void EnablePackageLiveSorting(ICollectionView view)
+    {
+        if (view is not ListCollectionView listView || !listView.CanChangeLiveSorting)
+            return;
+
+        if (!listView.LiveSortingProperties.Contains(nameof(Package.DisplayName)))
+            listView.LiveSortingProperties.Add(nameof(Package.DisplayName));
+        listView.IsLiveSorting = true;
     }
 
     public void SetSort(SortingSelector.DirSortingOption sort) => SetSort(sort.Property, sort.Direction);
@@ -107,22 +153,19 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     {
         IsIconView = value is not ThumbnailService.ThumbnailSize.Disabled;
 
-        if (!Data.FileActions.IsAppDrive)
-        {
-            if (Data.Settings.ThumbSizePerLocation)
-            {
-                if (Data.Settings.LocationThumbSize.ContainsKey(Data.CurrentPath))
-                {
-                    Data.Settings.LocationThumbSize[Data.CurrentPath] = value;
-                }
-                else
-                {
-                    Data.Settings.LocationThumbSize.Add(Data.CurrentPath, value);
-                }
-            }
+        // Device without unzip: force details view without clobbering saved sizes.
+        if (Data.FileActions.IsAppDriveThumbsLocked)
+            return;
 
-            Data.RuntimeSettings.ThumbsSize = value;
+        if (Data.Settings.ThumbSizePerLocation)
+        {
+            if (Data.Settings.LocationThumbSize.ContainsKey(Data.CurrentPath))
+                Data.Settings.LocationThumbSize[Data.CurrentPath] = value;
+            else
+                Data.Settings.LocationThumbSize.Add(Data.CurrentPath, value);
         }
+
+        Data.RuntimeSettings.ThumbsSize = value;
     }
 
     public int FirstSelectedIndex { get; set; } = -1;
@@ -198,6 +241,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
             _filterDebounceTimer.Stop();
             RefreshExplorerFilter();
         };
+
         Data.DevicesObjectCreated += (_, _) => App.SafeInvoke(EnsureDevicesSubscription);
     }
 
@@ -313,7 +357,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
                 break;
 
             case nameof(AppRuntimeSettings.ThumbsSize):
-                IsIconView = !Data.FileActions.IsAppDrive && Data.RuntimeSettings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
+                IsIconView = Data.RuntimeSettings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
                 break;
 
             default:
@@ -403,12 +447,21 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
                     ? FileHelper.PkgFilter()
                     : pkg => ((Package)pkg).Type is Package.PackageType.User;
 
-                if (view.SortDescriptions.All(d => d.PropertyName != nameof(Package.Type)))
-                {
-                    view.SortDescriptions.Add(new(nameof(Package.Type), ListSortDirection.Descending));
-                }
+                // Default: Name, ascending.
+                SortDirection ??= ListSortDirection.Ascending;
+                SortedColumn ??= SortingSelector.SortingProperty.Name;
 
-                PackageTypeColumnSortDirection ??= ListSortDirection.Descending;
+                if (!view.SortDescriptions.Any(d => d.PropertyName == nameof(Package.DisplayName)
+                        || d.PropertyName == nameof(Package.Type)
+                        || d.PropertyName == nameof(Package.Uid)
+                        || d.PropertyName == nameof(Package.Version)))
+                {
+                    ApplyPackageSortToView(view, SortedColumn.Value, SortDirection.Value);
+                }
+                else
+                {
+                    EnablePackageLiveSorting(view);
+                }
             }
             else
             {

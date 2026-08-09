@@ -1,5 +1,8 @@
 ﻿using ADB_Explorer.Helpers;
-using Newtonsoft.Json;
+using ADB_Explorer.Models;
+using ADB_Explorer.Services;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace ADB_Explorer.Controls;
 
@@ -14,25 +17,53 @@ public partial class SortingSelector : UserControl
         Name,
         Date,
         Size,
-        Type
+        Type,
+        UserId,
+        Version,
     }
 
     public SortingSelector()
     {
-        Items = [
-            new SortingSelectorItem(Strings.Resources.S_COLUMN_NAME, SortingProperty.Name, this),
-            new SortingSelectorItem(Strings.Resources.S_COLUMN_DATE_MODIFIED, SortingProperty.Date, this),
-            new SortingSelectorItem(Strings.Resources.S_COLUMN_SIZE, SortingProperty.Size, this),
-            new SortingSelectorItem(Strings.Resources.S_COLUMN_TYPE, SortingProperty.Type, this),
-            new Separator(),
-            new SortingSelectorItem(Strings.Resources.S_SORT_ASCENDING, ListSortDirection.Ascending, this),
-            new SortingSelectorItem(Strings.Resources.S_SORT_DESCENDING, ListSortDirection.Descending, this)
-        ];
+        Items = [];
+        RebuildItems();
 
         InitializeComponent();
+
+        Data.FileActions.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(FileActionsEnable.IsAppDrive))
+                RebuildItems();
+        };
     }
-    
-    public ICollection<object> Items { get; }
+
+    public ObservableCollection<object> Items { get; }
+
+    public void RebuildItems()
+    {
+        foreach (var item in Items.OfType<SortingSelectorItem>())
+            item.Detach();
+
+        Items.Clear();
+
+        if (Data.FileActions.IsAppDrive)
+        {
+            Items.Add(new SortingSelectorItem(Strings.Resources.S_COLUMN_NAME, SortingProperty.Name, this));
+            Items.Add(new SortingSelectorItem(Strings.Resources.S_COLUMN_TYPE, SortingProperty.Type, this));
+            Items.Add(new SortingSelectorItem(Strings.Resources.S_COLUMN_USER_ID, SortingProperty.UserId, this));
+            Items.Add(new SortingSelectorItem(Strings.Resources.S_COLUMN_VERSION, SortingProperty.Version, this));
+        }
+        else
+        {
+            Items.Add(new SortingSelectorItem(Strings.Resources.S_COLUMN_NAME, SortingProperty.Name, this));
+            Items.Add(new SortingSelectorItem(Strings.Resources.S_COLUMN_DATE_MODIFIED, SortingProperty.Date, this));
+            Items.Add(new SortingSelectorItem(Strings.Resources.S_COLUMN_SIZE, SortingProperty.Size, this));
+            Items.Add(new SortingSelectorItem(Strings.Resources.S_COLUMN_TYPE, SortingProperty.Type, this));
+        }
+
+        Items.Add(new Separator());
+        Items.Add(new SortingSelectorItem(Strings.Resources.S_SORT_ASCENDING, ListSortDirection.Ascending, this));
+        Items.Add(new SortingSelectorItem(Strings.Resources.S_SORT_DESCENDING, ListSortDirection.Descending, this));
+    }
 
     public void SetSortDirection(ListSortDirection direction)
     {
@@ -87,34 +118,41 @@ public partial class SortingSelector : UserControl
 
         public BaseAction Action { get; set; }
 
+        private readonly SortingSelector _selector;
+        private readonly PropertyChangedEventHandler _handler;
+
         public SortingSelectorItem(string name, SortingProperty prop, SortingSelector selector)
         {
             Name = name;
+            _selector = selector;
             Action = new(() => true, () => selector.SetSortOption(prop));
-            selector.PropertyChanged += (_, e) =>
+            _handler = (_, e) =>
             {
                 if (e.PropertyName == nameof(SortOption))
-                {
                     IsChecked = selector.SortOption == prop;
-                }
             };
-
+            selector.PropertyChanged += _handler;
             IsChecked = selector.SortOption == prop;
         }
 
         public SortingSelectorItem(string name, ListSortDirection direction, SortingSelector selector)
         {
             Name = name;
+            _selector = selector;
             Action = new(() => true, () => selector.SetSortDirection(direction));
-            selector.PropertyChanged += (_, e) =>
+            _handler = (_, e) =>
             {
                 if (e.PropertyName == nameof(SortDirection))
-                {
                     IsChecked = selector.SortDirection == direction;
-                }
             };
-
+            selector.PropertyChanged += _handler;
             IsChecked = selector.SortDirection == direction;
+        }
+
+        public void Detach()
+        {
+            if (_handler is not null)
+                _selector.PropertyChanged -= _handler;
         }
     }
 }

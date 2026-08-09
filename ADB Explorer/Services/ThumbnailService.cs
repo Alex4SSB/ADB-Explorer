@@ -897,6 +897,12 @@ public static partial class ThumbnailService
                 return;
             }
 
+            if (!IsPendingCustomPull(pullKey) || Data.DeviceCts.IsCancellationRequested)
+            {
+                CompleteCustomPull(pullKey, throttled);
+                return;
+            }
+
             startPull(throttled);
         }
         catch
@@ -1387,6 +1393,12 @@ public static partial class ThumbnailService
 
         Task.Run(() =>
         {
+            if (Data.DeviceCts.IsCancellationRequested)
+            {
+                ThumbnailProgressChanged?.Invoke(ThumbnailStep.CheckingUpdates, false);
+                return;
+            }
+
             var opsList = FileActionLogic.SilentPullFiles(device, deviceDir, Data.Settings.LimitThumbsPullSpeed, filesToReplace, [.. picFolders, movies]).ToList();
 
             ThumbnailProgressChanged?.Invoke(ThumbnailStep.CheckingUpdates, false);

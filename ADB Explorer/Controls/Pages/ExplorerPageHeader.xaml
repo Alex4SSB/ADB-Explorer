@@ -304,7 +304,6 @@
                     <local:AdbListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <local:AdbVirtualizingWrapPanel
-                                Width="{Binding RelativeSource={RelativeSource AncestorType=local:AdbListView}, Path=ActualWidth}"
                                 CacheLength="2,2"
                                 CacheLengthUnit="Page"
                                 IsVirtualizing="True"
@@ -545,11 +544,12 @@
                             <DataGridTextColumn
                                 x:Name="PackageName"
                                 Width="400"
-                                Binding="{Binding Name}"
+                                Binding="{Binding DisplayName}"
                                 ElementStyle="{StaticResource ExplorerGridCellStyle}"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
                                 Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_NAME}}"
                                 IsReadOnly="True"
+                                SortMemberPath="DisplayName"
                                 Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageColumnVisibility}" />
                             <DataGridTextColumn
                                 x:Name="PackageType"

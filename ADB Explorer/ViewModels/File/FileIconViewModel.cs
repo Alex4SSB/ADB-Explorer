@@ -18,6 +18,14 @@ public partial class FileIconViewModel : FileViewModelBase
     {
         get
         {
+            if (_file.IsApk)
+            {
+                if (_file.ApkIcon is null)
+                    ApkIconService.BeginLoadForFile(_file);
+
+                return _file.ApkIcon ?? LargeFileIcon;
+            }
+
             if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.Off)
                 return LargeFileIcon;
 
@@ -286,6 +294,11 @@ public partial class FileIconViewModel : FileViewModelBase
         {
             BeginLoadThumbnail(Data.RuntimeSettings.ThumbsSize);
         }
+    }
+
+    public void OnApkIconChanged()
+    {
+        OnPropertyChanged(nameof(LargeIcon));
     }
 
     public void InvalidateThumbnail()

@@ -603,7 +603,30 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         CopyPasteService.ClearTempFolder();
         VirtualFileDataObject vfdo = new(DragDropEffects.Copy, method);
 
-        var files = FileHelper.GetFilesFromTree(FileHelper.GetFolderTree(packages.Select(p => p.Path), false, Data.DeviceCts.Token)).ToList();
+        var packageList = packages.ToList();
+        var files = FileHelper.GetFilesFromTree(FileHelper.GetFolderTree(packageList.Select(p => p.Path), false, Data.DeviceCts.Token)).ToList();
+
+        // Stamp parsed launcher icons onto the transfer files so any DragImage path prefers them
+        // over the generic APK shell placeholder.
+        foreach (var package in packageList)
+        {
+            if (package.Icon is null)
+                continue;
+
+            foreach (var file in files)
+            {
+                if (string.Equals(file.FullPath, package.Path, StringComparison.Ordinal)
+                    || string.Equals(file.FullName, FileHelper.GetFullName(package.Path), StringComparison.Ordinal))
+                {
+                    file.ApplyApkIcon(package.Icon);
+                }
+            }
+
+            // Single-APK packages: also stamp the sole top-level file when paths differ (apex, splits).
+            if (files.Count == 1 && packageList.Count == 1)
+                files[0].ApplyApkIcon(package.Icon);
+        }
+
         vfdo.Operations = [.. files.Select(f => f.PrepareDescriptors(vfdo))];
         vfdo.SetFileDescriptors(files.SelectMany(f => f.Descriptors));
         vfdo.SetAdbDrag(files, Data.DevicesObject.Current);

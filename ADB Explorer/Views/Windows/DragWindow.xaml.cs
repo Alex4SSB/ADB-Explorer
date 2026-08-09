@@ -125,6 +125,11 @@ public partial class DragWindow : INotifyPropertyChanged
 
                 if (Data.FileActions.IsAppDrive && Data.CopyPaste.MouseWithinApp)
                 {
+                    // Self-drag on app drive is not an install target (pull-only).
+                    if (Data.CopyPaste.IsSelf
+                        || Data.CopyPaste.CurrentDropEffect is DragDropEffects.None)
+                        return;
+
                     result = string.Format(Strings.Resources.S_DRAG_INSTALL_SINGLE, source);
                     var apkSplit = result.Split(source);
 

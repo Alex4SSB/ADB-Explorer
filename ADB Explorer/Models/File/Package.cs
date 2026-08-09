@@ -16,9 +16,33 @@ public partial class Package : ObservableObject, IBrowserItem
     [ObservableProperty]
     public partial string Path { get; set; }
 
-    public string DisplayName => Name;
+    /// <summary>Localized application label when known; otherwise the package id.</summary>
+    public string DisplayName => string.IsNullOrWhiteSpace(Label) ? Name : Label!;
+
+    [ObservableProperty]
+    public partial string? Label { get; set; }
+
+    partial void OnLabelChanged(string? value)
+    {
+        OnPropertyChanged(nameof(DisplayName));
+        _iconViewModel?.OnDisplayNameChanged();
+    }
 
     public FolderViewModel FolderViewModel => null;
+
+    private PackageIconViewModel? _iconViewModel;
+    public PackageIconViewModel IconViewModel => _iconViewModel ??= new PackageIconViewModel(this);
+
+    /// <summary>Unused for packages; kept so <see cref="Views.FileIconView"/> bindings resolve.</summary>
+    public bool IsIconPlaceholder => false;
+
+    /// <summary>Unused for packages; kept so <see cref="Views.FileIconView"/> bindings resolve.</summary>
+    public DragDropEffects CutState => DragDropEffects.None;
+
+    /// <summary>Unused for packages; kept so <see cref="Views.FileIconView"/> bindings resolve.</summary>
+    public bool IsLink => false;
+
+    public FlowDirection NameFlowDirection => FlowDirection.LeftToRight;
 
     [ObservableProperty]
     public partial PackageType Type { get; set; }
@@ -37,6 +61,11 @@ public partial class Package : ObservableObject, IBrowserItem
 
     [ObservableProperty]
     public partial bool IsSelected { get; set; }
+
+    [ObservableProperty]
+    public partial BitmapSource? Icon { get; set; }
+
+    partial void OnIconChanged(BitmapSource? value) => _iconViewModel?.OnIconChanged();
 
     public static Package New(string package, PackageType type)
     {

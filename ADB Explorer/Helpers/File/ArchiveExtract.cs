@@ -761,6 +761,44 @@ public static class ArchiveExtract
         return ADBService.ExecuteDeviceAdbShellCommand(deviceId, tar, out stdout, out stderr, cancellationToken, [.. args]);
     }
 
+    /// <summary>
+    /// Extracts specific zip members into a staging content root (paths preserved under that root).
+    /// Caller must <see cref="CleanupStaging"/> the returned staging root.
+    /// </summary>
+    public static (string StagingRoot, string ContentRoot) ExtractZipMembersToStaging(
+        string deviceId,
+        string archivePath,
+        IReadOnlyList<string> members,
+        CancellationToken cancellationToken = default)
+    {
+        if (ArchiveHelper.GetFamily(archivePath) is not ArchiveFamily.Zip)
+            throw new InvalidOperationException($"Not a zip archive: {archivePath}");
+
+        if (members is null || members.Count == 0)
+            throw new ArgumentException("At least one member is required.", nameof(members));
+
+        var stagingRoot = CreateStagingRoot(deviceId, cancellationToken);
+        try
+        {
+            var contentRoot = FileHelper.ConcatPaths(stagingRoot, "content");
+            ShellFileOperation.MakeDirs(deviceId, [contentRoot]).GetAwaiter().GetResult();
+
+            var exitCode = ExtractZip(deviceId, archivePath, contentRoot, members, cancellationToken, out var stdout, out var stderr);
+            if (exitCode != 0)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
+            }
+
+            return (stagingRoot, contentRoot);
+        }
+        catch
+        {
+            CleanupStaging(deviceId, stagingRoot, CancellationToken.None);
+            throw;
+        }
+    }
+
     private static int ExtractZip(
         string deviceId,
         string archivePath,

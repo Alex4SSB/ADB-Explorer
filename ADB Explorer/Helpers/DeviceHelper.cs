@@ -659,6 +659,7 @@ public static class DeviceHelper
             Data.DeviceCts = new();
 
             ThumbnailService.StopLoading();
+            ApkIconService.CancelPending();
             DriveHelper.ClearDrives();
             Devices.SetOpenDevice(null);
         }
@@ -885,6 +886,7 @@ public static class DeviceHelper
                     Data.DeviceCts = new();
 
                     ThumbnailService.StopLoading();
+                    ApkIconService.CancelPending();
                     DriveHelper.ClearDrives();
                     FileActionLogic.ClearExplorer();
                     NavHistory.Reset();
@@ -911,6 +913,7 @@ public static class DeviceHelper
         Data.DeviceCts.Cancel();
         Data.DeviceCts.Dispose();
         Data.DeviceCts = new();
+        ApkIconService.CancelPending();
 
         Devices.SetOpenDevice(device);
 

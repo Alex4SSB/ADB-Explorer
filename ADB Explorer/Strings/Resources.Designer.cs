@@ -320,6 +320,15 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_APK_ICON_LIC", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to App Name.
+        /// </summary>
+        public static string S_APP_NAME {
+            get {
+                return ResourceManager.GetString("S_APP_NAME", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to App Data Folder.
@@ -2918,6 +2927,15 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_PACKED_SIZE", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Package ID.
+        /// </summary>
+        public static string S_PACKAGE_ID {
+            get {
+                return ResourceManager.GetString("S_PACKAGE_ID", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Pairing Error.
@@ -4523,6 +4541,15 @@ namespace ADB_Explorer.Strings {
         public static string S_TERMINAL {
             get {
                 return ResourceManager.GetString("S_TERMINAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading app icons.
+        /// </summary>
+        public static string S_THUMB_SNACKBAR_APK_ICONS {
+            get {
+                return ResourceManager.GetString("S_THUMB_SNACKBAR_APK_ICONS", resourceCulture);
             }
         }
         

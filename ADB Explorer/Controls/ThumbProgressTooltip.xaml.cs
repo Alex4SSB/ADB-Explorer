@@ -28,6 +28,8 @@ public partial class ThumbProgressTooltip : UserControl
             typeof(ThumbProgressTooltip), new PropertyMetadata(string.Empty));
 
     private DispatcherTimer? _pullTimeoutTimer;
+    private bool _thumbnailProgressActive;
+    private bool _apkIconProgressActive;
 
     public ThumbProgressTooltip()
     {
@@ -38,13 +40,41 @@ public partial class ThumbProgressTooltip : UserControl
         {
             ThumbnailService.ThumbnailProgressChanged += OnThumbnailProgressChanged;
             ThumbnailService.ThumbnailPullingProgressUpdated += OnThumbnailPullingProgressUpdated;
+            ApkIconService.IconLoadProgressChanged += OnApkIconLoadProgressChanged;
+            ApkIconService.IconLoadProgressTick += OnApkIconLoadProgressTick;
         };
         Unloaded += (_, _) =>
         {
             ThumbnailService.ThumbnailProgressChanged -= OnThumbnailProgressChanged;
             ThumbnailService.ThumbnailPullingProgressUpdated -= OnThumbnailPullingProgressUpdated;
+            ApkIconService.IconLoadProgressChanged -= OnApkIconLoadProgressChanged;
+            ApkIconService.IconLoadProgressTick -= OnApkIconLoadProgressTick;
             StopPullTimeoutTimer();
         };
+    }
+
+    private void OnApkIconLoadProgressTick()
+    {
+        App.SafeInvoke(ResetPullTimeoutTimer);
+    }
+
+    private void OnApkIconLoadProgressChanged(bool isStarting)
+    {
+        App.SafeInvoke(() =>
+        {
+            _apkIconProgressActive = isStarting;
+            if (isStarting)
+            {
+                ProgressText = Strings.Resources.S_THUMB_SNACKBAR_APK_ICONS;
+                Visibility = Visibility.Visible;
+                StartPullTimeoutTimer();
+            }
+            else
+            {
+                StopPullTimeoutTimer();
+                UpdateVisibilityAfterProgressEnd();
+            }
+        });
     }
 
     private void OnThumbnailProgressChanged(ThumbnailService.ThumbnailStep step, bool isStarting)
@@ -53,6 +83,7 @@ public partial class ThumbProgressTooltip : UserControl
         {
             if (isStarting)
             {
+                _thumbnailProgressActive = true;
                 ProgressText = step switch
                 {
                     ThumbnailService.ThumbnailStep.ReadingDatabase => Strings.Resources.S_THUMB_SNACKBAR_READING,
@@ -70,10 +101,26 @@ public partial class ThumbProgressTooltip : UserControl
                 if (step is ThumbnailService.ThumbnailStep.Pulling)
                     StopPullTimeoutTimer();
 
-                ProgressText = string.Empty;
-                Visibility = Visibility.Collapsed;
+                _thumbnailProgressActive = false;
+                UpdateVisibilityAfterProgressEnd();
             }
         });
+    }
+
+    private void UpdateVisibilityAfterProgressEnd()
+    {
+        if (_apkIconProgressActive)
+        {
+            ProgressText = Strings.Resources.S_THUMB_SNACKBAR_APK_ICONS;
+            Visibility = Visibility.Visible;
+            return;
+        }
+
+        if (_thumbnailProgressActive)
+            return;
+
+        ProgressText = string.Empty;
+        Visibility = Visibility.Collapsed;
     }
 
     private void OnThumbnailPullingProgressUpdated(int completed, int total)
@@ -108,6 +155,8 @@ public partial class ThumbProgressTooltip : UserControl
     private void OnPullTimeout(object? sender, EventArgs e)
     {
         StopPullTimeoutTimer();
+        _apkIconProgressActive = false;
+        _thumbnailProgressActive = false;
         ProgressText = string.Empty;
         Visibility = Visibility.Collapsed;
     }

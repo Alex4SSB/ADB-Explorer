@@ -280,7 +280,7 @@ public partial class DetailsPane : UserControl
     private static readonly FileClass EmptyTrash = new("RecycleBin", "/RecycleBin", AbstractFile.FileType.EmptyTrash);
     private static readonly FileClass FullTrash = new("RecycleBin", "/RecycleBin", AbstractFile.FileType.FullTrash);
     private static readonly FileClass Phone = new("Phone", "/Phone", AbstractFile.FileType.Phone);
-    private static readonly BitmapSource AppIcon = FileToIconConverter.LoadBitmap(new System.Drawing.Icon(Properties.AppGlobal.APK_icon, 128, 128).ToBitmap());
+    private static readonly BitmapSource AppIcon = DefaultAndroidPackageIcon.Bitmap;
 
     private CancellationTokenSource? _cancellationToken;
     private CancellationTokenSource? _extraInfoCts;
@@ -428,6 +428,8 @@ public partial class DetailsPane : UserControl
                     control.SmallFileIcon.Source = f.CacheThumbnail?.Image is null ? null : f.FileIcon32;
                     control.InvalidSelectionBorder.Visibility = Visibility.Collapsed;
                     f.BeginLoadCacheThumbnail();
+                    if (f.IsApk)
+                        ApkIconService.BeginLoadForFile(f, priority: true);
                     // BeginLoad is async; if the pane cache was already warm, refresh now.
                     if (f.CacheThumbnail?.Image is not null)
                         control.UpdateFileThumbnailDisplay(f);
@@ -436,17 +438,27 @@ public partial class DetailsPane : UserControl
                 }
                 else if (item is Package p)
                 {
+                    if (control.Package is not null)
+                        control.Package.PropertyChanged -= control.OnPackagePropertyChanged;
+
                     control.Package = p;
+                    p.PropertyChanged -= control.OnPackagePropertyChanged;
+                    p.PropertyChanged += control.OnPackagePropertyChanged;
                     control.FileNameTextBlock.Text = p.DisplayName;
                     control.FileNameTextBlock.FlowDirection = FlowDirection.LeftToRight;
-                    control.LargeFileIcon.Source = AppIcon;
+                    control.LargeFileIcon.Source = p.Icon ?? AppIcon;
                     control.LargeFileIcon.MaxHeight = 128;
                     control.SmallFileIcon.Source = null;
                     control.InvalidSelectionBorder.Visibility = Visibility.Collapsed;
                     control.PopulateThumbnailInfoItems(p);
+                    ApkIconService.BeginLoadForPackage(p, priority: true);
+                    ApkIconService.BeginEnsureLabelForPackage(p, priority: true);
                 }
                 else if (item is DriveViewModel drive)
                 {
+                    if (control.Package is not null)
+                        control.Package.PropertyChanged -= control.OnPackagePropertyChanged;
+
                     control.File = null;
                     control.Package = null;
                     control.Drive = drive;
@@ -473,6 +485,9 @@ public partial class DetailsPane : UserControl
             }
             else if (files.Count() > 1)
             {
+                if (control.Package is not null)
+                    control.Package.PropertyChanged -= control.OnPackagePropertyChanged;
+
                 control.File = null;
                 control.Package = null;
                 control.FileNameTextBlock.Text = $"{files.Count()} {Strings.Resources.S_ITEMS_SELECTED_PLURAL}";
@@ -489,6 +504,9 @@ public partial class DetailsPane : UserControl
             {
                 if (control.File is FileClass previousFile)
                     previousFile.PropertyChanged -= control.OnFileFullPathChanged;
+
+                if (control.Package is not null)
+                    control.Package.PropertyChanged -= control.OnPackagePropertyChanged;
 
                 control.File = null;
                 control.Package = null;
@@ -561,6 +579,20 @@ public partial class DetailsPane : UserControl
     public void RefreshSelection() =>
         OnSelectedFilesChanged(this, new DependencyPropertyChangedEventArgs(SelectedFilesProperty, SelectedFiles, SelectedFiles));
 
+    private void OnPackagePropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => App.SafeBeginInvoke(() =>
+    {
+        if (sender is not Package package || !ReferenceEquals(Package, package))
+            return;
+
+        if (e.PropertyName is nameof(Package.Icon))
+            LargeFileIcon.Source = package.Icon ?? AppIcon;
+        else if (e.PropertyName is nameof(Package.Label) or nameof(Package.DisplayName) or nameof(Package.Name))
+        {
+            FileNameTextBlock.Text = package.DisplayName;
+            PopulateThumbnailInfoItems(package);
+        }
+    });
+
     private void OnFileFullPathChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => App.SafeBeginInvoke(() =>
     {
         if (e.PropertyName == nameof(FileClass.DisplayName))
@@ -587,7 +619,7 @@ public partial class DetailsPane : UserControl
             or nameof(FileClass.ModifiedTimeWithOffset)
             or nameof(FileClass.LinkTarget))
             return;
-        else if (e.PropertyName is nameof(FileClass.DragImage) or nameof(FileClass.CacheThumbnail))
+        else if (e.PropertyName is nameof(FileClass.DragImage) or nameof(FileClass.CacheThumbnail) or nameof(FileClass.ApkIcon))
         {
             if (sender is FileClass file && ReferenceEquals(File, file))
             {
@@ -905,6 +937,8 @@ public partial class DetailsPane : UserControl
     {
         SelectionInfoItems.Clear();
 
+        SelectionInfoItems.Add(new ItemDetailsViewModel<Package>(package, Strings.Resources.S_PACKAGE_ID, p => p.Name, valueIsLtr: true));
+
         SelectionInfoItems.Add(new ItemDetailsViewModel<Package>(package, Strings.Resources.S_ITEM_LOCATION, f => FileHelper.GetParentPath(f.Path), valueIsLtr: true));
 
         SelectionInfoItems.Add(new ItemDetailsViewModel<Package>(package, Strings.Resources.S_COLUMN_TYPE, p => $"{p.Type}"));
@@ -914,6 +948,7 @@ public partial class DetailsPane : UserControl
 
         SelectionInfoItems.Add(new ItemDetailsViewModel<Package>(package, Strings.Resources.S_COLUMN_DATE_MODIFIED, p => p.LastUpdateTime.HasValue ? p.LastUpdateTime.Value.ToString(Data.Settings.ActualFormatCulture) : "").Init());
 
+        _cancellationToken?.Cancel();
         var cts = new CancellationTokenSource();
         _cancellationToken = cts;
 

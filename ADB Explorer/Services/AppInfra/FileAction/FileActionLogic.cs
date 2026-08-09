@@ -967,6 +967,7 @@ internal static class FileActionLogic
 
         Data.DeviceCts.Cancel();
         Data.DirList?.Stop();
+        ApkIconService.CancelPending();
     }
 
     public static void RefreshDrives(bool asyncClassify, CancellationToken cancellationToken)
@@ -1110,6 +1111,13 @@ internal static class FileActionLogic
                 }
 
                 Data.FileActions.ListingInProgress = false;
+
+                if (updateExplorer
+                    && Data.FileActions.IsAppDrive
+                    && ApkIconService.IsEnabled)
+                {
+                    ApkIconService.BeginPreloadPackages(Data.Packages);
+                }
             });
         });
     }
