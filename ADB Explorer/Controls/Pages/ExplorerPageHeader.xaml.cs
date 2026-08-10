@@ -181,6 +181,13 @@ public partial class ExplorerPageHeader : UserControl
 
     private readonly DispatcherTimer SelectionTimer = new() { Interval = SELECTION_CHANGED_DELAY };
     private readonly DispatcherTimer _searchDebounceTimer = new() { Interval = TimeSpan.FromMilliseconds(300) };
+
+    /// <summary>
+    /// Guards against a stray selection right after navigating (e.g. the second click of a
+    /// double-click on a drive tile landing on the newly shown grid at the same screen position).
+    /// Restarted on every navigation so back-to-back navigations don't race a stale continuation.
+    /// </summary>
+    private readonly DispatcherTimer _explorerLoadedTimer = new() { Interval = EXPLORER_NAV_DELAY };
     private bool _isSyncingSelection = false;
 
     public ExplorerPageHeader(ExplorerViewModel viewModel)
@@ -230,6 +237,11 @@ public partial class ExplorerPageHeader : UserControl
         {
             _searchDebounceTimer.Stop();
             RunExplorerSearch();
+        };
+        _explorerLoadedTimer.Tick += (_, _) =>
+        {
+            _explorerLoadedTimer.Stop();
+            RuntimeSettings.IsExplorerLoaded = true;
         };
 
         DriveList.SelectionChanged += DriveList_SelectionChanged;
@@ -771,7 +783,8 @@ public partial class ExplorerPageHeader : UserControl
         RuntimeSettings.BrowseDrive = null;
         RuntimeSettings.SelectedDrive = null;
 
-        Task.Delay(EXPLORER_NAV_DELAY).ContinueWith(_ => App.SafeInvoke(() => RuntimeSettings.IsExplorerLoaded = true));
+        _explorerLoadedTimer.Stop();
+        _explorerLoadedTimer.Start();
 
         return _navigateToPath(realPath);
     }

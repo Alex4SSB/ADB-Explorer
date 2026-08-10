@@ -50,6 +50,15 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         if (SortDirection is not { } dir || SortedColumn is not { } col || ExplorerItemsSource is not { } view)
             return;
 
+        // SortExplorer() runs synchronously in _navigateToPath right after FileActions.IsAppDrive
+        // flips for the new location, but ExplorerItemsSource/ExplorerSource are only swapped once
+        // the new location's items (packages or files) actually arrive. Applying Package-only or
+        // File-only SortDescriptions to the stale, mismatched view here would sort the wrong
+        // (soon-to-be-discarded) collection instead of the one about to be shown.
+        var sourceIsPackages = ExplorerSource is IEnumerable<Package>;
+        if (Data.FileActions.IsAppDrive != sourceIsPackages)
+            return;
+
         if (Data.FileActions.IsAppDrive)
         {
             ApplyPackageSortToView(view, col, dir);
@@ -103,6 +112,8 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
         // Live-sort on DisplayName so labels arriving later re-order tiles without
         // ICollectionView.Refresh() (which resets virtualization and blanks all icons).
+        // Paused while APK icons/labels are streaming in — WPF resets ListView selection
+        // whenever a live-sorted collection reorders, which breaks clicking to select.
         EnablePackageLiveSorting(view);
 
         PackageTypeColumnSortDirection = col is SortingSelector.SortingProperty.Type ? dir : null;
@@ -123,7 +134,54 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
         if (!listView.LiveSortingProperties.Contains(nameof(Package.DisplayName)))
             listView.LiveSortingProperties.Add(nameof(Package.DisplayName));
-        listView.IsLiveSorting = true;
+
+        listView.IsLiveSorting = !ApkIconService.IsLoadInProgress;
+    }
+
+    /// <summary>
+    /// Disables live sorting the moment the icon/label queue starts (so streaming labels can't
+    /// trigger a live-sort reorder mid-click), and once it goes idle again, re-applies the sort
+    /// as a one-shot refresh, then re-enables live sorting. Preserves selection across the refresh.
+    /// </summary>
+    private void OnApkIconLoadProgressChanged(bool active)
+    {
+        if (!Data.FileActions.IsAppDrive)
+            return;
+
+        App.SafeBeginInvoke(() =>
+        {
+            if (!Data.FileActions.IsAppDrive || ExplorerItemsSource is not { } view)
+                return;
+
+            if (active)
+            {
+                DisablePackageLiveSorting(view);
+                return;
+            }
+
+            if (SortDirection is not { } dir || SortedColumn is not { } col)
+                return;
+
+            var selected = Data.Packages?.Where(static p => p.IsSelected).ToList() ?? [];
+
+            ApplyPackageSortToView(view, col, dir);
+
+            if (selected.Count == 0 || Data.Packages is null)
+                return;
+
+            foreach (var pkg in Data.Packages)
+            {
+                var shouldSelect = selected.Contains(pkg);
+                if (pkg.IsSelected != shouldSelect)
+                    pkg.IsSelected = shouldSelect;
+            }
+        });
+    }
+
+    private static void DisablePackageLiveSorting(ICollectionView view)
+    {
+        if (view is ListCollectionView { CanChangeLiveSorting: true } listView)
+            listView.IsLiveSorting = false;
     }
 
     public void SetSort(SortingSelector.DirSortingOption sort) => SetSort(sort.Property, sort.Direction);
@@ -243,6 +301,8 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         };
 
         Data.DevicesObjectCreated += (_, _) => App.SafeInvoke(EnsureDevicesSubscription);
+
+        ApkIconService.IconLoadProgressChanged += OnApkIconLoadProgressChanged;
     }
 
     public Task OnNavigatedToAsync()

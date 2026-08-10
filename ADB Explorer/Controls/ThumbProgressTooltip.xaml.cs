@@ -55,12 +55,12 @@ public partial class ThumbProgressTooltip : UserControl
 
     private void OnApkIconLoadProgressTick()
     {
-        App.SafeInvoke(ResetPullTimeoutTimer);
+        App.SafeBeginInvoke(ResetPullTimeoutTimer);
     }
 
     private void OnApkIconLoadProgressChanged(bool isStarting)
     {
-        App.SafeInvoke(() =>
+        App.SafeBeginInvoke(() =>
         {
             _apkIconProgressActive = isStarting;
             if (isStarting)

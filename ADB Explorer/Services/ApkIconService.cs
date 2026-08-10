@@ -57,6 +57,9 @@ public static partial class ApkIconService
 
     private static int ProgressActiveCount;
 
+    /// <summary>True while any icon/label load is queued or running.</summary>
+    public static bool IsLoadInProgress => Volatile.Read(ref ProgressActiveCount) != 0;
+
     /// <param name="IconExt">
     /// File extension only (<c>.webp</c>/<c>.png</c>), <see cref="FailMarker"/> if fetch failed today,
     /// or empty if not yet attempted. Local file is always <c>{package}{IconExt}</c>.
@@ -800,10 +803,19 @@ public static partial class ApkIconService
         }
     }
 
+    /// <summary>
+    /// Unlike a plain file pull, a single icon load fans out into several concurrent <c>adb.exe</c>
+    /// process launches (manifest zip listing, staging extraction, cleanup, and per-split retries),
+    /// so reusing <see cref="AppSettings.MaxSimultaneousOps"/> as-is (default 32, up to 999) can spawn
+    /// dozens to hundreds of OS processes at once, starving the UI thread and looking like a freeze.
+    /// Cap far below that setting regardless of how high the user has configured it.
+    /// </summary>
+    private const int IconLoadConcurrencyCap = 6;
+
     private static int GetMaxConcurrentLoads()
         => Data.Settings.LimitThumbsPullSpeed
             ? 1
-            : Math.Clamp(Data.Settings.MaxSimultaneousOps, 1, AppSettings.MaxSimultaneousOpsMax);
+            : Math.Min(Math.Clamp(Data.Settings.MaxSimultaneousOps, 1, AppSettings.MaxSimultaneousOpsMax), IconLoadConcurrencyCap);
 
     private static async Task ProcessQueueAsync(int generation, CancellationToken workerToken)
     {
@@ -839,6 +851,7 @@ public static partial class ApkIconService
 
                 if (inFlight.Count == 0)
                 {
+                    var queueIdle = false;
                     lock (QueueLock)
                     {
                         if (generation != WorkerGeneration)
@@ -849,6 +862,14 @@ public static partial class ApkIconService
                             continue;
 
                         WorkerRunning = false;
+                        queueIdle = true;
+                    }
+
+                    // Raised outside the lock: subscribers may synchronously call back into
+                    // methods that also take QueueLock (e.g. via a blocking Dispatcher.Invoke
+                    // from this background thread), which would deadlock against the UI thread.
+                    if (queueIdle)
+                    {
                         SetIconLoadProgress(false);
                         return;
                     }
@@ -865,6 +886,7 @@ public static partial class ApkIconService
                 catch { /* per-request failures are handled inside ProcessRequestAsync */ }
             }
 
+            var queueIdle = false;
             lock (QueueLock)
             {
                 if (generation == WorkerGeneration)
@@ -873,9 +895,13 @@ public static partial class ApkIconService
                     if (LoadQueue.Count > 0 && !Data.DeviceCts.IsCancellationRequested)
                         StartWorker_NoLock();
                     else
-                        SetIconLoadProgress(false);
+                        queueIdle = true;
                 }
             }
+
+            // Raised outside the lock; see comment above.
+            if (queueIdle)
+                SetIconLoadProgress(false);
         }
     }
 
