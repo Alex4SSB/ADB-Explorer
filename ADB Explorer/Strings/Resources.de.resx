@@ -864,7 +864,7 @@ Alle laufenden Vorgänge abbrechen</value>
     <value>Wechselspannung</value>
   </data>
   <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
-    <value>Kein</value>
+    <value>Keine</value>
   </data>
   <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
     <value>Unbekannt</value>
@@ -909,7 +909,7 @@ Alle laufenden Vorgänge abbrechen</value>
     <value>WSA-Start</value>
   </data>
   <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
-    <value>Nicht mehr anzeigen.</value>
+    <value>Nicht erneut anzeigen.</value>
   </data>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Abbrechen</value>
@@ -1352,7 +1352,7 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
     <value>Aus</value>
   </data>
   <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
-    <value>mDNS-Serverstatus wird überprüft…</value>
+    <value>mDNS-Serverstatus wird überprüft …</value>
   </data>
   <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
     <value>Symbole</value>
@@ -1555,5 +1555,47 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_SEARCH_OPTIONS" xml:space="preserve">
     <value>Suchoptionen</value>
+  </data>
+  <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
+    <value>Datei wird übersprungen.</value>
+  </data>
+  <data name="S_NEWER" xml:space="preserve">
+    <value>nie</value>
+  </data>
+  <data name="S_BIGGER" xml:space="preserve">
+    <value>größer</value>
+  </data>
+  <data name="S_TOOLTIP_REPLACED" xml:space="preserve">
+    <value>Datei wird ersetzt.</value>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - Offline</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>Status: {0}</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX" xml:space="preserve">
+    <value>Syntax</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX_AUTOMATIC" xml:space="preserve">
+    <value>Automatisch</value>
+  </data>
+  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
+    <value>Komprimierte Größe</value>
+  </data>
+  <data name="S_PACKED_SIZE" xml:space="preserve">
+    <value>Gepackte Größe</value>
+  </data>
+  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
+    <value>Verhältnis</value>
+  </data>
+  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
+    <value>Verfahren</value>
+  </data>
+  <data name="S_OPEN_FOLDER" xml:space="preserve">
+    <value>Öffnen</value>
+  </data>
+  <data name="S_RESTART" xml:space="preserve">
+    <value>Jetzt neu starten</value>
   </data>
 </root>
