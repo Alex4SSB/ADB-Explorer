@@ -406,7 +406,7 @@ Le contenu visible peut être incomplet.</value>
     <value>Il y a {0} objets en conflit dans {1}</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Coller conflits</value>
+    <value>Remplacer ou ignorer des fichiers</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Sélectionnez dossiers à pousser</value>
@@ -1748,5 +1748,32 @@ Séléctionnez Personnalisé pour utiliser un emplacement qui ne sera pas suppri
   </data>
   <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
     <value>Quitter le mode résultats de recherche.</value>
+  </data>
+  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
+    <value>Remplacer les fichiers dans la destination</value>
+  </data>
+  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
+    <value>Ignorer ces fichiers</value>
+  </data>
+  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
+    <value>Me laisser décider pour chaque fichier</value>
+  </data>
+  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
+    <value>Résoudre {0} conflit</value>
+  </data>
+  <data name="S_NEWER" xml:space="preserve">
+    <value>Plus récents</value>
+  </data>
+  <data name="S_BIGGER" xml:space="preserve">
+    <value>Plus grands</value>
+  </data>
+  <data name="S_PER_FILE_CONFLICT_TABLE_TITLE" xml:space="preserve">
+    <value>Pour chaque conflit, sélectionnez sa destination pour le sauter ou sa source pour le remplacer.</value>
+  </data>
+  <data name="S_TOOLTIP_REPLACED" xml:space="preserve">
+    <value>Le fichier sera remplacé.</value>
+  </data>
+  <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
+    <value>Le fichier sera ignoré.</value>
   </data>
 </root>
