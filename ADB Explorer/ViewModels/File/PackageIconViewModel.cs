@@ -9,7 +9,8 @@ namespace ADB_Explorer.ViewModels;
 /// </summary>
 public partial class PackageIconViewModel : ObservableObject
 {
-    private static readonly BitmapSource FallbackIcon = DefaultAndroidPackageIcon.Bitmap;
+    private static readonly BitmapSource LoadingPlaceholder = DefaultAndroidPackageIcon.GrayscaleBitmap;
+    private static readonly BitmapSource MissingIconPlaceholder = DefaultAndroidPackageIcon.Bitmap;
 
     private readonly Package _package;
 
@@ -22,13 +23,26 @@ public partial class PackageIconViewModel : ObservableObject
     {
         get
         {
-            // Always ensure the label — icons may already be cached while the name is still empty.
-            ApkIconService.BeginEnsureLabelForPackage(_package, priority: true);
-
+            // Binding re-reads this on every recycle/scroll. Only kick a load when needed.
+            // Skip while force-reload / stop has blocked the queue — keep grayscale placeholder.
             if (_package.Icon is null)
-                ApkIconService.BeginLoadForPackage(_package, priority: true);
+            {
+                if (!ApkIconService.IsLoadingStopped)
+                    ApkIconService.BeginLoadForPackage(_package, ApkIconService.ApkLoadPriority.Visible);
+            }
+            else
+            {
+                ApkIconService.BeginEnsureLabelForPackage(_package, ApkIconService.ApkLoadPriority.Visible);
+            }
 
-            return _package.Icon ?? FallbackIcon;
+            if (_package.Icon is not null)
+                return _package.Icon;
+
+            // Grayscale while in-flight; green Bugdroid once loading finished with no icon.
+            if (_package.IconLoadCompleted)
+                return MissingIconPlaceholder;
+
+            return LoadingPlaceholder;
         }
     }
 
@@ -37,9 +51,6 @@ public partial class PackageIconViewModel : ObservableObject
     public BitmapSource? VideoIconOverlay => null;
 
     public string? IconViewTooltip => _package.DisplayName;
-
-    [ObservableProperty]
-    public partial bool IsInEditMode { get; set; }
 
     public void OnIconChanged() => OnPropertyChanged(nameof(LargeIcon));
 

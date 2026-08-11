@@ -32,6 +32,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     private bool _suppressSortApply;
 
     private readonly DispatcherTimer _filterDebounceTimer;
+    private readonly DispatcherTimer _packageSortCatchUpTimer;
 
     partial void OnSortDirectionChanged(ListSortDirection? value)
     {
@@ -139,9 +140,12 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     }
 
     /// <summary>
-    /// Disables live sorting the moment the icon/label queue starts (so streaming labels can't
-    /// trigger a live-sort reorder mid-click), and once it goes idle again, re-applies the sort
-    /// as a one-shot refresh, then re-enables live sorting. Preserves selection across the refresh.
+    /// Disables live sorting while the icon/label queue is active (streaming labels would
+    /// reorder mid-click and reset ListView selection). On idle, re-enable live sorting only —
+    /// do not Clear/re-add <see cref="SortDescription"/>s: that refreshes the view, resets
+    /// virtualization, and blanks all but a few tiles (especially when scroll keeps restarting
+    /// the queue). Labels that arrived while paused are caught up via a debounced
+    /// <see cref="DisplayName"/> nudge after the queue stays idle.
     /// </summary>
     private void OnApkIconLoadProgressChanged(bool active)
     {
@@ -155,27 +159,45 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
             if (active)
             {
+                _packageSortCatchUpTimer.Stop();
                 DisablePackageLiveSorting(view);
                 return;
             }
 
-            if (SortDirection is not { } dir || SortedColumn is not { } col)
-                return;
-
-            var selected = Data.Packages?.Where(static p => p.IsSelected).ToList() ?? [];
-
-            ApplyPackageSortToView(view, col, dir);
-
-            if (selected.Count == 0 || Data.Packages is null)
-                return;
-
-            foreach (var pkg in Data.Packages)
-            {
-                var shouldSelect = selected.Contains(pkg);
-                if (pkg.IsSelected != shouldSelect)
-                    pkg.IsSelected = shouldSelect;
-            }
+            EnablePackageLiveSorting(view);
+            _packageSortCatchUpTimer.Stop();
+            _packageSortCatchUpTimer.Start();
         });
+    }
+
+    private void PackageSortCatchUpTimer_Tick(object? sender, EventArgs e)
+    {
+        _packageSortCatchUpTimer.Stop();
+
+        if (!Data.FileActions.IsAppDrive || ApkIconService.IsLoadInProgress)
+            return;
+        if (ExplorerItemsSource is not ListCollectionView { IsLiveSorting: true })
+            return;
+        if (Data.Packages is not { Count: > 0 } packages)
+            return;
+
+        var selected = packages.Where(static p => p.IsSelected).ToList();
+        var pending = packages.Where(static p => p.NeedsLiveSortCatchUp).ToList();
+        if (pending.Count == 0)
+            return;
+
+        foreach (var pkg in pending)
+            pkg.NotifyDisplayNameForSort();
+
+        if (selected.Count == 0)
+            return;
+
+        foreach (var pkg in packages)
+        {
+            var shouldSelect = selected.Contains(pkg);
+            if (pkg.IsSelected != shouldSelect)
+                pkg.IsSelected = shouldSelect;
+        }
     }
 
     private static void DisablePackageLiveSorting(ICollectionView view)
@@ -299,6 +321,11 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
             _filterDebounceTimer.Stop();
             RefreshExplorerFilter();
         };
+
+        // After icon/label queue idle (+ progress hide debounce), wait a bit longer so scroll
+        // bursts do not thrash live-sort catch-up.
+        _packageSortCatchUpTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(750) };
+        _packageSortCatchUpTimer.Tick += PackageSortCatchUpTimer_Tick;
 
         Data.DevicesObjectCreated += (_, _) => App.SafeInvoke(EnsureDevicesSubscription);
 
@@ -593,5 +620,76 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
         DriveItemsSource = view;
     }
+
+#if DEBUG
+    [ObservableProperty]
+    public partial string DebugApkLoadStatus { get; set; } = "";
+
+    [RelayCommand]
+    private void StopApkIconLoading()
+    {
+        ApkIconService.StopAllLoading();
+        DebugApkLoadStatus = "Stopped — scroll will not load more icons";
+    }
+
+    [RelayCommand]
+    private void ForceReloadSelectedApkIcon()
+    {
+        var selected = Data.SelectedPackages?.Where(static p => p is not null).ToList() ?? [];
+        if (selected.Count == 0)
+        {
+            DebugApkLoadStatus = "No package selected";
+            return;
+        }
+
+        if (selected.Count == 1)
+        {
+            var package = selected[0];
+            DebugApkLoadStatus = $"Reloading {package.Name}…";
+            ApkIconService.ForceReloadPackage(package, report =>
+            {
+                App.SafeBeginInvoke(() =>
+                {
+                    try { Clipboard.SetText(report); }
+                    catch { /* clipboard busy */ }
+
+                    var totalLine = report.Split('\n')
+                        .LastOrDefault(static l => l.StartsWith("Total:", StringComparison.Ordinal))
+                        ?.Trim();
+                    DebugApkLoadStatus = string.IsNullOrEmpty(totalLine)
+                        ? "Done — timing copied"
+                        : $"{totalLine} — timing copied";
+                });
+            });
+            return;
+        }
+
+        DebugApkLoadStatus = $"Reloading {selected.Count} packages…";
+        var remaining = selected.Count;
+        var reports = new System.Collections.Concurrent.ConcurrentBag<string>();
+        foreach (var package in selected)
+        {
+            ApkIconService.ForceReloadPackage(package, report =>
+            {
+                reports.Add(report);
+                App.SafeBeginInvoke(() =>
+                {
+                    remaining--;
+                    if (remaining > 0)
+                        return;
+
+                    var combined = string.Join("\n---\n", reports);
+                    try { Clipboard.SetText(combined); }
+                    catch { /* clipboard busy */ }
+
+                    DebugApkLoadStatus = $"{selected.Count} packages — timing copied";
+                });
+            });
+        }
+    }
+#else
+    // Bound from XAML (collapsed unless RuntimeSettings.IsDebug); keep members for release builds.
+    public string DebugApkLoadStatus => "";
+#endif
 
 }

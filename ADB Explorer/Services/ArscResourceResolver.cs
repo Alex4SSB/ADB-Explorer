@@ -3,7 +3,7 @@ namespace ADB_Explorer.Services;
 /// <summary>
 /// Minimal resources.arsc reader that handles sparse/offset16 type chunks.
 /// AlphaOmega's <c>ResourceMap</c> collapses configs and often maps the wrong string
-/// for sparse packages (Termux, Earth, WhatsApp, etc.).
+/// for sparse packages.
 /// </summary>
 internal static class ArscResourceResolver
 {
@@ -88,89 +88,6 @@ internal static class ArscResourceResolver
             .ToList();
     }
 
-    /// <summary>
-    /// Finds drawable/mipmap file paths whose resource key contains any of
-    /// <paramref name="keyHints"/> (e.g. <c>security_privacy</c> for Contact Keys).
-    /// </summary>
-    public static List<string> FindDrawablePathsByKeyHints(byte[] arscBytes, params string[] keyHints)
-    {
-        if (arscBytes.Length < 12 || keyHints.Length == 0)
-            return [];
-
-        try
-        {
-            if (!TryParsePackages(arscBytes, out var valuePool, out var packages))
-                return [];
-
-            var paths = new List<string>();
-            foreach (var package in packages)
-            {
-                var drawableTypeIds = new HashSet<int>();
-                for (var i = 0; i < package.Types.Length; i++)
-                {
-                    var typeName = package.Types[i];
-                    if (typeName.Equals("drawable", StringComparison.OrdinalIgnoreCase)
-                        || typeName.Equals("mipmap", StringComparison.OrdinalIgnoreCase))
-                        drawableTypeIds.Add(i + 1); // type ids are 1-based
-                }
-
-                if (drawableTypeIds.Count == 0)
-                    continue;
-
-                foreach (var chunk in package.TypeChunks)
-                {
-                    if (!drawableTypeIds.Contains(chunk.TypeId))
-                        continue;
-
-                    foreach (var (index, entryOffset) in EnumerateEntryOffsets(arscBytes, chunk))
-                    {
-                        var entryPos = chunk.ChunkPos + chunk.EntriesStart + entryOffset;
-                        if (entryPos + 8 > arscBytes.Length)
-                            continue;
-
-                        var keyIndex = BitConverter.ToInt32(arscBytes, entryPos + 4);
-                        if (keyIndex < 0 || keyIndex >= package.Keys.Length)
-                            continue;
-
-                        var key = package.Keys[keyIndex];
-                        if (string.IsNullOrEmpty(key) || !keyHints.Any(h => KeyMatchesHint(key, h)))
-                            continue;
-
-                        var resourceId = (package.Id << 24) | (chunk.TypeId << 16) | index;
-                        paths.AddRange(ResolvePaths(arscBytes, resourceId));
-                    }
-                }
-            }
-
-            return paths.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-        }
-        catch
-        {
-            return [];
-        }
-    }
-
-    /// <summary>
-    /// Matches resource keys as path segments, not raw substrings.
-    /// <c>gs_</c> must not hit <c>settings_*</c> (<c>…gs_…</c> inside "settings").
-    /// </summary>
-    private static bool KeyMatchesHint(string key, string hint)
-    {
-        if (string.IsNullOrEmpty(hint))
-            return false;
-
-        if (key.Equals(hint, StringComparison.OrdinalIgnoreCase)
-            || key.StartsWith(hint, StringComparison.OrdinalIgnoreCase))
-            return true;
-
-        // Segment boundary: "_gs_android…" or "prefix_gs_…"
-        return key.Contains("_" + hint, StringComparison.OrdinalIgnoreCase);
-    }
-
-    /// <summary>
-    /// AccuBattery stores some drawables as root zip entries (<c>aw</c>, <c>bt</c>) without a
-    /// <c>res/</c> prefix. Accept those plus normal <c>res/…</c> paths.
-    /// </summary>
     private static bool IsDrawablePath(string value)
     {
         if (value.StartsWith("res/", StringComparison.OrdinalIgnoreCase))
@@ -302,7 +219,7 @@ internal static class ArscResourceResolver
         if (IsPseudoAccentLabel(value))
             return false;
 
-        // Obfuscated single-token junk (e.g. "ab"), not short real brands like "bit" / "VLC".
+        // Obfuscated single-token junk (e.g. "ab"), not short real labels.
         if (value.Length <= 2)
             return false;
 

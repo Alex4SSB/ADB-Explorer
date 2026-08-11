@@ -40,14 +40,21 @@ public partial class ThumbProgressTooltip : UserControl
         {
             ThumbnailService.ThumbnailProgressChanged += OnThumbnailProgressChanged;
             ThumbnailService.ThumbnailPullingProgressUpdated += OnThumbnailPullingProgressUpdated;
-            ApkIconService.IconLoadProgressChanged += OnApkIconLoadProgressChanged;
+            // Icon pulls only — label-only backfill (common while scrolling after icons are done)
+            // still uses IconLoadProgressChanged for live-sort pausing, but must not show this tooltip.
+            ApkIconService.IconPullProgressChanged += OnApkIconPullProgressChanged;
             ApkIconService.IconLoadProgressTick += OnApkIconLoadProgressTick;
+
+            // Package icon-view sort refresh can unload/recreate this control while loads are
+            // still active; the start event already fired, so resync visibility on Loaded.
+            if (ApkIconService.IsIconPullInProgress)
+                ShowApkIconProgress();
         };
         Unloaded += (_, _) =>
         {
             ThumbnailService.ThumbnailProgressChanged -= OnThumbnailProgressChanged;
             ThumbnailService.ThumbnailPullingProgressUpdated -= OnThumbnailPullingProgressUpdated;
-            ApkIconService.IconLoadProgressChanged -= OnApkIconLoadProgressChanged;
+            ApkIconService.IconPullProgressChanged -= OnApkIconPullProgressChanged;
             ApkIconService.IconLoadProgressTick -= OnApkIconLoadProgressTick;
             StopPullTimeoutTimer();
         };
@@ -55,26 +62,38 @@ public partial class ThumbProgressTooltip : UserControl
 
     private void OnApkIconLoadProgressTick()
     {
+        // Only keep the idle timeout alive while an icon pull is actually showing.
+        if (!_apkIconProgressActive && !ApkIconService.IsIconPullInProgress)
+            return;
+
         App.SafeBeginInvoke(ResetPullTimeoutTimer);
     }
 
-    private void OnApkIconLoadProgressChanged(bool isStarting)
+    private void OnApkIconPullProgressChanged(bool isStarting)
     {
         App.SafeBeginInvoke(() =>
         {
-            _apkIconProgressActive = isStarting;
             if (isStarting)
             {
-                ProgressText = Strings.Resources.S_THUMB_SNACKBAR_APK_ICONS;
-                Visibility = Visibility.Visible;
-                StartPullTimeoutTimer();
+                ShowApkIconProgress();
+                return;
             }
-            else
-            {
-                StopPullTimeoutTimer();
-                UpdateVisibilityAfterProgressEnd();
-            }
+
+            _apkIconProgressActive = false;
+            StopPullTimeoutTimer();
+            UpdateVisibilityAfterProgressEnd();
         });
+    }
+
+    private void ShowApkIconProgress()
+    {
+        _apkIconProgressActive = true;
+        ProgressText = Strings.Resources.S_THUMB_SNACKBAR_APK_ICONS;
+        // Avoid Visibility.Collapsed ↔ Visible toggles that re-fire Rectangle.Loaded and
+        // restart the stroke animation (visible flicker between icon-load batches).
+        if (Visibility != Visibility.Visible)
+            Visibility = Visibility.Visible;
+        StartPullTimeoutTimer();
     }
 
     private void OnThumbnailProgressChanged(ThumbnailService.ThumbnailStep step, bool isStarting)
@@ -154,6 +173,16 @@ public partial class ThumbProgressTooltip : UserControl
 
     private void OnPullTimeout(object? sender, EventArgs e)
     {
+        // Keep showing while APK icons are still pulling — individual pulls can take
+        // longer than the idle timeout when concurrency is capped and the queue is deep.
+        // Label-only work must not keep this tooltip alive.
+        if (ApkIconService.IsIconPullInProgress)
+        {
+            ShowApkIconProgress();
+            ResetPullTimeoutTimer();
+            return;
+        }
+
         StopPullTimeoutTimer();
         _apkIconProgressActive = false;
         _thumbnailProgressActive = false;

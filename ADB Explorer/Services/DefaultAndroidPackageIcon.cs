@@ -39,8 +39,14 @@ internal static class DefaultAndroidPackageIcon
     private static readonly Lazy<BitmapSource> LazyBitmap =
         new(() => Render(DefaultSize), LazyThreadSafetyMode.ExecutionAndPublication);
 
+    private static readonly Lazy<BitmapSource> LazyGrayscaleBitmap =
+        new(CreateGrayscaleBitmap, LazyThreadSafetyMode.ExecutionAndPublication);
+
     /// <summary>Cached 512×512 adaptive-template icon for UI bindings.</summary>
     public static BitmapSource Bitmap => LazyBitmap.Value;
+
+    /// <summary>Desaturated copy of <see cref="Bitmap"/> — package icon-view placeholder while loading.</summary>
+    public static BitmapSource GrayscaleBitmap => LazyGrayscaleBitmap.Value;
 
     public static BitmapSource Render(int size = DefaultSize)
     {
@@ -48,6 +54,30 @@ internal static class DefaultAndroidPackageIcon
 
         using var sk = RenderToSkBitmap(size);
         return ApkVectorIconRenderer.ToBitmapSource(sk);
+    }
+
+    private static BitmapSource CreateGrayscaleBitmap()
+    {
+        using var color = RenderToSkBitmap(DefaultSize);
+        using var gray = new SKBitmap(color.Width, color.Height, SKColorType.Bgra8888, SKAlphaType.Premul);
+        using var canvas = new SKCanvas(gray);
+        canvas.Clear(SKColors.Transparent);
+
+        // Rec. 709 luminance → RGB (keep alpha).
+        float[] matrix =
+        [
+            0.2126f, 0.7152f, 0.0722f, 0, 0,
+            0.2126f, 0.7152f, 0.0722f, 0, 0,
+            0.2126f, 0.7152f, 0.0722f, 0, 0,
+            0, 0, 0, 1, 0,
+        ];
+        using var paint = new SKPaint
+        {
+            IsAntialias = true,
+            ColorFilter = SKColorFilter.CreateColorMatrix(matrix),
+        };
+        canvas.DrawBitmap(color, 0, 0, paint);
+        return ApkVectorIconRenderer.ToBitmapSource(gray);
     }
 
     public static SKBitmap RenderToSkBitmap(int size = DefaultSize)

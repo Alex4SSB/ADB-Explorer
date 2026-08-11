@@ -5,7 +5,7 @@ namespace ADB_Explorer.Services;
 /// <summary>
 /// Reads selected <c>&lt;application&gt;</c> attributes from binary AndroidManifest AXML.
 /// AlphaOmega often drops attribute names when the manifest uses the XML resource-id map
-/// (AccuBattery: nameless theme + missing label).
+/// (nameless theme + missing label).
 /// </summary>
 internal static class AxmlManifestReader
 {
@@ -99,7 +99,7 @@ internal static class AxmlManifestReader
                                 DataTypeString => rawValue >= 0
                                     ? GetString(strings, rawValue)
                                     : GetString(strings, (int)data),
-                                // Never treat booleans as label/icon (El Al mis-bind → "true").
+                                // Never treat booleans as label/icon.
                                 DataTypeIntBoolean => null,
                                 _ => null,
                             };
@@ -132,7 +132,7 @@ internal static class AxmlManifestReader
                     if (inApplication && depth <= 1)
                     {
                         inApplication = false;
-                        // Do not return null — Zoom's wrong early match used to bail here.
+                        // Do not return null — a wrong early match used to bail here.
                         // Keep scanning for a real <application> if we haven't returned yet.
                     }
                 }

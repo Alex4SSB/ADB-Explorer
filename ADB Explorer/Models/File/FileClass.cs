@@ -64,6 +64,9 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     [ObservableProperty]
     public partial bool IsIconPlaceholder { get; set; }
+
+    /// <summary>Files support F2 / delayed-click rename in icon view; packages do not.</summary>
+    public bool SupportsIconRename => true;
     
     private FileType type;
     public FileType Type

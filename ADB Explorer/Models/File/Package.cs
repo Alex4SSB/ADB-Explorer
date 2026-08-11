@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.ViewModels;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Models;
 
@@ -25,7 +26,24 @@ public partial class Package : ObservableObject, IBrowserItem
     partial void OnLabelChanged(string? value)
     {
         OnPropertyChanged(nameof(DisplayName));
+        OnPropertyChanged(nameof(NameFlowDirection));
         _iconViewModel?.OnDisplayNameChanged();
+        NeedsLiveSortCatchUp = true;
+    }
+
+    /// <summary>
+    /// Set when <see cref="Label"/> changes; cleared after a live-sort catch-up nudge.
+    /// </summary>
+    public bool NeedsLiveSortCatchUp { get; private set; }
+
+    /// <summary>
+    /// Re-raises <see cref="DisplayName"/> so <see cref="ListCollectionView"/> live sorting can
+    /// catch up after it was paused (label updates during the pause do not reorder).
+    /// </summary>
+    public void NotifyDisplayNameForSort()
+    {
+        NeedsLiveSortCatchUp = false;
+        OnPropertyChanged(nameof(DisplayName));
     }
 
     public FolderViewModel FolderViewModel => null;
@@ -42,7 +60,11 @@ public partial class Package : ObservableObject, IBrowserItem
     /// <summary>Unused for packages; kept so <see cref="Views.FileIconView"/> bindings resolve.</summary>
     public bool IsLink => false;
 
-    public FlowDirection NameFlowDirection => FlowDirection.LeftToRight;
+    /// <summary>Packages are not renamed from icon view.</summary>
+    public bool SupportsIconRename => false;
+
+    public FlowDirection NameFlowDirection =>
+        TextHelper.ContainsRtl(DisplayName) ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
 
     [ObservableProperty]
     public partial PackageType Type { get; set; }
@@ -65,7 +87,21 @@ public partial class Package : ObservableObject, IBrowserItem
     [ObservableProperty]
     public partial BitmapSource? Icon { get; set; }
 
-    partial void OnIconChanged(BitmapSource? value) => _iconViewModel?.OnIconChanged();
+    /// <summary>
+    /// True after an icon fetch finished (success or fail). While false and <see cref="Icon"/> is null,
+    /// icon view shows the grayscale Bugdroid placeholder.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IconLoadCompleted { get; set; }
+
+    partial void OnIconChanged(BitmapSource? value)
+    {
+        if (value is not null)
+            IconLoadCompleted = true;
+        _iconViewModel?.OnIconChanged();
+    }
+
+    partial void OnIconLoadCompletedChanged(bool value) => _iconViewModel?.OnIconChanged();
 
     public static Package New(string package, PackageType type)
     {

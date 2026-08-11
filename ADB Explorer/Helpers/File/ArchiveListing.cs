@@ -163,6 +163,12 @@ public static class ArchiveListing
         if (ArchiveHelper.GetFamily(archivePath) is not ArchiveFamily.Zip)
             return [];
 
+#if DEBUG
+        ApkIconService.MarkLoadStep(
+            $"FetchZipMemberListing start ({members.Count}): {string.Join(',', members)}");
+        var sw = Stopwatch.StartNew();
+#endif
+
         var unzip = ShellCommands.TranslateCommand("unzip");
         var args = new List<string>
         {
@@ -183,7 +189,12 @@ public static class ArchiveListing
         _ = ADBService.ExecuteDeviceAdbShellCommand(
             deviceId, unzip, out var stdout, out _, cancellationToken, [.. args]);
 
-        return ParseZip(stdout).Entries;
+        var entries = ParseZip(stdout).Entries;
+#if DEBUG
+        ApkIconService.MarkLoadStep(
+            $"FetchZipMemberListing parse done ({entries.Count} hits, stdout={stdout.Length}B, {sw.ElapsedMilliseconds}ms)");
+#endif
+        return entries;
     }
 
     public static void InvalidateToc(string archivePath)

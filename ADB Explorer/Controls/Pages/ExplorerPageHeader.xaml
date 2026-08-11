@@ -160,6 +160,44 @@
             </Grid.ColumnDefinitions>
             <local:AdbMenu x:Name="MainToolBar" Style="{StaticResource MainToolBarStyle}" />
             <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <StackPanel
+                    Margin="4,0,4,0"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsDebug}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static models:Data.FileActions}, Path=IsAppDrive}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <Button
+                        Margin="0,0,4,0"
+                        Padding="6,2"
+                        Command="{Binding StopApkIconLoadingCommand}"
+                        Content="Stop icons"
+                        FontSize="11"
+                        ToolTip="Stop all APK icon/label loading (scroll will not restart)" />
+                    <Button
+                        Margin="0,0,4,0"
+                        Padding="6,2"
+                        Command="{Binding ForceReloadSelectedApkIconCommand}"
+                        Content="Reload selected"
+                        FontSize="11"
+                        ToolTip="Clear and reload icon+name for the selected package(s)" />
+                    <TextBlock
+                        Margin="0,0,4,0"
+                        VerticalAlignment="Center"
+                        FontSize="11"
+                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                        Text="{Binding DebugApkLoadStatus}" />
+                </StackPanel>
                 <Separator Margin="0,2">
                     <Separator.Style>
                         <Style BasedOn="{StaticResource {x:Type Separator}}" TargetType="Separator">
@@ -295,6 +333,7 @@
                     ItemsSource="{Binding ExplorerItemsSource}"
                     MouseMove="IconView_MouseMove"
                     PreviewMouseDown="IconView_PreviewMouseDown"
+                    ScrollViewer.ScrollChanged="ExplorerScrollViewer_ScrollChanged"
                     SelectionChanged="ExplorerGrid_SelectionChanged">
                     <local:AdbListView.Resources>
                         <DataTemplate x:Key="FileIconViewTemplate">
@@ -363,6 +402,7 @@
                         MouseDown="ExplorerGrid_MouseDown"
                         MouseMove="ExplorerGrid_MouseMove"
                         RowStyle="{StaticResource RowStyle}"
+                        ScrollViewer.ScrollChanged="ExplorerScrollViewer_ScrollChanged"
                         SelectionChanged="ExplorerGrid_SelectionChanged"
                         SelectionMode="Extended"
                         SelectionUnit="FullRow"

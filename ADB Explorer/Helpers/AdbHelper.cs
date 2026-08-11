@@ -142,18 +142,39 @@ public static class AdbHelper
 
     public static async Task<MemoryStream?> ReadFileAsStreamAsync(LogicalDeviceViewModel device, string path, CancellationToken cancellationToken = default)
     {
+#if DEBUG
+        ApkIconService.MarkLoadStep($"ReadFileAsStreamAsync start: {path}");
+        var sw = Stopwatch.StartNew();
+#endif
         try
         {
             if (ArchivePath.TryParse(path, out var archivePath, out var internalPath, device.ID)
                 && !string.IsNullOrEmpty(internalPath))
             {
-                return await ReadArchiveMemberAsStreamAsync(device, archivePath, internalPath, cancellationToken);
+                var stream = await ReadArchiveMemberAsStreamAsync(device, archivePath, internalPath, cancellationToken);
+#if DEBUG
+                var len = stream?.Length ?? 0;
+                ApkIconService.MarkLoadStep(
+                    $"ReadFileAsStreamAsync done archive-member ({len}B, {sw.ElapsedMilliseconds}ms): {path}");
+#endif
+                return stream;
             }
 
-            return await PullPathAsStreamAsync(device, path, cancellationToken);
+            {
+                var stream = await PullPathAsStreamAsync(device, path, cancellationToken);
+#if DEBUG
+                var len = stream?.Length ?? 0;
+                ApkIconService.MarkLoadStep(
+                    $"ReadFileAsStreamAsync done pull ({len}B, {sw.ElapsedMilliseconds}ms): {path}");
+#endif
+                return stream;
+            }
         }
         catch (OperationCanceledException)
         {
+#if DEBUG
+            ApkIconService.MarkLoadStep($"ReadFileAsStreamAsync cancelled ({sw.ElapsedMilliseconds}ms): {path}");
+#endif
             return null;
         }
     }
@@ -192,6 +213,11 @@ public static class AdbHelper
         string path,
         CancellationToken cancellationToken)
     {
+#if DEBUG
+        ApkIconService.MarkLoadStep($"SyncService.PullAsync start: {path}");
+        var sw = Stopwatch.StartNew();
+#endif
+
         MemoryStream stream = new();
         using (SyncService service = new(device.Device.DeviceData))
         {
@@ -202,11 +228,19 @@ public static class AdbHelper
             }
             catch
             {
+#if DEBUG
+                ApkIconService.MarkLoadStep(
+                    $"SyncService.PullAsync failed ({sw.ElapsedMilliseconds}ms): {path}");
+#endif
                 return null;
             }
         }
 
         stream.Position = 0;
+#if DEBUG
+        ApkIconService.MarkLoadStep(
+            $"SyncService.PullAsync done ({stream.Length}B, {sw.ElapsedMilliseconds}ms): {path}");
+#endif
         return stream;
     }
 

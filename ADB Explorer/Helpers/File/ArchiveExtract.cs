@@ -41,6 +41,9 @@ public static class ArchiveExtract
 
         // Never cancel cleanup — a cancelled extract/pull token must not leave temp dirs behind.
         _ = cancellationToken;
+#if DEBUG
+        ApkIconService.MarkLoadStep($"CleanupStaging: {stagingRoot}");
+#endif
         RemoveDeviceTree(deviceId, stagingRoot);
         ActiveStagingRoots.TryRemove(stagingRoot, out _);
     }
@@ -765,11 +768,16 @@ public static class ArchiveExtract
     /// Extracts specific zip members into a staging content root (paths preserved under that root).
     /// Caller must <see cref="CleanupStaging"/> the returned staging root.
     /// </summary>
+    /// <remarks>
+    /// Unlike <see cref="ExtractSelectionForPull"/>, this does not <c>mv</c> members to a flat
+    /// <c>out/</c> basename — pull from <c>contentRoot/member</c> directly.
+    /// </remarks>
     public static (string StagingRoot, string ContentRoot) ExtractZipMembersToStaging(
         string deviceId,
         string archivePath,
         IReadOnlyList<string> members,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        bool allowMissingMembers = false)
     {
         if (ArchiveHelper.GetFamily(archivePath) is not ArchiveFamily.Zip)
             throw new InvalidOperationException($"Not a zip archive: {archivePath}");
@@ -777,26 +785,80 @@ public static class ArchiveExtract
         if (members is null || members.Count == 0)
             throw new ArgumentException("At least one member is required.", nameof(members));
 
+#if DEBUG
+        ApkIconService.MarkLoadStep(
+            $"ExtractZipMembersToStaging start ({members.Count}): {string.Join(',', members)}");
+        var sw = Stopwatch.StartNew();
+#endif
+
         var stagingRoot = CreateStagingRoot(deviceId, cancellationToken);
         try
         {
             var contentRoot = FileHelper.ConcatPaths(stagingRoot, "content");
             ShellFileOperation.MakeDirs(deviceId, [contentRoot]).GetAwaiter().GetResult();
 
-            var exitCode = ExtractZip(deviceId, archivePath, contentRoot, members, cancellationToken, out var stdout, out var stderr);
-            if (exitCode != 0)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
-            }
+            ExtractZipMembersInto(
+                deviceId, archivePath, contentRoot, members, cancellationToken, allowMissingMembers);
 
+#if DEBUG
+            ApkIconService.MarkLoadStep(
+                $"ExtractZipMembersToStaging done ({sw.ElapsedMilliseconds}ms)");
+#endif
             return (stagingRoot, contentRoot);
         }
         catch
         {
+#if DEBUG
+            ApkIconService.MarkLoadStep(
+                $"ExtractZipMembersToStaging failed ({sw.ElapsedMilliseconds}ms)");
+#endif
             CleanupStaging(deviceId, stagingRoot, CancellationToken.None);
             throw;
         }
+    }
+
+    /// <summary>
+    /// Extracts named zip members into an existing content root (paths preserved).
+    /// When <paramref name="allowMissingMembers"/> is true, a non-zero unzip exit is tolerated
+    /// (Android/Info-ZIP still extract matches; absent names do not roll back prior files).
+    /// </summary>
+    public static void ExtractZipMembersInto(
+        string deviceId,
+        string archivePath,
+        string contentRoot,
+        IReadOnlyList<string> members,
+        CancellationToken cancellationToken = default,
+        bool allowMissingMembers = false)
+    {
+        if (ArchiveHelper.GetFamily(archivePath) is not ArchiveFamily.Zip)
+            throw new InvalidOperationException($"Not a zip archive: {archivePath}");
+
+        if (string.IsNullOrEmpty(contentRoot))
+            throw new ArgumentException("Content root is required.", nameof(contentRoot));
+
+        if (members is null || members.Count == 0)
+            throw new ArgumentException("At least one member is required.", nameof(members));
+
+#if DEBUG
+        ApkIconService.MarkLoadStep(
+            $"ExtractZipMembersInto ({members.Count}, allowMissing={allowMissingMembers}): {string.Join(',', members)}");
+#endif
+
+        var exitCode = ExtractZip(deviceId, archivePath, contentRoot, members, cancellationToken, out var stdout, out var stderr);
+        if (exitCode == 0)
+            return;
+
+        cancellationToken.ThrowIfCancellationRequested();
+        if (allowMissingMembers)
+        {
+#if DEBUG
+            ApkIconService.MarkLoadStep(
+                $"ExtractZipMembersInto non-zero exit={exitCode} (tolerated); stderr={stderr}");
+#endif
+            return;
+        }
+
+        throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
     }
 
     private static int ExtractZip(
@@ -819,6 +881,9 @@ public static class ArchiveExtract
         };
         args.AddRange(members.Select(m => ADBService.EscapeAdbShellString(m)));
 
+#if DEBUG
+        ApkIconService.MarkLoadStep($"ExtractZip (unzip -o -q) {members.Count} member(s)");
+#endif
         return ADBService.ExecuteDeviceAdbShellCommand(deviceId, unzip, out stdout, out stderr, cancellationToken, [.. args]);
     }
 

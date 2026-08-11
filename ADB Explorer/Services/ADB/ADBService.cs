@@ -93,6 +93,12 @@ public partial class ADBService
     public static int ExecuteCommand(
         string file, string cmd, out string stdout, out string stderr, Encoding encoding, CancellationToken cancellationToken, params string[] args)
     {
+#if DEBUG
+        var summary = FormatProcessSummary(file, cmd, args);
+        ApkIconService.MarkLoadStep($"ADB start: {summary}");
+        var sw = Stopwatch.StartNew();
+#endif
+
         UpdateCommandActive(1);
         using var cmdProcess = StartCommandProcess(file, cmd, encoding, args: args);
         ActiveCommandProcesses[cmdProcess.Id] = cmdProcess;
@@ -109,6 +115,10 @@ public partial class ADBService
 
             stdout = stdoutTask.Result;
             stderr = stderrTask.Result;
+#if DEBUG
+            ApkIconService.MarkLoadStep(
+                $"ADB done exit={cmdProcess.ExitCode} out={stdout.Length}B err={stderr.Length}B ({sw.ElapsedMilliseconds}ms): {summary}");
+#endif
             return cmdProcess.ExitCode;
         }
         catch (OperationCanceledException)
@@ -122,6 +132,9 @@ public partial class ADBService
             stdout = "";
             stderr = "";
 
+#if DEBUG
+            ApkIconService.MarkLoadStep($"ADB cancelled ({sw.ElapsedMilliseconds}ms): {summary}");
+#endif
             return -1;
         }
         finally
@@ -130,6 +143,17 @@ public partial class ADBService
             UpdateCommandActive(-1);
         }
     }
+
+#if DEBUG
+    private static string FormatProcessSummary(string file, string cmd, string[]? args)
+    {
+        var name = string.IsNullOrEmpty(file) ? "" : file;
+        if (args is null || args.Length == 0)
+            return string.IsNullOrEmpty(cmd) ? name : $"{name} {cmd}".Trim();
+
+        return $"{name} {cmd} {string.Join(' ', args)}".Trim();
+    }
+#endif
 
     public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, CancellationToken cancellationToken, params string[] args)
     {
@@ -169,8 +193,15 @@ public partial class ADBService
     public static IEnumerable<string> ExecuteCommandAsync(
         string file, string cmd, Encoding encoding, CancellationToken cancellationToken, bool redirect = true, Process process = null, string workingDir = null, params string[] args)
     {
+#if DEBUG
+        var summary = FormatProcessSummary(file, cmd, args);
+        ApkIconService.MarkLoadStep($"ADB async start: {summary}");
+        var sw = Stopwatch.StartNew();
+#endif
+
         UpdateCommandActive(1);
         var processId = -1;
+        var exitCode = -1;
         try
         {
         using var cmdProcess = StartCommandProcess(file, cmd, encoding, redirect, process, workingDir, args: args);
@@ -217,6 +248,7 @@ public partial class ADBService
         }
 
         cmdProcess.WaitForExit();
+        exitCode = cmdProcess.ExitCode;
 
         if (cmdProcess.ExitCode == 0)
             yield break;
@@ -245,6 +277,9 @@ public partial class ADBService
             if (processId >= 0)
                 ActiveCommandProcesses.TryRemove(processId, out _);
             UpdateCommandActive(-1);
+#if DEBUG
+            ApkIconService.MarkLoadStep($"ADB async done exit={exitCode} ({sw.ElapsedMilliseconds}ms): {summary}");
+#endif
         }
     }
 

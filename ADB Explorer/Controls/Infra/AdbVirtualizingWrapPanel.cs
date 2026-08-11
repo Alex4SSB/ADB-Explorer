@@ -20,10 +20,14 @@ public class AdbVirtualizingWrapPanel : Wpf.Ui.Controls.VirtualizingWrapPanel
     private CancellationTokenSource? _placeholderCts;
     private int _earliestPlaceholderIndex = -1;
     private double _viewportHeight;
+    private Wpf.Ui.Controls.ItemRange _visibleRange;
 
     public int ItemsInView => ChildSize.Height > 0 && ItemsPerRowCount > 0
         ? (int)Math.Ceiling(_viewportHeight / ChildSize.Height) * ItemsPerRowCount
         : 0;
+
+    /// <summary>Last realized item index range from virtualization (visible + cache buffer).</summary>
+    public Wpf.Ui.Controls.ItemRange VisibleRange => _visibleRange;
 
     private static Size ShrinkWidthForScrollbar(Size size)
     {
@@ -60,6 +64,7 @@ public class AdbVirtualizingWrapPanel : Wpf.Ui.Controls.VirtualizingWrapPanel
     protected override Wpf.Ui.Controls.ItemRange UpdateItemRange()
     {
         var range = base.UpdateItemRange();
+        _visibleRange = range;
 
         // Reset tracking when the items collection changes (e.g. navigation to a new folder).
         if (Items.Count != _prevItemsCount)

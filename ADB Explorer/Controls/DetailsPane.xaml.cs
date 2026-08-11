@@ -429,7 +429,7 @@ public partial class DetailsPane : UserControl
                     control.InvalidSelectionBorder.Visibility = Visibility.Collapsed;
                     f.BeginLoadCacheThumbnail();
                     if (f.IsApk)
-                        ApkIconService.BeginLoadForFile(f, priority: true);
+                        ApkIconService.BeginLoadForFile(f, ApkIconService.ApkLoadPriority.Selected);
                     // BeginLoad is async; if the pane cache was already warm, refresh now.
                     if (f.CacheThumbnail?.Image is not null)
                         control.UpdateFileThumbnailDisplay(f);
@@ -451,8 +451,7 @@ public partial class DetailsPane : UserControl
                     control.SmallFileIcon.Source = null;
                     control.InvalidSelectionBorder.Visibility = Visibility.Collapsed;
                     control.PopulateThumbnailInfoItems(p);
-                    ApkIconService.BeginLoadForPackage(p, priority: true);
-                    ApkIconService.BeginEnsureLabelForPackage(p, priority: true);
+                    ApkIconService.BeginLoadForPackage(p, ApkIconService.ApkLoadPriority.Selected);
                 }
                 else if (item is DriveViewModel drive)
                 {

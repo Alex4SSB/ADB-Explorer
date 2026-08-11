@@ -5,7 +5,7 @@ namespace ADB_Explorer.Services;
 
 /// <summary>
 /// Renders simple Android vector drawables (path-based) to a bitmap.
-/// Used when an APK launcher icon is adaptive/vector-only (e.g. Termux).
+/// Used when an APK launcher icon is adaptive/vector-only.
 /// </summary>
 internal static partial class ApkVectorIconRenderer
 {
@@ -42,17 +42,6 @@ internal static partial class ApkVectorIconRenderer
         }
     }
 
-    public static BitmapSource? TryRender(
-        byte[] axmlBytes,
-        int size = DefaultSize,
-        SKColor? background = null,
-        Func<int, SKColor?>? resolveColor = null,
-        Func<int, byte[]?>? resolveXmlResource = null)
-    {
-        using var sk = TryRenderToSkBitmap(axmlBytes, size, background, resolveColor, resolveXmlResource);
-        return sk is null ? null : ToBitmapSource(sk);
-    }
-
     /// <summary>Caller owns and must dispose the returned bitmap.</summary>
     public static SKBitmap? TryRenderToSkBitmap(
         byte[] axmlBytes,
@@ -78,7 +67,7 @@ internal static partial class ApkVectorIconRenderer
     }
 
     /// <summary>
-    /// Renders a standalone <c>&lt;gradient&gt;</c> drawable (Truecaller/Canon launcher fills)
+    /// Renders a standalone <c>&lt;gradient&gt;</c> drawable (launcher fills)
     /// as a full-size bitmap.
     /// </summary>
     public static SKBitmap? TryRenderGradientDrawable(byte[] axmlBytes, int size = DefaultSize)
@@ -108,8 +97,40 @@ internal static partial class ApkVectorIconRenderer
     }
 
     /// <summary>
+    /// Renders a <c>&lt;color android:color="…" /&gt;</c> drawable as a solid bitmap
+    /// (<c>ic_launcher_background</c> as a solid brand color).
+    /// </summary>
+    public static SKBitmap? TryRenderColorDrawable(
+        byte[] axmlBytes,
+        int size = DefaultSize,
+        Func<int, SKColor?>? resolveColor = null)
+    {
+        try
+        {
+            using var stream = new MemoryStream(axmlBytes, writable: false);
+            using var axml = new AxmlFile(new StreamLoader(stream));
+            var root = axml.RootNode;
+            if (root is null || !root.NodeName.Equals("color", StringComparison.OrdinalIgnoreCase))
+                return null;
+
+            var color = ReadColorAttribute(root, "color", resolveColor);
+            if (color is null || color.Value.Alpha == 0)
+                return null;
+
+            var bitmap = new SKBitmap(size, size, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+            using var canvas = new SKCanvas(bitmap);
+            canvas.Clear(color.Value);
+            return bitmap;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
     /// Renders an inline <c>&lt;vector&gt;</c> nested under an adaptive-icon layer
-    /// (e.g. Clock background; Calculator pad under a foreground layer-list) when the
+    /// (e.g. Clock background; pad under a foreground layer-list) when the
     /// layer has no usable drawable/src raster.
     /// </summary>
     public static SKBitmap? TryRenderInlineAdaptiveLayer(
@@ -134,22 +155,6 @@ internal static partial class ApkVectorIconRenderer
         catch
         {
             return null;
-        }
-    }
-
-    /// <summary>True when <paramref name="layerName"/> contains a nested <c>&lt;vector&gt;</c>.</summary>
-    public static bool HasInlineVectorUnderLayer(byte[] adaptiveXmlBytes, string layerName)
-    {
-        try
-        {
-            using var stream = new MemoryStream(adaptiveXmlBytes, writable: false);
-            using var axml = new AxmlFile(new StreamLoader(stream));
-            var layer = FindNamedChild(axml.RootNode, layerName);
-            return FindVectorRoot(layer) is not null;
-        }
-        catch
-        {
-            return false;
         }
     }
 
@@ -254,7 +259,7 @@ internal static partial class ApkVectorIconRenderer
             var rotation = ReadFloatBits(node, "rotation") ?? 0f;
 
             // VectorDrawable docs: transforms apply scale → rotate → translate in viewport
-            // space about the pivot. (Zoom wordmark: translate = (viewport - scaledWidth) / 2.)
+            // space about the pivot (translate = (viewport - scaledWidth) / 2).
             // Build M = T(translate+pivot) × R × S × T(-pivot) so p' = R(S(p-pivot))+pivot+translate.
             var local = SKMatrix.CreateTranslation(-px, -py);
             if (sx != 1f || sy != 1f)
@@ -310,6 +315,31 @@ internal static partial class ApkVectorIconRenderer
                     finally
                     {
                         fillShader?.Dispose();
+                    }
+
+                    // Stroke-only rings (transparent fill + strokeColor).
+                    var strokeWidth = ReadFloatBits(node, "strokeWidth") ?? 0f;
+                    if (strokeWidth > 0f)
+                    {
+                        var strokeColor = ReadColorAttribute(node, "strokeColor", resolveColor);
+                        if (strokeColor is { } sc && sc.Alpha > 0)
+                        {
+                            using var strokePaint = new SKPaint
+                            {
+                                IsAntialias = true,
+                                Style = SKPaintStyle.Stroke,
+                                Color = sc,
+                                StrokeWidth = strokeWidth,
+                                StrokeJoin = SKStrokeJoin.Round,
+                                StrokeCap = SKStrokeCap.Butt,
+                            };
+                            ApplyAlphaAttribute(node, "strokeAlpha", strokePaint);
+                            if (strokePaint.Color.Alpha > 0)
+                            {
+                                canvas.DrawPath(path, strokePaint);
+                                drew = true;
+                            }
+                        }
                     }
                 }
             }

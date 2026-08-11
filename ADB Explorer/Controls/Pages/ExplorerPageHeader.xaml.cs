@@ -188,6 +188,9 @@ public partial class ExplorerPageHeader : UserControl
     /// Restarted on every navigation so back-to-back navigations don't race a stale continuation.
     /// </summary>
     private readonly DispatcherTimer _explorerLoadedTimer = new() { Interval = EXPLORER_NAV_DELAY };
+
+    /// <summary>Debounces APK icon priority updates on scroll / selection.</summary>
+    private readonly DispatcherTimer _apkPriorityTimer = new() { Interval = TimeSpan.FromMilliseconds(100) };
     private bool _isSyncingSelection = false;
 
     public ExplorerPageHeader(ExplorerViewModel viewModel)
@@ -243,6 +246,11 @@ public partial class ExplorerPageHeader : UserControl
             _explorerLoadedTimer.Stop();
             RuntimeSettings.IsExplorerLoaded = true;
         };
+        _apkPriorityTimer.Tick += (_, _) =>
+        {
+            _apkPriorityTimer.Stop();
+            UpdateApkIconPriorities();
+        };
 
         DriveList.SelectionChanged += DriveList_SelectionChanged;
 
@@ -260,6 +268,16 @@ public partial class ExplorerPageHeader : UserControl
             ActiveView.SelectedItem = ItemToSelect.Value;
             if (ItemToSelect is not null)
                 ActiveScrollIntoView(ItemToSelect.Value);
+        };
+
+        ViewModel.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(ExplorerViewModel.IsIconView)
+                or nameof(ExplorerViewModel.ExplorerItemsSource)
+                or nameof(ExplorerViewModel.ExplorerSource))
+            {
+                ScheduleApkIconPriorityUpdate();
+            }
         };
     }
 
@@ -480,6 +498,65 @@ public partial class ExplorerPageHeader : UserControl
         ViewModel.NotifySelectedFilesTotalSize();
 
         FileActionLogic.UpdateFileActions();
+
+        if (FileActions.IsAppDrive)
+            ScheduleApkIconPriorityUpdate();
+    }
+
+    private void ScheduleApkIconPriorityUpdate()
+    {
+        _apkPriorityTimer.Stop();
+        _apkPriorityTimer.Start();
+    }
+
+    private void UpdateApkIconPriorities()
+    {
+        if (!FileActions.IsAppDrive || Data.Packages is null || Data.Packages.Count == 0)
+            return;
+
+        var selected = SelectedPackages.ToList();
+        var visible = CollectVisiblePackages();
+        ApkIconService.UpdatePackageLoadPriorities(selected, visible);
+    }
+
+    private List<Package> CollectVisiblePackages()
+    {
+        List<Package> visible = [];
+        if (ViewModel.IsIconView)
+        {
+            var range = IconView.VisibleRange;
+            var count = IconView.Items.Count;
+            for (int i = range.StartIndex; i <= range.EndIndex && i < count; i++)
+            {
+                if (i < 0)
+                    continue;
+                if (IconView.Items[i] is Package package)
+                    visible.Add(package);
+            }
+        }
+        else
+        {
+            var generator = ExplorerGrid.ItemContainerGenerator;
+            for (int i = 0; i < ExplorerGrid.Items.Count; i++)
+            {
+                if (generator.ContainerFromIndex(i) is null)
+                    continue;
+                if (ExplorerGrid.Items[i] is Package package)
+                    visible.Add(package);
+            }
+        }
+
+        return visible;
+    }
+
+    private void ExplorerScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+    {
+        if (!FileActions.IsAppDrive)
+            return;
+        if (e.VerticalChange == 0 && e.ViewportHeightChange == 0 && e.ExtentHeightChange == 0)
+            return;
+
+        ScheduleApkIconPriorityUpdate();
     }
 
     private void RuntimeSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)

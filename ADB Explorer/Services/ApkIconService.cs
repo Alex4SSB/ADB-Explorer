@@ -4,6 +4,8 @@ using ADB_Explorer.ViewModels;
 using AlphaOmega.Debug;
 using AlphaOmega.Debug.Manifest;
 using SkiaSharp;
+using System.Diagnostics;
+using System.Text;
 
 namespace ADB_Explorer.Services;
 
@@ -16,7 +18,9 @@ namespace ADB_Explorer.Services;
 /// (not <see cref="AppSettings.ThumbsAge"/>).
 /// Loads respect <see cref="Data.DeviceCts"/> and are cleared by <see cref="CancelPending"/>.
 /// Concurrency follows <see cref="AppSettings.LimitThumbsPullSpeed"/>: one at a time when
-/// throttled (same as thumbnail pulls), otherwise up to <see cref="AppSettings.MaxSimultaneousOps"/>.
+/// throttled, otherwise up to <see cref="IconLoadConcurrencyCap"/> (capped well below
+/// <see cref="AppSettings.MaxSimultaneousOps"/> because each load fans out into several adb processes).
+/// Queue order is <see cref="ApkLoadPriority"/>: Selected → Visible → Background.
 /// </summary>
 public static partial class ApkIconService
 {
@@ -52,13 +56,43 @@ public static partial class ApkIconService
     /// <summary>Raised when APK icon queue work starts (<c>true</c>) or the queue goes idle (<c>false</c>).</summary>
     public static event Action<bool>? IconLoadProgressChanged;
 
+    /// <summary>
+    /// Raised when a real icon pull is in the queue (not label-only backfill).
+    /// Scroll often re-fetches missing labels after icons are done; that must not flash the thumb tooltip.
+    /// </summary>
+    public static event Action<bool>? IconPullProgressChanged;
+
     /// <summary>Raised after each queued icon attempt so the progress UI can keep its timeout alive.</summary>
     public static event Action? IconLoadProgressTick;
 
     private static int ProgressActiveCount;
+    private static int IconPullProgressActiveCount;
 
-    /// <summary>True while any icon/label load is queued or running.</summary>
+    /// <summary>
+    /// Bumped to cancel a pending debounced progress-hide. Virtualization and label-only
+    /// follow-ups often restart the worker a few hundred ms after the queue first empties;
+    /// collapsing the status spinner across that gap restarts its stroke animation and looks like flicker.
+    /// </summary>
+    private static int ProgressHideGeneration;
+    private static int IconPullProgressHideGeneration;
+
+    /// <summary>Hold the progress indicator briefly after the queue empties so batch gaps do not flicker.</summary>
+    private static readonly TimeSpan ProgressHideDelay = TimeSpan.FromMilliseconds(500);
+
+    /// <summary>True while any icon/label load is queued or running (includes the hide debounce window).</summary>
     public static bool IsLoadInProgress => Volatile.Read(ref ProgressActiveCount) != 0;
+
+    /// <summary>True while an icon (non-label-only) pull is active or in the UI hide debounce window.</summary>
+    public static bool IsIconPullInProgress => Volatile.Read(ref IconPullProgressActiveCount) != 0;
+
+    /// <summary>
+    /// When true, <see cref="BeginLoad"/> / preload / scroll priority updates enqueue nothing.
+    /// Set by <see cref="StopAllLoading"/>; cleared by <see cref="CancelPending"/> on navigate/disconnect
+    /// (not by force-reload, which keeps the stop so only the timed package runs).
+    /// </summary>
+    public static bool IsLoadingStopped => Volatile.Read(ref LoadingStopped) != 0;
+
+    private static int LoadingStopped;
 
     /// <param name="IconExt">
     /// File extension only (<c>.webp</c>/<c>.png</c>), <see cref="FailMarker"/> if fetch failed today,
@@ -77,21 +111,90 @@ public static partial class ApkIconService
 
     private static bool _uiLanguageHooked;
 
+#if DEBUG
+    private static readonly AsyncLocal<ApkLoadTiming?> CurrentTiming = new();
+#endif
+    private static readonly AsyncLocal<ApkIconExtractSession?> CurrentExtractSession = new();
+
+#if DEBUG
+    /// <summary>
+    /// Records a step on the active force-reload timing log (no-op when none is active).
+    /// Call from ADB / archive / sync helpers so every device round-trip is measured.
+    /// </summary>
+    public static void MarkLoadStep(string step) => CurrentTiming.Value?.Mark(step);
+#endif
+
+    /// <summary>
+    /// Queue ordering for APK icon/label loads. Higher values are dequeued first.
+    /// </summary>
+    public enum ApkLoadPriority : byte
+    {
+        Background = 0,
+        Visible = 1,
+        Selected = 2,
+    }
+
     private sealed class LoadRequest(
         string PullKey,
         LogicalDeviceViewModel Device,
         string ApkPath,
         string? PackageName,
         Action<BitmapSource?>? OnReady,
-        bool LabelOnly = false)
+        bool LabelOnly = false,
+        ApkLoadPriority Priority = ApkLoadPriority.Background)
     {
         public string PullKey { get; } = PullKey;
         public LogicalDeviceViewModel Device { get; } = Device;
         public string ApkPath { get; } = ApkPath;
         public string? PackageName { get; set; } = PackageName;
         public Action<BitmapSource?>? OnReady { get; set; } = OnReady;
-        public bool LabelOnly { get; } = LabelOnly;
+        public bool LabelOnly { get; set; } = LabelOnly;
+        public ApkLoadPriority Priority { get; set; } = Priority;
+#if DEBUG
+        public ApkLoadTiming? Timing { get; set; }
+#endif
     }
+
+#if DEBUG
+    /// <summary>Step log for DEBUG force-reload; thread-safe for parallel sub-tasks.</summary>
+    private sealed class ApkLoadTiming(string packageName, string apkPath)
+    {
+        private readonly object _lock = new();
+        private readonly Stopwatch _sw = Stopwatch.StartNew();
+        private readonly DateTime _startedAt = DateTime.Now;
+        private readonly List<(long AtMs, long StepMs, string Step)> _steps = [];
+        private long _lastMark;
+
+        public void Mark(string step)
+        {
+            lock (_lock)
+            {
+                var at = _sw.ElapsedMilliseconds;
+                var stepMs = at - _lastMark;
+                _lastMark = at;
+                _steps.Add((at, stepMs, step));
+            }
+        }
+
+        public string Format(bool success, string? note = null)
+        {
+            lock (_lock)
+            {
+                _sw.Stop();
+                var sb = new StringBuilder();
+                sb.AppendLine($"APK icon reload — {packageName}");
+                sb.AppendLine($"Path: {apkPath}");
+                sb.AppendLine($"Started: {_startedAt:yyyy-MM-dd HH:mm:ss.fff}");
+                sb.AppendLine($"Result: {(success ? "ok" : "failed")}{(string.IsNullOrEmpty(note) ? "" : $" ({note})")}");
+                sb.AppendLine("Steps (step ms / cumulative ms):");
+                foreach (var (atMs, stepMs, step) in _steps)
+                    sb.AppendLine($"  +{stepMs,7} ms  (t={atMs,7})  {step}");
+                sb.AppendLine($"Total: {_sw.ElapsedMilliseconds} ms");
+                return sb.ToString();
+            }
+        }
+    }
+#endif
 
     /// <summary>
     /// <see cref="AppSettings.ThumbnailMode.OnConnect"/> is treated as
@@ -120,8 +223,15 @@ public static partial class ApkIconService
     /// <summary>
     /// Drops queued work and cancels the in-flight load (call when <see cref="Data.DeviceCts"/> is cancelled).
     /// </summary>
-    public static void CancelPending()
+    /// <param name="clearLoadingStopped">
+    /// When true (default), allows new loads again — use on navigate / device change.
+    /// Pass false from <see cref="StopAllLoading"/> / force-reload so scroll cannot restart the queue.
+    /// </param>
+    public static void CancelPending(bool clearLoadingStopped = true)
     {
+        if (clearLoadingStopped)
+            Volatile.Write(ref LoadingStopped, 0);
+
         CancellationTokenSource? toCancel;
         lock (QueueLock)
         {
@@ -145,6 +255,7 @@ public static partial class ApkIconService
         catch { /* ignore */ }
 
         SetIconLoadProgress(false, force: true);
+        SetIconPullProgress(false, force: true);
     }
 
     public static void BeginLoad(
@@ -152,16 +263,43 @@ public static partial class ApkIconService
         string apkPath,
         string? packageName = null,
         Action<BitmapSource?>? onReady = null,
-        bool priority = false)
+        ApkLoadPriority priority = ApkLoadPriority.Background)
+        => BeginLoadCore(device, apkPath, packageName, onReady, priority);
+
+    private static void BeginLoadCore(
+        LogicalDeviceViewModel device,
+        string apkPath,
+        string? packageName,
+        Action<BitmapSource?>? onReady,
+        ApkLoadPriority priority
+#if DEBUG
+        , ApkLoadTiming? timing = null
+#endif
+        )
     {
         if (device is null || string.IsNullOrEmpty(apkPath) || !CanLoadOnDevice(device.ID))
         {
+#if DEBUG
+            timing?.Mark("BeginLoad aborted (device/path/disabled)");
+#endif
             onReady?.Invoke(null);
             return;
         }
 
         if (Data.DeviceCts.IsCancellationRequested)
         {
+#if DEBUG
+            timing?.Mark("BeginLoad aborted (cancelled)");
+#endif
+            onReady?.Invoke(null);
+            return;
+        }
+
+        if (IsLoadingStopped)
+        {
+#if DEBUG
+            timing?.Mark("BeginLoad aborted (loading stopped)");
+#endif
             onReady?.Invoke(null);
             return;
         }
@@ -172,26 +310,58 @@ public static partial class ApkIconService
             var cached = TryGetCachedIcon(device, packageName);
             if (cached is not null)
             {
+#if DEBUG
+                timing?.Mark("cache hit (unexpected during force reload)");
+#endif
                 onReady?.Invoke(cached);
                 return;
             }
         }
 
         // Dedupe by package when known so app-drive and file-path loads share one pull.
+        // Icon loads also fetch the label, so a pending label-only request is upgraded in place.
         var pullKey = $"{device.SerialNumber}|{packageName ?? apkPath}";
+        var labelKey = string.IsNullOrEmpty(packageName) ? null : LabelPullKey(device.SerialNumber, packageName);
+
+        var upgradeLabelOnly = false;
         lock (PendingLock)
         {
-            if (!PendingLoads.Add(pullKey))
+            if (labelKey is not null && PendingLoads.Contains(labelKey) && !PendingLoads.Contains(pullKey))
             {
+                upgradeLabelOnly = true;
+            }
+            else if (!PendingLoads.Add(pullKey))
+            {
+#if DEBUG
+                timing?.Mark("attached to in-flight/queued request");
+#endif
                 AttachOnReady(pullKey, packageName, onReady, priority);
                 return;
             }
         }
 
-        Enqueue(new LoadRequest(pullKey, device, apkPath, packageName, onReady), priority);
+        if (upgradeLabelOnly)
+        {
+#if DEBUG
+            timing?.Mark("upgrading pending label-only → icon load");
+            UpgradeLabelOnlyToIcon(labelKey!, pullKey, device, apkPath, packageName, onReady, priority, timing);
+#else
+            UpgradeLabelOnlyToIcon(labelKey!, pullKey, device, apkPath, packageName, onReady, priority);
+#endif
+            return;
+        }
+
+        var request = new LoadRequest(pullKey, device, apkPath, packageName, onReady, LabelOnly: false, priority)
+#if DEBUG
+        {
+            Timing = timing,
+        }
+#endif
+        ;
+        Enqueue(request, priority);
     }
 
-    public static void BeginLoadForFile(FileClass file, bool priority = false)
+    public static void BeginLoadForFile(FileClass file, ApkLoadPriority priority = ApkLoadPriority.Background)
     {
         if (file is null || !file.IsApk || file.ApkIcon is not null || !IsEnabled)
             return;
@@ -219,16 +389,29 @@ public static partial class ApkIconService
         }, priority);
     }
 
-    public static void BeginLoadForPackage(Package package, bool priority = false)
+    public static void BeginLoadForPackage(Package package, ApkLoadPriority priority = ApkLoadPriority.Background)
     {
         if (package is null || string.IsNullOrEmpty(package.Path) || !IsEnabled)
+        {
+            if (package is not null)
+                package.IconLoadCompleted = true;
             return;
+        }
 
         if (Data.DevicesObject?.Current is not { } device || !CanLoadOnDevice(device.ID))
+        {
+            package.IconLoadCompleted = true;
+            return;
+        }
+
+        // Force-reload / StopAllLoading: do not enqueue and do not treat as a finished miss
+        // (otherwise the tile flips to the green Bugdroid instead of staying grayscale).
+        if (IsLoadingStopped)
             return;
 
         if (package.Icon is not null)
         {
+            package.IconLoadCompleted = true;
             ApplyCachedLabel(device, package);
             BeginEnsureLabelForPackage(package, priority);
             return;
@@ -247,12 +430,14 @@ public static partial class ApkIconService
 
             if (IsIconFailedToday(device, package.Name))
             {
+                package.IconLoadCompleted = true;
                 ApplyCachedLabel(device, package);
                 BeginEnsureLabelForPackage(package, priority);
                 return;
             }
         }
 
+        // Full icon pull also writes the label — do not enqueue a separate label-only job.
         BeginLoad(device, package.Path, package.Name, bmp =>
         {
             if (Data.DevicesObject?.Current?.SerialNumber != device.SerialNumber)
@@ -261,17 +446,22 @@ public static partial class ApkIconService
             ApplyCachedLabel(device, package);
             if (bmp is not null)
                 package.Icon = bmp;
-
-            BeginEnsureLabelForPackage(package, priority);
+            else if (!IsLoadingStopped)
+                package.IconLoadCompleted = true;
         }, priority);
     }
 
     /// <summary>
     /// Fetches the package label when missing, even if the icon is already cached/displayed.
+    /// When the icon still needs loading, delegates to <see cref="BeginLoadForPackage"/> so
+    /// manifest/resources are pulled only once for both icon and name.
     /// </summary>
-    public static void BeginEnsureLabelForPackage(Package package, bool priority = false)
+    public static void BeginEnsureLabelForPackage(Package package, ApkLoadPriority priority = ApkLoadPriority.Background)
     {
         if (package is null || string.IsNullOrEmpty(package.Path) || string.IsNullOrEmpty(package.Name))
+            return;
+
+        if (IsLoadingStopped)
             return;
 
         if (Data.DevicesObject?.Current is not { } device || !CanLoadOnDevice(device.ID))
@@ -282,7 +472,29 @@ public static partial class ApkIconService
         if (!NeedsLabelFetch(device, package.Name))
             return;
 
-        var pullKey = $"{device.SerialNumber}|{package.Name}|label";
+        // Icon load already pulls the label — piggy-back instead of a second pull.
+        if (package.Icon is null && !IsIconFailedToday(device, package.Name))
+        {
+            var iconKey = $"{device.SerialNumber}|{package.Name}";
+            lock (PendingLock)
+            {
+                if (PendingLoads.Contains(iconKey))
+                {
+                    AttachOnReady(iconKey, package.Name, _ =>
+                    {
+                        if (Data.DevicesObject?.Current?.SerialNumber != device.SerialNumber)
+                            return;
+                        ApplyCachedLabel(device, package);
+                    }, priority);
+                    return;
+                }
+            }
+
+            BeginLoadForPackage(package, priority);
+            return;
+        }
+
+        var pullKey = LabelPullKey(device.SerialNumber, package.Name);
         lock (PendingLock)
         {
             if (!PendingLoads.Add(pullKey))
@@ -302,32 +514,303 @@ public static partial class ApkIconService
             if (Data.DevicesObject?.Current?.SerialNumber != device.SerialNumber)
                 return;
             ApplyCachedLabel(device, package);
-        }, LabelOnly: true), priority);
+        }, LabelOnly: true, priority), priority);
     }
 
     /// <summary>
-    /// Queues icon loads for packages not yet requested (visible tiles use <paramref name="priority"/> via
-    /// <see cref="PackageIconViewModel"/> so off-screen work runs after in-view tiles).
+    /// Queues loads for packages not yet requested. Visible tiles and selection raise priority
+    /// via <see cref="UpdatePackageLoadPriorities"/> / <see cref="PackageIconViewModel"/>.
     /// </summary>
     public static void BeginPreloadPackages(IEnumerable<Package> packages)
     {
-        if (packages is null || !IsEnabled)
+        if (packages is null || !IsEnabled || IsLoadingStopped)
             return;
 
         if (Data.DevicesObject?.Current is not { } device || !CanLoadOnDevice(device.ID))
             return;
 
-        // Labels first so names appear without waiting for every icon pull.
+        // Single path per package: icon load fetches the label; label-only only when icon is done.
         foreach (var package in packages)
-            BeginEnsureLabelForPackage(package, priority: false);
+            BeginLoadForPackage(package, ApkLoadPriority.Background);
+    }
 
-        foreach (var package in packages)
+    /// <summary>
+    /// Reorders the in-flight queue so selected packages load first, then visible ones,
+    /// then everything else. Also kicks loads for selected/visible items that are not yet cached.
+    /// </summary>
+    public static void UpdatePackageLoadPriorities(
+        IEnumerable<Package>? selected,
+        IEnumerable<Package>? visible)
+    {
+        if (IsLoadingStopped)
+            return;
+
+        if (!IsEnabled || Data.DevicesObject?.Current is not { } device || !CanLoadOnDevice(device.ID))
+            return;
+
+        var selectedList = selected?.Where(static p => p is not null).Distinct().ToList() ?? [];
+        var visibleList = visible?.Where(static p => p is not null).Distinct().ToList() ?? [];
+        var selectedNames = new HashSet<string>(
+            selectedList.Select(static p => p.Name).Where(static n => !string.IsNullOrEmpty(n))!,
+            StringComparer.Ordinal);
+        var visibleNames = new HashSet<string>(
+            visibleList.Select(static p => p.Name).Where(static n => !string.IsNullOrEmpty(n))!,
+            StringComparer.Ordinal);
+
+        lock (QueueLock)
         {
-            if (package.Icon is not null)
-                continue;
+            foreach (var request in LoadQueue)
+            {
+                if (string.IsNullOrEmpty(request.PackageName))
+                    continue;
 
-            BeginLoadForPackage(package, priority: false);
+                if (selectedNames.Contains(request.PackageName))
+                    request.Priority = ApkLoadPriority.Selected;
+                else if (visibleNames.Contains(request.PackageName))
+                    request.Priority = ApkLoadPriority.Visible;
+                else
+                    request.Priority = ApkLoadPriority.Background;
+            }
+
+            ResortQueue_NoLock();
         }
+
+        foreach (var package in selectedList)
+            BeginLoadForPackage(package, ApkLoadPriority.Selected);
+
+        foreach (var package in visibleList)
+        {
+            if (selectedNames.Contains(package.Name))
+                continue;
+            BeginLoadForPackage(package, ApkLoadPriority.Visible);
+        }
+    }
+
+    /// <summary>
+    /// Stops the worker, drops the queue, and blocks further icon/label loads (including
+    /// scroll/visibility kicks) until App Drive is left or the device changes.
+    /// </summary>
+    public static void StopAllLoading()
+    {
+        Volatile.Write(ref LoadingStopped, 1);
+        CancelPending(clearLoadingStopped: false);
+    }
+
+#if DEBUG
+    /// <summary>
+    /// Clears cache for <paramref name="package"/> and runs a dedicated <see cref="LoadIconAsync"/>
+    /// on a long-running thread (bypasses the shared queue so cancelled preload work cannot
+    /// starve or re-warm the cache before measurement). Every nested ADB/file call is timed via
+    /// <see cref="MarkLoadStep"/>.
+    /// </summary>
+    public static void ForceReloadPackage(Package package, Action<string>? onCompleted = null)
+    {
+        if (package is null || string.IsNullOrEmpty(package.Path) || string.IsNullOrEmpty(package.Name))
+        {
+            onCompleted?.Invoke("No package / path");
+            return;
+        }
+
+        if (Data.DevicesObject?.Current is not { } device || !CanLoadOnDevice(device.ID))
+        {
+            onCompleted?.Invoke("Device unavailable or APK icons disabled");
+            return;
+        }
+
+        var timing = new ApkLoadTiming(package.Name, package.Path);
+        var apkPath = package.Path;
+        var packageName = package.Name;
+
+        timing.Mark("CancelPending (stop competing loads)");
+        // Keep / set stopped so scroll and tile materialization cannot enqueue other packages.
+        Volatile.Write(ref LoadingStopped, 1);
+        CancelPending(clearLoadingStopped: false);
+
+        // Cancelled adb processes may still hold the thread pool for a long time; wait them out
+        // so a late MarkFetchResult cannot re-warm the cache before our timed load.
+        timing.Mark("wait for adb command drain");
+        WaitForAdbIdle(TimeSpan.FromSeconds(20), timing);
+
+        timing.Mark("invalidate cache + clear UI (post-drain)");
+        InvalidatePackageCache(device, packageName);
+        // Clear completed first so the Icon=null notify already binds the grayscale placeholder.
+        package.IconLoadCompleted = false;
+        package.Icon = null;
+        package.Label = null;
+
+        _ = Task.Factory.StartNew(async () =>
+        {
+            CurrentTiming.Value = timing;
+            try
+            {
+                using var cts = CancellationTokenSource.CreateLinkedTokenSource(Data.DeviceCts.Token);
+                timing.Mark("LoadIconAsync start (direct, no queue)");
+                var (bmp, _) = await LoadIconAsync(device, apkPath, packageName, cts.Token, timing)
+                    .ConfigureAwait(false);
+
+                timing.Mark(bmp is null ? "LoadIconAsync done (no icon)" : "LoadIconAsync done");
+
+                App.SafeBeginInvoke(() =>
+                {
+                    try
+                    {
+                        if (Data.DevicesObject?.Current?.SerialNumber == device.SerialNumber)
+                        {
+                            ApplyCachedLabel(device, package);
+                            if (bmp is not null)
+                                package.Icon = bmp;
+                            else
+                                package.IconLoadCompleted = true;
+                        }
+
+                        timing.Mark(bmp is not null ? "UI apply complete" : "UI apply complete (no icon)");
+                        onCompleted?.Invoke(timing.Format(bmp is not null, bmp is null ? "icon null" : null));
+                    }
+                    catch (Exception e)
+                    {
+                        timing.Mark($"UI apply exception: {e.Message}");
+                        onCompleted?.Invoke(timing.Format(false, e.Message));
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                timing.Mark($"ForceReload exception: {e.GetType().Name}: {e.Message}");
+                App.SafeBeginInvoke(() =>
+                {
+                    if (Data.DevicesObject?.Current?.SerialNumber == device.SerialNumber)
+                    {
+                        ApplyCachedLabel(device, package);
+                        package.IconLoadCompleted = true;
+                    }
+                    onCompleted?.Invoke(timing.Format(false, e.Message));
+                });
+            }
+            finally
+            {
+                CurrentTiming.Value = null;
+            }
+        },
+        CancellationToken.None,
+        TaskCreationOptions.LongRunning,
+        TaskScheduler.Default).Unwrap();
+    }
+
+    private static void WaitForAdbIdle(TimeSpan timeout, ApkLoadTiming timing)
+    {
+        var deadline = DateTime.UtcNow + timeout;
+        while (ADBService.IsCommandActive && DateTime.UtcNow < deadline)
+            Thread.Sleep(50);
+
+        if (ADBService.IsCommandActive)
+            timing.Mark($"adb drain timeout after {(int)timeout.TotalSeconds}s (still active)");
+        else
+            timing.Mark("adb drain complete");
+    }
+#endif
+
+    private static string LabelPullKey(string serial, string packageName)
+        => $"{serial}|{packageName}|label";
+
+    private static void InvalidatePackageCache(LogicalDeviceViewModel device, string packageName)
+    {
+        lock (GetDeviceLock(device.SerialNumber))
+        {
+            var cache = GetOrLoadCache(device.SerialNumber);
+            if (!cache.TryGetValue(packageName, out var entry))
+                return;
+
+            if (IsSuccessfulIconExt(entry.IconExt))
+            {
+                var path = GetLocalIconPath(device.SerialNumber, packageName, entry.IconExt);
+                try { if (File.Exists(path)) File.Delete(path); } catch { /* ignore */ }
+            }
+
+            cache.Remove(packageName);
+            WriteCache(device.SerialNumber, cache);
+        }
+    }
+
+    /// <summary>
+    /// A label-only request is already pending for this package; convert it to a full icon load
+    /// so manifest/resources are not pulled twice.
+    /// </summary>
+    private static void UpgradeLabelOnlyToIcon(
+        string labelKey,
+        string iconKey,
+        LogicalDeviceViewModel device,
+        string apkPath,
+        string? packageName,
+        Action<BitmapSource?>? onReady,
+        ApkLoadPriority priority
+#if DEBUG
+        , ApkLoadTiming? timing = null
+#endif
+        )
+    {
+        LoadRequest? upgraded = null;
+        lock (QueueLock)
+        {
+            var node = LoadQueue.First;
+            while (node is not null)
+            {
+                if (node.Value.PullKey == labelKey)
+                {
+                    upgraded = node.Value;
+                    LoadQueue.Remove(node);
+                    break;
+                }
+                node = node.Next;
+            }
+        }
+
+        lock (PendingLock)
+        {
+            PendingLoads.Remove(labelKey);
+            if (!PendingLoads.Add(iconKey))
+            {
+                // An icon load sneaked in; chain onto it and drop the label-only work.
+                if (upgraded?.OnReady is { } previous)
+                {
+                    AttachOnReady(iconKey, packageName, bmp =>
+                    {
+                        previous(bmp);
+                        onReady?.Invoke(bmp);
+                    }, priority);
+                }
+                else
+                {
+                    AttachOnReady(iconKey, packageName, onReady, priority);
+                }
+                return;
+            }
+        }
+
+        if (upgraded is not null)
+        {
+            var previous = upgraded.OnReady;
+            Enqueue(new LoadRequest(iconKey, device, apkPath, packageName, bmp =>
+            {
+                previous?.Invoke(bmp);
+                onReady?.Invoke(bmp);
+            }, LabelOnly: false, priority)
+#if DEBUG
+            {
+                Timing = timing ?? upgraded.Timing,
+            }
+#endif
+            , priority);
+            return;
+        }
+
+        // Label-only was already running (not in queue) — start a dedicated icon load.
+        Enqueue(new LoadRequest(iconKey, device, apkPath, packageName, onReady, LabelOnly: false, priority)
+#if DEBUG
+        {
+            Timing = timing,
+        }
+#endif
+        , priority);
     }
 
     /// <summary>
@@ -442,9 +925,6 @@ public static partial class ApkIconService
            && label != FailMarker
            && !ArscResourceResolver.IsPseudoAccentLabel(label)
            && !IsCorruptCachedLabel(label);
-
-    /// <summary>True when the package already shows a usable name for the current UI language.</summary>
-    private static bool IsUsableCachedLabel(string? label) => IsUsableDisplayLabel(label);
 
     /// <summary>
     /// Detects labels mangled by ANSI/Default round-trips (Hebrew → <c>????</c>) or bad UTF-8 (<c>U+FFFD</c>).
@@ -685,7 +1165,7 @@ public static partial class ApkIconService
         foreach (var package in Data.Packages)
         {
             ApplyCachedLabel(device, package);
-            BeginEnsureLabelForPackage(package, priority: false);
+            BeginEnsureLabelForPackage(package, ApkLoadPriority.Background);
         }
     }
 
@@ -694,9 +1174,9 @@ public static partial class ApkIconService
            && iconExt != FailMarker
            && iconExt.StartsWith('.');
 
-    private static void AttachOnReady(string pullKey, string? packageName, Action<BitmapSource?>? onReady, bool priority)
+    private static void AttachOnReady(string pullKey, string? packageName, Action<BitmapSource?>? onReady, ApkLoadPriority priority)
     {
-        if (onReady is null)
+        if (onReady is null && priority == ApkLoadPriority.Background)
             return;
 
         lock (QueueLock)
@@ -709,31 +1189,39 @@ public static partial class ApkIconService
                 if (string.IsNullOrEmpty(request.PackageName) && !string.IsNullOrEmpty(packageName))
                     request.PackageName = packageName;
 
-                var previous = request.OnReady;
-                request.OnReady = bmp =>
+                if (onReady is not null)
                 {
-                    previous?.Invoke(bmp);
-                    onReady(bmp);
-                };
+                    var previous = request.OnReady;
+                    request.OnReady = bmp =>
+                    {
+                        previous?.Invoke(bmp);
+                        onReady(bmp);
+                    };
+                }
 
-                if (priority && LoadQueue.First?.Value != request)
+                if (priority > request.Priority)
                 {
+                    request.Priority = priority;
                     LoadQueue.Remove(request);
-                    LoadQueue.AddFirst(request);
+                    InsertByPriority_NoLock(request);
                 }
 
                 return;
             }
         }
 
+        if (onReady is null)
+            return;
+
         void Handler(string serial, string cachedPackageName)
         {
-            var expected = pullKey.Split('|', 2);
-            if (expected.Length != 2 || serial != expected[0])
+            var parts = pullKey.Split('|');
+            if (parts.Length < 2 || serial != parts[0])
                 return;
 
+            var keyPackage = parts[1];
             // Match by package name, or by apk path used as interim pull key.
-            if (!string.Equals(cachedPackageName, expected[1], StringComparison.Ordinal)
+            if (!string.Equals(cachedPackageName, keyPackage, StringComparison.Ordinal)
                 && (string.IsNullOrEmpty(packageName) || !string.Equals(cachedPackageName, packageName, StringComparison.Ordinal)))
                 return;
 
@@ -751,20 +1239,46 @@ public static partial class ApkIconService
         ApkIconUpdated += Handler;
     }
 
-    private static void Enqueue(LoadRequest request, bool priority)
+    private static void Enqueue(LoadRequest request, ApkLoadPriority priority)
     {
         lock (QueueLock)
         {
-            if (priority)
-                LoadQueue.AddFirst(request);
-            else
-                LoadQueue.AddLast(request);
+            request.Priority = priority;
+            InsertByPriority_NoLock(request);
 
             if (WorkerRunning)
                 return;
 
             StartWorker_NoLock();
         }
+    }
+
+    private static void InsertByPriority_NoLock(LoadRequest request)
+    {
+        // Higher priority first; within the same priority, preserve FIFO (append after equals).
+        var node = LoadQueue.First;
+        while (node is not null)
+        {
+            if (node.Value.Priority < request.Priority)
+            {
+                LoadQueue.AddBefore(node, request);
+                return;
+            }
+            node = node.Next;
+        }
+
+        LoadQueue.AddLast(request);
+    }
+
+    private static void ResortQueue_NoLock()
+    {
+        if (LoadQueue.Count <= 1)
+            return;
+
+        var ordered = LoadQueue.OrderByDescending(static r => r.Priority).ToList();
+        LoadQueue.Clear();
+        foreach (var request in ordered)
+            LoadQueue.AddLast(request);
     }
 
     private static void StartWorker_NoLock()
@@ -777,30 +1291,123 @@ public static partial class ApkIconService
     }
 
     private static void SetIconLoadProgress(bool active, bool force = false)
+        => SetDebouncedProgress(ProgressKind.AnyQueueWork, active, force);
+
+    private static void SetIconPullProgress(bool active, bool force = false)
+        => SetDebouncedProgress(ProgressKind.IconPull, active, force);
+
+    private enum ProgressKind
+    {
+        AnyQueueWork,
+        IconPull,
+    }
+
+    private static void SetDebouncedProgress(ProgressKind kind, bool active, bool force)
     {
         if (force)
         {
-            Interlocked.Exchange(ref ProgressActiveCount, 0);
-            try { IconLoadProgressChanged?.Invoke(false); } catch { /* ignore */ }
+            BumpHideGeneration(kind);
+            if (ExchangeActive(kind, 0) != 0)
+                RaiseProgressChanged(kind, false);
             return;
         }
 
         if (active)
         {
-            if (Interlocked.CompareExchange(ref ProgressActiveCount, 1, 0) == 0)
-            {
-                try { IconLoadProgressChanged?.Invoke(true); } catch { /* ignore */ }
-            }
+            BumpHideGeneration(kind);
+            if (CompareExchangeActive(kind, 1, 0) == 0)
+                RaiseProgressChanged(kind, true);
             else
+                ExchangeActive(kind, 1);
+            return;
+        }
+
+        var generation = BumpHideGeneration(kind);
+        _ = HideDebouncedProgressWhenIdleAsync(kind, generation);
+    }
+
+    private static int BumpHideGeneration(ProgressKind kind)
+    {
+        if (kind is ProgressKind.IconPull)
+            return Interlocked.Increment(ref IconPullProgressHideGeneration);
+        return Interlocked.Increment(ref ProgressHideGeneration);
+    }
+
+    private static int ReadHideGeneration(ProgressKind kind)
+    {
+        if (kind is ProgressKind.IconPull)
+            return Volatile.Read(ref IconPullProgressHideGeneration);
+        return Volatile.Read(ref ProgressHideGeneration);
+    }
+
+    private static int ExchangeActive(ProgressKind kind, int value)
+    {
+        if (kind is ProgressKind.IconPull)
+            return Interlocked.Exchange(ref IconPullProgressActiveCount, value);
+        return Interlocked.Exchange(ref ProgressActiveCount, value);
+    }
+
+    private static int CompareExchangeActive(ProgressKind kind, int value, int comparand)
+    {
+        if (kind is ProgressKind.IconPull)
+            return Interlocked.CompareExchange(ref IconPullProgressActiveCount, value, comparand);
+        return Interlocked.CompareExchange(ref ProgressActiveCount, value, comparand);
+    }
+
+    private static void RaiseProgressChanged(ProgressKind kind, bool active)
+    {
+        try
+        {
+            if (kind is ProgressKind.IconPull)
+                IconPullProgressChanged?.Invoke(active);
+            else
+                IconLoadProgressChanged?.Invoke(active);
+        }
+        catch
+        {
+            /* ignore */
+        }
+    }
+
+    private static async Task HideDebouncedProgressWhenIdleAsync(ProgressKind kind, int generation)
+    {
+        try
+        {
+            await Task.Delay(ProgressHideDelay).ConfigureAwait(false);
+        }
+        catch
+        {
+            return;
+        }
+
+        if (generation != ReadHideGeneration(kind))
+            return;
+
+        if (kind is ProgressKind.AnyQueueWork)
+        {
+            lock (QueueLock)
             {
-                Interlocked.Exchange(ref ProgressActiveCount, 1);
+                if (generation != ReadHideGeneration(kind))
+                    return;
+
+                if (WorkerRunning || LoadQueue.Count > 0)
+                    return;
             }
         }
-        else
+
+        if (generation != ReadHideGeneration(kind))
+            return;
+
+        if (CompareExchangeActive(kind, 0, 1) != 1)
+            return;
+
+        if (generation != ReadHideGeneration(kind))
         {
-            Interlocked.Exchange(ref ProgressActiveCount, 0);
-            try { IconLoadProgressChanged?.Invoke(false); } catch { /* ignore */ }
+            ExchangeActive(kind, 1);
+            return;
         }
+
+        RaiseProgressChanged(kind, false);
     }
 
     /// <summary>
@@ -820,7 +1427,8 @@ public static partial class ApkIconService
     private static async Task ProcessQueueAsync(int generation, CancellationToken workerToken)
     {
         SetIconLoadProgress(true);
-        var inFlight = new List<Task>();
+        var pullProgressShown = false;
+        var inFlight = new List<(Task Task, bool IsIconPull)>();
         try
         {
             while (!workerToken.IsCancellationRequested)
@@ -828,7 +1436,9 @@ public static partial class ApkIconService
                 if (generation != WorkerGeneration)
                     return;
 
-                inFlight.RemoveAll(static t => t.IsCompleted);
+                inFlight.RemoveAll(static t => t.Task.IsCompleted);
+
+                MaybeHideIconPullProgress(ref pullProgressShown, inFlight);
 
                 var max = GetMaxConcurrentLoads();
                 while (inFlight.Count < max && !workerToken.IsCancellationRequested)
@@ -846,7 +1456,13 @@ public static partial class ApkIconService
                         LoadQueue.RemoveFirst();
                     }
 
-                    inFlight.Add(ProcessRequestAsync(request, generation, workerToken));
+                    if (!request.LabelOnly && !pullProgressShown)
+                    {
+                        SetIconPullProgress(true);
+                        pullProgressShown = true;
+                    }
+
+                    inFlight.Add((ProcessRequestAsync(request, generation, workerToken), !request.LabelOnly));
                 }
 
                 if (inFlight.Count == 0)
@@ -870,19 +1486,21 @@ public static partial class ApkIconService
                     // from this background thread), which would deadlock against the UI thread.
                     if (queueIdle)
                     {
+                        if (pullProgressShown)
+                            SetIconPullProgress(false);
                         SetIconLoadProgress(false);
                         return;
                     }
                 }
 
-                await Task.WhenAny(inFlight).ConfigureAwait(false);
+                await Task.WhenAny(inFlight.Select(static t => t.Task)).ConfigureAwait(false);
             }
         }
         finally
         {
             if (inFlight.Count > 0)
             {
-                try { await Task.WhenAll(inFlight).ConfigureAwait(false); }
+                try { await Task.WhenAll(inFlight.Select(static t => t.Task)).ConfigureAwait(false); }
                 catch { /* per-request failures are handled inside ProcessRequestAsync */ }
             }
 
@@ -901,8 +1519,32 @@ public static partial class ApkIconService
 
             // Raised outside the lock; see comment above.
             if (queueIdle)
+            {
+                if (pullProgressShown)
+                    SetIconPullProgress(false);
                 SetIconLoadProgress(false);
+            }
         }
+    }
+
+    private static void MaybeHideIconPullProgress(
+        ref bool pullProgressShown,
+        List<(Task Task, bool IsIconPull)> inFlight)
+    {
+        if (!pullProgressShown)
+            return;
+
+        if (inFlight.Any(static t => !t.Task.IsCompleted && t.IsIconPull))
+            return;
+
+        lock (QueueLock)
+        {
+            if (LoadQueue.Any(static r => !r.LabelOnly))
+                return;
+        }
+
+        SetIconPullProgress(false);
+        pullProgressShown = false;
     }
 
     private static async Task ProcessRequestAsync(
@@ -910,6 +1552,13 @@ public static partial class ApkIconService
         int generation,
         CancellationToken workerToken)
     {
+#if DEBUG
+        var timing = request.Timing;
+        timing?.Mark("worker dequeued — start ProcessRequest");
+        if (timing is not null)
+            CurrentTiming.Value = timing;
+#endif
+
         BitmapSource? result = null;
         string? resolvedPackageName = request.PackageName;
         try
@@ -917,28 +1566,51 @@ public static partial class ApkIconService
             using var linked = CancellationTokenSource.CreateLinkedTokenSource(workerToken, Data.DeviceCts.Token);
             if (request.LabelOnly)
             {
+#if DEBUG
+                timing?.Mark("LoadLabelAsync start");
+#endif
                 resolvedPackageName = await LoadLabelAsync(
                     request.Device, request.ApkPath, request.PackageName, linked.Token).ConfigureAwait(false);
+#if DEBUG
+                timing?.Mark("LoadLabelAsync done");
+#endif
                 result = null;
             }
             else
             {
+#if DEBUG
+                timing?.Mark("LoadIconAsync start");
+                (result, resolvedPackageName) = await LoadIconAsync(
+                    request.Device, request.ApkPath, request.PackageName, linked.Token, timing).ConfigureAwait(false);
+                timing?.Mark(result is null ? "LoadIconAsync done (no icon)" : "LoadIconAsync done");
+#else
                 (result, resolvedPackageName) = await LoadIconAsync(
                     request.Device, request.ApkPath, request.PackageName, linked.Token).ConfigureAwait(false);
+#endif
             }
         }
         catch (OperationCanceledException)
         {
+#if DEBUG
+            timing?.Mark("cancelled");
+#endif
             result = null;
         }
         catch (Exception e)
         {
+#if DEBUG
+            timing?.Mark($"exception: {e.GetType().Name}: {e.Message}");
+#endif
 #if !DEPLOY
             DebugLog.PrintLine($"APK icon load failed for {request.ApkPath}: {e.Message}");
 #endif
         }
         finally
         {
+#if DEBUG
+            if (timing is not null)
+                CurrentTiming.Value = null;
+#endif
             lock (PendingLock)
                 PendingLoads.Remove(request.PullKey);
         }
@@ -947,6 +1619,9 @@ public static partial class ApkIconService
             || workerToken.IsCancellationRequested
             || Data.DeviceCts.IsCancellationRequested)
         {
+#if DEBUG
+            timing?.Mark("discarded (generation/cancel)");
+#endif
             return;
         }
 
@@ -959,6 +1634,9 @@ public static partial class ApkIconService
 
         var onReady = request.OnReady;
         var bitmap = result;
+#if DEBUG
+        timing?.Mark("dispatch OnReady to UI");
+#endif
         App.SafeBeginInvoke(() => onReady?.Invoke(bitmap));
     }
 
@@ -1010,7 +1688,11 @@ public static partial class ApkIconService
         LogicalDeviceViewModel device,
         string apkPath,
         string? packageName,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+#if DEBUG
+        , ApkLoadTiming? timing = null
+#endif
+        )
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -1019,6 +1701,14 @@ public static partial class ApkIconService
         var today = DateOnly.FromDateTime(DateTime.Today);
 
         packageName ??= TryResolvePackageName(apkPath);
+        // Force-reload timing must never short-circuit on a cache that a cancelled load re-warmed.
+#if DEBUG
+        if (timing is not null)
+        {
+            timing.Mark("skip warm/fail cache (force-reload measurement)");
+        }
+        else
+#endif
         if (!string.IsNullOrEmpty(packageName))
         {
             lock (GetDeviceLock(serial))
@@ -1030,54 +1720,111 @@ public static partial class ApkIconService
                 {
                     var warmPath = GetLocalIconPath(serial, packageName, warm.IconExt);
                     if (File.Exists(warmPath))
+                    {
+#if DEBUG
+                        timing?.Mark("warm cache hit (local icon file)");
+#endif
                         return (DecodeBitmap(warmPath), packageName);
+                    }
                 }
 
                 if (cache.TryGetValue(packageName, out warm)
                     && warm.CheckedDate == today
                     && warm.IconExt == FailMarker)
                 {
+#if DEBUG
+                    timing?.Mark("fail-marker cache hit (skip)");
+#endif
                     return (null, packageName);
                 }
             }
         }
 
-        // Manifest CRC listing in parallel with pulling AndroidManifest.xml + resources.arsc.
+        using var extractSession = new ApkIconExtractSession(device);
+        CurrentExtractSession.Value = extractSession;
+        try
+        {
+        // Manifest CRC listing in parallel with batch extract of AndroidManifest.xml + resources.arsc.
+#if DEBUG
+        timing?.Mark("parallel: zip listing(manifest) + batch extract manifest+arsc");
+        var listingSw = Stopwatch.StartNew();
+        var metaSw = Stopwatch.StartNew();
+#endif
         var manifestListingTask = Task.Run(
-            () => ArchiveListing.FetchZipMemberListing(deviceId, apkPath, [MANIFEST], cancellationToken),
+            () =>
+            {
+                var listing = ArchiveListing.FetchZipMemberListing(deviceId, apkPath, [MANIFEST], cancellationToken);
+#if DEBUG
+                timing?.Mark($"FetchZipMemberListing(AndroidManifest.xml) finished in {listingSw.ElapsedMilliseconds} ms");
+#endif
+                return listing;
+            },
             cancellationToken);
-        var metaTask = PullManifestAndResourcesAsync(device, apkPath, cancellationToken);
 
-        await Task.WhenAll(manifestListingTask, metaTask).ConfigureAwait(false);
+        await extractSession.EnsureMembersAsync(apkPath, [MANIFEST, RESOURCES], cancellationToken).ConfigureAwait(false);
+#if DEBUG
+        timing?.Mark($"batch manifest+arsc done in {metaSw.ElapsedMilliseconds} ms");
+#endif
+
+        await manifestListingTask.ConfigureAwait(false);
+#if DEBUG
+        timing?.Mark("parallel: zip listing + meta pull both complete");
+#endif
         cancellationToken.ThrowIfCancellationRequested();
 
         var manifestEntry = FindEntry(manifestListingTask.Result, MANIFEST);
         if (manifestEntry is null || string.IsNullOrEmpty(manifestEntry.Value.Crc))
         {
+            #if DEBUG
+            timing?.Mark("manifest CRC missing — abort");
+            #endif
             if (!string.IsNullOrEmpty(packageName))
                 MarkFetchResult(serial, packageName, "", today, FailMarker, FailMarker);
             return (null, packageName);
         }
 
         var manifestCrc = NormalizeCrc(manifestEntry.Value.Crc);
-        var (manifestBytes, resourcesBytes) = metaTask.Result;
+        var manifestBytes = extractSession.TryGetCached(apkPath, MANIFEST);
+        var resourcesBytes = extractSession.TryGetCached(apkPath, RESOURCES);
         if (manifestBytes is null || manifestBytes.Length == 0 || resourcesBytes is null || resourcesBytes.Length == 0)
         {
+            #if DEBUG
+            timing?.Mark($"meta pull empty (manifest={manifestBytes?.Length ?? 0}B, arsc={resourcesBytes?.Length ?? 0}B)");
+            #endif
             if (!string.IsNullOrEmpty(packageName))
                 MarkFetchResult(serial, packageName, manifestCrc, today, FailMarker, FailMarker);
             return (null, packageName);
         }
 
+        #if DEBUG
+        timing?.Mark($"parse package name + label (manifest={manifestBytes.Length}B, arsc={resourcesBytes.Length}B)");
+        #endif
         packageName ??= TryReadPackageName(manifestBytes, resourcesBytes);
         if (string.IsNullOrEmpty(packageName))
+        {
+            #if DEBUG
+            timing?.Mark("package name unresolved — abort");
+            #endif
             return (null, null);
+        }
 
         var label = TryReadPackageLabel(manifestBytes, resourcesBytes) ?? FailMarker;
+        #if DEBUG
+        timing?.Mark($"label={(label == FailMarker ? "fail" : "ok")}");
+        #endif
+
+        // Persist the label before icon work so a compose crash still leaves the display name.
+        if (label != FailMarker)
+            MarkFetchResult(serial, packageName, manifestCrc, today, iconExt: null, label);
 
         lock (GetDeviceLock(serial))
         {
             var cache = GetOrLoadCache(serial);
-            if (cache.TryGetValue(packageName, out var existing)
+            if (
+#if DEBUG
+                timing is null &&
+#endif
+                cache.TryGetValue(packageName, out var existing)
                 && string.Equals(existing.ManifestCrc, manifestCrc, StringComparison.OrdinalIgnoreCase)
                 && IsSuccessfulIconExt(existing.IconExt))
             {
@@ -1097,15 +1844,44 @@ public static partial class ApkIconService
                         WriteCache(serial, cache);
                     }
 
+#if DEBUG
+                    timing?.Mark("CRC-matched local icon — skip re-extract");
+#endif
                     return (DecodeBitmap(localPath), packageName);
                 }
             }
+#if DEBUG
+            else if (timing is not null
+                && cache.TryGetValue(packageName, out var crcHit)
+                && string.Equals(crcHit.ManifestCrc, manifestCrc, StringComparison.OrdinalIgnoreCase)
+                && IsSuccessfulIconExt(crcHit.IconExt)
+                && File.Exists(GetLocalIconPath(serial, packageName, crcHit.IconExt)))
+            {
+                timing.Mark("CRC would match local icon — forcing re-extract for timing");
+            }
+#endif
         }
 
+#if DEBUG
+        timing?.Mark("ResolveIconCandidatesAsync start");
+#endif
         var iconCandidates = await ResolveIconCandidatesAsync(
-            device, apkPath, manifestBytes, resourcesBytes, cancellationToken).ConfigureAwait(false);
+            device, apkPath, manifestBytes, resourcesBytes, cancellationToken
+#if DEBUG
+            , timing
+#endif
+            ).ConfigureAwait(false);
+#if DEBUG
+        timing?.Mark($"ResolveIconCandidatesAsync done ({iconCandidates.Count} candidates)");
+#endif
 
+        #if DEBUG
+        timing?.Mark("DiscoverApkBundleFiles start");
+        #endif
         var apkFiles = DiscoverApkBundleFiles(deviceId, apkPath);
+        #if DEBUG
+        timing?.Mark($"DiscoverApkBundleFiles done ({apkFiles.Count} apk(s))");
+        #endif
         byte[] effectiveResources = resourcesBytes;
 
         if (iconCandidates.Count == 0 && apkFiles.Count > 1)
@@ -1113,40 +1889,82 @@ public static partial class ApkIconService
             foreach (var splitApk in PreferApksForRead(apkFiles, apkPath).Where(p => !string.Equals(p, apkPath, StringComparison.Ordinal)))
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var splitResources = await PullResourcesOnlyAsync(device, splitApk, cancellationToken).ConfigureAwait(false);
+#if DEBUG
+                timing?.Mark($"PullResourcesOnlyAsync split: {Path.GetFileName(splitApk)}");
+#endif
+                var splitResources = await PullResourcesOnlyAsync(device, splitApk, cancellationToken
+#if DEBUG
+                    , timing
+#endif
+                    ).ConfigureAwait(false);
                 if (splitResources is null || splitResources.Length == 0)
                     continue;
 
+                #if DEBUG
+                timing?.Mark($"ResolveIconCandidatesAsync on split {Path.GetFileName(splitApk)}");
+                #endif
                 var splitCandidates = await ResolveIconCandidatesAsync(
-                    device, splitApk, manifestBytes, splitResources, cancellationToken).ConfigureAwait(false);
+                    device, splitApk, manifestBytes, splitResources, cancellationToken
+#if DEBUG
+                    , timing
+#endif
+                    ).ConfigureAwait(false);
                 if (splitCandidates.Count == 0)
                     continue;
 
                 iconCandidates = splitCandidates;
                 effectiveResources = splitResources;
+                #if DEBUG
+                timing?.Mark($"split candidates found ({iconCandidates.Count})");
+                #endif
                 break;
             }
         }
 
         if (iconCandidates.Count == 0)
         {
-            // Splits exhausted (or single APK) — brand / string-pool / heuristics are safe now.
-            iconCandidates = FindFallbackBrandIconPaths(effectiveResources);
-            if (iconCandidates.Count == 0)
+            // Splits exhausted (or single APK) — string-pool / heuristics.
+            // Overlay / RRO arsc is often tiny or malformed; AlphaOmega ArscFile can throw
+            // (Resolve already swallowed that). Keep fallbacks best-effort.
+            #if DEBUG
+            timing?.Mark("fallback string-pool / heuristic candidates");
+            #endif
+            try
+            {
                 iconCandidates = FindLikelyIconPathsInStringPool(new ArscFile(effectiveResources));
-            if (iconCandidates.Count == 0)
-                iconCandidates = HeuristicIconCandidates();
+                if (iconCandidates.Count == 0)
+                    iconCandidates = HeuristicIconCandidates();
+            }
+            catch (Exception e)
+            {
+#if DEBUG
+                timing?.Mark($"fallback parse failed: {e.GetType().Name}: {e.Message}");
+#else
+                _ = e;
+#endif
+                iconCandidates = [];
+            }
+
+            #if DEBUG
+            timing?.Mark($"fallback candidates: {iconCandidates.Count}");
+            #endif
         }
 
-        // Adaptive wrappers often live only in a density split — always probe common paths.
-        iconCandidates =
-        [
-            "res/mipmap-anydpi-v26/ic_launcher.xml",
-            "res/drawable-anydpi-v26/ic_launcher.xml",
-            "res/mipmap-anydpi-v26/ic_launcher_round.xml",
-            "res/drawable-anydpi-v26/ic_launcher_round.xml",
-            .. iconCandidates,
-        ];
+        // Stock ic_launcher paths are last-resort only. Prepending them used to beat a confirmed
+        // brand adaptive wrapper because both score as adaptive and
+        // PickBestIconMember's stable sort keeps earlier list order — composing the leftover
+        // Android Studio template instead of the real icon.
+        if (!iconCandidates.Any(IsAdaptiveWrapperPath))
+        {
+            iconCandidates =
+            [
+                .. iconCandidates,
+                "res/mipmap-anydpi-v26/ic_launcher.xml",
+                "res/drawable-anydpi-v26/ic_launcher.xml",
+                "res/mipmap-anydpi-v26/ic_launcher_round.xml",
+                "res/drawable-anydpi-v26/ic_launcher_round.xml",
+            ];
+        }
 
         string? iconMember = null;
         var iconSourceApk = apkPath;
@@ -1155,16 +1973,25 @@ public static partial class ApkIconService
             if (iconCandidates.Count > MaxIconCandidatesToProbe)
                 iconCandidates = iconCandidates.Take(MaxIconCandidatesToProbe).ToList();
 
-            foreach (var candidateApk in PreferApksForRead(apkFiles, apkPath))
-            {
-                var candidateListing = ArchiveListing.FetchZipMemberListing(
-                    deviceId, candidateApk, iconCandidates, cancellationToken);
-                cancellationToken.ThrowIfCancellationRequested();
+            // Prefer base/density only; Prefetch stops once every candidate is found.
+            #if DEBUG
+            timing?.Mark($"Prefetch icon candidates ({iconCandidates.Count})");
+            #endif
+            await extractSession.PrefetchFromBundleAsync(apkFiles, iconCandidates, cancellationToken)
+                .ConfigureAwait(false);
 
-                iconMember = PickBestIconMember(iconCandidates, candidateListing);
+            foreach (var candidateApk in PreferApksForIconMember(apkFiles, apkPath))
+            {
+                iconMember = PickBestIconMember(
+                    iconCandidates,
+                    extractSession.PresentMembers(candidateApk, iconCandidates),
+                    m => extractSession.TryGetCached(candidateApk, m)?.Length ?? 0);
                 if (iconMember is not null)
                 {
                     iconSourceApk = candidateApk;
+                    #if DEBUG
+                    timing?.Mark($"picked icon member: {iconMember} from {Path.GetFileName(candidateApk)}");
+                    #endif
                     break;
                 }
             }
@@ -1174,6 +2001,9 @@ public static partial class ApkIconService
         {
             foreach (var candidateApk in PreferApksForRead(apkFiles, apkPath))
             {
+                #if DEBUG
+                timing?.Mark($"DiscoverIconMembersOnDevice: {Path.GetFileName(candidateApk)}");
+                #endif
                 var discovered = DiscoverIconMembersOnDevice(deviceId, candidateApk, cancellationToken);
                 if (discovered.Count == 0)
                     continue;
@@ -1184,6 +2014,11 @@ public static partial class ApkIconService
                 if (iconMember is not null)
                 {
                     iconSourceApk = candidateApk;
+                    #if DEBUG
+                    timing?.Mark($"discovered icon member: {iconMember}");
+                    #endif
+                    await extractSession.EnsureMembersAsync(candidateApk, [iconMember], cancellationToken)
+                        .ConfigureAwait(false);
                     break;
                 }
             }
@@ -1191,26 +2026,38 @@ public static partial class ApkIconService
 
         if (iconMember is null)
         {
+            #if DEBUG
+            timing?.Mark("no icon member found — abort");
+            #endif
             MarkFetchResult(serial, packageName, manifestCrc, today, FailMarker, label);
             return (null, packageName);
         }
 
-        await using var iconStream = await AdbHelper.ReadFileAsStreamAsync(
-            device, FileHelper.ConcatPaths(iconSourceApk, iconMember), cancellationToken).ConfigureAwait(false);
-        if (iconStream is null || iconStream.Length == 0)
+        #if DEBUG
+        timing?.Mark($"ReadFileAsStreamAsync icon: {iconMember}");
+        #endif
+        var memberBytes = extractSession.TryGetCached(iconSourceApk, iconMember);
+        if (memberBytes is null || memberBytes.Length == 0)
         {
+            await extractSession.EnsureMembersAsync(iconSourceApk, [iconMember], cancellationToken)
+                .ConfigureAwait(false);
+            memberBytes = extractSession.TryGetCached(iconSourceApk, iconMember);
+        }
+
+        if (memberBytes is null || memberBytes.Length == 0)
+        {
+            #if DEBUG
+            timing?.Mark("icon bytes empty — abort");
+            #endif
             MarkFetchResult(serial, packageName, manifestCrc, today, FailMarker, label);
             return (null, packageName);
         }
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var memberBytes = ToByteArray(iconStream);
-        if (memberBytes is null || memberBytes.Length == 0)
-        {
-            MarkFetchResult(serial, packageName, manifestCrc, today, FailMarker, label);
-            return (null, packageName);
-        }
+        #if DEBUG
+        timing?.Mark($"icon bytes ready ({memberBytes.Length}B, xml={iconMember.EndsWith(".xml", StringComparison.OrdinalIgnoreCase)})");
+        #endif
 
         BitmapSource? bitmap = null;
         string iconExt;
@@ -1236,8 +2083,14 @@ public static partial class ApkIconService
                 if (xmlCache is not null)
                     return xmlCache;
 
+                #if DEBUG
+                timing?.Mark("PreloadXmlResourcesAsync start");
+                #endif
                 xmlCache = await PreloadXmlResourcesAsync(
                     device, apkBundle, composeResources, memberBytes, cancellationToken).ConfigureAwait(false);
+                #if DEBUG
+                timing?.Mark($"PreloadXmlResourcesAsync done ({xmlCache.Count} entries)");
+                #endif
                 return xmlCache;
             }
 
@@ -1246,13 +2099,27 @@ public static partial class ApkIconService
 
             if (ApkVectorIconRenderer.IsVectorDrawable(memberBytes))
             {
+                #if DEBUG
+                timing?.Mark("render vector drawable");
+                #endif
                 xmlCache = await PreloadXmlResourcesAsync(
                     device, apkBundle, resourcesForIcon, memberBytes, cancellationToken).ConfigureAwait(false);
+                #if DEBUG
+                timing?.Mark($"PreloadXmlResourcesAsync (vector) done ({xmlCache.Count})");
+                #endif
 
                 using var rendered = ApkVectorIconRenderer.TryRenderToSkBitmap(
                     memberBytes, size: 192, background: SKColors.Transparent,
                     resolveColor: ResolveColor, resolveXmlResource: ResolveXml);
-                if (rendered is not null && !IsDegenerateIcon(rendered))
+                if (rendered is not null && IsStockAndroidStudioGreenPlate(rendered))
+                {
+                    // Green plate without Bugdroid — ship the complete template icon.
+                    bitmap = DefaultAndroidPackageIcon.Render(192);
+                    #if DEBUG
+                    timing?.Mark("stock AS green plate → default package icon");
+                    #endif
+                }
+                else if (rendered is not null && !IsDegenerateIcon(rendered))
                 {
                     // Corner-biased vectors need recentering; full launcher vectors must keep placement.
                     if (IsCornerBiasedIcon(rendered))
@@ -1264,43 +2131,120 @@ public static partial class ApkIconService
                     {
                         bitmap = ApkVectorIconRenderer.ToBitmapSource(rendered);
                     }
+                    #if DEBUG
+                    timing?.Mark("vector render ok");
+                    #endif
+                }
+                else
+                {
+                    #if DEBUG
+                    timing?.Mark("vector render failed / degenerate");
+                    #endif
                 }
             }
             else
             {
                 await GetXmlCacheAsync().ConfigureAwait(false);
+                #if DEBUG
+                timing?.Mark("TryComposeAdaptiveIconAsync start");
+                #endif
                 bitmap = await TryComposeAdaptiveIconAsync(
                     device, apkBundle, memberBytes, composeArsc, composeResources, cancellationToken,
                     ResolveXml, packageName).ConfigureAwait(false);
+                #if DEBUG
+                timing?.Mark(bitmap is null ? "adaptive compose failed" : "adaptive compose ok");
+                #endif
 
                 // If adaptive composition fails, fall back to the best foreground raster
                 // composited on white (Android adaptive icons are always opaque).
                 if (bitmap is null)
                 {
+                    #if DEBUG
+                    timing?.Mark("adaptive fg-raster fallback start");
+                    #endif
                     var layers = ResolveAdaptiveLayers(memberBytes, composeArsc, composeResources);
                     var fgOnly = RankIconCandidates(layers.ForegroundImages);
                     if (fgOnly.Count == 0)
                     {
-                        // AccuBattery / El Al: adaptive layers unresolved — use mipmap rasters from icon ref.
+                        // Adaptive layers unresolved — use every
+                        // density raster for the manifest icon id (PreferIconPaths would keep
+                        // only the adaptive XML and RankIconCandidates would then drop it).
                         var iconRef = AxmlManifestReader.TryGetApplicationAttribute(manifestBytes, AxmlManifestReader.AttrIcon)
                                       ?? FindApplicationAttributeFromAxml(manifestBytes, "icon");
                         if (!string.IsNullOrWhiteSpace(iconRef))
-                            fgOnly = RankIconCandidates(ResolveIconRefToPaths(iconRef, composeArsc, composeResources));
+                        {
+                            fgOnly = RankIconCandidates(ResolveIconRefToAllPaths(iconRef, composeArsc, composeResources));
+
+                            // Density-split arsc often owns the legacy PNG while base only
+                            // lists the adaptive XML for the same icon id.
+                            if (TryParseResourceId(iconRef, out var iconId))
+                            {
+                                foreach (var splitApk in PreferApksForIconMember(apkBundle, apkPath))
+                                {
+                                    if (Path.GetFileName(splitApk)
+                                        .Equals("base.apk", StringComparison.OrdinalIgnoreCase))
+                                        continue;
+
+                                    var splitRes = await TryGetResourcesFromApkAsync(
+                                        device, splitApk, cancellationToken).ConfigureAwait(false);
+                                    if (splitRes is null || splitRes.Length == 0)
+                                        continue;
+
+                                    var splitPaths = RankIconCandidates(
+                                        ArscResourceResolver.ResolvePaths(splitRes, iconId));
+                                    if (splitPaths.Count == 0)
+                                        continue;
+
+                                    fgOnly = RankIconCandidates(fgOnly.Concat(splitPaths));
+                                    #if DEBUG
+                                    timing?.Mark($"fg-raster split paths: {splitPaths.Count}");
+                                    #endif
+                                    break;
+                                }
+                            }
+                        }
                     }
 
                     if (fgOnly.Count > 0)
                     {
-                        foreach (var candidateApk in apkBundle)
+                        var fgProbe = fgOnly.Take(MaxIconCandidatesToProbe).ToList();
+                        if (CurrentExtractSession.Value is { } fgSession)
+                            await fgSession.PrefetchFromBundleAsync(apkBundle, fgProbe, cancellationToken)
+                                .ConfigureAwait(false);
+
+                        foreach (var candidateApk in PreferApksForIconMember(apkBundle, apkPath))
                         {
-                            var fgListing = ArchiveListing.FetchZipMemberListing(
-                                deviceId, candidateApk, fgOnly.Take(MaxIconCandidatesToProbe).ToList(), cancellationToken);
-                            var fgMember = PickBestIconMember(fgOnly, fgListing);
+                            #if DEBUG
+                            timing?.Mark($"fg batch in {Path.GetFileName(candidateApk)}");
+                            #endif
+                            string? fgMember;
+                            if (CurrentExtractSession.Value is { } s)
+                            {
+                                fgMember = PickBestIconMember(
+                                    fgProbe,
+                                    s.PresentMembers(candidateApk, fgProbe),
+                                    m => s.TryGetCached(candidateApk, m)?.Length ?? 0);
+                            }
+                            else
+                            {
+                                var fgListing = ArchiveListing.FetchZipMemberListing(
+                                    deviceId, candidateApk, fgProbe, cancellationToken);
+                                fgMember = PickBestIconMember(fgOnly, fgListing);
+                            }
+
                             if (fgMember is null)
                                 continue;
 
-                            await using var fgStream = await AdbHelper.ReadFileAsStreamAsync(
-                                device, FileHelper.ConcatPaths(candidateApk, fgMember), cancellationToken).ConfigureAwait(false);
-                            var fgBytes = ToByteArray(fgStream);
+                            #if DEBUG
+                            timing?.Mark($"read fg raster: {fgMember}");
+                            #endif
+                            var fgBytes = CurrentExtractSession.Value?.TryGetCached(candidateApk, fgMember);
+                            if (fgBytes is null || fgBytes.Length == 0)
+                            {
+                                fgBytes = await ProbeApkMemberBytesAsync(
+                                    device, candidateApk, fgMember, cancellationToken).ConfigureAwait(false);
+                            }
+
                             if (fgBytes is null || fgBytes.Length == 0)
                                 continue;
 
@@ -1309,38 +2253,78 @@ public static partial class ApkIconService
                                 continue;
 
                             // Prefer opaque white plate under transparent adaptive foregrounds
-                            // (healthdata / Google One) over writing a raw transparent PNG.
+                            // over writing a raw transparent PNG.
                             var bgColor = layers.BackgroundColor ?? SKColors.White;
                             bitmap = CompositeOnOpaqueBackground(fgSk, 192, bgColor);
                             if (bitmap is not null)
+                            {
+                                #if DEBUG
+                                timing?.Mark("fg-raster composite ok");
+                                #endif
                                 break;
+                            }
 
                             memberBytes = fgBytes;
                             iconMember = fgMember;
                             writeRawRaster = true;
+                            #if DEBUG
+                            timing?.Mark("fg-raster write-raw fallback");
+                            #endif
                             break;
                         }
+                    }
+                    else
+                    {
+                        #if DEBUG
+                        timing?.Mark("no fg-raster candidates");
+                        #endif
                     }
                 }
             }
 
-            // RedAlert / density-split apps: adaptive fg is layer-list with split-only rasters.
+            // Density-split apps: adaptive fg is often a layer-list whose rasters live only in a split.
             if (bitmap is null && !writeRawRaster)
             {
-                // Probe enough candidates — mipmap-* paths often miss while drawable-xxhdpi hits.
+                // RankIconCandidates is xxxhdpi-first; Take(N) alone never reaches xxhdpi-only packs.
                 const int heuristicProbe = 48;
-                var heuristic = HeuristicIconCandidates();
-                foreach (var candidateApk in PreferApksForRead(apkBundle, apkPath))
+                var heuristic = HeuristicIconProbeCandidates(heuristicProbe);
+                #if DEBUG
+                timing?.Mark($"heuristic probe ({heuristic.Count} paths)");
+                #endif
+                if (CurrentExtractSession.Value is { } heurSession)
+                    await heurSession.PrefetchFromBundleAsync(apkBundle, heuristic, cancellationToken)
+                        .ConfigureAwait(false);
+
+                foreach (var candidateApk in PreferApksForIconMember(apkBundle, apkPath))
                 {
-                    var listing = ArchiveListing.FetchZipMemberListing(
-                        deviceId, candidateApk, heuristic.Take(heuristicProbe).ToList(), cancellationToken);
-                    var member = PickBestIconMember(heuristic, listing);
+                    string? member;
+                    if (CurrentExtractSession.Value is { } s)
+                    {
+                        member = PickBestIconMember(
+                            heuristic,
+                            s.PresentMembers(candidateApk, heuristic),
+                            m => s.TryGetCached(candidateApk, m)?.Length ?? 0);
+                    }
+                    else
+                    {
+                        var listing = ArchiveListing.FetchZipMemberListing(
+                            deviceId, candidateApk, heuristic, cancellationToken);
+                        member = PickBestIconMember(heuristic, listing);
+                    }
+
                     if (member is null)
                         continue;
 
-                    await using var stream = await AdbHelper.ReadFileAsStreamAsync(
-                        device, FileHelper.ConcatPaths(candidateApk, member), cancellationToken).ConfigureAwait(false);
-                    var bytes = ToByteArray(stream);
+                    #if DEBUG
+                    timing?.Mark($"heuristic hit: {member} in {Path.GetFileName(candidateApk)}");
+                    #endif
+                    var bytes = CurrentExtractSession.Value?.TryGetCached(candidateApk, member);
+                    if (bytes is null || bytes.Length == 0)
+                    {
+                        bytes = await ProbeApkMemberBytesAsync(
+                            device, candidateApk, member, cancellationToken).ConfigureAwait(false);
+                    }
+
                     if (bytes is null || bytes.Length == 0)
                         continue;
 
@@ -1350,33 +2334,71 @@ public static partial class ApkIconService
 
                     bitmap = CompositeOnOpaqueBackground(sk, 192, SKColors.White);
                     if (bitmap is not null)
+                    {
+                        #if DEBUG
+                        timing?.Mark("heuristic composite ok");
+                        #endif
                         break;
+                    }
 
                     memberBytes = bytes;
                     iconMember = member;
                     writeRawRaster = true;
+                    #if DEBUG
+                    timing?.Mark("heuristic write-raw fallback");
+                    #endif
                     break;
                 }
             }
 
+
             if (bitmap is null && !writeRawRaster)
             {
+                #if DEBUG
+                timing?.Mark("XML icon path exhausted — abort");
+                #endif
                 MarkFetchResult(serial, packageName, manifestCrc, today, FailMarker, label);
                 return (null, packageName);
             }
 
-            iconExt = writeRawRaster
-                ? (Path.GetExtension(iconMember) is { Length: > 0 } ext ? ext : ".png")
-                : ".png";
+            if (writeRawRaster)
+            {
+                iconExt = Path.GetExtension(iconMember);
+                if (string.IsNullOrEmpty(iconExt))
+                    iconExt = DetectRasterExtension(memberBytes) ?? ".png";
+            }
+            else
+            {
+                iconExt = ".png";
+            }
         }
         else
         {
             iconExt = Path.GetExtension(iconMember);
             if (string.IsNullOrEmpty(iconExt))
-                iconExt = ".png";
+                iconExt = DetectRasterExtension(memberBytes) ?? ".png";
             writeRawRaster = true;
+            #if DEBUG
+            timing?.Mark($"raw raster path ({iconExt})");
+            #endif
         }
 
+        // Extensionless WebP (WebView res/9M) must not be saved as .png — WIC then decodes
+        // VP8L without alpha and fills transparent corners with opaque black.
+        if (writeRawRaster
+            && iconExt.Equals(".png", StringComparison.OrdinalIgnoreCase)
+            && DetectRasterExtension(memberBytes) is { } detected
+            && !detected.Equals(".png", StringComparison.OrdinalIgnoreCase))
+        {
+            iconExt = detected;
+            #if DEBUG
+            timing?.Mark($"corrected raster ext → {iconExt}");
+            #endif
+        }
+
+        #if DEBUG
+        timing?.Mark("save local icon file");
+        #endif
         var localDir = GetLocalIconDirectory(serial);
         Directory.CreateDirectory(localDir);
         var localFile = GetLocalIconPath(serial, packageName, iconExt);
@@ -1384,10 +2406,13 @@ public static partial class ApkIconService
         if (bitmap is not null && !writeRawRaster)
         {
             await SaveBitmapAsPngAsync(bitmap, localFile, cancellationToken).ConfigureAwait(false);
+            #if DEBUG
+            timing?.Mark("SaveBitmapAsPngAsync done");
+            #endif
         }
         else
         {
-            // Upscale tiny system rasters (ANGLE 48×48) so list thumbnails are not muddy.
+            // Upscale tiny system rasters so list thumbnails are not muddy.
             using (var rawSk = DecodeSkBitmap(memberBytes))
             {
                 if (rawSk is not null && (rawSk.Width < 128 || rawSk.Height < 128))
@@ -1400,6 +2425,9 @@ public static partial class ApkIconService
                             bitmap = ApkVectorIconRenderer.ToBitmapSource(upscaled);
                             await SaveBitmapAsPngAsync(bitmap, localFile, cancellationToken).ConfigureAwait(false);
                             MarkFetchResult(serial, packageName, manifestCrc, today, ".png", label);
+                            #if DEBUG
+                            timing?.Mark("upscaled tiny raster saved");
+                            #endif
                             return (bitmap, packageName);
                         }
                         finally
@@ -1416,6 +2444,9 @@ public static partial class ApkIconService
             if (!File.Exists(localFile) || new FileInfo(localFile).Length == 0)
             {
                 try { File.Delete(localFile); } catch { /* ignore */ }
+                #if DEBUG
+                timing?.Mark("local file write failed — abort");
+                #endif
                 MarkFetchResult(serial, packageName, manifestCrc, today, FailMarker, label);
                 return (null, packageName);
             }
@@ -1424,6 +2455,9 @@ public static partial class ApkIconService
             if (bitmap is null)
             {
                 try { File.Delete(localFile); } catch { /* ignore */ }
+                #if DEBUG
+                timing?.Mark("DecodeBitmap failed — abort");
+                #endif
                 MarkFetchResult(serial, packageName, manifestCrc, today, FailMarker, label);
                 return (null, packageName);
             }
@@ -1434,14 +2468,29 @@ public static partial class ApkIconService
                 if (sk is not null && IsDegenerateIcon(sk))
                 {
                     try { File.Delete(localFile); } catch { /* ignore */ }
+                    #if DEBUG
+                    timing?.Mark("degenerate icon rejected — abort");
+                    #endif
                     MarkFetchResult(serial, packageName, manifestCrc, today, FailMarker, label);
                     return (null, packageName);
                 }
             }
+
+            #if DEBUG
+            timing?.Mark("raw raster saved + decoded");
+            #endif
         }
 
         MarkFetchResult(serial, packageName, manifestCrc, today, iconExt, label);
+        #if DEBUG
+        timing?.Mark("MarkFetchResult / cache write done");
+        #endif
         return (bitmap, packageName);
+        }
+        finally
+        {
+            CurrentExtractSession.Value = null;
+        }
     }
 
     /// <param name="iconExt">New icon ext, <see cref="FailMarker"/>, or null to leave the existing icon field unchanged.</param>
@@ -1482,32 +2531,56 @@ public static partial class ApkIconService
     private static async Task<(byte[]? Manifest, byte[]? Resources)> PullManifestAndResourcesAsync(
         LogicalDeviceViewModel device,
         string apkPath,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+#if DEBUG
+        , ApkLoadTiming? timing = null
+        , Stopwatch? outerSw = null
+#endif
+        )
     {
         string? stagingRoot = null;
         try
         {
+#if DEBUG
+            timing?.Mark("ExtractZipMembersToStaging(manifest+arsc) start");
+            var extractSw = Stopwatch.StartNew();
+#endif
             var (root, contentRoot) = await Task.Run(
                 () => ArchiveExtract.ExtractZipMembersToStaging(
                     device.ID, apkPath, [MANIFEST, RESOURCES], cancellationToken),
                 cancellationToken).ConfigureAwait(false);
             stagingRoot = root;
+#if DEBUG
+            timing?.Mark($"ExtractZipMembersToStaging done in {extractSw.ElapsedMilliseconds} ms");
 
+            timing?.Mark("ReadFileAsStreamAsync manifest + resources start");
+            var readSw = Stopwatch.StartNew();
+#endif
             var manifestTask = AdbHelper.ReadFileAsStreamAsync(
                 device, FileHelper.ConcatPaths(contentRoot, MANIFEST), cancellationToken);
             var resourcesTask = AdbHelper.ReadFileAsStreamAsync(
                 device, FileHelper.ConcatPaths(contentRoot, RESOURCES), cancellationToken);
 
             await Task.WhenAll(manifestTask, resourcesTask).ConfigureAwait(false);
+#if DEBUG
+            timing?.Mark($"ReadFileAsStreamAsync manifest+resources done in {readSw.ElapsedMilliseconds} ms"
+                + (outerSw is null ? "" : $" (meta wall {outerSw.ElapsedMilliseconds} ms)"));
+#endif
 
             return (ToByteArray(manifestTask.Result), ToByteArray(resourcesTask.Result));
         }
         catch (OperationCanceledException)
         {
+#if DEBUG
+            timing?.Mark("PullManifestAndResources cancelled");
+#endif
             throw;
         }
         catch (Exception e)
         {
+#if DEBUG
+            timing?.Mark($"PullManifestAndResources failed: {e.Message}");
+#endif
 #if !DEPLOY
             DebugLog.PrintLine($"APK meta pull failed for {apkPath}: {e.Message}");
 #endif
@@ -1516,12 +2589,22 @@ public static partial class ApkIconService
         finally
         {
             if (stagingRoot is not null)
+            {
+#if DEBUG
+                timing?.Mark("CleanupStaging start");
+#endif
                 ArchiveExtract.CleanupStaging(device.ID, stagingRoot, CancellationToken.None);
+#if DEBUG
+                timing?.Mark("CleanupStaging done");
+#endif
+            }
         }
     }
 
     /// <summary>
-    /// Sibling APKs in an app install dir (<c>base.apk</c> + <c>split_config.*dpi*.apk</c>).
+    /// Sibling APKs in an app install dir (<c>base.apk</c> + <c>split_*.apk</c>).
+    /// Shared folders such as <c>/product/overlay</c> hold many unrelated RROs — do not
+    /// treat them as density splits (that previously scanned dozens of APKs per icon load).
     /// </summary>
     private static List<string> DiscoverApkBundleFiles(string deviceId, string apkPath)
     {
@@ -1532,6 +2615,7 @@ public static partial class ApkIconService
             if (string.IsNullOrEmpty(parent))
                 return result;
 
+            var siblings = new List<(string Name, string Full)>();
             foreach (var entry in ADBService.ListDirectoryEntries(deviceId, parent, CancellationToken.None))
             {
                 if (entry.Type is not AbstractFile.FileType.File)
@@ -1544,6 +2628,23 @@ public static partial class ApkIconService
                 var full = string.IsNullOrEmpty(entry.FullPath)
                     ? FileHelper.ConcatPaths(parent, name)
                     : entry.FullPath;
+                siblings.Add((name, full));
+            }
+
+            // Play/system install dirs always include base.apk. Standalone APKs in shared
+            // dirs (overlays, priv-app dumps) use distinct filenames and must stay alone.
+            var selfName = Path.GetFileName(apkPath);
+            var hasBase = selfName.Equals("base.apk", StringComparison.OrdinalIgnoreCase)
+                || siblings.Any(s => s.Name.Equals("base.apk", StringComparison.OrdinalIgnoreCase));
+            if (!hasBase)
+                return result;
+
+            foreach (var (name, full) in siblings)
+            {
+                if (!name.Equals("base.apk", StringComparison.OrdinalIgnoreCase)
+                    && !name.StartsWith("split_", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
                 if (result.Any(p => string.Equals(p, full, StringComparison.Ordinal)))
                     continue;
 
@@ -1559,61 +2660,359 @@ public static partial class ApkIconService
     }
 
     /// <summary>
-    /// Prefer higher-density config splits, then base.apk, then others.
+    /// One device staging folder for an entire package icon load. All APK unzips go into the
+    /// same root (no per-APK mkdir, no mid-load cleanup). Dispose removes that single folder.
+    /// </summary>
+    private sealed class ApkIconExtractSession(LogicalDeviceViewModel device) : IDisposable
+    {
+        private string? _stagingRoot;
+        private readonly Dictionary<(string Apk, string Member), byte[]> _cache = new();
+        private readonly HashSet<(string Apk, string Member)> _absent = new();
+        /// <summary>Members present under staging from any APK (shared tree).</summary>
+        private readonly HashSet<string> _onDeviceMembers = new(StringComparer.OrdinalIgnoreCase);
+        private bool _disposed;
+
+        public byte[]? TryGetCached(string apkPath, string member)
+        {
+            member = ArchivePath.NormalizeInternal(member);
+            if (_cache.TryGetValue((apkPath, member), out var bytes))
+                return bytes;
+
+            // Shared staging reuses identical drawable paths across density splits, but
+            // resources.arsc / AndroidManifest.xml differ per APK — never cross-read those.
+            if (IsPerApkExclusiveMember(member))
+                return null;
+
+            // Shared staging: another APK may have supplied this path already.
+            foreach (var kv in _cache)
+            {
+                if (string.Equals(kv.Key.Member, member, StringComparison.OrdinalIgnoreCase))
+                    return kv.Value;
+            }
+
+            return null;
+        }
+
+        public bool HasMemberAnywhere(string member)
+        {
+            member = ArchivePath.NormalizeInternal(member);
+            if (_onDeviceMembers.Contains(member))
+                return true;
+            foreach (var key in _cache.Keys)
+            {
+                if (string.Equals(key.Member, member, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public IReadOnlyList<string> PresentMembers(string apkPath, IEnumerable<string> candidates)
+        {
+            List<string> found = [];
+            foreach (var raw in candidates)
+            {
+                var member = ArchivePath.NormalizeInternal(raw);
+                // Require cached bytes — _onDeviceMembers alone can list staging leftovers
+                // that failed to sync, which made heuristic picks unreadable.
+                if (TryGetCached(apkPath, member) is { Length: > 0 })
+                    found.Add(member);
+            }
+
+            return found;
+        }
+
+        private static bool IsPerApkExclusiveMember(string member)
+            => member.Equals(RESOURCES, StringComparison.OrdinalIgnoreCase)
+               || member.Equals(MANIFEST, StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// One <c>unzip -o -d staging</c> of pending suspects from <paramref name="apkPath"/> into
+        /// the shared package staging root. Missing members are tolerated.
+        /// </summary>
+        public async Task EnsureMembersAsync(
+            string apkPath,
+            IReadOnlyList<string> members,
+            CancellationToken cancellationToken)
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+
+            var pending = members
+                .Select(ArchivePath.NormalizeInternal)
+                .Where(static m => !string.IsNullOrEmpty(m))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Where(m => !_cache.ContainsKey((apkPath, m))
+                            && !_absent.Contains((apkPath, m))
+                            // resources.arsc is per-APK; do not skip because base already staged one.
+                            && (IsPerApkExclusiveMember(m) || !_onDeviceMembers.Contains(m)))
+                .ToList();
+
+            if (pending.Count == 0)
+                return;
+
+            #if DEBUG
+            MarkLoadStep(
+                $"batch EnsureMembers ({pending.Count}) from {Path.GetFileName(apkPath)}: {string.Join(',', pending)}");
+            #endif
+
+            var stagingRoot = EnsureStagingRoot(cancellationToken);
+            await Task.Run(
+                () => ArchiveExtract.ExtractZipMembersInto(
+                    device.ID,
+                    apkPath,
+                    stagingRoot,
+                    pending,
+                    cancellationToken,
+                    allowMissingMembers: true),
+                cancellationToken).ConfigureAwait(false);
+
+            // One find after unzip — avoid N failed sync pulls for missing members.
+            var onDevice = ListRelativeFilesUnder(device.ID, stagingRoot, cancellationToken);
+            foreach (var path in onDevice)
+                _onDeviceMembers.Add(path);
+
+            foreach (var member in pending)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (!onDevice.Contains(member))
+                {
+                    _absent.Add((apkPath, member));
+                    continue;
+                }
+
+                var devicePath = FileHelper.ConcatPaths(stagingRoot, member);
+                await using var stream = await AdbHelper.ReadFileAsStreamAsync(
+                    device, devicePath, cancellationToken).ConfigureAwait(false);
+                var bytes = ToByteArray(stream);
+                if (bytes is { Length: > 0 })
+                    _cache[(apkPath, member)] = bytes;
+                else
+                    _absent.Add((apkPath, member));
+            }
+        }
+
+        public async Task PrefetchFromBundleAsync(
+            IReadOnlyList<string> apkFiles,
+            IReadOnlyList<string> members,
+            CancellationToken cancellationToken)
+        {
+            if (members.Count == 0 || apkFiles.Count == 0)
+                return;
+
+            var needed = members
+                .Select(ArchivePath.NormalizeInternal)
+                .Where(static m => !string.IsNullOrEmpty(m))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Where(m => !HasMemberAnywhere(m))
+                .ToList();
+
+            if (needed.Count == 0)
+                return;
+
+            foreach (var apk in PreferApksForIconMember(apkFiles))
+            {
+                await EnsureMembersAsync(apk, needed, cancellationToken).ConfigureAwait(false);
+                needed = needed.Where(m => !HasMemberAnywhere(m)).ToList();
+                if (needed.Count == 0)
+                    break;
+            }
+        }
+
+        public async Task<byte[]?> TryGetFromBundleAsync(
+            IReadOnlyList<string> apkFiles,
+            string member,
+            CancellationToken cancellationToken)
+        {
+            member = ArchivePath.NormalizeInternal(member);
+            if (string.IsNullOrEmpty(member) || apkFiles.Count == 0)
+                return null;
+
+            // TryGetCached falls back across APKs; any path works for the probe key.
+            var existing = TryGetCached(apkFiles[0], member);
+            if (existing is not null)
+                return existing;
+
+            await PrefetchFromBundleAsync(apkFiles, [member], cancellationToken).ConfigureAwait(false);
+            return TryGetCached(apkFiles[0], member);
+        }
+
+        public void Dispose()
+        {
+            if (_disposed)
+                return;
+            _disposed = true;
+
+            if (_stagingRoot is not null)
+            {
+                #if DEBUG
+                MarkLoadStep($"ApkIconExtractSession dispose: {_stagingRoot}");
+                #endif
+                try { ArchiveExtract.CleanupStaging(device.ID, _stagingRoot, CancellationToken.None); }
+                catch { /* best-effort */ }
+                _stagingRoot = null;
+            }
+
+            _cache.Clear();
+            _absent.Clear();
+            _onDeviceMembers.Clear();
+        }
+
+        private string EnsureStagingRoot(CancellationToken cancellationToken)
+        {
+            if (_stagingRoot is not null)
+                return _stagingRoot;
+
+            _stagingRoot = ArchiveExtract.CreateStagingRoot(device.ID, cancellationToken);
+            // Single mkdir for the package; unzip -d writes members under this root.
+            ShellFileOperation.MakeDirs(device.ID, [_stagingRoot]).GetAwaiter().GetResult();
+            #if DEBUG
+            MarkLoadStep($"package staging created: {_stagingRoot}");
+            #endif
+            return _stagingRoot;
+        }
+
+        private static HashSet<string> ListRelativeFilesUnder(
+            string deviceId,
+            string stagingRoot,
+            CancellationToken cancellationToken)
+        {
+            var find = ShellCommands.TranslateCommand("find");
+            _ = ADBService.ExecuteDeviceAdbShellCommand(
+                deviceId,
+                find,
+                out var stdout,
+                out _,
+                cancellationToken,
+                ADBService.EscapeAdbShellString(stagingRoot),
+                "-type",
+                "f");
+
+            var prefix = stagingRoot.TrimEnd('/') + "/";
+            var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var line in stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries))
+            {
+                var path = line.Trim();
+                if (path.StartsWith(prefix, StringComparison.Ordinal))
+                    result.Add(path[prefix.Length..]);
+            }
+
+            #if DEBUG
+            MarkLoadStep($"staging find under {stagingRoot}: {result.Count} file(s)");
+            #endif
+            return result;
+        }
+    }
+
+    /// <summary>
+    /// Order APKs for icon/resource reads: density splits, then <c>base.apk</c>, then
+    /// other resource-ish configs. ABI / language / feature modules are last.
     /// </summary>
     private static List<string> PreferApksForRead(IReadOnlyList<string> apkFiles, string baseApk)
     {
         return apkFiles
             .Distinct(StringComparer.Ordinal)
-            .OrderByDescending(DensitySplitRank)
+            .OrderByDescending(IconApkRank)
             .ThenBy(p => string.Equals(p, baseApk, StringComparison.Ordinal) ? 0 : 1)
             .ThenBy(p => p, StringComparer.Ordinal)
             .ToList();
     }
 
-    private static int DensitySplitRank(string apkPath)
+    /// <summary>
+    /// Density splits + base only (base first). Feature / ABI / language modules are excluded.
+    /// </summary>
+    private static List<string> PreferApksForIconMember(IReadOnlyList<string> apkFiles, string? baseApk = null)
     {
-        var name = Path.GetFileName(apkPath).ToLowerInvariant();
-        if (name.Contains("xxxhdpi")) return 5;
-        if (name.Contains("xxhdpi")) return 4;
-        if (name.Contains("xhdpi")) return 3;
-        if (name.Contains("hdpi")) return 2;
-        if (name.Contains("mdpi")) return 1;
-        if (name.Contains("split_config") || name.Contains("config.")) return 0;
-        return -1; // base / unknown
+        baseApk ??= apkFiles.FirstOrDefault(static p =>
+            Path.GetFileName(p).Equals("base.apk", StringComparison.OrdinalIgnoreCase));
+
+        var preferred = PreferApksForRead(apkFiles, baseApk ?? apkFiles[0])
+            .Where(static p => IconApkRank(p) >= 5)
+            .ToList();
+
+        if (preferred.Count == 0)
+            preferred = PreferApksForRead(apkFiles, baseApk ?? apkFiles[0]);
+
+        // Base first — adaptive XML / vectors almost always live there.
+        return
+        [
+            .. preferred.Where(p => Path.GetFileName(p).Equals("base.apk", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(p, baseApk, StringComparison.Ordinal)),
+            .. preferred.Where(p => !Path.GetFileName(p).Equals("base.apk", StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(p, baseApk, StringComparison.Ordinal)),
+        ];
     }
 
-    private static async Task<byte[]?> PullResourcesOnlyAsync(
-        LogicalDeviceViewModel device,
-        string apkPath,
-        CancellationToken cancellationToken)
-    {
-        string? stagingRoot = null;
-        try
-        {
-            var (root, contentRoot) = await Task.Run(
-                () => ArchiveExtract.ExtractZipMembersToStaging(
-                    device.ID, apkPath, [RESOURCES], cancellationToken),
-                cancellationToken).ConfigureAwait(false);
-            stagingRoot = root;
+    private const int IconApkRankBase = 35;
 
-            await using var stream = await AdbHelper.ReadFileAsStreamAsync(
-                device, FileHelper.ConcatPaths(contentRoot, RESOURCES), cancellationToken).ConfigureAwait(false);
-            return ToByteArray(stream);
-        }
-        catch (OperationCanceledException)
+    private static int IconApkRank(string apkPath)
+    {
+        var name = Path.GetFileName(apkPath).ToLowerInvariant();
+
+        if (name.Contains("xxxhdpi", StringComparison.Ordinal)) return 50;
+        if (name.Contains("xxhdpi", StringComparison.Ordinal)) return 40;
+        if (name.Contains("xhdpi", StringComparison.Ordinal)) return 30;
+        if (name.Contains("tvdpi", StringComparison.Ordinal)) return 18;
+        if (name.Contains("hdpi", StringComparison.Ordinal)) return 20;
+        if (name.Contains("mdpi", StringComparison.Ordinal)) return 10;
+        if (name.Contains("ldpi", StringComparison.Ordinal)) return 5;
+
+        if (name.Equals("base.apk", StringComparison.OrdinalIgnoreCase)
+            || (!name.Contains("split", StringComparison.Ordinal)
+                && name.EndsWith(".apk", StringComparison.Ordinal)))
+            return IconApkRankBase;
+
+        if (name.Contains("arm64", StringComparison.Ordinal)
+            || name.Contains("armeabi", StringComparison.Ordinal)
+            || name.Contains("x86_64", StringComparison.Ordinal)
+            || name.Contains("x86", StringComparison.Ordinal))
+            return -40;
+
+        if (IsLanguageConfigSplitName(name))
+            return -30;
+
+        // Feature modules (split_OCRCoreDF.apk, split_FASOpenCVDF.apk, …) — never launcher icons.
+        if (name.StartsWith("split_", StringComparison.Ordinal))
+            return -20;
+
+        if (name.Contains("config.", StringComparison.Ordinal))
+            return 0;
+
+        return 1;
+    }
+
+    private static bool IsLanguageConfigSplitName(string lowerFileName)
+    {
+        var marker = ".config.";
+        var idx = lowerFileName.IndexOf(marker, StringComparison.Ordinal);
+        if (idx < 0)
         {
-            throw;
+            marker = "split_config.";
+            idx = lowerFileName.IndexOf(marker, StringComparison.Ordinal);
+            if (idx < 0)
+                return false;
         }
-        catch
+
+        var locale = lowerFileName[(idx + marker.Length)..];
+        if (locale.EndsWith(".apk", StringComparison.Ordinal))
+            locale = locale[..^4];
+
+        if (locale.Length is < 2 or > 12)
+            return false;
+
+        if (locale.Contains("dpi", StringComparison.Ordinal)
+            || locale.Contains("arm", StringComparison.Ordinal)
+            || locale.Contains("x86", StringComparison.Ordinal))
+            return false;
+
+        for (var i = 0; i < locale.Length; i++)
         {
-            return null;
+            var c = locale[i];
+            if (c is >= 'a' and <= 'z' or >= 'A' and <= 'Z' or >= '0' and <= '9' or '-' or '+' or '_')
+                continue;
+            return false;
         }
-        finally
-        {
-            if (stagingRoot is not null)
-                ArchiveExtract.CleanupStaging(device.ID, stagingRoot, CancellationToken.None);
-        }
+
+        return true;
     }
 
     private static async Task<byte[]?> ReadMemberFromBundleAsync(
@@ -1622,25 +3021,128 @@ public static partial class ApkIconService
         string member,
         CancellationToken cancellationToken)
     {
+        _ = device;
         member = ArchivePath.NormalizeInternal(member);
-        foreach (var apk in apkFiles)
+        if (string.IsNullOrEmpty(member) || apkFiles.Count == 0)
+            return null;
+
+        if (CurrentExtractSession.Value is { } session)
+            return await session.TryGetFromBundleAsync(apkFiles, member, cancellationToken).ConfigureAwait(false);
+
+        using var fallback = new ApkIconExtractSession(device);
+        return await fallback.TryGetFromBundleAsync(apkFiles, member, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Reads <c>resources.arsc</c> from an APK via the active extract session when possible.
+    /// </summary>
+    private static async Task<byte[]?> TryGetResourcesFromApkAsync(
+        LogicalDeviceViewModel device,
+        string apkPath,
+        CancellationToken cancellationToken)
+    {
+        if (CurrentExtractSession.Value is { } session)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            try
-            {
-                await using var stream = await AdbHelper.ReadFileAsStreamAsync(
-                    device, FileHelper.ConcatPaths(apk, member), cancellationToken).ConfigureAwait(false);
-                var bytes = ToByteArray(stream);
-                if (bytes is { Length: > 0 })
-                    return bytes;
-            }
-            catch
-            {
-                // try next apk
-            }
+            var cached = session.TryGetCached(apkPath, RESOURCES);
+            if (cached is { Length: > 0 })
+                return cached;
+
+            await session.EnsureMembersAsync(apkPath, [RESOURCES], cancellationToken).ConfigureAwait(false);
+            return session.TryGetCached(apkPath, RESOURCES);
         }
 
-        return null;
+        return await PullResourcesOnlyAsync(device, apkPath, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Drawable paths for a resource id, consulting density-split <c>resources.arsc</c> when the
+    /// base table has only a typeSpec (density split owns the file path).
+    /// </summary>
+    private static async Task<List<string>> ResolveDrawableFilePathsAcrossBundleAsync(
+        LogicalDeviceViewModel device,
+        IReadOnlyList<string> apkFiles,
+        byte[] baseResources,
+        int resourceId,
+        CancellationToken cancellationToken)
+    {
+        var paths = ArscResourceResolver.ResolvePaths(baseResources, resourceId)
+            .Select(ArchivePath.NormalizeInternal)
+            .Where(static p => !string.IsNullOrWhiteSpace(p) && !IsColorResourcePath(p))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        if (paths.Count > 0)
+            return PreferHighestDensityOnly(paths);
+
+        // Native table empty (INVALID TYPE CONFIG) — density splits own the file. Do not trust
+        // AlphaOmega ResourceMap alone; it often invents pool strings for missing configs.
+        foreach (var apk in PreferApksForIconMember(apkFiles))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (Path.GetFileName(apk).Equals("base.apk", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var splitRes = await TryGetResourcesFromApkAsync(device, apk, cancellationToken).ConfigureAwait(false);
+            if (splitRes is null || splitRes.Length == 0)
+                continue;
+
+            paths = ArscResourceResolver.ResolvePaths(splitRes, resourceId)
+                .Select(ArchivePath.NormalizeInternal)
+                .Where(static p => !string.IsNullOrWhiteSpace(p) && !IsColorResourcePath(p))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            if (paths.Count > 0)
+                return PreferHighestDensityOnly(paths);
+        }
+
+        return [];
+    }
+
+    private static async Task<byte[]?> PullResourcesOnlyAsync(
+        LogicalDeviceViewModel device,
+        string apkPath,
+        CancellationToken cancellationToken
+#if DEBUG
+        , ApkLoadTiming? timing = null
+#endif
+        )
+    {
+        string? stagingRoot = null;
+        try
+        {
+#if DEBUG
+            timing?.Mark($"ExtractZipMembersToStaging(resources) {Path.GetFileName(apkPath)}");
+#endif
+            var (root, contentRoot) = await Task.Run(
+                () => ArchiveExtract.ExtractZipMembersToStaging(
+                    device.ID, apkPath, [RESOURCES], cancellationToken),
+                cancellationToken).ConfigureAwait(false);
+            stagingRoot = root;
+
+            await using var stream = await AdbHelper.ReadFileAsStreamAsync(
+                device, FileHelper.ConcatPaths(contentRoot, RESOURCES), cancellationToken).ConfigureAwait(false);
+            var bytes = ToByteArray(stream);
+#if DEBUG
+            timing?.Mark($"PullResourcesOnlyAsync done ({bytes?.Length ?? 0}B)");
+#endif
+            return bytes;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch
+        {
+#if DEBUG
+            timing?.Mark("PullResourcesOnlyAsync failed");
+#endif
+            return null;
+        }
+        finally
+        {
+            if (stagingRoot is not null)
+                ArchiveExtract.CleanupStaging(device.ID, stagingRoot, CancellationToken.None);
+        }
     }
 
     private static async Task<Dictionary<int, byte[]>> PreloadXmlResourcesAsync(
@@ -1682,12 +3184,41 @@ public static partial class ApkIconService
         return stream.ToArray();
     }
 
+    /// <summary>
+    /// Read one zip member via the package extract session (shared staging), never via
+    /// <see cref="ArchiveExtract.ExtractSelectionForPull"/> (mkdir/mv/cleanup).
+    /// </summary>
+    private static async Task<byte[]?> ProbeApkMemberBytesAsync(
+        LogicalDeviceViewModel device,
+        string apkPath,
+        string member,
+        CancellationToken cancellationToken)
+    {
+        member = ArchivePath.NormalizeInternal(member);
+        if (string.IsNullOrEmpty(member))
+            return null;
+
+        if (CurrentExtractSession.Value is { } session)
+        {
+            await session.EnsureMembersAsync(apkPath, [member], cancellationToken).ConfigureAwait(false);
+            return session.TryGetCached(apkPath, member);
+        }
+
+        using var fallback = new ApkIconExtractSession(device);
+        await fallback.EnsureMembersAsync(apkPath, [member], cancellationToken).ConfigureAwait(false);
+        return fallback.TryGetCached(apkPath, member);
+    }
+
     private static async Task<List<string>> ResolveIconCandidatesAsync(
         LogicalDeviceViewModel device,
         string apkPath,
         byte[] manifestBytes,
         byte[] resourcesBytes,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+#if DEBUG
+        , ApkLoadTiming? timing = null
+#endif
+        )
     {
         try
         {
@@ -1701,15 +3232,33 @@ public static partial class ApkIconService
                 ?? TryGetTypedApplicationIcon(axml, arsc);
 
             if (string.IsNullOrEmpty(iconRef))
+            {
+                #if DEBUG
+                timing?.Mark("ResolveIconCandidates: no icon ref → string-pool");
+                #endif
                 return FindLikelyIconPathsInStringPool(arsc);
+            }
+
+            #if DEBUG
+            timing?.Mark($"ResolveIconCandidates: iconRef={iconRef}");
+            #endif
 
             // Resolve the manifest icon id only — do not fall back to string-pool or brand
             // guesses here. Density-split APKs often own the real adaptive wrapper while the
-            // base arsc lists the id as INVALID (Zoom). Brand key hints like "gs_" previously
-            // matched inside "settings_*" and returned notification dots before splits ran.
+            // base arsc lists the id as INVALID. Broad key-hint fallbacks previously
+            // matched chrome glyphs and returned notification dots before splits ran.
             var paths = ResolveIconRefToPathsStrict(iconRef, arsc, resourcesBytes);
             if (paths.Count == 0)
+            {
+                #if DEBUG
+                timing?.Mark("ResolveIconCandidates: strict resolve empty");
+                #endif
                 return [];
+            }
+
+            #if DEBUG
+            timing?.Mark($"ResolveIconCandidates: {paths.Count} strict paths");
+            #endif
 
             // Adaptive wrappers (anydpi / *launcher* XML) before density rasters.
             var adaptivePreferred = paths
@@ -1720,23 +3269,38 @@ public static partial class ApkIconService
             foreach (var xmlMember in adaptivePreferred)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                await using var xmlStream = await AdbHelper.ReadFileAsStreamAsync(
-                    device, FileHelper.ConcatPaths(apkPath, xmlMember), cancellationToken).ConfigureAwait(false);
-                var xmlBytes = ToByteArray(xmlStream);
+                #if DEBUG
+                timing?.Mark($"probe adaptive wrapper: {xmlMember}");
+                #endif
+                var xmlBytes = await ProbeApkMemberBytesAsync(device, apkPath, xmlMember, cancellationToken)
+                    .ConfigureAwait(false);
                 if (xmlBytes is null || xmlBytes.Length == 0)
                     continue;
 
                 if (ApkVectorIconRenderer.IsAdaptiveIcon(xmlBytes))
+                {
+                    #if DEBUG
+                    timing?.Mark($"adaptive wrapper confirmed: {xmlMember}");
+                    #endif
+                    // Always compose the adaptive wrapper. Layer names like
+                    // ic_launcher_background can still hold real product art
+                    // (custom plates); same-named mipmap rasters are often social badges.
                     return [xmlMember];
+                }
             }
 
-            // Prefer pre-rendered density rasters (bit / AccuBattery) over distorting vectors.
-            // Skip bare *_background layers (Strava pride themes).
+            // Prefer pre-rendered density rasters over distorting vectors.
+            // Skip bare *_background layers (themed alternate plates).
             var rasters = RankIconCandidates(paths.Where(p =>
                 !p.Contains("_background.", StringComparison.OrdinalIgnoreCase)
                 && !p.Contains("_background_", StringComparison.OrdinalIgnoreCase)));
             if (rasters.Count > 0)
+            {
+                #if DEBUG
+                timing?.Mark($"ResolveIconCandidates: {rasters.Count} ranked rasters");
+                #endif
                 return rasters;
+            }
 
             // Any remaining XML from the icon ref (including obfuscated names like res/qq.xml).
             var xmlMembers = paths
@@ -1747,18 +3311,30 @@ public static partial class ApkIconService
             foreach (var xmlMember in xmlMembers)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                await using var xmlStream = await AdbHelper.ReadFileAsStreamAsync(
-                    device, FileHelper.ConcatPaths(apkPath, xmlMember), cancellationToken).ConfigureAwait(false);
-                var xmlBytes = ToByteArray(xmlStream);
+                #if DEBUG
+                timing?.Mark($"probe xml member: {xmlMember}");
+                #endif
+                var xmlBytes = await ProbeApkMemberBytesAsync(device, apkPath, xmlMember, cancellationToken)
+                    .ConfigureAwait(false);
                 if (xmlBytes is null || xmlBytes.Length == 0)
                     continue;
 
                 // Keep the adaptive wrapper — never return bare foreground vectors (white-on-transparent).
                 if (ApkVectorIconRenderer.IsAdaptiveIcon(xmlBytes))
+                {
+                    #if DEBUG
+                    timing?.Mark($"xml adaptive confirmed: {xmlMember}");
+                    #endif
                     return [xmlMember];
+                }
 
                 if (ApkVectorIconRenderer.IsVectorDrawable(xmlBytes))
+                {
+                    #if DEBUG
+                    timing?.Mark($"xml vector confirmed: {xmlMember}");
+                    #endif
                     return [xmlMember];
+                }
             }
 
             var images = paths.Where(IsImagePath).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
@@ -1797,15 +3373,6 @@ public static partial class ApkIconService
         }
     }
 
-    private static List<string> ResolveIconRefToPaths(string iconRef, ArscFile arsc, byte[] resourcesBytes)
-    {
-        var paths = ResolveIconRefToPathsStrict(iconRef, arsc, resourcesBytes);
-        if (paths.Count > 0)
-            return paths;
-
-        return FindLikelyIconPathsInStringPool(arsc);
-    }
-
     /// <summary>
     /// Resolves <paramref name="iconRef"/> to archive members without string-pool fallbacks.
     /// Empty means the id is missing from this <c>resources.arsc</c> (often a density split owns it).
@@ -1824,6 +3391,27 @@ public static partial class ApkIconService
             return nativePaths;
 
         return PreferIconPaths(GetResourcePaths(arsc, resourceId));
+    }
+
+    /// <summary>
+    /// All file paths for an icon resource id — keeps density PNGs alongside adaptive XML
+    /// (<c>mipmap/launcher_icon</c> may have broken adaptive layers but valid density PNGs).
+    /// </summary>
+    private static List<string> ResolveIconRefToAllPaths(string iconRef, ArscFile arsc, byte[] resourcesBytes)
+    {
+        iconRef = ArchivePath.NormalizeInternal(iconRef.Trim());
+        if (IsImagePath(iconRef) || iconRef.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+            return [iconRef];
+
+        if (!TryParseResourceId(iconRef, out var resourceId))
+            return [];
+
+        return ArscResourceResolver.ResolvePaths(resourcesBytes, resourceId)
+            .Concat(GetResourcePaths(arsc, resourceId))
+            .Select(ArchivePath.NormalizeInternal)
+            .Where(static p => !string.IsNullOrWhiteSpace(p))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
 
     private static bool IsAdaptiveWrapperPath(string path)
@@ -1856,7 +3444,7 @@ public static partial class ApkIconService
 
     /// <summary>
     /// AlphaOmega ResourceMap often lists themed <c>*_background</c> rasters alongside the real
-    /// adaptive XML for the same id (Strava pride/road/gravel). Prefer the adaptive wrapper.
+    /// adaptive XML for the same id (themed alternate plates). Prefer the adaptive wrapper.
     /// </summary>
     private static List<string> PreferIconPaths(IEnumerable<string> paths)
     {
@@ -1886,17 +3474,6 @@ public static partial class ApkIconService
             .ToList();
 
         return withoutBg.Count > 0 ? withoutBg : list;
-    }
-
-    private static List<string> ResolveAdaptiveIconMembers(byte[] xmlBytes, ArscFile arsc, byte[] resourcesBytes)
-    {
-        var layers = ResolveAdaptiveLayers(xmlBytes, arsc, resourcesBytes);
-        if (layers.ForegroundImages.Count > 0)
-            return layers.ForegroundImages;
-        if (layers.BackgroundImages.Count > 0)
-            return layers.BackgroundImages;
-
-        return FindLikelyIconPathsInStringPool(arsc);
     }
 
     private readonly record struct AdaptiveLayers(
@@ -1929,10 +3506,12 @@ public static partial class ApkIconService
             {
                 color ??= TryGetResourceColor(arsc, resourcesBytes, id);
                 var imagesForId = new List<string>();
-                foreach (var rawPath in GetResourcePaths(arsc, id)
-                             .Concat(ArscResourceResolver.ResolvePaths(resourcesBytes, id)))
+
+                // Prefer native arsc paths. AlphaOmega ResourceMap often returns the wrong
+                // string for sparse packages (wrong sibling drawable;
+                // color resources mapped to Material state-list XMLs).
+                foreach (var path in ResolveDrawableFilePaths(arsc, resourcesBytes, id))
                 {
-                    var path = ArchivePath.NormalizeInternal(rawPath);
                     if (IsImagePath(path) || IsExtensionlessRasterCandidate(path))
                     {
                         images.Add(path);
@@ -1946,7 +3525,7 @@ public static partial class ApkIconService
                     imageLayers.Add(imagesForId.Distinct(StringComparer.OrdinalIgnoreCase).ToList());
             }
 
-            // Prefer real rasters over animated-vector XML siblings (AccuBattery: aw vs aw.xml).
+            // Prefer real rasters over animated-vector XML siblings.
             if (images.Count > 0)
                 xmls.RemoveAll(x => images.Any(img =>
                     string.Equals(Path.GetFileNameWithoutExtension(img), Path.GetFileNameWithoutExtension(x),
@@ -1962,21 +3541,117 @@ public static partial class ApkIconService
         var fg = ResolveGroup(foreground.Count > 0 ? foreground : other);
         var bg = ResolveGroup(background);
 
-        // Calculator etc.: foreground is an inline <vector> under <layer-list>, plus a
-        // transparent @android:color banner ref. Do not replace that with string-pool
-        // "likely" rasters — those block TryRenderInlineAdaptiveLayer.
-        if (fg.Images.Count == 0 && fg.Xmls.Count == 0
-            && !ApkVectorIconRenderer.HasInlineVectorUnderLayer(xmlBytes, "foreground"))
-        {
-            var likely = FindLikelyIconPathsInStringPool(arsc);
-            fg = (
-                likely.Where(IsImagePath).ToList(),
-                [],
-                likely.Where(p => p.EndsWith(".xml", StringComparison.OrdinalIgnoreCase)).ToList(),
-                fg.Color);
-        }
+        // Do not invent string-pool "likely" paths for empty layers — nested adaptive wrappers
+        // Broken @drawable layer ids cause compose failures. Empty layers
+        // make TryComposeAdaptiveIconAsync return null so density-raster fallback can run.
 
         return new AdaptiveLayers(fg.Images, fg.ImageLayers, fg.Xmls, bg.Images, bg.Xmls, bg.Color);
+    }
+
+    /// <summary>
+    /// When adaptive layer drawable ids are missing from the base table (density split owns
+    /// the PNGs), resolve those ids across the APK bundle and merge into <paramref name="layers"/>.
+    /// </summary>
+    private static async Task<AdaptiveLayers> EnrichAdaptiveLayersFromSplitsAsync(
+        LogicalDeviceViewModel device,
+        IReadOnlyList<string> apkFiles,
+        byte[] adaptiveXmlBytes,
+        AdaptiveLayers layers,
+        byte[] baseResources,
+        CancellationToken cancellationToken)
+    {
+        var needFg = layers.ForegroundImages.Count == 0
+                     && layers.ForegroundXmls.Count == 0
+                     && layers.ForegroundImageLayers.Count == 0;
+        var needBg = layers.BackgroundImages.Count == 0
+                     && layers.BackgroundXmls.Count == 0
+                     && layers.BackgroundColor is null;
+        if (!needFg && !needBg)
+            return layers;
+
+        using var stream = new MemoryStream(adaptiveXmlBytes, writable: false);
+        using var axml = new AxmlFile(new StreamLoader(stream));
+        if (axml.RootNode is null)
+            return layers;
+
+        var foreground = new List<int>();
+        var background = new List<int>();
+        var other = new List<int>();
+        CollectDrawableResourceIds(axml.RootNode, parentName: null, foreground, background, other);
+
+        async Task<(List<string> Images, List<List<string>> ImageLayers, List<string> Xmls)> ResolveIdsAsync(
+            List<int> ids)
+        {
+            var images = new List<string>();
+            var imageLayers = new List<List<string>>();
+            var xmls = new List<string>();
+            foreach (var id in ids)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var imagesForId = new List<string>();
+                foreach (var path in await ResolveDrawableFilePathsAcrossBundleAsync(
+                             device, apkFiles, baseResources, id, cancellationToken)
+                             .ConfigureAwait(false))
+                {
+                    if (IsImagePath(path) || IsExtensionlessRasterCandidate(path))
+                    {
+                        images.Add(path);
+                        imagesForId.Add(path);
+                    }
+                    else if (path.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+                    {
+                        xmls.Add(path);
+                    }
+                }
+
+                if (imagesForId.Count > 0)
+                    imageLayers.Add(imagesForId.Distinct(StringComparer.OrdinalIgnoreCase).ToList());
+            }
+
+            return (
+                images.Distinct(StringComparer.OrdinalIgnoreCase).ToList(),
+                imageLayers,
+                xmls.Distinct(StringComparer.OrdinalIgnoreCase).ToList());
+        }
+
+        var fgImages = layers.ForegroundImages;
+        var fgLayers = layers.ForegroundImageLayers;
+        var fgXmls = layers.ForegroundXmls;
+        if (needFg)
+        {
+            var fgIds = foreground.Count > 0 ? foreground : other;
+            if (fgIds.Count > 0)
+            {
+                var resolved = await ResolveIdsAsync(fgIds).ConfigureAwait(false);
+                if (resolved.Images.Count > 0 || resolved.Xmls.Count > 0)
+                {
+                    fgImages = resolved.Images;
+                    fgLayers = resolved.ImageLayers;
+                    fgXmls = resolved.Xmls;
+                    #if DEBUG
+                    MarkLoadStep($"adaptive fg from density split: {fgImages.Count} img, {fgXmls.Count} xml");
+                    #endif
+                }
+            }
+        }
+
+        var bgImages = layers.BackgroundImages;
+        var bgXmls = layers.BackgroundXmls;
+        var bgColor = layers.BackgroundColor;
+        if (needBg && background.Count > 0)
+        {
+            var resolved = await ResolveIdsAsync(background).ConfigureAwait(false);
+            if (resolved.Images.Count > 0 || resolved.Xmls.Count > 0)
+            {
+                bgImages = resolved.Images;
+                bgXmls = resolved.Xmls;
+                #if DEBUG
+                MarkLoadStep($"adaptive bg from density split: {bgImages.Count} img, {bgXmls.Count} xml");
+                #endif
+            }
+        }
+
+        return new AdaptiveLayers(fgImages, fgLayers, fgXmls, bgImages, bgXmls, bgColor);
     }
 
     private static SKColor? TryGetResourceColor(ArscFile arsc, byte[] resourcesBytes, int resourceId)
@@ -2026,9 +3701,69 @@ public static partial class ApkIconService
         Func<int, byte[]?>? resolveXmlResource = null,
         string? packageName = null)
     {
+        try
+        {
+            return await TryComposeAdaptiveIconCoreAsync(
+                device, apkFiles, adaptiveXmlBytes, arsc, resourcesBytes, cancellationToken,
+                resolveXmlResource, packageName).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception e)
+        {
+            // Broken layer resource ids / nested adaptive XML must not
+            // abort the whole icon load — density rasters / asset fallbacks are still usable.
+#if DEBUG
+            MarkLoadStep($"adaptive compose exception: {e.GetType().Name}: {e.Message}");
+#else
+            _ = e;
+#endif
+            return null;
+        }
+    }
+
+    private static async Task<BitmapSource?> TryComposeAdaptiveIconCoreAsync(
+        LogicalDeviceViewModel device,
+        IReadOnlyList<string> apkFiles,
+        byte[] adaptiveXmlBytes,
+        ArscFile arsc,
+        byte[] resourcesBytes,
+        CancellationToken cancellationToken,
+        Func<int, byte[]?>? resolveXmlResource,
+        string? packageName)
+    {
         var layers = ResolveAdaptiveLayers(adaptiveXmlBytes, arsc, resourcesBytes);
+        layers = await EnrichAdaptiveLayersFromSplitsAsync(
+            device, apkFiles, adaptiveXmlBytes, layers, resourcesBytes, cancellationToken)
+            .ConfigureAwait(false);
+
+        // Final thumbnail size. Layers are kept at ≥108/72 of that so the launcher viewport
+        // crop downsamples once instead of downscale-to-192 then upscale×1.5 (blur).
         const int size = 192;
+        var layerSize = AdaptiveIconLayerRasterSize(size);
         SKColor? ResolveColor(int id) => TryGetResourceColor(arsc, resourcesBytes, id);
+
+        // Batch-extract adaptive layers once. Prefer highest-density rasters only — pulling every
+        // mdpi…xxxhdpi variant wastes sync round-trips.
+        var rasterSuspects = PreferHighestDensityOnly(
+            layers.ForegroundImages
+                .Concat(layers.BackgroundImages)
+                .Concat(layers.ForegroundImageLayers.SelectMany(static l => l)));
+        var suspectPaths = layers.ForegroundXmls
+            .Concat(layers.BackgroundXmls)
+            .Concat(rasterSuspects)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (CurrentExtractSession.Value is { } session && suspectPaths.Count > 0)
+        {
+            #if DEBUG
+            MarkLoadStep($"adaptive PrefetchFromBundle ({suspectPaths.Count}): {string.Join(',', suspectPaths)}");
+            #endif
+            await session.PrefetchFromBundleAsync(apkFiles, suspectPaths, cancellationToken).ConfigureAwait(false);
+        }
 
         // Adaptive wrappers rarely carry fillColor — preload gradients from layer vectors too.
         var xmlCache = new Dictionary<int, byte[]>();
@@ -2036,6 +3771,24 @@ public static partial class ApkIconService
         {
             if (drawableBytes is null || drawableBytes.Length == 0)
                 return;
+
+            List<string> fillPaths = [];
+            foreach (var id in ApkVectorIconRenderer.CollectFillResourceIds(drawableBytes))
+            {
+                if (xmlCache.ContainsKey(id))
+                    continue;
+                if (TryGetResourceColor(arsc, resourcesBytes, id) is not null)
+                    continue;
+
+                foreach (var path in ArscResourceResolver.ResolvePaths(resourcesBytes, id))
+                {
+                    if (path.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+                        fillPaths.Add(ArchivePath.NormalizeInternal(path));
+                }
+            }
+
+            if (fillPaths.Count > 0 && CurrentExtractSession.Value is { } fillSession)
+                await fillSession.PrefetchFromBundleAsync(apkFiles, fillPaths, cancellationToken).ConfigureAwait(false);
 
             foreach (var id in ApkVectorIconRenderer.CollectFillResourceIds(drawableBytes))
             {
@@ -2084,20 +3837,21 @@ public static partial class ApkIconService
 
         using var fgLayer = await LoadAdaptiveLayerStackAsync(
             device, apkFiles, layers.ForegroundImageLayers, layers.ForegroundImages, layers.ForegroundXmls,
-            size, cancellationToken, ResolveColor, resolveXmlResource, resourcesBytes).ConfigureAwait(false);
+            layerSize, cancellationToken, ResolveColor, resolveXmlResource, resourcesBytes,
+            keepOversizedRaster: true).ConfigureAwait(false);
 
         using var bgLayer = await LoadAdaptiveLayerAsync(
-            device, apkFiles, layers.BackgroundImages, layers.BackgroundXmls, size, cancellationToken,
-            ResolveColor, resolveXmlResource, resourcesBytes).ConfigureAwait(false);
+            device, apkFiles, layers.BackgroundImages, layers.BackgroundXmls, layerSize, cancellationToken,
+            ResolveColor, resolveXmlResource, resourcesBytes, keepOversizedRaster: true).ConfigureAwait(false);
 
-        // Inline <vector> under <background>/<foreground> (Clock face; Calculator pad under layer-list).
+        // Inline <vector> under <background>/<foreground> (Clock face; pad under layer-list).
         using var inlineBg = ApkVectorIconRenderer.TryRenderInlineAdaptiveLayer(
-            adaptiveXmlBytes, "background", size, SKColors.Transparent, ResolveColor, resolveXmlResource);
+            adaptiveXmlBytes, "background", layerSize, SKColors.Transparent, ResolveColor, resolveXmlResource);
         using var inlineFg = ApkVectorIconRenderer.TryRenderInlineAdaptiveLayer(
-            adaptiveXmlBytes, "foreground", size, SKColors.Transparent, ResolveColor, resolveXmlResource);
+            adaptiveXmlBytes, "foreground", layerSize, SKColors.Transparent, ResolveColor, resolveXmlResource);
 
         // Prefer inline artwork when present — drawable siblings are often transparent placeholders
-        // (Calculator launcher_calculator_banner → @android:color/transparent).
+        // (transparent banner placeholders under layer-list).
         var bg = inlineBg ?? bgLayer;
         var fg = inlineFg ?? fgLayer;
         SKBitmap? overlayFg = null;
@@ -2105,37 +3859,59 @@ public static partial class ApkIconService
         // Deskclock live hands use <rotate>/<layer-list> which we cannot render — always synthesize 3:00.
         if (IsDeskclockPackage(packageName))
         {
-            overlayFg = CreateClockHandsAtThree(size);
+            overlayFg = CreateClockHandsAtThree(layerSize);
             fg = overlayFg;
+        }
+        else if (fg is not null && IsEmptyTransparentLayer(fg))
+        {
+            // Empty/transparent stock foreground (ic_launcher_foreground is a no-op
+            // path) — treat as absent so background-only product art can win.
+            // Do NOT use IsDegenerateIcon here: sparse light glyphs
+            // valid artwork that only covers a few percent of the canvas.
+            fg = null;
         }
 
         try
         {
-            // Background-only adaptive is incomplete — fall through to density rasters.
-            if (fg is null && !IsDeskclockPackage(packageName))
+            if (bg is null && fg is null && layers.BackgroundColor is null)
                 return null;
 
-            if (bg is null && fg is null && layers.BackgroundColor is null)
+            // Background-only is valid when the background carries the launcher art
+            // (custom ic_launcher_background + empty foreground).
+            // Stock Android Studio green alone is only half the template — use the full default.
+            if (fg is null
+                && !IsDeskclockPackage(packageName)
+                && bg is not null
+                && IsStockAndroidStudioGreenPlate(bg))
+            {
+                return DefaultAndroidPackageIcon.Render(size);
+            }
+
+            if (fg is null
+                && !IsDeskclockPackage(packageName)
+                && (bg is null || IsDegenerateIcon(bg)))
                 return null;
 
             using var canvasBitmap = new SKBitmap(size, size, SKColorType.Bgra8888, SKAlphaType.Unpremul);
             using var canvas = new SKCanvas(canvasBitmap);
             canvas.Clear(layers.BackgroundColor ?? SKColors.White);
 
+            // Match AdaptiveIconDrawable: show the center 72/108 of each 108dp layer.
+            // Source rect crop (not post-scale) so xxxhdpi → thumbnail is a single downsample.
             if (bg is not null)
-                canvas.DrawBitmap(bg, new SKRect(0, 0, size, size));
+                DrawAdaptiveIconViewport(canvas, bg, size);
 
             if (fg is not null)
             {
                 // Clock hands are already positioned; only recenter corner-biased artwork.
                 if (IsDeskclockPackage(packageName) || !IsCornerBiasedIcon(fg))
                 {
-                    canvas.DrawBitmap(fg, new SKRect(0, 0, size, size));
+                    DrawAdaptiveIconViewport(canvas, fg, size);
                 }
                 else
                 {
                     using var centeredFg = RecenterOpaqueContent(fg);
-                    canvas.DrawBitmap(centeredFg ?? fg, new SKRect(0, 0, size, size));
+                    DrawAdaptiveIconViewport(canvas, centeredFg ?? fg, size);
                 }
             }
 
@@ -2154,6 +3930,43 @@ public static partial class ApkIconService
         => !string.IsNullOrEmpty(packageName)
            && (packageName.Contains("deskclock", StringComparison.OrdinalIgnoreCase)
                || packageName.Equals("com.google.android.deskclock", StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>
+    /// Adaptive layer size in dp (full bleed including mask padding).
+    /// </summary>
+    private const float AdaptiveIconLayerDp = 108f;
+
+    /// <summary>
+    /// Launcher-visible viewport in dp (<c>AdaptiveIconDrawable</c> uses 72 = 108×2/3).
+    /// </summary>
+    private const float AdaptiveIconViewportDp = 72f;
+
+    /// <summary>
+    /// Minimum raster edge for adaptive layers so a 72/108 crop still has ≥ <paramref name="outputSize"/> pixels.
+    /// </summary>
+    private static int AdaptiveIconLayerRasterSize(int outputSize)
+        => Math.Max(outputSize, (int)Math.Ceiling(outputSize * AdaptiveIconLayerDp / AdaptiveIconViewportDp));
+
+    /// <summary>
+    /// Draws the center 72/108 of <paramref name="layer"/> into <paramref name="outputSize"/>²
+    /// (one resample; keeps xxxhdpi sharp).
+    /// </summary>
+    private static void DrawAdaptiveIconViewport(SKCanvas canvas, SKBitmap layer, int outputSize)
+    {
+        var srcW = layer.Width;
+        var srcH = layer.Height;
+        if (srcW <= 0 || srcH <= 0 || outputSize <= 0)
+            return;
+
+        var visibleW = srcW * AdaptiveIconViewportDp / AdaptiveIconLayerDp;
+        var visibleH = srcH * AdaptiveIconViewportDp / AdaptiveIconLayerDp;
+        var src = new SKRect(
+            (srcW - visibleW) / 2f,
+            (srcH - visibleH) / 2f,
+            (srcW + visibleW) / 2f,
+            (srcH + visibleH) / 2f);
+        canvas.DrawBitmap(layer, src, new SKRect(0, 0, outputSize, outputSize));
+    }
 
     /// <summary>
     /// Static white clock hands at 3:00 (hour → 3, minute → 12) for adaptive live-clock icons.
@@ -2223,7 +4036,8 @@ public static partial class ApkIconService
         CancellationToken cancellationToken,
         Func<int, SKColor?>? resolveColor = null,
         Func<int, byte[]?>? resolveXmlResource = null,
-        byte[]? resourcesBytes = null)
+        byte[]? resourcesBytes = null,
+        bool keepOversizedRaster = false)
     {
         // Calendar etc.: adaptive foreground is a layer-list of distinct drawables (plate + "31").
         if (imageLayers.Count > 1)
@@ -2236,13 +4050,11 @@ public static partial class ApkIconService
                     cancellationToken.ThrowIfCancellationRequested();
                     using var layer = await LoadAdaptiveLayerAsync(
                         device, apkFiles, layerImages, [], size, cancellationToken,
-                        resolveColor, resolveXmlResource, resourcesBytes).ConfigureAwait(false);
+                        resolveColor, resolveXmlResource, resourcesBytes, keepOversizedRaster).ConfigureAwait(false);
                     if (layer is null)
                         continue;
 
-                    // Density rasters are often 324²/432² — scale to the compose canvas first.
-                    // Drawing into SKRect(0,0,192,192) on a larger bitmap pinned the date glyph
-                    // into the top-left as a tiny "badge" instead of a full-size "31".
+                    // Density rasters are often 324²/432² — normalize before stacking.
                     using var sized = EnsureSkBitmapSize(layer, size);
                     if (sized is null)
                         continue;
@@ -2280,7 +4092,8 @@ public static partial class ApkIconService
 
         return await LoadAdaptiveLayerAsync(
             device, apkFiles, flatImages.Count > 0 ? flatImages : imageLayers.SelectMany(x => x).ToList(),
-            xmls, size, cancellationToken, resolveColor, resolveXmlResource, resourcesBytes).ConfigureAwait(false);
+            xmls, size, cancellationToken, resolveColor, resolveXmlResource, resourcesBytes,
+            keepOversizedRaster).ConfigureAwait(false);
     }
 
     private static SKBitmap? EnsureSkBitmapSize(SKBitmap source, int size)
@@ -2289,6 +4102,21 @@ public static partial class ApkIconService
             return source.Copy();
 
         return source.Resize(new SKImageInfo(size, size), new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear));
+    }
+
+    /// <summary>
+    /// Keeps xxxhdpi (etc.) intact when composing with a viewport crop; only upscales undersized rasters.
+    /// Returns <paramref name="source"/> itself when kept or already exact — caller must not dispose it then.
+    /// </summary>
+    private static SKBitmap? FitAdaptiveRaster(SKBitmap source, int minSize, bool keepOversized)
+    {
+        if (source.Width == minSize && source.Height == minSize)
+            return source;
+
+        if (keepOversized && source.Width >= minSize && source.Height >= minSize)
+            return source;
+
+        return EnsureSkBitmapSize(source, minSize);
     }
 
     /// <summary>
@@ -2375,39 +4203,60 @@ public static partial class ApkIconService
         CancellationToken cancellationToken,
         Func<int, SKColor?>? resolveColor = null,
         Func<int, byte[]?>? resolveXmlResource = null,
-        byte[]? resourcesBytes = null)
+        byte[]? resourcesBytes = null,
+        bool keepOversizedRaster = false)
     {
-        var imageCandidates = RankIconCandidates(images);
+        // Highest-density first; do not probe every density via archive-path ExtractSelectionForPull.
+        var imageCandidates = PreferHighestDensityOnly(RankIconCandidates(images));
         if (imageCandidates.Count > 0)
         {
-            if (imageCandidates.Count > MaxIconCandidatesToProbe)
-                imageCandidates = imageCandidates.Take(MaxIconCandidatesToProbe).ToList();
-
-            foreach (var apkPath in apkFiles)
+            if (CurrentExtractSession.Value is { } session)
             {
-                var listing = ArchiveListing.FetchZipMemberListing(
-                    device.ID, apkPath, imageCandidates, cancellationToken);
-                var member = PickBestIconMember(imageCandidates, listing);
-                if (member is null)
-                    continue;
+                await session.PrefetchFromBundleAsync(apkFiles, imageCandidates, cancellationToken)
+                    .ConfigureAwait(false);
 
-                await using var stream = await AdbHelper.ReadFileAsStreamAsync(
-                    device, FileHelper.ConcatPaths(apkPath, member), cancellationToken).ConfigureAwait(false);
-                var bytes = ToByteArray(stream);
-                if (bytes is not null && bytes.Length > 0)
+                foreach (var candidateApk in PreferApksForIconMember(apkFiles))
                 {
-                    var bmp = DecodeSkBitmap(bytes);
+                    var member = PickBestIconMember(
+                        imageCandidates,
+                        session.PresentMembers(candidateApk, imageCandidates),
+                        m => session.TryGetCached(candidateApk, m)?.Length ?? 0);
+                    if (member is null)
+                        continue;
+
+                    var cached = session.TryGetCached(candidateApk, member);
+                    if (cached is null || cached.Length == 0)
+                        continue;
+
+                    var bmp = DecodeSkBitmap(cached);
                     if (bmp is null)
                         continue;
 
-                    if (bmp.Width == size && bmp.Height == size)
-                        return bmp;
-
-                    var scaled = EnsureSkBitmapSize(bmp, size);
-                    bmp.Dispose();
-                    if (scaled is not null)
-                        return scaled;
+                    var fitted = FitAdaptiveRaster(bmp, size, keepOversizedRaster);
+                    if (!ReferenceEquals(fitted, bmp))
+                        bmp.Dispose();
+                    if (fitted is not null)
+                        return fitted;
                 }
+            }
+
+            foreach (var member in imageCandidates)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var bytes = await ReadMemberFromBundleAsync(device, apkFiles, member, cancellationToken)
+                    .ConfigureAwait(false);
+                if (bytes is null || bytes.Length == 0)
+                    continue;
+
+                var bmp = DecodeSkBitmap(bytes);
+                if (bmp is null)
+                    continue;
+
+                var fitted = FitAdaptiveRaster(bmp, size, keepOversizedRaster);
+                if (!ReferenceEquals(fitted, bmp))
+                    bmp.Dispose();
+                if (fitted is not null)
+                    return fitted;
             }
         }
 
@@ -2418,6 +4267,15 @@ public static partial class ApkIconService
             if (bytes is null || bytes.Length == 0)
                 continue;
 
+            // Nested adaptive wrappers are not layer drawables (string-pool misfires).
+            if (ApkVectorIconRenderer.IsAdaptiveIcon(bytes))
+                continue;
+
+            // <color android:color="@color/…"/> solid adaptive backgrounds.
+            var colorLayer = ApkVectorIconRenderer.TryRenderColorDrawable(bytes, size, resolveColor);
+            if (colorLayer is not null)
+                return colorLayer;
+
             if (ApkVectorIconRenderer.IsVectorDrawable(bytes))
             {
                 var rendered = ApkVectorIconRenderer.TryRenderToSkBitmap(
@@ -2426,7 +4284,7 @@ public static partial class ApkIconService
                     return rendered;
             }
 
-            // RedAlert etc.: <layer-list><item android:drawable="@…"/></layer-list>
+            // Layer-list: <item android:drawable="@…"/> (often density-split rasters).
             if (resourcesBytes is not null)
             {
                 var layerListInner = await TryLoadLayerListDrawableAsync(
@@ -2436,7 +4294,7 @@ public static partial class ApkIconService
                     return layerListInner;
             }
 
-            // Wallet etc.: <inset android:drawable="@…"/> wrapping the real vector.
+            // <inset android:drawable="@…"/> wrapping the real vector.
             if (resourcesBytes is not null)
             {
                 var insetInner = await TryLoadInsetDrawableAsync(
@@ -2452,6 +4310,24 @@ public static partial class ApkIconService
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Keep one path per basename — the highest-density folder (xxxhdpi ≻ … ≻ mdpi).
+    /// </summary>
+    private static List<string> PreferHighestDensityOnly(IEnumerable<string> paths)
+    {
+        return paths
+            .Select(ArchivePath.NormalizeInternal)
+            .Where(static p => !string.IsNullOrEmpty(p))
+            .GroupBy(Path.GetFileName, StringComparer.OrdinalIgnoreCase)
+            .Select(g => g
+                .OrderByDescending(DensityRank)
+                .ThenBy(static p => p, StringComparer.OrdinalIgnoreCase)
+                .First())
+            .OrderByDescending(DensityRank)
+            .ThenBy(static p => p, StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
 
     private static async Task<SKBitmap?> TryLoadInsetDrawableAsync(
@@ -2485,7 +4361,7 @@ public static partial class ApkIconService
             if (drawableRef is null || !TryParseResourceId(drawableRef, out var id))
                 return null;
 
-            // Wallet etc.: insetLeft/Right/Top/Bottom are parent fractions (often ~18–26%).
+            // insetLeft/Right/Top/Bottom are parent fractions (often ~18–26%).
             var left = ResolveInsetPixels(axml.RootNode, "insetLeft", size);
             var right = ResolveInsetPixels(axml.RootNode, "insetRight", size);
             var top = ResolveInsetPixels(axml.RootNode, "insetTop", size);
@@ -2512,7 +4388,9 @@ public static partial class ApkIconService
 
                 if (inner is null)
                 {
-                    foreach (var path in ArscResourceResolver.ResolvePaths(resourcesBytes, id))
+                    foreach (var path in await ResolveDrawableFilePathsAcrossBundleAsync(
+                                 device, apkFiles, resourcesBytes, id, cancellationToken)
+                                 .ConfigureAwait(false))
                     {
                         cancellationToken.ThrowIfCancellationRequested();
                         var memberBytes = await ReadMemberFromBundleAsync(
@@ -2569,7 +4447,7 @@ public static partial class ApkIconService
     }
 
     /// <summary>
-    /// Resolves <c>android:inset*</c> to pixels. Supports complex fractions (Wallet 26%) and
+    /// Resolves <c>android:inset*</c> to pixels. Supports complex fractions and
     /// plain floats / percentages.
     /// </summary>
     private static float ResolveInsetPixels(XmlNode node, string attributeName, int parentSize)
@@ -2690,8 +4568,18 @@ public static partial class ApkIconService
                         return rendered;
                 }
 
-                foreach (var path in ArscResourceResolver.ResolvePaths(resourcesBytes, id)
-                             .Concat(GetResourcePaths(new ArscFile(resourcesBytes), id)))
+                var paths = await ResolveDrawableFilePathsAcrossBundleAsync(
+                    device, apkFiles, resourcesBytes, id, cancellationToken).ConfigureAwait(false);
+                if (paths.Count == 0)
+                    continue;
+
+                if (CurrentExtractSession.Value is { } session)
+                {
+                    await session.PrefetchFromBundleAsync(apkFiles, paths, cancellationToken)
+                        .ConfigureAwait(false);
+                }
+
+                foreach (var path in paths)
                 {
                     var memberBytes = await ReadMemberFromBundleAsync(device, apkFiles, path, cancellationToken)
                         .ConfigureAwait(false);
@@ -2724,7 +4612,7 @@ public static partial class ApkIconService
     }
 
     /// <summary>
-    /// True when opaque ink sits in a corner rather than filling the canvas (maxcom/ambient).
+    /// True when opaque ink sits in a corner rather than filling the canvas.
     /// </summary>
     private static bool IsCornerBiasedIcon(SKBitmap bitmap)
     {
@@ -2773,7 +4661,7 @@ public static partial class ApkIconService
 
     /// <summary>
     /// Recenters opaque ink when vector group transforms leave artwork in a corner
-    /// (maxcom / ambient streaming).
+    /// corner-biased artwork.
     /// </summary>
     private static SKBitmap? RecenterOpaqueContent(SKBitmap source)
     {
@@ -2826,8 +4714,42 @@ public static partial class ApkIconService
     }
 
     /// <summary>
+    /// Fully empty adaptive layer (stock foreground). Sparse light glyphs that only
+    /// cover a few percent of the canvas are still real artwork — use
+    /// <see cref="IsDegenerateIcon"/> for blank-tile detection, not for discarding layers.
+    /// </summary>
+    private static bool IsEmptyTransparentLayer(SKBitmap bitmap)
+    {
+        if (bitmap.Width <= 0 || bitmap.Height <= 0)
+            return true;
+
+        var stride = bitmap.RowBytes;
+        var buffer = new byte[stride * bitmap.Height];
+        System.Runtime.InteropServices.Marshal.Copy(bitmap.GetPixels(), buffer, 0, buffer.Length);
+
+        long opaque = 0, samples = 0;
+        for (var y = 0; y < bitmap.Height; y += 4)
+        {
+            var row = y * stride;
+            for (var x = 0; x < bitmap.Width; x += 4)
+            {
+                var i = row + x * 4;
+                if (i + 3 >= buffer.Length)
+                    continue;
+
+                samples++;
+                if (buffer[i + 3] >= 16)
+                    opaque++;
+            }
+        }
+
+        // <0.25% opaque — empty stock templates, not sparse logos.
+        return samples == 0 || opaque * 400 < samples;
+    }
+
+    /// <summary>
     /// True when the bitmap is empty/transparent, or a near-solid blank light tile with no real artwork.
-    /// White logos on transparency (Termux) and white-bg icons with color accents (Google One) are kept.
+    /// White logos on transparency and white-bg icons with color accents are kept.
     /// </summary>
     private static bool IsDegenerateIcon(SKBitmap bitmap)
     {
@@ -2838,7 +4760,7 @@ public static partial class ApkIconService
         var buffer = new byte[stride * bitmap.Height];
         System.Runtime.InteropServices.Marshal.Copy(bitmap.GetPixels(), buffer, 0, buffer.Length);
 
-        long opaque = 0, light = 0, colored = 0, dark = 0, samples = 0;
+        long opaque = 0, light = 0, colored = 0, dark = 0, stockGreen = 0, samples = 0;
         for (var y = 0; y < bitmap.Height; y += 4)
         {
             var row = y * stride;
@@ -2857,7 +4779,9 @@ public static partial class ApkIconService
                     continue;
 
                 opaque++;
-                if (r > 230 && g > 230 && b > 230)
+                if (IsNearStockAndroidStudioGreen(r, g, b))
+                    stockGreen++;
+                else if (r > 230 && g > 230 && b > 230)
                     light++;
                 else if (r < 40 && g < 40 && b < 40)
                     dark++;
@@ -2869,6 +4793,18 @@ public static partial class ApkIconService
         if (samples == 0 || opaque * 20 < samples) // <5% opaque
             return true;
 
+        // Leftover Android Studio ic_launcher_background (#3DDC84) with no foreground.
+        if (opaque * 20 >= samples * 19 && stockGreen * 20 >= opaque * 19)
+            return true;
+
+        // Stock Bugdroid foreground alone: mostly transparent, opaque ink near-white.
+        if (opaque * 4 < samples
+            && light * 10 >= opaque * 9
+            && colored < Math.Max(3, opaque / 20)
+            && dark < 3
+            && stockGreen == 0)
+            return true;
+
         // Real artwork: color accents, dark ink on light tiles, etc.
         if (colored >= Math.Max(3, opaque / 50)
             || dark >= Math.Max(3, opaque / 50))
@@ -2877,6 +4813,45 @@ public static partial class ApkIconService
         // Near-solid light fill covering most of the canvas — blank tile.
         return opaque * 2 >= samples && light * 20 >= opaque * 19;
     }
+
+    /// <summary>Near-solid Android Studio template green <c>#3DDC84</c> plate (no Bugdroid).</summary>
+    private static bool IsStockAndroidStudioGreenPlate(SKBitmap bitmap)
+    {
+        if (bitmap.Width <= 0 || bitmap.Height <= 0)
+            return false;
+
+        var stride = bitmap.RowBytes;
+        var buffer = new byte[stride * bitmap.Height];
+        System.Runtime.InteropServices.Marshal.Copy(bitmap.GetPixels(), buffer, 0, buffer.Length);
+
+        long opaque = 0, stockGreen = 0, samples = 0;
+        for (var y = 0; y < bitmap.Height; y += 4)
+        {
+            var row = y * stride;
+            for (var x = 0; x < bitmap.Width; x += 4)
+            {
+                var i = row + x * 4;
+                if (i + 3 >= buffer.Length)
+                    continue;
+
+                samples++;
+                if (buffer[i + 3] < 16)
+                    continue;
+
+                opaque++;
+                if (IsNearStockAndroidStudioGreen(buffer[i + 2], buffer[i + 1], buffer[i]))
+                    stockGreen++;
+            }
+        }
+
+        return samples > 0
+               && opaque * 20 >= samples * 19
+               && stockGreen * 20 >= opaque * 19;
+    }
+
+    /// <summary>Android Studio template green <c>#3DDC84</c> (±slop for resample).</summary>
+    private static bool IsNearStockAndroidStudioGreen(byte r, byte g, byte b)
+        => Math.Abs(r - 61) <= 28 && Math.Abs(g - 220) <= 28 && Math.Abs(b - 132) <= 28;
 
     private static SKBitmap? DecodeSkBitmap(byte[] bytes)
     {
@@ -2911,54 +4886,32 @@ public static partial class ApkIconService
     }
 
     private static bool IsLikelyLauncherPath(string path)
-        => path.Contains("ic_foreground", StringComparison.OrdinalIgnoreCase)
-           || path.Contains("ic_launcher_foreground", StringComparison.OrdinalIgnoreCase)
-           || path.Contains("icon_launcher", StringComparison.OrdinalIgnoreCase)
-           || path.Contains("/ic_launcher.", StringComparison.OrdinalIgnoreCase)
-           || path.Contains("/ic_launcher_round.", StringComparison.OrdinalIgnoreCase)
-           || path.Contains("/icon.", StringComparison.OrdinalIgnoreCase)
-           || path.Contains("launcher", StringComparison.OrdinalIgnoreCase);
+    {
+        // Stock AS layer XML halves are incomplete alone (green plate or transparent Bugdroid).
+        // Prefer compositing / DefaultAndroidPackageIcon over either half as a final icon.
+        if (IsStockAndroidStudioLayerPath(path))
+            return false;
+
+        return path.Contains("ic_foreground", StringComparison.OrdinalIgnoreCase)
+               || path.Contains("icon_launcher", StringComparison.OrdinalIgnoreCase)
+               || path.Contains("/ic_launcher.", StringComparison.OrdinalIgnoreCase)
+               || path.Contains("/ic_launcher_round.", StringComparison.OrdinalIgnoreCase)
+               || path.Contains("/icon.", StringComparison.OrdinalIgnoreCase)
+               || path.Contains("launcher", StringComparison.OrdinalIgnoreCase);
+    }
 
     /// <summary>
-    /// When android:icon points at an empty/invalid resource, prefer product brand vectors
-    /// (e.g. Contact Keys <c>gs_android_security_privacy_vd_theme_24</c>) over Material chrome.
+    /// Leftover Android Studio <c>ic_launcher_background</c> / <c>ic_launcher_foreground</c> XML
+    /// (not density PNGs that happen to share the name).
     /// </summary>
-    private static List<string> FindFallbackBrandIconPaths(byte[] resourcesBytes)
+    private static bool IsStockAndroidStudioLayerPath(string path)
     {
-        var paths = ArscResourceResolver.FindDrawablePathsByKeyHints(
-            resourcesBytes,
-            "security_privacy",
-            "gs_shield_vd",
-            "gs_encrypted_vd_theme",
-            "gs_android_security");
+        if (!path.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+            return false;
 
-        if (paths.Count > 0)
-        {
-            return paths
-                .OrderBy(p => p.Contains("security_privacy", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
-                .ThenBy(p => p.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
-                .ToList();
-        }
-
-        // Broader gs_*_vd drawables, excluding navigation/chrome glyphs.
-        paths = ArscResourceResolver.FindDrawablePathsByKeyHints(resourcesBytes, "gs_");
-        return paths
-            .Where(p =>
-            {
-                ReadOnlySpan<string> skip =
-                [
-                    "chevron", "arrow", "delete", "close", "check", "keyboard", "question",
-                    "sim_card", "qr_code",
-                ];
-                foreach (var s in skip)
-                {
-                    if (p.Contains(s, StringComparison.OrdinalIgnoreCase))
-                        return false;
-                }
-                return p.EndsWith(".xml", StringComparison.OrdinalIgnoreCase);
-            })
-            .Take(8)
-            .ToList();
+        var name = Path.GetFileNameWithoutExtension(path);
+        return name.Equals("ic_launcher_background", StringComparison.OrdinalIgnoreCase)
+               || name.Equals("ic_launcher_foreground", StringComparison.OrdinalIgnoreCase);
     }
 
     private static string? TryReadPackageLabel(byte[] manifestBytes, byte[] resourcesBytes)
@@ -2967,7 +4920,7 @@ public static partial class ApkIconService
         {
             // Prefer AlphaOmega's named android:label when present — the binary resource-map
             // walker can match a wrong early element (e.g. a settings activity label).
-            // Fall back to binary AXML when AO drops the attribute (AccuBattery / El Al).
+            // Fall back to binary AXML when AO drops the attribute.
             var labelRef = FindNamedApplicationAttribute(manifestBytes, "label")
                            ?? AxmlManifestReader.TryGetApplicationAttribute(
                                manifestBytes, AxmlManifestReader.AttrLabel)
@@ -3054,7 +5007,7 @@ public static partial class ApkIconService
     }
 
     /// <summary>
-    /// AccuBattery and similar apps omit <c>android:label</c> on <c>&lt;application&gt;</c>
+    /// Some apps omit <c>android:label</c> on <c>&lt;application&gt;</c>
     /// and only label the MAIN/LAUNCHER activity. Also accept nameless <c>@7F12…</c> string refs
     /// when AlphaOmega drops the attribute name.
     /// </summary>
@@ -3225,7 +5178,7 @@ public static partial class ApkIconService
         if (value.Length <= 8 && value.All(char.IsAsciiDigit))
             return false;
 
-        // Boolean attrs misread as labels (El Al → "true").
+        // Boolean attrs misread as labels ("true").
         if (value.Equals("true", StringComparison.OrdinalIgnoreCase)
             || value.Equals("false", StringComparison.OrdinalIgnoreCase)
             || value.Equals("yes", StringComparison.OrdinalIgnoreCase)
@@ -3396,6 +5349,32 @@ public static partial class ApkIconService
             .ToList();
     }
 
+    /// <summary>
+    /// Drawable/mipmap file paths for a resource id. Native arsc first — AlphaOmega's
+    /// <see cref="ArscFile.ResourceMap"/> frequently maps the wrong pool string.
+    /// </summary>
+    private static List<string> ResolveDrawableFilePaths(ArscFile arsc, byte[] resourcesBytes, int resourceId)
+    {
+        var native = ArscResourceResolver.ResolvePaths(resourcesBytes, resourceId)
+            .Select(ArchivePath.NormalizeInternal)
+            .Where(static p => !string.IsNullOrWhiteSpace(p))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        IEnumerable<string> candidates = native.Count > 0 ? native : GetResourcePaths(arsc, resourceId);
+
+        return candidates
+            .Select(ArchivePath.NormalizeInternal)
+            .Where(static p => !string.IsNullOrWhiteSpace(p) && !IsColorResourcePath(p))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+    private static bool IsColorResourcePath(string path)
+        => path.Contains("/color/", StringComparison.OrdinalIgnoreCase)
+           || path.Contains(@"\color\", StringComparison.OrdinalIgnoreCase)
+           || path.StartsWith("res/color", StringComparison.OrdinalIgnoreCase);
+
     private static bool TryParseResourceId(string value, out int resourceId)
     {
         resourceId = 0;
@@ -3423,7 +5402,64 @@ public static partial class ApkIconService
     }
 
     /// <summary>
-    /// El Al / AccuBattery store PNG/WebP without an extension (<c>res/raw/aay</c>, root <c>aw</c>).
+    /// Obfuscated APK members (WebView <c>res/9M</c>) omit extensions; sniff container magic.
+    /// </summary>
+    private static string? DetectRasterExtension(ReadOnlySpan<byte> bytes)
+    {
+        if (bytes.Length >= 12
+            && bytes[0] == (byte)'R'
+            && bytes[1] == (byte)'I'
+            && bytes[2] == (byte)'F'
+            && bytes[3] == (byte)'F'
+            && bytes[8] == (byte)'W'
+            && bytes[9] == (byte)'E'
+            && bytes[10] == (byte)'B'
+            && bytes[11] == (byte)'P')
+        {
+            return ".webp";
+        }
+
+        if (bytes.Length >= 8
+            && bytes[0] == 0x89
+            && bytes[1] == (byte)'P'
+            && bytes[2] == (byte)'N'
+            && bytes[3] == (byte)'G'
+            && bytes[4] == 0x0D
+            && bytes[5] == 0x0A
+            && bytes[6] == 0x1A
+            && bytes[7] == 0x0A)
+        {
+            return ".png";
+        }
+
+        if (bytes.Length >= 3
+            && bytes[0] == 0xFF
+            && bytes[1] == 0xD8
+            && bytes[2] == 0xFF)
+        {
+            return ".jpg";
+        }
+
+        return null;
+    }
+
+    private static bool FileLooksLikeWebp(string localPath)
+    {
+        try
+        {
+            using var fs = new FileStream(localPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            Span<byte> hdr = stackalloc byte[12];
+            var read = fs.Read(hdr);
+            return DetectRasterExtension(hdr[..read]) == ".webp";
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Some packs store PNG/WebP without an extension (<c>res/raw/…</c> or root entries).
     /// </summary>
     private static bool IsExtensionlessRasterCandidate(string path)
     {
@@ -3484,7 +5520,7 @@ public static partial class ApkIconService
 
     private static List<string> HeuristicIconCandidates()
     {
-        string[] names = ["ic_launcher", "ic_launcher_round", "ic_launcher_foreground", "icon_launcher", "icon"];
+        string[] names = ["ic_launcher", "ic_launcher_round", "ic_launcher_foreground", "icon_launcher", "icon", "launcher_icon"];
         // Drawable densities first — some apps ship launcher PNGs only under drawable-*.
         string[] folders =
         [
@@ -3505,7 +5541,28 @@ public static partial class ApkIconService
             }
         }
 
+        // Flutter apps often keep launcher art under assets/.
+        result.Add("assets/flutter_assets/images/ic_launcher.png");
+        result.Add("assets/flutter_assets/images/ic_launcher.webp");
+        result.Add("assets/flutter_assets/AppIcon.png");
+
         return RankIconCandidates(result);
+    }
+
+    /// <summary>
+    /// Heuristic paths for probing: top densities per basename so xxhdpi-only packs are not
+    /// skipped when xxxhdpi variants dominate a flat density-sorted <c>Take(N)</c>.
+    /// </summary>
+    private static List<string> HeuristicIconProbeCandidates(int maxPaths)
+    {
+        const int densitiesPerName = 4;
+        // Keep per-name density picks in group order — do not re-sort by density before Take,
+        // or only xxxhdpi paths survive.
+        return HeuristicIconCandidates()
+            .GroupBy(static p => Path.GetFileName(p) ?? p, StringComparer.OrdinalIgnoreCase)
+            .SelectMany(static g => g.OrderByDescending(DensityRank).Take(densitiesPerName))
+            .Take(maxPaths)
+            .ToList();
     }
 
     private static List<string> RankIconCandidates(IEnumerable<string> candidates)
@@ -3523,9 +5580,10 @@ public static partial class ApkIconService
     private static List<string> RankDiscoveredIconCandidates(IEnumerable<string> candidates)
         => candidates
             .Select(ArchivePath.NormalizeInternal)
-            .Where(p => IsImagePath(p)
-                        || IsExtensionlessRasterCandidate(p)
-                        || p.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+            .Where(p => !IsStockAndroidStudioLayerPath(p)
+                        && (IsImagePath(p)
+                            || IsExtensionlessRasterCandidate(p)
+                            || p.EndsWith(".xml", StringComparison.OrdinalIgnoreCase)))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderByDescending(IconCandidateScore)
             .ThenByDescending(DensityRank)
@@ -3547,25 +5605,50 @@ public static partial class ApkIconService
         return 2;
     }
 
+    private static string? PickBestIconMember(
+        IReadOnlyList<string> rankedCandidates,
+        IEnumerable<string> availableMembers,
+        Func<string, long>? sizeOf = null)
+    {
+        var present = new HashSet<string>(
+            availableMembers.Select(ArchivePath.NormalizeInternal),
+            StringComparer.OrdinalIgnoreCase);
+        if (rankedCandidates.Count == 0 || present.Count == 0)
+            return null;
+
+        // Obfuscated packs store density variants as short res/ names with no
+        // mipmap-*dpi* folder — DensityRank ties at 0; prefer the largest pulled bytes.
+        return rankedCandidates
+            .Select(ArchivePath.NormalizeInternal)
+            .Where(present.Contains)
+            .OrderByDescending(IconCandidateScore)
+            .ThenByDescending(DensityRank)
+            // Prefer brand / resolved names over leftover Android Studio templates when tied.
+            .ThenBy(StockLauncherTemplatePenalty)
+            .ThenByDescending(p => sizeOf?.Invoke(p) ?? 0)
+            .ThenBy(static p => p, StringComparer.OrdinalIgnoreCase)
+            .FirstOrDefault();
+    }
+
+    /// <summary>0 = keep; 1 = demote stock <c>ic_launcher</c> / <c>ic_launcher_round</c> templates.</summary>
+    private static int StockLauncherTemplatePenalty(string path)
+    {
+        var name = Path.GetFileNameWithoutExtension(path);
+        if (name.Equals("ic_launcher", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("ic_launcher_round", StringComparison.OrdinalIgnoreCase))
+            return 1;
+        return 0;
+    }
+
     private static string? PickBestIconMember(IReadOnlyList<string> rankedCandidates, IReadOnlyList<ArchiveEntry> listing)
     {
         if (rankedCandidates.Count == 0 || listing.Count == 0)
             return null;
 
-        var byPath = listing
-            .Where(e => !e.IsDirectory)
-            .GroupBy(e => ArchivePath.NormalizeInternal(e.Path), StringComparer.OrdinalIgnoreCase)
-            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
-
-        var present = rankedCandidates.Where(byPath.ContainsKey).ToList();
-        if (present.Count == 0)
-            return null;
-
-        return present
-            .OrderByDescending(IconCandidateScore)
-            .ThenByDescending(DensityRank)
-            .ThenByDescending(path => byPath[path].Size)
-            .First();
+        return PickBestIconMember(
+            rankedCandidates,
+            listing.Where(static e => !e.IsDirectory).Select(static e => e.Path),
+            p => FindEntry(listing, p)?.Size ?? 0);
     }
 
     private static int DensityRank(string path)
@@ -3602,7 +5685,10 @@ public static partial class ApkIconService
         try
         {
             // WIC's WebP decoder drops alpha (VP8L → Bgr32 / opaque black).
-            if (Path.GetExtension(localPath).Equals(".webp", StringComparison.OrdinalIgnoreCase))
+            // Also sniff content: extensionless WebP was historically cached as .png.
+            var isWebp = Path.GetExtension(localPath).Equals(".webp", StringComparison.OrdinalIgnoreCase)
+                || FileLooksLikeWebp(localPath);
+            if (isWebp)
                 return DecodeWebpWithAlpha(localPath) ?? DecodeBitmapWithWic(localPath);
 
             return DecodeBitmapWithWic(localPath);
