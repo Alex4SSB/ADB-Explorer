@@ -55,12 +55,12 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="QRCoder.Xaml" Version="1.8.0" />
     <PackageReference Include="SkiaSharp" Version="4.151.1" />
-    <PackageReference Include="System.IO.Hashing" Version="10.0.0" />
-    <PackageReference Include="System.Management" Version="10.0.9" />
-    <PackageReference Include="Vanara.Windows.Shell.Common" Version="5.0.5" />
+    <PackageReference Include="System.IO.Hashing" Version="10.0.11" />
+    <PackageReference Include="System.Management" Version="10.0.11" />
+    <PackageReference Include="Vanara.Windows.Shell.Common" Version="5.0.6" />
     <PackageReference Include="WPF-UI" Version="4.3.0" />
     <PackageReference Include="WPF-UI.DependencyInjection" Version="4.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.11" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
   </ItemGroup>
 
@@ -168,9 +168,18 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <Target Name="RemoveSkiaSharpPdb" AfterTargets="ResolvePackageAssets">
+  <!--
+    SkiaSharp.NativeAssets.Win32 ships win-x86 + win-x64 + win-arm64 (~90–100 MB each, plus PDBs).
+    This app builds per Platform (x64 / ARM64); keep only that RID's DLL and drop PDBs.
+  -->
+  <Target Name="TrimSkiaSharpNativeAssets" AfterTargets="ResolvePackageAssets">
+    <PropertyGroup>
+      <_SkiaNativeRid Condition="'$(Platform)' == 'x64'">win-x64</_SkiaNativeRid>
+      <_SkiaNativeRid Condition="'$(Platform)' == 'ARM64'">win-arm64</_SkiaNativeRid>
+    </PropertyGroup>
     <ItemGroup>
-      <NativeCopyLocalItems Remove="@(NativeCopyLocalItems)" Condition="'%(Filename)%(Extension)' == 'libSkiaSharp.pdb'" />
+      <RuntimeTargetsCopyLocalItems Remove="@(RuntimeTargetsCopyLocalItems)" Condition="$([System.String]::Copy('%(Identity)').EndsWith('libSkiaSharp.pdb'))" />
+      <RuntimeTargetsCopyLocalItems Remove="@(RuntimeTargetsCopyLocalItems)" Condition="'$(_SkiaNativeRid)' != ''&#xD;&#xA;                                               and $([System.String]::Copy('%(Identity)').Contains('libSkiaSharp'))&#xD;&#xA;                                               and !$([System.String]::Copy('%(Identity)').Contains('$(_SkiaNativeRid)'))" />
     </ItemGroup>
   </Target>
 
