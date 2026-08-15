@@ -1744,4 +1744,10 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
     <value>Файл будет пропущен.</value>
   </data>
+  <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
+    <value>Загрузка иконок приложений</value>
+  </data>
+  <data name="S_PACKAGE_ID" xml:space="preserve">
+    <value>Пакет ID</value>
+  </data>
 </root>
