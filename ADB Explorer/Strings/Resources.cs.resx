@@ -419,7 +419,7 @@ Zobrazený obsah nemusí být úplný.</value>
     <value>V umístění {1} existuje {0} konfliktních položek</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Konflikty při vkládání</value>
+    <value>Nahradit nebo přeskočit soubory</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Vyberte složky k nahrání</value>
@@ -1977,5 +1977,44 @@ Kontroly se snaží zabránit tomu, aby nic netušící uživatel spustil potenc
   </data>
   <data name="S_MENU_ARCHIVE" xml:space="preserve">
     <value>Archiv</value>
+  </data>
+  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
+    <value>Nahradit soubory v cíli</value>
+  </data>
+  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
+    <value>Přeskočit tyto soubory</value>
+  </data>
+  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
+    <value>Rozhodnout o každém souboru</value>
+  </data>
+  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
+    <value>Vyřešit konflikty ({0})</value>
+  </data>
+  <data name="S_NEWER" xml:space="preserve">
+    <value>novější</value>
+  </data>
+  <data name="S_BIGGER" xml:space="preserve">
+    <value>větší</value>
+  </data>
+  <data name="S_PER_FILE_CONFLICT_TABLE_TITLE" xml:space="preserve">
+    <value>U každého konfliktu zvolte cíl pro přeskočení nebo zdroj pro nahrazení.</value>
+  </data>
+  <data name="S_TOOLTIP_REPLACED" xml:space="preserve">
+    <value>Soubor bude nahrazen.</value>
+  </data>
+  <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
+    <value>Soubor bude přeskočen.</value>
+  </data>
+  <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
+    <value>V tomto systému není k dispozici.</value>
+  </data>
+  <data name="S_PACKAGE_ID" xml:space="preserve">
+    <value>ID balíčku</value>
+  </data>
+  <data name="S_APP_NAME" xml:space="preserve">
+    <value>Název aplikace</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
+    <value>Načítání ikon aplikací</value>
   </data>
 </root>
