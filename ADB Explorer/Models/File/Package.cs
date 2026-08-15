@@ -17,6 +17,9 @@ public partial class Package : ObservableObject, IBrowserItem
     [ObservableProperty]
     public partial string Path { get; set; }
 
+    /// <summary>Serial of the device this package was listed from (clock-hand cache, icon loads).</summary>
+    public string? DeviceSerial { get; set; }
+
     /// <summary>Localized application label when known; otherwise the package id.</summary>
     public string DisplayName => string.IsNullOrWhiteSpace(Label) ? Name : Label!;
 

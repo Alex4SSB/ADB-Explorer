@@ -356,8 +356,17 @@ internal static class ArscResourceResolver
     private static IEnumerable<ConfigValue> PreferDefaultConfig(IEnumerable<ConfigValue> values)
         => values
             .OrderBy(v => v.IsNight ? 1 : 0)
-            .ThenBy(v => string.IsNullOrEmpty(v.Language) ? 0 : v.Language.Equals("en", StringComparison.OrdinalIgnoreCase) ? 1 : 2)
+            .ThenBy(LanguageSortRank)
             .ThenBy(v => v.Country.Length);
+
+    private static int LanguageSortRank(ConfigValue value)
+    {
+        if (string.IsNullOrEmpty(value.Language))
+            return 0;
+        if (value.Language.Equals("en", StringComparison.OrdinalIgnoreCase))
+            return 1;
+        return 2;
+    }
 
     private static List<ConfigValue> ResolveValues(byte[] data, int resourceId, int maxReferenceDepth)
     {

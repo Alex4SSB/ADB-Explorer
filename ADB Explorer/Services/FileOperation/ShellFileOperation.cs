@@ -812,21 +812,26 @@ public static class ShellFileOperation
 
         if (includeSystem)
         {
-            packages.AddRange(ParsePackageSection(ExtractPackageListSection(stdout, PKG_LIST_SYSTEM), Package.PackageType.System));
-            packages.AddRange(ParsePackageSection(ExtractPackageListSection(stdout, PKG_LIST_USER), Package.PackageType.User));
+            packages.AddRange(ParsePackageSection(ExtractPackageListSection(stdout, PKG_LIST_SYSTEM), Package.PackageType.System, device.SerialNumber));
+            packages.AddRange(ParsePackageSection(ExtractPackageListSection(stdout, PKG_LIST_USER), Package.PackageType.User, device.SerialNumber));
         }
         else
         {
-            packages.AddRange(ParsePackageSection(stdout, Package.PackageType.User));
+            packages.AddRange(ParsePackageSection(stdout, Package.PackageType.User, device.SerialNumber));
         }
 
         return packages;
     }
 
-    private static IEnumerable<Package> ParsePackageSection(string section, Package.PackageType type)
+    private static IEnumerable<Package> ParsePackageSection(string section, Package.PackageType type, string serialNumber)
         => section.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries)
                   .Select(pkg => Package.New(pkg, type))
-                  .OfType<Package>();
+                  .OfType<Package>()
+                  .Select(pkg =>
+                  {
+                      pkg.DeviceSerial = serialNumber;
+                      return pkg;
+                  });
 
     private static string ExtractPackageListSection(string stdout, string label)
     {

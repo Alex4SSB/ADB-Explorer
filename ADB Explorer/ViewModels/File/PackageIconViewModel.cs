@@ -43,7 +43,7 @@ public partial class PackageIconViewModel : ObservableObject
                     return _displayedIcon;
 
                 _displayedFace = _package.Icon;
-                _displayedIcon = ApkIconService.ForIconView(_package.Icon, _package.Name);
+                _displayedIcon = ApkIconService.ForIconView(_package.Icon, _package.Name, _package.DeviceSerial);
                 return _displayedIcon;
             }
 
@@ -82,4 +82,14 @@ public partial class PackageIconViewModel : ObservableObject
     }
 
     public void OnDisplayNameChanged() => OnPropertyChanged(nameof(IconViewTooltip));
+
+    /// <summary>
+    /// Drop the recycled overlay so the next bind can apply clock hands after a cache inspect.
+    /// </summary>
+    public void InvalidateDisplayedIcon()
+    {
+        _displayedFace = null;
+        _displayedIcon = null;
+        OnPropertyChanged(nameof(LargeIcon));
+    }
 }

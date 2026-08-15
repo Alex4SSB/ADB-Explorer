@@ -412,9 +412,9 @@ public static partial class ThumbnailService
     private static readonly Mutex _listMutex = new(false);
     private static readonly HashSet<string> PendingCustomPulls = [];
     private static readonly Lock PendingCustomPullsLock = new();
-    private static readonly Lock ThrottledPullScheduleLock = new();
-    private static readonly Queue<(string PullKey, Action StartPull)> ThrottledPullQueue = new();
-    private static int _throttledPullsInFlight;
+    private static readonly Lock CustomPullScheduleLock = new();
+    private static readonly Queue<(string PullKey, Action StartPull)> CustomPullQueue = new();
+    private static int _customPullsInFlight;
     private static readonly ConcurrentDictionary<string, Lock> DeviceCsvLocks = new(StringComparer.Ordinal);
 
     private static readonly List<DeviceThumbnailInfo> _deviceInfoCache = [];
@@ -855,23 +855,23 @@ public static partial class ThumbnailService
 
     private static void QueueCustomPull(string pullKey, Action startPull)
     {
-        lock (ThrottledPullScheduleLock)
+        lock (CustomPullScheduleLock)
         {
-            ThrottledPullQueue.Enqueue((pullKey, startPull));
-            TryStartNextThrottledPull();
+            CustomPullQueue.Enqueue((pullKey, startPull));
+            TryStartNextCustomPull();
         }
     }
 
-    private static void TryStartNextThrottledPull()
+    private static void TryStartNextCustomPull()
     {
         var max = Data.Settings.ThumbAndIconConcurrency;
-        while (_throttledPullsInFlight < max && ThrottledPullQueue.Count > 0)
+        while (_customPullsInFlight < max && CustomPullQueue.Count > 0)
         {
-            var (pullKey, startPull) = ThrottledPullQueue.Dequeue();
+            var (pullKey, startPull) = CustomPullQueue.Dequeue();
             if (!IsPendingCustomPull(pullKey))
                 continue;
 
-            _throttledPullsInFlight++;
+            _customPullsInFlight++;
             _ = Task.Run(() => RunCustomPull(pullKey, startPull));
         }
     }
@@ -882,7 +882,7 @@ public static partial class ThumbnailService
         {
             if (!IsPendingCustomPull(pullKey))
             {
-                ThrottledPullCompleted();
+                CustomPullCompleted();
                 return;
             }
 
@@ -906,13 +906,13 @@ public static partial class ThumbnailService
             return PendingCustomPulls.Contains(pullKey);
     }
 
-    private static void ThrottledPullCompleted()
+    private static void CustomPullCompleted()
     {
-        lock (ThrottledPullScheduleLock)
+        lock (CustomPullScheduleLock)
         {
-            if (_throttledPullsInFlight > 0)
-                _throttledPullsInFlight--;
-            TryStartNextThrottledPull();
+            if (_customPullsInFlight > 0)
+                _customPullsInFlight--;
+            TryStartNextCustomPull();
         }
     }
 
@@ -925,7 +925,7 @@ public static partial class ThumbnailService
     private static void CompleteCustomPull(string pullKey)
     {
         CancelCustomPull(pullKey);
-        ThrottledPullCompleted();
+        CustomPullCompleted();
     }
 
     private static DeviceThumbnailInfo GetCachedDeviceInfo(string serialNumber)

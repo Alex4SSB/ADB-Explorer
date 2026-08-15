@@ -518,7 +518,12 @@ internal static partial class ApkVectorIconRenderer
                     if (color is null)
                         continue;
 
-                    var offset = ReadFloatBits(child, "offset") ?? (stops.Count == 0 ? 0f : 1f);
+                    var parsedOffset = ReadFloatBits(child, "offset");
+                    float offset;
+                    if (parsedOffset is null)
+                        offset = stops.Count == 0 ? 0f : 1f;
+                    else
+                        offset = parsedOffset.Value;
                     offset = Math.Clamp(offset, 0f, 1f);
                     stops.Add((offset, color.Value));
                 }
