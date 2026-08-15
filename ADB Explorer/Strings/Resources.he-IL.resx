@@ -413,7 +413,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>קיימים {0} פריטים עם התנגשות ב {1}</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>התנגשויות בהדבקה</value>
+    <value>החלף או דלג על קבצים</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>בחר תיקיות להעלאה</value>
@@ -1747,5 +1747,41 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
     <value>לא זמין במערכת זו.</value>
+  </data>
+  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
+    <value>החלף את הקבצים ביעד</value>
+  </data>
+  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
+    <value>דלג על הקבצים האלה</value>
+  </data>
+  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
+    <value>אַפשר לי להחליט עבור כל קובץ</value>
+  </data>
+  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
+    <value>פתור {0} התנגשויות</value>
+  </data>
+  <data name="S_PACKAGE_ID" xml:space="preserve">
+    <value>ID חבילה</value>
+  </data>
+  <data name="S_APP_NAME" xml:space="preserve">
+    <value>שם אפליקציה</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
+    <value>טוען סמלי אפליקציות</value>
+  </data>
+  <data name="S_NEWER" xml:space="preserve">
+    <value>חדש יותר</value>
+  </data>
+  <data name="S_BIGGER" xml:space="preserve">
+    <value>גדול יותר</value>
+  </data>
+  <data name="S_PER_FILE_CONFLICT_TABLE_TITLE" xml:space="preserve">
+    <value>עבור כל התנגשות, בחר יעד כדי לדלג על הקובץ, או מקור להחליף אותו.</value>
+  </data>
+  <data name="S_TOOLTIP_REPLACED" xml:space="preserve">
+    <value>הקובץ יוחלף.</value>
+  </data>
+  <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
+    <value>הקובץ ידולג.</value>
   </data>
 </root>
