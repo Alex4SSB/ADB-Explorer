@@ -1744,4 +1744,10 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
     <value>将跳过文件。</value>
   </data>
+  <data name="S_PACKAGE_ID" xml:space="preserve">
+    <value>包 ID</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
+    <value>正在加载应用图标</value>
+  </data>
 </root>
