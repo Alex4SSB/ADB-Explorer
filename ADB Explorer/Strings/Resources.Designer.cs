@@ -320,15 +320,6 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_APK_ICON_LIC", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Looks up a localized string similar to App Name.
-        /// </summary>
-        public static string S_APP_NAME {
-            get {
-                return ResourceManager.GetString("S_APP_NAME", resourceCulture);
-            }
-        }
         
         /// <summary>
         ///   Looks up a localized string similar to App Data Folder.
@@ -383,6 +374,15 @@ namespace ADB_Explorer.Strings {
         public static string S_APP_DATA_LOCATION_VIRTUALIZED {
             get {
                 return ResourceManager.GetString("S_APP_DATA_LOCATION_VIRTUALIZED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to App Name.
+        /// </summary>
+        public static string S_APP_NAME {
+            get {
+                return ResourceManager.GetString("S_APP_NAME", resourceCulture);
             }
         }
         
@@ -2920,20 +2920,20 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Packed size.
-        /// </summary>
-        public static string S_PACKED_SIZE {
-            get {
-                return ResourceManager.GetString("S_PACKED_SIZE", resourceCulture);
-            }
-        }
-
-        /// <summary>
         ///   Looks up a localized string similar to Package ID.
         /// </summary>
         public static string S_PACKAGE_ID {
             get {
                 return ResourceManager.GetString("S_PACKAGE_ID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Packed size.
+        /// </summary>
+        public static string S_PACKED_SIZE {
+            get {
+                return ResourceManager.GetString("S_PACKED_SIZE", resourceCulture);
             }
         }
         

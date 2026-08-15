@@ -1830,8 +1830,8 @@ Please help us localize the app to your language on Weblate.</value>
     <comment>The setting used allow saving thumbnails locally from one app session to another</comment>
   </data>
   <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>Limit Thumbnails &amp; App Icon Pull Speed</value>
-    <comment>Limits concurrent thumbnail pulls and app icon/name loads from the device</comment>
+    <value>Limit Thumbnails Pull Speed</value>
+    <comment>The setting used to limit the speed at which thumbnails are pulled in bulk from the device</comment>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>Show Icons For Special Folders</value>
