@@ -338,10 +338,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>为多个项目选择目标文件夹</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>以下内容将被删除:
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>以下内容将被永久删除：
 {0}</value>
@@ -573,12 +569,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>搜索视图</value>
   </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>全部折叠</value>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>展开所有</value>
-  </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>设置</value>
   </data>
@@ -682,9 +672,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>安装</value>
   </data>
-  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>复制到临时目录</value>
-  </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>清除命令日志</value>
   </data>
@@ -787,12 +774,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SECONDS_SHORT" xml:space="preserve">
     <value>{0}秒</value>
   </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>关闭服务器</value>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>关闭进程</value>
-  </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>刷新设备</value>
   </data>
@@ -819,9 +800,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>有限的支持</value>
-  </data>
-  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
-    <value>某些操作失败了</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
     <value>启用 Root 权限</value>
@@ -999,9 +977,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>临时目录</value>
-  </data>
-  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>{0} 文件名在目标文件系统上无效</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>内容不匹配</value>
@@ -1293,9 +1268,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="GIGA" xml:space="preserve">
     <value>{0} GB</value>
   </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>毫安</value>
   </data>
@@ -1412,9 +1384,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>会话</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>限制缩略图拉取速度</value>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>显示特殊文件夹图标</value>

@@ -338,10 +338,6 @@ SDK இயங்குதளக் கருவிகளைப் பதிவ�
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>பல உருப்படிகளுக்கான இலக்கைத் தேர்ந்தெடுக்கவும்</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>பின்வருபவை நீக்கப்படும்: 
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>பின்வருபவை நிரந்தரமாக நீக்கப்படும்: 
 {0}</value>
@@ -578,12 +574,6 @@ Select Custom to use a location that will not be removed on uninstall. The custo
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>தேடல் பார்வை</value>
   </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>அனைத்தையும் சுருக்கு</value>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>அனைத்தையும் விரிவாக்கு</value>
-  </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>அமைப்புகள்</value>
   </data>
@@ -687,9 +677,6 @@ Select Custom to use a location that will not be removed on uninstall. The custo
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>நிறுவவும்</value>
   </data>
-  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>தற்காலிகமாக நகலெடுக்கவும்</value>
-  </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>கட்டளை பதிவை அழிக்கவும்</value>
   </data>
@@ -792,12 +779,6 @@ Select Custom to use a location that will not be removed on uninstall. The custo
   <data name="S_SECONDS_SHORT" xml:space="preserve">
     <value>{0}வி</value>
   </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>கில் சர்வர்</value>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>கொலை செயல்முறை</value>
-  </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>சாதனங்களைப் புதுப்பிக்கவும்</value>
   </data>
@@ -824,9 +805,6 @@ Select Custom to use a location that will not be removed on uninstall. The custo
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>வரையறுக்கப்பட்ட உதவி</value>
-  </data>
-  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
-    <value>சில செயல்பாடுகள் தோல்வியடைந்தன</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
     <value>ரூட் அணுகல் இயக்கப்பட்டது</value>
@@ -1004,9 +982,6 @@ Select Custom to use a location that will not be removed on uninstall. The custo
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>வெப்பநிலை</value>
-  </data>
-  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>இலக்கு கோப்பு முறைமையில் கோப்பு பெயர் சட்டவிரோதமானது: {0}</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>உள்ளடக்கம் பொருந்தவில்லை</value>
@@ -1292,9 +1267,6 @@ Weblate இல் உங்கள் மொழியில் பயன்பா
   <data name="GIGA" xml:space="preserve">
     <value>{0} சிபி</value>
   </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>மீ</value>
   </data>
@@ -1411,9 +1383,6 @@ Weblate இல் உங்கள் மொழியில் பயன்பா
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>அமர்வுகளுக்கு இடையில் சிறுபடங்களைத் தொடரவும்</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>சிறு உருவங்களை இழுக்கும் வேகத்தை வரம்பிடவும்</value>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>சிறப்பு கோப்புறைகளுக்கான ஐகான்களைக் காட்டு</value>

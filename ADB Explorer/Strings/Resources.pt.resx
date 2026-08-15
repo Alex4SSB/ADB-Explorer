@@ -342,10 +342,6 @@ Infelizmente, não podemos providenciar-lhe o ADB através da aplicação, devid
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>Selecione o destino para os múltiplos elementos</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>Os seguintes serão apagados:
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>Os seguintes serão apagados permanentemente:
 {0}</value>
@@ -605,14 +601,6 @@ Selecione "Personalizado" para utilizar uma localização que não será removid
     <value>Ver a Caixa de Pesquisa</value>
     <comment>The tooltip of the button used to show the settings search textbox</comment>
   </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>Colapsar Tudo</value>
-    <comment>The tooltip of the button used to collapse all settings groups</comment>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>Expandir Tudo</value>
-    <comment>The tooltip of the button used to expand all settings groups</comment>
-  </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>Definições</value>
     <comment>The title of the settings view</comment>
@@ -738,10 +726,6 @@ Cancelar Todas a Serem Reproduzidas</value>
   </data>
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>Instalar</value>
-  </data>
-  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>Copiar para o Disco Temporário</value>
-    <comment>The menu used to copy selected APK files to the temp drive</comment>
   </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>Limpar o Registo de Comandos</value>
@@ -898,10 +882,6 @@ Cancelar Todas a Serem Reproduzidas</value>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Suporte Limitado</value>
     <comment>The tooltip displayed for too low Android versions</comment>
-  </data>
-  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
-    <value>Algumas operações falharam</value>
-    <comment>The tooltip displayed when some file operations have failed</comment>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
     <value>Acesso Root Ativo</value>
@@ -1118,10 +1098,6 @@ Cancelar Todas a Serem Reproduzidas</value>
     <value>Disco Temporário</value>
     <comment>The user space temp drive - /data/local/tmp</comment>
   </data>
-  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>O nome do ficheiro não é permitido no sistema de ficheiros de destino: {0}</value>
-    <comment>0 = file name</comment>
-  </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>Disparidade do conteúdo</value>
     <comment>The error displayed when validation of a file operation resulted in different MD5 checksums of the source and target</comment>
@@ -1309,10 +1285,6 @@ Cancelar Todas a Serem Reproduzidas</value>
   <data name="GIGA" xml:space="preserve">
     <value>{0} GB</value>
     <comment>The notation for GigaBytes when displaying file size or drive usage</comment>
-  </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-    <comment>The notation for TeraBytes when displaying file size or drive usage</comment>
   </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
@@ -1580,12 +1552,6 @@ Items suportados: miniaturas de imagem, PDF; outros ficheiros cujo tamanho estej
   <data name="S_COLUMN_USER_ID" xml:space="preserve">
     <value>ID do Utilizador</value>
   </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>Terminar a Execução do Servidor</value>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>Terminar o Processo</value>
-  </data>
   <data name="S_RESTART_ADB" xml:space="preserve">
     <value>Reiniciar o ADB</value>
   </data>
@@ -1833,9 +1799,6 @@ Ajude-nos a traduzir a aplicação para o seu idioma na plataforma Weblate.</val
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>Preservar as Miniaturas de Imagem entre Sessões</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>Limitar a Rapidez de Transferência de Miniaturas de Imagem</value>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>Mostrar Ícones para Pastas Especiais</value>

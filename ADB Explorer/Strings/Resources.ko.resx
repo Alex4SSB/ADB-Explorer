@@ -319,10 +319,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>여러 항목의 대상 선택</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>다음 항목이 삭제됩니다:
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>다음 항목은 영구적으로 삭제됩니다:
 {0}</value>
@@ -532,12 +528,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>검색 보기</value>
   </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>모두 접기</value>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>모두 펼치기</value>
-  </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>설정</value>
   </data>
@@ -641,9 +631,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>설치</value>
   </data>
-  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>임시로 복사</value>
-  </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>명령 로그 지우기</value>
   </data>
@@ -746,12 +733,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_SECONDS_SHORT" xml:space="preserve">
     <value>{0}초</value>
   </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>서버 종료</value>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>프로세스 종료</value>
-  </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>장치 새로 고침</value>
   </data>
@@ -778,9 +759,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>제한된 지원</value>
-  </data>
-  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
-    <value>일부 작업이 실패했습니다</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
     <value>루트 권한 활성화됨</value>
@@ -958,9 +936,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>임시</value>
-  </data>
-  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>대상 파일 시스템에서 잘못된 파일 이름: {0}</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>내용 불일치</value>
@@ -1237,9 +1212,6 @@ Weblate에서 앱을 해당 언어로 현지화하는 데 도움을 주세요.</
   <data name="GIGA" xml:space="preserve">
     <value>{0} GB</value>
   </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
   </data>
@@ -1356,9 +1328,6 @@ Weblate에서 앱을 해당 언어로 현지화하는 데 도움을 주세요.</
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>세션 간 썸네일 유지</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>썸네일 pull 속도 제한</value>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>특수 폴더 아이콘 표시</value>

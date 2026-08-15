@@ -338,10 +338,6 @@ Infelizmento, nós não podemos te providenciar o ADB junto com o app, por conta
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>Selecione o destino para os múltiplos itens</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>Os a seguir serão deletados:
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>Os a seguir serão deletados permanentemente:
 {0}</value>
@@ -604,14 +600,6 @@ Selecione "Personalizar" para usar um local que não será removido ao desinstal
     <value>Visualização de Busca</value>
     <comment>The tooltip of the button used to show the settings search textbox</comment>
   </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>Colapsar Tudo</value>
-    <comment>The tooltip of the button used to collapse all settings groups</comment>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>Expandir Tudo</value>
-    <comment>The tooltip of the button used to expand all settings groups</comment>
-  </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>Configurações</value>
     <comment>The title of the settings view</comment>
@@ -741,10 +729,6 @@ Cancela Tudo Rodando</value>
   </data>
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>Instalar</value>
-  </data>
-  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>Copiar para o Diretório Temporário</value>
-    <comment>The menu used to copy selected APK files to the temp drive</comment>
   </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>Limpar Registro de Comandos</value>
@@ -881,14 +865,6 @@ Cancela Tudo Rodando</value>
     <value>{0}s</value>
     <comment>Seconds display (eg. 6s)</comment>
   </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>Finalizar Servidor</value>
-    <comment>The content of a button to kill ADB server</comment>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>Finalizar Processo</value>
-    <comment>The content of a button to kill the process of ADB</comment>
-  </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>Atualizar Dispositivos</value>
     <comment>The tooltip of a button to manually refresh the device list</comment>
@@ -924,10 +900,6 @@ Cancela Tudo Rodando</value>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Suporte Limitado</value>
     <comment>The tooltip displayed for too low Android versions</comment>
-  </data>
-  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
-    <value>Algumas operações falharam</value>
-    <comment>The tooltip displayed when some file operations have failed</comment>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
     <value>Acesso ao Root Ativado</value>
@@ -1151,10 +1123,6 @@ Cancela Tudo Rodando</value>
     <value>Diretório Temporário</value>
     <comment>The user space temp drive - /data/local/tmp</comment>
   </data>
-  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>Nome de arquivo inválido no sistema de arquivos de destino: {0}</value>
-    <comment>0 = file name</comment>
-  </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>Incompatibilidade de conteúdo</value>
     <comment>The error displayed when validation of a file operation resulted in different MD5 checksums of the source and target</comment>
@@ -1299,10 +1267,6 @@ Cancela Tudo Rodando</value>
   <data name="GIGA" xml:space="preserve">
     <value>{0} GB</value>
     <comment>The notation for GigaBytes when displaying file size or drive usage</comment>
-  </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-    <comment>The notation for TeraBytes when displaying file size or drive usage</comment>
   </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>

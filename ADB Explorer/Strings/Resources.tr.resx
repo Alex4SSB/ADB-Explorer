@@ -319,10 +319,6 @@ Ne yazık ki, lisans kısıtlamaları nedeniyle uygulamayla birlikte ADB'yi sağ
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>Birden fazla öğe için hedef seç</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>Aşağıdakiler silinecektir:
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>Aşağıdakiler kalıcı olarak silinecektir:
 {0}</value>

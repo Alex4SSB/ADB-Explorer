@@ -338,10 +338,6 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>Выберите назначение для нескольких элементов</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>Следующее будет удалено:
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>Следующие элементы будут безвозвратно удалены:
 {0}</value>
@@ -573,12 +569,6 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>Просмотр поиска</value>
   </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>Свернуть все</value>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>Развернуть все</value>
-  </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>Настройки</value>
   </data>
@@ -682,9 +672,6 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>Установить</value>
   </data>
-  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>Копировать во временную папку</value>
-  </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>Очистить журнал команд</value>
   </data>
@@ -787,12 +774,6 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_SECONDS_SHORT" xml:space="preserve">
     <value>{0}сек.</value>
   </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>Убить сервер</value>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>Убить процесс</value>
-  </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>Обновить устройства</value>
   </data>
@@ -819,9 +800,6 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Ограниченная поддержка</value>
-  </data>
-  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
-    <value>Некоторые операции не выполнены</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
     <value>Root-доступ включен</value>
@@ -999,9 +977,6 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>Временная папка</value>
-  </data>
-  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>Имя файла недопустимо в конечной файловой системе: {0}</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>Несоответствие содержимого</value>
@@ -1293,9 +1268,6 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="GIGA" xml:space="preserve">
     <value>{0} ГБ</value>
   </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} ТБ</value>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
   </data>
@@ -1412,9 +1384,6 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>Сохранение миниатюр между сеансами</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>Ограничить скорость вытаскивании миниатюр</value>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>Показывать Иконки для специальных папок</value>

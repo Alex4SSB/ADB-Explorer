@@ -331,10 +331,6 @@ Malheureusement, nous ne pouvons pas inclure ADB dans l’application en raison 
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>Sélectionnez la destination pour plusieurs éléments</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>Les éléments suivants seront supprimés :
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>Les éléments suivants seront définitivement supprimés :
 {0}</value>
@@ -553,12 +549,6 @@ Le contenu visible peut être incomplet.</value>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>Vue recherche</value>
   </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>Réduire tout</value>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>Étendre tout</value>
-  </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>Paramètres</value>
   </data>
@@ -662,9 +652,6 @@ Annuler tout en cours</value>
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>Installer</value>
   </data>
-  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>Copier vers Temp</value>
-  </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>Vider l'historique de commandes</value>
   </data>
@@ -767,12 +754,6 @@ Annuler tout en cours</value>
   <data name="S_SECONDS_SHORT" xml:space="preserve">
     <value>{0}s</value>
   </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>Arrêter le serveur</value>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>Tuer processus</value>
-  </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>Rafraîchir appareils</value>
   </data>
@@ -799,9 +780,6 @@ Annuler tout en cours</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Support limité</value>
-  </data>
-  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
-    <value>Certaines opérations ont échoué</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
     <value>Accès root activé</value>
@@ -979,9 +957,6 @@ Annuler tout en cours</value>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>Temp</value>
-  </data>
-  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>Nom de fichier illégal sur le système de fichiers cible : {0}</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>Contenu discordant</value>
@@ -1270,9 +1245,6 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="GIGA" xml:space="preserve">
     <value>{0} GB</value>
   </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>mA</value>
   </data>
@@ -1389,9 +1361,6 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>Persistance vignettes entre sessions</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>Limiter vitesse tirage vignettes</value>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>Afficher icônes pour dossiers spéciaux</value>

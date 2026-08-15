@@ -331,10 +331,6 @@ Leider können wir ADB mit der App aufgrund von Lizenzbeschränkungen nicht bere
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>Ziel für mehrere Elemente auswählen</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>Folgendes wird gelöscht:
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>Folgendes wird endgültig gelöscht:
 {0}</value>
@@ -550,12 +546,6 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>Suchansicht</value>
   </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>Alles einklappen</value>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>Alles ausklappen</value>
-  </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>Einstellungen</value>
   </data>
@@ -659,9 +649,6 @@ Alle laufenden Vorgänge abbrechen</value>
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>Installieren</value>
   </data>
-  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>Nach Temporär kopieren</value>
-  </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>Befehlsprotokoll löschen</value>
   </data>
@@ -764,12 +751,6 @@ Alle laufenden Vorgänge abbrechen</value>
   <data name="S_SECONDS_SHORT" xml:space="preserve">
     <value>{0} s</value>
   </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>Server abwürgen</value>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>Prozess abwürgen</value>
-  </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>Geräte auffrischen</value>
   </data>
@@ -796,9 +777,6 @@ Alle laufenden Vorgänge abbrechen</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Eingeschränkte Unterstützung</value>
-  </data>
-  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
-    <value>Manche Operationen sind fehlgeschlagen</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
     <value>Root-Zugriff aktiviert</value>
@@ -970,9 +948,6 @@ Alle laufenden Vorgänge abbrechen</value>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>Temporär</value>
-  </data>
-  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>Dateiname auf dem Zieldateisystem ungültig: {0}</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>Inhalt stimmt nicht überein</value>
@@ -1255,9 +1230,6 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="GIGA" xml:space="preserve">
     <value>{0} GB</value>
   </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
   </data>
@@ -1371,9 +1343,6 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>Miniaturansichten über mehrere Sitzungen hinweg beibehalten</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>Geschwindigkeit beim Abrufen von Miniaturansichten begrenzen</value>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>Symbole für spezielle Ordner anzeigen</value>

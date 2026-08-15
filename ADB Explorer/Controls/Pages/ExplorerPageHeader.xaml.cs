@@ -128,7 +128,7 @@ public partial class ExplorerPageHeader : UserControl
     /// </summary>
     private static bool IsInScrollBar(DependencyObject? source)
     {
-        for (var dep = source; dep is not null; dep = VisualTreeHelper.GetParent(dep))
+        for (var dep = source; dep is not null; dep = GetVisualOrLogicalParent(dep))
         {
             if (dep is System.Windows.Controls.Primitives.ScrollBar)
                 return true;
@@ -137,6 +137,21 @@ public partial class ExplorerPageHeader : UserControl
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Walks the visual tree when possible; content elements (<see cref="System.Windows.Documents.Run"/>, etc.)
+    /// are not Visuals, so fall back to the logical parent.
+    /// </summary>
+    private static DependencyObject? GetVisualOrLogicalParent(DependencyObject current)
+    {
+        if (current is Visual or System.Windows.Media.Media3D.Visual3D)
+            return VisualTreeHelper.GetParent(current);
+
+        if (current is FrameworkContentElement content)
+            return content.Parent;
+
+        return LogicalTreeHelper.GetParent(current);
     }
 
     private bool SuppressExplorerSelection =>

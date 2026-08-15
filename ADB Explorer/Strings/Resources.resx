@@ -360,10 +360,6 @@ Unfortunately, we cannot provide ADB with the app due to licensing restrictions.
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>Select destination for multiple items</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>The following will be deleted:
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>The following will be permanently deleted:
 {0}</value>
@@ -675,14 +671,6 @@ Select Custom to use a location that will not be removed on uninstall. The custo
     <value>Search View</value>
     <comment>The tooltip of the button used to show the settings search textbox</comment>
   </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>Collapse All</value>
-    <comment>The tooltip of the button used to collapse all settings groups</comment>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>Expand All</value>
-    <comment>The tooltip of the button used to expand all settings groups</comment>
-  </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>Settings</value>
     <comment>The title of the settings view</comment>
@@ -852,10 +840,6 @@ Cancel All Running</value>
     <value>Install</value>
     <comment>The menu to install app packages</comment>
   </data>
-  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>Copy To Temp</value>
-    <comment>The menu used to copy selected APK files to the temp drive</comment>
-  </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>Clear Command Log</value>
     <comment>The button used to clear the command log</comment>
@@ -984,10 +968,6 @@ Cancel All Running</value>
     <value>Package ID</value>
     <comment>Details pane label for the Android package name (application id)</comment>
   </data>
-  <data name="S_APP_NAME" xml:space="preserve">
-    <value>App Name</value>
-    <comment>Details pane label for the localized application label when available</comment>
-  </data>
   <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
     <value>ADB Server Unresponsive</value>
     <comment>The notification displayed when the server is unresponsive</comment>
@@ -999,14 +979,6 @@ Cancel All Running</value>
   <data name="S_SECONDS_SHORT" xml:space="preserve">
     <value>{0}s</value>
     <comment>Seconds display (eg. 6s)</comment>
-  </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>Kill Server</value>
-    <comment>The content of a button to kill ADB server</comment>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>Kill Process</value>
-    <comment>The content of a button to kill the process of ADB</comment>
   </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>Refresh Devices</value>
@@ -1043,10 +1015,6 @@ Cancel All Running</value>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Limited Support</value>
     <comment>The tooltip displayed for too low Android versions</comment>
-  </data>
-  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
-    <value>Some operations have failed</value>
-    <comment>The tooltip displayed when some file operations have failed</comment>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
     <value>Root Access Enabled</value>
@@ -1282,10 +1250,6 @@ Cancel All Running</value>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>Temp</value>
     <comment>The user space temp drive - /data/local/tmp</comment>
-  </data>
-  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>File name illegal on target file system: {0}</value>
-    <comment>0 = file name</comment>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>Content mismatch</value>
@@ -1673,10 +1637,6 @@ Please help us localize the app to your language on Weblate.</value>
     <value>{0} GB</value>
     <comment>The notation for GigaBytes when displaying file size or drive usage</comment>
   </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-    <comment>The notation for TeraBytes when displaying file size or drive usage</comment>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
     <comment>milli. Used for units like Ampere in battery current</comment>
@@ -1828,10 +1788,6 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>Persist Thumbnails Between Sessions</value>
     <comment>The setting used allow saving thumbnails locally from one app session to another</comment>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>Limit Thumbnails Pull Speed</value>
-    <comment>The setting used to limit the speed at which thumbnails are pulled in bulk from the device</comment>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>Show Icons For Special Folders</value>

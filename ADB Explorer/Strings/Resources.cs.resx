@@ -342,10 +342,6 @@ Z licenčních důvodů bohužel nemůžeme ADB přibalit k aplikaci.</value>
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>Zvolte cíl pro více položek</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>Budou odstraněny tyto položky:
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>Natrvalo budou odstraněny tyto položky:
 {0}</value>
@@ -608,14 +604,6 @@ Zvolte Vlastní, chcete-li použít umístění, které se při odinstalování 
     <value>Vyhledávací zobrazení</value>
     <comment>The tooltip of the button used to show the settings search textbox</comment>
   </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>Sbalit vše</value>
-    <comment>The tooltip of the button used to collapse all settings groups</comment>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>Rozbalit vše</value>
-    <comment>The tooltip of the button used to expand all settings groups</comment>
-  </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>Nastavení</value>
   </data>
@@ -729,9 +717,6 @@ Zrušit všechny probíhající operace</value>
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>Nainstalovat</value>
   </data>
-  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>Uložit do složky Temp</value>
-  </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>Vymazat protokol příkazů</value>
     <comment>The button used to clear the command log</comment>
@@ -837,14 +822,6 @@ Zrušit všechny probíhající operace</value>
   <data name="S_SECONDS_SHORT" xml:space="preserve">
     <value>{0} s</value>
   </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>Ukončit server</value>
-    <comment>The content of a button to kill ADB server</comment>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>Ukončit proces</value>
-    <comment>The content of a button to kill the process of ADB</comment>
-  </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>Obnovit zařízení</value>
     <comment>The tooltip of a button to manually refresh the device list</comment>
@@ -874,9 +851,6 @@ Zrušit všechny probíhající operace</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Omezená podpora</value>
-  </data>
-  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
-    <value>Některé operace selhaly</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
     <value>Přístup root je povolen</value>
@@ -1085,10 +1059,6 @@ Zrušit všechny probíhající operace</value>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>Dočasné soubory</value>
-  </data>
-  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>Název souboru není v cílovém systému souborů povolen: {0}</value>
-    <comment>0 = file name</comment>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>Neshoda obsahu</value>
@@ -1434,10 +1404,6 @@ Pomozte nám prosím lokalizovat aplikaci do svého jazyka na Weblate.</value>
     <value>{0} GB</value>
     <comment>The notation for GigaBytes when displaying file size or drive usage</comment>
   </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-    <comment>The notation for TeraBytes when displaying file size or drive usage</comment>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
     <comment>The notation for milli (Ampere) when displaying battery usage</comment>
@@ -1581,10 +1547,6 @@ Pomozte nám prosím lokalizovat aplikaci do svého jazyka na Weblate.</value>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>Zachovat náhledy mezi relacemi</value>
     <comment>The setting used allow saving thumbnails locally from one app session to another</comment>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>Omezit rychlost stahování náhledů</value>
-    <comment>The setting used to limit the speed at which thumbnails are pulled in bulk from the device</comment>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>Zobrazovat ikony zvláštních složek</value>
@@ -2010,9 +1972,6 @@ Kontroly se snaží zabránit tomu, aby nic netušící uživatel spustil potenc
   </data>
   <data name="S_PACKAGE_ID" xml:space="preserve">
     <value>ID balíčku</value>
-  </data>
-  <data name="S_APP_NAME" xml:space="preserve">
-    <value>Název aplikace</value>
   </data>
   <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
     <value>Načítání ikon aplikací</value>

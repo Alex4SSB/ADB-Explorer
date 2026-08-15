@@ -338,10 +338,6 @@ Niestety, ze względu na ograniczenia licencyjne nie możemy udostępnić ADB wr
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>Wybierz miejsce docelowe dla wielu plików</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>Następujące dane zostaną usunięte:
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>Następujące dane zostaną trwale usunięte:
 {0}</value>
@@ -566,12 +562,6 @@ Zaznacz Niestandardową lokalizacje która nie będzie usunięta podczas dezinst
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>Widok wyszukiwania</value>
   </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>Zwiń wszystko</value>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>Rozwiń wszystko</value>
-  </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>Ustawienia</value>
   </data>
@@ -675,9 +665,6 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>Zainstaluj</value>
   </data>
-  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>Kopiuj do tymczasowego</value>
-  </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>Wyczyść dziennik logów</value>
   </data>
@@ -780,12 +767,6 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_SECONDS_SHORT" xml:space="preserve">
     <value>{0}s</value>
   </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>Zabij serwer</value>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>Zabij proces</value>
-  </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>Odśwież urządzenia</value>
   </data>
@@ -812,9 +793,6 @@ Anuluj wszystkie uruchomione</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Ograniczone wsparcie</value>
-  </data>
-  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
-    <value>Niektóre operacje zakończyły się niepowodzeniem</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
     <value>Dostęp Root włączony</value>
@@ -983,9 +961,6 @@ Anuluj wszystkie uruchomione</value>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>Podręczny</value>
-  </data>
-  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>Nazwa pliku jest nieprawidłowa w docelowym systemie plików: {0}</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>Niezgodność treści</value>
@@ -1268,9 +1243,6 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   <data name="GIGA" xml:space="preserve">
     <value>{0} GB</value>
   </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
   </data>
@@ -1387,9 +1359,6 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>Utrzymuj miniatury między sesjami</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>Ogranicz prędkość pobierania miniatur</value>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>Pokaż ikony dla specjalnych folderów</value>

@@ -378,15 +378,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to App Name.
-        /// </summary>
-        public static string S_APP_NAME {
-            get {
-                return ResourceManager.GetString("S_APP_NAME", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Archive contents can be modified.
         /// </summary>
         public static string S_ARCHIVE_CAN_MODIFY {
@@ -901,15 +892,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Collapse All.
-        /// </summary>
-        public static string S_COLLAPSE_ALL {
-            get {
-                return ResourceManager.GetString("S_COLLAPSE_ALL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Blue.
         /// </summary>
         public static string S_COLOR_BLUE {
@@ -1275,16 +1257,6 @@ namespace ADB_Explorer.Strings {
         public static string S_DELETE_ACTION {
             get {
                 return ResourceManager.GetString("S_DELETE_ACTION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The following will be deleted:
-        ///{0}.
-        /// </summary>
-        public static string S_DELETE_CONFIRMATION {
-            get {
-                return ResourceManager.GetString("S_DELETE_CONFIRMATION", resourceCulture);
             }
         }
         
@@ -1787,29 +1759,11 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expand All.
-        /// </summary>
-        public static string S_EXPAND_ALL {
-            get {
-                return ResourceManager.GetString("S_EXPAND_ALL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Connection Error.
         /// </summary>
         public static string S_FAILED_CONN_TITLE {
             get {
                 return ResourceManager.GetString("S_FAILED_CONN_TITLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Some operations have failed.
-        /// </summary>
-        public static string S_FAILED_OPERATIONS {
-            get {
-                return ResourceManager.GetString("S_FAILED_OPERATIONS", resourceCulture);
             }
         }
         
@@ -2286,24 +2240,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Kill Process.
-        /// </summary>
-        public static string S_KILL_PROCESS {
-            get {
-                return ResourceManager.GetString("S_KILL_PROCESS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Kill Server.
-        /// </summary>
-        public static string S_KILL_SERVER {
-            get {
-                return ResourceManager.GetString("S_KILL_SERVER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to {0} (Link).
         /// </summary>
         public static string S_KNOWN_TYPE_LINK {
@@ -2465,15 +2401,6 @@ namespace ADB_Explorer.Strings {
         public static string S_MENU_COPY_LINK {
             get {
                 return ResourceManager.GetString("S_MENU_COPY_LINK", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Copy To Temp.
-        /// </summary>
-        public static string S_MENU_COPY_TEMP {
-            get {
-                return ResourceManager.GetString("S_MENU_COPY_TEMP", resourceCulture);
             }
         }
         
@@ -2735,15 +2662,6 @@ namespace ADB_Explorer.Strings {
         public static string S_MOUNT_POINT {
             get {
                 return ResourceManager.GetString("S_MOUNT_POINT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to File name illegal on target file system: {0}.
-        /// </summary>
-        public static string S_NAME_ILLEGAL_FS {
-            get {
-                return ResourceManager.GetString("S_NAME_ILLEGAL_FS", resourceCulture);
             }
         }
         
@@ -4338,15 +4256,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Limit Thumbnails Pull Speed.
-        /// </summary>
-        public static string S_SETTINGS_THUMBS_THROTTLE {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_THUMBS_THROTTLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Settings.
         /// </summary>
         public static string S_SETTINGS_TITLE {
@@ -4988,13 +4897,5 @@ namespace ADB_Explorer.Strings {
             }
         }
         
-        /// <summary>
-        ///   Looks up a localized string similar to {0} TB.
-        /// </summary>
-        public static string TERA {
-            get {
-                return ResourceManager.GetString("TERA", resourceCulture);
-            }
-        }
     }
 }

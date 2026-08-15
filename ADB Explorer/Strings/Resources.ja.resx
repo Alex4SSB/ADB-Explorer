@@ -319,10 +319,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>複数項目の保存先を選択</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>以下が削除されます:
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>以下は完全に削除されます:
 {0}</value>
@@ -523,12 +519,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>検索を表示</value>
   </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>すべて折りたたむ</value>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>すべて展開</value>
-  </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>設定</value>
   </data>
@@ -632,9 +622,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>インストール</value>
   </data>
-  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>一時ドライブにコピー</value>
-  </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>コマンドログをクリアする</value>
   </data>
@@ -737,12 +724,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   <data name="S_SECONDS_SHORT" xml:space="preserve">
     <value>{0}秒</value>
   </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>サーバーを強制終了</value>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>プロセスを強制終了</value>
-  </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>デバイス一覧の更新</value>
   </data>
@@ -769,9 +750,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>限定的なサポート</value>
-  </data>
-  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
-    <value>いくつかの操作が失敗しました</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
     <value>root権限が有効</value>
@@ -949,9 +927,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>一時ディレクトリ</value>
-  </data>
-  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>ファイル名はターゲット ファイル システムでは無効です: {0}</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>コンテンツの不一致</value>
@@ -1227,9 +1202,6 @@ Weblate でアプリをあなたの言語にローカライズできるよう、
   </data>
   <data name="GIGA" xml:space="preserve">
     <value>{0} GB</value>
-  </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
   </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>

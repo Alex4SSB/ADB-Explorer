@@ -319,10 +319,6 @@ Sayangnya, kami tidak dapat menyediakan ADB bersama aplikasi ini karena pembatas
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>Pilih tujuan untuk beberapa item</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>Berikut akan dihapus:
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>Berikut akan dihapus secara permanen:
 {0}</value>
@@ -532,12 +528,6 @@ Konten yang terlihat mungkin tidak lengkap.</value>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>Tampilan Pencarian</value>
   </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>Ciutkan Semua</value>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>Luaskan Semua</value>
-  </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>Pengaturan</value>
   </data>
@@ -641,9 +631,6 @@ Batalkan Semua yang Sedang Berjalan</value>
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>Instal</value>
   </data>
-  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>Salin ke Temp</value>
-  </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>Bersihkan Log Perintah</value>
   </data>
@@ -746,12 +733,6 @@ Batalkan Semua yang Sedang Berjalan</value>
   <data name="S_SECONDS_SHORT" xml:space="preserve">
     <value>{0}d</value>
   </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>Matikan Server</value>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>Matikan Proses</value>
-  </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>Segarkan Perangkat</value>
   </data>
@@ -778,9 +759,6 @@ Batalkan Semua yang Sedang Berjalan</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Dukungan Terbatas</value>
-  </data>
-  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
-    <value>Beberapa operasi gagal</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
     <value>Akses Root Aktif</value>
@@ -949,9 +927,6 @@ Batalkan Semua yang Sedang Berjalan</value>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>Temp</value>
-  </data>
-  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>Nama file tidak valid pada sistem file tujuan: {0}</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>Konten tidak cocok</value>
@@ -1228,9 +1203,6 @@ Bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
   <data name="GIGA" xml:space="preserve">
     <value>{0} GB</value>
   </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
   </data>
@@ -1347,9 +1319,6 @@ Bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>Pertahankan Thumbnail Antar Sesi</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>Batasi Kecepatan Pengambilan Thumbnail</value>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>Tampilkan Ikon untuk Folder Khusus</value>

@@ -338,10 +338,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>בחר יעד למספר פריטים</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>הנ"ל יימחק:
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>הנ"ל יימחק לצמיתות:
 {0}</value>
@@ -573,12 +569,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>תצוגת חיפוש</value>
   </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>כווץ הכל</value>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>הרחב הכל</value>
-  </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>הגדרות</value>
   </data>
@@ -682,9 +672,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>התקן</value>
   </data>
-  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>העתק ל Temp</value>
-  </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>נקה את יומן הפקודות</value>
   </data>
@@ -787,12 +774,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_SECONDS_SHORT" xml:space="preserve">
     <value>{0}שנ'</value>
   </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>הרוג את השרת</value>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>הרוג את התהליך</value>
-  </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>רענן מכשירים</value>
   </data>
@@ -819,9 +800,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>תמיכה חלקית</value>
-  </data>
-  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
-    <value>פעולות מסויימות נכשלו</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
     <value>גישת Root מאופשרת</value>
@@ -999,9 +977,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>כונן Temp</value>
-  </data>
-  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>שם קובץ לא חוקי במערכת הקבצים ביעד: {0}</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>שוני בתוכן</value>
@@ -1293,9 +1268,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="GIGA" xml:space="preserve">
     <value>‎{0} GB</value>
   </data>
-  <data name="TERA" xml:space="preserve">
-    <value>‎{0} TB</value>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
   </data>
@@ -1412,9 +1384,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>שמירת תמונות ממוזערות לשימוש חוזר</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>הגבלת מהירות בהורדת תמונות ממוזערות</value>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>הצגת סמלים לתיקיות מיוחדות</value>
@@ -1762,9 +1731,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_PACKAGE_ID" xml:space="preserve">
     <value>ID חבילה</value>
-  </data>
-  <data name="S_APP_NAME" xml:space="preserve">
-    <value>שם אפליקציה</value>
   </data>
   <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
     <value>טוען סמלי אפליקציות</value>

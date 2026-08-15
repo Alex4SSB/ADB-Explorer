@@ -319,10 +319,6 @@ Tyvärr kan vi inte tillhandahålla ADB med appen på grund av licensbegränsnin
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>Välj destination för flera objekt</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>Följande raderas:
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>Följande raderas permanent:
 {0}</value>
@@ -523,12 +519,6 @@ Synligt innehåll kan vara ofullständigt.</value>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>Sök vy</value>
   </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>Kollapsa alla</value>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>Expandera alla</value>
-  </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>Inställningar</value>
   </data>
@@ -632,9 +622,6 @@ Avbryt alla aktiva</value>
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>Installera</value>
   </data>
-  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>Kopiera till Temp</value>
-  </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>Rensa kommandologg</value>
   </data>
@@ -737,12 +724,6 @@ Avbryt alla aktiva</value>
   <data name="S_SECONDS_SHORT" xml:space="preserve">
     <value>{0}s</value>
   </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>Döda server</value>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>Döda process</value>
-  </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>Uppdatera enheter</value>
   </data>
@@ -769,9 +750,6 @@ Avbryt alla aktiva</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Begränsad support</value>
-  </data>
-  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
-    <value>Vissa operationer har misslyckats</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
     <value>Root-åtkomst aktiverat</value>
@@ -943,9 +921,6 @@ Avbryt alla aktiva</value>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>Temp</value>
-  </data>
-  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>Filnamnet är inte tillåtet på målfilsystem: {0}</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>Innehåll överensstämmer inte</value>
@@ -1222,9 +1197,6 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
   <data name="GIGA" xml:space="preserve">
     <value>{0} GB</value>
   </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
   </data>
@@ -1341,9 +1313,6 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>Spara miniatyrbilder mellan sessioner</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>Begränsa miniatyrers hastighet vid dragning</value>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>Visa ikoner för speciella mappar</value>

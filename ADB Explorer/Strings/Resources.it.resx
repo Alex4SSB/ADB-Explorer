@@ -319,10 +319,6 @@ Purtroppo, non possiamo fornire ADB con l'applicazione a delle restrizioni della
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>Seleziona la destinazione per gli elementi</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>Verranno eliminati i seguenti elementi:
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>Verranno eliminati definitivamente i seguenti elementi:
 {0}</value>
@@ -523,12 +519,6 @@ Il contenuto che vedi potrebbe essere incompleto.</value>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>Cerca</value>
   </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>Comprimi tutto</value>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>Espandi tutto</value>
-  </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>Impostazioni</value>
   </data>
@@ -632,9 +622,6 @@ Annulla tutte le operazioni in corso</value>
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>Installa</value>
   </data>
-  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>Copia nella cartella temporanea</value>
-  </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>Pulisci il log dei comandi</value>
   </data>
@@ -737,12 +724,6 @@ Annulla tutte le operazioni in corso</value>
   <data name="S_SECONDS_SHORT" xml:space="preserve">
     <value>{0}s</value>
   </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>Forza chiusura</value>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>Forza chiusura del processo</value>
-  </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>Aggiorna la lista</value>
   </data>
@@ -769,9 +750,6 @@ Annulla tutte le operazioni in corso</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Supporto limitato</value>
-  </data>
-  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
-    <value>Alcune operazioni sono fallite</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
     <value>Accesso root abilitato</value>
@@ -949,9 +927,6 @@ Annulla tutte le operazioni in corso</value>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>Cartella temporanea</value>
-  </data>
-  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>Il nome {0} non è consentito sul file system di destinazione</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>Il contenuto non corrisponde</value>
@@ -1228,9 +1203,6 @@ Aiutaci a localizzare l'app nella vostra lingua su Weblate.</value>
   <data name="GIGA" xml:space="preserve">
     <value>{0} GB</value>
   </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
   </data>
@@ -1344,9 +1316,6 @@ Aiutaci a localizzare l'app nella vostra lingua su Weblate.</value>
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>Conserva le miniature tra sessioni</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>Limita velocità di estrazione delle miniature</value>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>Mostra icone per cartelle speciali</value>

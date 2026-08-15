@@ -338,10 +338,6 @@ Desafortunadamente, no podemos proporcionar ADB son la app debido a restriccione
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
     <value>Seleccionar destino para múltiples elementos</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>Lo siguiente será eliminado:
-{0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>Lo siguiente será eliminado permanentemente:
 {0}</value>
@@ -573,12 +569,6 @@ Seleccione Personalizada para usar una ubicación que no se eliminará al desins
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>Buscar Vista</value>
   </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>Colapsar Todo</value>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>Expandir Todo</value>
-  </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>Ajustes</value>
   </data>
@@ -682,9 +672,6 @@ Cancelar Todas las Activas</value>
   <data name="S_MENU_INSTALL" xml:space="preserve">
     <value>Instalar</value>
   </data>
-  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>Copiar al temporal</value>
-  </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>Vaciar bitácora de instrucción</value>
   </data>
@@ -787,12 +774,6 @@ Cancelar Todas las Activas</value>
   <data name="S_SECONDS_SHORT" xml:space="preserve">
     <value>{0}s</value>
   </data>
-  <data name="S_KILL_SERVER" xml:space="preserve">
-    <value>Matar Servidor</value>
-  </data>
-  <data name="S_KILL_PROCESS" xml:space="preserve">
-    <value>Matar Proceso</value>
-  </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>Refrescar Dispositivos</value>
   </data>
@@ -819,9 +800,6 @@ Cancelar Todas las Activas</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Mantenimiento Limitado</value>
-  </data>
-  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
-    <value>Algunas operaciones han fallado</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
     <value>Acceso Root Habilitado</value>
@@ -999,9 +977,6 @@ Cancelar Todas las Activas</value>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>Temporal</value>
-  </data>
-  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
-    <value>Nombre de archivo ilegal en el sistema de archivo destino: {0}</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>El contenido no coincide</value>
@@ -1293,9 +1268,6 @@ Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
   <data name="GIGA" xml:space="preserve">
     <value>{0} GB</value>
   </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
   </data>
@@ -1412,9 +1384,6 @@ Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
     <value>Miniaturas Persistentes Entre Sesiones</value>
-  </data>
-  <data name="S_SETTINGS_THUMBS_THROTTLE" xml:space="preserve">
-    <value>Velocidad Limite de Subida de Miniaturas</value>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
     <value>Mostrar Iconos Para Carpetas Especiales</value>

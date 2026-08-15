@@ -739,10 +739,6 @@
   <data name="GIGA" xml:space="preserve">
     <value>{0} جيجابايت</value>
   </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-    <comment>The notation for TeraBytes when displaying file size or drive usage</comment>
-  </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
     <comment>The notation for milli (Ampere) when displaying battery usage</comment>

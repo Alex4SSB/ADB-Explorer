@@ -190,9 +190,6 @@
   <data name="S_BUTTON_CLOSE" xml:space="preserve">
     <value>Đóng</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>The following will be deleted: {0}</value>
-  </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>The following will be permanently deleted: {0}</value>
   </data>
@@ -393,9 +390,6 @@
   </data>
   <data name="GIGA" xml:space="preserve">
     <value>{0} GB</value>
-  </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
   </data>
   <data name="MILLI" xml:space="preserve">
     <value>m</value>
