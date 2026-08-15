@@ -85,14 +85,15 @@ public partial class SearchOptionsControl : UserControl
         {
             Info = info;
             Name = name;
+            Mode = mode;
             Icon = SearchBoxModeIcons[mode];
-            Action = new(IsSearchAllowed, () => Data.Settings.SearchBox = mode);
+            Action = new(IsModeAllowed, () => Data.Settings.SearchBox = mode);
 
             Data.Settings.PropertyChanged += (_, e) =>
             {
                 if (e.PropertyName == nameof(AppSettings.SearchBox))
                 {
-                    IsChecked = IsSearchAllowed()
+                    IsChecked = IsModeAllowed()
                         ? Data.Settings.SearchBox == mode
                         : mode == SearchBox.SearchBoxMode.CurrentFolder;
                 }
@@ -102,17 +103,30 @@ public partial class SearchOptionsControl : UserControl
             {
                 if (e.PropertyName is nameof(FileActionsEnable.IsAppDrive) or nameof(FileActionsEnable.IsRecycleBin))
                 {
-                    IsChecked = IsSearchAllowed()
+                    IsChecked = IsModeAllowed()
                         ? Data.Settings.SearchBox == mode
                         : mode == SearchBox.SearchBoxMode.CurrentFolder;
+                    CommandManager.InvalidateRequerySuggested();
                 }
             };
 
-            IsChecked = IsSearchAllowed()
+            IsChecked = IsModeAllowed()
                 ? Data.Settings.SearchBox == mode
                 : mode == SearchBox.SearchBoxMode.CurrentFolder;
         }
 
-        private static bool IsSearchAllowed() => !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive;
+        private bool IsModeAllowed()
+        {
+            if (Data.FileActions.IsRecycleBin)
+                return false;
+
+            // App list is flat — recursive subfolder search does not apply.
+            if (Data.FileActions.IsAppDrive)
+                return Mode == SearchBox.SearchBoxMode.CurrentFolder;
+
+            return true;
+        }
+
+        private SearchBox.SearchBoxMode Mode { get; }
     }
 }

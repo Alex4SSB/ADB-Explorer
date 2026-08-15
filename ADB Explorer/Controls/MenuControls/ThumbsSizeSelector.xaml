@@ -22,7 +22,7 @@
         <local:AdbMenu.Style>
             <Style BasedOn="{StaticResource AdbMenuStyle}" TargetType="local:AdbMenu">
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDriveThumbsLocked}" Value="True">
                         <Setter Property="IsEnabled" Value="False" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">

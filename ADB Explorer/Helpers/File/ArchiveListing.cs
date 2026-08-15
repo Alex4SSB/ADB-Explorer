@@ -146,6 +146,57 @@ public static class ArchiveListing
     public static ArchiveToc GetOrFetchToc(string deviceId, string archivePath, CancellationToken cancellationToken)
         => TocCache.GetOrAdd(archivePath, key => FetchTableOfContents(deviceId, key, cancellationToken));
 
+    /// <summary>
+    /// Lists only the named zip members via <c>unzip -lv archive member…</c>
+    /// (avoids dumping the full central directory for large APKs).
+    /// Missing members are simply omitted from the result.
+    /// </summary>
+    public static IReadOnlyList<ArchiveEntry> FetchZipMemberListing(
+        string deviceId,
+        string archivePath,
+        IReadOnlyList<string> members,
+        CancellationToken cancellationToken = default)
+    {
+        if (members is null || members.Count == 0)
+            return [];
+
+        if (ArchiveHelper.GetFamily(archivePath) is not ArchiveFamily.Zip)
+            return [];
+
+#if DEBUG
+        ApkIconService.MarkLoadStep(
+            $"FetchZipMemberListing start ({members.Count}): {string.Join(',', members)}");
+        var sw = Stopwatch.StartNew();
+#endif
+
+        var unzip = ShellCommands.TranslateCommand("unzip");
+        var args = new List<string>
+        {
+            "-lv",
+            ADBService.EscapeAdbShellString(archivePath),
+        };
+        foreach (var member in members)
+        {
+            var normalized = ArchivePath.NormalizeInternal(member);
+            if (!string.IsNullOrEmpty(normalized))
+                args.Add(ADBService.EscapeAdbShellString(normalized));
+        }
+
+        if (args.Count < 3)
+            return [];
+
+        // Non-zero exit is common when some named members are absent — still parse stdout.
+        _ = ADBService.ExecuteDeviceAdbShellCommand(
+            deviceId, unzip, out var stdout, out _, cancellationToken, [.. args]);
+
+        var entries = ParseZip(stdout).Entries;
+#if DEBUG
+        ApkIconService.MarkLoadStep(
+            $"FetchZipMemberListing parse done ({entries.Count} hits, stdout={stdout.Length}B, {sw.ElapsedMilliseconds}ms)");
+#endif
+        return entries;
+    }
+
     public static void InvalidateToc(string archivePath)
         => TocCache.TryRemove(archivePath, out _);
 

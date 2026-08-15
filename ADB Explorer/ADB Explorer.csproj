@@ -48,11 +48,13 @@
 
   <ItemGroup>
     <PackageReference Include="AdvancedSharpAdbClient" Version="3.6.16" />
+    <PackageReference Include="AlphaOmega.ApkReader" Version="2.0.10" />
     <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
     <PackageReference Include="Emoji.Wpf" Version="0.3.4" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="QRCoder.Xaml" Version="1.8.0" />
+    <PackageReference Include="SkiaSharp" Version="4.151.1" />
     <PackageReference Include="System.IO.Hashing" Version="10.0.0" />
     <PackageReference Include="System.Management" Version="10.0.9" />
     <PackageReference Include="Vanara.Windows.Shell.Common" Version="5.0.5" />
@@ -172,9 +174,7 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="AuthenticodeSignDeploy"
-          AfterTargets="Build"
-          Condition="'$(Configuration)' == 'Deploy'">
+  <Target Name="AuthenticodeSignDeploy" AfterTargets="Build" Condition="'$(Configuration)' == 'Deploy'">
     <PropertyGroup>
       <!-- TargetPath is the managed DLL; sign the apphost exe instead -->
       <_SignTarget>$(TargetDir)$(TargetName).exe</_SignTarget>

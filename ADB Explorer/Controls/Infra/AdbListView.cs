@@ -57,6 +57,8 @@ public class AdbListView : Wpf.Ui.Controls.ListView
 
     public int ItemsInView => WrapPanel?.ItemsInView ?? 0;
 
+    public Wpf.Ui.Controls.ItemRange VisibleRange => WrapPanel?.VisibleRange ?? default;
+
     private void GridListView_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
         var offset = ScrollViewer.VerticalOffset - Math.Sign(e.Delta) * ItemHeight;

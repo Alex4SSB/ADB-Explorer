@@ -4,6 +4,13 @@ namespace ADB_Explorer.Controls;
 
 public class AdbVirtualizingWrapPanel : Wpf.Ui.Controls.VirtualizingWrapPanel
 {
+    /// <summary>
+    /// Reserved strip on the right so icons are not laid out under / flush against the scrollbar.
+    /// Must be applied in both measure and arrange — measure-only gutters are redistributed as
+    /// <see cref="Wpf.Ui.Controls.SpacingMode"/> spacing and the rightmost icons move back to the edge.
+    /// </summary>
+    private static double ScrollbarGutter => Math.Max(12, SystemParameters.VerticalScrollBarWidth);
+
     public new Size ChildSize => base.ChildSize;
 
     public new int ItemsPerRowCount => base.ItemsPerRowCount;
@@ -13,13 +20,28 @@ public class AdbVirtualizingWrapPanel : Wpf.Ui.Controls.VirtualizingWrapPanel
     private CancellationTokenSource? _placeholderCts;
     private int _earliestPlaceholderIndex = -1;
     private double _viewportHeight;
+    private Wpf.Ui.Controls.ItemRange _visibleRange;
 
     public int ItemsInView => ChildSize.Height > 0 && ItemsPerRowCount > 0
         ? (int)Math.Ceiling(_viewportHeight / ChildSize.Height) * ItemsPerRowCount
         : 0;
 
+    /// <summary>Last realized item index range from virtualization (visible + cache buffer).</summary>
+    public Wpf.Ui.Controls.ItemRange VisibleRange => _visibleRange;
+
+    private static Size ShrinkWidthForScrollbar(Size size)
+    {
+        var gutter = ScrollbarGutter;
+        if (double.IsInfinity(size.Width) || size.Width <= gutter * 2)
+            return size;
+
+        return new Size(Math.Max(0, size.Width - gutter), size.Height);
+    }
+
     protected override Size MeasureOverride(Size availableSize)
     {
+        availableSize = ShrinkWidthForScrollbar(availableSize);
+
         _viewportHeight = availableSize.Height;
         var result = base.MeasureOverride(availableSize);
 
@@ -32,9 +54,17 @@ public class AdbVirtualizingWrapPanel : Wpf.Ui.Controls.VirtualizingWrapPanel
         return result;
     }
 
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        // Keep the gutter out of spacing math so Uniform / BetweenItemsOnly cannot eat it.
+        base.ArrangeOverride(ShrinkWidthForScrollbar(finalSize));
+        return finalSize;
+    }
+
     protected override Wpf.Ui.Controls.ItemRange UpdateItemRange()
     {
         var range = base.UpdateItemRange();
+        _visibleRange = range;
 
         // Reset tracking when the items collection changes (e.g. navigation to a new folder).
         if (Items.Count != _prevItemsCount)

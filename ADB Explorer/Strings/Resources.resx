@@ -980,6 +980,14 @@ Cancel All Running</value>
     <value>Version</value>
     <comment>App view data grid column name for the installed package version</comment>
   </data>
+  <data name="S_PACKAGE_ID" xml:space="preserve">
+    <value>Package ID</value>
+    <comment>Details pane label for the Android package name (application id)</comment>
+  </data>
+  <data name="S_APP_NAME" xml:space="preserve">
+    <value>App Name</value>
+    <comment>Details pane label for the localized application label when available</comment>
+  </data>
   <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
     <value>ADB Server Unresponsive</value>
     <comment>The notification displayed when the server is unresponsive</comment>
@@ -1884,6 +1892,10 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_STRING_PASTE" xml:space="preserve">
     <value>Paste</value>
     <comment>As in "Paste the copied string"</comment>
+  </data>
+  <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
+    <value>Loading app icons</value>
+    <comment>A hint displayed while APK/package icons are being pulled</comment>
   </data>
   <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
     <value>Checking for thumbnail updates</value>

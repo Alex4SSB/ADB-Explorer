@@ -967,6 +967,7 @@ internal static class FileActionLogic
 
         Data.DeviceCts.Cancel();
         Data.DirList?.Stop();
+        ApkIconService.CancelPending();
     }
 
     public static void RefreshDrives(bool asyncClassify, CancellationToken cancellationToken)
@@ -1110,6 +1111,13 @@ internal static class FileActionLogic
                 }
 
                 Data.FileActions.ListingInProgress = false;
+
+                if (updateExplorer
+                    && Data.FileActions.IsAppDrive
+                    && ApkIconService.IsEnabled)
+                {
+                    ApkIconService.BeginPreloadPackages(Data.Packages);
+                }
             });
         });
     }
@@ -1145,6 +1153,11 @@ internal static class FileActionLogic
             Data.FileActions.IsCutPasteDeleteVisible.Value = true;
             Data.FileActions.IsPullCopyVisible.Value = true;
             Data.FileActions.IsPasteVisible.Value = true;
+
+            Data.FileActions.IsAppDrive = false;
+            Data.FileActions.IsRecycleBin = false;
+            Data.FileActions.IsArchive = false;
+            Data.FileActions.IsTemp = false;
 
             Data.FileActions.ExplorerFilter = "";
 
@@ -1912,8 +1925,9 @@ internal static class FileActionLogic
         }
     }
 
-    public static IEnumerable<FileSyncOperation> SilentPullFiles(LogicalDeviceViewModel device, string target, bool disableParallel, IEnumerable<string> filesToReplace, params IEnumerable<FileClass> pullItems)
+    public static IEnumerable<FileSyncOperation> SilentPullFiles(LogicalDeviceViewModel device, string target, int maxThreads, IEnumerable<string> filesToReplace, params IEnumerable<FileClass> pullItems)
     {
+        maxThreads = Math.Max(1, maxThreads);
         foreach (var item in pullItems)
         {
             if (item.Type is not FileType.Folder)
@@ -1927,8 +1941,7 @@ internal static class FileActionLogic
             if (op is null)
                 continue;
 
-            if (disableParallel)
-                op.MaxThreads = 1;
+            op.MaxThreads = maxThreads;
 
             op.Start();
             yield return op;

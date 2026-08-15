@@ -32,6 +32,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     private bool _suppressSortApply;
 
     private readonly DispatcherTimer _filterDebounceTimer;
+    private readonly DispatcherTimer _packageSortCatchUpTimer;
 
     partial void OnSortDirectionChanged(ListSortDirection? value)
     {
@@ -50,8 +51,20 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         if (SortDirection is not { } dir || SortedColumn is not { } col || ExplorerItemsSource is not { } view)
             return;
 
-        if (Data.FileActions.IsAppDrive || Data.FileActions.WasInAppDrive)
+        // SortExplorer() runs synchronously in _navigateToPath right after FileActions.IsAppDrive
+        // flips for the new location, but ExplorerItemsSource/ExplorerSource are only swapped once
+        // the new location's items (packages or files) actually arrive. Applying Package-only or
+        // File-only SortDescriptions to the stale, mismatched view here would sort the wrong
+        // (soon-to-be-discarded) collection instead of the one about to be shown.
+        var sourceIsPackages = ExplorerSource is IEnumerable<Package>;
+        if (Data.FileActions.IsAppDrive != sourceIsPackages)
             return;
+
+        if (Data.FileActions.IsAppDrive)
+        {
+            ApplyPackageSortToView(view, col, dir);
+            return;
+        }
 
         view.SortDescriptions.Clear();
         view.SortDescriptions.Add(new(nameof(FileClass.IsTemp), ListSortDirection.Descending));
@@ -78,6 +91,119 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
                 Data.Settings.LocationSorting.Add(Data.CurrentPath, new(col, dir));
             }
         }
+    }
+
+    private void ApplyPackageSortToView(ICollectionView view, SortingSelector.SortingProperty col, ListSortDirection dir)
+    {
+        view.SortDescriptions.Clear();
+
+        var sortProp = col switch
+        {
+            SortingSelector.SortingProperty.Type => nameof(Package.Type),
+            SortingSelector.SortingProperty.UserId => nameof(Package.Uid),
+            SortingSelector.SortingProperty.Version => nameof(Package.Version),
+            _ => nameof(Package.DisplayName),
+        };
+
+        view.SortDescriptions.Add(new(sortProp, dir));
+
+        // Secondary name sort (same direction) when the primary column is not name.
+        if (col is not SortingSelector.SortingProperty.Name)
+            view.SortDescriptions.Add(new(nameof(Package.DisplayName), dir));
+
+        // Live-sort on DisplayName so labels arriving later re-order tiles without
+        // ICollectionView.Refresh() (which resets virtualization and blanks all icons).
+        // Paused while APK icons/labels are streaming in — WPF resets ListView selection
+        // whenever a live-sorted collection reorders, which breaks clicking to select.
+        EnablePackageLiveSorting(view);
+
+        PackageTypeColumnSortDirection = col is SortingSelector.SortingProperty.Type ? dir : null;
+
+        if (Data.Settings.SortingPerLocation)
+        {
+            if (Data.Settings.LocationSorting.ContainsKey(Data.CurrentPath))
+                Data.Settings.LocationSorting[Data.CurrentPath] = new(col, dir);
+            else
+                Data.Settings.LocationSorting.Add(Data.CurrentPath, new(col, dir));
+        }
+    }
+
+    private static void EnablePackageLiveSorting(ICollectionView view)
+    {
+        if (view is not ListCollectionView listView || !listView.CanChangeLiveSorting)
+            return;
+
+        if (!listView.LiveSortingProperties.Contains(nameof(Package.DisplayName)))
+            listView.LiveSortingProperties.Add(nameof(Package.DisplayName));
+
+        listView.IsLiveSorting = !ApkIconService.IsLoadInProgress;
+    }
+
+    /// <summary>
+    /// Disables live sorting while the icon/label queue is active (streaming labels would
+    /// reorder mid-click and reset ListView selection). On idle, re-enable live sorting only —
+    /// do not Clear/re-add <see cref="SortDescription"/>s: that refreshes the view, resets
+    /// virtualization, and blanks all but a few tiles (especially when scroll keeps restarting
+    /// the queue). Labels that arrived while paused are caught up via a debounced
+    /// <see cref="DisplayName"/> nudge after the queue stays idle.
+    /// </summary>
+    private void OnApkIconLoadProgressChanged(bool active)
+    {
+        if (!Data.FileActions.IsAppDrive)
+            return;
+
+        App.SafeBeginInvoke(() =>
+        {
+            if (!Data.FileActions.IsAppDrive || ExplorerItemsSource is not { } view)
+                return;
+
+            if (active)
+            {
+                _packageSortCatchUpTimer.Stop();
+                DisablePackageLiveSorting(view);
+                return;
+            }
+
+            EnablePackageLiveSorting(view);
+            _packageSortCatchUpTimer.Stop();
+            _packageSortCatchUpTimer.Start();
+        });
+    }
+
+    private void PackageSortCatchUpTimer_Tick(object? sender, EventArgs e)
+    {
+        _packageSortCatchUpTimer.Stop();
+
+        if (!Data.FileActions.IsAppDrive || ApkIconService.IsLoadInProgress)
+            return;
+        if (ExplorerItemsSource is not ListCollectionView { IsLiveSorting: true })
+            return;
+        if (Data.Packages is not { Count: > 0 } packages)
+            return;
+
+        var selected = packages.Where(static p => p.IsSelected).ToList();
+        var pending = packages.Where(static p => p.NeedsLiveSortCatchUp).ToList();
+        if (pending.Count == 0)
+            return;
+
+        foreach (var pkg in pending)
+            pkg.NotifyDisplayNameForSort();
+
+        if (selected.Count == 0)
+            return;
+
+        foreach (var pkg in packages)
+        {
+            var shouldSelect = selected.Contains(pkg);
+            if (pkg.IsSelected != shouldSelect)
+                pkg.IsSelected = shouldSelect;
+        }
+    }
+
+    private static void DisablePackageLiveSorting(ICollectionView view)
+    {
+        if (view is ListCollectionView { CanChangeLiveSorting: true } listView)
+            listView.IsLiveSorting = false;
     }
 
     public void SetSort(SortingSelector.DirSortingOption sort) => SetSort(sort.Property, sort.Direction);
@@ -107,22 +233,19 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     {
         IsIconView = value is not ThumbnailService.ThumbnailSize.Disabled;
 
-        if (!Data.FileActions.IsAppDrive)
-        {
-            if (Data.Settings.ThumbSizePerLocation)
-            {
-                if (Data.Settings.LocationThumbSize.ContainsKey(Data.CurrentPath))
-                {
-                    Data.Settings.LocationThumbSize[Data.CurrentPath] = value;
-                }
-                else
-                {
-                    Data.Settings.LocationThumbSize.Add(Data.CurrentPath, value);
-                }
-            }
+        // Device without unzip: force details view without clobbering saved sizes.
+        if (Data.FileActions.IsAppDriveThumbsLocked)
+            return;
 
-            Data.RuntimeSettings.ThumbsSize = value;
+        if (Data.Settings.ThumbSizePerLocation)
+        {
+            if (Data.Settings.LocationThumbSize.ContainsKey(Data.CurrentPath))
+                Data.Settings.LocationThumbSize[Data.CurrentPath] = value;
+            else
+                Data.Settings.LocationThumbSize.Add(Data.CurrentPath, value);
         }
+
+        Data.RuntimeSettings.ThumbsSize = value;
     }
 
     public int FirstSelectedIndex { get; set; } = -1;
@@ -198,7 +321,15 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
             _filterDebounceTimer.Stop();
             RefreshExplorerFilter();
         };
+
+        // After icon/label queue idle (+ progress hide debounce), wait a bit longer so scroll
+        // bursts do not thrash live-sort catch-up.
+        _packageSortCatchUpTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(750) };
+        _packageSortCatchUpTimer.Tick += PackageSortCatchUpTimer_Tick;
+
         Data.DevicesObjectCreated += (_, _) => App.SafeInvoke(EnsureDevicesSubscription);
+
+        ApkIconService.IconLoadProgressChanged += OnApkIconLoadProgressChanged;
     }
 
     public Task OnNavigatedToAsync()
@@ -313,7 +444,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
                 break;
 
             case nameof(AppRuntimeSettings.ThumbsSize):
-                IsIconView = !Data.FileActions.IsAppDrive && Data.RuntimeSettings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
+                IsIconView = Data.RuntimeSettings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
                 break;
 
             default:
@@ -403,12 +534,16 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
                     ? FileHelper.PkgFilter()
                     : pkg => ((Package)pkg).Type is Package.PackageType.User;
 
-                if (view.SortDescriptions.All(d => d.PropertyName != nameof(Package.Type)))
-                {
-                    view.SortDescriptions.Add(new(nameof(Package.Type), ListSortDirection.Descending));
-                }
+                // Default: Name, ascending.
+                SortDirection ??= ListSortDirection.Ascending;
+                SortedColumn ??= SortingSelector.SortingProperty.Name;
 
-                PackageTypeColumnSortDirection ??= ListSortDirection.Descending;
+                // Bind first. DataGrid.OnItemsSourceChanged clears SortDescriptions that
+                // don't match a column SortDirection, which used to wipe the sort applied
+                // just before this assignment.
+                ExplorerItemsSource = view;
+                ApplyPackageSortToView(view, SortedColumn.Value, SortDirection.Value);
+                return;
             }
             else
             {
@@ -480,5 +615,76 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
         DriveItemsSource = view;
     }
+
+#if DEBUG
+    [ObservableProperty]
+    public partial string DebugApkLoadStatus { get; set; } = "";
+
+    [RelayCommand]
+    private void StopApkIconLoading()
+    {
+        ApkIconService.StopAllLoading();
+        DebugApkLoadStatus = "Stopped — scroll will not load more icons";
+    }
+
+    [RelayCommand]
+    private void ForceReloadSelectedApkIcon()
+    {
+        var selected = Data.SelectedPackages?.Where(static p => p is not null).ToList() ?? [];
+        if (selected.Count == 0)
+        {
+            DebugApkLoadStatus = "No package selected";
+            return;
+        }
+
+        if (selected.Count == 1)
+        {
+            var package = selected[0];
+            DebugApkLoadStatus = $"Reloading {package.Name}…";
+            ApkIconService.ForceReloadPackage(package, report =>
+            {
+                App.SafeBeginInvoke(() =>
+                {
+                    try { Clipboard.SetText(report); }
+                    catch { /* clipboard busy */ }
+
+                    var totalLine = report.Split('\n')
+                        .LastOrDefault(static l => l.StartsWith("Total:", StringComparison.Ordinal))
+                        ?.Trim();
+                    DebugApkLoadStatus = string.IsNullOrEmpty(totalLine)
+                        ? "Done — timing copied"
+                        : $"{totalLine} — timing copied";
+                });
+            });
+            return;
+        }
+
+        DebugApkLoadStatus = $"Reloading {selected.Count} packages…";
+        var remaining = selected.Count;
+        var reports = new System.Collections.Concurrent.ConcurrentBag<string>();
+        foreach (var package in selected)
+        {
+            ApkIconService.ForceReloadPackage(package, report =>
+            {
+                reports.Add(report);
+                App.SafeBeginInvoke(() =>
+                {
+                    remaining--;
+                    if (remaining > 0)
+                        return;
+
+                    var combined = string.Join("\n---\n", reports);
+                    try { Clipboard.SetText(combined); }
+                    catch { /* clipboard busy */ }
+
+                    DebugApkLoadStatus = $"{selected.Count} packages — timing copied";
+                });
+            });
+        }
+    }
+#else
+    // Bound from XAML (collapsed unless RuntimeSettings.IsDebug); keep members for release builds.
+    public string DebugApkLoadStatus => "";
+#endif
 
 }

@@ -29,6 +29,86 @@
             <TextBlock Text="{Binding IconViewModel.IconViewTooltip}" TextWrapping="Wrap" />
         </ToolTip>
         <DataTemplate x:Key="IconViewPlaceholderTemplate" />
+        <DataTemplate x:Key="IconViewLabelReadOnlyTemplate">
+            <emoji:TextBlock
+                MaxHeight="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=LabelMaxHeight}"
+                FlowDirection="{Binding NameFlowDirection}"
+                Text="{Binding DisplayName}"
+                TextAlignment="Center"
+                TextTrimming="CharacterEllipsis"
+                TextWrapping="Wrap"
+                ToolTip="{x:Null}">
+                <emoji:TextBlock.Style>
+                    <Style TargetType="emoji:TextBlock">
+                        <Setter Property="Opacity" Value="1" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CutState}" Value="Move">
+                                <Setter Property="Opacity" Value="0.5" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding CutState}" Value="Copy">
+                                <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </emoji:TextBlock.Style>
+            </emoji:TextBlock>
+        </DataTemplate>
+        <DataTemplate x:Key="IconViewLabelEditableTemplate">
+            <Grid>
+                <Popup
+                    AllowsTransparency="True"
+                    IsOpen="{Binding IconViewModel.IsInEditMode}"
+                    Placement="Relative"
+                    PlacementTarget="{Binding ElementName=IconLabel}"
+                    StaysOpen="False">
+                    <Popup.Resources>
+                        <converters:ThumbnailSizeConverter x:Key="ThumbnailSizeConverter" />
+                    </Popup.Resources>
+                    <Border Background="{DynamicResource CardStrokeColorDefaultSolidBrush}" CornerRadius="4">
+                        <ui:TextBox
+                            Width="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=EditWidth}"
+                            Padding="1"
+                            ClearButtonEnabled="False"
+                            FlowDirection="{Binding NameFlowDirection}"
+                            FontSize="14"
+                            KeyDown="IconViewNameEdit_KeyDown"
+                            Loaded="IconViewNameEdit_Loaded"
+                            LostFocus="IconViewNameEdit_LostFocus"
+                            Style="{StaticResource FileNameEditingElementStyle}"
+                            TextChanged="IconViewNameEdit_TextChanged"
+                            TextWrapping="Wrap" />
+                    </Border>
+                </Popup>
+                <emoji:TextBlock
+                    x:Name="IconLabel"
+                    MaxHeight="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=LabelMaxHeight}"
+                    FlowDirection="{Binding NameFlowDirection}"
+                    PreviewMouseDown="IconViewNameTextBlock_PreviewMouseDown"
+                    PreviewMouseUp="IconViewNameTextBlock_PreviewMouseUp"
+                    Text="{Binding DisplayName}"
+                    TextAlignment="Center"
+                    TextTrimming="CharacterEllipsis"
+                    TextWrapping="Wrap"
+                    ToolTip="{x:Null}">
+                    <emoji:TextBlock.Style>
+                        <Style TargetType="emoji:TextBlock">
+                            <Setter Property="Opacity" Value="1" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IconViewModel.IsInEditMode}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CutState}" Value="Move">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding CutState}" Value="Copy">
+                                    <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </emoji:TextBlock.Style>
+                </emoji:TextBlock>
+            </Grid>
+        </DataTemplate>
         <DataTemplate x:Key="IconViewRealTemplate">
             <Grid ToolTip="{StaticResource IconViewTooltip}">
                 <Grid.RowDefinitions>
@@ -78,57 +158,18 @@
                     MinWidth="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=EditWidth}"
                     Margin="0,4,0,0"
                     HorizontalAlignment="Center">
-                    <Popup
-                        AllowsTransparency="True"
-                        IsOpen="{Binding IconViewModel.IsInEditMode}"
-                        Placement="Relative"
-                        PlacementTarget="{Binding ElementName=LabelGrid}"
-                        StaysOpen="False">
-                        <Popup.Resources>
-                            <converters:ThumbnailSizeConverter x:Key="ThumbnailSizeConverter" />
-                        </Popup.Resources>
-                        <Border Background="{DynamicResource CardStrokeColorDefaultSolidBrush}" CornerRadius="4">
-                            <ui:TextBox
-                                Width="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=EditWidth}"
-                                Padding="1"
-                                ClearButtonEnabled="False"
-                                FlowDirection="{Binding NameFlowDirection}"
-                                FontSize="14"
-                                KeyDown="IconViewNameEdit_KeyDown"
-                                Loaded="IconViewNameEdit_Loaded"
-                                LostFocus="IconViewNameEdit_LostFocus"
-                                Style="{StaticResource FileNameEditingElementStyle}"
-                                TextChanged="IconViewNameEdit_TextChanged"
-                                TextWrapping="Wrap" />
-                        </Border>
-                    </Popup>
-                    <emoji:TextBlock
-                        MaxHeight="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=LabelMaxHeight}"
-                        FlowDirection="{Binding NameFlowDirection}"
-                        PreviewMouseDown="IconViewNameTextBlock_PreviewMouseDown"
-                        PreviewMouseUp="IconViewNameTextBlock_PreviewMouseUp"
-                        Text="{Binding DisplayName}"
-                        TextAlignment="Center"
-                        TextTrimming="CharacterEllipsis"
-                        TextWrapping="Wrap"
-                        ToolTip="{x:Null}">
-                        <emoji:TextBlock.Style>
-                            <Style TargetType="emoji:TextBlock">
-                                <Setter Property="Opacity" Value="1" />
+                    <ContentControl Content="{Binding}">
+                        <ContentControl.Style>
+                            <Style TargetType="ContentControl">
+                                <Setter Property="ContentTemplate" Value="{StaticResource IconViewLabelReadOnlyTemplate}" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IconViewModel.IsInEditMode}" Value="True">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding CutState}" Value="Move">
-                                        <Setter Property="Opacity" Value="0.5" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding CutState}" Value="Copy">
-                                        <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+                                    <DataTrigger Binding="{Binding SupportsIconRename}" Value="True">
+                                        <Setter Property="ContentTemplate" Value="{StaticResource IconViewLabelEditableTemplate}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </emoji:TextBlock.Style>
-                    </emoji:TextBlock>
+                        </ContentControl.Style>
+                    </ContentControl>
                 </Grid>
             </Grid>
         </DataTemplate>

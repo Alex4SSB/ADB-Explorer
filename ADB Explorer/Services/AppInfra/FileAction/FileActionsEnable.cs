@@ -212,7 +212,7 @@ public partial class FileActionsEnable : ObservableObject
         }
     }
 
-    private bool isAppDrive;
+    private static bool isAppDrive;
     public bool IsAppDrive
     {
         get => isAppDrive;
@@ -223,9 +223,24 @@ public partial class FileActionsEnable : ObservableObject
                 IsNewMenuVisible.Value = !IsExplorerVisible || (!IsRecycleBin && !IsAppDrive && !IsArchive);
                 IsCutPasteDeleteVisible.Value = !value;
                 IsPasteVisible.Value = !value && !IsRecycleBin;
+                OnPropertyChanged(nameof(IsAppDriveThumbsLocked));
             }
         }
     }
+
+    /// <summary>
+    /// App drive locks the thumbs-size control unless the device has <c>unzip</c>
+    /// (required to load package icons for icon view).
+    /// </summary>
+    public bool IsAppDriveThumbsLocked =>
+        IsAppDrive
+        && (Data.DevicesObject?.Current is not { } device || !ShellCommands.UnzipExists(device.ID));
+
+    /// <summary>
+    /// Re-raise <see cref="IsAppDriveThumbsLocked"/> when the open device or its
+    /// <c>unzip</c> probe changes without <see cref="IsAppDrive"/> flipping.
+    /// </summary>
+    public void NotifyAppDriveThumbsLocked() => OnPropertyChanged(nameof(IsAppDriveThumbsLocked));
 
     private bool isArchive;
     public bool IsArchive

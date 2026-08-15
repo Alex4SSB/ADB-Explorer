@@ -64,6 +64,9 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     [ObservableProperty]
     public partial bool IsIconPlaceholder { get; set; }
+
+    /// <summary>Files support F2 / delayed-click rename in icon view; packages do not.</summary>
+    public bool SupportsIconRename => true;
     
     private FileType type;
     public FileType Type
@@ -144,6 +147,22 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         }
     }
 
+    private BitmapSource? _apkIcon;
+    public BitmapSource? ApkIcon => _apkIcon;
+
+    public void ApplyApkIcon(BitmapSource icon)
+    {
+        if (icon is null || ReferenceEquals(_apkIcon, icon))
+            return;
+
+        _apkIcon = icon;
+        GetIcon();
+        OnPropertyChanged(nameof(ApkIcon));
+        OnPropertyChanged(nameof(LargeIcon));
+        OnPropertyChanged(nameof(DragImage));
+        _iconViewModel?.OnApkIconChanged();
+    }
+
     [ObservableProperty]
     public partial BitmapSource? IconOverlay { get; set; } = null;
 
@@ -151,6 +170,10 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     {
         get
         {
+            // Parsed APK launcher icons take priority over shell / thumbnail placeholders.
+            if (ApkIcon is not null)
+                return ApkIcon;
+
             if (Data.Settings.ThumbsMode is not AppSettings.ThumbnailMode.Off
                 && CacheThumbnail?.Image is BitmapSource cached)
                 return cached;
@@ -162,11 +185,12 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     }
 
     public BitmapSource LargeIcon =>
-        Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.Off
+        ApkIcon
+        ?? (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.Off
             ? LargeFileIcon
-            : CacheThumbnail?.Image ?? LargeFileIcon;
+            : CacheThumbnail?.Image ?? LargeFileIcon);
 
-    private BitmapSource LargeFileIcon => FileToIconConverter.GetImage(this, 120).First();
+    private BitmapSource LargeFileIcon => ApkIcon ?? FileToIconConverter.GetImage(this, 120).First();
 
     public ThumbnailService.Thumbnail? CacheThumbnail => ThumbnailService.GetPaneThumbnail(this);
 
@@ -767,6 +791,14 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     public void GetIcon()
     {
+        if (IsApk && ApkIcon is BitmapSource apkIcon)
+        {
+            _icon = apkIcon;
+            OnPropertyChanged(nameof(Icon));
+            IconOverlay = null;
+            return;
+        }
+
         var icons = FileToIconConverter.GetImage(this, 16).ToArray();
 
         if (icons.Length > 0 && icons[0] is BitmapSource icon)

@@ -255,7 +255,6 @@ public static class UISettings
                                    sizes[1],
                                    AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode),
                                    new("\uEE71")),
-                new BoolSetting(() => Settings.LimitThumbsPullSpeed, Strings.Resources.S_SETTINGS_THUMBS_THROTTLE, AbstractSetting.ExtractPropertyInfo(() => Settings.ThumbsMode), new("\uEC48")),
                 new BoolSetting(() => Settings.SpecialFolderIcons, Strings.Resources.S_SETTINGS_SPECIAL_DIR_ICONS, icon: new("\uEC25")),
             ], new("\uE8B9")),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_WORK_DIRS,

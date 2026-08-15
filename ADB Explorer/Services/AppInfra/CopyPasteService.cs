@@ -380,7 +380,12 @@ public partial class CopyPasteService : ObservableObject
         if (sender is null)
         {
             if (Data.FileActions.IsAppDrive)
+            {
+                if (IsSelf)
+                    return DragDropEffects.None;
+
                 return FileHelper.AllFilesAreApks(DragFiles) ? DragDropEffects.Copy : DragDropEffects.None;
+            }
 
             if (CurrentSource.HasFlag(DataSource.Virtual) && !CurrentSource.HasFlag(DataSource.Android))
                 return DragDropEffects.Copy;
@@ -393,6 +398,10 @@ public partial class CopyPasteService : ObservableObject
 
         if (Data.FileActions.IsAppDrive)
         {
+            // App drive drag is pull-to-elsewhere only — never install/move onto itself.
+            if (IsSelf)
+                return DragDropEffects.None;
+
             if (FileHelper.AllFilesAreApks(DragFiles))
                 return DragDropEffects.Copy;
         }
@@ -602,6 +611,10 @@ public partial class CopyPasteService : ObservableObject
     {
         var deviceId = Data.DevicesObject.Current?.ID ?? "";
         if (FileHelper.IsSearchLocation(targetFolder))
+            return;
+
+        // Packages are pulled out of app drive — never dropped back onto it.
+        if (Data.FileActions.IsAppDrive && IsSelf)
             return;
 
         if (!DriveHelper.IsModificationAllowedAt(targetFolder, deviceId))
