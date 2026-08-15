@@ -538,17 +538,12 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
                 SortDirection ??= ListSortDirection.Ascending;
                 SortedColumn ??= SortingSelector.SortingProperty.Name;
 
-                if (!view.SortDescriptions.Any(d => d.PropertyName == nameof(Package.DisplayName)
-                        || d.PropertyName == nameof(Package.Type)
-                        || d.PropertyName == nameof(Package.Uid)
-                        || d.PropertyName == nameof(Package.Version)))
-                {
-                    ApplyPackageSortToView(view, SortedColumn.Value, SortDirection.Value);
-                }
-                else
-                {
-                    EnablePackageLiveSorting(view);
-                }
+                // Bind first. DataGrid.OnItemsSourceChanged clears SortDescriptions that
+                // don't match a column SortDirection, which used to wipe the sort applied
+                // just before this assignment.
+                ExplorerItemsSource = view;
+                ApplyPackageSortToView(view, SortedColumn.Value, SortDirection.Value);
+                return;
             }
             else
             {

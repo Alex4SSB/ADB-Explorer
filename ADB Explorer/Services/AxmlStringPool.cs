@@ -14,8 +14,16 @@ internal static class AxmlStringPool
 
     /// <summary>
     /// When <paramref name="partial"/> looks truncated, returns the longest pool string that starts with it
-    /// (or with a stable leading prefix — AlphaOmega sometimes cuts mid-number so the partial is not an exact prefix).
+    /// (or with a near-prefix — AlphaOmega sometimes cuts mid-number so the partial is not an exact prefix).
     /// </summary>
+    /// <remarks>
+    /// Sibling <c>pathData</c> values often share a short command prefix
+    /// (<c>M70.6,72.7c-</c>, <c>M144.37,60.1</c>). Matching on 12–16 characters
+    /// replaces a complete shorter path with a longer sibling (Phone handset
+    /// body, Pango coral lobe). Only treat the pool string as an expansion when
+    /// it is a true extension of <paramref name="partial"/>, allowing a short
+    /// tail for a mid-token cut.
+    /// </remarks>
     public static string? ExpandTruncated(byte[] axmlBytes, string? partial)
     {
         if (string.IsNullOrEmpty(partial) || axmlBytes.Length < 16)
@@ -27,57 +35,23 @@ internal static class AxmlStringPool
             if (strings.Count == 0)
                 return partial;
 
-            string? best = null;
-            foreach (var s in strings)
+            var exact = LongestStartingWith(strings, partial);
+            if (exact is not null)
+                return exact;
+
+            // Mid-token cut (e.g. "22.543" vs "22.5438"): drop a short tail and
+            // require a stem longer than typical sibling-path shared prefixes.
+            const int maxTail = 24;
+            var minStem = Math.Min(32, partial.Length);
+            for (var tail = 1; tail <= maxTail; tail++)
             {
-                if (s.Length <= partial.Length)
-                    continue;
-                if (!s.StartsWith(partial, StringComparison.Ordinal))
-                    continue;
-                if (best is null || s.Length > best.Length)
-                    best = s;
-            }
+                if (partial.Length - tail < minStem)
+                    break;
 
-            if (best is not null)
-                return best;
-
-            // AlphaOmega may truncate mid-token (e.g. "22.543" vs "22.5438"); match on a leading prefix.
-            // Prefer a longer stable prefix for huge pathData (Play Protect gear, Essential Apps logo).
-            var prefixLen = Math.Min(partial.Length, 64);
-            while (prefixLen >= 12)
-            {
-                var prefix = partial[..prefixLen];
-                foreach (var s in strings)
-                {
-                    if (s.Length <= partial.Length)
-                        continue;
-                    if (!s.StartsWith(prefix, StringComparison.Ordinal))
-                        continue;
-                    if (best is null || s.Length > best.Length)
-                        best = s;
-                }
-
-                if (best is not null)
-                    return best;
-
-                prefixLen -= 4;
-            }
-
-            // Last resort: partial is an interior fragment of the full pool string.
-            if (partial.Length >= 24)
-            {
-                foreach (var s in strings)
-                {
-                    if (s.Length <= partial.Length)
-                        continue;
-                    if (!s.Contains(partial, StringComparison.Ordinal))
-                        continue;
-                    if (best is null || s.Length > best.Length)
-                        best = s;
-                }
-
-                if (best is not null)
-                    return best;
+                var stem = partial[..^tail];
+                var match = LongestStartingWith(strings, stem);
+                if (match is not null)
+                    return match;
             }
 
             return partial;
@@ -86,6 +60,25 @@ internal static class AxmlStringPool
         {
             return partial;
         }
+    }
+
+    private static string? LongestStartingWith(List<string> strings, string prefix)
+    {
+        if (string.IsNullOrEmpty(prefix))
+            return null;
+
+        string? best = null;
+        foreach (var s in strings)
+        {
+            if (s.Length <= prefix.Length)
+                continue;
+            if (!s.StartsWith(prefix, StringComparison.Ordinal))
+                continue;
+            if (best is null || s.Length > best.Length)
+                best = s;
+        }
+
+        return best;
     }
 
     public static List<string> ReadAll(byte[] data)

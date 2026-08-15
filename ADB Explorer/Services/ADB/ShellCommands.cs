@@ -292,6 +292,8 @@ public static class ShellCommands
             Crc32Command = hashProbe.Crc32Command,
             Md5SumCommand = hashProbe.Md5SumCommand,
         };
+
+        NotifyAppDriveThumbsLockIfCurrent(deviceID);
     }
 
     private static void ProbeShellCommands(string deviceID)
@@ -329,6 +331,16 @@ public static class ShellCommands
             Crc32Command = hashProbe.Crc32Command,
             Md5SumCommand = hashProbe.Md5SumCommand,
         };
+
+        NotifyAppDriveThumbsLockIfCurrent(deviceID);
+    }
+
+    private static void NotifyAppDriveThumbsLockIfCurrent(string deviceID)
+    {
+        if (Data.DevicesObject?.Current?.ID != deviceID)
+            return;
+
+        App.SafeBeginInvoke(() => Data.FileActions.NotifyAppDriveThumbsLocked());
     }
 
     private static HashProbeResult ProbeHashCommands(string deviceID, bool busyBoxExists)

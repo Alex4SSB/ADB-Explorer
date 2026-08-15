@@ -609,7 +609,15 @@
                                 FontSize="{Binding Source={StaticResource FontSize}}"
                                 Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_USER_ID}}"
                                 IsReadOnly="True"
-                                Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageColumnVisibility}" />
+                                SortMemberPath="Uid"
+                                Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageColumnVisibility}">
+                                <DataGridTextColumn.SortDirection>
+                                    <MultiBinding Converter="{StaticResource ColumnSortDirectionConverter}" ConverterParameter="UserId">
+                                        <Binding Path="Data.SortDirection" Source="{StaticResource ViewModelProxy}" />
+                                        <Binding Path="Data.SortedColumn" Source="{StaticResource ViewModelProxy}" />
+                                    </MultiBinding>
+                                </DataGridTextColumn.SortDirection>
+                            </DataGridTextColumn>
                             <DataGridTextColumn
                                 x:Name="PackageVersion"
                                 Width="100"
@@ -618,7 +626,15 @@
                                 FontSize="{Binding Source={StaticResource FontSize}}"
                                 Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_VERSION}}"
                                 IsReadOnly="True"
-                                Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageColumnVisibility}" />
+                                SortMemberPath="Version"
+                                Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageColumnVisibility}">
+                                <DataGridTextColumn.SortDirection>
+                                    <MultiBinding Converter="{StaticResource ColumnSortDirectionConverter}" ConverterParameter="Version">
+                                        <Binding Path="Data.SortDirection" Source="{StaticResource ViewModelProxy}" />
+                                        <Binding Path="Data.SortedColumn" Source="{StaticResource ViewModelProxy}" />
+                                    </MultiBinding>
+                                </DataGridTextColumn.SortDirection>
+                            </DataGridTextColumn>
                         </ui:DataGrid.Columns>
                     </ui:DataGrid>
                 </Grid>

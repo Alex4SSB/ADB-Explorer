@@ -413,8 +413,8 @@ public static partial class ThumbnailService
     private static readonly HashSet<string> PendingCustomPulls = [];
     private static readonly Lock PendingCustomPullsLock = new();
     private static readonly Lock ThrottledPullScheduleLock = new();
-    private static readonly Queue<(string PullKey, Action<bool> StartPull)> ThrottledPullQueue = new();
-    private static bool _throttledPullInFlight;
+    private static readonly Queue<(string PullKey, Action StartPull)> ThrottledPullQueue = new();
+    private static int _throttledPullsInFlight;
     private static readonly ConcurrentDictionary<string, Lock> DeviceCsvLocks = new(StringComparer.Ordinal);
 
     private static readonly List<DeviceThumbnailInfo> _deviceInfoCache = [];
@@ -683,7 +683,7 @@ public static partial class ThumbnailService
         }
 
         var localFile = Path.Combine(targetDir, thumbId);
-        QueueCustomPull(pullKey, throttled =>
+        QueueCustomPull(pullKey, () =>
         {
             string? stagingRoot = null;
             var succeeded = false;
@@ -730,7 +730,7 @@ public static partial class ThumbnailService
                 if (stagingRoot is not null)
                     ArchiveExtract.CleanupStaging(device.ID, stagingRoot, CancellationToken.None);
 
-                CompleteCustomPull(pullKey, throttled);
+                CompleteCustomPull(pullKey);
                 if (!succeeded)
                     NotifyPaneThumbnailUnavailable(file);
             }
@@ -824,11 +824,10 @@ public static partial class ThumbnailService
         var target = SyncFile.MergeToWindowsPath(source, parent);
         target.UpdatePath(localFile);
 
-        QueueCustomPull(pullKey, throttled =>
+        QueueCustomPull(pullKey, () =>
         {
             var op = FileSyncOperation.PullFile(source, target, device, App.AppDispatcher);
-            if (throttled)
-                op.MaxThreads = 1;
+            op.MaxThreads = 1;
 
             op.PropertyChanged += (_, e) =>
             {
@@ -840,12 +839,12 @@ public static partial class ThumbnailService
                     var resolution = knownResolution ?? ReadImageResolution(localFile);
                     long? pulledSize = File.Exists(localFile) ? new FileInfo(localFile).Length : null;
                     MarkCustomThumbnailReady(device.SerialNumber, file, thumbId, resolution, pulledSize);
-                    CompleteCustomPull(pullKey, throttled);
+                    CompleteCustomPull(pullKey);
                 }
                 else if (op.Status is FileOperation.OperationStatus.Failed
                     or FileOperation.OperationStatus.Canceled)
                 {
-                    CompleteCustomPull(pullKey, throttled);
+                    CompleteCustomPull(pullKey);
                     NotifyPaneThumbnailUnavailable(file);
                 }
             };
@@ -854,14 +853,8 @@ public static partial class ThumbnailService
         });
     }
 
-    private static void QueueCustomPull(string pullKey, Action<bool> startPull)
+    private static void QueueCustomPull(string pullKey, Action startPull)
     {
-        if (!Data.Settings.LimitThumbsPullSpeed)
-        {
-            _ = Task.Run(() => RunCustomPull(pullKey, startPull, throttled: false));
-            return;
-        }
-
         lock (ThrottledPullScheduleLock)
         {
             ThrottledPullQueue.Enqueue((pullKey, startPull));
@@ -871,43 +864,39 @@ public static partial class ThumbnailService
 
     private static void TryStartNextThrottledPull()
     {
-        if (_throttledPullInFlight)
-            return;
-
-        while (ThrottledPullQueue.Count > 0)
+        var max = Data.Settings.ThumbAndIconConcurrency;
+        while (_throttledPullsInFlight < max && ThrottledPullQueue.Count > 0)
         {
             var (pullKey, startPull) = ThrottledPullQueue.Dequeue();
             if (!IsPendingCustomPull(pullKey))
                 continue;
 
-            _throttledPullInFlight = true;
-            _ = Task.Run(() => RunCustomPull(pullKey, startPull, throttled: true));
-            return;
+            _throttledPullsInFlight++;
+            _ = Task.Run(() => RunCustomPull(pullKey, startPull));
         }
     }
 
-    private static void RunCustomPull(string pullKey, Action<bool> startPull, bool throttled)
+    private static void RunCustomPull(string pullKey, Action startPull)
     {
         try
         {
             if (!IsPendingCustomPull(pullKey))
             {
-                if (throttled)
-                    ThrottledPullCompleted();
+                ThrottledPullCompleted();
                 return;
             }
 
             if (!IsPendingCustomPull(pullKey) || Data.DeviceCts.IsCancellationRequested)
             {
-                CompleteCustomPull(pullKey, throttled);
+                CompleteCustomPull(pullKey);
                 return;
             }
 
-            startPull(throttled);
+            startPull();
         }
         catch
         {
-            CompleteCustomPull(pullKey, throttled);
+            CompleteCustomPull(pullKey);
         }
     }
 
@@ -921,7 +910,8 @@ public static partial class ThumbnailService
     {
         lock (ThrottledPullScheduleLock)
         {
-            _throttledPullInFlight = false;
+            if (_throttledPullsInFlight > 0)
+                _throttledPullsInFlight--;
             TryStartNextThrottledPull();
         }
     }
@@ -932,11 +922,10 @@ public static partial class ThumbnailService
             PendingCustomPulls.Remove(pullKey);
     }
 
-    private static void CompleteCustomPull(string pullKey, bool throttled)
+    private static void CompleteCustomPull(string pullKey)
     {
         CancelCustomPull(pullKey);
-        if (throttled)
-            ThrottledPullCompleted();
+        ThrottledPullCompleted();
     }
 
     private static DeviceThumbnailInfo GetCachedDeviceInfo(string serialNumber)
@@ -1399,7 +1388,7 @@ public static partial class ThumbnailService
                 return;
             }
 
-            var opsList = FileActionLogic.SilentPullFiles(device, deviceDir, Data.Settings.LimitThumbsPullSpeed, filesToReplace, [.. picFolders, movies]).ToList();
+            var opsList = FileActionLogic.SilentPullFiles(device, deviceDir, Data.Settings.ThumbAndIconConcurrency, filesToReplace, [.. picFolders, movies]).ToList();
 
             ThumbnailProgressChanged?.Invoke(ThumbnailStep.CheckingUpdates, false);
 

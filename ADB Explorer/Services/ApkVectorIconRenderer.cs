@@ -70,7 +70,10 @@ internal static partial class ApkVectorIconRenderer
     /// Renders a standalone <c>&lt;gradient&gt;</c> drawable (launcher fills)
     /// as a full-size bitmap.
     /// </summary>
-    public static SKBitmap? TryRenderGradientDrawable(byte[] axmlBytes, int size = DefaultSize)
+    public static SKBitmap? TryRenderGradientDrawable(
+        byte[] axmlBytes,
+        int size = DefaultSize,
+        Func<int, SKColor?>? resolveColor = null)
     {
         try
         {
@@ -80,7 +83,7 @@ internal static partial class ApkVectorIconRenderer
             if (gradient is null)
                 return null;
 
-            using var shader = TryCreateGradientShader(gradient, size, size);
+            using var shader = TryCreateGradientShader(gradient, size, size, resolveColor);
             if (shader is null)
                 return null;
 
@@ -369,22 +372,6 @@ internal static partial class ApkVectorIconRenderer
 
         var expanded = AxmlStringPool.ExpandTruncated(axmlBytes, originalPartial);
         if (string.IsNullOrEmpty(expanded) || expanded.Length <= cleaned.Length)
-        {
-            // Try every longer pool string that shares the leading command prefix.
-            var prefix = originalPartial[..Math.Min(16, originalPartial.Length)];
-            string? best = null;
-            foreach (var s in AxmlStringPool.ReadAll(axmlBytes))
-            {
-                if (s.Length <= originalPartial.Length || !s.StartsWith(prefix, StringComparison.Ordinal))
-                    continue;
-                if (best is null || s.Length > best.Length)
-                    best = s;
-            }
-
-            expanded = best;
-        }
-
-        if (string.IsNullOrEmpty(expanded))
             return null;
 
         var retry = PathWhitespace().Replace(expanded, " ").Trim();
@@ -450,7 +437,8 @@ internal static partial class ApkVectorIconRenderer
                     var gradient = FindGradientRoot(axml.RootNode);
                     if (gradient is not null)
                     {
-                        shader = TryCreateGradientShader(gradient, viewportWidth, viewportHeight);
+                        shader = TryCreateGradientShader(
+                            gradient, viewportWidth, viewportHeight, resolveColor);
                         if (shader is not null)
                         {
                             paint.Shader = shader;
@@ -513,7 +501,8 @@ internal static partial class ApkVectorIconRenderer
         return null;
     }
 
-    private static SKShader? TryCreateGradientShader(XmlNode gradient, float width, float height)
+    private static SKShader? TryCreateGradientShader(
+        XmlNode gradient, float width, float height, Func<int, SKColor?>? resolveColor = null)
     {
         var stops = new List<(float Offset, SKColor Color)>();
         if (gradient.ChildNodes is not null)
@@ -525,7 +514,7 @@ internal static partial class ApkVectorIconRenderer
                     if (!child.NodeName.Equals("item", StringComparison.OrdinalIgnoreCase))
                         continue;
 
-                    var color = ReadColorAttribute(child, "color", resolveColor: null);
+                    var color = ReadColorAttribute(child, "color", resolveColor);
                     if (color is null)
                         continue;
 
@@ -538,6 +527,10 @@ internal static partial class ApkVectorIconRenderer
 
         if (stops.Count == 0)
             return null;
+
+        // Skia requires ≥2 stops; Android sometimes emits a single solid stop.
+        if (stops.Count == 1)
+            stops.Add((1f, stops[0].Color));
 
         stops.Sort((a, b) => a.Offset.CompareTo(b.Offset));
         var colors = stops.Select(s => s.Color).ToArray();

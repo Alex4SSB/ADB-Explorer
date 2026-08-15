@@ -236,6 +236,12 @@ public partial class FileActionsEnable : ObservableObject
         IsAppDrive
         && (Data.DevicesObject?.Current is not { } device || !ShellCommands.UnzipExists(device.ID));
 
+    /// <summary>
+    /// Re-raise <see cref="IsAppDriveThumbsLocked"/> when the open device or its
+    /// <c>unzip</c> probe changes without <see cref="IsAppDrive"/> flipping.
+    /// </summary>
+    public void NotifyAppDriveThumbsLocked() => OnPropertyChanged(nameof(IsAppDriveThumbsLocked));
+
     private bool isArchive;
     public bool IsArchive
     {

@@ -922,6 +922,7 @@ public static class DeviceHelper
         
         FileActionLogic.ClearExplorer();
         NavHistory.Reset();
+        Data.FileActions.NotifyAppDriveThumbsLocked();
         InitDevice();
     }
 

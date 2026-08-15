@@ -1,5 +1,4 @@
 using ADB_Explorer.Converters;
-using ADB_Explorer.Controls;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
@@ -123,6 +122,23 @@ public partial class ExplorerPageHeader : UserControl
 
     private static Point NullPoint => new(-1, -1);
 
+    /// <summary>
+    /// True when the routed event originated on a view scrollbar (including a captured thumb).
+    /// MouseMove bubbles from the thumb, so a scrollbar drag would otherwise start marquee selection.
+    /// </summary>
+    private static bool IsInScrollBar(DependencyObject? source)
+    {
+        for (var dep = source; dep is not null; dep = VisualTreeHelper.GetParent(dep))
+        {
+            if (dep is System.Windows.Controls.Primitives.ScrollBar)
+                return true;
+            if (dep is ListView or DataGrid)
+                break;
+        }
+
+        return false;
+    }
+
     private bool SuppressExplorerSelection =>
         ViewModel.IsMenuOpen || _toolbarSubmenuDepth > 0 || _suppressSelectionAfterMenu;
 
@@ -191,6 +207,12 @@ public partial class ExplorerPageHeader : UserControl
 
     /// <summary>Debounces APK icon priority updates on scroll / selection.</summary>
     private readonly DispatcherTimer _apkPriorityTimer = new() { Interval = TimeSpan.FromMilliseconds(100) };
+
+    /// <summary>
+    /// Coalesces wrap-panel reflows (side pane open/close/resize) so we scroll once after layout.
+    /// </summary>
+    private int _keepSelectionInViewGeneration;
+
     private bool _isSyncingSelection = false;
 
     public ExplorerPageHeader(ExplorerViewModel viewModel)
@@ -209,6 +231,9 @@ public partial class ExplorerPageHeader : UserControl
             {
                 ClearSelectionForSearch();
             }
+
+            if (e.PropertyName is nameof(FileActionsEnable.IsAppDriveThumbsLocked))
+                ApplyAppDriveThumbsLockState();
         });
 
         Data.RunExplorerSearch += (_, _) => App.SafeInvoke(() =>
@@ -253,6 +278,11 @@ public partial class ExplorerPageHeader : UserControl
         };
 
         DriveList.SelectionChanged += DriveList_SelectionChanged;
+
+        // Side pane open/close/resize changes column width; icon wrap reflow can push the
+        // selection off-screen. Scroll it back after the layout pass settles.
+        IconView.SizeChanged += IconView_SizeChanged;
+        DriveList.SizeChanged += DriveList_SizeChanged;
 
         FileIconView.RenameStarted += IconView_RenameStarted;
         FileIconView.RenameEnded += (_, _) => ClearRename();
@@ -928,20 +958,7 @@ public partial class ExplorerPageHeader : UserControl
 
         FileActions.CopyPathDescription.Value = FileActions.IsAppDrive ? Strings.Resources.S_COPY_APK_NAME : Strings.Resources.S_COPY_PATH;
 
-        if (FileActions.IsAppDriveThumbsLocked)
-        {
-            ViewModel.CurrentThumbsSize = ThumbnailService.ThumbnailSize.Disabled;
-        }
-        else if (Settings.ThumbSizePerLocation)
-        {
-            ThumbnailService.ThumbnailSize size = ThumbnailService.ThumbnailSize.Disabled;
-            Settings.LocationThumbSize.TryGetValue(CurrentPath, out size);
-            ViewModel.CurrentThumbsSize = size;
-        }
-        else
-        {
-            ViewModel.CurrentThumbsSize = RuntimeSettings.ThumbsSize;
-        }
+        ApplyAppDriveThumbsLockState();
 
         SortExplorer();
 
@@ -1098,6 +1115,38 @@ public partial class ExplorerPageHeader : UserControl
         {
             ViewModel.SetSort(SortingSelector.SortingProperty.Name, ListSortDirection.Ascending);
         }
+    }
+
+    /// <summary>
+    /// Forces details view when app drive cannot load icons; otherwise restores the
+    /// preferred thumb size (location or global). Also refreshes when <c>unzip</c>
+    /// probe finishes after a device switch.
+    /// </summary>
+    private void ApplyAppDriveThumbsLockState()
+    {
+        if (!FileActions.IsAppDrive)
+            return;
+
+        if (FileActions.IsAppDriveThumbsLocked)
+        {
+            ViewModel.CurrentThumbsSize = ThumbnailService.ThumbnailSize.Disabled;
+            return;
+        }
+
+        if (Settings.ThumbSizePerLocation)
+        {
+            ThumbnailService.ThumbnailSize size = ThumbnailService.ThumbnailSize.Disabled;
+            Settings.LocationThumbSize.TryGetValue(CurrentPath, out size);
+            ViewModel.CurrentThumbsSize = size;
+        }
+        else
+        {
+            ViewModel.CurrentThumbsSize = RuntimeSettings.ThumbsSize;
+        }
+
+        // Icons may have been skipped while unzip was still unknown.
+        if (Data.Packages is { Count: > 0 } && ApkIconService.IsEnabled)
+            ApkIconService.BeginPreloadPackages(Data.Packages);
     }
 
     private static void InvalidateFileIcons()
@@ -1740,6 +1789,12 @@ public partial class ExplorerPageHeader : UserControl
                      ? CopyPasteService.DragState.Pending
                      : CopyPasteService.DragState.None;
 
+        if (IsInScrollBar(e.OriginalSource as DependencyObject))
+        {
+            MouseDownPoint = NullPoint;
+            return;
+        }
+
         var point = e.GetPosition(ExplorerGrid);
         MouseDownPoint = SuppressExplorerSelection ? NullPoint : point;
 
@@ -1796,7 +1851,8 @@ public partial class ExplorerPageHeader : UserControl
             || !RuntimeSettings.IsExplorerLoaded
             || MouseDownPoint == NullPoint
             || withinEditingCell
-            || SuppressExplorerSelection;
+            || SuppressExplorerSelection
+            || IsInScrollBar(e.OriginalSource as DependencyObject);
 
         if (CopyPaste.DragStatus is CopyPasteService.DragState.Pending && (MouseDownPoint - point).LengthSquared >= 25)
         {
@@ -2237,11 +2293,12 @@ public partial class ExplorerPageHeader : UserControl
         }
         else
         {
-            // Ignore clicks on scrollbars
-            for (var dep = source; dep is not null and not ListView; dep = VisualTreeHelper.GetParent(dep))
+            // Ignore clicks on scrollbars — do not keep MouseDownPoint or marquee starts
+            // when the captured thumb's MouseMove bubbles over the viewport.
+            if (IsInScrollBar(source))
             {
-                if (dep is System.Windows.Controls.Primitives.ScrollBar)
-                    return;
+                MouseDownPoint = NullPoint;
+                return;
             }
 
             if (IconView.SelectedItems.Count > 0 && IsInEditMode)
@@ -2275,7 +2332,8 @@ public partial class ExplorerPageHeader : UserControl
         var abortDrag = e.LeftButton == MouseButtonState.Released
             || !RuntimeSettings.IsExplorerLoaded
             || MouseDownPoint == NullPoint
-            || SuppressExplorerSelection;
+            || SuppressExplorerSelection
+            || IsInScrollBar(e.OriginalSource as DependencyObject);
 
         if (CopyPaste.DragStatus is CopyPasteService.DragState.Pending && (MouseDownPoint - point).LengthSquared >= 25)
         {
@@ -2305,12 +2363,51 @@ public partial class ExplorerPageHeader : UserControl
         if (size != ThumbnailService.ThumbnailSize.Disabled)
             InvalidateFileIcons();
 
+        if (ActiveSelectedItems.Count > 0)
+            ScheduleKeepFirstSelectedInView();
+        else
+        {
+            App.SafeBeginInvoke(() => ActiveScrollViewer?.ScrollToTop(), DispatcherPriority.Loaded);
+        }
+    }
+
+    private void IconView_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (!e.WidthChanged || !ViewModel.IsIconView || ActiveSelectedItems.Count == 0)
+            return;
+
+        ScheduleKeepFirstSelectedInView();
+    }
+
+    private void DriveList_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (!e.WidthChanged
+            || !FileActions.IsDriveViewVisible
+            || DriveList.SelectedItem is null)
+            return;
+
+        var generation = ++_keepSelectionInViewGeneration;
         App.SafeBeginInvoke(() =>
         {
+            if (generation != _keepSelectionInViewGeneration)
+                return;
+            if (DriveList.SelectedItem is not null)
+                DriveList.ScrollIntoView(DriveList.SelectedItem);
+        }, DispatcherPriority.Loaded);
+    }
+
+    /// <summary>
+    /// After a wrap-panel width change, ensure the first selected explorer item is still visible.
+    /// </summary>
+    private void ScheduleKeepFirstSelectedInView()
+    {
+        var generation = ++_keepSelectionInViewGeneration;
+        App.SafeBeginInvoke(() =>
+        {
+            if (generation != _keepSelectionInViewGeneration)
+                return;
             if (ActiveSelectedItems.Count > 0)
                 ActiveScrollIntoView(ActiveSelectedItems[0]);
-            else
-                ActiveScrollViewer?.ScrollToTop();
         }, DispatcherPriority.Loaded);
     }
 

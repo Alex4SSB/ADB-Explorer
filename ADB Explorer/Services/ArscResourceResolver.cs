@@ -20,7 +20,13 @@ internal static class ArscResourceResolver
     private const byte DataTypeColorArgb4 = 0x1E;
     private const byte DataTypeColorRgb4 = 0x1F;
 
-    private readonly record struct ConfigValue(string Language, string Country, byte DataType, int Data, string? StringValue);
+    private readonly record struct ConfigValue(
+        string Language,
+        string Country,
+        byte DataType,
+        int Data,
+        string? StringValue,
+        bool IsNight);
 
     public static string? ResolveString(byte[] arscBytes, int resourceId)
         => ResolveString(arscBytes, resourceId, preferredCulture: null);
@@ -83,6 +89,7 @@ internal static class ArscResourceResolver
             .Where(v => v.DataType == DataTypeString
                         && !string.IsNullOrWhiteSpace(v.StringValue)
                         && IsDrawablePath(v.StringValue))
+            .OrderBy(v => v.IsNight ? 1 : 0) // Prefer light / default over night (Health Connect, etc.)
             .Select(v => v.StringValue!)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
@@ -118,6 +125,73 @@ internal static class ArscResourceResolver
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Looks up a resource id by its package key-string (e.g. <c>calendar_date_14_adaptive</c>).
+    /// AlphaOmega's map often omits these names when the file paths are obfuscated.
+    /// </summary>
+    public static int? FindResourceIdByKeyName(byte[] arscBytes, string keyName)
+    {
+        foreach (var (key, id) in FindResourceIdsByKeyPrefix(arscBytes, keyName))
+        {
+            if (key.Equals(keyName, StringComparison.OrdinalIgnoreCase))
+                return id;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// First resource id per matching key (case-insensitive prefix).
+    /// </summary>
+    public static List<(string Key, int Id)> FindResourceIdsByKeyPrefix(byte[] arscBytes, string prefix)
+    {
+        if (arscBytes is null || arscBytes.Length < 12 || string.IsNullOrEmpty(prefix))
+            return [];
+
+        try
+        {
+            if (!TryParsePackages(arscBytes, out _, out var packages))
+                return [];
+
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var result = new List<(string Key, int Id)>();
+
+            foreach (var package in packages)
+            {
+                if (package.Keys.Length == 0)
+                    continue;
+
+                foreach (var chunk in package.TypeChunks)
+                {
+                    foreach (var (index, entryOffset) in EnumerateEntryOffsets(arscBytes, chunk))
+                    {
+                        var entryPos = chunk.ChunkPos + chunk.EntriesStart + entryOffset;
+                        if (entryPos + 8 > arscBytes.Length)
+                            continue;
+
+                        var keyIndex = BitConverter.ToInt32(arscBytes, entryPos + 4);
+                        if ((uint)keyIndex >= (uint)package.Keys.Length)
+                            continue;
+
+                        var key = package.Keys[keyIndex];
+                        if (!key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                            continue;
+                        if (!seen.Add(key))
+                            continue;
+
+                        result.Add((key, (package.Id << 24) | (chunk.TypeId << 16) | (index & 0xFFFF)));
+                    }
+                }
+            }
+
+            return result;
+        }
+        catch
+        {
+            return [];
+        }
     }
 
     private static string? PickPreferredString(
@@ -281,7 +355,8 @@ internal static class ArscResourceResolver
 
     private static IEnumerable<ConfigValue> PreferDefaultConfig(IEnumerable<ConfigValue> values)
         => values
-            .OrderBy(v => string.IsNullOrEmpty(v.Language) ? 0 : v.Language.Equals("en", StringComparison.OrdinalIgnoreCase) ? 1 : 2)
+            .OrderBy(v => v.IsNight ? 1 : 0)
+            .ThenBy(v => string.IsNullOrEmpty(v.Language) ? 0 : v.Language.Equals("en", StringComparison.OrdinalIgnoreCase) ? 1 : 2)
             .ThenBy(v => v.Country.Length);
 
     private static List<ConfigValue> ResolveValues(byte[] data, int resourceId, int maxReferenceDepth)
@@ -329,7 +404,8 @@ internal static class ArscResourceResolver
                         if (dataType == DataTypeString && payload >= 0 && payload < valuePool.Length)
                             str = valuePool[payload];
 
-                        result.Add(new ConfigValue(chunk.Language, chunk.Country, dataType, payload, str));
+                        result.Add(new ConfigValue(
+                            chunk.Language, chunk.Country, dataType, payload, str, chunk.IsNight));
                     }
                 }
             }
@@ -412,7 +488,19 @@ internal static class ArscResourceResolver
                 // ResTable_config begins at offset 20: size(4) + mcc/mnc(4) + language(2) + country(2)…
                 var language = Encoding.ASCII.GetString(data, cur + 28, 2).Trim('\0');
                 var country = Encoding.ASCII.GetString(data, cur + 30, 2).Trim('\0');
-                typeChunks.Add(new TypeChunkData(cur, hs, typeId, data[cur + 9], entryCount, entriesStart, language, country));
+                // uiMode lives at config+29 when size is large enough (screenLayout/uiMode/…).
+                var configSize = BitConverter.ToInt32(data, cur + 20);
+                var isNight = false;
+                if (configSize >= 36 && cur + 20 + 29 < end)
+                {
+                    const byte uiModeNightMask = 0x30;
+                    const byte uiModeNightYes = 0x20;
+                    var uiMode = data[cur + 20 + 29];
+                    isNight = (uiMode & uiModeNightMask) == uiModeNightYes;
+                }
+
+                typeChunks.Add(new TypeChunkData(
+                    cur, hs, typeId, data[cur + 9], entryCount, entriesStart, language, country, isNight));
             }
 
             cur += chunkSize;
@@ -543,5 +631,6 @@ internal static class ArscResourceResolver
         int EntryCount,
         int EntriesStart,
         string Language,
-        string Country);
+        string Country,
+        bool IsNight);
 }

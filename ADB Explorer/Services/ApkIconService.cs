@@ -4,8 +4,7 @@ using ADB_Explorer.ViewModels;
 using AlphaOmega.Debug;
 using AlphaOmega.Debug.Manifest;
 using SkiaSharp;
-using System.Diagnostics;
-using System.Text;
+using Wpf.Ui.Appearance;
 
 namespace ADB_Explorer.Services;
 
@@ -17,9 +16,8 @@ namespace ADB_Explorer.Services;
 /// invalidation uses the AndroidManifest CRC-32 and a date-only CSV stamp
 /// (not <see cref="AppSettings.ThumbsAge"/>).
 /// Loads respect <see cref="Data.DeviceCts"/> and are cleared by <see cref="CancelPending"/>.
-/// Concurrency follows <see cref="AppSettings.LimitThumbsPullSpeed"/>: one at a time when
-/// throttled, otherwise up to <see cref="IconLoadConcurrencyCap"/> (capped well below
-/// <see cref="AppSettings.MaxSimultaneousOps"/> because each load fans out into several adb processes).
+/// Concurrency is <see cref="AppSettings.ThumbAndIconConcurrency"/> (⌈MaxSimultaneousOps / 6⌉)
+/// because each load fans out into several adb processes.
 /// Queue order is <see cref="ApkLoadPriority"/>: Selected → Visible → Background.
 /// </summary>
 public static partial class ApkIconService
@@ -31,6 +29,10 @@ public static partial class ApkIconService
     private const string CsvDateFormat = "yyyy-MM-dd";
     /// <summary>CSV sentinel: icon or label fetch failed today — skip retry until the date changes.</summary>
     private const string FailMarker = "!";
+    /// <summary>CSV 6th field: OEM clock face already has hands.</summary>
+    private const string ClockHandsBaked = "baked";
+    /// <summary>CSV 6th field: blank clock disc — overlay live hands at display time.</summary>
+    private const string ClockHandsOverlay = "overlay";
     private const int MaxIconCandidatesToProbe = 12;
 
     private static readonly Encoding CsvEncoding = new UTF8Encoding(true);
@@ -103,13 +105,19 @@ public static partial class ApkIconService
     /// <see cref="FailMarker"/> if the current locale failed today, or null/empty if unknown.
     /// Legacy bare labels are attributed to <see cref="GetAppLocaleKey"/> (never <c>*</c>).
     /// </param>
+    /// <param name="ClockHands">
+    /// Deskclock faces only: <c>baked</c> (OEM hands already in the PNG) or <c>overlay</c>
+    /// (blank disc — draw live hands). Null/empty until first icon-view inspect.
+    /// </param>
     private readonly record struct ApkIconCacheEntry(
         string ManifestCrc,
         DateOnly CheckedDate,
         string IconExt,
-        string? Label);
+        string? Label,
+        string? ClockHands = null);
 
     private static bool _uiLanguageHooked;
+    private static bool _themeContrastHooked;
 
 #if DEBUG
     private static readonly AsyncLocal<ApkLoadTiming?> CurrentTiming = new();
@@ -141,7 +149,8 @@ public static partial class ApkIconService
         string? PackageName,
         Action<BitmapSource?>? OnReady,
         bool LabelOnly = false,
-        ApkLoadPriority Priority = ApkLoadPriority.Background)
+        ApkLoadPriority Priority = ApkLoadPriority.Background,
+        bool Quiet = false)
     {
         public string PullKey { get; } = PullKey;
         public LogicalDeviceViewModel Device { get; } = Device;
@@ -150,6 +159,7 @@ public static partial class ApkIconService
         public Action<BitmapSource?>? OnReady { get; set; } = OnReady;
         public bool LabelOnly { get; set; } = LabelOnly;
         public ApkLoadPriority Priority { get; set; } = Priority;
+        public bool Quiet { get; } = Quiet;
 #if DEBUG
         public ApkLoadTiming? Timing { get; set; }
 #endif
@@ -263,15 +273,17 @@ public static partial class ApkIconService
         string apkPath,
         string? packageName = null,
         Action<BitmapSource?>? onReady = null,
-        ApkLoadPriority priority = ApkLoadPriority.Background)
-        => BeginLoadCore(device, apkPath, packageName, onReady, priority);
+        ApkLoadPriority priority = ApkLoadPriority.Background,
+        bool quiet = false)
+        => BeginLoadCore(device, apkPath, packageName, onReady, priority, quiet);
 
     private static void BeginLoadCore(
         LogicalDeviceViewModel device,
         string apkPath,
         string? packageName,
         Action<BitmapSource?>? onReady,
-        ApkLoadPriority priority
+        ApkLoadPriority priority,
+        bool quiet = false
 #if DEBUG
         , ApkLoadTiming? timing = null
 #endif
@@ -316,6 +328,18 @@ public static partial class ApkIconService
                 onReady?.Invoke(cached);
                 return;
             }
+
+            // Date rollover: keep showing yesterday's icon while the re-check runs.
+            var stored = TryGetStoredIcon(device, packageName);
+            if (stored is not null)
+                onReady?.Invoke(stored);
+
+            // Overlays / no-launcher APKs must not re-unzip every launch. FailMarker is a settled miss.
+            if (HasSettledIconMiss(device, packageName))
+            {
+                onReady?.Invoke(null);
+                return;
+            }
         }
 
         // Dedupe by package when known so app-drive and file-path loads share one pull.
@@ -351,7 +375,7 @@ public static partial class ApkIconService
             return;
         }
 
-        var request = new LoadRequest(pullKey, device, apkPath, packageName, onReady, LabelOnly: false, priority)
+        var request = new LoadRequest(pullKey, device, apkPath, packageName, onReady, LabelOnly: false, priority, Quiet: quiet)
 #if DEBUG
         {
             Timing = timing,
@@ -378,6 +402,10 @@ public static partial class ApkIconService
                 file.ApplyApkIcon(cached);
                 return;
             }
+
+            var stored = TryGetStoredIcon(device, packageName);
+            if (stored is not null)
+                file.ApplyApkIcon(stored);
         }
 
         BeginLoad(device, file.FullPath, packageName, bmp =>
@@ -409,29 +437,39 @@ public static partial class ApkIconService
         if (IsLoadingStopped)
             return;
 
-        if (package.Icon is not null)
+        ApplyCachedLabel(device, package);
+
+        var alreadyHasIcon = package.Icon is not null;
+
+        if (alreadyHasIcon)
         {
             package.IconLoadCompleted = true;
-            ApplyCachedLabel(device, package);
-            BeginEnsureLabelForPackage(package, priority);
-            return;
-        }
+            if (IsIconFreshToday(device, package.Name))
+            {
+                BeginEnsureLabelForPackage(package, priority);
+                return;
+            }
 
-        if (!string.IsNullOrEmpty(package.Name))
+            // Date rolled: keep the current tile and re-check in the background.
+            // Do not raise the thumbnail tooltip — the icon is already on screen.
+        }
+        else if (!string.IsNullOrEmpty(package.Name))
         {
             var cached = TryGetCachedIcon(device, package.Name);
             if (cached is not null)
             {
-                ApplyCachedLabel(device, package);
                 package.Icon = cached;
                 BeginEnsureLabelForPackage(package, priority);
                 return;
             }
 
-            if (IsIconFailedToday(device, package.Name))
+            var stored = TryGetStoredIcon(device, package.Name);
+            if (stored is not null)
+                package.Icon = stored;
+
+            if (HasSettledIconMiss(device, package.Name))
             {
                 package.IconLoadCompleted = true;
-                ApplyCachedLabel(device, package);
                 BeginEnsureLabelForPackage(package, priority);
                 return;
             }
@@ -448,7 +486,7 @@ public static partial class ApkIconService
                 package.Icon = bmp;
             else if (!IsLoadingStopped)
                 package.IconLoadCompleted = true;
-        }, priority);
+        }, priority, quiet: alreadyHasIcon);
     }
 
     /// <summary>
@@ -473,7 +511,7 @@ public static partial class ApkIconService
             return;
 
         // Icon load already pulls the label — piggy-back instead of a second pull.
-        if (package.Icon is null && !IsIconFailedToday(device, package.Name))
+        if (package.Icon is null && !HasSettledIconMiss(device, package.Name))
         {
             var iconKey = $"{device.SerialNumber}|{package.Name}";
             lock (PendingLock)
@@ -832,24 +870,63 @@ public static partial class ApkIconService
 
     /// <param name="packageName">Android package id used as the CSV / local-file cache key.</param>
     public static BitmapSource? TryGetCachedIcon(LogicalDeviceViewModel device, string packageName)
+        => TryGetCachedIconCore(device, packageName, requireToday: true);
+
+    /// <summary>
+    /// Last successful icon on disk, including a previous day's entry. Used to keep the tile
+    /// populated while a date-rollover re-check runs.
+    /// </summary>
+    private static BitmapSource? TryGetStoredIcon(LogicalDeviceViewModel device, string packageName)
+        => TryGetCachedIconCore(device, packageName, requireToday: false);
+
+    private static BitmapSource? TryGetCachedIconCore(
+        LogicalDeviceViewModel device,
+        string packageName,
+        bool requireToday)
     {
+        EnsureThemeContrastHook();
+
         if (device is null || string.IsNullOrEmpty(packageName) || !IsEnabled)
             return null;
 
         lock (GetDeviceLock(device.SerialNumber))
         {
             var cache = GetOrLoadCache(device.SerialNumber);
-            if (!cache.TryGetValue(packageName, out var entry))
+            if (cache.TryGetValue(packageName, out var entry))
+            {
+                if (requireToday && entry.CheckedDate != DateOnly.FromDateTime(DateTime.Today))
+                    return null;
+
+                if (IsSuccessfulIconExt(entry.IconExt))
+                {
+                    var localPath = GetLocalIconPath(device.SerialNumber, packageName, entry.IconExt);
+                    if (File.Exists(localPath))
+                        return ForDisplay(DecodeBitmap(localPath));
+                }
+
+                // Same-day row whose recorded file is missing (tiny system rasters used to
+                // write PNG bytes under the source .webp/.jpg name). Reuse any copy on disk.
+                return TryDecodeExistingIconFile(device.SerialNumber, packageName);
+            }
+
+            if (requireToday)
                 return null;
 
-            if (entry.CheckedDate != DateOnly.FromDateTime(DateTime.Today))
-                return null;
+            return TryDecodeExistingIconFile(device.SerialNumber, packageName);
+        }
+    }
 
-            if (!IsSuccessfulIconExt(entry.IconExt))
-                return null;
+    private static bool IsIconFreshToday(LogicalDeviceViewModel device, string packageName)
+    {
+        if (device is null || string.IsNullOrEmpty(packageName))
+            return false;
 
-            var localPath = GetLocalIconPath(device.SerialNumber, packageName, entry.IconExt);
-            return File.Exists(localPath) ? DecodeBitmap(localPath) : null;
+        lock (GetDeviceLock(device.SerialNumber))
+        {
+            var cache = GetOrLoadCache(device.SerialNumber);
+            return cache.TryGetValue(packageName, out var entry)
+                   && entry.CheckedDate == DateOnly.FromDateTime(DateTime.Today)
+                   && IsSuccessfulIconExt(entry.IconExt);
         }
     }
 
@@ -881,15 +958,31 @@ public static partial class ApkIconService
             package.Label = label;
     }
 
-    private static bool IsIconFailedToday(LogicalDeviceViewModel device, string packageName)
+    /// <summary>
+    /// True when this package already has a settled "no icon" result that must not
+    /// trigger another APK unzip: a <see cref="FailMarker"/> (any day — overlays never
+    /// grow a launcher icon). Empty <see cref="ApkIconCacheEntry.IconExt"/> means the
+    /// label was persisted before icon work finished and must be retried.
+    /// </summary>
+    private static bool HasSettledIconMiss(LogicalDeviceViewModel device, string packageName)
     {
+        if (device is null || string.IsNullOrEmpty(packageName) || IsCalendarPackage(packageName))
+            return false;
+
         lock (GetDeviceLock(device.SerialNumber))
         {
             var cache = GetOrLoadCache(device.SerialNumber);
             return cache.TryGetValue(packageName, out var entry)
-                   && entry.CheckedDate == DateOnly.FromDateTime(DateTime.Today)
-                   && entry.IconExt == FailMarker;
+                   && IsSettledIconMiss(entry, packageName);
         }
+    }
+
+    private static bool IsSettledIconMiss(in ApkIconCacheEntry entry, string packageName)
+    {
+        if (IsCalendarPackage(packageName) || IsSuccessfulIconExt(entry.IconExt))
+            return false;
+
+        return entry.IconExt == FailMarker;
     }
 
     private static bool NeedsLabelFetch(LogicalDeviceViewModel device, string packageName)
@@ -1169,6 +1262,735 @@ public static partial class ApkIconService
         }
     }
 
+    private static void EnsureThemeContrastHook()
+    {
+        if (_themeContrastHooked)
+            return;
+
+        _themeContrastHooked = true;
+        ApplicationThemeManager.Changed += (_, _) => App.SafeBeginInvoke(OnAppThemeChanged);
+    }
+
+    /// <summary>
+    /// Re-applies contrast plates after light/dark switch without re-pulling APKs.
+    /// </summary>
+    private static void OnAppThemeChanged()
+    {
+        if (Data.Packages is null || Data.Packages.Count == 0)
+            return;
+
+        if (Data.DevicesObject?.Current is not { } device)
+            return;
+
+        foreach (var package in Data.Packages)
+        {
+            if (package.Icon is null || string.IsNullOrEmpty(package.Name))
+                continue;
+
+            var refreshed = TryGetStoredIcon(device, package.Name);
+            if (refreshed is not null)
+                package.Icon = refreshed;
+        }
+    }
+
+    /// <summary>
+    /// Theme-aware presentation: contrast plate for monochrome glyphs, knockout art whose
+    /// prevalent ink is too close to the icon-view background, and compact knockout marks.
+    /// Disk cache keeps true alpha so theme switches stay correct.
+    /// </summary>
+    private static BitmapSource? ForDisplay(BitmapSource? source)
+    {
+        if (source is null)
+            return null;
+
+        using var sk = BitmapSourceToSkBitmap(source);
+        if (sk is null)
+            return source;
+
+        if (TryClassifyMonochromeTransparent(sk, out var isDarkInk)
+            || TryClassifyLowContrastTransparent(sk, out isDarkInk)
+            || TryClassifyCompactKnockout(sk, out isDarkInk))
+        {
+            var plated = TryApplyThemeContrastPlate(sk, isDarkInk);
+            if (plated is not null)
+                return plated;
+        }
+
+        return source;
+    }
+
+    /// <summary>
+    /// Icon-view presentation: analog hands at the current local time when the
+    /// cached face is a blank disc (Google Clock). OEM faces that already print
+    /// hands (ASUS Clock) are shown as-is.
+    /// </summary>
+    [return: NotNullIfNotNull(nameof(source))]
+    public static BitmapSource? ForIconView(BitmapSource? source, string? packageName)
+    {
+        if (source is null)
+            return null;
+
+        if (!IsDeskclockPackage(packageName))
+            return source;
+
+        using var sk = BitmapSourceToSkBitmap(source);
+        if (sk is null)
+            return source;
+
+        if (!ShouldOverlayLiveClockHands(packageName, sk))
+            return source;
+
+        using var canvasBitmap = new SKBitmap(sk.Width, sk.Height, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+        using var canvas = new SKCanvas(canvasBitmap);
+        canvas.DrawBitmap(sk, 0, 0);
+        DrawClockHands(canvas, sk, DateTime.Now);
+        return ApkVectorIconRenderer.ToBitmapSource(canvasBitmap);
+    }
+
+    private static BitmapSource? TryApplyThemeContrastPlate(SKBitmap sk, bool isDarkInk)
+    {
+        var appIsDark = ApplicationThemeManager.GetAppTheme() == ApplicationTheme.Dark;
+        SKColor? plate = null;
+        if (isDarkInk && appIsDark)
+            plate = SKColors.White;
+        else if (!isDarkInk && !appIsDark)
+            plate = new SKColor(0x40, 0x40, 0x40);
+
+        if (plate is null)
+            return null;
+
+        using var canvasBitmap = new SKBitmap(sk.Width, sk.Height, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+        using var canvas = new SKCanvas(canvasBitmap);
+        canvas.Clear(plate.Value);
+        canvas.DrawBitmap(sk, 0, 0);
+        return ApkVectorIconRenderer.ToBitmapSource(canvasBitmap);
+    }
+
+    private static readonly SKColor IconViewBackgroundDark = new(0x27, 0x27, 0x27);
+    private static readonly SKColor IconViewBackgroundLight = new(0xF8, 0xFA, 0xFA);
+    private const int IconViewBackgroundSimilaritySq = 120 * 120;
+    private const int DominantInkNumerator = 7;
+    private const int DominantInkDenominator = 10;
+
+    /// <summary>
+    /// Knockout art whose prevalent near-neutral ink disappears against the icon-view
+    /// background. A small chromatic accent does not override a large dark or light shape.
+    /// </summary>
+    private static bool TryClassifyLowContrastTransparent(SKBitmap bitmap, out bool isDarkInk)
+    {
+        isDarkInk = false;
+        if (bitmap.Width <= 0 || bitmap.Height <= 0)
+            return false;
+
+        var stride = bitmap.RowBytes;
+        var buffer = new byte[stride * bitmap.Height];
+        System.Runtime.InteropServices.Marshal.Copy(bitmap.GetPixels(), buffer, 0, buffer.Length);
+
+        var w = bitmap.Width;
+        var h = bitmap.Height;
+        if (!CornersAreFullyTransparent(buffer, w, h, stride))
+            return false;
+
+        long samples = 0, ink = 0, clear = 0, veil = 0;
+        long darkNeutral = 0, lightNeutral = 0;
+        long darkR = 0, darkG = 0, darkB = 0;
+        long lightR = 0, lightG = 0, lightB = 0;
+
+        for (var y = 0; y < h; y += 2)
+        {
+            var row = y * stride;
+            for (var x = 0; x < w; x += 2)
+            {
+                var i = row + x * 4;
+                if (i + 3 >= buffer.Length)
+                    continue;
+
+                samples++;
+                var b = buffer[i];
+                var g = buffer[i + 1];
+                var r = buffer[i + 2];
+                var a = buffer[i + 3];
+
+                if (a == 0)
+                {
+                    clear++;
+                    continue;
+                }
+
+                if (a < 48)
+                {
+                    veil++;
+                    continue;
+                }
+
+                ink++;
+                if (ChannelChroma(r, g, b) >= 48)
+                    continue;
+
+                var luma = Rec709Luma(r, g, b);
+                if (luma <= 115)
+                {
+                    darkNeutral++;
+                    darkR += r;
+                    darkG += g;
+                    darkB += b;
+                }
+                else if (luma >= 190)
+                {
+                    lightNeutral++;
+                    lightR += r;
+                    lightG += g;
+                    lightB += b;
+                }
+            }
+        }
+
+        if (samples == 0 || ink == 0 || clear == 0)
+            return false;
+
+        // Translucent fill in the "empty" region — not a knockout background.
+        if (veil * 4 >= samples)
+            return false;
+        if (veil > clear)
+            return false;
+
+        var appIsDark = ApplicationThemeManager.GetAppTheme() == ApplicationTheme.Dark;
+        SKColor viewBg;
+        if (appIsDark)
+        {
+            if (darkNeutral == 0 || darkNeutral * DominantInkDenominator < ink * DominantInkNumerator)
+                return false;
+
+            var prevalent = new SKColor(
+                (byte)(darkR / darkNeutral),
+                (byte)(darkG / darkNeutral),
+                (byte)(darkB / darkNeutral));
+            if (!IsTooSimilarToIconViewBackground(prevalent, IconViewBackgroundDark))
+                return false;
+
+            isDarkInk = true;
+            viewBg = IconViewBackgroundDark;
+        }
+        else
+        {
+            if (lightNeutral == 0 || lightNeutral * DominantInkDenominator < ink * DominantInkNumerator)
+                return false;
+
+            var lightPrevalent = new SKColor(
+                (byte)(lightR / lightNeutral),
+                (byte)(lightG / lightNeutral),
+                (byte)(lightB / lightNeutral));
+            if (!IsTooSimilarToIconViewBackground(lightPrevalent, IconViewBackgroundLight))
+                return false;
+
+            isDarkInk = false;
+            viewBg = IconViewBackgroundLight;
+        }
+
+        if (IsFilledRegularOccupant(buffer, w, h, stride))
+            return false;
+        if (OutlineAlreadyContrasts(buffer, w, h, stride, viewBg))
+            return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// Compact knockout mark (opaque bbox under 40% tall and 20% of canvas area).
+    /// Treated as dark ink so dark mode paints a white plate; light mode is unchanged.
+    /// </summary>
+    private static bool TryClassifyCompactKnockout(SKBitmap bitmap, out bool isDarkInk)
+    {
+        isDarkInk = false;
+        if (bitmap.Width <= 0 || bitmap.Height <= 0)
+            return false;
+
+        var stride = bitmap.RowBytes;
+        var buffer = new byte[stride * bitmap.Height];
+        System.Runtime.InteropServices.Marshal.Copy(bitmap.GetPixels(), buffer, 0, buffer.Length);
+
+        var w = bitmap.Width;
+        var h = bitmap.Height;
+        if (!CornersAreFullyTransparent(buffer, w, h, stride))
+            return false;
+
+        long samples = 0, ink = 0, clear = 0, veil = 0;
+        var minX = w;
+        var minY = h;
+        var maxX = -1;
+        var maxY = -1;
+
+        for (var y = 0; y < h; y += 2)
+        {
+            var row = y * stride;
+            for (var x = 0; x < w; x += 2)
+            {
+                var i = row + x * 4;
+                if (i + 3 >= buffer.Length)
+                    continue;
+
+                samples++;
+                var a = buffer[i + 3];
+                if (a == 0)
+                {
+                    clear++;
+                    continue;
+                }
+
+                if (a < 48)
+                {
+                    veil++;
+                    continue;
+                }
+
+                ink++;
+                if (x < minX) minX = x;
+                if (y < minY) minY = y;
+                if (x > maxX) maxX = x;
+                if (y > maxY) maxY = y;
+            }
+        }
+
+        if (samples == 0 || ink == 0 || clear == 0 || maxX < minX)
+            return false;
+        if (veil * 4 >= samples || veil > clear)
+            return false;
+
+        var bw = maxX - minX + 1;
+        var bh = maxY - minY + 1;
+        if (bh * 5 >= h * 2)
+            return false;
+        if ((long)bw * bh * 5 >= (long)w * h)
+            return false;
+
+        isDarkInk = true;
+        return true;
+    }
+
+    /// <summary>
+    /// True when opaque ink is one filled square, rounded square, or circle whose width at
+    /// half height is at least 70% of the canvas — a plate, not a glyph.
+    /// </summary>
+    private static bool IsFilledRegularOccupant(byte[] buffer, int w, int h, int stride)
+    {
+        var mask = new bool[w * h];
+        var minX = w;
+        var minY = h;
+        var maxX = -1;
+        var maxY = -1;
+        long inkCount = 0;
+        var seed = -1;
+
+        for (var y = 0; y < h; y++)
+        {
+            var row = y * stride;
+            for (var x = 0; x < w; x++)
+            {
+                if (buffer[row + x * 4 + 3] < 48)
+                    continue;
+
+                var i = y * w + x;
+                mask[i] = true;
+                inkCount++;
+                if (seed < 0)
+                    seed = i;
+                if (x < minX) minX = x;
+                if (y < minY) minY = y;
+                if (x > maxX) maxX = x;
+                if (y > maxY) maxY = y;
+            }
+        }
+
+        if (inkCount == 0 || maxX < minX)
+            return false;
+
+        var midY = h / 2;
+        var midFirst = -1;
+        var midLast = -1;
+        var midRow = midY * w;
+        for (var x = 0; x < w; x++)
+        {
+            if (!mask[midRow + x])
+                continue;
+            if (midFirst < 0)
+                midFirst = x;
+            midLast = x;
+        }
+
+        if (midFirst < 0)
+            return false;
+        if ((midLast - midFirst + 1) * DominantInkDenominator < w * DominantInkNumerator)
+            return false;
+
+        var bw = maxX - minX + 1;
+        var bh = maxY - minY + 1;
+        var shortSide = Math.Min(bw, bh);
+        var longSide = Math.Max(bw, bh);
+        if (shortSide * 10 < longSide * 9)
+            return false;
+
+        var reached = FloodCount(mask, w, h, seed);
+        if (reached * 20 < inkCount * 19)
+            return false;
+
+        var bboxArea = (long)bw * bh;
+        if (bboxArea <= 0)
+            return false;
+
+        var cx = (minX + maxX) * 0.5;
+        var cy = (minY + maxY) * 0.5;
+        var circleR = shortSide * 0.5;
+        var circleRSq = circleR * circleR;
+        var cornerR = Math.Max(1, shortSide / 5);
+
+        long matchSquare = 0, matchRound = 0, matchCircle = 0;
+        for (var y = minY; y <= maxY; y++)
+        {
+            for (var x = minX; x <= maxX; x++)
+            {
+                var on = mask[y * w + x];
+                if (on)
+                    matchSquare++;
+
+                var dx = x - cx;
+                var dy = y - cy;
+                var inCircle = dx * dx + dy * dy <= circleRSq;
+                if (on == inCircle)
+                    matchCircle++;
+
+                var inRound = InRoundedRect(x, y, minX, minY, maxX, maxY, cornerR);
+                if (on == inRound)
+                    matchRound++;
+            }
+        }
+
+        var best = matchSquare;
+        if (matchRound > best)
+            best = matchRound;
+        if (matchCircle > best)
+            best = matchCircle;
+
+        return best * 10 >= bboxArea * 9;
+    }
+
+    /// <summary>
+    /// True when at least 90% of the outer silhouette already contrasts with the
+    /// icon-view background. Interior holes are ignored.
+    /// </summary>
+    private static bool OutlineAlreadyContrasts(
+        byte[] buffer, int w, int h, int stride, SKColor background)
+    {
+        var exterior = new bool[w * h];
+        MarkExteriorTransparent(buffer, w, h, stride, exterior);
+
+        long outline = 0, contrasting = 0;
+        for (var y = 0; y < h; y++)
+        {
+            var row = y * stride;
+            for (var x = 0; x < w; x++)
+            {
+                var i = row + x * 4;
+                if (buffer[i + 3] < 48)
+                    continue;
+                if (!TouchesExterior(exterior, w, h, x, y))
+                    continue;
+
+                outline++;
+                var color = new SKColor(buffer[i + 2], buffer[i + 1], buffer[i], buffer[i + 3]);
+                if (!IsTooSimilarToIconViewBackground(color, background))
+                    contrasting++;
+            }
+        }
+
+        if (outline == 0)
+            return false;
+
+        return contrasting * 10 >= outline * 9;
+    }
+
+    private static bool TouchesExterior(bool[] exterior, int w, int h, int x, int y)
+    {
+        if (x == 0 || y == 0 || x == w - 1 || y == h - 1)
+            return true;
+        if (exterior[y * w + (x - 1)])
+            return true;
+        if (exterior[y * w + (x + 1)])
+            return true;
+        if (exterior[(y - 1) * w + x])
+            return true;
+        return exterior[(y + 1) * w + x];
+    }
+
+    private static void MarkExteriorTransparent(
+        byte[] buffer, int w, int h, int stride, bool[] exterior)
+    {
+        var queue = new Queue<int>();
+
+        void TrySeed(int x, int y)
+        {
+            if (buffer[y * stride + x * 4 + 3] >= 48)
+                return;
+            var i = y * w + x;
+            if (exterior[i])
+                return;
+            exterior[i] = true;
+            queue.Enqueue(i);
+        }
+
+        for (var x = 0; x < w; x++)
+        {
+            TrySeed(x, 0);
+            TrySeed(x, h - 1);
+        }
+
+        for (var y = 1; y < h - 1; y++)
+        {
+            TrySeed(0, y);
+            TrySeed(w - 1, y);
+        }
+
+        while (queue.Count > 0)
+        {
+            var i = queue.Dequeue();
+            var x = i % w;
+            var y = i / w;
+            TryEnqueueExterior(queue, exterior, buffer, w, h, stride, x - 1, y);
+            TryEnqueueExterior(queue, exterior, buffer, w, h, stride, x + 1, y);
+            TryEnqueueExterior(queue, exterior, buffer, w, h, stride, x, y - 1);
+            TryEnqueueExterior(queue, exterior, buffer, w, h, stride, x, y + 1);
+        }
+    }
+
+    private static void TryEnqueueExterior(
+        Queue<int> queue, bool[] exterior, byte[] buffer, int w, int h, int stride, int x, int y)
+    {
+        if ((uint)x >= (uint)w || (uint)y >= (uint)h)
+            return;
+
+        var i = y * w + x;
+        if (exterior[i] || buffer[y * stride + x * 4 + 3] >= 48)
+            return;
+
+        exterior[i] = true;
+        queue.Enqueue(i);
+    }
+
+    private static long FloodCount(bool[] ink, int w, int h, int seed)
+    {
+        var visited = new bool[ink.Length];
+        var queue = new Queue<int>();
+        queue.Enqueue(seed);
+        visited[seed] = true;
+        long n = 0;
+
+        while (queue.Count > 0)
+        {
+            var i = queue.Dequeue();
+            if (!ink[i])
+                continue;
+
+            n++;
+            var x = i % w;
+            var y = i / w;
+            TryEnqueueFlood(queue, visited, ink, w, h, x - 1, y);
+            TryEnqueueFlood(queue, visited, ink, w, h, x + 1, y);
+            TryEnqueueFlood(queue, visited, ink, w, h, x, y - 1);
+            TryEnqueueFlood(queue, visited, ink, w, h, x, y + 1);
+        }
+
+        return n;
+    }
+
+    private static void TryEnqueueFlood(
+        Queue<int> queue, bool[] visited, bool[] ink, int w, int h, int x, int y)
+    {
+        if ((uint)x >= (uint)w || (uint)y >= (uint)h)
+            return;
+
+        var i = y * w + x;
+        if (visited[i] || !ink[i])
+            return;
+
+        visited[i] = true;
+        queue.Enqueue(i);
+    }
+
+    private static bool InRoundedRect(int x, int y, int minX, int minY, int maxX, int maxY, int radius)
+    {
+        var ix0 = minX + radius;
+        var iy0 = minY + radius;
+        var ix1 = maxX - radius;
+        var iy1 = maxY - radius;
+        if (ix0 > ix1 || iy0 > iy1)
+            return false;
+
+        if (x >= ix0 && x <= ix1 && y >= minY && y <= maxY)
+            return true;
+        if (y >= iy0 && y <= iy1 && x >= minX && x <= maxX)
+            return true;
+
+        var rSq = radius * radius;
+        if (DistSq(x, y, ix0, iy0) <= rSq)
+            return true;
+        if (DistSq(x, y, ix1, iy0) <= rSq)
+            return true;
+        if (DistSq(x, y, ix0, iy1) <= rSq)
+            return true;
+        return DistSq(x, y, ix1, iy1) <= rSq;
+    }
+
+    private static int DistSq(int x0, int y0, int x1, int y1)
+    {
+        var dx = x0 - x1;
+        var dy = y0 - y1;
+        return dx * dx + dy * dy;
+    }
+
+    private static bool IsTooSimilarToIconViewBackground(SKColor color, SKColor background)
+    {
+        var dr = color.Red - background.Red;
+        var dg = color.Green - background.Green;
+        var db = color.Blue - background.Blue;
+        return dr * dr + dg * dg + db * db <= IconViewBackgroundSimilaritySq;
+    }
+
+    private static int ChannelChroma(byte r, byte g, byte b)
+    {
+        var max = r;
+        if (g > max)
+            max = g;
+        if (b > max)
+            max = b;
+        var min = r;
+        if (g < min)
+            min = g;
+        if (b < min)
+            min = b;
+        return max - min;
+    }
+
+    private static int Rec709Luma(byte r, byte g, byte b)
+        => (r * 54 + g * 183 + b * 19) >> 8;
+
+    private static bool CornersAreFullyTransparent(byte[] buffer, int w, int h, int stride)
+    {
+        ReadOnlySpan<(int X, int Y)> corners =
+        [
+            (0, 0),
+            (w - 1, 0),
+            (0, h - 1),
+            (w - 1, h - 1),
+        ];
+
+        foreach (var (x, y) in corners)
+        {
+            var i = y * stride + x * 4;
+            if (i + 3 >= buffer.Length || buffer[i + 3] != 0)
+                return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// True when the bitmap is sparse transparent ink that is almost entirely dark or light
+    /// (e.g. logkit). Dense logos and brand art with any real chroma are left alone.
+    /// </summary>
+    private static bool TryClassifyMonochromeTransparent(SKBitmap bitmap, out bool isDarkInk)
+    {
+        isDarkInk = false;
+        if (bitmap.Width <= 0 || bitmap.Height <= 0)
+            return false;
+
+        var stride = bitmap.RowBytes;
+        var buffer = new byte[stride * bitmap.Height];
+        System.Runtime.InteropServices.Marshal.Copy(bitmap.GetPixels(), buffer, 0, buffer.Length);
+
+        long opaque = 0, light = 0, dark = 0, colored = 0, samples = 0;
+        for (var y = 0; y < bitmap.Height; y += 4)
+        {
+            var row = y * stride;
+            for (var x = 0; x < bitmap.Width; x += 4)
+            {
+                var i = row + x * 4;
+                if (i + 3 >= buffer.Length)
+                    continue;
+
+                samples++;
+                var b = buffer[i];
+                var g = buffer[i + 1];
+                var r = buffer[i + 2];
+                var a = buffer[i + 3];
+                if (a < 16)
+                    continue;
+
+                opaque++;
+                if (r > 230 && g > 230 && b > 230)
+                    light++;
+                else if (r < 40 && g < 40 && b < 40)
+                    dark++;
+                else
+                    colored++;
+            }
+        }
+
+        if (samples == 0 || opaque == 0)
+            return false;
+
+        // Sparse glyphs only (logkit ~30%). Dense black logos must not get a white plate.
+        if (opaque * 5 >= samples * 2) // >= 40% opaque
+            return false;
+
+        // Any meaningful chroma → brand art (VLC, Sudoku accents, etc.).
+        if (colored > 0 && colored * 50 >= opaque)
+            return false;
+
+        if (colored >= 3)
+            return false;
+
+        // Require near-pure dark or light ink.
+        if (dark * 20 >= opaque * 19)
+        {
+            isDarkInk = true;
+            return true;
+        }
+
+        if (light * 20 >= opaque * 19)
+        {
+            isDarkInk = false;
+            return true;
+        }
+
+        return false;
+    }
+
+    private static SKBitmap? BitmapSourceToSkBitmap(BitmapSource source)
+    {
+        try
+        {
+            BitmapSource bgra = source;
+            if (source.Format != PixelFormats.Bgra32)
+                bgra = new FormatConvertedBitmap(source, PixelFormats.Bgra32, null, 0);
+
+            var width = bgra.PixelWidth;
+            var height = bgra.PixelHeight;
+            if (width <= 0 || height <= 0)
+                return null;
+
+            var stride = width * 4;
+            var pixels = new byte[stride * height];
+            bgra.CopyPixels(pixels, stride, 0);
+
+            var sk = new SKBitmap(width, height, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+            System.Runtime.InteropServices.Marshal.Copy(pixels, 0, sk.GetPixels(), pixels.Length);
+            return sk;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     private static bool IsSuccessfulIconExt(string? iconExt)
         => !string.IsNullOrEmpty(iconExt)
            && iconExt != FailMarker
@@ -1410,19 +2232,8 @@ public static partial class ApkIconService
         RaiseProgressChanged(kind, false);
     }
 
-    /// <summary>
-    /// Unlike a plain file pull, a single icon load fans out into several concurrent <c>adb.exe</c>
-    /// process launches (manifest zip listing, staging extraction, cleanup, and per-split retries),
-    /// so reusing <see cref="AppSettings.MaxSimultaneousOps"/> as-is (default 32, up to 999) can spawn
-    /// dozens to hundreds of OS processes at once, starving the UI thread and looking like a freeze.
-    /// Cap far below that setting regardless of how high the user has configured it.
-    /// </summary>
-    private const int IconLoadConcurrencyCap = 6;
-
     private static int GetMaxConcurrentLoads()
-        => Data.Settings.LimitThumbsPullSpeed
-            ? 1
-            : Math.Min(Math.Clamp(Data.Settings.MaxSimultaneousOps, 1, AppSettings.MaxSimultaneousOpsMax), IconLoadConcurrencyCap);
+        => Data.Settings.ThumbAndIconConcurrency;
 
     private static async Task ProcessQueueAsync(int generation, CancellationToken workerToken)
     {
@@ -1456,13 +2267,13 @@ public static partial class ApkIconService
                         LoadQueue.RemoveFirst();
                     }
 
-                    if (!request.LabelOnly && !pullProgressShown)
+                    if (!request.LabelOnly && !request.Quiet && !pullProgressShown)
                     {
                         SetIconPullProgress(true);
                         pullProgressShown = true;
                     }
 
-                    inFlight.Add((ProcessRequestAsync(request, generation, workerToken), !request.LabelOnly));
+                    inFlight.Add((ProcessRequestAsync(request, generation, workerToken), !request.LabelOnly && !request.Quiet));
                 }
 
                 if (inFlight.Count == 0)
@@ -1604,6 +2415,17 @@ public static partial class ApkIconService
 #if !DEPLOY
             DebugLog.PrintLine($"APK icon load failed for {request.ApkPath}: {e.Message}");
 #endif
+            // Deterministic compose/extract failures must not retry on every launch.
+            if (!request.LabelOnly && !string.IsNullOrEmpty(request.PackageName))
+            {
+                MarkFetchResult(
+                    request.Device.SerialNumber,
+                    request.PackageName,
+                    "",
+                    DateOnly.FromDateTime(DateTime.Today),
+                    FailMarker,
+                    label: null);
+            }
         }
         finally
         {
@@ -1724,13 +2546,12 @@ public static partial class ApkIconService
 #if DEBUG
                         timing?.Mark("warm cache hit (local icon file)");
 #endif
-                        return (DecodeBitmap(warmPath), packageName);
+                        return (ForDisplay(DecodeBitmap(warmPath)), packageName);
                     }
                 }
 
                 if (cache.TryGetValue(packageName, out warm)
-                    && warm.CheckedDate == today
-                    && warm.IconExt == FailMarker)
+                    && IsSettledIconMiss(warm, packageName))
                 {
 #if DEBUG
                     timing?.Mark("fail-marker cache hit (skip)");
@@ -1825,8 +2646,39 @@ public static partial class ApkIconService
                 timing is null &&
 #endif
                 cache.TryGetValue(packageName, out var existing)
+                && IsSettledIconMiss(existing, packageName))
+            {
+                var missLabel = MergeLocaleLabel(existing.Label, label);
+                var missUpdated = existing with
+                {
+                    ManifestCrc = string.IsNullOrEmpty(manifestCrc) ? existing.ManifestCrc : manifestCrc,
+                    CheckedDate = today,
+                    Label = missLabel,
+                };
+                if (!string.Equals(existing.ManifestCrc, missUpdated.ManifestCrc, StringComparison.OrdinalIgnoreCase))
+                    missUpdated = missUpdated with { ClockHands = null };
+                if (existing.CheckedDate != today
+                    || missUpdated.Label != existing.Label
+                    || missUpdated.ManifestCrc != existing.ManifestCrc)
+                {
+                    cache[packageName] = missUpdated;
+                    WriteCache(serial, cache);
+                }
+
+#if DEBUG
+                timing?.Mark("settled miss — skip icon member extract");
+#endif
+                return (null, packageName);
+            }
+
+            if (
+#if DEBUG
+                timing is null &&
+#endif
+                cache.TryGetValue(packageName, out existing)
                 && string.Equals(existing.ManifestCrc, manifestCrc, StringComparison.OrdinalIgnoreCase)
-                && IsSuccessfulIconExt(existing.IconExt))
+                && IsSuccessfulIconExt(existing.IconExt)
+                && !IsCalendarPackage(packageName))
             {
                 var localPath = GetLocalIconPath(serial, packageName, existing.IconExt);
                 if (File.Exists(localPath))
@@ -1847,7 +2699,7 @@ public static partial class ApkIconService
 #if DEBUG
                     timing?.Mark("CRC-matched local icon — skip re-extract");
 #endif
-                    return (DecodeBitmap(localPath), packageName);
+                    return (ForDisplay(DecodeBitmap(localPath)), packageName);
                 }
             }
 #if DEBUG
@@ -2252,9 +3104,12 @@ public static partial class ApkIconService
                             if (fgSk is null)
                                 continue;
 
-                            // Prefer opaque white plate under transparent adaptive foregrounds
-                            // over writing a raw transparent PNG.
-                            var bgColor = layers.BackgroundColor ?? SKColors.White;
+                            // Keep declared non-white colors. Drop near-white so light FG ink
+                            // (VLC) is not washed out; raster white plates are omitted in compose.
+                            var bgColor = layers.BackgroundColor ?? SKColors.Transparent;
+                            if (IsNearWhiteColor(bgColor))
+                                bgColor = SKColors.Transparent;
+
                             bitmap = CompositeOnOpaqueBackground(fgSk, 192, bgColor);
                             if (bitmap is not null)
                             {
@@ -2332,7 +3187,7 @@ public static partial class ApkIconService
                     if (sk is null || IsDegenerateIcon(sk))
                         continue;
 
-                    bitmap = CompositeOnOpaqueBackground(sk, 192, SKColors.White);
+                    bitmap = CompositeOnOpaqueBackground(sk, 192, SKColors.Transparent);
                     if (bitmap is not null)
                     {
                         #if DEBUG
@@ -2423,12 +3278,19 @@ public static partial class ApkIconService
                         try
                         {
                             bitmap = ApkVectorIconRenderer.ToBitmapSource(upscaled);
-                            await SaveBitmapAsPngAsync(bitmap, localFile, cancellationToken).ConfigureAwait(false);
+                            var pngPath = GetLocalIconPath(serial, packageName, ".png");
+                            await SaveBitmapAsPngAsync(bitmap, pngPath, cancellationToken).ConfigureAwait(false);
+                            if (!string.Equals(pngPath, localFile, StringComparison.OrdinalIgnoreCase)
+                                && File.Exists(localFile))
+                            {
+                                try { File.Delete(localFile); } catch { /* ignore */ }
+                            }
+
                             MarkFetchResult(serial, packageName, manifestCrc, today, ".png", label);
                             #if DEBUG
                             timing?.Mark("upscaled tiny raster saved");
                             #endif
-                            return (bitmap, packageName);
+                            return (ForDisplay(bitmap), packageName);
                         }
                         finally
                         {
@@ -2482,10 +3344,10 @@ public static partial class ApkIconService
         }
 
         MarkFetchResult(serial, packageName, manifestCrc, today, iconExt, label);
-        #if DEBUG
+#if DEBUG
         timing?.Mark("MarkFetchResult / cache write done");
-        #endif
-        return (bitmap, packageName);
+#endif
+        return (ForDisplay(bitmap), packageName);
         }
         finally
         {
@@ -2513,6 +3375,9 @@ public static partial class ApkIconService
                 ? existing.Label
                 : MergeLocaleLabel(existing.Label == FailMarker ? null : existing.Label, label);
             var nextCrc = string.IsNullOrEmpty(manifestCrc) ? (existing.ManifestCrc ?? "") : manifestCrc;
+            var nextHands = existing.ClockHands;
+            if (!string.Equals(existing.ManifestCrc, nextCrc, StringComparison.OrdinalIgnoreCase))
+                nextHands = null;
 
             // Drop obsolete local files when the extension changes.
             if (IsSuccessfulIconExt(existing.IconExt)
@@ -2523,7 +3388,7 @@ public static partial class ApkIconService
                 try { if (File.Exists(oldPath)) File.Delete(oldPath); } catch { /* ignore */ }
             }
 
-            cache[packageName] = new ApkIconCacheEntry(nextCrc, today, nextIcon, nextLabel);
+            cache[packageName] = new ApkIconCacheEntry(nextCrc, today, nextIcon, nextLabel, nextHands);
             WriteCache(serial, cache);
         }
     }
@@ -3452,6 +4317,7 @@ public static partial class ApkIconService
             .Select(ArchivePath.NormalizeInternal)
             .Where(p => !string.IsNullOrWhiteSpace(p))
             .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(IsNightQualifiedPath) // light / default before night
             .ToList();
 
         if (list.Count <= 1)
@@ -3459,7 +4325,8 @@ public static partial class ApkIconService
 
         var adaptiveXml = list
             .Where(IsAdaptiveWrapperPath)
-            .OrderBy(p => p.Contains("default", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+            .OrderBy(IsNightQualifiedPath)
+            .ThenBy(p => p.Contains("default", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
             .ThenBy(p => p.Contains("anydpi", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
             .ThenBy(p => p.Length)
             .ToList();
@@ -3739,6 +4606,9 @@ public static partial class ApkIconService
             device, apkFiles, adaptiveXmlBytes, layers, resourcesBytes, cancellationToken)
             .ConfigureAwait(false);
 
+        if (IsCalendarPackage(packageName))
+            layers = SubstituteCalendarDateLayers(layers, resourcesBytes);
+
         // Final thumbnail size. Layers are kept at ≥108/72 of that so the launcher viewport
         // crop downsamples once instead of downscale-to-192 then upscale×1.5 (blur).
         const int size = 192;
@@ -3854,14 +4724,11 @@ public static partial class ApkIconService
         // (transparent banner placeholders under layer-list).
         var bg = inlineBg ?? bgLayer;
         var fg = inlineFg ?? fgLayer;
-        SKBitmap? overlayFg = null;
+        var isClockFace = IsDeskclockPackage(packageName);
 
-        // Deskclock live hands use <rotate>/<layer-list> which we cannot render — always synthesize 3:00.
-        if (IsDeskclockPackage(packageName))
-        {
-            overlayFg = CreateClockHandsAtThree(layerSize);
-            fg = overlayFg;
-        }
+        // Live <rotate> hands are not renderable; cache the face only and paint hands at display time.
+        if (isClockFace)
+            fg = null;
         else if (fg is not null && IsEmptyTransparentLayer(fg))
         {
             // Empty/transparent stock foreground (ic_launcher_foreground is a no-op
@@ -3871,65 +4738,205 @@ public static partial class ApkIconService
             fg = null;
         }
 
-        try
+        if (bg is null && fg is null && layers.BackgroundColor is null && !isClockFace)
+            return null;
+
+        // Background-only is valid when the background carries the launcher art
+        // (custom ic_launcher_background + empty foreground).
+        // Stock Android Studio green alone is only half the template — use the full default.
+        if (fg is null
+            && !isClockFace
+            && bg is not null
+            && IsStockAndroidStudioGreenPlate(bg))
         {
-            if (bg is null && fg is null && layers.BackgroundColor is null)
-                return null;
-
-            // Background-only is valid when the background carries the launcher art
-            // (custom ic_launcher_background + empty foreground).
-            // Stock Android Studio green alone is only half the template — use the full default.
-            if (fg is null
-                && !IsDeskclockPackage(packageName)
-                && bg is not null
-                && IsStockAndroidStudioGreenPlate(bg))
-            {
-                return DefaultAndroidPackageIcon.Render(size);
-            }
-
-            if (fg is null
-                && !IsDeskclockPackage(packageName)
-                && (bg is null || IsDegenerateIcon(bg)))
-                return null;
-
-            using var canvasBitmap = new SKBitmap(size, size, SKColorType.Bgra8888, SKAlphaType.Unpremul);
-            using var canvas = new SKCanvas(canvasBitmap);
-            canvas.Clear(layers.BackgroundColor ?? SKColors.White);
-
-            // Match AdaptiveIconDrawable: show the center 72/108 of each 108dp layer.
-            // Source rect crop (not post-scale) so xxxhdpi → thumbnail is a single downsample.
-            if (bg is not null)
-                DrawAdaptiveIconViewport(canvas, bg, size);
-
-            if (fg is not null)
-            {
-                // Clock hands are already positioned; only recenter corner-biased artwork.
-                if (IsDeskclockPackage(packageName) || !IsCornerBiasedIcon(fg))
-                {
-                    DrawAdaptiveIconViewport(canvas, fg, size);
-                }
-                else
-                {
-                    using var centeredFg = RecenterOpaqueContent(fg);
-                    DrawAdaptiveIconViewport(canvas, centeredFg ?? fg, size);
-                }
-            }
-
-            if (IsDegenerateIcon(canvasBitmap))
-                return null;
-
-            return ApkVectorIconRenderer.ToBitmapSource(canvasBitmap);
+            return DefaultAndroidPackageIcon.Render(size);
         }
-        finally
+
+        if (fg is null
+            && !isClockFace
+            && (bg is null || IsDegenerateIcon(bg)))
+            return null;
+
+        using var canvasBitmap = new SKBitmap(size, size, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+        using var canvas = new SKCanvas(canvasBitmap);
+
+        var bgColor = layers.BackgroundColor;
+        var bgDraw = bg;
+
+        // Drop near-solid white/light adaptive plates (Outlook / Word / Snapseed card).
+        // Keep real colored plates (Translate blue). Soft FG alpha veils are APK artwork.
+        if (ShouldOmitLightBackgroundForForeground(bgDraw, bgColor, fg))
         {
-            overlayFg?.Dispose();
+            bgDraw = null;
+            bgColor = null;
         }
+
+        canvas.Clear(bgColor ?? SKColors.Transparent);
+
+        // Crop to the launcher 72/108 viewport only when the layer has clear adaptive-style
+        // margins; full-bleed / near-edge art is drawn uncropped.
+        if (bgDraw is not null)
+            DrawAdaptiveIconLayer(canvas, bgDraw, size);
+
+        if (fg is not null)
+        {
+            if (!IsCornerBiasedIcon(fg))
+            {
+                DrawAdaptiveIconLayer(canvas, fg, size);
+            }
+            else
+            {
+                using var centeredFg = RecenterOpaqueContent(fg);
+                DrawAdaptiveIconLayer(canvas, centeredFg ?? fg, size);
+            }
+        }
+
+        if (IsDegenerateIcon(canvasBitmap))
+            return null;
+
+        return ApkVectorIconRenderer.ToBitmapSource(canvasBitmap);
     }
 
     private static bool IsDeskclockPackage(string? packageName)
         => !string.IsNullOrEmpty(packageName)
            && (packageName.Contains("deskclock", StringComparison.OrdinalIgnoreCase)
                || packageName.Equals("com.google.android.deskclock", StringComparison.OrdinalIgnoreCase));
+
+    private static bool IsCalendarPackage(string? packageName)
+        => packageName is not null
+           && (packageName.Equals("com.google.android.calendar", StringComparison.OrdinalIgnoreCase)
+               || packageName.Equals("com.android.calendar", StringComparison.OrdinalIgnoreCase));
+
+    private static List<string> ResolveCalendarDateIconPaths(byte[] resourcesBytes)
+    {
+        if (resourcesBytes is null || resourcesBytes.Length == 0)
+            return [];
+
+        var day = DateTime.Today.Day;
+        var dd = day.ToString("00", CultureInfo.InvariantCulture);
+        string[] names =
+        [
+            $"calendar_date_{dd}_adaptive",
+            $"calendar_date_{dd}",
+            $"calendar_date_{day.ToString(CultureInfo.InvariantCulture)}",
+        ];
+
+        foreach (var name in names)
+        {
+            var id = ArscResourceResolver.FindResourceIdByKeyName(resourcesBytes, name);
+            if (id is null)
+                continue;
+
+            var paths = ArscResourceResolver.ResolvePaths(resourcesBytes, id.Value)
+                .Select(ArchivePath.NormalizeInternal)
+                .Where(static p => !string.IsNullOrWhiteSpace(p))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            if (paths.Count == 0)
+                continue;
+
+            var images = paths
+                .Where(p => IsImagePath(p) || IsExtensionlessRasterCandidate(p))
+                .ToList();
+            if (images.Count > 0)
+                return PreferHighestDensityOnly(images);
+
+            return PreferIconPaths(paths);
+        }
+
+        return [];
+    }
+
+    private static HashSet<string> CollectCalendarDateAssetPaths(byte[] resourcesBytes)
+    {
+        var paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (_, id) in ArscResourceResolver.FindResourceIdsByKeyPrefix(resourcesBytes, "calendar_date_"))
+        {
+            foreach (var path in ArscResourceResolver.ResolvePaths(resourcesBytes, id))
+            {
+                var normalized = ArchivePath.NormalizeInternal(path);
+                if (!string.IsNullOrWhiteSpace(normalized))
+                    paths.Add(normalized);
+            }
+        }
+
+        return paths;
+    }
+
+    /// <summary>
+    /// Replaces the store-listing date glyph in the launcher adaptive foreground with today's day-of-month asset.
+    /// Does not replace the whole icon — that drawable is only the numeral plate.
+    /// </summary>
+    private static AdaptiveLayers SubstituteCalendarDateLayers(AdaptiveLayers layers, byte[] resourcesBytes)
+    {
+        var todayPaths = ResolveCalendarDateIconPaths(resourcesBytes);
+        if (todayPaths.Count == 0)
+            return layers;
+
+        var allDatePaths = CollectCalendarDateAssetPaths(resourcesBytes);
+        if (allDatePaths.Count == 0)
+            return layers;
+
+        var todayImages = todayPaths
+            .Where(p => IsImagePath(p) || IsExtensionlessRasterCandidate(p))
+            .ToList();
+        var todayXmls = todayPaths
+            .Where(p => p.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        var replaced = false;
+        var fgLayers = new List<List<string>>();
+        foreach (var layer in layers.ForegroundImageLayers)
+        {
+            if (!layer.Any(allDatePaths.Contains))
+            {
+                fgLayers.Add(layer);
+                continue;
+            }
+
+            replaced = true;
+            if (todayImages.Count > 0)
+                fgLayers.Add(todayImages);
+        }
+
+        var fgXmls = layers.ForegroundXmls;
+        if (fgXmls.Any(allDatePaths.Contains))
+        {
+            replaced = true;
+            fgXmls = fgXmls
+                .Where(p => !allDatePaths.Contains(p))
+                .Concat(todayXmls)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+        else if (replaced && todayImages.Count == 0 && todayXmls.Count > 0)
+        {
+            fgXmls = fgXmls
+                .Concat(todayXmls)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
+        if (!replaced && fgLayers.Count > 1 && todayImages.Count > 0)
+        {
+            fgLayers[^1] = todayImages;
+            replaced = true;
+        }
+
+        if (!replaced)
+            return layers;
+
+        var fgImages = fgLayers
+            .SelectMany(static l => l)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        return layers with
+        {
+            ForegroundImages = fgImages,
+            ForegroundImageLayers = fgLayers,
+            ForegroundXmls = fgXmls,
+        };
+    }
 
     /// <summary>
     /// Adaptive layer size in dp (full bleed including mask padding).
@@ -3946,6 +4953,62 @@ public static partial class ApkIconService
     /// </summary>
     private static int AdaptiveIconLayerRasterSize(int outputSize)
         => Math.Max(outputSize, (int)Math.Ceiling(outputSize * AdaptiveIconLayerDp / AdaptiveIconViewportDp));
+
+    /// <summary>
+    /// Draws an adaptive layer into <paramref name="outputSize"/>². Applies the launcher
+    /// 72/108 viewport crop only when opaque content is inset (adaptive safe-zone padding);
+    /// full-bleed layers are scaled without cropping.
+    /// </summary>
+    private static void DrawAdaptiveIconLayer(SKCanvas canvas, SKBitmap layer, int outputSize)
+    {
+        if (ShouldApplyAdaptiveViewportCrop(layer))
+            DrawAdaptiveIconViewport(canvas, layer, outputSize);
+        else
+            canvas.DrawBitmap(layer, new SKRect(0, 0, outputSize, outputSize));
+    }
+
+    /// <summary>
+    /// True when opaque ink leaves meaningful margin — typical adaptive 108dp layers with
+    /// bleed. Edge-reaching / legacy full-bleed art returns false so we do not clip logos.
+    /// </summary>
+    private static bool ShouldApplyAdaptiveViewportCrop(SKBitmap layer)
+    {
+        if (layer.Width <= 0 || layer.Height <= 0)
+            return false;
+
+        var stride = layer.RowBytes;
+        var buffer = new byte[stride * layer.Height];
+        System.Runtime.InteropServices.Marshal.Copy(layer.GetPixels(), buffer, 0, buffer.Length);
+
+        var minX = layer.Width;
+        var minY = layer.Height;
+        var maxX = -1;
+        var maxY = -1;
+
+        for (var y = 0; y < layer.Height; y += 2)
+        {
+            var row = y * stride;
+            for (var x = 0; x < layer.Width; x += 2)
+            {
+                if (buffer[row + x * 4 + 3] < 16)
+                    continue;
+
+                if (x < minX) minX = x;
+                if (y < minY) minY = y;
+                if (x > maxX) maxX = x;
+                if (y > maxY) maxY = y;
+            }
+        }
+
+        if (maxX < minX)
+            return false;
+
+        var fillX = (maxX - minX + 1) / (float)layer.Width;
+        var fillY = (maxY - minY + 1) / (float)layer.Height;
+        // Only crop clearly padded adaptive layers. Threshold was 0.82 and still clipped
+        // logos that use most of the safe zone (Snapseed, system setup icons, etc.).
+        return fillX < 0.68f && fillY < 0.68f;
+    }
 
     /// <summary>
     /// Draws the center 72/108 of <paramref name="layer"/> into <paramref name="outputSize"/>²
@@ -3969,16 +5032,22 @@ public static partial class ApkIconService
     }
 
     /// <summary>
-    /// Static white clock hands at 3:00 (hour → 3, minute → 12) for adaptive live-clock icons.
+    /// Analog hands at <paramref name="time"/> (white hour/minute, black second), scaled to the inner face circle.
     /// </summary>
-    private static SKBitmap CreateClockHandsAtThree(int size)
+    private static void DrawClockHands(SKCanvas canvas, SKBitmap face, DateTime time)
     {
-        var bitmap = new SKBitmap(size, size, SKColorType.Bgra8888, SKAlphaType.Unpremul);
-        using var canvas = new SKCanvas(bitmap);
-        canvas.Clear(SKColors.Transparent);
-
+        var size = face.Width;
         var cx = size / 2f;
         var cy = size / 2f;
+        var radius = MeasureClockFaceRadius(face);
+
+        var hour = time.Hour % 12;
+        var minute = time.Minute;
+        var second = time.Second;
+        var hourAngle = hour * 30f + minute * 0.5f;
+        var minuteAngle = minute * 6f + second * 0.1f;
+        var secondAngle = second * 6f;
+
         using var paint = new SKPaint
         {
             Color = SKColors.White,
@@ -3986,25 +5055,253 @@ public static partial class ApkIconService
             Style = SKPaintStyle.Fill,
         };
 
-        // Minute hand (12 o'clock): vertical bar from center upward.
-        var minuteW = size * 0.055f;
-        var minuteH = size * 0.34f;
+        DrawClockHand(canvas, cx, cy, hourAngle, radius * 0.50f, radius * 0.12f, radius * 0.06f, paint);
+        DrawClockHand(canvas, cx, cy, minuteAngle, radius * 0.78f, radius * 0.085f, radius * 0.06f, paint);
+
+        paint.Color = SKColors.Black;
+        DrawClockHand(canvas, cx, cy, secondAngle, radius * 0.90f, radius * 0.035f, radius * 0.18f, paint);
+
+        paint.Color = SKColors.White;
+        canvas.DrawCircle(cx, cy, radius * 0.09f, paint);
+    }
+
+    /// <summary>
+    /// True when the cached clock face already contains 1–3 thin radial hands
+    /// (OEM static art). Blank discs used with live overlay return false.
+    /// Inspected from the extracted bitmap — once per displayed face.
+    /// </summary>
+    private static bool ClockFaceAlreadyHasHands(SKBitmap face)
+    {
+        var w = face.Width;
+        var h = face.Height;
+        if (w < 16 || h < 16)
+            return false;
+
+        var cx = w / 2f;
+        var cy = h / 2f;
+        var radius = MeasureClockFaceRadius(face);
+        var faceColor = SampleClockFaceColor(face, cx, cy, radius);
+        if (faceColor.Alpha < 16)
+            return false;
+
+        const int binCount = 72;
+        const int radialSamples = 10;
+        var r0 = radius * 0.22f;
+        var r1 = radius * 0.68f;
+        if (r1 - r0 < 4f)
+            return false;
+
+        Span<float> coverage = stackalloc float[binCount];
+        var contrastThresholdSq = 45 * 45;
+        for (var b = 0; b < binCount; b++)
+        {
+            var angle = b * (360f / binCount) * (MathF.PI / 180f);
+            var sin = MathF.Sin(angle);
+            var cos = MathF.Cos(angle);
+            var contrast = 0;
+            var total = 0;
+            for (var s = 0; s < radialSamples; s++)
+            {
+                var t = (s + 0.5f) / radialSamples;
+                var r = r0 + (r1 - r0) * t;
+                var x = (int)MathF.Round(cx + sin * r);
+                var y = (int)MathF.Round(cy - cos * r);
+                if ((uint)x >= (uint)w || (uint)y >= (uint)h)
+                    continue;
+
+                total++;
+                var p = face.GetPixel(x, y);
+                if (p.Alpha < 16)
+                    continue;
+                if (RgbDistanceSq(p, faceColor) > contrastThresholdSq)
+                    contrast++;
+            }
+
+            coverage[b] = total == 0 ? 0f : (float)contrast / total;
+        }
+
+        return CountRadialHandPeaks(coverage) is >= 1 and <= 3;
+    }
+
+    /// <summary>
+    /// Mode of quantized samples on a ring inside the face (hands occupy few angles).
+    /// </summary>
+    private static SKColor SampleClockFaceColor(SKBitmap face, float cx, float cy, float radius)
+    {
+        var counts = new Dictionary<uint, int>();
+        var r = radius * 0.40f;
+        var w = face.Width;
+        var h = face.Height;
+        for (var deg = 0; deg < 360; deg += 10)
+        {
+            var rad = deg * (MathF.PI / 180f);
+            var x = (int)MathF.Round(cx + MathF.Sin(rad) * r);
+            var y = (int)MathF.Round(cy - MathF.Cos(rad) * r);
+            if ((uint)x >= (uint)w || (uint)y >= (uint)h)
+                continue;
+
+            var p = face.GetPixel(x, y);
+            if (p.Alpha < 16)
+                continue;
+
+            var key = QuantizeClockColor(p);
+            counts[key] = counts.TryGetValue(key, out var n) ? n + 1 : 1;
+        }
+
+        uint best = 0;
+        var bestCount = -1;
+        foreach (var (key, n) in counts)
+        {
+            if (n <= bestCount)
+                continue;
+            bestCount = n;
+            best = key;
+        }
+
+        if (bestCount <= 0)
+            return SKColors.Transparent;
+
+        return new SKColor(best);
+    }
+
+    private static uint QuantizeClockColor(SKColor p)
+        => ((uint)(p.Alpha & 0xF0) << 24)
+           | ((uint)(p.Red & 0xF0) << 16)
+           | ((uint)(p.Green & 0xF0) << 8)
+           | (uint)(p.Blue & 0xF0);
+
+    /// <summary>
+    /// Thin radial spikes in the inner ring. Walks from a gap so a hand that
+    /// crosses 12 o'clock is one peak, not two.
+    /// </summary>
+    private static int CountRadialHandPeaks(ReadOnlySpan<float> coverage)
+    {
+        const float threshold = 0.45f;
+        var binCount = coverage.Length;
+        var maxWidth = binCount / 8;
+
+        var gap = -1;
+        for (var i = 0; i < binCount; i++)
+        {
+            if (coverage[i] >= threshold)
+                continue;
+            gap = i;
+            break;
+        }
+
+        if (gap < 0)
+            return 0;
+
+        var peaks = 0;
+        var visited = 0;
+        var index = gap;
+        while (visited < binCount)
+        {
+            if (coverage[index % binCount] < threshold)
+            {
+                index++;
+                visited++;
+                continue;
+            }
+
+            var width = 0;
+            while (visited < binCount && coverage[index % binCount] >= threshold)
+            {
+                width++;
+                index++;
+                visited++;
+            }
+
+            if (width >= 2 && width <= maxWidth)
+                peaks++;
+        }
+
+        return peaks;
+    }
+
+    private static void DrawClockHand(
+        SKCanvas canvas,
+        float cx,
+        float cy,
+        float angleDegrees,
+        float length,
+        float width,
+        float tail,
+        SKPaint paint)
+    {
+        canvas.Save();
+        canvas.Translate(cx, cy);
+        canvas.RotateDegrees(angleDegrees);
         canvas.DrawRoundRect(
-            new SKRoundRect(new SKRect(cx - minuteW / 2f, cy - minuteH, cx + minuteW / 2f, cy + minuteW / 2f), minuteW / 2f),
+            new SKRoundRect(new SKRect(-width / 2f, -length, width / 2f, tail), width / 2f),
             paint);
+        canvas.Restore();
+    }
 
-        // Hour hand (3 o'clock): thicker horizontal bar from center to the right.
-        var hourW = size * 0.28f;
-        var hourH = size * 0.07f;
-        canvas.DrawRoundRect(
-            new SKRoundRect(new SKRect(cx - hourH / 2f, cy - hourH / 2f, cx + hourW, cy + hourH / 2f), hourH / 2f),
-            paint);
+    /// <summary>
+    /// Radius of the inner disc around the center (the analog face), not the outer plate.
+    /// </summary>
+    private static float MeasureClockFaceRadius(SKBitmap face)
+    {
+        var w = face.Width;
+        var h = face.Height;
+        var cx = w / 2;
+        var cy = h / 2;
+        var maxR = Math.Min(cx, cy);
+        var probe = Math.Max(4, maxR / 4);
+        var inner = face.GetPixel(Math.Min(w - 1, cx + probe), cy);
+        if (inner.Alpha < 16)
+            inner = face.GetPixel(cx, Math.Min(h - 1, cy + probe));
 
-        // Center cap.
-        var hub = size * 0.045f;
-        canvas.DrawCircle(cx, cy, hub, paint);
+        Span<float> hits = stackalloc float[8];
+        ReadOnlySpan<(int Dx, int Dy)> dirs =
+        [
+            (1, 0), (-1, 0), (0, 1), (0, -1),
+            (1, 1), (1, -1), (-1, 1), (-1, -1),
+        ];
 
-        return bitmap;
+        for (var d = 0; d < dirs.Length; d++)
+        {
+            var (dx, dy) = dirs[d];
+            var hit = (float)maxR;
+            var diagonal = dx != 0 && dy != 0;
+            for (var i = probe; i < maxR; i++)
+            {
+                var x = cx + dx * i;
+                var y = cy + dy * i;
+                if ((uint)x >= (uint)w || (uint)y >= (uint)h)
+                    break;
+
+                var p = face.GetPixel(x, y);
+                if (p.Alpha < 16 || RgbDistanceSq(p, inner) > 50 * 50)
+                {
+                    hit = i;
+                    if (diagonal)
+                        hit *= 1.41421356f;
+                    break;
+                }
+            }
+
+            hits[d] = hit;
+        }
+
+        hits.Sort();
+        var radius = hits[hits.Length / 2];
+        var minRadius = maxR * 0.18f;
+        var maxRadius = maxR * 0.92f;
+        if (radius < minRadius)
+            return minRadius;
+        if (radius > maxRadius)
+            return maxRadius;
+        return radius;
+    }
+
+    private static int RgbDistanceSq(SKColor a, SKColor b)
+    {
+        var dr = a.Red - b.Red;
+        var dg = a.Green - b.Green;
+        var db = a.Blue - b.Blue;
+        return dr * dr + dg * dg + db * db;
     }
 
     private static BitmapSource? CompositeOnOpaqueBackground(SKBitmap foreground, int size, SKColor background)
@@ -4066,9 +5363,9 @@ public static partial class ApkIconService
                     }
 
                     using var canvas = new SKCanvas(composed);
-                    // White-on-black date plates: punch black to alpha. Transparent white
-                    // glyphs (calendar_date_* with alpha) draw as-is.
-                    if (IsMostlyDarkPlate(sized))
+                    // White-on-black date plates only: punch black when there is substantial
+                    // light ink. Dense dark artwork (Sudoku, etc.) must draw as-is.
+                    if (IsMostlyDarkPlate(sized) && HasSubstantialLightInk(sized))
                     {
                         using var ink = KnockoutNearBlackKeepLight(sized);
                         if (ink is not null)
@@ -4194,6 +5491,192 @@ public static partial class ApkIconService
         return opaque > 0 && dark * 5 >= opaque * 4 && light >= Math.Max(3, opaque / 200);
     }
 
+    /// <summary>
+    /// Calendar date plates carry a large share of light ink on the dark plate.
+    /// Thin anti-aliased edges on a dark logo must not trigger black knockout.
+    /// </summary>
+    private static bool HasSubstantialLightInk(SKBitmap bitmap)
+    {
+        if (bitmap.Width <= 0 || bitmap.Height <= 0)
+            return false;
+
+        var stride = bitmap.RowBytes;
+        var buffer = new byte[stride * bitmap.Height];
+        System.Runtime.InteropServices.Marshal.Copy(bitmap.GetPixels(), buffer, 0, buffer.Length);
+
+        long opaque = 0, light = 0;
+        for (var y = 0; y < bitmap.Height; y += 4)
+        {
+            var row = y * stride;
+            for (var x = 0; x < bitmap.Width; x += 4)
+            {
+                var i = row + x * 4;
+                if (i + 3 >= buffer.Length)
+                    continue;
+                if (buffer[i + 3] < 16)
+                    continue;
+
+                opaque++;
+                var b = buffer[i];
+                var g = buffer[i + 1];
+                var r = buffer[i + 2];
+                if (r > 200 && g > 200 && b > 200)
+                    light++;
+            }
+        }
+
+        return opaque > 0 && light * 5 >= opaque;
+    }
+
+    /// <summary>
+    /// Near-solid white/light adaptive plates are omitted so brand tiles (Outlook, Word,
+    /// Snapseed) are not wrapped in a white card. Kept when the foreground is full-bleed
+    /// with interior cutouts that need the plate (Translate letter holes on #EEEEEE).
+    /// </summary>
+    private static bool ShouldOmitLightBackgroundForForeground(
+        SKBitmap? background,
+        SKColor? backgroundColor,
+        SKBitmap? foreground)
+    {
+        var lightBg = background is not null && IsNearSolidLightPlate(background)
+                      || IsNearWhiteColor(backgroundColor);
+        if (!lightBg)
+            return false;
+
+        // Translate-style: opaque edges + hollow glyphs — dropping the plate opens dark holes.
+        if (foreground is not null && ForegroundNeedsLightPlateBacking(foreground))
+            return false;
+
+        return true;
+    }
+
+    /// <summary>
+    /// True when opaque ink reaches the canvas edge band and the opaque bbox still contains
+    /// meaningful transparency (glyph cutouts). Margin-only icons return false.
+    /// </summary>
+    private static bool ForegroundNeedsLightPlateBacking(SKBitmap foreground)
+    {
+        if (foreground.Width <= 0 || foreground.Height <= 0)
+            return false;
+
+        var stride = foreground.RowBytes;
+        var buffer = new byte[stride * foreground.Height];
+        System.Runtime.InteropServices.Marshal.Copy(foreground.GetPixels(), buffer, 0, buffer.Length);
+
+        var w = foreground.Width;
+        var h = foreground.Height;
+        var edgeX = Math.Max(1, w / 12);
+        var edgeY = Math.Max(1, h / 12);
+
+        long edgeSamples = 0, edgeOpaque = 0;
+        var minX = w;
+        var minY = h;
+        var maxX = -1;
+        var maxY = -1;
+
+        for (var y = 0; y < h; y += 2)
+        {
+            var row = y * stride;
+            for (var x = 0; x < w; x += 2)
+            {
+                var i = row + x * 4;
+                if (i + 3 >= buffer.Length)
+                    continue;
+
+                var opaque = buffer[i + 3] >= 16;
+                var onEdge = x < edgeX || x >= w - edgeX || y < edgeY || y >= h - edgeY;
+                if (onEdge)
+                {
+                    edgeSamples++;
+                    if (opaque)
+                        edgeOpaque++;
+                }
+
+                if (!opaque)
+                    continue;
+
+                if (x < minX) minX = x;
+                if (y < minY) minY = y;
+                if (x > maxX) maxX = x;
+                if (y > maxY) maxY = y;
+            }
+        }
+
+        if (edgeSamples == 0 || maxX < minX)
+            return false;
+
+        // Require real full-bleed coverage (Translate blue tile); Outlook glyph fails this.
+        if (edgeOpaque * 2 < edgeSamples)
+            return false;
+
+        long interior = 0, interiorTransparent = 0;
+        for (var y = minY; y <= maxY; y += 2)
+        {
+            var row = y * stride;
+            for (var x = minX; x <= maxX; x += 2)
+            {
+                var i = row + x * 4;
+                if (i + 3 >= buffer.Length)
+                    continue;
+
+                interior++;
+                if (buffer[i + 3] < 16)
+                    interiorTransparent++;
+            }
+        }
+
+        return interior > 0 && interiorTransparent * 8 >= interior;
+    }
+
+    private static bool IsNearWhiteColor(SKColor? color)
+    {
+        if (color is null)
+            return false;
+
+        var c = color.Value;
+        return c.Alpha > 200 && c.Red > 245 && c.Green > 245 && c.Blue > 245;
+    }
+
+    /// <summary>
+    /// Near-solid white / light-gray plate (common adaptive <c>ic_launcher_background</c>).
+    /// </summary>
+    private static bool IsNearSolidLightPlate(SKBitmap bitmap)
+    {
+        if (bitmap.Width <= 0 || bitmap.Height <= 0)
+            return false;
+
+        var stride = bitmap.RowBytes;
+        var buffer = new byte[stride * bitmap.Height];
+        System.Runtime.InteropServices.Marshal.Copy(bitmap.GetPixels(), buffer, 0, buffer.Length);
+
+        long opaque = 0, light = 0, samples = 0;
+        for (var y = 0; y < bitmap.Height; y += 4)
+        {
+            var row = y * stride;
+            for (var x = 0; x < bitmap.Width; x += 4)
+            {
+                var i = row + x * 4;
+                if (i + 3 >= buffer.Length)
+                    continue;
+
+                samples++;
+                if (buffer[i + 3] < 16)
+                    continue;
+
+                opaque++;
+                var b = buffer[i];
+                var g = buffer[i + 1];
+                var r = buffer[i + 2];
+                if (r > 230 && g > 230 && b > 230)
+                    light++;
+            }
+        }
+
+        return samples > 0
+               && opaque * 20 >= samples * 19
+               && light * 20 >= opaque * 19;
+    }
+
     private static async Task<SKBitmap?> LoadAdaptiveLayerAsync(
         LogicalDeviceViewModel device,
         IReadOnlyList<string> apkFiles,
@@ -4304,7 +5787,7 @@ public static partial class ApkIconService
                     return insetInner;
             }
 
-            var gradient = ApkVectorIconRenderer.TryRenderGradientDrawable(bytes, size);
+            var gradient = ApkVectorIconRenderer.TryRenderGradientDrawable(bytes, size, resolveColor);
             if (gradient is not null)
                 return gradient;
         }
@@ -4322,10 +5805,12 @@ public static partial class ApkIconService
             .Where(static p => !string.IsNullOrEmpty(p))
             .GroupBy(Path.GetFileName, StringComparer.OrdinalIgnoreCase)
             .Select(g => g
-                .OrderByDescending(DensityRank)
+                .OrderBy(IsNightQualifiedPath)
+                .ThenByDescending(DensityRank)
                 .ThenBy(static p => p, StringComparer.OrdinalIgnoreCase)
                 .First())
-            .OrderByDescending(DensityRank)
+            .OrderBy(IsNightQualifiedPath)
+            .ThenByDescending(DensityRank)
             .ThenBy(static p => p, StringComparer.OrdinalIgnoreCase)
             .ToList();
     }
@@ -4857,7 +6342,28 @@ public static partial class ApkIconService
     {
         try
         {
-            return SKBitmap.Decode(bytes);
+            var decoded = SKBitmap.Decode(bytes);
+            if (decoded is null)
+                return null;
+
+            // Already BGRA — keep AlphaType as-is. ScalePixels Premul→Unpremul invents false
+            // near-white samples and made Health Connect omit its white adaptive plate.
+            if (decoded.ColorType == SKColorType.Bgra8888)
+                return decoded;
+
+            // Solid white adaptive plates often decode as Gray8 (1 byte/px). Pixel scanners and
+            // WriteableBitmap assume Bgra8888 — Gray8 caused IndexOutOfRange on Health Connect.
+            var converted = new SKBitmap(
+                decoded.Width, decoded.Height, SKColorType.Bgra8888, SKAlphaType.Unpremul);
+            if (!decoded.ScalePixels(converted, new SKSamplingOptions(SKFilterMode.Nearest, SKMipmapMode.None)))
+            {
+                using var canvas = new SKCanvas(converted);
+                canvas.Clear(SKColors.Transparent);
+                canvas.DrawBitmap(decoded, 0, 0);
+            }
+
+            decoded.Dispose();
+            return converted;
         }
         catch
         {
@@ -5570,7 +7076,8 @@ public static partial class ApkIconService
             .Select(ArchivePath.NormalizeInternal)
             .Where(p => IsImagePath(p) || IsExtensionlessRasterCandidate(p))
             .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderByDescending(DensityRank)
+            .OrderBy(IsNightQualifiedPath)
+            .ThenByDescending(DensityRank)
             .ThenByDescending(p => IsImagePath(p) ? 1 : 0)
             .ToList();
 
@@ -5586,6 +7093,7 @@ public static partial class ApkIconService
                             || p.EndsWith(".xml", StringComparison.OrdinalIgnoreCase)))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderByDescending(IconCandidateScore)
+            .ThenBy(IsNightQualifiedPath)
             .ThenByDescending(DensityRank)
             .ToList();
 
@@ -5661,6 +7169,13 @@ public static partial class ApkIconService
 
         return 0;
     }
+
+    /// <summary>0 = default/light; 1 = night-qualified (drawable-night, -night-*, etc.).</summary>
+    private static int IsNightQualifiedPath(string path)
+        => path.Contains("-night", StringComparison.OrdinalIgnoreCase)
+           || path.Contains("/night/", StringComparison.OrdinalIgnoreCase)
+            ? 1
+            : 0;
 
     private static ArchiveEntry? FindEntry(IReadOnlyList<ArchiveEntry> entries, string memberName)
     {
@@ -5770,8 +7285,50 @@ public static partial class ApkIconService
     private static string GetLocalIconDirectory(string serialNumber)
         => Path.Combine(Data.AppDataPath, serialNumber, ICONS_SUBFOLDER);
 
+    /// <summary>
+    /// Filename tag so clock (face-only) and calendar (day-of-month) caches are not reused
+    /// from earlier builds that baked hands or a stale date into the PNG.
+    /// </summary>
+    private const string DynamicLauncherIconTag = ".dyn";
+
     private static string GetLocalIconPath(string serialNumber, string packageName, string iconExt)
-        => Path.Combine(GetLocalIconDirectory(serialNumber), SanitizePackageFileName(packageName) + iconExt);
+    {
+        var fileName = SanitizePackageFileName(packageName);
+        if (IsDeskclockPackage(packageName) || IsCalendarPackage(packageName))
+            fileName += DynamicLauncherIconTag;
+        return Path.Combine(GetLocalIconDirectory(serialNumber), fileName + iconExt);
+    }
+
+    private static BitmapSource? TryDecodeExistingIconFile(string serialNumber, string packageName)
+    {
+        foreach (var path in EnumerateLocalIconCandidatePaths(serialNumber, packageName))
+        {
+            if (!File.Exists(path))
+                continue;
+
+            var decoded = DecodeBitmap(path);
+            if (decoded is not null)
+                return ForDisplay(decoded);
+        }
+
+        return null;
+    }
+
+    private static IEnumerable<string> EnumerateLocalIconCandidatePaths(string serialNumber, string packageName)
+    {
+        var dir = GetLocalIconDirectory(serialNumber);
+        var baseName = SanitizePackageFileName(packageName);
+        var tagged = IsDeskclockPackage(packageName) || IsCalendarPackage(packageName);
+        string[] names = tagged
+            ? [baseName + DynamicLauncherIconTag, baseName]
+            : [baseName];
+        string[] exts = [".png", ".webp"];
+        foreach (var name in names)
+        {
+            foreach (var ext in exts)
+                yield return Path.Combine(dir, name + ext);
+        }
+    }
 
     private static object GetDeviceLock(string serialNumber)
         => DeviceLocks.GetOrAdd(serialNumber, _ => new object());
@@ -5815,11 +7372,20 @@ public static partial class ApkIconService
             if (!DateOnly.TryParseExact(parts[2], CsvDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
                 continue;
 
+            string? label = null;
+            if (parts.Length >= 5)
+                label = NormalizeLabelField(parts[4]);
+
+            string? clockHands = null;
+            if (parts.Length >= 6)
+                clockHands = NormalizeClockHandsField(parts[5]);
+
             result[parts[0]] = new ApkIconCacheEntry(
                 NormalizeCrc(parts[1]),
                 date,
                 NormalizeIconExtField(parts[3]),
-                parts.Length >= 5 ? NormalizeLabelField(parts[4]) : null);
+                label,
+                clockHands);
         }
 
         return result;
@@ -5862,6 +7428,70 @@ public static partial class ApkIconService
         return EncodeLocalizedLabels(map);
     }
 
+    /// <summary>
+    /// Live overlay only when this device's clock face is a blank disc.
+    /// Stored in <see cref="CSV_FILE"/> field 6, keyed with the icon CRC.
+    /// </summary>
+    private static bool ShouldOverlayLiveClockHands(string? packageName, SKBitmap face)
+    {
+        if (string.IsNullOrEmpty(packageName))
+            return !ClockFaceAlreadyHasHands(face);
+
+        var serial = Data.DevicesObject?.Current?.SerialNumber;
+        if (string.IsNullOrEmpty(serial))
+            return !ClockFaceAlreadyHasHands(face);
+
+        lock (GetDeviceLock(serial))
+        {
+            var cache = GetOrLoadCache(serial);
+            if (cache.TryGetValue(packageName, out var entry)
+                && TryParseClockHandsField(entry.ClockHands, out var cachedBaked))
+                return !cachedBaked;
+
+            var baked = ClockFaceAlreadyHasHands(face);
+            if (cache.TryGetValue(packageName, out entry))
+            {
+                var flag = baked ? ClockHandsBaked : ClockHandsOverlay;
+                cache[packageName] = entry with { ClockHands = flag };
+                WriteCache(serial, cache);
+            }
+
+            return !baked;
+        }
+    }
+
+    private static string? NormalizeClockHandsField(string field)
+    {
+        if (string.IsNullOrWhiteSpace(field))
+            return null;
+
+        field = field.Trim();
+        if (field.Equals(ClockHandsBaked, StringComparison.OrdinalIgnoreCase))
+            return ClockHandsBaked;
+        if (field.Equals(ClockHandsOverlay, StringComparison.OrdinalIgnoreCase))
+            return ClockHandsOverlay;
+
+        return null;
+    }
+
+    private static bool TryParseClockHandsField(string? field, out bool hasBakedHands)
+    {
+        hasBakedHands = false;
+        if (string.IsNullOrEmpty(field))
+            return false;
+
+        if (field.Equals(ClockHandsBaked, StringComparison.OrdinalIgnoreCase))
+        {
+            hasBakedHands = true;
+            return true;
+        }
+
+        if (field.Equals(ClockHandsOverlay, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    }
+
     private static void WriteCache(string serialNumber, Dictionary<string, ApkIconCacheEntry> cache)
     {
         var deviceDir = Path.Combine(Data.AppDataPath, serialNumber);
@@ -5871,7 +7501,10 @@ public static partial class ApkIconService
         {
             var iconExt = string.IsNullOrEmpty(kvp.Value.IconExt) ? "" : kvp.Value.IconExt;
             var label = string.IsNullOrEmpty(kvp.Value.Label) ? "" : kvp.Value.Label.Replace('|', '_');
-            return $"{kvp.Key}|{kvp.Value.ManifestCrc}|{kvp.Value.CheckedDate.ToString(CsvDateFormat, CultureInfo.InvariantCulture)}|{iconExt}|{label}";
+            var line = $"{kvp.Key}|{kvp.Value.ManifestCrc}|{kvp.Value.CheckedDate.ToString(CsvDateFormat, CultureInfo.InvariantCulture)}|{iconExt}|{label}";
+            if (!string.IsNullOrEmpty(kvp.Value.ClockHands))
+                line += "|" + kvp.Value.ClockHands;
+            return line;
         });
         File.WriteAllText(csvPath, string.Join(Environment.NewLine, lines), CsvEncoding);
     }

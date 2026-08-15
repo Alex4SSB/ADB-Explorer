@@ -1154,6 +1154,11 @@ internal static class FileActionLogic
             Data.FileActions.IsPullCopyVisible.Value = true;
             Data.FileActions.IsPasteVisible.Value = true;
 
+            Data.FileActions.IsAppDrive = false;
+            Data.FileActions.IsRecycleBin = false;
+            Data.FileActions.IsArchive = false;
+            Data.FileActions.IsTemp = false;
+
             Data.FileActions.ExplorerFilter = "";
 
             if (clearDevice)
@@ -1920,8 +1925,9 @@ internal static class FileActionLogic
         }
     }
 
-    public static IEnumerable<FileSyncOperation> SilentPullFiles(LogicalDeviceViewModel device, string target, bool disableParallel, IEnumerable<string> filesToReplace, params IEnumerable<FileClass> pullItems)
+    public static IEnumerable<FileSyncOperation> SilentPullFiles(LogicalDeviceViewModel device, string target, int maxThreads, IEnumerable<string> filesToReplace, params IEnumerable<FileClass> pullItems)
     {
+        maxThreads = Math.Max(1, maxThreads);
         foreach (var item in pullItems)
         {
             if (item.Type is not FileType.Folder)
@@ -1935,8 +1941,7 @@ internal static class FileActionLogic
             if (op is null)
                 continue;
 
-            if (disableParallel)
-                op.MaxThreads = 1;
+            op.MaxThreads = maxThreads;
 
             op.Start();
             yield return op;

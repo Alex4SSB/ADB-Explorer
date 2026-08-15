@@ -93,7 +93,9 @@ public partial class DetailsPane : UserControl
             animation.To = 0;
             pane.SlideTransform.BeginAnimation(TranslateTransform.XProperty, animation);
 
-            OnSelectedFilesChanged(d, new DependencyPropertyChangedEventArgs(SelectedFilesProperty, pane.SelectedFiles, pane.SelectedFiles));
+            // Selection is not pushed into this pane while it is closed. Pick up the
+            // current explorer/drive selection so opening does not keep none-selected UI.
+            pane.ApplyCurrentExplorerSelection();
         }
         else
         {
@@ -446,7 +448,7 @@ public partial class DetailsPane : UserControl
                     p.PropertyChanged += control.OnPackagePropertyChanged;
                     control.FileNameTextBlock.Text = p.DisplayName;
                     control.FileNameTextBlock.FlowDirection = FlowDirection.LeftToRight;
-                    control.LargeFileIcon.Source = p.Icon ?? AppIcon;
+                    control.LargeFileIcon.Source = p.IconViewModel.LargeIcon;
                     control.LargeFileIcon.MaxHeight = 128;
                     control.SmallFileIcon.Source = null;
                     control.InvalidSelectionBorder.Visibility = Visibility.Collapsed;
@@ -578,13 +580,39 @@ public partial class DetailsPane : UserControl
     public void RefreshSelection() =>
         OnSelectedFilesChanged(this, new DependencyPropertyChangedEventArgs(SelectedFilesProperty, SelectedFiles, SelectedFiles));
 
+    /// <summary>
+    /// Copies the live explorer selection into <see cref="SelectedFiles"/>.
+    /// Used when the pane opens; while closed, <see cref="ExplorerPageHeader"/> skips that update.
+    /// </summary>
+    private void ApplyCurrentExplorerSelection()
+    {
+        if (Data.FileActions.IsDriveViewVisible)
+        {
+            var drive = Data.RuntimeSettings.SelectedDrive;
+            SelectedFiles = drive is null ? [] : [drive];
+            return;
+        }
+
+        if (Data.FileActions.IsAppDrive)
+        {
+            SelectedFiles = Data.Packages?.Where(static p => p.IsSelected).ToList()
+                ?? Data.SelectedPackages?.ToList()
+                ?? [];
+            return;
+        }
+
+        SelectedFiles = Data.DirList?.FileList?.Where(static f => f.IsSelected).ToList()
+            ?? Data.SelectedFiles?.ToList()
+            ?? [];
+    }
+
     private void OnPackagePropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => App.SafeBeginInvoke(() =>
     {
         if (sender is not Package package || !ReferenceEquals(Package, package))
             return;
 
-        if (e.PropertyName is nameof(Package.Icon))
-            LargeFileIcon.Source = package.Icon ?? AppIcon;
+        if (e.PropertyName is nameof(Package.Icon) or nameof(Package.IconLoadCompleted))
+            LargeFileIcon.Source = package.IconViewModel.LargeIcon;
         else if (e.PropertyName is nameof(Package.Label) or nameof(Package.DisplayName) or nameof(Package.Name))
         {
             FileNameTextBlock.Text = package.DisplayName;

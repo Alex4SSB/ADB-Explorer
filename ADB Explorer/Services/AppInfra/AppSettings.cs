@@ -103,6 +103,20 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     public const int MaxSimultaneousOpsMax = 999;
     public const int MaxSimultaneousOpsDefault = 32;
 
+    /// <summary>
+    /// Concurrent thumbnail pulls and APK icon loads: ⌈<see cref="MaxSimultaneousOps"/> / 6⌉.
+    /// Each of those jobs fans out into several adb processes, so the full ops limit is too high.
+    /// </summary>
+    [JsonIgnore]
+    public int ThumbAndIconConcurrency
+    {
+        get
+        {
+            var ops = Math.Clamp(MaxSimultaneousOps, MaxSimultaneousOpsMin, MaxSimultaneousOpsMax);
+            return Math.Max(1, (ops + 5) / 6);
+        }
+    }
+
     void IJsonOnDeserialized.OnDeserialized()
     {
         _locationThumbSize ??= [];
@@ -134,9 +148,6 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
 
     [ObservableProperty]
     public partial bool PersistThumbs { get; set; } = true;
-
-    [ObservableProperty]
-    public partial bool LimitThumbsPullSpeed { get; set; } = true;
 
     [ObservableProperty]
     public partial bool ThumbSizePerLocation { get; set; } = true;
