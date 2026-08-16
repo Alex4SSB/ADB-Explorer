@@ -1745,4 +1745,10 @@ Séléctionnez Personnalisé pour utiliser un emplacement qui ne sera pas suppri
   <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
     <value>Le fichier sera ignoré.</value>
   </data>
+  <data name="S_PACKAGE_ID" xml:space="preserve">
+    <value>ID de paquet</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
+    <value>Chargement des icônes d'application</value>
+  </data>
 </root>
