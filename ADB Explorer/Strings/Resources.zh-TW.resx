@@ -1670,4 +1670,22 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_PREVIEW_SYNTAX" xml:space="preserve">
     <value>語法</value>
   </data>
+  <data name="S_NEW_VERSION_READY" xml:space="preserve">
+    <value>新的 {0}，版本 {1}，已下載並準備安裝。</value>
+  </data>
+  <data name="S_UPDATE_ON_CLOSE" xml:space="preserve">
+    <value>關閉更新</value>
+  </data>
+  <data name="S_UPDATE_APPLY_FAILED" xml:space="preserve">
+    <value>更新無法準備。請確保有可用的 .7z 處理程式（Windows 檔案總管、7-Zip、NanaZip 等），或從 GitHub 手動下載版本。</value>
+  </data>
+  <data name="S_NEW_ARCHIVE" xml:space="preserve">
+    <value>新檔案</value>
+  </data>
+  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
+    <value>替換目的地中的檔案</value>
+  </data>
+  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
+    <value>跳過這些檔案</value>
+  </data>
 </root>
