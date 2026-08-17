@@ -237,7 +237,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         if (Data.FileActions.IsAppDriveThumbsLocked)
             return;
 
-        if (Data.Settings.ThumbSizePerLocation)
+        if (Data.Settings.ThumbSizePerLocation && Data.CurrentPath is not null)
         {
             if (Data.Settings.LocationThumbSize.ContainsKey(Data.CurrentPath))
                 Data.Settings.LocationThumbSize[Data.CurrentPath] = value;

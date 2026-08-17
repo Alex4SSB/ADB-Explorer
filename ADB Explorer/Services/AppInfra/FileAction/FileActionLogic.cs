@@ -119,13 +119,41 @@ internal static class FileActionLogic
             DefaultDirectory = Data.Settings.DefaultFolder,
             Title = Strings.Resources.S_INSTALL_APK,
         };
-        dialog.Filters.Add(new(Strings.Resources.S_FILE_TYPE_APK, string.Join(';', AdbExplorerConst.INSTALL_APK.Select(name => name[1..]))));
+        dialog.Filters.Add(new(
+            Strings.Resources.S_FILE_TYPE_APK,
+            string.Join(';', AdbExplorerConst.INSTALL_APK.Select(name => name[1..]).Append(AdbExplorerConst.APK_BACKUP_EXTENSION[1..].ToLowerInvariant()))));
 
         if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
             return;
 
         var shItems = dialog.FileNames.Select(ShellItem.Open);
         ShellFileOperation.PushPackages(Data.DevicesObject.Current, shItems, App.AppDispatcher);
+    }
+
+    public static void BackupPackages()
+    {
+        var packages = Data.SelectedPackages.ToList();
+        if (packages.Count == 0 || Data.DevicesObject.Current is null)
+            return;
+
+        var dialog = new CommonOpenFileDialog()
+        {
+            IsFolderPicker = true,
+            Multiselect = false,
+            DefaultDirectory = Data.Settings.DefaultFolder,
+            Title = packages.Count > 1
+                ? Strings.Resources.S_ITEM_DESTINATION_PLURAL
+                : string.Format(Strings.Resources.S_ITEM_DESTINATION, packages[0].Name),
+        };
+
+        if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+            return;
+
+        var targetPath = dialog.FileName;
+        if (!Directory.Exists(targetPath) && FileHelper.GetFullName(targetPath) == packages[0].Name)
+            targetPath = FileHelper.GetParentPath(targetPath);
+
+        ShellFileOperation.BackupPackages(Data.DevicesObject.Current, packages, targetPath, App.AppDispatcher);
     }
 
     public static void UpdateModifiedDates()
@@ -240,7 +268,7 @@ internal static class FileActionLogic
             {
                 file.IsTemp = false;
                 file.ModifiedTime = DateTime.Now;
-                file.Size = 0;
+                file.Size = null;
                 file.IsCreationTimeResolved = false;
                 file.UpdateType();
 
@@ -936,7 +964,7 @@ internal static class FileActionLogic
     {
         if (Data.FileActions.IsAppDrive)
         {
-            UpdatePackages(true);
+            UpdatePackages(updateExplorer: true, cacheOnly: true);
             return;
         }
 
@@ -1086,7 +1114,7 @@ internal static class FileActionLogic
         });
     }
 
-    public static void UpdatePackages(bool updateExplorer = false, CancellationToken cancellationToken = default)
+    public static void UpdatePackages(bool updateExplorer = false, CancellationToken cancellationToken = default, bool cacheOnly = false)
     {
         Data.FileActions.ListingInProgress = true;
 
@@ -1100,9 +1128,24 @@ internal static class FileActionLogic
 
             App.SafeInvoke(() =>
             {
-                Data.Packages = t.Result;
+                var listed = t.Result;
+
+                if (cacheOnly)
+                {
+                    MergePackageList(listed);
+                    ApkIconService.ApplyCacheToPackages(Data.Packages);
+                }
+                else
+                {
+                    Data.Packages = listed;
+                }
+
                 if (updateExplorer)
-                    App.Services.GetService<ExplorerViewModel>().ExplorerSource = Data.Packages;
+                {
+                    var explorer = App.Services.GetService<ExplorerViewModel>();
+                    if (!ReferenceEquals(explorer.ExplorerSource, Data.Packages))
+                        explorer.ExplorerSource = Data.Packages;
+                }
 
                 if (!updateExplorer && Data.DevicesObject.Current is not null)
                 {
@@ -1111,8 +1154,11 @@ internal static class FileActionLogic
                 }
 
                 Data.FileActions.ListingInProgress = false;
+                UpdateFileActions();
+                CommandManager.InvalidateRequerySuggested();
 
-                if (updateExplorer
+                if (!cacheOnly
+                    && updateExplorer
                     && Data.FileActions.IsAppDrive
                     && ApkIconService.IsEnabled)
                 {
@@ -1120,6 +1166,33 @@ internal static class FileActionLogic
                 }
             });
         });
+    }
+
+    /// <summary>
+    /// Updates <see cref="Data.Packages"/> to match a fresh <c>pm list</c> without replacing
+    /// existing instances (keeps in-memory icons/labels).
+    /// </summary>
+    private static void MergePackageList(ObservableList<Package> listed)
+    {
+        var incomingByName = listed.ToDictionary(pkg => pkg.Name, StringComparer.Ordinal);
+        Data.Packages.RemoveAll(pkg => !incomingByName.ContainsKey(pkg.Name));
+
+        var existingByName = Data.Packages.ToDictionary(pkg => pkg.Name, StringComparer.Ordinal);
+
+        foreach (var pkg in listed)
+        {
+            if (existingByName.TryGetValue(pkg.Name, out var existing))
+            {
+                existing.Path = pkg.Path;
+                existing.Type = pkg.Type;
+                existing.Uid = pkg.Uid;
+                existing.Version = pkg.Version;
+                existing.DeviceSerial = pkg.DeviceSerial;
+                continue;
+            }
+
+            Data.Packages.Add(pkg);
+        }
     }
 
     public static void ClearExplorer(bool clearDevice = true)
@@ -1134,6 +1207,7 @@ internal static class FileActionLogic
             Data.FileActions.PushFilesFoldersEnabled =
             Data.FileActions.PullEnabled =
             Data.FileActions.DeleteEnabled =
+            Data.FileActions.BackupPackageEnabled =
             Data.FileActions.RenameEnabled =
             Data.FileActions.HomeEnabled =
             Data.FileActions.NewEnabled =
@@ -1411,8 +1485,10 @@ internal static class FileActionLogic
         // All selected files are installable
         // Not in trash or recovery
         var allInstallApk = selectedFiles.AnyAll(file => file.IsInstallApk);
+        var allInstallOrBackup = selectedFiles.AnyAll(file =>
+            file.IsInstallApk || AppBackupHelper.IsApkBackup(file.FullName));
         actions.PackageActionsEnabled = enableApk
-            && allInstallApk
+            && allInstallOrBackup
             && !isRecycleBin
             && isNotRecovery;
 
@@ -1472,6 +1548,11 @@ internal static class FileActionLogic
             && tarAvailable;
         actions.IsCompressToContextEnabled = actions.IsCompressToEnabled
             && hasFileSelection;
+
+        actions.BackupPackageEnabled = isAppDrive
+            && hasPackageSelection
+            && tarAvailable
+            && isNotRecovery;
 
         actions.InstallPackageEnabled = isNotRecovery;
 

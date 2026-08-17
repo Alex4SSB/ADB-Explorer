@@ -313,6 +313,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The app was installed, but OBB files could not be restored. Open the app once on the device and try again..
+        /// </summary>
+        public static string S_APK_BACKUP_OBB_FAILED {
+            get {
+                return ResourceManager.GetString("S_APK_BACKUP_OBB_FAILED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The APK icon is licensed under the Apache License, Version 2.0..
         /// </summary>
         public static string S_APK_ICON_LIC {
@@ -420,6 +429,15 @@ namespace ADB_Explorer.Strings {
         public static string S_AWAITING_RESPONSE {
             get {
                 return ResourceManager.GetString("S_AWAITING_RESPONSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create a .APKBKP of the app installation and OBB data.
+        /// </summary>
+        public static string S_BACKUP_PACKAGE_INFO {
+            get {
+                return ResourceManager.GetString("S_BACKUP_PACKAGE_INFO", resourceCulture);
             }
         }
         
@@ -2356,6 +2374,15 @@ namespace ADB_Explorer.Strings {
         public static string S_MENU_ARCHIVE {
             get {
                 return ResourceManager.GetString("S_MENU_ARCHIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Backup.
+        /// </summary>
+        public static string S_MENU_BACKUP_PACKAGE {
+            get {
+                return ResourceManager.GetString("S_MENU_BACKUP_PACKAGE", resourceCulture);
             }
         }
         
@@ -4896,6 +4923,5 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("ScrollBar_ScrollToTopCommand", resourceCulture);
             }
         }
-        
     }
 }

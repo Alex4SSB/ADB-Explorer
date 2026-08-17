@@ -840,6 +840,13 @@ Cancel All Running</value>
     <value>Install</value>
     <comment>The menu to install app packages</comment>
   </data>
+  <data name="S_MENU_BACKUP_PACKAGE" xml:space="preserve">
+    <value>Backup</value>
+    <comment>The menu used to back up an installed app with its OBB files</comment>
+  </data>
+  <data name="S_APK_BACKUP_OBB_FAILED" xml:space="preserve">
+    <value>The app was installed, but OBB files could not be restored. Open the app once on the device and try again.</value>
+  </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>Clear Command Log</value>
     <comment>The button used to clear the command log</comment>
@@ -2185,5 +2192,9 @@ The checks attempt to prevent an unsuspecting user from launching a possibly mal
   <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
     <value>File will be skipped.</value>
     <comment>Tooltip in the file conflict resolution table</comment>
+  </data>
+  <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
+    <value>Create a .APKBKP of the app installation and OBB data</value>
+    <comment>Tooltip for apk backup</comment>
   </data>
 </root>

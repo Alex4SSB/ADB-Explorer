@@ -575,6 +575,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             LastAccessTime = info.Value.AccessTime;
             CreationTime = info.Value.CreationTime;
             ModifiedTimeWithOffset = info.Value.ModifiedTime;
+            ModifiedTime = info.Value.ModifiedTime.DateTime.ToLocalTime();
             Permissions = info.Value.Permissions;
 
             if (!IsDirectory && info.Value.Size is long size && size >= 0)

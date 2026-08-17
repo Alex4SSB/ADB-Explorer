@@ -1218,7 +1218,7 @@ public static partial class ApkIconService
         if (ShouldApplyAdaptiveViewportCrop(layer))
             DrawAdaptiveIconViewport(canvas, layer, outputSize);
         else
-            canvas.DrawBitmap(layer, new SKRect(0, 0, outputSize, outputSize));
+            canvas.DrawBitmap(layer, new SKRect(0, 0, outputSize, outputSize), ScaleSampling);
     }
 
 
@@ -1284,7 +1284,7 @@ public static partial class ApkIconService
             (srcH - visibleH) / 2f,
             (srcW + visibleW) / 2f,
             (srcH + visibleH) / 2f);
-        canvas.DrawBitmap(layer, src, new SKRect(0, 0, outputSize, outputSize));
+        canvas.DrawBitmap(layer, src, new SKRect(0, 0, outputSize, outputSize), ScaleSampling);
     }
 
 
@@ -1293,7 +1293,7 @@ public static partial class ApkIconService
         using var canvasBitmap = new SKBitmap(size, size, SKColorType.Bgra8888, SKAlphaType.Unpremul);
         using var canvas = new SKCanvas(canvasBitmap);
         canvas.Clear(background);
-        canvas.DrawBitmap(foreground, new SKRect(0, 0, size, size));
+        canvas.DrawBitmap(foreground, new SKRect(0, 0, size, size), ScaleSampling);
         if (IsDegenerateIcon(canvasBitmap))
             return null;
         return ApkVectorIconRenderer.ToBitmapSource(canvasBitmap);
@@ -1355,11 +1355,11 @@ public static partial class ApkIconService
                     {
                         using var ink = KnockoutNearBlackKeepLight(sized);
                         if (ink is not null)
-                            canvas.DrawBitmap(ink, new SKRect(0, 0, size, size));
+                            canvas.DrawBitmap(ink, new SKRect(0, 0, size, size), ScaleSampling);
                     }
                     else
                     {
-                        canvas.DrawBitmap(sized, new SKRect(0, 0, size, size));
+                        canvas.DrawBitmap(sized, new SKRect(0, 0, size, size), ScaleSampling);
                     }
                 }
 
@@ -1913,7 +1913,7 @@ public static partial class ApkIconService
                 var result = new SKBitmap(size, size, SKColorType.Bgra8888, SKAlphaType.Unpremul);
                 using var canvas = new SKCanvas(result);
                 canvas.Clear(SKColors.Transparent);
-                canvas.DrawBitmap(inner, dest);
+                canvas.DrawBitmap(inner, dest, ScaleSampling);
                 return result;
             }
             finally
@@ -2198,7 +2198,7 @@ public static partial class ApkIconService
         var result = new SKBitmap(source.Width, source.Height, SKColorType.Bgra8888, SKAlphaType.Unpremul);
         using var canvas = new SKCanvas(result);
         canvas.Clear(SKColors.Transparent);
-        canvas.DrawBitmap(source, dx, dy);
+        canvas.DrawBitmap(source, dx, dy, PixelCopySampling);
         return result;
     }
 
@@ -2368,7 +2368,7 @@ public static partial class ApkIconService
             {
                 using var canvas = new SKCanvas(converted);
                 canvas.Clear(SKColors.Transparent);
-                canvas.DrawBitmap(decoded, 0, 0);
+                canvas.DrawBitmap(decoded, 0, 0, PixelCopySampling);
             }
 
             decoded.Dispose();

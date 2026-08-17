@@ -42,13 +42,23 @@ public class FileExtractOperation : AbstractShellFileOperation
 
         var operationTask = Task.Run(() =>
         {
+            var toc = ArchiveListing.GetOrFetchToc(Device.ID, ArchiveSourcePath, CancelTokenSource.Token);
+            var memberBytes = ArchiveVerboseProgress.MemberBytesForSelection(
+                toc.Entries,
+                ArchiveInternalPath,
+                IsArchiveDirectory);
+            var session = new ArchiveOpProgressSession(this, memberBytes);
+
             ArchiveExtract.ExtractSelection(
                 Device.ID,
                 ArchiveSourcePath,
                 ArchiveInternalPath,
                 IsArchiveDirectory,
                 TargetPath.FullPath,
-                CancelTokenSource.Token);
+                CancelTokenSource.Token,
+                session.OnLine);
+
+            session.Finish();
         }, CancelTokenSource.Token);
 
         operationTask.ContinueWith(_ =>

@@ -118,12 +118,23 @@ public class FileArchiveModifyOperation : AbstractShellFileOperation
 
         var operationTask = Task.Run(() =>
         {
+            var session = ArchiveOpProgressSession.FromToc(
+                this,
+                Device.ID,
+                TarArchivePath,
+                CancelTokenSource.Token,
+                phases: 2);
+
             ArchiveExtract.AddOrUpdateTarMembers(
                 Device.ID,
                 TarArchivePath,
                 InternalDestDir,
                 PopulateOverlay,
-                CancelTokenSource.Token);
+                CancelTokenSource.Token,
+                session.OnLine,
+                session.BeginPhase);
+
+            session.Finish();
 
             if (IsMove && DeviceSources.Count > 0)
                 ShellFileOperation.SilentDelete(Device, DeviceSources);

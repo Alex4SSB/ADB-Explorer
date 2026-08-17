@@ -49,6 +49,8 @@ public static partial class ApkIconService
     private static CancellationTokenSource? WorkerCts;
 
     private static readonly string[] ImageExtensions = [".png", ".webp", ".jpg", ".jpeg"];
+    private static readonly SKSamplingOptions PixelCopySampling = new(SKFilterMode.Nearest, SKMipmapMode.None);
+    private static readonly SKSamplingOptions ScaleSampling = new(SKFilterMode.Linear, SKMipmapMode.Linear);
     private static readonly string[] DensityOrder =
     [
         "xxxhdpi", "xxhdpi", "xhdpi", "hdpi", "tvdpi", "mdpi", "ldpi",
@@ -321,6 +323,19 @@ public static partial class ApkIconService
         }
 
         packageName ??= TryResolvePackageName(apkPath);
+        if (!IsListedPackageApk(packageName, apkPath))
+        {
+#if DEBUG
+            timing?.Mark("BeginLoad aborted (not listed package APK)");
+#endif
+            BitmapSource? cached = null;
+            if (!string.IsNullOrEmpty(packageName))
+                cached = TryGetStoredIcon(device, packageName);
+
+            onReady?.Invoke(cached);
+            return;
+        }
+
         if (!string.IsNullOrEmpty(packageName))
         {
             var cached = TryGetCachedIcon(device, packageName);
@@ -394,31 +409,17 @@ public static partial class ApkIconService
         if (file is null || !file.IsApk || file.ApkIcon is not null || !IsEnabled)
             return;
 
-        if (Data.DevicesObject?.Current is not { } device || !CanLoadOnDevice(device.ID))
+        var package = TryResolvePackage(file.FullPath);
+        var icon = package?.Icon;
+        if (icon is null)
             return;
 
-        var packageName = TryResolvePackageName(file.FullPath);
-        if (!string.IsNullOrEmpty(packageName))
+        // Icon bindings call this from a getter — apply after the current layout pass.
+        App.SafeBeginInvoke(() =>
         {
-            var cached = TryGetCachedIcon(device, packageName);
-            if (cached is not null)
-            {
-                file.ApplyApkIcon(cached);
-                return;
-            }
-
-            var stored = TryGetStoredIcon(device, packageName);
-            if (stored is not null)
-                file.ApplyApkIcon(stored);
-        }
-
-        BeginLoad(device, file.FullPath, packageName, bmp =>
-        {
-            if (bmp is null || Data.DevicesObject?.Current?.SerialNumber != device.SerialNumber)
-                return;
-
-            file.ApplyApkIcon(bmp);
-        }, priority);
+            if (file.ApkIcon is null)
+                file.ApplyApkIcon(icon);
+        });
     }
 
     public static void BeginLoadForPackage(Package package, ApkLoadPriority priority = ApkLoadPriority.Background)
@@ -430,13 +431,25 @@ public static partial class ApkIconService
             return;
         }
 
-        if (Data.DevicesObject?.Current is not { } device || !CanLoadOnDevice(device.ID))
+        if (Data.DevicesObject?.Current is not { } device)
         {
             package.IconLoadCompleted = true;
             return;
         }
 
         package.DeviceSerial ??= device.SerialNumber;
+
+        if (!Data.FileActions.IsAppDrive)
+        {
+            ApplyCacheToPackages([package]);
+            return;
+        }
+
+        if (!CanLoadOnDevice(device.ID))
+        {
+            package.IconLoadCompleted = true;
+            return;
+        }
 
         // Force-reload / StopAllLoading: do not enqueue and do not treat as a finished miss
         // (otherwise the tile flips to the green Bugdroid instead of staying grayscale).
@@ -508,10 +521,12 @@ public static partial class ApkIconService
         if (IsLoadingStopped)
             return;
 
-        if (Data.DevicesObject?.Current is not { } device || !CanLoadOnDevice(device.ID))
+        if (Data.DevicesObject?.Current is not { } device)
             return;
 
         ApplyCachedLabel(device, package);
+        if (!Data.FileActions.IsAppDrive || !CanLoadOnDevice(device.ID))
+            return;
         // Missing locale for the current UI language must re-fetch even if another locale is cached.
         if (!NeedsLabelFetch(device, package.Name))
             return;
@@ -839,20 +854,68 @@ public static partial class ApkIconService
     }
 
     /// <summary>
-    /// Looks up an installed package whose <see cref="Package.Path"/> matches the APK path.
+    /// Looks up an installed package for <paramref name="apkPath"/>: the listed base APK,
+    /// or another APK in the same install directory (split configs).
+    /// Uses a string parent (not <see cref="FileHelper.GetParentPath"/>) so <c>.apk</c>
+    /// archive detection cannot issue a device <c>stat</c> on the UI thread.
     /// </summary>
     public static string? TryResolvePackageName(string apkPath)
+        => TryResolvePackage(apkPath)?.Name;
+
+    private static Package? TryResolvePackage(string apkPath)
     {
         if (string.IsNullOrEmpty(apkPath) || Data.Packages is null || Data.Packages.Count == 0)
             return null;
 
+        var parent = GetUnixParentPath(apkPath);
         foreach (var package in Data.Packages)
         {
+            if (string.IsNullOrEmpty(package.Path))
+                continue;
+
             if (string.Equals(package.Path, apkPath, StringComparison.Ordinal))
-                return package.Name;
+                return package;
+
+            if (parent is not null
+                && string.Equals(GetUnixParentPath(package.Path), parent, StringComparison.Ordinal))
+                return package;
         }
 
         return null;
+    }
+
+    private static string? GetUnixParentPath(string path)
+    {
+        var end = path.Length;
+        while (end > 1 && path[end - 1] == '/')
+            end--;
+
+        var slash = path.LastIndexOf('/', end - 1);
+        if (slash < 0)
+            return null;
+        if (slash == 0)
+            return "/";
+
+        return path[..slash];
+    }
+
+    /// <summary>
+    /// True when <paramref name="apkPath"/> is the <c>pm</c>-listed APK for
+    /// <paramref name="packageName"/>. Split/sibling APKs must not unzip into the shared cache.
+    /// </summary>
+    private static bool IsListedPackageApk(string? packageName, string apkPath)
+    {
+        if (string.IsNullOrEmpty(packageName) || string.IsNullOrEmpty(apkPath) || Data.Packages is not { Count: > 0 })
+            return false;
+
+        foreach (var package in Data.Packages)
+        {
+            if (string.Equals(package.Name, packageName, StringComparison.Ordinal)
+                && string.Equals(package.Path, apkPath, StringComparison.Ordinal))
+                return true;
+        }
+
+        return false;
     }
 
     private static void AttachOnReady(string pullKey, string? packageName, Action<BitmapSource?>? onReady, ApkLoadPriority priority)

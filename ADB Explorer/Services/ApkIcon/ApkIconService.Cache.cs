@@ -128,6 +128,42 @@ public static partial class ApkIconService
 
 
     /// <summary>
+    /// Restores launcher icons and labels from the on-disk cache without pulling APKs.
+    /// Used when the package list is re-read (F5) — membership may change, the apps themselves do not.
+    /// </summary>
+    public static void ApplyCacheToPackages(IEnumerable<Package> packages)
+    {
+        if (packages is null || !IsEnabled)
+            return;
+
+        if (Data.DevicesObject?.Current is not { } device)
+            return;
+
+        foreach (var package in packages)
+        {
+            if (package is null || string.IsNullOrEmpty(package.Name))
+                continue;
+
+            package.DeviceSerial ??= device.SerialNumber;
+            ApplyCachedLabel(device, package);
+
+            if (package.Icon is not null)
+                continue;
+
+            var cached = TryGetStoredIcon(device, package.Name);
+            if (cached is not null)
+            {
+                package.Icon = cached;
+                continue;
+            }
+
+            if (HasSettledIconMiss(device, package.Name))
+                package.IconLoadCompleted = true;
+        }
+    }
+
+
+    /// <summary>
     /// True when this package already has a settled "no icon" result that must not
     /// trigger another APK unzip: a <see cref="FailMarker"/> (any day — overlays never
     /// grow a launcher icon). Empty <see cref="ApkIconCacheEntry.IconExt"/> means the

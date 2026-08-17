@@ -89,6 +89,13 @@ public partial class FileActionsEnable : ObservableObject
         set => SetProperty(ref uninstallPackageEnabled, value);
     }
 
+    private bool backupPackageEnabled;
+    public bool BackupPackageEnabled
+    {
+        get => backupPackageEnabled;
+        set => SetProperty(ref backupPackageEnabled, value);
+    }
+
     private bool submenuUninstallEnabled;
     public bool SubmenuUninstallEnabled
     {

@@ -32,19 +32,30 @@ public class FileCompressOperation : AbstractShellFileOperation
         Status = OperationStatus.InProgress;
         StatusInfo = new InProgShellProgressViewModel();
 
-        var operationTask = Task.Run(() =>
-        {
-            ArchiveExtract.CreateTarArchive(
-                Device.ID,
-                FilePath.FullPath,
-                SourcePaths,
-                CancelTokenSource.Token);
-        }, CancelTokenSource.Token);
+        var operationTask = CreateArchiveAsync();
 
-        operationTask.ContinueWith(_ =>
+        operationTask.ContinueWith(t =>
         {
-            Status = OperationStatus.Completed;
-            StatusInfo = new CompletedShellProgressViewModel();
+            if (t.Result == "")
+            {
+                Status = OperationStatus.Completed;
+                StatusInfo = new CompletedShellProgressViewModel();
+                return;
+            }
+
+            if (CancelTokenSource?.IsCancellationRequested == true || t.Result == "Canceled")
+            {
+                Status = OperationStatus.Canceled;
+                StatusInfo = new CanceledOpProgressViewModel();
+                return;
+            }
+
+            Status = OperationStatus.Failed;
+            StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(
+                typeof(ShellErrorInfo),
+                failed: -1,
+                message: t.Result,
+                total: true));
         }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
         operationTask.ContinueWith(_ =>
@@ -63,5 +74,37 @@ public class FileCompressOperation : AbstractShellFileOperation
                 message: message,
                 total: true));
         }, TaskContinuationOptions.OnlyOnFaulted);
+    }
+
+    private async Task<string> CreateArchiveAsync()
+    {
+        Dictionary<string, long> memberBytes;
+        try
+        {
+            memberBytes = await Task.Run(
+                () => ArchiveExtract.CollectCreateMemberBytes(Device.ID, SourcePaths, CancelTokenSource.Token),
+                CancelTokenSource.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            return "Canceled";
+        }
+        catch (Exception e)
+        {
+            return e.Message;
+        }
+
+        var session = new ArchiveOpProgressSession(this, memberBytes);
+        var result = await ArchiveExtract.CreateTarArchiveAsync(
+            Device.ID,
+            FilePath.FullPath,
+            SourcePaths,
+            CancelTokenSource.Token,
+            session.OnLine).ConfigureAwait(false);
+
+        if (result == "")
+            session.Finish();
+
+        return result;
     }
 }

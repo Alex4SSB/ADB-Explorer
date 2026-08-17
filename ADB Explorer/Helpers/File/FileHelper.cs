@@ -401,7 +401,8 @@ public static class FileHelper
     public static string[] ApkExtensions => [.. APK_NAMES.Select(n => n[1..])];
 
     public static bool AllFilesAreApks(string[] items) =>
-        items.AnyAll(i => i.Contains('.') && ApkExtensions.Any(n => n == i.Split('.').Last().ToUpper()));
+        items.AnyAll(i => AppBackupHelper.IsApkBackup(i)
+            || (i.Contains('.') && ApkExtensions.Any(n => n == i.Split('.').Last().ToUpper())));
 
     /// <summary>
     /// Returns the relation of <paramref name="other"/> to <paramref name="self"/>.<br />

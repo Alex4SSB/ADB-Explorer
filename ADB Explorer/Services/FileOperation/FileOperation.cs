@@ -101,7 +101,13 @@ public abstract class FileOperation : ViewModelBase
         get => statusInfo;
         // BeginInvoke (fire-and-forget) so background pull threads are never blocked waiting
         // for the UI thread to process the update (which would deadlock with the spin-wait).
-        set => Dispatcher.BeginInvoke(() => Set(ref statusInfo, value));
+        set => Dispatcher.BeginInvoke(() =>
+        {
+            if (!ReferenceEquals(statusInfo, value) && statusInfo is IDisposable disposable)
+                disposable.Dispose();
+
+            Set(ref statusInfo, value);
+        });
     }
 
     private bool isPastOp = false;

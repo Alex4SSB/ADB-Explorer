@@ -35,12 +35,23 @@ public class FileRenameOperation : AbstractShellFileOperation
         {
             operationTask = Task.Run(() =>
             {
+                var session = ArchiveOpProgressSession.FromToc(
+                    this,
+                    Device.ID,
+                    archivePath,
+                    CancelTokenSource.Token,
+                    phases: 2);
+
                 ArchiveExtract.RenameTarMember(
                     Device.ID,
                     archivePath,
                     oldInternal,
                     newInternal,
-                    CancelTokenSource.Token);
+                    CancelTokenSource.Token,
+                    session.OnLine,
+                    session.BeginPhase);
+
+                session.Finish();
             }, CancelTokenSource.Token);
         }
         else

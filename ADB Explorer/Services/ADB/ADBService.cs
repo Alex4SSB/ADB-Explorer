@@ -323,6 +323,29 @@ public partial class ADBService
     }
 
     /// <summary>
+    /// Returns the size of a device path via <c>stat -c%s</c>, or <see langword="null"/> if it cannot be read.
+    /// </summary>
+    public static long? TryGetFileSize(string deviceId, string path, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(path))
+            return null;
+
+        var exit = ExecuteDeviceAdbShellCommand(
+            deviceId,
+            "stat",
+            out var stdout,
+            out _,
+            cancellationToken,
+            "-c%s",
+            EscapeAdbShellString(path));
+
+        if (exit != 0 || !long.TryParse(stdout.Trim(), out var size) || size < 0)
+            return null;
+
+        return size;
+    }
+
+    /// <summary>
     /// Executes a device ADB shell command that is expected to return a value only upon failure.
     /// </summary>
     public static async Task<string> ExecuteVoidShellCommand(string deviceId, CancellationToken cancellationToken, string cmd, params string[] args)

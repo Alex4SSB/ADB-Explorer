@@ -248,7 +248,7 @@ public partial class ExplorerPageHeader : UserControl
             }
 
             if (e.PropertyName is nameof(FileActionsEnable.IsAppDriveThumbsLocked))
-                ApplyAppDriveThumbsLockState();
+                ApplyLocationThumbSize();
         });
 
         Data.RunExplorerSearch += (_, _) => App.SafeInvoke(() =>
@@ -795,8 +795,9 @@ public partial class ExplorerPageHeader : UserControl
 
         DirList.FileList.Insert(0, newItem);
 
-        ActiveScrollIntoView(newItem);
         ActiveView.SelectedItem = newItem;
+        ActiveScrollViewer?.ScrollToTop();
+        App.SafeBeginInvoke(() => ActiveScrollViewer?.ScrollToTop(), DispatcherPriority.Loaded);
 
         IsInEditMode = true;
         if (!IsInEditMode)
@@ -973,7 +974,7 @@ public partial class ExplorerPageHeader : UserControl
 
         FileActions.CopyPathDescription.Value = FileActions.IsAppDrive ? Strings.Resources.S_COPY_APK_NAME : Strings.Resources.S_COPY_PATH;
 
-        ApplyAppDriveThumbsLockState();
+        ApplyLocationThumbSize();
 
         SortExplorer();
 
@@ -1071,16 +1072,7 @@ public partial class ExplorerPageHeader : UserControl
         if (DetailsPane.IsOpen)
             DetailsPane.SelectedFiles = [];
 
-        if (Settings.ThumbSizePerLocation)
-        {
-            ThumbnailService.ThumbnailSize size = ThumbnailService.ThumbnailSize.Disabled;
-            Settings.LocationThumbSize.TryGetValue(searchPath, out size);
-            ViewModel.CurrentThumbsSize = size;
-        }
-        else
-        {
-            ViewModel.CurrentThumbsSize = ThumbnailService.ThumbnailSize.Disabled;
-        }
+        ApplyLocationThumbSize();
 
         SortExplorer();
         DirList.Search(searchRoot, query, DeviceCts.Token);
@@ -1133,13 +1125,12 @@ public partial class ExplorerPageHeader : UserControl
     }
 
     /// <summary>
-    /// Forces details view when app drive cannot load icons; otherwise restores the
-    /// preferred thumb size (location or global). Also refreshes when <c>unzip</c>
-    /// probe finishes after a device switch.
+    /// Restores the preferred thumb size for the current path (per-location or global).
+    /// App drive without <c>unzip</c> stays in details view without overwriting saved sizes.
     /// </summary>
-    private void ApplyAppDriveThumbsLockState()
+    private void ApplyLocationThumbSize()
     {
-        if (!FileActions.IsAppDrive)
+        if (string.IsNullOrEmpty(CurrentPath) || FileActions.IsDriveViewVisible)
             return;
 
         if (FileActions.IsAppDriveThumbsLocked)
@@ -1159,8 +1150,9 @@ public partial class ExplorerPageHeader : UserControl
             ViewModel.CurrentThumbsSize = RuntimeSettings.ThumbsSize;
         }
 
-        // Icons may have been skipped while unzip was still unknown.
-        if (Data.Packages is { Count: > 0 } && ApkIconService.IsEnabled)
+        if (FileActions.IsAppDrive
+            && Data.Packages is { Count: > 0 }
+            && ApkIconService.IsEnabled)
             ApkIconService.BeginPreloadPackages(Data.Packages);
     }
 
@@ -1626,11 +1618,11 @@ public partial class ExplorerPageHeader : UserControl
 
     private void ItemContainer_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton == MouseButton.Left && !FileActions.IsAppDrive && SelectedFiles.Count() == 1 && !IsInEditMode)
-        {
-            ClickCount = -1;
-            DoubleClick(ActiveView.SelectedItem);
-        }
+        if (e.ChangedButton != MouseButton.Left || IsInEditMode || ActiveSelectedItems.Count != 1)
+            return;
+
+        ClickCount = -1;
+        DoubleClick(ActiveView.SelectedItem);
     }
 
     private void DataGridRow_KeyDown(object sender, KeyEventArgs e)
@@ -1740,11 +1732,20 @@ public partial class ExplorerPageHeader : UserControl
 
         if (FileActions.IsAppDrive)
         {
-            // Keep the parsed launcher icon — CurrentFiles are APK paths whose DragImage is the shell placeholder.
-            var packageIcon = ActiveSelectedItems.OfType<Package>().Select(p => p.Icon).FirstOrDefault(i => i is not null)
-                ?? Data.SelectedPackages.Select(p => p.Icon).FirstOrDefault(i => i is not null);
-            if (packageIcon is not null)
-                CopyPaste.DragBitmap = packageIcon;
+            // Incoming APK / APKBKP install: always the default package large icon, not the
+            // Windows shell APK glyph or a selected package's parsed launcher icon.
+            if (!CopyPaste.IsSelf && FileHelper.AllFilesAreApks(CopyPaste.DragFiles))
+            {
+                CopyPaste.DragBitmap = DefaultAndroidPackageIcon.Bitmap;
+            }
+            else
+            {
+                // Outgoing package drag: CurrentFiles are APK paths whose DragImage is the shell placeholder.
+                var packageIcon = ActiveSelectedItems.OfType<Package>().Select(p => p.Icon).FirstOrDefault(i => i is not null)
+                    ?? Data.SelectedPackages.Select(p => p.Icon).FirstOrDefault(i => i is not null);
+                if (packageIcon is not null)
+                    CopyPaste.DragBitmap = packageIcon;
+            }
         }
         else if (CopyPaste.CurrentFiles.Any())
         {

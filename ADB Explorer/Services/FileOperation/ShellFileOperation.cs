@@ -453,6 +453,7 @@ public static class ShellFileOperation
             {
                 op.FilePath.UpdateType();
                 FileActionLogic.UpdateFileActions();
+                _ = op.FilePath.UpdateExtraInfoAsync(CancellationToken.None);
             }
 
             op.PropertyChanged -= CompressOp_PropertyChanged;
@@ -722,6 +723,12 @@ public static class ShellFileOperation
     {
         foreach (var item in items)
         {
+            if (AppBackupHelper.IsApkBackup(item.FullName))
+            {
+                RestorePackageBackup(device, item, dispatcher);
+                continue;
+            }
+
             var op = new PackageInstallOperation(dispatcher, device, item);
             op.PropertyChanged += InstallOp_PropertyChanged;
 
@@ -731,13 +738,83 @@ public static class ShellFileOperation
 
     public static void PushPackages(LogicalDeviceViewModel device, IEnumerable<ShellItem> items, Dispatcher dispatcher)
     {
-        foreach (var item in items.Select(file => new FilePath(file)))
+        foreach (var item in items)
         {
-            var op = new PackageInstallOperation(dispatcher, device, new(item), pushPackage: true);
+            if (AppBackupHelper.IsApkBackup(item.ParsingName) || AppBackupHelper.IsApkBackup(item.Name))
+            {
+                RestorePackageBackup(device, item, dispatcher);
+                continue;
+            }
+
+            var op = new PackageInstallOperation(dispatcher, device, new(new FilePath(item)), pushPackage: true);
             op.PropertyChanged += InstallOp_PropertyChanged;
             
             Data.FileOpQ.AddOperation(op);
         }
+    }
+
+    public static void BackupPackages(
+        LogicalDeviceViewModel device,
+        IEnumerable<Package> packages,
+        string windowsFolder,
+        Dispatcher dispatcher)
+    {
+        foreach (var package in packages)
+        {
+            var destName = FileHelper.DuplicateFile(
+                Directory.Exists(windowsFolder) ? Directory.GetFiles(windowsFolder).Select(Path.GetFileName) : [],
+                AppBackupHelper.WindowsBackupFileName(package.Name));
+            var windowsDest = FileHelper.ConcatPaths(windowsFolder, destName, '\\');
+            Directory.CreateDirectory(windowsFolder);
+            var tempArchive = AppBackupHelper.DeviceTempArchivePath();
+            var display = new FileClass(destName, windowsDest, AbstractFile.FileType.File);
+
+            var op = new AppBackupOperation(display, tempArchive, windowsDest, package, device, dispatcher);
+            Data.FileOpQ.AddOperation(op);
+        }
+    }
+
+    public static void RestorePackageBackup(LogicalDeviceViewModel device, FileClass deviceFile, Dispatcher dispatcher)
+    {
+        var tempArchive = AppBackupHelper.DeviceTempArchivePath();
+        if (!SilentCopy(device, deviceFile.FullPath, tempArchive, out var stderr))
+        {
+            DialogService.ShowMessage(
+                stderr,
+                Strings.Resources.S_MENU_INSTALL,
+                DialogService.DialogIcon.Critical,
+                copyToClipboard: true);
+            return;
+        }
+
+        Data.FileOpQ.AddOperation(new AppRestoreOperation(deviceFile, tempArchive, device, dispatcher));
+    }
+
+    public static void RestorePackageBackup(LogicalDeviceViewModel device, ShellItem windowsItem, Dispatcher dispatcher)
+    {
+        var tempArchive = AppBackupHelper.DeviceTempArchivePath();
+        var source = new SyncFile(windowsItem);
+        var target = new SyncFile(tempArchive);
+        var push = FileSyncOperation.PushFile(source, target, device, dispatcher);
+        var display = new FileClass(windowsItem);
+
+        push.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is not nameof(FileOperation.Status))
+                return;
+
+            if (push.Status is FileOperation.OperationStatus.Completed)
+            {
+                dispatcher.Invoke(() =>
+                    Data.FileOpQ.AddOperation(new AppRestoreOperation(display, tempArchive, device, dispatcher)));
+            }
+            else if (push.Status is FileOperation.OperationStatus.Failed or FileOperation.OperationStatus.Canceled)
+            {
+                SilentDelete(device, tempArchive);
+            }
+        };
+
+        Data.FileOpQ.AddOperation(push);
     }
 
     public static void UninstallPackages(LogicalDeviceViewModel device, IEnumerable<string> packages, Dispatcher dispatcher)

@@ -42,7 +42,7 @@ public static partial class ApkIconService
 
         using var canvasBitmap = new SKBitmap(sk.Width, sk.Height, SKColorType.Bgra8888, SKAlphaType.Unpremul);
         using var canvas = new SKCanvas(canvasBitmap);
-        canvas.DrawBitmap(sk, 0, 0);
+        canvas.DrawBitmap(sk, 0, 0, PixelCopySampling);
         DrawClockHands(canvas, sk, DateTime.Now);
         return ApkVectorIconRenderer.ToBitmapSource(canvasBitmap);
     }

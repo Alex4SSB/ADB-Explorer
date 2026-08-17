@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Models;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 
 namespace ADB_Explorer.Controls;
@@ -20,27 +21,64 @@ public partial class RenameTooltip : UserControl
         App.SafeBeginInvoke(() => Position(anchor, centerHorizontally), DispatcherPriority.Loaded);
     }
 
-    private void Position(FrameworkElement anchor, bool centerHorizontally)
+    private void Position(FrameworkElement anchor, bool centerHorizontally, bool isRetry = false)
     {
-        if (!Data.FileActions.IsExplorerEditing)
+        if (!Data.FileActions.IsExplorerEditing || anchor is null || !anchor.IsVisible)
             return;
 
-        var tooltipWidth = TooltipBorder.ActualWidth;
-        var tooltipHeight = TooltipBorder.ActualHeight;
+        TooltipBorder.UpdateLayout();
+        if (TooltipBorder.ActualHeight <= 0)
+            TooltipBorder.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+
+        var tooltipWidth = Math.Max(TooltipBorder.ActualWidth, TooltipBorder.DesiredSize.Width);
+        var tooltipHeight = Math.Max(TooltipBorder.ActualHeight, TooltipBorder.DesiredSize.Height);
         var canvasWidth = OverlayCanvas.ActualWidth;
         var canvasHeight = OverlayCanvas.ActualHeight;
 
-        var anchorTopLeft = anchor.TranslatePoint(new Point(0, 0), OverlayCanvas);
         var anchorHeight = anchor.ActualHeight;
         var anchorWidth = anchor.ActualWidth;
+        if (anchorHeight <= 0 && VisualTreeHelper.GetParent(anchor) is FrameworkElement parent)
+            anchorHeight = parent.ActualHeight;
 
-        // Vertical: prefer above, fall back to below
-        var aboveY = anchorTopLeft.Y - tooltipHeight - 8;
-        var belowY = anchorTopLeft.Y + anchorHeight + 8;
-        var top = aboveY >= 0 ? aboveY : belowY;
-        top = Math.Max(0, Math.Min(top, canvasHeight - tooltipHeight));
+        if (!isRetry && (tooltipHeight <= 0 || canvasHeight <= 0 || anchorHeight <= 0))
+        {
+            App.SafeBeginInvoke(() => Position(anchor, centerHorizontally, isRetry: true), DispatcherPriority.ContextIdle);
+            return;
+        }
 
-        // Horizontal: left-align with anchor (folder view) or center on it (icon view), clamp within canvas
+        if (tooltipHeight <= 0)
+            return;
+
+        Point anchorTopLeft;
+        try
+        {
+            anchorTopLeft = anchor.TranslatePoint(new Point(0, 0), OverlayCanvas);
+        }
+        catch (InvalidOperationException)
+        {
+            return;
+        }
+
+        const double gap = 8;
+        var aboveY = anchorTopLeft.Y - tooltipHeight - gap;
+        var belowY = anchorTopLeft.Y + anchorHeight + gap;
+
+        // Prefer below the edit box so a new item at the top of the list is not covered.
+        bool fitsBelow = canvasHeight <= 0 || belowY + tooltipHeight <= canvasHeight;
+        bool fitsAbove = aboveY >= 0;
+        bool placedAbove = !fitsBelow && fitsAbove;
+        var top = placedAbove ? aboveY : belowY;
+
+        // Clamp to the canvas only when that would not cover the textbox.
+        if (canvasHeight > tooltipHeight)
+        {
+            var clamped = Math.Max(0, Math.Min(top, canvasHeight - tooltipHeight));
+            var anchorBottom = anchorTopLeft.Y + anchorHeight;
+            bool overlapsAnchor = clamped < anchorBottom && clamped + tooltipHeight > anchorTopLeft.Y;
+            if (!overlapsAnchor)
+                top = clamped;
+        }
+
         var left = centerHorizontally
             ? anchorTopLeft.X + (anchorWidth - tooltipWidth) / 2
             : anchorTopLeft.X;
@@ -56,8 +94,6 @@ public partial class RenameTooltip : UserControl
         Canvas.SetTop(TooltipBorder, top);
         TooltipBorder.Opacity = 1;
 
-        // Slide-in animation: come from below when shown above anchor, from above when shown below
-        bool placedAbove = aboveY >= 0 && top == Math.Max(0, Math.Min(aboveY, canvasHeight - tooltipHeight));
         double slideFrom = placedAbove ? tooltipHeight * 0.6 : -tooltipHeight * 0.6;
 
         TooltipTranslate.Y = slideFrom;

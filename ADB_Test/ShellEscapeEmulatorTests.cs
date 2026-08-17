@@ -1,3 +1,4 @@
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -10,15 +11,17 @@ using System.Text;
 namespace ADB_Test;
 
 /// <summary>
-/// Exercises <see cref="ADBService.EscapeAdbShellPath"/> and <see cref="ADBService.EscapeAdbShellScript"/>
-/// against a live device using the same Process argument joining as <see cref="ADBService"/>.
-/// Special-char filenames are created under <see cref="AdbExplorerConst.TEMP_PATH"/> only.
+/// Exercises <see cref="ADBService.EscapeAdbShellString"/> against a live device using the
+/// same Process argument joining as <see cref="ADBService"/>. Special-char names are created
+/// under <see cref="AdbExplorerConst.TEMP_PATH"/> only.
 /// Run: dotnet test --filter ShellEscape
 /// </summary>
 [TestClass]
 public class ShellEscapeEmulatorTests
 {
     private const string TestDir = $"{AdbExplorerConst.TEMP_PATH}/adb-explorer-test-escape";
+    private const string IncrementalDir =
+        $"{TestDir}/~~YpQ0dzQS2vI-67ptyyetpg==/com.runbuddy.prod-xxx";
     private static string? _deviceId;
 
     public TestContext TestContext { get; set; } = null!;
@@ -35,10 +38,29 @@ public class ShellEscapeEmulatorTests
     }
 
     [TestMethod]
-    public void EscapeAdbShellPath_AndScript_AreIdentical()
+    public void ShellEscape_Emulator_IncrementalAppDir_TarCViaShC()
     {
-        foreach (var sample in new[] { "~name", "/data/local/tmp/foo (1).txt", "a&b", "file`tick.txt" })
-            Assert.AreEqual(ADBService.EscapeAdbShellString(sample), ADBService.EscapeAdbShellString(sample));
+        if (_deviceId is null)
+        {
+            Assert.Inconclusive("No adb device attached.");
+            return;
+        }
+
+        var archive = $"{TestDir}/esc-tilde.tar.gz";
+        var script = AppBackupHelper.BuildCreateArchiveScript(
+            "tar",
+            archive,
+            IncrementalDir,
+            ["base.apk"],
+            null);
+        var result = RunAdb(
+        [
+            "-s", _deviceId, "shell", "sh", "-c",
+            ADBService.EscapeAdbShellString(script),
+        ]);
+
+        Assert.AreEqual(0, result.ExitCode, result.Stderr);
+        Assert.DoesNotContain(@"\~", result.Stderr);
     }
 
     [TestMethod]
@@ -169,6 +191,8 @@ public class ShellEscapeEmulatorTests
     private static void EnsureTestFiles(string deviceId)
     {
         RunAdb(["-s", deviceId, "shell", "mkdir", "-p", ADBService.EscapeAdbShellString(TestDir)]);
+        RunAdb(["-s", deviceId, "shell", "mkdir", "-p", ADBService.EscapeAdbShellString(IncrementalDir)]);
+        RunAdb(["-s", deviceId, "shell", "touch", ADBService.EscapeAdbShellString($"{IncrementalDir}/base.apk")]);
 
         foreach (var (fileName, _) in SpecialFileNames)
         {

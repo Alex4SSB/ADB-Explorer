@@ -125,7 +125,8 @@ public static class ArchiveExtract
         string internalPath,
         bool isDirectory,
         string destinationPath,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        Action<string>? onVerbose = null)
     {
         internalPath = ArchivePath.NormalizeInternal(internalPath);
         if (string.IsNullOrEmpty(internalPath))
@@ -142,7 +143,7 @@ public static class ArchiveExtract
             var destParent = FileHelper.GetParentPath(destinationPath);
             ShellFileOperation.MakeDirs(deviceId, [contentRoot, destParent]).GetAwaiter().GetResult();
 
-            ExtractMembers(deviceId, family, archivePath, internalPath, isDirectory, contentRoot, cancellationToken);
+            ExtractMembers(deviceId, family, archivePath, internalPath, isDirectory, contentRoot, cancellationToken, onVerbose);
 
             var extractedPath = FileHelper.ConcatPaths(contentRoot, internalPath);
 
@@ -227,7 +228,8 @@ public static class ArchiveExtract
         string deviceId,
         string archivePath,
         string contentRoot,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        Action<string>? onVerbose = null)
     {
         ArchiveHelper.EnsureModifiableTar(archivePath, deviceId);
 
@@ -244,22 +246,14 @@ public static class ArchiveExtract
         // Pack top-level names via -T (not ".") so members are stored as "path"
         // rather than "./path". The latter breaks later extract-by-name on toybox.
         // -1: one name per line so names with spaces survive the pipe into tar -T.
-        var script = $"cd {rootEsc} && ls -A1 | {tar} -cf {tempEsc} -T -";
-        var createExit = ADBService.ExecuteDeviceAdbShellCommand(
-            deviceId,
-            "sh",
-            out var createStdout,
-            out var createStderr,
-            cancellationToken,
-            "-c",
-            ADBService.EscapeAdbShellString(script));
+        // -v is its own token so create/extract progress can share the same streaming path.
+        string script;
+        if (onVerbose is not null)
+            script = $"cd {rootEsc} && ls -A1 | {tar} -cf {tempEsc} -v -T -";
+        else
+            script = $"cd {rootEsc} && ls -A1 | {tar} -cf {tempEsc} -T -";
 
-        if (createExit != 0)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            RemoveDeviceTree(deviceId, tempArchive);
-            throw new IOException(string.IsNullOrWhiteSpace(createStderr) ? createStdout : createStderr);
-        }
+        ExecuteTarCreateScript(deviceId, tempArchive, script, cancellationToken, onVerbose);
 
         var moveExit = ADBService.ExecuteDeviceAdbShellCommand(
             deviceId,
@@ -286,12 +280,13 @@ public static class ArchiveExtract
         string deviceId,
         string archivePath,
         string contentRoot,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        Action<string>? onVerbose = null)
     {
         if (ArchiveHelper.GetFamily(archivePath) is not ArchiveFamily.Tar)
             throw new InvalidOperationException($"Cannot extract non-tar archive: {archivePath}");
 
-        var exitCode = ExtractTar(deviceId, archivePath, contentRoot, members: [], cancellationToken, out var stdout, out var stderr);
+        var exitCode = ExtractTar(deviceId, archivePath, contentRoot, members: [], cancellationToken, out var stdout, out var stderr, onVerbose);
         if (exitCode != 0)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -389,7 +384,9 @@ public static class ArchiveExtract
         string archivePath,
         string internalDestDir,
         Action<string, CancellationToken> populateOverlay,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        Action<string>? onVerbose = null,
+        Action? onExtractComplete = null)
     {
         ArchiveHelper.EnsureModifiableTar(archivePath, deviceId);
 
@@ -401,7 +398,8 @@ public static class ArchiveExtract
             var contentRoot = FileHelper.ConcatPaths(stagingRoot, "content");
             ShellFileOperation.MakeDirs(deviceId, [contentRoot]).GetAwaiter().GetResult();
 
-            ExtractEntireTar(deviceId, archivePath, contentRoot, cancellationToken);
+            ExtractEntireTar(deviceId, archivePath, contentRoot, cancellationToken, onVerbose);
+            onExtractComplete?.Invoke();
 
             var overlayDest = string.IsNullOrEmpty(internalDestDir)
                 ? contentRoot
@@ -410,7 +408,7 @@ public static class ArchiveExtract
 
             populateOverlay(overlayDest, cancellationToken);
 
-            RepackTarArchive(deviceId, archivePath, contentRoot, cancellationToken);
+            RepackTarArchive(deviceId, archivePath, contentRoot, cancellationToken, onVerbose);
             ArchiveListing.InvalidateToc(archivePath);
         }
         finally
@@ -426,7 +424,9 @@ public static class ArchiveExtract
         string deviceId,
         string archivePath,
         IReadOnlyList<string> internalPaths,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        Action<string>? onVerbose = null,
+        Action? onExtractComplete = null)
     {
         ArchiveHelper.EnsureModifiableTar(archivePath, deviceId);
 
@@ -445,7 +445,8 @@ public static class ArchiveExtract
             var contentRoot = FileHelper.ConcatPaths(stagingRoot, "content");
             ShellFileOperation.MakeDirs(deviceId, [contentRoot]).GetAwaiter().GetResult();
 
-            ExtractEntireTar(deviceId, archivePath, contentRoot, cancellationToken);
+            ExtractEntireTar(deviceId, archivePath, contentRoot, cancellationToken, onVerbose);
+            onExtractComplete?.Invoke();
 
             foreach (var internalPath in normalized)
             {
@@ -470,7 +471,7 @@ public static class ArchiveExtract
                 }
             }
 
-            RepackTarArchive(deviceId, archivePath, contentRoot, cancellationToken);
+            RepackTarArchive(deviceId, archivePath, contentRoot, cancellationToken, onVerbose);
             ArchiveListing.InvalidateToc(archivePath);
         }
         finally
@@ -487,7 +488,9 @@ public static class ArchiveExtract
         string archivePath,
         string oldInternalPath,
         string newInternalPath,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        Action<string>? onVerbose = null,
+        Action? onExtractComplete = null)
     {
         ArchiveHelper.EnsureModifiableTar(archivePath, deviceId);
 
@@ -504,7 +507,8 @@ public static class ArchiveExtract
         {
             var contentRoot = FileHelper.ConcatPaths(stagingRoot, "content");
             ShellFileOperation.MakeDirs(deviceId, [contentRoot]).GetAwaiter().GetResult();
-            ExtractEntireTar(deviceId, archivePath, contentRoot, cancellationToken);
+            ExtractEntireTar(deviceId, archivePath, contentRoot, cancellationToken, onVerbose);
+            onExtractComplete?.Invoke();
 
             var source = FileHelper.ConcatPaths(contentRoot, oldInternalPath);
             var dest = FileHelper.ConcatPaths(contentRoot, newInternalPath);
@@ -525,7 +529,7 @@ public static class ArchiveExtract
                 throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
             }
 
-            RepackTarArchive(deviceId, archivePath, contentRoot, cancellationToken);
+            RepackTarArchive(deviceId, archivePath, contentRoot, cancellationToken, onVerbose);
             ArchiveListing.InvalidateToc(archivePath);
         }
         finally
@@ -542,7 +546,9 @@ public static class ArchiveExtract
         string archivePath,
         string internalPath,
         bool isDirectory,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        Action<string>? onVerbose = null,
+        Action? onExtractComplete = null)
     {
         ArchiveHelper.EnsureModifiableTar(archivePath, deviceId);
 
@@ -555,7 +561,8 @@ public static class ArchiveExtract
         {
             var contentRoot = FileHelper.ConcatPaths(stagingRoot, "content");
             ShellFileOperation.MakeDirs(deviceId, [contentRoot]).GetAwaiter().GetResult();
-            ExtractEntireTar(deviceId, archivePath, contentRoot, cancellationToken);
+            ExtractEntireTar(deviceId, archivePath, contentRoot, cancellationToken, onVerbose);
+            onExtractComplete?.Invoke();
 
             var target = FileHelper.ConcatPaths(contentRoot, internalPath);
             if (isDirectory)
@@ -580,7 +587,7 @@ public static class ArchiveExtract
                 }
             }
 
-            RepackTarArchive(deviceId, archivePath, contentRoot, cancellationToken);
+            RepackTarArchive(deviceId, archivePath, contentRoot, cancellationToken, onVerbose);
             ArchiveListing.InvalidateToc(archivePath);
         }
         finally
@@ -706,7 +713,8 @@ public static class ArchiveExtract
         string internalPath,
         bool isDirectory,
         string contentRoot,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        Action<string>? onVerbose = null)
     {
         var toc = ArchiveListing.GetOrFetchToc(deviceId, archivePath, cancellationToken);
         var members = GetMemberPathsToExtract(toc.Entries, internalPath, isDirectory);
@@ -723,8 +731,8 @@ public static class ArchiveExtract
         string stderr = "";
         var exitCode = family switch
         {
-            ArchiveFamily.Tar => ExtractTar(deviceId, archivePath, contentRoot, members, cancellationToken, out stdout, out stderr),
-            ArchiveFamily.Zip => ExtractZip(deviceId, archivePath, contentRoot, members, cancellationToken, out stdout, out stderr),
+            ArchiveFamily.Tar => ExtractTar(deviceId, archivePath, contentRoot, members, cancellationToken, out stdout, out stderr, onVerbose),
+            ArchiveFamily.Zip => ExtractZip(deviceId, archivePath, contentRoot, members, cancellationToken, out stdout, out stderr, onVerbose),
             _ => -1,
         };
 
@@ -746,20 +754,25 @@ public static class ArchiveExtract
         IReadOnlyList<string> members,
         CancellationToken cancellationToken,
         out string stdout,
-        out string stderr)
+        out string stderr,
+        Action<string>? onVerbose = null)
     {
         var tar = ShellCommands.TranslateCommand("tar");
         // -o / --no-same-owner: skip restoring uid/gid. Rooted adb otherwise tries
         // chown (e.g. 0:0) and fails with "Operation not permitted" on Android.
+        var flags = onVerbose is not null ? "-xvof" : "-xof";
         var args = new List<string>
         {
-            "-xof",
+            flags,
             ADBService.EscapeAdbShellString(archivePath),
             "-C",
             ADBService.EscapeAdbShellString(contentRoot),
         };
         foreach (var member in members)
             args.Add(ADBService.EscapeAdbShellString(member.TrimEnd('/')));
+
+        if (onVerbose is not null)
+            return RunStreamingExtract(deviceId, tar, args, onVerbose, cancellationToken, out stdout, out stderr);
 
         return ADBService.ExecuteDeviceAdbShellCommand(deviceId, tar, out stdout, out stderr, cancellationToken, [.. args]);
     }
@@ -868,22 +881,29 @@ public static class ArchiveExtract
         IReadOnlyList<string> members,
         CancellationToken cancellationToken,
         out string stdout,
-        out string stderr)
+        out string stderr,
+        Action<string>? onVerbose = null)
     {
         var unzip = ShellCommands.TranslateCommand("unzip");
         var args = new List<string>
         {
             "-o",
-            "-q",
-            ADBService.EscapeAdbShellString(archivePath),
-            "-d",
-            ADBService.EscapeAdbShellString(contentRoot),
         };
+        if (onVerbose is null)
+            args.Add("-q");
+
+        args.Add(ADBService.EscapeAdbShellString(archivePath));
+        args.Add("-d");
+        args.Add(ADBService.EscapeAdbShellString(contentRoot));
         args.AddRange(members.Select(m => ADBService.EscapeAdbShellString(m)));
 
 #if DEBUG
-        ApkIconService.MarkLoadStep($"ExtractZip (unzip -o -q) {members.Count} member(s)");
+        var quiet = onVerbose is null ? " -q" : "";
+        ApkIconService.MarkLoadStep($"ExtractZip (unzip -o{quiet}) {members.Count} member(s)");
 #endif
+        if (onVerbose is not null)
+            return RunStreamingExtract(deviceId, unzip, args, onVerbose, cancellationToken, out stdout, out stderr);
+
         return ADBService.ExecuteDeviceAdbShellCommand(deviceId, unzip, out stdout, out stderr, cancellationToken, [.. args]);
     }
 
@@ -933,6 +953,41 @@ public static class ArchiveExtract
     }
 
     /// <summary>
+    /// Builds the <c>sh -c</c> script used to create a tar-family archive at
+    /// <paramref name="archivePath"/>. Compression is selected by toybox from the filename
+    /// extension (e.g. <c>.tar.gz</c>). When <paramref name="sourceFullPaths"/> is empty,
+    /// creates an empty archive. All sources must share the same parent directory.
+    /// </summary>
+    public static string BuildCreateTarArchiveScript(
+        string archivePath,
+        IReadOnlyList<string> sourceFullPaths,
+        bool verbose = false)
+    {
+        var tar = ShellCommands.TranslateCommand("tar");
+        var archiveEsc = ADBService.EscapeAdbShellString(archivePath);
+        var verboseFlag = verbose ? " -v" : "";
+
+        if (sourceFullPaths.Count == 0)
+            return $"{tar} -cf {archiveEsc}{verboseFlag} -T /dev/null";
+
+        var parent = FileHelper.GetParentPath(sourceFullPaths[0]);
+        foreach (var path in sourceFullPaths)
+        {
+            if (!string.Equals(FileHelper.GetParentPath(path), parent, StringComparison.Ordinal))
+                throw new InvalidOperationException("All items to compress must be in the same folder.");
+        }
+
+        var parentEsc = ADBService.EscapeAdbShellString(parent);
+        var printfArgs = string.Join(
+            " ",
+            sourceFullPaths.Select(p => ADBService.EscapeAdbShellString(FileHelper.GetFullName(p))));
+
+        // Pack named members via -T so names with spaces survive; avoid "./name" members.
+        // -v is its own token so tests can still match `tar -cf`.
+        return $"cd {parentEsc} && printf '%s\\n' {printfArgs} | {tar} -cf {archiveEsc}{verboseFlag} -T -";
+    }
+
+    /// <summary>
     /// Creates a new tar-family archive at <paramref name="archivePath"/>.
     /// Compression is selected by toybox from the filename extension (e.g. <c>.tar.gz</c>).
     /// When <paramref name="sourceFullPaths"/> is empty, creates an empty archive.
@@ -944,33 +999,127 @@ public static class ArchiveExtract
         IReadOnlyList<string> sourceFullPaths,
         CancellationToken cancellationToken = default)
     {
-        if (!ShellCommands.TarExists(deviceId))
-            throw new InvalidOperationException("tar is not available on this device.");
+        ThrowIfTarMissing(deviceId);
+
+        var script = BuildCreateTarArchiveScript(archivePath, sourceFullPaths);
+        ExecuteTarCreateScript(deviceId, archivePath, script, cancellationToken);
+    }
+
+    /// <summary>
+    /// Async counterpart of <see cref="CreateTarArchive"/> using
+    /// <see cref="ADBService.ExecuteVoidShellCommand"/> so file-ops can show snackbar progress.
+    /// Returns an empty string on success, or the error / <c>Canceled</c> text.
+    /// </summary>
+    public static Task<string> CreateTarArchiveAsync(
+        string deviceId,
+        string archivePath,
+        IReadOnlyList<string> sourceFullPaths,
+        CancellationToken cancellationToken = default,
+        Action<string>? onVerboseMember = null)
+    {
+        try
+        {
+            ThrowIfTarMissing(deviceId);
+            var verbose = onVerboseMember is not null;
+            var script = BuildCreateTarArchiveScript(archivePath, sourceFullPaths, verbose);
+
+            if (onVerboseMember is null)
+                return RunTarCreateScriptAsync(deviceId, archivePath, script, cancellationToken);
+
+            var callback = onVerboseMember;
+            return Task.Run(
+                () => RunTarCreateScriptStreaming(deviceId, archivePath, script, callback, cancellationToken),
+                cancellationToken);
+        }
+        catch (Exception e)
+        {
+            return Task.FromResult(e.Message);
+        }
+    }
+
+    /// <summary>
+    /// Creates a gzip tar for an app backup. APKs are packed from <paramref name="apkParent"/>
+    /// (names only, no <c>lib/</c> or <c>oat/</c>). Optional OBB is packed from
+    /// <c>/sdcard/Android/obb</c> without copying into tmp. Uses <c>-z</c> so the archive can
+    /// later be renamed to <c>.apkbkp</c> on Windows.
+    /// </summary>
+    public static void CreateApkBackupArchive(
+        string deviceId,
+        string archivePath,
+        string apkParent,
+        IReadOnlyList<string> apkFileNames,
+        string? obbPackageName,
+        CancellationToken cancellationToken = default)
+    {
+        ThrowIfTarMissing(deviceId);
 
         var tar = ShellCommands.TranslateCommand("tar");
-        var archiveEsc = ADBService.EscapeAdbShellString(archivePath);
+        var script = AppBackupHelper.BuildCreateArchiveScript(
+            tar, archivePath, apkParent, apkFileNames, obbPackageName);
+        ExecuteTarCreateScript(deviceId, archivePath, script, cancellationToken);
+    }
 
-        string script;
-        if (sourceFullPaths.Count == 0)
+    /// <summary>
+    /// Async counterpart of <see cref="CreateApkBackupArchive"/>. When
+    /// <paramref name="onVerboseMember"/> is set, runs <c>tar -v</c> and invokes the
+    /// callback for each member name on the same ADB stream (no extra polling).
+    /// Returns an empty string on success, or the error / <c>Canceled</c> text.
+    /// </summary>
+    public static Task<string> CreateApkBackupArchiveAsync(
+        string deviceId,
+        string archivePath,
+        string apkParent,
+        IReadOnlyList<string> apkFileNames,
+        string? obbPackageName,
+        CancellationToken cancellationToken = default,
+        Action<string>? onVerboseMember = null)
+    {
+        try
         {
-            script = $"{tar} -cf {archiveEsc} -T /dev/null";
+            ThrowIfTarMissing(deviceId);
+            var tar = ShellCommands.TranslateCommand("tar");
+            var verbose = onVerboseMember is not null;
+            var script = AppBackupHelper.BuildCreateArchiveScript(
+                tar, archivePath, apkParent, apkFileNames, obbPackageName, verbose);
+
+            if (onVerboseMember is null)
+                return RunTarCreateScriptAsync(deviceId, archivePath, script, cancellationToken);
+
+            var callback = onVerboseMember;
+            return Task.Run(
+                () => RunTarCreateScriptStreaming(deviceId, archivePath, script, callback, cancellationToken),
+                cancellationToken);
         }
-        else
+        catch (Exception e)
         {
-            var parent = FileHelper.GetParentPath(sourceFullPaths[0]);
-            foreach (var path in sourceFullPaths)
+            return Task.FromResult(e.Message);
+        }
+    }
+
+    private static void ThrowIfTarMissing(string deviceId)
+    {
+        if (!ShellCommands.TarExists(deviceId))
+            throw new InvalidOperationException("tar is not available on this device.");
+    }
+
+    private static void ExecuteTarCreateScript(
+        string deviceId,
+        string archivePath,
+        string script,
+        CancellationToken cancellationToken,
+        Action<string>? onVerbose = null)
+    {
+        if (onVerbose is not null)
+        {
+            var streamed = RunTarCreateScriptStreaming(deviceId, archivePath, script, onVerbose, cancellationToken);
+            if (streamed == "Canceled")
             {
-                if (!string.Equals(FileHelper.GetParentPath(path), parent, StringComparison.Ordinal))
-                    throw new InvalidOperationException("All items to compress must be in the same folder.");
+                cancellationToken.ThrowIfCancellationRequested();
+                throw new OperationCanceledException();
             }
-
-            var parentEsc = ADBService.EscapeAdbShellString(parent);
-            var printfArgs = string.Join(
-                " ",
-                sourceFullPaths.Select(p => ADBService.EscapeAdbShellString(FileHelper.GetFullName(p))));
-
-            // Pack named members via -T so names with spaces survive; avoid "./name" members.
-            script = $"cd {parentEsc} && printf '%s\\n' {printfArgs} | {tar} -cf {archiveEsc} -T -";
+            if (!string.IsNullOrEmpty(streamed))
+                throw new IOException(streamed);
+            return;
         }
 
         var exit = ADBService.ExecuteDeviceAdbShellCommand(
@@ -982,11 +1131,228 @@ public static class ArchiveExtract
             "-c",
             ADBService.EscapeAdbShellString(script));
 
-        if (exit != 0)
+        if (exit == 0)
+            return;
+
+        cancellationToken.ThrowIfCancellationRequested();
+        RemoveDeviceTree(deviceId, archivePath);
+        throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
+    }
+
+    private static async Task<string> RunTarCreateScriptAsync(
+        string deviceId,
+        string archivePath,
+        string script,
+        CancellationToken cancellationToken)
+    {
+        var result = await ADBService.ExecuteVoidShellCommand(
+            deviceId,
+            cancellationToken,
+            "sh",
+            "-c",
+            ADBService.EscapeAdbShellString(script)).ConfigureAwait(false);
+
+        if (!string.IsNullOrEmpty(result) && result != "Canceled")
+            RemoveDeviceTree(deviceId, archivePath);
+
+        return result;
+    }
+
+    private static string RunTarCreateScriptStreaming(
+        string deviceId,
+        string archivePath,
+        string script,
+        Action<string> onVerboseMember,
+        CancellationToken cancellationToken)
+    {
+        string lastError = "";
+        try
+        {
+            var sh = ShellCommands.TranslateCommand("sh");
+            foreach (var line in ADBService.ExecuteDeviceAdbCommandAsync(
+                deviceId,
+                "shell",
+                cancellationToken,
+                [sh, "-c", ADBService.EscapeAdbShellString(script)]))
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+
+                if (line.StartsWith("tar:", StringComparison.OrdinalIgnoreCase))
+                {
+                    lastError = line;
+                    continue;
+                }
+
+                onVerboseMember(line);
+            }
+
+            return "";
+        }
+        catch (OperationCanceledException)
+        {
+            RemoveDeviceTree(deviceId, archivePath);
+            return "Canceled";
+        }
+        catch (ADBService.ProcessFailedException e)
+        {
+            RemoveDeviceTree(deviceId, archivePath);
+            if (!string.IsNullOrWhiteSpace(e.StandardError))
+                return e.StandardError.Trim();
+            if (!string.IsNullOrWhiteSpace(lastError))
+                return lastError;
+            return e.Message;
+        }
+    }
+
+    /// <summary>
+    /// Extracts named tar members into <paramref name="destDir"/> (created if needed).
+    /// Compression is autodetected from gzip magic (works for temp <c>.tar.gz</c>).
+    /// </summary>
+    public static void ExtractTarMembers(
+        string deviceId,
+        string archivePath,
+        string destDir,
+        IReadOnlyList<string> members,
+        CancellationToken cancellationToken = default,
+        Action<string>? onVerbose = null)
+    {
+        if (members is null || members.Count == 0)
+            throw new ArgumentException("At least one member is required.", nameof(members));
+
+        ShellFileOperation.MakeDirs(deviceId, [destDir]).GetAwaiter().GetResult();
+
+        var exitCode = ExtractTar(deviceId, archivePath, destDir, members, cancellationToken, out var stdout, out var stderr, onVerbose);
+        if (exitCode == 0)
+            return;
+
+        cancellationToken.ThrowIfCancellationRequested();
+        throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
+    }
+
+    /// <summary>
+    /// Sizes for <c>tar -cvf</c> members created from <paramref name="sourceFullPaths"/>.
+    /// Directories are expanded with a recursive listing; <c>stat</c> is not used as a directory size.
+    /// </summary>
+    public static Dictionary<string, long> CollectCreateMemberBytes(
+        string deviceId,
+        IReadOnlyList<string> sourceFullPaths,
+        CancellationToken cancellationToken)
+    {
+        Dictionary<string, long> result = new(StringComparer.Ordinal);
+        if (sourceFullPaths.Count == 0)
+            return result;
+
+        var parent = FileHelper.GetParentPath(sourceFullPaths[0]);
+        foreach (var path in sourceFullPaths)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            RemoveDeviceTree(deviceId, archivePath);
-            throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
+            var kind = ADBService.TryGetPathKind(deviceId, path, cancellationToken);
+            if (kind is DevicePathKind.Directory)
+                AddCreateDirectoryMembers(deviceId, parent, path, result, cancellationToken);
+            else
+                AddCreateFileMember(deviceId, path, result, cancellationToken);
+        }
+
+        return result;
+    }
+
+    private static void AddCreateFileMember(
+        string deviceId,
+        string path,
+        Dictionary<string, long> result,
+        CancellationToken cancellationToken)
+    {
+        var key = ArchiveVerboseProgress.NormalizeMember(FileHelper.GetFullName(path));
+        if (string.IsNullOrEmpty(key))
+            return;
+
+        result[key] = ADBService.TryGetFileSize(deviceId, path, cancellationToken) ?? 0;
+    }
+
+    private static void AddCreateDirectoryMembers(
+        string deviceId,
+        string parent,
+        string dirPath,
+        Dictionary<string, long> result,
+        CancellationToken cancellationToken)
+    {
+        var dirKey = ArchiveVerboseProgress.NormalizeMember(FileHelper.GetFullName(dirPath));
+        if (!string.IsNullOrEmpty(dirKey))
+            result.TryAdd(dirKey, 0);
+
+        try
+        {
+            foreach (var entry in ADBService.ListDirectoryRecursive(deviceId, dirPath, cancellationToken))
+            {
+                var relative = FileHelper.ExtractRelativePath(entry.FullPath, parent, includeSelf: false);
+                var key = ArchiveVerboseProgress.NormalizeMember(relative);
+                if (string.IsNullOrEmpty(key))
+                    continue;
+
+                long size = 0;
+                if (entry.Type is FileType.File)
+                    size = entry.Size ?? 0;
+
+                result[key] = size;
+            }
+        }
+        catch
+        {
+            // Listing is best-effort; tar -v still reports members without sizes.
+        }
+    }
+
+    private static int RunStreamingExtract(
+        string deviceId,
+        string command,
+        IReadOnlyList<string> args,
+        Action<string> onVerbose,
+        CancellationToken cancellationToken,
+        out string stdout,
+        out string stderr)
+    {
+        stdout = "";
+        stderr = "";
+        string lastError = "";
+        try
+        {
+            foreach (var line in ADBService.ExecuteDeviceAdbCommandAsync(
+                deviceId,
+                "shell",
+                cancellationToken,
+                [command, .. args]))
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+
+                if (line.StartsWith("tar:", StringComparison.OrdinalIgnoreCase)
+                    || line.StartsWith("unzip:", StringComparison.OrdinalIgnoreCase))
+                {
+                    lastError = line;
+                    continue;
+                }
+
+                onVerbose(line);
+            }
+
+            return 0;
+        }
+        catch (OperationCanceledException)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            stderr = "Canceled";
+            return -1;
+        }
+        catch (ADBService.ProcessFailedException e)
+        {
+            if (!string.IsNullOrWhiteSpace(e.StandardError))
+                stderr = e.StandardError.Trim();
+            else if (!string.IsNullOrWhiteSpace(lastError))
+                stderr = lastError;
+            else
+                stderr = e.Message;
+            return e.ExitCode == 0 ? -1 : e.ExitCode;
         }
     }
 }

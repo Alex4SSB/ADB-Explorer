@@ -76,7 +76,7 @@ internal static class DefaultAndroidPackageIcon
             IsAntialias = true,
             ColorFilter = SKColorFilter.CreateColorMatrix(matrix),
         };
-        canvas.DrawBitmap(color, 0, 0, paint);
+        canvas.DrawBitmap(color, 0, 0, new SKSamplingOptions(SKFilterMode.Nearest, SKMipmapMode.None), paint);
         return ApkVectorIconRenderer.ToBitmapSource(gray);
     }
 

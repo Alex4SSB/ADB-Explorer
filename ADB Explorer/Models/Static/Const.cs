@@ -79,6 +79,8 @@ public static class AdbExplorerConst
 
     public static readonly string[] APK_NAMES = [".APK", ".XAPK", ".APKS", ".APKM", ".APEX"];
     public static readonly string[] INSTALL_APK = [".APK", ".APEX"];
+    public const string APK_BACKUP_EXTENSION = ".APKBKP";
+    public const string OBB_ROOT = "/sdcard/Android/obb";
     public static readonly string[] ARCHIVE_NAMES = [".7Z", ".ZIP", ".RAR", ".CAB", ".ISO", ".XZ", ".TXZ", ".LZMA", ".TAR", ".CPIO", ".BZ2", ".BZIP2", ".TBZ2", ".TBZ", ".GZ", ".GZIP", ".TGZ", ".TPZ", ".ZST", ".TZST"];
 
     public static readonly UnicodeCategory[] UNICODE_ICONS = [UnicodeCategory.Surrogate, UnicodeCategory.PrivateUse, UnicodeCategory.OtherSymbol, UnicodeCategory.OtherNotAssigned];
@@ -86,7 +88,12 @@ public static class AdbExplorerConst
     public static readonly char[] WIFI_PAIRING_ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-+*/<>{}".ToCharArray();
     public const string PAIRING_SERVICE_PREFIX = "adbexplorer-";
 
-    public static readonly char[] ESCAPE_ADB_SHELL_CHARS = ['(', ')', '<', '>', '|', ';', '&', '*', '\\', '~', '"', '\'', ' ', '$', '`'];
+    /// <summary>
+    /// Characters escaped inside <see cref="Services.ADBService.EscapeAdbShellString"/>'s double quotes.
+    /// Do not include <c>~</c>: tilde is not special in double quotes, and <c>\~</c> is a literal
+    /// backslash (breaks <c>/data/app/~~…</c> install dirs used with <c>tar -C</c>).
+    /// </summary>
+    public static readonly char[] ESCAPE_ADB_SHELL_CHARS = ['(', ')', '<', '>', '|', ';', '&', '*', '\\', '"', '\'', ' ', '$', '`'];
 
     public const char ADB_UNIT_SEP = '\u001E';
     public const char ADB_FIELD_SEP = '\u001F';

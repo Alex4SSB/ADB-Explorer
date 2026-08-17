@@ -130,6 +130,10 @@ internal static class MainToolBar
             StyleHelper.ContentAnimation.RightMarquee,
             isVisible: Data.FileActions.IsUninstallVisible),
         new IconMenu(
+            AppActions.List.Find(a => a.Name is FileAction.FileActionType.BackupPackage),
+            AppActions.Icon(FileAction.FileActionType.BackupPackage, 18),
+            isVisible: Data.FileActions.IsUninstallVisible),
+        new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Uninstall),
             AppActions.Icon(FileAction.FileActionType.Uninstall, 18),
             StyleHelper.ContentAnimation.DownMarquee,
@@ -158,6 +162,7 @@ internal static class MainToolBar
                     isVisible: Data.FileActions.IsApkActionsVisible,
                     children:
                     [
+                        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.BackupPackage), AppActions.Icon(FileAction.FileActionType.BackupPackage, 16)),
                         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Install), AppActions.Icon(FileAction.FileActionType.Install, 16)),
                         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.SubMenuUninstall), AppActions.Icon(FileAction.FileActionType.Uninstall, 16)),
                     ]),
@@ -245,6 +250,8 @@ internal static class ExplorerContextMenu
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Pull),
             new(new PullIcon(), 16)),
+        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.BackupPackage), 
+            AppActions.Icon(FileAction.FileActionType.BackupPackage, 16)),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPush),
             new(new PushIcon(), 16),
