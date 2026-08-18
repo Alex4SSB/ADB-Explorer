@@ -1750,4 +1750,13 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
     <value>正在加载应用图标</value>
   </data>
+  <data name="S_MENU_BACKUP_PACKAGE" xml:space="preserve">
+    <value>备份</value>
+  </data>
+  <data name="S_APK_BACKUP_OBB_FAILED" xml:space="preserve">
+    <value>已安装应用，但无法恢复 OBB 文件。在设备上打开一次应用并重试。</value>
+  </data>
+  <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
+    <value>创建应用安装和 OBB 数据的 .APKBKP 备份</value>
+  </data>
 </root>
