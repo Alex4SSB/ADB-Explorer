@@ -1750,4 +1750,13 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_PACKAGE_ID" xml:space="preserve">
     <value>Пакет ID</value>
   </data>
+  <data name="S_MENU_BACKUP_PACKAGE" xml:space="preserve">
+    <value>Резервное копирование</value>
+  </data>
+  <data name="S_APK_BACKUP_OBB_FAILED" xml:space="preserve">
+    <value>Приложение было установлено, но файлы OBB не удалось восстановить. Откройте приложение на устройстве один раз и попробуйте снова.</value>
+  </data>
+  <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
+    <value>Создайте .APKBKP для установки приложения и данных OBB</value>
+  </data>
 </root>
