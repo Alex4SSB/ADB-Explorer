@@ -1750,4 +1750,13 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
     <value>Завантаження іконок додатків</value>
   </data>
+  <data name="S_MENU_BACKUP_PACKAGE" xml:space="preserve">
+    <value>Резервне копіювання</value>
+  </data>
+  <data name="S_APK_BACKUP_OBB_FAILED" xml:space="preserve">
+    <value>Додаток було встановлено, але файли OBB не вдалося відновити. Відкрийте додаток на пристрої один раз і спробуйте ще раз.</value>
+  </data>
+  <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
+    <value>Створіть .APKBKP для встановлення додатка та даних OBB</value>
+  </data>
 </root>
