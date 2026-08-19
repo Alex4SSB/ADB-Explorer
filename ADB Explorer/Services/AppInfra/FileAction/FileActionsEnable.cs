@@ -219,7 +219,7 @@ public partial class FileActionsEnable : ObservableObject
         }
     }
 
-    private static bool isAppDrive;
+    private bool isAppDrive;
     public bool IsAppDrive
     {
         get => isAppDrive;
@@ -476,7 +476,7 @@ public partial class FileActionsEnable : ObservableObject
 
     public ObservableProperty<bool> IsPasteVisible = new() { Value = true };
 
-    public ObservableProperty<bool> IsApkActionsVisible = new() { Value = Data.Settings.EnableApk };
+    public ObservableProperty<bool> IsApkActionsVisible = new();
 
     public ObservableProperty<bool> IsPushMenuVisible = new() { Value = true };
 

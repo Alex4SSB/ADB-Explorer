@@ -120,6 +120,12 @@ public partial class ExplorerPageHeader : UserControl
 
     public ScrollViewer ActiveScrollViewer => ViewModel.IsIconView ? IconScrollViewer : ExplorerScrollViewer;
 
+    private void ResetExplorerHorizontalScroll()
+    {
+        ActiveScrollViewer?.ScrollToHorizontalOffset(0);
+        App.SafeBeginInvoke(() => ActiveScrollViewer?.ScrollToHorizontalOffset(0), DispatcherPriority.Loaded);
+    }
+
     private static Point NullPoint => new(-1, -1);
 
     /// <summary>
@@ -515,23 +521,26 @@ public partial class ExplorerPageHeader : UserControl
 
     private void ApplySelectionEffects()
     {
-        SelectedFiles = FileActions.IsAppDrive ? [] : (DirList?.FileList?.Where(f => f.IsSelected) ?? []);
-        SelectedPackages = FileActions.IsAppDrive
-            ? (Data.Packages?.Where(p => p.IsSelected) ?? [])
+        var files = Files;
+        files.SelectedFiles = files.Actions.IsAppDrive ? [] : (files.DirList?.FileList?.Where(f => f.IsSelected) ?? []);
+        files.SelectedPackages = files.Actions.IsAppDrive
+            ? (Packages?.Where(p => p.IsSelected) ?? [])
             : [];
-        FileActions.SelectedItemsCount = FileActions.IsAppDrive ? SelectedPackages.Count() : SelectedFiles.Count();
+        files.Actions.SelectedItemsCount = files.Actions.IsAppDrive
+            ? files.SelectedPackages.Count()
+            : files.SelectedFiles.Count();
 
         if (DetailsPane.IsOpen)
         {
             // Snapshot so OldValue isn't a live Where() that re-evaluates after selection changes.
-            DetailsPane.SelectedFiles = FileActions.IsAppDrive
-                ? SelectedPackages.ToList()
-                : SelectedFiles.ToList();
+            DetailsPane.SelectedFiles = files.Actions.IsAppDrive
+                ? files.SelectedPackages.ToList()
+                : files.SelectedFiles.ToList();
         }
 
         if (DevicesObject.Current is { SupportsLsV2: false })
         {
-            foreach (var file in SelectedFiles.Where(f => f.IsRegularFile && f.ShellLsSize is null))
+            foreach (var file in files.SelectedFiles.Where(f => f.IsRegularFile && f.ShellLsSize is null))
             {
                 if (DetailsPane.IsOpen && !file.IsCreationTimeResolved)
                     continue;
@@ -542,9 +551,9 @@ public partial class ExplorerPageHeader : UserControl
 
         ViewModel.NotifySelectedFilesTotalSize();
 
-        FileActionLogic.UpdateFileActions();
+        FileActionLogic.UpdateFileActions(files);
 
-        if (FileActions.IsAppDrive)
+        if (files.Actions.IsAppDrive)
             ScheduleApkIconPriorityUpdate();
     }
 
@@ -683,7 +692,7 @@ public partial class ExplorerPageHeader : UserControl
                         if (FileActions.IsAppDrive || FileActions.IsRecycleBin || DevicesObject.Current is null)
                             FilterFileActions();
                     });
-                    Task.Run(ExplorerContextMenu.UpdateSeparators);
+                    Task.Run(() => ExplorerContextMenu.UpdateSeparators());
                     break;
 
                 case nameof(AppRuntimeSettings.NewFolder):
@@ -806,6 +815,7 @@ public partial class ExplorerPageHeader : UserControl
 
     private void InitLister()
     {
+        Files.Device = DevicesObject.Current;
         DirList = new(App.AppDispatcher, DevicesObject.Current, FileHelper.ListerFileManipulator);
         DirList.PropertyChanged += DirectoryLister_PropertyChanged;
     }
@@ -869,6 +879,8 @@ public partial class ExplorerPageHeader : UserControl
 
             case nameof(DirectoryLister.IsLinkListingFinished):
                 {
+                    ViewModel.NotifyDirectoryLinksResolved();
+
                     if (DirList.FileList.Count > 0)
                     {
                         SortExplorer();
@@ -947,6 +959,7 @@ public partial class ExplorerPageHeader : UserControl
 
         ActiveView.Focus();
 
+        NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
         NavigationBox.Path = realPath == RECYCLE_PATH ? AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin) : realPath;
         CurrentDrive = DriveHelper.GetCurrentDrive(devicePath);
         FileActions.IsRecycleBin = realPath == RECYCLE_PATH;
@@ -991,6 +1004,7 @@ public partial class ExplorerPageHeader : UserControl
             {
                 FileActionLogic.UpdatePackages(true, DeviceCts.Token);
                 FileActionLogic.UpdateFileActions();
+                ResetExplorerHorizontalScroll();
                 return true;
             }
 
@@ -1000,7 +1014,10 @@ public partial class ExplorerPageHeader : UserControl
         }
 
         ViewModel.ExplorerSource = DirList.FileList;
+
         FileActionLogic.UpdateFileActions();
+
+        ResetExplorerHorizontalScroll();
 
         return true;
     }
@@ -1078,6 +1095,7 @@ public partial class ExplorerPageHeader : UserControl
         DirList.Search(searchRoot, query, DeviceCts.Token);
         ViewModel.ExplorerSource = DirList.FileList;
         FileActionLogic.UpdateFileActions();
+        ResetExplorerHorizontalScroll();
 
         if (DetailsPane.IsOpen)
             DetailsPane.RefreshSelection();
@@ -1213,7 +1231,10 @@ public partial class ExplorerPageHeader : UserControl
                 : location.Path;
 
             if (!FileActions.IsExplorerVisible)
-                InitNavigation(path);
+            {
+                if (!InitNavigation(path))
+                    DriveViewNav();
+            }
             else
                 NavigateToPath(path);
         }

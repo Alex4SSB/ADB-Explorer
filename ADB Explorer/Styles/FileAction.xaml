@@ -346,6 +346,9 @@
             <DataTrigger Binding="{Binding Info}" Value="{x:Null}">
                 <Setter Property="ToolTip" Value="{x:Null}" />
             </DataTrigger>
+            <DataTrigger Binding="{Binding ShowInputGestures, RelativeSource={RelativeSource AncestorType=controls:AdbContextMenu}}" Value="False">
+                <Setter Property="InputGestureText" Value="" />
+            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style
@@ -431,6 +434,19 @@
         BasedOn="{StaticResource BaseContextMenuStyle}"
         TargetType="controls:AdbContextMenu">
         <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:ExplorerContextMenu.VisibleList}}" />
+    </Style>
+    <Style
+        x:Key="TreeContextMenuStyle"
+        BasedOn="{StaticResource ExplorerContextMenuStyle}"
+        TargetType="controls:AdbContextMenu">
+        <Setter Property="ShowInputGestures" Value="False" />
+    </Style>
+    <Style
+        x:Key="DeviceContextMenuStyle"
+        BasedOn="{StaticResource BaseContextMenuStyle}"
+        TargetType="controls:AdbContextMenu">
+        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:DeviceContextMenu.VisibleList}}" />
+        <Setter Property="ShowInputGestures" Value="False" />
     </Style>
     <Style
         x:Key="PathBoxContextMenuStyle"

@@ -28,6 +28,7 @@ public partial class DetailsPane : UserControl
     }
 
     private DriveViewModel? _mountOptionsDrive;
+    private VirtualDriveViewModel? _trashCountDrive;
     private string? _previewFileExtension;
     private bool _updatingSyntaxSelection;
 
@@ -292,6 +293,7 @@ public partial class DetailsPane : UserControl
     private static void OnSelectedFilesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => App.SafeBeginInvoke(() =>
     {
         var control = (DetailsPane)d;
+        control.UnsubscribeTrashCountDrive();
         var files = (IEnumerable<IBrowserItem>)e.NewValue;
 
         FileClass? oldFile = e.OldValue is IEnumerable<IBrowserItem> oldFiles
@@ -468,12 +470,17 @@ public partial class DetailsPane : UserControl
                         ? FlowDirection.RightToLeft
                         : FlowDirection.LeftToRight;
 
-                    var trashDrive = Data.DevicesObject.Current?.Drives.OfType<VirtualDriveViewModel>().FirstOrDefault(d => d.Type is AbstractDrive.DriveType.Trash);
+                    VirtualDriveViewModel? trashDrive = null;
+                    if (drive is VirtualDriveViewModel virtualDrive
+                        && virtualDrive.Type is AbstractDrive.DriveType.Trash)
+                        trashDrive = virtualDrive;
+                    else if (drive.Type is AbstractDrive.DriveType.Trash)
+                        trashDrive = TrashHelper.GetTrashDrive(Data.DevicesObject.Current);
 
+                    control.SubscribeTrashCountDrive(drive.Type is AbstractDrive.DriveType.Trash ? trashDrive : null);
                     control.LargeFileIcon.Source = drive.Type switch
                     {
-                        AbstractDrive.DriveType.Trash when trashDrive?.ItemsCount == 0 => EmptyTrash.DragImage,
-                        AbstractDrive.DriveType.Trash => FullTrash.DragImage,
+                        AbstractDrive.DriveType.Trash => TrashIcon(trashDrive),
                         AbstractDrive.DriveType.Package => AppIcon,
                         _ => DriveIcon.DragImage,
                     };
@@ -525,8 +532,9 @@ public partial class DetailsPane : UserControl
                 else if (Data.FileActions.IsRecycleBin)
                 {
                     control.FileNameTextBlock.Text = Strings.Resources.S_DRIVE_TRASH;
-                    bool emptyTrash = Data.DevicesObject.Current.Drives.OfType<VirtualDriveViewModel>().First(d => d.Type is AbstractDrive.DriveType.Trash).ItemsCount == 0;
-                    control.LargeFileIcon.Source = emptyTrash ? EmptyTrash.DragImage : FullTrash.DragImage;
+                    var trashDrive = TrashHelper.GetTrashDrive(Data.DevicesObject.Current);
+                    control.SubscribeTrashCountDrive(trashDrive);
+                    control.LargeFileIcon.Source = TrashIcon(trashDrive);
                 }
                 else if (Data.FileActions.IsAppDrive)
                 {
@@ -890,6 +898,34 @@ public partial class DetailsPane : UserControl
                 page.Label = $"{pages.IndexOf(page) + 1}/{total}";
         });
     }
+
+    private void UnsubscribeTrashCountDrive()
+    {
+        if (_trashCountDrive is null)
+            return;
+
+        _trashCountDrive.PropertyChanged -= OnTrashCountChanged;
+        _trashCountDrive = null;
+    }
+
+    private void SubscribeTrashCountDrive(VirtualDriveViewModel? trash)
+    {
+        UnsubscribeTrashCountDrive();
+        _trashCountDrive = trash;
+        if (trash is not null)
+            trash.PropertyChanged += OnTrashCountChanged;
+    }
+
+    private void OnTrashCountChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is not nameof(VirtualDriveViewModel.ItemsCount))
+            return;
+
+        App.SafeBeginInvoke(() => LargeFileIcon.Source = TrashIcon(_trashCountDrive));
+    }
+
+    private static BitmapSource TrashIcon(VirtualDriveViewModel? trash)
+        => trash?.ItemsCount == 0 ? EmptyTrash.DragImage : FullTrash.DragImage;
 
     private void UnsubscribeMountOptionsDrive()
     {

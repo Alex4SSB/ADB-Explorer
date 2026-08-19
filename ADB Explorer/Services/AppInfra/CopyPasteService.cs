@@ -2,6 +2,7 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
+using ADB_Explorer.ViewModels.Pages;
 using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
 
@@ -228,12 +229,19 @@ public partial class CopyPasteService : ObservableObject
     {
         FileActionLogic.UpdateFileActions();
 
-        List<FileClass> cutItems = [];
-        if (PasteSource is not DataSource.None && PasteSource.HasFlag(DataSource.Self))
-            cutItems = [.. Data.DirList.FileList.Where(f => Files.Contains(f.FullPath))];
+        var listing = Data.Files.DirList?.FileList;
+        if (listing is not null)
+        {
+            List<FileClass> cutItems = [];
+            var listingDevice = Data.Files.Device ?? Data.DevicesObject.Current;
+            if (PasteSource is not DataSource.None && IsFromDevice(listingDevice))
+                cutItems = [.. listing.Where(f => ContainsPath(f.FullPath))];
 
-        cutItems.ForEach(file => file.CutState = PasteState);
-        Data.DirList?.FileList.Except(cutItems).ForEach(file => file.CutState = DragDropEffects.None);
+            cutItems.ForEach(file => file.CutState = PasteState);
+            listing.Except(cutItems).ForEach(file => file.CutState = DragDropEffects.None);
+        }
+
+        App.Services.GetService<ExplorerViewModel>()?.Tree.UpdateCutStates();
     }
 
     public void Clear()
@@ -245,6 +253,7 @@ public partial class CopyPasteService : ObservableObject
             PasteSource = DataSource.None;
             Files = [];
             ParentFolder = "";
+            SourceDevice = null;
         }
 
         ClearDrag();
@@ -268,6 +277,50 @@ public partial class CopyPasteService : ObservableObject
         ArchiveExtract.BeginCleanupAllStaging();
     }
 
+    public bool IsFromDevice(LogicalDeviceViewModel? device)
+    {
+        if (device is null)
+            return IsSelf;
+
+        if (SourceDevice is not null)
+            return SourceDevice.ID == device.ID;
+
+        return IsSelf;
+    }
+
+    public bool ContainsPath(string? path)
+    {
+        if (string.IsNullOrEmpty(path) || Files.Length == 0)
+            return false;
+
+        foreach (var file in Files)
+        {
+            if (NavigationTreeNode.PathsEqual(file, path))
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool ShouldKeepSelfAndroidClipboard(IDataObject dataObject)
+    {
+        if (!CurrentSource.HasFlag(DataSource.Android)
+            || MasterPid != Environment.ProcessId
+            || Files.Length == 0)
+            return false;
+
+        if (dataObject.GetDataPresent(AdbDataFormats.AdbDrop)
+            && dataObject.GetData(AdbDataFormats.AdbDrop) is MemoryStream)
+            return false;
+
+        // A new Windows/shell copy typically includes FileDrop. OLE can omit AdbDrop
+        // on the first update while still holding our FileDescriptor payload.
+        return !dataObject.GetDataPresent(AdbDataFormats.FileDrop);
+    }
+
+    private static bool IsAndroidAbsolutePath(string path)
+        => !string.IsNullOrEmpty(path) && path[0] == '/';
+
     public void GetClipboardPasteItems()
     {
         var CPDO = Clipboard.GetDataObject();
@@ -275,6 +328,12 @@ public partial class CopyPasteService : ObservableObject
 #if !DEPLOY
         DebugLog.PrintLine($"Clipboard formats: {string.Join(", ", CPDO.GetFormats())}");
 #endif
+
+        if (ShouldKeepSelfAndroidClipboard(CPDO))
+        {
+            UpdateUI();
+            return;
+        }
 
         var allowedEffect = GetAllowedDragEffects(CPDO);
         if (allowedEffect is DragDropEffects.None)
@@ -303,8 +362,13 @@ public partial class CopyPasteService : ObservableObject
         else
             PasteState = DragDropEffects.None;
 
-        Files = DragFiles;
-        ParentFolder = DragParent;
+        if (DragFiles.Length > 0 && DragFiles.All(IsAndroidAbsolutePath))
+            Files = DragFiles;
+        else if (!CurrentSource.HasFlag(DataSource.Android) || Files.Length == 0)
+            Files = DragFiles;
+
+        if (!string.IsNullOrEmpty(DragParent))
+            ParentFolder = DragParent;
 
         UpdateUI();
 
@@ -329,7 +393,10 @@ public partial class CopyPasteService : ObservableObject
                 PasteState = pasteEffect;
         }
 
-        SourceDevice = Data.DevicesObject.Current;
+        var copyDevice = Data.Active.Device ?? Data.DevicesObject.Current;
+        if (copyDevice is not null
+            && (SourceDevice is null || !ReferenceEquals(Data.Active, Data.Files)))
+            SourceDevice = copyDevice;
         MasterPid = Environment.ProcessId;
         var transferParent = FileHelper.GetSearchTransferParent(VirtualFileDataObject.SelfFiles);
         if (Data.FileActions.IsSearchMode)
@@ -448,9 +515,6 @@ public partial class CopyPasteService : ObservableObject
     {
         CurrentSource &= ~(DataSource.Android | DataSource.Self | DataSource.Virtual);
 
-        if (Data.DevicesObject.Current is null)
-            return;
-
         DragParent = "";
         string[] oldFiles = [.. DragFiles];
 
@@ -461,20 +525,28 @@ public partial class CopyPasteService : ObservableObject
             var deviceId = dragList.deviceId;
 
             var device = Data.DevicesObject.UIList.OfType<LogicalDeviceViewModel>().FirstOrDefault(d => d.ID == deviceId && d.Status is DeviceStatus.Ok);
+            if (device is null
+                && SourceDevice?.ID == deviceId
+                && MasterPid == Environment.ProcessId)
+                device = SourceDevice;
+
             if (!IsDrag && device is null)
             {
                 Clear();
                 return;
             }
-            else
-                SourceDevice = device;
+
+            SourceDevice = device;
 
             MasterPid = dragList.pid;
             DragParent = dragList.parentFolder;
             DragFiles = [.. dragList.items.Select(f => FileHelper.ConcatPaths(DragParent, f))];
 
             CurrentSource |= DataSource.Android;
-            if (deviceId == Data.DevicesObject.Current.ID)
+            var currentId = Data.DevicesObject.Current?.ID;
+            if (deviceId == currentId)
+                CurrentSource |= DataSource.Self;
+            else if (currentId is null && dragList.pid == Environment.ProcessId)
                 CurrentSource |= DataSource.Self;
             else
                 CurrentSource |= DataSource.Virtual;
@@ -507,6 +579,7 @@ public partial class CopyPasteService : ObservableObject
         // Shell ID List - the only format Microsoft supports for anything added after Windows XP (non-ZIP archives, UNC paths, etc.)
         else if (dataObject.GetDataPresent(AdbDataFormats.ShellidList))
         {
+            SourceDevice = null;
             var ido = (System.Runtime.InteropServices.ComTypes.IDataObject)dataObject;
             ShellItemArray? shItems = null;
 
@@ -535,6 +608,7 @@ public partial class CopyPasteService : ObservableObject
         // This is the format we supply to File Explorer. Also provided by File Explorer for contents of ZIP archives (introduced in Windows ME).
         else if (dataObject.GetDataPresent(AdbDataFormats.FileDescriptor))
         {
+            SourceDevice = null;
             GetDescriptors(dataObject);
 
             DragFiles = [.. Descriptors.Where(d => !d.Name.Contains('\\')).Select(d => d.Name)];
@@ -546,6 +620,7 @@ public partial class CopyPasteService : ObservableObject
         // If the data object only has FileDrop, then it's probably dropping by target detect, which we can't support (7-Zip, WinRAR, etc.)
         else
         {
+            SourceDevice = null;
             DragFiles = [];
             UpdateUI();
         }

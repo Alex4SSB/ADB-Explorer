@@ -6,13 +6,41 @@ namespace ADB_Explorer.Models;
 
 public static class Data
 {
+    /// <summary>
+    /// Explorer (and later, the active tab). Location-dependent chrome binds here.
+    /// </summary>
+    public static FileList Files { get; } = new();
+
+    private static FileList? actionTarget;
+
+    /// <summary>
+    /// Action target: a tree context list, an inactive tab, or <see cref="Files"/>.
+    /// </summary>
+    public static FileList Active => actionTarget ?? Files;
+
+    public static FileListScope Use(FileList list) => new(list);
+
+    public readonly struct FileListScope : IDisposable
+    {
+        private readonly FileList? previous;
+
+        internal FileListScope(FileList list)
+        {
+            previous = actionTarget;
+            actionTarget = list;
+        }
+
+        public void Dispose() => actionTarget = previous;
+    }
+
     public static string CurrentPath 
     {
         get;
         set
         {
-            field = value;
-            CurrentPathO.Value = value;
+            field = value ?? "";
+            Files.Path = field;
+            CurrentPathO.Value = field;
         }
     } = "";
     public static string ParentPath => FileHelper.GetParentPath(CurrentPath);
@@ -34,7 +62,11 @@ public static class Data
 
     public static ObservableProperty<string> CurrentPathO { get; } = new();
 
-    public static DriveViewModel CurrentDrive { get; set; } = null;
+    public static DriveViewModel CurrentDrive
+    {
+        get => Active.CurrentDrive;
+        set => Files.CurrentDrive = value;
+    }
 
     public static FileOperationQueue FileOpQ { get; set; }
 
@@ -54,9 +86,13 @@ public static class Data
 
     public static Version AppVersion => new(Properties.AppGlobal.AppVersion);
 
-    public static FileActionsEnable FileActions { get; set; } = new();
+    public static FileActionsEnable FileActions => Files.Actions;
 
-    public static DirectoryLister DirList { get; set; }
+    public static DirectoryLister DirList
+    {
+        get => Active.DirList;
+        set => Files.DirList = value;
+    }
 
     public static string AppDataPath { get; set; } = "";
 
@@ -68,9 +104,17 @@ public static class Data
 
     public static MDNS MdnsService { get; } = new();
 
-    public static IEnumerable<FileClass> SelectedFiles { get; set; } = [];
+    public static IEnumerable<FileClass> SelectedFiles
+    {
+        get => Active.SelectedFiles ?? [];
+        set => Files.SelectedFiles = value ?? [];
+    }
 
-    public static IEnumerable<Package> SelectedPackages { get; set; } = [];
+    public static IEnumerable<Package> SelectedPackages
+    {
+        get => Active.SelectedPackages ?? [];
+        set => Files.SelectedPackages = value ?? [];
+    }
 
     public static ObservableProperty<Type> CurrentPage { get; set; } = new();
 

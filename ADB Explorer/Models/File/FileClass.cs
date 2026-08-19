@@ -590,14 +590,14 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     public FileSyncOperation PrepareDescriptors(VirtualFileDataObject vfdo, bool includeContent = true)
     {
-        var name = Data.FileActions.IsAppDrive
+        var name = Data.Active.Actions.IsAppDrive
             ? Data.SelectedPackages.FirstOrDefault(pkg => pkg.Path == FullPath)?.Name + ".apk"
             : FullName;
 
         SyncFile target = new(FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, name, '\\'))
             { PathType = FilePathType.Windows };
 
-        var device = Data.DevicesObject.Current;
+        var device = Data.Active.Device ?? Data.DevicesObject.Current;
         var deviceId = device.ID;
         SyncFile pullSource;
         FolderTree[]? children;
@@ -629,7 +629,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         else
         {
             children = Children;
-            if (Data.FileActions.IsSearchMode && !string.IsNullOrEmpty(Data.SearchOriginPath))
+            if (Data.Active.Actions.IsSearchMode && !string.IsNullOrEmpty(Data.SearchOriginPath))
             {
                 IEnumerable<FileClass> transferFiles = Data.SelectedFiles.Any() ? Data.SelectedFiles : [this];
                 descriptorParent = Data.SearchTransferParent ?? FileHelper.GetSearchTransferParent(transferFiles);
@@ -646,7 +646,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
         vfdo.OperationCompleted += VFDO_OperationCompleted;
 
-        var treeName = Data.FileActions.IsSearchMode ? FullPath : name;
+        var treeName = Data.Active.Actions.IsSearchMode ? FullPath : name;
         FolderTree[] items = [new(treeName, Size, UnixTime)];
         if (includeContent && children is not null)
         {

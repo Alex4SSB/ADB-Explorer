@@ -629,7 +629,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
 
         vfdo.Operations = [.. files.Select(f => f.PrepareDescriptors(vfdo))];
         vfdo.SetFileDescriptors(files.SelectMany(f => f.Descriptors));
-        vfdo.SetAdbDrag(files, Data.DevicesObject.Current);
+        vfdo.SetAdbDrag(files, TransferDevice);
 
         return vfdo;
     }
@@ -640,27 +640,29 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     {
         CopyPasteService.ClearTempFolder();
 
-        Data.FileActions.IsSelectionIllegalOnWindows = !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.Windows);
-        Data.FileActions.IsSelectionIllegalNaming = !Data.FileActions.IsRecycleBin
-            && !Data.FileActions.IsAppDrive
-            && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.RestrictedNaming);
-        Data.FileActions.IsSelectionConflictingNames = Data.SelectedFiles.Select(f => f.FullName)
+        var actions = Data.Active.Actions;
+        var selectedFiles = Data.SelectedFiles;
+        actions.IsSelectionIllegalOnWindows = !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.Windows);
+        actions.IsSelectionIllegalNaming = !actions.IsRecycleBin
+            && !actions.IsAppDrive
+            && !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.RestrictedNaming);
+        actions.IsSelectionConflictingNames = selectedFiles.Select(f => f.FullName)
             .Distinct(StringComparer.InvariantCultureIgnoreCase)
-            .Count() != Data.SelectedFiles.Count();
+            .Count() != selectedFiles.Count();
 
         VirtualFileDataObject vfdo = new(preferredEffect, method);
 
         var fileList = files.ToList();
-        Data.SearchTransferParent = Data.FileActions.IsSearchMode
+        Data.SearchTransferParent = actions.IsSearchMode
             ? FileHelper.GetSearchTransferParent(fileList)
             : null;
 
         var includeContent =
             preferredEffect is not DragDropEffects.Link
-            && !Data.FileActions.IsSelectionIllegalOnWindows
-            && !Data.FileActions.IsSelectionIllegalNaming
-            && !Data.FileActions.IsSelectionConflictingNames
-            && !Data.FileActions.IsRecycleBin;
+            && !actions.IsSelectionIllegalOnWindows
+            && !actions.IsSelectionIllegalNaming
+            && !actions.IsSelectionConflictingNames
+            && !actions.IsRecycleBin;
 
         if (includeContent)
         {
@@ -717,10 +719,13 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         }
 
         // Finally we provide the ADB drag data, which only we recongize
-        vfdo.SetAdbDrag(fileList, Data.DevicesObject.Current);
+        vfdo.SetAdbDrag(fileList, TransferDevice);
 
         return vfdo;
     }
+
+    private static LogicalDeviceViewModel? TransferDevice =>
+        Data.Active.Device ?? Data.DevicesObject.Current;
 
     public enum DataObjectMethod
     {

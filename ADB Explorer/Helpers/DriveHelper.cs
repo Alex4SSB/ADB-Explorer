@@ -11,14 +11,15 @@ internal class DriveHelper
         Data.FileActions.IsDriveViewVisible = false;
     }
 
-    public static DriveViewModel GetCurrentDrive(string path)
+    public static DriveViewModel GetCurrentDrive(string path, LogicalDeviceViewModel? device = null)
     {
         if (string.IsNullOrEmpty(path)) return null;
 
         if (AdbLocation.LocationFromString(path) is not Navigation.SpecialLocation.None)
             return null;
 
-        var drives = Data.DevicesObject?.Current?.Drives;
+        device ??= Data.Active.Device ?? Data.DevicesObject?.Current;
+        var drives = device?.Drives;
         if (drives is null)
             return null;
 

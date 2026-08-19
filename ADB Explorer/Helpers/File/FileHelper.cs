@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Converters;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels;
 using Vanara.PInvoke;
 using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
@@ -13,11 +14,14 @@ public static class FileHelper
     public static FileClass ListerFileManipulator(FileClass item)
     {
         if (Data.CopyPaste.Files.Length > 0
-            && Data.CopyPaste.IsSelfClipboard
-            && Data.CopyPaste.ParentFolder == Data.DirList.CurrentPath
-            && Data.CopyPaste.Files.FirstOrDefault(f => f == item.FullPath) is not null)
+            && Data.CopyPaste.IsClipboard
+            && Data.DirList is not null
+            && NavigationTreeNode.PathsEqual(Data.CopyPaste.ParentFolder, Data.DirList.CurrentPath)
+            && Data.CopyPaste.ContainsPath(item.FullPath))
         {
-            item.CutState = Data.CopyPaste.PasteState;
+            var listingDevice = Data.Files.Device ?? Data.DevicesObject.Current;
+            if (Data.CopyPaste.IsFromDevice(listingDevice))
+                item.CutState = Data.CopyPaste.PasteState;
         }
 
         if (Data.FileActions.IsRecycleBin)
