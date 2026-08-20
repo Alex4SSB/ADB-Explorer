@@ -1751,4 +1751,13 @@ Séléctionnez Personnalisé pour utiliser un emplacement qui ne sera pas suppri
   <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
     <value>Chargement des icônes d'application</value>
   </data>
+  <data name="S_MENU_BACKUP_PACKAGE" xml:space="preserve">
+    <value>Sauvegarde</value>
+  </data>
+  <data name="S_APK_BACKUP_OBB_FAILED" xml:space="preserve">
+    <value>L'application a été installée mais les fichiers OBB n'ont pu être restaurés. Ouvrez l'application une fois sur l'appareil et réessayez.</value>
+  </data>
+  <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
+    <value>Créez un .APKBKP de l'installation de l'application et des données OBB</value>
+  </data>
 </root>
