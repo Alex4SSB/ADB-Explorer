@@ -2612,6 +2612,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show.
+        /// </summary>
+        public static string S_MENU_SHOW {
+            get {
+                return ResourceManager.GetString("S_MENU_SHOW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Stop loading {0}.
         /// </summary>
         public static string S_MENU_STOP_LOADING {
@@ -2707,6 +2716,15 @@ namespace ADB_Explorer.Strings {
         public static string S_NAV_HISTORY {
             get {
                 return ResourceManager.GetString("S_NAV_HISTORY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Navigation pane.
+        /// </summary>
+        public static string S_NAVIGATION_PANE {
+            get {
+                return ResourceManager.GetString("S_NAVIGATION_PANE", resourceCulture);
             }
         }
         

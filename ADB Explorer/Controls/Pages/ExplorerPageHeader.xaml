@@ -647,7 +647,6 @@
                         x:Name="SelectionRect"
                         PreviewMouseUp="SelectionRect_PreviewMouseUp"
                         RectMouseMove="SelectionRect_MouseMove" />
-                    <local:RenameTooltip x:Name="RenameTooltipControl" DataContext="{x:Null}" />
                     <Grid Margin="0,40" Style="{StaticResource EmptyFolderGridStyle}">
                         <StackPanel Style="{StaticResource NonRootEmptyFolderStyle}">
                             <TextBlock
@@ -664,8 +663,13 @@
                 </Grid>
                 <local:NavigationPane
                     x:Name="NavigationPane"
-                    IsOpen="True"
+                    IsOpen="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsNavigationPaneOpen, Mode=OneWay}"
                     TreeItems="{Binding Tree.TreeSource}" />
+                <local:RenameTooltip
+                    x:Name="RenameTooltipControl"
+                    Grid.ColumnSpan="2"
+                    Panel.ZIndex="1"
+                    DataContext="{x:Null}" />
             </Grid>
         </Border>
         <Grid

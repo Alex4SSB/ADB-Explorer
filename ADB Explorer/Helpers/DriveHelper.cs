@@ -43,7 +43,11 @@ internal class DriveHelper
 
     public static bool IsModificationAllowedAt(string path, string deviceId)
     {
-        if (GetCurrentDrive(path)?.Restrictions.ReadOnly is true)
+        LogicalDeviceViewModel? device = null;
+        if (!string.IsNullOrEmpty(deviceId))
+            device = Data.DevicesObject?.LogicalDeviceViewModels?.FirstOrDefault(d => d.ID == deviceId);
+
+        if (GetCurrentDrive(path, device)?.Restrictions.ReadOnly is true)
             return false;
 
         return ArchiveHelper.IsModificationAllowedAt(path, deviceId);

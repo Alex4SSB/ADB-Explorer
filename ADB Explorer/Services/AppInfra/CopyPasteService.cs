@@ -122,6 +122,12 @@ public partial class CopyPasteService : ObservableObject
 
     public NativeMethods.HResult DragResult { get; set; }
 
+    /// <summary>
+    /// True from the start of an OLE drag until the next listing/tree mouse-down.
+    /// Used to skip the context menu that would otherwise open after a right-click cancel.
+    /// </summary>
+    public bool WasDragging { get; set; }
+
     public DragDropEffects CurrentEffect => IsDrag ? DropEffect : PasteState;
     public string CurrentParent => IsDrag ? DragParent : ParentFolder;
     public bool IsSelf => CurrentSource.HasFlag(DataSource.Self);
@@ -682,17 +688,46 @@ public partial class CopyPasteService : ObservableObject
         AcceptDataObject(dataObject, targetFolder, isLink);
     }
 
-    public void AcceptDataObject(IDataObject dataObject, string targetFolder, bool isLink = false)
+    public DragDropEffects GetAllowedTreeDropEffects(IDataObject dataObject, NavigationTreeNode node)
     {
-        var deviceId = Data.DevicesObject.Current?.ID ?? "";
-        if (FileHelper.IsSearchLocation(targetFolder))
+        PreviewDataObject(dataObject);
+        if (DragFiles.Length < 1)
+            return DragDropEffects.None;
+
+        return FileActionLogic.EnableTreeDropPaste(node);
+    }
+
+    public void AcceptTreeDrop(System.Windows.DragEventArgs e, NavigationTreeNode node)
+    {
+        var allowed = GetAllowedTreeDropEffects(e.Data, node);
+        if (allowed is DragDropEffects.None)
             return;
 
-        // Packages are pulled out of app drive — never dropped back onto it.
-        if (Data.FileActions.IsAppDrive && IsSelf)
+        var device = node.OwnerDevice ?? Data.DevicesObject.Current;
+        var deviceId = device?.ID ?? "";
+        var targetFolder = ArchiveHelper.ResolvePasteTargetPath(node.DropTargetPath, deviceId);
+        var isAppDrive = node.Drive?.Type is AbstractDrive.DriveType.Package;
+
+        if (IsSelf && targetFolder == DragParent && e.KeyStates is DragDropKeyStates.None)
             return;
 
-        if (!DriveHelper.IsModificationAllowedAt(targetFolder, deviceId))
+        AcceptDataObject(e.Data, targetFolder, e.KeyStates.HasFlag(DragDropKeyStates.AltKey), device, isAppDrive);
+    }
+
+    public void AcceptDataObject(IDataObject dataObject, string targetFolder, bool isLink = false)
+        => AcceptDataObject(dataObject, targetFolder, isLink, Data.DevicesObject.Current, Data.FileActions.IsAppDrive);
+
+    public void AcceptDataObject(IDataObject dataObject, string targetFolder, bool isLink, LogicalDeviceViewModel? device, bool isAppDrive)
+    {
+        var deviceId = device?.ID ?? "";
+        if (device is null || FileHelper.IsSearchLocation(targetFolder))
+            return;
+
+        // Packages pulled from app drive are not dropped back onto it.
+        if (isAppDrive && IsSelf && Data.FileActions.IsAppDrive)
+            return;
+
+        if (!DriveHelper.IsModificationAllowedAt(targetFolder, deviceId) && !isAppDrive)
             return;
 
         // Symlink into archives is not supported.
@@ -700,13 +735,13 @@ public partial class CopyPasteService : ObservableObject
             return;
 
         if ((isLink || CurrentEffect is DragDropEffects.Link)
-            && DriveHelper.GetCurrentDrive(targetFolder)?.Restrictions.NoSymbolicLinks is true)
+            && DriveHelper.GetCurrentDrive(targetFolder, device)?.Restrictions.NoSymbolicLinks is true)
             return;
 
         void ReadObject()
         {
             // For all cases where the files aren't immediately available on disk
-            if (IsVirtual)
+            if (IsVirtual && SourceDevice?.ID != device.ID)
             {
                 ClearTempFolder();
 
@@ -728,10 +763,10 @@ public partial class CopyPasteService : ObservableObject
 
                             // Once done, create a shell item and push it to the target device (current)
                             FileClass file = new(target) { ShellItem = ShellItem.Open(target.FullPath) };
-                            if (Data.FileActions.IsAppDrive)
+                            if (isAppDrive)
                             {
                                 if (FileHelper.AllFilesAreApks(DragFiles))
-                                    ShellFileOperation.PushPackages(Data.DevicesObject.Current, [file.ShellItem], App.AppDispatcher);
+                                    ShellFileOperation.PushPackages(device, [file.ShellItem], App.AppDispatcher);
 
                                 return;
                             }
@@ -776,10 +811,10 @@ public partial class CopyPasteService : ObservableObject
                         // A new top level item means the previous one is done
                         if (lastTopItem is not null && lastTopItem.ParsingName != e.DestItem.ParsingName)
                         {
-                            if (Data.FileActions.IsAppDrive)
+                            if (isAppDrive)
                             {
                                 if (FileHelper.AllFilesAreApks(DragFiles))
-                                    ShellFileOperation.PushPackages(Data.DevicesObject.Current, [lastTopItem], App.AppDispatcher);
+                                    ShellFileOperation.PushPackages(device, [lastTopItem], App.AppDispatcher);
                             }
                             else
                                 VerifyAndPush(targetFolder, new FileClass(lastTopItem), CurrentEffect, lastTopSource);
@@ -794,10 +829,10 @@ public partial class CopyPasteService : ObservableObject
                         // The last item is not caught by the PostCopyItem event
                         if (lastTopItem is not null)
                         {
-                            if (Data.FileActions.IsAppDrive)
+                            if (isAppDrive)
                             {
                                 if (FileHelper.AllFilesAreApks(DragFiles))
-                                    ShellFileOperation.PushPackages(Data.DevicesObject.Current, [lastTopItem], App.AppDispatcher);
+                                    ShellFileOperation.PushPackages(device, [lastTopItem], App.AppDispatcher);
                             }
                             else
                                 VerifyAndPush(targetFolder, new FileClass(lastTopItem), CurrentEffect, lastTopSource);
@@ -836,7 +871,7 @@ public partial class CopyPasteService : ObservableObject
                                             FileOperation.OperationType.Push,
                                             Descriptors[i],
                                             new(targetFolder),
-                                            Data.DevicesObject.Current,
+                                            device,
                                             new FailedOpProgressViewModel(e.Message)));
                                 });
 
@@ -864,10 +899,10 @@ public partial class CopyPasteService : ObservableObject
                         
                         if (shItems.Any())
                         {
-                            if (Data.FileActions.IsAppDrive)
+                            if (isAppDrive)
                             {
                                 if (FileHelper.AllFilesAreApks(DragFiles))
-                                    ShellFileOperation.PushPackages(Data.DevicesObject.Current, shItems.Select(f => f.ShellItem), App.AppDispatcher);
+                                    ShellFileOperation.PushPackages(device, shItems.Select(f => f.ShellItem), App.AppDispatcher);
                             }
                             else
                                 VerifyAndPush(targetFolder, shItems, CurrentEffect);
@@ -877,24 +912,24 @@ public partial class CopyPasteService : ObservableObject
             }
             else if (IsWindows) // FileDrop format
             {
-                if (Data.FileActions.IsAppDrive)
+                if (isAppDrive)
                 {
                     if (FileHelper.AllFilesAreApks(DragFiles))
-                        ShellFileOperation.PushPackages(Data.DevicesObject.Current, CurrentFiles.Select(f => f.ShellItem), App.AppDispatcher);
+                        ShellFileOperation.PushPackages(device, CurrentFiles.Select(f => f.ShellItem), App.AppDispatcher);
                 }
                 else
                     VerifyAndPush(targetFolder, CurrentFiles, CurrentEffect);
             }
-            else if (IsSelf)
+            else if (SourceDevice?.ID == device.ID)
             {
                 // Dragging a folder into itself is not allowed
                 if (DragFiles.Length == 1 && DragFiles[0] == targetFolder && IsDrag)
                     return;
 
-                if (Data.FileActions.IsAppDrive)
+                if (isAppDrive)
                 {
                     if (FileHelper.AllFilesAreApks(DragFiles))
-                        ShellFileOperation.InstallPackages(Data.DevicesObject.Current, CurrentFiles, App.AppDispatcher);
+                        ShellFileOperation.InstallPackages(device, CurrentFiles, App.AppDispatcher);
                 }
                 else
                 {
@@ -903,7 +938,7 @@ public partial class CopyPasteService : ObservableObject
                                targetFolder,
                                CurrentFiles,
                                App.AppDispatcher,
-                               Data.DevicesObject.Current,
+                               device,
                                Data.CurrentPath,
                                masterPid);
                 }
@@ -1092,7 +1127,7 @@ public partial class CopyPasteService : ObservableObject
                   items: pasteItems,
                   targetPath: targetPath,
                   currentPath: currentPath,
-                  existingItems: Data.DirList.FileList.Select(f => f.FullName),
+                  existingItems: Data.Files.DirList?.FileList?.Select(f => f.FullName) ?? [],
                   dispatcher: dispatcher,
                   cutType: cutType,
                   masterPid: masterPid);

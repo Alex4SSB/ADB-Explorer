@@ -5,6 +5,8 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using System.Drawing;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using static Services.NativeMethods;
 
 namespace ADB_Explorer.Helpers;
@@ -193,6 +195,10 @@ public class FileToIconConverter
 
     private static string ComputeIconId(string fileName, AbstractFile.SpecialFileType specialType, string? filePath = null)
     {
+        if (specialType.HasFlag(AbstractFile.SpecialFileType.Regular)
+            && FileHelper.TryGetUnicodeIconExtension(fileName, out var emoji))
+            return $"emoji:{emoji}";
+
         if (IsSupportedArchive(fileName, specialType))
             return $"{ArchiveIcon.DllPath}_{ArchiveIcon.Index}";
 
@@ -242,8 +248,104 @@ public class FileToIconConverter
         return LoadJumbo(new SpecialIcon(null, _imgList.IconIndex(lookup)), iconId, desiredSize);
     }
 
+    private static BitmapSource RenderEmojiIcon(string emoji, int desiredSize)
+    {
+        BitmapSource? result = null;
+        void Render()
+        {
+            var pixelSize = Math.Max(desiredSize, 16);
+            var block = new Emoji.Wpf.TextBlock
+            {
+                Text = emoji,
+                FontSize = pixelSize,
+            };
+            block.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
+            var textSize = block.DesiredSize;
+            block.Arrange(new Rect(textSize));
+
+            var raw = new RenderTargetBitmap(
+                Math.Max(1, (int)Math.Ceiling(textSize.Width)),
+                Math.Max(1, (int)Math.Ceiling(textSize.Height)),
+                96, 96, PixelFormats.Pbgra32);
+            raw.Render(block);
+
+            result = CenterOpaquePixels(raw, pixelSize);
+            result.Freeze();
+        }
+
+        var dispatcher = App.AppDispatcher;
+        if (dispatcher is null || dispatcher.CheckAccess())
+            Render();
+        else
+            dispatcher.Invoke(Render);
+
+        return result!;
+    }
+
+    private static BitmapSource CenterOpaquePixels(BitmapSource source, int size)
+    {
+        var width = source.PixelWidth;
+        var height = source.PixelHeight;
+        var stride = width * 4;
+        var pixels = new byte[stride * height];
+        source.CopyPixels(pixels, stride, 0);
+
+        var minX = width;
+        var minY = height;
+        var maxX = -1;
+        var maxY = -1;
+        for (var y = 0; y < height; y++)
+        {
+            for (var x = 0; x < width; x++)
+            {
+                if (pixels[y * stride + x * 4 + 3] == 0)
+                    continue;
+
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+            }
+        }
+
+        if (maxX < minX)
+            return source;
+
+        var contentW = maxX - minX + 1;
+        var contentH = maxY - minY + 1;
+        var scale = Math.Min((double)size / contentW, (double)size / contentH);
+        var destW = Math.Max(1, (int)Math.Round(contentW * scale));
+        var destH = Math.Max(1, (int)Math.Round(contentH * scale));
+        var left = (size - destW) / 2.0;
+        var top = (size - destH) / 2.0;
+
+        var crop = new CroppedBitmap(source, new Int32Rect(minX, minY, contentW, contentH));
+        var visual = new DrawingVisual();
+        using (var dc = visual.RenderOpen())
+            dc.DrawImage(crop, new Rect(left, top, destW, destH));
+
+        var centered = new RenderTargetBitmap(size, size, 96, 96, PixelFormats.Pbgra32);
+        centered.Render(visual);
+        return centered;
+    }
+
     private static BitmapSource AddToDictionary(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.Regular, string? filePath = null)
     {
+        if (specialType.HasFlag(AbstractFile.SpecialFileType.Regular)
+            && FileHelper.TryGetUnicodeIconExtension(fileName, out var emoji))
+        {
+            var pixelSize = desiredSize > 0 ? desiredSize : IconToSize(size).Width;
+            var emojiKey = new IconCacheKey(ComputeIconId(fileName, specialType, filePath), size, pixelSize);
+            if (iconDic.TryGetValue(emojiKey, out var emojiCached))
+                return emojiCached;
+
+            var rendered = RenderEmojiIcon(emoji, pixelSize);
+            lock (iconDic)
+                iconDic.TryAdd(emojiKey, rendered);
+
+            return iconDic[emojiKey];
+        }
+
         if (size > IconSize.ExtraLarge && specialType is not AbstractFile.SpecialFileType.LinkOverlay)
         {
             var iconId = ComputeIconId(fileName, specialType, filePath);

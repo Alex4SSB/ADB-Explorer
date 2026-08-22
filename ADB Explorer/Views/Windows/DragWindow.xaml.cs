@@ -256,6 +256,7 @@ public partial class DragWindow : INotifyPropertyChanged
 
             if ((e.PropertyName == nameof(Data.CopyPaste.DragFiles)
                 || e.PropertyName == nameof(Data.CopyPaste.DropTarget)
+                || e.PropertyName == nameof(Data.CopyPaste.CurrentDropEffect)
                 || e.PropertyName == nameof(Data.CopyPaste.MouseWithinApp))
                 && Data.CopyPaste.DragBitmap is not null)
             {

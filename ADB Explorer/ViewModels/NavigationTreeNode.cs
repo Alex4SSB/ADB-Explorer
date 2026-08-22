@@ -17,6 +17,8 @@ public partial class NavigationTreeNode : ObservableObject
 
     internal static int SuppressUserSelectFromExpander;
 
+    internal static int SuppressUserSelectFromEdit;
+
     public DriveViewModel? Drive { get; }
 
     public LogicalDeviceViewModel? Device { get; }
@@ -58,7 +60,50 @@ public partial class NavigationTreeNode : ObservableObject
     public partial bool IsContextTarget { get; set; }
 
     [ObservableProperty]
+    public partial bool IsDragOver { get; set; }
+
+    [ObservableProperty]
     public partial DragDropEffects CutState { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsInEditMode { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsRenameUnixLegal { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsRenameNamingLegal { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsRenameWindowsLegal { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsRenameDriveRootLegal { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsRenameUnique { get; set; }
+
+    public bool IsTemp { get; set; }
+
+    public FileClass? File { get; set; }
+
+    public bool IsRtlName => TextHelper.ContainsRtl(DisplayName);
+
+    public bool IsLogicalDriveNode => Drive is LogicalDriveViewModel
+        || Drive?.Type is AbstractDrive.DriveType.Temp;
+
+    public bool IsFolderNode => Device is null && Drive is null;
+
+    public string DropTargetPath
+    {
+        get
+        {
+            if (Drive?.LinkTargetPath is string link && !string.IsNullOrEmpty(link))
+                return link;
+
+            return Path;
+        }
+    }
 
     public NavigationTreeNode(
         string path,
@@ -102,12 +147,15 @@ public partial class NavigationTreeNode : ObservableObject
             _onExpanded?.Invoke(this);
     }
 
+    partial void OnDisplayNameChanged(string value)
+        => OnPropertyChanged(nameof(IsRtlName));
+
     partial void OnIsSelectedChanged(bool value)
     {
         if (_suppressSelectionCallback)
             return;
 
-        if (SuppressUserSelectFromExpander > 0)
+        if (SuppressUserSelectFromExpander > 0 || SuppressUserSelectFromEdit > 0)
         {
             if (value)
                 SetSelected(false);

@@ -50,14 +50,7 @@ public partial class FileViewModelBase : ObservableObject
     }
 
     public string ShortExtension
-    {
-        get
-        {
-            return (_file.Extension.Length > 1 && Array.IndexOf(AdbExplorerConst.UNICODE_ICONS, char.GetUnicodeCategory(_file.Extension[1])) > -1)
-                ? _file.Extension[1..]
-                : "";
-        }
-    }
+        => FileHelper.TryGetUnicodeIconExtension(_file.FullName, out var icon) ? icon : "";
 
     public string UserPermissionsString
     {

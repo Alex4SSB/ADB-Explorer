@@ -1,6 +1,8 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.Services.AppInfra;
+using System.Windows.Threading;
 
 namespace ADB_Explorer.ViewModels;
 
@@ -10,9 +12,24 @@ public partial class NavigationTreeViewModel : ObservableObject
     private readonly HashSet<ObservableList<DriveViewModel>> _subscribedDriveLists = [];
     private NavigationTreeNode? _selectedTreeNode;
     private bool _syncing;
+    private NavigationTreeNode? _queuedRename;
+    private NavigationTreeNode? _queuedNewFolderParent;
+    private NavigationTreeNode? _editingNode;
+    private readonly Dictionary<NavigationTreeNode, Task> _childLoadTasks = [];
 
     [ObservableProperty]
     public partial ObservableList<NavigationTreeNode> TreeSource { get; set; } = [];
+
+    public NavigationTreeNode? ContextTarget { get; private set; }
+
+    public NavigationTreeNode? EditingNode => _editingNode;
+
+    public bool IsTreeDragBlocked
+        => _editingNode is not null
+        || HasQueuedEdit
+        || FindNode(TreeSource, node => node.IsTemp) is not null;
+
+    public event EventHandler<NavigationTreeNode>? NodeEditStarted;
 
     public NavigationTreeViewModel(Func<IEnumerable<IBrowserItem>?> currentExplorerItems)
     {
@@ -315,10 +332,22 @@ public partial class NavigationTreeViewModel : ObservableObject
         _ = LoadTreeChildrenAsync(node);
     }
 
-    private async Task LoadTreeChildrenAsync(NavigationTreeNode node)
+    private Task LoadTreeChildrenAsync(NavigationTreeNode node)
     {
-        if (node.ChildrenLoaded || node.ChildrenLoading)
-            return;
+        if (_childLoadTasks.TryGetValue(node, out var inflight))
+            return inflight;
+
+        if (node.ChildrenLoaded)
+            return Task.CompletedTask;
+
+        var task = LoadTreeChildrenCoreAsync(node);
+        _childLoadTasks[node] = task;
+        _ = task.ContinueWith(_ => App.SafeInvoke(() => _childLoadTasks.Remove(node)));
+        return task;
+    }
+
+    private async Task LoadTreeChildrenCoreAsync(NavigationTreeNode node)
+    {
 
         if (IsCurrentExplorerPath(node) && Data.FileActions.ListingInProgress)
             return;
@@ -382,7 +411,7 @@ public partial class NavigationTreeViewModel : ObservableObject
 
         foreach (var child in node.Children.ToList())
         {
-            if (child.Drive is not null)
+            if (child.Drive is not null || child.IsTemp || child.IsInEditMode)
                 continue;
 
             if (matching.Any(folder => NavigationTreeNode.PathsEqual(folder.FullPath, child.Path)))
@@ -745,6 +774,7 @@ public partial class NavigationTreeViewModel : ObservableObject
                 existing.DisplayName = file.DisplayName;
                 existing.Icon = file.Icon;
                 existing.IconOverlay = file.IconOverlay;
+                existing.File ??= file;
             }
             existing.CutState = CutStateFor(existing);
             return existing;
@@ -759,7 +789,8 @@ public partial class NavigationTreeViewModel : ObservableObject
             ownerDevice: parent.OwnerDevice,
             onExpanded: OnTreeNodeExpanded)
         {
-            IconOverlay = file?.IconOverlay
+            IconOverlay = file?.IconOverlay,
+            File = file
         };
         child.CutState = CutStateFor(child);
 
@@ -811,7 +842,7 @@ public partial class NavigationTreeViewModel : ObservableObject
 
     private void OnTreeNodeSelected(NavigationTreeNode node)
     {
-        if (_syncing)
+        if (_syncing || node.IsInEditMode || node.IsTemp || _editingNode is not null)
             return;
 
         if (node.Device is { } device)
@@ -957,5 +988,370 @@ public partial class NavigationTreeViewModel : ObservableObject
 
         return ancestor.Children.Contains(node)
             || ancestor.Children.Any(child => IsAncestor(node, child));
+    }
+
+    public void SetContextTarget(NavigationTreeNode? node)
+        => ContextTarget = node;
+
+    public void QueueRename(NavigationTreeNode node)
+    {
+        CancelEdit();
+        _queuedNewFolderParent = null;
+        _queuedRename = node;
+    }
+
+    public void QueueNewFolder(NavigationTreeNode parent)
+    {
+        CancelEdit();
+        _queuedRename = null;
+        _queuedNewFolderParent = parent;
+    }
+
+    public bool HasQueuedEdit => _queuedRename is not null || _queuedNewFolderParent is not null;
+
+    public async void StartQueuedEdit()
+    {
+        var rename = _queuedRename;
+        var parent = _queuedNewFolderParent;
+        _queuedRename = null;
+        _queuedNewFolderParent = null;
+
+        if (rename is not null)
+        {
+            BeginEdit(rename);
+            return;
+        }
+
+        if (parent is not null)
+            await StartNewFolderAsync(parent);
+    }
+
+    private async Task StartNewFolderAsync(NavigationTreeNode parent)
+    {
+        parent.CanExpand = true;
+        parent.IsExpanded = true;
+        await LoadTreeChildrenAsync(parent);
+
+        if (!IsTreeNodeAttached(parent))
+            return;
+
+        var siblingNames = parent.Children.Select(child => child.DisplayName);
+        var fileName = FileHelper.DuplicateFile(siblingNames, ADB_Explorer.Strings.Resources.S_NEW_FOLDER);
+        var path = FileHelper.ConcatPaths(parent.Path, fileName);
+        var file = new FileClass(fileName, path, AbstractFile.FileType.Folder, isTemp: true);
+        var child = new NavigationTreeNode(
+            path,
+            fileName,
+            NavigationTreeNode.FolderIcon(path),
+            OnTreeNodeSelected,
+            ownerDevice: parent.OwnerDevice,
+            onExpanded: OnTreeNodeExpanded)
+        {
+            File = file,
+            IsTemp = true,
+            CanExpand = false,
+        };
+        InsertChild(parent, child);
+        parent.CanExpand = true;
+        BeginEdit(child);
+    }
+
+    private void BeginEdit(NavigationTreeNode node)
+    {
+        if (!ReferenceEquals(_editingNode, node))
+            CancelEdit();
+
+        node.File ??= new FileClass(node.DisplayName, node.Path, AbstractFile.FileType.Folder);
+        _editingNode = node;
+        node.IsInEditMode = true;
+        Data.FileActions.IsExplorerEditing = true;
+        NodeEditStarted?.Invoke(this, node);
+    }
+
+    public void CancelEdit(bool removeTemp = true)
+    {
+        if (_editingNode is null)
+            return;
+
+        var node = _editingNode;
+        node.IsInEditMode = false;
+        Data.FileActions.IsExplorerEditing = false;
+        _editingNode = null;
+
+        if (removeTemp && node.IsTemp)
+            RemoveTempNode(node);
+
+        BlockReselectAfterEdit(node);
+    }
+
+    private void RemoveTempNode(NavigationTreeNode node)
+    {
+        var parent = FindParent(node);
+        if (parent is null)
+            return;
+
+        node.Detach();
+        parent.Children.Remove(node);
+        RestoreParentChevron(parent);
+    }
+
+    private static void RestoreParentChevron(NavigationTreeNode parent)
+    {
+        if (parent.AlwaysExpandable)
+            return;
+
+        if (parent.Children.Any(child => child.Drive is null))
+            return;
+
+        parent.CanExpand = false;
+        parent.IsExpanded = false;
+    }
+
+    public void RemoveDeletedFolder(string deviceId, string path)
+    {
+        App.SafeInvoke(() =>
+        {
+            var node = FindNode(TreeSource, candidate =>
+                candidate.Device is null
+                && candidate.Drive is null
+                && candidate.OwnerDevice?.ID == deviceId
+                && NavigationTreeNode.PathsEqual(candidate.Path, path));
+
+            if (node is null)
+                return;
+
+            var parent = FindParent(node);
+            var parentPath = parent?.Path;
+            if (parent is not null)
+            {
+                node.Detach();
+                parent.Children.Remove(node);
+                RestoreParentChevron(parent);
+            }
+
+            if (deviceId != Data.DevicesObject.Current?.ID || string.IsNullOrEmpty(Data.CurrentPath))
+                return;
+
+            var current = NavigationTreeNode.NormalizePath(Data.CurrentPath);
+            var deleted = NavigationTreeNode.NormalizePath(path);
+            var isCurrentOrChild = NavigationTreeNode.PathsEqual(current, deleted)
+                || current.StartsWith($"{deleted}/", StringComparison.Ordinal);
+
+            if (isCurrentOrChild && !string.IsNullOrEmpty(parentPath))
+                Data.RuntimeSettings.LocationToNavigate = new(parentPath);
+        });
+    }
+
+    public void RenameFolder(string deviceId, string oldPath, string newPath)
+    {
+        App.SafeInvoke(() =>
+        {
+            var node = FindNode(TreeSource, candidate =>
+                candidate.Device is null
+                && candidate.Drive is null
+                && candidate.OwnerDevice?.ID == deviceId
+                && (NavigationTreeNode.PathsEqual(candidate.Path, oldPath)
+                    || NavigationTreeNode.PathsEqual(candidate.Path, newPath)));
+
+            if (node is not null)
+            {
+                node.DisplayName = NavigationTreeNode.FolderDisplayName(newPath);
+                UpdateSubtreePaths(node, oldPath, newPath);
+            }
+
+            if (deviceId != Data.DevicesObject.Current?.ID || string.IsNullOrEmpty(Data.CurrentPath))
+                return;
+
+            var current = NavigationTreeNode.NormalizePath(Data.CurrentPath);
+            var oldNorm = NavigationTreeNode.NormalizePath(oldPath);
+            if (NavigationTreeNode.PathsEqual(current, oldNorm))
+            {
+                Data.RuntimeSettings.LocationToNavigate = new(newPath);
+                return;
+            }
+
+            if (!current.StartsWith($"{oldNorm}/", StringComparison.Ordinal))
+                return;
+
+            Data.RuntimeSettings.LocationToNavigate = new(newPath + current[oldNorm.Length..]);
+        });
+    }
+
+    private static void UpdateSubtreePaths(NavigationTreeNode node, string oldPath, string newPath)
+    {
+        node.UpdatePath(RewritePath(node.Path, oldPath, newPath));
+        if (node.File is not null)
+            node.File.UpdatePath(node.Path);
+
+        foreach (var child in node.Children)
+            UpdateSubtreePaths(child, oldPath, newPath);
+    }
+
+    private static string RewritePath(string path, string oldPath, string newPath)
+    {
+        var current = NavigationTreeNode.NormalizePath(path);
+        var oldNorm = NavigationTreeNode.NormalizePath(oldPath);
+        if (NavigationTreeNode.PathsEqual(current, oldNorm))
+            return newPath;
+
+        if (current.StartsWith($"{oldNorm}/", StringComparison.Ordinal))
+            return newPath + current[oldNorm.Length..];
+
+        return path;
+    }
+
+    public void CancelTempFile(FileClass file)
+    {
+        var node = FindNodeByFile(file);
+        if (node is null)
+            return;
+
+        if (ReferenceEquals(_editingNode, node))
+            CancelEdit(removeTemp: true);
+        else if (node.IsTemp)
+            RemoveTempNode(node);
+    }
+
+    public void CompleteTempFile(FileClass file)
+    {
+        var node = FindNodeByFile(file);
+        if (node is null)
+            return;
+
+        node.IsTemp = false;
+        node.UpdatePath(file.FullPath);
+        node.DisplayName = file.DisplayName;
+        node.File = file;
+
+        var parent = FindParent(node);
+        if (parent is not null)
+            parent.CanExpand = true;
+    }
+
+    public void CommitEdit(TextBox textBox, bool restorePreviousSelection = true)
+    {
+        if (_editingNode is null || textBox.DataContext is not NavigationTreeNode)
+            return;
+
+        var node = _editingNode;
+        FileActionLogic.RenameTreeNode(node, textBox);
+        node.IsInEditMode = false;
+        Data.FileActions.IsExplorerEditing = false;
+        _editingNode = null;
+
+        if (restorePreviousSelection)
+            BlockReselectAfterEdit(node);
+    }
+
+    public void EscapeEdit(TextBox textBox)
+    {
+        if (_editingNode is null)
+            return;
+
+        if (_editingNode.IsTemp)
+        {
+            CancelEdit(removeTemp: true);
+            return;
+        }
+
+        var name = FileHelper.DisplayName(_editingNode.File);
+        if (!string.IsNullOrEmpty(name))
+            textBox.Text = name;
+
+        CancelEdit(removeTemp: false);
+    }
+
+    public void UpdateRenameLegality(TextBox textBox)
+    {
+        if (textBox.DataContext is not NavigationTreeNode node)
+            return;
+
+        var drive = node.Drive
+            ?? DriveHelper.GetCurrentDrive(node.Path, node.OwnerDevice)
+            ?? Data.CurrentDrive;
+        if (drive is null)
+            return;
+
+        textBox.FilterString(drive.Restrictions.RestrictedNaming
+            ? AdbExplorerConst.INVALID_NTFS_CHARS
+            : AdbExplorerConst.INVALID_UNIX_CHARS);
+
+        node.IsRenameUnixLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Unix);
+        node.IsRenameNamingLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.RestrictedNaming);
+        node.IsRenameWindowsLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Windows);
+        node.IsRenameDriveRootLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.WinRoot);
+
+        var comparison = drive.Restrictions.CaseInsensitiveNames
+            ? StringComparison.InvariantCultureIgnoreCase
+            : StringComparison.InvariantCulture;
+
+        var parent = FindParent(node);
+        var siblings = parent?.Children ?? [];
+        node.IsRenameUnique = !siblings.Any(child =>
+            !ReferenceEquals(child, node)
+            && child.DisplayName.Equals(textBox.Text, comparison));
+    }
+
+    public void PrepareRenameTextBox(TextBox textBox)
+    {
+        if (textBox.DataContext is not NavigationTreeNode node)
+            return;
+
+        textBox.ClearValue(TextBox.TextProperty);
+        textBox.Text = node.DisplayName;
+        UpdateRenameLegality(textBox);
+        textBox.Focus();
+        textBox.SelectAll();
+    }
+
+    private NavigationTreeNode? FindParent(NavigationTreeNode child)
+        => FindParent(TreeSource, child);
+
+    private static NavigationTreeNode? FindParent(IEnumerable<NavigationTreeNode> nodes, NavigationTreeNode child)
+    {
+        foreach (var node in nodes)
+        {
+            if (node.Children.Contains(child))
+                return node;
+
+            var nested = FindParent(node.Children, child);
+            if (nested is not null)
+                return nested;
+        }
+
+        return null;
+    }
+
+    private NavigationTreeNode? FindNodeByFile(FileClass file)
+        => FindNode(TreeSource, node => ReferenceEquals(node.File, file));
+
+    private static NavigationTreeNode? FindNode(IEnumerable<NavigationTreeNode> nodes, Func<NavigationTreeNode, bool> match)
+    {
+        foreach (var node in nodes)
+        {
+            if (match(node))
+                return node;
+
+            var nested = FindNode(node.Children, match);
+            if (nested is not null)
+                return nested;
+        }
+
+        return null;
+    }
+
+    private void BlockReselectAfterEdit(NavigationTreeNode node)
+    {
+        NavigationTreeNode.SuppressUserSelectFromEdit++;
+        node.SetSelected(false);
+        _selectedTreeNode?.SetSelected(true);
+
+        App.SafeBeginInvoke(() =>
+        {
+            node.SetSelected(false);
+            _selectedTreeNode?.SetSelected(true);
+            if (NavigationTreeNode.SuppressUserSelectFromEdit > 0)
+                NavigationTreeNode.SuppressUserSelectFromEdit--;
+        }, DispatcherPriority.ContextIdle);
     }
 }

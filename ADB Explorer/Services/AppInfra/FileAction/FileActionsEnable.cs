@@ -385,6 +385,10 @@ public partial class FileActionsEnable : ObservableObject
 
     public ObservableProperty<bool> IsCompressToEnabled = new();
 
+    public ObservableProperty<bool> IsContextNewFileVisible = new() { Value = true };
+
+    public ObservableProperty<bool> IsContextNewArchiveVisible = new() { Value = true };
+
     [ObservableProperty]
     public partial bool IsCompressToContextEnabled { get; set; }
 

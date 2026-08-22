@@ -201,6 +201,12 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     public partial DetailsPane.SidePaneMode SidePane { get; set; } = DetailsPane.SidePaneMode.Details;
 
     [ObservableProperty]
+    public partial bool IsNavigationPaneOpen { get; set; } = true;
+
+    [ObservableProperty]
+    public partial int NavigationPaneWidth { get; set; } = 200;
+
+    [ObservableProperty]
     public partial int MaxPreviewFileSize { get; set; } = 300;
 
     [ObservableProperty]

@@ -155,13 +155,13 @@ public static class FileHelper
         return false;
     }
 
-    public static void RenameFile(FileClass file, string newName)
+    public static void RenameFile(FileClass file, string newName, LogicalDeviceViewModel? device = null)
     {
         var newPath = ConcatPaths(file.ParentPath, newName);
         if (!Data.Settings.ShowExtensions)
             newPath += file.Extension;
 
-        ShellFileOperation.Rename(file, newPath, Data.DevicesObject.Current);
+        ShellFileOperation.Rename(file, newPath, device ?? Data.Active.Device ?? Data.DevicesObject.Current);
     }
 
     public static string DisplayName(TextBox textBox) => DisplayName(textBox.DataContext as FilePath);
@@ -300,6 +300,28 @@ public static class FileHelper
             return fullName[secondLast..];
 
         return fullName[lastDot..];
+    }
+
+    /// <summary>
+    /// When the extension is a Unicode icon (emoji, symbol, private-use), returns the glyph
+    /// after the dot (e.g. <c>.📷</c> → <c>📷</c>).
+    /// </summary>
+    public static bool TryGetUnicodeIconExtension(string? fullName, out string icon)
+    {
+        icon = "";
+        var ext = GetExtension(fullName ?? "");
+        if (ext.Length < 2)
+            return false;
+
+        var remainder = ext.AsSpan(1);
+        if (Rune.DecodeFromUtf16(remainder, out var rune, out _) != System.Buffers.OperationStatus.Done)
+            return false;
+
+        if (Array.IndexOf(UNICODE_ICONS, Rune.GetUnicodeCategory(rune)) < 0)
+            return false;
+
+        icon = ext[1..];
+        return true;
     }
 
     public static string DuplicateFile(ObservableList<FileClass> fileList, string fullName, DragDropEffects cutType = DragDropEffects.None)

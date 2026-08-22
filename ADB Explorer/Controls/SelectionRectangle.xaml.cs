@@ -35,6 +35,14 @@ public partial class SelectionRectangle : UserControl
     {
         Rect.Visibility = Visibility.Collapsed;
         _mouseDownPoint = null;
+        if (IsMouseCaptured)
+            ReleaseMouseCapture();
+    }
+
+    public void Arm()
+    {
+        if (!IsMouseCaptured)
+            CaptureMouse();
     }
 
     /// <summary>
@@ -65,13 +73,22 @@ public partial class SelectionRectangle : UserControl
         var horizontal = scroller.ComputedHorizontalScrollBarVisibility is Visibility.Visible ? 1 : 0;
         var vertical = scroller.ComputedVerticalScrollBarVisibility is Visibility.Visible ? 1 : 0;
 
-        if (mousePosition.X < 0 || mousePosition.Y < 0
-            || mousePosition.X > ActualWidth - SystemParameters.VerticalScrollBarWidth * vertical
-            || mousePosition.Y > ActualHeight - SystemParameters.HorizontalScrollBarHeight * horizontal)
-            return;
+        var maxX = ActualWidth - SystemParameters.VerticalScrollBarWidth * vertical;
+        var maxY = ActualHeight - SystemParameters.HorizontalScrollBarHeight * horizontal;
+        if (maxX < 0)
+            maxX = 0;
+        if (maxY < 0)
+            maxY = 0;
+
+        mousePosition = new Point(
+            Math.Clamp(mousePosition.X, 0, maxX),
+            Math.Clamp(mousePosition.Y, 0, maxY));
 
         if (!Rect.IsVisible)
+        {
             _preRectSelectedItems = [.. activeSelectedItems.Cast<object>()];
+            Arm();
+        }
 
         Rect.Visibility = Visibility.Visible;
 
@@ -137,6 +154,23 @@ public partial class SelectionRectangle : UserControl
 
     private void Rect_MouseMove(object sender, MouseEventArgs e)
     {
+        if (IsMouseCaptured)
+            return;
+
         RectMouseMove?.Invoke(sender, e);
+    }
+
+    protected override void OnMouseMove(MouseEventArgs e)
+    {
+        base.OnMouseMove(e);
+        if (IsMouseCaptured)
+            RectMouseMove?.Invoke(this, e);
+    }
+
+    protected override void OnMouseUp(MouseButtonEventArgs e)
+    {
+        base.OnMouseUp(e);
+        if (e.ChangedButton is MouseButton.Left && (IsActive || IsMouseCaptured))
+            Collapse();
     }
 }
