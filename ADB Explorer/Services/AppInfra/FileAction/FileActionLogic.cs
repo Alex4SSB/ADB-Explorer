@@ -10,7 +10,18 @@ namespace ADB_Explorer.Services.AppInfra;
 
 internal static class FileActionLogic
 {
-    private static bool HasRootShell => Data.DevicesObject.Current?.HasRootShell == true;
+    private static FileList ActionList => Data.Active;
+
+    private static FileActionsEnable ActionFlags => ActionList.Actions;
+
+    private static LogicalDeviceViewModel? ActionDevice => ActionList.Device ?? Data.DevicesObject?.Current;
+
+    private static string ActionPath => ActionList.Path;
+
+    private static NavigationTreeViewModel? ExplorerTree
+        => App.Services.GetService<ExplorerViewModel>()?.Tree;
+
+    private static bool HasRootShell => ActionDevice?.HasRootShell == true;
 
     private static bool SelectionIsFuseProtectedAndroidRoot =>
         Data.SelectedFiles.Any(f => ShellAccessHelper.IsFuseProtectedAndroidRoot(f.FullPath));
@@ -84,7 +95,7 @@ internal static class FileActionLogic
         var files = Data.SelectedFiles;
 
         var result = await DialogService.ShowConfirmation(
-            RemoveApkMessage(Data.FileActions.IsAppDrive ? pkgs : files),
+            RemoveApkMessage(ActionFlags.IsAppDrive ? pkgs : files),
             Strings.Resources.S_CONF_UNI_TITLE,
             Strings.Resources.S_UNINSTALL,
             icon: DialogService.DialogIcon.Exclamation);
@@ -94,24 +105,29 @@ internal static class FileActionLogic
 
         var packageTask = await Task.Run(() =>
         {
-            if (Data.FileActions.IsAppDrive)
+            if (ActionFlags.IsAppDrive)
                 return pkgs.Select(pkg => pkg.Name);
 
-            return files.Select(item => ShellFileOperation.GetPackageName(Data.DevicesObject.Current, item.FullPath));
+            return files.Select(item => ShellFileOperation.GetPackageName(ActionDevice, item.FullPath));
         });
 
-        ShellFileOperation.UninstallPackages(Data.DevicesObject.Current, packageTask, App.AppDispatcher);
+        ShellFileOperation.UninstallPackages(ActionDevice, packageTask, App.AppDispatcher);
     }
 
     public static void InstallPackages()
     {
         var packages = Data.SelectedFiles;
 
-        ShellFileOperation.InstallPackages(Data.DevicesObject.Current, packages, App.AppDispatcher);
+        ShellFileOperation.InstallPackages(ActionDevice, packages, App.AppDispatcher);
     }
 
-    public static void PushPackages()
+    public static void PushPackages() => PushPackages(ActionDevice);
+
+    public static void PushPackages(LogicalDeviceViewModel? device)
     {
+        if (device is null)
+            return;
+
         var dialog = new CommonOpenFileDialog()
         {
             IsFolderPicker = false,
@@ -127,13 +143,13 @@ internal static class FileActionLogic
             return;
 
         var shItems = dialog.FileNames.Select(ShellItem.Open);
-        ShellFileOperation.PushPackages(Data.DevicesObject.Current, shItems, App.AppDispatcher);
+        ShellFileOperation.PushPackages(device, shItems, App.AppDispatcher);
     }
 
     public static void BackupPackages()
     {
         var packages = Data.SelectedPackages.ToList();
-        if (packages.Count == 0 || Data.DevicesObject.Current is null)
+        if (packages.Count == 0 || ActionDevice is null)
             return;
 
         var dialog = new CommonOpenFileDialog()
@@ -153,24 +169,26 @@ internal static class FileActionLogic
         if (!Directory.Exists(targetPath) && FileHelper.GetFullName(targetPath) == packages[0].Name)
             targetPath = FileHelper.GetParentPath(targetPath);
 
-        ShellFileOperation.BackupPackages(Data.DevicesObject.Current, packages, targetPath, App.AppDispatcher);
+        ShellFileOperation.BackupPackages(ActionDevice, packages, targetPath, App.AppDispatcher);
     }
 
     public static void UpdateModifiedDates()
     {
-        ShellFileOperation.ChangeDateFromName(Data.DevicesObject.Current, Data.SelectedFiles, App.AppDispatcher);
+        ShellFileOperation.ChangeDateFromName(ActionDevice, Data.SelectedFiles, App.AppDispatcher);
     }
 
     public static void RestoreItems()
     {
-        var restoreItems = (!Data.SelectedFiles.Any() ? Data.DirList.FileList : Data.SelectedFiles).Where(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
+        var listed = Data.DirList?.FileList;
+        var restoreSource = !Data.SelectedFiles.Any() && listed is not null ? listed : Data.SelectedFiles;
+        var restoreItems = restoreSource.Where(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
         string[] existingItems = [];
         List<FileClass> existingFiles = [];
         bool merge = false;
 
         var restoreTask = Task.Run(() =>
         {
-            existingItems = ADBService.PathsExist(Data.DevicesObject.Current.ID, restoreItems.Select(file => file.TrashIndex.OriginalPath));
+            existingItems = ADBService.PathsExist(ActionDevice.ID, restoreItems.Select(file => file.TrashIndex.OriginalPath));
             if (existingItems?.Length > 0)
             {
                 if (restoreItems.Any(item => item.IsDirectory && existingItems.Contains(item.TrashIndex.OriginalPath)))
@@ -225,20 +243,22 @@ internal static class FileActionLogic
                     }
                 }
 
-                ShellFileOperation.MoveItems(device: Data.DevicesObject.Current,
+                ShellFileOperation.MoveItems(device: ActionDevice,
                                          items: restoreItems,
                                          targetPath: null,
-                                         currentPath: Data.CurrentPath,
-                                         fileList: Data.DirList.FileList,
+                                         currentPath: ActionPath,
+                                         fileList: Data.DirList?.FileList,
                                          dispatcher: App.AppDispatcher);
 
-                var remainingItems = Data.DirList.FileList.Except(restoreItems);
+                var remainingItems = Data.DirList?.FileList is { } listed
+                    ? listed.Except(restoreItems)
+                    : [];
                 TrashHelper.EnableRecycleButtons(remainingItems);
 
                 // Clear all remaining files if none of them are indexed
                 if (!remainingItems.Any(item => item.TrashIndex is not null))
                 {
-                    _ = Task.Run(() => ShellFileOperation.SilentDelete(Data.DevicesObject.Current, remainingItems));
+                    _ = Task.Run(() => ShellFileOperation.SilentDelete(ActionDevice, remainingItems));
                 }
 
                 if (!Data.SelectedFiles.Any())
@@ -249,21 +269,28 @@ internal static class FileActionLogic
 
     public static void CopyItemPath()
     {
-        var path = Data.FileActions.IsAppDrive ? Data.SelectedPackages.First().Name : Data.SelectedFiles.First().FullPath;
+        var path = ActionFlags.IsAppDrive ? Data.SelectedPackages.First().Name : Data.SelectedFiles.First().FullPath;
         Clipboard.SetText(path);
     }
 
-    public static async Task CreateNewItem(FileClass file, string newName = null)
+    public static async Task CreateNewItem(FileClass file, string newName = null, LogicalDeviceViewModel? device = null, bool selectCreated = true)
     {
         if (!string.IsNullOrEmpty(newName))
-            file.UpdatePath($"{Data.CurrentPath}{(Data.CurrentPath == "/" ? "" : "/")}{newName}");
+            file.UpdatePath(FileHelper.ConcatPaths(file.ParentPath, newName));
 
         if (Data.Settings.ShowExtensions)
             file.UpdateType();
 
         try
         {
-            var device = Data.DevicesObject.Current;
+            device ??= ActionDevice;
+            if (device is null)
+            {
+                Data.DirList?.FileList.Remove(file);
+                ExplorerTree?.CancelTempFile(file);
+                return;
+            }
+
             if (TryConsumePendingCompress(file, out var compressSources))
             {
                 file.IsTemp = false;
@@ -303,7 +330,8 @@ internal static class FileActionLogic
                                       DialogService.DialogIcon.Critical,
                                       copyToClipboard: true,
                                       error: DialogError.CreateFileFailed);
-            Data.DirList.FileList.Remove(file);
+            Data.DirList?.FileList.Remove(file);
+            ExplorerTree?.CancelTempFile(file);
             return;
         }
 
@@ -315,15 +343,29 @@ internal static class FileActionLogic
         // Temp rename may have marked this resolved before the path existed on device.
         file.IsCreationTimeResolved = false;
 
+        if (Data.DirList?.FileList is { } listing
+            && device.ID == (Data.Files.Device?.ID ?? Data.DevicesObject.Current?.ID)
+            && NavigationTreeNode.PathsEqual(Data.CurrentPath, file.ParentPath)
+            && listing.IndexOf(file) < 0)
+            listing.Insert(0, file);
+
         RefreshNewItemInList(file);
-        Data.ItemToSelect.Value = file;
+        ExplorerTree?.CompleteTempFile(file);
+        if (selectCreated && Data.DirList?.FileList?.Contains(file) == true)
+            Data.ItemToSelect.Value = file;
     }
 
     private static void RefreshNewItemInList(FileClass file)
     {
-        var index = Data.DirList.FileList.IndexOf(file);
-        Data.DirList.FileList.Remove(file);
-        Data.DirList.FileList.Insert(index, file);
+        if (Data.DirList?.FileList is not { } files)
+            return;
+
+        var index = files.IndexOf(file);
+        if (index < 0)
+            return;
+
+        files.Remove(file);
+        files.Insert(index, file);
     }
 
     public static void IsPasteEnabled()
@@ -332,78 +374,95 @@ internal static class FileActionLogic
         if (Data.CopyPaste.IsDrag)
             return;
 
-        // Explorer view AND source is clipboard
-        if (Data.FileActions.IsPasteStateVisible && Data.CopyPaste.Files.Length > 0)
+        var hasClipboard = Data.CopyPaste.PasteSource is not CopyPasteService.DataSource.None
+            && Data.CopyPaste.Files.Length > 0;
+
+        if (!hasClipboard)
         {
-            Data.FileActions.CutItemsCount.Value = Data.CopyPaste.Files.Length.ToString();
+            ActionFlags.CutItemsCount.Value = "";
+            ActionFlags.PasteEnabled = false;
+            ActionFlags.IsKeyboardPasteEnabled = false;
+            return;
+        }
+
+        SetPasteLabels(ActionFlags);
+        if (!ReferenceEquals(ActionFlags, Data.FileActions))
+            SetPasteLabels(Data.FileActions);
+
+        if (!ActionFlags.IsPasteStateVisible)
+        {
+            ActionFlags.PasteEnabled = false;
+            ActionFlags.IsKeyboardPasteEnabled = false;
+            return;
+        }
+
+        if (ActionFlags.IsAppDrive)
+        {
+            ActionFlags.PasteEnabled = FileHelper.AllFilesAreApks(Data.CopyPaste.Files);
+            ActionFlags.IsKeyboardPasteEnabled = false;
+        }
+        else if (Data.CopyPaste.PasteState is DragDropEffects.Link)
+        {
+            ActionFlags.PasteEnabled = false;
+            ActionFlags.IsKeyboardPasteEnabled = false;
         }
         else
         {
-            Data.FileActions.CutItemsCount.Value = "";
-            Data.FileActions.IsCopyState.Value = false;
-            Data.FileActions.IsCutState.Value = false;
+            ActionFlags.PasteEnabled = EnableUiPaste();
+            ActionFlags.IsKeyboardPasteEnabled = EnableKeyboardPaste();
+        }
+    }
 
-            Data.FileActions.PasteEnabled = false;
-            Data.FileActions.IsKeyboardPasteEnabled = false;
+    private static void SetPasteLabels(FileActionsEnable actions)
+    {
+        actions.CutItemsCount.Value = Data.CopyPaste.Files.Length.ToString();
+
+        if (Data.CopyPaste.Files.Length > 1)
+        {
+            if (actions.IsAppDrive)
+            {
+                actions.PasteDescription.Value = string.Format(
+                    Strings.Resources.S_DRAG_INSTALL_MULTIPLE,
+                    Data.CopyPaste.Files.Length);
+            }
+            else if (Data.CopyPaste.PasteState is DragDropEffects.Move)
+            {
+                actions.PasteDescription.Value = string.Format(
+                    Strings.Resources.S_PASTE_PLURAL_CUT_ITEMS,
+                    Data.CopyPaste.Files.Length);
+            }
+            else
+            {
+                actions.PasteDescription.Value = string.Format(
+                    Strings.Resources.S_PASTE_PLURAL_COPIED_ITEMS,
+                    Data.CopyPaste.Files.Length);
+            }
 
             return;
         }
 
-        string stringFormat;
-        if (Data.CopyPaste.Files.Length > 1)
+        if (actions.IsAppDrive)
         {
-            if (Data.FileActions.IsAppDrive)
-            {
-                stringFormat = Strings.Resources.S_DRAG_INSTALL_MULTIPLE;
-            }
-            else
-            {
-                stringFormat = Data.CopyPaste.PasteState is DragDropEffects.Move
-                    ? Strings.Resources.S_PASTE_PLURAL_CUT_ITEMS
-                    : Strings.Resources.S_PASTE_PLURAL_COPIED_ITEMS;
-            }
-
-            Data.FileActions.PasteDescription.Value = string.Format(stringFormat, Data.CopyPaste.Files.Length);
+            actions.PasteDescription.Value = string.Format(
+                Strings.Resources.S_DRAG_INSTALL_SINGLE,
+                Data.CopyPaste.CurrentFiles.FirstOrDefault()?.NoExtName);
+        }
+        else if (Data.CopyPaste.PasteState is DragDropEffects.Move)
+        {
+            actions.PasteDescription.Value = Strings.Resources.S_PASTE_ONE_CUT_ITEM;
         }
         else
         {
-            if (Data.FileActions.IsAppDrive)
-            {
-                stringFormat = string.Format(Strings.Resources.S_DRAG_INSTALL_SINGLE, Data.CopyPaste.CurrentFiles.FirstOrDefault()?.NoExtName);
-            }
-            else
-            {
-                stringFormat = Data.CopyPaste.PasteState is DragDropEffects.Move
-                    ? Strings.Resources.S_PASTE_ONE_CUT_ITEM
-                    : Strings.Resources.S_PASTE_ONE_COPIED_ITEM;
-            }
-
-            Data.FileActions.PasteDescription.Value = stringFormat;
-        }
-
-        if (Data.FileActions.IsAppDrive)
-        {
-            Data.FileActions.PasteEnabled = FileHelper.AllFilesAreApks(Data.CopyPaste.Files);
-            Data.FileActions.IsKeyboardPasteEnabled = false;
-        }
-        else
-        {
-            if (Data.CopyPaste.PasteState is DragDropEffects.Link)
-            {
-                Data.FileActions.PasteEnabled = false;
-                Data.FileActions.IsKeyboardPasteEnabled = false;
-            }
-            else
-            {
-                Data.FileActions.PasteEnabled = EnableUiPaste();
-                Data.FileActions.IsKeyboardPasteEnabled = EnableKeyboardPaste();
-            }
+            actions.PasteDescription.Value = Strings.Resources.S_PASTE_ONE_COPIED_ITEM;
         }
     }
 
   public static bool EnableUiPaste()
     {
-        if (Data.CurrentDrive?.Restrictions.ReadOnly is true)
+        if (ActionFlags.IsRecycleBin || ActionList.ForbidPaste)
+            return false;
+
+        if (ActionList.CurrentDrive?.Restrictions.ReadOnly is true)
             return false;
 
         string[] files = Data.CopyPaste.Files;
@@ -414,14 +473,15 @@ internal static class FileActionLogic
             files = [.. Data.CopyPaste.Descriptors.Select(d => d.Name)];
         }
 
-        Data.FileActions.IsPastingInDescendant = files.Length == 1
-            && FileHelper.RelationFrom(files[0], Data.CurrentPath) is RelationType.Descendant or RelationType.Self;
+        ActionFlags.IsPastingInDescendant = AppliesAndroidSelfPasteRules()
+            && files.Length == 1
+            && FileHelper.RelationFrom(files[0], ActionPath) is RelationType.Descendant or RelationType.Self;
 
-        if (Data.FileActions.IsPastingInDescendant)
+        if (ActionFlags.IsPastingInDescendant)
             return false;
 
         var selected = Data.SelectedFiles?.Count();
-        var deviceId = Data.DevicesObject?.Current?.ID ?? "";
+        var deviceId = ActionDevice?.ID ?? "";
 
         string targetPath;
         if (selected == 1)
@@ -432,7 +492,7 @@ internal static class FileActionLogic
         }
         else
         {
-            targetPath = Data.CurrentPath;
+            targetPath = ActionPath;
         }
 
         if (!IsPasteIntoTargetAllowed(targetPath))
@@ -440,13 +500,15 @@ internal static class FileActionLogic
 
         UpdatePastingRestrictions(targetPath, files);
 
-        if (Data.FileActions.IsPastingIllegalNaming || Data.FileActions.IsPastingConflictingNames)
+        if (ActionFlags.IsPastingIllegalNaming || ActionFlags.IsPastingConflictingNames)
             return false;
 
+        var sameDevice = AppliesAndroidSelfPasteRules();
         switch (selected)
         {
             case 0:
-                Data.FileActions.IsPastingInDescendant = Data.CopyPaste.ParentFolder == Data.CurrentPath
+                ActionFlags.IsPastingInDescendant = sameDevice
+                    && NavigationTreeNode.PathsEqual(Data.CopyPaste.ParentFolder, ActionPath)
                     && Data.CopyPaste.PasteState is DragDropEffects.Move;
 
                 break;
@@ -455,21 +517,25 @@ internal static class FileActionLogic
                 if (!ArchiveHelper.IsPasteTargetContainer(item, deviceId))
                     return false;
 
-                Data.FileActions.IsPastingInDescendant = (files.Length == 1 && files[0] == item.FullPath)
-                    || (Data.CopyPaste.ParentFolder == item.FullPath);
+                ActionFlags.IsPastingInDescendant = sameDevice
+                    && ((files.Length == 1 && NavigationTreeNode.PathsEqual(files[0], item.FullPath))
+                        || NavigationTreeNode.PathsEqual(Data.CopyPaste.ParentFolder, item.FullPath));
 
                 break;
             default:
                 return false;
         }
 
-        return !Data.FileActions.IsPastingInDescendant
+        return !ActionFlags.IsPastingInDescendant
             && DriveHelper.IsModificationAllowedAt(targetPath, deviceId);
     }
 
     public static bool EnableKeyboardPaste()
     {
-        if (Data.CurrentDrive?.Restrictions.ReadOnly is true)
+        if (ActionFlags.IsRecycleBin || ActionList.ForbidPaste)
+            return false;
+
+        if (ActionList.CurrentDrive?.Restrictions.ReadOnly is true)
             return false;
 
         string[] files = Data.CopyPaste.Files;
@@ -480,14 +546,15 @@ internal static class FileActionLogic
             files = [.. Data.CopyPaste.Descriptors.Select(d => d.Name)];
         }
 
-        Data.FileActions.IsPastingInDescendant = files.Length == 1
-            && FileHelper.RelationFrom(files[0], Data.CurrentPath) is RelationType.Descendant or RelationType.Self;
+        ActionFlags.IsPastingInDescendant = AppliesAndroidSelfPasteRules()
+            && files.Length == 1
+            && FileHelper.RelationFrom(files[0], ActionPath) is RelationType.Descendant or RelationType.Self;
 
-        if (Data.FileActions.IsPastingInDescendant)
+        if (ActionFlags.IsPastingInDescendant)
             return false;
 
         var selected = Data.SelectedFiles?.Count() > 1 ? 0 : Data.SelectedFiles?.Count();
-        var deviceId = Data.DevicesObject?.Current?.ID ?? "";
+        var deviceId = ActionDevice?.ID ?? "";
 
         string targetPath;
         if (selected == 1)
@@ -498,7 +565,7 @@ internal static class FileActionLogic
         }
         else
         {
-            targetPath = Data.CurrentPath;
+            targetPath = ActionPath;
         }
 
         if (!IsPasteIntoTargetAllowed(targetPath))
@@ -506,43 +573,59 @@ internal static class FileActionLogic
 
         UpdatePastingRestrictions(targetPath, files);
 
-        if (Data.FileActions.IsPastingIllegalNaming || Data.FileActions.IsPastingConflictingNames)
+        if (ActionFlags.IsPastingIllegalNaming || ActionFlags.IsPastingConflictingNames)
             return false;
 
+        var sameDevice = AppliesAndroidSelfPasteRules();
         switch (selected)
         {
             case 0:
-                Data.FileActions.IsPastingInDescendant = Data.CopyPaste.ParentFolder == Data.CurrentPath
+                ActionFlags.IsPastingInDescendant = sameDevice
+                    && NavigationTreeNode.PathsEqual(Data.CopyPaste.ParentFolder, ActionPath)
                     && Data.CopyPaste.PasteState is DragDropEffects.Move;
 
                 break;
             case 1:
                 // When duplicating a file multiple times using the keyboard, the selection is the previous copy
-                if (Data.CopyPaste.PasteState is DragDropEffects.Copy && Data.DirList.FileList.Any(f => f.FullPath == files[0]))
+                if (Data.CopyPaste.PasteState is DragDropEffects.Copy && Data.DirList?.FileList.Any(f => f.FullPath == files[0]) is true)
                     return DriveHelper.IsModificationAllowedAt(targetPath, deviceId);
 
                 var item = Data.SelectedFiles.First();
                 if (!ArchiveHelper.IsPasteTargetContainer(item, deviceId))
                     return false;
 
-                Data.FileActions.IsPastingInDescendant = (files.Length == 1 && files[0] == item.FullPath)
-                    || (Data.CopyPaste.ParentFolder == item.FullPath);
+                ActionFlags.IsPastingInDescendant = sameDevice
+                    && ((files.Length == 1 && NavigationTreeNode.PathsEqual(files[0], item.FullPath))
+                        || NavigationTreeNode.PathsEqual(Data.CopyPaste.ParentFolder, item.FullPath));
 
                 break;
             default:
                 return false;
         }
 
-        return !Data.FileActions.IsPastingInDescendant
-            && DriveHelper.IsModificationAllowedAt(targetPath, Data.DevicesObject?.Current?.ID ?? "");
+        return !ActionFlags.IsPastingInDescendant
+            && DriveHelper.IsModificationAllowedAt(targetPath, deviceId);
+    }
+
+    /// <summary>
+    /// Path-only "paste into self/descendant" applies only when the clipboard is from
+    /// the same Android device as the paste target. The same path on another device is a different folder.
+    /// </summary>
+    private static bool AppliesAndroidSelfPasteRules()
+    {
+        if (!Data.CopyPaste.CurrentSource.HasFlag(CopyPasteService.DataSource.Android)
+            && !Data.CopyPaste.IsSelf)
+            return false;
+
+        return Data.CopyPaste.IsFromDevice(ActionDevice);
     }
 
     private static bool IsPasteIntoTargetAllowed(string targetPath)
     {
-        if (Data.FileActions.IsSearchMode && FileHelper.IsSearchLocation(targetPath))
+        if (ActionFlags.IsSearchMode && FileHelper.IsSearchLocation(targetPath))
             return false;
 
-        var deviceId = Data.DevicesObject?.Current?.ID ?? "";
+        var deviceId = ActionDevice?.ID ?? "";
         if (!ArchivePath.IsArchivePath(targetPath, deviceId))
             return true;
 
@@ -635,22 +718,131 @@ internal static class FileActionLogic
         return fromArchive ? result : result | DragDropEffects.Move;
     }
 
+    public static DragDropEffects EnableTreeDropPaste(NavigationTreeNode target)
+    {
+        if (!Data.CopyPaste.CurrentFiles.Any())
+            return DragDropEffects.None;
+
+        if (target.Device is not null || target.IsTemp || target.IsInEditMode)
+            return DragDropEffects.None;
+
+        var drive = target.Drive ?? DriveHelper.GetCurrentDrive(target.Path, target.OwnerDevice);
+        if (drive is null)
+            return DragDropEffects.None;
+
+        if (drive.Type is AbstractDrive.DriveType.Trash)
+            return DragDropEffects.None;
+
+        if (drive.Type is AbstractDrive.DriveType.Root)
+            return DragDropEffects.None;
+
+        var deviceId = target.OwnerDevice?.ID ?? Data.DevicesObject.Current?.ID ?? "";
+
+        if (drive.Type is AbstractDrive.DriveType.Package)
+        {
+            if (Data.CopyPaste.IsSelf && Data.FileActions.IsAppDrive)
+                return DragDropEffects.None;
+
+            return FileHelper.AllFilesAreApks(Data.CopyPaste.DragFiles)
+                ? DragDropEffects.Copy
+                : DragDropEffects.None;
+        }
+
+        var targetPath = ArchiveHelper.ResolvePasteTargetPath(target.DropTargetPath, deviceId);
+        if (drive.Restrictions.ReadOnly || !ArchiveHelper.IsModificationAllowedAt(targetPath, deviceId))
+            return DragDropEffects.None;
+
+        if (ArchivePath.IsArchivePath(targetPath, deviceId)
+            && !ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId))
+            return DragDropEffects.None;
+
+        if (FileHelper.RelationFrom(Data.CopyPaste.DragParent, AdbExplorerConst.RECYCLE_PATH)
+            is RelationType.Self or RelationType.Ancestor)
+            return DragDropEffects.Move;
+
+        UpdatePastingRestrictions(targetPath, [.. Data.CopyPaste.CurrentFiles.Select(f => f.FullPath)]);
+        if (Data.FileActions.IsPastingIllegalNaming || Data.FileActions.IsPastingConflictingNames)
+            return DragDropEffects.None;
+
+        var fromArchive = ArchiveExtract.IsArchiveSource(Data.CopyPaste.CurrentFiles, deviceId);
+        var intoArchive = ArchivePath.IsArchivePath(targetPath, deviceId);
+        if (intoArchive && fromArchive)
+            return DragDropEffects.None;
+
+        if (Data.CopyPaste.CurrentSource.HasFlag(CopyPasteService.DataSource.Android))
+        {
+            var sameDevice = Data.CopyPaste.IsFromDevice(target.OwnerDevice);
+            if (sameDevice)
+            {
+                foreach (var file in Data.CopyPaste.CurrentFiles)
+                {
+                    var relation = FileHelper.RelationFrom(file.FullPath, targetPath);
+                    if (relation is RelationType.Self or RelationType.Descendant)
+                        return DragDropEffects.None;
+                }
+            }
+
+            var result = DragDropEffects.Copy;
+            if (!intoArchive
+                && !fromArchive
+                && target.OwnerDevice?.HasRootShell == true
+                && sameDevice
+                && DriveHelper.GetCurrentDrive(targetPath, target.OwnerDevice)?.Restrictions.NoSymbolicLinks is not true
+                && Data.CopyPaste.CurrentFiles.Count() == 1)
+                result |= DragDropEffects.Link;
+
+            return fromArchive ? result : result | DragDropEffects.Move;
+        }
+
+        if (Data.CopyPaste.CurrentSource.HasFlag(CopyPasteService.DataSource.Virtual))
+            return DragDropEffects.Copy;
+
+        if (ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId))
+            return DragDropEffects.Copy | DragDropEffects.Move;
+
+        return DragDropEffects.Move | DragDropEffects.Copy;
+    }
+
     private static void UpdatePastingRestrictions(string targetPath, string[] files)
     {
         var restrictions = DriveHelper.GetCurrentDrive(targetPath)?.Restrictions ?? DriveRestrictions.None;
 
-        if (Data.FileActions.IsAppDrive)
+        if (ActionFlags.IsAppDrive)
         {
-            Data.FileActions.IsPastingIllegalNaming = Data.CopyPaste.IsSelf
+            ActionFlags.IsPastingIllegalNaming = Data.CopyPaste.IsSelf
                 && (DriveHelper.GetCurrentDrive(files[0])?.Restrictions.RestrictedNaming is true);
             return;
         }
 
-        Data.FileActions.IsPastingIllegalNaming = restrictions.RestrictedNaming
+        ActionFlags.IsPastingIllegalNaming = restrictions.RestrictedNaming
             && !FileHelper.FileNameLegal(files.Select(FileHelper.GetFullName), FileHelper.RenameTarget.RestrictedNaming);
 
-        Data.FileActions.IsPastingConflictingNames = restrictions.CaseInsensitiveNames
+        ActionFlags.IsPastingConflictingNames = restrictions.CaseInsensitiveNames
             && files.Distinct(StringComparer.InvariantCultureIgnoreCase).Count() != files.Length;
+    }
+
+    public static void NewFolder()
+    {
+        if (!ReferenceEquals(Data.Active, Data.Files)
+            && ExplorerTree?.ContextTarget is { } node)
+        {
+            ExplorerTree.QueueNewFolder(node);
+            return;
+        }
+
+        Data.RuntimeSettings.NewFolder = true;
+    }
+
+    public static void ContextRename()
+    {
+        if (!ReferenceEquals(Data.Active, Data.Files)
+            && ExplorerTree?.ContextTarget is { } node)
+        {
+            ExplorerTree.QueueRename(node);
+            return;
+        }
+
+        Data.RuntimeSettings.Rename = true;
     }
 
     public static void PasteFiles(IEnumerable<FileClass> selectedFiles, bool isLink = false)
@@ -662,7 +854,7 @@ internal static class FileActionLogic
 
     public static void CutItems(bool isCopy = false)
     {
-        if (Data.FileActions.IsAppDrive)
+        if (ActionFlags.IsAppDrive)
             CopyPackages(Data.SelectedPackages);
         else
             CutFiles(Data.SelectedFiles, isCopy);
@@ -670,8 +862,8 @@ internal static class FileActionLogic
 
     public static void CopyPackages(IEnumerable<Package> items)
     {
-        Data.FileActions.CopyEnabled = false;
-        Data.FileActions.CutEnabled = true;
+        ActionFlags.CopyEnabled = false;
+        ActionFlags.CutEnabled = true;
 
         IsPasteEnabled();
 
@@ -688,8 +880,8 @@ internal static class FileActionLogic
         var itemsToCut = HasRootShell
                     ? items : items.Where(file => file.Type is FileType.File or FileType.Folder);
 
-        Data.FileActions.CopyEnabled = !isCopy;
-        Data.FileActions.CutEnabled = isCopy;
+        ActionFlags.CopyEnabled = !isCopy;
+        ActionFlags.CutEnabled = isCopy;
 
         IsPasteEnabled();
 
@@ -708,8 +900,8 @@ internal static class FileActionLogic
     {
         var itemsToCopy = items;
 
-        Data.FileActions.CopyEnabled = true;
-        Data.FileActions.CutEnabled = true;
+        ActionFlags.CopyEnabled = true;
+        ActionFlags.CutEnabled = true;
 
         IsPasteEnabled();
 
@@ -766,16 +958,16 @@ internal static class FileActionLogic
     /// </summary>
     public static void ExtractArchiveHere()
     {
-        if (Data.DevicesObject.Current is not { } device)
+        if (ActionDevice is not { } device)
             return;
 
         string? archivePath = null;
-        var targetFolder = Data.CurrentPath;
+        var targetFolder = ActionPath;
 
         if (TryGetSelectedNavigableArchive(out var selectedArchive))
         {
             archivePath = selectedArchive.FullPath;
-            targetFolder = Data.CurrentPath;
+            targetFolder = ActionPath;
         }
         else if (IsClipboardSingleArchiveFileCopy())
         {
@@ -864,23 +1056,88 @@ internal static class FileActionLogic
         }
     }
 
+    public static void RenameTreeNode(NavigationTreeNode node, TextBox textBox)
+    {
+        if (node.File is not { } file)
+            return;
+
+        var drive = node.Drive
+            ?? DriveHelper.GetCurrentDrive(node.Path, node.OwnerDevice)
+            ?? Data.CurrentDrive;
+
+        if (!node.IsRenameUnixLegal
+            || (drive?.Restrictions.RestrictedNaming is true && !node.IsRenameNamingLegal)
+            || !node.IsRenameUnique)
+        {
+            if (file.IsTemp)
+                ExplorerTree?.CancelTempFile(file);
+            return;
+        }
+
+        if (file.IsTemp)
+        {
+            if (string.IsNullOrEmpty(textBox.Text))
+            {
+                ExplorerTree?.CancelTempFile(file);
+                return;
+            }
+
+            _ = CreateNewItem(file, textBox.Text, node.OwnerDevice, selectCreated: false);
+            return;
+        }
+
+        var name = node.DisplayName;
+        if (string.IsNullOrEmpty(textBox.Text) || textBox.Text == name)
+            return;
+
+        try
+        {
+            var text = textBox.Text;
+            if (text.Count(c => c == TextHelper.RTL_MARK) == 1)
+                text = text.Replace($"{TextHelper.RTL_MARK}", "");
+
+            FileHelper.RenameFile(file, text, node.OwnerDevice);
+            var newPath = FileHelper.ConcatPaths(FileHelper.GetParentPath(node.Path), text);
+            node.DisplayName = text;
+            node.UpdatePath(newPath);
+            file.UpdatePath(newPath);
+        }
+        catch (Exception)
+        { }
+    }
+
     public static async void DeleteFiles(bool? permanent = null)
     {
         permanent ??= Keyboard.Modifiers is ModifierKeys.Shift;
 
+        // Snapshot everything derived from Data.Active up front: a tree context menu's Data.Use scope
+        // ends asynchronously once the menu closes (see NavigationPane.TreeContextMenu_Closed), which
+        // can happen before the confirmation dialog below is answered, reverting Data.Active in the
+        // meantime and making the live ActionDevice / ActionPath / Data.DirList properties unsafe to
+        // read again after the first await.
+        var device = ActionDevice;
+        if (device is null)
+            return;
+
+        var isRecycleBin = ActionFlags.IsRecycleBin;
+        var hasRootShell = device.HasRootShell;
+        var actionPath = ActionPath;
+        var dirFileList = Data.DirList?.FileList;
+
         var emptyTrashFromDriveView = IsTrashDriveSelectedInDriveView() && !Data.SelectedFiles.Any();
-        var emptyingRecycleBin = (Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any()) || emptyTrashFromDriveView;
+        var emptyingRecycleBin = (isRecycleBin && !Data.SelectedFiles.Any()) || emptyTrashFromDriveView;
 
         List<FileClass> itemsToDelete;
         if (emptyingRecycleBin)
         {
-            itemsToDelete = emptyTrashFromDriveView
-                ? TrashHelper.GetRecycleBinItems()
-                : [.. Data.DirList.FileList.Where(f => f.Extension != AdbExplorerConst.RECYCLE_INDEX_SUFFIX)];
+            if (emptyTrashFromDriveView || dirFileList is null)
+                itemsToDelete = TrashHelper.GetRecycleBinItems();
+            else
+                itemsToDelete = [.. dirFileList.Where(f => f.Extension != AdbExplorerConst.RECYCLE_INDEX_SUFFIX)];
         }
         else
         {
-            itemsToDelete = [.. HasRootShell
+            itemsToDelete = [.. hasRootShell
                 ? Data.SelectedFiles
                 : Data.SelectedFiles.Where(file => file.Type is FileType.File or FileType.Folder)];
         }
@@ -899,11 +1156,10 @@ internal static class FileActionLogic
                 deletedString += Strings.Resources.S_BROWSER_ITEMS_PLURAL;
         }
 
-        if (!Data.FileActions.IsRecycleBin && !emptyTrashFromDriveView && Data.Settings.EnableRecycle && !permanent.Value)
+        if (!isRecycleBin && !emptyTrashFromDriveView && Data.Settings.EnableRecycle && !permanent.Value)
         {
             // Archive members cannot be moved to the recycle bin — always permanent-delete them.
-            var deviceId = Data.DevicesObject.Current?.ID ?? "";
-            if (itemsToDelete.Any(f => ArchivePath.IsArchivePath(f.FullPath, deviceId)))
+            if (itemsToDelete.Any(f => ArchivePath.IsArchivePath(f.FullPath, device.ID)))
             {
                 permanent = true;
             }
@@ -921,41 +1177,44 @@ internal static class FileActionLogic
                 return;
         }
 
-        if (!Data.FileActions.IsRecycleBin && !emptyTrashFromDriveView && Data.Settings.EnableRecycle && !permanent.Value)
+        if (!isRecycleBin && !emptyTrashFromDriveView && Data.Settings.EnableRecycle && !permanent.Value)
         {
-            await ShellFileOperation.MakeDir(Data.DevicesObject.Current, AdbExplorerConst.RECYCLE_PATH);
+            await ShellFileOperation.MakeDir(device, AdbExplorerConst.RECYCLE_PATH);
 
-            ShellFileOperation.MoveItems(Data.DevicesObject.Current,
+            ShellFileOperation.MoveItems(device,
                                          itemsToDelete,
                                          AdbExplorerConst.RECYCLE_PATH,
-                                         Data.CurrentPath,
-                                         Data.DirList.FileList,
+                                         actionPath,
+                                         dirFileList,
                                          App.AppDispatcher);
         }
         else
         {
-            ShellFileOperation.DeleteItems(Data.DevicesObject.Current, itemsToDelete, App.AppDispatcher);
+            ShellFileOperation.DeleteItems(device, itemsToDelete, App.AppDispatcher);
 
-            if (Data.FileActions.IsRecycleBin)
+            if (emptyingRecycleBin)
+                TrashHelper.GetTrashDrive(device)?.SetItemsCount(0);
+
+            if (isRecycleBin)
             {
-                var remainingItems = Data.DirList.FileList.Except(itemsToDelete);
+                var remainingItems = dirFileList is { } listed
+                    ? listed.Except(itemsToDelete)
+                    : [];
                 TrashHelper.EnableRecycleButtons(remainingItems);
 
                 // Clear all remaining files if none of them are indexed
                 if (!remainingItems.Any(item => item.TrashIndex is not null))
                 {
-                    _ = Task.Run(() => ShellFileOperation.SilentDelete(Data.DevicesObject.Current, remainingItems));
+                    _ = Task.Run(() => ShellFileOperation.SilentDelete(device, remainingItems));
                 }
             }
             else if (emptyTrashFromDriveView)
             {
-                var indexPaths = ADBService.FindFilesInPath(Data.DevicesObject.Current.ID,
+                var indexPaths = ADBService.FindFilesInPath(device.ID,
                                                             AdbExplorerConst.RECYCLE_PATH,
                                                             includeNames: ["*" + AdbExplorerConst.RECYCLE_INDEX_SUFFIX]);
                 if (indexPaths.Length > 0)
-                    ShellFileOperation.SilentDelete(Data.DevicesObject.Current, indexPaths);
-
-                SelectedTrashDrive()?.SetItemsCount(0);
+                    ShellFileOperation.SilentDelete(device, indexPaths);
             }
         }
     }
@@ -1249,11 +1508,19 @@ internal static class FileActionLogic
         Data.RuntimeSettings.FilterActions = true;
     }
 
-    public static void UpdateFileActions()
+    public static void UpdateFileActions() => UpdateFileActions(Data.Files);
+
+    public static void UpdateFileActions(FileList list)
     {
-        var actions = Data.FileActions;
-        var selectedFiles = Data.SelectedFiles;
-        var selectedPackages = Data.SelectedPackages;
+        using (Data.Use(list))
+            UpdateFileActionsCore(list);
+    }
+
+    private static void UpdateFileActionsCore(FileList list)
+    {
+        var actions = list.Actions;
+        var selectedFiles = list.SelectedFiles ?? [];
+        var selectedPackages = list.SelectedPackages ?? [];
         var hasFileSelection = selectedFiles.Any();
         var hasPackageSelection = selectedPackages.Any();
         var singleFileSelected = selectedFiles.Count() == 1;
@@ -1266,7 +1533,7 @@ internal static class FileActionLogic
         var isExplorerVisible = actions.IsExplorerVisible;
         var isDriveViewVisible = actions.IsDriveViewVisible;
         var enableApk = Data.Settings.EnableApk;
-        var currentDevice = Data.DevicesObject?.Current;
+        var currentDevice = list.Device ?? Data.DevicesObject?.Current;
         var isNotRecovery = currentDevice?.Type is not DeviceType.Recovery;
         var hasRoot = HasRootShell;
         var fuseProtectedRoot = SelectionIsFuseProtectedAndroidRoot;
@@ -1305,20 +1572,26 @@ internal static class FileActionLogic
         var isFollowLinkEnabled = actions.IsFollowLinkEnabled;
         var followLinkAllowsAction = !isFollowLinkEnabled || hasRoot;
 
-        var restrictions = Data.CurrentDrive?.Restrictions ?? DriveRestrictions.None;
+        var restrictions = list.CurrentDrive?.Restrictions ?? DriveRestrictions.None;
         var deviceId = currentDevice?.ID;
-        if (deviceId is not null && Data.DirList?.CurrentPath is { } currentPath)
-            actions.IsArchive = ArchivePath.IsArchivePath(currentPath, deviceId);
+        var listingPath = list.DirList?.CurrentPath ?? list.Path;
+        if (deviceId is not null && !string.IsNullOrEmpty(listingPath))
+            actions.IsArchive = ArchivePath.IsArchivePath(listingPath, deviceId);
 
         var isArchive = actions.IsArchive;
 
-        var isWritable = restrictions.ReadOnly is not true
-            && (isSearchMode
-                ? Data.SearchOriginCanWrite
-                : Data.DirList?.CurrentLocation?.CanWriteLocation == true);
+        bool isWritable;
+        if (restrictions.ReadOnly is true)
+            isWritable = false;
+        else if (isSearchMode)
+            isWritable = Data.SearchOriginCanWrite;
+        else if (list.CanWrite is bool canWrite)
+            isWritable = canWrite;
+        else
+            isWritable = list.DirList?.CurrentLocation?.CanWriteLocation == true;
 
         var canPasteIntoTar = deviceId is not null
-            && ArchiveHelper.CanPasteIntoArchive(Data.CurrentPath ?? "", deviceId);
+            && ArchiveHelper.CanPasteIntoArchive(list.Path ?? "", deviceId);
 
         var archiveAllowsModify = !isArchive || canPasteIntoTar;
         var isExplorerFolder = isExplorerVisible
@@ -1344,7 +1617,16 @@ internal static class FileActionLogic
 
         if (isRecycleBin)
         {
-            TrashHelper.EnableRecycleButtons(hasFileSelection ? selectedFiles : Data.DirList.FileList);
+            if (hasFileSelection)
+                TrashHelper.EnableRecycleButtons(selectedFiles);
+            else if (list.DirList?.FileList is { } recycleFiles)
+                TrashHelper.EnableRecycleButtons(recycleFiles);
+            else
+            {
+                var count = TrashHelper.EnsureRecycleCount(currentDevice, list.CurrentDrive as VirtualDriveViewModel);
+                actions.DeleteEnabled = count > 0;
+                actions.RestoreEnabled = false;
+            }
         }
         else if (SelectedTrashDrive() is { ItemsCount: > 0 })
         {
@@ -1369,13 +1651,16 @@ internal static class FileActionLogic
 
         if (isRecycleBin)
         {
-            actions.DeleteDescription.Value = hasFileSelection
+            var recycleDelete = hasFileSelection
                 ? Strings.Resources.S_PERM_DEL
                 : Strings.Resources.S_EMPTY_TRASH;
+            actions.DeleteDescription.Value = recycleDelete;
+            actions.ContextDeleteDescription.Value = recycleDelete;
         }
         else if (IsTrashDriveSelectedInDriveView())
         {
             actions.DeleteDescription.Value = Strings.Resources.S_EMPTY_TRASH;
+            actions.ContextDeleteDescription.Value = Strings.Resources.S_EMPTY_TRASH;
         }
         else
         {
@@ -1449,9 +1734,9 @@ internal static class FileActionLogic
             && isRegularItem
             && followLinkAllowsAction;
 
-        var allSelectedAreCut = Data.CopyPaste.IsSelf
-            && Data.CopyPaste.Files.AnyAll(item => selectedFiles.Any(f => f.FullPath == item))
-            && Data.CopyPaste.Files.Length == selectedFiles.Count();
+        var allSelectedAreCut = Data.CopyPaste.IsFromDevice(list.Device ?? ActionDevice)
+            && Data.CopyPaste.Files.Length == selectedFiles.Count()
+            && Data.CopyPaste.Files.AnyAll(item => selectedFiles.Any(f => NavigationTreeNode.PathsEqual(f.FullPath, item)));
 
         var cutIsMove = allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Move;
         var cutIsCopy = allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Copy;
@@ -1465,6 +1750,14 @@ internal static class FileActionLogic
             && !cutIsMove
             && isRegularItem
             && followLinkAllowsAction;
+
+        if (list.ForbidDestructive)
+        {
+            actions.CutEnabled = false;
+            actions.RenameEnabled = false;
+            if (!isRecycleBin)
+                actions.DeleteEnabled = false;
+        }
 
         if (isAppDrive)
         {
@@ -1497,11 +1790,20 @@ internal static class FileActionLogic
         else
             actions.IsCopyItemPathEnabled = singleFileSelected && !isRecycleBin;
 
+        actions.CopyPathDescription.Value = isAppDrive
+            ? Strings.Resources.S_COPY_APK_NAME
+            : Strings.Resources.S_COPY_PATH;
+
+        var isTreeList = !ReferenceEquals(list, Data.Files);
+        var contextNewOnFolder = isTreeList
+            && singleFileSelected
+            && selectedFile is { IsDirectory: true };
+
         actions.ContextNewEnabled = isWritable
-            && !hasFileSelection
             && !isRecycleBin
             && !isAppDrive
-            && archiveAllowsModify;
+            && archiveAllowsModify
+            && (!hasFileSelection || contextNewOnFolder);
 
         actions.SubmenuUninstallEnabled = allInstallApk && isNotRecovery;
 
@@ -1511,20 +1813,22 @@ internal static class FileActionLogic
 
         string? pasteLinkTarget;
         if (!hasFileSelection)
-            pasteLinkTarget = Data.CurrentPath;
+            pasteLinkTarget = list.Path;
         else if (singleFileSelected && selectedFile is { IsDirectory: true })
             pasteLinkTarget = selectedFile.IsLink ? selectedFile.LinkTarget : selectedFile.FullPath;
         else
             pasteLinkTarget = null;
 
         actions.IsPasteLinkEnabled = !isAppDrive
+            && !isRecycleBin
+            && !list.ForbidPaste
             && pasteLinkTarget is not null
             && Data.CopyPaste.Files.Length == 1
             && Data.CopyPaste.IsSelf
             && Data.CopyPaste.PasteState is DragDropEffects.Copy or DragDropEffects.Link
             && IsSymlinkPasteAllowed(pasteLinkTarget);
 
-        actions.IsCopyLinkEnabled = Data.CurrentDrive?.Restrictions.NoSymbolicLinks is not true
+        actions.IsCopyLinkEnabled = list.CurrentDrive?.Restrictions.NoSymbolicLinks is not true
             && hasRoot
             && singleFileSelected
             && noBrokenLinks
@@ -1556,7 +1860,27 @@ internal static class FileActionLogic
 
         actions.InstallPackageEnabled = isNotRecovery;
 
-        if (!Data.CopyPaste.IsDrag)
+        if (list.DirList is null)
+        {
+            if (ReferenceEquals(list, Data.Files))
+            {
+                actions.NewEnabled = false;
+                actions.ContextNewEnabled = false;
+                actions.RenameEnabled = false;
+            }
+
+            actions.IsCompressToEnabled.Value = false;
+            actions.IsCompressToContextEnabled = false;
+            actions.IsSingleFolder = false;
+        }
+
+        Data.FileActions.IsContextNewFileVisible.Value = !isTreeList;
+        Data.FileActions.IsContextNewArchiveVisible.Value = !isTreeList && Data.FileActions.IsCompressToEnabled;
+
+        if (!ReferenceEquals(list, Data.Files))
+            Data.FileActions.ContextDeleteDescription.Value = actions.ContextDeleteDescription.Value;
+
+        if (!Data.CopyPaste.IsDrag && ReferenceEquals(list, Data.Files))
             Data.RuntimeSettings.FilterActions = true;
     }
 
@@ -1571,7 +1895,7 @@ internal static class FileActionLogic
             || !Data.CopyPaste.IsSelf
             || Data.CopyPaste.PasteState is not DragDropEffects.Copy
             || Data.CopyPaste.Files.Length == 0
-            || Data.DevicesObject.Current is not { } device)
+            || ActionDevice is not { } device)
             return false;
 
         var selectedArchive = archive.FullPath;
@@ -1591,10 +1915,10 @@ internal static class FileActionLogic
     {
         archive = null;
 
-        if (Data.DevicesObject.Current is not { } device
-            || Data.FileActions.IsAppDrive
-            || Data.FileActions.IsRecycleBin
-            || !Data.FileActions.IsRegularItem
+        if (ActionDevice is not { } device
+            || ActionFlags.IsAppDrive
+            || ActionFlags.IsRecycleBin
+            || !ActionFlags.IsRegularItem
             || Data.SelectedFiles.Count() != 1
             || Data.SelectedFiles.First() is not { } selected)
             return false;
@@ -1603,7 +1927,7 @@ internal static class FileActionLogic
                 selected.FullPath,
                 selected.FullName,
                 device.ID,
-                Data.FileActions.IsArchive))
+                ActionFlags.IsArchive))
             return false;
 
         archive = selected;
@@ -1612,25 +1936,25 @@ internal static class FileActionLogic
 
     private static bool CanExtractSelectedArchiveHere()
     {
-        if (Data.DevicesObject.Current is not { } device
+        if (ActionDevice is not { } device
             || !TryGetSelectedNavigableArchive(out _))
             return false;
 
-        var target = Data.CurrentPath;
+        var target = ActionPath;
         return !ArchivePath.IsArchivePath(target, device.ID)
-            && Data.CurrentDrive?.Restrictions.ReadOnly is not true
+            && ActionList.CurrentDrive?.Restrictions.ReadOnly is not true
             && DriveHelper.IsModificationAllowedAt(target, device.ID);
     }
 
     private static bool CanExtractClipboardArchiveHere()
     {
         if (!IsClipboardSingleArchiveFileCopy()
-            || Data.DevicesObject.Current is not { } device)
+            || ActionDevice is not { } device)
             return false;
 
         var target = GetUiPasteTargetPath();
         return !ArchivePath.IsArchivePath(target, device.ID)
-            && Data.CurrentDrive?.Restrictions.ReadOnly is not true
+            && ActionList.CurrentDrive?.Restrictions.ReadOnly is not true
             && DriveHelper.IsModificationAllowedAt(target, device.ID);
     }
 
@@ -1638,14 +1962,14 @@ internal static class FileActionLogic
     {
         if (Data.SelectedFiles?.Count() == 1
             && Data.SelectedFiles.First() is { } item
-            && Data.DevicesObject.Current is { } device
+            && ActionDevice is { } device
             && ArchiveHelper.IsPasteTargetContainer(item, device.ID))
         {
             var path = item.IsLink ? item.LinkTarget : item.FullPath;
             return ArchiveHelper.ResolvePasteTargetPath(path, device.ID);
         }
 
-        return Data.CurrentPath;
+        return ActionPath;
     }
 
     /// <summary>
@@ -1656,7 +1980,7 @@ internal static class FileActionLogic
         if (!Data.CopyPaste.IsSelf
             || Data.CopyPaste.PasteState is not DragDropEffects.Copy
             || Data.CopyPaste.Files.Length != 1
-            || Data.DevicesObject.Current is not { } device)
+            || ActionDevice is not { } device)
             return false;
 
         var path = Data.CopyPaste.Files[0];
@@ -1699,7 +2023,7 @@ internal static class FileActionLogic
 
         string targetPath, targetName = "";
         string title = "";
-        var deviceId = Data.DevicesObject.Current?.ID ?? "";
+        var deviceId = ActionDevice?.ID ?? "";
         if (isContextMenu && Data.SelectedFiles.Count() == 1)
         {
             var selected = Data.SelectedFiles.First();
@@ -1713,7 +2037,7 @@ internal static class FileActionLogic
         }
         else
         {
-            targetPath = Data.CurrentPath;
+            targetPath = GetUiPasteTargetPath();
 
             title = isFolderPicker
                 ? Strings.Resources.S_SELECT_FOLDER_PUSH
@@ -1742,7 +2066,8 @@ internal static class FileActionLogic
         DragDropEffects dropEffects = DragDropEffects.Copy,
         ShellItem originalShellItem = null,
         IReadOnlySet<string>? replacePaths = null,
-        IReadOnlySet<string>? conflictPaths = null)
+        IReadOnlySet<string>? conflictPaths = null,
+        LogicalDeviceViewModel? device = null)
     {
         if (item is null)
             return null;
@@ -1766,7 +2091,8 @@ internal static class FileActionLogic
             source.IsDirectory ? FileType.Folder : FileType.File)
             { Size = source.Size };
 
-        if (Data.DevicesObject.Current is null)
+        device ??= Data.DevicesObject.Current;
+        if (device is null)
             return null;
 
         replacePaths ??= EmptyPathSet;
@@ -1784,14 +2110,15 @@ internal static class FileActionLogic
                 return null;
             }
         }
-        else if (!FileMergeHelper.FilterIdenticalPushTree(source, androidDest, Data.DevicesObject.Current.ID))
+        else if (!FileMergeHelper.FilterIdenticalPushTree(source, androidDest, device.ID))
         {
             return null;
         }
 
+        var pushDevice = device;
         App.SafeInvoke(() =>
         {
-            pushOperation = FileSyncOperation.PushFile(source, target, Data.DevicesObject.Current, App.AppDispatcher);
+            pushOperation = FileSyncOperation.PushFile(source, target, pushDevice, App.AppDispatcher);
             pushOperation.DropEffects = dropEffects;
             pushOperation.OriginalShellItem = originalShellItem;
             pushOperation.PropertyChanged += PushOperation_PropertyChanged;
@@ -1806,8 +2133,9 @@ internal static class FileActionLogic
         string targetPath,
         DragDropEffects dropEffects = DragDropEffects.Copy,
         IReadOnlySet<string>? replacePaths = null,
-        IReadOnlySet<string>? conflictPaths = null)
-        => items.ForEach(item => PushShellObject(item, targetPath, dropEffects, replacePaths: replacePaths, conflictPaths: conflictPaths));
+        IReadOnlySet<string>? conflictPaths = null,
+        LogicalDeviceViewModel? device = null)
+        => items.ForEach(item => PushShellObject(item, targetPath, dropEffects, replacePaths: replacePaths, conflictPaths: conflictPaths, device: device));
 
     private static void PushOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
@@ -1822,13 +2150,16 @@ internal static class FileActionLogic
         if (op.Status is FileOperation.OperationStatus.Completed)
         {
             // Current path (and device) is where the new file was pushed to and it is not shown yet
-            if (op.Device.ID == Data.DevicesObject.Current.ID
+            if (op.Device.ID == Data.DevicesObject.Current?.ID
                 && op.TargetPath.ParentPath == Data.CurrentPath
                 && Data.DirList.FileList.All(f => f.FullName != op.FilePath.FullName))
             {
                 op.Dispatcher.Invoke(() =>
                     Data.DirList.FileList.Add(new(op.TargetPath) { ModifiedTime = op.FilePath.DateModified }));
             }
+
+            if (op.FilePath.IsDirectory)
+                ExplorerTree?.AddCreatedFolder(op.Device.ID, op.TargetPath.FullPath);
 
             if (op.FilePath.IsDirectory
                 && op.FilePath.ShellItem is ShellFolder shellFolder)
@@ -1869,7 +2200,7 @@ internal static class FileActionLogic
     {
         Data.RaiseFocusNavigationBox(false);
 
-        if (Data.FileActions.IsAppDrive)
+        if (ActionFlags.IsAppDrive)
         {
             PullPackages(targetPath);
             return;
@@ -2052,7 +2383,7 @@ internal static class FileActionLogic
             }
             else
             {
-                op = GeneratePullOp(targetPath, item.GetSyncFile(), notify, device, replacePaths, conflictPaths);
+                op = GeneratePullOp(targetPath, item.GetSyncFile(deviceId), notify, device, replacePaths, conflictPaths);
             }
 
             if (op is not null)
@@ -2180,18 +2511,26 @@ internal static class FileActionLogic
             return;
 
         var file = Data.SelectedFiles.First();
-        var path = Data.DevicesObject.Current is { } device
-            && ArchiveHelper.CanNavigateIntoArchive(file.FullPath, file.FullName, device.ID, Data.FileActions.IsArchive)
+        var device = ActionDevice;
+        var path = device is not null
+            && ArchiveHelper.CanNavigateIntoArchive(file.FullPath, file.FullName, device.ID, ActionFlags.IsArchive)
             ? ArchivePath.Join(file.FullPath, "")
             : file.FullPath;
+
+        if (device is not null && !device.IsOpen)
+        {
+            Data.RuntimeSettings.PendingLocationAfterDeviceOpen = new(path);
+            DeviceHelper.BrowseDeviceAction(device);
+            return;
+        }
 
         Data.RuntimeSettings.LocationToNavigate = new(path);
     }
 
     internal static bool CanEnterSelection(FileClass file)
         => file.IsDirectory
-        || (Data.DevicesObject.Current is { } device
-            && ArchiveHelper.CanNavigateIntoArchive(file.FullPath, file.FullName, device.ID, Data.FileActions.IsArchive));
+        || (ActionDevice is { } device
+            && ArchiveHelper.CanNavigateIntoArchive(file.FullPath, file.FullName, device.ID, ActionFlags.IsArchive));
 
     public static void OpenApkLocation(Package apk = null)
     {

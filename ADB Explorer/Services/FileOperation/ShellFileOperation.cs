@@ -2,6 +2,7 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
+using ADB_Explorer.ViewModels.Pages;
 using AdvancedSharpAdbClient;
 using AdvancedSharpAdbClient.Models;
 using Vanara.Windows.Shell;
@@ -127,7 +128,7 @@ public static class ShellFileOperation
         if (op.FilePath.TrashIndex is TrashIndexer indexer)
             SilentDelete(op.Device, indexer.IndexerPath);
 
-        if (op.Device.ID == Data.DevicesObject.Current.ID)
+        if (op.Device.ID == Data.DevicesObject.Current?.ID)
         {
             // remove file from cut items and clear its trash indexer if current device
             op.FilePath.CutState = DragDropEffects.None;
@@ -136,12 +137,15 @@ public static class ShellFileOperation
             // update UI if current path
             if (op.TargetPath.ParentPath == Data.CurrentPath)
             {
-                Data.DirList.FileList.Remove(op.FilePath);
+                Data.Files.DirList?.FileList.Remove(op.FilePath);
                 FileActionLogic.UpdateFileActions();
             }
         }
 
         TrashHelper.SyncDriveViewTrashCountAfterDelete(op);
+
+        if (op.FilePath.IsDirectory)
+            RemoveDeletedTreeFolder(op.Device.ID, op.FilePath.FullPath);
 
         op.PropertyChanged -= DeleteFileOp_PropertyChanged;
     }
@@ -162,25 +166,32 @@ public static class ShellFileOperation
         if (e.PropertyName is not nameof(FileOperation.Status) || op.Status is not FileOperation.OperationStatus.Completed)
             return;
 
-        if (op.Device.ID == Data.DevicesObject.Current.ID
+        var oldPath = op.FilePath.FullPath;
+        var newPath = op.TargetPath.FullPath;
+
+        if (op.Device.ID == Data.DevicesObject.Current?.ID
             && op.FilePath.ParentPath == Data.CurrentPath)
         {
-            var file = Data.DirList.FileList.Find(f => f.FullPath == op.FilePath.FullPath);
+            var file = Data.Files.DirList?.FileList?.Find(f => f.FullPath == oldPath);
 
-            // update UI when on current device and current path
-            op.Dispatcher.Invoke(() =>
+            if (file is not null)
             {
-                file.UpdatePath(op.TargetPath.FullPath);
-                FileActionLogic.UpdateFileActions();
-            });
+                op.Dispatcher.Invoke(() =>
+                {
+                    file.UpdatePath(newPath);
+                    FileActionLogic.UpdateFileActions();
+                });
 
-            if (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First() == file)
-                Data.ItemToSelect.Value = null;
+                if (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First() == file)
+                    Data.ItemToSelect.Value = null;
 
-            // only select the item if there aren't any other operations
-            if (Data.FileOpQ.TotalCount == 1)
-                Data.ItemToSelect.Value = file;
+                if (Data.FileOpQ.TotalCount == 1)
+                    Data.ItemToSelect.Value = file;
+            }
         }
+
+        if (op.FilePath.IsDirectory)
+            RenameTreeFolder(op.Device.ID, oldPath, newPath);
 
         op.PropertyChanged -= RenameFileOp_PropertyChanged;
     }
@@ -288,11 +299,13 @@ public static class ShellFileOperation
                                  ObservableList<FileClass> fileList,
                                  Dispatcher dispatcher,
                                  DragDropEffects cutType = DragDropEffects.None)
+        // fileList is only used for same-folder copy-paste rename collisions; it's null when
+        // called from a context (e.g. a tree node delete/recycle) with no live directory listing.
         => MoveItems(device,
                      items,
                      targetPath,
                      currentPath,
-                     fileList.Select(f => f.FullName),
+                     fileList?.Select(f => f.FullName) ?? [],
                      dispatcher,
                      cutType);
 
@@ -576,7 +589,11 @@ public static class ShellFileOperation
             // remove file from cut items
             op.FilePath.CutState = DragDropEffects.None;
 
-            if (op.Device.ID == Data.DevicesObject.Current.ID)
+            var sourcePath = op.FilePath.FullPath;
+            var removeFromTree = op.OperationName is FileOperation.OperationType.Recycle or FileOperation.OperationType.Move
+                && op.FilePath.IsDirectory;
+
+            if (op.Device.ID == Data.DevicesObject.Current?.ID)
             {
                 // notify master process of completion
                 if (op.MasterPid > 0 && op.OperationName is not FileOperation.OperationType.Copy)
@@ -590,8 +607,10 @@ public static class ShellFileOperation
                     op.FilePath.TrashIndex = null;
                 }
 
+                var listing = Data.Files.DirList?.FileList;
+
                 // update UI when copy / cut target is current path
-                if (op.TargetPath.ParentPath == Data.CurrentPath)
+                if (listing is not null && op.TargetPath.ParentPath == Data.CurrentPath)
                 {
                     if (op.OperationName is FileOperation.OperationType.Copy)
                     {
@@ -602,7 +621,7 @@ public static class ShellFileOperation
                         newFile.UpdatePath(op.TargetPath.FullPath);
                         newFile.ModifiedTime = op.DateModified;
                         
-                        Data.DirList.FileList.Add(newFile);
+                        listing.Add(newFile);
 
                         // only select the item if there aren't any other operations
                         if (Data.FileOpQ.TotalCount == 1)
@@ -611,7 +630,7 @@ public static class ShellFileOperation
                     else
                     {
                         op.FilePath.UpdatePath(op.TargetPath.FullPath);
-                        Data.DirList.FileList.Add(op.FilePath);
+                        listing.Add(op.FilePath);
 
                         // only select the item if there aren't any other operations
                         if (Data.FileOpQ.TotalCount == 1)
@@ -622,12 +641,23 @@ public static class ShellFileOperation
                 }
 
                 // update UI when cut / restore / recycle source is current path
-                else if (op.FilePath.ParentPath == Data.CurrentPath && op.OperationName is not FileOperation.OperationType.Copy)
+                else if (listing is not null
+                    && op.FilePath.ParentPath == Data.CurrentPath
+                    && op.OperationName is not FileOperation.OperationType.Copy)
                 {
-                    Data.DirList.FileList.Remove(op.FilePath);
+                    var listed = listing.Find(f => f.FullPath == sourcePath) ?? op.FilePath;
+                    listing.Remove(listed);
                     FileActionLogic.UpdateFileActions();
                 }
             }
+
+            if (removeFromTree)
+                RemoveDeletedTreeFolder(op.Device.ID, sourcePath);
+
+            // A move/copy that lands a folder in a new location needs the same tree update a push gets:
+            // add it under its (already loaded) destination parent, if that parent is visible in the tree.
+            if (op.FilePath.IsDirectory && op.OperationName is FileOperation.OperationType.Move or FileOperation.OperationType.Copy)
+                AddCreatedTreeFolder(op.Device.ID, op.TargetPath.FullPath);
 
             op.PropertyChanged -= MoveFileOp_PropertyChanged;
         }
@@ -977,5 +1007,20 @@ public static class ShellFileOperation
         }
 
         op.PropertyChanged -= ChangeModifiedOp_PropertyChanged;
+    }
+
+    private static void RemoveDeletedTreeFolder(string deviceId, string path)
+    {
+        App.Services.GetService<ExplorerViewModel>()?.Tree?.RemoveDeletedFolder(deviceId, path);
+    }
+
+    private static void AddCreatedTreeFolder(string deviceId, string path)
+    {
+        App.Services.GetService<ExplorerViewModel>()?.Tree?.AddCreatedFolder(deviceId, path);
+    }
+
+    private static void RenameTreeFolder(string deviceId, string oldPath, string newPath)
+    {
+        App.Services.GetService<ExplorerViewModel>()?.Tree?.RenameFolder(deviceId, oldPath, newPath);
     }
 }

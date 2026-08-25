@@ -479,14 +479,14 @@
             x:Key="FileOpDeviceTextblockStyle"
             BasedOn="{StaticResource BoldInProgressTextBlockStyle}"
             TargetType="TextBlock">
-            <Setter Property="Text" Value="{Binding Device.Device.Name}" />
+            <Setter Property="Text" Value="{Binding Device.Name}" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Device.Device.Status}" Value="Unauthorized">
                     <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DEVICE_UNAUTH_NONAME}}" />
                 </DataTrigger>
-                <DataTrigger Binding="{Binding Device.Device.Type}" Value="Emulator">
+                <!--<DataTrigger Binding="{Binding Device.Device.Type}" Value="Emulator">
                     <Setter Property="Text" Value="{Binding Device.Device.ID}" />
-                </DataTrigger>
+                </DataTrigger>-->
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
                         <Condition Binding="{Binding Device.Device.Type}" Value="Service" />
@@ -643,7 +643,7 @@
                     x:Name="TimeStampColumn"
                     CellTemplate="{StaticResource FileOpTimeStampTemplate}"
                     Header="{x:Static strings:Resources.S_COLUMN_ADDED}"
-                    SortMemberPath="Time" />
+                    SortMemberPath="TimeStamp" />
                 <DataGridTemplateColumn
                     x:Name="DeviceColumn"
                     CellTemplate="{StaticResource FileOpDeviceColumnStyle}"

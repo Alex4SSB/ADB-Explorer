@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Converters;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels;
 using Vanara.PInvoke;
 using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
@@ -13,11 +14,14 @@ public static class FileHelper
     public static FileClass ListerFileManipulator(FileClass item)
     {
         if (Data.CopyPaste.Files.Length > 0
-            && Data.CopyPaste.IsSelfClipboard
-            && Data.CopyPaste.ParentFolder == Data.DirList.CurrentPath
-            && Data.CopyPaste.Files.FirstOrDefault(f => f == item.FullPath) is not null)
+            && Data.CopyPaste.IsClipboard
+            && Data.DirList is not null
+            && NavigationTreeNode.PathsEqual(Data.CopyPaste.ParentFolder, Data.DirList.CurrentPath)
+            && Data.CopyPaste.ContainsPath(item.FullPath))
         {
-            item.CutState = Data.CopyPaste.PasteState;
+            var listingDevice = Data.Files.Device ?? Data.DevicesObject.Current;
+            if (Data.CopyPaste.IsFromDevice(listingDevice))
+                item.CutState = Data.CopyPaste.PasteState;
         }
 
         if (Data.FileActions.IsRecycleBin)
@@ -151,13 +155,13 @@ public static class FileHelper
         return false;
     }
 
-    public static void RenameFile(FileClass file, string newName)
+    public static void RenameFile(FileClass file, string newName, LogicalDeviceViewModel? device = null)
     {
         var newPath = ConcatPaths(file.ParentPath, newName);
         if (!Data.Settings.ShowExtensions)
             newPath += file.Extension;
 
-        ShellFileOperation.Rename(file, newPath, Data.DevicesObject.Current);
+        ShellFileOperation.Rename(file, newPath, device ?? Data.Active.Device ?? Data.DevicesObject.Current);
     }
 
     public static string DisplayName(TextBox textBox) => DisplayName(textBox.DataContext as FilePath);
@@ -298,6 +302,28 @@ public static class FileHelper
         return fullName[lastDot..];
     }
 
+    /// <summary>
+    /// When the extension is a Unicode icon (emoji, symbol, private-use), returns the glyph
+    /// after the dot (e.g. <c>.📷</c> → <c>📷</c>).
+    /// </summary>
+    public static bool TryGetUnicodeIconExtension(string? fullName, out string icon)
+    {
+        icon = "";
+        var ext = GetExtension(fullName ?? "");
+        if (ext.Length < 2)
+            return false;
+
+        var remainder = ext.AsSpan(1);
+        if (Rune.DecodeFromUtf16(remainder, out var rune, out _) != System.Buffers.OperationStatus.Done)
+            return false;
+
+        if (Array.IndexOf(UNICODE_ICONS, Rune.GetUnicodeCategory(rune)) < 0)
+            return false;
+
+        icon = ext[1..];
+        return true;
+    }
+
     public static string DuplicateFile(ObservableList<FileClass> fileList, string fullName, DragDropEffects cutType = DragDropEffects.None)
         => DuplicateFile(fileList.Select(f => f.FullName), fullName, cutType);
 
@@ -428,12 +454,11 @@ public static class FileHelper
 
     public static IEnumerable<FileClass> GetFilesFromTree(FolderTree[] tree) => tree.Select(t => new FileClass(t));
 
-    public static FolderTree[] GetFolderTree(IEnumerable<string> paths, bool isFolder = true, CancellationToken cancellationToken = default)
+    public static FolderTree[] GetFolderTree(IEnumerable<string> paths, bool isFolder = true, CancellationToken cancellationToken = default, string? deviceId = null)
     {
-        if (Data.DevicesObject.Current is null)
+        deviceId ??= Data.DevicesObject.Current?.ID;
+        if (string.IsNullOrEmpty(deviceId))
             return [];
-
-        var deviceId = Data.DevicesObject.Current.ID;
 
         if (!ShellCommands.FindExists(deviceId))
             return GetFolderTreeViaAdbLs(deviceId, paths, isFolder, cancellationToken);

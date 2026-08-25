@@ -175,6 +175,9 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
         _operationsSource.Source = Data.FileOpQ.Operations;
         Operations.Filter = op => op is FileOperation fileOp && Data.Settings.FileOpFilters.Contains(fileOp.Filter);
 
+        // Default list order: newest-added operation first.
+        Operations.SortDescriptions.Add(new(nameof(FileOperation.TimeStamp), ListSortDirection.Descending));
+
         if (Operations is ICollectionViewLiveShaping liveShaping)
         {
             liveShaping.LiveFilteringProperties.Add(nameof(FileOperation.Status));

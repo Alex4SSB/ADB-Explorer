@@ -37,6 +37,11 @@ public partial class AppRuntimeSettings : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Path to open after switching devices, instead of drive view.
+    /// </summary>
+    public AdbLocation? PendingLocationAfterDeviceOpen { get; set; }
+
     private string pathBoxNavigation = "";
     public string PathBoxNavigation
     {

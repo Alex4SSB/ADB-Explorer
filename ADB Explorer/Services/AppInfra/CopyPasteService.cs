@@ -2,6 +2,7 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
+using ADB_Explorer.ViewModels.Pages;
 using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
 
@@ -46,6 +47,9 @@ public partial class CopyPasteService : ObservableObject
 
     [ObservableProperty]
     public partial string? DropTarget { get; set; } = null;
+
+    [ObservableProperty]
+    public partial LogicalDeviceViewModel? DropTargetDevice { get; set; }
 
     public string DropTargetName
     {
@@ -120,6 +124,12 @@ public partial class CopyPasteService : ObservableObject
     public partial bool MouseWithinApp { get; set; } = true;
 
     public NativeMethods.HResult DragResult { get; set; }
+
+    /// <summary>
+    /// True from the start of an OLE drag until the next listing/tree mouse-down.
+    /// Used to skip the context menu that would otherwise open after a right-click cancel.
+    /// </summary>
+    public bool WasDragging { get; set; }
 
     public DragDropEffects CurrentEffect => IsDrag ? DropEffect : PasteState;
     public string CurrentParent => IsDrag ? DragParent : ParentFolder;
@@ -228,12 +238,19 @@ public partial class CopyPasteService : ObservableObject
     {
         FileActionLogic.UpdateFileActions();
 
-        List<FileClass> cutItems = [];
-        if (PasteSource is not DataSource.None && PasteSource.HasFlag(DataSource.Self))
-            cutItems = [.. Data.DirList.FileList.Where(f => Files.Contains(f.FullPath))];
+        var listing = Data.Files.DirList?.FileList;
+        if (listing is not null)
+        {
+            List<FileClass> cutItems = [];
+            var listingDevice = Data.Files.Device ?? Data.DevicesObject.Current;
+            if (PasteSource is not DataSource.None && IsFromDevice(listingDevice))
+                cutItems = [.. listing.Where(f => ContainsPath(f.FullPath))];
 
-        cutItems.ForEach(file => file.CutState = PasteState);
-        Data.DirList?.FileList.Except(cutItems).ForEach(file => file.CutState = DragDropEffects.None);
+            cutItems.ForEach(file => file.CutState = PasteState);
+            listing.Except(cutItems).ForEach(file => file.CutState = DragDropEffects.None);
+        }
+
+        App.Services.GetService<ExplorerViewModel>()?.Tree.UpdateCutStates();
     }
 
     public void Clear()
@@ -245,6 +262,7 @@ public partial class CopyPasteService : ObservableObject
             PasteSource = DataSource.None;
             Files = [];
             ParentFolder = "";
+            SourceDevice = null;
         }
 
         ClearDrag();
@@ -268,6 +286,50 @@ public partial class CopyPasteService : ObservableObject
         ArchiveExtract.BeginCleanupAllStaging();
     }
 
+    public bool IsFromDevice(LogicalDeviceViewModel? device)
+    {
+        if (device is null)
+            return IsSelf;
+
+        if (SourceDevice is not null)
+            return SourceDevice.ID == device.ID;
+
+        return IsSelf;
+    }
+
+    public bool ContainsPath(string? path)
+    {
+        if (string.IsNullOrEmpty(path) || Files.Length == 0)
+            return false;
+
+        foreach (var file in Files)
+        {
+            if (NavigationTreeNode.PathsEqual(file, path))
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool ShouldKeepSelfAndroidClipboard(IDataObject dataObject)
+    {
+        if (!CurrentSource.HasFlag(DataSource.Android)
+            || MasterPid != Environment.ProcessId
+            || Files.Length == 0)
+            return false;
+
+        if (dataObject.GetDataPresent(AdbDataFormats.AdbDrop)
+            && dataObject.GetData(AdbDataFormats.AdbDrop) is MemoryStream)
+            return false;
+
+        // A new Windows/shell copy typically includes FileDrop. OLE can omit AdbDrop
+        // on the first update while still holding our FileDescriptor payload.
+        return !dataObject.GetDataPresent(AdbDataFormats.FileDrop);
+    }
+
+    private static bool IsAndroidAbsolutePath(string path)
+        => !string.IsNullOrEmpty(path) && path[0] == '/';
+
     public void GetClipboardPasteItems()
     {
         var CPDO = Clipboard.GetDataObject();
@@ -275,6 +337,12 @@ public partial class CopyPasteService : ObservableObject
 #if !DEPLOY
         DebugLog.PrintLine($"Clipboard formats: {string.Join(", ", CPDO.GetFormats())}");
 #endif
+
+        if (ShouldKeepSelfAndroidClipboard(CPDO))
+        {
+            UpdateUI();
+            return;
+        }
 
         var allowedEffect = GetAllowedDragEffects(CPDO);
         if (allowedEffect is DragDropEffects.None)
@@ -303,8 +371,13 @@ public partial class CopyPasteService : ObservableObject
         else
             PasteState = DragDropEffects.None;
 
-        Files = DragFiles;
-        ParentFolder = DragParent;
+        if (DragFiles.Length > 0 && DragFiles.All(IsAndroidAbsolutePath))
+            Files = DragFiles;
+        else if (!CurrentSource.HasFlag(DataSource.Android) || Files.Length == 0)
+            Files = DragFiles;
+
+        if (!string.IsNullOrEmpty(DragParent))
+            ParentFolder = DragParent;
 
         UpdateUI();
 
@@ -329,7 +402,10 @@ public partial class CopyPasteService : ObservableObject
                 PasteState = pasteEffect;
         }
 
-        SourceDevice = Data.DevicesObject.Current;
+        var copyDevice = Data.Active.Device ?? Data.DevicesObject.Current;
+        if (copyDevice is not null
+            && (SourceDevice is null || !ReferenceEquals(Data.Active, Data.Files)))
+            SourceDevice = copyDevice;
         MasterPid = Environment.ProcessId;
         var transferParent = FileHelper.GetSearchTransferParent(VirtualFileDataObject.SelfFiles);
         if (Data.FileActions.IsSearchMode)
@@ -418,6 +494,7 @@ public partial class CopyPasteService : ObservableObject
             var deviceId = Data.DevicesObject.Current?.ID ?? "";
             var targetPath = ArchiveHelper.ResolvePasteTargetPath(rawPath, deviceId);
             Data.CopyPaste.DropTarget = targetPath;
+            Data.CopyPaste.DropTargetDevice = Data.DevicesObject.Current;
 
             if (!DriveHelper.IsModificationAllowedAt(targetPath, deviceId))
                 return DragDropEffects.None;
@@ -448,9 +525,6 @@ public partial class CopyPasteService : ObservableObject
     {
         CurrentSource &= ~(DataSource.Android | DataSource.Self | DataSource.Virtual);
 
-        if (Data.DevicesObject.Current is null)
-            return;
-
         DragParent = "";
         string[] oldFiles = [.. DragFiles];
 
@@ -461,20 +535,28 @@ public partial class CopyPasteService : ObservableObject
             var deviceId = dragList.deviceId;
 
             var device = Data.DevicesObject.UIList.OfType<LogicalDeviceViewModel>().FirstOrDefault(d => d.ID == deviceId && d.Status is DeviceStatus.Ok);
+            if (device is null
+                && SourceDevice?.ID == deviceId
+                && MasterPid == Environment.ProcessId)
+                device = SourceDevice;
+
             if (!IsDrag && device is null)
             {
                 Clear();
                 return;
             }
-            else
-                SourceDevice = device;
+
+            SourceDevice = device;
 
             MasterPid = dragList.pid;
             DragParent = dragList.parentFolder;
             DragFiles = [.. dragList.items.Select(f => FileHelper.ConcatPaths(DragParent, f))];
 
             CurrentSource |= DataSource.Android;
-            if (deviceId == Data.DevicesObject.Current.ID)
+            var currentId = Data.DevicesObject.Current?.ID;
+            if (deviceId == currentId)
+                CurrentSource |= DataSource.Self;
+            else if (currentId is null && dragList.pid == Environment.ProcessId)
                 CurrentSource |= DataSource.Self;
             else
                 CurrentSource |= DataSource.Virtual;
@@ -507,6 +589,7 @@ public partial class CopyPasteService : ObservableObject
         // Shell ID List - the only format Microsoft supports for anything added after Windows XP (non-ZIP archives, UNC paths, etc.)
         else if (dataObject.GetDataPresent(AdbDataFormats.ShellidList))
         {
+            SourceDevice = null;
             var ido = (System.Runtime.InteropServices.ComTypes.IDataObject)dataObject;
             ShellItemArray? shItems = null;
 
@@ -535,6 +618,7 @@ public partial class CopyPasteService : ObservableObject
         // This is the format we supply to File Explorer. Also provided by File Explorer for contents of ZIP archives (introduced in Windows ME).
         else if (dataObject.GetDataPresent(AdbDataFormats.FileDescriptor))
         {
+            SourceDevice = null;
             GetDescriptors(dataObject);
 
             DragFiles = [.. Descriptors.Where(d => !d.Name.Contains('\\')).Select(d => d.Name)];
@@ -546,6 +630,7 @@ public partial class CopyPasteService : ObservableObject
         // If the data object only has FileDrop, then it's probably dropping by target detect, which we can't support (7-Zip, WinRAR, etc.)
         else
         {
+            SourceDevice = null;
             DragFiles = [];
             UpdateUI();
         }
@@ -607,17 +692,52 @@ public partial class CopyPasteService : ObservableObject
         AcceptDataObject(dataObject, targetFolder, isLink);
     }
 
-    public void AcceptDataObject(IDataObject dataObject, string targetFolder, bool isLink = false)
+    public DragDropEffects GetAllowedTreeDropEffects(IDataObject dataObject, NavigationTreeNode node)
     {
-        var deviceId = Data.DevicesObject.Current?.ID ?? "";
-        if (FileHelper.IsSearchLocation(targetFolder))
+        // Marks this as an active drag (routes CurrentSource through DragPasteSource instead of the
+        // clipboard's PasteSource) so IsWindows/IsVirtual/IsSelf reflect the data actually being dragged,
+        // not whatever was last copied. A self-initiated tree drag already did this via UpdateSelfVFDO,
+        // but an external Explorer drag never goes through that, so it must happen here too.
+        DragPasteSource &= ~DataSource.None;
+
+        PreviewDataObject(dataObject);
+        if (DragFiles.Length < 1)
+            return DragDropEffects.None;
+
+        return FileActionLogic.EnableTreeDropPaste(node);
+    }
+
+    public void AcceptTreeDrop(System.Windows.DragEventArgs e, NavigationTreeNode node)
+    {
+        var allowed = GetAllowedTreeDropEffects(e.Data, node);
+        if (allowed is DragDropEffects.None)
             return;
 
-        // Packages are pulled out of app drive — never dropped back onto it.
-        if (Data.FileActions.IsAppDrive && IsSelf)
+        var device = node.OwnerDevice ?? Data.DevicesObject.Current;
+        var deviceId = device?.ID ?? "";
+        var targetFolder = ArchiveHelper.ResolvePasteTargetPath(node.DropTargetPath, deviceId);
+        var isAppDrive = node.Drive?.Type is AbstractDrive.DriveType.Package;
+
+        if (IsFromDevice(device) && targetFolder == DragParent && e.KeyStates is DragDropKeyStates.None)
             return;
 
-        if (!DriveHelper.IsModificationAllowedAt(targetFolder, deviceId))
+        AcceptDataObject(e.Data, targetFolder, e.KeyStates.HasFlag(DragDropKeyStates.AltKey), device, isAppDrive);
+    }
+
+    public void AcceptDataObject(IDataObject dataObject, string targetFolder, bool isLink = false)
+        => AcceptDataObject(dataObject, targetFolder, isLink, Data.DevicesObject.Current, Data.FileActions.IsAppDrive);
+
+    public void AcceptDataObject(IDataObject dataObject, string targetFolder, bool isLink, LogicalDeviceViewModel? device, bool isAppDrive)
+    {
+        var deviceId = device?.ID ?? "";
+        if (device is null || FileHelper.IsSearchLocation(targetFolder))
+            return;
+
+        // Packages pulled from app drive are not dropped back onto it.
+        if (isAppDrive && IsSelf && Data.FileActions.IsAppDrive)
+            return;
+
+        if (!DriveHelper.IsModificationAllowedAt(targetFolder, deviceId) && !isAppDrive)
             return;
 
         // Symlink into archives is not supported.
@@ -625,26 +745,35 @@ public partial class CopyPasteService : ObservableObject
             return;
 
         if ((isLink || CurrentEffect is DragDropEffects.Link)
-            && DriveHelper.GetCurrentDrive(targetFolder)?.Restrictions.NoSymbolicLinks is true)
+            && DriveHelper.GetCurrentDrive(targetFolder, device)?.Restrictions.NoSymbolicLinks is true)
             return;
 
         void ReadObject()
         {
-            // For all cases where the files aren't immediately available on disk
-            if (IsVirtual)
+            var fromOtherAndroid = CurrentSource.HasFlag(DataSource.Android)
+                && SourceDevice is not null
+                && SourceDevice.ID != device.ID;
+
+            // Virtual payload, or Android files that are not already on the drop target.
+            // Self+Android with no explorer device is not Virtual, but is still a cross-device copy.
+            if (fromOtherAndroid || (IsVirtual && SourceDevice?.ID != device.ID))
             {
                 ClearTempFolder();
 
                 // Transfer from another Android device
-                if (!IsWindows)
+                if (fromOtherAndroid || !IsWindows)
                 {
                     foreach (var item in CurrentFiles)
                     {
                         SyncFile target = new(item) { PathType = FilePathType.Windows };
                         target.UpdatePath(FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, item.FullName, '\\'));
 
+                        FolderTree[]? children = null;
+                        if (item.IsDirectory)
+                            children = item.GetChildren(SourceDevice.ID);
+
                         // Pull the file from the source device to the temp folder
-                        var pullOp = FileSyncOperation.PullFile(new(item), target, SourceDevice, App.AppDispatcher);
+                        var pullOp = FileSyncOperation.PullFile(new(item, children), target, SourceDevice, App.AppDispatcher);
                         pullOp.PropertyChanged += (s, e) =>
                         {
                             if (e.PropertyName != nameof(FileSyncOperation.Status)
@@ -653,15 +782,15 @@ public partial class CopyPasteService : ObservableObject
 
                             // Once done, create a shell item and push it to the target device (current)
                             FileClass file = new(target) { ShellItem = ShellItem.Open(target.FullPath) };
-                            if (Data.FileActions.IsAppDrive)
+                            if (isAppDrive)
                             {
                                 if (FileHelper.AllFilesAreApks(DragFiles))
-                                    ShellFileOperation.PushPackages(Data.DevicesObject.Current, [file.ShellItem], App.AppDispatcher);
+                                    ShellFileOperation.PushPackages(device, [file.ShellItem], App.AppDispatcher);
 
                                 return;
                             }
 
-                            var pushOp = VerifyAndPush(targetFolder, file, CurrentEffect);
+                            var pushOp = VerifyAndPush(targetFolder, file, CurrentEffect, device: device);
                             if (pushOp is null || CurrentEffect is not DragDropEffects.Move)
                                 return;
 
@@ -701,13 +830,13 @@ public partial class CopyPasteService : ObservableObject
                         // A new top level item means the previous one is done
                         if (lastTopItem is not null && lastTopItem.ParsingName != e.DestItem.ParsingName)
                         {
-                            if (Data.FileActions.IsAppDrive)
+                            if (isAppDrive)
                             {
                                 if (FileHelper.AllFilesAreApks(DragFiles))
-                                    ShellFileOperation.PushPackages(Data.DevicesObject.Current, [lastTopItem], App.AppDispatcher);
+                                    ShellFileOperation.PushPackages(device, [lastTopItem], App.AppDispatcher);
                             }
                             else
-                                VerifyAndPush(targetFolder, new FileClass(lastTopItem), CurrentEffect, lastTopSource);
+                                VerifyAndPush(targetFolder, new FileClass(lastTopItem), CurrentEffect, lastTopSource, device);
                         }
 
                         lastTopItem = e.DestItem;
@@ -719,13 +848,13 @@ public partial class CopyPasteService : ObservableObject
                         // The last item is not caught by the PostCopyItem event
                         if (lastTopItem is not null)
                         {
-                            if (Data.FileActions.IsAppDrive)
+                            if (isAppDrive)
                             {
                                 if (FileHelper.AllFilesAreApks(DragFiles))
-                                    ShellFileOperation.PushPackages(Data.DevicesObject.Current, [lastTopItem], App.AppDispatcher);
+                                    ShellFileOperation.PushPackages(device, [lastTopItem], App.AppDispatcher);
                             }
                             else
-                                VerifyAndPush(targetFolder, new FileClass(lastTopItem), CurrentEffect, lastTopSource);
+                                VerifyAndPush(targetFolder, new FileClass(lastTopItem), CurrentEffect, lastTopSource, device);
                         }
                     };
 
@@ -761,7 +890,7 @@ public partial class CopyPasteService : ObservableObject
                                             FileOperation.OperationType.Push,
                                             Descriptors[i],
                                             new(targetFolder),
-                                            Data.DevicesObject.Current,
+                                            device,
                                             new FailedOpProgressViewModel(e.Message)));
                                 });
 
@@ -789,37 +918,37 @@ public partial class CopyPasteService : ObservableObject
                         
                         if (shItems.Any())
                         {
-                            if (Data.FileActions.IsAppDrive)
+                            if (isAppDrive)
                             {
                                 if (FileHelper.AllFilesAreApks(DragFiles))
-                                    ShellFileOperation.PushPackages(Data.DevicesObject.Current, shItems.Select(f => f.ShellItem), App.AppDispatcher);
+                                    ShellFileOperation.PushPackages(device, shItems.Select(f => f.ShellItem), App.AppDispatcher);
                             }
                             else
-                                VerifyAndPush(targetFolder, shItems, CurrentEffect);
+                                VerifyAndPush(targetFolder, shItems, CurrentEffect, device);
                         }
                     });
                 }
             }
             else if (IsWindows) // FileDrop format
             {
-                if (Data.FileActions.IsAppDrive)
+                if (isAppDrive)
                 {
                     if (FileHelper.AllFilesAreApks(DragFiles))
-                        ShellFileOperation.PushPackages(Data.DevicesObject.Current, CurrentFiles.Select(f => f.ShellItem), App.AppDispatcher);
+                        ShellFileOperation.PushPackages(device, CurrentFiles.Select(f => f.ShellItem), App.AppDispatcher);
                 }
                 else
-                    VerifyAndPush(targetFolder, CurrentFiles, CurrentEffect);
+                    VerifyAndPush(targetFolder, CurrentFiles, CurrentEffect, device);
             }
-            else if (IsSelf)
+            else if (SourceDevice?.ID == device.ID)
             {
                 // Dragging a folder into itself is not allowed
                 if (DragFiles.Length == 1 && DragFiles[0] == targetFolder && IsDrag)
                     return;
 
-                if (Data.FileActions.IsAppDrive)
+                if (isAppDrive)
                 {
                     if (FileHelper.AllFilesAreApks(DragFiles))
-                        ShellFileOperation.InstallPackages(Data.DevicesObject.Current, CurrentFiles, App.AppDispatcher);
+                        ShellFileOperation.InstallPackages(device, CurrentFiles, App.AppDispatcher);
                 }
                 else
                 {
@@ -828,7 +957,7 @@ public partial class CopyPasteService : ObservableObject
                                targetFolder,
                                CurrentFiles,
                                App.AppDispatcher,
-                               Data.DevicesObject.Current,
+                               device,
                                Data.CurrentPath,
                                masterPid);
                 }
@@ -849,11 +978,15 @@ public partial class CopyPasteService : ObservableObject
             ClearDrag();
     }
 
-    public static async void VerifyAndPush(string targetPath, IEnumerable<ShellItem> pasteItems)
+    public static async void VerifyAndPush(string targetPath, IEnumerable<ShellItem> pasteItems, LogicalDeviceViewModel? device = null)
     {
-        var deviceId = Data.DevicesObject.Current?.ID ?? "";
+        device ??= Data.DevicesObject.Current;
+        if (device is null)
+            return;
+
+        var deviceId = device.ID;
         var skipMergeForForeignArchive = ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId)
-            && !string.Equals(Data.CurrentPath, targetPath, StringComparison.Ordinal);
+            && !IsExplorerListing(targetPath, device);
 
         IEnumerable<string> files;
         IReadOnlySet<string> replacePaths = EmptyPathSet;
@@ -862,7 +995,7 @@ public partial class CopyPasteService : ObservableObject
             files = pasteItems.Select(f => f.ParsingName);
         else
         {
-            var outcome = await MergeFiles(pasteItems.Select(f => f.ParsingName), targetPath);
+            var outcome = await MergeFiles(pasteItems.Select(f => f.ParsingName), targetPath, device);
             files = outcome.Items;
             replacePaths = outcome.ReplaceRelativePaths;
             conflictPaths = outcome.ConflictRelativePaths;
@@ -875,24 +1008,28 @@ public partial class CopyPasteService : ObservableObject
 
         if (ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId))
         {
-            ShellFileOperation.PushItemsToTar(Data.DevicesObject.Current, pasteItems, targetPath, App.AppDispatcher);
+            ShellFileOperation.PushItemsToTar(device, pasteItems, targetPath, App.AppDispatcher);
             return;
         }
 
-        FileActionLogic.PushShellObjects(pasteItems, targetPath, replacePaths: replacePaths, conflictPaths: conflictPaths);
+        FileActionLogic.PushShellObjects(pasteItems, targetPath, replacePaths: replacePaths, conflictPaths: conflictPaths, device: device);
     }
 
-    public static async void VerifyAndPush(string targetPath, IEnumerable<FileClass> pasteItems, DragDropEffects dropEffects = DragDropEffects.Copy)
+    public static async void VerifyAndPush(string targetPath, IEnumerable<FileClass> pasteItems, DragDropEffects dropEffects = DragDropEffects.Copy, LogicalDeviceViewModel? device = null)
     {
-        var deviceId = Data.DevicesObject.Current?.ID ?? "";
+        device ??= Data.DevicesObject.Current;
+        if (device is null)
+            return;
+
+        var deviceId = device.ID;
         var skipMergeForForeignArchive = ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId)
-            && !string.Equals(Data.CurrentPath, targetPath, StringComparison.Ordinal);
+            && !IsExplorerListing(targetPath, device);
 
         IReadOnlySet<string> replacePaths = EmptyPathSet;
         IReadOnlySet<string> conflictPaths = EmptyPathSet;
         if (!skipMergeForForeignArchive)
         {
-            var outcome = await MergeFiles(targetPath, pasteItems);
+            var outcome = await MergeFiles(targetPath, pasteItems, device);
             pasteItems = outcome.Items;
             replacePaths = outcome.ReplaceRelativePaths;
             conflictPaths = outcome.ConflictRelativePaths;
@@ -903,7 +1040,7 @@ public partial class CopyPasteService : ObservableObject
         if (ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId))
         {
             ShellFileOperation.PushItemsToTar(
-                Data.DevicesObject.Current,
+                device,
                 pasteItems.Select(f => f.ShellItem),
                 targetPath,
                 App.AppDispatcher);
@@ -915,20 +1052,25 @@ public partial class CopyPasteService : ObservableObject
             targetPath,
             dropEffects,
             replacePaths,
-            conflictPaths);
+            conflictPaths,
+            device);
     }
 
-    public static FileSyncOperation? VerifyAndPush(string targetPath, FileClass pasteItem, DragDropEffects dropEffects = DragDropEffects.Copy, ShellItem originalShellItem = null)
+    public static FileSyncOperation? VerifyAndPush(string targetPath, FileClass pasteItem, DragDropEffects dropEffects = DragDropEffects.Copy, ShellItem originalShellItem = null, LogicalDeviceViewModel? device = null)
     {
-        var deviceId = Data.DevicesObject.Current?.ID ?? "";
+        device ??= Data.DevicesObject.Current;
+        if (device is null)
+            return null;
+
+        var deviceId = device.ID;
         var skipMergeForForeignArchive = ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId)
-            && !string.Equals(Data.CurrentPath, targetPath, StringComparison.Ordinal);
+            && !IsExplorerListing(targetPath, device);
 
         IReadOnlySet<string> replacePaths = EmptyPathSet;
         IReadOnlySet<string> conflictPaths = EmptyPathSet;
         if (!skipMergeForForeignArchive)
         {
-            var outcome = MergeFiles(targetPath, pasteItem).Result;
+            var outcome = MergeFiles(targetPath, (IEnumerable<FileClass>)[pasteItem], device).Result;
             var items = outcome.Items;
             replacePaths = outcome.ReplaceRelativePaths;
             conflictPaths = outcome.ConflictRelativePaths;
@@ -938,10 +1080,10 @@ public partial class CopyPasteService : ObservableObject
             pasteItem = items[0];
         }
 
-        if (ArchiveHelper.CanPasteIntoArchive(targetPath, Data.DevicesObject.Current?.ID ?? ""))
+        if (ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId))
         {
             ShellFileOperation.PushItemsToTar(
-                Data.DevicesObject.Current,
+                device,
                 [pasteItem.ShellItem ?? originalShellItem ?? ShellItem.Open(pasteItem.FullPath)],
                 targetPath,
                 App.AppDispatcher);
@@ -955,7 +1097,8 @@ public partial class CopyPasteService : ObservableObject
             dropEffects,
             originalShellItem,
             replacePaths,
-            conflictPaths);
+            conflictPaths,
+            device);
     }
 
     public async void VerifyAndPaste(DragDropEffects cutType,
@@ -979,11 +1122,11 @@ public partial class CopyPasteService : ObservableObject
             && pasteItems.All(f => f.ParentPath == targetPath);
 
         var skipMergeForForeignArchive = ArchiveHelper.CanPasteIntoArchive(targetPath, device.ID)
-            && !string.Equals(Data.CurrentPath, targetPath, StringComparison.Ordinal);
+            && !IsExplorerListing(targetPath, device);
 
         if (!isSameFolderSelfCopy && !skipMergeForForeignArchive)
         {
-            var outcome = await MergeFiles(targetPath, pasteItems);
+            var outcome = await MergeFiles(targetPath, pasteItems, device);
             pasteItems = outcome.Items;
             if (!pasteItems.Any())
                 return;
@@ -1017,7 +1160,7 @@ public partial class CopyPasteService : ObservableObject
                   items: pasteItems,
                   targetPath: targetPath,
                   currentPath: currentPath,
-                  existingItems: Data.DirList.FileList.Select(f => f.FullName),
+                  existingItems: Data.Files.DirList?.FileList?.Select(f => f.FullName) ?? [],
                   dispatcher: dispatcher,
                   cutType: cutType,
                   masterPid: masterPid);
@@ -1048,7 +1191,7 @@ public partial class CopyPasteService : ObservableObject
     /// Check for existing items in the target location and resolve conflicts.
     /// Matching folders are merged; only nested file collisions are prompted.
     /// </summary>
-    public static async Task<FileMergeHelper.MergeOutcome<string>> MergeFiles(IEnumerable<string> filePaths, string targetPath)
+    public static async Task<FileMergeHelper.MergeOutcome<string>> MergeFiles(IEnumerable<string> filePaths, string targetPath, LogicalDeviceViewModel? device = null)
     {
         if (filePaths is null || targetPath is null)
             return new([], EmptyPathSet, EmptyPathSet);
@@ -1057,17 +1200,18 @@ public partial class CopyPasteService : ObservableObject
         if (items.Count == 0)
             return new(items, EmptyPathSet, EmptyPathSet);
 
+        device ??= Data.DevicesObject.Current;
         var sep = FileHelper.GetSeparator(targetPath);
-        var caseSensitive = sep is '/' && DriveHelper.GetCurrentDrive(targetPath)?.Restrictions.CaseInsensitiveNames is not true;
+        var caseSensitive = sep is '/' && DriveHelper.GetCurrentDrive(targetPath, device)?.Restrictions.CaseInsensitiveNames is not true;
         StringComparer comparer = caseSensitive
             ? StringComparer.InvariantCulture
             : StringComparer.InvariantCultureIgnoreCase;
 
         Dictionary<string, FileStat>? androidListing = null;
         var androidListingFailed = false;
-        if (sep is '/' && targetPath != Data.CurrentPath && Data.DevicesObject.Current is not null)
+        if (sep is '/' && device is not null && !IsExplorerListing(targetPath, device))
         {
-            androidListing = FileMergeHelper.TryListAndroidDirByName(Data.DevicesObject.Current.ID, targetPath, comparer);
+            androidListing = FileMergeHelper.TryListAndroidDirByName(device.ID, targetPath, comparer);
             androidListingFailed = androidListing is null;
         }
 
@@ -1133,7 +1277,7 @@ public partial class CopyPasteService : ObservableObject
         if (existingNames.Count == 0)
             return new(items, EmptyPathSet, EmptyPathSet);
 
-        var deviceId = Data.DevicesObject.Current?.ID;
+        var deviceId = device?.ID;
         var comparisons = await Task.Run(() => FileMergeHelper.ExpandConflicts(
             candidates.Where(c => existingNames.Contains(c.Name)),
             targetPath,
@@ -1153,11 +1297,14 @@ public partial class CopyPasteService : ObservableObject
         return ApplyPathMergeOutcome(items, candidates, GetDest, conflictNames, resolution, comparer);
     }
 
+    public static Task<FileMergeHelper.MergeOutcome<FileClass>> MergeFiles(string targetPath, params IEnumerable<FileClass> filePaths)
+        => MergeFiles(targetPath, filePaths, null);
+
     /// <summary>
     /// Check for existing items in the target location and resolve conflicts.
     /// Matching folders are merged; only nested file collisions are prompted.
     /// </summary>
-    public static async Task<FileMergeHelper.MergeOutcome<FileClass>> MergeFiles(string targetPath, params IEnumerable<FileClass> filePaths)
+    public static async Task<FileMergeHelper.MergeOutcome<FileClass>> MergeFiles(string targetPath, IEnumerable<FileClass> filePaths, LogicalDeviceViewModel? device)
     {
         if (filePaths is null || targetPath is null)
             return new([], EmptyPathSet, EmptyPathSet);
@@ -1166,17 +1313,18 @@ public partial class CopyPasteService : ObservableObject
         if (items.Count == 0)
             return new(items, EmptyPathSet, EmptyPathSet);
 
+        device ??= Data.DevicesObject.Current;
         var sep = FileHelper.GetSeparator(targetPath);
-        var caseSensitive = sep is '/' && DriveHelper.GetCurrentDrive(targetPath)?.Restrictions.CaseInsensitiveNames is not true;
+        var caseSensitive = sep is '/' && DriveHelper.GetCurrentDrive(targetPath, device)?.Restrictions.CaseInsensitiveNames is not true;
         StringComparer comparer = caseSensitive
             ? StringComparer.InvariantCulture
             : StringComparer.InvariantCultureIgnoreCase;
 
         Dictionary<string, FileStat>? androidListing = null;
         var androidListingFailed = false;
-        if (sep is '/' && targetPath != Data.CurrentPath && Data.DevicesObject.Current is not null)
+        if (sep is '/' && device is not null && !IsExplorerListing(targetPath, device))
         {
-            androidListing = FileMergeHelper.TryListAndroidDirByName(Data.DevicesObject.Current.ID, targetPath, comparer);
+            androidListing = FileMergeHelper.TryListAndroidDirByName(device.ID, targetPath, comparer);
             androidListingFailed = androidListing is null;
         }
 
@@ -1222,7 +1370,7 @@ public partial class CopyPasteService : ObservableObject
         if (existingNames.Count == 0)
             return new(items, EmptyPathSet, EmptyPathSet);
 
-        var deviceId = Data.DevicesObject.Current?.ID;
+        var deviceId = device?.ID;
         var comparisons = await Task.Run(() => FileMergeHelper.ExpandConflicts(
             candidates.Where(c => existingNames.Contains(c.Name)),
             targetPath,
@@ -1240,6 +1388,17 @@ public partial class CopyPasteService : ObservableObject
             sourcePath, targetPath, conflictNames.Count, comparisons);
 
         return ApplyFileClassMergeOutcome(items, GetDest, conflictNames, resolution, comparer);
+    }
+
+    private static bool IsExplorerListing(string targetPath, LogicalDeviceViewModel? device)
+    {
+        var current = Data.DevicesObject.Current;
+        if (current is null)
+            return false;
+        if (device is not null && device.ID != current.ID)
+            return false;
+
+        return string.Equals(Data.CurrentPath, targetPath, StringComparison.Ordinal);
     }
 
     private static readonly HashSet<string> EmptyPathSet = [];

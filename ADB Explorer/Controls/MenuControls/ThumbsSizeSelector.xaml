@@ -36,14 +36,18 @@
                 <ui:FontIcon
                     x:Key="ThumbCheckedIcon"
                     Margin="14,0"
-                    x:Shared="False"
-                    FontSize="6"
-                    Glyph="&#xF137;">
+                    x:Shared="False">
                     <ui:FontIcon.Style>
                         <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                            <Setter Property="Glyph" Value="&#xF137;" />
+                            <Setter Property="FontSize" Value="6" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsChecked}" Value="False">
                                     <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsRadioButton}" Value="False">
+                                    <Setter Property="Glyph" Value="&#xE73E;" />
+                                    <Setter Property="FontSize" Value="12" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -62,6 +66,7 @@
             </local:AdbMenuItem.Header>
             <local:AdbMenuItem.ItemContainerStyle>
                 <Style TargetType="local:AdbMenuItem">
+                    <Setter Property="ItemsSource" Value="{Binding Children}" />
                     <Setter Property="Icon" Value="{StaticResource ThumbCheckedIcon}" />
                     <Setter Property="Command" Value="{Binding Action.Command}" />
                     <Setter Property="ToolTip" Value="{StaticResource InfoTooltip}" />

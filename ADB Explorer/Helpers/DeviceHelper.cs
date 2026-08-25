@@ -761,8 +761,21 @@ public static class DeviceHelper
 
         device.SetAndroidVersion();
         FolderHelper.CombineDisplayNames();
-        Data.RuntimeSettings.DriveViewNav = true;
-        NavHistory.Navigate(Navigation.SpecialLocation.DriveView);
+
+        var pending = Data.RuntimeSettings.PendingLocationAfterDeviceOpen;
+        Data.RuntimeSettings.PendingLocationAfterDeviceOpen = null;
+
+        if (pending is not null
+            && pending.IsNavigable
+            && pending.Location is not Navigation.SpecialLocation.DriveView)
+        {
+            Data.RuntimeSettings.LocationToNavigate = pending;
+        }
+        else
+        {
+            Data.RuntimeSettings.DriveViewNav = true;
+            NavHistory.Navigate(Navigation.SpecialLocation.DriveView);
+        }
 
         if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.OnConnect)
             Task.Run(() => ThumbnailService.ForceLoad(device));
@@ -916,6 +929,7 @@ public static class DeviceHelper
         ApkIconService.CancelPending();
 
         Devices.SetOpenDevice(device);
+        Data.Files.Device = device;
 
         Data.CurrentPage.Value = typeof(ExplorerPage);
         Data.RuntimeSettings.InitLister = true;

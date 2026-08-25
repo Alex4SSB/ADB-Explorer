@@ -258,26 +258,25 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     public FileNameSort SortName { get; private set; }
 
-    public FolderTree[]? Children
+    public FolderTree[]? Children => GetChildren();
+
+    public FolderTree[]? GetChildren(string? deviceId = null)
     {
-        get
+        if (!IsDirectory)
+            return null;
+
+        deviceId ??= Data.DevicesObject?.Current?.ID;
+        if (deviceId is not null
+            && ArchivePath.TryParse(FullPath, out var archivePath, out var internalPath, deviceId))
         {
-            if (!IsDirectory)
-                return null;
-
-            var deviceId = Data.DevicesObject?.Current?.ID;
-            if (deviceId is not null
-                && ArchivePath.TryParse(FullPath, out var archivePath, out var internalPath, deviceId))
-            {
-                return ArchiveExtract.GetArchiveFolderTree(
-                    deviceId,
-                    archivePath,
-                    internalPath,
-                    Data.DeviceCts.Token);
-            }
-
-            return FileHelper.GetFolderTree([FullPath], cancellationToken: Data.DeviceCts.Token);
+            return ArchiveExtract.GetArchiveFolderTree(
+                deviceId,
+                archivePath,
+                internalPath,
+                Data.DeviceCts.Token);
         }
+
+        return FileHelper.GetFolderTree([FullPath], cancellationToken: Data.DeviceCts.Token, deviceId: deviceId);
     }
 
     public IEnumerable<FileDescriptor> Descriptors { get; private set; }
@@ -586,18 +585,31 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         });
     }
 
-    public SyncFile GetSyncFile() => new(this, Children);
+    public SyncFile GetSyncFile(string? deviceId = null) => new(this, GetChildren(deviceId));
 
     public FileSyncOperation PrepareDescriptors(VirtualFileDataObject vfdo, bool includeContent = true)
     {
-        var name = Data.FileActions.IsAppDrive
-            ? Data.SelectedPackages.FirstOrDefault(pkg => pkg.Path == FullPath)?.Name + ".apk"
-            : FullName;
+        var source = Data.Active;
+        var device = source.Device ?? Data.DevicesObject.Current
+            ?? throw new InvalidOperationException("Cannot prepare file transfer descriptors without a device.");
+        return PrepareDescriptors(vfdo, includeContent, device, source);
+    }
+
+    public FileSyncOperation PrepareDescriptors(
+        VirtualFileDataObject vfdo,
+        bool includeContent,
+        LogicalDeviceViewModel device,
+        FileList source)
+    {
+        string name;
+        if (source.Actions.IsAppDrive)
+            name = source.SelectedPackages.FirstOrDefault(pkg => pkg.Path == FullPath)?.Name + ".apk";
+        else
+            name = FullName;
 
         SyncFile target = new(FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, name, '\\'))
             { PathType = FilePathType.Windows };
 
-        var device = Data.DevicesObject.Current;
         var deviceId = device.ID;
         SyncFile pullSource;
         FolderTree[]? children;
@@ -628,10 +640,10 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         }
         else
         {
-            children = Children;
-            if (Data.FileActions.IsSearchMode && !string.IsNullOrEmpty(Data.SearchOriginPath))
+            children = GetChildren(deviceId);
+            if (source.Actions.IsSearchMode && !string.IsNullOrEmpty(Data.SearchOriginPath))
             {
-                IEnumerable<FileClass> transferFiles = Data.SelectedFiles.Any() ? Data.SelectedFiles : [this];
+                IEnumerable<FileClass> transferFiles = source.SelectedFiles.Any() ? source.SelectedFiles : [this];
                 descriptorParent = Data.SearchTransferParent ?? FileHelper.GetSearchTransferParent(transferFiles);
             }
             else
@@ -646,7 +658,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
         vfdo.OperationCompleted += VFDO_OperationCompleted;
 
-        var treeName = Data.FileActions.IsSearchMode ? FullPath : name;
+        var treeName = source.Actions.IsSearchMode ? FullPath : name;
         FolderTree[] items = [new(treeName, Size, UnixTime)];
         if (includeContent && children is not null)
         {
@@ -772,7 +784,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
                 ShellFileOperation.SilentDelete(device, FullPath);
 
                 // Remove file in UI if present
-                if (device.ID == Data.DevicesObject.Current.ID
+                if (device.ID == Data.DevicesObject.Current?.ID
                     && ParentPath == Data.CurrentPath)
                 {
                     App.SafeInvoke(() =>

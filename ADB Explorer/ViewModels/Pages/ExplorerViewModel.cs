@@ -18,7 +18,11 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     [ObservableProperty]
     public partial IEnumerable<IBrowserItem> ExplorerSource { get; set; }
 
+    public NavigationTreeViewModel Tree { get; }
+
     partial void OnExplorerSourceChanged(IEnumerable<IBrowserItem> value) => UpdateExplorerView();
+
+    private bool _uiListSubscribed;
 
     [ObservableProperty]
     public partial ICollectionView DriveItemsSource { get; set; }
@@ -313,6 +317,8 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
     public ExplorerViewModel()
     {
+        Tree = new(() => ExplorerSource);
+
         IsIconView = Data.RuntimeSettings.ThumbsSize != ThumbnailService.ThumbnailSize.Disabled;
 
         _filterDebounceTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
@@ -344,6 +350,8 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         return Task.CompletedTask;
     }
 
+    public void NotifyDirectoryLinksResolved() => Tree.Sync();
+
     private void InitializeViewModel()
     {
         Data.Settings.SavedLocations ??= [];
@@ -359,7 +367,10 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         Data.CurrentPathO.PropertyChanged += (s, e) =>
         {
             RequestModeRefresh?.Invoke();
+            Tree.Sync();
         };
+
+        Tree.Sync();
 
         _isInitialized = true;
     }
@@ -371,6 +382,8 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
         Data.DevicesObject.PropertyChanged += DevicesObject_PropertyChanged;
         _devicesSubscribed = true;
+        SubscribeDeviceList();
+        Tree.SubscribeDriveLists();
     }
 
     public Task OnNavigatedFromAsync() => Task.CompletedTask;
@@ -412,6 +425,11 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
             case nameof(AppSettings.EnableApk):
             case nameof(AppSettings.EnableRecycle):
                 UpdateDriveView();
+                Tree.Sync();
+                break;
+
+            case nameof(AppSettings.ShowHiddenItems):
+                Tree.OnShowHiddenItemsChanged();
                 break;
 
             case nameof(AppSettings.PollBattery):
@@ -461,6 +479,13 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
             OnPropertyChanged(nameof(IsBatteryVisible));
             SubscribeToBattery(CurrentDeviceBattery);
             UpdateDriveView();
+            Tree.SubscribeDriveLists();
+            Tree.Sync();
+        }
+        else if (e.PropertyName == nameof(Devices.Count))
+        {
+            Tree.SubscribeDriveLists();
+            Tree.Sync();
         }
     }
 
@@ -487,6 +512,11 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
             case nameof(FileActionsEnable.IsDriveViewVisible):
                 UpdateDriveView();
+                break;
+
+            case nameof(FileActionsEnable.ListingInProgress):
+                if (!Data.FileActions.ListingInProgress)
+                    Tree.Sync();
                 break;
 
             case nameof(FileActionsEnable.ExplorerFilter):
@@ -577,6 +607,26 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
             ExplorerItemsSource = view;
         });
+    }
+
+    private void SubscribeDeviceList()
+    {
+        if (Data.DevicesObject?.UIList is null)
+            return;
+
+        if (!_uiListSubscribed)
+        {
+            Data.DevicesObject.UIList.CollectionChanged += UIList_CollectionChanged;
+            _uiListSubscribed = true;
+        }
+
+        Tree.SubscribeDriveLists();
+    }
+
+    private void UIList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        Tree.SubscribeDriveLists();
+        Tree.Sync();
     }
 
     private void UpdateDriveView()

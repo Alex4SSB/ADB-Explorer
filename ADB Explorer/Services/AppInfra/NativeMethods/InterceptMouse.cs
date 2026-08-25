@@ -21,6 +21,7 @@ public static partial class NativeMethods
         private static bool _isHooked;
         private static Action<POINT> _mouseMoveAction;
         private static Action _rButtonAction;
+        private static Action<int>? _mouseWheelAction;
         public static POINT MousePosition { get; private set; }
         
         public static HANDLE WindowUnderMouse { get; private set; }
@@ -32,10 +33,11 @@ public static partial class NativeMethods
         /// since a system-wide <see cref="WinHooks.WH_MOUSE_LL"/> hook adds latency to every mouse
         /// message and causes stutter while the UI thread is busy. Safe to call repeatedly.
         /// </summary>
-        public static void Init(Action<POINT> mouseMoveAction, Action rButtonAction)
+        public static void Init(Action<POINT> mouseMoveAction, Action rButtonAction, Action<int>? mouseWheelAction = null)
         {
             _mouseMoveAction = mouseMoveAction;
             _rButtonAction = rButtonAction;
+            _mouseWheelAction = mouseWheelAction;
 
             if (_isHooked)
                 return;
@@ -78,7 +80,10 @@ public static partial class NativeMethods
 
         private static HANDLE HookCallback(int nCode, MouseMessages wParam, HANDLE lParam)
         {
-            if (nCode < 0 || wParam is not MouseMessages.WM_MOUSEMOVE and not MouseMessages.WM_RBUTTONDOWN)
+            if (nCode < 0
+                || wParam is not MouseMessages.WM_MOUSEMOVE
+                    and not MouseMessages.WM_RBUTTONDOWN
+                    and not MouseMessages.WM_MOUSEWHEEL)
             {
                 return CallNextHookEx(_mouseHookID, nCode, wParam, lParam);
             }
@@ -88,6 +93,10 @@ public static partial class NativeMethods
             if (wParam is MouseMessages.WM_RBUTTONDOWN)
             {
                 _rButtonAction?.Invoke();
+            }
+            else if (wParam is MouseMessages.WM_MOUSEWHEEL)
+            {
+                _mouseWheelAction?.Invoke((short)(hookStruct.mouseData >> 16));
             }
             else
             {

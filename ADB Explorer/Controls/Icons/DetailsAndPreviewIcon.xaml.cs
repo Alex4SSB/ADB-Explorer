@@ -35,6 +35,17 @@ public partial class DetailsAndPreviewIcon : UserControl
         DependencyProperty.Register(nameof(Stretch), typeof(Stretch),
           typeof(DetailsAndPreviewIcon), new PropertyMetadata(Stretch.None));
 
+    public bool Invert
+    {
+        get => (bool)GetValue(InvertProperty);
+        set => SetValue(InvertProperty, value);
+    }
+
+    public static readonly DependencyProperty InvertProperty =
+        DependencyProperty.Register(nameof(Invert), typeof(bool),
+          typeof(DetailsAndPreviewIcon), new PropertyMetadata(false));
+
+
     public DetailsAndPreviewIcon()
     {
         InitializeComponent();

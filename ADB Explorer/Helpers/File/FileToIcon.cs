@@ -5,6 +5,8 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using System.Drawing;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using static Services.NativeMethods;
 
 namespace ADB_Explorer.Helpers;
@@ -191,24 +193,28 @@ public class FileToIconConverter
         return ext.Length > 0 && AdbExplorerConst.ARCHIVE_NAMES.Contains(ext);
     }
 
-    private static string ComputeIconId(string fileName, AbstractFile.SpecialFileType specialType)
+    private static string ComputeIconId(string fileName, AbstractFile.SpecialFileType specialType, string? filePath = null)
     {
+        if (specialType.HasFlag(AbstractFile.SpecialFileType.Regular)
+            && FileHelper.TryGetUnicodeIconExtension(fileName, out var emoji))
+            return $"emoji:{emoji}";
+
         if (IsSupportedArchive(fileName, specialType))
             return $"{ArchiveIcon.DllPath}_{ArchiveIcon.Index}";
 
         if (specialType.HasFlag(AbstractFile.SpecialFileType.Regular))
             return Path.GetExtension(ArchiveHelper.GetShellAssociationName(fileName)).ToLower();
 
-        var specialIcon = SpecialTypeIndex(specialType, fileName);
+        var specialIcon = SpecialTypeIndex(specialType, fileName, filePath);
         return specialIcon.IsValid
             ? $"{specialIcon.DllPath}_{specialIcon.Index}"
             : Enum.GetName(specialType) ?? specialType.ToString();
     }
 
-    private static IconCacheKey ReturnKey(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType)
+    private static IconCacheKey ReturnKey(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType, string? filePath = null)
     {
         int keyedSize = size is IconSize.Jumbo or IconSize.Thumbnail ? desiredSize : 0;
-        return new IconCacheKey(ComputeIconId(fileName, specialType), size, keyedSize);
+        return new IconCacheKey(ComputeIconId(fileName, specialType, filePath), size, keyedSize);
     }
 
     private static Bitmap LoadJumbo(SpecialIcon specialIcon, string iconId, int desiredSize)
@@ -242,11 +248,107 @@ public class FileToIconConverter
         return LoadJumbo(new SpecialIcon(null, _imgList.IconIndex(lookup)), iconId, desiredSize);
     }
 
-    private static BitmapSource AddToDictionary(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.Regular)
+    private static BitmapSource RenderEmojiIcon(string emoji, int desiredSize)
     {
+        BitmapSource? result = null;
+        void Render()
+        {
+            var pixelSize = Math.Max(desiredSize, 16);
+            var block = new Emoji.Wpf.TextBlock
+            {
+                Text = emoji,
+                FontSize = pixelSize,
+            };
+            block.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
+            var textSize = block.DesiredSize;
+            block.Arrange(new Rect(textSize));
+
+            var raw = new RenderTargetBitmap(
+                Math.Max(1, (int)Math.Ceiling(textSize.Width)),
+                Math.Max(1, (int)Math.Ceiling(textSize.Height)),
+                96, 96, PixelFormats.Pbgra32);
+            raw.Render(block);
+
+            result = CenterOpaquePixels(raw, pixelSize);
+            result.Freeze();
+        }
+
+        var dispatcher = App.AppDispatcher;
+        if (dispatcher is null || dispatcher.CheckAccess())
+            Render();
+        else
+            dispatcher.Invoke(Render);
+
+        return result!;
+    }
+
+    private static BitmapSource CenterOpaquePixels(BitmapSource source, int size)
+    {
+        var width = source.PixelWidth;
+        var height = source.PixelHeight;
+        var stride = width * 4;
+        var pixels = new byte[stride * height];
+        source.CopyPixels(pixels, stride, 0);
+
+        var minX = width;
+        var minY = height;
+        var maxX = -1;
+        var maxY = -1;
+        for (var y = 0; y < height; y++)
+        {
+            for (var x = 0; x < width; x++)
+            {
+                if (pixels[y * stride + x * 4 + 3] == 0)
+                    continue;
+
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+            }
+        }
+
+        if (maxX < minX)
+            return source;
+
+        var contentW = maxX - minX + 1;
+        var contentH = maxY - minY + 1;
+        var scale = Math.Min((double)size / contentW, (double)size / contentH);
+        var destW = Math.Max(1, (int)Math.Round(contentW * scale));
+        var destH = Math.Max(1, (int)Math.Round(contentH * scale));
+        var left = (size - destW) / 2.0;
+        var top = (size - destH) / 2.0;
+
+        var crop = new CroppedBitmap(source, new Int32Rect(minX, minY, contentW, contentH));
+        var visual = new DrawingVisual();
+        using (var dc = visual.RenderOpen())
+            dc.DrawImage(crop, new Rect(left, top, destW, destH));
+
+        var centered = new RenderTargetBitmap(size, size, 96, 96, PixelFormats.Pbgra32);
+        centered.Render(visual);
+        return centered;
+    }
+
+    private static BitmapSource AddToDictionary(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.Regular, string? filePath = null)
+    {
+        if (specialType.HasFlag(AbstractFile.SpecialFileType.Regular)
+            && FileHelper.TryGetUnicodeIconExtension(fileName, out var emoji))
+        {
+            var pixelSize = desiredSize > 0 ? desiredSize : IconToSize(size).Width;
+            var emojiKey = new IconCacheKey(ComputeIconId(fileName, specialType, filePath), size, pixelSize);
+            if (iconDic.TryGetValue(emojiKey, out var emojiCached))
+                return emojiCached;
+
+            var rendered = RenderEmojiIcon(emoji, pixelSize);
+            lock (iconDic)
+                iconDic.TryAdd(emojiKey, rendered);
+
+            return iconDic[emojiKey];
+        }
+
         if (size > IconSize.ExtraLarge && specialType is not AbstractFile.SpecialFileType.LinkOverlay)
         {
-            var iconId = ComputeIconId(fileName, specialType);
+            var iconId = ComputeIconId(fileName, specialType, filePath);
             var canonicalKey = new IconCacheKey(iconId, size, 0);
             var sizedKey = new IconCacheKey(iconId, size, desiredSize);
 
@@ -267,7 +369,7 @@ public class FileToIconConverter
                     return sizedCached;
             }
 
-            var bitmap = GetBitmap(fileName, size, desiredSize, specialType);
+            var bitmap = GetBitmap(fileName, size, desiredSize, specialType, filePath);
             bool wasUnmodified = bitmap.Width != desiredSize || bitmap.Height != desiredSize;
             var storeKey = wasUnmodified ? canonicalKey : sizedKey;
             BitmapSource value = LoadBitmap(bitmap);
@@ -278,11 +380,11 @@ public class FileToIconConverter
             return iconDic[storeKey];
         }
 
-        var key = ReturnKey(fileName, size, desiredSize, specialType);
+        var key = ReturnKey(fileName, size, desiredSize, specialType, filePath);
 
         if (!iconDic.ContainsKey(key))
             lock (iconDic)
-                iconDic.TryAdd(key, GetImage(fileName, size, desiredSize, specialType));
+                iconDic.TryAdd(key, GetImage(fileName, size, desiredSize, specialType, filePath));
 
         return iconDic[key];
     }
@@ -298,13 +400,13 @@ public class FileToIconConverter
         return iconDic[key];
     }
 
-    private static BitmapSource GetImage(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.Regular)
-        => LoadBitmap(GetBitmap(fileName, size, desiredSize, specialType));
+    private static BitmapSource GetImage(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.Regular, string? filePath = null)
+        => LoadBitmap(GetBitmap(fileName, size, desiredSize, specialType, filePath));
 
-    private static Bitmap GetBitmap(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.Regular)
+    private static Bitmap GetBitmap(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.Regular, string? filePath = null)
     {
         Icon icon;
-        var specialIcon = SpecialTypeIndex(specialType, fileName);
+        var specialIcon = SpecialTypeIndex(specialType, fileName, filePath);
         var associationName = ArchiveHelper.GetShellAssociationName(fileName);
         string lookup = specialType.HasFlag(AbstractFile.SpecialFileType.Regular) && Path.GetExtension(associationName) is { Length: > 0 } ext
             ? $"aaa{ext.ToLower()}"
@@ -314,7 +416,7 @@ public class FileToIconConverter
         {
             case IconSize.Jumbo or IconSize.Thumbnail:
             {
-                var iconId = ComputeIconId(fileName, specialType);
+                var iconId = ComputeIconId(fileName, specialType, filePath);
                 return specialIcon.IsValid
                     ? LoadJumbo(specialIcon, iconId, desiredSize)
                     : LoadJumbo(lookup, iconId, desiredSize);
@@ -340,15 +442,27 @@ public class FileToIconConverter
         }
     }
 
-    private static SpecialIcon SpecialTypeIndex(AbstractFile.SpecialFileType specialType, string? fileName = null)
+    private static bool IsOnInternalStorage(string? filePath)
+    {
+        var path = filePath ?? Data.CurrentPath;
+        if (string.IsNullOrEmpty(path))
+            return false;
+
+        var drive = DriveHelper.GetCurrentDrive(path);
+        if (drive is not null)
+            return drive.Type is AbstractDrive.DriveType.Internal;
+
+        return AdbExplorerConst.IsInternalStoragePath(path);
+    }
+
+    private static SpecialIcon SpecialTypeIndex(AbstractFile.SpecialFileType specialType, string? fileName = null, string? filePath = null)
     {
         if (IsSupportedArchive(fileName, specialType))
             return ArchiveIcon;
 
         if (specialType is AbstractFile.SpecialFileType.Folder)
         {
-            if (Data.Settings.SpecialFolderIcons
-                && DriveHelper.GetCurrentDrive(Data.CurrentPath)?.Type is AbstractDrive.DriveType.Internal)
+            if (Data.Settings.SpecialFolderIcons && IsOnInternalStorage(filePath))
             {
                 return fileName switch
                 {
@@ -417,13 +531,13 @@ public class FileToIconConverter
         else
         {
             // Get icon without link overlay
-            yield return AddToDictionary(file.FullName, size, iconSize, specialType & ~AbstractFile.SpecialFileType.LinkOverlay);
+            yield return AddToDictionary(file.FullName, size, iconSize, specialType & ~AbstractFile.SpecialFileType.LinkOverlay, file.FullPath);
         }
 
         if (specialType.HasFlag(AbstractFile.SpecialFileType.LinkOverlay))
         {
             // Get link overlay if required
-            yield return AddToDictionary(file.FullName, size, iconSize, AbstractFile.SpecialFileType.LinkOverlay);
+            yield return AddToDictionary(file.FullName, size, iconSize, AbstractFile.SpecialFileType.LinkOverlay, file.FullPath);
         }
     }
 }

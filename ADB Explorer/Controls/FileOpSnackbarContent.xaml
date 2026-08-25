@@ -148,6 +148,7 @@
 
         <helpers:FileOpFileNameTemplateSelector
             x:Key="CompactFileOpFileNameTemplateSelector"
+            FolderCompletedOpFileNameTemplate="{StaticResource CompactFolderInProgOpFileNameInnerTemplate}"
             FolderInProgOpFileNameTemplate="{StaticResource CompactFolderInProgOpFileNameInnerTemplate}"
             RegularOpFileNameTemplate="{StaticResource RegularOpFileNameTemplate}"
             UninstallOpFileNameTemplate="{StaticResource UninstallOpFileNameTemplate}" />

@@ -54,9 +54,12 @@ public static class FolderHelper
         if (ArchivePath.IsArchivePath(path, Data.DevicesObject?.Current?.ID))
             return path;
 
+        if (Data.DevicesObject?.Current is not { } device)
+            return null;
+
         try
         {
-            return ADBService.TranslateDevicePath(Data.DevicesObject.Current.ID, path);
+            return ADBService.TranslateDevicePath(device.ID, path);
         }
         catch (Exception e)
         {

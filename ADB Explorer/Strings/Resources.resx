@@ -2197,4 +2197,12 @@ The checks attempt to prevent an unsuspecting user from launching a possibly mal
     <value>Create a .APKBKP of the app installation and OBB data</value>
     <comment>Tooltip for apk backup</comment>
   </data>
+  <data name="S_NAVIGATION_PANE" xml:space="preserve">
+    <value>Navigation pane</value>
+    <comment>The show -&gt; navigation pane that enabled that pane</comment>
+  </data>
+  <data name="S_MENU_SHOW" xml:space="preserve">
+    <value>Show</value>
+    <comment>The toolbar menu item that contains settings of items to show</comment>
+  </data>
 </root>

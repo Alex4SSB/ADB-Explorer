@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using System.Linq.Expressions;
 using Wpf.Ui.Controls;
 
 namespace ADB_Explorer.Controls;
@@ -21,6 +22,24 @@ public partial class ThumbsSizeSelector : UserControl
             new Separator(),
             new SidePaneModeItem(Strings.Resources.S_THUMBSIZE_DETAILS, DetailsPane.SidePaneMode.Details, Strings.Resources.S_DETAILS_PANE_INFO),
             new SidePaneModeItem(Strings.Resources.S_SIDE_PANE_PREVIEW, DetailsPane.SidePaneMode.Preview, Strings.Resources.S_PREVIEW_PANE_INFO),
+            new Separator(),
+            new ThumbSizeBaseItem() {
+                Name = Strings.Resources.S_MENU_SHOW,
+                Icon = new FontIcon() { Glyph = "\uE138", FontSize = 16, Visibility = Visibility.Hidden },
+                Children = [
+                    new SettingsItem(Strings.Resources.S_NAVIGATION_PANE, () => Data.Settings.IsNavigationPaneOpen, 
+                        new DetailsAndPreviewIcon()
+                        {
+                            Size = 16,
+                            Mode = DetailsPane.SidePaneMode.Preview,
+                            Stretch = Stretch.Uniform,
+                            Invert = true
+                        }),
+                        new Separator(),
+                        new SettingsItem(Strings.Resources.S_SETTINGS_SHOW_EXTENSIONS, () => Data.Settings.ShowExtensions, new FontIcon() { Glyph = "\uE8AC", FontSize = 16 }),
+                        new SettingsItem(Strings.Resources.S_SETTINGS_HIDDEN_ITEMS, () => Data.Settings.ShowHiddenItems, new FontIcon() { Glyph = "\uE8FF", FontSize = 16 })
+                    ]
+            },
         ];
 
         InitializeComponent();
@@ -76,13 +95,50 @@ public partial class ThumbsSizeSelector : UserControl
         selector.OnPropertyChanged(nameof(ThumbnailSize));
     }
 
-    public abstract partial class ThumbSizeBaseItem : ObservableObject
+    public partial class ThumbSizeBaseItem : ObservableObject
     {
         public virtual BaseAction Action { get; set; }
         public virtual UIElement Icon { get; set; }
         public virtual string? Info { get; set; } = null;
         public virtual bool IsChecked { get; set; }
         public virtual string Name { get; set; }
+        public virtual ICollection<object> Children { get; set; }
+        public virtual bool IsRadioButton { get; set; } = true;
+    }
+
+    public partial class SettingsItem : ThumbSizeBaseItem
+    {
+        readonly PropertyInfo valueProp;
+
+        public override bool IsChecked
+        {
+            get => (bool)valueProp.GetValue(Data.Settings);
+            set
+            {
+                valueProp.SetValue(Data.Settings, value);
+                OnPropertyChanged();
+            }
+        }
+
+        public SettingsItem(string name, Expression<Func<bool>> propertyExpr, UIElement icon = null, string? info = null)
+        {
+            IsRadioButton = false;
+            Name = name;
+            Info = info;
+            Icon = icon;
+            valueProp = AbstractSetting.ExtractPropertyInfo(propertyExpr);
+            Action = new(() => true, () => IsChecked ^= true);
+
+            Data.Settings.PropertyChanged += Settings_PropertyChanged;
+        }
+
+        private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == valueProp.Name)
+            {
+                OnPropertyChanged(nameof(IsChecked));
+            }
+        }
     }
 
     public partial class SidePaneModeItem : ThumbSizeBaseItem

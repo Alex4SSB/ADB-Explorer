@@ -1,0 +1,239 @@
+﻿<UserControl
+    x:Class="ADB_Explorer.Controls.NavigationPane"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:ADB_Explorer.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
+    x:Name="pane"
+    d:DesignHeight="800"
+    d:DesignWidth="400"
+    mc:Ignorable="d">
+    <Grid DataContext="{Binding ElementName=pane}">
+        <Grid x:Name="ContentBox" Width="220">
+            <Grid>
+                <TreeView
+                    x:Name="Tree"
+                    AllowDrop="False"
+                    ItemsSource="{Binding TreeItems}"
+                    PreviewMouseLeftButtonUp="Tree_PreviewMouseLeftButtonUp"
+                    PreviewMouseMove="Tree_PreviewMouseMove">
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type viewmodels:NavigationTreeNode}" ItemsSource="{Binding Children}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Grid
+                                    Width="16"
+                                    Height="16"
+                                    Margin="0,0,6,0">
+                                    <Grid.Style>
+                                        <Style TargetType="Grid">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding CutState}" Value="Move">
+                                                    <Setter Property="Opacity" Value="0.5" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
+                                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="{Binding Icon}" />
+                                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="{Binding IconOverlay}" />
+                                </Grid>
+                                <emoji:TextBlock
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding DisplayName}"
+                                    TextTrimming="CharacterEllipsis">
+                                    <emoji:TextBlock.Style>
+                                        <Style TargetType="emoji:TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding CutState}" Value="Move">
+                                                    <Setter Property="Opacity" Value="0.5" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding CutState}" Value="Copy">
+                                                    <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </emoji:TextBlock.Style>
+                                </emoji:TextBlock>
+                                <ui:TextBox
+                                    Grid.Column="1"
+                                    MinWidth="80"
+                                    VerticalAlignment="Center"
+                                    ClearButtonEnabled="False"
+                                    IsVisibleChanged="TreeNameEdit_IsVisibleChanged"
+                                    KeyDown="TreeNameEdit_KeyDown"
+                                    LostFocus="TreeNameEdit_LostFocus"
+                                    PreviewKeyDown="TreeNameEdit_PreviewKeyDown"
+                                    TextChanged="TreeNameEdit_TextChanged">
+                                    <ui:TextBox.Style>
+                                        <Style BasedOn="{StaticResource FileNameEditingElementStyle}" TargetType="ui:TextBox">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:TextBox.Style>
+                                </ui:TextBox>
+                            </Grid>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                    <TreeView.ItemContainerStyle>
+                        <Style BasedOn="{StaticResource DefaultTreeViewItemStyle}" TargetType="TreeViewItem">
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                            <Setter Property="AllowDrop" Value="True" />
+                            <Setter Property="Padding" Value="2,4,4,4" />
+                            <Setter Property="Margin" Value="1,0" />
+                            <Setter Property="ContextMenu">
+                                <Setter.Value>
+                                    <controls:AdbContextMenu Style="{StaticResource TreeContextMenuStyle}" />
+                                </Setter.Value>
+                            </Setter>
+                            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="TreeViewItem_PreviewMouseLeftButtonDown" />
+                            <EventSetter Event="PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown" />
+                            <EventSetter Event="PreviewMouseLeftButtonUp" Handler="TreeViewItem_PreviewMouseLeftButtonUp" />
+                            <EventSetter Event="MouseMove" Handler="TreeViewItem_MouseMove" />
+                            <EventSetter Event="DragEnter" Handler="TreeViewItem_DragEnter" />
+                            <EventSetter Event="DragLeave" Handler="TreeViewItem_DragLeave" />
+                            <EventSetter Event="DragOver" Handler="TreeViewItem_DragOver" />
+                            <EventSetter Event="Drop" Handler="TreeViewItem_Drop" />
+                            <EventSetter Event="Selected" Handler="TreeViewItem_Selected" />
+                            <EventSetter Event="Expanded" Handler="TreeViewItem_Expanded" />
+                            <EventSetter Event="RequestBringIntoView" Handler="TreeViewItem_RequestBringIntoView" />
+                            <EventSetter Event="ContextMenuOpening" Handler="TreeViewItem_ContextMenuOpening" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+                                            <Border
+                                                x:Name="Border"
+                                                Grid.Row="0"
+                                                Background="Transparent"
+                                                CornerRadius="2">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" MinWidth="19" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Rectangle
+                                                        x:Name="ActiveRectangle"
+                                                        Grid.Column="0"
+                                                        Width="3"
+                                                        Height="16"
+                                                        HorizontalAlignment="Left"
+                                                        VerticalAlignment="Center"
+                                                        Fill="{DynamicResource TreeViewItemSelectionIndicatorForeground}"
+                                                        RadiusX="2"
+                                                        RadiusY="2"
+                                                        Visibility="Collapsed" />
+                                                    <ToggleButton
+                                                        x:Name="Expander"
+                                                        Grid.Column="0"
+                                                        Margin="8,0"
+                                                        ClickMode="Press"
+                                                        IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                                        Style="{StaticResource ExpandCollapseToggleButtonStyle}" />
+                                                    <ContentPresenter
+                                                        x:Name="PART_Header"
+                                                        Grid.Column="1"
+                                                        Margin="{TemplateBinding Padding}"
+                                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                        ContentSource="Header"
+                                                        Cursor="Hand"
+                                                        TextElement.FontSize="{TemplateBinding FontSize}" />
+                                                </Grid>
+                                            </Border>
+                                            <Grid Grid.Row="1">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="12" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <ItemsPresenter
+                                                    x:Name="ItemsHost"
+                                                    Grid.Column="1"
+                                                    Visibility="Collapsed" />
+                                            </Grid>
+                                            <Border
+                                                x:Name="FocusChrome"
+                                                Grid.Row="0"
+                                                BorderBrush="{DynamicResource KeyboardFocusBorderColorBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="2"
+                                                IsHitTestVisible="False"
+                                                SnapsToDevicePixels="True"
+                                                Visibility="Collapsed" />
+                                            <Separator
+                                                x:Name="DeviceSeparator"
+                                                Grid.Row="2"
+                                                Margin="8,6"
+                                                IsHitTestVisible="False"
+                                                Visibility="Collapsed" />
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="HasItems" Value="False">
+                                                <Setter TargetName="Expander" Property="Visibility" Value="Hidden" />
+                                            </Trigger>
+                                            <DataTrigger Binding="{Binding CanExpand}" Value="True">
+                                                <Setter TargetName="Expander" Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                            <Trigger Property="IsExpanded" Value="True">
+                                                <Setter TargetName="ItemsHost" Property="Visibility" Value="Visible" />
+                                            </Trigger>
+                                            <Trigger SourceName="Border" Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource TreeViewItemBackgroundPointerOver}" />
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource TreeViewItemBackgroundSelected}" />
+                                                <Setter TargetName="ActiveRectangle" Property="Visibility" Value="Visible" />
+                                            </Trigger>
+                                            <DataTrigger Binding="{Binding IsDragOver}" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource TreeViewItemBackgroundPointerOver}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsContextTarget}" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource TreeViewItemBackgroundPointerOver}" />
+                                                <Setter TargetName="FocusChrome" Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsDragSource}" Value="True">
+                                                <Setter TargetName="FocusChrome" Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ShowSeparator}" Value="True">
+                                                <Setter TargetName="DeviceSeparator" Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </TreeView.ItemContainerStyle>
+                </TreeView>
+            </Grid>
+        </Grid>
+        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+            <GridSplitter
+                Width="8"
+                VerticalAlignment="Stretch"
+                Background="Transparent"
+                Cursor="SizeWE"
+                DragDelta="GridSplitter_DragDelta"
+                FocusVisualStyle="{x:Null}" />
+            <Separator />
+        </StackPanel>
+    </Grid>
+</UserControl>

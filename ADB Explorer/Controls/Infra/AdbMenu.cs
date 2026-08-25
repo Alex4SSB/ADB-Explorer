@@ -32,6 +32,27 @@ public class AdbMenuItem : Wpf.Ui.Controls.MenuItem
         _headerPresenter = GetTemplateChild("Header") as ContentPresenter;
         _topLevelBorder = GetTemplateChild("Border") as Border;
         UpdateContentMirror();
+        CopyItemContainerStyleSelectorFromMenu();
+    }
+
+    private void CopyItemContainerStyleSelectorFromMenu()
+    {
+        if (ItemContainerStyleSelector is not null)
+            return;
+
+        var current = VisualTreeHelper.GetParent(this) as DependencyObject;
+        while (current is not null)
+        {
+            if (current is AdbContextMenu menu)
+            {
+                ItemContainerStyleSelector = menu.ItemContainerStyleSelector;
+                return;
+            }
+
+            current = current is Visual
+                ? VisualTreeHelper.GetParent(current)
+                : LogicalTreeHelper.GetParent(current);
+        }
     }
 
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)

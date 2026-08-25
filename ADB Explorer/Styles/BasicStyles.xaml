@@ -451,6 +451,7 @@
         TargetType="ui:DataGrid">
         <Setter Property="CanUserDeleteRows" Value="False" />
         <Setter Property="MinRowHeight" Value="32" />
+        <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />
@@ -953,6 +954,7 @@
         x:Key="AdbMenuItemStyle"
         BasedOn="{StaticResource WpfUiMenuItem}"
         TargetType="controls:AdbMenuItem">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Style.Triggers>
             <Trigger Property="Role" Value="TopLevelItem">
                 <Setter Property="Template" Value="{StaticResource AdbMenuItemTopLevelItemTemplateKey}" />

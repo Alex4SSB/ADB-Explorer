@@ -1,6 +1,8 @@
 ﻿using ADB_Explorer.Controls;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Services.AppInfra;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
@@ -183,7 +185,7 @@ internal static class ExplorerContextMenu
         return menu.Action.Command.IsEnabled && menu.Children.Any(child => child.Action.Command.IsEnabled);
     }
 
-    public static void UpdateSeparators()
+    public static void UpdateSeparators(bool showEmptyPlaceholder = true)
     {
         var list = List.ToArray();
         var separators = list.OfType<SubMenuSeparator>().Select(separator => (separator, List.IndexOf(separator))).ToList();
@@ -202,7 +204,8 @@ internal static class ExplorerContextMenu
                     && list[startIndexAfter..].Any(IsVisibleInContextMenu);
             }
 
-            List.OfType<DummySubMenu>().First().IsEnabled = !List.OfType<SubMenu>().Any(IsVisibleInContextMenu);
+            List.OfType<DummySubMenu>().First().IsEnabled = showEmptyPlaceholder
+                && !List.OfType<SubMenu>().Any(IsVisibleInContextMenu);
 
             RefreshVisibleList(list);
         });
@@ -248,17 +251,17 @@ internal static class ExplorerContextMenu
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Enter),
             new("\uE838", 16)),
         new SubMenu(
-            AppActions.List.Find(a => a.Name is FileAction.FileActionType.Pull),
+            AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPull),
             new(new PullIcon(), 16)),
-        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.BackupPackage), 
+        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextBackupPackage), 
             AppActions.Icon(FileAction.FileActionType.BackupPackage, 16)),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPush),
             new(new PushIcon(), 16),
             children:
             [
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFolders), AppActions.Icon(FileAction.FileActionType.PushFolders, 16)),
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFiles), AppActions.Icon(FileAction.FileActionType.NewFile, 16)),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPushFolders), AppActions.Icon(FileAction.FileActionType.PushFolders, 16)),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPushFiles), AppActions.Icon(FileAction.FileActionType.NewFile, 16)),
             ]),
         new SubMenuSeparator(),
         new SubMenu(
@@ -266,21 +269,22 @@ internal static class ExplorerContextMenu
             new BaseIcon(new AddCircleIcon(), 16),
             children:
             [
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFolder), AppActions.Icon(FileAction.FileActionType.PushFolders, 16)),
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFile), AppActions.Icon(FileAction.FileActionType.NewFile, 16)),
-                new SubMenuSeparator(Data.FileActions.IsCompressToEnabled),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextNewFolder), AppActions.Icon(FileAction.FileActionType.PushFolders, 16)),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFile), AppActions.Icon(FileAction.FileActionType.NewFile, 16),
+                    isVisible: Data.FileActions.IsContextNewFileVisible),
+                new SubMenuSeparator(() => Data.FileActions.IsContextNewArchiveVisible.Value),
                 new (
                     AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewCompressTo),
                     AppActions.Icon(FileAction.FileActionType.NewCompressTo, 16),
-                    isVisible: Data.FileActions.IsCompressToEnabled,
+                    isVisible: Data.FileActions.IsContextNewArchiveVisible,
                     children: CompressToMenuHelper.CompressToFormatMenus()),
             ]),
         new SubMenuSeparator(),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Cut), AppActions.Icon(FileAction.FileActionType.Cut, 16)),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Copy), new BaseIcon(new CopyIcon(), 16)),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyLink), AppActions.Icon(FileAction.FileActionType.CopyLink, 16)),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Paste), new BaseIcon(new PasteIcon(), 16)),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.PasteLink), AppActions.Icon(FileAction.FileActionType.PasteLink, 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextCut), AppActions.Icon(FileAction.FileActionType.Cut, 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextCopy), new BaseIcon(new CopyIcon(), 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextCopyLink), AppActions.Icon(FileAction.FileActionType.CopyLink, 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPaste), new BaseIcon(new PasteIcon(), 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPasteLink), AppActions.Icon(FileAction.FileActionType.PasteLink, 16)),
         new SubMenuSeparator(),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyContents), new BaseIcon(new CopyArrowRightIcon(), 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ExtractHere), new BaseIcon(new FolderArrowRightIcon(), 16)),
@@ -289,28 +293,132 @@ internal static class ExplorerContextMenu
             AppActions.Icon(FileAction.FileActionType.CompressTo, 16),
             children: CompressToMenuHelper.CompressToFormatMenus()),
         new SubMenuSeparator(),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Rename), new BaseIcon(new RenameAIcon(), 16)),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FollowLink), AppActions.Icon(FileAction.FileActionType.FollowLink, 16)),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenPackageLocation), AppActions.Icon(FileAction.FileActionType.FollowLink, 16)),
-        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), AppActions.Icon(FileAction.FileActionType.CopyItemPath, 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextRename), new BaseIcon(new RenameAIcon(), 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextFollowLink), AppActions.Icon(FileAction.FileActionType.FollowLink, 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextOpenPackageLocation), AppActions.Icon(FileAction.FileActionType.FollowLink, 16)),
+        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextCopyItemPath), AppActions.Icon(FileAction.FileActionType.CopyItemPath, 16)),
         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), AppActions.Icon(FileAction.FileActionType.UpdateModified, 16)),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Uninstall), AppActions.Icon(FileAction.FileActionType.Uninstall, 16)),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Restore), AppActions.Icon(FileAction.FileActionType.Restore, 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextUninstall), AppActions.Icon(FileAction.FileActionType.Uninstall, 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextRestore), AppActions.Icon(FileAction.FileActionType.Restore, 16)),
         new SubMenuSeparator(),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Package),
             new(FluentPathGeometries.Box, 16),
             children:
             [
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Install), AppActions.Icon(FileAction.FileActionType.Install, 16)),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextInstall), AppActions.Icon(FileAction.FileActionType.Install, 16)),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.SubMenuUninstall), AppActions.Icon(FileAction.FileActionType.Uninstall, 16)),
             ]),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.SearchApkOnWeb), AppActions.Icon(FileAction.FileActionType.SearchApkOnWeb, 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextSearchApkOnWeb), AppActions.Icon(FileAction.FileActionType.SearchApkOnWeb, 16)),
         new SubMenuSeparator(),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextDelete), AppActions.Icon(FileAction.FileActionType.Delete, 16)),
         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPushPackages), AppActions.Icon(FileAction.FileActionType.Install, 16)),
         new DummySubMenu(),
     ];
+}
+
+internal static class DeviceContextMenu
+{
+    public static ObservableList<SubMenu> VisibleList { get; } = [];
+
+    public static void SetFor(LogicalDeviceViewModel device)
+    {
+        var items = new List<SubMenu>();
+
+        AddEnabled(items, PushPackagesItem(device));
+        AddSeparator(items);
+        Add(items, RootItem(device));
+        AddEnabled(items, RebootItem(device));
+        AddEnabled(items, RemoveItem(device));
+        AddEnabled(items, SideloadItem(device));
+        TrimTrailingSeparator(items);
+
+        VisibleList.RemoveAll();
+        VisibleList.AddRange(items);
+    }
+
+    private static void AddEnabled(List<SubMenu> items, SubMenu item)
+    {
+        if (ExplorerContextMenu.IsVisibleInContextMenu(item))
+            items.Add(item);
+    }
+
+    private static void Add(List<SubMenu> items, SubMenu item)
+    {
+        if (item.Action.Command.IsEnabled)
+            items.Add(item);
+    }
+
+    private static void AddSeparator(List<SubMenu> items)
+    {
+        if (items.Count > 0 && items[^1] is not SubMenuSeparator)
+            items.Add(new SubMenuSeparator());
+    }
+
+    private static void TrimTrailingSeparator(List<SubMenu> items)
+    {
+        while (items.Count > 0 && items[^1] is SubMenuSeparator)
+            items.RemoveAt(items.Count - 1);
+    }
+
+    private static SubMenu PushPackagesItem(LogicalDeviceViewModel device) =>
+        new(
+            new FileAction(
+                FileAction.FileActionType.PushPackages,
+                () => Data.Settings.EnableApk
+                    && device.Status is DeviceStatus.Ok
+                    && device.Type is not DeviceType.Recovery,
+                () => FileActionLogic.PushPackages(device),
+                Strings.Resources.S_PUSH_PKG),
+            AppActions.Icon(FileAction.FileActionType.Install, 16));
+
+    private static SubMenu RootItem(LogicalDeviceViewModel device)
+    {
+        var toggleText = device.Root is RootStatus.Enabled
+            ? Strings.Resources.S_BUTTON_DISABLE
+            : Strings.Resources.S_BUTTON_ENABLE;
+
+        return new(
+            new FileAction(
+                FileAction.FileActionType.None,
+                () => device.Status is DeviceStatus.Ok && device.Type is not DeviceType.Sideload,
+                () => { },
+                string.Format(Strings.Resources.S_ROOT_STATUS_TITLE, device.RootString)),
+            new BaseIcon("\uE7EF", 16),
+            children:
+            [
+                new SubMenu(
+                    new FileAction(
+                        FileAction.FileActionType.None,
+                        () => device.ToggleRootCommand.IsEnabled,
+                        device.ToggleRootCommand.Execute,
+                        toggleText)),
+            ]);
+    }
+
+    private static SubMenu RebootItem(LogicalDeviceViewModel device) =>
+        new(
+            new FileAction(
+                FileAction.FileActionType.None,
+                () => device.Status is DeviceStatus.Ok,
+                () => { },
+                Strings.Resources.S_DEVICE_REBOOT_TITLE),
+            new BaseIcon("\uE777", 16),
+            children: [.. device.RebootCommands.Select(command =>
+                new SubMenu(new FileAction(FileAction.FileActionType.None, command, command.Description)))]);
+
+    private static SubMenu RemoveItem(LogicalDeviceViewModel device) =>
+        new(
+            new FileAction(FileAction.FileActionType.None, device.RemoveCommand, device.RemoveCommand.Description),
+            new BaseIcon("\uE711", 16));
+
+    private static SubMenu SideloadItem(LogicalDeviceViewModel device) =>
+        new(
+            new FileAction(
+                FileAction.FileActionType.None,
+                device.SideloadCommand,
+                Strings.Resources.S_REBOOT_SIDELOAD),
+            new BaseIcon("\uE67A", 16));
 }
 
 internal static class PathContextMenu

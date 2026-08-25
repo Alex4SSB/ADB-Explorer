@@ -18,9 +18,22 @@
             Height="24"
             Margin="0,0,-2,0"
             RenderTransformOrigin="0.5,0.5">
-            <Grid.RenderTransform>
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Invert}" Value="False">
+                            <Setter Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="-1" />
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <!--<Grid.RenderTransform>
                 <ScaleTransform ScaleX="-1" />
-            </Grid.RenderTransform>
+            </Grid.RenderTransform>-->
 
             <!--  Details: full outline (monochrome)  -->
             <Path
