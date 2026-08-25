@@ -325,6 +325,11 @@ public partial class ExplorerPageHeader : UserControl
             DragAutoScroll.Register(ExplorerScrollViewer);
             DragAutoScroll.Register(IconScrollViewer);
         };
+        Unloaded += (_, _) =>
+        {
+            DragAutoScroll.Unregister(ExplorerScrollViewer);
+            DragAutoScroll.Unregister(IconScrollViewer);
+        };
 
         HookToolbarMenu(MainToolBar);
         HookToolbarMenu(NavigationToolBar);
@@ -518,6 +523,9 @@ public partial class ExplorerPageHeader : UserControl
         switch (key)
         {
             case Key.Escape:
+                if (SelectionRect.IsActive)
+                    return true;
+
                 ActiveUnselectAll();
                 break;
 
@@ -1976,9 +1984,6 @@ public partial class ExplorerPageHeader : UserControl
 
     private void InitiateDrag(DependencyObject dragSource)
     {
-        CopyPaste.DragStatus = CopyPasteService.DragState.Active;
-        CopyPaste.WasDragging = true;
-
         IEnumerable<FileClass> selectedItems;
         VirtualFileDataObject? vfdo;
         if (FileActions.IsAppDrive)
@@ -1999,37 +2004,39 @@ public partial class ExplorerPageHeader : UserControl
                 vfdo.PreferredDropEffect = DragDropEffects.Copy;
         }
 
-        if (vfdo is not null)
+        if (vfdo is null)
+            return;
+
+        CopyPaste.DragStatus = CopyPasteService.DragState.Active;
+        CopyPaste.WasDragging = true;
+        CopyPaste.UpdateSelfVFDO(true);
+
+        if (FileActions.IsAppDrive)
         {
-            CopyPaste.UpdateSelfVFDO(true);
+            var package = ActiveSelectedItems.OfType<Package>().FirstOrDefault();
+            // Prefer the parsed launcher icon already shown in the tile (not APK shell / placeholder).
+            CopyPaste.DragBitmap = package?.Icon
+                ?? VirtualFileDataObject.SelfFiles?.FirstOrDefault()?.ApkIcon
+                ?? package?.IconViewModel.LargeIcon;
+        }
+        else
+        {
+            CopyPaste.DragBitmap = selectedItems.First().DragImage;
+        }
 
-            if (FileActions.IsAppDrive)
-            {
-                var package = ActiveSelectedItems.OfType<Package>().FirstOrDefault();
-                // Prefer the parsed launcher icon already shown in the tile (not APK shell / placeholder).
-                CopyPaste.DragBitmap = package?.Icon
-                    ?? VirtualFileDataObject.SelfFiles?.FirstOrDefault()?.ApkIcon
-                    ?? package?.IconViewModel.LargeIcon;
-            }
-            else
-            {
-                CopyPaste.DragBitmap = selectedItems.First().DragImage;
-            }
-
-            DragAutoScroll.Register(ActiveScrollViewer);
-            DragAutoScroll.Begin();
-            try
-            {
-                vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, dragSource, vfdo.PreferredDropEffect.Value);
-            }
-            finally
-            {
-                DragAutoScroll.End();
-                // Escape (and other OLE cancels) leave the button down; drop the original
-                // mouse-down so MouseMove cannot start a rubber-band from that point.
-                MouseDownPoint = NullPoint;
-                SelectionRect.Collapse();
-            }
+        DragAutoScroll.Register(ActiveScrollViewer);
+        DragAutoScroll.Begin();
+        try
+        {
+            vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, dragSource, vfdo.PreferredDropEffect.Value);
+        }
+        finally
+        {
+            DragAutoScroll.End();
+            // Escape (and other OLE cancels) leave the button down; drop the original
+            // mouse-down so MouseMove cannot start a rubber-band from that point.
+            MouseDownPoint = NullPoint;
+            SelectionRect.Collapse();
         }
     }
 

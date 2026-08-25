@@ -31,6 +31,8 @@ public partial class NavigationTreeNode : ObservableObject
 
     public bool ChildrenLoading { get; set; }
 
+    public int ChildrenLoadEpoch { get; set; }
+
     public string Path { get; private set; }
 
     public ObservableList<NavigationTreeNode> Children { get; } = [];
@@ -219,29 +221,37 @@ public partial class NavigationTreeNode : ObservableObject
 
     public static BitmapSource? DeviceIcon() => PhoneIcon.Icon;
 
-    public static BitmapSource? FolderIcon(string path)
+    public static BitmapSource? FolderIcon(string path, string? deviceId = null)
     {
-        var name = ArchivePath.IsArchivePath(path, Data.DevicesObject?.Current?.ID)
-            ? ArchivePath.GetBreadcrumbLabel(path, Data.DevicesObject?.Current?.ID)
-            : FileHelper.GetFullName(path);
+        deviceId ??= Data.DevicesObject?.Current?.ID;
 
-        var type = ArchivePath.TryParse(path, out _, out var internalPath, Data.DevicesObject?.Current?.ID)
-            && string.IsNullOrEmpty(internalPath)
-            ? AbstractFile.FileType.File
-            : AbstractFile.FileType.Folder;
+        string name;
+        if (ArchivePath.IsArchivePath(path, deviceId))
+            name = ArchivePath.GetBreadcrumbLabel(path, deviceId);
+        else
+            name = FileHelper.GetFullName(path);
+
+        AbstractFile.FileType type;
+        if (ArchivePath.TryParse(path, out _, out var internalPath, deviceId)
+            && string.IsNullOrEmpty(internalPath))
+            type = AbstractFile.FileType.File;
+        else
+            type = AbstractFile.FileType.Folder;
 
         return new FileClass(name, path, type).Icon;
     }
 
-    public static string FolderDisplayName(string path)
+    public static string FolderDisplayName(string path, string? deviceId = null)
     {
-        if (ArchivePath.IsArchivePath(path, Data.DevicesObject?.Current?.ID))
-            return ArchivePath.GetBreadcrumbLabel(path, Data.DevicesObject?.Current?.ID);
+        deviceId ??= Data.DevicesObject?.Current?.ID;
+
+        if (ArchivePath.IsArchivePath(path, deviceId))
+            return ArchivePath.GetBreadcrumbLabel(path, deviceId);
 
         return FileHelper.GetFullName(path);
     }
 
-    public static bool PathsEqual(string? left, string? right)
+    public static bool PathsEqual(string? left, string? right, string? deviceId = null)
     {
         if (left is null || right is null)
             return false;
@@ -249,8 +259,8 @@ public partial class NavigationTreeNode : ObservableObject
         if (left == right)
             return true;
 
-        var a = NormalizePath(left);
-        var b = NormalizePath(right);
+        var a = NormalizePath(left, deviceId);
+        var b = NormalizePath(right, deviceId);
         if (a == b)
             return true;
 
@@ -262,12 +272,13 @@ public partial class NavigationTreeNode : ObservableObject
         return leftRelative == rightRelative;
     }
 
-    public static string NormalizePath(string path)
+    public static string NormalizePath(string path, string? deviceId = null)
     {
         if (string.IsNullOrEmpty(path) || path == "/")
             return path;
 
-        if (ArchivePath.IsArchivePath(path, Data.DevicesObject?.Current?.ID))
+        deviceId ??= Data.DevicesObject?.Current?.ID;
+        if (ArchivePath.IsArchivePath(path, deviceId))
             return path;
 
         return path.TrimEnd('/');

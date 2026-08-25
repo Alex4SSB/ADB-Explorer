@@ -44,7 +44,8 @@ public partial class NavigationTreeViewModel : ObservableObject
             try
             {
                 SyncDeviceRoots();
-                DiscoverAndSelect(Data.CurrentPath);
+                if (!IsTreeDragBlocked)
+                    DiscoverAndSelect(Data.CurrentPath);
             }
             finally
             {
@@ -334,20 +335,25 @@ public partial class NavigationTreeViewModel : ObservableObject
 
     private Task LoadTreeChildrenAsync(NavigationTreeNode node)
     {
-        if (_childLoadTasks.TryGetValue(node, out var inflight))
-            return inflight;
-
         if (node.ChildrenLoaded)
             return Task.CompletedTask;
 
+        if (_childLoadTasks.TryGetValue(node, out var inflight))
+            return inflight;
+
         var task = LoadTreeChildrenCoreAsync(node);
         _childLoadTasks[node] = task;
-        _ = task.ContinueWith(_ => App.SafeInvoke(() => _childLoadTasks.Remove(node)));
+        _ = task.ContinueWith(_ => App.SafeInvoke(() =>
+        {
+            if (_childLoadTasks.TryGetValue(node, out var current) && ReferenceEquals(current, task))
+                _childLoadTasks.Remove(node);
+        }));
         return task;
     }
 
     private async Task LoadTreeChildrenCoreAsync(NavigationTreeNode node)
     {
+        var epoch = node.ChildrenLoadEpoch;
 
         if (IsCurrentExplorerPath(node) && Data.FileActions.ListingInProgress)
             return;
@@ -384,9 +390,12 @@ public partial class NavigationTreeViewModel : ObservableObject
             return;
         }
 
+        var applied = false;
         App.SafeInvoke(() =>
         {
-            if (!IsTreeNodeAttached(node))
+            if (epoch != node.ChildrenLoadEpoch
+                || token.IsCancellationRequested
+                || !IsTreeNodeAttached(node))
             {
                 node.ChildrenLoading = false;
                 return;
@@ -395,9 +404,11 @@ public partial class NavigationTreeViewModel : ObservableObject
             ApplyTreeFolders(node, folders);
             node.ChildrenLoaded = true;
             node.ChildrenLoading = false;
+            applied = true;
         });
 
-        await ProbeTreeCanExpandAsync(node);
+        if (applied)
+            await ProbeTreeCanExpandAsync(node);
     }
 
     private void ApplyTreeFolders(NavigationTreeNode node, List<FileClass> folders)
@@ -427,6 +438,8 @@ public partial class NavigationTreeViewModel : ObservableObject
         var deviceId = node.OwnerDevice?.ID;
         if (string.IsNullOrEmpty(deviceId) || !IsTreeNodeAttached(node))
             return;
+
+        var epoch = node.ChildrenLoadEpoch;
 
         var childPaths = node.Children
             .Where(child => child.Drive is null)
@@ -458,6 +471,9 @@ public partial class NavigationTreeViewModel : ObservableObject
         {
             App.SafeInvoke(() =>
             {
+                if (epoch != node.ChildrenLoadEpoch)
+                    return;
+
                 foreach (var child in node.Children.Where(c => c.Drive is null))
                     child.CanExpand = true;
             });
@@ -466,7 +482,7 @@ public partial class NavigationTreeViewModel : ObservableObject
 
         App.SafeInvoke(() =>
         {
-            if (!IsTreeNodeAttached(node))
+            if (epoch != node.ChildrenLoadEpoch || !IsTreeNodeAttached(node))
                 return;
 
             foreach (var child in node.Children)
@@ -493,10 +509,6 @@ public partial class NavigationTreeViewModel : ObservableObject
                 entries = ADBService.ListDirectoryEntries(deviceId, path, token);
         }
         catch (ADBService.ProcessFailedException)
-        {
-            return [];
-        }
-        catch (OperationCanceledException)
         {
             return [];
         }
@@ -533,10 +545,6 @@ public partial class NavigationTreeViewModel : ObservableObject
             linkTypes = [.. ADBService.GetLinkType(deviceId, linkPaths, token)];
         }
         catch (ADBService.ProcessFailedException)
-        {
-            return folders;
-        }
-        catch (OperationCanceledException)
         {
             return folders;
         }
@@ -644,6 +652,7 @@ public partial class NavigationTreeViewModel : ObservableObject
 
     private void InvalidateTreeChildrenLoaded()
     {
+        _childLoadTasks.Clear();
         foreach (var node in TreeSource)
             InvalidateTreeChildrenLoaded(node);
     }
@@ -656,6 +665,7 @@ public partial class NavigationTreeViewModel : ObservableObject
         {
             node.ChildrenLoaded = false;
             node.ChildrenLoading = false;
+            node.ChildrenLoadEpoch++;
         }
 
         foreach (var child in node.Children)
@@ -778,10 +788,11 @@ public partial class NavigationTreeViewModel : ObservableObject
             return existing;
         }
 
-        var icon = file?.Icon ?? NavigationTreeNode.FolderIcon(path);
+        var deviceId = parent.OwnerDevice?.ID;
+        var icon = file?.Icon ?? NavigationTreeNode.FolderIcon(path, deviceId);
         var child = new NavigationTreeNode(
             path,
-            file?.DisplayName ?? NavigationTreeNode.FolderDisplayName(path),
+            file?.DisplayName ?? NavigationTreeNode.FolderDisplayName(path, deviceId),
             icon,
             OnTreeNodeSelected,
             ownerDevice: parent.OwnerDevice,
@@ -1040,7 +1051,7 @@ public partial class NavigationTreeViewModel : ObservableObject
         var child = new NavigationTreeNode(
             path,
             fileName,
-            NavigationTreeNode.FolderIcon(path),
+            NavigationTreeNode.FolderIcon(path, parent.OwnerDevice?.ID),
             OnTreeNodeSelected,
             ownerDevice: parent.OwnerDevice,
             onExpanded: OnTreeNodeExpanded)
@@ -1153,7 +1164,7 @@ public partial class NavigationTreeViewModel : ObservableObject
 
             if (node is not null)
             {
-                node.DisplayName = NavigationTreeNode.FolderDisplayName(newPath);
+                node.DisplayName = NavigationTreeNode.FolderDisplayName(newPath, deviceId);
                 UpdateSubtreePaths(node, oldPath, newPath);
             }
 
@@ -1215,7 +1226,7 @@ public partial class NavigationTreeViewModel : ObservableObject
 
     private static void UpdateSubtreePaths(NavigationTreeNode node, string oldPath, string newPath)
     {
-        node.UpdatePath(RewritePath(node.Path, oldPath, newPath));
+        node.UpdatePath(RewritePath(node.Path, oldPath, newPath, node.OwnerDevice?.ID));
         if (node.File is not null)
             node.File.UpdatePath(node.Path);
 
@@ -1223,10 +1234,10 @@ public partial class NavigationTreeViewModel : ObservableObject
             UpdateSubtreePaths(child, oldPath, newPath);
     }
 
-    private static string RewritePath(string path, string oldPath, string newPath)
+    private static string RewritePath(string path, string oldPath, string newPath, string? deviceId = null)
     {
-        var current = NavigationTreeNode.NormalizePath(path);
-        var oldNorm = NavigationTreeNode.NormalizePath(oldPath);
+        var current = NavigationTreeNode.NormalizePath(path, deviceId);
+        var oldNorm = NavigationTreeNode.NormalizePath(oldPath, deviceId);
         if (NavigationTreeNode.PathsEqual(current, oldNorm))
             return newPath;
 
