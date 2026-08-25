@@ -329,6 +329,7 @@
         BasedOn="{StaticResource WpfUiMenuItem}"
         TargetType="controls:AdbMenuItem">
         <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
     </Style>
 
     <Style

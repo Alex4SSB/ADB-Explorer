@@ -107,6 +107,7 @@
         TargetType="controls:AdbMenuItem">
         <Setter Property="Command" Value="{Binding Action.Command.Command}" />
         <Setter Property="ItemsSource" Value="{Binding Children}" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsVisible}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />

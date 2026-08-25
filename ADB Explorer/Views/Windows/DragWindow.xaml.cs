@@ -103,7 +103,7 @@ public partial class DragWindow : INotifyPropertyChanged
             string target = "";
             if (Data.CopyPaste.MouseWithinApp)
             {
-                if (Data.CopyPaste.IsSelf
+                if (Data.CopyPaste.IsFromDevice(Data.CopyPaste.DropTargetDevice)
                     && Data.CopyPaste.DropTarget == Data.CopyPaste.DragParent
                     && !Keyboard.Modifiers.HasFlag(ModifierKeys.Control)
                     && !Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
@@ -285,7 +285,7 @@ public partial class DragWindow : INotifyPropertyChanged
 #if DEBUG
         Data.CopyPaste.MouseWithinApp = true;
 #else
-        InterceptMouse.Init(UpdateMouse, CancelDrag);
+        InterceptMouse.Init(UpdateMouse, CancelDrag, DragAutoScroll.OnMouseWheel);
 #endif
 
         DragTimer.Start();

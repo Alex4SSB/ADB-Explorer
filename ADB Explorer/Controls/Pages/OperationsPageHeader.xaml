@@ -643,7 +643,7 @@
                     x:Name="TimeStampColumn"
                     CellTemplate="{StaticResource FileOpTimeStampTemplate}"
                     Header="{x:Static strings:Resources.S_COLUMN_ADDED}"
-                    SortMemberPath="Time" />
+                    SortMemberPath="TimeStamp" />
                 <DataGridTemplateColumn
                     x:Name="DeviceColumn"
                     CellTemplate="{StaticResource FileOpDeviceColumnStyle}"

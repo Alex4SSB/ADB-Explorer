@@ -771,18 +771,22 @@ internal static class FileActionLogic
 
         if (Data.CopyPaste.CurrentSource.HasFlag(CopyPasteService.DataSource.Android))
         {
-            foreach (var file in Data.CopyPaste.CurrentFiles)
+            var sameDevice = Data.CopyPaste.IsFromDevice(target.OwnerDevice);
+            if (sameDevice)
             {
-                var relation = FileHelper.RelationFrom(file.FullPath, targetPath);
-                if (relation is RelationType.Self or RelationType.Descendant)
-                    return DragDropEffects.None;
+                foreach (var file in Data.CopyPaste.CurrentFiles)
+                {
+                    var relation = FileHelper.RelationFrom(file.FullPath, targetPath);
+                    if (relation is RelationType.Self or RelationType.Descendant)
+                        return DragDropEffects.None;
+                }
             }
 
             var result = DragDropEffects.Copy;
             if (!intoArchive
                 && !fromArchive
                 && target.OwnerDevice?.HasRootShell == true
-                && Data.CopyPaste.IsSelf
+                && sameDevice
                 && DriveHelper.GetCurrentDrive(targetPath, target.OwnerDevice)?.Restrictions.NoSymbolicLinks is not true
                 && Data.CopyPaste.CurrentFiles.Count() == 1)
                 result |= DragDropEffects.Link;
@@ -1106,20 +1110,34 @@ internal static class FileActionLogic
     {
         permanent ??= Keyboard.Modifiers is ModifierKeys.Shift;
 
+        // Snapshot everything derived from Data.Active up front: a tree context menu's Data.Use scope
+        // ends asynchronously once the menu closes (see NavigationPane.TreeContextMenu_Closed), which
+        // can happen before the confirmation dialog below is answered, reverting Data.Active in the
+        // meantime and making the live ActionDevice / ActionPath / Data.DirList properties unsafe to
+        // read again after the first await.
+        var device = ActionDevice;
+        if (device is null)
+            return;
+
+        var isRecycleBin = ActionFlags.IsRecycleBin;
+        var hasRootShell = device.HasRootShell;
+        var actionPath = ActionPath;
+        var dirFileList = Data.DirList?.FileList;
+
         var emptyTrashFromDriveView = IsTrashDriveSelectedInDriveView() && !Data.SelectedFiles.Any();
-        var emptyingRecycleBin = (ActionFlags.IsRecycleBin && !Data.SelectedFiles.Any()) || emptyTrashFromDriveView;
+        var emptyingRecycleBin = (isRecycleBin && !Data.SelectedFiles.Any()) || emptyTrashFromDriveView;
 
         List<FileClass> itemsToDelete;
         if (emptyingRecycleBin)
         {
-            if (emptyTrashFromDriveView || Data.DirList?.FileList is null)
+            if (emptyTrashFromDriveView || dirFileList is null)
                 itemsToDelete = TrashHelper.GetRecycleBinItems();
             else
-                itemsToDelete = [.. Data.DirList.FileList.Where(f => f.Extension != AdbExplorerConst.RECYCLE_INDEX_SUFFIX)];
+                itemsToDelete = [.. dirFileList.Where(f => f.Extension != AdbExplorerConst.RECYCLE_INDEX_SUFFIX)];
         }
         else
         {
-            itemsToDelete = [.. HasRootShell
+            itemsToDelete = [.. hasRootShell
                 ? Data.SelectedFiles
                 : Data.SelectedFiles.Where(file => file.Type is FileType.File or FileType.Folder)];
         }
@@ -1138,11 +1156,10 @@ internal static class FileActionLogic
                 deletedString += Strings.Resources.S_BROWSER_ITEMS_PLURAL;
         }
 
-        if (!ActionFlags.IsRecycleBin && !emptyTrashFromDriveView && Data.Settings.EnableRecycle && !permanent.Value)
+        if (!isRecycleBin && !emptyTrashFromDriveView && Data.Settings.EnableRecycle && !permanent.Value)
         {
             // Archive members cannot be moved to the recycle bin — always permanent-delete them.
-            var deviceId = ActionDevice?.ID ?? "";
-            if (itemsToDelete.Any(f => ArchivePath.IsArchivePath(f.FullPath, deviceId)))
+            if (itemsToDelete.Any(f => ArchivePath.IsArchivePath(f.FullPath, device.ID)))
             {
                 permanent = true;
             }
@@ -1160,27 +1177,27 @@ internal static class FileActionLogic
                 return;
         }
 
-        if (!ActionFlags.IsRecycleBin && !emptyTrashFromDriveView && Data.Settings.EnableRecycle && !permanent.Value)
+        if (!isRecycleBin && !emptyTrashFromDriveView && Data.Settings.EnableRecycle && !permanent.Value)
         {
-            await ShellFileOperation.MakeDir(ActionDevice, AdbExplorerConst.RECYCLE_PATH);
+            await ShellFileOperation.MakeDir(device, AdbExplorerConst.RECYCLE_PATH);
 
-            ShellFileOperation.MoveItems(ActionDevice,
+            ShellFileOperation.MoveItems(device,
                                          itemsToDelete,
                                          AdbExplorerConst.RECYCLE_PATH,
-                                         ActionPath,
-                                         Data.DirList?.FileList,
+                                         actionPath,
+                                         dirFileList,
                                          App.AppDispatcher);
         }
         else
         {
-            ShellFileOperation.DeleteItems(ActionDevice, itemsToDelete, App.AppDispatcher);
+            ShellFileOperation.DeleteItems(device, itemsToDelete, App.AppDispatcher);
 
             if (emptyingRecycleBin)
-                TrashHelper.GetTrashDrive(ActionDevice)?.SetItemsCount(0);
+                TrashHelper.GetTrashDrive(device)?.SetItemsCount(0);
 
-            if (ActionFlags.IsRecycleBin)
+            if (isRecycleBin)
             {
-                var remainingItems = Data.DirList?.FileList is { } listed
+                var remainingItems = dirFileList is { } listed
                     ? listed.Except(itemsToDelete)
                     : [];
                 TrashHelper.EnableRecycleButtons(remainingItems);
@@ -1188,16 +1205,16 @@ internal static class FileActionLogic
                 // Clear all remaining files if none of them are indexed
                 if (!remainingItems.Any(item => item.TrashIndex is not null))
                 {
-                    _ = Task.Run(() => ShellFileOperation.SilentDelete(ActionDevice, remainingItems));
+                    _ = Task.Run(() => ShellFileOperation.SilentDelete(device, remainingItems));
                 }
             }
             else if (emptyTrashFromDriveView)
             {
-                var indexPaths = ADBService.FindFilesInPath(ActionDevice.ID,
+                var indexPaths = ADBService.FindFilesInPath(device.ID,
                                                             AdbExplorerConst.RECYCLE_PATH,
                                                             includeNames: ["*" + AdbExplorerConst.RECYCLE_INDEX_SUFFIX]);
                 if (indexPaths.Length > 0)
-                    ShellFileOperation.SilentDelete(ActionDevice, indexPaths);
+                    ShellFileOperation.SilentDelete(device, indexPaths);
             }
         }
     }
@@ -2049,7 +2066,8 @@ internal static class FileActionLogic
         DragDropEffects dropEffects = DragDropEffects.Copy,
         ShellItem originalShellItem = null,
         IReadOnlySet<string>? replacePaths = null,
-        IReadOnlySet<string>? conflictPaths = null)
+        IReadOnlySet<string>? conflictPaths = null,
+        LogicalDeviceViewModel? device = null)
     {
         if (item is null)
             return null;
@@ -2073,7 +2091,8 @@ internal static class FileActionLogic
             source.IsDirectory ? FileType.Folder : FileType.File)
             { Size = source.Size };
 
-        if (Data.DevicesObject.Current is null)
+        device ??= Data.DevicesObject.Current;
+        if (device is null)
             return null;
 
         replacePaths ??= EmptyPathSet;
@@ -2091,14 +2110,15 @@ internal static class FileActionLogic
                 return null;
             }
         }
-        else if (!FileMergeHelper.FilterIdenticalPushTree(source, androidDest, Data.DevicesObject.Current.ID))
+        else if (!FileMergeHelper.FilterIdenticalPushTree(source, androidDest, device.ID))
         {
             return null;
         }
 
+        var pushDevice = device;
         App.SafeInvoke(() =>
         {
-            pushOperation = FileSyncOperation.PushFile(source, target, Data.DevicesObject.Current, App.AppDispatcher);
+            pushOperation = FileSyncOperation.PushFile(source, target, pushDevice, App.AppDispatcher);
             pushOperation.DropEffects = dropEffects;
             pushOperation.OriginalShellItem = originalShellItem;
             pushOperation.PropertyChanged += PushOperation_PropertyChanged;
@@ -2113,8 +2133,9 @@ internal static class FileActionLogic
         string targetPath,
         DragDropEffects dropEffects = DragDropEffects.Copy,
         IReadOnlySet<string>? replacePaths = null,
-        IReadOnlySet<string>? conflictPaths = null)
-        => items.ForEach(item => PushShellObject(item, targetPath, dropEffects, replacePaths: replacePaths, conflictPaths: conflictPaths));
+        IReadOnlySet<string>? conflictPaths = null,
+        LogicalDeviceViewModel? device = null)
+        => items.ForEach(item => PushShellObject(item, targetPath, dropEffects, replacePaths: replacePaths, conflictPaths: conflictPaths, device: device));
 
     private static void PushOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
@@ -2129,13 +2150,16 @@ internal static class FileActionLogic
         if (op.Status is FileOperation.OperationStatus.Completed)
         {
             // Current path (and device) is where the new file was pushed to and it is not shown yet
-            if (op.Device.ID == Data.DevicesObject.Current.ID
+            if (op.Device.ID == Data.DevicesObject.Current?.ID
                 && op.TargetPath.ParentPath == Data.CurrentPath
                 && Data.DirList.FileList.All(f => f.FullName != op.FilePath.FullName))
             {
                 op.Dispatcher.Invoke(() =>
                     Data.DirList.FileList.Add(new(op.TargetPath) { ModifiedTime = op.FilePath.DateModified }));
             }
+
+            if (op.FilePath.IsDirectory)
+                ExplorerTree?.AddCreatedFolder(op.Device.ID, op.TargetPath.FullPath);
 
             if (op.FilePath.IsDirectory
                 && op.FilePath.ShellItem is ShellFolder shellFolder)
@@ -2359,7 +2383,7 @@ internal static class FileActionLogic
             }
             else
             {
-                op = GeneratePullOp(targetPath, item.GetSyncFile(), notify, device, replacePaths, conflictPaths);
+                op = GeneratePullOp(targetPath, item.GetSyncFile(deviceId), notify, device, replacePaths, conflictPaths);
             }
 
             if (op is not null)

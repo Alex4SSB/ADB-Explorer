@@ -299,11 +299,13 @@ public static class ShellFileOperation
                                  ObservableList<FileClass> fileList,
                                  Dispatcher dispatcher,
                                  DragDropEffects cutType = DragDropEffects.None)
+        // fileList is only used for same-folder copy-paste rename collisions; it's null when
+        // called from a context (e.g. a tree node delete/recycle) with no live directory listing.
         => MoveItems(device,
                      items,
                      targetPath,
                      currentPath,
-                     fileList.Select(f => f.FullName),
+                     fileList?.Select(f => f.FullName) ?? [],
                      dispatcher,
                      cutType);
 
@@ -651,6 +653,11 @@ public static class ShellFileOperation
 
             if (removeFromTree)
                 RemoveDeletedTreeFolder(op.Device.ID, sourcePath);
+
+            // A move/copy that lands a folder in a new location needs the same tree update a push gets:
+            // add it under its (already loaded) destination parent, if that parent is visible in the tree.
+            if (op.FilePath.IsDirectory && op.OperationName is FileOperation.OperationType.Move or FileOperation.OperationType.Copy)
+                AddCreatedTreeFolder(op.Device.ID, op.TargetPath.FullPath);
 
             op.PropertyChanged -= MoveFileOp_PropertyChanged;
         }
@@ -1005,6 +1012,11 @@ public static class ShellFileOperation
     private static void RemoveDeletedTreeFolder(string deviceId, string path)
     {
         App.Services.GetService<ExplorerViewModel>()?.Tree?.RemoveDeletedFolder(deviceId, path);
+    }
+
+    private static void AddCreatedTreeFolder(string deviceId, string path)
+    {
+        App.Services.GetService<ExplorerViewModel>()?.Tree?.AddCreatedFolder(deviceId, path);
     }
 
     private static void RenameTreeFolder(string deviceId, string oldPath, string newPath)

@@ -594,17 +594,23 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         public Func<(HANDLE, NativeMethods.HResult)> GetData { get; set; }
     }
 
-    public static VirtualFileDataObject PrepareTransfer(IEnumerable<Package> packages,
+    public static VirtualFileDataObject? PrepareTransfer(IEnumerable<Package> packages,
                                                         DataObjectMethod method = DataObjectMethod.DragDrop)
     {
         Data.FileActions.IsSelectionIllegalOnWindows =
         Data.FileActions.IsSelectionConflictingNames = false;
 
         CopyPasteService.ClearTempFolder();
+
+        var source = Data.Active;
+        var device = source.Device ?? Data.DevicesObject.Current;
+        if (device is null)
+            return null;
+
         VirtualFileDataObject vfdo = new(DragDropEffects.Copy, method);
 
         var packageList = packages.ToList();
-        var files = FileHelper.GetFilesFromTree(FileHelper.GetFolderTree(packageList.Select(p => p.Path), false, Data.DeviceCts.Token)).ToList();
+        var files = FileHelper.GetFilesFromTree(FileHelper.GetFolderTree(packageList.Select(p => p.Path), false, Data.DeviceCts.Token, device.ID)).ToList();
 
         // Stamp parsed launcher icons onto the transfer files so any DragImage path prefers them
         // over the generic APK shell placeholder.
@@ -627,21 +633,26 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
                 files[0].ApplyApkIcon(package.Icon);
         }
 
-        vfdo.Operations = [.. files.Select(f => f.PrepareDescriptors(vfdo))];
+        vfdo.Operations = [.. files.Select(f => f.PrepareDescriptors(vfdo, true, device, source))];
         vfdo.SetFileDescriptors(files.SelectMany(f => f.Descriptors));
-        vfdo.SetAdbDrag(files, TransferDevice);
+        vfdo.SetAdbDrag(files, device);
 
         return vfdo;
     }
 
-    public static VirtualFileDataObject PrepareTransfer(IEnumerable<FileClass> files,
+    public static VirtualFileDataObject? PrepareTransfer(IEnumerable<FileClass> files,
                                                         DragDropEffects preferredEffect = DragDropEffects.Copy,
                                                         DataObjectMethod method = DataObjectMethod.DragDrop)
     {
         CopyPasteService.ClearTempFolder();
 
-        var actions = Data.Active.Actions;
-        var selectedFiles = Data.SelectedFiles;
+        var source = Data.Active;
+        var device = source.Device ?? Data.DevicesObject.Current;
+        if (device is null)
+            return null;
+
+        var actions = source.Actions;
+        var selectedFiles = source.SelectedFiles;
         actions.IsSelectionIllegalOnWindows = !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.Windows);
         actions.IsSelectionIllegalNaming = !actions.IsRecycleBin
             && !actions.IsAppDrive
@@ -671,7 +682,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             Task.Run(() =>
             {
                 // Prepare file ops recursively for folders
-                return fileSnapshot.Select(f => f.PrepareDescriptors(vfdo)).ToList();
+                return fileSnapshot.Select(f => f.PrepareDescriptors(vfdo, true, device, source)).ToList();
             }).ContinueWith(t =>
             {
                 if (t.IsFaulted)
@@ -714,18 +725,15 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             // Next we provide the real file descriptors and file contents.
             // File Explorer isn't supposed to use them, but since it's already implemented,
             // might as well leave it for any other app to use.
-            fileList.ForEach(f => f.PrepareDescriptors(vfdo, false));
+            fileList.ForEach(f => f.PrepareDescriptors(vfdo, false, device, source));
             vfdo.SetFileDescriptors(fileList.SelectMany(f => f.Descriptors), false);
         }
 
         // Finally we provide the ADB drag data, which only we recongize
-        vfdo.SetAdbDrag(fileList, TransferDevice);
+        vfdo.SetAdbDrag(fileList, device);
 
         return vfdo;
     }
-
-    private static LogicalDeviceViewModel? TransferDevice =>
-        Data.Active.Device ?? Data.DevicesObject.Current;
 
     public enum DataObjectMethod
     {

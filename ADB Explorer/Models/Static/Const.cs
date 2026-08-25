@@ -147,6 +147,14 @@ public static class AdbExplorerConst
 
     public static readonly Point DRAG_OFFSET_DEFAULT = new(48, 89);
 
+    /// <summary>Windows Explorer-style distance before a drag or marquee starts, in DIPs.</summary>
+    public const double DRAG_START_DISTANCE = 5;
+    public const double DRAG_START_DISTANCE_SQUARED = DRAG_START_DISTANCE * DRAG_START_DISTANCE;
+
+    /// <summary>Vertical band at the top/bottom of a scrollable view that auto-scrolls during drag.</summary>
+    public const double DRAG_AUTO_SCROLL_EDGE = 40;
+    public const double DRAG_AUTO_SCROLL_MAX_STEP = 24;
+
     public static readonly Key[] NAVIGATION_KEYS = [Key.Enter, Key.Up, Key.Down, Key.Left, Key.Right, Key.Escape, Key.Home, Key.End];
 
     public static readonly string[] COMMON_PHOTO_EXT = [".jpg", ".jpeg", ".png", ".bmp", ".gif", ".webp"];

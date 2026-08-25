@@ -104,7 +104,6 @@
                             <EventSetter Event="PreviewMouseLeftButtonDown" Handler="TreeViewItem_PreviewMouseLeftButtonDown" />
                             <EventSetter Event="PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown" />
                             <EventSetter Event="PreviewMouseLeftButtonUp" Handler="TreeViewItem_PreviewMouseLeftButtonUp" />
-                            <EventSetter Event="MouseLeftButtonDown" Handler="TreeViewItem_MouseLeftButtonDown" />
                             <EventSetter Event="MouseMove" Handler="TreeViewItem_MouseMove" />
                             <EventSetter Event="DragEnter" Handler="TreeViewItem_DragEnter" />
                             <EventSetter Event="DragLeave" Handler="TreeViewItem_DragLeave" />
@@ -171,6 +170,15 @@
                                                     Grid.Column="1"
                                                     Visibility="Collapsed" />
                                             </Grid>
+                                            <Border
+                                                x:Name="FocusChrome"
+                                                Grid.Row="0"
+                                                BorderBrush="{DynamicResource KeyboardFocusBorderColorBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="2"
+                                                IsHitTestVisible="False"
+                                                SnapsToDevicePixels="True"
+                                                Visibility="Collapsed" />
                                             <Separator
                                                 x:Name="DeviceSeparator"
                                                 Grid.Row="2"
@@ -200,6 +208,10 @@
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding IsContextTarget}" Value="True">
                                                 <Setter TargetName="Border" Property="Background" Value="{DynamicResource TreeViewItemBackgroundPointerOver}" />
+                                                <Setter TargetName="FocusChrome" Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsDragSource}" Value="True">
+                                                <Setter TargetName="FocusChrome" Property="Visibility" Value="Visible" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding ShowSeparator}" Value="True">
                                                 <Setter TargetName="DeviceSeparator" Property="Visibility" Value="Visible" />

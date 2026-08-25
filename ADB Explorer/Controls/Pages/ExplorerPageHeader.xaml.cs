@@ -93,9 +93,8 @@ public partial class ExplorerPageHeader : UserControl
         else
         {
             ExplorerGrid.ScrollIntoView(item);
-
-            if (ExplorerScrollViewer?.ComputedHorizontalScrollBarVisibility is Visibility.Visible)
-                ExplorerScrollViewer.ScrollToLeftEnd();
+            // ScrollIntoView aligns the row box and skips the 3px left margin; restore it.
+            ResetExplorerHorizontalScroll();
         }
     }
 
@@ -121,42 +120,95 @@ public partial class ExplorerPageHeader : UserControl
 
     private void ResetExplorerHorizontalScroll()
     {
-        ActiveScrollViewer?.ScrollToHorizontalOffset(0);
-        App.SafeBeginInvoke(() => ActiveScrollViewer?.ScrollToHorizontalOffset(0), DispatcherPriority.Loaded);
+        void reset() => ActiveScrollViewer?.ScrollToHorizontalOffset(0);
+
+        reset();
+        // DataGrid.ScrollIntoView often defers BringIntoView to Loaded; run after that
+        // so the row left margin is not scrolled off against the tree splitter.
+        App.SafeBeginInvoke(reset, DispatcherPriority.Loaded);
+        App.SafeBeginInvoke(reset, DispatcherPriority.Input);
     }
 
     private static Point NullPoint => new(-1, -1);
 
-    /// <summary>
-    /// True when the routed event originated on a view scrollbar (including a captured thumb).
-    /// MouseMove bubbles from the thumb, so a scrollbar drag would otherwise start marquee selection.
-    /// </summary>
-    private static bool IsInScrollBar(DependencyObject? source)
+    private bool IsExplorerNameOrIconHit(DependencyObject? originalSource, Point positionInSelectionRect)
     {
-        for (var dep = source; dep is not null; dep = GetVisualOrLogicalParent(dep))
-        {
-            if (dep is System.Windows.Controls.Primitives.ScrollBar)
-                return true;
-            if (dep is ListView or DataGrid)
-                break;
-        }
+        if (originalSource is null || positionInSelectionRect == NullPoint)
+            return false;
 
-        return false;
+        return HitTestHelper.IsExplorerNameOrIconHit(
+            originalSource,
+            positionInSelectionRect,
+            SelectionRect,
+            ViewModel.IsIconView,
+            IconColumn,
+            NameColumn,
+            PackageName);
     }
 
-    /// <summary>
-    /// Walks the visual tree when possible; content elements (<see cref="System.Windows.Documents.Run"/>, etc.)
-    /// are not Visuals, so fall back to the logical parent.
-    /// </summary>
-    private static DependencyObject? GetVisualOrLogicalParent(DependencyObject current)
+    private bool IsAlreadySelectedExplorerItem(DependencyObject? originalSource)
     {
-        if (current is Visual or System.Windows.Media.Media3D.Visual3D)
-            return VisualTreeHelper.GetParent(current);
+        if (originalSource is null)
+            return false;
 
-        if (current is FrameworkContentElement content)
-            return content.Parent;
+        if (ViewModel.IsIconView)
+        {
+            var item = HitTestHelper.FindAncestor<ListViewItem>(originalSource);
+            return item?.IsSelected == true;
+        }
 
-        return LogicalTreeHelper.GetParent(current);
+        var row = HitTestHelper.FindAncestor<DataGridRow>(originalSource);
+        return row?.IsSelected == true;
+    }
+
+    private void TrackExplorerMouseDown(MouseButtonEventArgs e, DependencyObject? originalSource)
+    {
+        SelectionRect.ResetGesture();
+
+        MouseDownPoint = SuppressExplorerSelection
+            ? NullPoint
+            : e.GetPosition(SelectionRect);
+
+        if (MouseDownPoint == NullPoint)
+        {
+            CopyPaste.DragStatus = CopyPasteService.DragState.None;
+            return;
+        }
+
+        if (IsExplorerNameOrIconHit(originalSource, MouseDownPoint)
+            || IsAlreadySelectedExplorerItem(originalSource))
+            CopyPaste.DragStatus = CopyPasteService.DragState.Pending;
+        else
+            CopyPaste.DragStatus = CopyPasteService.DragState.None;
+    }
+
+    private void TryBeginExplorerDragOrMarquee(Point point, bool abort, ScrollViewer scroller, DependencyObject? dragSource)
+    {
+        if (abort || CopyPaste.WasDragging || CopyPaste.DragStatus is CopyPasteService.DragState.Active)
+        {
+            SelectionRect.Collapse();
+            return;
+        }
+
+        if (SelectionRect.IsActive)
+        {
+            SelectionRect.Update(point, MouseDownPoint, scroller, ActiveView, ActiveSelectedItems, ViewModel);
+            return;
+        }
+
+        if ((MouseDownPoint - point).LengthSquared < DRAG_START_DISTANCE_SQUARED)
+            return;
+
+        if (CopyPaste.DragStatus is CopyPasteService.DragState.Pending
+            && ActiveSelectedItems.Count > 0
+            && ActiveSelectedItems[0] is FileClass or Package)
+        {
+            InitiateDrag(dragSource);
+            return;
+        }
+
+        CopyPaste.DragStatus = CopyPasteService.DragState.None;
+        SelectionRect.Update(point, MouseDownPoint, scroller, ActiveView, ActiveSelectedItems, ViewModel);
     }
 
     private bool SuppressExplorerSelection =>
@@ -268,6 +320,12 @@ public partial class ExplorerPageHeader : UserControl
 
         InitializeComponent();
 
+        Loaded += (_, _) =>
+        {
+            DragAutoScroll.Register(ExplorerScrollViewer);
+            DragAutoScroll.Register(IconScrollViewer);
+        };
+
         HookToolbarMenu(MainToolBar);
         HookToolbarMenu(NavigationToolBar);
         HookToolbarMenu(StyleHelper.FindDescendant<AdbMenu>(SortingSelector));
@@ -369,9 +427,17 @@ public partial class ExplorerPageHeader : UserControl
         if (Keyboard.Modifiers.HasFlag(ModifierKeys.Alt)
             || SearchBox.IsKeyboardFocusWithin
             || NavigationBox.IsKeyboardFocusWithin
+            || DetailsPane.IsEditorFocused
             || FileActions.IsExplorerEditing)
             return;
-        
+
+        if (e.Key is Key.Left or Key.Right or Key.Up or Key.Down
+            && DevicesObject?.Current is not { IsOpen: true })
+        {
+            e.Handled = true;
+            return;
+        }
+
         bool handle = false;
 
         if (e.Key is Key.A && Keyboard.Modifiers is ModifierKeys.Control)
@@ -1329,6 +1395,8 @@ public partial class ExplorerPageHeader : UserControl
         if (e.ChangedButton is not MouseButton.Left and not MouseButton.Right)
             return;
 
+        SelectionRect.ResetGesture();
+
         if (e.OriginalSource is Border)
         {
             ClickCount = -1;
@@ -1355,11 +1423,7 @@ public partial class ExplorerPageHeader : UserControl
             return;
         }
 
-        CopyPaste.DragStatus = e.OriginalSource is TextBlock or Image || row.IsSelected
-                     ? CopyPasteService.DragState.Pending
-                     : CopyPasteService.DragState.None;
-
-        MouseDownPoint = e.GetPosition(ExplorerGrid);
+        TrackExplorerMouseDown(e, e.OriginalSource as DependencyObject);
         e.Handled = true;
         ClickCount = e.ClickCount;
 
@@ -1482,7 +1546,7 @@ public partial class ExplorerPageHeader : UserControl
         if (e.ChangedButton is not MouseButton.Left || ClickCount < 0)
             return;
 
-        if (SelectionRect.IsActive)
+        if (SelectionRect.IsActive || SelectionRect.SelectionOccurred)
         {
             SelectionRect.Collapse();
             e.Handled = true;
@@ -1627,6 +1691,8 @@ public partial class ExplorerPageHeader : UserControl
         if (e.ChangedButton is not MouseButton.Left)
             return;
 
+        SelectionRect.ResetGesture();
+
         if (e.OriginalSource is Border)
         {
             ClickCount = -1;
@@ -1636,9 +1702,7 @@ public partial class ExplorerPageHeader : UserControl
         CopyPaste.WasDragging = false;
         var row = sender as DataGridRow;
 
-        CopyPaste.DragStatus = e.OriginalSource is TextBlock or Image || row.IsSelected
-            ? CopyPasteService.DragState.Pending
-            : CopyPasteService.DragState.None;
+        TrackExplorerMouseDown(e, e.OriginalSource as DependencyObject);
 
         ViewModel.SetIndexSingle(row.GetIndex());
     }
@@ -1796,6 +1860,7 @@ public partial class ExplorerPageHeader : UserControl
             {
                 ViewModel.IsMenuOpen = false;
                 e.Handled = true;
+                ClearWasDraggingAfterContext();
                 return;
             }
         }
@@ -1803,6 +1868,7 @@ public partial class ExplorerPageHeader : UserControl
         {
             ViewModel.IsMenuOpen = false;
             e.Handled = true;
+            ClearWasDraggingAfterContext();
             return;
         }
 
@@ -1812,6 +1878,15 @@ public partial class ExplorerPageHeader : UserControl
 
         if (e.Source is FrameworkElement target)
             target.ContextMenu = CreateRowContextMenu();
+    }
+
+    private void ClearWasDraggingAfterContext()
+    {
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (CopyPaste.DragStatus is not CopyPasteService.DragState.Active)
+                CopyPaste.WasDragging = false;
+        }, DispatcherPriority.Input);
     }
 
     private AdbContextMenu CreateRowContextMenu() => new()
@@ -1828,19 +1903,15 @@ public partial class ExplorerPageHeader : UserControl
             RowHeight = row.ActualHeight;
 
         CopyPaste.WasDragging = false;
-        CopyPaste.DragStatus = e.OriginalSource is TextBlock or Image
-                     ? CopyPasteService.DragState.Pending
-                     : CopyPasteService.DragState.None;
+        TrackExplorerMouseDown(e, e.OriginalSource as DependencyObject);
 
-        if (IsInScrollBar(e.OriginalSource as DependencyObject))
+        if (HitTestHelper.IsInScrollBar(e.OriginalSource as DependencyObject))
         {
             MouseDownPoint = NullPoint;
             return;
         }
 
         var gridPoint = e.GetPosition(ExplorerGrid);
-        var point = e.GetPosition(SelectionRect);
-        MouseDownPoint = SuppressExplorerSelection ? NullPoint : point;
 
         int selectionIndex = ExplorerGrid.SelectedIndex;
 
@@ -1848,11 +1919,12 @@ public partial class ExplorerPageHeader : UserControl
             .Where(col => col.Visibility == Visibility.Visible)
             .Sum(item => item.ActualWidth);
 
-        if (gridPoint.Y > (ExplorerGrid.Items.Count * RowHeight + ColumnHeaderHeight)
-            || gridPoint.Y > (ExplorerGrid.ActualHeight - StyleHelper.FindDescendant<ItemsPresenter>(ExplorerGrid)?.ActualHeight % RowHeight)
-            || gridPoint.Y < ColumnHeaderHeight + ScrollContentPresenterMargin
-            || gridPoint.X > actualRowWidth
-            || gridPoint.X > DataGridContentWidth)
+        var source = e.OriginalSource as DependencyObject;
+        var onHeader = HitTestHelper.FindAncestor<DataGridColumnHeader>(source) is not null;
+        var onRow = HitTestHelper.FindAncestor<DataGridRow>(source) is not null;
+        var rightOfRows = gridPoint.X > actualRowWidth || gridPoint.X > DataGridContentWidth;
+
+        if (!onHeader && (!onRow || rightOfRows))
         {
             if (ExplorerGrid.SelectedItems.Count > 0 && IsInEditMode)
                 IsInEditMode = false;
@@ -1860,6 +1932,7 @@ public partial class ExplorerPageHeader : UserControl
             if ((e.ChangedButton is MouseButton.Right || !SuppressExplorerSelection)
                 && Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
             {
+                ClearDataItemSelectionFlags();
                 ExplorerGrid.UnselectAll();
                 ExplorerGrid.SelectedIndex =
                 selectionIndex = -1;
@@ -1873,11 +1946,6 @@ public partial class ExplorerPageHeader : UserControl
         {
             ViewModel.FirstSelectedIndex = selectionIndex;
         }
-
-        if (e.ChangedButton is MouseButton.Left
-            && CopyPaste.DragStatus is CopyPasteService.DragState.None
-            && MouseDownPoint != NullPoint)
-            SelectionRect.Arm();
     }
 
     private void ExplorerGrid_MouseMove(object sender, MouseEventArgs e)
@@ -1901,27 +1969,9 @@ public partial class ExplorerPageHeader : UserControl
             || MouseDownPoint == NullPoint
             || withinEditingCell
             || SuppressExplorerSelection
-            || (!SelectionRect.IsActive && IsInScrollBar(e.OriginalSource as DependencyObject));
+            || (!SelectionRect.IsActive && HitTestHelper.IsInScrollBar(e.OriginalSource as DependencyObject));
 
-        if (CopyPaste.DragStatus is CopyPasteService.DragState.Pending && (MouseDownPoint - point).LengthSquared >= 25)
-        {
-            if (ExplorerGrid.SelectedItems.Count > 0
-                && ExplorerGrid.SelectedItems[0] is FileClass or Package
-                && !abortDrag)
-            {
-                InitiateDrag(cell);
-            }
-            else
-                CopyPaste.DragStatus = CopyPasteService.DragState.None;
-        }
-
-        if (abortDrag || CopyPaste.DragStatus is not CopyPasteService.DragState.None || CopyPaste.WasDragging)
-        {
-            SelectionRect.Collapse();
-            return;
-        }
-
-        SelectionRect.Update(point, MouseDownPoint, ExplorerScrollViewer, ActiveView, ActiveSelectedItems, ViewModel);
+        TryBeginExplorerDragOrMarquee(point, abortDrag, ExplorerScrollViewer, cell);
     }
 
     private void InitiateDrag(DependencyObject dragSource)
@@ -1930,7 +1980,7 @@ public partial class ExplorerPageHeader : UserControl
         CopyPaste.WasDragging = true;
 
         IEnumerable<FileClass> selectedItems;
-        VirtualFileDataObject vfdo;
+        VirtualFileDataObject? vfdo;
         if (FileActions.IsAppDrive)
         {
             vfdo = VirtualFileDataObject.PrepareTransfer(ActiveSelectedItems.Cast<Package>());
@@ -1966,7 +2016,20 @@ public partial class ExplorerPageHeader : UserControl
                 CopyPaste.DragBitmap = selectedItems.First().DragImage;
             }
 
-            vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, dragSource, vfdo.PreferredDropEffect.Value);
+            DragAutoScroll.Register(ActiveScrollViewer);
+            DragAutoScroll.Begin();
+            try
+            {
+                vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, dragSource, vfdo.PreferredDropEffect.Value);
+            }
+            finally
+            {
+                DragAutoScroll.End();
+                // Escape (and other OLE cancels) leave the button down; drop the original
+                // mouse-down so MouseMove cannot start a rubber-band from that point.
+                MouseDownPoint = NullPoint;
+                SelectionRect.Collapse();
+            }
         }
     }
 
@@ -2230,6 +2293,9 @@ public partial class ExplorerPageHeader : UserControl
 
     private void SelectionRect_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
+        if (SelectionRect.IsActive || SelectionRect.SelectionOccurred)
+            e.Handled = true;
+
         SelectionRect.Collapse();
 
         if (ViewModel.FirstSelectedIndex < 0
@@ -2273,6 +2339,7 @@ public partial class ExplorerPageHeader : UserControl
             SelectionRect.Collapse();
 
         MouseDownPoint = NullPoint;
+        CopyPaste.WasDragging = false;
         _suppressSelectionAfterMenu = false;
 
         if (FileActions.ListingInProgress && e.ChangedButton is MouseButton.XButton1 or MouseButton.XButton2)
@@ -2319,9 +2386,6 @@ public partial class ExplorerPageHeader : UserControl
             return;
 
         CopyPaste.WasDragging = false;
-        MouseDownPoint = SuppressExplorerSelection
-            ? NullPoint
-            : e.GetPosition(SelectionRect);
 
         // Walk up from the original source to determine if the click is on an item or empty space
         var source = e.OriginalSource as DependencyObject;
@@ -2329,9 +2393,7 @@ public partial class ExplorerPageHeader : UserControl
             ? ItemsControl.ContainerFromElement(IconView, source) as ListViewItem
             : null;
 
-        CopyPaste.DragStatus = hitItem is not null && (e.OriginalSource is TextBlock or Image || hitItem.IsSelected)
-                     ? CopyPasteService.DragState.Pending
-                     : CopyPasteService.DragState.None;
+        TrackExplorerMouseDown(e, source);
 
         int selectionIndex = IconView.SelectedIndex;
 
@@ -2355,7 +2417,7 @@ public partial class ExplorerPageHeader : UserControl
         {
             // Ignore clicks on scrollbars — do not keep MouseDownPoint or marquee starts
             // when the captured thumb's MouseMove bubbles over the viewport.
-            if (IsInScrollBar(source))
+            if (HitTestHelper.IsInScrollBar(source))
             {
                 MouseDownPoint = NullPoint;
                 return;
@@ -2380,12 +2442,18 @@ public partial class ExplorerPageHeader : UserControl
         {
             ViewModel.FirstSelectedIndex = selectionIndex;
         }
+    }
 
-        if (e.ChangedButton is MouseButton.Left
-            && hitItem is null
-            && CopyPaste.DragStatus is CopyPasteService.DragState.None
-            && MouseDownPoint != NullPoint)
-            SelectionRect.Arm();
+    private void IconView_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton is not MouseButton.Left)
+            return;
+
+        if (!SelectionRect.IsActive && !SelectionRect.SelectionOccurred)
+            return;
+
+        SelectionRect.Collapse();
+        e.Handled = true;
     }
 
     private void IconView_MouseMove(object sender, MouseEventArgs e)
@@ -2399,28 +2467,13 @@ public partial class ExplorerPageHeader : UserControl
             || !RuntimeSettings.IsExplorerLoaded
             || MouseDownPoint == NullPoint
             || SuppressExplorerSelection
-            || (!SelectionRect.IsActive && IsInScrollBar(e.OriginalSource as DependencyObject));
+            || (!SelectionRect.IsActive && HitTestHelper.IsInScrollBar(e.OriginalSource as DependencyObject));
 
-        if (CopyPaste.DragStatus is CopyPasteService.DragState.Pending && (MouseDownPoint - point).LengthSquared >= 25)
-        {
-            if (IconView.SelectedItems.Count > 0
-                && IconView.SelectedItems[0] is FileClass or Package
-                && !abortDrag)
-            {
-                var dragSource = IconView.ItemContainerGenerator.ContainerFromItem(IconView.SelectedItems[0]) as DependencyObject ?? IconView;
-                InitiateDrag(dragSource);
-            }
-            else
-                CopyPaste.DragStatus = CopyPasteService.DragState.None;
-        }
+        DependencyObject dragSource = IconView;
+        if (IconView.SelectedItems.Count > 0)
+            dragSource = IconView.ItemContainerGenerator.ContainerFromItem(IconView.SelectedItems[0]) as DependencyObject ?? IconView;
 
-        if (abortDrag || CopyPaste.DragStatus is not CopyPasteService.DragState.None || CopyPaste.WasDragging)
-        {
-            SelectionRect.Collapse();
-            return;
-        }
-
-        SelectionRect.Update(point, MouseDownPoint, IconView.ScrollViewer, ActiveView, ActiveSelectedItems, ViewModel);
+        TryBeginExplorerDragOrMarquee(point, abortDrag, IconView.ScrollViewer, dragSource);
     }
 
     private void OnThumbsSizeChanged()

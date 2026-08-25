@@ -365,8 +365,8 @@ public partial class NavigationTreeViewModel : ObservableObject
             return;
 
         node.ChildrenLoading = true;
-        var path = node.Path;
-        var token = Data.DeviceCts.Token;
+        var path = node.DropTargetPath;
+        var token = TreeListingToken(node);
 
         List<FileClass> folders;
         try
@@ -440,10 +440,8 @@ public partial class NavigationTreeViewModel : ObservableObject
             return;
         }
 
-        var token = Data.DeviceCts.Token;
-        var probePath = node.Path;
-        if (node.Drive?.LinkTargetPath is string link && !string.IsNullOrEmpty(link))
-            probePath = link;
+        var token = TreeListingToken(node);
+        var probePath = node.DropTargetPath;
 
         HashSet<string> withSubfolders;
         try
@@ -1174,6 +1172,44 @@ public partial class NavigationTreeViewModel : ObservableObject
                 return;
 
             Data.RuntimeSettings.LocationToNavigate = new(newPath + current[oldNorm.Length..]);
+        });
+    }
+
+    /// <summary>
+    /// Token for ADB listing of a tree node. <see cref="Data.DeviceCts"/> is cancelled whenever the
+    /// explorer's current device is cleared (including while no device is open, on every poll) — so
+    /// listings for other devices, or any device while none is selected, must not use it.
+    /// </summary>
+    private static CancellationToken TreeListingToken(NavigationTreeNode node)
+    {
+        if (node.OwnerDevice is { } owner && owner == Data.DevicesObject?.Current)
+            return Data.DeviceCts.Token;
+
+        return CancellationToken.None;
+    }
+
+    /// <summary>
+    /// Adds a node for a folder that just finished being created on <paramref name="deviceId"/> — via a push
+    /// from Windows, or a device-internal move/copy — when its parent is already in the tree. If the parent
+    /// is expanded or its children were previously loaded, the new folder appears immediately; otherwise the
+    /// chevron is enabled so a later expand lists it from the device.
+    /// </summary>
+    public void AddCreatedFolder(string deviceId, string path)
+    {
+        App.SafeInvoke(() =>
+        {
+            var parent = FindNode(TreeSource, candidate =>
+                candidate.OwnerDevice?.ID == deviceId
+                && candidate.Device is null
+                && candidate.IsDirectChildPath(path));
+
+            if (parent is null)
+                return;
+
+            if (parent.ChildrenLoaded || parent.IsExpanded)
+                FindOrCreateChild(parent, path);
+
+            parent.CanExpand = true;
         });
     }
 

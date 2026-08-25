@@ -454,12 +454,11 @@ public static class FileHelper
 
     public static IEnumerable<FileClass> GetFilesFromTree(FolderTree[] tree) => tree.Select(t => new FileClass(t));
 
-    public static FolderTree[] GetFolderTree(IEnumerable<string> paths, bool isFolder = true, CancellationToken cancellationToken = default)
+    public static FolderTree[] GetFolderTree(IEnumerable<string> paths, bool isFolder = true, CancellationToken cancellationToken = default, string? deviceId = null)
     {
-        if (Data.DevicesObject.Current is null)
+        deviceId ??= Data.DevicesObject.Current?.ID;
+        if (string.IsNullOrEmpty(deviceId))
             return [];
-
-        var deviceId = Data.DevicesObject.Current.ID;
 
         if (!ShellCommands.FindExists(deviceId))
             return GetFolderTreeViaAdbLs(deviceId, paths, isFolder, cancellationToken);

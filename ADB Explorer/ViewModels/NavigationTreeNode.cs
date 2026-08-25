@@ -63,6 +63,9 @@ public partial class NavigationTreeNode : ObservableObject
     public partial bool IsDragOver { get; set; }
 
     [ObservableProperty]
+    public partial bool IsDragSource { get; set; }
+
+    [ObservableProperty]
     public partial DragDropEffects CutState { get; set; }
 
     [ObservableProperty]

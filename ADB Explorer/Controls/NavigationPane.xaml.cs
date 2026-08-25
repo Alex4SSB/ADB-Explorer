@@ -9,6 +9,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Controls;
 
@@ -69,14 +70,21 @@ public partial class NavigationPane : UserControl
 
     private void NavigationPane_Loaded(object sender, RoutedEventArgs e)
     {
-        if (TreeVm is not { } tree)
-            return;
+        if (TreeVm is { } tree)
+        {
+            tree.NodeEditStarted -= Tree_NodeEditStarted;
+            tree.NodeEditStarted += Tree_NodeEditStarted;
+            Tree.PreviewKeyDown -= Tree_PreviewKeyDown;
+            Tree.PreviewKeyDown += Tree_PreviewKeyDown;
+        }
 
-        tree.NodeEditStarted -= Tree_NodeEditStarted;
-        tree.NodeEditStarted += Tree_NodeEditStarted;
-        Tree.PreviewKeyDown -= Tree_PreviewKeyDown;
-        Tree.PreviewKeyDown += Tree_PreviewKeyDown;
+        DragAutoScroll.Register(TreeScrollViewer);
+        Unloaded -= NavigationPane_Unloaded;
+        Unloaded += NavigationPane_Unloaded;
     }
+
+    private void NavigationPane_Unloaded(object sender, RoutedEventArgs e)
+        => DragAutoScroll.Unregister(TreeScrollViewer);
 
     private void GridSplitter_DragDelta(object sender, DragDeltaEventArgs e)
     {
@@ -97,6 +105,7 @@ public partial class NavigationPane : UserControl
     private NavigationTreeNode? _contextTarget;
     private IDisposable? _treeMenuScope;
     private bool _holdSelectSuppressForMenu;
+    private bool _suppressTreeDragAfterMenu;
     private Point _treeDragStart;
     private NavigationTreeNode? _treeDragNode;
     private TreeViewItem? _treeDragItem;
@@ -109,18 +118,51 @@ public partial class NavigationPane : UserControl
     {
         Data.CopyPaste.WasDragging = false;
 
-        if (sender is not TreeViewItem || e.OriginalSource is not DependencyObject source)
+        if (sender is not TreeViewItem item || e.OriginalSource is not DependencyObject source)
             return;
 
         if (!ReferenceEquals(FindOwningTreeViewItem(source), sender))
             return;
 
-        if (!IsExpanderSource(source))
+        if (IsExpanderSource(source))
+        {
+            NavigationTreeNode.SuppressUserSelectFromExpander++;
+            _selectionBeforeExpander = FindSelectedNode(TreeItems);
+            Dispatcher.BeginInvoke(EndExpanderInteraction, DispatcherPriority.Input);
+            return;
+        }
+
+        if (item.DataContext is not NavigationTreeNode node)
             return;
 
-        NavigationTreeNode.SuppressUserSelectFromExpander++;
-        _selectionBeforeExpander = FindSelectedNode(TreeItems);
-        Dispatcher.BeginInvoke(EndExpanderInteraction, DispatcherPriority.Input);
+        // Let the rename box receive the click.
+        if (node.IsInEditMode)
+            return;
+
+        // Keep TreeView from selecting on mouse down so a drag can start first.
+        e.Handled = true;
+
+        if (e.ClickCount > 1)
+        {
+            item.IsSelected = true;
+            if (item.HasItems)
+                item.IsExpanded = !item.IsExpanded;
+            return;
+        }
+
+        // Dismissing an open context menu must not start a drag.
+        if (_contextTarget is not null || _suppressTreeDragAfterMenu)
+        {
+            _suppressTreeDragAfterMenu = false;
+            return;
+        }
+
+        _treeDragPending = true;
+        _treeDidDrag = false;
+        _treeDragNode = node;
+        _treeDragItem = item;
+        _treeDragStart = e.GetPosition(null);
+        item.CaptureMouse();
     }
 
     private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -147,6 +189,13 @@ public partial class NavigationPane : UserControl
         if (Data.CopyPaste.WasDragging)
         {
             e.Handled = true;
+
+            // Swallow this opening (cancel-drag click, including nested TreeViewItems), then allow the next one.
+            Dispatcher.BeginInvoke(() =>
+            {
+                if (Data.CopyPaste.DragStatus is not CopyPasteService.DragState.Active)
+                    Data.CopyPaste.WasDragging = false;
+            }, DispatcherPriority.Input);
             return;
         }
 
@@ -226,6 +275,8 @@ public partial class NavigationPane : UserControl
         ReleaseRightClickSuppress();
         _selectionBeforeExpander = null;
         SetContextTarget(null);
+        if (Mouse.LeftButton is MouseButtonState.Pressed)
+            _suppressTreeDragAfterMenu = true;
         Dispatcher.BeginInvoke(() =>
         {
             EndTreeMenuScope();
@@ -318,45 +369,6 @@ public partial class NavigationPane : UserControl
             return;
 
         ScrollTreeItemIntoView(item);
-    }
-
-    private void TreeViewItem_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        if (sender is not TreeViewItem item || e.OriginalSource is not DependencyObject source)
-            return;
-
-        if (!ReferenceEquals(FindOwningTreeViewItem(source), item))
-            return;
-
-        if (item.DataContext is not NavigationTreeNode node)
-            return;
-
-        if (node.IsInEditMode)
-        {
-            e.Handled = true;
-            return;
-        }
-
-        if (IsExpanderSource(source))
-        {
-            e.Handled = true;
-            return;
-        }
-
-        if (CanStartTreeDrag(node))
-        {
-            _treeDragPending = true;
-            _treeDidDrag = false;
-            _treeDragNode = node;
-            _treeDragItem = item;
-            _treeDragStart = e.GetPosition(null);
-            item.CaptureMouse();
-            e.Handled = true;
-            return;
-        }
-
-        item.IsSelected = true;
-        e.Handled = true;
     }
 
     private void ScrollTreeItemIntoView(TreeViewItem item)
@@ -547,7 +559,15 @@ public partial class NavigationPane : UserControl
     }
 
     private void Tree_PreviewKeyDown(object sender, KeyEventArgs e)
-        => TryFinishTreeEditFromKey(e);
+    {
+        TryFinishTreeEditFromKey(e);
+        if (e.Handled)
+            return;
+
+        if (e.Key is Key.Left or Key.Right or Key.Up or Key.Down
+            && Data.DevicesObject?.Current is not { IsOpen: true })
+            e.Handled = true;
+    }
 
     private void TreeNameEdit_PreviewKeyDown(object sender, KeyEventArgs e)
         => TryFinishTreeEditFromKey(e, sender as TextBox);
@@ -635,17 +655,17 @@ public partial class NavigationPane : UserControl
             return;
 
         var delta = e.GetPosition(null) - _treeDragStart;
-        if (delta.LengthSquared < 25)
+        if (delta.LengthSquared < DRAG_START_DISTANCE_SQUARED)
             return;
 
         var node = _treeDragNode;
         var item = _treeDragItem;
+        if (node is null || item is null || !CanStartTreeDrag(node))
+            return;
+
         _treeDragPending = false;
         _treeDidDrag = true;
         ReleaseTreeDragCapture();
-
-        if (node is null || item is null || !CanStartTreeDrag(node))
-            return;
 
         InitiateTreeDrag(item, node);
     }
@@ -705,7 +725,10 @@ public partial class NavigationPane : UserControl
         Data.CopyPaste.DragStatus = CopyPasteService.DragState.Active;
         Data.CopyPaste.WasDragging = true;
         Data.CopyPaste.DragBitmap = files[0].DragImage;
+        node.IsDragSource = true;
         NavigationTreeNode.SuppressUserSelectFromExpander++;
+        DragAutoScroll.Register(TreeScrollViewer);
+        DragAutoScroll.Begin();
         try
         {
             vfdo.SendObjectToShell(
@@ -715,12 +738,15 @@ public partial class NavigationPane : UserControl
         }
         finally
         {
+            node.IsDragSource = false;
             Data.CopyPaste.DragStatus = CopyPasteService.DragState.None;
             if (Data.CopyPaste.IsDrag)
                 Data.CopyPaste.ClearDrag();
             ClearTreeDropHighlight();
             if (NavigationTreeNode.SuppressUserSelectFromExpander > 0)
                 NavigationTreeNode.SuppressUserSelectFromExpander--;
+
+            DragAutoScroll.End();
         }
     }
 
@@ -770,7 +796,7 @@ public partial class NavigationPane : UserControl
         SetTreeDropHighlight(node, allowed);
 
         if (allowed.HasFlag(DragDropEffects.Move)
-            && Data.CopyPaste.IsSelf
+            && Data.CopyPaste.IsFromDevice(node.OwnerDevice)
             && !e.KeyStates.HasFlag(DragDropKeyStates.ControlKey)
             && !e.KeyStates.HasFlag(DragDropKeyStates.AltKey))
         {
@@ -801,6 +827,21 @@ public partial class NavigationPane : UserControl
         Data.CopyPaste.DropEffect =
         Data.CopyPaste.CurrentDropEffect = e.Effects;
         Data.CopyPaste.DropTarget = node.Path;
+        Data.CopyPaste.DropTargetDevice = node.OwnerDevice;
+
+        // Foreign drags (e.g. from Windows Explorer) never set a drag image on drag start like our own
+        // drags do, so DragWindow stays hidden unless something sets one while dragging over a drop
+        // target - mirrors ExplorerGrid_DragOver's equivalent handling for the explorer grid.
+        var isAppDrive = node.Drive?.Type is AbstractDrive.DriveType.Package;
+        if (isAppDrive)
+        {
+            if (!Data.CopyPaste.IsSelf && FileHelper.AllFilesAreApks(Data.CopyPaste.DragFiles))
+                Data.CopyPaste.DragBitmap = DefaultAndroidPackageIcon.Bitmap;
+        }
+        else if (Data.CopyPaste.CurrentFiles.Any())
+        {
+            Data.CopyPaste.DragBitmap = Data.CopyPaste.CurrentFiles.First().DragImage;
+        }
     }
 
     private void SetTreeDropHighlight(NavigationTreeNode node, DragDropEffects allowed)

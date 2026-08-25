@@ -338,6 +338,7 @@
                         ItemsSource="{Binding ExplorerItemsSource}"
                         MouseMove="IconView_MouseMove"
                         PreviewMouseDown="IconView_PreviewMouseDown"
+                        PreviewMouseUp="IconView_PreviewMouseUp"
                         ScrollViewer.ScrollChanged="ExplorerScrollViewer_ScrollChanged"
                         SelectionChanged="ExplorerGrid_SelectionChanged">
                         <local:AdbListView.Resources>

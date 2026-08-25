@@ -23,6 +23,12 @@ public partial class SelectionRectangle : UserControl
     /// </summary>
     public bool IsActive => Rect.IsVisible;
 
+    /// <summary>
+    /// True after this gesture has shown the rubber-band, until the next mouse down.
+    /// <see cref="Collapse"/> does not clear this, so mouse-up can skip click-selection.
+    /// </summary>
+    public bool SelectionOccurred { get; private set; }
+
     public SelectionRectangle()
     {
         InitializeComponent();
@@ -38,6 +44,8 @@ public partial class SelectionRectangle : UserControl
         if (IsMouseCaptured)
             ReleaseMouseCapture();
     }
+
+    public void ResetGesture() => SelectionOccurred = false;
 
     public void Arm()
     {
@@ -87,6 +95,7 @@ public partial class SelectionRectangle : UserControl
         if (!Rect.IsVisible)
         {
             _preRectSelectedItems = [.. activeSelectedItems.Cast<object>()];
+            SelectionOccurred = true;
             Arm();
         }
 
