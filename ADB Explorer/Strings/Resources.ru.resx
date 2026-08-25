@@ -1759,4 +1759,10 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
     <value>Создайте .APKBKP для установки приложения и данных OBB</value>
   </data>
+  <data name="S_NAVIGATION_PANE" xml:space="preserve">
+    <value>Панель навигации</value>
+  </data>
+  <data name="S_MENU_SHOW" xml:space="preserve">
+    <value>Показать</value>
+  </data>
 </root>
