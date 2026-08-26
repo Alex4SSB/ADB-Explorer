@@ -41,13 +41,66 @@ internal class DriveHelper
         return drive.Type is AbstractDrive.DriveType.Internal && AdbExplorerConst.IsInternalStoragePath(path);
     }
 
+    public static DriveRestrictions GetRestrictions(string path, LogicalDeviceViewModel? device = null)
+    {
+        if (string.IsNullOrEmpty(path))
+            return DriveRestrictions.None;
+
+        device ??= Data.Active.Device ?? Data.DevicesObject?.Current;
+        var drive = GetCurrentDrive(path, device);
+
+        // Overlay/submount writability (e.g. rw /vendor vs ro /) only matters with a root shell.
+        if (device is not { HasRootShell: true })
+            return drive?.Restrictions ?? DriveRestrictions.None;
+
+        var lookupPath = GetMountLookupPath(path, device, drive);
+        var includeRoot = drive is null || drive.Type is AbstractDrive.DriveType.Root;
+        var mount = device.Mounts.Find(lookupPath, includeRoot);
+        if (mount is not null)
+            return DriveRestrictions.From(mount.Value.Options);
+
+        return drive?.Restrictions ?? DriveRestrictions.None;
+    }
+
+    public static DriveRestrictions GetRestrictions(string path, string? deviceId)
+    {
+        LogicalDeviceViewModel? device = null;
+        if (!string.IsNullOrEmpty(deviceId))
+            device = Data.DevicesObject?.LogicalDeviceViewModels?.FirstOrDefault(d => d.ID == deviceId);
+
+        return GetRestrictions(path, device);
+    }
+
+    /// <summary>
+    /// Translate a drive alias such as <c>/sdcard</c> to the path <c>mount</c> actually lists.
+    /// </summary>
+    private static string GetMountLookupPath(string path, LogicalDeviceViewModel? device, DriveViewModel? drive)
+    {
+        var deviceId = device?.ID;
+        if (!string.IsNullOrEmpty(deviceId) && ArchivePath.IsArchivePath(path, deviceId))
+            path = ArchivePath.GetArchivePath(path, deviceId);
+
+        drive ??= GetCurrentDrive(path, device);
+        if (drive is null || string.IsNullOrEmpty(drive.LinkTargetPath))
+            return path;
+
+        var drivePath = drive.Path.TrimEnd('/');
+        if (path == drive.Path || path == drivePath)
+            return drive.LinkTargetPath;
+
+        if (path.StartsWith(drivePath + "/", StringComparison.Ordinal))
+            return FileHelper.ConcatPaths(drive.LinkTargetPath, path[(drivePath.Length + 1)..]);
+
+        return path;
+    }
+
     public static bool IsModificationAllowedAt(string path, string deviceId)
     {
         LogicalDeviceViewModel? device = null;
         if (!string.IsNullOrEmpty(deviceId))
             device = Data.DevicesObject?.LogicalDeviceViewModels?.FirstOrDefault(d => d.ID == deviceId);
 
-        if (GetCurrentDrive(path, device)?.Restrictions.ReadOnly is true)
+        if (GetRestrictions(path, device).ReadOnly)
             return false;
 
         return ArchiveHelper.IsModificationAllowedAt(path, deviceId);
@@ -59,6 +112,6 @@ internal class DriveHelper
             || path.StartsWith($"{AdbExplorerConst.TEMP_PATH}/", StringComparison.Ordinal))
             return false;
 
-        return GetCurrentDrive(path)?.Restrictions.NoApkInstall is true;
+        return GetRestrictions(path).NoApkInstall;
     }
 }

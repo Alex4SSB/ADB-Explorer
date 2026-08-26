@@ -142,7 +142,8 @@ public partial class FileViewModelBase : ObservableObject
         if (textBox.DataContext is not FileClass file || Data.CurrentDrive is null)
             return;
 
-        textBox.FilterString(Data.CurrentDrive.Restrictions.RestrictedNaming
+        var restrictions = DriveHelper.GetRestrictions(file.FullPath);
+        textBox.FilterString(restrictions.RestrictedNaming
             ? AdbExplorerConst.INVALID_NTFS_CHARS
             : AdbExplorerConst.INVALID_UNIX_CHARS);
 
@@ -157,7 +158,7 @@ public partial class FileViewModelBase : ObservableObject
             ? textBox.Text
             : textBox.Text + file.Extension;
 
-        var comparison = Data.CurrentDrive.Restrictions.CaseInsensitiveNames
+        var comparison = restrictions.CaseInsensitiveNames
             ? StringComparison.InvariantCultureIgnoreCase
             : StringComparison.InvariantCulture;
 

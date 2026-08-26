@@ -457,12 +457,9 @@ internal static class FileActionLogic
         }
     }
 
-  public static bool EnableUiPaste()
+    public static bool EnableUiPaste()
     {
         if (ActionFlags.IsRecycleBin || ActionList.ForbidPaste)
-            return false;
-
-        if (ActionList.CurrentDrive?.Restrictions.ReadOnly is true)
             return false;
 
         string[] files = Data.CopyPaste.Files;
@@ -533,9 +530,6 @@ internal static class FileActionLogic
     public static bool EnableKeyboardPaste()
     {
         if (ActionFlags.IsRecycleBin || ActionList.ForbidPaste)
-            return false;
-
-        if (ActionList.CurrentDrive?.Restrictions.ReadOnly is true)
             return false;
 
         string[] files = Data.CopyPaste.Files;
@@ -635,11 +629,12 @@ internal static class FileActionLogic
     private static bool IsSymlinkPasteAllowed(string targetPath)
     {
         var deviceId = Data.DevicesObject?.Current?.ID ?? "";
+        var restrictions = DriveHelper.GetRestrictions(targetPath);
         return HasRootShell
             && Data.CopyPaste.Files.Length == 1
             && Data.CopyPaste.IsSelf
-            && DriveHelper.GetCurrentDrive(targetPath)?.Restrictions.NoSymbolicLinks is not true
-            && DriveHelper.GetCurrentDrive(targetPath)?.Restrictions.ReadOnly is not true
+            && restrictions.NoSymbolicLinks is not true
+            && restrictions.ReadOnly is not true
             && !ArchivePath.IsArchivePath(targetPath, deviceId);
     }
 
@@ -690,7 +685,7 @@ internal static class FileActionLogic
             && !fromArchive
             && HasRootShell
             && Data.CopyPaste.IsSelf
-            && DriveHelper.GetCurrentDrive(targetPath)?.Restrictions.NoSymbolicLinks is not true
+            && DriveHelper.GetRestrictions(targetPath).NoSymbolicLinks is not true
             && Data.CopyPaste.CurrentFiles.Count() == 1)
             result |= DragDropEffects.Link;
 
@@ -733,7 +728,7 @@ internal static class FileActionLogic
         if (drive.Type is AbstractDrive.DriveType.Trash)
             return DragDropEffects.None;
 
-        if (drive.Type is AbstractDrive.DriveType.Root)
+        if (target.Drive?.Type is AbstractDrive.DriveType.Root)
             return DragDropEffects.None;
 
         var deviceId = target.OwnerDevice?.ID ?? Data.DevicesObject.Current?.ID ?? "";
@@ -749,7 +744,7 @@ internal static class FileActionLogic
         }
 
         var targetPath = ArchiveHelper.ResolvePasteTargetPath(target.DropTargetPath, deviceId);
-        if (drive.Restrictions.ReadOnly || !ArchiveHelper.IsModificationAllowedAt(targetPath, deviceId))
+        if (!DriveHelper.IsModificationAllowedAt(targetPath, deviceId))
             return DragDropEffects.None;
 
         if (ArchivePath.IsArchivePath(targetPath, deviceId)
@@ -787,7 +782,7 @@ internal static class FileActionLogic
                 && !fromArchive
                 && target.OwnerDevice?.HasRootShell == true
                 && sameDevice
-                && DriveHelper.GetCurrentDrive(targetPath, target.OwnerDevice)?.Restrictions.NoSymbolicLinks is not true
+                && DriveHelper.GetRestrictions(targetPath, target.OwnerDevice).NoSymbolicLinks is not true
                 && Data.CopyPaste.CurrentFiles.Count() == 1)
                 result |= DragDropEffects.Link;
 
@@ -805,12 +800,12 @@ internal static class FileActionLogic
 
     private static void UpdatePastingRestrictions(string targetPath, string[] files)
     {
-        var restrictions = DriveHelper.GetCurrentDrive(targetPath)?.Restrictions ?? DriveRestrictions.None;
+        var restrictions = DriveHelper.GetRestrictions(targetPath);
 
         if (ActionFlags.IsAppDrive)
         {
             ActionFlags.IsPastingIllegalNaming = Data.CopyPaste.IsSelf
-                && (DriveHelper.GetCurrentDrive(files[0])?.Restrictions.RestrictedNaming is true);
+                && DriveHelper.GetRestrictions(files[0]).RestrictedNaming;
             return;
         }
 
@@ -1020,7 +1015,7 @@ internal static class FileActionLogic
         var name = FileHelper.DisplayName(textBox);
 
         if (!vm.IsRenameUnixLegal
-            || (Data.CurrentDrive?.Restrictions.RestrictedNaming is true && !vm.IsRenameNamingLegal)
+            || (DriveHelper.GetRestrictions(file.FullPath).RestrictedNaming && !vm.IsRenameNamingLegal)
             || !vm.IsRenameUnique)
         {
             return;
@@ -1061,12 +1056,8 @@ internal static class FileActionLogic
         if (node.File is not { } file)
             return;
 
-        var drive = node.Drive
-            ?? DriveHelper.GetCurrentDrive(node.Path, node.OwnerDevice)
-            ?? Data.CurrentDrive;
-
         if (!node.IsRenameUnixLegal
-            || (drive?.Restrictions.RestrictedNaming is true && !node.IsRenameNamingLegal)
+            || (DriveHelper.GetRestrictions(node.Path, node.OwnerDevice).RestrictedNaming && !node.IsRenameNamingLegal)
             || !node.IsRenameUnique)
         {
             if (file.IsTemp)
@@ -1572,9 +1563,9 @@ internal static class FileActionLogic
         var isFollowLinkEnabled = actions.IsFollowLinkEnabled;
         var followLinkAllowsAction = !isFollowLinkEnabled || hasRoot;
 
-        var restrictions = list.CurrentDrive?.Restrictions ?? DriveRestrictions.None;
-        var deviceId = currentDevice?.ID;
         var listingPath = list.DirList?.CurrentPath ?? list.Path;
+        var restrictions = DriveHelper.GetRestrictions(listingPath, currentDevice);
+        var deviceId = currentDevice?.ID;
         if (deviceId is not null && !string.IsNullOrEmpty(listingPath))
             actions.IsArchive = ArchivePath.IsArchivePath(listingPath, deviceId);
 
@@ -1828,7 +1819,7 @@ internal static class FileActionLogic
             && Data.CopyPaste.PasteState is DragDropEffects.Copy or DragDropEffects.Link
             && IsSymlinkPasteAllowed(pasteLinkTarget);
 
-        actions.IsCopyLinkEnabled = list.CurrentDrive?.Restrictions.NoSymbolicLinks is not true
+        actions.IsCopyLinkEnabled = DriveHelper.GetRestrictions(listingPath, currentDevice).NoSymbolicLinks is not true
             && hasRoot
             && singleFileSelected
             && noBrokenLinks
@@ -1942,7 +1933,6 @@ internal static class FileActionLogic
 
         var target = ActionPath;
         return !ArchivePath.IsArchivePath(target, device.ID)
-            && ActionList.CurrentDrive?.Restrictions.ReadOnly is not true
             && DriveHelper.IsModificationAllowedAt(target, device.ID);
     }
 
@@ -1954,7 +1944,6 @@ internal static class FileActionLogic
 
         var target = GetUiPasteTargetPath();
         return !ArchivePath.IsArchivePath(target, device.ID)
-            && ActionList.CurrentDrive?.Restrictions.ReadOnly is not true
             && DriveHelper.IsModificationAllowedAt(target, device.ID);
     }
 

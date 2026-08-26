@@ -11,7 +11,7 @@ namespace ADB_Explorer.Controls;
 /// </summary>
 public partial class NavigationBox : UserControl
 {
-    private DriveViewModel? _trackedDrive;
+    private LogicalDeviceViewModel? _trackedDevice;
 
     public enum ViewMode
     {
@@ -76,7 +76,11 @@ public partial class NavigationBox : UserControl
 
                 if (update)
                 {
-                    TrackDriveRestrictions(DriveHelper.GetCurrentDrive(value));
+                    if (string.IsNullOrEmpty(value))
+                        UntrackDevice();
+                    else
+                        TrackPathRestrictions();
+
                     AddDevice(value);
                 }
             }, DispatcherPriority.Render);
@@ -553,59 +557,65 @@ public partial class NavigationBox : UserControl
         }
     }
 
-    private void TrackDriveRestrictions(DriveViewModel? drive)
+    private void TrackPathRestrictions()
     {
-        if (_trackedDrive == drive)
+        var device = Data.DevicesObject?.Current;
+        if (_trackedDevice != device)
         {
-            ApplyDriveRestrictions();
-            return;
+            UntrackDevice();
+            _trackedDevice = device;
+            if (_trackedDevice is not null)
+                _trackedDevice.PropertyChanged += OnTrackedDevicePropertyChanged;
         }
-
-        _trackedDrive?.PropertyChanged -= OnTrackedDrivePropertyChanged;
-
-        _trackedDrive = drive;
-
-        _trackedDrive?.PropertyChanged += OnTrackedDrivePropertyChanged;
 
         ApplyDriveRestrictions();
 
-        if (drive?.FSInfo is null && Data.DevicesObject?.Current is LogicalDeviceViewModel device)
-            _ = Task.Run(() => AdbHelper.ApplyMountInfo(device, Data.DeviceCts.Token), Data.DeviceCts.Token);
+        if (AdbHelper.NeedsMountInfo(_trackedDevice))
+            _ = Task.Run(() => AdbHelper.ApplyMountInfo(_trackedDevice, Data.DeviceCts.Token), Data.DeviceCts.Token);
     }
 
-    private void OnTrackedDrivePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void UntrackDevice()
     {
-        if (e.PropertyName is nameof(DriveViewModel.FSInfo)
-            or nameof(DriveViewModel.HasDriveRestrictions)
-            or nameof(DriveViewModel.RestrictionsTooltip)
-            or nameof(DriveViewModel.Restrictions))
+        if (_trackedDevice is null)
+            return;
+
+        _trackedDevice.PropertyChanged -= OnTrackedDevicePropertyChanged;
+        _trackedDevice = null;
+    }
+
+    private void OnTrackedDevicePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(LogicalDeviceViewModel.Mounts)
+            or nameof(LogicalDeviceViewModel.HasRootShell))
             App.SafeInvoke(ApplyDriveRestrictions);
     }
 
     private void ApplyDriveRestrictions()
     {
-        var driveRestrictions = _trackedDrive?.Restrictions ?? DriveRestrictions.None;
-        var deviceId = Data.DevicesObject?.Current?.ID;
-        var isArchive = ArchivePath.IsArchivePath(Path, deviceId);
+        var path = Path;
+        var device = _trackedDevice ?? Data.DevicesObject?.Current;
+        var deviceId = device?.ID;
+        var isArchive = ArchivePath.IsArchivePath(path, deviceId);
+        var restrictions = DriveHelper.GetRestrictions(path, device);
 
         string tooltipText;
         string iconGlyph;
 
         if (isArchive)
         {
-            var archiveDevicePath = ArchivePath.GetArchivePath(Path, deviceId);
+            var archiveDevicePath = ArchivePath.GetArchivePath(path, deviceId);
             tooltipText = ArchiveHelper.GetArchiveModificationTooltip(
                 FileHelper.GetFullName(archiveDevicePath),
-                Data.DevicesObject?.Current?.ID ?? "");
+                deviceId ?? "");
 
             iconGlyph = "\uF012";
             HasDriveRestrictions = true;
         }
         else
         {
-            tooltipText = _trackedDrive?.RestrictionsTooltip ?? "";
-            iconGlyph = driveRestrictions.IconGlyph;
-            HasDriveRestrictions = driveRestrictions.HasAny;
+            tooltipText = restrictions.GetTooltipText();
+            iconGlyph = restrictions.IconGlyph;
+            HasDriveRestrictions = restrictions.HasAny;
         }
 
         RestrictionsTooltip = tooltipText;

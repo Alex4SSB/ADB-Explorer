@@ -31,8 +31,8 @@ public class FileList
     public bool ForbidDestructive { get; set; }
 
     /// <summary>
-    /// Root (`/`) drive, or a folder under it.
-    /// Paste is not offered onto that node.
+    /// Root (`/`) drive card. Paste is not offered onto that node.
+    /// Folders under it follow the covering mount's writability.
     /// </summary>
     public bool ForbidPaste { get; set; }
 
@@ -58,7 +58,7 @@ public class FileList
             CurrentDrive = drive,
             ForbidDestructive = node.Drive is not null
                 || drive?.Type is AbstractDrive.DriveType.Root,
-            ForbidPaste = drive?.Type is AbstractDrive.DriveType.Root,
+            ForbidPaste = node.Drive?.Type is AbstractDrive.DriveType.Root,
         };
 
         if (drive?.Type is AbstractDrive.DriveType.Package)
@@ -84,7 +84,7 @@ public class FileList
         list.SelectedFiles = [folder];
         list.Path = FileHelper.GetParentPath(node.Path);
         list.Actions.IsExplorerVisible = true;
-        list.CanWrite = drive?.Restrictions.ReadOnly is not true;
+        list.CanWrite = DriveHelper.GetRestrictions(node.Path, device).ReadOnly is not true;
         return list;
     }
 

@@ -23,6 +23,9 @@
                 <Style TargetType="avalonEdit:TextEditor">
                     <Setter Property="Background" Value="{DynamicResource TextControlBackground}" />
                     <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsHexMode}" Value="True">
+                            <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
+                        </DataTrigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" Value="{DynamicResource TextControlBackgroundPointerOver}" />
                         </Trigger>

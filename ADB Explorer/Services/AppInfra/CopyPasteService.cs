@@ -745,7 +745,7 @@ public partial class CopyPasteService : ObservableObject
             return;
 
         if ((isLink || CurrentEffect is DragDropEffects.Link)
-            && DriveHelper.GetCurrentDrive(targetFolder, device)?.Restrictions.NoSymbolicLinks is true)
+            && DriveHelper.GetRestrictions(targetFolder, device).NoSymbolicLinks)
             return;
 
         void ReadObject()
@@ -1202,7 +1202,7 @@ public partial class CopyPasteService : ObservableObject
 
         device ??= Data.DevicesObject.Current;
         var sep = FileHelper.GetSeparator(targetPath);
-        var caseSensitive = sep is '/' && DriveHelper.GetCurrentDrive(targetPath, device)?.Restrictions.CaseInsensitiveNames is not true;
+        var caseSensitive = sep is '/' && DriveHelper.GetRestrictions(targetPath, device).CaseInsensitiveNames is not true;
         StringComparer comparer = caseSensitive
             ? StringComparer.InvariantCulture
             : StringComparer.InvariantCultureIgnoreCase;
@@ -1315,7 +1315,7 @@ public partial class CopyPasteService : ObservableObject
 
         device ??= Data.DevicesObject.Current;
         var sep = FileHelper.GetSeparator(targetPath);
-        var caseSensitive = sep is '/' && DriveHelper.GetCurrentDrive(targetPath, device)?.Restrictions.CaseInsensitiveNames is not true;
+        var caseSensitive = sep is '/' && DriveHelper.GetRestrictions(targetPath, device).CaseInsensitiveNames is not true;
         StringComparer comparer = caseSensitive
             ? StringComparer.InvariantCulture
             : StringComparer.InvariantCultureIgnoreCase;

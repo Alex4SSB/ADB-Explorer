@@ -40,6 +40,9 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     [ObservableProperty]
     public partial ObservableList<DriveViewModel> Drives { get; set; } = [];
 
+    [ObservableProperty]
+    public partial MountTable Mounts { get; set; } = MountTable.Empty;
+
     #endregion
 
     #region Read only properties
@@ -409,7 +412,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         RefreshShellIdentity();
 
         if (Data.DevicesObject.Current?.ID == ID)
-            Data.DirList?.RefreshLocationAccess();
+            AdbHelper.ApplyMountInfo(this, Data.DeviceCts.Token);
 
         OnPropertyChanged(nameof(Root));
     }
@@ -426,7 +429,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
             {
                 RefreshShellIdentity();
                 if (Data.DevicesObject.Current?.ID == ID)
-                    Data.DirList?.RefreshLocationAccess();
+                    AdbHelper.ApplyMountInfo(this, Data.DeviceCts.Token);
             }
 
             return true;

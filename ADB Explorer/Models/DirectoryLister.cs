@@ -159,7 +159,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
             locationSource = null;
 
             var drivePath = ArchivePath.IsArchivePath(path, Device.ID) ? ArchivePath.GetArchivePath(path, Device.ID) : path;
-            var restrictions = DriveHelper.GetCurrentDrive(drivePath)?.Restrictions ?? DriveRestrictions.None;
+            var restrictions = DriveHelper.GetRestrictions(drivePath, Device);
             var preliminary = FileClass.BuildCurrentLocation(path, null, source, Device.ShellIdentity, restrictions, Device.ID);
             CurrentLocation = preliminary;
         }).Wait();
@@ -301,7 +301,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
 
         var identity = Device.GetOrLoadShellIdentity();
         var drivePath = ArchivePath.IsArchivePath(path, Device.ID) ? ArchivePath.GetArchivePath(path, Device.ID) : path;
-        var restrictions = DriveHelper.GetCurrentDrive(drivePath)?.Restrictions ?? DriveRestrictions.None;
+        var restrictions = DriveHelper.GetRestrictions(drivePath, Device);
 
         LocationInfo? info = null;
         if (!ArchivePath.IsArchivePath(path, Device.ID))

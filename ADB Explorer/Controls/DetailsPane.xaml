@@ -120,7 +120,11 @@
                             FontSize="12"
                             Foreground="{DynamicResource InfoBadgeInformationalSeverityBackgroundBrush}"
                             Text="{Binding Source={x:Static Member=strings:Resources.S_PREVIEW_SYNTAX}}" />
-                        <ComboBox ItemsSource="{Binding SyntaxOptions}" SelectedItem="{Binding SelectedSyntax, Mode=TwoWay}">
+                        <ComboBox
+                            ItemsSource="{Binding SyntaxOptions}"
+                            MaxDropDownHeight="287"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                            SelectedItem="{Binding SelectedSyntax, Mode=TwoWay}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding DisplayName}" />
@@ -132,6 +136,7 @@
                         <local:AdbAvalonEditor
                             x:Name="EditorTextBox"
                             EditorText="{Binding EditorText, Mode=TwoWay}"
+                            IsHexMode="{Binding SelectedSyntax.IsHex, FallbackValue=False, TargetNullValue=False}"
                             IsReadOnly="{Binding IsEditorReadOnly}" />
                         <local:AdbMenu
                             Margin="0,0,12,0"

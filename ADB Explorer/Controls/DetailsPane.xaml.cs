@@ -16,20 +16,24 @@ namespace ADB_Explorer.Controls;
 /// </summary>
 public partial class DetailsPane : UserControl
 {
-    public sealed class PreviewSyntaxOption(string displayName, string? highlightingName, bool disableHighlighting = false)
+    public sealed class PreviewSyntaxOption(string displayName, string? highlightingName, bool disableHighlighting = false, bool isHex = false)
     {
         public string DisplayName { get; } = displayName;
 
         /// <summary>Null means Automatic (pick by file extension) unless <see cref="DisableHighlighting"/>.</summary>
         public string? HighlightingName { get; } = highlightingName;
 
-        /// <summary>When true, no syntax highlighting is applied (the None option).</summary>
+        /// <summary>When true, no syntax highlighting is applied (None and Hex).</summary>
         public bool DisableHighlighting { get; } = disableHighlighting;
+
+        public bool IsHex { get; } = isHex;
     }
 
     private DriveViewModel? _mountOptionsDrive;
+    private LogicalDeviceViewModel? _previewMountDevice;
     private VirtualDriveViewModel? _trashCountDrive;
     private string? _previewFileExtension;
+    private byte[]? _previewBytes;
     private bool _updatingSyntaxSelection;
 
     public enum SidePaneMode
@@ -165,17 +169,23 @@ public partial class DetailsPane : UserControl
     private static IReadOnlyList<PreviewSyntaxOption> BuildSyntaxOptions()
     {
         var automatic = new PreviewSyntaxOption(Strings.Resources.S_PREVIEW_SYNTAX_AUTOMATIC, null);
+        var hex = new PreviewSyntaxOption("Hex", null, disableHighlighting: true, isHex: true);
         var none = new PreviewSyntaxOption(Strings.Resources.S_DISABLED, null, disableHighlighting: true);
         var named = HighlightingManager.Instance.HighlightingDefinitions
             .OrderBy(d => d.Name, StringComparer.OrdinalIgnoreCase)
             .Select(d => new PreviewSyntaxOption(d.Name, d.Name));
-        return [automatic, none, .. named];
+        return [automatic, hex, none, .. named];
     }
 
     private static void OnSelectedSyntaxChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is not DetailsPane pane || pane._updatingSyntaxSelection)
             return;
+
+        var wasHex = e.OldValue is PreviewSyntaxOption { IsHex: true };
+        var isHex = pane.SelectedSyntax?.IsHex is true;
+        if (wasHex != isHex)
+            pane.SwitchPreviewEncoding(fromHex: wasHex);
 
         pane.ApplyPreviewSyntaxHighlighting();
     }
@@ -313,9 +323,11 @@ public partial class DetailsPane : UserControl
                 oldFile.CancelCacheThumbnailLoading();
         }
 
+        control.UnsubscribePreviewMounts();
         control.ClearPhotoPreview();
 
         control.EditorText = null;
+        control._previewBytes = null;
         control.IsEditorReadOnly = false;
         control.ResetSyntaxToAutomatic();
         control._previewFileExtension = null;
@@ -361,7 +373,8 @@ public partial class DetailsPane : UserControl
 
                 var device = Data.DevicesObject.Current;
                 var deviceId = device?.ID ?? "";
-                control.IsEditorReadOnly = ArchiveHelper.IsMemberPreviewReadOnly(file.FullPath, deviceId);
+                control.SubscribePreviewMounts(device);
+                control.IsEditorReadOnly = IsPreviewTextReadOnly(file, device);
                 control._previewFileExtension = file.Extension;
                 control.UpdateSyntaxSelectorVisibility();
                 control.ApplyPreviewSyntaxHighlighting();
@@ -395,9 +408,17 @@ public partial class DetailsPane : UserControl
 
                     _ = Task.Run(async () =>
                     {
-                        var text = await AdbHelper.ReadTextFileAsync(device, fullPath, cts.Token);
-                        if (text is not null && !cts.IsCancellationRequested)
-                            App.SafeInvoke(() => control.EditorText = text);
+                        var stream = await AdbHelper.ReadFileAsStreamAsync(device, fullPath, cts.Token);
+                        if (stream is null || cts.IsCancellationRequested) return;
+
+                        var bytes = stream.ToArray();
+                        if (cts.IsCancellationRequested) return;
+
+                        App.SafeInvoke(() =>
+                        {
+                            control._previewBytes = bytes;
+                            control.ApplyPreviewContent();
+                        });
                     }, cts.Token);
                 }
             }
@@ -739,8 +760,27 @@ public partial class DetailsPane : UserControl
             if (IsEditorReadOnly)
                 return;
 
-            var file = SelectedFiles.First() as FileClass;
-            var result = await AdbHelper.WriteTextFileAsync(Data.DevicesObject.Current, file, EditorText, _cancellationToken.Token);
+            if (SelectedFiles.First() is not FileClass file)
+                return;
+
+            var token = _cancellationToken?.Token ?? default;
+            bool result;
+            int byteCount;
+            if (SelectedSyntax?.IsHex is true)
+            {
+                var bytes = HexText.Parse(EditorText);
+                result = await AdbHelper.WriteBytesFileAsync(Data.DevicesObject.Current, file, bytes, token);
+                byteCount = bytes.Length;
+                if (result)
+                    _previewBytes = bytes;
+            }
+            else
+            {
+                result = await AdbHelper.WriteTextFileAsync(Data.DevicesObject.Current, file, EditorText ?? "", token);
+                byteCount = Encoding.UTF8.GetByteCount(EditorText ?? "");
+                if (result)
+                    _previewBytes = Encoding.UTF8.GetBytes(EditorText ?? "");
+            }
 
             if (result)
             {
@@ -748,7 +788,6 @@ public partial class DetailsPane : UserControl
                 EditorText = null;
                 EditorText = text;
 
-                var byteCount = Encoding.UTF8.GetByteCount(text);
                 file.ModifiedTime = DateTime.Now;
                 file.ShellLsSize = byteCount;
                 file.Size = byteCount;
@@ -790,6 +829,40 @@ public partial class DetailsPane : UserControl
         };
 
         OnSelectedFilesChanged(this, new DependencyPropertyChangedEventArgs(SelectedFilesProperty, null, SelectedFiles));
+    }
+
+    private void ApplyPreviewContent()
+    {
+        if (_previewBytes is null)
+            return;
+
+        if (SelectedSyntax?.IsHex is true)
+            EditorText = HexText.Format(_previewBytes);
+        else
+            EditorText = DecodePreviewText(_previewBytes);
+    }
+
+    private static string DecodePreviewText(byte[] bytes)
+    {
+        using var reader = new StreamReader(new MemoryStream(bytes), detectEncodingFromByteOrderMarks: true);
+        return reader.ReadToEnd();
+    }
+
+    private void SwitchPreviewEncoding(bool fromHex)
+    {
+        var unsaved = EditorTextBox?.HasUnsavedChanges is true;
+
+        if (unsaved)
+        {
+            if (fromHex)
+                _previewBytes = HexText.Parse(EditorText);
+            else
+                _previewBytes = Encoding.UTF8.GetBytes(EditorText ?? "");
+        }
+
+        ApplyPreviewContent();
+        if (unsaved)
+            EditorTextBox?.MarkAsUnsaved();
     }
 
     private void ResetSyntaxToAutomatic()
@@ -926,6 +999,61 @@ public partial class DetailsPane : UserControl
 
     private static BitmapSource TrashIcon(VirtualDriveViewModel? trash)
         => trash?.ItemsCount == 0 ? EmptyTrash.DragImage : FullTrash.DragImage;
+
+    private static bool IsPreviewTextReadOnly(FileClass file, LogicalDeviceViewModel? device)
+    {
+        var deviceId = device?.ID ?? "";
+        if (ArchiveHelper.IsMemberPreviewReadOnly(file.FullPath, deviceId))
+            return true;
+
+        return DriveHelper.GetRestrictions(file.FullPath, device).ReadOnly;
+    }
+
+    private void SubscribePreviewMounts(LogicalDeviceViewModel? device)
+    {
+        if (_previewMountDevice == device)
+            return;
+
+        UnsubscribePreviewMounts();
+        _previewMountDevice = device;
+        if (_previewMountDevice is not null)
+            _previewMountDevice.PropertyChanged += OnPreviewMountsChanged;
+
+        if (AdbHelper.NeedsMountInfo(_previewMountDevice))
+            _ = Task.Run(() => AdbHelper.ApplyMountInfo(_previewMountDevice, Data.DeviceCts.Token), Data.DeviceCts.Token);
+    }
+
+    private void UnsubscribePreviewMounts()
+    {
+        if (_previewMountDevice is null)
+            return;
+
+        _previewMountDevice.PropertyChanged -= OnPreviewMountsChanged;
+        _previewMountDevice = null;
+    }
+
+    private void OnPreviewMountsChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is not nameof(LogicalDeviceViewModel.Mounts)
+            and not nameof(LogicalDeviceViewModel.HasRootShell))
+            return;
+
+        App.SafeInvoke(UpdatePreviewEditorReadOnly);
+    }
+
+    private void UpdatePreviewEditorReadOnly()
+    {
+        if (Mode is not SidePaneMode.Preview)
+            return;
+
+        if (SelectedFiles?.Count() != 1 || SelectedFiles.First() is not FileClass file)
+            return;
+
+        if (file.Type is not AbstractFile.FileType.File)
+            return;
+
+        IsEditorReadOnly = IsPreviewTextReadOnly(file, Data.DevicesObject.Current);
+    }
 
     private void UnsubscribeMountOptionsDrive()
     {
@@ -1081,7 +1209,7 @@ public partial class DetailsPane : UserControl
         if (file.ModifiedTime.HasValue)
             SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_FILE_INFO_MODIFIED, f => f.FolderViewModel.ModifiedTimeWithOffsetString, valueIsLtr: true).Init());
 
-        if (Data.CurrentDrive?.Restrictions.SupportsAccessTime is true)
+        if (DriveHelper.GetRestrictions(file.FullPath).SupportsAccessTime)
             SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(
                 file,
                 Strings.Resources.S_DATE_ACCESSED,

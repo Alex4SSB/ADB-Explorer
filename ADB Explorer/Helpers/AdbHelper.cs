@@ -93,11 +93,17 @@ public static class AdbHelper
     });
 
     public static Task<bool> WriteTextFileAsync(LogicalDeviceViewModel device, FileClass file, string content, CancellationToken cancellationToken = default) =>
+        WriteFileWithUiAsync(() => WriteFileAsync(device, file, content, cancellationToken));
+
+    public static Task<bool> WriteBytesFileAsync(LogicalDeviceViewModel device, FileClass file, byte[] content, CancellationToken cancellationToken = default) =>
+        WriteFileWithUiAsync(() => WriteFileAsync(device, file, content, cancellationToken));
+
+    private static Task<bool> WriteFileWithUiAsync(Func<Task> write) =>
         Task.Run(async () =>
     {
         try
         {
-            await WriteFileAsync(device, file, content, cancellationToken);
+            await write();
             return true;
         }
         catch (Exception e)
@@ -251,6 +257,18 @@ public static class AdbHelper
         await writer.WriteAsync(content);
         await writer.FlushAsync(cancellationToken);
         stream.Position = 0;
+        await PushFileStreamAsync(device, file, stream, cancellationToken);
+    }
+
+    public static async Task WriteFileAsync(LogicalDeviceViewModel device, FileClass file, byte[] content, CancellationToken cancellationToken = default)
+    {
+        using MemoryStream stream = new(content);
+        await PushFileStreamAsync(device, file, stream, cancellationToken);
+    }
+
+    private static async Task PushFileStreamAsync(LogicalDeviceViewModel device, FileClass file, MemoryStream stream, CancellationToken cancellationToken)
+    {
+        stream.Position = 0;
 
         if (ArchivePath.TryParse(file.FullPath, out var archivePath, out var internalPath, device.ID)
             && !string.IsNullOrEmpty(internalPath))
@@ -329,80 +347,75 @@ public static class AdbHelper
         });
     }
 
+    public static bool NeedsMountInfo(LogicalDeviceViewModel? device)
+    {
+        if (device is null)
+            return false;
+
+        if (device.HasRootShell && device.Mounts.IsEmpty)
+            return true;
+
+        var root = device.Drives.FirstOrDefault(d => d.Type is AbstractDrive.DriveType.Root);
+        return root?.FSInfo is null;
+    }
+
     public static void ApplyMountInfo(LogicalDeviceViewModel device, CancellationToken cancellationToken)
     {
-        var infos = GetMountInfo(device, cancellationToken).ToList();
+        ADBService.ExecuteDeviceAdbShellCommand(device.ID, "mount", out string stdout, out _, cancellationToken);
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
+        var table = MountTable.Parse(stdout);
+        device.GetOrLoadShellIdentity();
+        var storeAllMounts = device.HasRootShell;
 
         DriveViewModel[] drives = [];
         App.SafeInvoke(() => drives = [.. device.Drives]);
 
+        List<(DriveViewModel Drive, Models.FileSystemInfo? Info)> assignments = [];
+
         foreach (var drive in drives.OfType<LogicalDriveViewModel>())
         {
             if (cancellationToken.IsCancellationRequested)
-                break;
+                return;
 
+            Models.FileSystemInfo? info;
             if (drive.Type is AbstractDrive.DriveType.Root)
             {
-                var rootInfo = infos.FirstOrDefault(i => i.MountPoint == "/");
-                App.SafeInvoke(() => drive.FSInfo = rootInfo);
+                info = table.Find("/", includeRoot: true);
             }
             else
             {
                 var path = string.IsNullOrEmpty(drive.LinkTargetPath)
                     ? drive.Path
                     : drive.LinkTargetPath;
-
-                Models.FileSystemInfo? info = null;
-
-                do
-                {
-                    if (infos.FirstOrDefault(i => i.MountPoint == path) is Models.FileSystemInfo inf && inf.MountPoint is not null)
-                    {
-                        info = inf;
-                        break;
-                    }
-                    path = FileHelper.GetParentPath(path);
-
-                } while (path != "/");
-
-                App.SafeInvoke(() => drive.FSInfo = info);
+                info = table.Find(path, includeRoot: false);
             }
+
+            assignments.Add((drive, info));
         }
 
         foreach (var drive in drives.OfType<VirtualDriveViewModel>().Where(d => d.Type is AbstractDrive.DriveType.Temp))
         {
             if (cancellationToken.IsCancellationRequested)
-                break;
+                return;
 
             Models.FileSystemInfo? info = null;
             var mountPoint = drive.DfMountPoint;
-
             if (!string.IsNullOrEmpty(mountPoint))
-                info = infos.FirstOrDefault(i => i.MountPoint == mountPoint);
+                info = table.Find(mountPoint, includeRoot: false);
 
-            App.SafeInvoke(() => drive.FSInfo = info);
+            assignments.Add((drive, info));
         }
 
-        App.SafeInvoke(FileActionLogic.UpdateFileActions);
-    }
-
-    private static IEnumerable<Models.FileSystemInfo> GetMountInfo(LogicalDeviceViewModel device, CancellationToken cancellationToken)
-    {
-        ADBService.ExecuteDeviceAdbShellCommand(device.ID, "mount", out string stdout, out _, cancellationToken);
-
-        var matches = AdbRegEx.RE_MOUNT_PARSE().Matches(stdout);
-
-        foreach (Match match in matches)
+        App.SafeInvoke(() =>
         {
-            if (cancellationToken.IsCancellationRequested)
-                yield break;
+            device.Mounts = storeAllMounts ? table : MountTable.Empty;
+            foreach (var (drive, info) in assignments)
+                drive.FSInfo = info;
 
-            yield return new(
-                BlockDev: match.Groups["BlockDev"].Value,
-                MountPoint: match.Groups["MntPt"].Value,
-                FileSystemType: match.Groups["Type"].Value,
-                Options: match.Groups["Attr"].Value.Split(',')
-            );
-        }
+            Data.DirList?.RefreshLocationAccess();
+            FileActionLogic.UpdateFileActions();
+        });
     }
 }
