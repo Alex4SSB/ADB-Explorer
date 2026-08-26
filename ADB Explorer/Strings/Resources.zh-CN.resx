@@ -1759,4 +1759,10 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
     <value>创建应用安装和 OBB 数据的 .APKBKP 备份</value>
   </data>
+  <data name="S_NAVIGATION_PANE" xml:space="preserve">
+    <value>导航窗格</value>
+  </data>
+  <data name="S_MENU_SHOW" xml:space="preserve">
+    <value>显示</value>
+  </data>
 </root>
