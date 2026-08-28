@@ -1074,14 +1074,14 @@ public partial class ADBService
 
             return await Task.Run<FileExtraInfo?>(() =>
             {
-                // Size, user, group, mode, access/creation/modified (human-readable for UTC offset)
+                // Size, user, group, uid, gid, mode, access/creation/modified (human-readable for UTC offset)
                 var res = ExecuteDeviceAdbShellCommand(deviceId,
                                                        "stat",
                                                        out string stdout,
                                                        out _,
                                                        cancellationToken,
                                                        "-c",
-                                                       $"%s{ADB_FIELD_SEP}%U{ADB_FIELD_SEP}%G{ADB_FIELD_SEP}%a{ADB_FIELD_SEP}%x{ADB_FIELD_SEP}%z{ADB_FIELD_SEP}%y",
+                                                       $"%s{ADB_FIELD_SEP}%U{ADB_FIELD_SEP}%G{ADB_FIELD_SEP}%u{ADB_FIELD_SEP}%g{ADB_FIELD_SEP}%a{ADB_FIELD_SEP}%x{ADB_FIELD_SEP}%z{ADB_FIELD_SEP}%y",
                                                        EscapeAdbShellString(path));
 
                 if (res != 0 || string.IsNullOrWhiteSpace(stdout))
@@ -1091,16 +1091,20 @@ public partial class ADBService
                 {
                     var parts = stdout.Split(ADB_FIELD_SEP);
                     long? size = long.TryParse(parts[0].Trim(), out long bytes) ? bytes : null;
-                    var permissions = (System.IO.UnixFileMode)Convert.ToInt32(parts[3].Trim(), 8);
+                    int? ownerUid = int.TryParse(parts[3].Trim(), out var uid) ? uid : null;
+                    int? ownerGid = int.TryParse(parts[4].Trim(), out var gid) ? gid : null;
+                    var permissions = (System.IO.UnixFileMode)Convert.ToInt32(parts[5].Trim(), 8);
 
                     return new FileExtraInfo(
-                        parts[1],
-                        parts[2],
+                        parts[1].Trim(),
+                        parts[2].Trim(),
                         permissions,
-                        DateTimeOffset.Parse(parts[4].Trim(), CultureInfo.InvariantCulture),
-                        DateTimeOffset.Parse(parts[5].Trim(), CultureInfo.InvariantCulture),
                         DateTimeOffset.Parse(parts[6].Trim(), CultureInfo.InvariantCulture),
-                        size);
+                        DateTimeOffset.Parse(parts[7].Trim(), CultureInfo.InvariantCulture),
+                        DateTimeOffset.Parse(parts[8].Trim(), CultureInfo.InvariantCulture),
+                        size,
+                        ownerUid,
+                        ownerGid);
                 }
                 catch
                 {
@@ -1112,6 +1116,55 @@ public partial class ADBService
         {
             ExtraInfoStatGate.Release();
         }
+    }
+
+    public static (IReadOnlyList<string> Users, IReadOnlyList<string> Groups) GetKnownUsersAndGroups(string deviceId, CancellationToken cancellationToken = default)
+    {
+        var cat = ShellCommands.TranslateCommand("cat");
+        var echo = ShellCommands.TranslateCommand("echo");
+        var script =
+            $"{cat} {string.Join(' ', AndroidAids.PasswdPaths)} 2>/dev/null; " +
+            $"{echo} {ADB_FIELD_SEP}; " +
+            $"{cat} {string.Join(' ', AndroidAids.GroupPaths)} 2>/dev/null";
+
+        ExecuteDeviceAdbShellCommand(deviceId, script, out string stdout, out _, cancellationToken);
+
+        string passwdStdout;
+        string groupStdout;
+        var separator = stdout.IndexOf(ADB_FIELD_SEP);
+        if (separator < 0)
+        {
+            passwdStdout = stdout;
+            groupStdout = "";
+        }
+        else
+        {
+            passwdStdout = stdout[..separator];
+            groupStdout = stdout[(separator + 1)..];
+        }
+
+        return (
+            ShellAccessHelper.CombineKnownIdentities(passwdStdout),
+            ShellAccessHelper.CombineKnownIdentities(groupStdout));
+    }
+
+    public static Task<string> ChangeFileModeAsync(string deviceId, string path, System.IO.UnixFileMode mode, CancellationToken cancellationToken)
+        => ExecuteVoidShellCommand(deviceId, cancellationToken, "chmod", ShellAccessHelper.ToChmodOctal(mode), EscapeAdbShellString(path));
+
+    public static Task<string> ChangeFileUserAsync(string deviceId, string path, string user, bool noDereference, CancellationToken cancellationToken)
+    {
+        if (noDereference)
+            return ExecuteVoidShellCommand(deviceId, cancellationToken, "chown", "-h", EscapeAdbShellString(user), EscapeAdbShellString(path));
+
+        return ExecuteVoidShellCommand(deviceId, cancellationToken, "chown", EscapeAdbShellString(user), EscapeAdbShellString(path));
+    }
+
+    public static Task<string> ChangeFileGroupAsync(string deviceId, string path, string group, bool noDereference, CancellationToken cancellationToken)
+    {
+        if (noDereference)
+            return ExecuteVoidShellCommand(deviceId, cancellationToken, "chgrp", "-h", EscapeAdbShellString(group), EscapeAdbShellString(path));
+
+        return ExecuteVoidShellCommand(deviceId, cancellationToken, "chgrp", EscapeAdbShellString(group), EscapeAdbShellString(path));
     }
 
     public static IEnumerable<(string, FileType)> GetLinkType(string deviceId, IEnumerable<string> filePaths, CancellationToken cancellationToken)
@@ -1710,4 +1763,6 @@ public record struct FileExtraInfo(string User,
                                    DateTimeOffset AccessTime,
                                    DateTimeOffset CreationTime,
                                    DateTimeOffset ModifiedTime,
-                                   long? Size);
+                                   long? Size,
+                                   int? OwnerUid = null,
+                                   int? OwnerGid = null);

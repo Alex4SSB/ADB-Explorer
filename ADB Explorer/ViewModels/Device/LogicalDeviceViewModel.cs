@@ -114,6 +114,60 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
     public bool HasRootShell => ShellIdentity?.IsRoot == true;
 
+    private readonly object _unixIdLock = new();
+    private readonly HashSet<string> _knownUsers = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _knownGroups = new(StringComparer.Ordinal);
+    private bool _unixIdsLoaded;
+
+    public void RecordUnixIdentity(string? user, string? group)
+    {
+        lock (_unixIdLock)
+        {
+            if (!string.IsNullOrEmpty(user))
+                _knownUsers.Add(user);
+            if (!string.IsNullOrEmpty(group))
+                _knownGroups.Add(group);
+        }
+    }
+
+    public void EnsureKnownIdentities()
+    {
+        lock (_unixIdLock)
+        {
+            if (_unixIdsLoaded)
+                return;
+        }
+
+        var (users, groups) = ADBService.GetKnownUsersAndGroups(ID);
+        lock (_unixIdLock)
+        {
+            foreach (var user in users)
+                _knownUsers.Add(user);
+            foreach (var group in groups)
+                _knownGroups.Add(group);
+            _unixIdsLoaded = true;
+        }
+    }
+
+    public List<string> GetKnownUsersOrdered(string? current)
+        => OrderedUnixIdentities(_knownUsers, current);
+
+    public List<string> GetKnownGroupsOrdered(string? current)
+        => OrderedUnixIdentities(_knownGroups, current);
+
+    private List<string> OrderedUnixIdentities(HashSet<string> source, string? current)
+    {
+        lock (_unixIdLock)
+        {
+            var list = source.ToList();
+            if (!string.IsNullOrEmpty(current) && !source.Contains(current))
+                list.Add(current);
+
+            list.Sort(StringComparer.OrdinalIgnoreCase);
+            return list;
+        }
+    }
+
     public string RootString => Root switch
     {
         RootStatus.Unchecked => Strings.Resources.S_STAT_ROOT_UNCHECKED,

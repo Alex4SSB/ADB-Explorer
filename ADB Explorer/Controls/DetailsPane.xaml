@@ -2,6 +2,7 @@
     x:Class="ADB_Explorer.Controls.DetailsPane"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
     xmlns:local="clr-namespace:ADB_Explorer.Controls"
@@ -30,6 +31,7 @@
         </Style>
     </UserControl.Style>
     <UserControl.Resources>
+        <converters:PermissionLetterConverter x:Key="PermissionLetterConverter" />
         <DataTemplate x:Key="FileDetailsTemplate" DataType="{x:Type viewmodels:IDetailsViewModel}">
             <Grid Margin="0,3" Visibility="{Binding RowVisibility}">
                 <Grid.ColumnDefinitions>
@@ -54,6 +56,7 @@
                 <TextBlock
                     Grid.Column="2"
                     HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
                     FontSize="12"
                     Foreground="{DynamicResource InfoBadgeInformationalSeverityBackgroundBrush}"
                     Text="{Binding Value}"
@@ -73,6 +76,19 @@
                 </TextBlock>
             </Grid>
         </DataTemplate>
+        <Style
+            x:Key="PermissionToggleStyle"
+            BasedOn="{StaticResource DefaultToggleButtonStyle}"
+            TargetType="ToggleButton">
+            <Setter Property="MinWidth" Value="22" />
+            <Setter Property="MinHeight" Value="22" />
+            <Setter Property="Padding" Value="4,1" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        </Style>
     </UserControl.Resources>
     <Grid DataContext="{Binding ElementName=pane}">
         <Grid x:Name="ContentBox" d:Visibility="Visible">
@@ -399,12 +415,212 @@
                                         </Style.Triggers>
                                     </Style>
                                 </StackPanel.Style>
-                                <TextBlock
-                                    Margin="0,10"
-                                    FontSize="12"
-                                    FontWeight="SemiBold"
-                                    Text="{Binding Source={x:Static Member=strings:Resources.S_FILE_PERMISSIONS}}" />
-                                <ItemsControl ItemTemplate="{StaticResource FileDetailsTemplate}" ItemsSource="{Binding PermissionsItems}" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock
+                                        Margin="0,10"
+                                        FontSize="12"
+                                        FontWeight="SemiBold"
+                                        Text="{Binding Source={x:Static Member=strings:Resources.S_FILE_PERMISSIONS}}" />
+                                    <local:SimpleStackPanel
+                                        Grid.Column="1"
+                                        Orientation="Horizontal"
+                                        Spacing="6">
+                                        <ui:Button
+                                            Appearance="Primary"
+                                            Command="{Binding SavePermissionsCommand}"
+                                            ToolTip="{Binding Source={x:Static Member=strings:Resources.S_MENU_SAVE_CHANGES}}">
+                                            <ui:Button.Style>
+                                                <Style BasedOn="{StaticResource RestartAppButtonStyle}" TargetType="ui:Button">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsEditingPermissions}" Value="False">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ui:Button.Style>
+                                            <ui:FontIcon Glyph="&#xE74E;" />
+                                        </ui:Button>
+                                        <ui:Button
+                                            Appearance="Primary"
+                                            Command="{Binding EditPermissionsCommand}"
+                                            ToolTip="{Binding EditPermissionsTooltip}">
+                                            <ui:Button.Style>
+                                                <Style BasedOn="{StaticResource RestartAppButtonStyle}" TargetType="ui:Button">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CanEditPermissions}" Value="False">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ui:Button.Style>
+                                            <ui:FontIcon>
+                                                <ui:FontIcon.Style>
+                                                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                                        <Setter Property="Glyph" Value="&#xE70F;" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsEditingPermissions}" Value="True">
+                                                                <Setter Property="Glyph" Value="&#xE711;" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ui:FontIcon.Style>
+                                            </ui:FontIcon>
+                                        </ui:Button>
+                                    </local:SimpleStackPanel>
+                                </Grid>
+                                <ItemsControl ItemTemplate="{StaticResource FileDetailsTemplate}" ItemsSource="{Binding PermissionsItems}">
+                                    <ItemsControl.Style>
+                                        <Style TargetType="ItemsControl">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEditingPermissions}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ItemsControl.Style>
+                                </ItemsControl>
+                                <local:SimpleStackPanel FlowDirection="LeftToRight" Spacing="6">
+                                    <local:SimpleStackPanel.Style>
+                                        <Style TargetType="local:SimpleStackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEditingPermissions}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </local:SimpleStackPanel.Style>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="20" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            FontSize="12"
+                                            Foreground="{DynamicResource InfoBadgeInformationalSeverityBackgroundBrush}"
+                                            Text="{Binding Source={x:Static Member=strings:Resources.S_FILE_PERM_USER}}" />
+                                        <local:SimpleStackPanel
+                                            Grid.Column="2"
+                                            HorizontalAlignment="Right"
+                                            Orientation="Horizontal"
+                                            Spacing="6">
+                                            <ComboBox
+                                                IsEditable="True"
+                                                IsEnabled="{Binding PermissionsEdit.CanChangeOwner}"
+                                                ItemsSource="{Binding PermissionsEdit.KnownUsers}"
+                                                MaxDropDownHeight="287"
+                                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                Text="{Binding PermissionsEdit.SelectedUser, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                            <local:SimpleStackPanel Orientation="Horizontal" Spacing="1">
+                                                <ToggleButton
+                                                    Content="{Binding PermissionsEdit.UserRead, Converter={StaticResource PermissionLetterConverter}, ConverterParameter=r}"
+                                                    IsChecked="{Binding PermissionsEdit.UserRead}"
+                                                    IsEnabled="{Binding PermissionsEdit.CanChangeMode}"
+                                                    Style="{StaticResource PermissionToggleStyle}"
+                                                    ToolTip="r" />
+                                                <ToggleButton
+                                                    Content="{Binding PermissionsEdit.UserWrite, Converter={StaticResource PermissionLetterConverter}, ConverterParameter=w}"
+                                                    IsChecked="{Binding PermissionsEdit.UserWrite}"
+                                                    IsEnabled="{Binding PermissionsEdit.CanChangeMode}"
+                                                    Style="{StaticResource PermissionToggleStyle}"
+                                                    ToolTip="w" />
+                                                <ToggleButton
+                                                    Content="{Binding PermissionsEdit.UserExecute, Converter={StaticResource PermissionLetterConverter}, ConverterParameter=x}"
+                                                    IsChecked="{Binding PermissionsEdit.UserExecute}"
+                                                    IsEnabled="{Binding PermissionsEdit.CanChangeMode}"
+                                                    Style="{StaticResource PermissionToggleStyle}"
+                                                    ToolTip="x" />
+                                            </local:SimpleStackPanel>
+                                        </local:SimpleStackPanel>
+                                    </Grid>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="20" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            FontSize="12"
+                                            Foreground="{DynamicResource InfoBadgeInformationalSeverityBackgroundBrush}"
+                                            Text="{Binding Source={x:Static Member=strings:Resources.S_FILE_PERM_GROUP}}" />
+                                        <local:SimpleStackPanel
+                                            Grid.Column="2"
+                                            HorizontalAlignment="Right"
+                                            Orientation="Horizontal"
+                                            Spacing="6">
+                                            <ComboBox
+                                                IsEditable="True"
+                                                IsEnabled="{Binding PermissionsEdit.CanChangeGroup}"
+                                                ItemsSource="{Binding PermissionsEdit.KnownGroups}"
+                                                MaxDropDownHeight="287"
+                                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                Text="{Binding PermissionsEdit.SelectedGroup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                            <local:SimpleStackPanel Orientation="Horizontal" Spacing="1">
+                                                <ToggleButton
+                                                    Content="{Binding PermissionsEdit.GroupRead, Converter={StaticResource PermissionLetterConverter}, ConverterParameter=r}"
+                                                    IsChecked="{Binding PermissionsEdit.GroupRead}"
+                                                    IsEnabled="{Binding PermissionsEdit.CanChangeMode}"
+                                                    Style="{StaticResource PermissionToggleStyle}"
+                                                    ToolTip="r" />
+                                                <ToggleButton
+                                                    Content="{Binding PermissionsEdit.GroupWrite, Converter={StaticResource PermissionLetterConverter}, ConverterParameter=w}"
+                                                    IsChecked="{Binding PermissionsEdit.GroupWrite}"
+                                                    IsEnabled="{Binding PermissionsEdit.CanChangeMode}"
+                                                    Style="{StaticResource PermissionToggleStyle}"
+                                                    ToolTip="w" />
+                                                <ToggleButton
+                                                    Content="{Binding PermissionsEdit.GroupExecute, Converter={StaticResource PermissionLetterConverter}, ConverterParameter=x}"
+                                                    IsChecked="{Binding PermissionsEdit.GroupExecute}"
+                                                    IsEnabled="{Binding PermissionsEdit.CanChangeMode}"
+                                                    Style="{StaticResource PermissionToggleStyle}"
+                                                    ToolTip="x" />
+                                            </local:SimpleStackPanel>
+                                        </local:SimpleStackPanel>
+                                    </Grid>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="20" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            FontSize="12"
+                                            Foreground="{DynamicResource InfoBadgeInformationalSeverityBackgroundBrush}"
+                                            Text="{Binding Source={x:Static Member=strings:Resources.S_FILE_PERM_OTHER}}" />
+                                        <local:SimpleStackPanel
+                                            Grid.Column="2"
+                                            HorizontalAlignment="Right"
+                                            Orientation="Horizontal"
+                                            Spacing="1">
+                                            <ToggleButton
+                                                Content="{Binding PermissionsEdit.OtherRead, Converter={StaticResource PermissionLetterConverter}, ConverterParameter=r}"
+                                                IsChecked="{Binding PermissionsEdit.OtherRead}"
+                                                IsEnabled="{Binding PermissionsEdit.CanChangeMode}"
+                                                Style="{StaticResource PermissionToggleStyle}"
+                                                ToolTip="r" />
+                                            <ToggleButton
+                                                Content="{Binding PermissionsEdit.OtherWrite, Converter={StaticResource PermissionLetterConverter}, ConverterParameter=w}"
+                                                IsChecked="{Binding PermissionsEdit.OtherWrite}"
+                                                IsEnabled="{Binding PermissionsEdit.CanChangeMode}"
+                                                Style="{StaticResource PermissionToggleStyle}"
+                                                ToolTip="w" />
+                                            <ToggleButton
+                                                Content="{Binding PermissionsEdit.OtherExecute, Converter={StaticResource PermissionLetterConverter}, ConverterParameter=x}"
+                                                IsChecked="{Binding PermissionsEdit.OtherExecute}"
+                                                IsEnabled="{Binding PermissionsEdit.CanChangeMode}"
+                                                Style="{StaticResource PermissionToggleStyle}"
+                                                ToolTip="x" />
+                                        </local:SimpleStackPanel>
+                                    </Grid>
+                                </local:SimpleStackPanel>
                             </StackPanel>
                         </local:SimpleStackPanel>
                     </Grid>

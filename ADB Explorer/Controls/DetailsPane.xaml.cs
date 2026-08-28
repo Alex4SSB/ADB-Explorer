@@ -60,6 +60,50 @@ public partial class DetailsPane : UserControl
         DependencyProperty.Register(nameof(IsOpen), typeof(bool),
           typeof(DetailsPane), new PropertyMetadata(false, OnIsOpenChanged));
 
+    public bool IsEditingPermissions
+    {
+        get => (bool)GetValue(IsEditingPermissionsProperty);
+        set => SetValue(IsEditingPermissionsProperty, value);
+    }
+
+    public static readonly DependencyProperty IsEditingPermissionsProperty =
+        DependencyProperty.Register(nameof(IsEditingPermissions), typeof(bool),
+          typeof(DetailsPane), new PropertyMetadata(false, OnIsEditingPermissionsChanged));
+
+    private static void OnIsEditingPermissionsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is not DetailsPane pane) return;
+
+        pane.EditPermissionsTooltip = pane.IsEditingPermissions
+            ? Strings.Resources.S_CANCEL
+            : Strings.Resources.S_MENU_EDIT;
+
+        pane.UpdateIsEditorFocused();
+
+        if (pane.IsEditingPermissions)
+            pane.BeginPermissionsEdit();
+    }
+
+    public bool CanEditPermissions
+    {
+        get => (bool)GetValue(CanEditPermissionsProperty);
+        set => SetValue(CanEditPermissionsProperty, value);
+    }
+
+    public static readonly DependencyProperty CanEditPermissionsProperty =
+        DependencyProperty.Register(nameof(CanEditPermissions), typeof(bool),
+          typeof(DetailsPane), new PropertyMetadata(false));
+
+    public string EditPermissionsTooltip
+    {
+        get => (string)GetValue(EditPermissionsTooltipProperty);
+        set => SetValue(EditPermissionsTooltipProperty, value);
+    }
+
+    public static readonly DependencyProperty EditPermissionsTooltipProperty =
+        DependencyProperty.Register(nameof(EditPermissionsTooltip), typeof(string),
+          typeof(DetailsPane), new PropertyMetadata(Strings.Resources.S_BUTTON_CHANGE));
+
     public double PaneMinWidth
     {
         get => (double)GetValue(PaneMinWidthProperty);
@@ -253,9 +297,12 @@ public partial class DetailsPane : UserControl
     public ObservableCollection<IDetailsViewModel> SelectionInfoItems { get; } = [];
     public ObservableCollection<IDetailsViewModel> PermissionsItems { get; } = [];
     public ObservableCollection<MountOptionViewModel> MountOptionsItems { get; } = [];
+    public PermissionsEditViewModel PermissionsEdit { get; } = new();
     
 
     public AsyncRelayCommand SaveCommand { get; }
+    public AsyncRelayCommand SavePermissionsCommand { get; }
+    public RelayCommand EditPermissionsCommand { get; }
     public RelayCommand PdfUnlockCommand { get; }
 
     public bool IsPdfPasswordPromptVisible
@@ -299,6 +346,7 @@ public partial class DetailsPane : UserControl
     private CancellationTokenSource? _extraInfoCts;
     private string? _extraInfoPath;
     private MemoryStream? _pdfMemoryStream;
+    private LogicalDeviceViewModel? _permissionDevice;
 
     private static void OnSelectedFilesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => App.SafeBeginInvoke(() =>
     {
@@ -324,7 +372,10 @@ public partial class DetailsPane : UserControl
         }
 
         control.UnsubscribePreviewMounts();
+        control.UnsubscribePermissionDevice();
         control.ClearPhotoPreview();
+        control.IsEditingPermissions = false;
+        control.CanEditPermissions = false;
 
         control.EditorText = null;
         control._previewBytes = null;
@@ -671,10 +722,19 @@ public partial class DetailsPane : UserControl
             or nameof(FileClass.IsCreationTimeResolved)
             or nameof(FileClass.User)
             or nameof(FileClass.Group)
+            or nameof(FileClass.OwnerUid)
+            or nameof(FileClass.OwnerGid)
             or nameof(FileClass.LastAccessTime)
             or nameof(FileClass.ModifiedTimeWithOffset)
             or nameof(FileClass.LinkTarget))
+        {
+            if (e.PropertyName is nameof(FileClass.User)
+                or nameof(FileClass.Group)
+                or nameof(FileClass.OwnerUid)
+                or nameof(FileClass.OwnerGid))
+                UpdateCanEditPermissions();
             return;
+        }
         else if (e.PropertyName is nameof(FileClass.DragImage) or nameof(FileClass.CacheThumbnail) or nameof(FileClass.ApkIcon))
         {
             if (sender is FileClass file && ReferenceEquals(File, file))
@@ -686,7 +746,11 @@ public partial class DetailsPane : UserControl
             }
         }
         else if (sender is FileClass file && ReferenceEquals(File, file))
+        {
+            if (e.PropertyName is nameof(FileClass.Permissions))
+                UpdateCanEditPermissions();
             PopulateThumbnailInfoItems(file);
+        }
     });
 
     private void UpdateFileThumbnailDisplay(FileClass file)
@@ -796,6 +860,9 @@ public partial class DetailsPane : UserControl
             }
         });
 
+        SavePermissionsCommand = new AsyncRelayCommand(SavePermissionsAsync);
+        EditPermissionsCommand = new RelayCommand(() => IsEditingPermissions ^= true);
+
         PdfUnlockCommand = new RelayCommand(() =>
         {
             if (_pdfMemoryStream is null || _cancellationToken is null) return;
@@ -814,10 +881,7 @@ public partial class DetailsPane : UserControl
 
         ContentBox.Width = Data.Settings.DetailsPaneWidth;
 
-        EditorTextBox.IsKeyboardFocusWithinChanged += (s, e) =>
-        {
-            IsEditorFocused = EditorTextBox.IsKeyboardFocusWithin || EditorTextBox.IsContextMenuOpen;
-        };
+        EditorTextBox.IsKeyboardFocusWithinChanged += (s, e) => UpdateIsEditorFocused();
 
         RequestModeRefresh = () =>
         {
@@ -1315,6 +1379,9 @@ public partial class DetailsPane : UserControl
 
             PermissionsItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_FILE_PERM_OTHER, f => $"{f.FolderViewModel.OtherPermissionsString}", valueIsLtr: true, useConsoleFont: true));
         }
+
+        SubscribePermissionDevice();
+        UpdateCanEditPermissions();
     }
 
     private static string FormatArchiveLocation(FileClass file)
@@ -1354,5 +1421,131 @@ public partial class DetailsPane : UserControl
     private void PdfPasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
     {
         IsPdfPasswordWrong = false;
+    }
+
+    private void UpdateIsEditorFocused()
+    {
+        IsEditorFocused = IsEditingPermissions
+            || EditorTextBox.IsKeyboardFocusWithin
+            || EditorTextBox.IsContextMenuOpen;
+    }
+
+    private void UpdateCanEditPermissions()
+    {
+        var allowed = DriveHelper.GetEditableUnixChanges(File, Data.DevicesObject.Current);
+        CanEditPermissions = allowed.Any;
+        if (!CanEditPermissions && IsEditingPermissions)
+            IsEditingPermissions = false;
+    }
+
+    private void SubscribePermissionDevice()
+    {
+        var device = Data.DevicesObject.Current;
+        if (_permissionDevice == device)
+            return;
+
+        UnsubscribePermissionDevice();
+        _permissionDevice = device;
+        if (device is not null)
+            device.PropertyChanged += OnPermissionDeviceChanged;
+    }
+
+    private void UnsubscribePermissionDevice()
+    {
+        if (_permissionDevice is null)
+            return;
+
+        _permissionDevice.PropertyChanged -= OnPermissionDeviceChanged;
+        _permissionDevice = null;
+    }
+
+    private void OnPermissionDeviceChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is not nameof(LogicalDeviceViewModel.HasRootShell)
+            and not nameof(LogicalDeviceViewModel.Mounts))
+            return;
+
+        App.SafeInvoke(UpdateCanEditPermissions);
+    }
+
+    private void BeginPermissionsEdit()
+    {
+        if (File is not { } file)
+        {
+            IsEditingPermissions = false;
+            return;
+        }
+
+        var device = Data.DevicesObject.Current;
+        var allowed = DriveHelper.GetEditableUnixChanges(file, device);
+        if (!allowed.Any)
+        {
+            IsEditingPermissions = false;
+            return;
+        }
+
+        PermissionsEdit.BeginEdit(file, allowed);
+        LoadKnownIdentities(file, device);
+    }
+
+    private void LoadKnownIdentities(FileClass file, LogicalDeviceViewModel? device)
+    {
+        if (device is null)
+        {
+            IEnumerable<string> users = file.User is null ? [] : [file.User];
+            IEnumerable<string> groups = file.Group is null ? [] : [file.Group];
+            PermissionsEdit.SetKnownIdentities(users, groups, file.User, file.Group);
+            return;
+        }
+
+        device.RecordUnixIdentity(file.User, file.Group);
+        PermissionsEdit.SetKnownIdentities(
+            device.GetKnownUsersOrdered(file.User),
+            device.GetKnownGroupsOrdered(file.Group),
+            file.User,
+            file.Group);
+
+        _ = Task.Run(() =>
+        {
+            device.EnsureKnownIdentities();
+            App.SafeInvoke(() =>
+            {
+                if (!IsEditingPermissions || !ReferenceEquals(File, file))
+                    return;
+
+                PermissionsEdit.SetKnownIdentities(
+                    device.GetKnownUsersOrdered(file.User),
+                    device.GetKnownGroupsOrdered(file.Group),
+                    PermissionsEdit.SelectedUser ?? file.User,
+                    PermissionsEdit.SelectedGroup ?? file.Group);
+            });
+        });
+    }
+
+    private async Task SavePermissionsAsync()
+    {
+        if (!IsEditingPermissions || File is not { } file)
+            return;
+
+        var device = Data.DevicesObject.Current;
+        if (device is null)
+            return;
+
+        var token = _cancellationToken?.Token ?? default;
+        var error = await PermissionsEdit.ApplyAsync(file, device.ID, token);
+
+        IsEditingPermissions = false;
+        await file.UpdateExtraInfoAsync(token);
+        UpdateCanEditPermissions();
+
+        if (!string.IsNullOrEmpty(error))
+        {
+            DialogService.ShowMessage(
+                error,
+                Strings.Resources.S_FILE_PERMISSIONS,
+                DialogService.DialogIcon.Critical,
+                copyToClipboard: true,
+                error: DialogError.ChangePermissionsFailed);
+        }
     }
 }

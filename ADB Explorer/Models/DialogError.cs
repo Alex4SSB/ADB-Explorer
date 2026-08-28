@@ -12,6 +12,7 @@ public enum DialogError
     WriteFileFailed = 1104,
     ReadFileFailed = 1105,
     WinRootIllegalPath = 1106,
+    ChangePermissionsFailed = 1107,
 
     SideloadFailed = 1200,
     DisconnectFailed = 1201,

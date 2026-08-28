@@ -114,4 +114,70 @@ internal class DriveHelper
 
         return GetRestrictions(path).NoApkInstall;
     }
+
+    /// <summary>
+    /// Whether <paramref name="path"/> is on a filesystem that can persist unix mode/owner/group.
+    /// FUSE/FAT volumes and archives expose synthetic rwx bits that chmod/chown cannot change.
+    /// </summary>
+    public static bool SupportsUnixMetadataChanges(string? path, LogicalDeviceViewModel? device = null)
+    {
+        if (string.IsNullOrEmpty(path))
+            return false;
+
+        device ??= Data.Active.Device ?? Data.DevicesObject?.Current;
+        if (device is null)
+            return false;
+
+        if (ArchivePath.IsArchivePath(path, device.ID))
+            return false;
+
+        var drive = GetCurrentDrive(path, device);
+        if (IsNonUnixMetadataFileSystem(drive?.FileSystem))
+            return false;
+
+        var restrictions = GetRestrictions(path, device);
+        if (restrictions.NoExec)
+            return false;
+
+        if (!restrictions.ReadOnly)
+            return true;
+
+        // Without a root shell, nested native mounts are attributed to the read-only
+        // root drive. Do not treat that as a real RO block for those paths.
+        if (device.HasRootShell)
+            return false;
+
+        return drive?.Type is AbstractDrive.DriveType.Root;
+    }
+
+    public static ShellAccessHelper.UnixPermissionChanges GetEditableUnixChanges(FileClass? file, LogicalDeviceViewModel? device = null)
+    {
+        if (file?.Permissions is null)
+            return ShellAccessHelper.UnixPermissionChanges.None;
+
+        device ??= Data.Active.Device ?? Data.DevicesObject?.Current;
+        if (device is null)
+            return ShellAccessHelper.UnixPermissionChanges.None;
+
+        if (Data.FileActions.IsRecycleBin || Data.FileActions.IsAppDrive)
+            return ShellAccessHelper.UnixPermissionChanges.None;
+
+        if (!SupportsUnixMetadataChanges(file.FullPath, device))
+            return ShellAccessHelper.UnixPermissionChanges.None;
+
+        return ShellAccessHelper.GetAllowedChanges(file.OwnerUid, file.User, device.ShellIdentity);
+    }
+
+    private static bool IsNonUnixMetadataFileSystem(string? fileSystem)
+    {
+        if (string.IsNullOrEmpty(fileSystem))
+            return false;
+
+        return fileSystem.ToLowerInvariant() switch
+        {
+            "fuse" or "fuseblk" or "sdcardfs" or "vfat" or "exfat"
+                or "msdos" or "fat" or "ntfs" or "texfat" => true,
+            _ => false,
+        };
+    }
 }

@@ -498,6 +498,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         location.ModifiedTimeWithOffset = info.Value.ModifiedTime ?? location.ModifiedTimeWithOffset;
         location.ModifiedTime = info.Value.ModifiedTime?.DateTime.ToLocalTime() ?? location.ModifiedTime;
         location.EffectiveAccess = ShellAccessHelper.ResolveLocationAccess(location.FullPath, info, identity, restrictions);
+        Data.DevicesObject.Current?.RecordUnixIdentity(location.User, location.Group);
     }
 
     private void OnSettingsPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -574,11 +575,14 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
             User = info.Value.User;
             Group = info.Value.Group;
+            OwnerUid = info.Value.OwnerUid ?? OwnerUid;
+            OwnerGid = info.Value.OwnerGid ?? OwnerGid;
             LastAccessTime = info.Value.AccessTime;
             CreationTime = info.Value.CreationTime;
             ModifiedTimeWithOffset = info.Value.ModifiedTime;
             ModifiedTime = info.Value.ModifiedTime.DateTime.ToLocalTime();
             Permissions = info.Value.Permissions;
+            deviceId?.RecordUnixIdentity(info.Value.User, info.Value.Group);
 
             if (!IsDirectory && info.Value.Size is long size && size >= 0)
             {

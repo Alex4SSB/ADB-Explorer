@@ -242,4 +242,94 @@ public static partial class ShellAccessHelper
 
         return ApplyRestrictions(access, restrictions);
     }
+
+    public readonly record struct UnixPermissionChanges(bool Mode, bool Owner, bool Group)
+    {
+        public static readonly UnixPermissionChanges None = default;
+
+        public bool Any => Mode || Owner || Group;
+    }
+
+    public static UnixPermissionChanges GetAllowedChanges(int? ownerUid, string? ownerName, ShellIdentity? identity)
+    {
+        if (identity is null)
+            return UnixPermissionChanges.None;
+
+        if (identity.IsRoot)
+            return new(Mode: true, Owner: true, Group: true);
+
+        if (IsOwner(ownerUid, ownerName, identity))
+            return new(Mode: true, Owner: false, Group: true);
+
+        return UnixPermissionChanges.None;
+    }
+
+    public static bool IsOwner(int? ownerUid, string? ownerName, ShellIdentity identity)
+    {
+        if (ownerUid is int uid)
+            return uid == identity.Uid;
+
+        if (!string.IsNullOrEmpty(ownerName))
+            return string.Equals(ownerName, identity.UserName, StringComparison.Ordinal);
+
+        return false;
+    }
+
+    public static UnixFileMode ComposeMode(
+        bool userRead, bool userWrite, bool userExecute,
+        bool groupRead, bool groupWrite, bool groupExecute,
+        bool otherRead, bool otherWrite, bool otherExecute)
+    {
+        UnixFileMode mode = 0;
+        if (userRead) mode |= UnixFileMode.UserRead;
+        if (userWrite) mode |= UnixFileMode.UserWrite;
+        if (userExecute) mode |= UnixFileMode.UserExecute;
+        if (groupRead) mode |= UnixFileMode.GroupRead;
+        if (groupWrite) mode |= UnixFileMode.GroupWrite;
+        if (groupExecute) mode |= UnixFileMode.GroupExecute;
+        if (otherRead) mode |= UnixFileMode.OtherRead;
+        if (otherWrite) mode |= UnixFileMode.OtherWrite;
+        if (otherExecute) mode |= UnixFileMode.OtherExecute;
+        return mode;
+    }
+
+    public static string ToChmodOctal(UnixFileMode mode)
+        => Convert.ToString((int)mode & 0x1FF, 8).PadLeft(3, '0');
+
+    public static IEnumerable<string> ParsePasswdNames(string? stdout)
+        => ParseColonFileNames(stdout);
+
+    public static IEnumerable<string> ParseGroupNames(string? stdout)
+        => ParseColonFileNames(stdout);
+
+    /// <summary>
+    /// Platform AID names plus any extra names from passwd/group files.
+    /// Used when those files are missing, as on Pixel 3.
+    /// </summary>
+    public static IReadOnlyList<string> CombineKnownIdentities(string? colonFileStdout)
+    {
+        var names = new HashSet<string>(AndroidAids.Names, StringComparer.Ordinal);
+        foreach (var name in ParseColonFileNames(colonFileStdout))
+            names.Add(name);
+
+        return [.. names];
+    }
+
+    private static IEnumerable<string> ParseColonFileNames(string? stdout)
+    {
+        if (string.IsNullOrWhiteSpace(stdout))
+            yield break;
+
+        foreach (var rawLine in stdout.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries))
+        {
+            var line = rawLine.Trim();
+            if (line.Length == 0 || line.StartsWith('#'))
+                continue;
+
+            var colon = line.IndexOf(':');
+            var name = colon < 0 ? line : line[..colon];
+            if (name.Length > 0)
+                yield return name;
+        }
+    }
 }
