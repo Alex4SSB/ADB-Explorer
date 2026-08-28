@@ -417,25 +417,35 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         OnPropertyChanged(nameof(Root));
     }
 
+    public void InvalidateRootStatus()
+    {
+        SetShellIdentity(null);
+
+        if (Root is RootStatus.Unchecked)
+            return;
+
+        Device.Root = RootStatus.Unchecked;
+        OnPropertyChanged(nameof(Root));
+        OnPropertyChanged(nameof(RootString));
+    }
+
     public bool SetRootStatus(RootStatus status)
     {
-        if (Root != status)
+        if (Root == status)
+            return false;
+
+        Device.Root = status;
+        OnPropertyChanged(nameof(Root));
+        OnPropertyChanged(nameof(RootString));
+
+        if (IsOpen && Status is DeviceStatus.Ok)
         {
-            Device.Root = status;
-            OnPropertyChanged(nameof(Root));
-            OnPropertyChanged(nameof(RootString));
-
-            if (IsOpen)
-            {
-                RefreshShellIdentity();
-                if (Data.DevicesObject.Current?.ID == ID)
-                    AdbHelper.ApplyMountInfo(this, Data.DeviceCts.Token);
-            }
-
-            return true;
+            RefreshShellIdentity();
+            if (Data.DevicesObject.Current?.ID == ID)
+                AdbHelper.ApplyMountInfo(this, Data.DeviceCts.Token);
         }
 
-        return false;
+        return true;
     }
 
     public void UpdateBattery(CancellationToken cancellationToken)

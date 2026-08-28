@@ -23,6 +23,7 @@
     <Thickness x:Key="ExpanderBorderThemeThickness">1</Thickness>
     <system:Double x:Key="ExpanderChevronSize">16.0</system:Double>
     <Duration x:Key="AnimationDuration">00:00:00.3</Duration>
+    <Duration x:Key="TreeChevronAnimationDuration">00:00:00.12</Duration>
     <sys:TimeSpan x:Key="AnimationKeytime">00:00:00.2</sys:TimeSpan>
 
     <converters:AnimationFactorToValueConverter x:Key="AnimationFactorToValueConverter" />
@@ -61,6 +62,42 @@
             From="179"
             To="1"
             Duration="{StaticResource AnimationDuration}" />
+    </Storyboard>
+
+    <Storyboard x:Key="RotateTo90CwStoryboard">
+        <DoubleAnimation
+            Storyboard.TargetName="ArrowRotateTransform"
+            Storyboard.TargetProperty="Angle"
+            From="1"
+            To="89"
+            Duration="{StaticResource TreeChevronAnimationDuration}" />
+    </Storyboard>
+
+    <Storyboard x:Key="RotateTo0From90CwStoryboard">
+        <DoubleAnimation
+            Storyboard.TargetName="ArrowRotateTransform"
+            Storyboard.TargetProperty="Angle"
+            From="91"
+            To="1"
+            Duration="{StaticResource TreeChevronAnimationDuration}" />
+    </Storyboard>
+
+    <Storyboard x:Key="RotateTo90CcwStoryboard">
+        <DoubleAnimation
+            Storyboard.TargetName="ArrowRotateTransform"
+            Storyboard.TargetProperty="Angle"
+            From="359"
+            To="271"
+            Duration="{StaticResource TreeChevronAnimationDuration}" />
+    </Storyboard>
+
+    <Storyboard x:Key="RotateTo0From90CcwStoryboard">
+        <DoubleAnimation
+            Storyboard.TargetName="ArrowRotateTransform"
+            Storyboard.TargetProperty="Angle"
+            From="269"
+            To="359"
+            Duration="{StaticResource TreeChevronAnimationDuration}" />
     </Storyboard>
 
     <TranslateTransform x:Key="RollDownTransform">
@@ -109,6 +146,8 @@
             <Grid
                 x:Name="ChevronGrid"
                 Grid.Column="0"
+                Width="{StaticResource ExpanderChevronSize}"
+                Height="{StaticResource ExpanderChevronSize}"
                 Margin="{TemplateBinding Padding}"
                 VerticalAlignment="Center"
                 Background="Transparent"
@@ -118,8 +157,13 @@
                 </Grid.RenderTransform>
                 <ui:SymbolIcon
                     x:Name="ControlChevronIcon"
+                    Width="{StaticResource ExpanderChevronSize}"
+                    Height="{StaticResource ExpanderChevronSize}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
                     FontSize="{StaticResource ExpanderChevronSize}"
                     Foreground="{TemplateBinding Foreground}"
+                    RenderTransformOrigin="0.5, 0.5"
                     Symbol="ChevronDown24">
                     <ui:SymbolIcon.RenderTransform>
                         <RotateTransform Angle="0" />
@@ -136,57 +180,81 @@
                 TextElement.FontSize="{TemplateBinding FontSize}" />
         </Grid>
         <ControlTemplate.Triggers>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.ChevronPlacement)}" Value="Right">
+            <Trigger Property="helpers:ExpanderHelper.ChevronPlacement" Value="Right">
                 <Setter TargetName="ChevronGrid" Property="Grid.Column" Value="2" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=ExpandDirection}" Value="Left">
+            </Trigger>
+            <Trigger Property="helpers:ExpanderHelper.ExpandDirection" Value="Left">
                 <Setter TargetName="ControlChevronIcon" Property="RenderTransform">
                     <Setter.Value>
                         <RotateTransform Angle="90" />
                     </Setter.Value>
                 </Setter>
-            </DataTrigger>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=ExpandDirection}" Value="Up">
+            </Trigger>
+            <Trigger Property="helpers:ExpanderHelper.ExpandDirection" Value="Up">
                 <Setter TargetName="ControlChevronIcon" Property="RenderTransform">
                     <Setter.Value>
                         <RotateTransform Angle="180" />
                     </Setter.Value>
                 </Setter>
-            </DataTrigger>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=ExpandDirection}" Value="Right">
+            </Trigger>
+            <Trigger Property="helpers:ExpanderHelper.ExpandDirection" Value="Right">
                 <Setter TargetName="ControlChevronIcon" Property="RenderTransform">
                     <Setter.Value>
                         <RotateTransform Angle="270" />
                     </Setter.Value>
                 </Setter>
-            </DataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsChecked}" Value="True" />
-                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.ExpanderArrow)}" Value="CCW" />
-                </MultiDataTrigger.Conditions>
-                <MultiDataTrigger.EnterActions>
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="helpers:ExpanderHelper.ChevronRotation" Value="CCW" />
+                </MultiTrigger.Conditions>
+                <MultiTrigger.EnterActions>
                     <BeginStoryboard Storyboard="{StaticResource RotateTo180CcwStoryboard}" />
-                </MultiDataTrigger.EnterActions>
-                <MultiDataTrigger.ExitActions>
+                </MultiTrigger.EnterActions>
+                <MultiTrigger.ExitActions>
                     <BeginStoryboard Storyboard="{StaticResource RotateTo0CcwStoryboard}" />
-                </MultiDataTrigger.ExitActions>
-            </MultiDataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsChecked}" Value="True" />
-                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.ExpanderArrow)}" Value="CW" />
-                </MultiDataTrigger.Conditions>
-                <MultiDataTrigger.EnterActions>
+                </MultiTrigger.ExitActions>
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="helpers:ExpanderHelper.ChevronRotation" Value="CW" />
+                </MultiTrigger.Conditions>
+                <MultiTrigger.EnterActions>
                     <BeginStoryboard Storyboard="{StaticResource RotateTo180CwStoryboard}" />
-                </MultiDataTrigger.EnterActions>
-                <MultiDataTrigger.ExitActions>
+                </MultiTrigger.EnterActions>
+                <MultiTrigger.ExitActions>
                     <BeginStoryboard Storyboard="{StaticResource RotateTo0CwStoryboard}" />
-                </MultiDataTrigger.ExitActions>
-            </MultiDataTrigger>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.ExpanderArrow)}" Value="None">
+                </MultiTrigger.ExitActions>
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="helpers:ExpanderHelper.ChevronRotation" Value="CCW90" />
+                </MultiTrigger.Conditions>
+                <MultiTrigger.EnterActions>
+                    <BeginStoryboard Storyboard="{StaticResource RotateTo90CcwStoryboard}" />
+                </MultiTrigger.EnterActions>
+                <MultiTrigger.ExitActions>
+                    <BeginStoryboard Storyboard="{StaticResource RotateTo0From90CcwStoryboard}" />
+                </MultiTrigger.ExitActions>
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="helpers:ExpanderHelper.ChevronRotation" Value="CW90" />
+                </MultiTrigger.Conditions>
+                <MultiTrigger.EnterActions>
+                    <BeginStoryboard Storyboard="{StaticResource RotateTo90CwStoryboard}" />
+                </MultiTrigger.EnterActions>
+                <MultiTrigger.ExitActions>
+                    <BeginStoryboard Storyboard="{StaticResource RotateTo0From90CwStoryboard}" />
+                </MultiTrigger.ExitActions>
+            </MultiTrigger>
+            <Trigger Property="helpers:ExpanderHelper.ChevronRotation" Value="None">
                 <Setter TargetName="ChevronGrid" Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
+            </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
@@ -209,7 +277,7 @@
         <Setter Property="IsExpanded" Value="False" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
-        <Setter Property="helpers:ExpanderHelper.ExpanderArrow" Value="CCW" />
+        <Setter Property="helpers:ExpanderHelper.ChevronRotation" Value="CCW" />
         <Setter Property="helpers:ExpanderHelper.ChevronPlacement" Value="Right" />
         <Setter Property="Template">
             <Setter.Value>
@@ -230,6 +298,9 @@
                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                 HorizontalContentAlignment="Stretch"
                                 VerticalContentAlignment="Center"
+                                helpers:ExpanderHelper.ChevronPlacement="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(helpers:ExpanderHelper.ChevronPlacement)}"
+                                helpers:ExpanderHelper.ExpandDirection="{TemplateBinding ExpandDirection}"
+                                helpers:ExpanderHelper.ChevronRotation="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(helpers:ExpanderHelper.ChevronRotation)}"
                                 Content="{TemplateBinding Header}"
                                 FontSize="{TemplateBinding FontSize}"
                                 Foreground="{TemplateBinding Foreground}"
@@ -237,7 +308,7 @@
                                 IsEnabled="{TemplateBinding IsEnabled}"
                                 OverridesDefaultStyle="True"
                                 Template="{StaticResource DefaultExpanderToggleButtonStyle}"
-                                ToolTip="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.HeaderTooltip)}" />
+                                ToolTip="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(helpers:ExpanderHelper.HeaderTooltip)}" />
                         </Border>
 
                         <!--  Collapsed content to expand  -->

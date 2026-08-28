@@ -1,26 +1,41 @@
-﻿namespace ADB_Explorer.Helpers;
+namespace ADB_Explorer.Helpers;
 
 public static class ExpanderHelper
 {
-    public enum ExpandArrow
+    public enum Rotation
     {
         None,
         CW,
-        CCW
+        CCW,
+        CW90,
+        CCW90,
     }
 
-    public static ExpandArrow GetExpanderArrow(Control control) =>
-        (ExpandArrow)control.GetValue(ExpanderArrowProperty);
+    public static Rotation GetChevronRotation(Control control) =>
+        (Rotation)control.GetValue(ChevronRotationProperty);
 
-    public static void SetExpanderArrow(Control control, ExpandArrow value) =>
-        control.SetValue(ExpanderArrowProperty, value);
+    public static void SetChevronRotation(Control control, Rotation value) =>
+        control.SetValue(ChevronRotationProperty, value);
 
-    public static readonly DependencyProperty ExpanderArrowProperty =
+    public static readonly DependencyProperty ChevronRotationProperty =
         DependencyProperty.RegisterAttached(
-            "ExpanderArrow",
-            typeof(ExpandArrow),
+            "ChevronRotation",
+            typeof(Rotation),
             typeof(ExpanderHelper),
             null);
+
+    public static ExpandDirection GetExpandDirection(Control control) =>
+        (ExpandDirection)control.GetValue(ExpandDirectionProperty);
+
+    public static void SetExpandDirection(Control control, ExpandDirection value) =>
+        control.SetValue(ExpandDirectionProperty, value);
+
+    public static readonly DependencyProperty ExpandDirectionProperty =
+        DependencyProperty.RegisterAttached(
+            "ExpandDirection",
+            typeof(ExpandDirection),
+            typeof(ExpanderHelper),
+            new(ExpandDirection.Down));
 
     public static AlignmentX GetChevronPlacement(Control control) =>
         (AlignmentX)control.GetValue(ChevronPlacementProperty);

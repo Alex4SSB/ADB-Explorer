@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:ADB_Explorer.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
@@ -47,10 +48,12 @@
                                 <emoji:TextBlock
                                     Grid.Column="1"
                                     VerticalAlignment="Center"
-                                    Text="{Binding DisplayName}"
-                                    TextTrimming="CharacterEllipsis">
+                                    Text="{Binding DisplayName}">
                                     <emoji:TextBlock.Style>
-                                        <Style TargetType="emoji:TextBlock">
+                                        <Style BasedOn="{StaticResource FileNameTextBlockStyle}" TargetType="emoji:TextBlock">
+                                            <Style.Resources>
+                                                <Style BasedOn="{StaticResource OverflowsTreeTooltipStyle}" TargetType="ToolTip" />
+                                            </Style.Resources>
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
                                                     <Setter Property="Visibility" Value="Collapsed" />
@@ -147,9 +150,17 @@
                                                         x:Name="Expander"
                                                         Grid.Column="0"
                                                         Margin="8,0"
+                                                        Padding="0"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        helpers:ExpanderHelper.ChevronPlacement="Left"
+                                                        helpers:ExpanderHelper.ExpandDirection="Right"
+                                                        helpers:ExpanderHelper.ChevronRotation="CW90"
                                                         ClickMode="Press"
+                                                        Focusable="False"
+                                                        Foreground="{TemplateBinding Foreground}"
                                                         IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
-                                                        Style="{StaticResource ExpandCollapseToggleButtonStyle}" />
+                                                        Template="{StaticResource DefaultExpanderToggleButtonStyle}" />
                                                     <ContentPresenter
                                                         x:Name="PART_Header"
                                                         Grid.Column="1"

@@ -542,7 +542,11 @@ public partial class ADBService
         if (stdout != "" || stderr != "")
             ExecuteDeviceAdbCommand(deviceId, "", out stdout, out _, CancellationToken.None, "root");
 
-        return !stdout.Contains("cannot run as root");
+        var success = !stdout.Contains("cannot run as root");
+        if (success)
+            DevicesObject.UpdateDeviceRoot(deviceId, false);
+
+        return success;
     }
 
     public static bool Unroot(string deviceId)

@@ -11,6 +11,7 @@
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     <converters:TrimmedTooltipConverter x:Key="TrimmedTooltip" />
+    <converters:OverflowsTreeTooltipConverter x:Key="OverflowsTreeTooltip" />
     <converters:StringFormatConverter x:Key="StringFormatConverter" />
     <Style
         x:Key="StretchCheckBoxStyle"
@@ -60,6 +61,14 @@
         TargetType="ToolTip">
         <Setter Property="Visibility" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=PlacementTarget, Converter={StaticResource TrimmedTooltip}}" />
         <Setter Property="FlowDirection" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=PlacementTarget.FlowDirection}" />
+    </Style>
+    <Style
+        x:Key="OverflowsTreeTooltipStyle"
+        BasedOn="{StaticResource FluentTooltipStyle}"
+        TargetType="ToolTip">
+        <Setter Property="Visibility" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=PlacementTarget, Converter={StaticResource OverflowsTreeTooltip}}" />
+        <Setter Property="FlowDirection" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=PlacementTarget.FlowDirection}" />
+        <Setter Property="MaxWidth" Value="800"/>
     </Style>
     <Style
         x:Key="TooltipTextBoxStyle"
@@ -488,7 +497,7 @@
         x:Key="DeviceExpanderStyle"
         BasedOn="{StaticResource DefaultExpanderStyle}"
         TargetType="Expander">
-        <Setter Property="helpers:ExpanderHelper.ExpanderArrow" Value="None" />
+        <Setter Property="helpers:ExpanderHelper.ChevronRotation" Value="None" />
         <Setter Property="IsExpanded" Value="{Binding DeviceSelected, Mode=TwoWay}" />
         <Setter Property="MinHeight" Value="40" />
     </Style>

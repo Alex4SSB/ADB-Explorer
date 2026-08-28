@@ -501,7 +501,9 @@ public static class DeviceHelper
 
     public static void UpdateDevicesRootAccess()
     {
-        var devices = Data.DevicesObject.LogicalDeviceViewModels.Where(d => d.Root is RootStatus.Unchecked).ToList();
+        var devices = Data.DevicesObject.LogicalDeviceViewModels
+            .Where(d => d.Status is DeviceStatus.Ok && d.Root is RootStatus.Unchecked)
+            .ToList();
         foreach (var device in devices)
         {
             var identity = ADBService.GetShellIdentity(device.ID);

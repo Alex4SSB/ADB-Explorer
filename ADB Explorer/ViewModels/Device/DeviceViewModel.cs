@@ -126,27 +126,34 @@ public abstract class DeviceViewModel : ViewModelBase
 
     public bool SetStatus(DeviceStatus status)
     {
-        if (Status != status)
+        if (Status == status)
+            return false;
+
+        var previous = Status;
+        Device.Status = status;
+
+        OnPropertyChanged(nameof(Status));
+        OnPropertyChanged(nameof(StatusIcon));
+
+        if (this is LogicalDeviceViewModel logical)
         {
-            Device.Status = status;
+            ShellCommands.DeviceCommands.Remove(ID);
+            if (status is DeviceStatus.Ok)
+                Task.Run(() => ShellCommands.FindCommands(ID));
 
-            OnPropertyChanged(nameof(Status));
-            OnPropertyChanged(nameof(StatusIcon));
+            if (previous is DeviceStatus.Ok
+                && logical.IsOpen
+                && logical.Root is RootStatus.Enabled
+                && Data.Settings.UnrootOnDisconnect is true)
+                ADBService.Unroot(ID);
 
-            if (this is LogicalDeviceViewModel)
-            {
-                ShellCommands.DeviceCommands.Remove(ID);
-                if (status is DeviceStatus.Ok)
-                    Task.Run(() => ShellCommands.FindCommands(ID));
-            }
-
-            if (status is DeviceStatus.Offline)
-                Data.FileOpQ?.MoveOperationsToPast(true, this);
-
-            return true;
+            logical.InvalidateRootStatus();
         }
 
-        return false;
+        if (status is DeviceStatus.Offline)
+            Data.FileOpQ?.MoveOperationsToPast(true, this);
+
+        return true;
     }
 
     #endregion

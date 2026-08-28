@@ -78,6 +78,8 @@ public class DevicePollingService : BackgroundService
         if (Data.Settings.EnableWsa)
             DeviceHelper.ConnectWsaDevice();
 
+        DeviceHelper.UpdateDevicesRootAccess();
+
         if (!isDevicesPage)
             return;
 
@@ -85,8 +87,6 @@ public class DevicePollingService : BackgroundService
 
         if (Data.MdnsService?.State is MDNS.MdnsState.Running)
             DeviceHelper.ListServices(WiFiPairingService.GetServices(cancellationToken), cancellationToken);
-
-        DeviceHelper.UpdateDevicesRootAccess();
 
         DeviceHelper.UpdateWsaPkgStatus();
 
