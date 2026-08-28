@@ -796,4 +796,7 @@
     <value>ডানে স্ক্রল করুন</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
+  <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
+    <value>অ</value>
+  </data>
 </root>

@@ -1588,4 +1588,7 @@ Weblate இல் உங்கள் மொழியில் பயன்பா
     <value>Allow ADB From Untrusted Sources</value>
     <comment>The setting that allows using ADB without integrity checks and without path restrictions</comment>
   </data>
+  <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
+    <value>அ</value>
+  </data>
 </root>

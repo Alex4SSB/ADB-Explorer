@@ -1688,4 +1688,7 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SKIP_THESE_FILES" xml:space="preserve">
     <value>跳過這些檔案</value>
   </data>
+  <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
+    <value>名</value>
+  </data>
 </root>

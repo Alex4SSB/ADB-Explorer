@@ -1765,4 +1765,7 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MENU_SHOW" xml:space="preserve">
     <value>显示</value>
   </data>
+  <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
+    <value>名</value>
+  </data>
 </root>

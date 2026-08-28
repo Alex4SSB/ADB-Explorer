@@ -1765,4 +1765,7 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_MENU_SHOW" xml:space="preserve">
     <value>Показати</value>
   </data>
+  <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
+    <value>А</value>
+  </data>
 </root>

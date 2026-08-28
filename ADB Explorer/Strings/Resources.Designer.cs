@@ -3555,6 +3555,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A.
+        /// </summary>
+        public static string S_RENAME_ICON_LETTER {
+            get {
+                return ResourceManager.GetString("S_RENAME_ICON_LETTER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Restore.
         /// </summary>
         public static string S_RESTORE_ACTION {

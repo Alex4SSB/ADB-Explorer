@@ -1401,4 +1401,7 @@ Weblate でアプリをあなたの言語にローカライズできるよう、
     <value>Pair</value>
     <comment>The button for pairing a device</comment>
   </data>
+  <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
+    <value>あ</value>
+  </data>
 </root>

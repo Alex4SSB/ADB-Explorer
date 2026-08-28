@@ -1447,4 +1447,7 @@ Weblate에서 앱을 해당 언어로 현지화하는 데 도움을 주세요.</
     <value>Pair</value>
     <comment>The button for pairing a device</comment>
   </data>
+  <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
+    <value>ㄱ</value>
+  </data>
 </root>

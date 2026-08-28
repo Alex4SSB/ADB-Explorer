@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -297,6 +297,15 @@
   <data name="S_NEW_VERSION" xml:space="preserve">
     <value>גרסת {0} חדשה, {1}, זמינה להורדה</value>
   </data>
+  <data name="S_NEW_VERSION_READY" xml:space="preserve">
+    <value>גרסה חדשה של {0}, גרסה {1}, סיימה הורדה ומוכנה להתקנה.</value>
+  </data>
+  <data name="S_UPDATE_ON_CLOSE" xml:space="preserve">
+    <value>עדכן ביציאה</value>
+  </data>
+  <data name="S_UPDATE_APPLY_FAILED" xml:space="preserve">
+    <value>לא ניתן היה להכין את עדכון התוכנה. וודאו כי מותקן כלי לטיפול בקבצי 7z (הסייר של ווינדוס, ‎7-Zip‏, NanaZip‏, וכו'). לחלופין ניתן להוריד את העדכון ידנית מגיטהאב.</value>
+  </data>
   <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
     <value>עבור אל דף הגרסה</value>
   </data>
@@ -348,6 +357,9 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_NEW_FOLDER" xml:space="preserve">
     <value>תיקייה חדשה</value>
   </data>
+  <data name="S_NEW_ARCHIVE" xml:space="preserve">
+    <value>ארכיון חדש</value>
+  </data>
   <data name="S_CC_NAME" xml:space="preserve">
     <value>קריאייטיב קומונס</value>
   </data>
@@ -395,6 +407,18 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>מזג או החלף</value>
+  </data>
+  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
+    <value>החלף את הקבצים ביעד</value>
+  </data>
+  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
+    <value>דלג על הקבצים האלה</value>
+  </data>
+  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
+    <value>אַפשר לי להחליט עבור כל קובץ</value>
+  </data>
+  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
+    <value>פתור {0} התנגשויות</value>
   </data>
   <data name="S_CONFLICT_ITEMS" xml:space="preserve">
     <value>קיים פריט 1 עם התנגשות</value>
@@ -500,6 +524,12 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>בדוק אחר עדכונים</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
+    <value>בדיקה והודעה</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_UPDATE" xml:space="preserve">
+    <value>עדכון והתקנה</value>
   </data>
   <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
     <value>גרפיקה</value>
@@ -630,6 +660,9 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_MENU_REFRESH" xml:space="preserve">
     <value>רענן</value>
   </data>
+  <data name="S_MENU_STOP_LOADING" xml:space="preserve">
+    <value>הפסק טעינת {0}</value>
+  </data>
   <data name="S_MENU_COPY" xml:space="preserve">
     <value>העתק</value>
   </data>
@@ -656,6 +689,27 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_MENU_PASTE_LINK" xml:space="preserve">
     <value>הדבק קישור</value>
+  </data>
+  <data name="S_MENU_COPY_LINK" xml:space="preserve">
+    <value>העתק כקישור</value>
+  </data>
+  <data name="S_MENU_COPY_CONTENTS" xml:space="preserve">
+    <value>העתק תוכן</value>
+  </data>
+  <data name="S_MENU_EXTRACT_HERE" xml:space="preserve">
+    <value>חלץ כאן</value>
+  </data>
+  <data name="S_MENU_COMPRESS_TO" xml:space="preserve">
+    <value>כווץ לתוך</value>
+  </data>
+  <data name="S_ACTION_COMPRESS" xml:space="preserve">
+    <value>כיווץ</value>
+  </data>
+  <data name="S_ACTION_EXTRACT" xml:space="preserve">
+    <value>חילוץ</value>
+  </data>
+  <data name="S_MENU_ARCHIVE" xml:space="preserve">
+    <value>ארכיון</value>
   </data>
   <data name="S_MENU_RENAME" xml:space="preserve">
     <value>שנה שם</value>
@@ -764,6 +818,9 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_COLUMN_VERSION" xml:space="preserve">
     <value>גרסה</value>
+  </data>
+  <data name="S_PACKAGE_ID" xml:space="preserve">
+    <value>ID חבילה</value>
   </data>
   <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
     <value>שרת ADB אינו מגיב</value>
@@ -1433,6 +1490,9 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_STRING_PASTE" xml:space="preserve">
     <value>הדבק</value>
   </data>
+  <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
+    <value>טוען סמלי אפליקציות</value>
+  </data>
   <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
     <value>בודק אחר עדכונים לתמונות</value>
   </data>
@@ -1489,6 +1549,12 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
     <value>גודל קובץ מקסימלי לתצוגה מקדימה</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX" xml:space="preserve">
+    <value>סינטקס</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX_AUTOMATIC" xml:space="preserve">
+    <value>אוטומטי</value>
   </data>
   <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
     <value>הורד קובץ לתיקיית ברירת המחדל בלחיצה כפולה</value>
@@ -1604,6 +1670,9 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
     <value>אַפשר שימוש ב-ADB ממקורות לא בטוחים</value>
   </data>
+  <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
+    <value>לא זמין במערכת זו.</value>
+  </data>
   <data name="S_SETTINGS_FILE_SIZE_MODE" xml:space="preserve">
     <value>תצוגת גודל קובץ</value>
   </data>
@@ -1612,54 +1681,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_OPEN_FOLDER" xml:space="preserve">
     <value>פתח</value>
-  </data>
-  <data name="S_PREVIEW_SYNTAX" xml:space="preserve">
-    <value>סינטקס</value>
-  </data>
-  <data name="S_PREVIEW_SYNTAX_AUTOMATIC" xml:space="preserve">
-    <value>אוטומטי</value>
-  </data>
-  <data name="S_NEW_VERSION_READY" xml:space="preserve">
-    <value>גרסה חדשה של {0}, גרסה {1}, סיימה הורדה ומוכנה להתקנה.</value>
-  </data>
-  <data name="S_UPDATE_ON_CLOSE" xml:space="preserve">
-    <value>עדכן ביציאה</value>
-  </data>
-  <data name="S_UPDATE_APPLY_FAILED" xml:space="preserve">
-    <value>לא ניתן היה להכין את עדכון התוכנה. וודאו כי מותקן כלי לטיפול בקבצי 7z (הסייר של ווינדוס, ‎7-Zip‏, NanaZip‏, וכו'). לחלופין ניתן להוריד את העדכון ידנית מגיטהאב.</value>
-  </data>
-  <data name="S_NEW_ARCHIVE" xml:space="preserve">
-    <value>ארכיון חדש</value>
-  </data>
-  <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
-    <value>בדיקה והודעה</value>
-  </data>
-  <data name="S_SETTINGS_UPDATES_UPDATE" xml:space="preserve">
-    <value>עדכון והתקנה</value>
-  </data>
-  <data name="S_MENU_STOP_LOADING" xml:space="preserve">
-    <value>הפסק טעינת {0}</value>
-  </data>
-  <data name="S_MENU_COPY_LINK" xml:space="preserve">
-    <value>העתק כקישור</value>
-  </data>
-  <data name="S_MENU_COPY_CONTENTS" xml:space="preserve">
-    <value>העתק תוכן</value>
-  </data>
-  <data name="S_MENU_EXTRACT_HERE" xml:space="preserve">
-    <value>חלץ כאן</value>
-  </data>
-  <data name="S_MENU_COMPRESS_TO" xml:space="preserve">
-    <value>כווץ לתוך</value>
-  </data>
-  <data name="S_ACTION_COMPRESS" xml:space="preserve">
-    <value>כיווץ</value>
-  </data>
-  <data name="S_ACTION_EXTRACT" xml:space="preserve">
-    <value>חילוץ</value>
-  </data>
-  <data name="S_MENU_ARCHIVE" xml:space="preserve">
-    <value>ארכיון</value>
   </data>
   <data name="S_RESTART" xml:space="preserve">
     <value>הפעל מחדש עכשיו</value>
@@ -1714,27 +1735,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
     <value>צא ממצב תוצאות חיפוש.</value>
   </data>
-  <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
-    <value>לא זמין במערכת זו.</value>
-  </data>
-  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
-    <value>החלף את הקבצים ביעד</value>
-  </data>
-  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
-    <value>דלג על הקבצים האלה</value>
-  </data>
-  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
-    <value>אַפשר לי להחליט עבור כל קובץ</value>
-  </data>
-  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
-    <value>פתור {0} התנגשויות</value>
-  </data>
-  <data name="S_PACKAGE_ID" xml:space="preserve">
-    <value>ID חבילה</value>
-  </data>
-  <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
-    <value>טוען סמלי אפליקציות</value>
-  </data>
   <data name="S_NEWER" xml:space="preserve">
     <value>חדש יותר</value>
   </data>
@@ -1749,5 +1749,14 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
     <value>הקובץ ידולג.</value>
+  </data>
+  <data name="S_NAVIGATION_PANE" xml:space="preserve">
+    <value>חלונית ניווט</value>
+  </data>
+  <data name="S_MENU_SHOW" xml:space="preserve">
+    <value>הצג</value>
+  </data>
+  <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
+    <value>א</value>
   </data>
 </root>

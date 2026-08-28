@@ -915,4 +915,7 @@
     <value>التمرير لليمين</value>
     <comment>ScrollBar ContextMenu</comment>
   </data>
+  <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
+    <value>م</value>
+  </data>
 </root>
