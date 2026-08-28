@@ -1228,7 +1228,13 @@ public partial class ExplorerPageHeader : UserControl
     /// </summary>
     private void ApplyLocationThumbSize()
     {
-        if (string.IsNullOrEmpty(CurrentPath) || FileActions.IsDriveViewVisible)
+        if (FileActions.IsDriveViewVisible)
+        {
+            ViewModel.CurrentThumbsSize = ThumbnailService.ThumbnailSize.Tiles;
+            return;
+        }
+
+        if (string.IsNullOrEmpty(CurrentPath))
             return;
 
         if (FileActions.IsAppDriveThumbsLocked)
@@ -1388,6 +1394,8 @@ public partial class ExplorerPageHeader : UserControl
 
         RuntimeSettings.SelectedDrive = DriveList.SelectedItem as DriveViewModel;
         FileActionLogic.UpdateFileActions();
+
+        ViewModel.CurrentThumbsSize = ThumbnailService.ThumbnailSize.Tiles;
     }
 
     private void DataGridCell_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)

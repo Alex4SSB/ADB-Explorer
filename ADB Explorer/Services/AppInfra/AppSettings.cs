@@ -133,7 +133,9 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
 
     void IJsonOnSerializing.OnSerializing()
     {
-        _locationThumbSize = LocationThumbSize.Where(kv => kv.Value is not ThumbnailService.ThumbnailSize.Disabled).ToDictionary();
+        _locationThumbSize = LocationThumbSize.Where(kv =>
+            kv.Value is not ThumbnailService.ThumbnailSize.Disabled
+            and not ThumbnailService.ThumbnailSize.Tiles).ToDictionary();
         _locationSorting = LocationSorting.Where(kv => kv.Value.Property != SortingSelector.SortingProperty.Name || kv.Value.Direction != ListSortDirection.Ascending).ToDictionary();
     }
 

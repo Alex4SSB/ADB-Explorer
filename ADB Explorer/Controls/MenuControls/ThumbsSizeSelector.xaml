@@ -18,19 +18,10 @@
             <TextBlock Text="{Binding Info}" TextWrapping="Wrap" />
         </ToolTip>
     </UserControl.Resources>
-    <local:AdbMenu d:Visibility="Visible" DataContext="{Binding ElementName=tsz}">
-        <local:AdbMenu.Style>
-            <Style BasedOn="{StaticResource AdbMenuStyle}" TargetType="local:AdbMenu">
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDriveThumbsLocked}" Value="True">
-                        <Setter Property="IsEnabled" Value="False" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </local:AdbMenu.Style>
+    <local:AdbMenu
+        d:Visibility="Visible"
+        DataContext="{Binding ElementName=tsz}"
+        Style="{StaticResource AdbMenuStyle}">
         <local:AdbMenuItem ItemsSource="{Binding Items}" ToolTip="{Binding Source={x:Static Member=strings:Resources.S_THUMBSIZE_TOOLTIP}}">
             <local:AdbMenuItem.Resources>
                 <ui:FontIcon

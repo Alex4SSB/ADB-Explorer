@@ -113,11 +113,16 @@ public static partial class ThumbnailService
     public enum ThumbnailSize
     {
         Disabled = 0,
+        /// <summary>Drive-view layout sentinel; not a thumbnail pixel size.</summary>
+        Tiles = 1,
         Medium = 48,
         Large = 96,
         ExtraLarge = 192,
         Drag = 256,
     }
+
+    public static bool IsIconLayout(ThumbnailSize size) =>
+        size is ThumbnailSize.Medium or ThumbnailSize.Large or ThumbnailSize.ExtraLarge;
 
     /// <summary>
     /// Raised when a thumbnail acquisition step starts or completes.

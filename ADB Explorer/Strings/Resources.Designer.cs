@@ -3473,6 +3473,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A.
+        /// </summary>
+        public static string S_RENAME_ICON_LETTER {
+            get {
+                return ResourceManager.GetString("S_RENAME_ICON_LETTER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Replace.
         /// </summary>
         public static string S_REPLACE {
@@ -3551,15 +3560,6 @@ namespace ADB_Explorer.Strings {
         public static string S_RESTART_LATER {
             get {
                 return ResourceManager.GetString("S_RESTART_LATER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A.
-        /// </summary>
-        public static string S_RENAME_ICON_LETTER {
-            get {
-                return ResourceManager.GetString("S_RENAME_ICON_LETTER", resourceCulture);
             }
         }
         
@@ -4567,6 +4567,15 @@ namespace ADB_Explorer.Strings {
         public static string S_THUMBSIZE_MEDIUM {
             get {
                 return ResourceManager.GetString("S_THUMBSIZE_MEDIUM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tiles.
+        /// </summary>
+        public static string S_THUMBSIZE_TILES {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_TILES", resourceCulture);
             }
         }
         

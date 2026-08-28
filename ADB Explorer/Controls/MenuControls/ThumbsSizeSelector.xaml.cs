@@ -15,6 +15,7 @@ public partial class ThumbsSizeSelector : UserControl
     public ThumbsSizeSelector()
     {
         Items = [
+            new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_TILES, ThumbnailService.ThumbnailSize.Tiles, this, canSelect: false),
             new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_DETAILS, ThumbnailService.ThumbnailSize.Disabled, this),
             new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_MEDIUM, ThumbnailService.ThumbnailSize.Medium, this),
             new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_LARGE, ThumbnailService.ThumbnailSize.Large, this),
@@ -47,6 +48,7 @@ public partial class ThumbsSizeSelector : UserControl
 
     static Dictionary<ThumbnailService.ThumbnailSize, UIElement> Icons => new()
     {
+        { ThumbnailService.ThumbnailSize.Tiles, new FluentPathIcon() { Data = FluentPathGeometries.AppsListDetail, Height = 16 } },
         { ThumbnailService.ThumbnailSize.Disabled, new FluentPathIcon() { Data = FluentPathGeometries.TextBulletList, Height = 16 } },
         { ThumbnailService.ThumbnailSize.Medium, new FontIcon() { Glyph = "\uE138", FontSize = 16 } },
         { ThumbnailService.ThumbnailSize.Large, new LargeThumbsIcon() { SubFontSize = 8 } },
@@ -178,7 +180,10 @@ public partial class ThumbsSizeSelector : UserControl
                 : mode == DetailsPane.SidePaneMode.Details;
         }
 
-        private static bool IsPreviewAllowed() => !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive && !Data.FileActions.IsDriveViewVisible;
+        private static bool IsPreviewAllowed() => 
+            !Data.FileActions.IsRecycleBin 
+            && !Data.FileActions.IsAppDrive 
+            && Data.FileActions.IsExplorerVisible;
     }
 
     public partial class ThumbSizeItem : ThumbSizeBaseItem
@@ -186,11 +191,14 @@ public partial class ThumbsSizeSelector : UserControl
         [ObservableProperty]
         public override partial bool IsChecked { get; set; } = false;
 
-        public ThumbSizeItem(string name, ThumbnailService.ThumbnailSize size, ThumbsSizeSelector selector)
+        public ThumbSizeItem(string name, ThumbnailService.ThumbnailSize size, ThumbsSizeSelector selector, bool canSelect = true)
         {
             Name = name;
             Icon = Icons[size];
-            Action = new(() => Data.Settings.ThumbsMode > AppSettings.ThumbnailMode.Off, () => selector.SetThumbnailSize(size));
+            if (canSelect)
+                Action = new(IsThumbSizeChangeAllowed, () => selector.SetThumbnailSize(size));
+            else
+                Action = new(() => false, static () => { });
 
             selector.PropertyChanged += (_, e) =>
             {
@@ -202,5 +210,10 @@ public partial class ThumbsSizeSelector : UserControl
 
             IsChecked = selector.ThumbnailSize == size;
         }
+
+        private static bool IsThumbSizeChangeAllowed() => 
+            Data.Settings.ThumbsMode > AppSettings.ThumbnailMode.Off 
+            && !Data.FileActions.IsAppDriveThumbsLocked
+            && Data.FileActions.IsExplorerVisible;
     }
 }

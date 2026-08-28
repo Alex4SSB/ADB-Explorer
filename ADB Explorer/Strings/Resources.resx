@@ -1892,6 +1892,10 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Extra Large Icons</value>
     <comment>Thumbnail size selector - extra large icons</comment>
   </data>
+  <data name="S_THUMBSIZE_TILES" xml:space="preserve">
+    <value>Tiles</value>
+    <comment>Thumbnail size selector - tiles layout</comment>
+  </data>
   <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
     <value>Layout and view options</value>
     <comment>The tooltip of the thumbnail size selector. view = icon view / details view</comment>
