@@ -50,7 +50,7 @@ public partial class ThumbsSizeSelector : UserControl
         { ThumbnailService.ThumbnailSize.Disabled, new FluentPathIcon() { Data = FluentPathGeometries.TextBulletList, Height = 16 } },
         { ThumbnailService.ThumbnailSize.Medium, new FontIcon() { Glyph = "\uE138", FontSize = 16 } },
         { ThumbnailService.ThumbnailSize.Large, new LargeThumbsIcon() { SubFontSize = 8 } },
-        { ThumbnailService.ThumbnailSize.ExtraLarge, new FontIcon() { Glyph = "\uE15A", FontSize = 16 } },
+        { ThumbnailService.ThumbnailSize.ExtraLarge, (UIElement)new BaseIcon("\uE15A", 16, rtlBehavior: RtlBehavior.ForceRtl).IconContent },
     };
 
     static Dictionary<DetailsPane.SidePaneMode, UIElement> SidePaneModeIcons => new()

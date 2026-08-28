@@ -60,7 +60,7 @@ public static class AppActions
         FileActionType.CopyLink => new(new DocumentLinkIcon(), size),
         FileActionType.CopyContents => new(new CopyArrowRightIcon(), size),
         FileActionType.ExtractHere => new(new FolderArrowRightIcon(), size),
-        FileActionType.CompressTo or FileActionType.NewCompressTo or FileActionType.BackupPackage => new(new ZipIcon(), size),
+        FileActionType.CompressTo or FileActionType.NewCompressTo or FileActionType.BackupPackage => new(new ZipIcon(), size, RtlBehavior.ForceLtr),
         FileActionType.PasteLink => new(new DocumentLinkIcon(), size),
         FileActionType.SearchApkOnWeb => new(new GlobeSearchIcon(), size),
         _ => new(Icons[type], size),

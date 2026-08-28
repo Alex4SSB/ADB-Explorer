@@ -1,3 +1,4 @@
+using ADB_Explorer.Models;
 using Wpf.Ui.Controls;
 
 namespace ADB_Explorer.Controls;
@@ -126,6 +127,13 @@ public class ScaledPathIcon : UserControl
         new PropertyMetadata(16.0d));
 }
 
+public enum RtlBehavior
+{
+    None,
+    ForceLtr,
+    ForceRtl,
+}
+
 public class BaseIcon
 {
     private const string DefaultForegroundBrush = "TextFillColorPrimaryBrush";
@@ -134,7 +142,7 @@ public class BaseIcon
 
     public double Size { get; }
 
-    public BaseIcon(string glyph, double fontSize = 22, string? brush = null)
+    public BaseIcon(string glyph, double fontSize = 22, string? brush = null, RtlBehavior rtlBehavior = RtlBehavior.None)
     {
         Size = fontSize;
         FontIcon fontIcon = new()
@@ -144,10 +152,11 @@ public class BaseIcon
             Style = CreateForegroundStyle(typeof(FontIcon), "BaseIconFontStyle", brush ?? DefaultForegroundBrush),
         };
 
+        ApplyRtlBehavior(fontIcon, rtlBehavior);
         IconContent = fontIcon;
     }
 
-    public BaseIcon(Geometry data, double height = 22, string? brush = null, Stretch stretch = Stretch.Uniform, FlowDirection? flowDirection = null)
+    public BaseIcon(Geometry data, double height = 22, string? brush = null, Stretch stretch = Stretch.Uniform, RtlBehavior rtlBehavior = RtlBehavior.None)
     {
         Size = height;
         FluentPathIcon icon = new()
@@ -159,9 +168,7 @@ public class BaseIcon
             Style = CreateForegroundStyle(typeof(FluentPathIcon), "BaseIconPathStyle", brush ?? DefaultForegroundBrush),
         };
 
-        if (flowDirection is not null)
-            icon.FlowDirection = flowDirection.Value;
-
+        ApplyRtlBehavior(icon, rtlBehavior);
         IconContent = icon;
     }
 
@@ -176,7 +183,7 @@ public class BaseIcon
         };
     }
 
-    public BaseIcon(UserControl content, double size = 18)
+    public BaseIcon(UserControl content, double size = 18, RtlBehavior rtlBehavior = RtlBehavior.None)
     {
         Size = size;
         if (content is ScaledPathIcon scaledPathIcon)
@@ -185,7 +192,19 @@ public class BaseIcon
         content.Width = size;
         content.Height = size;
 
+        ApplyRtlBehavior(content, rtlBehavior);
         IconContent = content;
+    }
+
+    private static void ApplyRtlBehavior(FrameworkElement element, RtlBehavior behavior)
+    {
+        if (behavior is RtlBehavior.None)
+            return;
+
+        element.FlowDirection = FlowDirection.LeftToRight;
+
+        if (behavior is RtlBehavior.ForceRtl && Data.RuntimeSettings.IsRTL)
+            element.LayoutTransform = new ScaleTransform(-1, 1);
     }
 
     private static Style CreateForegroundStyle(Type targetType, string baseStyleKey, string enabledBrushKey)

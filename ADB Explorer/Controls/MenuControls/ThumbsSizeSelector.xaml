@@ -65,7 +65,7 @@
                 </local:SimpleStackPanel>
             </local:AdbMenuItem.Header>
             <local:AdbMenuItem.ItemContainerStyle>
-                <Style TargetType="local:AdbMenuItem">
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="local:AdbMenuItem">
                     <Setter Property="ItemsSource" Value="{Binding Children}" />
                     <Setter Property="Icon" Value="{StaticResource ThumbCheckedIcon}" />
                     <Setter Property="Command" Value="{Binding Action.Command}" />

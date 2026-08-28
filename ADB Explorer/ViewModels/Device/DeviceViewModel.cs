@@ -56,7 +56,7 @@ public abstract class DeviceViewModel : ViewModelBase
 
     public object TypeIconContent => Type switch
     {
-        DeviceType.Local => new BaseIcon(FluentPathGeometries.UsbDevice, 28, flowDirection: FlowDirection.LeftToRight).IconContent,
+        DeviceType.Local => new BaseIcon(FluentPathGeometries.UsbDevice, 28, rtlBehavior: RtlBehavior.ForceLtr).IconContent,
         DeviceType.New => new BaseIcon(FluentPathGeometries.PhoneAdd, 28).IconContent,
         _ => new BaseIcon(TypeIcon, 28).IconContent,
     };
