@@ -143,6 +143,17 @@ public static class ArchiveListing
         return GetFileStats(archivePath, internalPath, toc.Entries);
     }
 
+    public static bool HasCachedToc(string archivePath)
+        => TocCache.ContainsKey(archivePath);
+
+    public static IEnumerable<FileStat> TryListCachedEntries(string archivePath, string internalPath)
+    {
+        if (!TocCache.TryGetValue(archivePath, out var toc))
+            return [];
+
+        return GetFileStats(archivePath, internalPath, toc.Entries);
+    }
+
     public static ArchiveToc GetOrFetchToc(string deviceId, string archivePath, CancellationToken cancellationToken)
         => TocCache.GetOrAdd(archivePath, key => FetchTableOfContents(deviceId, key, cancellationToken));
 

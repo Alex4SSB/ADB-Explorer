@@ -31,7 +31,7 @@ internal static class TrashHelper
         {
             var name = FileHelper.GetFullName(path);
             var item = new FileClass(name, path, AbstractFile.FileType.File);
-            if (Data.RecycleIndex.FirstOrDefault(index => index.RecycleName == name) is TrashIndexer indexer)
+            if (Data.RecycleIndex.FirstOrDefault(index => index.MatchesRecycleFile(name)) is TrashIndexer indexer)
                 item.TrashIndex = indexer;
 
             items.Add(item);
@@ -99,32 +99,33 @@ internal static class TrashHelper
         }
     }
 
-    public static Task ParseIndexersAsync(CancellationToken cancellationToken = default) => Task.Run(() =>
-    {
-        Data.RecycleIndex.Clear();
-
-        var indexers = ADBService.FindFilesInPath(Data.DevicesObject.Current.ID,
-                                                  AdbExplorerConst.RECYCLE_PATH,
-                                                  includeNames: ["*" + AdbExplorerConst.RECYCLE_INDEX_SUFFIX]);
-
-        var lines = ShellFileOperation.ReadAllText(Data.DevicesObject.Current, indexers).Split(ADBService.LINE_SEPARATORS,
-                                                                                          StringSplitOptions.RemoveEmptyEntries);
-
-        lines.ToList().ForEach(line => Data.RecycleIndex.Add(new(line)));
-    }, cancellationToken);
+    public static Task ParseIndexersAsync(CancellationToken cancellationToken = default)
+        => Task.Run(ParseIndexers, cancellationToken);
 
     public static void ParseIndexers()
     {
+        var device = Data.DevicesObject.Current;
+        if (device is null)
+            return;
+
+        string text;
+        try
+        {
+            var indexers = ADBService.FindFilesInPath(device.ID,
+                                                      AdbExplorerConst.RECYCLE_PATH,
+                                                      includeNames: ["*" + AdbExplorerConst.RECYCLE_INDEX_SUFFIX]);
+
+            text = ShellFileOperation.ReadAllText(device, indexers);
+        }
+        catch
+        {
+            Data.RecycleIndex.Clear();
+            return;
+        }
+
+        var parsed = TrashIndexer.ParseLines(text);
         Data.RecycleIndex.Clear();
-
-        var indexers = ADBService.FindFilesInPath(Data.DevicesObject.Current.ID,
-                                                  AdbExplorerConst.RECYCLE_PATH,
-                                                  includeNames: ["*" + AdbExplorerConst.RECYCLE_INDEX_SUFFIX]);
-
-        var lines = ShellFileOperation.ReadAllText(Data.DevicesObject.Current, indexers).Split(ADBService.LINE_SEPARATORS,
-                                                                                          StringSplitOptions.RemoveEmptyEntries);
-
-        lines.ToList().ForEach(line => Data.RecycleIndex.Add(new(line)));
+        Data.RecycleIndex.AddRange(parsed);
     }
 
     public static void SyncDriveViewTrashCountAfterDelete(FileDeleteOperation completedOp)

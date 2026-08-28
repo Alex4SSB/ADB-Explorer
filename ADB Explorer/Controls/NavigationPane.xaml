@@ -113,7 +113,6 @@
                             <EventSetter Event="DragOver" Handler="TreeViewItem_DragOver" />
                             <EventSetter Event="Drop" Handler="TreeViewItem_Drop" />
                             <EventSetter Event="Selected" Handler="TreeViewItem_Selected" />
-                            <EventSetter Event="Expanded" Handler="TreeViewItem_Expanded" />
                             <EventSetter Event="RequestBringIntoView" Handler="TreeViewItem_RequestBringIntoView" />
                             <EventSetter Event="ContextMenuOpening" Handler="TreeViewItem_ContextMenuOpening" />
                             <Setter Property="Template">

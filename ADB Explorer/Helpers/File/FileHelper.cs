@@ -26,7 +26,7 @@ public static class FileHelper
 
         if (Data.FileActions.IsRecycleBin)
         {
-            var indexer = Data.RecycleIndex.FirstOrDefault(index => index.RecycleName == item.FullName);
+            var indexer = Data.RecycleIndex.FirstOrDefault(index => index.MatchesRecycleFile(item.FullName));
             if (indexer is not null)
             {
                 item.TrashIndex = indexer;

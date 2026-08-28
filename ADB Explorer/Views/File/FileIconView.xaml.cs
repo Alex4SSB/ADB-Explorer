@@ -13,6 +13,7 @@ public partial class FileIconView : UserControl
     private bool _wasSelectedOnMouseDown;
     private bool _wasEditingOnMouseDown;
     private int _clickCount;
+    private static int _delayedRenameEpoch;
 
     /// <summary>
     /// Raised when icon rename editing starts. Sender is the <see cref="FileIconView"/> instance.
@@ -28,6 +29,9 @@ public partial class FileIconView : UserControl
     {
         InitializeComponent();
     }
+
+    public static void CancelDelayedRename()
+        => Interlocked.Increment(ref _delayedRenameEpoch);
 
     private void IconViewNameTextBlock_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
@@ -61,6 +65,7 @@ public partial class FileIconView : UserControl
             return;
 
         var path = file.FullPath;
+        var epoch = _delayedRenameEpoch;
 
         Task.Run(() =>
         {
@@ -74,12 +79,15 @@ public partial class FileIconView : UserControl
                     break;
 
                 var currentPath = App.AppDispatcher?.Invoke(() => (DataContext as FileClass)?.FullPath);
-                if (_clickCount > 1 || currentPath != path)
+                if (_clickCount != 1 || epoch != _delayedRenameEpoch || currentPath != path)
                     return;
             }
 
             App.SafeInvoke(() =>
             {
+                if (_clickCount != 1 || epoch != _delayedRenameEpoch)
+                    return;
+
                 if (DataContext is FileClass currentFile && currentFile.FullPath == path && !currentFile.IconViewModel.IsInEditMode)
                 {
                     currentFile.IconViewModel.IsInEditMode = true;

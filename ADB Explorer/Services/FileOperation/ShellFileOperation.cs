@@ -518,7 +518,7 @@ public static class ShellFileOperation
                     ? item.FullName
                     : FileHelper.GetFullName(item.TrashIndex.RecycleName);
 
-                var indexer = Data.RecycleIndex.FirstOrDefault(f => f.RecycleName == recycleName);
+                var indexer = Data.RecycleIndex.FirstOrDefault(f => f.MatchesRecycleFile(recycleName));
                 if (indexer is null)
                     continue;
 

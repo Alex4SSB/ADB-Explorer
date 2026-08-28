@@ -267,7 +267,8 @@ public partial class NavigationTreeViewModel : ObservableObject
                     currentNode = FindOrCreateChild(currentNode, chain[i]);
                     if (i < chain.Count - 1)
                     {
-                        currentNode.CanExpand = true;
+                        if (!IsArchiveRootNode(currentNode))
+                            currentNode.CanExpand = true;
                         currentNode.IsExpanded = true;
                     }
                 }
@@ -307,9 +308,11 @@ public partial class NavigationTreeViewModel : ObservableObject
             yield break;
 
         var allowHidden = Data.Settings.ShowHiddenItems;
+        var isInsideArchive = Data.FileActions.IsArchive;
+        var deviceId = Data.DevicesObject?.Current?.ID;
         foreach (var item in source)
         {
-            if (item is not FileClass file || !file.IsDirectory)
+            if (item is not FileClass file)
                 continue;
 
             if (!allowHidden && file.IsHidden)
@@ -318,7 +321,15 @@ public partial class NavigationTreeViewModel : ObservableObject
             if (FileHelper.IsHiddenRecycleItem(file))
                 continue;
 
-            yield return file;
+            if (file.IsDirectory)
+            {
+                yield return file;
+                continue;
+            }
+
+            if (deviceId is not null
+                && ArchiveHelper.CanNavigateIntoArchive(file.FullPath, file.FullName, deviceId, isInsideArchive))
+                yield return file;
         }
     }
 
@@ -413,19 +424,21 @@ public partial class NavigationTreeViewModel : ObservableObject
 
     private void ApplyTreeFolders(NavigationTreeNode node, List<FileClass> folders)
     {
+        var deviceId = node.OwnerDevice?.ID;
         var matching = folders
-            .Where(folder => node.IsDirectChildPath(folder.FullPath))
+            .Select(folder => (File: folder, Path: TreeItemPath(folder, deviceId)))
+            .Where(item => node.IsDirectChildPath(item.Path) || node.IsDirectChildPath(item.File.FullPath))
             .ToList();
 
-        foreach (var folder in matching)
-            FindOrCreateChild(node, folder.FullPath, folder);
+        foreach (var item in matching)
+            FindOrCreateChild(node, item.Path, item.File);
 
         foreach (var child in node.Children.ToList())
         {
             if (child.Drive is not null || child.IsTemp || child.IsInEditMode)
                 continue;
 
-            if (matching.Any(folder => NavigationTreeNode.PathsEqual(folder.FullPath, child.Path)))
+            if (matching.Any(item => NavigationTreeNode.PathsEqual(item.Path, child.Path)))
                 continue;
 
             child.Detach();
@@ -475,7 +488,12 @@ public partial class NavigationTreeViewModel : ObservableObject
                     return;
 
                 foreach (var child in node.Children.Where(c => c.Drive is null))
-                    child.CanExpand = true;
+                {
+                    if (IsArchiveRootNode(child))
+                        RefreshArchiveCanExpand(child);
+                    else
+                        child.CanExpand = true;
+                }
             });
             return;
         }
@@ -490,7 +508,10 @@ public partial class NavigationTreeViewModel : ObservableObject
                 if (child.Drive is not null)
                     continue;
 
-                child.CanExpand = withSubfolders.Any(path => NavigationTreeNode.PathsEqual(path, child.Path));
+                if (IsArchiveRootNode(child))
+                    RefreshArchiveCanExpand(child);
+                else
+                    child.CanExpand = withSubfolders.Any(path => NavigationTreeNode.PathsEqual(path, child.Path));
             }
 
             if (!node.AlwaysExpandable)
@@ -501,10 +522,11 @@ public partial class NavigationTreeViewModel : ObservableObject
     private static List<FileClass> ListTreeSubfolders(string deviceId, string path, CancellationToken token)
     {
         IEnumerable<FileStat> entries;
+        var listingInsideArchive = ArchivePath.TryParse(path, out var archivePath, out var internalPath, deviceId);
         try
         {
-            if (ArchivePath.TryParse(path, out var archivePath, out var internalPath, deviceId))
-                entries = ArchiveListing.ListEntries(deviceId, archivePath, internalPath, token);
+            if (listingInsideArchive)
+                entries = ArchiveListing.TryListCachedEntries(archivePath, internalPath);
             else
                 entries = ADBService.ListDirectoryEntries(deviceId, path, token);
         }
@@ -531,11 +553,24 @@ public partial class NavigationTreeViewModel : ObservableObject
                 continue;
             }
 
+            if (!listingInsideArchive
+                && entry.Type is AbstractFile.FileType.File
+                && !entry.IsLink
+                && ArchiveHelper.IsNavigableArchive(entry.FullName, deviceId))
+            {
+                var archive = new FileClass(entry.FullName, entry.FullPath, AbstractFile.FileType.File);
+                if (FileHelper.IsHiddenRecycleItem(archive))
+                    continue;
+
+                folders.Add(archive);
+                continue;
+            }
+
             if (entry.IsLink && entry.Type is AbstractFile.FileType.Unknown)
                 unresolvedLinks.Add(entry);
         }
 
-        if (unresolvedLinks.Count == 0)
+        if (listingInsideArchive || unresolvedLinks.Count == 0)
             return folders;
 
         List<(string Target, AbstractFile.FileType Type)> linkTypes;
@@ -785,6 +820,7 @@ public partial class NavigationTreeViewModel : ObservableObject
                 existing.File ??= file;
             }
             existing.CutState = CutStateFor(existing);
+            RefreshArchiveCanExpand(existing);
             return existing;
         }
 
@@ -802,9 +838,42 @@ public partial class NavigationTreeViewModel : ObservableObject
             File = file
         };
         child.CutState = CutStateFor(child);
+        RefreshArchiveCanExpand(child);
 
         InsertChild(parent, child);
         return child;
+    }
+
+    private static string TreeItemPath(FileClass file, string? deviceId)
+    {
+        if (deviceId is not null
+            && ArchiveHelper.CanNavigateIntoArchive(
+                file.FullPath,
+                file.FullName,
+                deviceId,
+                ArchivePath.IsArchivePath(file.FullPath, deviceId)))
+            return ArchivePath.Join(file.FullPath, "");
+
+        return file.FullPath;
+    }
+
+    private static bool IsArchiveRootNode(NavigationTreeNode node)
+    {
+        var deviceId = node.OwnerDevice?.ID;
+        return deviceId is not null
+            && ArchivePath.TryParse(node.Path, out _, out var internalPath, deviceId)
+            && string.IsNullOrEmpty(internalPath);
+    }
+
+    private static void RefreshArchiveCanExpand(NavigationTreeNode node)
+    {
+        var deviceId = node.OwnerDevice?.ID;
+        if (string.IsNullOrEmpty(deviceId)
+            || !ArchivePath.TryParse(node.Path, out var archivePath, out var internalPath, deviceId)
+            || !string.IsNullOrEmpty(internalPath))
+            return;
+
+        node.CanExpand = ArchiveListing.HasCachedToc(archivePath);
     }
 
     private static void InsertDrive(NavigationTreeNode deviceNode, NavigationTreeNode driveNode)

@@ -1512,6 +1512,8 @@ public partial class ExplorerPageHeader : UserControl
 
     private void DoubleClick(object source)
     {
+        FileIconView.CancelDelayedRename();
+
         if (FileActions.IsRecycleBin)
             return;
 
@@ -1656,12 +1658,15 @@ public partial class ExplorerPageHeader : UserControl
                         break;
 
                     var currentPath = App.AppDispatcher?.Invoke(() => ((FileClass)ExplorerGrid.SelectedItem)?.FullPath);
-                    if (ClickCount > 1 || currentPath != path)
+                    if (ClickCount != 1 || currentPath != path)
                         return;
                 }
 
                 App.SafeInvoke(() =>
                 {
+                    if (ClickCount != 1)
+                        return;
+
                     file.FolderViewModel.IsInEditMode = true;
                     FileActions.IsExplorerEditing = true;
                 });

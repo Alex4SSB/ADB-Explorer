@@ -349,26 +349,11 @@ public partial class NavigationPane : UserControl
             Dispatcher.BeginInvoke(() => ScrollTreeItemIntoView(item), DispatcherPriority.Loaded);
     }
 
-    private void TreeViewItem_Expanded(object sender, RoutedEventArgs e)
-    {
-        if (ShouldSkipTreeScroll())
-            return;
-
-        if (sender is TreeViewItem item && ReferenceEquals(e.OriginalSource, item))
-            Dispatcher.BeginInvoke(() => ScrollTreeItemIntoView(item), DispatcherPriority.Loaded);
-    }
-
     private void TreeViewItem_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
     {
-        if (sender is not TreeViewItem item || !ReferenceEquals(e.OriginalSource, item))
-            return;
-
+        // Child headers (long names) raise this on expand/collapse; the default
+        // ScrollViewer pans horizontally to fit the full item. Always suppress.
         e.Handled = true;
-
-        if (ShouldSkipTreeScroll())
-            return;
-
-        ScrollTreeItemIntoView(item);
     }
 
     private void ScrollTreeItemIntoView(TreeViewItem item)
@@ -377,36 +362,7 @@ public partial class NavigationPane : UserControl
             return;
 
         item.ApplyTemplate();
-        var expander = item.Template.FindName("Expander", item) as FrameworkElement;
-        var header = item.Template.FindName("PART_Header", item) as FrameworkElement;
         var row = item.Template.FindName("Border", item) as FrameworkElement;
-        var target = expander ?? header ?? row;
-        if (target is null)
-            return;
-
-        Rect targetBounds;
-        try
-        {
-            targetBounds = target.TransformToAncestor(scrollViewer)
-                .TransformBounds(new Rect(0, 0, target.ActualWidth, target.ActualHeight));
-        }
-        catch (InvalidOperationException)
-        {
-            return;
-        }
-
-        var left = targetBounds.Left;
-        var showRight = left + targetBounds.Width + 120;
-        var viewportWidth = scrollViewer.ViewportWidth;
-        var horizontalOffset = scrollViewer.HorizontalOffset;
-
-        if (left < 0)
-            horizontalOffset += left;
-        else if (showRight > viewportWidth)
-            horizontalOffset += showRight - viewportWidth;
-
-        scrollViewer.ScrollToHorizontalOffset(Math.Max(0, horizontalOffset));
-
         if (row is null)
             return;
 

@@ -248,6 +248,9 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             {
                 FullName = FileHelper.GetFullName(value.OriginalPath);
                 SortName = new(FullName);
+                OnPropertyChanged(nameof(DisplayName));
+                OnPropertyChanged(nameof(NoExtName));
+                OnPropertyChanged(nameof(Extension));
             }
         }
     }
