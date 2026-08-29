@@ -390,7 +390,7 @@ Konten yang terlihat mungkin tidak lengkap.</value>
     <value>Ada {0} item yang konflik di {1}</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Konflik Tempel</value>
+    <value>Ganti atau Lewati File</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Pilih folder untuk didorong</value>
@@ -1715,5 +1715,62 @@ Pemeriksaan ini berupaya mencegah pengguna yang tidak menyadari risiko menjalank
   </data>
   <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
     <value>Keluar dari mode hasil pencarian.</value>
+  </data>
+  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
+    <value>Ganti file di tujuan</value>
+  </data>
+  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
+    <value>Lewati file ini</value>
+  </data>
+  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
+    <value>Biarkan saya memutuskan untuk setiap file</value>
+  </data>
+  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
+    <value>Selesaikan {0} konflik</value>
+  </data>
+  <data name="S_MENU_BACKUP_PACKAGE" xml:space="preserve">
+    <value>Cadangan</value>
+  </data>
+  <data name="S_APK_BACKUP_OBB_FAILED" xml:space="preserve">
+    <value>Aplikasi telah diinstal, tetapi file OBB tidak dapat dipulihkan. Buka aplikasi sekali di perangkat dan coba lagi.</value>
+  </data>
+  <data name="S_PACKAGE_ID" xml:space="preserve">
+    <value>ID Paket</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
+    <value>Memuat ikon aplikasi</value>
+  </data>
+  <data name="S_THUMBSIZE_TILES" xml:space="preserve">
+    <value>Ubin</value>
+  </data>
+  <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
+    <value>Tidak tersedia di sistem ini.</value>
+  </data>
+  <data name="S_NEWER" xml:space="preserve">
+    <value>lebih baru</value>
+  </data>
+  <data name="S_BIGGER" xml:space="preserve">
+    <value>lebih besar</value>
+  </data>
+  <data name="S_PER_FILE_CONFLICT_TABLE_TITLE" xml:space="preserve">
+    <value>Untuk setiap konflik, pilih tujuan untuk melewatkannya, atau sumber untuk menggantinya.</value>
+  </data>
+  <data name="S_TOOLTIP_REPLACED" xml:space="preserve">
+    <value>File akan diganti.</value>
+  </data>
+  <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
+    <value>File akan dilewati.</value>
+  </data>
+  <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
+    <value>Buat .APKBKP dari instalasi aplikasi dan data OBB</value>
+  </data>
+  <data name="S_NAVIGATION_PANE" xml:space="preserve">
+    <value>Panel navigasi</value>
+  </data>
+  <data name="S_MENU_SHOW" xml:space="preserve">
+    <value>Tampilkan</value>
+  </data>
+  <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
+    <value>A</value>
   </data>
 </root>
