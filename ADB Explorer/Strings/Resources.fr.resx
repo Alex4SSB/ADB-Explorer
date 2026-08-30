@@ -1760,4 +1760,16 @@ Séléctionnez Personnalisé pour utiliser un emplacement qui ne sera pas suppri
   <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
     <value>Créez un .APKBKP de l'installation de l'application et des données OBB</value>
   </data>
+  <data name="S_THUMBSIZE_TILES" xml:space="preserve">
+    <value>Tuiles</value>
+  </data>
+  <data name="S_NAVIGATION_PANE" xml:space="preserve">
+    <value>Panneaux de navigation</value>
+  </data>
+  <data name="S_MENU_SHOW" xml:space="preserve">
+    <value>Affichage</value>
+  </data>
+  <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
+    <value>A</value>
+  </data>
 </root>
