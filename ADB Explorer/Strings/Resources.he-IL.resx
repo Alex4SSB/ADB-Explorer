@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1758,5 +1758,17 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
     <value>א</value>
+  </data>
+  <data name="S_MENU_BACKUP_PACKAGE" xml:space="preserve">
+    <value>גיבוי</value>
+  </data>
+  <data name="S_APK_BACKUP_OBB_FAILED" xml:space="preserve">
+    <value>האפליקציה הותקנה, אך לא ניתן לשחזר את קבצי ה-OBB. פתח את האפליקציה במכשיר ונסה שוב.</value>
+  </data>
+  <data name="S_THUMBSIZE_TILES" xml:space="preserve">
+    <value>אריחים</value>
+  </data>
+  <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
+    <value>יוצר APKBKP של התקנת האפליקציה ונתוני ה-OBB</value>
   </data>
 </root>
