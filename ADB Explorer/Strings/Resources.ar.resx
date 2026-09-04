@@ -918,4 +918,24 @@
   <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
     <value>م</value>
   </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• ملفات نظام للقراءة فقط</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• لا يتم دعم الروابط الرمزية
+• لا يجوز أن تحتوي أسماء الملفات على الأحرف التالية: " * / : &lt; &gt; ? \ |
+• لا يُراعي تمييز الأحرف الكبيرة والصغيرة في أسماء الملفات
+• لا يتم دعم تثبيت ملفات APK</value>
+  </data>
+  <data name="S_RESET_SETTINGS" xml:space="preserve">
+    <value>سيتم إعادة ضبط جميع إعدادات التطبيق عند إغلاقه.
+لا يمكن التراجع عن هذه الخطوة. هل أنت متأكد؟</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>اختر «تشغيل» إذا كان ADB قد تمت الموافقة عليه مسبقًا في WSA.
+للموافقة على ADB، افتح الإعدادات المتقدمة لـ WSA.⁧⁧‬</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
+    <value>لا يمكن إنشاء {0} من الملفات المحددة ضمن نظام Windows drive root.</value>
+  </data>
 </root>
