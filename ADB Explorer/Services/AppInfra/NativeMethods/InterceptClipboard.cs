@@ -4,10 +4,10 @@ public static partial class NativeMethods
 {
     public sealed partial class InterceptClipboard : IDisposable
     {
-        private static Action _externalClipAction;
-        private static Action<string> _externalIpcAction;
-        private static Action<float> _externalScalingAction;
-        private static HwndSource _hwndSource;
+        private static Action _externalClipAction = null!;
+        private static Action<string> _externalIpcAction = null!;
+        private static Action<float> _externalScalingAction = null!;
+        private static HwndSource _hwndSource = null!;
 
         public static HANDLE MainWindowHandle { get; private set; } = IntPtr.Zero;
 

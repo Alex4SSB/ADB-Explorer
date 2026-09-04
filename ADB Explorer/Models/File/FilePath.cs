@@ -87,7 +87,7 @@ public class FilePath : AbstractFile, IBaseFile
 
     public bool IsDirectory => SpecialType.HasFlag(SpecialFileType.Folder);
 
-    private string fullPath;
+    private string fullPath = "";
     public string FullPath
     {
         get => fullPath;
@@ -96,7 +96,7 @@ public class FilePath : AbstractFile, IBaseFile
 
     public string ParentPath => FileHelper.GetParentPath(FullPath);
 
-    private string fullName;
+    private string fullName = "";
     public string FullName
     {
         get => fullName;
@@ -128,7 +128,8 @@ public class FilePath : AbstractFile, IBaseFile
 
     public bool IsRtlName => TextHelper.ContainsRtl(FullName);
 
-    public ShellItem ShellItem { get; set; }
+    // Only set for FilePaths constructed from a Windows-side ShellItem; absent for Android paths.
+    public ShellItem? ShellItem { get; set; }
 
     public bool IsHidden => FullName.StartsWith('.');
 
@@ -193,7 +194,7 @@ public class FilePath : AbstractFile, IBaseFile
 
         try
         {
-            FullPath = windowsPath.ParsingName;
+            FullPath = windowsPath.ParsingName ?? "";
             FullName = windowsPath.GetDisplayName(ShellItemDisplayString.ParentRelativeParsing)
                 ?? FileHelper.GetFullName(FullPath);
 

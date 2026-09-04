@@ -1223,7 +1223,7 @@ public partial class DetailsPane : UserControl
             SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COLUMN_TYPE, f => f.FolderViewModel.TypeName));
 
         if (Data.FileActions.IsRecycleBin)
-            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COLUMN_ORIGINAL_LOCATION, f => f.TrashIndex.OriginalPath, valueIsLtr: true));
+            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COLUMN_ORIGINAL_LOCATION, f => f.TrashIndex!.OriginalPath, valueIsLtr: true));
         else
             SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_ITEM_LOCATION, FormatArchiveLocation, valueIsLtr: true));
 
@@ -1297,7 +1297,7 @@ public partial class DetailsPane : UserControl
         }
 
         if (Data.FileActions.IsRecycleBin)
-            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COLUMN_DATE_DELETED, f => f.TrashIndex.ModifiedTimeString));
+            SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COLUMN_DATE_DELETED, f => f.TrashIndex!.ModifiedTimeString));
         if (file.IsLink)
             SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_FILE_TYPE_LINK, f => f.LinkTarget, valueIsLtr: true));
 

@@ -161,7 +161,7 @@ public static partial class NativeMethods
         private static extern int SHGetImageList(
             int iImageList,
             ref Guid riid,
-            ref IImageList ppv
+            ref IImageList? ppv
             );
 
         [DllImport("Shell32.dll", EntryPoint = "#727")]
@@ -322,7 +322,7 @@ public static partial class NativeMethods
 
         #region Member Variables
         private HANDLE hIml = IntPtr.Zero;
-        private IImageList iImageList;
+        private IImageList? iImageList;
         private SysImageListSize size = SysImageListSize.SHIL_SMALL;
         private bool disposed;
         #endregion

@@ -7,8 +7,8 @@ namespace ADB_Explorer.Services;
 
 public class FileMoveOperation : AbstractShellFileOperation
 {
-    public string RecycleName;
-    public string IndexerPath;
+    public string RecycleName = "";
+    public string IndexerPath = "";
     public DateTime? DateModified;
     public readonly bool isLink;
 
@@ -52,8 +52,8 @@ public class FileMoveOperation : AbstractShellFileOperation
         }
         else if (OperationName is OperationType.Restore)
         {
-            RecycleName = FilePath.TrashIndex.RecycleName;
-            IndexerPath = FilePath.TrashIndex.IndexerPath;
+            RecycleName = FilePath.TrashIndex!.RecycleName;
+            IndexerPath = FilePath.TrashIndex!.IndexerPath;
         }
 
         var cmd = OperationName switch
@@ -81,7 +81,7 @@ public class FileMoveOperation : AbstractShellFileOperation
         if (OperationName is OperationType.Copy or OperationType.Recycle)
             DateModified = DateTime.Now;
 
-        var operationTask = ADBService.ExecuteVoidShellCommand(Device.ID, CancelTokenSource.Token, cmd, flag,
+        var operationTask = ADBService.ExecuteVoidShellCommand(Device.ID, CancelTokenSource!.Token, cmd, flag,
             ADBService.EscapeAdbShellString(FilePath.FullPath),
             ADBService.EscapeAdbShellString(TargetPath.FullPath));
 

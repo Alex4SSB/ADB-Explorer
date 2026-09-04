@@ -4,7 +4,7 @@ namespace ADB_Explorer.Helpers;
 
 public class RandomString
 {
-    public static string GetUniqueKey(int size, char[] chars = null)
+    public static string GetUniqueKey(int size, char[]? chars = null)
     {
         if (chars is null)
         {

@@ -4,20 +4,21 @@ namespace ADB_Explorer.Helpers;
 
 public class SettingsTemplateSelector : DataTemplateSelector
 {
-    public DataTemplate BoolSettingTemplate { get; set; }
-    public DataTemplate TextboxSettingTemplate { get; set; }
-    public DataTemplate EnumSettingTemplate { get; set; }
-    public DataTemplate CultureInfoSettingTemplate { get; set; }
-    public DataTemplate InfoSettingTemplate { get; set; }
-    public DataTemplate LinkSettingTemplate { get; set; }
-    public DataTemplate MultiLinkSettingTemplate { get; set; }
-    public DataTemplate LongDescriptionTemplate { get; set; }
-    public DataTemplate NumericTemplate { get; set; }
-    public DataTemplate ColorSettingTemplate { get; set; }
+    // Set via XAML resource declarations, not a constructor — genuinely absent until then.
+    public DataTemplate? BoolSettingTemplate { get; set; }
+    public DataTemplate? TextboxSettingTemplate { get; set; }
+    public DataTemplate? EnumSettingTemplate { get; set; }
+    public DataTemplate? CultureInfoSettingTemplate { get; set; }
+    public DataTemplate? InfoSettingTemplate { get; set; }
+    public DataTemplate? LinkSettingTemplate { get; set; }
+    public DataTemplate? MultiLinkSettingTemplate { get; set; }
+    public DataTemplate? LongDescriptionTemplate { get; set; }
+    public DataTemplate? NumericTemplate { get; set; }
+    public DataTemplate? ColorSettingTemplate { get; set; }
 
     public override DataTemplate SelectTemplate(object item, DependencyObject container)
     {
-        return item switch
+        return (item switch
         {
             InfoSetting => InfoSettingTemplate,
             LinkSetting => LinkSettingTemplate,
@@ -30,6 +31,6 @@ public class SettingsTemplateSelector : DataTemplateSelector
             ColorSetting => ColorSettingTemplate,
             _ when item.GetType().IsGenericType && item.GetType().GetGenericTypeDefinition() == typeof(SimpleComboSetting<>) => EnumSettingTemplate,
             _ => throw new NotImplementedException(),
-        };
+        }) ?? new();
     }
 }

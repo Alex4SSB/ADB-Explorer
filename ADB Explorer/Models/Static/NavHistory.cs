@@ -38,7 +38,7 @@ namespace ADB_Explorer.Models
                 Path = path;
         }
 
-        public string Path { get; private set; }
+        public string Path { get; private set; } = "";
 
         public SpecialLocation Location { get; private set; }
 
@@ -108,7 +108,7 @@ namespace ADB_Explorer.Models
         public static string StringFromLocation(SpecialLocation location) =>
             $"[{Enum.GetName(location)}]";
 
-        public static SpecialLocation LocationFromString(string location)
+        public static SpecialLocation LocationFromString(string? location)
         {
             if (location is string loc && loc.EndsWith(']') && loc.StartsWith('[') && Enum.TryParse<SpecialLocation>(loc.Trim('[', ']'), out var result))
             {
@@ -187,7 +187,7 @@ namespace ADB_Explorer.Models
         public TextMenu NameSubMenu =>
             new TextMenu(new FileAction(FileAction.FileActionType.None, new(() => true, () => Data.RuntimeSettings.LocationToNavigate = this), BreadcrumbLabel));
 
-        public override bool Equals(object other)
+        public override bool Equals(object? other)
         {
             if (other is not AdbLocation location)
                 return false;
@@ -233,7 +233,7 @@ namespace ADB_Explorer.Models
 
         public static FileClass? FindBackNavigationItem(string path)
         {
-            if (Data.DirList.FileList.FirstOrDefault(item => item.FullPath == path) is { } exact)
+            if (Data.DirList!.FileList.FirstOrDefault(item => item.FullPath == path) is { } exact)
                 return exact;
 
             var deviceId = Data.DevicesObject.Current?.ID;
@@ -244,7 +244,7 @@ namespace ADB_Explorer.Models
                 return null;
 
             var archivePath = ArchivePath.GetArchivePath(path, deviceId);
-            return Data.DirList.FileList.FirstOrDefault(item => item.FullPath == archivePath);
+            return Data.DirList!.FileList.FirstOrDefault(item => item.FullPath == archivePath);
         }
 
         public static bool BackAvailable { get { return historyIndex > 0; } }

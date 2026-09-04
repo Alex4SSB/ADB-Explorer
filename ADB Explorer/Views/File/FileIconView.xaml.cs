@@ -18,12 +18,12 @@ public partial class FileIconView : UserControl
     /// <summary>
     /// Raised when icon rename editing starts. Sender is the <see cref="FileIconView"/> instance.
     /// </summary>
-    public static event EventHandler<System.Windows.Controls.TextBox> RenameStarted;
+    public static event EventHandler<System.Windows.Controls.TextBox>? RenameStarted;
 
     /// <summary>
     /// Raised when icon rename editing ends. Sender is the <see cref="FileIconView"/> instance.
     /// </summary>
-    public static event EventHandler RenameEnded;
+    public static event EventHandler? RenameEnded;
 
     public FileIconView()
     {

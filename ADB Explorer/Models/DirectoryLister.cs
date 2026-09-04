@@ -7,12 +7,12 @@ using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Models;
 
-public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewModel device, Func<FileClass, FileClass> fileManipulator = null) : ViewModelBase
+public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewModel device, Func<FileClass, FileClass>? fileManipulator = null) : ViewModelBase
 {
     public LogicalDeviceViewModel Device { get; } = device;
     public ObservableList<FileClass> FileList { get; } = [];
 
-    private string currentPath;
+    private string currentPath = "";
     public string CurrentPath
     {
         get => currentPath;
@@ -41,15 +41,15 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
     }
 
     private Dispatcher Dispatcher { get; } = dispatcher;
-    private Task UpdateTask { get; set; }
+    private Task? UpdateTask { get; set; }
     private TimeSpan UpdateInterval { get; set; }
     private int MinUpdateThreshold { get; set; }
-    private Task ReadTask { get; set; } = null;
-    private CancellationTokenSource CurrentCancellationToken { get; set; }
-    private CancellationTokenSource LinkListCancellation { get; set; }
-    private Func<FileClass, FileClass> FileManipulator { get; } = fileManipulator;
+    private Task? ReadTask { get; set; } = null;
+    private CancellationTokenSource? CurrentCancellationToken { get; set; }
+    private CancellationTokenSource? LinkListCancellation { get; set; }
+    private Func<FileClass, FileClass>? FileManipulator { get; } = fileManipulator;
 
-    private ConcurrentQueue<FileStat> currentFileQueue;
+    private ConcurrentQueue<FileStat>? currentFileQueue;
 
     private bool isSearchListing;
 
@@ -185,7 +185,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
         UpdateTask = Task.Delay(UpdateInterval);
         UpdateTask.ContinueWith(
             (t) => Dispatcher.BeginInvoke(() => UpdateDirectoryList(!InProgress)),
-            CurrentCancellationToken.Token,
+            CurrentCancellationToken?.Token ?? CancellationToken.None,
             TaskContinuationOptions.OnlyOnRanToCompletion,
             TaskScheduler.Default);
     }
@@ -245,7 +245,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
            return;
         }
 
-        CurrentCancellationToken.Cancel();
+        CurrentCancellationToken?.Cancel();
 
         try
         {

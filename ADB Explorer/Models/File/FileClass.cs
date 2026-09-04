@@ -237,8 +237,8 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     [ObservableProperty]
     public partial DragDropEffects CutState { get; set; }
 
-    private TrashIndexer trashIndex;
-    public TrashIndexer TrashIndex
+    private TrashIndexer? trashIndex;
+    public TrashIndexer? TrashIndex
     {
         get => trashIndex;
         set
@@ -282,7 +282,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         return FileHelper.GetFolderTree([FullPath], cancellationToken: Data.DeviceCts.Token, deviceId: deviceId);
     }
 
-    public IEnumerable<FileDescriptor> Descriptors { get; private set; }
+    public IEnumerable<FileDescriptor>? Descriptors { get; private set; }
 
     /// <summary>Device temp root used when staging archive extract for pull; cleaned after VFDO completes.</summary>
     private string? archivePullStagingRoot;
@@ -391,11 +391,12 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     }
 
     public FileClass(FileDescriptor fileDescriptor)
-        : base(fileDescriptor.SourcePath, fileDescriptor.Name, fileDescriptor.IsDirectory ? FileType.Folder : FileType.File)
+        : base(fileDescriptor.SourcePath ?? "", fileDescriptor.Name, fileDescriptor.IsDirectory ? FileType.Folder : FileType.File)
     {
         Size = fileDescriptor.Length;
         ModifiedTime = fileDescriptor.ChangeTimeUtc;
         Type = fileDescriptor.IsDirectory ? FileType.Folder : FileType.File;
+        SortName = new(FullName);
     }
 
     public static FileClass GenerateAndroidFile(FileStat fileStat)
@@ -501,7 +502,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         Data.DevicesObject.Current?.RecordUnixIdentity(location.User, location.Group);
     }
 
-    private void OnSettingsPropertyChanged(object sender, PropertyChangedEventArgs args)
+    private void OnSettingsPropertyChanged(object? sender, PropertyChangedEventArgs args)
     {
         if (args.PropertyName == nameof(Data.Settings.ShowExtensions))
         {
@@ -767,7 +768,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         return null;
     }
 
-    private void VFDO_OperationCompleted(object sender, NativeMethods.HResult hResult)
+    private void VFDO_OperationCompleted(object? sender, NativeMethods.HResult hResult)
     {
         if (sender is not VirtualFileDataObject vfdo)
             return;
@@ -796,7 +797,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
                 {
                     App.SafeInvoke(() =>
                     {
-                        Data.DirList.FileList.RemoveAll(f => f.FullPath == FullPath);
+                        Data.DirList!.FileList.RemoveAll(f => f.FullPath == FullPath);
                         FileActionLogic.UpdateFileActions();
                     });
                 }
@@ -850,7 +851,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         }
     }
 
-    protected override bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+    protected override bool Set<T>(ref T storage, T value, [CallerMemberName] string? propertyName = null)
     {
         if (!base.Set(ref storage, value, propertyName))
             return false;
@@ -875,7 +876,7 @@ public class FileNameSort(string name) : IComparable
         return Name;
     }
 
-    public int CompareTo(object obj)
+    public int CompareTo(object? obj)
     {
         if (obj is not FileNameSort other)
             return 0;

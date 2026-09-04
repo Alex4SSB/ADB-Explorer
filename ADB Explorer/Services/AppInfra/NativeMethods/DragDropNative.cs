@@ -83,7 +83,7 @@ public static partial class NativeMethods
             parentFolder = files.First().ParentPath;
             
             items = [.. parentFolder == AdbExplorerConst.RECYCLE_PATH
-                ? files.Select(f => f.TrashIndex.RecycleName)
+                ? files.Select(f => f.TrashIndex!.RecycleName)
                 : files.Select(f => f.FullName)];
         }
 
@@ -177,7 +177,7 @@ public static partial class NativeMethods
         Vanara.PInvoke.STGM grfMode,
         FileFlagsAndAttributes dwAttributes,
         [MarshalAs(UnmanagedType.Bool)] bool fCreate,
-        IStream pstmTemplate,
+        IStream? pstmTemplate,
         out IStream ppstm);
 
     public static IStream GetComStreamFromFile(string filePath)

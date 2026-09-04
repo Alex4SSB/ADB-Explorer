@@ -69,11 +69,11 @@ public class FileOpColumnConfig : ViewModelBase
 
     public bool IsEnabled => IsChecked is false || CheckedColumnsCount > 1;
 
-    public DataGridColumn Column => column;
+    public DataGridColumn? Column => column;
 
     #endregion
 
-    private DataGridColumn column;
+    private DataGridColumn? column;
 
     public void AssignColumn(DataGridColumn col)
     {

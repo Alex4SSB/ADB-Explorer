@@ -6,7 +6,7 @@ internal class CompletedShellProgressViewModel : FileOpProgressViewModel
 
     public bool NoConfirmation => Message == Strings.Resources.S_SYNC_NO_CONFIRM;
 
-    public CompletedShellProgressViewModel(string message = null) : base(Services.FileOperation.OperationStatus.Completed)
+    public CompletedShellProgressViewModel(string? message = null) : base(Services.FileOperation.OperationStatus.Completed)
     {
         if (message is null)
             message = Strings.Resources.S_FILEOP_COMPLETED;

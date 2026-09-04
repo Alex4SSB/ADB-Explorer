@@ -64,7 +64,7 @@ public partial class TerminalViewModel : ObservableObject, INavigationAware
         RefreshDeviceList();
     }
 
-    private void UIList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    private void UIList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems is not null)
             foreach (DeviceViewModel item in e.NewItems)
@@ -77,7 +77,7 @@ public partial class TerminalViewModel : ObservableObject, INavigationAware
         App.SafeInvoke(RefreshDeviceList);
     }
 
-    private void DeviceItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void DeviceItem_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(DeviceViewModel.Status))
             App.SafeInvoke(RefreshDeviceList);

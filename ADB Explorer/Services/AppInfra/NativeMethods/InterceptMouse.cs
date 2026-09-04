@@ -19,8 +19,8 @@ public static partial class NativeMethods
         private static readonly LowLevelMouseProc _mouseProc = HookCallback;
         private static HANDLE _mouseHookID = IntPtr.Zero;
         private static bool _isHooked;
-        private static Action<POINT> _mouseMoveAction;
-        private static Action _rButtonAction;
+        private static Action<POINT>? _mouseMoveAction;
+        private static Action? _rButtonAction;
         private static Action<int>? _mouseWheelAction;
         public static POINT MousePosition { get; private set; }
         

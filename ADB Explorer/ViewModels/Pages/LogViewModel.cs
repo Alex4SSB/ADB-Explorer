@@ -8,9 +8,9 @@ public partial class LogViewModel : ObservableObject, INavigationAware
 {
     private bool _isInitialized = false;
 
-    public event Action<Log> LogEntryAdded;
-    public event Action LogCleared;
-    public event Action RefreshControls;
+    public event Action<Log>? LogEntryAdded;
+    public event Action? LogCleared;
+    public event Action? RefreshControls;
 
     public LogViewModel()
     {
@@ -67,7 +67,7 @@ public partial class LogViewModel : ObservableObject, INavigationAware
         _isInitialized = false;
     }
 
-    private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(AppSettings.EnableLog) && !Data.Settings.EnableLog)
         {
@@ -75,7 +75,7 @@ public partial class LogViewModel : ObservableObject, INavigationAware
         }
     }
 
-    private void CommandLog_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    private void CommandLog_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.Action is NotifyCollectionChangedAction.Add && e.NewItems is not null && !Data.IsLogPaused)
         {

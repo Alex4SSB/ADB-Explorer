@@ -13,8 +13,8 @@ namespace ADB_Explorer.Views.Windows;
 /// </summary>
 public partial class DragWindow : INotifyPropertyChanged
 {
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 #if RELEASE
     private const int VERTICAL_OFFSET = 10;
@@ -65,7 +65,7 @@ public partial class DragWindow : INotifyPropertyChanged
         IsOpen = false;
     }
 
-    private void DragTimer_Tick(object sender, EventArgs e)
+    private void DragTimer_Tick(object? sender, EventArgs e)
     {
         if (Data.CopyPaste.DragBitmap is not null)
             GetPathUnderMouse();

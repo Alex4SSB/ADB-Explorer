@@ -22,11 +22,11 @@ public class ToggleMenu : ViewModelBase
                       BaseIcon checkedIcon,
                       Action action,
                       string uncheckedDescription = "",
-                      BaseIcon uncheckedIcon = null,
-                      KeyGesture gesture = null,
-                      Brush checkBackground = null,
-                      IEnumerable<SubMenu> children = null,
-                      ObservableProperty<bool> isVisible = null,
+                      BaseIcon? uncheckedIcon = null,
+                      KeyGesture? gesture = null,
+                      Brush? checkBackground = null,
+                      IEnumerable<SubMenu>? children = null,
+                      ObservableProperty<bool>? isVisible = null,
                       bool toggleOnClick = true,
                       bool clearClipboard = false)
     {
@@ -40,7 +40,7 @@ public class ToggleMenu : ViewModelBase
         FileAction = new(type, canExecute, action, Description, gesture, gesture is not null, clearClipboard);
         Button = new(FileAction, Icon, IsChecked, checkBackground: checkBackground, children: children, isVisible: isVisible, isCheckable: toggleOnClick);
 
-        IsChecked.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) =>
+        IsChecked.PropertyChanged += (object? sender, PropertyChangedEventArgs<bool> e) =>
         {
             Description.Value = e.NewValue ? checkedDescription : uncheckedDescription;
             Icon.Value = e.NewValue ? checkedIcon : uncheckedIcon;

@@ -16,7 +16,7 @@ public partial class SelectionRectangle : UserControl
     /// Raised when the mouse moves over the visible selection border,
     /// so that the parent can forward the event to the appropriate view's MouseMove handler.
     /// </summary>
-    public event MouseEventHandler RectMouseMove;
+    public event MouseEventHandler? RectMouseMove;
 
     /// <summary>
     /// Whether the selection rectangle is currently visible (i.e. a drag-selection is in progress).

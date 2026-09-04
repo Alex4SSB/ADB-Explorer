@@ -229,10 +229,10 @@ public static class ArchiveHelper
             return "Stored";
 
         if (raw.StartsWith("Defl:", StringComparison.OrdinalIgnoreCase))
-            return FormatDeflateLevel(raw[5..]);
+            return FormatDeflateLevel(raw.AsSpan(5));
 
         if (raw.Length == 4 && raw.StartsWith("def", StringComparison.OrdinalIgnoreCase))
-            return FormatDeflateLevel(raw[3..]);
+            return FormatDeflateLevel(raw.AsSpan(3));
 
         if (raw.Equals("Shrunk", StringComparison.OrdinalIgnoreCase)
             || raw.Equals("Shrk", StringComparison.OrdinalIgnoreCase))

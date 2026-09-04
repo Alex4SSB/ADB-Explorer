@@ -35,9 +35,9 @@ public abstract class Device
 
     public DeviceStatus Status { get; set; }
 
-    public string IpAddress { get; set; }
+    public string IpAddress { get; set; } = "";
 
-    public string ID { get; set; }
+    public string ID { get; set; } = "";
 
     public static implicit operator bool(Device obj)
     {
@@ -50,7 +50,7 @@ public abstract class Device
 /// </summary>
 public abstract class PairingDevice : Device
 {
-    public string PairingPort { get; set; }
+    public string PairingPort { get; set; } = "";
 
-    public string PairingCode { get; set; }
+    public string PairingCode { get; set; } = "";
 }

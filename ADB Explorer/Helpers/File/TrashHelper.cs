@@ -6,7 +6,7 @@ namespace ADB_Explorer.Helpers;
 
 internal static class TrashHelper
 {
-    public static void EnableRecycleButtons(IEnumerable<FileClass> fileList = null)
+    public static void EnableRecycleButtons(IEnumerable<FileClass>? fileList = null)
     {
         if (fileList is null)
             fileList = Data.DirList?.FileList ?? [];

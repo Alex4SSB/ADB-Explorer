@@ -29,7 +29,7 @@ public partial class ADBService
 
     private static readonly ConcurrentDictionary<int, Process> ActiveCommandProcesses = new();
 
-    public static event Action<bool> CommandActiveChanged;
+    public static event Action<bool>? CommandActiveChanged;
 
     private static void UpdateCommandActive(int delta)
     {
@@ -56,10 +56,10 @@ public partial class ADBService
         }
 
         public int ExitCode { get; set; }
-        public string StandardError { get; set; }
+        public string? StandardError { get; set; }
     };
 
-    public static Process StartCommandProcess(string file, string cmd, Encoding encoding, bool redirect = true, Process cmdProcess = null, string workingDir = null, params string[] args)
+    public static Process StartCommandProcess(string file, string cmd, Encoding encoding, bool redirect = true, Process? cmdProcess = null, string? workingDir = null, params string[] args)
     {
         cmdProcess ??= new();
         var arguments = string.Join(' ', args.Prepend(cmd).Where(arg => !string.IsNullOrEmpty(arg)));
@@ -70,7 +70,7 @@ public partial class ADBService
         cmdProcess.StartInfo.RedirectStandardError =
         cmdProcess.StartInfo.CreateNoWindow = redirect;
 
-        cmdProcess.StartInfo.WorkingDirectory = workingDir;
+        cmdProcess.StartInfo.WorkingDirectory = workingDir ?? "";
         cmdProcess.StartInfo.FileName = file;
         cmdProcess.StartInfo.Arguments = arguments;
 
@@ -191,7 +191,7 @@ public partial class ADBService
     }
 
     public static IEnumerable<string> ExecuteCommandAsync(
-        string file, string cmd, Encoding encoding, CancellationToken cancellationToken, bool redirect = true, Process process = null, string workingDir = null, params string[] args)
+        string file, string cmd, Encoding encoding, CancellationToken cancellationToken, bool redirect = true, Process? process = null, string? workingDir = null, params string[] args)
     {
 #if DEBUG
         var summary = FormatProcessSummary(file, cmd, args);
@@ -393,7 +393,7 @@ public partial class ADBService
     /// <param name="cmd">connect / disconnect</param>
     /// <exception cref="ConnectionRefusedException"></exception>
     /// <exception cref="ConnectionTimeoutException"></exception>
-    private static void NetworkDeviceOperation(string cmd, string fullAddress, CancellationToken cancellationToken, string pairingCode = null)
+    private static void NetworkDeviceOperation(string cmd, string fullAddress, CancellationToken cancellationToken, string pairingCode = "")
     {
         ExecuteAdbCommand(cmd, out string stdout, out _, cancellationToken, fullAddress, pairingCode);
         if (stdout.ToLower() is string lower
@@ -616,7 +616,7 @@ public partial class ADBService
         };
     }
 
-    public static ulong CountFiles(string deviceID, string path, IEnumerable<string> includeNames = null, IEnumerable<string> excludeNames = null)
+    public static ulong CountFiles(string deviceID, string path, IEnumerable<string>? includeNames = null, IEnumerable<string>? excludeNames = null)
     {
         string[] args = PrepFindArgs(path, includeNames, excludeNames, true);
 
@@ -625,7 +625,7 @@ public partial class ADBService
         return ulong.TryParse(stdout, out var count) ? count : 0;
     }
 
-    public static string[] FindFilesInPath(string deviceID, string path, IEnumerable<string> includeNames = null, IEnumerable<string> excludeNames = null, bool caseSensitive = false)
+    public static string[] FindFilesInPath(string deviceID, string path, IEnumerable<string>? includeNames = null, IEnumerable<string>? excludeNames = null, bool caseSensitive = false)
     {
         string[] args = PrepFindArgs(path, includeNames, excludeNames, false, caseSensitive);
 
@@ -678,7 +678,7 @@ public partial class ADBService
         return stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries);
     }
 
-    private static string[] PrepFindArgs(string path, IEnumerable<string> includeNames, IEnumerable<string> excludeNames, bool countOnly, bool caseSensitive = false)
+    private static string[] PrepFindArgs(string path, IEnumerable<string>? includeNames, IEnumerable<string>? excludeNames, bool countOnly, bool caseSensitive = false)
     {
         if (includeNames is not null && excludeNames is not null)
             throw new ArgumentException("""
@@ -1388,7 +1388,7 @@ public partial class ADBService
         return string.Join("; ", parts);
     }
 
-    private static string BuildFindCountCommand(string path, IEnumerable<string> includeNames = null, IEnumerable<string> excludeNames = null)
+    private static string BuildFindCountCommand(string path, IEnumerable<string>? includeNames = null, IEnumerable<string>? excludeNames = null)
         => "find " + string.Join(' ', PrepFindArgs(path, includeNames, excludeNames, countOnly: true));
 
     internal static DrivePollResult ParseDrivePollOutput(

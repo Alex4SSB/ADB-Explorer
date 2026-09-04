@@ -2,15 +2,15 @@
 
 public class PropertyChangedEventArgs<T> : EventArgs
 {
-    public T OldValue { get; set; }
-    public T NewValue { get; set; }
+    public T OldValue { get; set; } = default!;
+    public T NewValue { get; set; } = default!;
 }
 
 public class ObservableProperty<T>
 {
-    public event EventHandler<PropertyChangedEventArgs<T>> PropertyChanged;
+    public event EventHandler<PropertyChangedEventArgs<T>>? PropertyChanged;
 
-    private T _value;
+    private T _value = default!;
     public T Value
     {
         get => _value;

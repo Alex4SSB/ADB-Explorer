@@ -222,9 +222,8 @@ public partial class MainWindow : INavigationWindow
         {
             return RootNavigation.Navigate(pageType);
         }
-        catch (Exception e)
+        catch (Exception)
         {
-
             return false;
         }
     }

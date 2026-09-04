@@ -11,7 +11,7 @@ namespace ADB_Explorer.Services;
 
 public static class UISettings
 {
-    public static ObservableList<AbstractGroup> SettingsList { get; set; }
+    public static ObservableList<AbstractGroup> SettingsList { get; set; } = [];
 
     public static IEnumerable<AbstractSetting> SortSettings => SettingsList.SelectMany(group => group.Children)
         .Where(set => set.Visibility is Visibility.Visible && set.Description != Properties.AppGlobal.AppDisplayName)
@@ -313,12 +313,12 @@ public static class UISettings
 
 public abstract class SettingsBase : ViewModelBase
 {
-    public BaseAction[] Commands { get; protected set; }
+    public BaseAction[] Commands { get; protected set; } = [];
 }
 
 public abstract class AbstractGroup : SettingsBase
 {
-    public List<AbstractSetting> Children { get; set; }
+    public List<AbstractSetting> Children { get; set; } = [];
 }
 
 public class SettingsGroup : AbstractGroup
@@ -337,8 +337,8 @@ public class SettingsGroup : AbstractGroup
 
 public abstract class AbstractSetting : SettingsBase
 {
-    protected readonly PropertyInfo valueProp;
-    protected readonly PropertyInfo visibleProp;
+    protected readonly PropertyInfo? valueProp;
+    protected readonly PropertyInfo? visibleProp;
     protected PropertyInfo? enabledProp;
 
     public string Description { get; private set; }
@@ -395,7 +395,7 @@ public abstract class AbstractSetting : SettingsBase
         }
     }
 
-    protected AbstractSetting(PropertyInfo valueProp, string description, PropertyInfo visibleProp = null, BaseIcon? icon = null, params BaseAction[] commands)
+    protected AbstractSetting(PropertyInfo? valueProp, string description, PropertyInfo? visibleProp = null, BaseIcon? icon = null, params BaseAction[] commands)
     {
         this.visibleProp = visibleProp;
         this.valueProp = valueProp;
@@ -406,7 +406,7 @@ public abstract class AbstractSetting : SettingsBase
         Settings.PropertyChanged += Settings_PropertyChanged;
     }
 
-    protected virtual void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    protected virtual void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == visibleProp?.Name)
         {
@@ -438,12 +438,12 @@ public class InfoSetting : AbstractSetting
     public int FontSize { get; set; }
     public string AltText { get; set; }
 
-    public InfoSetting(string description, BaseIcon? icon = null, FontFamily fontFamily = null, int fontSize = 14, string altText = null, TextAlignment headerAlignment = TextAlignment.Left)
+    public InfoSetting(string description, BaseIcon? icon = null, FontFamily? fontFamily = null, int fontSize = 14, string? altText = null, TextAlignment headerAlignment = TextAlignment.Left)
         : base(null, description, icon: icon)
     {
         FontFamily = fontFamily ?? new("Segoe UI");
         FontSize = fontSize;
-        AltText = altText;
+        AltText = altText ?? "";
         HeaderAlignment = headerAlignment;
     }
 }
@@ -452,7 +452,7 @@ public class LongDescriptionSetting : AbstractSetting
 {
     public string AltText { get; set; }
 
-    public LongDescriptionSetting(string description, string altText, BaseIcon? icon = null) 
+    public LongDescriptionSetting(string description, string altText, BaseIcon? icon = null)
         : base(null, description, null, icon)
     {
         AltText = altText;
@@ -496,12 +496,12 @@ public class LinkSetting : AbstractSetting
     public string ToolTip => _resolveFilePath?.Invoke()
         ?? (Url.IsFile ? Url.LocalPath : Url.ToString());
 
-    public LinkSetting(string description, Uri url, BaseIcon? iconBase = null, string altText = null, Func<string>? resolveFilePath = null)
+    public LinkSetting(string description, Uri url, BaseIcon? iconBase = null, string? altText = null, Func<string>? resolveFilePath = null)
         : base(null, description)
     {
         _resolveFilePath = resolveFilePath;
         Url = url;
-        AltText = altText;
+        AltText = altText ?? "";
         IconContent = iconBase?.IconContent;
     }
 }
@@ -510,8 +510,8 @@ public class NumericSetting : AbstractSetting
 {
     public int Value
     {
-        get => (int)valueProp.GetValue(Settings);
-        set => valueProp.SetValue(Settings, value);
+        get => (int)(valueProp!.GetValue(Settings) ?? 0);
+        set => valueProp!.SetValue(Settings, value);
     }
 
     public int MinValue { get; }
@@ -525,7 +525,7 @@ public class NumericSetting : AbstractSetting
                           int minValue = int.MinValue,
                           int maxValue = int.MaxValue,
                           string unit = "",
-                          PropertyInfo visibleProp = null,
+                          PropertyInfo? visibleProp = null,
                           BaseIcon? icon = null,
                           params BaseAction[] commands)
         : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
@@ -535,10 +535,10 @@ public class NumericSetting : AbstractSetting
         MaxValue = maxValue;
     }
 
-    protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    protected override void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         base.Settings_PropertyChanged(sender, e);
-        if (e.PropertyName == valueProp.Name)
+        if (e.PropertyName == valueProp?.Name)
             OnPropertyChanged(nameof(Value));
     }
 }
@@ -547,24 +547,24 @@ public class BoolSetting : AbstractSetting
 {
     public bool Value
     {
-        get => (bool)valueProp.GetValue(Settings);
+        get => (bool)(valueProp!.GetValue(Settings) ?? false);
         set
         {
-            valueProp.SetValue(Settings, value);
+            valueProp!.SetValue(Settings, value);
             OnPropertyChanged(nameof(Label));
         }
     }
 
     public string Label => Value ? Strings.Resources.S_SETTINGS_ACTIVE : Strings.Resources.S_SETTINGS_INACTIVE;
 
-    public BoolSetting(Expression<Func<bool>> propertyExpr, string description, PropertyInfo visibleProp = null, BaseIcon? icon = null, params BaseAction[] commands)
+    public BoolSetting(Expression<Func<bool>> propertyExpr, string description, PropertyInfo? visibleProp = null, BaseIcon? icon = null, params BaseAction[] commands)
         : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
     { }
 
-    protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    protected override void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         base.Settings_PropertyChanged(sender, e);
-        if (e.PropertyName == valueProp.Name)
+        if (e.PropertyName == valueProp?.Name)
             OnPropertyChanged(nameof(Value));
     }
 }
@@ -573,18 +573,18 @@ public class TextboxSetting : AbstractSetting
 {
     public string Value
     {
-        get => (string)valueProp.GetValue(Settings);
-        set => valueProp.SetValue(Settings, value);
+        get => (string)valueProp!.GetValue(Settings)!;
+        set => valueProp!.SetValue(Settings, value);
     }
 
-    public TextboxSetting(Expression<Func<string>> propertyExpr, string description, PropertyInfo visibleProp = null, BaseIcon? icon = null, params BaseAction[] commands)
+    public TextboxSetting(Expression<Func<string>> propertyExpr, string description, PropertyInfo? visibleProp = null, BaseIcon? icon = null, params BaseAction[] commands)
         : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
     { }
 
-    protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    protected override void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         base.Settings_PropertyChanged(sender, e);
-        if (e.PropertyName == valueProp.Name)
+        if (e.PropertyName == valueProp?.Name)
             OnPropertyChanged(nameof(Value));
     }
 }
@@ -593,22 +593,22 @@ public class SimpleComboSetting<T> : AbstractSetting
 {
     public T Value
     {
-        get => (T)valueProp.GetValue(Settings);
-        set => valueProp.SetValue(Settings, value);
+        get => (T)valueProp!.GetValue(Settings)!;
+        set => valueProp!.SetValue(Settings, value);
     }
 
     public IEnumerable<EnumComboboxItem> Options { get; } = [];
 
-    public SimpleComboSetting(Expression<Func<T>> propertyExpr, string description, IEnumerable<EnumComboboxItem> options, PropertyInfo visibleProp = null, BaseIcon? icon = null, params BaseAction[] commands)
+    public SimpleComboSetting(Expression<Func<T>> propertyExpr, string description, IEnumerable<EnumComboboxItem> options, PropertyInfo? visibleProp = null, BaseIcon? icon = null, params BaseAction[] commands)
         : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
     {
         Options = options;
     }
 
-    protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    protected override void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         base.Settings_PropertyChanged(sender, e);
-        if (e.PropertyName == valueProp.Name)
+        if (e.PropertyName == valueProp?.Name)
             OnPropertyChanged(nameof(Value));
     }
 }
@@ -617,17 +617,17 @@ public class ComboSetting<T> : AbstractSetting
 {
     public T Value
     {
-        get => (T)valueProp.GetValue(Settings);
-        set => valueProp.SetValue(Settings, value);
+        get => (T)valueProp!.GetValue(Settings)!;
+        set => valueProp!.SetValue(Settings, value);
     }
 
     public IEnumerable<T> Options { get; } = [];
 
-    public ObservableProperty<string> ObservableAltLabel { get; } = new();
+    public ObservableProperty<string>? ObservableAltLabel { get; }
 
-    public string AltLabel { get; private set; } = null;
+    public string? AltLabel { get; private set; }
 
-    public ComboSetting(Expression<Func<T>> propertyExpr, string description, IEnumerable<T> options, ObservableProperty<string> altLabel = null, BaseIcon? icon = null, params BaseAction[] commands)
+    public ComboSetting(Expression<Func<T>> propertyExpr, string description, IEnumerable<T> options, ObservableProperty<string>? altLabel = null, BaseIcon? icon = null, params BaseAction[] commands)
         : base(ExtractPropertyInfo(propertyExpr), description, null, icon, commands)
     {
         Options = options;
@@ -645,10 +645,10 @@ public class ComboSetting<T> : AbstractSetting
         }
     }
 
-    protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    protected override void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         base.Settings_PropertyChanged(sender, e);
-        if (e.PropertyName == valueProp.Name)
+        if (e.PropertyName == valueProp?.Name)
             OnPropertyChanged(nameof(Value));
     }
 }
@@ -657,15 +657,15 @@ public class ColorSetting : AbstractSetting
 {
     public Color PickerColor
     {
-        get => (Color)valueProp.GetValue(Settings); 
-        set => valueProp.SetValue(Settings, value);
+        get => (Color)(valueProp!.GetValue(Settings) ?? default(Color));
+        set => valueProp!.SetValue(Settings, value);
     }
 
     public AsyncRelayCommand PickColorCommand { get; }
 
     public ColorSetting(Expression<Func<Color>> propertyExpr,
                         string description,
-                        PropertyInfo visibleProp = null,
+                        PropertyInfo? visibleProp = null,
                         BaseIcon? icon = null)
         : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon)
     {
@@ -687,7 +687,7 @@ public class ColorSetting : AbstractSetting
         });
     }
 
-    protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    protected override void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         base.Settings_PropertyChanged(sender, e);
         if (e.PropertyName == valueProp?.Name)
@@ -700,7 +700,7 @@ public class EnumComboboxItem : ViewModelBase
     public Enum Key { get; set; }
     public string Name { get; set; }
 
-    readonly PropertyInfo visibleProp;
+    readonly PropertyInfo? visibleProp;
 
     public bool IsEnabled
     {
@@ -719,7 +719,7 @@ public class EnumComboboxItem : ViewModelBase
         }
     }
 
-    public EnumComboboxItem(Enum key, string name, PropertyInfo visibleProp = null)
+    public EnumComboboxItem(Enum key, string name, PropertyInfo? visibleProp = null)
     {
         Key = key;
         Name = name;
@@ -728,7 +728,7 @@ public class EnumComboboxItem : ViewModelBase
         Settings.PropertyChanged += Settings_PropertyChanged;
     }
 
-    private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == visibleProp?.Name)
         {

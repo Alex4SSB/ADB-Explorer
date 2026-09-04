@@ -17,8 +17,8 @@ public class AdbMenuItem : Wpf.Ui.Controls.MenuItem
     private static readonly Duration Medium = new(TimeSpan.FromMilliseconds(200));
     private static readonly BounceEase BounceOut = new() { Bounces = 2, Bounciness = 4, EasingMode = EasingMode.EaseOut };
 
-    private ContentPresenter _headerPresenter;
-    private Border _topLevelBorder;
+    private ContentPresenter? _headerPresenter;
+    private Border? _topLevelBorder;
 
     protected override DependencyObject GetContainerForItemOverride()
         => new AdbMenuItem();
@@ -122,7 +122,7 @@ public class AdbMenuItem : Wpf.Ui.Controls.MenuItem
     private void AnimateBounce()
     {
         var transform = new TranslateTransform();
-        _headerPresenter.RenderTransform = transform;
+        _headerPresenter!.RenderTransform = transform;
         _headerPresenter.RenderTransformOrigin = new Point(0.5, 0.5);
         transform.BeginAnimation(TranslateTransform.YProperty,
             new DoubleAnimation(0, -4, Short) { AutoReverse = true, EasingFunction = BounceOut });
@@ -131,7 +131,7 @@ public class AdbMenuItem : Wpf.Ui.Controls.MenuItem
     private void AnimateRotate(bool clockwise)
     {
         var transform = new RotateTransform();
-        _headerPresenter.RenderTransform = transform;
+        _headerPresenter!.RenderTransform = transform;
         _headerPresenter.RenderTransformOrigin = new Point(0.5, 0.5);
         transform.BeginAnimation(RotateTransform.AngleProperty,
             new DoubleAnimation(clockwise ? 0 : 360, clockwise ? 360 : 0, Medium));
@@ -140,7 +140,7 @@ public class AdbMenuItem : Wpf.Ui.Controls.MenuItem
     private void AnimateMarquee(int dx = 0, int dy = 0)
     {
         var transform = new TranslateTransform();
-        _headerPresenter.RenderTransform = transform;
+        _headerPresenter!.RenderTransform = transform;
 
         var prop = dx != 0 ? TranslateTransform.XProperty : TranslateTransform.YProperty;
         var sign = dx != 0 ? dx : dy;

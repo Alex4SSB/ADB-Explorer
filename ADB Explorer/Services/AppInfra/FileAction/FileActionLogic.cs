@@ -188,10 +188,10 @@ internal static class FileActionLogic
 
         var restoreTask = Task.Run(() =>
         {
-            existingItems = ADBService.PathsExist(ActionDevice.ID, restoreItems.Select(file => file.TrashIndex.OriginalPath));
+            existingItems = ADBService.PathsExist(ActionDevice.ID, restoreItems.Select(file => file.TrashIndex!.OriginalPath));
             if (existingItems?.Length > 0)
             {
-                if (restoreItems.Any(item => item.IsDirectory && existingItems.Contains(item.TrashIndex.OriginalPath)))
+                if (restoreItems.Any(item => item.IsDirectory && existingItems.Contains(item.TrashIndex!.OriginalPath)))
                     merge = true;
 
                 existingItems = [.. existingItems.Select(path => path[(path.LastIndexOf('/') + 1)..])];
@@ -202,7 +202,7 @@ internal static class FileActionLogic
                 if (existingItems.Contains(item.FullName))
                     return;
 
-                if (restoreItems.Count(file => file.FullName == item.FullName && file.TrashIndex.OriginalPath == item.TrashIndex.OriginalPath) > 1)
+                if (restoreItems.Count(file => file.FullName == item.FullName && file.TrashIndex!.OriginalPath == item.TrashIndex!.OriginalPath) > 1)
                 {
                     existingItems = [.. existingItems, item.FullName];
                     existingFiles.Add(item);
@@ -273,7 +273,7 @@ internal static class FileActionLogic
         Clipboard.SetText(path);
     }
 
-    public static async Task CreateNewItem(FileClass file, string newName = null, LogicalDeviceViewModel? device = null, bool selectCreated = true)
+    public static async Task CreateNewItem(FileClass file, string? newName = null, LogicalDeviceViewModel? device = null, bool selectCreated = true)
     {
         if (!string.IsNullOrEmpty(newName))
             file.UpdatePath(FileHelper.ConcatPaths(file.ParentPath, newName));
@@ -638,7 +638,7 @@ internal static class FileActionLogic
             && !ArchivePath.IsArchivePath(targetPath, deviceId);
     }
 
-    public static DragDropEffects EnableDropPaste(FileClass target = null)
+    public static DragDropEffects EnableDropPaste(FileClass? target = null)
     {
         if (!Data.CopyPaste.CurrentFiles.Any())
             return DragDropEffects.None;
@@ -1287,9 +1287,14 @@ internal static class FileActionLogic
             var result = t.Result.Value;
             App.SafeInvoke(async () =>
             {
-                if (Data.DevicesObject.Current?.Type is DeviceType.Recovery)
+                // Read Data.DevicesObject.Current once and reuse it below — re-reading the
+                // property between the type check and the Drives access left a window for
+                // the device to disconnect in between, throwing a NullReferenceException.
+                var device = Data.DevicesObject.Current;
+
+                if (device?.Type is DeviceType.Recovery)
                 {
-                    foreach (var item in Data.DevicesObject.Current.Drives.OfType<VirtualDriveViewModel>())
+                    foreach (var item in device.Drives.OfType<VirtualDriveViewModel>())
                         item.SetItemsCount(item.Type is AbstractDrive.DriveType.Package ? -1 : null);
                 }
                 else
@@ -1297,7 +1302,6 @@ internal static class FileActionLogic
                     ApplyVirtualDriveCounts(result);
                 }
 
-                var device = Data.DevicesObject.Current;
                 if (device is null || App.AppDispatcher is null)
                     return;
 
@@ -1488,7 +1492,7 @@ internal static class FileActionLogic
             if (clearDevice)
             {
                 Data.CurrentDisplayNames.Clear();
-                Data.CurrentPath = null;
+                Data.CurrentPath = "";
                 Data.DirList?.ClearCurrentLocation();
                 Data.RaiseClearNavigationBox();
 
@@ -2053,7 +2057,7 @@ internal static class FileActionLogic
         ShellItem item,
         string targetPath,
         DragDropEffects dropEffects = DragDropEffects.Copy,
-        ShellItem originalShellItem = null,
+        ShellItem? originalShellItem = null,
         IReadOnlySet<string>? replacePaths = null,
         IReadOnlySet<string>? conflictPaths = null,
         LogicalDeviceViewModel? device = null)
@@ -2126,7 +2130,7 @@ internal static class FileActionLogic
         LogicalDeviceViewModel? device = null)
         => items.ForEach(item => PushShellObject(item, targetPath, dropEffects, replacePaths: replacePaths, conflictPaths: conflictPaths, device: device));
 
-    private static void PushOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private static void PushOperation_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         var op = sender as FileSyncOperation;
 
@@ -2180,7 +2184,8 @@ internal static class FileActionLogic
             }
         }
 
-        op.FilePath.ShellItem = null;
+        // Release the COM reference; op.FilePath is not read again after this cleanup.
+        op.FilePath.ShellItem = null!;
         op.PropertyChanged -= PushOperation_PropertyChanged;
     }
 
@@ -2521,7 +2526,7 @@ internal static class FileActionLogic
         || (ActionDevice is { } device
             && ArchiveHelper.CanNavigateIntoArchive(file.FullPath, file.FullName, device.ID, ActionFlags.IsArchive));
 
-    public static void OpenApkLocation(Package apk = null)
+    public static void OpenApkLocation(Package? apk = null)
     {
         apk ??= Data.SelectedPackages.First();
 

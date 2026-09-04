@@ -42,7 +42,7 @@ public partial class AppRestoreOperation : AbstractShellFileOperation
         Status = OperationStatus.InProgress;
         StatusInfo = new InProgShellProgressViewModel();
 
-        var operationTask = Task.Run(() => Restore(CancelTokenSource.Token), CancelTokenSource.Token);
+        var operationTask = Task.Run(() => Restore(CancelTokenSource!.Token), CancelTokenSource!.Token);
 
         operationTask.ContinueWith(_ =>
         {

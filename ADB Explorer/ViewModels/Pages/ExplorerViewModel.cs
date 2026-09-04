@@ -311,7 +311,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
     public Battery? CurrentDeviceBattery => Data.DevicesObject?.Current?.Battery;
 
-    public Action RequestModeRefresh { get; set; }
+    public Action? RequestModeRefresh { get; set; }
 
     public bool IsBatteryVisible =>
         Data.Settings.PollBattery
@@ -391,7 +391,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
     public Task OnNavigatedFromAsync() => Task.CompletedTask;
 
-    private void SavedLocations_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void SavedLocations_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs? e)
     {
         App.SafeBeginInvoke(() =>
         {

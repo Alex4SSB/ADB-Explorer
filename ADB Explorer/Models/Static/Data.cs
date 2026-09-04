@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ADB_Explorer.Models;
 
@@ -33,9 +34,10 @@ public static class Data
         public void Dispose() => actionTarget = previous;
     }
 
-    public static string CurrentPath 
+    public static string CurrentPath
     {
         get;
+        [param: AllowNull]
         set
         {
             field = value ?? "";
@@ -62,13 +64,14 @@ public static class Data
 
     public static ObservableProperty<string> CurrentPathO { get; } = new();
 
-    public static DriveViewModel CurrentDrive
+    public static DriveViewModel? CurrentDrive
     {
         get => Active.CurrentDrive;
         set => Files.CurrentDrive = value;
     }
 
-    public static FileOperationQueue FileOpQ { get; set; }
+    // Created in MainWindow.Initialize after CheckAdbVersion succeeds; not available before then.
+    public static FileOperationQueue FileOpQ { get; set; } = null!;
 
     public static Dictionary<string, string> CurrentDisplayNames { get; set; } = [];
 
@@ -96,7 +99,8 @@ public static class Data
 
     public static string AppDataPath { get; set; } = "";
 
-    public static Devices DevicesObject { get; set; }
+    // Created in MainWindow.Initialize after CheckAdbVersion succeeds; not available before then.
+    public static Devices DevicesObject { get; set; } = null!;
 
     public static event EventHandler? DevicesObjectCreated;
 

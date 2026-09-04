@@ -128,7 +128,7 @@ public abstract class FileOperation : ViewModelBase
 
     #region Base Properties
 
-    public CancellationTokenSource CancelTokenSource;
+    public CancellationTokenSource? CancelTokenSource;
 
     public Dispatcher Dispatcher { get; }
 
@@ -136,7 +136,7 @@ public abstract class FileOperation : ViewModelBase
 
     public virtual FilePath FilePath { get; }
 
-    public virtual SyncFile TargetPath { get; protected set; }
+    public virtual SyncFile TargetPath { get; protected set; } = null!;
 
     public AdbLocation AltSource { get; protected set; } = new(Navigation.SpecialLocation.None);
 
@@ -426,6 +426,6 @@ public abstract class FileOperation : ViewModelBase
             throw new Exception("Cannot cancel a deactivated operation!");
         }
 
-        CancelTokenSource.Cancel();
+        CancelTokenSource!.Cancel();
     }
 }

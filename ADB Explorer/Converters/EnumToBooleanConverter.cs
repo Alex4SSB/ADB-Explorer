@@ -2,7 +2,7 @@
 
 public class EnumToBooleanConverter : IValueConverter
 {
-    public Type EnumType { get; set; }
+    public Type EnumType { get; set; } = null!;
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {

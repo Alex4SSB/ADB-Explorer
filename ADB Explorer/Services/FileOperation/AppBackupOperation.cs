@@ -105,8 +105,8 @@ public class AppBackupOperation : AbstractShellFileOperation
         try
         {
             sources = await Task.Run(
-                () => AppBackupHelper.CollectSources(Device.ID, Package, CancelTokenSource.Token),
-                CancelTokenSource.Token).ConfigureAwait(false);
+                () => AppBackupHelper.CollectSources(Device.ID, Package, CancelTokenSource!.Token),
+                CancelTokenSource!.Token).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -124,7 +124,7 @@ public class AppBackupOperation : AbstractShellFileOperation
             sources.ApkParent,
             sources.ApkFileNames,
             sources.ObbPackageName,
-            CancelTokenSource.Token,
+            CancelTokenSource!.Token,
             session.OnLine).ConfigureAwait(false);
 
         if (result == "")

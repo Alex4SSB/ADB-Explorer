@@ -8,15 +8,15 @@ namespace ADB_Explorer.Models;
 /// </summary>
 public class LogicalDevice : Device
 {
-    public string Name { get; set; }
+    public string Name { get; set; } = "";
 
-    public string AvdName { get; set; }
+    public string? AvdName { get; set; }
 
     public RootStatus Root { get; set; } = RootStatus.Unchecked;
 
     public Battery Battery { get; set; } = new();
 
-    public DeviceData DeviceData { get; set; }
+    public required DeviceData DeviceData { get; set; }
 
     private LogicalDevice(string name, string id)
     {

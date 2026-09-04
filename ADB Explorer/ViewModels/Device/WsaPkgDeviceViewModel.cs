@@ -5,7 +5,7 @@ namespace ADB_Explorer.ViewModels;
 
 public class WsaPkgDeviceViewModel : DeviceViewModel
 {
-    private WsaPkgDevice device;
+    private WsaPkgDevice device = null!;
     protected new WsaPkgDevice Device
     {
         get => device;
@@ -20,7 +20,7 @@ public class WsaPkgDeviceViewModel : DeviceViewModel
 
     public override bool DeviceExists => false;
 
-    public WsaPkgDeviceViewModel(WsaPkgDevice device, Devices devicesObject = null) : base(device, devicesObject)
+    public WsaPkgDeviceViewModel(WsaPkgDevice device, Devices? devicesObject = null) : base(device, devicesObject)
     {
         Device = device;
 

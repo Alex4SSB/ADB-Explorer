@@ -82,8 +82,8 @@ public class FileCompressOperation : AbstractShellFileOperation
         try
         {
             memberBytes = await Task.Run(
-                () => ArchiveExtract.CollectCreateMemberBytes(Device.ID, SourcePaths, CancelTokenSource.Token),
-                CancelTokenSource.Token).ConfigureAwait(false);
+                () => ArchiveExtract.CollectCreateMemberBytes(Device.ID, SourcePaths, CancelTokenSource!.Token),
+                CancelTokenSource!.Token).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -99,7 +99,7 @@ public class FileCompressOperation : AbstractShellFileOperation
             Device.ID,
             FilePath.FullPath,
             SourcePaths,
-            CancelTokenSource.Token,
+            CancelTokenSource!.Token,
             session.OnLine).ConfigureAwait(false);
 
         if (result == "")

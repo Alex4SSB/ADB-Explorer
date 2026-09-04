@@ -88,7 +88,7 @@ public partial class TrashIndexer : ObservableObject
         return result;
     }
 
-    public static bool TryParse(string line, out TrashIndexer indexer)
+    public static bool TryParse(string line, [NotNullWhen(true)] out TrashIndexer? indexer)
     {
         indexer = null;
         if (string.IsNullOrWhiteSpace(line))

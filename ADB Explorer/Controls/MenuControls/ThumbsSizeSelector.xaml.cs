@@ -99,12 +99,12 @@ public partial class ThumbsSizeSelector : UserControl
 
     public partial class ThumbSizeBaseItem : ObservableObject
     {
-        public virtual BaseAction Action { get; set; }
-        public virtual UIElement Icon { get; set; }
+        public virtual BaseAction Action { get; set; } = null!;
+        public virtual UIElement Icon { get; set; } = null!;
         public virtual string? Info { get; set; } = null;
         public virtual bool IsChecked { get; set; }
-        public virtual string Name { get; set; }
-        public virtual ICollection<object> Children { get; set; }
+        public virtual string Name { get; set; } = "";
+        public virtual ICollection<object>? Children { get; set; }
         public virtual bool IsRadioButton { get; set; } = true;
     }
 
@@ -114,7 +114,7 @@ public partial class ThumbsSizeSelector : UserControl
 
         public override bool IsChecked
         {
-            get => (bool)valueProp.GetValue(Data.Settings);
+            get => (bool)(valueProp.GetValue(Data.Settings) ?? false);
             set
             {
                 valueProp.SetValue(Data.Settings, value);
@@ -122,12 +122,12 @@ public partial class ThumbsSizeSelector : UserControl
             }
         }
 
-        public SettingsItem(string name, Expression<Func<bool>> propertyExpr, UIElement icon = null, string? info = null)
+        public SettingsItem(string name, Expression<Func<bool>> propertyExpr, UIElement? icon = null, string? info = null)
         {
             IsRadioButton = false;
             Name = name;
             Info = info;
-            Icon = icon;
+            Icon = icon!;
             valueProp = AbstractSetting.ExtractPropertyInfo(propertyExpr);
             Action = new(() => true, () => IsChecked ^= true);
 

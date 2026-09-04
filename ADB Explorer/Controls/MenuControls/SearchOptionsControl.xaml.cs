@@ -43,7 +43,7 @@ public partial class SearchOptionsControl : UserControl
     public bool IsSearchOptionsVisible =>
         Data.RuntimeSettings.IsSearchBoxFocused || !string.IsNullOrEmpty(Data.FileActions.ExplorerFilter);
 
-    public bool IsVisible => IsCloseSearchVisible || IsSearchOptionsVisible;
+    public new bool IsVisible => IsCloseSearchVisible || IsSearchOptionsVisible;
 
     private static bool CanCloseSearch() => !string.IsNullOrEmpty(Data.FileActions.ExplorerFilter);
 
@@ -69,11 +69,11 @@ public partial class SearchOptionsControl : UserControl
 
     public abstract partial class SearchOptionsBaseItem : ObservableObject
     {
-        public virtual BaseAction Action { get; set; }
-        public virtual UIElement Icon { get; set; }
+        public virtual BaseAction Action { get; set; } = null!;
+        public virtual UIElement Icon { get; set; } = null!;
         public virtual string? Info { get; set; } = null;
         public virtual bool IsChecked { get; set; }
-        public virtual string Name { get; set; }
+        public virtual string Name { get; set; } = "";
     }
 
     public partial class SearchBoxModeItem : SearchOptionsBaseItem

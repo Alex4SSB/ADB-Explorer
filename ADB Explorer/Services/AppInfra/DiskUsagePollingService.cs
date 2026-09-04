@@ -7,7 +7,7 @@ namespace ADB_Explorer.Services;
 
 public class DiskUsagePollingService(IServiceProvider serviceProvider) : BackgroundService
 {
-    private MainWindowViewModel _mainWindowVM;
+    private MainWindowViewModel? _mainWindowVM;
 
     public static DateTime LastServerResponse { get; set; } = DateTime.Now;
 

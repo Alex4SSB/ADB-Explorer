@@ -13,9 +13,9 @@ public partial class AdbAvalonEditor : UserControl
 {
     private bool _updatingText;
     private bool _hexSnapping;
-    private HashSet<FrameworkElement> _visualChildren;
+    private HashSet<FrameworkElement> _visualChildren = [];
 
-    private string OriginalText;
+    private string? OriginalText;
 
     public bool HasUnsavedChanges
     {
@@ -180,7 +180,7 @@ public partial class AdbAvalonEditor : UserControl
         }
     }
 
-    private void EditorTextBox_TextChanged(object sender, EventArgs e)
+    private void EditorTextBox_TextChanged(object? sender, EventArgs e)
     {
         if (_updatingText || IsReadOnly)
             return;

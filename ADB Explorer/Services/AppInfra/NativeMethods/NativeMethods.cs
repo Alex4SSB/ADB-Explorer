@@ -505,7 +505,7 @@ public static partial class NativeMethods
         public static bool operator !=(POINT self, POINT other)
             => self.X != other.X || self.Y != other.Y;
 
-        public readonly override bool Equals(object obj)
+        public readonly override bool Equals(object? obj)
             => obj is POINT other &&
                 X == other.X &&
                 Y == other.Y;

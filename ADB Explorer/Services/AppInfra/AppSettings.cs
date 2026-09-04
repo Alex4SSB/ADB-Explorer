@@ -583,7 +583,7 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     }
 
     [JsonIgnore]
-    public ObservableProperty<string> CultureTranslationProgress { get; private set; } = new() { Value = null };
+    public ObservableProperty<string> CultureTranslationProgress { get; private set; } = new() { Value = "" };
 
     [ObservableProperty]
     public partial string UILanguage { get; set; } = "";

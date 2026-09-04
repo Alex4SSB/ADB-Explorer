@@ -424,7 +424,7 @@ public static partial class ThumbnailService
 
     private static readonly List<DeviceThumbnailInfo> _deviceInfoCache = [];
 
-    public record struct Thumbnail(BitmapSource Image, ThumbnailInfo Info);
+    public record struct Thumbnail(BitmapSource? Image, ThumbnailInfo Info);
 
     private record struct DeviceThumbnailInfo
     {
@@ -443,17 +443,17 @@ public static partial class ThumbnailService
         /// Device serial number used for on-disk storage and device comparison.
         /// </summary>
         public string DeviceId { get; init; }
-        public string DevicePicturesThumbnailDir { get; set; }
+        public string DevicePicturesThumbnailDir { get; set; } = "";
         public string[] DeviceImageThumbnailDirs { get; set; } = [];
         public string? DeviceMoviesThumbnailDir { get; set; }
-        public string LocalThumbnailDir { get; set; }
+        public string LocalThumbnailDir { get; set; } = "";
         public bool IsProbed { get; set; }
         public bool HasThumbnailSupport { get; set; }
 
         /// <summary>
         /// Key: Original file path on the device, Value: Thumbnail info (including thumbnail ID which corresponds to the local thumbnail file name)
         /// </summary>
-        public Dictionary<string, ThumbnailInfo> ThumbnailPathCache { get; set; }
+        public Dictionary<string, ThumbnailInfo> ThumbnailPathCache { get; set; } = [];
     }
 
     [GeneratedRegex(@"Row: \d+ _id=(?<ID>\d+), _data=(?<Path>.+), resolution=(?:(?:(?<ResX>\d+).(?<ResY>\d+))|NULL), f_number=(?:(?<fNum>[\d.]+)|NULL), iso=(?:(?<ISO>\d+)|NULL), exposure_time=(?:(?<Exposure>[\d.E-]+)|NULL)", RegexOptions.Multiline)]

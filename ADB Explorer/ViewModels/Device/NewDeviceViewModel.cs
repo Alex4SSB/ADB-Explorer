@@ -7,7 +7,7 @@ public class NewDeviceViewModel : PairingDeviceViewModel
 {
     #region Full properties
 
-    private NewDevice device;
+    private NewDevice device = null!;
     protected new NewDevice Device
     {
         get => device;
@@ -21,7 +21,7 @@ public class NewDeviceViewModel : PairingDeviceViewModel
         set => Set(ref isPairingEnabled, value);
     }
 
-    private string uiPairingCode;
+    private string uiPairingCode = "";
     public string UIPairingCode
     {
         get => uiPairingCode;
@@ -68,7 +68,7 @@ public class NewDeviceViewModel : PairingDeviceViewModel
 
     public DeviceAction ClearCommand { get; }
 
-    public NewDeviceViewModel(NewDevice device, Devices devicesObject = null) : base(device, devicesObject)
+    public NewDeviceViewModel(NewDevice device, Devices? devicesObject = null) : base(device, devicesObject)
     {
         Device = device;
         
@@ -87,7 +87,7 @@ public class NewDeviceViewModel : PairingDeviceViewModel
         PropertyChanged += NewDeviceViewModel_PropertyChanged;
     }
 
-    private void NewDeviceViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void NewDeviceViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(IpAddress))
             HostName = IsIpAddressValid ? null : IpAddress;

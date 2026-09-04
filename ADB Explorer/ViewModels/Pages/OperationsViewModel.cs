@@ -34,6 +34,8 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
     public FileOpColumnConfig TimeStampConfig { get; private set; }
     public FileOpColumnConfig DeviceConfig { get; private set; }
 
+    [MemberNotNull(nameof(OpTypeConfig), nameof(FileNameConfig), nameof(ProgressConfig),
+        nameof(SourceConfig), nameof(DestConfig), nameof(TimeStampConfig), nameof(DeviceConfig), nameof(ColumnList))]
     private void InitColumns()
     {
         OpTypeConfig    = new(FileOpColumnConfig.ColumnType.OpType,    defaultIndex: 0, constWidth:   50,  visibleByDefault: true);
@@ -136,9 +138,6 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
 
     public OperationsViewModel()
     {
-        if (App.IsShuttingDown)
-            return;
-
         _operationsSource.Source = Array.Empty<FileOperation>();
 
         RemoveOpAction = new(() => false, () => { });
@@ -146,6 +145,9 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
         AddTestOpAction = new(() => false, () => { });
 
         InitColumns();
+
+        if (App.IsShuttingDown)
+            return;
 
         Data.DevicesObjectCreated += (_, _) => App.SafeInvoke(TryInitializeViewModel);
     }

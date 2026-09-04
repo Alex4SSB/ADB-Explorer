@@ -136,7 +136,7 @@ public class FileOperationQueue : ViewModelBase
         }
     }
 
-    public void MoveOperationsToPast(bool includeAll = false, DeviceViewModel device = null)
+    public void MoveOperationsToPast(bool includeAll = false, DeviceViewModel? device = null)
     {
         try
         {
@@ -291,10 +291,12 @@ public class FileOperationQueue : ViewModelBase
         ADBService.ForceMediaScan(fileOp.Device);
     }
 
-    private void CurrentOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void CurrentOperation_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        var op = (FileOperation)sender;
-        
+        if (sender is not FileOperation op)
+            return;
+
+
         if (e.PropertyName is nameof(FileOperation.Status))
         {
             Data.RuntimeSettings.IsPollingStopped = Data.Settings.StopPollingOnSync
@@ -324,7 +326,7 @@ public class FileOperationQueue : ViewModelBase
         }
     }
 
-    private void Operations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    private void Operations_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         OnPropertyChanged(nameof(TotalCount));
         UpdateProgress();

@@ -7,14 +7,14 @@ public class ServiceDeviceViewModel : PairingDeviceViewModel
 {
     #region Full properties
 
-    private ServiceDevice device;
+    private ServiceDevice device = null!;
     protected new ServiceDevice Device
     {
         get => device;
         set => Set(ref device, value);
     }
 
-    private string uiPairingCode;
+    private string uiPairingCode = "";
     public string UIPairingCode
     {
         get => uiPairingCode;
@@ -32,7 +32,7 @@ public class ServiceDeviceViewModel : PairingDeviceViewModel
         private set => Set(ref isPairingInProgress, value);
     }
 
-    private string pairingError;
+    private string pairingError = "";
     public string PairingError
     {
         get => pairingError;
@@ -69,7 +69,7 @@ public class ServiceDeviceViewModel : PairingDeviceViewModel
 
     public DeviceAction PairCommand { get; }
 
-    public ServiceDeviceViewModel(ServiceDevice service, Devices devicesObject = null) : base(service, devicesObject)
+    public ServiceDeviceViewModel(ServiceDevice service, Devices? devicesObject = null) : base(service, devicesObject)
     {
         Device = service;
 
@@ -107,13 +107,13 @@ public class ServiceDeviceViewModel : PairingDeviceViewModel
 
     public void BeginPairing()
     {
-        PairingError = null;
+        PairingError = "";
         IsPairingInProgress = true;
         PairCommand.NotifyIsEnabledChanged();
         CommandManager.InvalidateRequerySuggested();
     }
 
-    public void EndPairing(bool success, string error = null)
+    public void EndPairing(bool success, string? error = null)
     {
         IsPairingInProgress = false;
 

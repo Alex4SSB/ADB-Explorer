@@ -22,7 +22,7 @@ public partial class App
     /// <summary>
     /// Cached dispatcher reference that remains valid after <see cref="Application.Current"/> becomes null during shutdown.
     /// </summary>
-    public static Dispatcher AppDispatcher { get; private set; }
+    public static Dispatcher AppDispatcher { get; private set; } = null!;
 
     /// <summary>
     /// Indicates whether the application has begun shutting down. Check this before dispatching work

@@ -5,7 +5,7 @@ namespace ADB_Explorer.Services;
 
 public abstract class FileOpProgressInfo : ViewModelBase
 {
-    public string AndroidPath { get; protected set; }
+    public string AndroidPath { get; protected set; } = "";
 
     public void SetPathToCurrent(FileOperation op)
     {
@@ -19,7 +19,7 @@ public abstract class FileOpProgressInfo : ViewModelBase
 
 public abstract class FileOpErrorInfo : FileOpProgressInfo
 {
-    public string Message { get; protected set; }
+    public string Message { get; protected set; } = "";
 
     protected FileOpErrorInfo(string message)
     {
@@ -63,7 +63,7 @@ public class ShellErrorInfo : FileOpErrorInfo
 
 public class SyncErrorInfo : FileOpErrorInfo
 {
-    public string WindowsPath { get; protected set; }
+    public string WindowsPath { get; protected set; } = "";
 
     private SyncErrorInfo()
     { }

@@ -61,9 +61,9 @@ public partial class NavigationBox : UserControl
 
     #region Dependency Properties
 
-    public string Path
+    public string? Path
     {
-        get => (string)GetValue(PathProperty);
+        get => (string?)GetValue(PathProperty);
         set
         {
             bool update = Path != value;
@@ -91,9 +91,9 @@ public partial class NavigationBox : UserControl
         DependencyProperty.Register(nameof(Path), typeof(string),
           typeof(NavigationBox), new PropertyMetadata(null));
 
-    public string DisplayPath
+    public string? DisplayPath
     {
-        get => (string)GetValue(DisplayPathProperty);
+        get => (string?)GetValue(DisplayPathProperty);
         set => SetValue(DisplayPathProperty, value);
     }
 
@@ -243,7 +243,7 @@ public partial class NavigationBox : UserControl
 
     public double MenuHeight => Height - MenuPadding.Top - MenuPadding.Bottom;
 
-    private void AddDevice(string path)
+    private void AddDevice(string? path)
     {
         if (string.IsNullOrEmpty(path))
             return;
@@ -534,9 +534,9 @@ public partial class NavigationBox : UserControl
         }
         else if (e.Key == Key.Enter)
         {
-            Data.RuntimeSettings.PathBoxNavigation = AdbExplorerConst.POSSIBLE_RECYCLE_PATHS.Any(DisplayPath.StartsWith)
+            Data.RuntimeSettings.PathBoxNavigation = AdbExplorerConst.POSSIBLE_RECYCLE_PATHS.Any(p => DisplayPath?.StartsWith(p) == true)
                 ? AdbExplorerConst.RECYCLE_PATH
-                : DisplayPath;
+                : DisplayPath ?? "";
 
             e.Handled = true;
             Mode = ViewMode.Breadcrumbs;
@@ -595,15 +595,15 @@ public partial class NavigationBox : UserControl
         var path = Path;
         var device = _trackedDevice ?? Data.DevicesObject?.Current;
         var deviceId = device?.ID;
-        var isArchive = ArchivePath.IsArchivePath(path, deviceId);
-        var restrictions = DriveHelper.GetRestrictions(path, device);
+        var isArchive = ArchivePath.IsArchivePath(path ?? "", deviceId);
+        var restrictions = DriveHelper.GetRestrictions(path ?? "", device);
 
         string tooltipText;
         string iconGlyph;
 
         if (isArchive)
         {
-            var archiveDevicePath = ArchivePath.GetArchivePath(path, deviceId);
+            var archiveDevicePath = ArchivePath.GetArchivePath(path ?? "", deviceId);
             tooltipText = ArchiveHelper.GetArchiveModificationTooltip(
                 FileHelper.GetFullName(archiveDevicePath),
                 deviceId ?? "");

@@ -10,8 +10,10 @@ namespace ADB_Explorer.Services;
 
 public class FileSyncOperation : FileOperation
 {
-    private CancellationTokenSource cancelTokenSource;
-    public ObservableList<FileOpProgressInfo> ProgressUpdates;
+    // Both created in Start(), not the constructor — an operation exists in a
+    // "not started" state before that, where neither is meaningful yet.
+    private CancellationTokenSource cancelTokenSource = null!;
+    public ObservableList<FileOpProgressInfo> ProgressUpdates = null!;
 
     private readonly ConcurrentDictionary<string, long> lastReportedBytes = new();
     private readonly ConcurrentDictionary<string, ulong> lastRawReceivedBytes = new();
@@ -25,7 +27,7 @@ public class FileSyncOperation : FileOperation
         ? FilePath
         : TargetPath;
 
-    public VirtualFileDataObject VFDO { get; set; } = null;
+    public VirtualFileDataObject? VFDO { get; set; }
 
     private DragDropEffects dropEffects = DragDropEffects.None;
     public DragDropEffects DropEffects
@@ -40,7 +42,7 @@ public class FileSyncOperation : FileOperation
         }
     }
 
-    public ShellItem OriginalShellItem { get; set; }
+    public ShellItem? OriginalShellItem { get; set; }
 
     public DateTime TransferStart { get; private set; }
     public DateTime TransferEnd { get; private set; }
@@ -346,14 +348,14 @@ public class FileSyncOperation : FileOperation
             item.Size = item.ShellLsSize = file.ShellLsSize;
     }
 
-    private void ProgressUpdates_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    private void ProgressUpdates_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (Status is not OperationStatus.InProgress)
             return;
 
         if (ProgressUpdates.LastOrDefault() is AdbSyncProgressInfo currProgress and not null)
         {
-            var total = (double)Files.Sum(f => f.BytesTransferred) / TotalBytes;
+            var total = (double)(Files.Sum(f => f.BytesTransferred) ?? 0) / (TotalBytes ?? 0);
             currProgress.TotalPercentage = total * 100;
 
             AdbSyncProgressInfo info = currProgress;
@@ -365,7 +367,7 @@ public class FileSyncOperation : FileOperation
             {
                 info = new(string.Format(Strings.Resources.S_FILES_PLURAL, ActiveFiles.Count()),
                            currProgress.TotalPercentage,
-                           (int)ActiveFiles.Average(f => f.CurrentPercentage),
+                           (int)(ActiveFiles.Average(f => f.CurrentPercentage) ?? 0),
                            currProgress.TotalBytesTransferred);
             }
 

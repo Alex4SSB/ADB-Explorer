@@ -67,19 +67,19 @@ public class FileArchiveDeleteOperation : AbstractShellFileOperation
                 this,
                 Device.ID,
                 TarArchivePath,
-                CancelTokenSource.Token,
+                CancelTokenSource!.Token,
                 phases: 2);
 
             ArchiveExtract.DeleteTarMembers(
                 Device.ID,
                 TarArchivePath,
                 internalPaths,
-                CancelTokenSource.Token,
+                CancelTokenSource!.Token,
                 session.OnLine,
                 session.BeginPhase);
 
             session.Finish();
-        }, CancelTokenSource.Token);
+        }, CancelTokenSource!.Token);
 
         operationTask.ContinueWith(_ =>
         {

@@ -5,7 +5,7 @@ namespace ADB_Explorer.ViewModels;
 
 internal class InProgSyncProgressViewModel : FileOpProgressViewModel, IDisposable
 {
-    private readonly AdbSyncProgressInfo adbInfo = null;
+    private readonly AdbSyncProgressInfo? adbInfo = null;
     private readonly DateTime? transferStart = null;
     private readonly long? totalFileBytes = null;
     private readonly long? totalBytesTransferred = null;

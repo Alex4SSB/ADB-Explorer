@@ -122,7 +122,7 @@ public class FileArchiveModifyOperation : AbstractShellFileOperation
                 this,
                 Device.ID,
                 TarArchivePath,
-                CancelTokenSource.Token,
+                CancelTokenSource!.Token,
                 phases: 2);
 
             ArchiveExtract.AddOrUpdateTarMembers(
@@ -130,7 +130,7 @@ public class FileArchiveModifyOperation : AbstractShellFileOperation
                 TarArchivePath,
                 InternalDestDir,
                 PopulateOverlay,
-                CancelTokenSource.Token,
+                CancelTokenSource!.Token,
                 session.OnLine,
                 session.BeginPhase);
 
@@ -138,7 +138,7 @@ public class FileArchiveModifyOperation : AbstractShellFileOperation
 
             if (IsMove && DeviceSources.Count > 0)
                 ShellFileOperation.SilentDelete(Device, DeviceSources);
-        }, CancelTokenSource.Token);
+        }, CancelTokenSource!.Token);
 
         operationTask.ContinueWith(_ =>
         {

@@ -12,14 +12,14 @@ public class CommandHandler : ICommand
     /// </summary>
     public ObservableProperty<bool> OnExecute { get; set; } = new();
 
-    public void Execute(object parameter)
+    public void Execute(object? parameter)
     {
         _action();
 
         OnExecute.Value ^= true;
     }
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
         return _canExecute.Invoke();
     }
@@ -30,7 +30,7 @@ public class CommandHandler : ICommand
         _canExecute = canExecute;
     }
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
@@ -45,10 +45,10 @@ public class BaseAction : ViewModelBase
 
     private readonly Action action;
 
-    private ICommand command;
+    private ICommand? command;
     public ICommand Command => command ??= new CommandHandler(action, canExecute);
 
-    public BaseAction(Func<bool> canExecute, Action action)
+    public BaseAction(Func<bool>? canExecute, Action action)
     {
         this.canExecute = canExecute ??= () => true;
         this.action = action;

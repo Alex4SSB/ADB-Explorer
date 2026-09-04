@@ -19,13 +19,13 @@ public class PackageInstallOperation : AbstractShellFileOperation
 
     public override FrameworkElement OpIcon => IsUninstall ? new UninstallIcon() : new InstallIcon();
 
-    private string tempInstallPath;
+    private string? tempInstallPath;
 
     public PackageInstallOperation(Dispatcher dispatcher,
                                    LogicalDeviceViewModel device,
-                                   FileClass path = null,
-                                   string packageName = null,
-                                   bool pushPackage = false) : base(path, device, dispatcher)
+                                   FileClass? path = null,
+                                   string packageName = "",
+                                   bool pushPackage = false) : base(path!, device, dispatcher)
     {
         OperationName = OperationType.Install;
         PackageName = packageName;
@@ -76,7 +76,7 @@ public class PackageInstallOperation : AbstractShellFileOperation
                     return;
                 }
 
-                installPath = tempInstallPath;
+                installPath = tempInstallPath!;
             }
 
             if (!PushPackage)
@@ -96,8 +96,8 @@ public class PackageInstallOperation : AbstractShellFileOperation
             : ADBService.EscapeAdbShellString(args[index]);
 
         var operationTask = PushPackage
-                ? ADBService.ExecuteDeviceAdbCommand(Device.ID, CancelTokenSource.Token, "install", args)
-                : ADBService.ExecuteVoidShellCommand(Device.ID, CancelTokenSource.Token, "pm", args);
+                ? ADBService.ExecuteDeviceAdbCommand(Device.ID, CancelTokenSource!.Token, "install", args)
+                : ADBService.ExecuteVoidShellCommand(Device.ID, CancelTokenSource!.Token, "pm", args);
 
         operationTask.ContinueWith((t) =>
         {

@@ -1,10 +1,8 @@
 ﻿namespace ADB_Explorer.ViewModels;
 
-public abstract class ViewModelBase : ObservableObject, INotifyPropertyChanged
+public abstract class ViewModelBase : ObservableObject
 {
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+    protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string? propertyName = null)
     {
         if (Equals(storage, value))
         {
@@ -15,14 +13,6 @@ public abstract class ViewModelBase : ObservableObject, INotifyPropertyChanged
         OnPropertyChanged(propertyName);
 
         return true;
-    }
-
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
-    {
-        base.OnPropertyChanged(e);
-        PropertyChanged?.Invoke(this, e);
     }
 
     public static void ExecuteInDispatcher(Action action, bool executeInDispatcher = true)

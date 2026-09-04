@@ -607,7 +607,7 @@ public partial class ExplorerPageHeader : UserControl
         return true;
     }
 
-    private void SelectionTimer_Tick(object sender, EventArgs e)
+    private void SelectionTimer_Tick(object? sender, EventArgs e)
     {
         SelectionTimer.Stop();
         ApplySelectionEffects();
@@ -714,7 +714,7 @@ public partial class ExplorerPageHeader : UserControl
             switch (e.PropertyName)
             {
                 case nameof(AppRuntimeSettings.BrowseDrive) when RuntimeSettings.BrowseDrive:
-                    InitNavigation(RuntimeSettings.BrowseDrive.Path);
+                    InitNavigation(RuntimeSettings.BrowseDrive!.Path);
                     break;
 
                 case nameof(AppRuntimeSettings.DriveViewNav):
@@ -930,7 +930,7 @@ public partial class ExplorerPageHeader : UserControl
         return true;
     }
 
-    private void DirectoryLister_PropertyChanged(object sender, PropertyChangedEventArgs e) => App.SafeInvoke(() =>
+    private void DirectoryLister_PropertyChanged(object? sender, PropertyChangedEventArgs e) => App.SafeInvoke(() =>
     {
         switch (e.PropertyName)
         {
@@ -1704,6 +1704,12 @@ public partial class ExplorerPageHeader : UserControl
             ExplorerGrid.UnselectAll();
 
             var firstSelected = ViewModel.FirstSelectedIndex;
+            // FirstSelectedIndex defaults to -1 until a plain click sets it. If Shift+click
+            // is the very first selection in a session, treat the clicked row as the start
+            // of the range instead of indexing into Items[-1] below.
+            if (firstSelected < 0)
+                firstSelected = current;
+
             int firstUnselected = firstSelected, lastUnselected = current + 1;
             if (current < firstSelected)
             {
@@ -2023,7 +2029,7 @@ public partial class ExplorerPageHeader : UserControl
         if (FileActions.IsAppDrive)
         {
             vfdo = VirtualFileDataObject.PrepareTransfer(ActiveSelectedItems.Cast<Package>());
-            selectedItems = VirtualFileDataObject.SelfFiles;
+            selectedItems = VirtualFileDataObject.SelfFiles!;
         }
         else
         {
@@ -2062,7 +2068,7 @@ public partial class ExplorerPageHeader : UserControl
         DragAutoScroll.Begin();
         try
         {
-            vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, dragSource, vfdo.PreferredDropEffect.Value);
+            vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, dragSource, vfdo.PreferredDropEffect ?? DragDropEffects.Copy);
         }
         finally
         {
@@ -2306,7 +2312,7 @@ public partial class ExplorerPageHeader : UserControl
         }
     }
 
-    private void IconView_RenameStarted(object sender, TextBox textBox)
+    private void IconView_RenameStarted(object? sender, TextBox textBox)
     {
         BeginRename(textBox);
         if (textBox.DataContext is FileClass file)

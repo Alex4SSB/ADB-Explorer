@@ -21,7 +21,22 @@ public partial class AdbContentDialog : UserControl
 
     public BaseAction CopyCommand => new(() => true, () =>
     {
-        Clipboard.SetText(MessageToCopy);
+        // OpenClipboard can transiently fail with CLIPBRD_E_CANT_OPEN when another
+        // process (clipboard manager, RDP bridge, AV scanner) briefly holds the
+        // clipboard open. Retry a few times before giving up.
+        for (int attempt = 0; attempt < 3; attempt++)
+        {
+            try
+            {
+                Clipboard.SetText(MessageToCopy);
+                break;
+            }
+            catch (COMException) when (attempt < 2)
+            {
+                Thread.Sleep(50);
+            }
+        }
+
         MessageToCopy = "";
     });
 

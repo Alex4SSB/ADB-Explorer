@@ -36,9 +36,9 @@ public partial class Devices : ObservableObject
 
     public List<string> RootDevices { get; protected set; } = [];
 
-    public NewDeviceViewModel CurrentNewDevice { get; set; }
+    public NewDeviceViewModel CurrentNewDevice { get; set; } = null!;
 
-    public string WsaPort { get; set; }
+    public string WsaPort { get; set; } = "";
 
     #endregion
 
@@ -112,13 +112,13 @@ public partial class Devices : ObservableObject
         ObservableCount.Value = "0";
     }
 
-    private void Devices_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void Devices_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(Count))
             ObservableCount.Value = Count.ToString();
     }
 
-    private void UIList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    private void UIList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         OnPropertyChanged(nameof(Count));
     }

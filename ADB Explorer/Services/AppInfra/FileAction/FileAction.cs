@@ -509,7 +509,7 @@ public static class AppActions
     public static List<KeyBinding> Bindings =>
         [.. List.Where(a => a.UseForGesture)
             .Select(action => action.KeyBinding)
-            .Where(binding => binding is not null)];
+            .OfType<KeyBinding>()];
 
 }
 
@@ -608,9 +608,9 @@ public class FileAction : ViewModelBase
 
     public BaseAction Command { get; }
 
-    public KeyGesture Gesture { get; }
+    public KeyGesture? Gesture { get; }
 
-    public KeyBinding KeyBinding { get; }
+    public KeyBinding? KeyBinding { get; }
 
     public string Description { get; private set; }
 
@@ -653,7 +653,7 @@ public class FileAction : ViewModelBase
     public FileAction(FileActionType name,
                       BaseAction command,
                       string description,
-                      KeyGesture gesture = null,
+                      KeyGesture? gesture = null,
                       bool useForGesture = false,
                       bool clearClipboard = false,
                       string? info = null)
@@ -669,7 +669,7 @@ public class FileAction : ViewModelBase
 
         UseForGesture = useForGesture;
 
-        ((CommandHandler)Command.Command).OnExecute.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) =>
+        ((CommandHandler)Command.Command).OnExecute.PropertyChanged += (object? sender, PropertyChangedEventArgs<bool> e) =>
         {
             if (clearClipboard && Data.CopyPaste.IsSelf)
                 Data.CopyPaste.Clear();
@@ -680,7 +680,7 @@ public class FileAction : ViewModelBase
                       Func<bool> canExecute,
                       Action action,
                       string description = "",
-                      KeyGesture gesture = null,
+                      KeyGesture? gesture = null,
                       bool useForGesture = false,
                       bool clearClipboard = false,
                       string? info = null)
@@ -691,13 +691,13 @@ public class FileAction : ViewModelBase
                       Func<bool> canExecute,
                       Action action,
                       ObservableProperty<string> description,
-                      KeyGesture gesture = null,
+                      KeyGesture? gesture = null,
                       bool useForGesture = false,
                       bool clearClipboard = false,
                       string? info = null)
         : this(name, new(canExecute, action), description.Value, gesture, useForGesture, clearClipboard, info)
     {
-        description.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) =>
+        description.PropertyChanged += (object? sender, PropertyChangedEventArgs<string> e) =>
         {
             Description = e.NewValue;
             OnPropertyChanged(nameof(Description));

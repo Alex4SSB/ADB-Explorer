@@ -5,7 +5,7 @@ namespace ADB_Explorer.ViewModels;
 
 public class EmulatorPackageDeviceViewModel : DeviceViewModel
 {
-    private EmulatorPackageDevice device;
+    private EmulatorPackageDevice device = null!;
     protected new EmulatorPackageDevice Device
     {
         get => device;
@@ -22,7 +22,7 @@ public class EmulatorPackageDeviceViewModel : DeviceViewModel
 
     public override bool DeviceExists => false;
 
-    public EmulatorPackageDeviceViewModel(EmulatorPackageDevice device, Devices devicesObject = null) : base(device, devicesObject)
+    public EmulatorPackageDeviceViewModel(EmulatorPackageDevice device, Devices? devicesObject = null) : base(device, devicesObject)
     {
         Device = device;
         LaunchCommand = DeviceHelper.LaunchEmulator(this);

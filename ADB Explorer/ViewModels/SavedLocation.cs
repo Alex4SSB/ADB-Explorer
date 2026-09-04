@@ -5,7 +5,7 @@ namespace ADB_Explorer.ViewModels;
 
 public class SavedLocation : ViewModelBase
 {
-    private string path;
+    private string path = "";
     public string Path
     {
         get => path;

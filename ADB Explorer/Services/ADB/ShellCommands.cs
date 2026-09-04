@@ -262,13 +262,13 @@ public static class ShellCommands
 
         sysBinCmds.Select<string, (ShellCmd?, string)>(c => (Enum.TryParse<ShellCmd>(c, true, out var result) ? result : null, c))
                   .Where(c => c.Item1 is not null)
-                  .ForEach(c => deviceDict.TryAdd(c.Item1.Value, c.Item2));
+                  .ForEach(c => deviceDict.TryAdd(c.Item1!.Value, c.Item2));
 
         if (missingCmds.Count > 0 && busyBoxExists)
         {
             missingCmds.Select<string, (ShellCmd?, string)>(c => (Enum.TryParse<ShellCmd>(c, true, out var result) ? result : null, c))
                   .Where(c => c.Item1 is not null)
-                  .ForEach(c => deviceDict.TryAdd(c.Item1.Value, $"busybox {c.Item2}"));
+                  .ForEach(c => deviceDict.TryAdd(c.Item1!.Value, $"busybox {c.Item2}"));
         }
 
         var archiveProbe = ProbeArchiveCapabilities(deviceID, busyBoxExists);

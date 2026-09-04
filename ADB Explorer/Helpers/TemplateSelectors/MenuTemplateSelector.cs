@@ -4,15 +4,16 @@ namespace ADB_Explorer.Helpers;
 
 internal class MenuTemplateSelector : DataTemplateSelector
 {
-    public DataTemplate CompoundIconMenuTemplate { get; set; }
-    public DataTemplate IconMenuTemplate { get; set; }
-    public DataTemplate DynamicAltTextTemplate { get; set; }
-    public DataTemplate SeparatorTemplate { get; set; }
-    public DataTemplate SubMenuTemplate { get; set; }
-    public DataTemplate SubMenuSeparatorTemplate { get; set; }
-    public DataTemplate DualActionButtonTemplate { get; set; }
+    // Set via XAML resource declarations, not a constructor — genuinely absent until then.
+    public DataTemplate? CompoundIconMenuTemplate { get; set; }
+    public DataTemplate? IconMenuTemplate { get; set; }
+    public DataTemplate? DynamicAltTextTemplate { get; set; }
+    public DataTemplate? SeparatorTemplate { get; set; }
+    public DataTemplate? SubMenuTemplate { get; set; }
+    public DataTemplate? SubMenuSeparatorTemplate { get; set; }
+    public DataTemplate? DualActionButtonTemplate { get; set; }
 
-    public override DataTemplate SelectTemplate(object item, DependencyObject container) => item switch
+    public override DataTemplate SelectTemplate(object item, DependencyObject container) => (item switch
     {
         DualActionButton => DualActionButtonTemplate,
         SubMenuSeparator => SubMenuSeparatorTemplate,
@@ -23,21 +24,22 @@ internal class MenuTemplateSelector : DataTemplateSelector
         CompoundIconMenu => CompoundIconMenuTemplate,
         null => new(),
         _ => throw new NotSupportedException(),
-    };
+    }) ?? new();
 }
 
 internal class MenuStyleSelector : StyleSelector
 {
-    public Style IconMenuStyle { get; set; }
-    public Style DynamicAltTextStyle { get; set; }
-    public Style SeparatorStyle { get; set; }
-    public Style SubMenuStyle { get; set; }
-    public Style SubMenuSeparatorStyle { get; set; }
-    public Style CompoundIconMenuStyle { get; set; }
-    public Style DualActionButtonStyle { get; set; }
-    public Style DummySubMenuStyle { get; set; }
+    // Set via XAML resource declarations, not a constructor — genuinely absent until then.
+    public Style? IconMenuStyle { get; set; }
+    public Style? DynamicAltTextStyle { get; set; }
+    public Style? SeparatorStyle { get; set; }
+    public Style? SubMenuStyle { get; set; }
+    public Style? SubMenuSeparatorStyle { get; set; }
+    public Style? CompoundIconMenuStyle { get; set; }
+    public Style? DualActionButtonStyle { get; set; }
+    public Style? DummySubMenuStyle { get; set; }
 
-    public override Style SelectStyle(object item, DependencyObject container) => item switch
+    public override Style SelectStyle(object item, DependencyObject container) => (item switch
     {
         DualActionButton => DualActionButtonStyle,
         DummySubMenu => DummySubMenuStyle,
@@ -48,5 +50,5 @@ internal class MenuStyleSelector : StyleSelector
         IconMenu => IconMenuStyle,
         CompoundIconMenu => CompoundIconMenuStyle,
         _ => throw new NotSupportedException(),
-    };
+    }) ?? new();
 }

@@ -12,7 +12,7 @@ public enum SnackProgressMode
 
 public class AdbSnackbar : Snackbar
 {
-    private DispatcherTimer _countdownTimer;
+    private DispatcherTimer? _countdownTimer;
 
     public AdbSnackbar(SnackbarPresenter presenter) : base(presenter) { }
 
@@ -135,7 +135,7 @@ public class AdbSnackbar : Snackbar
         TimeRemaining = TimeSpan.Zero;
     }
 
-    private void OnCountdownTick(object sender, EventArgs e)
+    private void OnCountdownTick(object? sender, EventArgs e)
     {
         var remaining = TimeRemaining - TimeSpan.FromSeconds(1);
         TimeRemaining = remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero;

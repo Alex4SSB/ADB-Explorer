@@ -21,7 +21,7 @@ public abstract partial class AbstractDrive : ObservableObject
     public partial DriveType Type { get; set; } = DriveType.Unknown;
 
 
-    public static implicit operator bool(AbstractDrive obj)
+    public static implicit operator bool(AbstractDrive? obj)
     {
         return obj is not null;
     }

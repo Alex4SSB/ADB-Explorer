@@ -12,15 +12,15 @@ public partial class AppRuntimeSettings : ViewModelBase
     /// </summary>
     public bool ApplyUpdateOnExit { get; set; } = false;
 
-    private DriveViewModel browseDrive = null;
-    public DriveViewModel BrowseDrive
+    private DriveViewModel? browseDrive = null;
+    public DriveViewModel? BrowseDrive
     {
         get => browseDrive;
         set => Set(ref browseDrive, value);
     }
 
-    private DriveViewModel selectedDrive = null;
-    public DriveViewModel SelectedDrive
+    private DriveViewModel? selectedDrive = null;
+    public DriveViewModel? SelectedDrive
     {
         get => selectedDrive;
         set => Set(ref selectedDrive, value);

@@ -70,11 +70,11 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         }
     }
 
-    public string AvdName => Device.AvdName;
+    public string AvdName => Device.AvdName ?? "";
 
     public string BaseID => Type is DeviceType.Service ? ID.Split('.')[0] : ID;
 
-    private string serialNumber;
+    private string serialNumber = "";
     /// <summary>
     /// Stable device identifier used for comparison and on-disk storage (USB ID, <c>ro.serialno</c>, mDNS serial, or AVD name).
     /// </summary>
@@ -350,7 +350,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
             Data.DevicesObject.PropertyChanged += DevicesObject_PropertyChanged;
     }
 
-    private void DevicesObject_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void DevicesObject_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(Devices.DeviceToOpen))
         {
@@ -403,7 +403,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
             ?? Props.GetValueOrDefault(ADBService.QEMU_KERNEL_AVD_NAME);
     }
 
-    public void SetAvdName(string avdName)
+    public void SetAvdName(string? avdName)
     {
         if (Device.AvdName == avdName)
             return;
@@ -669,8 +669,11 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
 public class LogicalDeviceViewModelEqualityComparer : IEqualityComparer<LogicalDeviceViewModel>
 {
-    public bool Equals(LogicalDeviceViewModel x, LogicalDeviceViewModel y)
+    public bool Equals(LogicalDeviceViewModel? x, LogicalDeviceViewModel? y)
     {
+        if (x is null || y is null)
+            return x is null && y is null;
+
         return x.ID == y.ID && x.Status == y.Status && x.DeviceData == y.DeviceData;
     }
 

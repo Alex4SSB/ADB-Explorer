@@ -289,6 +289,6 @@ public partial class FileViewModelBase : ObservableObject
 
     public virtual void Dispose()
     {
-        TypeName = null;
+        TypeName = null!;
     }
 }

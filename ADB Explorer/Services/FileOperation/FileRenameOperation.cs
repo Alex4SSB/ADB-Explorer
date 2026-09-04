@@ -39,7 +39,7 @@ public class FileRenameOperation : AbstractShellFileOperation
                     this,
                     Device.ID,
                     archivePath,
-                    CancelTokenSource.Token,
+                    CancelTokenSource!.Token,
                     phases: 2);
 
                 ArchiveExtract.RenameTarMember(
@@ -47,17 +47,17 @@ public class FileRenameOperation : AbstractShellFileOperation
                     archivePath,
                     oldInternal,
                     newInternal,
-                    CancelTokenSource.Token,
+                    CancelTokenSource!.Token,
                     session.OnLine,
                     session.BeginPhase);
 
                 session.Finish();
-            }, CancelTokenSource.Token);
+            }, CancelTokenSource!.Token);
         }
         else
         {
             operationTask = ADBService.ExecuteVoidShellCommand(Device.ID,
-                CancelTokenSource.Token,
+                CancelTokenSource!.Token,
                 "mv",
                 ADBService.EscapeAdbShellString(FilePath.FullPath),
                 ADBService.EscapeAdbShellString(TargetPath.FullPath));

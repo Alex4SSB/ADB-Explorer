@@ -2,7 +2,7 @@
 
 public class HistoryDevice : NewDevice
 {
-    public string DeviceName { get; set; }
+    public string DeviceName { get; set; } = "";
 
     public HistoryDevice()
     {

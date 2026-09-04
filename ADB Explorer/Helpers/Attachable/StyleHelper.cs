@@ -223,7 +223,7 @@ public static class StyleHelper
         return result;
     }
 
-    public static void VerifyIcon(string icon, [CallerMemberName] string propertyName = null)
+    public static void VerifyIcon(string icon, [CallerMemberName] string? propertyName = null)
     {
         if (!IsFontIcon(icon))
             throw new ArgumentException("An icon must be one char in range E000-F8FF", propertyName);

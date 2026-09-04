@@ -12,7 +12,7 @@ public class FileGroup
 
     public IEnumerable<byte> GroupDescriptorBytes => GroupDescriptor.Bytes;
 
-    public IEnumerable<FileDescriptor.StreamContents> DataStreams => FileDescriptors.Select(f => f.Stream);
+    public IEnumerable<FileDescriptor.StreamContents> DataStreams => FileDescriptors.Select(f => f.Stream).OfType<FileDescriptor.StreamContents>();
 
     public FileGroup(IEnumerable<FileDescriptor> fileDescriptors)
     {
@@ -27,21 +27,23 @@ public class FileGroup
 /// </summary>
 public class FileDescriptor
 {
-    public string Name { get; set; }
+    public string Name { get; set; } = "";
 
     public Int64? Length { get; set; }
 
     public DateTime? ChangeTimeUtc { get; set; }
 
-    public Func<bool> SaveToFile { get; set; }
+    public Func<bool>? SaveToFile { get; set; }
 
     public bool IsDirectory { get; set; }
 
-    public string SourcePath { get; set; }
+    // Absent for descriptors built from an inbound drag/clipboard source outside our filesystem.
+    public string? SourcePath { get; set; }
 
-    public delegate System.Runtime.InteropServices.ComTypes.IStream StreamContents();
+    public delegate System.Runtime.InteropServices.ComTypes.IStream? StreamContents();
 
-    public StreamContents Stream { get; set; }
+    // Only set for descriptors we offer as drag/clipboard data; unset for inbound descriptors.
+    public StreamContents? Stream { get; set; }
 
     public override string ToString() => Name;
 
@@ -61,15 +63,15 @@ public class FileDescriptor
                 try
                 {
                     shellItem.Properties.TryGetValue<string>(Vanara.PInvoke.Ole32.PROPERTYKEY.System.FileName, out var name);
-                    Name = name;
+                    Name = name ?? "";
                 }
                 catch
                 {
-                    Name = shellItem.GetDisplayName(ShellItemDisplayString.ParentRelativeParsing);
+                    Name = shellItem.GetDisplayName(ShellItemDisplayString.ParentRelativeParsing) ?? "";
                 }
             }
             else
-                Name = shellItem.ParsingName;
+                Name = shellItem.ParsingName ?? "";
 
             Name ??= "";
             Length = shellItem.IsFolder ? null : shellItem.PIDL?.Size;
@@ -81,7 +83,7 @@ public class FileDescriptor
         }
     }
 
-    public static FileDescriptor[] GetDescriptors(IDataObject dataObject)
+    public static FileDescriptor[]? GetDescriptors(IDataObject dataObject)
     {
         if (Data.CopyPaste.IsSelf)
         {

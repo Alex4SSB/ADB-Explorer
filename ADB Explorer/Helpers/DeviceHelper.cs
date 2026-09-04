@@ -480,7 +480,7 @@ public static class DeviceHelper
         App.SafeInvoke(service.BeginPairing);
 
         var success = false;
-        string error = null;
+        string? error = null;
 
         try
         {
@@ -796,7 +796,7 @@ public static class DeviceHelper
     private static int _testDeviceCounter = 0;
 
     private static LogicalDeviceViewModel MakeLogicalVM(string nameSuffix, string id, string ipAddress, DeviceType type, DeviceStatus status)
-        => new(LogicalDevice.From(new DeviceSnapshot(id, nameSuffix, status, type, RootStatus.Unchecked, ipAddress, default))) { IsTestDevice = true };
+        => new(LogicalDevice.From(new DeviceSnapshot(id, nameSuffix, status, type, RootStatus.Unchecked, ipAddress, new()))) { IsTestDevice = true };
 
     private static IEnumerable<LogicalDeviceViewModel> CurrentLogical()
         => Data.DevicesObject.LogicalDeviceViewModels.ToList();
@@ -906,7 +906,7 @@ public static class DeviceHelper
                     FileActionLogic.ClearExplorer();
                     NavHistory.Reset();
                     Data.FileActions.IsExplorerVisible = false;
-                    Data.DirList = null;
+                    Data.DirList = null!;
                     Data.DevicesObject.DeviceToOpen = null;
                 }
 

@@ -8,7 +8,7 @@ public abstract class DeviceViewModel : ViewModelBase
 {
     #region Full properties
 
-    private Device device;
+    private Device device = null!;
     protected Device Device
     {
         get => device;
@@ -84,9 +84,9 @@ public abstract class DeviceViewModel : ViewModelBase
 
     #endregion
 
-    public virtual string Tooltip { get; }
+    public virtual string Tooltip { get; } = "";
 
-    private DeviceViewModel(Devices devicesObject = null)
+    private DeviceViewModel(Devices? devicesObject = null)
     {
         devicesObject ??= Data.DevicesObject;
         if (devicesObject is null)
@@ -95,12 +95,12 @@ public abstract class DeviceViewModel : ViewModelBase
         devicesObject.PropertyChanged += DevicesObject_PropertyChanged;
     }
 
-    protected DeviceViewModel(Device device, Devices devicesObject = null) : this(devicesObject)
+    protected DeviceViewModel(Device? device, Devices? devicesObject = null) : this(devicesObject)
     {
-        Device = device;
+        Device = device!;
     }
 
-    private void DevicesObject_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void DevicesObject_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(Devices.DeviceToConnect))
         {
@@ -165,7 +165,7 @@ public abstract class PairingDeviceViewModel : DeviceViewModel
 {
     #region Full properties
 
-    private PairingDevice device;
+    private PairingDevice device = null!;
     protected new PairingDevice Device
     {
         get => device;
@@ -198,7 +198,7 @@ public abstract class PairingDeviceViewModel : DeviceViewModel
 
     #endregion
 
-    protected PairingDeviceViewModel(PairingDevice device, Devices devicesObject) : base(device, devicesObject)
+    protected PairingDeviceViewModel(PairingDevice device, Devices? devicesObject) : base(device, devicesObject)
     {
         Device = device;
     }
@@ -237,8 +237,11 @@ public abstract class PairingDeviceViewModel : DeviceViewModel
 
 public class DeviceViewModelEqualityComparer : IEqualityComparer<DeviceViewModel>
 {
-    public bool Equals(DeviceViewModel x, DeviceViewModel y)
+    public bool Equals(DeviceViewModel? x, DeviceViewModel? y)
     {
+        if (x is null || y is null)
+            return x is null && y is null;
+
         return x.ID == y.ID && x.Status == y.Status;
     }
 

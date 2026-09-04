@@ -75,10 +75,10 @@ public partial class ConflictItemDecision : ViewModelBase
     public string DestSizeText { get; }
     public string DestModifiedText { get; }
 
-    public string SourceSizeComparison { get; }
-    public string DestSizeComparison { get; }
-    public string SourceDateComparison { get; }
-    public string DestDateComparison { get; }
+    public string? SourceSizeComparison { get; }
+    public string? DestSizeComparison { get; }
+    public string? SourceDateComparison { get; }
+    public string? DestDateComparison { get; }
 
     public string Index { get; }
 

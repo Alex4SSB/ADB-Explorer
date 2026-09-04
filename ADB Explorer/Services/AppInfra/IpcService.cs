@@ -32,7 +32,7 @@ public class IpcService
                 if (Data.CurrentPath != file.ParentPath)
                     return;
 
-                Data.DirList.FileList.RemoveAll(f => f.FullPath == file.FullPath);
+                Data.DirList!.FileList.RemoveAll(f => f.FullPath == file.FullPath);
 
                 break;
         }

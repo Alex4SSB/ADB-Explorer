@@ -50,7 +50,7 @@ public class SyncFile : FilePath
         }
     }
 
-    public SyncFile(FileClass fileClass, IEnumerable<FolderTree> tree = null)
+    public SyncFile(FileClass fileClass, IEnumerable<FolderTree>? tree = null)
         : base(fileClass.FullPath, fileClass.FullName, fileClass.Type)
     {
         ShellLsSize = fileClass.ShellLsSize is > 0 ? fileClass.ShellLsSize : null;
@@ -139,7 +139,7 @@ public class SyncFile : FilePath
     public void AddUpdates(params FileOpProgressInfo[] newUpdates)
         => AddUpdates(newUpdates.Where(o => o is not null));
 
-    public void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates, FileOperation fileOp = null, bool executeInDispatcher = true)
+    public void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates, FileOperation? fileOp = null, bool executeInDispatcher = true)
     {
         if (!newUpdates.Any())
             return;
@@ -238,8 +238,13 @@ public class SyncFile : FilePath
 
 public class SyncFileComparer : IEqualityComparer<SyncFile>
 {
-    public bool Equals(SyncFile x, SyncFile y)
-        => x.FullPath.Equals(y.FullPath);
+    public bool Equals(SyncFile? x, SyncFile? y)
+    {
+        if (x is null || y is null)
+            return x is null && y is null;
+
+        return x.FullPath.Equals(y.FullPath);
+    }
 
     public int GetHashCode([DisallowNull] SyncFile obj)
     {

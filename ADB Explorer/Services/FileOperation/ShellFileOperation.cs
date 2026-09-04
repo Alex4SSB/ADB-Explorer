@@ -18,11 +18,8 @@ public abstract class AbstractShellFileOperation : FileOperation
     protected AbstractShellFileOperation(FileClass filePath, LogicalDeviceViewModel device, Dispatcher dispatcher)
         : base(filePath, device, dispatcher)
     {
-        if (filePath is not null)
-        {
-            FilePath = filePath;
-            TargetPath = new(filePath);
-        }
+        FilePath = filePath;
+        TargetPath = new(filePath);
     }
 
     public override void ClearChildren()
@@ -89,7 +86,7 @@ public static class ShellFileOperation
         }
     }
 
-    private static void ArchiveDeleteOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private static void ArchiveDeleteOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (sender is not FileArchiveDeleteOperation op)
             return;
@@ -107,7 +104,7 @@ public static class ShellFileOperation
                 && currentArchive == op.TarArchivePath)
             {
                 foreach (var member in op.Members)
-                    Data.DirList.FileList.Remove(member);
+                    Data.DirList!.FileList.Remove(member);
 
                 FileActionLogic.UpdateFileActions();
             }
@@ -116,7 +113,7 @@ public static class ShellFileOperation
         op.PropertyChanged -= ArchiveDeleteOp_PropertyChanged;
     }
 
-    private static void DeleteFileOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private static void DeleteFileOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         var op = sender as FileDeleteOperation;
 
@@ -132,7 +129,7 @@ public static class ShellFileOperation
         {
             // remove file from cut items and clear its trash indexer if current device
             op.FilePath.CutState = DragDropEffects.None;
-            op.FilePath.TrashIndex = null;
+            op.FilePath.TrashIndex = null!;
 
             // update UI if current path
             if (op.TargetPath.ParentPath == Data.CurrentPath)
@@ -158,7 +155,7 @@ public static class ShellFileOperation
         Data.FileOpQ.AddOperation(fileOp);
     }
 
-    private static void RenameFileOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private static void RenameFileOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         var op = sender as FileRenameOperation;
 
@@ -294,7 +291,7 @@ public static class ShellFileOperation
 
     public static void MoveItems(LogicalDeviceViewModel device,
                                  IEnumerable<FileClass> items,
-                                 string targetPath,
+                                 string? targetPath,
                                  string currentPath,
                                  ObservableList<FileClass> fileList,
                                  Dispatcher dispatcher,
@@ -384,7 +381,7 @@ public static class ShellFileOperation
         });
     }
 
-    private static void ArchiveModifyOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private static void ArchiveModifyOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (sender is not FileArchiveModifyOperation op)
             return;
@@ -407,7 +404,7 @@ public static class ShellFileOperation
         op.PropertyChanged -= ArchiveModifyOp_PropertyChanged;
     }
 
-    private static void ExtractFileOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private static void ExtractFileOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (sender is not FileExtractOperation op)
             return;
@@ -423,7 +420,7 @@ public static class ShellFileOperation
         {
             FileClass newFile = new(op.FilePath);
             newFile.UpdatePath(op.TargetPath.FullPath);
-            Data.DirList.FileList.Add(newFile);
+            Data.DirList!.FileList.Add(newFile);
 
             if (Data.FileOpQ.TotalCount == 1)
                 Data.ItemToSelect.Value = newFile;
@@ -451,7 +448,7 @@ public static class ShellFileOperation
         });
     }
 
-    private static void CompressOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private static void CompressOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (sender is not FileCompressOperation op)
             return;
@@ -478,7 +475,7 @@ public static class ShellFileOperation
             if (op.Device.ID == Data.DevicesObject.Current?.ID
                 && op.FilePath.ParentPath == Data.CurrentPath)
             {
-                Data.DirList.FileList.Remove(op.FilePath);
+                Data.DirList!.FileList.Remove(op.FilePath);
                 FileActionLogic.UpdateFileActions();
             }
 
@@ -488,18 +485,19 @@ public static class ShellFileOperation
 
     public static void MoveItems(LogicalDeviceViewModel device,
                                  IEnumerable<FileClass> items,
-                                 string targetPath,
+                                 string? targetPath,
                                  string currentPath,
                                  IEnumerable<string> existingItems,
                                  Dispatcher dispatcher,
                                  DragDropEffects cutType = DragDropEffects.None,
                                  int masterPid = 0)
     {
+        // Only reached when targetPath == RECYCLE_PATH (see dispatch below), so never null here.
         IEnumerable<FileMoveOperation> Recycle()
         {
             foreach (var item in items)
             {
-                SyncFile target = new(FileHelper.ConcatPaths(targetPath, item.FullName), item.Type);
+                SyncFile target = new(FileHelper.ConcatPaths(targetPath!, item.FullName), item.Type);
                 yield return new(item, target, device, dispatcher);
             }
         }
@@ -533,6 +531,7 @@ public static class ShellFileOperation
             }
         }
 
+        // Only reached when targetPath is a real destination (see dispatch below), so never null here.
         IEnumerable<FileMoveOperation> Move()
         {
             foreach (var item in items)
@@ -543,7 +542,7 @@ public static class ShellFileOperation
                 if (cutType is DragDropEffects.Copy && item.ParentPath == targetPath)
                     targetName = FileHelper.DuplicateFile(existingItems, targetName, cutType);
 
-                SyncFile target = new(FileHelper.ConcatPaths(targetPath, targetName));
+                SyncFile target = new(FileHelper.ConcatPaths(targetPath!, targetName));
                 yield return new(item, target, device, dispatcher, cutType);
             }
         }
@@ -567,7 +566,7 @@ public static class ShellFileOperation
         });
     }
 
-    private static void MoveFileOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private static void MoveFileOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         var op = sender as FileMoveOperation;
 
@@ -604,7 +603,7 @@ public static class ShellFileOperation
                 // clear file trash indexer if restore / recycle on current device
                 if (op.OperationName is FileOperation.OperationType.Recycle or FileOperation.OperationType.Restore)
                 {
-                    op.FilePath.TrashIndex = null;
+                    op.FilePath.TrashIndex = null!;
                 }
 
                 var listing = Data.Files.DirList?.FileList;
@@ -858,7 +857,7 @@ public static class ShellFileOperation
         }
     }
 
-    private static void InstallOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private static void InstallOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         var op = sender as PackageInstallOperation;
 
@@ -991,7 +990,7 @@ public static class ShellFileOperation
         Data.FileOpQ.AddOperations(operations);
     }
 
-    private static void ChangeModifiedOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private static void ChangeModifiedOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         var op = sender as FileChangeModifiedOperation;
 

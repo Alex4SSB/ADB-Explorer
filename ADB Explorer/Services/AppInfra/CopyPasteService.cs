@@ -175,7 +175,7 @@ public partial class CopyPasteService : ObservableObject
         }
     } = [];
 
-    private IEnumerable<FileClass> _currentFiles = [];
+    private IEnumerable<FileClass>? _currentFiles = [];
     public IEnumerable<FileClass> CurrentFiles
     {
         get
@@ -230,7 +230,7 @@ public partial class CopyPasteService : ObservableObject
 
     public bool IsDragFromMaster => MasterPid != Environment.ProcessId;
 
-    public LogicalDeviceViewModel SourceDevice { get; private set; }
+    public LogicalDeviceViewModel? SourceDevice { get; private set; }
 
     public static string UserTemp => $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Temp\\";
 
@@ -436,7 +436,7 @@ public partial class CopyPasteService : ObservableObject
         UpdateUI();
     }
 
-    public DragDropEffects GetAllowedDragEffects(IDataObject dataObject, FrameworkElement sender = null)
+    public DragDropEffects GetAllowedDragEffects(IDataObject dataObject, FrameworkElement? sender = null)
     {
         if (sender is null)
         {
@@ -770,10 +770,10 @@ public partial class CopyPasteService : ObservableObject
 
                         FolderTree[]? children = null;
                         if (item.IsDirectory)
-                            children = item.GetChildren(SourceDevice.ID);
+                            children = item.GetChildren(SourceDevice!.ID);
 
                         // Pull the file from the source device to the temp folder
-                        var pullOp = FileSyncOperation.PullFile(new(item, children), target, SourceDevice, App.AppDispatcher);
+                        var pullOp = FileSyncOperation.PullFile(new(item, children), target, SourceDevice!, App.AppDispatcher);
                         pullOp.PropertyChanged += (s, e) =>
                         {
                             if (e.PropertyName != nameof(FileSyncOperation.Status)
@@ -801,9 +801,9 @@ public partial class CopyPasteService : ObservableObject
                                     return;
 
                                 // Once the second part is done, delete the file from the source device if needed, and notify if its another window
-                                ShellFileOperation.SilentDelete(SourceDevice, item.FullName);
+                                ShellFileOperation.SilentDelete(SourceDevice!, item.FullName);
                                 if (IsDragFromMaster)
-                                    IpcService.NotifyFileMoved(MasterPid, SourceDevice, item);
+                                    IpcService.NotifyFileMoved(MasterPid, SourceDevice!, item);
                             };
                         };
 
@@ -901,8 +901,10 @@ public partial class CopyPasteService : ObservableObject
                             Directory.CreateDirectory(FileHelper.GetParentPath(files[i]));
 
                             NativeMethods.SaveComStreamToFile(stream, files[i]);
-                            if (Descriptors[i].ChangeTimeUtc is not null)
-                                File.SetLastWriteTime(files[i], Descriptors[i].ChangeTimeUtc.Value.ToLocalTime());
+
+                            var changeTimeUtc = Descriptors[i].ChangeTimeUtc;
+                            if (changeTimeUtc is not null)
+                                File.SetLastWriteTime(files[i], changeTimeUtc.Value.ToLocalTime());
                         }
 
                         IEnumerable<FileClass> shItems = [];
@@ -921,7 +923,7 @@ public partial class CopyPasteService : ObservableObject
                             if (isAppDrive)
                             {
                                 if (FileHelper.AllFilesAreApks(DragFiles))
-                                    ShellFileOperation.PushPackages(device, shItems.Select(f => f.ShellItem), App.AppDispatcher);
+                                    ShellFileOperation.PushPackages(device, shItems.Select(f => f.ShellItem).OfType<ShellItem>(), App.AppDispatcher);
                             }
                             else
                                 VerifyAndPush(targetFolder, shItems, CurrentEffect, device);
@@ -934,7 +936,7 @@ public partial class CopyPasteService : ObservableObject
                 if (isAppDrive)
                 {
                     if (FileHelper.AllFilesAreApks(DragFiles))
-                        ShellFileOperation.PushPackages(device, CurrentFiles.Select(f => f.ShellItem), App.AppDispatcher);
+                        ShellFileOperation.PushPackages(device, CurrentFiles.Select(f => f.ShellItem).OfType<ShellItem>(), App.AppDispatcher);
                 }
                 else
                     VerifyAndPush(targetFolder, CurrentFiles, CurrentEffect, device);
@@ -1041,14 +1043,14 @@ public partial class CopyPasteService : ObservableObject
         {
             ShellFileOperation.PushItemsToTar(
                 device,
-                pasteItems.Select(f => f.ShellItem),
+                pasteItems.Select(f => f.ShellItem).OfType<ShellItem>(),
                 targetPath,
                 App.AppDispatcher);
             return;
         }
 
         FileActionLogic.PushShellObjects(
-            pasteItems.Select(f => f.ShellItem),
+            pasteItems.Select(f => f.ShellItem).OfType<ShellItem>(),
             targetPath,
             dropEffects,
             replacePaths,
@@ -1056,7 +1058,7 @@ public partial class CopyPasteService : ObservableObject
             device);
     }
 
-    public static FileSyncOperation? VerifyAndPush(string targetPath, FileClass pasteItem, DragDropEffects dropEffects = DragDropEffects.Copy, ShellItem originalShellItem = null, LogicalDeviceViewModel? device = null)
+    public static FileSyncOperation? VerifyAndPush(string targetPath, FileClass pasteItem, DragDropEffects dropEffects = DragDropEffects.Copy, ShellItem? originalShellItem = null, LogicalDeviceViewModel? device = null)
     {
         device ??= Data.DevicesObject.Current;
         if (device is null)
@@ -1092,7 +1094,7 @@ public partial class CopyPasteService : ObservableObject
         }
 
         return FileActionLogic.PushShellObject(
-            pasteItem.ShellItem,
+            pasteItem.ShellItem ?? originalShellItem ?? ShellItem.Open(pasteItem.FullPath),
             targetPath,
             dropEffects,
             originalShellItem,

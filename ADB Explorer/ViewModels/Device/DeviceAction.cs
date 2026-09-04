@@ -7,7 +7,7 @@ public class DeviceAction : BaseAction
 {
     public string Description { get; }
 
-    public DeviceAction(Func<bool> canExecute, Action action, string description = null)
+    public DeviceAction(Func<bool>? canExecute, Action action, string description = "")
         : base(canExecute, action)
     {
         Description = description;
