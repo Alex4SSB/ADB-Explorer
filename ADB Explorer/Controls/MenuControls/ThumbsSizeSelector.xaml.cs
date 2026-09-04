@@ -50,7 +50,7 @@ public partial class ThumbsSizeSelector : UserControl
     {
         { ThumbnailService.ThumbnailSize.Tiles, new FluentPathIcon() { Data = FluentPathGeometries.AppsListDetail, Height = 16 } },
         { ThumbnailService.ThumbnailSize.Disabled, new FluentPathIcon() { Data = FluentPathGeometries.TextBulletList, Height = 16 } },
-        { ThumbnailService.ThumbnailSize.Medium, new FontIcon() { Glyph = "\uE138", FontSize = 16 } },
+        { ThumbnailService.ThumbnailSize.Medium, (UIElement)new BaseIcon("\uE138", 16).IconContent },
         { ThumbnailService.ThumbnailSize.Large, new LargeThumbsIcon() { SubFontSize = 8 } },
         { ThumbnailService.ThumbnailSize.ExtraLarge, (UIElement)new BaseIcon("\uE15A", 16, rtlBehavior: RtlBehavior.ForceRtl).IconContent },
     };
@@ -167,7 +167,7 @@ public partial class ThumbsSizeSelector : UserControl
 
             Data.FileActions.PropertyChanged += (_, e) =>
             {
-                if (e.PropertyName is nameof(FileActionsEnable.IsDriveViewVisible) or nameof(FileActionsEnable.IsAppDrive) or nameof(FileActionsEnable.IsRecycleBin))
+                if (e.PropertyName is nameof(FileActionsEnable.IsAppDrive) or nameof(FileActionsEnable.IsRecycleBin) or nameof(FileActionsEnable.IsExplorerVisible))
                 {
                     IsChecked = IsPreviewAllowed()
                         ? Data.Settings.SidePane == mode

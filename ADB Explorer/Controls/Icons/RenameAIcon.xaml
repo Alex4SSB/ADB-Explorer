@@ -26,17 +26,8 @@
             <Path
                 d:Fill="#4CC2FF"
                 Data="M14.5 2C14.6354 2 14.7526 2.04948 14.8516 2.14844C14.9505 2.2474 15 2.36458 15 2.5C15 2.63542 14.9505 2.7526 14.8516 2.85156C14.7526 2.95052 14.6354 3 14.5 3H13V17H14.5C14.6354 17 14.7526 17.0495 14.8516 17.1484C14.9505 17.2474 15 17.3646 15 17.5C15 17.6354 14.9505 17.7526 14.8516 17.8516C14.7526 17.9505 14.6354 18 14.5 18H10.5C10.3646 18 10.2474 17.9505 10.1484 17.8516C10.0495 17.7526 10 17.6354 10 17.5C10 17.3646 10.0495 17.2474 10.1484 17.1484C10.2474 17.0495 10.3646 17 10.5 17H12V3H10.5C10.3646 3 10.2474 2.95052 10.1484 2.85156C10.0495 2.7526 10 2.63542 10 2.5C10 2.36458 10.0495 2.2474 10.1484 2.14844C10.2474 2.04948 10.3646 2 10.5 2H14.5Z"
-                Stretch="None">
-                <Path.Style>
-                    <Style BasedOn="{StaticResource MonochromeIconPathStyle}" TargetType="Path">
-                        <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="True">
-                                <Setter Property="Fill" Value="{DynamicResource AccentButtonBackground}" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Path.Style>
-            </Path>
+                Stretch="None"
+                Style="{StaticResource IconAccentPathStyle}" />
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1.2*" />
@@ -54,17 +45,8 @@
                         Margin="0,0,0,1"
                         d:Fill="#4CC2FF"
                         Data="{Binding AlphabetGlyph}"
-                        Stretch="None">
-                        <Path.Style>
-                            <Style BasedOn="{StaticResource MonochromeIconPathStyle}" TargetType="Path">
-                                <Style.Triggers>
-                                    <Trigger Property="IsEnabled" Value="True">
-                                        <Setter Property="Fill" Value="{DynamicResource AccentButtonBackground}" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Path.Style>
-                    </Path>
+                        Stretch="None"
+                        Style="{StaticResource IconAccentPathStyle}" />
                 </Viewbox>
             </Grid>
         </Grid>

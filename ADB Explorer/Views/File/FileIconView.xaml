@@ -1,4 +1,4 @@
-﻿<UserControl
+<UserControl
     x:Class="ADB_Explorer.Views.FileIconView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -47,6 +47,9 @@
                             </DataTrigger>
                             <DataTrigger Binding="{Binding CutState}" Value="Copy">
                                 <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
@@ -102,6 +105,9 @@
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding CutState}" Value="Copy">
                                     <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                    <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

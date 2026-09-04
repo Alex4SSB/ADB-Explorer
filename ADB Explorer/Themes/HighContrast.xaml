@@ -1,0 +1,78 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <SolidColorBrush x:Key="NoticeBorderBackground" Color="{DynamicResource SystemColorButtonFaceColor}" />
+    <SolidColorBrush x:Key="SeparatorForeground" Color="{DynamicResource SystemColorGrayTextColor}" />
+    <SolidColorBrush x:Key="NewDeviceAltBorder" Color="{DynamicResource SystemColorWindowTextColor}" />
+    <SolidColorBrush x:Key="TempDriveAltBorder" Color="{DynamicResource SystemColorWindowTextColor}" />
+    <SolidColorBrush x:Key="TrashDriveAltBorder" Color="{DynamicResource SystemColorWindowTextColor}" />
+    <SolidColorBrush x:Key="HistoryDeviceBottomBorderBrush" Color="{DynamicResource SystemColorGrayTextColor}" />
+    <SolidColorBrush x:Key="FileOpHyperLinkBrush" Color="{DynamicResource SystemColorHotlightColor}" />
+    <SolidColorBrush x:Key="HyperLinkBrush" Color="{DynamicResource SystemColorHotlightColor}" />
+    <SolidColorBrush x:Key="SponsorIconBrush" Color="{DynamicResource SystemColorWindowTextColor}" />
+    <SolidColorBrush x:Key="RootTitleBrush" Color="{DynamicResource SystemColorWindowTextColor}" />
+
+    <SolidColorBrush x:Key="ValidationErrorBorderBrush" Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}" />
+
+    <SolidColorBrush x:Key="TitleBarBackgroundBrush" Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}" />
+    <SolidColorBrush x:Key="TitleBarForegroundBrush" Color="{DynamicResource {x:Static SystemColors.ActiveCaptionTextColorKey}}" />
+    <SolidColorBrush x:Key="FlyoutBorderBrush" Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}" />
+    <SolidColorBrush x:Key="ToolTipBorderBrush" Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}" />
+    <SolidColorBrush x:Key="ContextMenuBorderBrush" Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}" />
+    <SolidColorBrush x:Key="SurfaceStrokeColorFlyoutBrush" Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}" />
+
+    <SolidColorBrush x:Key="PaletteRedBrush" Color="{DynamicResource SystemColorHighlightColor}" />
+
+    <SolidColorBrush x:Key="MouseOverBackground" Color="Transparent" />
+    <SolidColorBrush x:Key="MouseOverBorderBrush" Color="{DynamicResource SystemColorWindowTextColor}" />
+
+    <SolidColorBrush x:Key="SelectedMouseOverBorderBrush" Color="{DynamicResource SystemColorWindowColor}" />
+    <SolidColorBrush x:Key="MouseOverForeground" Color="{DynamicResource SystemColorHighlightTextColor}" />
+    <SolidColorBrush x:Key="SelectedBackground" Color="{DynamicResource SystemColorHighlightColor}" />
+    <SolidColorBrush x:Key="SelectedForeground" Color="{DynamicResource SystemColorHighlightTextColor}" />
+    <SolidColorBrush x:Key="SelectedInactiveBackground" Color="{DynamicResource SystemColorHighlightColor}" />
+    <SolidColorBrush x:Key="SelectedMouseOverInactiveBackground" Color="{DynamicResource SystemColorHighlightColor}" />
+
+    <SolidColorBrush x:Key="SelectedMouseOverBackground" Color="{DynamicResource SystemColorWindowTextColor}" />
+    <SolidColorBrush x:Key="SelectedMouseOverForeground" Color="{DynamicResource SystemColorWindowColor}" />
+    <SolidColorBrush x:Key="DeviceMouseOverBackground" Color="{DynamicResource SystemColorButtonFaceColor}" />
+
+    <!--  Idle control-chrome color (idle button FG/border, idle CardControl FG/border, scrollbars) - distinct from WindowText, e.g. yellow in Night Sky.  -->
+    <SolidColorBrush x:Key="SystemColorButtonTextBrush" Color="{DynamicResource SystemColorButtonTextColor}" />
+
+    <SolidColorBrush x:Key="OpaqueBorderBrush" Color="{DynamicResource SystemColorWindowTextColor}" />
+
+    <SolidColorBrush x:Key="IconAccentBrush" Color="{DynamicResource SystemColorWindowTextColor}" />
+
+    <SolidColorBrush x:Key="MenuBarBackground" Color="Transparent" />
+    <SolidColorBrush x:Key="MenuBarItemBackgroundSelected" Color="{DynamicResource SystemColorHighlightColor}" />
+    <SolidColorBrush x:Key="MenuBarItemBackgroundPressed" Color="{DynamicResource SystemColorHighlightColor}" />
+    <SolidColorBrush x:Key="MenuBarItemBorderBrush" Color="{DynamicResource SystemColorWindowTextColor}" />
+    <SolidColorBrush x:Key="MenuBarItemTextForegroundPressed" Color="{DynamicResource SystemColorHighlightTextColor}" />
+    <SolidColorBrush x:Key="NavigationViewItemBorderBrush" Color="Transparent" />
+
+    <SolidColorBrush x:Key="TreeViewItemBackgroundSelected" Color="{DynamicResource SystemColorHighlightColor}" />
+
+    <SolidColorBrush x:Key="ToggleSwitchFillOffPointerOver" Color="{DynamicResource SystemColorWindowTextColor}" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOnPointerOver" Color="{DynamicResource SystemColorWindowTextColor}" />
+    <SolidColorBrush x:Key="ToggleSwitchKnobFillOffPointerOver" Color="{DynamicResource SystemColorWindowColor}" />
+    <SolidColorBrush x:Key="ToggleSwitchKnobFillOnPointerOver" Color="{DynamicResource SystemColorWindowColor}" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOffPointerOver" Color="{DynamicResource SystemColorWindowColor}" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOnPointerOver" Color="{DynamicResource SystemColorWindowColor}" />
+
+    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="{DynamicResource SystemColorHighlightTextColor}" />
+
+    <SolidColorBrush x:Key="ProgressBarBackground" Color="Transparent" />
+
+    <SolidColorBrush x:Key="SystemFillColorSuccessBrush" Color="{DynamicResource SystemColorWindowTextColor}" />
+    <SolidColorBrush x:Key="SystemFillColorCautionBrush" Color="{DynamicResource SystemColorWindowTextColor}" />
+    <SolidColorBrush x:Key="SystemFillColorCriticalBrush" Color="{DynamicResource SystemColorWindowTextColor}" />
+    <SolidColorBrush x:Key="SystemFillColorNeutralBrush" Color="{DynamicResource SystemColorWindowTextColor}" />
+    <SolidColorBrush x:Key="SystemFillColorSolidNeutralBrush" Color="{DynamicResource SystemColorWindowTextColor}" />
+    <SolidColorBrush x:Key="SystemFillColorAttentionBackgroundBrush" Color="{DynamicResource SystemColorWindowColor}" />
+    <SolidColorBrush x:Key="SystemFillColorSuccessBackgroundBrush" Color="{DynamicResource SystemColorWindowColor}" />
+    <SolidColorBrush x:Key="SystemFillColorCautionBackgroundBrush" Color="{DynamicResource SystemColorWindowColor}" />
+    <SolidColorBrush x:Key="SystemFillColorCriticalBackgroundBrush" Color="{DynamicResource SystemColorWindowColor}" />
+    <SolidColorBrush x:Key="SystemFillColorNeutralBackgroundBrush" Color="{DynamicResource SystemColorWindowColor}" />
+    <SolidColorBrush x:Key="SystemFillColorSolidAttentionBackgroundBrush" Color="{DynamicResource SystemColorWindowColor}" />
+    <SolidColorBrush x:Key="SystemFillColorSolidNeutralBackgroundBrush" Color="{DynamicResource SystemColorWindowColor}" />
+</ResourceDictionary>

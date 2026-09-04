@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Controls;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Properties;
 using ADB_Explorer.ViewModels;
@@ -603,6 +603,13 @@ public class SimpleComboSetting<T> : AbstractSetting
         : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, icon, commands)
     {
         Options = options;
+    }
+
+    protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        base.Settings_PropertyChanged(sender, e);
+        if (e.PropertyName == valueProp.Name)
+            OnPropertyChanged(nameof(Value));
     }
 }
 

@@ -1,4 +1,4 @@
-﻿<UserControl
+<UserControl
     x:Class="ADB_Explorer.Controls.DetailsControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -23,7 +23,7 @@
         <local:AdbMenuItem
             IsCheckable="True"
             IsChecked="{Binding IsChecked, Mode=TwoWay}"
-            Style="{StaticResource WpfUiMenuItem}"
+            Style="{StaticResource AdbMenuItemHoverStyle}"
             ToolTip="{Binding Source={x:Static Member=strings:Resources.S_DETAILS_PANE_TOOLTIP}}">
             <local:AdbMenuItem.Header>
                 <local:SimpleStackPanel Orientation="Horizontal" Spacing="6">

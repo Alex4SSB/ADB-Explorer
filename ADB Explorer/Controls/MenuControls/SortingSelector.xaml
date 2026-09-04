@@ -1,8 +1,9 @@
-﻿<UserControl
+<UserControl
     x:Class="ADB_Explorer.Controls.SortingSelector"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:local="clr-namespace:ADB_Explorer.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
@@ -57,9 +58,18 @@
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding SortDirection}" Value="Ascending">
                                             <Setter Property="FontWeight" Value="Bold" />
-                                            <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+                                            <Setter Property="Foreground" Value="{DynamicResource IconAccentBrush}" />
                                             <Setter Property="FontSize" Value="14" />
                                         </DataTrigger>
+                                        <!--  IconAccentBrush above is a Style Setter with no hover awareness of its own — same IsMenuHighlighted flip as IconAccentGlyphStyle, so the active-direction arrow still reacts to hovering the Sort menu item.  -->
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True" />
+                                                <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}" Value="True" />
+                                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:StyleHelper.IsMenuHighlighted)}" Value="True" />
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Foreground" Value="{DynamicResource MouseOverForeground}" />
+                                        </MultiDataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </ui:FontIcon.Style>
@@ -79,9 +89,18 @@
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding SortDirection}" Value="Descending">
                                             <Setter Property="FontWeight" Value="Bold" />
-                                            <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+                                            <Setter Property="Foreground" Value="{DynamicResource IconAccentBrush}" />
                                             <Setter Property="FontSize" Value="14" />
                                         </DataTrigger>
+                                        <!--  Same hover flip as the ascending arrow above — see its comment.  -->
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True" />
+                                                <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}" Value="True" />
+                                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:StyleHelper.IsMenuHighlighted)}" Value="True" />
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Foreground" Value="{DynamicResource MouseOverForeground}" />
+                                        </MultiDataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </ui:FontIcon.Style>
@@ -95,7 +114,8 @@
                 </local:SimpleStackPanel>
             </local:AdbMenuItem.Header>
             <local:AdbMenuItem.ItemContainerStyle>
-                <Style TargetType="local:AdbMenuItem">
+                <!--  BasedOn=AdbMenuItemStyle so leaf items pick up the Role=SubmenuItem template that pairs Background+Foreground on real IsMouseOver (see AdbMenuItemHoverStyle's comment); without it these items fell back to the native MenuItem template, whose checked-indicator and header text never reacted to actual hover.  -->
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="local:AdbMenuItem">
                     <Setter Property="Icon" Value="{StaticResource ThumbCheckedIcon}" />
                     <Setter Property="Command" Value="{Binding Action.Command}" />
                 </Style>

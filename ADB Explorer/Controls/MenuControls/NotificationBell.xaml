@@ -3,8 +3,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:local="clr-namespace:ADB_Explorer.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     x:Name="Bell"
@@ -22,7 +24,7 @@
                 </Style>
             </local:AdbMenuItem.Style>
             <local:AdbMenuItem.ItemContainerStyle>
-                <Style TargetType="local:AdbMenuItem">
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="local:AdbMenuItem">
                     <Setter Property="Header" Value="{Binding Title}" />
                     <Setter Property="ToolTip" Value="{Binding Tooltip}" />
                     <Setter Property="Command" Value="{Binding Command}" />
@@ -42,27 +44,49 @@
                         Width="16"
                         Height="15"
                         Margin="8,0,0,4"
-                        Background="{DynamicResource SystemFillColorCautionBrush}"
                         BorderBrush="{DynamicResource SolidBackgroundFillColorBaseBrush}"
                         BorderThickness="2"
                         CornerRadius="30">
                         <Border.Style>
                             <Style TargetType="Border">
+                                <Setter Property="Background" Value="{DynamicResource SystemFillColorCautionBrush}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding Notifications.Count}" Value="0">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
+                                    <!--  In HC, the caution-amber badge fill isn't a themed HC color; use the title bar's own color instead, matching the bell body/disk-usage arrows' title-bar-derived coloring.  -->
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource TitleBarBackgroundBrush}" />
+                                    </DataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:StyleHelper.IsMenuHighlighted)}" Value="True" />
+                                            <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Background" Value="{DynamicResource MenuBarItemBackgroundSelected}" />
+                                    </MultiDataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Border.Style>
+                        <!--  Foreground matches the disk-usage body/arrows' own title-bar-derived FG, per the same convention.  -->
                         <TextBlock
                             Margin="0,0,0,1"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             FontSize="11"
                             FontWeight="SemiBold"
-                            Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}"
-                            Text="{Binding Notifications.Count}" />
+                            Text="{Binding Notifications.Count}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{DynamicResource TextOnAccentFillColorPrimaryBrush}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                     </Border>
                 </Grid>
             </local:AdbMenuItem.Header>

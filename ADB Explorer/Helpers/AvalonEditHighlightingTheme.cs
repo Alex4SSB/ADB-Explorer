@@ -1,12 +1,13 @@
+using ADB_Explorer.Services;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Rendering;
-using Wpf.Ui.Appearance;
 
 namespace ADB_Explorer.Helpers;
 
 /// <summary>
-/// AvalonEdit built-in highlighters target a light background. In dark mode, remap
+/// AvalonEdit built-in highlighters target a light background. In dark chrome
+/// (Fluent Dark, or a dark high-contrast theme), remap
 /// foreground/background colors (HSL lightness invert + mild desaturation), matching
 /// the approach used by ILSpy's <c>ThemeManager.GetColorForDarkTheme</c>.
 /// </summary>
@@ -95,7 +96,7 @@ internal sealed class ThemeAwareHighlightingColorizer(IHighlightingDefinition de
 
     protected override void ApplyColorToElement(VisualLineElement element, HighlightingColor color)
     {
-        if (ApplicationThemeManager.GetAppTheme() is ApplicationTheme.Dark)
+        if (AdbThemeService.IsDarkChrome())
             color = GetDarkColor(color);
 
         base.ApplyColorToElement(element, color);

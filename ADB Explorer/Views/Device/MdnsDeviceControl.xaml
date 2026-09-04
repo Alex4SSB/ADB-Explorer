@@ -64,6 +64,7 @@
                             <ui:FontIcon.Style>
                                 <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                                     <Setter Property="FontWeight" Value="Bold" />
+                                    <Setter Property="Foreground" Value="{DynamicResource TextOnAccentFillColorPrimaryBrush}" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="InProgress">
                                             <Setter Property="Glyph" Value="&#xE897;" />
@@ -73,6 +74,9 @@
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="Running">
                                             <Setter Property="Glyph" Value="&#xE73E;" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>

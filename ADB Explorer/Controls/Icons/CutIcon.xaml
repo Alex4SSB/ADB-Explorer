@@ -25,21 +25,8 @@
             <Path
                 d:Fill="#4CC2FF"
                 Data="M11.78 1.07996C12.01 1.23996 12.07 1.54996 11.92 1.77996L9.21 5.84996L8.6 4.93996L11.08 1.21996C11.24 0.98996 11.55 0.92996 11.78 1.07996Z"
-                Stretch="None">
-                <Path.Style>
-                    <Style BasedOn="{StaticResource MonochromeIconPathStyle}" TargetType="Path">
-                        <Setter Property="Fill" Value="{DynamicResource TextFillColorPrimaryBrush}" />
-                        <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="True">
-                                <Setter Property="Fill" Value="{DynamicResource AccentButtonBackground}" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Fill" Value="{DynamicResource TextFillColorDisabledBrush}" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Path.Style>
-            </Path>
+                Stretch="None"
+                Style="{StaticResource IconAccentPathStyle}" />
         </Grid>
     </Viewbox>
 </controls:ScaledPathIcon>

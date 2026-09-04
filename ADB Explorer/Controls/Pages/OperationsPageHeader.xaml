@@ -1,4 +1,4 @@
-﻿<UserControl
+<UserControl
     x:Class="ADB_Explorer.Controls.Pages.OperationsPageHeader"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -458,7 +458,7 @@
         </DataTemplate>
         <Style
             x:Key="FileOpMenuItemStyle"
-            BasedOn="{StaticResource WpfUiMenuItem}"
+            BasedOn="{StaticResource AdbMenuItemHoverStyle}"
             TargetType="local:AdbMenuItem">
             <Setter Property="IsEnabled" Value="{Binding IsEnabled, Mode=OneWay}" />
         </Style>

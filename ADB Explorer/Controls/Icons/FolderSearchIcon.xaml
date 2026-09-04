@@ -27,17 +27,8 @@
             <Path
                 d:Fill="#4CC2FF"
                 Data="M13.5 16C14.2862 16 15.0119 15.7408 15.5962 15.3031L18.1464 17.8535C18.3417 18.0488 18.6583 18.0488 18.8535 17.8535C19.0488 17.6583 19.0488 17.3417 18.8536 17.1464L16.3032 14.596C16.7408 14.0117 17 13.2861 17 12.5C17 10.567 15.433 9 13.5 9C11.567 9 10 10.567 10 12.5C10 14.433 11.567 16 13.5 16ZM13.5 15C12.1193 15 11 13.8807 11 12.5C11 11.1193 12.1193 10 13.5 10C14.8807 10 16 11.1193 16 12.5C16 13.8807 14.8807 15 13.5 15Z"
-                Stretch="None">
-                <Path.Style>
-                    <Style BasedOn="{StaticResource MonochromeIconPathStyle}" TargetType="Path">
-                        <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="True">
-                                <Setter Property="Fill" Value="{DynamicResource AccentButtonBackground}" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Path.Style>
-            </Path>
+                Stretch="None"
+                Style="{StaticResource IconAccentPathStyle}" />
         </Grid>
     </Viewbox>
 </controls:ScaledPathIcon>

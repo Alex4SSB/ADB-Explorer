@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     x:Name="root"
+    Style="{StaticResource MenuHostedIconControlStyle}"
     mc:Ignorable="d">
     <Viewbox
         Width="{Binding Size}"
@@ -62,11 +63,8 @@
                     <RectangleGeometry Rect="0,0,10,24" />
                 </Path.Clip>
                 <Path.Style>
-                    <Style BasedOn="{StaticResource MonochromeIconPathStyle}" TargetType="Path">
+                    <Style BasedOn="{StaticResource IconAccentPathStyle}" TargetType="Path">
                         <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="True">
-                                <Setter Property="Fill" Value="{DynamicResource AccentButtonBackground}" />
-                            </Trigger>
                             <DataTrigger Binding="{Binding Mode}" Value="Preview">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
@@ -102,11 +100,8 @@
                     <RectangleGeometry Rect="0,0,9.5,24" />
                 </Path.Clip>
                 <Path.Style>
-                    <Style BasedOn="{StaticResource MonochromeIconPathStyle}" TargetType="Path">
+                    <Style BasedOn="{StaticResource IconAccentPathStyle}" TargetType="Path">
                         <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="True">
-                                <Setter Property="Fill" Value="{DynamicResource AccentButtonBackground}" />
-                            </Trigger>
                             <DataTrigger Binding="{Binding Mode}" Value="Details">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>

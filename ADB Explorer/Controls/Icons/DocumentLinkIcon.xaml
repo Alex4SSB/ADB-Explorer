@@ -25,19 +25,11 @@
             <Path
                 d:Fill="#4CC2FF"
                 Data="M5.5 19C7.98528 19 10 16.9853 10 14.5C10 12.0147 7.98528 10 5.5 10C3.01472 10 1 12.0147 1 14.5C1 16.9853 3.01472 19 5.5 19ZM7.85353 14.1465C8.04879 14.3418 8.04879 14.6583 7.85353 14.8536C7.65826 15.0489 7.34168 15.0489 7.14642 14.8536L5.99997 13.7072L5.99997 16.5001C5.99997 16.7762 5.77612 17.0001 5.49997 17.0001C5.22383 17.0001 4.99997 16.7762 4.99997 16.5001L4.99997 13.7072L3.85353 14.8536C3.65826 15.0489 3.34168 15.0489 3.14642 14.8536C2.95116 14.6583 2.95116 14.3418 3.14642 14.1465L5.14642 12.1465C5.19436 12.0986 5.24961 12.0624 5.30858 12.038C5.36666 12.0139 5.43027 12.0005 5.49697 12.0001L5.49997 12.0001L5.50297 12.0001C5.56967 12.0005 5.63328 12.0139 5.69136 12.038C5.74947 12.062 5.80396 12.0975 5.8514 12.1444L5.85392 12.1469L7.85353 14.1465Z"
-                Stretch="None">
+                Stretch="None"
+                Style="{StaticResource IconAccentPathStyle}">
                 <Path.RenderTransform>
                     <RotateTransform Angle="45" CenterX="5.5" CenterY="14.5" />
                 </Path.RenderTransform>
-                <Path.Style>
-                    <Style BasedOn="{StaticResource MonochromeIconPathStyle}" TargetType="Path">
-                        <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="True">
-                                <Setter Property="Fill" Value="{DynamicResource AccentButtonBackground}" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Path.Style>
             </Path>
         </Grid>
     </Viewbox>

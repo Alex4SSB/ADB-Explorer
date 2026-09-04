@@ -1,4 +1,4 @@
-﻿<UserControl
+<UserControl
     x:Class="ADB_Explorer.Views.LogicalDeviceControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -22,7 +22,10 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid>
-                    <Grid Width="28" Height="28" ToolTip="{Binding Tooltip}">
+                    <Grid
+                        Width="28"
+                        Height="28"
+                        ToolTip="{Binding Tooltip}">
                         <ContentPresenter
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
@@ -107,7 +110,7 @@
             </Grid.ColumnDefinitions>
             <Border
                 Padding="0,2"
-                BorderBrush="Gray"
+                BorderBrush="{DynamicResource SeparatorForeground}"
                 BorderThickness="1"
                 CornerRadius="4">
                 <controls:AdbMenu>
@@ -186,7 +189,7 @@
                         </Separator>
                         <controls:AdbMenuItem Command="{Binding ToggleRootCommand.Command}">
                             <controls:AdbMenuItem.Style>
-                                <Style BasedOn="{StaticResource WpfUiMenuItem}" TargetType="controls:AdbMenuItem">
+                                <Style BasedOn="{StaticResource AdbMenuItemHoverStyle}" TargetType="controls:AdbMenuItem">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Root}" Value="Forbidden">
                                             <Setter Property="Visibility" Value="Collapsed" />
@@ -228,7 +231,7 @@
                             </CompositeCollection>
                         </controls:AdbMenuItem.ItemsSource>
                         <controls:AdbMenuItem.ItemContainerStyle>
-                            <Style TargetType="MenuItem">
+                            <Style BasedOn="{StaticResource {x:Type MenuItem}}" TargetType="MenuItem">
                                 <Setter Property="Command" Value="{Binding Command}" />
                             </Style>
                         </controls:AdbMenuItem.ItemContainerStyle>

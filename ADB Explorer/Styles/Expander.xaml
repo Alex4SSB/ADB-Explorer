@@ -299,8 +299,8 @@
                                 HorizontalContentAlignment="Stretch"
                                 VerticalContentAlignment="Center"
                                 helpers:ExpanderHelper.ChevronPlacement="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(helpers:ExpanderHelper.ChevronPlacement)}"
-                                helpers:ExpanderHelper.ExpandDirection="{TemplateBinding ExpandDirection}"
                                 helpers:ExpanderHelper.ChevronRotation="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(helpers:ExpanderHelper.ChevronRotation)}"
+                                helpers:ExpanderHelper.ExpandDirection="{TemplateBinding ExpandDirection}"
                                 Content="{TemplateBinding Header}"
                                 FontSize="{TemplateBinding FontSize}"
                                 Foreground="{TemplateBinding Foreground}"
@@ -446,6 +446,7 @@
                             </Setter>
                             <Setter Property="BorderBrush" Value="Transparent" />
                             <Setter TargetName="ContentPresenterBorder" Property="Background" Value="Transparent" />
+                            <Setter TargetName="ContentPresenterBorder" Property="BorderThickness" Value="0" />
                         </Trigger>
                         <Trigger Property="helpers:ExpanderHelper.IsAccentHeader" Value="True">
                             <Setter Property="Background" Value="{DynamicResource AccentButtonBackground}" />
@@ -464,6 +465,16 @@
                                 </Setter.Value>
                             </Setter>
                         </Trigger>
+
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ElementName=ExpanderToggleButton, Path=IsMouseOver}" Value="True" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsTransparent)}" Value="True" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="BorderBrush" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+                        </MultiDataTrigger>
+
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition SourceName="ExpanderToggleButton" Property="IsMouseOver" Value="True" />

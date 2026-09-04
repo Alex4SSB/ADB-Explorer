@@ -95,6 +95,45 @@ public static class StyleHelper
             typeof(StyleHelper),
             null);
 
+    public static bool GetIsMenuHighlighted(UIElement control) =>
+        (bool)control.GetValue(IsMenuHighlightedProperty);
+
+    public static void SetIsMenuHighlighted(UIElement control, bool value) =>
+        control.SetValue(IsMenuHighlightedProperty, value);
+
+    public static readonly DependencyProperty IsMenuHighlightedProperty =
+        DependencyProperty.RegisterAttached(
+            "IsMenuHighlighted",
+            typeof(bool),
+            typeof(StyleHelper),
+            new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.Inherits));
+
+    public static Brush GetMenuItemForeground(UIElement control) =>
+        (Brush)control.GetValue(MenuItemForegroundProperty);
+
+    public static void SetMenuItemForeground(UIElement control, Brush value) =>
+        control.SetValue(MenuItemForegroundProperty, value);
+
+    public static readonly DependencyProperty MenuItemForegroundProperty =
+        DependencyProperty.RegisterAttached(
+            "MenuItemForeground",
+            typeof(Brush),
+            typeof(StyleHelper),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Inherits));
+
+    public static bool GetShowInputGestures(UIElement control) =>
+        (bool)control.GetValue(ShowInputGesturesProperty);
+
+    public static void SetShowInputGestures(UIElement control, bool value) =>
+        control.SetValue(ShowInputGesturesProperty, value);
+
+    public static readonly DependencyProperty ShowInputGesturesProperty =
+        DependencyProperty.RegisterAttached(
+            "ShowInputGestures",
+            typeof(bool),
+            typeof(StyleHelper),
+            new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.Inherits));
+
     public static bool GetEnableSelection(UIElement control) =>
         (bool)control.GetValue(EnableSelectionProperty);
 

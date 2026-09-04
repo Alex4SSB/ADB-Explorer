@@ -12,4 +12,6 @@
 
     <SolidColorBrush x:Key="EditorTextChangedBrush">#FFFCCB58</SolidColorBrush>
 
+    <SolidColorBrush x:Key="ValidationErrorBorderBrush" Color="Red" />
+
 </ResourceDictionary>

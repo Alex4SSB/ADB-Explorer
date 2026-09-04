@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels.Windows;
@@ -9,6 +9,7 @@ namespace ADB_Explorer.ViewModels.Pages;
 public partial class SettingsViewModel : ObservableObject, INavigationAware
 {
     private bool _isInitialized = false;
+    private bool _themeApplyQueued;
 
     [ObservableProperty]
     public partial ICollectionView SettingsList { get; set; }
@@ -41,14 +42,37 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
 
     public Task OnNavigatedFromAsync() => Task.CompletedTask;
 
+    /// <summary>
+    /// Apply theme after the settings ComboBox finishes closing. Replacing resource
+    /// dictionaries while its popup is open stalls the UI thread with no exception.
+    /// </summary>
+    private void QueueThemeApply()
+    {
+        if (_themeApplyQueued)
+            return;
+
+        _themeApplyQueued = true;
+        App.SafeBeginInvoke(() =>
+        {
+            try
+            {
+                AdbThemeService.SetTheme(Data.Settings.Theme);
+                AdbThemeService.SetAccent(Data.Settings.UseCustomAccent ? Data.Settings.AccentColor : null);
+            }
+            finally
+            {
+                _themeApplyQueued = false;
+            }
+        }, DispatcherPriority.ApplicationIdle);
+    }
+
     private void InitializeViewModel()
     {
         Data.Settings.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName is nameof(AppSettings.Theme) or nameof(AppSettings.UseCustomAccent))
             {
-                AdbThemeService.SetTheme(Data.Settings.Theme);
-                AdbThemeService.SetAccent(Data.Settings.UseCustomAccent ? Data.Settings.AccentColor : null);
+                QueueThemeApply();
             }
             else if (e.PropertyName is nameof(AppSettings.AccentColor) && Data.Settings.UseCustomAccent)
             {

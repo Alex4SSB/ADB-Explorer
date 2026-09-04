@@ -74,7 +74,8 @@
                 </local:SimpleStackPanel>
             </local:AdbMenuItem.Header>
             <local:AdbMenuItem.ItemContainerStyle>
-                <Style TargetType="local:AdbMenuItem">
+                <!--  BasedOn=AdbMenuItemStyle so leaf items pick up the Role=SubmenuItem template that pairs Background+Foreground on real IsMouseOver (see AdbMenuItemHoverStyle's comment); without it these items fell back to the native MenuItem template, whose checked-indicator and header text never reacted to actual hover.  -->
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="local:AdbMenuItem">
                     <Setter Property="Icon" Value="{StaticResource ThumbCheckedIcon}" />
                     <Setter Property="Command" Value="{Binding Action.Command}" />
                     <Setter Property="ToolTip" Value="{StaticResource InfoTooltip}" />
@@ -102,8 +103,8 @@
                 <local:SimpleStackPanel Orientation="Horizontal" Spacing="6">
                     <ui:FontIcon
                         FontSize="22"
-                        Foreground="{DynamicResource AccentButtonBackground}"
-                        Glyph="&#xE947;" />
+                        Glyph="&#xE947;"
+                        Style="{StaticResource IconAccentGlyphStyle}" />
                     <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_EXIT_SEARCH}}" />
                 </local:SimpleStackPanel>
             </local:AdbMenuItem.Header>

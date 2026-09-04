@@ -373,3 +373,4 @@ FodyWeavers.xsd
 ADB Explorer/FaroCollector.url
 scripts/.grafana-token
 crashes/
+/CLAUDE.md

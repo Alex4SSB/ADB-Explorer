@@ -1,4 +1,4 @@
-﻿<ResourceDictionary
+<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:app_prop="clr-namespace:ADB_Explorer.Properties"
@@ -31,6 +31,24 @@
         BasedOn="{StaticResource {x:Type ProgressBar}}"
         TargetType="ProgressBar">
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
+        <!--
+            HC-only track outline. The unfilled track itself stays Transparent (ProgressBarBackground
+            is redirected to Transparent in Themes/HighContrast.xaml), so without a border it's
+            invisible against the page background - this Trigger (tier 5) wins over any derived
+            style's own plain BorderBrush/BorderThickness Setters (tier 7, e.g.
+            ExpanderHeaderProgressBarStyle's Transparent/"0,1" pair) regardless of BasedOn depth, so
+            every ProgressBar in the app picks it up from this one place. SystemColorButtonTextBrush is
+            the same idle control-chrome color already used for idle button FG/border, idle
+            CardControl FG/border, and scrollbars, so the outline matches those (e.g. yellow in Night
+            Sky) instead of WindowText (SelectedMouseOverBackground) or the selection Highlight
+            (SelectedBackground), neither of which is that color.
+        -->
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True">
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderBrush" Value="{DynamicResource SystemColorButtonTextBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style x:Key="FluentProgressRingStyle" TargetType="ui:ProgressRing" />
     <Style x:Key="MenuStyle" TargetType="Menu">
@@ -68,7 +86,7 @@
         TargetType="ToolTip">
         <Setter Property="Visibility" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=PlacementTarget, Converter={StaticResource OverflowsTreeTooltip}}" />
         <Setter Property="FlowDirection" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=PlacementTarget.FlowDirection}" />
-        <Setter Property="MaxWidth" Value="800"/>
+        <Setter Property="MaxWidth" Value="800" />
     </Style>
     <Style
         x:Key="TooltipTextBoxStyle"
@@ -104,7 +122,7 @@
         TargetType="TextBlock">
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="Gray" />
+                <Setter Property="Foreground" Value="{DynamicResource TextFillColorDisabledBrush}" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -121,6 +139,11 @@
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
         <Setter Property="Opacity" Value="1" />
         <Setter Property="HorizontalAlignment" Value="Left" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="DirectoryGridCellStyle"
@@ -136,6 +159,9 @@
             <DataTrigger Binding="{Binding CutState}" Value="Copy">
                 <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
             </DataTrigger>
+            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
+            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style
@@ -148,11 +174,16 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type DataGridCell}">
                     <Grid Margin="0" Background="{TemplateBinding Background}">
-                        <ContentPresenter VerticalAlignment="Center" />
+                        <ContentPresenter VerticalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
     <Style x:Key="ExplorerViewBackgroundStyle" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource ControlBackground}" />
@@ -301,6 +332,9 @@
                             </DataTrigger>
                             <DataTrigger Binding="{Binding CutState}" Value="Move">
                                 <Setter Property="Opacity" Value="0.5" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
@@ -610,24 +644,35 @@
                             x:Name="Border"
                             Background="{TemplateBinding Background}"
                             CornerRadius="3">
-                            <ContentPresenter Margin="{TemplateBinding Padding}" />
+                            <ContentPresenter Margin="{TemplateBinding Padding}" TextElement.Foreground="{TemplateBinding Foreground}" />
                         </Border>
                     </Border>
                     <ControlTemplate.Triggers>
                         <DataTrigger Binding="{Binding FolderViewModel.IsDragOver}" Value="True">
-                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource ListViewItemBackgroundPointerOver}" />
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource MouseOverBackground}" />
+                            <Setter TargetName="SelectionBorder" Property="BorderBrush" Value="{DynamicResource MouseOverBorderBrush}" />
                         </DataTrigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsEnabled" Value="True" />
                                 <Condition Property="IsMouseOver" Value="True" />
                             </MultiTrigger.Conditions>
-                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource ListViewItemBackgroundPointerOver}" />
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource MouseOverBackground}" />
+                            <Setter TargetName="SelectionBorder" Property="BorderBrush" Value="{DynamicResource MouseOverBorderBrush}" />
                         </MultiTrigger>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="SelectionBorder" Property="BorderBrush" Value="{DynamicResource ListViewItemPillFillBrush}" />
-                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource ListViewItemBackgroundPointerOver}" />
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource SelectedBackground}" />
+                            <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
                         </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsSelected" Value="True" />
+                                <Condition Property="IsMouseOver" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource SelectedMouseOverBackground}" />
+                            <Setter Property="Foreground" Value="{DynamicResource SelectedMouseOverForeground}" />
+                        </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

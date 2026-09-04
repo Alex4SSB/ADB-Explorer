@@ -1,11 +1,11 @@
-﻿<UserControl
+<UserControl
     x:Class="ADB_Explorer.Controls.NavigationPane"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:ADB_Explorer.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
@@ -153,8 +153,8 @@
                                                         HorizontalAlignment="Center"
                                                         VerticalAlignment="Center"
                                                         helpers:ExpanderHelper.ChevronPlacement="Left"
-                                                        helpers:ExpanderHelper.ExpandDirection="Right"
                                                         helpers:ExpanderHelper.ChevronRotation="CW90"
+                                                        helpers:ExpanderHelper.ExpandDirection="Right"
                                                         ClickMode="Press"
                                                         Focusable="False"
                                                         Foreground="{TemplateBinding Foreground}"
@@ -189,6 +189,15 @@
                                                 IsHitTestVisible="False"
                                                 SnapsToDevicePixels="True"
                                                 Visibility="Collapsed" />
+                                            <Border
+                                                x:Name="HoverChrome"
+                                                Grid.Row="0"
+                                                BorderBrush="{DynamicResource MouseOverBorderBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="2"
+                                                IsHitTestVisible="False"
+                                                SnapsToDevicePixels="True"
+                                                Visibility="Collapsed" />
                                             <Separator
                                                 x:Name="DeviceSeparator"
                                                 Grid.Row="2"
@@ -208,10 +217,16 @@
                                             </Trigger>
                                             <Trigger SourceName="Border" Property="IsMouseOver" Value="True">
                                                 <Setter TargetName="Border" Property="Background" Value="{DynamicResource TreeViewItemBackgroundPointerOver}" />
+                                                <Setter TargetName="HoverChrome" Property="Visibility" Value="Visible" />
                                             </Trigger>
                                             <Trigger Property="IsSelected" Value="True">
                                                 <Setter TargetName="Border" Property="Background" Value="{DynamicResource TreeViewItemBackgroundSelected}" />
                                                 <Setter TargetName="ActiveRectangle" Property="Visibility" Value="Visible" />
+                                                <!--  No-op outside HC: SelectedForeground equals the normal text color there, same as an explorer row.  -->
+                                                <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
+                                                <!--  Selected item shows ActiveRectangle on the left edge; trim the chrome outlines so they don't overlap it.  -->
+                                                <Setter TargetName="FocusChrome" Property="BorderThickness" Value="0,1,1,1" />
+                                                <Setter TargetName="HoverChrome" Property="BorderThickness" Value="0,1,1,1" />
                                             </Trigger>
                                             <DataTrigger Binding="{Binding IsDragOver}" Value="True">
                                                 <Setter TargetName="Border" Property="Background" Value="{DynamicResource TreeViewItemBackgroundPointerOver}" />
@@ -220,6 +235,13 @@
                                                 <Setter TargetName="Border" Property="Background" Value="{DynamicResource TreeViewItemBackgroundPointerOver}" />
                                                 <Setter TargetName="FocusChrome" Property="Visibility" Value="Visible" />
                                             </DataTrigger>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsSelected}" Value="True" />
+                                                    <Condition Binding="{Binding IsContextTarget}" Value="True" />
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+                                            </MultiDataTrigger>
                                             <DataTrigger Binding="{Binding IsDragSource}" Value="True">
                                                 <Setter TargetName="FocusChrome" Property="Visibility" Value="Visible" />
                                             </DataTrigger>

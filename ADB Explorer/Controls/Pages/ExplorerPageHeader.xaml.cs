@@ -36,7 +36,7 @@ public partial class ExplorerPageHeader : UserControl
 
     /// <summary>
     /// True after a toolbar submenu closed while the left button was still down —
-    /// the dismiss click should not start rubber-band selection.
+    /// the dismiss click should not start rubber-band selection (it may still unselect).
     /// </summary>
     private bool _suppressSelectionAfterMenu;
 
@@ -165,7 +165,7 @@ public partial class ExplorerPageHeader : UserControl
     {
         SelectionRect.ResetGesture();
 
-        MouseDownPoint = SuppressExplorerSelection
+        MouseDownPoint = SuppressExplorerMarquee
             ? NullPoint
             : e.GetPosition(SelectionRect);
 
@@ -211,8 +211,18 @@ public partial class ExplorerPageHeader : UserControl
         SelectionRect.Update(point, MouseDownPoint, scroller, ActiveView, ActiveSelectedItems, ViewModel);
     }
 
-    private bool SuppressExplorerSelection =>
+    /// <summary>
+    /// Skip rubber-band / file drag from this click (open menu, or the click that just closed one).
+    /// </summary>
+    private bool SuppressExplorerMarquee =>
         ViewModel.IsMenuOpen || _toolbarSubmenuDepth > 0 || _suppressSelectionAfterMenu;
+
+    /// <summary>
+    /// Skip clearing selection only while the explorer context menu is open.
+    /// Toolbar submenu dismiss is handled by <see cref="SuppressExplorerMarquee"/> so
+    /// empty-space unselect still runs on that click.
+    /// </summary>
+    private bool SuppressExplorerUnselect => ViewModel.IsMenuOpen;
 
     private void HookToolbarMenu(AdbMenu? menu)
     {
@@ -228,10 +238,21 @@ public partial class ExplorerPageHeader : UserControl
     private void OnToolbarSubmenuClosed(object sender, RoutedEventArgs e)
     {
         _toolbarSubmenuDepth = Math.Max(0, _toolbarSubmenuDepth - 1);
+        if (_toolbarSubmenuDepth != 0)
+            return;
+
+        CancelExplorerMarquee();
 
         // Outside click dismisses with the button still down; Escape does not.
-        if (_toolbarSubmenuDepth == 0 && Mouse.LeftButton is MouseButtonState.Pressed)
+        if (Mouse.LeftButton is MouseButtonState.Pressed)
             _suppressSelectionAfterMenu = true;
+    }
+
+    private void CancelExplorerMarquee()
+    {
+        MouseDownPoint = NullPoint;
+        CopyPaste.DragStatus = CopyPasteService.DragState.None;
+        SelectionRect.Collapse();
     }
 
     private double? RowHeight { get; set; }
@@ -1950,7 +1971,7 @@ public partial class ExplorerPageHeader : UserControl
             if (ExplorerGrid.SelectedItems.Count > 0 && IsInEditMode)
                 IsInEditMode = false;
 
-            if ((e.ChangedButton is MouseButton.Right || !SuppressExplorerSelection)
+            if ((e.ChangedButton is MouseButton.Right || !SuppressExplorerUnselect)
                 && Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
             {
                 ClearDataItemSelectionFlags();
@@ -1989,7 +2010,7 @@ public partial class ExplorerPageHeader : UserControl
             || !RuntimeSettings.IsExplorerLoaded
             || MouseDownPoint == NullPoint
             || withinEditingCell
-            || SuppressExplorerSelection
+            || SuppressExplorerMarquee
             || (!SelectionRect.IsActive && HitTestHelper.IsInScrollBar(e.OriginalSource as DependencyObject));
 
         TryBeginExplorerDragOrMarquee(point, abortDrag, ExplorerScrollViewer, cell);
@@ -2339,6 +2360,28 @@ public partial class ExplorerPageHeader : UserControl
         RaiseUnfocusSearchBox();
     }
 
+    private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton is not MouseButton.Left)
+            return;
+
+        // Tunneling: run before UnselectAll so a nested MouseMove cannot start a rubber-band
+        // from a stale down-point (item that was selected when the menu opened).
+        if (_toolbarSubmenuDepth > 0 || _suppressSelectionAfterMenu)
+        {
+            _suppressSelectionAfterMenu = true;
+            CancelExplorerMarquee();
+        }
+    }
+
+    private void Window_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton is not MouseButton.Left)
+            return;
+
+        EndExplorerMouseGesture();
+    }
+
     private void Window_MouseDown(object sender, MouseButtonEventArgs e)
     {
         PathBoxFocus(false);
@@ -2353,7 +2396,7 @@ public partial class ExplorerPageHeader : UserControl
         MouseDownPoint = NullPoint;
     }
 
-    private void Window_MouseUp(object sender, MouseButtonEventArgs e)
+    private void EndExplorerMouseGesture()
     {
         if (SelectionRect.IsActive)
             SelectionRect.Collapse();
@@ -2361,6 +2404,11 @@ public partial class ExplorerPageHeader : UserControl
         MouseDownPoint = NullPoint;
         CopyPaste.WasDragging = false;
         _suppressSelectionAfterMenu = false;
+    }
+
+    private void Window_MouseUp(object sender, MouseButtonEventArgs e)
+    {
+        EndExplorerMouseGesture();
 
         if (FileActions.ListingInProgress && e.ChangedButton is MouseButton.XButton1 or MouseButton.XButton2)
         {
@@ -2446,7 +2494,7 @@ public partial class ExplorerPageHeader : UserControl
             if (IconView.SelectedItems.Count > 0 && IsInEditMode)
                 IsInEditMode = false;
 
-            if ((e.ChangedButton is MouseButton.Right || !SuppressExplorerSelection)
+            if ((e.ChangedButton is MouseButton.Right || !SuppressExplorerUnselect)
                 && Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
             {
                 ClearDataItemSelectionFlags();
@@ -2486,7 +2534,7 @@ public partial class ExplorerPageHeader : UserControl
         var abortDrag = e.LeftButton == MouseButtonState.Released
             || !RuntimeSettings.IsExplorerLoaded
             || MouseDownPoint == NullPoint
-            || SuppressExplorerSelection
+            || SuppressExplorerMarquee
             || (!SelectionRect.IsActive && HitTestHelper.IsInScrollBar(e.OriginalSource as DependencyObject));
 
         DependencyObject dragSource = IconView;

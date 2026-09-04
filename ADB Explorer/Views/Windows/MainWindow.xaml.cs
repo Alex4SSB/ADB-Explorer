@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Controls.Pages;
+using ADB_Explorer.Controls.Pages;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
@@ -8,7 +8,6 @@ using ADB_Explorer.ViewModels.Windows;
 using ADB_Explorer.Views.Pages;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
-using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
 namespace ADB_Explorer.Views.Windows;
@@ -75,8 +74,7 @@ public partial class MainWindow : INavigationWindow
 
     private async void Initialize()
     {
-        SystemThemeWatcher.Watch(this);
-        AdbThemeService.SetTheme(Data.Settings.Theme);
+        AdbThemeService.SetTheme(Data.Settings.Theme, this);
         AdbThemeService.SetAccent(Data.Settings.UseCustomAccent ? Data.Settings.AccentColor : null);
 
         ADBService.IsMdnsEnabled = Data.Settings.EnableMdns;

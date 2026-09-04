@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Highlighting;
@@ -123,7 +123,12 @@ public partial class AdbAvalonEditor : UserControl
         Unloaded += AvalonEditor_Unloaded;
 
         ApplyEditorTheme(ApplicationThemeManager.GetAppTheme());
-        ApplicationThemeManager.Changed += (_, _) => ApplyEditorTheme(ApplicationThemeManager.GetAppTheme());
+        // Changed can fire synchronously from a system theme-change message hook; defer so
+        // this (and every other open editor's) handler never blocks that message pump.
+        ApplicationThemeManager.Changed += (_, _) => App.SafeBeginInvoke(() =>
+        {
+            ApplyEditorTheme(ApplicationThemeManager.GetAppTheme());
+        });
     }
 
     public void SetSyntaxHighlighting(IHighlightingDefinition? definition)
@@ -131,10 +136,18 @@ public partial class AdbAvalonEditor : UserControl
 
     private void ApplyEditorTheme(ApplicationTheme theme)
     {
-        bool isDark = theme == ApplicationTheme.Dark;
-        EditorTextBox.TextArea.SelectionBrush = new SolidColorBrush(
-            isDark ? Color.FromArgb(0x7F, 0x77, 0x77, 0x77) : Color.FromArgb(0xFF, 0xCC, 0xE8, 0xFF));
-        EditorTextBox.TextArea.SelectionForeground = null;
+        if (theme == ApplicationTheme.HighContrast)
+        {
+            EditorTextBox.TextArea.SelectionBrush = new SolidColorBrush(SystemColors.HighlightColor);
+            EditorTextBox.TextArea.SelectionForeground = new SolidColorBrush(SystemColors.HighlightTextColor);
+        }
+        else
+        {
+            bool isDark = theme == ApplicationTheme.Dark;
+            EditorTextBox.TextArea.SelectionBrush = new SolidColorBrush(
+                isDark ? Color.FromArgb(0x7F, 0x77, 0x77, 0x77) : Color.FromArgb(0xFF, 0xCC, 0xE8, 0xFF));
+            EditorTextBox.TextArea.SelectionForeground = null;
+        }
 
         // ThemeAwareHighlightingColorizer reads the theme per paint; force a redraw.
         EditorTextBox.TextArea.TextView.Redraw();

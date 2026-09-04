@@ -99,6 +99,7 @@
                         Margin="0,0,0,0"
                         d:Foreground="White"
                         FontSize="24"
+                        Foreground="{DynamicResource SelectedForeground}"
                         Glyph="&#xE965;" />
                     <Grid Margin="0,-10,-10,0" d:Visibility="Hidden">
                         <Grid.Style>
@@ -155,15 +156,19 @@
                             d:Fill="#4CC2FF"
                             d:Stroke="#4CC2FF"
                             Data="M6.78633 1.45866C6.43733 0.847113 5.56266 0.847113 5.21367 1.45866L1.12237 8.62781C0.774094 9.23809 1.2107 10 1.9087 10H1.9365L1.94138 10H10.0576L10.0625 10H10.0913C10.7893 10 11.2259 9.23809 10.8776 8.62781L6.78633 1.45866Z"
-                            Fill="{DynamicResource AccentButtonBackground}"
                             Stretch="Uniform"
-                            Stroke="{DynamicResource AccentButtonBackground}"
                             StrokeThickness="1">
                             <Path.Style>
                                 <Style TargetType="Path">
+                                    <Setter Property="Fill" Value="{DynamicResource AccentButtonBackground}" />
+                                    <Setter Property="Stroke" Value="{DynamicResource AccentButtonBackground}" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsUpVisible, ElementName=transferIndicator}" Value="False">
                                             <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True">
+                                            <Setter Property="Fill" Value="{DynamicResource SelectedForeground}" />
+                                            <Setter Property="Stroke" Value="{DynamicResource SelectedForeground}" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -203,15 +208,19 @@
                             d:Fill="#4CC2FF"
                             d:Stroke="#4CC2FF"
                             Data="M5.21367 10.5414C5.56266 11.1529 6.43733 11.1529 6.78633 10.5414L10.8776 3.37221C11.2259 2.76192 10.7893 2.00001 10.0913 2.00001L10.0635 2.00001L10.0586 2L1.94235 2L1.93748 2.00001L1.9087 2.00001C1.21071 2.00001 0.774094 2.76192 1.12237 3.3722L5.21367 10.5414Z"
-                            Fill="{DynamicResource AccentButtonBackground}"
                             Stretch="Uniform"
-                            Stroke="{DynamicResource AccentButtonBackground}"
                             StrokeThickness="1">
                             <Path.Style>
                                 <Style TargetType="Path">
+                                    <Setter Property="Fill" Value="{DynamicResource AccentButtonBackground}" />
+                                    <Setter Property="Stroke" Value="{DynamicResource AccentButtonBackground}" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsDownVisible, ElementName=transferIndicator}" Value="False">
                                             <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True">
+                                            <Setter Property="Fill" Value="{DynamicResource SelectedForeground}" />
+                                            <Setter Property="Stroke" Value="{DynamicResource SelectedForeground}" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>

@@ -64,6 +64,9 @@ public partial class AppRuntimeSettings : ViewModelBase
         }
     }
 
+    [ObservableProperty]
+    public partial bool IsHighContrast { get; set; }
+
     public bool IsDebug
     {
         get

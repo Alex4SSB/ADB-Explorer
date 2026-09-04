@@ -21,17 +21,8 @@
             <Path
                 d:Fill="#4CC2FF"
                 Data="M16.9912 7.76074C17.6084 8.31022 17.999 9.10865 17.999 10V12C17.999 14.7614 15.7604 17 12.999 17H6.99902C6.1072 17 5.30731 16.6099 4.75781 15.9922C4.83762 15.9969 4.91802 16 4.99902 16H12.999C15.2082 16 16.999 14.2091 16.999 12V8C16.999 7.91966 16.9959 7.83991 16.9912 7.76074Z"
-                Stretch="None">
-                <Path.Style>
-                    <Style BasedOn="{StaticResource MonochromeIconPathStyle}" TargetType="Path">
-                        <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="True">
-                                <Setter Property="Fill" Value="{DynamicResource AccentButtonBackground}" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Path.Style>
-            </Path>
+                Stretch="None"
+                Style="{StaticResource IconAccentPathStyle}" />
             <!--  Front folder (monochrome)  -->
             <Path
                 d:Fill="White"

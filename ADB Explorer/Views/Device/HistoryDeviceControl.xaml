@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
@@ -46,7 +47,10 @@
                         <ColumnDefinition />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <Grid Width="28" Height="28" ToolTip="{Binding Tooltip}">
+                    <Grid
+                        Width="28"
+                        Height="28"
+                        ToolTip="{Binding Tooltip}">
                         <ContentPresenter
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
@@ -74,17 +78,10 @@
                     </TextBlock>
                     <ui:Button
                         Grid.Column="2"
-                        Appearance="Caution"
                         Command="{Binding RemoveCommand.Command}"
-                        Style="{StaticResource RestartAppButtonStyle}"
+                        Style="{StaticResource DeviceIconActionButtonStyle}"
                         ToolTip="{Binding Source={x:Static Member=strings:Resources.S_REM_HIST_DEV}}">
-                        <ui:FontIcon Glyph="&#xE74D;">
-                            <ui:FontIcon.Style>
-                                <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
-                                    <Setter Property="Foreground" Value="Black" />
-                                </Style>
-                            </ui:FontIcon.Style>
-                        </ui:FontIcon>
+                        <ui:FontIcon Glyph="&#xE74D;" />
                     </ui:Button>
                 </Grid>
             </Border>

@@ -73,7 +73,7 @@ public static partial class ApkIconService
 
     private static BitmapSource? TryApplyThemeContrastPlate(SKBitmap sk, bool isDarkInk)
     {
-        var appIsDark = ApplicationThemeManager.GetAppTheme() == ApplicationTheme.Dark;
+        var appIsDark = AdbThemeService.IsDarkChrome();
         SKColor? plate = null;
         if (isDarkInk && appIsDark)
             plate = SKColors.White;
@@ -173,8 +173,8 @@ public static partial class ApkIconService
         if (veil > clear)
             return false;
 
-        var appIsDark = ApplicationThemeManager.GetAppTheme() == ApplicationTheme.Dark;
-        SKColor viewBg;
+        var appIsDark = AdbThemeService.IsDarkChrome();
+        var viewBg = GetIconViewBackground();
         if (appIsDark)
         {
             if (darkNeutral == 0 || darkNeutral * DominantInkDenominator < ink * DominantInkNumerator)
@@ -184,11 +184,10 @@ public static partial class ApkIconService
                 (byte)(darkR / darkNeutral),
                 (byte)(darkG / darkNeutral),
                 (byte)(darkB / darkNeutral));
-            if (!IsTooSimilarToIconViewBackground(prevalent, IconViewBackgroundDark))
+            if (!IsTooSimilarToIconViewBackground(prevalent, viewBg))
                 return false;
 
             isDarkInk = true;
-            viewBg = IconViewBackgroundDark;
         }
         else
         {
@@ -199,11 +198,10 @@ public static partial class ApkIconService
                 (byte)(lightR / lightNeutral),
                 (byte)(lightG / lightNeutral),
                 (byte)(lightB / lightNeutral));
-            if (!IsTooSimilarToIconViewBackground(lightPrevalent, IconViewBackgroundLight))
+            if (!IsTooSimilarToIconViewBackground(lightPrevalent, viewBg))
                 return false;
 
             isDarkInk = false;
-            viewBg = IconViewBackgroundLight;
         }
 
         if (IsFilledRegularOccupant(buffer, w, h, stride))
@@ -724,6 +722,23 @@ public static partial class ApkIconService
         {
             return null;
         }
+    }
+
+    private static SKColor GetIconViewBackground()
+    {
+        if (ApplicationThemeManager.GetAppTheme() == ApplicationTheme.HighContrast)
+        {
+            if (Application.Current?.TryFindResource("ApplicationBackgroundColor") is Color window)
+                return new SKColor(window.R, window.G, window.B);
+
+            var sys = SystemColors.WindowColor;
+            return new SKColor(sys.R, sys.G, sys.B);
+        }
+
+        if (AdbThemeService.IsDarkChrome())
+            return IconViewBackgroundDark;
+
+        return IconViewBackgroundLight;
     }
 
     private static readonly SKColor IconViewBackgroundDark = new(0x27, 0x27, 0x27);

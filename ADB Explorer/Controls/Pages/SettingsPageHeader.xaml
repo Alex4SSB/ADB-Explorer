@@ -116,6 +116,14 @@
                 <DataTrigger Binding="{Binding Info}" Value="{x:Null}">
                     <Setter Property="ToolTip" Value="{x:Null}" />
                 </DataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="{DynamicResource CardBackgroundPointerOver}" />
+                    <Setter Property="Foreground" Value="{DynamicResource CardForegroundPointerOver}" />
+                </MultiDataTrigger>
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Background" Value="{DynamicResource CardBackgroundDisabled}" />
                     <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrushDisabled}" />
@@ -129,6 +137,17 @@
             TargetType="ui:CardExpander">
             <Setter Property="Icon" Value="{Binding IconContent}" />
             <Setter Property="Header" Value="{StaticResource SettingsCardHeader}" />
+            <Style.Triggers>
+                <!--  Same HC-only hover fix as SettingsCardHeaderStyle above; CardExpander's header row is TemplateBound to Background/Foreground the same way CardControl's is.  -->
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="{DynamicResource CardBackgroundPointerOver}" />
+                    <Setter Property="Foreground" Value="{DynamicResource CardForegroundPointerOver}" />
+                </MultiDataTrigger>
+            </Style.Triggers>
         </Style>
         <Style
             x:Key="SettingsCardActionStyle"
@@ -597,9 +616,28 @@
                         Grid.Column="2"
                         Margin="8,4,4,4"
                         Padding="8,4"
-                        Appearance="Danger"
                         Command="{Binding ResetSettingsCommand}"
                         ToolTip="{Binding Source={x:Static Member=strings:Resources.S_RESET_SETTINGS_TITLE}}">
+                        <ui:Button.Style>
+                            <Style BasedOn="{StaticResource {x:Type ui:Button}}" TargetType="ui:Button">
+                                <Setter Property="Appearance" Value="Danger" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True">
+                                        <Setter Property="Appearance" Value="Secondary" />
+                                        <Setter Property="Background" Value="{DynamicResource TitleBarBackgroundBrush}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource TitleBarForegroundBrush}" />
+                                    </DataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True" />
+                                            <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Background" Value="{DynamicResource TitleBarForegroundBrush}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource TitleBarBackgroundBrush}" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
                         <Path
                             Width="24"
                             Height="24"
