@@ -112,16 +112,6 @@ public class FilePath : AbstractFile, IBaseFile
         get
         {
             var noExtName = NoExtName;
-            // Display RTL names correctly in LTR mode.
-            // Add RTL mark to end of RTL file names with LTR extensions.
-            // This prevents numbers and punctuation from breaking the RTL ordering.
-            if (!Data.RuntimeSettings.IsRTL
-                && NameIsRtl
-                && NoExtName[^1] != TextHelper.RTL_MARK
-                && !ExtensionIsRtl)
-            {
-                noExtName = $"{NoExtName}{TextHelper.RTL_MARK}";
-            }
             return Data.Settings.ShowExtensions ? $"{noExtName}{Extension}" : noExtName;
         }
     }
