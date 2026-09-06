@@ -671,7 +671,7 @@ public class ColorSetting : AbstractSetting
     {
         PickColorCommand = new AsyncRelayCommand(async () =>
         {
-            var panel = new Controls.ColorPicker.ColorPickerPanel
+            var panel = new ColorPickerPanel
             {
                 SelectedColor = PickerColor
             };

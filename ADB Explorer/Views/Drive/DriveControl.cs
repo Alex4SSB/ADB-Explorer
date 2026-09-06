@@ -13,7 +13,13 @@ public class DriveControl : UserControl
     protected void Card_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         if (sender is FrameworkElement { DataContext: DriveViewModel drive })
+        {
             drive.BrowseCommand.Execute();
+            // Navigating can synchronously swap the drive view out for the Explorer grid/icon
+            // view at this same screen position; stop this gesture here so it isn't reinterpreted
+            // as a click on whatever is now underneath the pointer.
+            e.Handled = true;
+        }
     }
 
     protected void Card_KeyUp(object sender, KeyEventArgs e)

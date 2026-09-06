@@ -13,7 +13,7 @@ public partial class FileIconViewModel : FileViewModelBase
     private ThumbnailService.ThumbnailSize _cachedSize;
     private ThumbnailService.ThumbnailSize _currentlyLoadingSize;
 
-    private BitmapSource LargeFileIcon => FileToIconConverter.GetImage(_file, (int)((int)Data.RuntimeSettings.ThumbsSize / Data.RuntimeSettings.MainWindowScalingFactor)).First();
+    private BitmapSource LargeFileIcon => FileToIconConverter.GetImage(_file, (int)(ThumbnailService.GetPixelSize(Data.RuntimeSettings.ThumbsSize) / Data.RuntimeSettings.MainWindowScalingFactor)).First();
     public BitmapSource? LargeIcon
     {
         get
@@ -196,7 +196,7 @@ public partial class FileIconViewModel : FileViewModelBase
         OnPropertyChanged(nameof(LargeIcon));
         UpdateVideoOverlay(thumb);
         UpdateTooltip(thumb);
-        ThumbnailService.ApplyPaneThumbnail(_file, thumb);
+        ThumbnailService.ApplyPaneThumbnail(_file, thumb, size);
     }
 
     private void UpdateVideoOverlay(ThumbnailService.Thumbnail thumb)

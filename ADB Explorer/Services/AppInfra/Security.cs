@@ -23,7 +23,12 @@ public static class Security
             if (!NativeMethods.WinTrust.VerifyEmbeddedSignature(filePath))
                 return false;
 
+            // CreateFromSignedFile extracts the embedded Authenticode signer cert from a signed
+            // PE file; X509CertificateLoader (the SYSLIB0057 replacement) only loads PEM/DER/PFX
+            // data and has no equivalent for that, so there's no non-obsolete API to switch to.
+#pragma warning disable SYSLIB0057
             using var cert = X509Certificate2.CreateFromSignedFile(filePath);
+#pragma warning restore SYSLIB0057
 
             return cert.Subject.Contains($"O={owner}", StringComparison.OrdinalIgnoreCase);
         }
@@ -47,8 +52,12 @@ public static class Security
                 return false;
             }
 
+            // Same rationale as VerifyAuthenticode above: no SYSLIB0057-compliant API extracts a
+            // signer cert from a signed PE file.
+#pragma warning disable SYSLIB0057
             using var referenceCert = X509Certificate.CreateFromSignedFile(referencePath);
             using var candidateCert = X509Certificate.CreateFromSignedFile(candidatePath);
+#pragma warning restore SYSLIB0057
 
             return string.Equals(
                 referenceCert.GetCertHashString(),

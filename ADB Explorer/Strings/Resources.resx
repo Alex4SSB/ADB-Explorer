@@ -2213,4 +2213,8 @@ The checks attempt to prevent an unsuspecting user from launching a possibly mal
     <value>A</value>
     <comment>Single character on the rename icon. First letter of this language's alphabet or writing system; keep it simple enough to read at toolbar size.</comment>
   </data>
+  <data name="S_THUMBSIZE_CONTENT" xml:space="preserve">
+    <value>Content</value>
+    <comment>Thumbnail size - content</comment>
+  </data>
 </root>

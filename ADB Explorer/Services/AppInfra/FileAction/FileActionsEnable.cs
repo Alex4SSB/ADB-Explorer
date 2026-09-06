@@ -363,6 +363,17 @@ public partial class FileActionsEnable : ObservableObject
         set => SetProperty(ref isFollowLinkEnabled, value);
     }
 
+    /// <summary>
+    /// Search mode's "open item location" - navigates to the selected item's own parent folder
+    /// (as opposed to <see cref="IsFollowLinkEnabled"/>, which follows a link to its target).
+    /// </summary>
+    private bool isOpenItemLocationEnabled = false;
+    public bool IsOpenItemLocationEnabled
+    {
+        get => isOpenItemLocationEnabled;
+        set => SetProperty(ref isOpenItemLocationEnabled, value);
+    }
+
     private bool isPasteLinkEnabled = false;
     public bool IsPasteLinkEnabled
     {

@@ -134,7 +134,6 @@
         x:Key="ExplorerGridCellStyle"
         BasedOn="{StaticResource FileNameTextBlockStyle}"
         TargetType="TextBlock">
-        <Setter Property="Margin" Value="4,0" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
         <Setter Property="Opacity" Value="1" />
@@ -370,6 +369,12 @@
         <Setter Property="MaxControlWidth" Value="{Binding Source={x:Static Member=models:AdbExplorerConst.DEFAULT_SEARCH_WIDTH}}" />
         <Setter Property="MinControlWidth" Value="{Binding Source={x:Static Member=models:AdbExplorerConst.MIN_SEARCH_WIDTH}}" />
         <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ExplorerFilter, Mode=TwoWay}" />
+        <Style.Triggers>
+            <!--  Search doesn't apply to the recycle bin itself, and must never recurse into it.  -->
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRecycleBin}" Value="True">
+                <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style x:Key="NonRootEmptyFolderStyle" TargetType="StackPanel">
         <Style.Triggers>
@@ -379,7 +384,7 @@
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=SearchBox, Path=IsFiltered}" Value="True">
+            <DataTrigger Binding="{Binding DataContext.IsSearchBoxFiltered, RelativeSource={RelativeSource AncestorType=controls:ExplorerListHost}}" Value="True">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
@@ -392,7 +397,7 @@
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
                 <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_EMPTY_APP_DRIVE}}" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=SearchBox, Path=IsFiltered}" Value="True">
+            <DataTrigger Binding="{Binding DataContext.IsSearchBoxFiltered, RelativeSource={RelativeSource AncestorType=controls:ExplorerListHost}}" Value="True">
                 <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_EMPTY_FILTER}}" />
             </DataTrigger>
         </Style.Triggers>
@@ -411,7 +416,7 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Visibility" Value="Visible" />
             </MultiDataTrigger>
-            <DataTrigger Binding="{Binding ElementName=NavigationBox, Path=Mode}" Value="None">
+            <DataTrigger Binding="{Binding DataContext.NavigationBoxMode, RelativeSource={RelativeSource AncestorType=controls:ExplorerListHost}}" Value="None">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
@@ -461,9 +466,9 @@
         x:Key="ItemsCountStyle"
         BasedOn="{StaticResource MarginedTextBlockStyle}"
         TargetType="TextBlock">
-        <Setter Property="Text" Value="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
+        <Setter Property="Text" Value="{Binding ExplorerItemsSource.Count}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
                 <Setter Property="Text" Value="" />
             </DataTrigger>
         </Style.Triggers>

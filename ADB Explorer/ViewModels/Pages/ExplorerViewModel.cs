@@ -228,6 +228,15 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     public partial bool IsIconView { get; set; } = false;
 
     [ObservableProperty]
+    public partial bool IsContentView { get; set; } = false;
+
+    [ObservableProperty]
+    public partial NavigationBox.ViewMode NavigationBoxMode { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsSearchBoxFiltered { get; set; }
+
+    [ObservableProperty]
     public partial ThumbnailService.ThumbnailSize CurrentThumbsSize { get; set; }
 
     [ObservableProperty]
@@ -236,6 +245,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     partial void OnCurrentThumbsSizeChanged(ThumbnailService.ThumbnailSize value)
     {
         IsIconView = ThumbnailService.IsIconLayout(value);
+        IsContentView = value is ThumbnailService.ThumbnailSize.Content;
 
         // Device without unzip: force details view without clobbering saved sizes.
         // Tiles is drive-view only and must not overwrite the last explorer size.
@@ -323,6 +333,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         Tree = new(() => ExplorerSource);
 
         IsIconView = ThumbnailService.IsIconLayout(Data.RuntimeSettings.ThumbsSize);
+        IsContentView = Data.RuntimeSettings.ThumbsSize is ThumbnailService.ThumbnailSize.Content;
 
         _filterDebounceTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
         _filterDebounceTimer.Tick += (s, e) =>
@@ -466,6 +477,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
             case nameof(AppRuntimeSettings.ThumbsSize):
                 IsIconView = ThumbnailService.IsIconLayout(Data.RuntimeSettings.ThumbsSize);
+                IsContentView = Data.RuntimeSettings.ThumbsSize is ThumbnailService.ThumbnailSize.Content;
                 break;
 
             default:

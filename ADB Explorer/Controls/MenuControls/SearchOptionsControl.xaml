@@ -13,7 +13,7 @@
     <UserControl.Style>
         <Style TargetType="local:SearchOptionsControl">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsSearchOptionsVisible}" Value="False">
                     <Setter Property="Visibility" Value="Collapsed" />
                 </DataTrigger>
             </Style.Triggers>
@@ -35,16 +35,10 @@
                     <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
                         <Setter Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding IsVisible}" Value="False">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                    </DataTrigger>
                 </Style.Triggers>
             </Style>
         </local:AdbMenu.Style>
-        <local:AdbMenuItem
-            ItemsSource="{Binding Items}"
-            ToolTip="{Binding Source={x:Static Member=strings:Resources.S_SEARCH_OPTIONS_INFO}}"
-            Visibility="{Binding IsSearchOptionsVisible, Converter={StaticResource BoolToVisibility}}">
+        <local:AdbMenuItem ItemsSource="{Binding Items}" ToolTip="{Binding Source={x:Static Member=strings:Resources.S_SEARCH_OPTIONS_INFO}}">
             <local:AdbMenuItem.Resources>
                 <ui:FontIcon
                     x:Key="ThumbCheckedIcon"

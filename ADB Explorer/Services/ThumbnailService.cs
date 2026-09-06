@@ -112,14 +112,22 @@ public static partial class ThumbnailService
 
     public enum ThumbnailSize
     {
+        /// <summary>Details / Explorer view - 16px, no thumbnails</summary>
         Disabled = 0,
-        /// <summary>Drive-view layout sentinel; not a thumbnail pixel size.</summary>
+        /// <summary>Drive view. For files should be 48px</summary>
         Tiles = 1,
+        /// <summary>Content view - 32px</summary>
+        Content = 2,
         Medium = 48,
         Large = 96,
         ExtraLarge = 192,
         Drag = 256,
     }
+
+    public const int ContentIconPixelSize = 32;
+
+    public static int GetPixelSize(ThumbnailSize size) =>
+        size is ThumbnailSize.Content ? ContentIconPixelSize : (int)size;
 
     public static bool IsIconLayout(ThumbnailSize size) =>
         size is ThumbnailSize.Medium or ThumbnailSize.Large or ThumbnailSize.ExtraLarge;
@@ -193,8 +201,7 @@ public static partial class ThumbnailService
         EnsureCsvCacheLoaded(device);
         if (LoadThumbnail(device, file, size, scaleWithDpi) is Thumbnail { Image: not null } immediate)
         {
-            ApplyPaneThumbnail(file, immediate);
-            state.LoadedSize = size;
+            ApplyPaneThumbnail(file, immediate, size);
             return;
         }
 
@@ -223,7 +230,7 @@ public static partial class ThumbnailService
                 {
                     if (token.IsCancellationRequested)
                     {
-                        ApplyPaneThumbnail(file, loaded);
+                        ApplyPaneThumbnail(file, loaded, size);
                         ClearPaneLoadToken(file, token);
                         return;
                     }
@@ -262,7 +269,7 @@ public static partial class ThumbnailService
                 {
                     App.SafeBeginInvoke(() =>
                     {
-                        ApplyPaneThumbnail(file, cached);
+                        ApplyPaneThumbnail(file, cached, size);
                         ClearPaneLoadToken(file, token);
                     }, System.Windows.Threading.DispatcherPriority.Normal);
                 }
@@ -280,7 +287,7 @@ public static partial class ThumbnailService
                 {
                     if (token.IsCancellationRequested)
                     {
-                        ApplyPaneThumbnail(file, loaded);
+                        ApplyPaneThumbnail(file, loaded, size);
                         ClearPaneLoadToken(file, token);
                         return;
                     }
@@ -387,11 +394,11 @@ public static partial class ThumbnailService
         state.Cts = null;
     }
 
-    public static void ApplyPaneThumbnail(FileClass file, Thumbnail thumb)
+    public static void ApplyPaneThumbnail(FileClass file, Thumbnail thumb, ThumbnailSize size)
     {
         var state = PaneThumbnails.GetValue(file, static _ => new PaneThumbnailState());
         state.Cache = thumb;
-        state.LoadedSize = ThumbnailSize.Drag;
+        state.LoadedSize = size;
         file.NotifyPaneThumbnailChanged();
     }
 
@@ -1000,16 +1007,17 @@ public static partial class ThumbnailService
 
         try
         {
+            var pixelSize = GetPixelSize(size);
             var decodePixelWidth = Data.RuntimeSettings.MainWindowScalingFactor > 0
-                ? (int)Math.Ceiling((int)size / Data.RuntimeSettings.MainWindowScalingFactor)
-                : (int)size * 2;
+                ? (int)Math.Ceiling(pixelSize / Data.RuntimeSettings.MainWindowScalingFactor)
+                : pixelSize * 2;
 
             using var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
             var bitmapImage = new BitmapImage();
             bitmapImage.BeginInit();
             bitmapImage.StreamSource = stream;
             bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapImage.DecodePixelWidth = scaleWithDpi ? decodePixelWidth : (int)size;
+            bitmapImage.DecodePixelWidth = scaleWithDpi ? decodePixelWidth : pixelSize;
             bitmapImage.EndInit();
             bitmapImage.Freeze();
 

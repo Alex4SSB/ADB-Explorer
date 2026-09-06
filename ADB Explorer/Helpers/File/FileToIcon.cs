@@ -51,8 +51,6 @@ public class FileToIconConverter
 
     private static readonly System.Drawing.Color Gray232 = System.Drawing.Color.FromArgb(232, 232, 232);
 
-    private static bool IsWindows10 => Environment.OSVersion.Version < AdbExplorerConst.WIN11_VERSION;
-
     private readonly record struct IconCacheKey(string IconId, IconSize Size, int DesiredSize);
     private static readonly Dictionary<IconCacheKey, BitmapSource> iconDic = [];
     private static readonly Dictionary<string, Rectangle> contentBoundsCache = [];
@@ -471,7 +469,7 @@ public class FileToIconConverter
                     "Downloads" or "Download" => DownloadsFolderIcon,
                     "Videos" or "Movies" => VideosFolderIcon,
                     "Pictures" => PicturesFolderIcon,
-                    "DCIM" when IsWindows10 => PicturesFolderIcon,
+                    "DCIM" when Data.RuntimeSettings.IsWindows10 => PicturesFolderIcon,
                     "DCIM" => GalleryIcon,
                     _ => FolderIcon,
                 };
@@ -490,7 +488,7 @@ public class FileToIconConverter
             AbstractFile.SpecialFileType.EmptyTrash => EmptyTrashIcon,
             AbstractFile.SpecialFileType.FullTrash => FullTrashIcon,
             AbstractFile.SpecialFileType.Phone => PhoneIcon,
-            AbstractFile.SpecialFileType.Gallery when IsWindows10 => PicturesFolderIcon,
+            AbstractFile.SpecialFileType.Gallery when Data.RuntimeSettings.IsWindows10 => PicturesFolderIcon,
             AbstractFile.SpecialFileType.Gallery => GalleryIcon,
             AbstractFile.SpecialFileType.EnterFolder => EnterFolderIcon,
             _ => SpecialIcon.None,

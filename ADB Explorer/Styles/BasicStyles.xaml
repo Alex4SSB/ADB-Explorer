@@ -608,7 +608,7 @@
             Style="{StaticResource FluentDataGridRowBorderStyle}">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="3" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Rectangle
@@ -645,7 +645,7 @@
         TargetType="DataGridRow">
         <Setter Property="Visibility" Value="Visible" />
         <Setter Property="AllowDrop" Value="False" />
-        <Setter Property="Margin" Value="3,0,0,0" />
+        <Setter Property="Margin" Value="3,0,4,0" />
         <Setter Property="Template" Value="{StaticResource DataGridRowTemplate}" />
         <Setter Property="BorderThickness" Value="0,1,1,1" />
         <Style.Triggers>
@@ -692,6 +692,66 @@
                 <Setter Property="Background" Value="{DynamicResource SelectedMouseOverInactiveBackground}" />
             </MultiDataTrigger>
         </Style.Triggers>
+    </Style>
+
+    <ControlTemplate x:Key="ContentDataGridRowTemplate" TargetType="DataGridRow">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Separator x:Name="ItemSeparator" Grid.Row="0" />
+            <Border
+                x:Name="RowBorder"
+                Grid.Row="1"
+                HorizontalAlignment="Left"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                SnapsToDevicePixels="True"
+                Style="{StaticResource FluentDataGridRowBorderStyle}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Rectangle
+                        x:Name="ActiveRectangle"
+                        Width="3"
+                        Height="18"
+                        Margin="0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Fill="{DynamicResource ListViewItemPillFillBrush}"
+                        RadiusX="2"
+                        RadiusY="2"
+                        Visibility="Collapsed" />
+                    <DataGridCellsPresenter
+                        Grid.Column="1"
+                        ItemsPanel="{TemplateBinding ItemsPanel}"
+                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                </Grid>
+            </Border>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter TargetName="ActiveRectangle" Property="Visibility" Value="Visible" />
+            </MultiDataTrigger>
+            <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                <Setter TargetName="ItemSeparator" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style
+        x:Key="ContentRowStyle"
+        BasedOn="{StaticResource BaseRowStyle}"
+        TargetType="DataGridRow">
+        <Setter Property="Template" Value="{StaticResource ContentDataGridRowTemplate}" />
     </Style>
 
     <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="{x:Type Separator}">
@@ -1107,6 +1167,7 @@
                 x:Name="Border"
                 Grid.Row="1"
                 Margin="4,1,4,1"
+                Background="Transparent"
                 BorderThickness="1"
                 CornerRadius="4">
                 <Grid x:Name="MenuItemContent" Margin="8,6,8,6">
@@ -1370,7 +1431,7 @@
         <Border
             x:Name="Border"
             Margin="4,1,4,1"
-            Background="{TemplateBinding Background}"
+            Background="Transparent"
             CornerRadius="4">
             <Grid Margin="8,6,8,6">
                 <Grid.ColumnDefinitions>

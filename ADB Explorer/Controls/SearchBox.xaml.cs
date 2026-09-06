@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Models;
+using ADB_Explorer.ViewModels.Pages;
 
 namespace ADB_Explorer.Controls;
 
@@ -141,6 +142,11 @@ public partial class SearchBox : UserControl
     private void ContentBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         IsFiltered = !string.IsNullOrEmpty(Text);
+
+        // Mirror onto the ExplorerViewModel so styles that used to bind to this control by
+        // ElementName (now out of reach from ExplorerListHost) can react via the view model.
+        if (DataContext is ExplorerViewModel vm)
+            vm.IsSearchBoxFiltered = IsFiltered;
     }
 
     private void ContentBox_Loaded(object sender, RoutedEventArgs e)

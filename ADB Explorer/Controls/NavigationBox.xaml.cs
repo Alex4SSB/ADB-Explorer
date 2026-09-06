@@ -3,6 +3,7 @@ using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
+using ADB_Explorer.ViewModels.Pages;
 
 namespace ADB_Explorer.Controls;
 
@@ -229,6 +230,11 @@ public partial class NavigationBox : UserControl
         set
         {
             SetValue(ModeProperty, value);
+
+            // Mirror onto the ExplorerViewModel so styles that used to bind to this control by
+            // ElementName (now out of reach from ExplorerListHost) can react via the view model.
+            if (DataContext is ExplorerViewModel vm)
+                vm.NavigationBoxMode = value;
 
             if (value is ViewMode.Path)
                 PathBox.Focus();

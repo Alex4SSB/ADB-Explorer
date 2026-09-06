@@ -1564,6 +1564,11 @@ internal static class FileActionLogic
             && singleFileSelected
             && selectedFile is { IsLink: true, Type: not FileType.BrokenLink };
 
+        actions.IsOpenItemLocationEnabled = !isRecycleBin
+            && isSearchMode
+            && singleFileSelected
+            && selectedFile is not null;
+
         var isFollowLinkEnabled = actions.IsFollowLinkEnabled;
         var followLinkAllowsAction = !isFollowLinkEnabled || hasRoot;
 
@@ -2497,6 +2502,27 @@ internal static class FileActionLogic
         var file = Data.DirList.FileList.FirstOrDefault(f => f.FullPath == target);
         if (file is not null)
             Data.ItemToSelect.Value = file;
+    }
+
+    public static async void OpenItemLocation()
+    {
+        var file = Data.SelectedFiles.FirstOrDefault();
+        if (file is null)
+            return;
+
+        var target = file.FullPath;
+        var parentPath = FileHelper.GetParentPath(target);
+
+        if (parentPath != Data.CurrentPath)
+        {
+            Data.RuntimeSettings.LocationToNavigate = new(parentPath);
+        }
+
+        await AsyncHelper.WaitUntil(() => !Data.DirList.InProgress, TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(20), new());
+
+        var found = Data.DirList.FileList.FirstOrDefault(f => f.FullPath == target);
+        if (found is not null)
+            Data.ItemToSelect.Value = found;
     }
 
     public static void EnterFolder()

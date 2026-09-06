@@ -1,4 +1,4 @@
-namespace ADB_Explorer.Controls.ColorPicker;
+namespace ADB_Explorer.Controls;
 
 /// <summary>
 /// The picker grid content hosted inside a ContentDialog.

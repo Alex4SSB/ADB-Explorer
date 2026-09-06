@@ -4544,6 +4544,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Content.
+        /// </summary>
+        public static string S_THUMBSIZE_CONTENT {
+            get {
+                return ResourceManager.GetString("S_THUMBSIZE_CONTENT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Details.
         /// </summary>
         public static string S_THUMBSIZE_DETAILS {

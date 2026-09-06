@@ -20,12 +20,32 @@ public partial class FileViewModelBase : ObservableObject
             {
                 OnPropertyChanged(nameof(TypeIsRtl));
                 OnPropertyChanged(nameof(TypeFlowDirection));
+                OnPropertyChanged(nameof(ContentViewTypeText));
             }
         }
     }
 
     public bool TypeIsRtl => TextHelper.ContainsRtl(TypeName);
     public FlowDirection TypeFlowDirection => TypeIsRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
+
+    /// <summary>"Type: {TypeName}" (RTL-aware), for the Content view's collapsible type column.</summary>
+    public string ContentViewTypeText => FormatLabeledValue(Strings.Resources.S_COLUMN_TYPE, TypeName, TypeIsRtl);
+
+    /// <summary>"Date modified: {ModifiedTimeString}", for the Content view's date/size column.</summary>
+    public string ContentViewModifiedTimeText => FormatLabeledValue(Strings.Resources.S_COLUMN_DATE_MODIFIED, ModifiedTimeString, false);
+
+    /// <summary>"Size: {SizeString}", for the Content view's date/size column.</summary>
+    public string ContentViewSizeText => FormatLabeledValue(Strings.Resources.S_COLUMN_SIZE, SizeString, false);
+
+    private static string FormatLabeledValue(string label, string value, bool valueIsRtl)
+    {
+        if (string.IsNullOrEmpty(value))
+            return "";
+
+        return Data.RuntimeSettings.IsRTL && !valueIsRtl
+            ? $"{TextHelper.LTR_MARK}{label}: {TextHelper.RTL_MARK}{value}{TextHelper.LTR_MARK}"
+            : $"{label}: {value}";
+    }
 
     public string ModifiedTimeString => TabularDateFormatter.Format(_file.ModifiedTime, Data.Settings.ActualFormatCulture);
     public string ModifiedTimeWithOffsetString => _file.ModifiedTimeWithOffset is { } dto
@@ -115,6 +135,20 @@ public partial class FileViewModelBase : ObservableObject
     [ObservableProperty]
     public partial bool IsRenameUnique { get; set; }
 
+    /// <summary>
+    /// True while a search-mode unique-name check is debouncing or in flight - the rename tooltip
+    /// shows a "checking" indicator instead of pass/fail, and commit is refused until this clears.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsCheckingUniqueName { get; set; }
+
+    private DispatcherTimer? _uniqueCheckDebounceTimer;
+    private CancellationTokenSource? _uniqueCheckCts;
+    private string? _lastUniqueCheckedName;
+    private FileClass? _pendingUniqueCheckFile;
+    private string? _pendingUniqueCheckName;
+    private StringComparison _pendingUniqueCheckComparison;
+
     protected FileViewModelBase(FileClass file)
     {
         _file = file;
@@ -162,7 +196,118 @@ public partial class FileViewModelBase : ObservableObject
             ? StringComparison.InvariantCultureIgnoreCase
             : StringComparison.InvariantCulture;
 
-        vm.IsRenameUnique = !Data.DirList.FileList.Except([file]).Any(f => f.FullName.Equals(fullName, comparison));
+        if (Data.FileActions.IsSearchMode)
+        {
+            // Data.DirList here is the search-results listing, not the item's real parent folder -
+            // validate against the folder the item actually lives in instead (async + debounced).
+            vm.QueueSearchModeUniqueNameCheck(file, fullName, comparison);
+        }
+        else
+        {
+            vm.CancelUniqueNameCheck();
+            vm.IsRenameUnique = !Data.DirList.FileList.Except([file]).Any(f => f.FullName.Equals(fullName, comparison));
+        }
+    }
+
+    /// <summary>
+    /// Debounces (1s) a unique-name check for search mode, run against the item's actual parent
+    /// folder on the device rather than the search-results listing. Shows as "checking" the whole
+    /// time from the first keystroke that changed the name until a result comes back; a superseded
+    /// or canceled check never overwrites <see cref="IsRenameUnique"/> with a stale answer.
+    /// </summary>
+    private void QueueSearchModeUniqueNameCheck(FileClass file, string candidateFullName, StringComparison comparison)
+    {
+        // The unmodified name needs no round trip - it's trivially unique (it already exists as
+        // this very file in that folder).
+        if (candidateFullName == file.FullName)
+        {
+            CancelUniqueNameCheck();
+            _lastUniqueCheckedName = candidateFullName;
+            IsRenameUnique = true;
+            return;
+        }
+
+        // Already resolved for this exact text (e.g. the user retyped back to a previously-checked
+        // value) - IsRenameUnique already holds the right answer; just drop any leftover timer.
+        if (candidateFullName == _lastUniqueCheckedName)
+        {
+            CancelUniqueNameCheck();
+            return;
+        }
+
+        CancelUniqueNameCheck();
+        IsCheckingUniqueName = true;
+
+        _pendingUniqueCheckFile = file;
+        _pendingUniqueCheckName = candidateFullName;
+        _pendingUniqueCheckComparison = comparison;
+
+        _uniqueCheckDebounceTimer ??= new DispatcherTimer();
+        _uniqueCheckDebounceTimer.Interval = TimeSpan.FromSeconds(1);
+        _uniqueCheckDebounceTimer.Tick -= UniqueCheckDebounceTimer_Tick;
+        _uniqueCheckDebounceTimer.Tick += UniqueCheckDebounceTimer_Tick;
+        _uniqueCheckDebounceTimer.Start();
+    }
+
+    private void UniqueCheckDebounceTimer_Tick(object? sender, EventArgs e)
+    {
+        _uniqueCheckDebounceTimer?.Stop();
+
+        var file = _pendingUniqueCheckFile;
+        var candidateFullName = _pendingUniqueCheckName;
+        var comparison = _pendingUniqueCheckComparison;
+
+        if (file is null || candidateFullName is null || Data.DevicesObject.Current is not { } device)
+        {
+            IsCheckingUniqueName = false;
+            return;
+        }
+
+        var deviceId = device.ID;
+        var parentPath = FileHelper.GetParentPath(file.FullPath);
+        var originalFullPath = file.FullPath;
+
+        _uniqueCheckCts = new CancellationTokenSource();
+        var token = _uniqueCheckCts.Token;
+
+        Task.Run(() =>
+        {
+            bool isUnique;
+            try
+            {
+                isUnique = !ADBService.ListDirectoryEntries(deviceId, parentPath, token)
+                    .Any(entry => entry.FullPath != originalFullPath && entry.FullName.Equals(candidateFullName, comparison));
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+            catch
+            {
+                // Device / listing error: don't block the rename on an inconclusive check.
+                isUnique = true;
+            }
+
+            App.SafeBeginInvoke(() =>
+            {
+                if (token.IsCancellationRequested)
+                    return;
+
+                _lastUniqueCheckedName = candidateFullName;
+                IsRenameUnique = isUnique;
+                IsCheckingUniqueName = false;
+            });
+        }, token);
+    }
+
+    /// <summary>Stops any pending debounce timer / in-flight check without touching <see cref="IsRenameUnique"/>.</summary>
+    public void CancelUniqueNameCheck()
+    {
+        _uniqueCheckDebounceTimer?.Stop();
+        _uniqueCheckCts?.Cancel();
+        _uniqueCheckCts?.Dispose();
+        _uniqueCheckCts = null;
+        IsCheckingUniqueName = false;
     }
 
     public static void RenameKeyDown(TextBox textBox, Key key, Action<FileClass> exitEditMode)
@@ -172,6 +317,8 @@ public partial class FileViewModelBase : ObservableObject
 
         if (key is Key.Escape or Key.F2)
         {
+            file.ActiveViewModel.CancelUniqueNameCheck();
+
             if (file.IsTemp && key is Key.Escape)
             {
                 FileActionLogic.CancelPendingCompress(file);
@@ -197,12 +344,20 @@ public partial class FileViewModelBase : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Commits the rename - unless a search-mode unique-name check is still debouncing / in flight,
+    /// in which case the commit (from Enter or clicking away) is refused until it resolves.
+    /// </summary>
     public static void RenameCommit(TextBox textBox, Action<FileClass> exitEditMode)
     {
         if (textBox.DataContext is not FileClass file)
             return;
 
+        if (file.ActiveViewModel.IsCheckingUniqueName)
+            return;
+
         FileActionLogic.Rename(textBox);
+        file.ActiveViewModel.CancelUniqueNameCheck();
         exitEditMode(file);
     }
 
@@ -280,11 +435,13 @@ public partial class FileViewModelBase : ObservableObject
     {
         OnPropertyChanged(nameof(ModifiedTimeString));
         OnPropertyChanged(nameof(ModifiedTimeWithOffsetString));
+        OnPropertyChanged(nameof(ContentViewModifiedTimeText));
     }
 
     public void OnSizeChanged()
     {
         OnPropertyChanged(nameof(SizeString));
+        OnPropertyChanged(nameof(ContentViewSizeText));
     }
 
     public virtual void Dispose()

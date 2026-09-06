@@ -1,0 +1,28 @@
+﻿<controls:ScaledPathIcon
+    x:Class="ADB_Explorer.Controls.TextJustify"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:ADB_Explorer.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ADB_Explorer.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Name="Icon"
+    ArtboardSize="20"
+    mc:Ignorable="d">
+    <Viewbox
+        Width="{Binding Size}"
+        Height="{Binding Size}"
+        DataContext="{Binding ElementName=Icon}"
+        Stretch="Uniform">
+        <Grid
+            Width="{Binding ArtboardSize}"
+            Height="{Binding ArtboardSize}"
+            Margin="-2">
+            <Path
+                d:Fill="White"
+                Data="M2 4.5C2 4.22386 2.22386 4 2.5 4H17.5C17.77614 4 18 4.22386 18 4.5C18 4.77614 17.77614 5 17.5 5H2.5C2.22386 5 2 4.77614 2 4.5ZM2 7.83333C2 7.55719 2.22386 7.33333 2.5 7.33333H17.5C17.77614 7.33333 18 7.55719 18 7.83333C18 8.10948 17.77614 8.33333 17.5 8.33333H2.5C2.22386 8.33333 2 8.10948 2 7.83333ZM2 11.16667C2 10.89053 2.22386 10.66667 2.5 10.66667H17.5C17.77614 10.66667 18 10.89053 18 11.16667C18 11.44281 17.77614 11.66667 17.5 11.66667H2.5C2.22386 11.66667 2 11.44281 2 11.16667ZM2 14.5C2 14.22386 2.22386 14 2.5 14H17.5C17.77614 14 18 14.22386 18 14.5C18 14.77614 17.77614 15 17.5 15H2.5C2.22386 15 2 14.77614 2 14.5Z"
+                Stretch="None"
+                Style="{StaticResource MonochromeIconPathStyle}" />
+        </Grid>
+    </Viewbox>
+</controls:ScaledPathIcon>

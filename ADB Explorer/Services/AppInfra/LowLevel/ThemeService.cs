@@ -305,7 +305,7 @@ internal class AdbThemeService
 
         if (isHighContrast)
         {
-            ApplyHighContrastWindowBackground(window);
+            ApplyOpaqueWindowBackground(window);
             ApplyHighContrastWindowBorder(window);
             EnsureHighContrastBorderHooks(window);
         }
@@ -313,10 +313,21 @@ internal class AdbThemeService
         {
             RemoveHighContrastBorderHooks(window);
 
-            window.SetCurrentValue(Control.BackgroundProperty, Brushes.Transparent);
+            if (Data.RuntimeSettings.IsWindows10)
+            {
+                // Mica - the Win11+ backdrop the transparent branch below relies on to composite the
+                // real theme color behind the window - doesn't exist on Windows 10. With nothing
+                // painting behind a transparent window/compositor there, Windows falls back to a
+                // bright/white render instead, so keep the window opaque on Windows 10 like HC does.
+                ApplyOpaqueWindowBackground(window);
+            }
+            else
+            {
+                window.SetCurrentValue(Control.BackgroundProperty, Brushes.Transparent);
 
-            if (PresentationSource.FromVisual(window) is HwndSource { CompositionTarget: { } clearTarget })
-                clearTarget.BackgroundColor = Colors.Transparent;
+                if (PresentationSource.FromVisual(window) is HwndSource { CompositionTarget: { } clearTarget })
+                    clearTarget.BackgroundColor = Colors.Transparent;
+            }
 
             // Leave HC ActiveCaption border; FluentWindow re-applies SystemAccent on next Activated.
             if (window.IsActive)
@@ -335,7 +346,11 @@ internal class AdbThemeService
         _ = window.Dispatcher.BeginInvoke(() => RefreshWindowChrome(window));
     }
 
-    private static void ApplyHighContrastWindowBackground(Window window)
+    /// <summary>
+    /// Opaque window/compositor background, used both under high contrast and (on Windows 10) in
+    /// place of the normal transparent-for-Mica background - see <see cref="RefreshWindowChrome(Window)"/>.
+    /// </summary>
+    private static void ApplyOpaqueWindowBackground(Window window)
     {
         window.SetResourceReference(Control.BackgroundProperty, "ApplicationBackgroundBrush");
 

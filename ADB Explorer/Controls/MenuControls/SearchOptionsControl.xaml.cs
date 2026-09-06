@@ -43,8 +43,6 @@ public partial class SearchOptionsControl : UserControl
     public bool IsSearchOptionsVisible =>
         Data.RuntimeSettings.IsSearchBoxFocused || !string.IsNullOrEmpty(Data.FileActions.ExplorerFilter);
 
-    public new bool IsVisible => IsCloseSearchVisible || IsSearchOptionsVisible;
-
     private static bool CanCloseSearch() => !string.IsNullOrEmpty(Data.FileActions.ExplorerFilter);
 
     private static void CloseSearch()
@@ -57,7 +55,6 @@ public partial class SearchOptionsControl : UserControl
     {
         OnPropertyChanged(nameof(IsCloseSearchVisible));
         OnPropertyChanged(nameof(IsSearchOptionsVisible));
-        OnPropertyChanged(nameof(IsVisible));
         CommandManager.InvalidateRequerySuggested();
     }
 

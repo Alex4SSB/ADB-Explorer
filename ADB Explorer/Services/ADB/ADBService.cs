@@ -646,10 +646,15 @@ public partial class ADBService
             if (string.IsNullOrWhiteSpace(line))
                 continue;
 
-            if (ParseSearchResultLine(line) is { } fileStat)
+            if (ParseSearchResultLine(line) is { } fileStat && !IsWithinRecycleBin(fileStat.FullPath))
                 yield return fileStat;
         }
     }
+
+    private static bool IsWithinRecycleBin(string path) =>
+        POSSIBLE_RECYCLE_PATHS.Any(trashPath =>
+            path.Equals(trashPath, StringComparison.Ordinal)
+            || path.StartsWith(trashPath + "/", StringComparison.Ordinal));
 
     public static IEnumerable<string> SearchPathsStreaming(string deviceID, string path, string query, CancellationToken cancellationToken, bool caseSensitive = false)
     {

@@ -9,7 +9,7 @@
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="{Binding ViewModel.ApplicationTitle, Mode=OneWay}"
-    MinWidth="920"
+    MinWidth="950"
     MinHeight="480"
     d:DataContext="{d:DesignInstance local:MainWindow,
                                      IsDesignTimeCreatable=True}"
@@ -268,8 +268,8 @@
             <Grid>
                 <Border
                     x:Name="MainBorder"
-                    MinWidth="{StaticResource PaneFluentButtonWidth}"
                     Height="{StaticResource PaneFluentButtonHeight}"
+                    MinWidth="{StaticResource PaneFluentButtonWidth}"
                     Padding="4"
                     HorizontalAlignment="Stretch"
                     Background="Transparent"
@@ -331,8 +331,8 @@
                 <!--  Border-stroke-only overlay - see the comment above this template.  -->
                 <Border
                     x:Name="HoverBorder"
-                    MinWidth="{StaticResource PaneFluentButtonWidth}"
                     Height="{StaticResource PaneFluentButtonHeight}"
+                    MinWidth="{StaticResource PaneFluentButtonWidth}"
                     HorizontalAlignment="Stretch"
                     Background="Transparent"
                     BorderBrush="{TemplateBinding BorderBrush}"

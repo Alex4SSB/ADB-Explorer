@@ -15,11 +15,12 @@ public partial class ThumbsSizeSelector : UserControl
     public ThumbsSizeSelector()
     {
         Items = [
-            new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_TILES, ThumbnailService.ThumbnailSize.Tiles, this, canSelect: false),
-            new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_DETAILS, ThumbnailService.ThumbnailSize.Disabled, this),
-            new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_MEDIUM, ThumbnailService.ThumbnailSize.Medium, this),
-            new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_LARGE, ThumbnailService.ThumbnailSize.Large, this),
             new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_XL, ThumbnailService.ThumbnailSize.ExtraLarge, this),
+            new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_LARGE, ThumbnailService.ThumbnailSize.Large, this),
+            new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_MEDIUM, ThumbnailService.ThumbnailSize.Medium, this),
+            new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_DETAILS, ThumbnailService.ThumbnailSize.Disabled, this),
+            new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_TILES, ThumbnailService.ThumbnailSize.Tiles, this, canSelect: false),
+            new ThumbSizeItem(Strings.Resources.S_THUMBSIZE_CONTENT, ThumbnailService.ThumbnailSize.Content, this),
             new Separator(),
             new SidePaneModeItem(Strings.Resources.S_THUMBSIZE_DETAILS, DetailsPane.SidePaneMode.Details, Strings.Resources.S_DETAILS_PANE_INFO),
             new SidePaneModeItem(Strings.Resources.S_SIDE_PANE_PREVIEW, DetailsPane.SidePaneMode.Preview, Strings.Resources.S_PREVIEW_PANE_INFO),
@@ -48,11 +49,12 @@ public partial class ThumbsSizeSelector : UserControl
 
     static Dictionary<ThumbnailService.ThumbnailSize, UIElement> Icons => new()
     {
+        { ThumbnailService.ThumbnailSize.Content, (UIElement)new BaseIcon("\uE71D", 16).IconContent },
         { ThumbnailService.ThumbnailSize.Tiles, new FluentPathIcon() { Data = FluentPathGeometries.AppsListDetail, Height = 16 } },
-        { ThumbnailService.ThumbnailSize.Disabled, new FluentPathIcon() { Data = FluentPathGeometries.TextBulletList, Height = 16 } },
+        { ThumbnailService.ThumbnailSize.Disabled, new TextJustify() { Size = 16 } },
         { ThumbnailService.ThumbnailSize.Medium, (UIElement)new BaseIcon("\uE138", 16).IconContent },
         { ThumbnailService.ThumbnailSize.Large, new LargeThumbsIcon() { SubFontSize = 8 } },
-        { ThumbnailService.ThumbnailSize.ExtraLarge, (UIElement)new BaseIcon("\uE15A", 16, rtlBehavior: RtlBehavior.ForceRtl).IconContent },
+        { ThumbnailService.ThumbnailSize.ExtraLarge, (UIElement)new BaseIcon("\uE15A", 16, rtlBehavior: RtlBehavior.FlipInRtl).IconContent },
     };
 
     static Dictionary<DetailsPane.SidePaneMode, UIElement> SidePaneModeIcons => new()

@@ -114,6 +114,10 @@
                                     <Setter Property="Glyph" Value="&#xF13E;" />
                                     <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding IsCheckingUniqueName}" Value="True">
+                                    <Setter Property="Glyph" Value="&#xE897;" />
+                                    <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCautionBrush}" />
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </ui:FontIcon.Style>

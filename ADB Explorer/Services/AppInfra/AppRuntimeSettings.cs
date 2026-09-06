@@ -142,7 +142,7 @@ public partial class AppRuntimeSettings : ViewModelBase
 
     public bool SkipAppDataNotification { get; set; } = false;
 
-    public bool Is22H2 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_22H2;
+    public bool IsWindows10 => Environment.OSVersion.Version < AdbExplorerConst.WIN11_VERSION;
 
     public bool IsRTL => Data.Settings.ActualUICulture.TextInfo.IsRightToLeft;
 

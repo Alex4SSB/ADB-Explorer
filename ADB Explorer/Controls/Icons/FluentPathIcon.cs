@@ -130,8 +130,14 @@ public class ScaledPathIcon : UserControl
 public enum RtlBehavior
 {
     None,
+    /// <summary>
+    /// Forces the icon to LTR to prevent it from flipping horizontally when UI culture is RTL.
+    /// </summary>
     ForceLtr,
-    ForceRtl,
+    /// <summary>
+    /// Flips the icon horizontally when UI Culture is RTL.
+    /// </summary>
+    FlipInRtl,
 }
 
 public class BaseIcon
@@ -203,7 +209,7 @@ public class BaseIcon
 
         element.FlowDirection = FlowDirection.LeftToRight;
 
-        if (behavior is RtlBehavior.ForceRtl && Data.RuntimeSettings.IsRTL)
+        if (behavior is RtlBehavior.FlipInRtl && Data.RuntimeSettings.IsRTL)
             element.LayoutTransform = new ScaleTransform(-1, 1);
     }
 
