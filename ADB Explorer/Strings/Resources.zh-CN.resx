@@ -1771,4 +1771,7 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_THUMBSIZE_TILES" xml:space="preserve">
     <value>瓷贴</value>
   </data>
+  <data name="S_THUMBSIZE_CONTENT" xml:space="preserve">
+    <value>内容</value>
+  </data>
 </root>
