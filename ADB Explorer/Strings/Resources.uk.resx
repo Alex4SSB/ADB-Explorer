@@ -1771,4 +1771,7 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_THUMBSIZE_TILES" xml:space="preserve">
     <value>Плитка</value>
   </data>
+  <data name="S_THUMBSIZE_CONTENT" xml:space="preserve">
+    <value>Зміст</value>
+  </data>
 </root>
