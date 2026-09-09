@@ -18,12 +18,17 @@ public static class FolderHelper
         if (!Data.CurrentDisplayNames.TryAdd(driveView, name))
             Data.CurrentDisplayNames[driveView] = name;
 
-        foreach (var drive in device.Drives.OfType<LogicalDriveViewModel>().Where(d => d.Type 
-            is not AbstractDrive.DriveType.Root 
+        // Index USB/OTG drives only while more than one is connected, so DisplayName can tell them apart.
+        var externalDrives = device.Drives.OfType<LogicalDriveViewModel>().Where(d => d.Type is AbstractDrive.DriveType.External).ToList();
+        for (var i = 0; i < externalDrives.Count; i++)
+            externalDrives[i].SetDriveIndex(externalDrives.Count > 1 ? i + 1 : null);
+
+        foreach (var drive in device.Drives.OfType<LogicalDriveViewModel>().Where(d => d.Type
+            is not AbstractDrive.DriveType.Root
             and not AbstractDrive.DriveType.Internal))
         {
-            Data.CurrentDisplayNames.TryAdd(drive.Path, drive.Type is AbstractDrive.DriveType.External
-                ? drive.ID : drive.DisplayName);
+            if (!Data.CurrentDisplayNames.TryAdd(drive.Path, drive.DisplayName))
+                Data.CurrentDisplayNames[drive.Path] = drive.DisplayName;
         }
 
         foreach (var item in AdbExplorerConst.DRIVE_TYPES.Where(d => d.Value is AbstractDrive.DriveType.Root or AbstractDrive.DriveType.Internal))

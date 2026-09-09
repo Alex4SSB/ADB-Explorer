@@ -22,7 +22,33 @@ public partial class LogicalDrive : Drive
     [ObservableProperty]
     public partial string FileSystem { get; set; } = "";
 
+    /// <summary>Disk manufacturer/product label reported by <c>dumpsys mount</c> (e.g. "SanDisk"), when known.</summary>
+    [ObservableProperty]
+    public partial string? Manufacturer { get; set; }
+
+    /// <summary>User-visible volume label reported by <c>dumpsys mount</c> (e.g. "Micro SD"), when known.</summary>
+    [ObservableProperty]
+    public partial string? VolumeLabel { get; set; }
+
+    /// <summary>1-based position among this device's currently connected USB/OTG drives, set only when there is more than one.</summary>
+    [ObservableProperty]
+    public partial int? DriveIndex { get; set; }
+
     public string ID => Path.Count(c => c == '/') > 1 ? Path[(Path.LastIndexOf('/') + 1)..] : Path;
+
+    public override string DisplayName
+    {
+        get
+        {
+            var name = !string.IsNullOrEmpty(Manufacturer) && !string.IsNullOrEmpty(VolumeLabel)
+                ? $"{Manufacturer} {VolumeLabel}"
+                : base.DisplayName;
+
+            return Type is DriveType.External && DriveIndex is int index
+                ? $"{name} ({index})"
+                : name;
+        }
+    }
 
 
     public LogicalDrive(string size = "",
@@ -125,6 +151,9 @@ public partial class LogicalDrive : Drive
 
         if (snapshot.Type is not DriveType.Unknown && drive.Type != snapshot.Type)
             drive.Type = snapshot.Type;
+
+        drive.Manufacturer = snapshot.Manufacturer;
+        drive.VolumeLabel = snapshot.VolumeLabel;
 
         return drive;
     }

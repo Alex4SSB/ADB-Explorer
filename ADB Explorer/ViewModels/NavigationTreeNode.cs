@@ -5,12 +5,6 @@ namespace ADB_Explorer.ViewModels;
 
 public partial class NavigationTreeNode : ObservableObject
 {
-    private static readonly FileClass ShellDrive = new("Drive", "/Drive", AbstractFile.FileType.Drive);
-    private static readonly FileClass EmptyTrash = new("RecycleBin", "/RecycleBin", AbstractFile.FileType.EmptyTrash);
-    private static readonly FileClass FullTrash = new("RecycleBin", "/RecycleBin", AbstractFile.FileType.FullTrash);
-    private static readonly FileClass ApkIcon = new("app.apk", "/app.apk", AbstractFile.FileType.File);
-    private static readonly FileClass PhoneIcon = new("Phone", "/Phone", AbstractFile.FileType.Phone);
-
     private readonly Action<NavigationTreeNode>? _onUserSelect;
     private readonly Action<NavigationTreeNode>? _onExpanded;
     private bool _suppressSelectionCallback;
@@ -207,19 +201,11 @@ public partial class NavigationTreeNode : ObservableObject
 
     public static BitmapSource? DriveIcon(DriveViewModel drive)
     {
-        if (drive.Type is AbstractDrive.DriveType.Package)
-            return ApkIcon.Icon;
-
-        if (drive.Type is AbstractDrive.DriveType.Trash)
-        {
-            var empty = drive is VirtualDriveViewModel { ItemsCount: 0 };
-            return empty ? EmptyTrash.Icon : FullTrash.Icon;
-        }
-
-        return ShellDrive.Icon;
+        var trashEmpty = drive is VirtualDriveViewModel { ItemsCount: 0 };
+        return FileToIconConverter.GetDriveIcon(drive.Type, 16, trashEmpty);
     }
 
-    public static BitmapSource? DeviceIcon() => PhoneIcon.Icon;
+    public static BitmapSource? DeviceIcon() => FileToIconConverter.GetPhoneIcon(16);
 
     public static BitmapSource? FolderIcon(string path, string? deviceId = null)
     {

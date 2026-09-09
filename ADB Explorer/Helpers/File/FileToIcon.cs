@@ -5,8 +5,6 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using System.Drawing;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using static Services.NativeMethods;
 
 namespace ADB_Explorer.Helpers;
@@ -22,7 +20,7 @@ public class FileToIconConverter
         Thumbnail,
     }
 
-    private readonly record struct SpecialIcon(string? DllPath, int Index)
+    private readonly record struct SpecialIcon(string? DllPath, int Index, RotateFlipType Rotation = RotateFlipType.RotateNoneFlipNone)
     {
         public static readonly SpecialIcon None = new(null, -1);
         public bool IsValid => Index >= 0;
@@ -30,6 +28,7 @@ public class FileToIconConverter
 
     private const string Shell32 = "shell32.dll";
     private const string Imageres = "imageres.dll";
+    private const string Ddores = "ddores.dll";
 
     private static readonly SpecialIcon FolderIcon = new(Shell32, 3);
     private static readonly SpecialIcon DriveIcon = new(Shell32, 79);
@@ -40,6 +39,8 @@ public class FileToIconConverter
     private static readonly SpecialIcon BrokenLinkIcon = new(Shell32, 271);
     private static readonly SpecialIcon GalleryIcon = new(Shell32, 318);
     private static readonly SpecialIcon PhoneIcon = new(Imageres, 42);
+    // Source icon is drawn horizontally; rotate 90 deg CCW so it reads as a vertical SD/microSD card.
+    private static readonly SpecialIcon SdCardIcon = new(Imageres, 91, RotateFlipType.Rotate270FlipNone);
     private static readonly SpecialIcon MusicFolderIcon = new(Imageres, 103);
     private static readonly SpecialIcon DocumentsFolderIcon = new(Imageres, 107);
     private static readonly SpecialIcon PicturesFolderIcon = new(Imageres, 108);
@@ -48,6 +49,7 @@ public class FileToIconConverter
     private static readonly SpecialIcon DownloadsFolderIcon = new(Imageres, 175);
     private static readonly SpecialIcon VideosFolderIcon = new(Imageres, 178);
     private static readonly SpecialIcon EnterFolderIcon = new(Imageres, 265);
+    private static readonly SpecialIcon ExternalStorageIcon = new(Ddores, 83);
 
     private static readonly System.Drawing.Color Gray232 = System.Drawing.Color.FromArgb(232, 232, 232);
 
@@ -171,6 +173,123 @@ public class FileToIconConverter
             NativeMethods.MDeleteObject(hBitmap);
         }
     }
+
+    private const double RootDriveBadgeSizeRatio = 0.55;
+
+    private const int SmallRootDriveBadgeSize = 12;
+
+    private static readonly Dictionary<int, BitmapSource> RootDriveIconCache = [];
+
+    /// <summary>
+    /// Paints the <see cref="AndroidRobotHeadIcon"/> over <paramref name="baseIcon"/> (a plain drive
+    /// icon) in the top-left corner, mirroring how Windows paints its logo over the C: drive icon.
+    /// The badge is rendered from vector path data straight at the target pixel size (no stored
+    /// asset, no upscaling), so it stays sharp at any size. Cached per pixel size.
+    /// </summary>
+    public static BitmapSource ComposeRootDriveIcon(BitmapSource baseIcon)
+    {
+        var size = baseIcon.PixelWidth;
+
+        if (RootDriveIconCache.TryGetValue(size, out var cached))
+            return cached;
+
+        BitmapSource? result = null;
+        void Render()
+        {
+            var badgeWidth = size < 32
+                ? SmallRootDriveBadgeSize
+                : (int)Math.Round(size * RootDriveBadgeSizeRatio);
+            var badgeHeight = Math.Max(1, (int)Math.Round(badgeWidth / AndroidRobotHeadIcon.AspectRatio));
+
+            var badge = AndroidRobotHeadIcon.Render(badgeWidth, badgeHeight);
+
+            var visual = new DrawingVisual();
+            using (var dc = visual.RenderOpen())
+            {
+                dc.DrawImage(baseIcon, new Rect(0, 0, size, size));
+                dc.DrawImage(badge, new Rect(size / 15, size / 6, badgeWidth, badgeHeight));
+            }
+
+            var rendered = new RenderTargetBitmap(size, size, baseIcon.DpiX, baseIcon.DpiY, PixelFormats.Pbgra32);
+            rendered.Render(visual);
+            rendered.Freeze();
+
+            result = rendered;
+        }
+
+        var dispatcher = App.AppDispatcher;
+        if (dispatcher is null || dispatcher.CheckAccess())
+            Render();
+        else
+            dispatcher.Invoke(Render);
+
+        lock (RootDriveIconCache)
+            RootDriveIconCache.TryAdd(size, result!);
+
+        return result!;
+    }
+
+    // Resolves a fixed SpecialIcon directly, bypassing FileClass/SpecialFileType.
+    private static BitmapSource GetSpecialIcon(SpecialIcon specialIcon, string iconId, int desiredSize, Action<Bitmap>? postProcess = null)
+    {
+        var size = SizeToIconSize(desiredSize);
+        var keyedSize = size is IconSize.Jumbo or IconSize.Thumbnail ? desiredSize : 0;
+        var key = new IconCacheKey(iconId, size, keyedSize);
+
+        if (iconDic.TryGetValue(key, out var cached))
+            return cached;
+
+        Bitmap bitmap = size switch
+        {
+            IconSize.Jumbo or IconSize.Thumbnail => LoadJumbo(specialIcon, iconId, desiredSize),
+            IconSize.ExtraLarge => NativeMethods.ExtractIconByIndex(specialIcon.DllPath!, specialIcon.Index, 48).ToBitmap(),
+            _ => GetIconFromIndex(specialIcon, size).ToBitmap(),
+        };
+
+        if (specialIcon.Rotation != RotateFlipType.RotateNoneFlipNone)
+            bitmap.RotateFlip(specialIcon.Rotation);
+
+        postProcess?.Invoke(bitmap);
+
+        var value = LoadBitmap(bitmap);
+        lock (iconDic)
+            iconDic.TryAdd(key, value);
+
+        return iconDic[key];
+    }
+
+    /// <summary>
+    /// Resolves the same DLL-extracted drive icon shown in the details pane / navigation tree for any
+    /// <see cref="AbstractDrive.DriveType"/>, at an arbitrary pixel size. <paramref name="trashEmpty"/>
+    /// only matters for <see cref="AbstractDrive.DriveType.Trash"/>.
+    /// </summary>
+    public static BitmapSource GetDriveIcon(AbstractDrive.DriveType type, int size, bool trashEmpty = false)
+    {
+        if (type is AbstractDrive.DriveType.Package)
+            return DefaultAndroidPackageIcon.Bitmap;
+
+        if (type is AbstractDrive.DriveType.Trash)
+            return trashEmpty
+                ? GetSpecialIcon(EmptyTrashIcon, nameof(EmptyTrashIcon), size)
+                : GetSpecialIcon(FullTrashIcon, nameof(FullTrashIcon), size);
+
+        if (type is AbstractDrive.DriveType.Root)
+            return ComposeRootDriveIcon(GetSpecialIcon(DriveIcon, nameof(DriveIcon), size));
+
+        if (type is AbstractDrive.DriveType.External)
+            return GetSpecialIcon(ExternalStorageIcon, nameof(ExternalStorageIcon), size);
+
+        if (type is AbstractDrive.DriveType.Expansion or AbstractDrive.DriveType.Emulated)
+            return GetSpecialIcon(SdCardIcon, nameof(SdCardIcon), size);
+
+        return GetSpecialIcon(DriveIcon, nameof(DriveIcon), size);
+    }
+
+    public static BitmapSource GetMultipleFilesIcon(int size) =>
+        GetSpecialIcon(MultipleFilesIcon, nameof(MultipleFilesIcon), size);
+
+    public static BitmapSource GetPhoneIcon(int size) =>
+        GetSpecialIcon(PhoneIcon, nameof(PhoneIcon), size, DrawPhoneCameraCutout);
 
     private static bool IsSupportedArchive(string? fileName, AbstractFile.SpecialFileType specialType)
     {
@@ -410,14 +529,16 @@ public class FileToIconConverter
             ? $"aaa{ext.ToLower()}"
             : associationName;
 
+        Bitmap bitmap;
         switch (size)
         {
             case IconSize.Jumbo or IconSize.Thumbnail:
             {
                 var iconId = ComputeIconId(fileName, specialType, filePath);
-                return specialIcon.IsValid
+                bitmap = specialIcon.IsValid
                     ? LoadJumbo(specialIcon, iconId, desiredSize)
                     : LoadJumbo(lookup, iconId, desiredSize);
+                break;
             }
 
             case IconSize.ExtraLarge:
@@ -431,13 +552,40 @@ public class FileToIconConverter
                     icon = _imgList.Icon(_imgList.IconIndex(lookup));
                 }
 
-                return icon.ToBitmap();
+                bitmap = icon.ToBitmap();
+                break;
 
             default:
                 icon = specialIcon.IsValid ? GetIconFromIndex(specialIcon, size) : GetFileIcon(lookup, size);
 
-                return icon.ToBitmap();
+                bitmap = icon.ToBitmap();
+                break;
         }
+
+        if (specialIcon.Rotation != RotateFlipType.RotateNoneFlipNone)
+            bitmap.RotateFlip(specialIcon.Rotation);
+
+        return bitmap;
+    }
+
+    private const double PhoneCameraCutoutSizeRatio = 0.06;
+    private const double PhoneCameraCutoutTopRatio = 0.04;
+    private const int MinPhoneCameraCutoutSize = 3;
+
+    /// <summary>
+    /// Draws a small black front-camera cutout centered near the top of the phone icon, in place.
+    /// </summary>
+    private static void DrawPhoneCameraCutout(Bitmap phoneIcon)
+    {
+        var size = Math.Min(phoneIcon.Width, phoneIcon.Height);
+        var diameter = Math.Max(MinPhoneCameraCutoutSize, (int)Math.Round(size * PhoneCameraCutoutSizeRatio));
+        var top = Math.Max(1, (int)Math.Round(size * PhoneCameraCutoutTopRatio));
+        var left = (phoneIcon.Width - diameter) / 2;
+
+        using var g = Graphics.FromImage(phoneIcon);
+        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        using var brush = new SolidBrush(System.Drawing.Color.FromArgb(40, 40, 40));
+        g.FillEllipse(brush, left, top, diameter, diameter);
     }
 
     private static bool IsOnInternalStorage(string? filePath)
@@ -483,11 +631,6 @@ public class FileToIconConverter
             AbstractFile.SpecialFileType.BrokenLink => BrokenLinkIcon,
             AbstractFile.SpecialFileType.Unknown => UnknownIcon,
             AbstractFile.SpecialFileType.LinkOverlay => LinkOverlayIcon,
-            AbstractFile.SpecialFileType.MultipleFiles => MultipleFilesIcon,
-            AbstractFile.SpecialFileType.Drive => DriveIcon,
-            AbstractFile.SpecialFileType.EmptyTrash => EmptyTrashIcon,
-            AbstractFile.SpecialFileType.FullTrash => FullTrashIcon,
-            AbstractFile.SpecialFileType.Phone => PhoneIcon,
             AbstractFile.SpecialFileType.Gallery when Data.RuntimeSettings.IsWindows10 => PicturesFolderIcon,
             AbstractFile.SpecialFileType.Gallery => GalleryIcon,
             AbstractFile.SpecialFileType.EnterFolder => EnterFolderIcon,
@@ -522,7 +665,9 @@ public class FileToIconConverter
         
         if (specialType.HasFlag(AbstractFile.SpecialFileType.Apk))
         {
-            Icon apkIcon = new(size is IconSize.Small ? Properties.AppGlobal.APK_icon : Properties.AppGlobal.APK_icon_256px, IconToSize(size));
+            // Small is read at 2x its display size so it stays sharp under monitor scaling above 100%.
+            var apkIconSize = size is IconSize.Small ? new System.Drawing.Size(32, 32) : IconToSize(size);
+            Icon apkIcon = new(size is IconSize.Small ? Properties.AppGlobal.APK_icon : Properties.AppGlobal.APK_icon_256px, apkIconSize);
 
             yield return AddToDictionary(apkIcon, size, AbstractFile.SpecialFileType.Apk);
         }

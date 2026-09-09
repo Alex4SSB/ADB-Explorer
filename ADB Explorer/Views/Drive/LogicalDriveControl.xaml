@@ -40,28 +40,6 @@
                     </Style>
                 </StackPanel.Style>
                 <TextBlock Text="{Binding DisplayName}" />
-                <StackPanel Orientation="Horizontal">
-                    <StackPanel.Style>
-                        <Style TargetType="StackPanel">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Type}" Value="External">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Type}" Value="Emulated">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </StackPanel.Style>
-                    <TextBlock Text=" (" />
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        FontFamily="{StaticResource ConsoleFont}"
-                        FontWeight="Regular"
-                        Text="{Binding ID}" />
-                    <TextBlock Text=")" />
-                </StackPanel>
             </StackPanel>
             <ProgressBar
                 Grid.Row="1"

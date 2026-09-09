@@ -403,35 +403,40 @@ public partial class ADBService
         }
     }
 
-    public static bool MmcExists(string deviceID) => GetMmcNode(deviceID).Count > 1;
+    public readonly record struct DriveMountInfo(AbstractDrive.DriveType Type, string Manufacturer, string VolumeLabel);
 
-    public static GroupCollection GetMmcNode(string deviceID)
+    /// <summary>
+    /// Classifies every currently mounted removable drive as an SD/expansion card or a USB/OTG
+    /// drive, and captures the same manufacturer + volume label Android's own storage settings
+    /// show, by correlating <c>dumpsys mount</c>'s Disks section (<c>flags=SD|USB</c>, <c>label=</c>)
+    /// with its Volumes section (<c>diskId=</c>, <c>fsLabel=</c>, <c>path=</c>). Keyed by mount path.
+    /// </summary>
+    public static Dictionary<string, DriveMountInfo> GetRemovableDriveInfo(string deviceID)
     {
-        // Check whether the MMC block device (first partition) exists (MMC0 / MMC1)
-        ExecuteDeviceAdbShellCommand(deviceID, "stat", out string stdout, out _, CancellationToken.None, @"-c""%t,%T""", MMC_BLOCK_DEVICES[0], MMC_BLOCK_DEVICES[1]);
-        // Exit code will always be 1 since we are searching for both possibilities, and only one of them can exist
+        var exitCode = ExecuteDeviceAdbShellCommand(deviceID, "dumpsys", out string stdout, out _, CancellationToken.None, "mount");
 
-        // Get major and minor nodes in hex and return
-        return RE_MMC_BLOCK_DEVICE_NODE().Match(stdout).Groups;
+        return exitCode == 0 ? ParseMountDump(stdout) : [];
     }
 
-    public static string GetMmcId(string deviceID)
+    internal static Dictionary<string, DriveMountInfo> ParseMountDump(string stdout)
     {
-        var matchGroups = GetMmcNode(deviceID);
-        if (matchGroups.Count < 2)
-            return "";
+        Dictionary<string, (bool IsSd, string Label)> disks = [];
+        foreach (Match disk in RE_DUMPSYS_MOUNT_DISK().Matches(stdout))
+        {
+            disks[disk.Groups["Disk"].Value] = (disk.Groups["Flags"].Value.Contains("SD"), disk.Groups["Label"].Value.Trim());
+        }
 
-        // Get a list of all volumes (and their nodes)
-        // The public flag reduces execution time significantly
-        int exitCode = ExecuteDeviceAdbShellCommand(deviceID, "sm", out string stdout, out _, CancellationToken.None, "list-volumes", "public");
-        if (exitCode != 0)
-            return "";
+        Dictionary<string, DriveMountInfo> volumes = [];
+        foreach (Match volume in RE_DUMPSYS_MOUNT_VOLUME().Matches(stdout))
+        {
+            if (!disks.TryGetValue(volume.Groups["Disk"].Value, out var disk))
+                continue;
 
-        var node = $"{Convert.ToInt32(matchGroups["major"].Value, 16)},{Convert.ToInt32(matchGroups["minor"].Value, 16)}";
-        // Find the ID of the device with the MMC node
-        var mmcVolumeId = Regex.Match(stdout, @$"{node}\smounted\s(?<id>[\w-]+)");
+            var type = disk.IsSd ? AbstractDrive.DriveType.Expansion : AbstractDrive.DriveType.External;
+            volumes[volume.Groups["Path"].Value] = new(type, disk.Label, volume.Groups["FsLabel"].Value.Trim());
+        }
 
-        return mmcVolumeId.Success ? mmcVolumeId.Groups["id"].Value : "";
+        return volumes;
     }
 
     public static bool CheckMDNS()
@@ -925,8 +930,6 @@ public partial class ADBService
     public const string GET_PROP = "getprop";
     public const string ANDROID_VERSION = "ro.build.version.release";
     public const string BATTERY = "dumpsys battery";
-    public const string MMC_PROP = "vold.microsd.uuid";
-    public const string OTG_PROP = "vold.otgstorage.uuid";
 
     public const string BRAND_NAME = "ro.product.brand_device_name";
     public const string HOST_NAME = "net.hostname";
@@ -953,9 +956,6 @@ public partial class ADBService
                 : [];
         }
     }
-
-    // First partition of MMC block device 0 / 1
-    private static readonly string[] MMC_BLOCK_DEVICES = ["/dev/block/mmcblk0p1", "/dev/block/mmcblk1p1"];
 
     private static readonly string DRIVE_POLL_ROOT = $"{ADB_UNIT_SEP}ROOT{ADB_UNIT_SEP}";
     private static readonly string DRIVE_POLL_SDCARD = $"{ADB_UNIT_SEP}SDCARD{ADB_UNIT_SEP}";
@@ -1720,7 +1720,9 @@ public readonly record struct DriveSnapshot(
     sbyte UsageP,
     string FileSystem,
     bool IsEmulator,
-    string MountPoint = "")
+    string MountPoint = "",
+    string? Manufacturer = null,
+    string? VolumeLabel = null)
 {
     public string ID => Path.Count(c => c == '/') > 1 ? Path[(Path.LastIndexOf('/') + 1)..] : Path;
 

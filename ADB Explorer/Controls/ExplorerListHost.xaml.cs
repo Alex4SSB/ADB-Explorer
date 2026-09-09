@@ -794,6 +794,9 @@ public partial class ExplorerListHost : UserControl
                     cell = c;
                     row = DataGridRow.GetRowContainingElement(cell);
 
+                    if (row is null)
+                        return false;
+
                     if (cell.DataContext is FileClass clickedFile && clickedFile.FolderViewModel.IsInEditMode)
                         return false;
                     break;
@@ -806,7 +809,10 @@ public partial class ExplorerListHost : UserControl
                 return false;
         }
 
-        var grid = (DataGrid)ItemsControl.ItemsControlFromItemContainer(row);
+        // Row can be mid-recycling by the time mouse-up fires (e.g. a fast double-click that
+        // triggered navigation between down and up), leaving it detached from its DataGrid.
+        if (ItemsControl.ItemsControlFromItemContainer(row) is not DataGrid grid)
+            return false;
 
         var current = row.GetIndex();
         ViewModel.CurrentSelectedIndex = current;
@@ -1882,11 +1888,7 @@ public partial class ExplorerListHost : UserControl
         FileActionLogic.UpdateFileActions();
     }
 
-    /// <summary>
-    /// Selecting/focusing a drive tile (or a saved-location tile) would otherwise make WPF
-    /// auto-scroll this ScrollViewer so the clicked item is fully in view. Swallow that so
-    /// clicking inside the drives/saved-locations expanders never moves the scroll position.
-    /// </summary>
+    // Wired at each source (list + item containers), not just this ScrollViewer - see EventSetter usages.
     private void DriveScrollViewer_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
         => e.Handled = true;
 }

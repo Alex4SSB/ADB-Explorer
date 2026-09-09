@@ -335,11 +335,6 @@ public partial class DetailsPane : UserControl
         DependencyProperty.Register(nameof(RequestModeRefresh), typeof(Action),
           typeof(DetailsPane), new PropertyMetadata(null));
 
-    private static readonly FileClass MultipleFiles = new("MultipleFiles", "/MultipleFiles", AbstractFile.FileType.MultipleFiles);
-    private static readonly FileClass DriveIcon = new("Drive", "/Drive", AbstractFile.FileType.Drive);
-    private static readonly FileClass EmptyTrash = new("RecycleBin", "/RecycleBin", AbstractFile.FileType.EmptyTrash);
-    private static readonly FileClass FullTrash = new("RecycleBin", "/RecycleBin", AbstractFile.FileType.FullTrash);
-    private static readonly FileClass Phone = new("Phone", "/Phone", AbstractFile.FileType.Phone);
     private static readonly BitmapSource AppIcon = DefaultAndroidPackageIcon.Bitmap;
 
     private CancellationTokenSource? _cancellationToken;
@@ -550,12 +545,7 @@ public partial class DetailsPane : UserControl
                         trashDrive = TrashHelper.GetTrashDrive(Data.DevicesObject.Current);
 
                     control.SubscribeTrashCountDrive(drive.Type is AbstractDrive.DriveType.Trash ? trashDrive : null);
-                    control.LargeFileIcon.Source = drive.Type switch
-                    {
-                        AbstractDrive.DriveType.Trash => TrashIcon(trashDrive),
-                        AbstractDrive.DriveType.Package => AppIcon,
-                        _ => DriveIcon.DragImage,
-                    };
+                    control.LargeFileIcon.Source = FileToIconConverter.GetDriveIcon(drive.Type, 120, trashDrive?.ItemsCount == 0);
 
                     control.LargeFileIcon.MaxHeight = 128;
                     control.SmallFileIcon.Source = null;
@@ -575,7 +565,7 @@ public partial class DetailsPane : UserControl
                         ? FlowDirection.RightToLeft
                         : FlowDirection.LeftToRight;
 
-                control.LargeFileIcon.Source = MultipleFiles.DragImage;
+                control.LargeFileIcon.Source = FileToIconConverter.GetMultipleFilesIcon(120);
                 control.LargeFileIcon.MaxHeight = 128;
                 control.SmallFileIcon.Source = null;
                 control.InvalidSelectionBorder.Visibility = Visibility.Visible;
@@ -616,18 +606,18 @@ public partial class DetailsPane : UserControl
                 else if (Data.FileActions.IsDriveViewVisible)
                 {
                     control.FileNameTextBlock.Text = Data.DevicesObject.Current?.Name ?? "";
-                    control.LargeFileIcon.Source = Phone.DragImage;
+                    control.LargeFileIcon.Source = FileToIconConverter.GetPhoneIcon(120);
                     control.FileNameTextBlock.FlowDirection = FlowDirection.LeftToRight;
                 }
                 else if (Data.FileActions.IsSearchMode)
                 {
                     control.FileNameTextBlock.Text = Data.FileActions.ExplorerFilter;
-                    control.LargeFileIcon.Source = MultipleFiles.DragImage;
+                    control.LargeFileIcon.Source = FileToIconConverter.GetMultipleFilesIcon(120);
                 }
                 else if (Data.CurrentDrive?.Path == Data.CurrentPath)
                 {
-                    control.FileNameTextBlock.Text = $"{Data.CurrentDrive.DisplayName}\n{TextHelper.LTR_MARK}({Data.CurrentDrive.Path}){TextHelper.LTR_MARK}";
-                    control.LargeFileIcon.Source = DriveIcon.DragImage;
+                    control.FileNameTextBlock.Text = Data.CurrentDrive.DisplayName;
+                    control.LargeFileIcon.Source = FileToIconConverter.GetDriveIcon(Data.CurrentDrive.Type, 120);
                 }
                 else if (Data.DirList?.CurrentLocation is { } location)
                 {
@@ -1062,7 +1052,7 @@ public partial class DetailsPane : UserControl
     }
 
     private static BitmapSource TrashIcon(VirtualDriveViewModel? trash)
-        => trash?.ItemsCount == 0 ? EmptyTrash.DragImage : FullTrash.DragImage;
+        => FileToIconConverter.GetDriveIcon(AbstractDrive.DriveType.Trash, 120, trash?.ItemsCount == 0);
 
     private static bool IsPreviewTextReadOnly(FileClass file, LogicalDeviceViewModel? device)
     {

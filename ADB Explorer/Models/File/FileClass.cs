@@ -536,11 +536,6 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             FileType.Folder => SpecialFileType.Folder,
             FileType.Unknown => SpecialFileType.Unknown,
             FileType.BrokenLink => SpecialFileType.BrokenLink,
-            FileType.MultipleFiles => SpecialFileType.MultipleFiles,
-            FileType.Drive => SpecialFileType.Drive,
-            FileType.EmptyTrash => SpecialFileType.EmptyTrash,
-            FileType.FullTrash => SpecialFileType.FullTrash,
-            FileType.Phone => SpecialFileType.Phone,
             FileType.Gallery => SpecialFileType.Gallery,
             FileType.EnterFolder => SpecialFileType.EnterFolder,
             _ => SpecialFileType.Regular

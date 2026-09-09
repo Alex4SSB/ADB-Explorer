@@ -17,9 +17,6 @@
         [GeneratedRegex(@"(?<FileSystem>[\w\/]+)\s+(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>\/(?:storage|mnt\/media_rw)\/[\w-]+?)[\r\n]", RegexOptions.Multiline)]
         public static partial Regex RE_EMULATED_ONLY();
 
-        [GeneratedRegex(@"(?<major>[a-f\d]+),(?<minor>[a-f\d]+)")]
-        public static partial Regex RE_MMC_BLOCK_DEVICE_NODE();
-
         [GeneratedRegex(@"(?<ID>[^\s]+)\t*_adb-tls-(?<PortType>pairing|connect)\._tcp\.*\t*(?<IpAddress>[^:]+):(?<Port>\d+)")]
         public static partial Regex RE_MDNS_SERVICE();
 
@@ -88,5 +85,13 @@
         /// <summary>Toybox tabular help: <c>r</c> column with an Append description (no leading dash).</summary>
         [GeneratedRegex(@"(?m)^r\s{2,}Append\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
         public static partial Regex RE_TAR_APPEND_TOYBOX();
+
+        /// <summary><c>dumpsys mount</c> disk entry: removable-media flag (<c>SD</c>/<c>USB</c>) and manufacturer/product label.</summary>
+        [GeneratedRegex(@"DiskInfo\{disk:(?<Disk>[\d,]+)\}:\s*\r?\n\s*flags=(?<Flags>\S+)\s+size=\S+\s+label=(?<Label>.*?)\s*\r?\n")]
+        public static partial Regex RE_DUMPSYS_MOUNT_DISK();
+
+        /// <summary><c>dumpsys mount</c> public volume entry: owning disk, user-visible volume label, and mount path.</summary>
+        [GeneratedRegex(@"VolumeInfo\{public:[\d,]+\}:\s*\r?\n\s*type=PUBLIC diskId=disk:(?<Disk>[\d,]+)[^\r\n]*\r?\n\s*fsType=\S*\s+fsUuid=\S*\s+fsLabel=(?<FsLabel>.*?)\s*\r?\n\s*path=(?<Path>\S+)")]
+        public static partial Regex RE_DUMPSYS_MOUNT_VOLUME();
     }
 }

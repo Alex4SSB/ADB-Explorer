@@ -100,9 +100,44 @@ public partial class LogicalDriveViewModel : DriveViewModel
 
         if (Drive.FileSystem != snapshot.FileSystem)
             Drive.FileSystem = snapshot.FileSystem;
+
+        if (Drive.Manufacturer != snapshot.Manufacturer || Drive.VolumeLabel != snapshot.VolumeLabel)
+        {
+            Drive.Manufacturer = snapshot.Manufacturer;
+            Drive.VolumeLabel = snapshot.VolumeLabel;
+            OnPropertyChanged(nameof(DisplayName));
+        }
     }
 
-    public void SetExtension(bool isMMC = true) => SetType(isMMC ? DriveType.Expansion : DriveType.External);
+    /// <summary>
+    /// Classifies a drive as SD/expansion or USB/OTG, and records the manufacturer + volume label
+    /// (from <see cref="ADBService.DriveMountInfo"/>) so <see cref="DriveViewModel.DisplayName"/>
+    /// can show Android's own friendly name instead of the generic "SD card"/"OTG drive" text.
+    /// </summary>
+    public void SetRemovableInfo(DriveType type, string? manufacturer, string? volumeLabel)
+    {
+        SetType(type);
+
+        if (Drive.Manufacturer != manufacturer || Drive.VolumeLabel != volumeLabel)
+        {
+            Drive.Manufacturer = manufacturer;
+            Drive.VolumeLabel = volumeLabel;
+            OnPropertyChanged(nameof(DisplayName));
+        }
+    }
+
+    /// <summary>
+    /// Sets this USB/OTG drive's 1-based position among its device's other USB/OTG drives, shown in
+    /// <see cref="DriveViewModel.DisplayName"/> as "(n)" only while more than one is connected.
+    /// </summary>
+    public void SetDriveIndex(int? index)
+    {
+        if (Drive.DriveIndex != index)
+        {
+            Drive.DriveIndex = index;
+            OnPropertyChanged(nameof(DisplayName));
+        }
+    }
 
     public override string ToString() => DisplayName is null ? ID : DisplayName;
 }

@@ -26,7 +26,7 @@ public abstract partial class AbstractDrive : ObservableObject
         return obj is not null;
     }
 
-    public string DisplayName
+    public virtual string DisplayName
     {
         get => GetDriveDisplayName(Type);
     }

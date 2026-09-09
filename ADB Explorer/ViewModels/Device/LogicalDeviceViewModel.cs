@@ -254,30 +254,6 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         }
     } = null;
 
-    public string? MmcProp
-    {
-        get
-        {
-            if (string.IsNullOrEmpty(field))
-            {
-                field = Props.GetValueOrDefault(ADBService.MMC_PROP);
-            }
-            return field;
-        }
-    } = null;
-
-    public string? OtgProp
-    {
-        get
-        {
-            if (string.IsNullOrEmpty(field))
-            {
-                field = Props.GetValueOrDefault(ADBService.OTG_PROP);
-            }
-            return field;
-        }
-    } = null;
-
     public string? AndroidVersionString
     {
         get
@@ -557,18 +533,30 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
     private void UpdateExtensionDrives(IEnumerable<DriveSnapshot> snapshots, Dispatcher dispatcher)
     {
-        var mmcTask = Task.Run(() => DeviceHelper.GetMmcDrive(snapshots, ID));
-        mmcTask.ContinueWith(t =>
+        var mountTask = Task.Run(() => ADBService.GetRemovableDriveInfo(ID));
+        mountTask.ContinueWith(t =>
         {
             if (t.IsCanceled)
                 return;
 
-            dispatcher.BeginInvoke(() =>
-            {
-                SetMmcDrive(t.Result);
-                SetExternalDrives();
-            });
+            dispatcher.BeginInvoke(() => ApplyRemovableDriveInfo(t.Result));
         });
+    }
+
+    /// <summary>
+    /// Classifies every drive still of unknown type as SD/expansion or USB/OTG (with its manufacturer
+    /// and volume label when known), using the mount info gathered by <see cref="ADBService.GetRemovableDriveInfo"/>.
+    /// Drives with no matching mount info default to <see cref="AbstractDrive.DriveType.External"/>.
+    /// </summary>
+    private void ApplyRemovableDriveInfo(Dictionary<string, ADBService.DriveMountInfo> mountInfo)
+    {
+        foreach (var drive in Drives.OfType<LogicalDriveViewModel>().Where(d => d.Type is AbstractDrive.DriveType.Unknown))
+        {
+            if (mountInfo.TryGetValue(drive.Path, out var info))
+                drive.SetRemovableInfo(info.Type, info.Manufacturer, info.VolumeLabel);
+            else
+                drive.SetType(AbstractDrive.DriveType.External);
+        }
     }
 
     private async Task<bool> UpdateExtensionDrivesAsync(IEnumerable<DriveSnapshot> snapshots, Dispatcher dispatcher)
@@ -577,16 +565,16 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
         await Task.Run(() =>
         {
-            if (DeviceHelper.GetMmcDrive(list, ID) is { } mmc)
-            {
-                var idx = list.IndexOf(mmc);
-                list[idx] = mmc with { Type = AbstractDrive.DriveType.Expansion };
-            }
+            var mountInfo = ADBService.GetRemovableDriveInfo(ID);
 
             for (int i = 0; i < list.Count; i++)
             {
-                if (list[i].Type is AbstractDrive.DriveType.Unknown)
-                    list[i] = list[i] with { Type = AbstractDrive.DriveType.External };
+                if (list[i].Type is not AbstractDrive.DriveType.Unknown)
+                    continue;
+
+                list[i] = mountInfo.TryGetValue(list[i].Path, out var info)
+                    ? list[i] with { Type = info.Type, Manufacturer = info.Manufacturer, VolumeLabel = info.VolumeLabel }
+                    : list[i] with { Type = AbstractDrive.DriveType.External };
             }
         });
 
@@ -635,33 +623,6 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
                 || (s.Type is AbstractDrive.DriveType.Internal && self.Type is AbstractDrive.DriveType.Internal)));
 
         return added || removed;
-    }
-
-    public void SetMmcDrive(DriveSnapshot? mmc)
-    {
-        if (mmc is not { } mmcDrive)
-            return;
-
-        ((LogicalDriveViewModel)Drives.FirstOrDefault(d => d.Path == mmcDrive.Path))?.SetExtension();
-    }
-
-    public void SetMmcDrive(LogicalDrive mmcDrive)
-    {
-        if (mmcDrive is null)
-            return;
-
-        ((LogicalDriveViewModel)Drives.FirstOrDefault(d => d.Path == mmcDrive.Path))?.SetExtension();
-    }
-
-    /// <summary>
-    /// Sets type of all <see cref="DriveViewModel"/> with unknown type as external.
-    /// </summary>
-    public void SetExternalDrives()
-    {
-        foreach (var item in Drives.Where(d => d.Type == AbstractDrive.DriveType.Unknown))
-        {
-            ((LogicalDriveViewModel)item).SetExtension(false);
-        }
     }
 
     #endregion

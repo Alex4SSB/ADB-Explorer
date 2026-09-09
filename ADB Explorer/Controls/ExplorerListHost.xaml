@@ -57,13 +57,33 @@
             x:Key="DriveTemplateSelector"
             LogicalDriveTemplate="{StaticResource LogicalDriveTemplate}"
             VirtualDriveTemplate="{StaticResource VirtualDriveTemplate}" />
+        <!--  EventSetter needs x:Class, so it's layered on here rather than on DriveContainerStyle  -->
+        <Style
+            x:Key="DriveContainerStyleNoScroll"
+            BasedOn="{StaticResource DriveContainerStyle}"
+            TargetType="ui:ListViewItem">
+            <EventSetter Event="RequestBringIntoView" Handler="DriveScrollViewer_RequestBringIntoView" />
+        </Style>
         <Style
             x:Key="DriveListViewStyle"
             BasedOn="{StaticResource ListViewStyle}"
             TargetType="ui:ListView">
             <Setter Property="SelectionMode" Value="Single" />
             <Setter Property="ItemTemplateSelector" Value="{StaticResource DriveTemplateSelector}" />
-            <Setter Property="ItemContainerStyle" Value="{StaticResource DriveContainerStyle}" />
+            <Setter Property="ItemContainerStyle" Value="{StaticResource DriveContainerStyleNoScroll}" />
+        </Style>
+        <Style
+            x:Key="HomeSavedLocationsListStyleNoScroll"
+            BasedOn="{StaticResource HomeSavedLocationsListStyle}"
+            TargetType="ui:ListView">
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style BasedOn="{StaticResource ListViewItemContainerStyle}" TargetType="ui:ListViewItem">
+                        <Setter Property="Margin" Value="5" />
+                        <EventSetter Event="RequestBringIntoView" Handler="DriveScrollViewer_RequestBringIntoView" />
+                    </Style>
+                </Setter.Value>
+            </Setter>
         </Style>
         <Style
             x:Key="IconFileContainerWithContextMenuStyle"
@@ -115,7 +135,8 @@
                     <ui:ListView
                         x:Name="HomeSavedLocationsList"
                         ItemsSource="{Binding SavedItems}"
-                        Style="{StaticResource HomeSavedLocationsListStyle}">
+                        RequestBringIntoView="DriveScrollViewer_RequestBringIntoView"
+                        Style="{StaticResource HomeSavedLocationsListStyleNoScroll}">
                         <ui:ListView.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <WrapPanel Width="{Binding RelativeSource={RelativeSource AncestorType=ui:ListView}, Path=ActualWidth}" />
@@ -143,6 +164,7 @@
                         HorizontalAlignment="Stretch"
                         ItemsSource="{Binding DriveItemsSource}"
                         PreviewMouseDown="DriveList_PreviewMouseDown"
+                        RequestBringIntoView="DriveScrollViewer_RequestBringIntoView"
                         Style="{StaticResource DriveListViewStyle}">
                         <ui:ListView.ItemsPanel>
                             <ItemsPanelTemplate>

@@ -161,7 +161,7 @@ namespace ADB_Explorer.Models
             get
             {
                 if (Location is SpecialLocation.DriveView)
-                    return AppActions.Icon(FileAction.FileActionType.Home, 16);
+                    return new BaseIcon(FileToIconConverter.GetPhoneIcon(16), 16);
 
                 const int size = 16;
                 var lookupKey = !string.IsNullOrEmpty(Path)
@@ -174,7 +174,7 @@ namespace ADB_Explorer.Models
                     return DriveViewModel.GetDriveIcon(driveType, size);
 
                 var drive = Data.DevicesObject.Current?.Drives.FirstOrDefault(d => d.Path == Path);
-                return drive is null ? null : DriveViewModel.GetDriveIcon(drive.Type, size);
+                return drive?.GetIcon(size);
             }
         }
 

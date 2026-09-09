@@ -50,21 +50,27 @@ public partial class DriveViewModel : AbstractDrive, IBrowserItem
     public string MountPoint => FSInfo?.MountPoint;
     public string[] MountOptions => FSInfo?.Options;
 
-    public BaseIcon? DriveIcon => GetDriveIcon(Type);
+    // Read at 2x the display size so the icon stays sharp under monitor scaling above 100%.
+    public BaseIcon? DriveIcon => GetIcon(48, pixelSize: 96);
 
-    public static BaseIcon? GetDriveIcon(DriveType type, double size = 32) => type switch
+    /// <summary>
+    /// Same DLL-extracted icon shown in the details pane / navigation tree, displayed at <paramref name="size"/>
+    /// pixels but read from the icon source at <paramref name="pixelSize"/> (defaults to <paramref name="size"/>)
+    /// so it can be supersampled for crisp rendering under monitor DPI scaling.
+    /// </summary>
+    public BaseIcon? GetIcon(double size = 32, int? pixelSize = null)
     {
-        DriveType.Root => new("\uF259", size),
-        DriveType.Internal => new("\uEDA2", size),
-        DriveType.Expansion => new("\uE7F1", size),
-        DriveType.External => new("\uE88E", size),
-        DriveType.Unknown => null,
-        DriveType.Emulated => new("\uEDA2", size),
-        DriveType.Trash => new("\uE74D", size),
-        DriveType.Temp => new("\uE912", size),
-        DriveType.Package => new(FluentPathGeometries.Apps, size),
-        _ => throw new NotImplementedException(),
-    };
+        var trashEmpty = this is VirtualDriveViewModel { ItemsCount: 0 };
+        return GetDriveIcon(Type, size, trashEmpty, pixelSize);
+    }
+
+    public static BaseIcon? GetDriveIcon(DriveType type, double size = 32, bool trashEmpty = false, int? pixelSize = null)
+    {
+        if (type is DriveType.Unknown)
+            return null;
+
+        return new(FileToIconConverter.GetDriveIcon(type, pixelSize ?? (int)size, trashEmpty), size);
+    }
 
     #endregion
 
@@ -88,6 +94,7 @@ public partial class DriveViewModel : AbstractDrive, IBrowserItem
             Drive.Type = type;
             OnPropertyChanged(nameof(Type));
             OnPropertyChanged(nameof(DriveIcon));
+            OnPropertyChanged(nameof(DisplayName));
         }
     }
 }
