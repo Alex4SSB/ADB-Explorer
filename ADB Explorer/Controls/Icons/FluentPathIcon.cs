@@ -205,6 +205,20 @@ public class BaseIcon
         };
     }
 
+    // Same as the DrawingImage overload, for a non-square raster BitmapSource shown via a plain
+    // ContentPresenter. stretch has no default so this stays unambiguous with the square BitmapSource
+    // overload above - callers must opt in explicitly.
+    public BaseIcon(BitmapSource bitmap, double height, Stretch stretch)
+    {
+        Size = height;
+        IconContent = new System.Windows.Controls.Image()
+        {
+            Source = bitmap,
+            Height = height,
+            Stretch = stretch,
+        };
+    }
+
     public BaseIcon(UserControl content, double size = 18, RtlBehavior rtlBehavior = RtlBehavior.None)
     {
         Size = size;

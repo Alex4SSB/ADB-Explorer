@@ -113,7 +113,7 @@ public static class UISettings
             new LinkSetting(Strings.Resources.S_GITHUB_REPO, Resources.Links.ADB_EXPLORER_GITHUB, new(GitHubGeometry)),
             new LinkSetting(Strings.Resources.S_GOTO_WEBLATE, Resources.Links.WEBLATE, new(WeblateLogo)),
             new LinkSetting(Strings.Resources.S_PRIVACY_POLICY, Resources.Links.ADB_EXPLORER_PRIVACY, new("\uE72E")),
-            new LinkSetting(RuntimeSettings.IsAppPackaged ? Strings.Resources.S_ADB_LEARN_MORE : Strings.Resources.S_ADB_DOWNLOAD, Resources.Links.L_ADB_PAGE, new(FileToIconConverter.LoadBitmap(AppGlobal.icons8_android_os_94))),
+            new LinkSetting(RuntimeSettings.IsAppPackaged ? Strings.Resources.S_ADB_LEARN_MORE : Strings.Resources.S_ADB_DOWNLOAD, Resources.Links.L_ADB_PAGE, new(AndroidRobotHeadIcon.Render(64), 16, Stretch.Uniform)),
         };
 
         if (!RuntimeSettings.IsAppPackaged)

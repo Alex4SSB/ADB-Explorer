@@ -199,15 +199,14 @@ public class FileToIconConverter
             var badgeWidth = size < 32
                 ? SmallRootDriveBadgeSize
                 : (int)Math.Round(size * RootDriveBadgeSizeRatio);
-            var badgeHeight = Math.Max(1, (int)Math.Round(badgeWidth / AndroidRobotHeadIcon.AspectRatio));
 
-            var badge = AndroidRobotHeadIcon.Render(badgeWidth, badgeHeight);
+            var badge = AndroidRobotHeadIcon.Render(badgeWidth);
 
             var visual = new DrawingVisual();
             using (var dc = visual.RenderOpen())
             {
                 dc.DrawImage(baseIcon, new Rect(0, 0, size, size));
-                dc.DrawImage(badge, new Rect(size / 15, size / 6, badgeWidth, badgeHeight));
+                dc.DrawImage(badge, new Rect(size / 15, size / 6, badge.PixelWidth, badge.PixelHeight));
             }
 
             var rendered = new RenderTargetBitmap(size, size, baseIcon.DpiX, baseIcon.DpiY, PixelFormats.Pbgra32);

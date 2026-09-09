@@ -28,13 +28,13 @@ internal static class AndroidRobotHeadIcon
     private static readonly SKColor EyeColor = new(0x40, 0x40, 0x40);
 
     /// <summary>
-    /// Renders the head at <paramref name="width"/>×<paramref name="height"/> pixels. Pass a
-    /// <paramref name="height"/> derived from <see cref="AspectRatio"/> to avoid distorting it.
+    /// Renders the head at <paramref name="width"/> pixels wide; height is derived from <see cref="AspectRatio"/> so it can never be distorted.
     /// </summary>
-    public static BitmapSource Render(int width, int height)
+    public static BitmapSource Render(int width)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(width, 1);
-        ArgumentOutOfRangeException.ThrowIfLessThan(height, 1);
+
+        var height = Math.Max(1, (int)Math.Round(width / AspectRatio));
 
         using var bitmap = new SKBitmap(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
         using var canvas = new SKCanvas(bitmap);
