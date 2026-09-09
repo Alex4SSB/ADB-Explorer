@@ -19,6 +19,12 @@ public class FileSyncOperation : FileOperation
     private readonly ConcurrentDictionary<string, ulong> lastRawReceivedBytes = new();
     private readonly ConcurrentDictionary<string, long> receivedBytesCarry = new();
 
+    // Progress callbacks can fire thousands of times per second across all parallel
+    // transfers; gate how often they reach the (dispatcher-marshaled) UI collection
+    // instead of forwarding every single one, which was freezing the UI thread.
+    private long lastUiUpdateTicks;
+    private static readonly long UiUpdateThrottleTicks = TimeSpan.FromMilliseconds(150).Ticks;
+
     private bool useSyncV2;
 
     public override SyncFile FilePath { get; }
@@ -106,6 +112,7 @@ public class FileSyncOperation : FileOperation
         lastReportedBytes.Clear();
         lastRawReceivedBytes.Clear();
         receivedBytesCarry.Clear();
+        Interlocked.Exchange(ref lastUiUpdateTicks, 0);
 
         if (OperationName is OperationType.Push &&
             !File.Exists(FilePath.FullPath) && !Directory.Exists(FilePath.FullPath))
@@ -288,18 +295,23 @@ public class FileSyncOperation : FileOperation
             // Empty files have nothing to transfer; avoid leaving percentage null (counted as skipped).
             filePercentage = 100.0;
 
-        mutex.WaitOne();
         var progressInfo = new AdbSyncProgressInfo(item.FullPath, null, filePercentage, currentBytes);
 
         // Update the individual SyncFile's progress so that Files.Sum(f => f.BytesTransferred)
         // in ProgressUpdates_CollectionChanged returns the correct running total.
         item.AddUpdates(progressInfo);
 
-        ProgressUpdates.Add(progressInfo);
-
-        mutex.ReleaseMutex();
-
         TransferEnd = DateTime.Now;
+
+        var nowTicks = DateTime.UtcNow.Ticks;
+        if (nowTicks - Interlocked.Read(ref lastUiUpdateTicks) < UiUpdateThrottleTicks)
+            return;
+
+        Interlocked.Exchange(ref lastUiUpdateTicks, nowTicks);
+
+        mutex.WaitOne();
+        ProgressUpdates.Add(progressInfo);
+        mutex.ReleaseMutex();
     }
 
     /// <summary>
