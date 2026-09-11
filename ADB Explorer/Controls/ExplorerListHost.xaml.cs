@@ -598,6 +598,9 @@ public partial class ExplorerListHost : UserControl
 
         SelectionRect.ResetGesture();
 
+        Owner.PathBoxFocus(false);
+        RaiseUnfocusSearchBox();
+
         if (e.OriginalSource is Border)
         {
             ClickCount = -1;
@@ -648,9 +651,6 @@ public partial class ExplorerListHost : UserControl
             ClickCount = -1;
             return;
         }
-
-        Owner.PathBoxFocus(false);
-        RaiseUnfocusSearchBox();
 
         if (!row.IsSelected
             && Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
@@ -950,6 +950,9 @@ public partial class ExplorerListHost : UserControl
             return;
 
         SelectionRect.ResetGesture();
+
+        Owner.PathBoxFocus(false);
+        RaiseUnfocusSearchBox();
 
         if (e.OriginalSource is Border)
         {
@@ -1670,7 +1673,21 @@ public partial class ExplorerListHost : UserControl
             ? ItemsControl.ContainerFromElement(IconView, source) as ListViewItem
             : null;
 
-        TrackExplorerMouseDown(e, source, hitItem is not null && hitItem.IsSelected);
+        WasEditing = hitItem?.DataContext is FileClass clickedFile && clickedFile.IconViewModel.IsInEditMode;
+        if (WasEditing)
+        {
+            // A click anywhere else on the tile currently being renamed - not on the rename TextBox
+            // itself - should commit the rename, matching DataGridCell_PreviewMouseDown.
+            if (_renameTextBox is not null && !IsWithinElement(source, _renameTextBox))
+                FileViewModelBase.RenameCommit(_renameTextBox, ExitIconEditMode);
+
+            return;
+        }
+
+        var itemAlreadySelected = hitItem is not null && hitItem.IsSelected;
+        FileIconView.ItemWasSelectedBeforeClick = itemAlreadySelected;
+
+        TrackExplorerMouseDown(e, source, itemAlreadySelected);
 
         int selectionIndex = IconView.SelectedIndex;
 

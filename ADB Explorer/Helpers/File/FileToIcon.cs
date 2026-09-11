@@ -279,7 +279,14 @@ public class FileToIconConverter
             return GetSpecialIcon(ExternalStorageIcon, nameof(ExternalStorageIcon), size);
 
         if (type is AbstractDrive.DriveType.Expansion or AbstractDrive.DriveType.Emulated)
-            return GetSpecialIcon(SdCardIcon, nameof(SdCardIcon), size);
+        {
+            // The Windows 10 imageres.dll SD card glyph is already drawn vertically.
+            var sdCardIcon = Data.RuntimeSettings.IsWindows10
+                ? SdCardIcon with { Rotation = RotateFlipType.RotateNoneFlipNone }
+                : SdCardIcon;
+
+            return GetSpecialIcon(sdCardIcon, nameof(SdCardIcon), size);
+        }
 
         return GetSpecialIcon(DriveIcon, nameof(DriveIcon), size);
     }
@@ -288,7 +295,7 @@ public class FileToIconConverter
         GetSpecialIcon(MultipleFilesIcon, nameof(MultipleFilesIcon), size);
 
     public static BitmapSource GetPhoneIcon(int size) =>
-        GetSpecialIcon(PhoneIcon, nameof(PhoneIcon), size, DrawPhoneCameraCutout);
+        GetSpecialIcon(PhoneIcon, nameof(PhoneIcon), size, Data.RuntimeSettings.IsWindows10 ? null : DrawPhoneCameraCutout);
 
     private static bool IsSupportedArchive(string? fileName, AbstractFile.SpecialFileType specialType)
     {

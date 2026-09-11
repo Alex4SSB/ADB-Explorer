@@ -139,8 +139,15 @@
         <Setter Property="Opacity" Value="1" />
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Style.Triggers>
+            <DataTrigger Binding="{Binding CutState}" Value="Move">
+                <Setter Property="Opacity" Value="0.5" />
+            </DataTrigger>
             <DataTrigger Binding="{Binding IsSelected}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
+            </DataTrigger>
+            <!-- After IsSelected: a copied item keeps its accent color even while selected. -->
+            <DataTrigger Binding="{Binding CutState}" Value="Copy">
+                <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -151,15 +158,6 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding FolderViewModel.ExtensionIsGlyph}" Value="True">
                 <Setter Property="FontFamily" Value="Segoe UI Symbol" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding CutState}" Value="Move">
-                <Setter Property="Opacity" Value="0.5" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding CutState}" Value="Copy">
-                <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

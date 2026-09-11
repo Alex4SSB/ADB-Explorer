@@ -167,6 +167,11 @@ public partial class ExplorerPageHeader : UserControl
             {
                 ExplorerList.ScheduleApkIconPriorityUpdate();
             }
+
+            // ActiveView switches to a different grid on view-mode change; a stale target
+            // here means F6/Escape unfocus silently no-ops (Focus() on a hidden element fails).
+            if (e.PropertyName is nameof(ExplorerViewModel.IsIconView) or nameof(ExplorerViewModel.IsContentView))
+                NavigationBox.UnfocusTarget = SearchBox.UnfocusTarget = ExplorerList.ActiveView;
         };
     }
 
@@ -386,6 +391,9 @@ public partial class ExplorerPageHeader : UserControl
                 return;
 
             NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
+
+            if (NavigationBox.PathBox.IsKeyboardFocusWithin)
+                NavigationBox.UnfocusTarget?.Focus();
         }
     }
 
@@ -610,7 +618,7 @@ public partial class ExplorerPageHeader : UserControl
 
         FileActionLogic.IsPasteEnabled();
 
-        FileActions.PushPackageEnabled = Settings.EnableApk && DevicesObject?.Current?.Type is not DeviceType.Recovery;
+        FileActions.PushPackageEnabled = Settings.EnableApk && DevicesObject?.Current is { Type: not DeviceType.Recovery };
         FileActions.UninstallPackageEnabled = false;
 
         FileActions.ContextPushPackagesEnabled =

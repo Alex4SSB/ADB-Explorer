@@ -319,9 +319,6 @@
                                                     <DataTrigger Binding="{Binding FolderViewModel.IsInEditMode}" Value="True">
                                                         <Setter Property="Visibility" Value="Collapsed" />
                                                     </DataTrigger>
-                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                        <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
-                                                    </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </emoji:TextBlock.Style>
@@ -373,9 +370,6 @@
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Type}" Value="BrokenLink">
                                         <Setter Property="Visibility" Value="Visible" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                        <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -436,9 +430,6 @@
                                         </MultiDataTrigger.Conditions>
                                         <Setter Property="Visibility" Value="Visible" />
                                     </MultiDataTrigger>
-                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                        <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
-                                    </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </DataGridTextColumn.ElementStyle>
@@ -571,31 +562,6 @@
                 SelectionUnit="FullRow"
                 Style="{StaticResource ExplorerGridStyle}">
                 <ui:DataGrid.Columns>
-                    <!--
-                        Content view as three real columns (Name, Type, Date/Size). Only name/path
-                        is star-sized - it is the sole column that grows or shrinks with the
-                        window, capped by MaxWidth so it doesn't push Type and Date/Size out to the
-                        far right of a very wide window, but otherwise free to grow well past what
-                        the classic grid's fixed columns allow, so it isn't trimmed just because the
-                        window happens to be maximized. Type and Date/Size are NOT star columns -
-                        each is a fixed width (see their own comments, and ContentGrid_SizeChanged
-                        in the code-behind, for how each one's width and visibility are driven from
-                        this grid's own ActualWidth - a DataGridColumn isn't part of the visual
-                        tree, so its own Width/Visibility can't react to that via a
-                        RelativeSource/ElementName binding the way each cell template's content
-                        can). Because they're fixed rather than sharing a star-width pool with
-                        name/path, they never get squeezed to an in-between size that's too narrow
-                        for their full text but not yet hidden. name/path is allowed to give up
-                        some of its own comfortable width first, but Type and then Date/Size give
-                        way - outright, never trimmed into an unreadable fragment - well before
-                        name/path would otherwise be squeezed all the way down to its bare
-                        MinWidth. Below its own narrowest threshold, Date/Size collapses entirely
-                        just like Type; above that but below a wider one, it keeps showing "Size:
-                        {...}" alone, with "Date modified: {...}" hidden (never trimmed) rather
-                        than collapsed outright, so "Size: {...}" stays anchored to the same
-                        position it holds when both lines are shown instead of hopping into the
-                        space the date line leaves behind.
-                    -->
                     <DataGridTemplateColumn
                         x:Name="ContentNameColumn"
                         Width="*"
@@ -606,14 +572,6 @@
                         SortMemberPath="FullName">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <!--
-                                    The item divider used to be this Border's own bottom edge, which sat
-                                    inside the row's selection/hover highlight (RowBorder in
-                                    ContentDataGridRowTemplate) and so looked like part of the item. It is
-                                    now drawn by that row template instead, in the gap between rows -
-                                    outside the highlighted/rounded area - so it reads as a divider between
-                                    items rather than a stroke on the item itself.
-                                -->
                                 <Border Padding="10,7,0,7">
                                     <DockPanel LastChildFill="True">
 
@@ -625,7 +583,17 @@
                                             VerticalAlignment="Center"
                                             DockPanel.Dock="Left"
                                             Source="{Binding IconViewModel.LargeIcon}"
-                                            Stretch="Uniform" />
+                                            Stretch="Uniform">
+                                            <Image.Style>
+                                                <Style TargetType="Image">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding CutState}" Value="Move">
+                                                            <Setter Property="Opacity" Value="0.5" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Image.Style>
+                                        </Image>
 
                                         <!--  Row 0: file name / Row 1: full path — fills the rest of this column  -->
                                         <Grid VerticalAlignment="Center">
@@ -661,9 +629,6 @@
                                                                 <DataTrigger Binding="{Binding FolderViewModel.IsInEditMode}" Value="True">
                                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                                 </DataTrigger>
-                                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                                    <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
-                                                                </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
                                                     </emoji:TextBlock.Style>
@@ -673,16 +638,11 @@
                                                 Grid.Row="1"
                                                 Margin="0,2,0,0"
                                                 FontSize="{Binding Source={StaticResource FontSize}}"
-                                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                                 Text="{Binding FullPath}"
                                                 TextTrimming="CharacterEllipsis">
                                                 <emoji:TextBlock.Style>
                                                     <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                                <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
                                                     </Style>
                                                 </emoji:TextBlock.Style>
                                             </emoji:TextBlock>
@@ -700,31 +660,12 @@
                         SortMemberPath="FolderViewModel.TypeName">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <!--
-                                    Auto-width: this column always sizes to its own full "Type: {...}" text
-                                    (never trimmed) rather than sharing a star-width pool with the other
-                                    columns, so it's never rendered at some in-between width that's too
-                                    narrow to show that text but not yet hidden. Below
-                                    ContentTypeColumnHideWidth, ContentGrid_SizeChanged in the code-behind
-                                    collapses the whole column outright (not just this Border's content) so
-                                    name/path reclaims the freed space instead of leaving a blank gap where
-                                    Type used to be.
-                                -->
                                 <Border Padding="14,7,0,7">
                                     <emoji:TextBlock
                                         VerticalAlignment="Center"
                                         FontSize="{Binding Source={StaticResource FontSize}}"
-                                        Text="{Binding FolderViewModel.ContentViewTypeText}">
-                                        <emoji:TextBlock.Style>
-                                            <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                        <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </emoji:TextBlock.Style>
-                                    </emoji:TextBlock>
+                                        Style="{StaticResource DirectoryGridCellStyle}"
+                                        Text="{Binding FolderViewModel.ContentViewTypeText}" />
                                 </Border>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
@@ -743,44 +684,24 @@
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
-                                        <!--
-                                            This column's own declared Width is fixed, not star - either
-                                            ContentDateSizeFullWidth (250) or, below ContentDateLineHideWidth,
-                                            ContentDateSizeCollapsedWidth (130) - and its own Visibility
-                                            collapses the whole column entirely below the narrower
-                                            ContentDateSizeColumnHideWidth, all set directly by
-                                            ContentGrid_SizeChanged in the code-behind (see its comment for
-                                            why a DataGridColumn's own Width/Visibility can't just be bound to
-                                            this grid's ActualWidth from here). "Date modified: {...}" - the
-                                            longer of this column's two lines - hides (never trimmed) in
-                                            lockstep with that same Width step, via
-                                            ExplorerListHost.ContentDateLineVisibility (see that property's own
-                                            comment for why this binds to it directly, via RelativeSource to
-                                            this UserControl itself, rather than reacting to this cell's own
-                                            ActualWidth the way ContentTypeColumn's cell template used to).
-                                        -->
                                         <emoji:TextBlock
                                             Grid.Row="0"
                                             FontSize="{Binding Source={StaticResource FontSize}}"
+                                            Style="{StaticResource DirectoryGridCellStyle}"
                                             Text="{Binding FolderViewModel.ContentViewModifiedTimeText}"
-                                            Visibility="{Binding ContentDateLineVisibility, RelativeSource={RelativeSource AncestorType=local:ExplorerListHost}}">
-                                            <emoji:TextBlock.Style>
-                                                <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                            <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </emoji:TextBlock.Style>
-                                        </emoji:TextBlock>
+                                            Visibility="{Binding ContentDateLineVisibility, RelativeSource={RelativeSource AncestorType=local:ExplorerListHost}}" />
                                         <emoji:TextBlock
                                             Grid.Row="1"
                                             Margin="0,2,0,0"
                                             FontSize="{Binding Source={StaticResource FontSize}}"
-                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                             Text="{Binding FolderViewModel.ContentViewSizeText}"
-                                            TextTrimming="CharacterEllipsis" />
+                                            TextTrimming="CharacterEllipsis">
+                                            <emoji:TextBlock.Style>
+                                                <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+                                                </Style>
+                                            </emoji:TextBlock.Style>
+                                        </emoji:TextBlock>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

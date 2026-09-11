@@ -45,11 +45,12 @@
                             <DataTrigger Binding="{Binding CutState}" Value="Move">
                                 <Setter Property="Opacity" Value="0.5" />
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding CutState}" Value="Copy">
-                                <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
-                            </DataTrigger>
                             <DataTrigger Binding="{Binding IsSelected}" Value="True">
                                 <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
+                            </DataTrigger>
+                            <!-- After IsSelected: a copied item keeps its accent color even while selected. -->
+                            <DataTrigger Binding="{Binding CutState}" Value="Copy">
+                                <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
@@ -103,11 +104,12 @@
                                 <DataTrigger Binding="{Binding CutState}" Value="Move">
                                     <Setter Property="Opacity" Value="0.5" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding CutState}" Value="Copy">
-                                    <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
-                                </DataTrigger>
                                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
                                     <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
+                                </DataTrigger>
+                                <!-- After IsSelected: a copied item keeps its accent color even while selected. -->
+                                <DataTrigger Binding="{Binding CutState}" Value="Copy">
+                                    <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

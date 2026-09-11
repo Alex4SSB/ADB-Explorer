@@ -25,6 +25,13 @@ public partial class FileIconView : UserControl
     /// </summary>
     public static event EventHandler? RenameEnded;
 
+    /// <summary>
+    /// Whether the hit item was selected before the mouse-down currently in flight, captured by
+    /// ExplorerListHost.IconView_PreviewMouseDown (an ancestor handler that runs first and may
+    /// itself select the item) before that selection change happens.
+    /// </summary>
+    internal static bool ItemWasSelectedBeforeClick { get; set; }
+
     public FileIconView()
     {
         InitializeComponent();
@@ -41,7 +48,7 @@ public partial class FileIconView : UserControl
         if (DataContext is not FileClass file)
             return;
 
-        _wasSelectedOnMouseDown = file.IsSelected;
+        _wasSelectedOnMouseDown = ItemWasSelectedBeforeClick;
         _wasEditingOnMouseDown = file.IconViewModel.IsInEditMode;
         _clickCount = e.ClickCount;
     }
