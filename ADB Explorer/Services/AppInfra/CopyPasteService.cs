@@ -360,7 +360,7 @@ public partial class CopyPasteService : ObservableObject
         var prefDropEffect = VirtualFileDataObject.GetPreferredDropEffect(CPDO);
 
         // Link is only allowed depending on the target
-        if (prefDropEffect.HasFlag(DragDropEffects.Link))
+        if (prefDropEffect.HasFlag(DragDropEffects.Link) && allowedEffect.HasFlag(DragDropEffects.Link))
             PasteState = DragDropEffects.Link;
         else if (prefDropEffect.HasFlag(DragDropEffects.Copy) && allowedEffect.HasFlag(DragDropEffects.Copy))
             PasteState = DragDropEffects.Copy;
