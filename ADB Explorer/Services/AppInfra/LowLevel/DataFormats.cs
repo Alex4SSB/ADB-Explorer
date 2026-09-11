@@ -17,6 +17,11 @@ public static class AdbDataFormats
     public static AdbDataFormat ShellidList { get; } = new("Shell IDList Array");
     public static AdbDataFormat FileDrop { get; } = new(DataFormats.FileDrop);
     public static AdbDataFormat AdbDrop { get; } = new(AdbExplorerConst.ADB_DRAG_FORMAT);
+    public static AdbDataFormat DeviceIndependentBitmap { get; } = new(DataFormats.Dib);
+    /// <summary>
+    /// CF_DIBV5 (Format17), used for clipboard images
+    /// </summary>
+    public static AdbDataFormat Format17 { get; } = new(17);
 
     private static Dictionary<short, string> DataFormatKeys => new()
     {
@@ -32,6 +37,8 @@ public static class AdbDataFormats
         { ShellidList, nameof(ShellidList) },
         { FileDrop, nameof(FileDrop) },
         { AdbDrop, nameof(AdbDrop) },
+        { DeviceIndependentBitmap, nameof(DeviceIndependentBitmap) },
+        { Format17, nameof(Format17) },
     };
 
     private static Dictionary<short, AdbDataFormat> FormatObjects => new()
@@ -48,6 +55,8 @@ public static class AdbDataFormats
         { ShellidList, ShellidList },
         { FileDrop, FileDrop },
         { AdbDrop, AdbDrop },
+        { DeviceIndependentBitmap, DeviceIndependentBitmap },
+        { Format17, Format17 },
     };
 
     public static AdbDataFormat GetFormat(short id) =>
@@ -74,11 +83,15 @@ public class AdbDataFormat
     public AdbDataFormat(short id)
     {
         Id = id;
+        Name = DataFormats.GetDataFormat(id).Name;
     }
 
     public string Name { get; } = "";
 
     public short Id { get; }
+
+    public static implicit operator uint(AdbDataFormat self)
+        => (uint)self.Id;
 
     public static implicit operator short(AdbDataFormat self)
         => self.Id;

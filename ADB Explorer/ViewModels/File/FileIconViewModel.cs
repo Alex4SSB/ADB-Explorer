@@ -307,6 +307,17 @@ public partial class FileIconViewModel : FileViewModelBase
         OnPropertyChanged(nameof(LargeIcon));
     }
 
+    /// <summary>
+    /// Shows <paramref name="image"/> immediately, bypassing device/cache thumbnail acquisition
+    /// (e.g. a clipboard-image paste preview, before the file exists on the device).
+    /// </summary>
+    public void SetImmediatePreview(BitmapSource image)
+    {
+        _cachedThumbnail = image;
+        _cachedSize = ThumbnailService.ThumbnailSize.Drag;
+        OnPropertyChanged(nameof(LargeIcon));
+    }
+
     public void CancelLoading()
     {
         if (_thumbnailUpdatedHandler is not null)

@@ -589,6 +589,11 @@ public static class FileHelper
         return (size, modifiedTime);
     }
 
+    public static bool IsSupportedImageFile(FileClass file) =>
+        file.Type is FileType.File
+        && !file.IsLink
+        && COMMON_PHOTO_EXT.Contains(file.Extension, StringComparer.InvariantCultureIgnoreCase);
+
     public static bool IsPhotoDir()
     {
         float photos = Data.DirList.FileList.Count(f =>

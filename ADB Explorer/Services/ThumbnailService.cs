@@ -156,6 +156,70 @@ public static partial class ThumbnailService
 
     private static readonly ConditionalWeakTable<FileClass, PaneThumbnailState> PaneThumbnails = new();
 
+    /// <summary>
+    /// Downscales <paramref name="source"/> so neither dimension exceeds <paramref name="maxDimension"/>,
+    /// preserving aspect ratio. Returns the (frozen) source unchanged if it already fits.
+    /// </summary>
+    public static BitmapSource CreateScaledPreview(BitmapSource source, int maxDimension)
+    {
+        var largestSide = Math.Max(source.PixelWidth, source.PixelHeight);
+        if (largestSide <= maxDimension)
+        {
+            if (source.CanFreeze && !source.IsFrozen)
+                source.Freeze();
+
+            return source;
+        }
+
+        var scale = (double)maxDimension / largestSide;
+        var scaled = new TransformedBitmap(source, new ScaleTransform(scale, scale));
+        scaled.Freeze();
+
+        return scaled;
+    }
+
+    /// <summary>
+    /// Registers <paramref name="image"/> as the custom thumbnail for a just-created file, without
+    /// pulling it from the device (the file was just pushed from this same image).
+    /// </summary>
+    public static void SeedCustomThumbnail(LogicalDeviceViewModel device, FileClass file, BitmapSource image)
+    {
+        if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.Off || Data.Settings.MaxCustomThumbWeight <= 0)
+            return;
+
+        var deviceInfo = GetCachedDeviceInfo(device.SerialNumber);
+        if (string.IsNullOrEmpty(deviceInfo.DeviceId) || deviceInfo.ThumbnailPathCache is null)
+            return;
+
+        var targetDir = Path.Combine(Data.AppDataPath, deviceInfo.DeviceId, CUSTOM_PHOTOS_SUBFOLDER);
+        Directory.CreateDirectory(targetDir);
+
+        string thumbId;
+        lock (GetDeviceCsvLock(deviceInfo.DeviceId))
+        {
+            deviceInfo = GetCachedDeviceInfo(device.SerialNumber);
+            if (deviceInfo.ThumbnailPathCache is null)
+                return;
+
+            thumbId = NewCustomThumbId(file, useOriginalExtension: true);
+            RegisterCustomThumbCacheEntry(ref deviceInfo, file, thumbId);
+            UpdateCache(deviceInfo);
+            WriteThumbsCacheToCsvFile(deviceInfo.DeviceId, deviceInfo.ThumbnailPathCache);
+        }
+
+        var localFile = Path.Combine(targetDir, thumbId);
+        var encoder = new PngBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(image));
+
+        using (var fs = new FileStream(localFile, FileMode.Create, FileAccess.Write, FileShare.Read))
+            encoder.Save(fs);
+
+        var resolution = new Size(image.PixelWidth, image.PixelHeight);
+        var fileSize = new FileInfo(localFile).Length;
+
+        MarkCustomThumbnailReady(device.SerialNumber, file, thumbId, resolution, fileSize);
+    }
+
     public static bool IsCustomThumbnailCandidate(FileClass file) =>
         Data.Settings.ThumbsMode is not AppSettings.ThumbnailMode.Off
         && file.Type is AbstractFile.FileType.File

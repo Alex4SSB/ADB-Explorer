@@ -373,6 +373,10 @@ Unfortunately, we cannot provide ADB with the app due to licensing restrictions.
   <data name="S_NEW_ARCHIVE" xml:space="preserve">
     <value>New Archive</value>
   </data>
+  <data name="S_SCREENSHOT" xml:space="preserve">
+    <value>Screenshot</value>
+    <comment>Default base name for a file created by pasting a clipboard image</comment>
+  </data>
   <data name="S_CC_NAME" xml:space="preserve">
     <value>Creative Commons</value>
   </data>
@@ -792,9 +796,17 @@ Cancel All Running</value>
     <value>Paste Link</value>
     <comment>The menu used to paste a link of the copied item</comment>
   </data>
+  <data name="S_MENU_PASTE_IMAGE" xml:space="preserve">
+    <value>Paste image</value>
+    <comment>The Paste menu/button when the clipboard holds only an image</comment>
+  </data>
   <data name="S_MENU_COPY_LINK" xml:space="preserve">
     <value>Copy as link</value>
     <comment>The menu used to copy a link of the selected item for pasting as a symlink</comment>
+  </data>
+  <data name="S_MENU_COPY_AS_IMAGE" xml:space="preserve">
+    <value>Copy as image</value>
+    <comment>Context menu: put the selected image file onto the Windows clipboard as image data</comment>
   </data>
   <data name="S_MENU_COPY_CONTENTS" xml:space="preserve">
     <value>Copy contents</value>

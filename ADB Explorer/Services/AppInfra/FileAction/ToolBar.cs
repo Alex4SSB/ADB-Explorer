@@ -109,7 +109,7 @@ internal static class MainToolBar
         new DynamicAltTextMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Paste),
             Data.FileActions.CutItemsCount,
-            new BaseIcon(new PasteIcon()),
+            Data.FileActions.PasteIcon,
             StyleHelper.ContentAnimation.Bounce,
             altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardPaste),
             isVisible: Data.FileActions.IsPasteVisible),
@@ -160,7 +160,7 @@ internal static class MainToolBar
                             children: CompressToMenuHelper.CompressToFormatMenus()),
                     ]),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Package),
-                    new(FluentPathGeometries.Box, 16),
+                    new BaseIcon(FluentPathGeometries.Box, 16),
                     isVisible: Data.FileActions.IsApkActionsVisible,
                     children:
                     [
@@ -249,15 +249,15 @@ internal static class ExplorerContextMenu
     public static ObservableList<SubMenu> List { get; } = [
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Enter),
-            new("\uE838", 16)),
+            new BaseIcon("\uE838", 16)),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPull),
-            new(new PullIcon(), 16)),
-        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextBackupPackage), 
+            new BaseIcon(new PullIcon(), 16)),
+        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextBackupPackage),
             AppActions.Icon(FileAction.FileActionType.BackupPackage, 16)),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPush),
-            new(new PushIcon(), 16),
+            new BaseIcon(new PushIcon(), 16),
             children:
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPushFolders), AppActions.Icon(FileAction.FileActionType.PushFolders, 16)),
@@ -283,7 +283,8 @@ internal static class ExplorerContextMenu
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextCut), AppActions.Icon(FileAction.FileActionType.Cut, 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextCopy), new BaseIcon(new CopyIcon(), 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextCopyLink), AppActions.Icon(FileAction.FileActionType.CopyLink, 16)),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPaste), new BaseIcon(new PasteIcon(), 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextCopyAsImage), AppActions.Icon(FileAction.FileActionType.ContextCopyAsImage, 16)),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPaste), Data.FileActions.ContextPasteIcon),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPasteLink), AppActions.Icon(FileAction.FileActionType.PasteLink, 16)),
         new SubMenuSeparator(),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyContents), new BaseIcon(new CopyArrowRightIcon(), 16)),
@@ -304,7 +305,7 @@ internal static class ExplorerContextMenu
         new SubMenuSeparator(),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Package),
-            new(FluentPathGeometries.Box, 16),
+            new BaseIcon(FluentPathGeometries.Box, 16),
             children:
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextInstall), AppActions.Icon(FileAction.FileActionType.Install, 16)),

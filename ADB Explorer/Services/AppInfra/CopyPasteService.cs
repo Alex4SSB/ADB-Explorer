@@ -101,6 +101,7 @@ public partial class CopyPasteService : ObservableObject
 
     public bool IsDrag => DragPasteSource is not DataSource.None;
     public bool IsClipboard => PasteSource is not DataSource.None && !IsDrag;
+    public bool HasFiles => PasteSource is not DataSource.None && Files.Length > 0;
     
     public DataSource CurrentSource
     {
@@ -146,6 +147,12 @@ public partial class CopyPasteService : ObservableObject
 
     [ObservableProperty]
     public partial string[] Files { get; set; } = [];
+
+    /// <summary>
+    /// True when the clipboard holds an image and no files, as last seen by <see cref="GetClipboardPasteItems"/>.
+    /// Cached, not live-queried - polling the OS clipboard from a hot path (e.g. CanExecute) can stall/deadlock it.
+    /// </summary>
+    public bool HasClipboardImage { get; private set; }
 
     public string[] DragFiles
     {
@@ -311,11 +318,26 @@ public partial class CopyPasteService : ObservableObject
         return false;
     }
 
+    /// <summary>
+    /// OS clipboard sequence number right after this app's own self-copy wrote to the clipboard -
+    /// used by <see cref="ShouldKeepSelfAndroidClipboard"/> to bound how long it tolerates a
+    /// transient missing-AdbDrop read to just that one write. Set via <see cref="MarkSelfClipboardWritten"/>.
+    /// </summary>
+    private uint? _selfCopyClipboardSequence;
+
+    public void MarkSelfClipboardWritten() => _selfCopyClipboardSequence = NativeMethods.MGetClipboardSequenceNumber();
+
     private bool ShouldKeepSelfAndroidClipboard(IDataObject dataObject)
     {
         if (!CurrentSource.HasFlag(DataSource.Android)
             || MasterPid != Environment.ProcessId
             || Files.Length == 0)
+            return false;
+
+        // Only tolerate a transient OLE gap while nothing has touched the clipboard since our
+        // own write - any other sequence number means a distinct, fully-formed update (an image,
+        // a text copy, another self-copy...) that must be processed normally, not preserved.
+        if (_selfCopyClipboardSequence != NativeMethods.MGetClipboardSequenceNumber())
             return false;
 
         if (dataObject.GetDataPresent(AdbDataFormats.AdbDrop)
@@ -351,11 +373,14 @@ public partial class CopyPasteService : ObservableObject
             PasteSource = DataSource.None;
             Files = [];
             _currentFiles = [];
+            HasClipboardImage = CPDO?.GetDataPresent(DataFormats.Bitmap) == true;
 
             UpdateUI();
             ArchiveExtract.BeginCleanupAllStaging();
             return;
         }
+
+        HasClipboardImage = false;
 
         var prefDropEffect = VirtualFileDataObject.GetPreferredDropEffect(CPDO);
 

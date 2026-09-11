@@ -350,6 +350,10 @@ public partial class ExplorerPageHeader : UserControl
                     NewCompressItem();
                     break;
 
+                case nameof(AppRuntimeSettings.PasteClipboardImage):
+                    NewImagePasteItem();
+                    break;
+
                 case nameof(AppRuntimeSettings.Rename):
                     if (FileActions.RenameEnabled)
                         ExplorerList.IsInEditMode ^= true;
@@ -442,6 +446,28 @@ public partial class ExplorerPageHeader : UserControl
         ExplorerList.ActiveView.SelectedItem = newItem;
         ExplorerList.ActiveScrollViewer?.ScrollToTop();
         App.SafeBeginInvoke(() => ExplorerList.ActiveScrollViewer?.ScrollToTop(), DispatcherPriority.Loaded);
+
+        ExplorerList.IsInEditMode = true;
+        if (!ExplorerList.IsInEditMode)
+            _ = FileActionLogic.CreateNewItem(newItem);
+    }
+
+    private void NewImagePasteItem()
+    {
+        if (!FileActionLogic.IsPendingClipboardImage)
+            return;
+
+        var fileName = FileHelper.DuplicateFile(DirList.FileList, FileActionLogic.GetClipboardImageFileName());
+        FileClass newItem = new(fileName, FileHelper.ConcatPaths(CurrentPath, fileName), FileType.File, isTemp: true);
+        FileActionLogic.SetPendingClipboardImageTemp(newItem);
+
+        DirList.FileList.Insert(0, newItem);
+
+        ExplorerList.ActiveScrollIntoView(newItem);
+        ExplorerList.ActiveView.SelectedItem = newItem;
+
+        if (ViewModel.IsIconView && FileActionLogic.GetPendingClipboardImageThumbnail() is { } preview)
+            newItem.IconViewModel.SetImmediatePreview(preview);
 
         ExplorerList.IsInEditMode = true;
         if (!ExplorerList.IsInEditMode)

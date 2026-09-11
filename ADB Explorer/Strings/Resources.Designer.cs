@@ -2430,7 +2430,16 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_MENU_COPY_LINK", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Copy as image.
+        /// </summary>
+        public static string S_MENU_COPY_AS_IMAGE {
+            get {
+                return ResourceManager.GetString("S_MENU_COPY_AS_IMAGE", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Cut.
         /// </summary>
@@ -2556,7 +2565,16 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_MENU_PASTE_LINK", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Paste image.
+        /// </summary>
+        public static string S_MENU_PASTE_IMAGE {
+            get {
+                return ResourceManager.GetString("S_MENU_PASTE_IMAGE", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Redo.
         /// </summary>
@@ -2736,7 +2754,16 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_NEW_ARCHIVE", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Screenshot.
+        /// </summary>
+        public static string S_SCREENSHOT {
+            get {
+                return ResourceManager.GetString("S_SCREENSHOT", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Pair and/or connect a WiFi device (without using mDNS).
         /// </summary>

@@ -189,6 +189,28 @@ public class DynamicAltTextMenu : AltTextMenu
     {
         altText.PropertyChanged += (sender, e) => AltText = e.NewValue;
     }
+
+    public DynamicAltTextMenu(FileAction fileAction,
+                              ObservableProperty<string> altText,
+                              ObservableProperty<BaseIcon> dynamicIcon,
+                              StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
+                              AnimationSource animationSource = AnimationSource.Command,
+                              FileAction? altAction = null,
+                              ObservableProperty<bool>? isVisible = null)
+        : base(fileAction, dynamicIcon.Value, altText, animation: animation, animationSource: animationSource, altAction: altAction, isVisible: isVisible)
+    {
+        altText.PropertyChanged += (sender, e) => AltText = e.NewValue;
+
+        dynamicIcon.PropertyChanged += (_, _) =>
+        {
+            IconContent = dynamicIcon.Value?.IconContent;
+            if (dynamicIcon.Value is not null)
+            {
+                IconSize = (int)dynamicIcon.Value.Size;
+                OnPropertyChanged(nameof(IconSize));
+            }
+        };
+    }
 }
 
 public class IconMenu : ActionMenu
@@ -308,8 +330,24 @@ public class SubMenu : ActionMenu
 
     public SubMenu(FileAction fileAction, BaseIcon? icon = null, IEnumerable<SubMenu>? children = null, FileAction? altAction = null, ObservableProperty<bool>? isVisible = null)
         : base(fileAction, icon, children, altAction: altAction, isVisible: isVisible)
-    { 
+    {
         Info = fileAction.Info;
+    }
+
+    public SubMenu(FileAction fileAction, ObservableProperty<BaseIcon> dynamicIcon, IEnumerable<SubMenu>? children = null, FileAction? altAction = null, ObservableProperty<bool>? isVisible = null)
+        : base(fileAction, dynamicIcon.Value, children, altAction: altAction, isVisible: isVisible)
+    {
+        Info = fileAction.Info;
+
+        dynamicIcon.PropertyChanged += (_, _) =>
+        {
+            IconContent = dynamicIcon.Value?.IconContent;
+            if (dynamicIcon.Value is not null)
+            {
+                IconSize = (int)dynamicIcon.Value.Size;
+                OnPropertyChanged(nameof(IconSize));
+            }
+        };
     }
 }
 
@@ -330,7 +368,7 @@ public class DummySubMenu : SubMenu
     }
 
     public DummySubMenu()
-        : base(new(FileAction.FileActionType.None, () => true, dummyAction, Strings.Resources.S_MENU_EMPTY), new("\uF141", 16))
+        : base(new(FileAction.FileActionType.None, () => true, dummyAction, Strings.Resources.S_MENU_EMPTY), new BaseIcon("\uF141", 16))
     { }
 }
 

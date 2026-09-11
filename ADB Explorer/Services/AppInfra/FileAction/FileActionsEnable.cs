@@ -56,6 +56,9 @@ public partial class FileActionsEnable : ObservableObject
     [ObservableProperty]
     public partial bool IsCopyItemPathEnabled { get; set; }
 
+    [ObservableProperty]
+    public partial bool IsCopyAsImageEnabled { get; set; }
+
     private bool packageActionsEnabled;
     public bool PackageActionsEnabled
     {
@@ -512,7 +515,11 @@ public partial class FileActionsEnable : ObservableObject
     public ObservableProperty<string> NavRefreshDescription = new() { Value = Strings.Resources.S_MENU_REFRESH };
 
     public ObservableProperty<BaseIcon> NavRefreshIcon = new() { Value = new BaseIcon("\uE72C", 16) };
-    
+
+    public ObservableProperty<BaseIcon> PasteIcon = new() { Value = new BaseIcon(new PasteIcon(), 18) };
+
+    public ObservableProperty<BaseIcon> ContextPasteIcon = new() { Value = new BaseIcon(new PasteIcon(), 16) };
+
     #endregion
 
     #region read only

@@ -322,6 +322,7 @@ public partial class FileViewModelBase : ObservableObject
             if (file.IsTemp && key is Key.Escape)
             {
                 FileActionLogic.CancelPendingCompress(file);
+                FileActionLogic.CancelPendingClipboardImage(file);
                 Data.DirList.FileList.Remove(file);
             }
             else
@@ -330,6 +331,7 @@ public partial class FileViewModelBase : ObservableObject
                 if (string.IsNullOrEmpty(name))
                 {
                     FileActionLogic.CancelPendingCompress(file);
+                    FileActionLogic.CancelPendingClipboardImage(file);
                     Data.DirList.FileList.Remove(file);
                 }
                 else

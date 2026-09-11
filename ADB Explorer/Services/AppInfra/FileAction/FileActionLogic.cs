@@ -79,6 +79,166 @@ internal static class FileActionLogic
         return true;
     }
 
+    private static string? PendingClipboardImageStagingPath { get; set; }
+    private static BitmapSource? PendingClipboardImageThumbnail { get; set; }
+    private static FileClass? PendingClipboardImageTemp { get; set; }
+    public static bool IsPendingClipboardImage { get; private set; }
+
+    public static BitmapSource? GetPendingClipboardImageThumbnail() => PendingClipboardImageThumbnail;
+
+    /// <summary>
+    /// True when the Windows clipboard holds an image and the current Explorer location
+    /// can accept a new pasted item (same gating as New Folder/New File).
+    /// </summary>
+    public static bool CanPasteClipboardImage() =>
+        Data.CopyPaste.HasClipboardImage
+        && Data.FileActions.NewEnabled
+        && !Data.FileActions.IsExplorerEditing
+        && Data.DevicesObject?.Current is not null;
+
+    /// <summary>
+    /// Selection gating for "Paste as image" - the same single-target-selection rule
+    /// <see cref="EnableUiPaste"/>/<see cref="EnableKeyboardPaste"/> apply to other files,
+    /// including keyboard paste treating a multi-selection as none.
+    /// </summary>
+    public static bool CanPasteClipboardImageAtSelection(bool isKeyboard = false)
+    {
+        if (!CanPasteClipboardImage())
+            return false;
+
+        var selected = Data.SelectedFiles;
+        var count = selected.Count();
+
+        if (isKeyboard && count > 1)
+            count = 0;
+
+        if (count == 0)
+            return true;
+
+        return count == 1 && ArchiveHelper.IsPasteTargetContainer(selected.First(), ActionDevice?.ID ?? "");
+    }
+
+    public static void BeginPasteClipboardImage()
+    {
+        if (Clipboard.GetImage() is not BitmapSource image)
+            return;
+
+        var device = ActionDevice;
+        if (device is null)
+            return;
+
+        var stagingDir = Path.Combine(Path.GetTempPath(), "ADB Explorer", "ClipboardPaste");
+        Directory.CreateDirectory(stagingDir);
+        var stagingPath = Path.Combine(stagingDir, $"{Guid.NewGuid()}.png");
+
+        var encoder = new PngBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(image));
+        using (var fs = new FileStream(stagingPath, FileMode.Create, FileAccess.Write, FileShare.None))
+            encoder.Save(fs);
+
+        var targetFolder = ResolveClipboardImagePasteFolder(device.ID);
+        if (!NavigationTreeNode.PathsEqual(targetFolder, Data.CurrentPath))
+        {
+            // Target is a selected folder other than the one being browsed - there's no visible
+            // row to rename inline there, so push it directly under an auto-generated name.
+            PushClipboardImageToFolder(stagingPath, targetFolder, device);
+            return;
+        }
+
+        var maxDimension = (int)ThumbnailService.ThumbnailSize.Drag * 2;
+        PendingClipboardImageThumbnail = ThumbnailService.CreateScaledPreview(image, maxDimension);
+        PendingClipboardImageStagingPath = stagingPath;
+        PendingClipboardImageTemp = null;
+        IsPendingClipboardImage = true;
+
+        Data.RuntimeSettings.PasteClipboardImage = true;
+    }
+
+    /// <summary>
+    /// Same single-target-selection resolution regular file paste uses: a single selected
+    /// valid container is the target, else the current folder.
+    /// </summary>
+    private static string ResolveClipboardImagePasteFolder(string deviceId)
+    {
+        var selected = Data.SelectedFiles;
+        if (selected.Count() == 1 && selected.First() is { } item && ArchiveHelper.IsPasteTargetContainer(item, deviceId))
+        {
+            var path = item.IsLink ? item.LinkTarget : item.FullPath;
+            return ArchiveHelper.ResolvePasteTargetPath(path, deviceId);
+        }
+
+        return Data.CurrentPath;
+    }
+
+    private static async void PushClipboardImageToFolder(string stagingPath, string targetFolder, LogicalDeviceViewModel device)
+    {
+        var caseSensitive = DriveHelper.GetRestrictions(targetFolder, device).CaseInsensitiveNames is not true;
+        var comparer = caseSensitive ? StringComparer.InvariantCulture : StringComparer.InvariantCultureIgnoreCase;
+
+        var existingNames = await Task.Run(()
+            => (IEnumerable<string>?)FileMergeHelper.TryListAndroidDirByName(device.ID, targetFolder, comparer)?.Keys ?? []);
+
+        var fileName = FileHelper.DuplicateFile(existingNames, GetClipboardImageFileName());
+        var file = new FileClass(fileName, FileHelper.ConcatPaths(targetFolder, fileName), FileType.File);
+
+        PushClipboardImageFile(file, stagingPath, device);
+    }
+
+    /// <summary>
+    /// Same naming convention as Windows' own screenshot tools, e.g. "Screenshot 2025-11-22 223048.png".
+    /// </summary>
+    public static string GetClipboardImageFileName() =>
+        $"{Strings.Resources.S_SCREENSHOT} {DateTime.Now:yyyy-MM-dd HHmmss}.png";
+
+    public static void SetPendingClipboardImageTemp(FileClass file) => PendingClipboardImageTemp = file;
+
+    public static void CancelPendingClipboardImage(FileClass? file = null)
+    {
+        if (!IsPendingClipboardImage)
+            return;
+
+        if (file is not null
+            && PendingClipboardImageTemp is not null
+            && !ReferenceEquals(file, PendingClipboardImageTemp))
+            return;
+
+        DeleteClipboardImageStagingFile(PendingClipboardImageStagingPath);
+
+        IsPendingClipboardImage = false;
+        PendingClipboardImageStagingPath = null;
+        PendingClipboardImageThumbnail = null;
+        PendingClipboardImageTemp = null;
+    }
+
+    private static bool TryConsumePendingClipboardImage(FileClass file, out string stagingPath)
+    {
+        stagingPath = "";
+        if (!IsPendingClipboardImage
+            || !ReferenceEquals(file, PendingClipboardImageTemp)
+            || PendingClipboardImageStagingPath is null)
+            return false;
+
+        stagingPath = PendingClipboardImageStagingPath;
+        IsPendingClipboardImage = false;
+        PendingClipboardImageStagingPath = null;
+        PendingClipboardImageThumbnail = null;
+        PendingClipboardImageTemp = null;
+        return true;
+    }
+
+    private static void DeleteClipboardImageStagingFile(string? path)
+    {
+        if (string.IsNullOrEmpty(path) || !File.Exists(path))
+            return;
+
+        try
+        {
+            File.Delete(path);
+        }
+        catch
+        { }
+    }
+
     private static string RemoveApkMessage(IEnumerable<IBrowserItem> objects)
     {
         var count = objects.Count();
@@ -291,7 +451,21 @@ internal static class FileActionLogic
                 return;
             }
 
-            if (TryConsumePendingCompress(file, out var compressSources))
+            if (TryConsumePendingClipboardImage(file, out var clipboardStagingPath))
+            {
+                file.IsTemp = false;
+                file.ModifiedTime = DateTime.Now;
+                file.Size = null;
+                file.IsCreationTimeResolved = false;
+                file.UpdateType();
+
+                RefreshNewItemInList(file);
+                Data.ItemToSelect.Value = file;
+
+                PushClipboardImageFile(file, clipboardStagingPath, device);
+                return;
+            }
+            else if (TryConsumePendingCompress(file, out var compressSources))
             {
                 file.IsTemp = false;
                 file.ModifiedTime = DateTime.Now;
@@ -368,18 +542,36 @@ internal static class FileActionLogic
         files.Insert(index, file);
     }
 
+    private static readonly BaseIcon DefaultPasteIcon = new(new PasteIcon(), 18);
+    private static readonly BaseIcon DefaultContextPasteIcon = new(new PasteIcon(), 16);
+    private static readonly BaseIcon ClipboardImagePasteIcon = new(new ClipboardImageIcon(), 18);
+    private static readonly BaseIcon ClipboardImageContextPasteIcon = new(new ClipboardImageIcon(), 16);
+
     public static void IsPasteEnabled()
     {
         // Do not update if drag is active
         if (Data.CopyPaste.IsDrag)
             return;
 
-        var hasClipboard = Data.CopyPaste.PasteSource is not CopyPasteService.DataSource.None
-            && Data.CopyPaste.Files.Length > 0;
-
-        if (!hasClipboard)
+        if (!Data.CopyPaste.HasFiles)
         {
             ActionFlags.CutItemsCount.Value = "";
+
+            if (CanPasteClipboardImage())
+            {
+                SetClipboardImagePasteLabels(ActionFlags);
+                if (!ReferenceEquals(ActionFlags, Data.FileActions))
+                    SetClipboardImagePasteLabels(Data.FileActions);
+
+                ActionFlags.PasteEnabled = true;
+                ActionFlags.IsKeyboardPasteEnabled = true;
+                return;
+            }
+
+            ResetPasteImageLabels(ActionFlags);
+            if (!ReferenceEquals(ActionFlags, Data.FileActions))
+                ResetPasteImageLabels(Data.FileActions);
+
             ActionFlags.PasteEnabled = false;
             ActionFlags.IsKeyboardPasteEnabled = false;
             return;
@@ -413,8 +605,23 @@ internal static class FileActionLogic
         }
     }
 
+    private static void SetClipboardImagePasteLabels(FileActionsEnable actions)
+    {
+        actions.PasteDescription.Value = Strings.Resources.S_MENU_PASTE_IMAGE;
+        actions.PasteIcon.Value = ClipboardImagePasteIcon;
+        actions.ContextPasteIcon.Value = ClipboardImageContextPasteIcon;
+    }
+
+    private static void ResetPasteImageLabels(FileActionsEnable actions)
+    {
+        actions.PasteIcon.Value = DefaultPasteIcon;
+        actions.ContextPasteIcon.Value = DefaultContextPasteIcon;
+    }
+
     private static void SetPasteLabels(FileActionsEnable actions)
     {
+        ResetPasteImageLabels(actions);
+
         actions.CutItemsCount.Value = Data.CopyPaste.Files.Length.ToString();
 
         if (Data.CopyPaste.Files.Length > 1)
@@ -842,6 +1049,15 @@ internal static class FileActionLogic
 
     public static void PasteFiles(IEnumerable<FileClass> selectedFiles, bool isLink = false)
     {
+        // Toolbar and keyboard paste share this executor - CanExecute already applied the
+        // stricter (non-keyboard) selection rule for toolbar/context, so a multi-selection
+        // can only reach here via the keyboard's more lenient gating.
+        if (!Data.CopyPaste.HasFiles && CanPasteClipboardImageAtSelection(isKeyboard: true))
+        {
+            BeginPasteClipboardImage();
+            return;
+        }
+
         Data.CopyPaste.AcceptDataObject(Clipboard.GetDataObject(), selectedFiles, isLink);
 
         IsPasteEnabled();
@@ -868,6 +1084,7 @@ internal static class FileActionLogic
 
         Data.CopyPaste.UpdateSelfVFDO(isDrag: false, pasteEffect: DragDropEffects.Copy);
         vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.Clipboard, allowedEffects: DragDropEffects.Copy);
+        Data.CopyPaste.MarkSelfClipboardWritten();
     }
 
     public static void CutFiles(IEnumerable<FileClass> items, bool isCopy = false)
@@ -889,6 +1106,7 @@ internal static class FileActionLogic
         // (and archive extract staging) finish asynchronously.
         Data.CopyPaste.UpdateSelfVFDO(isDrag: false, pasteEffect: dropEffect);
         vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.Clipboard, allowedEffects: dropEffect);
+        Data.CopyPaste.MarkSelfClipboardWritten();
     }
 
     public static void CopyLinkFiles(IEnumerable<FileClass> items)
@@ -907,6 +1125,61 @@ internal static class FileActionLogic
 
         Data.CopyPaste.UpdateSelfVFDO(isDrag: false, pasteEffect: dropEffect);
         vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.Clipboard, allowedEffects: dropEffect);
+        Data.CopyPaste.MarkSelfClipboardWritten();
+    }
+
+    /// <summary>
+    /// Decodes off the UI thread (a lazy COM callback here could deadlock this app and the pasting
+    /// app), then writes via raw Win32 clipboard calls - DataObject.SetImage also advertises a
+    /// CF_BITMAP handle that some readers choke on, breaking every other format too.
+    /// </summary>
+    public static async void CopyAsImage()
+    {
+        var file = Data.SelectedFiles.First();
+        var device = ActionDevice;
+        if (device is null)
+            return;
+
+        var bitmap = await Task.Run(() => ProduceClipboardBitmap(device, file));
+        if (bitmap is null)
+            return;
+
+        NativeMethods.SetClipboardImage(bitmap);
+
+        // Unlike Clipboard.SetDataObject, a raw SetClipboardData write doesn't run through this
+        // app's own clipboard-changed handling until the async WM_CLIPBOARDUPDATE round-trip
+        // completes. Refresh state and force a command requery now instead of waiting for it.
+        Data.CopyPaste.GetClipboardPasteItems();
+        CommandManager.InvalidateRequerySuggested();
+    }
+
+    private static BitmapSource? ProduceClipboardBitmap(LogicalDeviceViewModel device, FileClass file)
+    {
+        try
+        {
+            using var stream = AdbHelper.ReadFileAsStreamAsync(device, file.FullPath, CancellationToken.None).GetAwaiter().GetResult();
+            if (stream is null)
+                return null;
+
+            var decoder = BitmapDecoder.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+            var frame = decoder.Frames[0];
+
+            // A decoder-backed frame keeps native WIC affinity to this thread even once frozen,
+            // throwing "different thread owns it" when the UI thread later touches it. Copying
+            // into a plain BitmapSource fully detaches the pixel data before handing it off.
+            var stride = (frame.PixelWidth * frame.Format.BitsPerPixel + 7) / 8;
+            var pixels = new byte[stride * frame.PixelHeight];
+            frame.CopyPixels(pixels, stride, 0);
+
+            var detached = BitmapSource.Create(frame.PixelWidth, frame.PixelHeight, frame.DpiX, frame.DpiY, frame.Format, frame.Palette, pixels, stride);
+            detached.Freeze();
+
+            return detached;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     /// <summary>
@@ -1026,6 +1299,7 @@ internal static class FileActionLogic
             if (string.IsNullOrEmpty(textBox.Text))
             {
                 CancelPendingCompress(file);
+                CancelPendingClipboardImage(file);
                 Data.DirList.FileList.Remove(file);
                 return;
             }
@@ -1496,6 +1770,11 @@ internal static class FileActionLogic
                 Data.DirList?.ClearCurrentLocation();
                 Data.RaiseClearNavigationBox();
 
+                // Nothing else ever nulls this out, so UpdateFileActions() below would otherwise
+                // keep resolving the stale, disconnected device instead of falling back to
+                // DevicesObject.Current (correctly null here) - e.g. leaving PushPackageEnabled on.
+                Data.Files.Device = null;
+
                 UpdateFileActions();
             }
         });
@@ -1790,6 +2069,12 @@ internal static class FileActionLogic
         else
             actions.IsCopyItemPathEnabled = singleFileSelected && !isRecycleBin;
 
+        actions.IsCopyAsImageEnabled = !isAppDrive
+            && !isRecycleBin
+            && singleFileSelected
+            && selectedFile is not null
+            && FileHelper.IsSupportedImageFile(selectedFile);
+
         actions.CopyPathDescription.Value = isAppDrive
             ? Strings.Resources.S_COPY_APK_NAME
             : Strings.Resources.S_COPY_PATH;
@@ -2056,6 +2341,51 @@ internal static class FileActionLogic
         var shItems = dialog.FileNames.Select(ShellItem.Open);
         
         CopyPasteService.VerifyAndPush(targetPath, shItems);
+    }
+
+    /// <summary>
+    /// Pushes a confirmed clipboard-image staging file to <paramref name="file"/>'s final (renamed) path,
+    /// then deletes the staging file and seeds a custom thumbnail once the transfer completes.
+    /// </summary>
+    private static void PushClipboardImageFile(FileClass file, string stagingPath, LogicalDeviceViewModel device)
+    {
+        var source = new SyncFile(ShellItem.Open(stagingPath));
+        var target = new SyncFile(file.FullPath, FileType.File) { Size = source.Size };
+
+        var pushOperation = FileSyncOperation.PushFile(source, target, device, App.AppDispatcher);
+        pushOperation.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName != nameof(FileOperation.Status))
+                return;
+
+            var op = (FileSyncOperation)s!;
+            if (op.Status is FileOperation.OperationStatus.Waiting or FileOperation.OperationStatus.InProgress)
+                return;
+
+            if (op.Status is FileOperation.OperationStatus.Completed && Data.Settings.MaxCustomThumbWeight > 0)
+                SeedClipboardImageThumbnail(device, file, stagingPath);
+
+            DeleteClipboardImageStagingFile(stagingPath);
+        };
+
+        Data.FileOpQ.AddOperation(pushOperation);
+    }
+
+    private static void SeedClipboardImageThumbnail(LogicalDeviceViewModel device, FileClass file, string stagingPath)
+    {
+        try
+        {
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.UriSource = new Uri(stagingPath);
+            bitmap.EndInit();
+            bitmap.Freeze();
+
+            ThumbnailService.SeedCustomThumbnail(device, file, bitmap);
+        }
+        catch
+        { }
     }
 
     public static FileSyncOperation PushShellObject(

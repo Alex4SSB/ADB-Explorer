@@ -150,6 +150,7 @@ public partial class AppRuntimeSettings : ViewModelBase
 
     public bool NewFolder { get => false; set => OnPropertyChanged(); }
     public bool NewFile { get => false; set => OnPropertyChanged(); }
+    public bool PasteClipboardImage { get => false; set => OnPropertyChanged(); }
 
     private string compressToExtension = "";
     /// <summary>
