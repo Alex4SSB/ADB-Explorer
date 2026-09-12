@@ -1774,4 +1774,13 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_THUMBSIZE_CONTENT" xml:space="preserve">
     <value>Содержание</value>
   </data>
+  <data name="S_SCREENSHOT" xml:space="preserve">
+    <value>Скриншот</value>
+  </data>
+  <data name="S_MENU_PASTE_IMAGE" xml:space="preserve">
+    <value>Вставить изображение</value>
+  </data>
+  <data name="S_MENU_COPY_AS_IMAGE" xml:space="preserve">
+    <value>Копировать как изображение</value>
+  </data>
 </root>
