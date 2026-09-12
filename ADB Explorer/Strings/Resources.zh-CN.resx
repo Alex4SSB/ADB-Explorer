@@ -1774,4 +1774,13 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_THUMBSIZE_CONTENT" xml:space="preserve">
     <value>内容</value>
   </data>
+  <data name="S_SCREENSHOT" xml:space="preserve">
+    <value>屏幕截图</value>
+  </data>
+  <data name="S_MENU_PASTE_IMAGE" xml:space="preserve">
+    <value>粘贴图片</value>
+  </data>
+  <data name="S_MENU_COPY_AS_IMAGE" xml:space="preserve">
+    <value>复制为图片</value>
+  </data>
 </root>
