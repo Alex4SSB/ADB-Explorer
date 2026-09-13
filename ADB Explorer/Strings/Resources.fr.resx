@@ -1772,4 +1772,16 @@ Séléctionnez Personnalisé pour utiliser un emplacement qui ne sera pas suppri
   <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
     <value>A</value>
   </data>
+  <data name="S_SCREENSHOT" xml:space="preserve">
+    <value>Capture d ' écran</value>
+  </data>
+  <data name="S_MENU_PASTE_IMAGE" xml:space="preserve">
+    <value>Image copiée</value>
+  </data>
+  <data name="S_MENU_COPY_AS_IMAGE" xml:space="preserve">
+    <value>Copier comme image</value>
+  </data>
+  <data name="S_THUMBSIZE_CONTENT" xml:space="preserve">
+    <value>Contenu</value>
+  </data>
 </root>
