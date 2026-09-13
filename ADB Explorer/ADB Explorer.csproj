@@ -28,6 +28,20 @@
     <InternalsVisibleTo Include="ADB_Test" />
   </ItemGroup>
 
+  <!-- Emoji.Wpf, built from our fork (github.com/Alex4SSB/emoji.wpf) instead of the
+       stock NuGet package, so it can highlight search matches (HighlightRanges). -->
+  <ItemGroup>
+    <Reference Include="Emoji.Wpf">
+      <HintPath>Libs\Emoji.Wpf\Emoji.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Typography.OpenFont">
+      <HintPath>Libs\Emoji.Wpf\Typography.OpenFont.dll</HintPath>
+    </Reference>
+    <Reference Include="Typography.GlyphLayout">
+      <HintPath>Libs\Emoji.Wpf\Typography.GlyphLayout.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
   <ItemGroup>
     <Content Include="Assets\app_icon_2023_combined.ico" />
   </ItemGroup>
@@ -50,17 +64,19 @@
     <PackageReference Include="AdvancedSharpAdbClient" Version="3.6.16" />
     <PackageReference Include="AlphaOmega.ApkReader" Version="2.0.10" />
     <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
-    <PackageReference Include="Emoji.Wpf" Version="0.3.4" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="QRCoder.Xaml" Version="1.8.0" />
-    <PackageReference Include="SkiaSharp" Version="4.151.1" />
-    <PackageReference Include="System.IO.Hashing" Version="10.0.11" />
-    <PackageReference Include="System.Management" Version="10.0.11" />
-    <PackageReference Include="Vanara.Windows.Shell.Common" Version="5.0.6" />
+    <PackageReference Include="SkiaSharp" Version="4.152.0" />
+    <!-- Runtime dependency of Emoji.Wpf (Libs\Emoji.Wpf); a raw <Reference> doesn't
+         pull in its transitive package deps the way PackageReference would. -->
+    <PackageReference Include="Stfu" Version="0.1.10" />
+    <PackageReference Include="System.IO.Hashing" Version="10.0.12" />
+    <PackageReference Include="System.Management" Version="10.0.12" />
+    <PackageReference Include="Vanara.Windows.Shell.Common" Version="5.0.7" />
     <PackageReference Include="WPF-UI" Version="4.3.0" />
     <PackageReference Include="WPF-UI.DependencyInjection" Version="4.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
   </ItemGroup>
 

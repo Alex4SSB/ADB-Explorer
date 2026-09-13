@@ -24,14 +24,12 @@
         Style="{StaticResource AdbMenuStyle}">
         <local:AdbMenuItem ItemsSource="{Binding Items}" ToolTip="{Binding Source={x:Static Member=strings:Resources.S_THUMBSIZE_TOOLTIP}}">
             <local:AdbMenuItem.Resources>
-                <ui:FontIcon
-                    x:Key="ThumbCheckedIcon"
-                    Margin="14,0"
-                    x:Shared="False">
+                <ui:FontIcon x:Key="ThumbCheckedIcon" x:Shared="False">
                     <ui:FontIcon.Style>
                         <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                             <Setter Property="Glyph" Value="&#xF137;" />
                             <Setter Property="FontSize" Value="6" />
+                            <Setter Property="Margin" Value="14,0" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsChecked}" Value="False">
                                     <Setter Property="Visibility" Value="Hidden" />
@@ -39,6 +37,7 @@
                                 <DataTrigger Binding="{Binding IsRadioButton}" Value="False">
                                     <Setter Property="Glyph" Value="&#xE73E;" />
                                     <Setter Property="FontSize" Value="12" />
+                                    <Setter Property="Margin" Value="11,0" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
