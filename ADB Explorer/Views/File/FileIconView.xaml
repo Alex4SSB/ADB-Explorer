@@ -33,11 +33,19 @@
             <emoji:TextBlock
                 MaxHeight="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=LabelMaxHeight}"
                 FlowDirection="{Binding NameFlowDirection}"
+                HighlightStyle="{StaticResource SearchHighlightStyle}"
                 Text="{Binding DisplayName}"
                 TextAlignment="Center"
                 TextTrimming="CharacterEllipsis"
                 TextWrapping="Wrap"
                 ToolTip="{x:Null}">
+                <emoji:TextBlock.HighlightRanges>
+                    <MultiBinding Converter="{StaticResource SearchHighlightRangesConverter}">
+                        <Binding Path="DisplayName" />
+                        <Binding Path="ExplorerFilter" Source="{x:Static models:Data.FileActions}" />
+                        <Binding Path="SearchCaseSensitive" Source="{x:Static models:Data.Settings}" />
+                    </MultiBinding>
+                </emoji:TextBlock.HighlightRanges>
                 <emoji:TextBlock.Style>
                     <Style TargetType="emoji:TextBlock">
                         <Setter Property="Opacity" Value="1" />

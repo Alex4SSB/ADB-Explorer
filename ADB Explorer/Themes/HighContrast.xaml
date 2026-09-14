@@ -75,4 +75,6 @@
     <SolidColorBrush x:Key="SystemFillColorNeutralBackgroundBrush" Color="{DynamicResource SystemColorWindowColor}" />
     <SolidColorBrush x:Key="SystemFillColorSolidAttentionBackgroundBrush" Color="{DynamicResource SystemColorWindowColor}" />
     <SolidColorBrush x:Key="SystemFillColorSolidNeutralBackgroundBrush" Color="{DynamicResource SystemColorWindowColor}" />
+
+    <SolidColorBrush x:Key="SearchHighlightBrush" Color="{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}" />
 </ResourceDictionary>

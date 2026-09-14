@@ -24,11 +24,18 @@ public partial class VirtualDriveViewModel : DriveViewModel
     {
         if (Drive.ItemsCount != newCount)
         {
+            var emptyChanged = (Drive.ItemsCount is null or <= 0) != (newCount is null or <= 0);
             Drive.ItemsCount = newCount;
             OnPropertyChanged(nameof(ItemsCount));
 
+            if (emptyChanged)
+                OnPropertyChanged(nameof(DriveIcon));
+
             if (Data.RuntimeSettings.SelectedDrive == this && Data.FileActions.IsDriveViewVisible)
                 FileActionLogic.UpdateFileActions();
+
+            if (emptyChanged && Type is AbstractDrive.DriveType.Trash)
+                NavHistory.RefreshMenuHistory();
         }
     }
 

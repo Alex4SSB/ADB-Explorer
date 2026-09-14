@@ -97,12 +97,40 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
         {
             try
             {
-                foreach (var fileStat in ADBService.SearchResultsStreaming(Device.ID, rootPath, query, CurrentCancellationToken.Token))
+                var matchedPaths = new HashSet<string>();
+
+                foreach (var fileStat in ADBService.SearchResultsStreaming(Device.ID, rootPath, query, CurrentCancellationToken.Token, Data.Settings.SearchCaseSensitive))
                 {
                     if (CurrentCancellationToken.IsCancellationRequested)
                         break;
 
+                    matchedPaths.Add(fileStat.FullPath);
                     currentFileQueue.Enqueue(fileStat);
+                }
+
+                if (Data.Settings.SearchContents && !CurrentCancellationToken.IsCancellationRequested)
+                {
+                    foreach (var fileStat in ADBService.SearchContentsStreaming(Device.ID, rootPath, query, recursive: true, CurrentCancellationToken.Token, Data.Settings.SearchCaseSensitive))
+                    {
+                        if (CurrentCancellationToken.IsCancellationRequested)
+                            break;
+
+                        if (matchedPaths.Add(fileStat.FullPath))
+                            currentFileQueue.Enqueue(fileStat);
+                    }
+                }
+
+                // Archive filenames only - never grep inside an archive reached by an outside traversal.
+                if (Data.Settings.SearchArchives && !CurrentCancellationToken.IsCancellationRequested)
+                {
+                    foreach (var fileStat in ArchiveHelper.SearchArchiveEntries(Device.ID, rootPath, query, CurrentCancellationToken.Token))
+                    {
+                        if (CurrentCancellationToken.IsCancellationRequested)
+                            break;
+
+                        if (matchedPaths.Add(fileStat.FullPath))
+                            currentFileQueue.Enqueue(fileStat);
+                    }
                 }
             }
             catch (OperationCanceledException)

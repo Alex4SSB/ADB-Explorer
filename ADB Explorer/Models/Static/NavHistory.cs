@@ -171,7 +171,12 @@ namespace ADB_Explorer.Models
                         : null;
 
                 if (lookupKey is not null && AdbExplorerConst.DRIVE_TYPES.TryGetValue(lookupKey, out var driveType))
-                    return DriveViewModel.GetDriveIcon(driveType, size);
+                {
+                    var trashEmpty = driveType is AbstractDrive.DriveType.Trash
+                        && TrashHelper.GetTrashDrive(Data.DevicesObject.Current)?.ItemsCount is null or <= 0;
+
+                    return DriveViewModel.GetDriveIcon(driveType, size, trashEmpty);
+                }
 
                 var drive = Data.DevicesObject.Current?.Drives.FirstOrDefault(d => d.Path == Path);
                 return drive?.GetIcon(size);
@@ -215,6 +220,9 @@ namespace ADB_Explorer.Models
                 .Where(path => !path.Equals(Current))
                 .Select(path => path.IconSubMenu);
         }
+
+        /// <summary>Rebuilds history menu icons, e.g. after the recycle bin's empty/full state changes.</summary>
+        public static void RefreshMenuHistory() => UpdateMenuHistory();
 
         private static int historyIndex = -1;
 

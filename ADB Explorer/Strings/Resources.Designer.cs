@@ -2414,6 +2414,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copy as image.
+        /// </summary>
+        public static string S_MENU_COPY_AS_IMAGE {
+            get {
+                return ResourceManager.GetString("S_MENU_COPY_AS_IMAGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Copy contents.
         /// </summary>
         public static string S_MENU_COPY_CONTENTS {
@@ -2430,16 +2439,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_MENU_COPY_LINK", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Copy as image.
-        /// </summary>
-        public static string S_MENU_COPY_AS_IMAGE {
-            get {
-                return ResourceManager.GetString("S_MENU_COPY_AS_IMAGE", resourceCulture);
-            }
-        }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Cut.
         /// </summary>
@@ -2558,15 +2558,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Paste Link.
-        /// </summary>
-        public static string S_MENU_PASTE_LINK {
-            get {
-                return ResourceManager.GetString("S_MENU_PASTE_LINK", resourceCulture);
-            }
-        }
-
-        /// <summary>
         ///   Looks up a localized string similar to Paste image.
         /// </summary>
         public static string S_MENU_PASTE_IMAGE {
@@ -2574,7 +2565,16 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_MENU_PASTE_IMAGE", resourceCulture);
             }
         }
-
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Paste Link.
+        /// </summary>
+        public static string S_MENU_PASTE_LINK {
+            get {
+                return ResourceManager.GetString("S_MENU_PASTE_LINK", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to Redo.
         /// </summary>
@@ -2754,16 +2754,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_NEW_ARCHIVE", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Screenshot.
-        /// </summary>
-        public static string S_SCREENSHOT {
-            get {
-                return ResourceManager.GetString("S_SCREENSHOT", resourceCulture);
-            }
-        }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Pair and/or connect a WiFi device (without using mDNS).
         /// </summary>
@@ -3702,6 +3693,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Screenshot.
+        /// </summary>
+        public static string S_SCREENSHOT {
+            get {
+                return ResourceManager.GetString("S_SCREENSHOT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search.
         /// </summary>
         public static string S_SEARCH {
@@ -3720,6 +3720,60 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Archive contents.
+        /// </summary>
+        public static string S_SEARCH_ARCHIVES {
+            get {
+                return ResourceManager.GetString("S_SEARCH_ARCHIVES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Also match files inside archives found while searching..
+        /// </summary>
+        public static string S_SEARCH_ARCHIVES_INFO {
+            get {
+                return ResourceManager.GetString("S_SEARCH_ARCHIVES_INFO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Case sensitive.
+        /// </summary>
+        public static string S_SEARCH_CASE_SENSITIVE {
+            get {
+                return ResourceManager.GetString("S_SEARCH_CASE_SENSITIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Match the exact letter case when searching..
+        /// </summary>
+        public static string S_SEARCH_CASE_SENSITIVE_INFO {
+            get {
+                return ResourceManager.GetString("S_SEARCH_CASE_SENSITIVE_INFO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File contents.
+        /// </summary>
+        public static string S_SEARCH_CONTENTS {
+            get {
+                return ResourceManager.GetString("S_SEARCH_CONTENTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Also match files whose contents contain the search text..
+        /// </summary>
+        public static string S_SEARCH_CONTENTS_INFO {
+            get {
+                return ResourceManager.GetString("S_SEARCH_CONTENTS_INFO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Current folder.
         /// </summary>
         public static string S_SEARCH_CURRENT_FOLDER {
@@ -3727,7 +3781,25 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_SEARCH_CURRENT_FOLDER", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Display relative path.
+        /// </summary>
+        public static string S_SEARCH_DISPLAY_PATH_RELATIVE {
+            get {
+                return ResourceManager.GetString("S_SEARCH_DISPLAY_PATH_RELATIVE", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to When selected, search results are displayed with a path relative to the current location. Otherwise the displayed path is absolute..
+        /// </summary>
+        public static string S_SEARCH_DISPLAY_PATH_RELATIVE_INFO {
+            get {
+                return ResourceManager.GetString("S_SEARCH_DISPLAY_PATH_RELATIVE_INFO", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Search options.
         /// </summary>

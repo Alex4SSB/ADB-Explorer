@@ -31,4 +31,7 @@
     <SolidColorBrush x:Key="OpaqueBorderBrush" Color="#10000000" />
 
     <SolidColorBrush x:Key="IconAccentBrush" Color="{DynamicResource AccentFillColorDefault}" />
+
+    <Color x:Key="SearchHighlight">#FFFFFD00</Color>
+    <SolidColorBrush x:Key="SearchHighlightBrush" Color="{StaticResource SearchHighlight}" />
 </ResourceDictionary>

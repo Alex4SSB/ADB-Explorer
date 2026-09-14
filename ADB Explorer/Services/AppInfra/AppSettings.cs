@@ -194,6 +194,18 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     public partial SearchBox.SearchBoxMode SearchBox { get; set; } = Controls.SearchBox.SearchBoxMode.CurrentFolder;
 
     [ObservableProperty]
+    public partial bool SearchCaseSensitive { get; set; } = false;
+
+    [ObservableProperty]
+    public partial bool SearchContents { get; set; } = false;
+
+    [ObservableProperty]
+    public partial bool SearchArchives { get; set; } = false;
+
+    [ObservableProperty]
+    public partial bool SearchDisplayPathRelative { get; set; } = true;
+
+    [ObservableProperty]
     public partial bool IsDetailsPaneOpen { get; set; } = false;
 
     [ObservableProperty]

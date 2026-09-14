@@ -661,10 +661,64 @@ public partial class ADBService
             path.Equals(trashPath, StringComparison.Ordinal)
             || path.StartsWith(trashPath + "/", StringComparison.Ordinal));
 
+    /// <summary>Recursively finds files under <paramref name="path"/> matching any of <paramref name="includeNames"/>
+    /// (case-insensitive glob). Unlike <see cref="FindFilesInPath"/>, this descends the whole subtree.</summary>
+    public static IEnumerable<string> FindFilesRecursive(string deviceID, string path, IEnumerable<string> includeNames, CancellationToken cancellationToken)
+    {
+        var names = includeNames.ToArray();
+        if (names.Length == 0)
+            yield break;
+
+        if (!path.EndsWith('/'))
+            path += "/";
+
+        var nameClauses = string.Join(" -o ", names.Select(f => $"-iname {EscapeAdbShellString(f)}"));
+        string[] args = [EscapeAdbShellString(path), "\\(", nameClauses, "\\)", "2>/dev/null"];
+
+        var actualCmd = ShellCommands.TranslateCommand("find");
+        foreach (var line in ExecuteDeviceAdbCommandAsync(deviceID, "shell", cancellationToken, [actualCmd, .. args]))
+        {
+            if (!string.IsNullOrWhiteSpace(line))
+                yield return line.Trim();
+        }
+    }
+
     public static IEnumerable<string> SearchPathsStreaming(string deviceID, string path, string query, CancellationToken cancellationToken, bool caseSensitive = false)
     {
         foreach (var result in SearchResultsStreaming(deviceID, path, query, cancellationToken, caseSensitive))
             yield return result.FullPath;
+    }
+
+    /// <summary>Finds files under <paramref name="path"/> whose contents match <paramref name="query"/> (literal).
+    /// Archive files (<see cref="ArchiveHelper.ArchiveExcludeGlobs"/>) are always excluded.</summary>
+    public static IEnumerable<FileStat> SearchContentsStreaming(string deviceID, string path, string query, bool recursive, CancellationToken cancellationToken, bool caseSensitive = false)
+    {
+        string[] matchArgs = PrepContentSearchArgs(path, query, recursive, caseSensitive);
+        if (matchArgs.Length == 0)
+            yield break;
+
+        var matchCmd = recursive ? ShellCommands.TranslateCommand("grep") : ShellCommands.TranslateCommand("find");
+
+        List<string> matches = [];
+        foreach (var line in ExecuteDeviceAdbCommandAsync(deviceID, "shell", cancellationToken, [matchCmd, .. matchArgs]))
+        {
+            if (!string.IsNullOrWhiteSpace(line) && !IsWithinRecycleBin(line))
+                matches.Add(line.Trim());
+        }
+
+        if (matches.Count == 0)
+            yield break;
+
+        var statCmd = ShellCommands.TranslateCommand("find");
+        var statArgs = PrepStatArgs(deviceID, matches);
+        foreach (var line in ExecuteDeviceAdbCommandAsync(deviceID, "shell", cancellationToken, [statCmd, .. statArgs]))
+        {
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            if (ParseSearchResultLine(line) is { } fileStat)
+                yield return fileStat;
+        }
     }
 
     /// <summary>
@@ -729,7 +783,8 @@ public partial class ADBService
             path += "/";
 
         var nameArg = caseSensitive ? "-name" : "-iname";
-        var pattern = $"*{EscapeFindPattern(query.Trim())}*";
+        var trimmedQuery = query.Trim();
+        var pattern = FileHelper.ContainsWildcard(trimmedQuery) ? trimmedQuery : $"*{EscapeFindPattern(trimmedQuery)}*";
         var lineEnd = $"\\n'";
 
         if (ShellCommands.FindPrintf(deviceID))
@@ -771,6 +826,72 @@ public partial class ADBService
             "else",
             $"echo \\\"$f{ADB_FIELD_SEP}$({stat} -c '%s{ADB_FIELD_SEP}%Y' \\\"$f\\\"){ADB_FIELD_SEP}\\\";",
             "fi; done;",
+        ];
+    }
+
+    private static string[] PrepContentSearchArgs(string path, string query, bool recursive, bool caseSensitive = false)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            return [];
+
+        if (!path.EndsWith('/'))
+            path += "/";
+
+        string[] caseArg = caseSensitive ? [] : ["-i"];
+        string[] patternArgs = ["--", EscapeAdbShellString(query)];
+
+        if (recursive)
+        {
+            // Short "-S PATTERN" does not take its value on-device (verified on-emulator); long form does.
+            var excludeArgs = ArchiveHelper.ArchiveExcludeGlobs.Select(glob => $"--exclude={EscapeAdbShellString(glob)}");
+
+            return
+            [
+                "-r", "-l", "-I", "-F",
+                .. caseArg,
+                .. excludeArgs,
+                .. patternArgs,
+                EscapeAdbShellString(path),
+                "2>/dev/null",
+            ];
+        }
+
+        // grep has no shallow-recursion flag; enumerate depth-1 files via find and pipe them through xargs.
+        var excludeFind = ArchiveHelper.ArchiveExcludeGlobs.SelectMany(glob => new[] { "-not", "-iname", EscapeAdbShellString(glob) });
+        var grep = ShellCommands.TranslateCommand("grep");
+
+        return
+        [
+            EscapeAdbShellString(path), "-maxdepth", "1", "-type", "f",
+            .. excludeFind,
+            "-print0", "2>/dev/null", "|", "xargs", "-0", grep, "-l", "-I", "-F",
+            .. caseArg,
+            .. patternArgs,
+        ];
+    }
+
+    /// <summary>Fetches type/size/mtime for a known, explicit list of device paths (used to stat grep's match output).</summary>
+    private static string[] PrepStatArgs(string deviceID, IEnumerable<string> paths)
+    {
+        var lineEnd = $"\\n'";
+        var pathArgs = paths.Select(p => EscapeAdbShellString(p));
+
+        if (ShellCommands.FindPrintf(deviceID))
+        {
+            var filePrintf = $"'%p{ADB_FIELD_SEP}%s{ADB_FIELD_SEP}%T@{ADB_FIELD_SEP}{lineEnd}";
+            return [.. pathArgs, "-maxdepth", "0", "-printf", filePrintf, "2>/dev/null"];
+        }
+
+        var stat = ShellCommands.TranslateCommand("stat");
+
+        return
+        [
+            .. pathArgs,
+            "-maxdepth", "0",
+            "2>/dev/null | while IFS= read -r f;",
+            "do",
+            $"echo \\\"$f{ADB_FIELD_SEP}$({stat} -c '%s{ADB_FIELD_SEP}%Y' \\\"$f\\\"){ADB_FIELD_SEP}\\\";",
+            "done;",
         ];
     }
 

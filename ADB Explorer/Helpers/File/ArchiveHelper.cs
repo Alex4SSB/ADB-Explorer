@@ -34,6 +34,63 @@ public static class ArchiveHelper
         return ArchiveFamily.None;
     }
 
+    /// <summary>Glob patterns (for <c>grep -S</c>/<c>--exclude</c>) covering every extension <see cref="GetFamily"/> recognizes.</summary>
+    public static IEnumerable<string> ArchiveExcludeGlobs =>
+        AdbExplorerConst.APK_NAMES.Select(ext => $"*{ext.ToLowerInvariant()}")
+            .Append("*.zip")
+            .Concat(TarExtensions.Select(ext => $"*{ext.ToLowerInvariant()}"))
+            .Append("*.tar.*");
+
+    /// <summary>Content-searches the files directly inside the archive folder at <paramref name="compositePath"/>
+    /// (an <see cref="ArchivePath"/>); returns matched entries' composite full paths.</summary>
+    public static HashSet<string> SearchArchiveContentsInFolder(string deviceId, string compositePath, string query, bool caseSensitive, CancellationToken cancellationToken)
+    {
+        if (!ArchivePath.TryParse(compositePath, out var archivePath, out var internalPath, deviceId))
+            return [];
+
+        var family = GetFamily(archivePath);
+        if (family is ArchiveFamily.None)
+            return [];
+
+        var toc = ArchiveListing.GetOrFetchToc(deviceId, archivePath, cancellationToken);
+        var candidates = GetDirectChildFiles(toc.Entries, internalPath);
+        if (candidates.Count == 0)
+            return [];
+
+        var members = candidates.Select(e => e.Path).ToArray();
+        var matched = ArchiveExtract.SearchMemberContents(deviceId, family, archivePath, members, query, caseSensitive, cancellationToken);
+
+        return [.. matched.Select(m => ArchivePath.Join(archivePath, m))];
+    }
+
+    private static List<ArchiveEntry> GetDirectChildFiles(IReadOnlyList<ArchiveEntry> entries, string internalPath)
+    {
+        var prefix = string.IsNullOrEmpty(internalPath) ? "" : internalPath + "/";
+        var result = new List<ArchiveEntry>();
+
+        foreach (var entry in entries)
+        {
+            if (entry.IsDirectory)
+                continue;
+
+            var path = entry.Path;
+            if (!string.IsNullOrEmpty(prefix))
+            {
+                if (!path.StartsWith(prefix, StringComparison.Ordinal))
+                    continue;
+
+                path = path[prefix.Length..];
+            }
+
+            if (string.IsNullOrEmpty(path) || path.Contains('/'))
+                continue;
+
+            result.Add(entry);
+        }
+
+        return result;
+    }
+
     public static bool IsTarFamily(string fileName) => GetFamily(fileName) is ArchiveFamily.Tar;
 
     public static bool IsZipFamily(string fileName) => GetFamily(fileName) is ArchiveFamily.Zip;
@@ -167,6 +224,51 @@ public static class ArchiveHelper
 
     public static bool IsNavigableArchive(string fileName, string deviceId)
         => GetFamily(fileName) is not ArchiveFamily.None && CanBrowse(fileName, deviceId);
+
+    /// <summary>Archive-entry names matching <paramref name="query"/>, across archives found under <paramref name="path"/>.
+    /// Filenames only - never reads entry contents.</summary>
+    public static IEnumerable<FileStat> SearchArchiveEntries(string deviceId, string path, string query, CancellationToken cancellationToken)
+    {
+        var archiveFiles = ADBService.FindFilesRecursive(deviceId, path, ArchiveExcludeGlobs, cancellationToken);
+
+        foreach (var archivePath in archiveFiles)
+        {
+            if (cancellationToken.IsCancellationRequested)
+                yield break;
+
+            if (!IsNavigableArchive(FileHelper.GetFullName(archivePath), deviceId))
+                continue;
+
+            ArchiveToc toc;
+            try
+            {
+                toc = ArchiveListing.GetOrFetchToc(deviceId, archivePath, cancellationToken);
+            }
+            catch
+            {
+                continue;
+            }
+
+            foreach (var entry in toc.Entries)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    yield break;
+
+                var entryName = FileHelper.GetFullName(entry.Path);
+                if (!FileHelper.MatchesSearchQuery(entryName, query))
+                    continue;
+
+                yield return new FileStat(
+                    entryName,
+                    ArchivePath.Join(archivePath, entry.Path),
+                    entry.IsDirectory ? AbstractFile.FileType.Folder : AbstractFile.FileType.File,
+                    false,
+                    entry.IsDirectory ? null : entry.Size,
+                    entry.Modified,
+                    entry.Permissions);
+            }
+        }
+    }
 
     public static bool CanNavigateIntoArchive(string fileFullPath, string fileName, string deviceId, bool isInsideArchive)
         => !isInsideArchive

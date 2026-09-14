@@ -311,7 +311,17 @@
                                             </Style>
                                         </ui:TextBox.Style>
                                     </ui:TextBox>
-                                    <emoji:TextBlock FlowDirection="{Binding NameFlowDirection}" Text="{Binding DisplayName}">
+                                    <emoji:TextBlock
+                                        FlowDirection="{Binding NameFlowDirection}"
+                                        HighlightStyle="{StaticResource SearchHighlightStyle}"
+                                        Text="{Binding DisplayName}">
+                                        <emoji:TextBlock.HighlightRanges>
+                                            <MultiBinding Converter="{StaticResource SearchHighlightRangesConverter}">
+                                                <Binding Path="DisplayName" />
+                                                <Binding Path="ExplorerFilter" Source="{x:Static models:Data.FileActions}" />
+                                                <Binding Path="SearchCaseSensitive" Source="{x:Static models:Data.Settings}" />
+                                            </MultiBinding>
+                                        </emoji:TextBlock.HighlightRanges>
                                         <emoji:TextBlock.Style>
                                             <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
                                                 <Setter Property="Margin" Value="4,0" />
@@ -621,8 +631,16 @@
                                                 <emoji:TextBlock
                                                     x:Name="ContentNameText"
                                                     FlowDirection="{Binding NameFlowDirection}"
+                                                    HighlightStyle="{StaticResource SearchHighlightStyle}"
                                                     Text="{Binding DisplayName}"
                                                     TextTrimming="CharacterEllipsis">
+                                                    <emoji:TextBlock.HighlightRanges>
+                                                        <MultiBinding Converter="{StaticResource SearchHighlightRangesConverter}">
+                                                            <Binding Path="DisplayName" />
+                                                            <Binding Path="ExplorerFilter" Source="{x:Static models:Data.FileActions}" />
+                                                            <Binding Path="SearchCaseSensitive" Source="{x:Static models:Data.Settings}" />
+                                                        </MultiBinding>
+                                                    </emoji:TextBlock.HighlightRanges>
                                                     <emoji:TextBlock.Style>
                                                         <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
                                                             <Style.Triggers>
@@ -638,11 +656,16 @@
                                                 Grid.Row="1"
                                                 Margin="0,2,0,0"
                                                 FontSize="{Binding Source={StaticResource FontSize}}"
-                                                Text="{Binding FullPath}"
                                                 TextTrimming="CharacterEllipsis">
                                                 <emoji:TextBlock.Style>
                                                     <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
                                                         <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+                                                        <Setter Property="Text" Value="{Binding FullPath}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=SearchDisplayPathRelative}" Value="True">
+                                                                <Setter Property="Text" Value="{Binding SearchDisplayPath}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
                                                     </Style>
                                                 </emoji:TextBlock.Style>
                                             </emoji:TextBlock>

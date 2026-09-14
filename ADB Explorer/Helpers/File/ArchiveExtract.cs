@@ -747,6 +747,73 @@ public static class ArchiveExtract
         }
     }
 
+    /// <summary>Extracts <paramref name="candidateMembers"/> to a temp staging dir and greps them for
+    /// <paramref name="query"/> (literal); returns the internal paths of members whose content matched.</summary>
+    public static IReadOnlyList<string> SearchMemberContents(
+        string deviceId,
+        ArchiveFamily family,
+        string archivePath,
+        IReadOnlyList<string> candidateMembers,
+        string query,
+        bool caseSensitive,
+        CancellationToken cancellationToken)
+    {
+        if (candidateMembers.Count == 0)
+            return [];
+
+        var stagingRoot = CreateStagingRoot(deviceId, cancellationToken);
+        var contentRoot = FileHelper.ConcatPaths(stagingRoot, "content");
+
+        try
+        {
+            ShellFileOperation.MakeDirs(deviceId, [contentRoot]).GetAwaiter().GetResult();
+
+            if (family is ArchiveFamily.Zip)
+            {
+                ExtractZipMembersInto(deviceId, archivePath, contentRoot, candidateMembers, cancellationToken, allowMissingMembers: true);
+            }
+            else
+            {
+                var toc = ArchiveListing.GetOrFetchToc(deviceId, archivePath, cancellationToken);
+                var members = candidateMembers;
+                if (toc.UsesDotSlashPrefix)
+                    members = [.. members.Select(m => m.StartsWith("./", StringComparison.Ordinal) ? m : "./" + m)];
+
+                ExtractTar(deviceId, archivePath, contentRoot, members, cancellationToken, out _, out _);
+            }
+
+            var grep = ShellCommands.TranslateCommand("grep");
+            string[] caseArg = caseSensitive ? [] : ["-i"];
+            string[] grepArgs =
+            [
+                "-r", "-l", "-I", "-F",
+                .. caseArg,
+                "--", ADBService.EscapeAdbShellString(query),
+                ADBService.EscapeAdbShellString(contentRoot),
+                "2>/dev/null",
+            ];
+
+            var prefix = contentRoot.TrimEnd('/') + "/";
+            List<string> matchedMembers = [];
+
+            foreach (var line in ADBService.ExecuteDeviceAdbCommandAsync(deviceId, "shell", cancellationToken, [grep, .. grepArgs]))
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+
+                var staged = line.Trim();
+                if (staged.StartsWith(prefix, StringComparison.Ordinal))
+                    matchedMembers.Add(ArchivePath.NormalizeInternal(staged[prefix.Length..]));
+            }
+
+            return matchedMembers;
+        }
+        finally
+        {
+            CleanupStaging(deviceId, stagingRoot, CancellationToken.None);
+        }
+    }
+
     private static int ExtractTar(
         string deviceId,
         string archivePath,

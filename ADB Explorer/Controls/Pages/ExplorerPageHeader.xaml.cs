@@ -637,9 +637,6 @@ public partial class ExplorerPageHeader : UserControl
         if (Files.DirList is null && DevicesObject.Current is not null)
             InitLister();
 
-        if (FileActions.IsAppDrive && Settings.SearchBox is SearchBox.SearchBoxMode.AllSubfolders)
-            Settings.SearchBox = SearchBox.SearchBoxMode.CurrentFolder;
-
         CurrentPath = realPath;
 
         FileActionLogic.IsPasteEnabled();

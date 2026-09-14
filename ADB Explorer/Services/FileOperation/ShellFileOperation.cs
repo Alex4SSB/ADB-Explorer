@@ -579,6 +579,12 @@ public static class ShellFileOperation
             {
                 TrashIndexer indexer = new(op);
                 WriteLine(op.Device, op.IndexerPath, ADBService.EscapeAdbShellString(indexer.ToString()));
+
+                if (TrashHelper.GetTrashDrive(op.Device) is { } trash)
+                {
+                    var baseline = trash.ItemsCount is null or <= 0 ? 0 : trash.ItemsCount.Value;
+                    trash.SetItemsCount(baseline + 1);
+                }
             }
             else if (op.OperationName is FileOperation.OperationType.Restore)
             {

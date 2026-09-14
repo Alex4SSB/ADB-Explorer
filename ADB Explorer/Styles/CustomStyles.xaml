@@ -13,6 +13,22 @@
     <converters:TrimmedTooltipConverter x:Key="TrimmedTooltip" />
     <converters:OverflowsTreeTooltipConverter x:Key="OverflowsTreeTooltip" />
     <converters:StringFormatConverter x:Key="StringFormatConverter" />
+    <converters:SearchHighlightRangesConverter x:Key="SearchHighlightRangesConverter" />
+    <Style x:Key="SearchHighlightStyle" TargetType="Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource SearchHighlightBrush}" />
+        <Setter Property="Background">
+            <Setter.Value>
+                <SolidColorBrush Opacity="0.25" Color="{DynamicResource SearchHighlight}" />
+            </Setter.Value>
+        </Setter>
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="3" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SearchHighlightBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
     <Style
         x:Key="StretchCheckBoxStyle"
         BasedOn="{StaticResource DefaultCheckBoxStyle}"
@@ -145,7 +161,6 @@
             <DataTrigger Binding="{Binding IsSelected}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
             </DataTrigger>
-            <!-- After IsSelected: a copied item keeps its accent color even while selected. -->
             <DataTrigger Binding="{Binding CutState}" Value="Copy">
                 <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
             </DataTrigger>

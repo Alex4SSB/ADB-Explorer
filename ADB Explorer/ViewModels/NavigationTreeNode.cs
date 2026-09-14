@@ -201,7 +201,7 @@ public partial class NavigationTreeNode : ObservableObject
 
     public static BitmapSource? DriveIcon(DriveViewModel drive)
     {
-        var trashEmpty = drive is VirtualDriveViewModel { ItemsCount: 0 };
+        var trashEmpty = drive is VirtualDriveViewModel { ItemsCount: null or <= 0 };
         return FileToIconConverter.GetDriveIcon(drive.Type, 16, trashEmpty);
     }
 

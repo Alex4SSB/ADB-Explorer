@@ -17,12 +17,13 @@ internal static class TrashHelper
 
     public static List<FileClass> GetRecycleBinItems()
     {
-        if (Data.Active.Device is null)
+        var device = Data.Active.Device ?? Data.DevicesObject.Current;
+        if (device is null)
             return [];
 
         ParseIndexers();
 
-        var paths = ADBService.FindFilesInPath(Data.Active.Device.ID,
+        var paths = ADBService.FindFilesInPath(device.ID,
                                                AdbExplorerConst.RECYCLE_PATH,
                                                excludeNames: ["*" + AdbExplorerConst.RECYCLE_INDEX_SUFFIX]);
 

@@ -2174,6 +2174,30 @@ The checks attempt to prevent an unsuspecting user from launching a possibly mal
     <value>All subfolders</value>
     <comment>The search option for recursive search</comment>
   </data>
+  <data name="S_SEARCH_CASE_SENSITIVE" xml:space="preserve">
+    <value>Case sensitive</value>
+    <comment>The search option for case-sensitive matching</comment>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE_INFO" xml:space="preserve">
+    <value>Match the exact letter case when searching.</value>
+    <comment>Case sensitive search option tooltip</comment>
+  </data>
+  <data name="S_SEARCH_CONTENTS" xml:space="preserve">
+    <value>File contents</value>
+    <comment>The search option for matching inside file contents</comment>
+  </data>
+  <data name="S_SEARCH_CONTENTS_INFO" xml:space="preserve">
+    <value>Also match files whose contents contain the search text.</value>
+    <comment>File contents search option tooltip</comment>
+  </data>
+  <data name="S_SEARCH_ARCHIVES" xml:space="preserve">
+    <value>Archive contents</value>
+    <comment>The search option for matching filenames inside archives</comment>
+  </data>
+  <data name="S_SEARCH_ARCHIVES_INFO" xml:space="preserve">
+    <value>Also match files inside archives found while searching.</value>
+    <comment>Archive contents search option tooltip</comment>
+  </data>
   <data name="S_SEARCH_CURRENT_FOLDER" xml:space="preserve">
     <value>Current folder</value>
     <comment>The search option for filtering</comment>
@@ -2228,5 +2252,13 @@ The checks attempt to prevent an unsuspecting user from launching a possibly mal
   <data name="S_THUMBSIZE_CONTENT" xml:space="preserve">
     <value>Content</value>
     <comment>Thumbnail size - content</comment>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE" xml:space="preserve">
+    <value>Display relative path</value>
+    <comment>search options control for displaying relative / absolute path</comment>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE_INFO" xml:space="preserve">
+    <value>When selected, search results are displayed with a path relative to the current location. Otherwise the displayed path is absolute.</value>
+    <comment>Info tooltip on search option for display path</comment>
   </data>
 </root>

@@ -545,7 +545,7 @@ public partial class DetailsPane : UserControl
                         trashDrive = TrashHelper.GetTrashDrive(Data.DevicesObject.Current);
 
                     control.SubscribeTrashCountDrive(drive.Type is AbstractDrive.DriveType.Trash ? trashDrive : null);
-                    control.LargeFileIcon.Source = FileToIconConverter.GetDriveIcon(drive.Type, 120, trashDrive?.ItemsCount == 0);
+                    control.LargeFileIcon.Source = FileToIconConverter.GetDriveIcon(drive.Type, 120, trashDrive?.ItemsCount is null or <= 0);
 
                     control.LargeFileIcon.MaxHeight = 128;
                     control.SmallFileIcon.Source = null;
@@ -1052,7 +1052,7 @@ public partial class DetailsPane : UserControl
     }
 
     private static BitmapSource TrashIcon(VirtualDriveViewModel? trash)
-        => FileToIconConverter.GetDriveIcon(AbstractDrive.DriveType.Trash, 120, trash?.ItemsCount == 0);
+        => FileToIconConverter.GetDriveIcon(AbstractDrive.DriveType.Trash, 120, trash?.ItemsCount is null or <= 0);
 
     private static bool IsPreviewTextReadOnly(FileClass file, LogicalDeviceViewModel? device)
     {

@@ -60,7 +60,7 @@ public partial class DriveViewModel : AbstractDrive, IBrowserItem
     /// </summary>
     public BaseIcon? GetIcon(double size = 32, int? pixelSize = null)
     {
-        var trashEmpty = this is VirtualDriveViewModel { ItemsCount: 0 };
+        var trashEmpty = this is VirtualDriveViewModel { ItemsCount: null or <= 0 };
         return GetDriveIcon(Type, size, trashEmpty, pixelSize);
     }
 

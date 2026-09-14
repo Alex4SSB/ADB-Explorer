@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using System.Linq.Expressions;
 
 namespace ADB_Explorer.Controls;
 
@@ -15,6 +16,31 @@ public partial class SearchOptionsControl : UserControl
         Items = [
             new SearchBoxModeItem(Strings.Resources.S_SEARCH_ALL_SUBFOLDERS, SearchBox.SearchBoxMode.AllSubfolders),
             new SearchBoxModeItem(Strings.Resources.S_SEARCH_CURRENT_FOLDER, SearchBox.SearchBoxMode.CurrentFolder),
+            new Separator(),
+            new SearchToggleItem(
+                Strings.Resources.S_SEARCH_CASE_SENSITIVE,
+                new TextChangeCaseIcon(),
+                () => Data.Settings.SearchCaseSensitive,
+                Strings.Resources.S_SEARCH_CASE_SENSITIVE_INFO),
+            new SearchToggleItem(
+                Strings.Resources.S_SEARCH_CONTENTS,
+                new DocumentSearchIcon(),
+                () => Data.Settings.SearchContents,
+                Strings.Resources.S_SEARCH_CONTENTS_INFO,
+                () => !Data.FileActions.IsAppDrive),
+            new SearchToggleItem(
+                Strings.Resources.S_SEARCH_ARCHIVES,
+                new ZipIcon(),
+                () => Data.Settings.SearchArchives,
+                Strings.Resources.S_SEARCH_ARCHIVES_INFO,
+                () => !Data.FileActions.IsAppDrive),
+            new Separator(),
+            new SearchToggleItem(
+                Strings.Resources.S_SEARCH_DISPLAY_PATH_RELATIVE,
+                new ItemPathIcon(),
+                () => Data.Settings.SearchDisplayPathRelative,
+                Strings.Resources.S_SEARCH_DISPLAY_PATH_RELATIVE_INFO,
+                () => !Data.FileActions.IsAppDrive)
         ];
 
         CloseSearchAction = new(CanCloseSearch, CloseSearch);
@@ -55,7 +81,6 @@ public partial class SearchOptionsControl : UserControl
     {
         OnPropertyChanged(nameof(IsCloseSearchVisible));
         OnPropertyChanged(nameof(IsSearchOptionsVisible));
-        CommandManager.InvalidateRequerySuggested();
     }
 
     static Dictionary<SearchBox.SearchBoxMode, UIElement> SearchBoxModeIcons => new()
@@ -70,6 +95,7 @@ public partial class SearchOptionsControl : UserControl
         public virtual UIElement Icon { get; set; } = null!;
         public virtual string? Info { get; set; } = null;
         public virtual bool IsChecked { get; set; }
+        public virtual bool IsRadioButton { get; set; } = true;
         public virtual string Name { get; set; } = "";
     }
 
@@ -90,33 +116,23 @@ public partial class SearchOptionsControl : UserControl
             {
                 if (e.PropertyName == nameof(AppSettings.SearchBox))
                 {
-                    IsChecked = IsModeAllowed()
-                        ? Data.Settings.SearchBox == mode
-                        : mode == SearchBox.SearchBoxMode.CurrentFolder;
+                    UpdateIsChecked();
                 }
             };
 
             Data.FileActions.PropertyChanged += (_, e) =>
             {
-                if (e.PropertyName is nameof(FileActionsEnable.IsAppDrive) or nameof(FileActionsEnable.IsRecycleBin))
+                if (e.PropertyName is nameof(FileActionsEnable.IsAppDrive))
                 {
-                    IsChecked = IsModeAllowed()
-                        ? Data.Settings.SearchBox == mode
-                        : mode == SearchBox.SearchBoxMode.CurrentFolder;
-                    CommandManager.InvalidateRequerySuggested();
+                    UpdateIsChecked();
                 }
             };
 
-            IsChecked = IsModeAllowed()
-                ? Data.Settings.SearchBox == mode
-                : mode == SearchBox.SearchBoxMode.CurrentFolder;
+            UpdateIsChecked();
         }
 
         private bool IsModeAllowed()
         {
-            if (Data.FileActions.IsRecycleBin)
-                return false;
-
             // App list is flat — recursive subfolder search does not apply.
             if (Data.FileActions.IsAppDrive)
                 return Mode == SearchBox.SearchBoxMode.CurrentFolder;
@@ -124,6 +140,68 @@ public partial class SearchOptionsControl : UserControl
             return true;
         }
 
+        private void UpdateIsChecked()
+        {
+            IsChecked = Mode switch
+            {
+                SearchBox.SearchBoxMode.CurrentFolder when Data.FileActions.IsAppDrive => true,
+                SearchBox.SearchBoxMode.AllSubfolders when Data.FileActions.IsAppDrive => false,
+                _ => Data.Settings.SearchBox == Mode,
+            };
+        }
+
         private SearchBox.SearchBoxMode Mode { get; }
+    }
+
+    /// <summary>A checkable (non-exclusive) search option backed by a single boolean <see cref="AppSettings"/> property.</summary>
+    public partial class SearchToggleItem : SearchOptionsBaseItem
+    {
+        [ObservableProperty]
+        public override partial bool IsChecked { get; set; } = false;
+
+        private readonly PropertyInfo? valueProp;
+
+        public bool Value
+        {
+            get => (bool)(valueProp!.GetValue(Data.Settings) ?? false);
+            set
+            {
+                valueProp!.SetValue(Data.Settings, value);
+                IsChecked = Action.IsEnabled && value;
+            }
+        }
+
+        public SearchToggleItem(string name, UIElement icon, Expression<Func<bool>> propertyExpr, string? info = null, Func<bool>? isAllowed = null)
+        {
+            valueProp = AbstractSetting.ExtractPropertyInfo(propertyExpr);
+
+            Name = name;
+            Icon = icon;
+            Info = info;
+            IsRadioButton = false;
+
+            if (isAllowed != null)
+            {
+                Data.FileActions.PropertyChanged += (_, e) =>
+                {
+                    if (e.PropertyName is nameof(FileActionsEnable.IsAppDrive))
+                    {
+                        IsChecked = Action.IsEnabled && Value;
+                    }
+                };
+            }
+            else
+                isAllowed = () => true;
+
+            Action = new(isAllowed, () => Value ^= true);
+
+            Data.Settings.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == valueProp?.Name)
+                    OnPropertyChanged(nameof(Value));
+            };
+
+            IsChecked = Action.IsEnabled && Value;
+        }
     }
 }

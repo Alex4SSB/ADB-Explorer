@@ -340,6 +340,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         {
             _filterDebounceTimer.Stop();
             RefreshExplorerFilter();
+            RefreshContentSearchMatches();
         };
 
         // After icon/label queue idle (+ progress hide debounce), wait a bit longer so scroll
@@ -460,6 +461,29 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
                 else if (Data.Settings.SearchBox is SearchBox.SearchBoxMode.AllSubfolders
                          && !string.IsNullOrEmpty(Data.FileActions.ExplorerFilter))
                     Data.RaiseRunExplorerSearch();
+
+                RefreshContentSearchMatches();
+                break;
+
+            case nameof(AppSettings.SearchCaseSensitive):
+                if (string.IsNullOrEmpty(Data.FileActions.ExplorerFilter))
+                    break;
+
+                if (Data.Settings.SearchBox is SearchBox.SearchBoxMode.AllSubfolders)
+                    Data.RaiseRunExplorerSearch();
+                else
+                    RefreshExplorerFilter();
+
+                RefreshContentSearchMatches();
+                break;
+
+            case nameof(AppSettings.SearchContents):
+            case nameof(AppSettings.SearchArchives):
+                if (Data.Settings.SearchBox is SearchBox.SearchBoxMode.AllSubfolders
+                    && !string.IsNullOrEmpty(Data.FileActions.ExplorerFilter))
+                    Data.RaiseRunExplorerSearch();
+                else
+                    RefreshContentSearchMatches();
                 break;
 
             default:
@@ -556,6 +580,73 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         {
             ExplorerItemsSource?.Refresh();
         });
+    }
+
+    private CancellationTokenSource? _contentSearchCts;
+
+    /// <summary>Re-runs the device "File contents" grep for Current Folder scope; matches land in
+    /// <see cref="Data.ContentSearchMatches"/> and trigger a second filter pass (can't await inline).</summary>
+    private void RefreshContentSearchMatches()
+    {
+        _contentSearchCts?.Cancel();
+        _contentSearchCts?.Dispose();
+        _contentSearchCts = null;
+
+        var query = Data.FileActions.ExplorerFilter?.Trim();
+
+        if (!Data.Settings.SearchContents
+            || Data.Settings.SearchBox is not SearchBox.SearchBoxMode.CurrentFolder
+            || string.IsNullOrEmpty(query)
+            || Data.DevicesObject?.Current is not { } device)
+        {
+            if (Data.ContentSearchMatches is not null)
+            {
+                Data.ContentSearchMatches = null;
+                RefreshExplorerFilter();
+            }
+
+            return;
+        }
+
+        var cts = new CancellationTokenSource();
+        _contentSearchCts = cts;
+        var path = Data.CurrentPath;
+        var caseSensitive = Data.Settings.SearchCaseSensitive;
+
+        Task.Run(() =>
+        {
+            HashSet<string> matches;
+
+            try
+            {
+                if (ArchivePath.IsArchivePath(path, device.ID))
+                {
+                    matches = ArchiveHelper.SearchArchiveContentsInFolder(device.ID, path, query, caseSensitive, cts.Token);
+                }
+                else
+                {
+                    matches = [];
+                    foreach (var fileStat in ADBService.SearchContentsStreaming(device.ID, path, query, recursive: false, cts.Token, caseSensitive))
+                        matches.Add(fileStat.FullPath);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+
+            if (cts.IsCancellationRequested)
+                return;
+
+            App.SafeInvoke(() =>
+            {
+                if (cts.IsCancellationRequested)
+                    return;
+
+                Data.ContentSearchMatches = matches;
+                RefreshExplorerFilter();
+            });
+        }, cts.Token);
     }
 
     private void UpdateExplorerView()

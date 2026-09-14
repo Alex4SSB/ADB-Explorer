@@ -62,6 +62,10 @@ public static class Data
     /// </summary>
     public static string? SearchTransferParent { get; set; }
 
+    /// <summary>Full paths matched by the "File contents" search option in Current Folder scope;
+    /// <see langword="null"/> when not applicable/stale.</summary>
+    public static HashSet<string>? ContentSearchMatches { get; set; }
+
     public static ObservableProperty<string> CurrentPathO { get; } = new();
 
     public static DriveViewModel? CurrentDrive

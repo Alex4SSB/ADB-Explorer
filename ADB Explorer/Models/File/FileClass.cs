@@ -16,6 +16,12 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         ? FullPath
         : FullPath.Replace(Data.CurrentDrive.Path, Data.CurrentDrive.LinkTargetPath);
 
+    /// <summary>Search-results path display: relative to the search's origin folder when enabled, absolute otherwise.</summary>
+    public string SearchDisplayPath =>
+        Data.FileActions.IsSearchMode && !string.IsNullOrEmpty(Data.SearchOriginPath)
+            ? FileHelper.ExtractRelativePath(ParentPath, Data.SearchOriginPath, isSearchMode: true)
+            : FullPath;
+
     [ObservableProperty]
     public partial long? Size { get; set; }
 

@@ -137,22 +137,175 @@ public static class FileHelper
     {
         if (pkg is not Package)
             return false;
-        
+
         return string.IsNullOrEmpty(Data.FileActions.ExplorerFilter)
-            || pkg.ToString().Contains(Data.FileActions.ExplorerFilter, StringComparison.OrdinalIgnoreCase);
+            || MatchesSearchQuery(pkg.ToString(), Data.FileActions.ExplorerFilter);
     };
 
     public static bool IsHiddenRecycleItem(FileClass file)
     {
         if (POSSIBLE_RECYCLE_PATHS.Contains(file.FullPath) || file.Extension == RECYCLE_INDEX_SUFFIX)
             return true;
-        
+
         if (!string.IsNullOrEmpty(Data.FileActions.ExplorerFilter)
             && Data.Settings.SearchBox is Controls.SearchBox.SearchBoxMode.CurrentFolder
-            && !file.ToString().Contains(Data.FileActions.ExplorerFilter, StringComparison.OrdinalIgnoreCase))
+            && !MatchesSearchQuery(file.ToString(), Data.FileActions.ExplorerFilter)
+            && Data.ContentSearchMatches?.Contains(file.FullPath) is not true)
             return true;
 
         return false;
+    }
+
+    private static readonly char[] WildcardChars = ['*', '?', '['];
+
+    /// <summary>Whether <paramref name="query"/> contains an unescaped wildcard char (<c>* ? [</c>).</summary>
+    public static bool ContainsWildcard(string query)
+    {
+        for (int i = 0; i < query.Length; i++)
+        {
+            if (query[i] == '\\')
+                i++;
+            else if (WildcardChars.Contains(query[i]))
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>Matches a search query: plain substring, or (if it has an unescaped <c>* ? [...]</c>)
+    /// the same glob dialect as device-side <c>find</c>.</summary>
+    public static bool MatchesSearchQuery(string text, string query)
+    {
+        if (string.IsNullOrEmpty(query))
+            return true;
+
+        var caseSensitive = Data.Settings.SearchCaseSensitive;
+
+        if (!ContainsWildcard(query))
+            return text.Contains(query, caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase);
+
+        return GetWildcardRegex(query, caseSensitive).IsMatch(text);
+    }
+
+    private static (string Query, bool CaseSensitive, Regex Regex)? cachedWildcardRegex;
+
+    private static Regex GetWildcardRegex(string query, bool caseSensitive)
+    {
+        if (cachedWildcardRegex is { } cached && cached.Query == query && cached.CaseSensitive == caseSensitive)
+            return cached.Regex;
+
+        var options = RegexOptions.Singleline | (caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+        var regex = new Regex(WildcardToRegexPattern(query), options);
+        cachedWildcardRegex = (query, caseSensitive, regex);
+
+        return regex;
+    }
+
+    /// <summary>Translates a POSIX <c>fnmatch</c>-style glob (<c>* ? [...] [!...] \x</c>) to an anchored regex pattern.</summary>
+    private static string WildcardToRegexPattern(string query)
+    {
+        var sb = new StringBuilder("^");
+
+        for (int i = 0; i < query.Length; i++)
+        {
+            var c = query[i];
+
+            if (c == '\\' && i + 1 < query.Length)
+                sb.Append(Regex.Escape(query[++i].ToString()));
+            else if (c == '*')
+                sb.Append(".*");
+            else if (c == '?')
+                sb.Append('.');
+            else if (c == '[' && query.IndexOf(']', i + 1) is var end && end > i)
+            {
+                var cls = query[(i + 1)..end];
+                sb.Append('[').Append(cls.StartsWith('!') ? "^" + cls[1..] : cls).Append(']');
+                i = end;
+            }
+            else
+                sb.Append(Regex.Escape(c.ToString()));
+        }
+
+        return sb.Append('$').ToString();
+    }
+
+    /// <summary>Same translation as <see cref="WildcardToRegexPattern"/>, except every run of literal
+    /// (non-wildcard) characters is wrapped in its own capturing group, so a successful match can report
+    /// where in the text each literal segment of the query landed - <c>* ? [...]</c> match "anything", so
+    /// they aren't part of any group and don't get highlighted.</summary>
+    private static string WildcardToHighlightRegexPattern(string query)
+    {
+        var sb = new StringBuilder("^");
+        var literal = new StringBuilder();
+
+        void FlushLiteral()
+        {
+            if (literal.Length == 0)
+                return;
+
+            sb.Append('(').Append(literal).Append(')');
+            literal.Clear();
+        }
+
+        for (int i = 0; i < query.Length; i++)
+        {
+            var c = query[i];
+
+            if (c == '\\' && i + 1 < query.Length)
+                literal.Append(Regex.Escape(query[++i].ToString()));
+            else if (c == '*')
+            {
+                FlushLiteral();
+                sb.Append(".*");
+            }
+            else if (c == '?')
+            {
+                FlushLiteral();
+                sb.Append('.');
+            }
+            else if (c == '[' && query.IndexOf(']', i + 1) is var end && end > i)
+            {
+                FlushLiteral();
+                var cls = query[(i + 1)..end];
+                sb.Append('[').Append(cls.StartsWith('!') ? "^" + cls[1..] : cls).Append(']');
+                i = end;
+            }
+            else
+                literal.Append(Regex.Escape(c.ToString()));
+        }
+
+        FlushLiteral();
+        return sb.Append('$').ToString();
+    }
+
+    private static (string Query, bool CaseSensitive, Regex Regex)? cachedWildcardHighlightRegex;
+
+    private static Regex GetWildcardHighlightRegex(string query, bool caseSensitive)
+    {
+        if (cachedWildcardHighlightRegex is { } cached && cached.Query == query && cached.CaseSensitive == caseSensitive)
+            return cached.Regex;
+
+        var options = RegexOptions.Singleline | (caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+        var regex = new Regex(WildcardToHighlightRegexPattern(query), options);
+        cachedWildcardHighlightRegex = (query, caseSensitive, regex);
+
+        return regex;
+    }
+
+    /// <summary>For a wildcard <paramref name="query"/>, the (Start, Length) ranges of its literal segments
+    /// as they appear in <paramref name="text"/>. Empty if the query doesn't actually match the text.</summary>
+    public static IEnumerable<(int Start, int Length)> GetWildcardHighlightRanges(string text, string query, bool caseSensitive)
+    {
+        var match = GetWildcardHighlightRegex(query, caseSensitive).Match(text);
+        if (!match.Success)
+            yield break;
+
+        for (int i = 1; i < match.Groups.Count; i++)
+        {
+            var group = match.Groups[i];
+            if (group.Success && group.Length > 0)
+                yield return (group.Index, group.Length);
+        }
     }
 
     public static void RenameFile(FileClass file, string newName, LogicalDeviceViewModel? device = null)
@@ -183,13 +336,23 @@ public static class FileHelper
         return result.Replace(separator is '/' ? '\\' : '/', separator);
     }
 
-    public static string ExtractRelativePath(string fullPath, string parent, bool includeSelf = true)
+    public static string ExtractRelativePath(string fullPath, string parent, bool includeSelf = true, bool isSearchMode = false)
     {
+        if (isSearchMode)
+            includeSelf = false;
+
         if (fullPath == parent)
         {
-            return includeSelf
-                ? GetFullName(fullPath)
-                : $"{GetSeparator(fullPath)}";
+            if (includeSelf)
+            {
+                return GetFullName(fullPath);
+            }
+            else
+            {
+                return isSearchMode 
+                    ? ""
+                    : $"{GetSeparator(fullPath)}";
+            }
         }
 
         var index = fullPath.IndexOf(parent);
@@ -198,7 +361,11 @@ public static class FileHelper
             ? fullPath
             : fullPath[parent.Length..];
 
-        return result.TrimStart('/', '\\');
+        result = result.TrimStart('/', '\\');
+
+        return isSearchMode
+            ? $"./{result.TrimEnd('/')}"
+            : result;
     }
 
     public static string GetParentPath(string fullPath, string? deviceId = null)
