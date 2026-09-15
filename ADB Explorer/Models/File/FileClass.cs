@@ -267,25 +267,43 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     public FileNameSort SortName { get; private set; }
 
-    public FolderTree[]? Children => GetChildren();
+    /// <summary>Tree fetched by the "View size" button or a drag/drop, reused by whichever needs it next.</summary>
+    public FolderTree[]? CachedChildren { get; set; }
+
+    public void CancelFolderSizeCalculation() => _folderViewModel?.CancelSizeCalculation();
 
     public FolderTree[]? GetChildren(string? deviceId = null)
     {
         if (!IsDirectory)
             return null;
 
+        if (CachedChildren is not null)
+            return CachedChildren;
+
         deviceId ??= Data.DevicesObject?.Current?.ID;
+        FolderTree[] tree;
+
         if (deviceId is not null
             && ArchivePath.TryParse(FullPath, out var archivePath, out var internalPath, deviceId))
         {
-            return ArchiveExtract.GetArchiveFolderTree(
+            tree = ArchiveExtract.GetArchiveFolderTree(
                 deviceId,
                 archivePath,
                 internalPath,
                 Data.DeviceCts.Token);
         }
+        else
+        {
+            tree = FileHelper.GetFolderTree([FullPath], cancellationToken: Data.DeviceCts.Token, deviceId: deviceId);
+        }
 
-        return FileHelper.GetFolderTree([FullPath], cancellationToken: Data.DeviceCts.Token, deviceId: deviceId);
+        CachedChildren = tree;
+
+        // A drag/drop also just fetched the tree - update the "View size" column with it, if shown.
+        if (_folderViewModel is { } vm)
+            App.SafeBeginInvoke(() => vm.SetCalculatedSizeFromTree(tree));
+
+        return tree;
     }
 
     public IEnumerable<FileDescriptor>? Descriptors { get; private set; }

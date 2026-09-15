@@ -971,6 +971,14 @@ Cancel All Running</value>
     <value>Size</value>
     <comment>File browser data grid column name for the size of the file</comment>
   </data>
+  <data name="S_BUTTON_VIEW_SIZE" xml:space="preserve">
+    <value>View size</value>
+    <comment>Button in the file browser size column that calculates a folder's total size on click</comment>
+  </data>
+  <data name="S_STATUS_CALCULATING_SIZE" xml:space="preserve">
+    <value>Calculating…</value>
+    <comment>File browser size column text shown while a folder's total size is being calculated</comment>
+  </data>
   <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
     <value>Date Deleted</value>
     <comment>File browser data grid column name for the date a file in the recycle bin was deleted</comment>
@@ -2260,5 +2268,9 @@ The checks attempt to prevent an unsuspecting user from launching a possibly mal
   <data name="S_SEARCH_DISPLAY_PATH_RELATIVE_INFO" xml:space="preserve">
     <value>When selected, search results are displayed with a path relative to the current location. Otherwise the displayed path is absolute.</value>
     <comment>Info tooltip on search option for display path</comment>
+  </data>
+  <data name="S_VIEW_SIZE_TOOLTIP" xml:space="preserve">
+    <value>Calculates and displays the total size of all files under this folder recursively.</value>
+    <comment>Tooltip for the view size button</comment>
   </data>
 </root>

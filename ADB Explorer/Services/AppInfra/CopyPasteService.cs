@@ -1208,7 +1208,7 @@ public partial class CopyPasteService : ObservableObject
     {
         StringComparer comparer = StringComparer.InvariantCultureIgnoreCase;
 
-        var children = folder.Children;
+        var children = folder.GetChildren();
         if (children is null || children.Length == 0)
             return folder.GetSyncFile();
 

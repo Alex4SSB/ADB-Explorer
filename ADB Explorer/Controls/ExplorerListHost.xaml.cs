@@ -607,6 +607,14 @@ public partial class ExplorerListHost : UserControl
             return;
         }
 
+        // A click on an embedded interactive control (e.g. the "View size" button) must reach it
+        // untouched, rather than being consumed here as a row/selection gesture.
+        if (HitTestHelper.FindAncestor<ButtonBase>(e.OriginalSource as DependencyObject) is not null)
+        {
+            ClickCount = -1;
+            return;
+        }
+
         // Left-button only - a right-click that cancels an in-progress drag (standard OLE
         // behavior) surfaces here as this same click's mouse-down, and resetting WasDragging for
         // it would clobber the flag before ExplorerGrid_ContextMenuOpening's suppression check can

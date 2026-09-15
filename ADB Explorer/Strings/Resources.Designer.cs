@@ -865,6 +865,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to View size.
+        /// </summary>
+        public static string S_BUTTON_VIEW_SIZE {
+            get {
+                return ResourceManager.GetString("S_BUTTON_VIEW_SIZE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Yes.
         /// </summary>
         public static string S_BUTTON_YES {
@@ -3781,7 +3790,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_SEARCH_CURRENT_FOLDER", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Display relative path.
         /// </summary>
@@ -3790,7 +3799,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_SEARCH_DISPLAY_PATH_RELATIVE", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to When selected, search results are displayed with a path relative to the current location. Otherwise the displayed path is absolute..
         /// </summary>
@@ -3799,7 +3808,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_SEARCH_DISPLAY_PATH_RELATIVE_INFO", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Search options.
         /// </summary>
@@ -4553,6 +4562,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Calculating….
+        /// </summary>
+        public static string S_STATUS_CALCULATING_SIZE {
+            get {
+                return ResourceManager.GetString("S_STATUS_CALCULATING_SIZE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} - Offline.
         /// </summary>
         public static string S_STATUS_OFFLINE {
@@ -4893,6 +4911,15 @@ namespace ADB_Explorer.Strings {
         public static string S_VIDEO_DURATION {
             get {
                 return ResourceManager.GetString("S_VIDEO_DURATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Calculates and displays the total size of all files under this folder recursively..
+        /// </summary>
+        public static string S_VIEW_SIZE_TOOLTIP {
+            get {
+                return ResourceManager.GetString("S_VIEW_SIZE_TOOLTIP", resourceCulture);
             }
         }
         

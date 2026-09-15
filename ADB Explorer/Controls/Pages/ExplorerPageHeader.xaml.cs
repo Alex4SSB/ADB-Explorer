@@ -868,6 +868,7 @@ public partial class ExplorerPageHeader : UserControl
         foreach (var file in files)
         {
             file.DisposeIconViewModel();
+            file.CancelFolderSizeCalculation();
         }
 
         Task.Run(static () =>

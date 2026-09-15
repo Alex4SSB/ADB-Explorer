@@ -441,7 +441,7 @@ public partial class FileViewModelBase : ObservableObject
         OnPropertyChanged(nameof(ContentViewModifiedTimeText));
     }
 
-    public void OnSizeChanged()
+    public virtual void OnSizeChanged()
     {
         OnPropertyChanged(nameof(SizeString));
         OnPropertyChanged(nameof(ContentViewSizeText));

@@ -409,41 +409,61 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn
+                    <DataGridTemplateColumn
                         x:Name="SizeColumn"
                         Width="Auto"
-                        FontSize="{Binding Source={StaticResource FontSize}}"
                         Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_SIZE}}"
                         IsReadOnly="True"
                         SortMemberPath="Size"
                         Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
-                        <DataGridTextColumn.SortDirection>
+                        <DataGridTemplateColumn.SortDirection>
                             <MultiBinding Converter="{StaticResource ColumnSortDirectionConverter}" ConverterParameter="Size">
                                 <Binding Path="Data.SortDirection" Source="{StaticResource ViewModelProxy}" />
                                 <Binding Path="Data.SortedColumn" Source="{StaticResource ViewModelProxy}" />
                             </MultiBinding>
-                        </DataGridTextColumn.SortDirection>
-                        <DataGridTextColumn.ElementStyle>
-                            <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
-                                <Setter Property="Margin" Value="4,0" />
-                                <Setter Property="Text" Value="{Binding FolderViewModel.SizeString}" />
-                                <Setter Property="HorizontalAlignment" Value="Right" />
-                                <Setter Property="Visibility" Value="Collapsed" />
-                                <Style.Triggers>
-                                    <Trigger Property="FlowDirection" Value="RightToLeft">
-                                        <Setter Property="HorizontalAlignment" Value="Left" />
-                                    </Trigger>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding Type}" Value="File" />
-                                            <Condition Binding="{Binding IsLink}" Value="False" />
-                                        </MultiDataTrigger.Conditions>
-                                        <Setter Property="Visibility" Value="Visible" />
-                                    </MultiDataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                        </DataGridTemplateColumn.SortDirection>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid Margin="4,0">
+                                    <TextBlock FontSize="{Binding Source={StaticResource FontSize}}" Text="{Binding FolderViewModel.SizeColumnText}">
+                                        <TextBlock.Style>
+                                            <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
+                                                <Setter Property="HorizontalAlignment" Value="Right" />
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <Trigger Property="FlowDirection" Value="RightToLeft">
+                                                        <Setter Property="HorizontalAlignment" Value="Left" />
+                                                    </Trigger>
+                                                    <DataTrigger Binding="{Binding FolderViewModel.ShowSizeText}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <ui:HyperlinkButton
+                                        Padding="4,2"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Command="{Binding FolderViewModel.CalculateSizeCommand}"
+                                        Content="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_VIEW_SIZE}}"
+                                        FontSize="{Binding Source={StaticResource FontSize}}"
+                                        ToolTip="{Binding Source={x:Static Member=strings:Resources.S_VIEW_SIZE_TOOLTIP}}">
+                                        <ui:HyperlinkButton.Style>
+                                            <Style BasedOn="{StaticResource {x:Type ui:HyperlinkButton}}" TargetType="ui:HyperlinkButton">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding FolderViewModel.ShowCalculateSizeButton}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ui:HyperlinkButton.Style>
+                                    </ui:HyperlinkButton>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn
                         x:Name="OriginalDate"
                         Width="Auto"

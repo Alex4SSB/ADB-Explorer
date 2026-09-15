@@ -29,7 +29,7 @@ public class PackageInstallOperation : AbstractShellFileOperation
         // Uninstall never has a real path — base() unconditionally builds a SyncFile from
         // it, so a null path (the old default) crashed. A name-only placeholder is unused
         // by Start()'s uninstall branch, which only reads PackageName.
-        : base(path ?? new FileClass(packageName, packageName, FileType.File), device, dispatcher)
+        : base(path ?? new FileClass(packageName, packageName, AbstractFile.FileType.File), device, dispatcher)
     {
         OperationName = OperationType.Install;
         PackageName = packageName;
