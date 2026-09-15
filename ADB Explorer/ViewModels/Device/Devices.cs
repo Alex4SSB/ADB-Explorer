@@ -312,10 +312,13 @@ public partial class Devices : ObservableObject
 
     public async void UpdateBrandNames()
     {
-        await Task.Run(() =>
-            UIList.OfType<LogicalDeviceViewModel>().ForEach(d => _ = d.BrandName));
+        // Snapshot before enumerating on a background thread — UIList can be mutated
+        // concurrently (device connect/disconnect), which threw InvalidOperationException.
+        var devices = UIList.OfType<LogicalDeviceViewModel>().ToList();
 
-        App.SafeInvoke(() => UIList.OfType<LogicalDeviceViewModel>().ForEach(d => d.UpdateName()));
+        await Task.Run(() => devices.ForEach(d => _ = d.BrandName));
+
+        App.SafeInvoke(() => devices.ForEach(d => d.UpdateName()));
     }
 
     public async void UpdateLogicalIp()

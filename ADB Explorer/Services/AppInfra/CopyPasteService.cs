@@ -199,7 +199,18 @@ public partial class CopyPasteService : ObservableObject
         {
             foreach (var file in DragFiles)
             {
-                yield return new(ShellItem.Open(file));
+                // Skip files removed from disk after being copied but before paste.
+                ShellItem item;
+                try
+                {
+                    item = ShellItem.Open(file);
+                }
+                catch (FileNotFoundException)
+                {
+                    continue;
+                }
+
+                yield return new(item);
             }
         }
         else

@@ -173,7 +173,8 @@ public partial class FileViewModelBase : ObservableObject
 
     public static void RenameTextChanged(TextBox textBox)
     {
-        if (textBox.DataContext is not FileClass file || Data.CurrentDrive is null)
+        // Data.DirList can turn null mid-rename (navigation/refresh); guard it like CurrentDrive.
+        if (textBox.DataContext is not FileClass file || Data.CurrentDrive is null || Data.DirList is null)
             return;
 
         var restrictions = DriveHelper.GetRestrictions(file.FullPath);

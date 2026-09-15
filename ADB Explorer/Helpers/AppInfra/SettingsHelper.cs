@@ -22,7 +22,12 @@ public static class SettingsHelper
         // still persists it (timeout-protected) without delaying the restart.
         App.Services.GetService<SettingsService>()?.SaveSettingsFile();
 
-        Process.Start(Environment.ProcessPath);
+        // Explicit WorkingDirectory: letting it inherit the current process's CWD could
+        // resolve to a protected folder (e.g. system32) and fail with "Access is denied".
+        Process.Start(new ProcessStartInfo(Environment.ProcessPath)
+        {
+            WorkingDirectory = Path.GetDirectoryName(Environment.ProcessPath) ?? "",
+        });
         Application.Current.Shutdown();
     }
 
