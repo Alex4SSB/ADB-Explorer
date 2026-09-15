@@ -1773,4 +1773,40 @@ Pemeriksaan ini berupaya mencegah pengguna yang tidak menyadari risiko menjalank
   <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
     <value>A</value>
   </data>
+  <data name="S_SCREENSHOT" xml:space="preserve">
+    <value>Tangkapan layar</value>
+  </data>
+  <data name="S_MENU_PASTE_IMAGE" xml:space="preserve">
+    <value>Tempel gambar</value>
+  </data>
+  <data name="S_MENU_COPY_AS_IMAGE" xml:space="preserve">
+    <value>Salin sebagai gambar</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE" xml:space="preserve">
+    <value>Peka huruf besar/kecil</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE_INFO" xml:space="preserve">
+    <value>Cocokkan penggunaan huruf besar/kecil secara tepat saat mencari.</value>
+  </data>
+  <data name="S_SEARCH_CONTENTS" xml:space="preserve">
+    <value>Isi file</value>
+  </data>
+  <data name="S_SEARCH_CONTENTS_INFO" xml:space="preserve">
+    <value>Juga cocokkan file yang isinya memuat teks pencarian.</value>
+  </data>
+  <data name="S_SEARCH_ARCHIVES" xml:space="preserve">
+    <value>Isi arsip</value>
+  </data>
+  <data name="S_SEARCH_ARCHIVES_INFO" xml:space="preserve">
+    <value>Juga cocokkan file di dalam arsip yang ditemukan saat pencarian.</value>
+  </data>
+  <data name="S_THUMBSIZE_CONTENT" xml:space="preserve">
+    <value>Konten</value>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE" xml:space="preserve">
+    <value>Tampilkan jalur relatif</value>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE_INFO" xml:space="preserve">
+    <value>Saat dipilih, hasil pencarian ditampilkan dengan jalur yang relatif terhadap lokasi saat ini. Jika tidak, jalur yang ditampilkan bersifat absolut.</value>
+  </data>
 </root>
