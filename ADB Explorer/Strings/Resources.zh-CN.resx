@@ -1807,4 +1807,13 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SEARCH_DISPLAY_PATH_RELATIVE_INFO" xml:space="preserve">
     <value>勾选时，显示相对于当前位置的搜索结果路径。如未勾选则显示绝对路径。</value>
   </data>
+  <data name="S_BUTTON_VIEW_SIZE" xml:space="preserve">
+    <value>查看大小</value>
+  </data>
+  <data name="S_STATUS_CALCULATING_SIZE" xml:space="preserve">
+    <value>计算中…</value>
+  </data>
+  <data name="S_VIEW_SIZE_TOOLTIP" xml:space="preserve">
+    <value>递归方式计算并显示此文件夹下所有文件的总大小。</value>
+  </data>
 </root>
