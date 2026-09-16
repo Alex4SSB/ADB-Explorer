@@ -1783,4 +1783,37 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_MENU_COPY_AS_IMAGE" xml:space="preserve">
     <value>Копировать как изображение</value>
   </data>
+  <data name="S_BUTTON_VIEW_SIZE" xml:space="preserve">
+    <value>Просмотреть размер</value>
+  </data>
+  <data name="S_STATUS_CALCULATING_SIZE" xml:space="preserve">
+    <value>Расчет…</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE" xml:space="preserve">
+    <value>Чувствительность регистра</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE_INFO" xml:space="preserve">
+    <value>При поиске учитывайте регистр букв.</value>
+  </data>
+  <data name="S_SEARCH_CONTENTS" xml:space="preserve">
+    <value>Содержимое файла</value>
+  </data>
+  <data name="S_SEARCH_CONTENTS_INFO" xml:space="preserve">
+    <value>Также можно найти файлы, содержимое которых содержит поисковый текст.</value>
+  </data>
+  <data name="S_SEARCH_ARCHIVES" xml:space="preserve">
+    <value>Содержимое архива</value>
+  </data>
+  <data name="S_SEARCH_ARCHIVES_INFO" xml:space="preserve">
+    <value>Также ищите файлы в архивах, найденных при поиске.</value>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE" xml:space="preserve">
+    <value>Показать относительный путь</value>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE_INFO" xml:space="preserve">
+    <value>Если выбрано, результаты поиска отображаются вместе с относительно текущего местоположения. В противном случае отображенный путь является абсолютным.</value>
+  </data>
+  <data name="S_VIEW_SIZE_TOOLTIP" xml:space="preserve">
+    <value>Рекурсивно вычисляет и отображает общий размер всех файлов в этой папке.</value>
+  </data>
 </root>
