@@ -1771,4 +1771,52 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
     <value>יוצר APKBKP של התקנת האפליקציה ונתוני ה-OBB</value>
   </data>
+  <data name="S_SCREENSHOT" xml:space="preserve">
+    <value>צילום מסך</value>
+  </data>
+  <data name="S_MENU_PASTE_IMAGE" xml:space="preserve">
+    <value>הדבק תמונה</value>
+  </data>
+  <data name="S_MENU_COPY_AS_IMAGE" xml:space="preserve">
+    <value>העתק בתור תמונה</value>
+  </data>
+  <data name="S_MENU_REMOVE_SAVED_LOCATION" xml:space="preserve">
+    <value>הסר מהמיקומים השמורים</value>
+  </data>
+  <data name="S_BUTTON_VIEW_SIZE" xml:space="preserve">
+    <value>הצג גודל</value>
+  </data>
+  <data name="S_STATUS_CALCULATING_SIZE" xml:space="preserve">
+    <value>מחשב…</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE" xml:space="preserve">
+    <value>התחשבות באותיות גדולות/קטנות</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE_INFO" xml:space="preserve">
+    <value>חפש תאימות מלאה בגודל אותיות בחיפוש.</value>
+  </data>
+  <data name="S_SEARCH_CONTENTS" xml:space="preserve">
+    <value>תכני קבצים</value>
+  </data>
+  <data name="S_SEARCH_CONTENTS_INFO" xml:space="preserve">
+    <value>כלול בתוצאות גם קבצים אשר תוכנם תואם את טקסט החיפוש.</value>
+  </data>
+  <data name="S_SEARCH_ARCHIVES" xml:space="preserve">
+    <value>תכני ארכיונים</value>
+  </data>
+  <data name="S_SEARCH_ARCHIVES_INFO" xml:space="preserve">
+    <value>כלול גם קבצים בתוך ארכיונים התואמים את החיפוש.</value>
+  </data>
+  <data name="S_THUMBSIZE_CONTENT" xml:space="preserve">
+    <value>תוכן</value>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE" xml:space="preserve">
+    <value>הצג נתיב יחסי</value>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE_INFO" xml:space="preserve">
+    <value>כשמסומן, תוצאות החיפוש מוצגות עם נתיב יחסי למיקום הנוכחי. אחרת הנתיב המוצג ויא מוחלט.</value>
+  </data>
+  <data name="S_VIEW_SIZE_TOOLTIP" xml:space="preserve">
+    <value>מחשב ומציג את הגודל הכולל של כל הקבצים תחת תיקיה זו בצורה רקורסיבית.</value>
+  </data>
 </root>
