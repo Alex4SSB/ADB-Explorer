@@ -299,6 +299,9 @@ internal static class ExplorerContextMenu
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextOpenPackageLocation), AppActions.Icon(FileAction.FileActionType.FollowLink, 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextOpenItemLocation), AppActions.Icon(FileAction.FileActionType.FollowLink, 16)),
         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextCopyItemPath), AppActions.Icon(FileAction.FileActionType.CopyItemPath, 16)),
+        new SubMenu(
+            AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextRemoveSavedLocation),
+            AppActions.Icon(FileAction.FileActionType.ContextRemoveSavedLocation, 16)),
         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), AppActions.Icon(FileAction.FileActionType.UpdateModified, 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextUninstall), AppActions.Icon(FileAction.FileActionType.Uninstall, 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextRestore), AppActions.Icon(FileAction.FileActionType.Restore, 16)),

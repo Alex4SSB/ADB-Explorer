@@ -18,17 +18,24 @@ public class SavedLocation : ViewModelBase
 
     public BaseAction NavigateAction { get; }
 
+    private static string? CurrentDeviceId => Data.DevicesObject?.Current?.ID;
+
     public SavedLocation(string path = "")
     {
         Path = path;
 
         DeleteAction = new(
             () => !string.IsNullOrEmpty(Path),
-            () => Data.Settings.SavedLocations.Remove(Path));
+            () =>
+            {
+                var entry = Data.Settings.SavedLocations.FirstOrDefault(e => e.DeviceId == CurrentDeviceId && e.Path == Path);
+                if (entry is not null)
+                    Data.Settings.SavedLocations.Remove(entry);
+            });
 
         AddAction = new(
-            () => string.IsNullOrEmpty(Path),
-            () => Data.Settings.SavedLocations.Add(Data.CurrentPath));
+            () => string.IsNullOrEmpty(Path) && CurrentDeviceId is not null,
+            () => Data.Settings.SavedLocations.Add(new(CurrentDeviceId, Data.CurrentPath)));
 
         NavigateAction = new(
             () => !string.IsNullOrEmpty(Path),

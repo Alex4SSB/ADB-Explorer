@@ -25,6 +25,27 @@
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate DataType="{x:Type viewmodels:NavigationTreeNode}" ItemsSource="{Binding Children}">
                             <Grid>
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="ToolTip" Value="{Binding DisplayName}" />
+                                        <Style.Resources>
+                                            <Style BasedOn="{StaticResource OverflowsTreeTooltipStyle}" TargetType="ToolTip" />
+                                        </Style.Resources>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSavedLocation}" Value="True">
+                                                <Setter Property="ToolTip">
+                                                    <Setter.Value>
+                                                        <ToolTip
+                                                            MaxWidth="600"
+                                                            Content="{Binding RelativeSource={RelativeSource Mode=Self}, Path=PlacementTarget.DataContext.Path}"
+                                                            FlowDirection="LeftToRight"
+                                                            Style="{StaticResource FluentTooltipStyle}" />
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition />
@@ -42,8 +63,34 @@
                                             </Style.Triggers>
                                         </Style>
                                     </Grid.Style>
-                                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="{Binding Icon}" />
-                                    <Image RenderOptions.BitmapScalingMode="HighQuality" Source="{Binding IconOverlay}" />
+                                    <Grid>
+                                        <Grid.Style>
+                                            <Style TargetType="Grid">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSavedLocation}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Grid.Style>
+                                        <Image RenderOptions.BitmapScalingMode="HighQuality" Source="{Binding Icon}" />
+                                        <Image RenderOptions.BitmapScalingMode="HighQuality" Source="{Binding IconOverlay}" />
+                                    </Grid>
+                                    <ui:FontIcon
+                                        FontFamily="{StaticResource FluentSymbolThemeFontFamily}"
+                                        FontSize="14"
+                                        Foreground="{DynamicResource AccentButtonBackground}"
+                                        Glyph="&#xE735;">
+                                        <ui:FontIcon.Style>
+                                            <Style TargetType="ui:FontIcon">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSavedLocation}" Value="False">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ui:FontIcon.Style>
+                                    </ui:FontIcon>
                                 </Grid>
                                 <emoji:TextBlock
                                     Grid.Column="1"
@@ -51,9 +98,8 @@
                                     Text="{Binding DisplayName}">
                                     <emoji:TextBlock.Style>
                                         <Style BasedOn="{StaticResource FileNameTextBlockStyle}" TargetType="emoji:TextBlock">
-                                            <Style.Resources>
-                                                <Style BasedOn="{StaticResource OverflowsTreeTooltipStyle}" TargetType="ToolTip" />
-                                            </Style.Resources>
+                                            <!--  Tooltip lives on the row Grid so icon + text share one hover target  -->
+                                            <Setter Property="ToolTip" Value="{x:Null}" />
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
                                                     <Setter Property="Visibility" Value="Collapsed" />

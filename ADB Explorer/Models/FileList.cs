@@ -36,6 +36,9 @@ public class FileList
     /// </summary>
     public bool ForbidPaste { get; set; }
 
+    /// <summary>Saved-location node in the tree — a pinned shortcut, not a real browsable target.</summary>
+    public bool ForbidNew { get; set; }
+
     /// <summary>
     /// When set, enablement uses this instead of <see cref="DirectoryLister.CurrentLocation"/>.
     /// Tree lists have no listing of the parent folder.
@@ -57,9 +60,13 @@ public class FileList
             Device = device,
             CurrentDrive = drive,
             ForbidDestructive = node.Drive is not null
-                || drive?.Type is AbstractDrive.DriveType.Root,
+                || drive?.Type is AbstractDrive.DriveType.Root
+                || node.IsSavedLocation,
             ForbidPaste = node.Drive?.Type is AbstractDrive.DriveType.Root,
+            ForbidNew = node.IsSavedLocation,
         };
+
+        list.Actions.RemoveSavedLocationEnabled = node.IsSavedLocation;
 
         if (drive?.Type is AbstractDrive.DriveType.Package)
         {

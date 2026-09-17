@@ -1047,6 +1047,19 @@ internal static class FileActionLogic
         Data.RuntimeSettings.Rename = true;
     }
 
+    public static void RemoveSavedLocation()
+    {
+        if (ExplorerTree?.ContextTarget is not { IsSavedLocation: true } node)
+            return;
+
+        var deviceId = node.OwnerDevice?.ID;
+        var entry = Data.Settings.SavedLocations.FirstOrDefault(e =>
+            e.DeviceId == deviceId && NavigationTreeNode.PathsEqual(e.Path, node.Path));
+
+        if (entry is not null)
+            Data.Settings.SavedLocations.Remove(entry);
+    }
+
     public static void PasteFiles(IEnumerable<FileClass> selectedFiles, bool isLink = false)
     {
         // Toolbar and keyboard paste share this executor - CanExecute already applied the
@@ -1859,13 +1872,16 @@ internal static class FileActionLogic
 
         var isArchive = actions.IsArchive;
 
+        // CanWrite (when set) is computed by the caller against the actual selected node's own
+        // path - e.g. a tree drive node's Path is its parent, so listingPath/restrictions below
+        // would otherwise check the wrong location's writability for it.
         bool isWritable;
-        if (restrictions.ReadOnly is true)
+        if (list.CanWrite is bool canWrite)
+            isWritable = canWrite;
+        else if (restrictions.ReadOnly is true)
             isWritable = false;
         else if (isSearchMode)
             isWritable = Data.SearchOriginCanWrite;
-        else if (list.CanWrite is bool canWrite)
-            isWritable = canWrite;
         else
             isWritable = list.DirList?.CurrentLocation?.CanWriteLocation == true;
 
@@ -2088,6 +2104,7 @@ internal static class FileActionLogic
             && !isRecycleBin
             && !isAppDrive
             && archiveAllowsModify
+            && !list.ForbidNew
             && (!hasFileSelection || contextNewOnFolder);
 
         actions.SubmenuUninstallEnabled = allInstallApk && isNotRecovery;

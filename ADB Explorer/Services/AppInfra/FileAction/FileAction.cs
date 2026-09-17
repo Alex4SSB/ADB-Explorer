@@ -47,6 +47,7 @@ public static class AppActions
         { FileActionType.Home, "\uE80F" },
         { FileActionType.Refresh, "\uE72C" },
         { FileActionType.FileOpStop, "\uE768" },
+        { FileActionType.ContextRemoveSavedLocation, "\uE8D9" },
     };
 
     public static BaseIcon Icon(FileActionType type, double size = 18) => type switch
@@ -512,7 +513,11 @@ public static class AppActions
             () => Actions.IsSingleFolder,
             FileActionLogic.EnterFolder,
             Strings.Resources.S_OPEN_FOLDER,
-            new(Key.Enter))
+            new(Key.Enter)),
+        new(FileActionType.ContextRemoveSavedLocation,
+            () => Actions.RemoveSavedLocationEnabled,
+            FileActionLogic.RemoveSavedLocation,
+            Strings.Resources.S_MENU_REMOVE_SAVED_LOCATION),
     ];
 
     public static List<KeyBinding> Bindings =>
@@ -611,6 +616,7 @@ public class FileAction : ViewModelBase
         OpenPackageLocation,
         ContextOpenPackageLocation,
         Enter,
+        ContextRemoveSavedLocation,
     }
 
     public FileActionType Name { get; }

@@ -59,6 +59,10 @@ public partial class FileActionsEnable : ObservableObject
     [ObservableProperty]
     public partial bool IsCopyAsImageEnabled { get; set; }
 
+    /// <summary>Tree context target is a saved-location node (<see cref="NavigationTreeNode.IsSavedLocation"/>).</summary>
+    [ObservableProperty]
+    public partial bool RemoveSavedLocationEnabled { get; set; }
+
     private bool packageActionsEnabled;
     public bool PackageActionsEnabled
     {

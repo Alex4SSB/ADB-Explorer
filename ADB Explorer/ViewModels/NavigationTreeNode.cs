@@ -84,6 +84,9 @@ public partial class NavigationTreeNode : ObservableObject
 
     public bool IsTemp { get; set; }
 
+    /// <summary>A saved-location entry shown above the device's drives, not an actual drive-tree folder.</summary>
+    public bool IsSavedLocation { get; set; }
+
     public FileClass? File { get; set; }
 
     public bool IsRtlName => TextHelper.ContainsRtl(DisplayName);

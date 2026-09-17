@@ -99,6 +99,40 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
             => writer.WriteNumberValue(Math.Clamp(value, MaxSimultaneousOpsMin, MaxSimultaneousOpsMax));
     }
 
+    /// <summary>
+    /// Reads the legacy flat <c>["path", ...]</c> array (each becomes an unclaimed entry with a
+    /// <see langword="null"/> <see cref="SavedLocationEntry.DeviceId"/>) as well as the current
+    /// <c>[{"DeviceId":..,"Path":..}, ...]</c> array.
+    /// </summary>
+    private sealed class SavedLocationsJsonConverter : JsonConverter<ObservableCollection<SavedLocationEntry>>
+    {
+        public override ObservableCollection<SavedLocationEntry> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            var result = new ObservableCollection<SavedLocationEntry>();
+            if (reader.TokenType != JsonTokenType.StartArray)
+                return result;
+
+            while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+            {
+                if (reader.TokenType == JsonTokenType.String)
+                    result.Add(new(null, reader.GetString() ?? ""));
+                else if (reader.TokenType == JsonTokenType.StartObject
+                    && JsonSerializer.Deserialize<SavedLocationEntry>(ref reader, options) is { } entry)
+                    result.Add(entry);
+            }
+
+            return result;
+        }
+
+        public override void Write(Utf8JsonWriter writer, ObservableCollection<SavedLocationEntry> value, JsonSerializerOptions options)
+        {
+            writer.WriteStartArray();
+            foreach (var entry in value)
+                JsonSerializer.Serialize(writer, entry, options);
+            writer.WriteEndArray();
+        }
+    }
+
     public const int MaxSimultaneousOpsMin = 1;
     public const int MaxSimultaneousOpsMax = 999;
     public const int MaxSimultaneousOpsDefault = 32;
@@ -172,8 +206,9 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
 
     public Dictionary<string, SortingSelector.DirSortingOption> _locationSorting { get; set; } = [];
 
+    [JsonConverter(typeof(SavedLocationsJsonConverter))]
     [ObservableProperty]
-    public partial ObservableCollection<string> SavedLocations { get; set; } = [];
+    public partial ObservableCollection<SavedLocationEntry> SavedLocations { get; set; } = [];
 
     [ObservableProperty]
     public partial StorageDevice[] StorageDevices { get; set; }

@@ -205,6 +205,7 @@ public partial class Devices : ObservableObject
         var result = App.AppDispatcher is not null
             ? App.AppDispatcher.Invoke(() => UpdateDevices(UIList, other))
             : UpdateDevices(UIList, other);
+        ClaimUnclaimedSavedLocations();
         OnPropertyChanged(nameof(Count));
 
         UpdateLogicalIp();
@@ -212,6 +213,27 @@ public partial class Devices : ObservableObject
         UpdateHistoryNames();
 
         return result;
+    }
+
+    private static bool _unclaimedSavedLocationsClaimed;
+
+    /// <summary>
+    /// One-time-per-session migration: saved locations from before saved locations were per-device
+    /// (<see cref="SavedLocationEntry.DeviceId"/> is <see langword="null"/>) are claimed by the first
+    /// device to connect, so they aren't silently lost.
+    /// </summary>
+    private void ClaimUnclaimedSavedLocations()
+    {
+        if (_unclaimedSavedLocationsClaimed)
+            return;
+
+        var device = LogicalDeviceViewModels.FirstOrDefault(d => d.Status is DeviceStatus.Ok);
+        if (device is null)
+            return;
+
+        _unclaimedSavedLocationsClaimed = true;
+        foreach (var entry in Data.Settings.SavedLocations.Where(e => string.IsNullOrEmpty(e.DeviceId)))
+            entry.DeviceId = device.ID;
     }
 
     private static bool UpdateDevices(ObservableList<DeviceViewModel> self, IEnumerable<LogicalDeviceViewModel> other)

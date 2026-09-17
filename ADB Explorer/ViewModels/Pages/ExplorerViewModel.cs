@@ -407,7 +407,12 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     {
         App.SafeBeginInvoke(() =>
         {
-            SavedItems = [.. Data.Settings.SavedLocations.Select(p => new SavedLocation(p))];
+            var deviceId = Data.DevicesObject?.Current?.ID;
+            SavedItems = [.. Data.Settings.SavedLocations
+                .Where(entry => entry.DeviceId == deviceId)
+                .Select(entry => new SavedLocation(entry.Path))];
+
+            Tree.Sync();
         });
     }
 
@@ -520,6 +525,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
             UpdateDriveView();
             Tree.SubscribeDriveLists();
             Tree.Sync();
+            SavedLocations_CollectionChanged(null, null);
         }
         else if (e.PropertyName == nameof(Devices.Count))
         {

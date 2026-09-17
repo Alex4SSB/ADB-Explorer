@@ -122,6 +122,7 @@ public partial class NavigationTreeViewModel : ObservableObject
                 node.DisplayName = device.Name;
             }
 
+            SyncSavedLocationsForDevice(node, device);
             SyncDrivesForDevice(node, device);
             remaining.Add(node);
         }
@@ -188,7 +189,7 @@ public partial class NavigationTreeViewModel : ObservableObject
             remaining.Add(node);
         }
 
-        foreach (var stale in deviceNode.Children.Where(n => !remaining.Contains(n)).ToList())
+        foreach (var stale in deviceNode.Children.Where(n => !n.IsSavedLocation && !remaining.Contains(n)).ToList())
         {
             if (ReferenceEquals(_selectedTreeNode, stale) || IsAncestor(_selectedTreeNode, stale))
                 SelectTreeNode(null);
@@ -197,13 +198,74 @@ public partial class NavigationTreeViewModel : ObservableObject
             deviceNode.Children.Remove(stale);
         }
 
-        var ordered = deviceNode.Children.OrderBy(n => n.Drive?.Type).ToList();
+        // InsertDrive doesn't know about saved-location nodes (it may place a new drive ahead of
+        // one), so the full order - saved locations first, then drives by type - is rebuilt here.
+        var ordered = deviceNode.Children.Where(n => n.IsSavedLocation)
+            .Concat(deviceNode.Children.Where(n => !n.IsSavedLocation).OrderBy(n => n.Drive?.Type))
+            .ToList();
         for (var i = 0; i < ordered.Count; i++)
         {
             var currentIndex = deviceNode.Children.IndexOf(ordered[i]);
             if (currentIndex != i)
                 deviceNode.Children.Move(currentIndex, i);
         }
+    }
+
+    /// <summary>Saved-location nodes always occupy the front of the device node's children, ahead of drives.</summary>
+    private void SyncSavedLocationsForDevice(NavigationTreeNode deviceNode, LogicalDeviceViewModel device)
+    {
+        var entries = Data.Settings.SavedLocations.Where(e => e.DeviceId == device.ID).ToList();
+        var remaining = new HashSet<NavigationTreeNode>();
+
+        for (var i = 0; i < entries.Count; i++)
+        {
+            var node = deviceNode.Children.FirstOrDefault(n =>
+                n.IsSavedLocation && NavigationTreeNode.PathsEqual(n.Path, entries[i].Path));
+
+            if (node is null)
+            {
+                node = CreateSavedLocationNode(entries[i].Path, device);
+                deviceNode.Children.Insert(Math.Min(i, deviceNode.Children.Count), node);
+            }
+
+            remaining.Add(node);
+
+            var currentIndex = deviceNode.Children.IndexOf(node);
+            if (currentIndex != i)
+                deviceNode.Children.Move(currentIndex, i);
+        }
+
+        foreach (var stale in deviceNode.Children.Where(n => n.IsSavedLocation && !remaining.Contains(n)).ToList())
+        {
+            if (ReferenceEquals(_selectedTreeNode, stale) || IsAncestor(_selectedTreeNode, stale))
+                SelectTreeNode(null);
+
+            stale.Detach();
+            deviceNode.Children.Remove(stale);
+        }
+    }
+
+    /// <summary>
+    /// Basename only - skips archive-boundary detection (a live ADB stat) since the last path
+    /// segment is right either way. Icon is replaced by a star overlay in the tree's DataTemplate.
+    /// </summary>
+    private NavigationTreeNode CreateSavedLocationNode(string path, LogicalDeviceViewModel device)
+    {
+        var name = FileHelper.GetFullName(path);
+        var icon = new FileClass(name, path, AbstractFile.FileType.Folder).Icon;
+
+        var node = new NavigationTreeNode(
+            path,
+            name,
+            icon,
+            OnTreeNodeSelected,
+            ownerDevice: device)
+        {
+            IsSavedLocation = true,
+            CanExpand = false,
+        };
+        node.CutState = CutStateFor(node);
+        return node;
     }
 
     private void DiscoverAndSelect(string? path)

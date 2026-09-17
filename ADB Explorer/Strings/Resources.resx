@@ -867,6 +867,10 @@ Cancel All Running</value>
     <value>Open Item Location</value>
     <comment>The menu used to open the (source) location to a symbolic link</comment>
   </data>
+  <data name="S_MENU_REMOVE_SAVED_LOCATION" xml:space="preserve">
+    <value>Remove from saved locations</value>
+    <comment>Tree context menu action removing a pinned saved-location node</comment>
+  </data>
   <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
     <value>Search In Browser</value>
     <comment>The menu used to open the default web browser and search for a package name from the installed apps view</comment>
