@@ -411,7 +411,7 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
-    <value>Söker efter enheter</value>
+    <value>Avsöker enheter</value>
   </data>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
     <value>Söker efter batteristatus</value>
@@ -435,7 +435,7 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>Tvinga omskanning av media vid skickning</value>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
-    <value>Söker efter enheter</value>
+    <value>Avsöker lagringsenheter</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
     <value>APK-stöd</value>
@@ -495,7 +495,7 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>Mapp för appdata</value>
   </data>
   <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
-    <value>Custom</value>
+    <value>Anpassad</value>
     <comment>Button to pick a non-virtualized custom app data folder</comment>
   </data>
   <data name="S_GITHUB_REPO" xml:space="preserve">
@@ -551,7 +551,7 @@ Avbryt alla pågående</value>
     <value>Kommandologg</value>
   </data>
   <data name="S_BUTTON_DRIVES" xml:space="preserve">
-    <value>Enheter</value>
+    <value>Enhetslagring</value>
   </data>
   <data name="S_BUTTON_BACK" xml:space="preserve">
     <value>Tillbaka</value>
@@ -965,10 +965,10 @@ Avbryt alla pågående</value>
     <value>En vald fil bryter mot namngivningsreglerna för roten på Windows-enheten</value>
   </data>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
-    <value>Vissa utvalda filer har motstridiga namn på FUSE / Windows</value>
+    <value>Vissa valda filer har motstridiga namn som inte skiljer mellan versaler och gemener</value>
   </data>
   <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
-    <value>Vissa kopierade filer har motstridiga namn på FUSE</value>
+    <value>Vissa kopierade filer har motstridiga namn som inte skiljer mellan versaler och gemener</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>Ett valt objekt är inte en fil eller mapp</value>
@@ -1162,22 +1162,22 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <value>Socket</value>
   </data>
   <data name="S_FILE_BLOCK" xml:space="preserve">
-    <value>Blockera enhet</value>
+    <value>Blockenhet</value>
   </data>
   <data name="S_FILE_CHAR" xml:space="preserve">
-    <value>Char-enhet</value>
+    <value>Teckenenhet</value>
   </data>
   <data name="S_FILE_FIFO" xml:space="preserve">
     <value>FIFO</value>
   </data>
   <data name="S_FILE_UNKNOWN" xml:space="preserve">
-    <value>Okänt</value>
+    <value>Okänd</value>
   </data>
   <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
     <value>Trasig länk</value>
   </data>
   <data name="S_NAV_HISTORY" xml:space="preserve">
-    <value>Navigationshistoria</value>
+    <value>Navigeringshistorik</value>
   </data>
   <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
     <value>Lägg till aktuell plats</value>
@@ -1189,7 +1189,7 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <value>Sparade platser</value>
   </data>
   <data name="KILO" xml:space="preserve">
-    <value>{0} KB</value>
+    <value>{0} kB</value>
   </data>
   <data name="MEGA" xml:space="preserve">
     <value>{0} MB</value>
@@ -1201,7 +1201,7 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <value>m</value>
   </data>
   <data name="MICRO" xml:space="preserve">
-    <value>u</value>
+    <value>µ</value>
   </data>
   <data name="NANO" xml:space="preserve">
     <value>n</value>
@@ -1225,16 +1225,16 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <value>Flytta {0} objekt</value>
   </data>
   <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
-    <value>Klistra in ett utklippt föremål</value>
+    <value>Klistra in 1 utklippt objekt</value>
   </data>
   <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
-    <value>Klistra in ett kopierat föremål</value>
+    <value>Klistra in 1 kopierat objekt</value>
   </data>
   <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
-    <value>Klistra in {0} kopierade föremål</value>
+    <value>Klistra in {0} kopierade objekt</value>
   </data>
   <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
-    <value>Klistra in {0} utklippta föremål</value>
+    <value>Klistra in {0} utklippta objekt</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} i {1} ({2})</value>
@@ -1258,19 +1258,19 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <value>Filen hittades inte</value>
   </data>
   <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
-    <value>Avslutad utan bekräftelse</value>
+    <value>Slutförd utan bekräftelse</value>
   </data>
   <data name="S_VALIDATION_ERROR" xml:space="preserve">
     <value>Valideringsfel: {0}</value>
   </data>
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
-    <value>Validerar…</value>
+    <value>Validerar …</value>
   </data>
   <data name="S_FILES_PLURAL" xml:space="preserve">
     <value>{0} filer</value>
   </data>
   <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
-    <value>Välj ROM för sidladdning</value>
+    <value>Välj ROM för sideload</value>
   </data>
   <data name="S_ROM_FILE" xml:space="preserve">
     <value>ROM-fil</value>
@@ -1279,13 +1279,13 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <value>Terminal</value>
   </data>
   <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
-    <value>Behåll fildatum modifierad</value>
+    <value>Behåll filens ändringsdatum</value>
   </data>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
     <value>Installera {0}</value>
   </data>
   <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
-    <value>Installera {0} APK:er</value>
+    <value>Installera {0} APK-filer</value>
   </data>
   <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
     <value>På</value>
@@ -1294,13 +1294,13 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <value>Av</value>
   </data>
   <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
-    <value>Kontrollerar mDNS serverstatus…</value>
+    <value>Kontrollerar mDNS-serverstatus …</value>
   </data>
   <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
     <value>Ikoner</value>
   </data>
   <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
-    <value>Dra &amp; visa miniatyrbilder</value>
+    <value>Hämta och visa miniatyrbilder</value>
   </data>
   <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
     <value>Endast i ikonvy</value>
@@ -1312,13 +1312,13 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <value>Vid anslutning</value>
   </data>
   <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
-    <value>Spara miniatyrbilder mellan sessioner</value>
+    <value>Behåll miniatyrbilder mellan sessioner</value>
   </data>
   <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
-    <value>Visa ikoner för speciella mappar</value>
+    <value>Visa ikoner för särskilda mappar</value>
   </data>
   <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
-    <value>Inkludera videominiatyrer</value>
+    <value>Inkludera videominiatyrbilder</value>
   </data>
   <data name="S_VIDEO_DURATION" xml:space="preserve">
     <value>Längd</value>
@@ -1339,25 +1339,25 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <value>En timme</value>
   </data>
   <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
-    <value>Lokala miniatyrers uppdateringstid</value>
+    <value>Uppdateringsintervall för lokala miniatyrbilder</value>
   </data>
   <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
-    <value>Använd BusyBox om tillgänglig</value>
+    <value>Använd BusyBox om det är tillgängligt</value>
   </data>
   <data name="S_SETTINGS_WSA" xml:space="preserve">
-    <value>Anslut till WSA automatiskt om det är tillgängligt</value>
+    <value>Anslut automatiskt till WSA om det är tillgängligt</value>
   </data>
   <data name="S_STRING_PASTE" xml:space="preserve">
     <value>Klistra in</value>
   </data>
   <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
-    <value>Kolla efter miniatyruppdateringar</value>
+    <value>Kontrollerar uppdateringar av miniatyrbilder</value>
   </data>
   <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
-    <value>Dragminiatyrbilder</value>
+    <value>Hämtar miniatyrbilder</value>
   </data>
   <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
-    <value>Läsa miniatyrbildsplatser och mediedatabas</value>
+    <value>Läser platser för miniatyrbilder och mediedatabas</value>
   </data>
   <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
     <value>Detaljer</value>
@@ -1366,7 +1366,7 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <value>Vy</value>
   </data>
   <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
-    <value>Medium ikoner</value>
+    <value>Medelstora ikoner</value>
   </data>
   <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
     <value>Stora ikoner</value>
@@ -1378,7 +1378,7 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <value>Layout- och vyalternativ</value>
   </data>
   <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
-    <value>Miniatyrbilders storlek sparad för varje plats</value>
+    <value>Miniatyrbildsstorlek sparas för varje plats</value>
   </data>
   <data name="S_SORT" xml:space="preserve">
     <value>Sortera</value>
@@ -1390,34 +1390,34 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <value>Fallande</value>
   </data>
   <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
-    <value>Sorteringskolumn &amp; ordning sparad för varje plats</value>
+    <value>Sorteringskolumn och ordning sparas för varje plats</value>
   </data>
   <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
-    <value>Max bildstorlek att använda som sin egen miniatyr (0 - Avaktiverad)</value>
+    <value>Största bildstorlek att använda som egen miniatyrbild (0 – inaktiverad)</value>
   </data>
   <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
-    <value>och {0} till…</value>
+    <value>och {0} till …</value>
   </data>
   <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
-    <value>Visa eller dölja detaljer och förhandsgranskningspanel.</value>
+    <value>Visa eller dölj detalj- och förhandsgranskningspanelen.</value>
   </data>
   <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
     <value>Förhandsgranskning</value>
   </data>
   <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
-    <value>Maximal filstorlek för förhandsvisning</value>
+    <value>Maximal filstorlek för förhandsgranskning</value>
   </data>
   <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
-    <value>Dra till standardmapp vid dubbelklick på fil</value>
+    <value>Hämta till standardmapp vid dubbelklick på fil</value>
   </data>
   <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
-    <value>Välj ett enskilt föremål för att få mer information.</value>
+    <value>Välj ett enskilt objekt för att få mer information.</value>
   </data>
   <data name="S_ITEM_LOCATION" xml:space="preserve">
     <value>Plats</value>
   </data>
   <data name="S_IMAGE_F_STOP" xml:space="preserve">
-    <value>F-stop</value>
+    <value>Bländartal</value>
   </data>
   <data name="S_IMAGE_ISO" xml:space="preserve">
     <value>ISO-hastighet</value>
@@ -1426,16 +1426,16 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <value>Exponeringstid</value>
   </data>
   <data name="S_VIDEO_BITRATE" xml:space="preserve">
-    <value>Bitrate</value>
+    <value>Bithastighet</value>
   </data>
   <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
-    <value>Välj en fil för förhandsgranska.</value>
+    <value>Välj en fil för förhandsgranskning.</value>
   </data>
   <data name="S_PREVIEW_INVALID" xml:space="preserve">
-    <value>Ingen förhandsvisning tillgänglig.</value>
+    <value>Ingen förhandsgranskning tillgänglig.</value>
   </data>
   <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
-    <value>Denna PDF är lösenordsskyddad.</value>
+    <value>PDF-filen är lösenordsskyddad.</value>
   </data>
   <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
     <value>Felaktigt lösenord.</value>
@@ -1444,7 +1444,7 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <value>Lås upp</value>
   </data>
   <data name="S_FILE_PERMISSIONS" xml:space="preserve">
-    <value>Tillstånd</value>
+    <value>Behörigheter</value>
   </data>
   <data name="S_FILE_PERM_USER" xml:space="preserve">
     <value>Användare</value>
@@ -1453,10 +1453,10 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <value>Grupp</value>
   </data>
   <data name="S_FILE_PERM_OTHER" xml:space="preserve">
-    <value>Andra</value>
+    <value>Övriga</value>
   </data>
   <data name="S_DATE_ACCESSED" xml:space="preserve">
-    <value>Tillgänglig</value>
+    <value>Åtkommen</value>
   </data>
   <data name="S_CREATION_TIME" xml:space="preserve">
     <value>Skapad</value>
@@ -1486,7 +1486,7 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <comment>The label of the blue channel in the color picker</comment>
   </data>
   <data name="S_BUTTON_PAIR" xml:space="preserve">
-    <value>Pair</value>
+    <value>Parkoppla</value>
     <comment>The button for pairing a device</comment>
   </data>
   <data name="S_STATUS_OFFLINE" xml:space="preserve">
