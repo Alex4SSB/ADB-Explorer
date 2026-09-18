@@ -1816,4 +1816,7 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_VIEW_SIZE_TOOLTIP" xml:space="preserve">
     <value>Рекурсивно вычисляет и отображает общий размер всех файлов в этой папке.</value>
   </data>
+  <data name="S_MENU_REMOVE_SAVED_LOCATION" xml:space="preserve">
+    <value>Удалить из сохраненных мест</value>
+  </data>
 </root>
