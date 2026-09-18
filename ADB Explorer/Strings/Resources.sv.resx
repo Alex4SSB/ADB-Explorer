@@ -851,13 +851,13 @@ Avbryt alla pågående</value>
     <value>Ospecificerat fel</value>
   </data>
   <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
-    <value>Kallt</value>
+    <value>Kall</value>
   </data>
   <data name="S_BUTTON_LAUNCH" xml:space="preserve">
     <value>Starta</value>
   </data>
   <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
-    <value>WSA-start</value>
+    <value>Starta WSA</value>
   </data>
   <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
     <value>Visa inte detta igen.</value>
@@ -866,7 +866,7 @@ Avbryt alla pågående</value>
     <value>Avbryt</value>
   </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>{0} Konflikt</value>
+    <value>{0}-konflikt</value>
   </data>
   <data name="S_PASTE" xml:space="preserve">
     <value>Klistra in</value>
@@ -875,10 +875,10 @@ Avbryt alla pågående</value>
     <value>Släpp</value>
   </data>
   <data name="S_ACTION_OPERATION" xml:space="preserve">
-    <value>Operation</value>
+    <value>Åtgärd</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
-    <value>Operationer</value>
+    <value>Åtgärder</value>
   </data>
   <data name="S_ACTION_VALIDATE" xml:space="preserve">
     <value>Validera {0}</value>
@@ -887,10 +887,10 @@ Avbryt alla pågående</value>
     <value>Länk</value>
   </data>
   <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
-    <value>{0} (Länk)</value>
+    <value>{0} (länk)</value>
   </data>
   <data name="S_FILE_TYPE_APK" xml:space="preserve">
-    <value>Android applikationspaket (APK)</value>
+    <value>Android-applikationspaket (APK)</value>
   </data>
   <data name="S_FILE_TYPE_EXE" xml:space="preserve">
     <value>Körbar Windowsfil</value>
@@ -902,7 +902,7 @@ Avbryt alla pågående</value>
     <value>Ja</value>
   </data>
   <data name="S_DRIVE_ROOT" xml:space="preserve">
-    <value>Root</value>
+    <value>Rot</value>
   </data>
   <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
     <value>Intern lagring</value>
@@ -911,58 +911,58 @@ Avbryt alla pågående</value>
     <value>Installerade appar</value>
   </data>
   <data name="S_DRIVE_SD" xml:space="preserve">
-    <value>μSD-kort</value>
+    <value>µSD-kort</value>
   </data>
   <data name="S_DRIVE_OTG" xml:space="preserve">
     <value>OTG-enhet</value>
   </data>
   <data name="S_DRIVE_EMULATED" xml:space="preserve">
-    <value>Emulerad enhet</value>
+    <value>Emulerad lagring</value>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
-    <value>Temp</value>
+    <value>Temporär</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
-    <value>Innehåll överensstämmer inte</value>
+    <value>Innehållet stämmer inte överens</value>
   </data>
   <data name="S_VALIDATE_MISSING" xml:space="preserve">
-    <value>Saknas från målplats</value>
+    <value>Saknas på målplatsen</value>
   </data>
   <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
-    <value>Permanent borttagning</value>
+    <value>Permanent radering</value>
   </data>
   <data name="S_LOCATION_NA" xml:space="preserve">
-    <value>N/A</value>
+    <value>Ej tillämpligt</value>
   </data>
   <data name="S_PATH_INVALID" xml:space="preserve">
-    <value>Argumentet måste ange hela vägen för en ny eller befintlig inställningsfil.</value>
+    <value>Argumentet måste ange den fullständiga sökvägen till en ny eller befintlig inställningsfil.</value>
   </data>
   <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
-    <value>Sökväg för anpassade appinställningar</value>
+    <value>Anpassad sökväg för appinställningar</value>
   </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Menyn är tom</value>
   </data>
   <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} Kopiera</value>
+    <value>{0} – kopia</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
-    <value>Följer Unix namnregler (via ADB)</value>
+    <value>Följer Unix namngivningsregler (via ADB)</value>
   </data>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
-    <value>Håller sig till Windows namnregler</value>
+    <value>Följer Windows namngivningsregler</value>
   </data>
   <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
-    <value>Håller sig till Windows-enhetens regler för rotnamn</value>
+    <value>Följer namngivningsreglerna för roten på Windows-enheten</value>
   </data>
   <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
-    <value>Unik på aktuell plats</value>
+    <value>Unikt på aktuell plats</value>
   </data>
   <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
     <value>En vald fil bryter mot Windows namngivningsregler</value>
   </data>
   <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
-    <value>En vald fil bryter mot Windowsenhetens namnregler för roten</value>
+    <value>En vald fil bryter mot namngivningsreglerna för roten på Windows-enheten</value>
   </data>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
     <value>Vissa utvalda filer har motstridiga namn på FUSE / Windows</value>
@@ -971,7 +971,7 @@ Avbryt alla pågående</value>
     <value>Vissa kopierade filer har motstridiga namn på FUSE</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
-    <value>Ett valt objekt är inte en fil / mapp</value>
+    <value>Ett valt objekt är inte en fil eller mapp</value>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>WSA-app</value>
@@ -980,10 +980,10 @@ Avbryt alla pågående</value>
     <value>Rootstatus: {0}</value>
   </data>
   <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
-    <value>Okontrollerad</value>
+    <value>Inte kontrollerad</value>
   </data>
   <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
-    <value>Förbjudet</value>
+    <value>Nekad</value>
   </data>
   <data name="S_BUTTON_ENABLE" xml:space="preserve">
     <value>Aktivera</value>
@@ -995,7 +995,7 @@ Avbryt alla pågående</value>
     <value>Parkopplingskod</value>
   </data>
   <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
-    <value>IP-adress / Värdnamn</value>
+    <value>IP-adress/värdnamn</value>
   </data>
   <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
     <value>Port</value>
@@ -1004,7 +1004,7 @@ Avbryt alla pågående</value>
     <value>Parkopplingsport</value>
   </data>
   <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
-    <value>Parkoppla &amp; anslut</value>
+    <value>Parkoppla och anslut</value>
   </data>
   <data name="S_DEVICE_SAVED" xml:space="preserve">
     <value>Sparad enhet</value>
@@ -1013,22 +1013,22 @@ Avbryt alla pågående</value>
     <value>QR-parkoppling</value>
   </data>
   <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
-    <value>Redo att parkoppla</value>
+    <value>Redo för parkoppling</value>
   </data>
   <data name="S_CLEAR_ALL" xml:space="preserve">
     <value>Rensa alla</value>
   </data>
   <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
-    <value>Lägg till ny enhet</value>
+    <value>Lägg till enhet</value>
   </data>
   <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
-    <value>[Oauktoriserad]</value>
+    <value>[Obehörig]</value>
   </data>
   <data name="S_SERVICE_NONAME" xml:space="preserve">
-    <value>[Service]</value>
+    <value>[Tjänst]</value>
   </data>
   <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
-    <value>För närvarande surfar</value>
+    <value>Bläddrar nu</value>
   </data>
   <data name="S_BUTTON_BROWSE" xml:space="preserve">
     <value>Bläddra</value>
@@ -1040,13 +1040,13 @@ Avbryt alla pågående</value>
     <value>{0} ledigt av {1}</value>
   </data>
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
-    <value>Tomt</value>
+    <value>Tom</value>
   </data>
   <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
-    <value>APK-installationsfil</value>
+    <value>APK-installatör</value>
   </data>
   <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
-    <value>APK-installationsfiler</value>
+    <value>APK-installatörer</value>
   </data>
   <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
     <value>Paket</value>
@@ -1061,16 +1061,16 @@ Avbryt alla pågående</value>
     <value>Slutförd</value>
   </data>
   <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
-    <value>{0} Misslyckades</value>
+    <value>{0} misslyckades</value>
   </data>
   <data name="S_FILEOP_TOTAL" xml:space="preserve">
     <value>Totalt:</value>
   </data>
   <data name="S_FILEOP_PREV" xml:space="preserve">
-    <value>Föregående operation</value>
+    <value>Föregående åtgärd</value>
   </data>
   <data name="S_FILEOP_RUNNING" xml:space="preserve">
-    <value>Kör</value>
+    <value>Körs</value>
   </data>
   <data name="S_FILEOP_WAITING" xml:space="preserve">
     <value>Köad</value>
@@ -1088,34 +1088,34 @@ Avbryt alla pågående</value>
     <value>Flytta</value>
   </data>
   <data name="S_ACTION_RECYCLE" xml:space="preserve">
-    <value>Kasta</value>
+    <value>Flytta till papperskorgen</value>
   </data>
   <data name="S_ACTION_UPDATE" xml:space="preserve">
     <value>Uppdatera</value>
   </data>
   <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
-    <value>{0}% Används</value>
+    <value>{0} % används</value>
   </data>
   <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
-    <value>Scrolla här</value>
+    <value>Rulla hit</value>
   </data>
   <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
-    <value>Topp</value>
+    <value>Överst</value>
   </data>
   <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
-    <value>Botten</value>
+    <value>Nederst</value>
   </data>
   <data name="ScrollBar_PageUpCommand" xml:space="preserve">
     <value>Sida upp</value>
   </data>
   <data name="ScrollBar_PageDownCommand" xml:space="preserve">
-    <value>Sida ner</value>
+    <value>Sida ned</value>
   </data>
   <data name="ScrollBar_LineUpCommand" xml:space="preserve">
-    <value>Scrolla upp</value>
+    <value>Rulla upp</value>
   </data>
   <data name="ScrollBar_LineDownCommand" xml:space="preserve">
-    <value>Scrolla ner</value>
+    <value>Rulla ned</value>
   </data>
   <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
     <value>Vänster kant</value>
@@ -1130,10 +1130,10 @@ Avbryt alla pågående</value>
     <value>Sida åt höger</value>
   </data>
   <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
-    <value>Scrolla vänster</value>
+    <value>Rulla åt vänster</value>
   </data>
   <data name="ScrollBar_LineRightCommand" xml:space="preserve">
-    <value>Scrolla höger</value>
+    <value>Rulla åt höger</value>
   </data>
   <data name="S_MENU_UNDO" xml:space="preserve">
     <value>Ångra</value>
@@ -1142,17 +1142,17 @@ Avbryt alla pågående</value>
     <value>Gör om</value>
   </data>
   <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
-    <value>Notiser</value>
+    <value>Aviseringar</value>
   </data>
   <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
-    <value>Klicka för att visa mer info</value>
+    <value>Klicka för att visa mer information</value>
   </data>
   <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
     <value>Appspråk</value>
   </data>
   <data name="S_LANG_NOTIFICATION" xml:space="preserve">
-    <value>Välj ditt appspråk i inställningarna.
-Översättningsframsteg visas för det valda språket.
+    <value>Välj önskat appspråk i inställningarna.
+Översättningsförloppet visas för det valda språket.
 Hjälp oss att översätta appen till ditt språk på Weblate.</value>
   </data>
   <data name="S_GOTO_WEBLATE" xml:space="preserve">
