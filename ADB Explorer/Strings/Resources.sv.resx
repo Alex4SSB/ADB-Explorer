@@ -390,7 +390,7 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>Det finns {0} objekt i konflikt i {1}</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Klistra konflikter</value>
+    <value>Ersätt eller hoppa över filer</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Välj mappar att skicka</value>
@@ -429,7 +429,7 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>Stoppa sökning vid skicka/hämta</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>Samtidiga operationer</value>
+    <value>Max samtidiga operationer</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
     <value>Tvinga omskanning av media vid skickning</value>
@@ -514,7 +514,7 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>Sökinställningar</value>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
-    <value>Stäng sökning</value>
+    <value>Stäng sök</value>
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>Sökvy</value>
@@ -659,7 +659,7 @@ Avbryt alla pågående</value>
     <value>Det gick inte att hämta listan.</value>
   </data>
   <data name="S_EMPTY_FILTER" xml:space="preserve">
-    <value>Inga objekt matchar aktuellt filter.</value>
+    <value>Inga objekt matchar din sökning.</value>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
     <value>&lt;Span&gt;Den här mappen &lt;Italic&gt;ser&lt;/Italic&gt; tom ut&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… vid första anblicken&lt;/Span&gt;&lt;/Span&gt;</value>
