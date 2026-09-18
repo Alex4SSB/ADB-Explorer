@@ -121,7 +121,7 @@
     <value>Ikon(er) för Androidrobot</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
-    <value>Androidroboten reproduceras eller ändras från arbete som skapats och delas av Google och används enligt villkor som beskrivs i Creative Commons 3.0 Attribution License.</value>
+    <value>Androidroboten återges eller ändras från verk som skapats och delas av Google och används enligt villkoren i Creative Commons Attribution License 3.0.</value>
   </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>APK-ikonen är licensierad under Apache License, Version 2.0.</value>
@@ -160,7 +160,7 @@
     <value>Radera</value>
   </data>
   <data name="S_DEST_ERR" xml:space="preserve">
-    <value>Målsökvägsfel</value>
+    <value>Fel i målsökväg</value>
   </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>Anslutningsfel</value>
@@ -223,7 +223,7 @@
     <value>Fel vid skrivning av fil</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>ADB-server måste startas om för att inaktivera mDNS.</value>
+    <value>ADB-servern måste startas om för att inaktivera mDNS.</value>
   </data>
   <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
     <value>Inaktivera mDNS</value>
@@ -232,40 +232,40 @@
     <value>Starta WSA i bakgrunden</value>
   </data>
   <data name="S_PULL_ACTION" xml:space="preserve">
-    <value>Dra</value>
+    <value>Hämta</value>
   </data>
   <data name="S_PULL_ACTION_LINK" xml:space="preserve">
-    <value>Dra (Länka mål)</value>
+    <value>Hämta (länkmål)</value>
   </data>
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Återställ</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>Lista katalogfel</value>
+    <value>Fel vid listning av katalog</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
-    <value>Dra till Windows-enhetens rot</value>
+    <value>Hämta till roten på Windows-enheten</value>
   </data>
   <data name="S_NEW_VERSION_MSG" xml:space="preserve">
-    <value>Välkommen till en ny ADB Explorer-version!
-Releaseanteckningarna finns tillgängliga på GitHub.</value>
+    <value>Välkommen till en ny version av ADB Explorer!
+Versionsanteckningarna finns på GitHub.</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
-    <value>Alla appinställningar kommer att återställas när du stänger appen.
-Detta kan inte göras ogjort. Är du säker?</value>
+    <value>Alla appinställningar återställs när appen stängs.
+Detta kan inte ångras. Är du säker?</value>
   </data>
   <data name="S_WSA_LAUNCH" xml:space="preserve">
     <value>Välj Starta om ADB redan är auktoriserad i WSA.
-För att godkänna ADB, öppna WSA avancerade inställningar.</value>
+För att auktorisera ADB öppnar du WSAs avancerade inställningar.</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
-    <value>{0} av de valda filerna kan inte skapas under en Windows rootenhet.</value>
+    <value>{0} av de valda filerna kan inte skapas under roten på en Windows-enhet.</value>
   </data>
   <data name="S_ADB_LEARN_MORE" xml:space="preserve">
     <value>Läs mer om ADB</value>
   </data>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
-    <value>Ladda ner ADB</value>
+    <value>Hämta ADB</value>
   </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>Ändra</value>
@@ -283,41 +283,41 @@ För att godkänna ADB, öppna WSA avancerade inställningar.</value>
     <value>Inaktiverad</value>
   </data>
   <data name="S_NEW_VERSION" xml:space="preserve">
-    <value>En ny {0} version {1} är tillgänglig</value>
+    <value>En ny {0}, version {1}, är tillgänglig</value>
   </data>
   <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
-    <value>Gå till versionssida</value>
+    <value>Gå till versionssidan</value>
   </data>
   <data name="S_BUTTON_CLOSE" xml:space="preserve">
     <value>Stäng</value>
   </data>
   <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
-    <value>Gå till versionsfakta</value>
+    <value>Gå till versionsanteckningar</value>
   </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
-    <value>ADB körbar fil</value>
+    <value>Körbar ADB-fil</value>
   </data>
   <data name="S_HELP_ON_ADB" xml:space="preserve">
-    <value>Denna app är ett användargränssnitt för ADB - Android Debug Bridge.
-För att använda appen måste du ha ADB på din dator.
-ADB är tillgänglig som en del av Android SDK Platform Tools.
-Du kan använda den angivna länken för att ladda ner SDK Platform Tools.
-Tyvärr kan vi inte tillhandahålla ADB med appen på grund av licensbegränsningar.</value>
+    <value>Den här appen är ett användargränssnitt för ADB – Android Debug Bridge.
+För att använda appen måste ADB finnas på datorn.
+ADB ingår i Android SDK Platform Tools.
+Använd länken för att hämta SDK Platform Tools.
+Vi kan tyvärr inte distribuera ADB med appen på grund av licensbegränsningar.</value>
   </data>
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
-    <value>Hjälp på Android Debug Bridge</value>
+    <value>Hjälp om ADB</value>
   </data>
   <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>Starta om Android Debug Bridge nu</value>
+    <value>Starta om ADB nu</value>
   </data>
   <data name="S_RESTART_LATER" xml:space="preserve">
     <value>Starta om senare</value>
   </data>
   <data name="S_ITEM_DESTINATION" xml:space="preserve">
-    <value>Välj destination för {0}</value>
+    <value>Välj mål för {0}</value>
   </data>
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
-    <value>Välj destination för flera objekt</value>
+    <value>Välj mål för flera objekt</value>
   </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>Följande raderas permanent:
@@ -333,14 +333,14 @@ Tyvärr kan vi inte tillhandahålla ADB med appen på grund av licensbegränsnin
     <value>Creative Commons</value>
   </data>
   <data name="S_LS_ERROR" xml:space="preserve">
-    <value>Ett fel inträffade när du försökte lista innehållet i den här mappen.
+    <value>Ett fel inträffade när innehållet i den här mappen skulle listas.
 Synligt innehåll kan vara ofullständigt.</value>
   </data>
   <data name="S_PASTE_ANCESTOR" xml:space="preserve">
-    <value>{0} ligger tidigare i mapphierarkin än destinationsmappen.</value>
+    <value>{0} är en överordnad mapp till målmappen.</value>
   </data>
   <data name="S_KILL_EMULATOR" xml:space="preserve">
-    <value>Är du säker på att du vill döda denna emulator?</value>
+    <value>Är du säker på att du vill avsluta den här emulatorn?</value>
   </data>
   <data name="S_REM_DEVICE" xml:space="preserve">
     <value>Är du säker på att du vill ta bort den här enheten?</value>
@@ -349,14 +349,14 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>Ta bort {0}</value>
   </data>
   <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
-    <value>Döda {0}</value>
+    <value>Avsluta {0}</value>
   </data>
   <data name="S_REM_APK" xml:space="preserve">
-    <value>Följande kommer att tas bort:
+    <value>Följande tas bort:
 {0}</value>
   </data>
   <data name="S_REM_APK_PLURAL" xml:space="preserve">
-    <value>Följande kommer att tas bort:
+    <value>Följande tas bort:
 {0} paket</value>
   </data>
   <data name="S_UNINSTALL" xml:space="preserve">
@@ -375,34 +375,34 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>Ersätt</value>
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
-    <value>Slå samman eller ersätt</value>
+    <value>Sammanfoga eller ersätt</value>
   </data>
   <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value>Det finns ett föremål i konflikt</value>
+    <value>Det finns ett objekt i konflikt</value>
   </data>
   <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>Det finns ett föremål i konflikt i {0}</value>
+    <value>Det finns ett objekt i konflikt i {0}</value>
   </data>
   <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value>Det finns {0} föremål i konflikt</value>
+    <value>Det finns {0} objekt i konflikt</value>
   </data>
   <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value>Det finns {0} föremål i konflikt i {1}</value>
+    <value>Det finns {0} objekt i konflikt i {1}</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
     <value>Klistra konflikter</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
-    <value>Välj mappar för att trycka</value>
+    <value>Välj mappar att skicka</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
-    <value>Välj mappar för att trycka till {0}</value>
+    <value>Välj mappar att skicka till {0}</value>
   </data>
   <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
-    <value>Välj filer för att trycka</value>
+    <value>Välj filer att skicka</value>
   </data>
   <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
-    <value>Välj filer för att trycka in till {0}</value>
+    <value>Välj filer att skicka till {0}</value>
   </data>
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
     <value>Rensa</value>
@@ -411,10 +411,10 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
-    <value>Polling efter enheter</value>
+    <value>Söker efter enheter</value>
   </data>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
-    <value>Polling för batteristatus</value>
+    <value>Söker efter batteristatus</value>
   </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>Aktivera root automatiskt</value>
@@ -423,28 +423,28 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>Spara manuellt anslutna enheter</value>
   </data>
   <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
-    <value>Öppna automatiskt för surfning</value>
+    <value>Öppna automatiskt för bläddring</value>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
-    <value>Stoppa polling på Dra/Tryck</value>
+    <value>Stoppa sökning vid skicka/hämta</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
     <value>Samtidiga operationer</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
-    <value>Tvinga omskanning av media vid Tryckning</value>
+    <value>Tvinga omskanning av media vid skickning</value>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
-    <value>Polling för lagringsenheter</value>
+    <value>Söker efter enheter</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
-    <value>APK support</value>
+    <value>APK-stöd</value>
   </data>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
     <value>Visa filnamnstillägg</value>
   </data>
   <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
-    <value>Visa dolda föremål</value>
+    <value>Visa dolda objekt</value>
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>Visa systemappar</value>
@@ -462,7 +462,7 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>Mörkt</value>
   </data>
   <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
-    <value>Windows standard</value>
+    <value>Windows-standard</value>
   </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>Tema</value>
@@ -471,19 +471,19 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>Inaktivera hårdvaruacceleration</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
-    <value>Kolla efter uppdateringar</value>
+    <value>Sök efter uppdateringar</value>
   </data>
   <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
     <value>Grafik</value>
   </data>
   <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
-    <value>Arbetsgrupper</value>
+    <value>Arbetskataloger</value>
   </data>
   <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
     <value>Utforskare</value>
   </data>
   <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
-    <value>Enheter &amp; funktioner</value>
+    <value>Enheter och funktioner</value>
   </data>
   <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
     <value>Enhet</value>
@@ -492,23 +492,23 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>Donera eller sponsra</value>
   </data>
   <data name="S_APP_DATA_FOLDER" xml:space="preserve">
-    <value>Appdatamappar</value>
+    <value>Mapp för appdata</value>
   </data>
   <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
     <value>Custom</value>
     <comment>Button to pick a non-virtualized custom app data folder</comment>
   </data>
   <data name="S_GITHUB_REPO" xml:space="preserve">
-    <value>GitHubförråd</value>
+    <value>GitHub-arkiv</value>
   </data>
   <data name="S_PRIVACY_POLICY" xml:space="preserve">
     <value>Integritetspolicy</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
-    <value>Attributioner och tredjepartslicenser</value>
+    <value>Erkännanden och tredjepartslicenser</value>
   </data>
   <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
-    <value>[inte inställd]</value>
+    <value>[inte angiven]</value>
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
     <value>Sökinställningar</value>
@@ -517,7 +517,7 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>Stäng sökning</value>
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
-    <value>Sök vy</value>
+    <value>Sökvy</value>
   </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>Inställningar</value>
@@ -529,20 +529,20 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>Språk</value>
   </data>
   <data name="S_BUTTON_OK" xml:space="preserve">
-    <value>Ok</value>
+    <value>OK</value>
   </data>
   <data name="S_FILTER_FILE_OPS" xml:space="preserve">
-    <value>Filtrera filoperationer</value>
+    <value>Filtrera filåtgärder</value>
   </data>
   <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
     <value>Aktivera automatisk uppspelning</value>
   </data>
   <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
-    <value>Inaktivera automatiskt uppspelning
-Avbryt alla aktiva</value>
+    <value>Inaktivera automatisk uppspelning
+Avbryt alla pågående</value>
   </data>
   <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
-    <value>Loguppdateringar är pausade</value>
+    <value>Logguppdateringar är pausade</value>
   </data>
   <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
     <value>Pausa logguppdateringar</value>
