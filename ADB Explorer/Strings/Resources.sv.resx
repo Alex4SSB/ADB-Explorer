@@ -551,7 +551,7 @@ Avbryt alla pågående</value>
     <value>Kommandologg</value>
   </data>
   <data name="S_BUTTON_DRIVES" xml:space="preserve">
-    <value>Lagringsenheter</value>
+    <value>Enheter</value>
   </data>
   <data name="S_BUTTON_BACK" xml:space="preserve">
     <value>Tillbaka</value>
@@ -569,7 +569,7 @@ Avbryt alla pågående</value>
     <value>Enheter</value>
   </data>
   <data name="S_BUTTON_PUSH" xml:space="preserve">
-    <value>Tryck</value>
+    <value>Skicka</value>
   </data>
   <data name="S_MENU_FOLDERS" xml:space="preserve">
     <value>Mappar</value>
@@ -590,7 +590,7 @@ Avbryt alla pågående</value>
     <value>Redigera</value>
   </data>
   <data name="S_MENU_NEW" xml:space="preserve">
-    <value>Nytt</value>
+    <value>Ny</value>
   </data>
   <data name="S_MENU_FOLDER" xml:space="preserve">
     <value>Mapp</value>
@@ -599,7 +599,7 @@ Avbryt alla pågående</value>
     <value>Fil</value>
   </data>
   <data name="S_MENU_SELECT_ALL" xml:space="preserve">
-    <value>Välj alla</value>
+    <value>Markera alla</value>
   </data>
   <data name="S_MENU_CUT" xml:space="preserve">
     <value>Klipp ut</value>
@@ -614,7 +614,7 @@ Avbryt alla pågående</value>
     <value>Paket</value>
   </data>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
-    <value>Uppdateringstid ändrad</value>
+    <value>Uppdatera ändringsdatum</value>
   </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Spara ändringar</value>
@@ -626,64 +626,64 @@ Avbryt alla pågående</value>
     <value>Rensa kommandologg</value>
   </data>
   <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
-    <value>Öppna föremålets plats</value>
+    <value>Öppna objektets plats</value>
   </data>
   <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
-    <value>Sök i browser</value>
+    <value>Sök i webbläsaren</value>
   </data>
   <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
     <value>Kopiera till urklipp</value>
   </data>
   <data name="S_ADB_DISK_USAGE" xml:space="preserve">
-    <value>ADB diskanvändning</value>
+    <value>ADB-diskanvändning</value>
   </data>
   <data name="S_DISK_USAGE_READ" xml:space="preserve">
-    <value>Läs: {0}</value>
+    <value>Läst: {0}</value>
   </data>
   <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
-    <value>Skriv: {0}</value>
+    <value>Skrivet: {0}</value>
   </data>
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>Om</value>
   </data>
   <data name="S_BROWSER_ITEMS" xml:space="preserve">
-    <value>föremål</value>
+    <value>objekt</value>
   </data>
   <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
-    <value>föremål</value>
+    <value>objekt</value>
   </data>
   <data name="S_FOLDER_EMPTY" xml:space="preserve">
-    <value>Denna mapp är tom.</value>
+    <value>Mappen är tom.</value>
   </data>
   <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
-    <value>Kan inte hämta listan.</value>
+    <value>Det gick inte att hämta listan.</value>
   </data>
   <data name="S_EMPTY_FILTER" xml:space="preserve">
     <value>Inga objekt matchar aktuellt filter.</value>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
-    <value>&lt;Span&gt; Denna mapp &lt;Italic&gt; ser &lt;/Italic&gt; tom &lt;LineBreak /&gt;&lt;Span FontSize="10"&gt; ... ut vid första anblick &lt;/Span&gt;&lt;/Span&gt;</value>
+    <value>&lt;Span&gt;Den här mappen &lt;Italic&gt;ser&lt;/Italic&gt; tom ut&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… vid första anblicken&lt;/Span&gt;&lt;/Span&gt;</value>
   </data>
   <data name="S_ITEMS_SELECTED" xml:space="preserve">
-    <value>föremål valt</value>
+    <value>objekt valt</value>
   </data>
   <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
-    <value>föremål valda</value>
+    <value>objekt valda</value>
   </data>
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
-    <value>Operationstyp</value>
+    <value>Åtgärdstyp</value>
   </data>
   <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
     <value>Filnamn</value>
   </data>
   <data name="S_COLUMN_PROGRESS" xml:space="preserve">
-    <value>Framsteg</value>
+    <value>Förlopp</value>
   </data>
   <data name="S_COLUMN_SOURCE" xml:space="preserve">
     <value>Källa</value>
   </data>
   <data name="S_COLUMN_DESTINATION" xml:space="preserve">
-    <value>Destination</value>
+    <value>Mål</value>
   </data>
   <data name="S_COLUMN_ADDED" xml:space="preserve">
     <value>Tillagd</value>
@@ -695,7 +695,7 @@ Avbryt alla pågående</value>
     <value>Namn</value>
   </data>
   <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
-    <value>Ursprungsplats</value>
+    <value>Ursprunglig plats</value>
   </data>
   <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
     <value>Ändringsdatum</value>
@@ -716,13 +716,13 @@ Avbryt alla pågående</value>
     <value>Version</value>
   </data>
   <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
-    <value>ADB servern svarar inte</value>
+    <value>ADB-servern svarar inte</value>
   </data>
   <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
-    <value>Tid sedan senaste serversvar</value>
+    <value>Tid sedan senaste svar från servern</value>
   </data>
   <data name="S_SECONDS_SHORT" xml:space="preserve">
-    <value>{0}s</value>
+    <value>{0} s</value>
   </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>Uppdatera enheter</value>
@@ -731,49 +731,49 @@ Avbryt alla pågående</value>
     <value>Starta om ADB</value>
   </data>
   <data name="S_SERVER_DOWN" xml:space="preserve">
-    <value>mDNS servern är nere</value>
+    <value>mDNS-servern är nere</value>
   </data>
   <data name="S_AWAITING_RESPONSE" xml:space="preserve">
     <value>Väntar på svar: {0}</value>
   </data>
   <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
-    <value>{0}ms</value>
+    <value>{0} ms</value>
   </data>
   <data name="S_MINUTES_SHORT" xml:space="preserve">
-    <value>{0} m</value>
+    <value>{0} min</value>
   </data>
   <data name="S_HOURS_SHORT" xml:space="preserve">
-    <value>{0}h</value>
+    <value>{0} h</value>
   </data>
   <data name="S_MDNS_ON" xml:space="preserve">
-    <value>mDNS-servern är igång</value>
+    <value>mDNS-servern körs</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
-    <value>Begränsad support</value>
+    <value>Begränsat stöd</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
-    <value>Root-åtkomst aktiverat</value>
+    <value>Rootåtkomst aktiverad</value>
   </data>
   <data name="S_ROOT_POSSIBLE" xml:space="preserve">
-    <value>Root kan aktiveras</value>
+    <value>Rootåtkomst kan aktiveras</value>
   </data>
   <data name="S_RECOVERY_MODE" xml:space="preserve">
-    <value>Återställning</value>
+    <value>Återställningsläge</value>
   </data>
   <data name="S_BAT_VOLT" xml:space="preserve">
-    <value>Spänning: {0}v</value>
+    <value>Spänning: {0} V</value>
   </data>
   <data name="S_BAT_TEMP" xml:space="preserve">
-    <value>Temperatur: {0°C</value>
+    <value>Temperatur: {0} °C</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>Nuvarande balans: {0}A</value>
+    <value>Aktuell balans: {0} A</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
-    <value>Omstartsinformation</value>
+    <value>Starta om till</value>
   </data>
   <data name="S_REBOOT_SYSTEM" xml:space="preserve">
-    <value>Systembild</value>
+    <value>Systemavbildning</value>
   </data>
   <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
     <value>Bootloader</value>
@@ -782,10 +782,10 @@ Avbryt alla pågående</value>
     <value>Sideload</value>
   </data>
   <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
-    <value>Sideload (Automatisk omstart)</value>
+    <value>Sideload (automatisk omstart)</value>
   </data>
   <data name="S_STATUS_UNAUTH" xml:space="preserve">
-    <value>{0} - Obehörig</value>
+    <value>{0} – Obehörig</value>
   </data>
   <data name="S_TYPE_EMULATOR" xml:space="preserve">
     <value>Emulator</value>
@@ -797,7 +797,7 @@ Avbryt alla pågående</value>
     <value>USB</value>
   </data>
   <data name="S_TYPE_WIFI" xml:space="preserve">
-    <value>WiFi</value>
+    <value>Wi‑Fi</value>
   </data>
   <data name="S_TYPE_WSA" xml:space="preserve">
     <value>WSA</value>
@@ -806,19 +806,19 @@ Avbryt alla pågående</value>
     <value>Batteristatus okänd</value>
   </data>
   <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
-    <value>{0}%, Inkopplad</value>
+    <value>{0} %, ansluten till ström</value>
   </data>
   <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
     <value>Trådlös</value>
   </data>
   <data name="S_BAT_SOURCE_AC" xml:space="preserve">
-    <value>AC</value>
+    <value>Nätström</value>
   </data>
   <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
     <value>Ingen</value>
   </data>
   <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
-    <value>Okänt</value>
+    <value>Okänd</value>
   </data>
   <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
     <value>Laddar</value>
@@ -830,7 +830,7 @@ Avbryt alla pågående</value>
     <value>Laddar inte</value>
   </data>
   <data name="S_BAT_STATE_FULL" xml:space="preserve">
-    <value>Full</value>
+    <value>Fulladdad</value>
   </data>
   <data name="S_BAT_HEALTH" xml:space="preserve">
     <value>Hälsa: {0}</value>
@@ -839,10 +839,10 @@ Avbryt alla pågående</value>
     <value>Bra</value>
   </data>
   <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
-    <value>Överhettning</value>
+    <value>Överhettad</value>
   </data>
   <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
-    <value>Död</value>
+    <value>Defekt</value>
   </data>
   <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
     <value>Överspänning</value>
