@@ -1489,4 +1489,339 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <value>Pair</value>
     <comment>The button for pairing a device</comment>
   </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} – Frånkopplad</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>Status: {0}</value>
+  </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Anpassad accentfärg</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Accentfärg</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Välj en färg</value>
+  </data>
+  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
+    <value>Det gick inte att hitta ADB i systemets PATH. Använd ”{0}” för att hitta det.</value>
+  </data>
+  <data name="S_ADB_PATH_INVALID" xml:space="preserve">
+    <value>Den angivna sökvägen {0} är antingen en Windows-genväg eller en UNC-sökväg (fjärrsökväg), vilket inte tillåts.</value>
+  </data>
+  <data name="S_ADB_COMPROMISED" xml:space="preserve">
+    <value>Det går inte att verifiera att den angivna körbara filen är ADB. Hämta endast officiella Android Platform Tools från Google.</value>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Visa dialogruta för kraschrapport</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Kraschrapportering</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>Efter en krasch kan du välja att skicka en diagnostisk rapport som hjälper oss att åtgärda felet. Rapporter skickas endast när du klickar på Skicka rapport och innehåller normalt undantagsmeddelande, stackspårning, app- och Windows-version samt den öppna sidan. Uppgifterna behandlas av Grafana Labs (Grafana Cloud). Se länken till integritetspolicyn ovan.</value>
+  </data>
+  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
+    <value>Identifiera Android-emulatorer</value>
+  </data>
+  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
+    <value>Starta den här emulatorn</value>
+  </data>
+  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
+    <value>Emulatorstart</value>
+  </data>
+  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
+    <value>Android SDK-emulatorn hittades inte. Installera Android SDK-emulatorpaketet eller ange ANDROID_SDK_ROOT.</value>
+  </data>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Enhetsbegränsningar:</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• Skrivskyddat filsystem</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• Symboliska länkar stöds inte
+• Filnamn får inte innehålla ” * / : &lt; &gt; ? \ |”
+• Filnamn är inte skiftlägeskänsliga
+• Installation av APK-filer stöds inte</value>
+  </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Följer namngivningsreglerna för användarutrymmet</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>En vald fil bryter mot namngivningsreglerna för användarutrymmet</value>
+  </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>En kopierad fil bryter mot namngivningsreglerna för användarutrymmet</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Integritetspolicyn har uppdaterats</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>Den här appversionen släpptes efter en uppdatering av integritetspolicyn.
+Granska ändringarna på GitHub.</value>
+  </data>
+  <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
+    <value>Avsluta ADB när appen stängs</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
+    <value>Plats för appdata</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
+    <value>Den här appdistributionen sparar data på en virtualiserad plats som är svår att nå och rensas när appen avinstalleras.
+
+Välj Anpassad för att använda en plats som inte tas bort vid avinstallation. Den anpassade platsen får inte ligga under C:\Users\…\AppData</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
+    <value>Använd standardplatsen</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
+    <value>Välj mapp för appdata</value>
+  </data>
+  <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
+    <value>Den anpassade platsen får inte ligga under C:\Users\…\AppData – välj en annan plats</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
+    <value>Tillåt ADB från otillförlitliga källor</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_MODE" xml:space="preserve">
+    <value>Visning av filstorlek</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
+    <value>Antal decimaler för filstorlek</value>
+  </data>
+  <data name="S_OPEN_FOLDER" xml:space="preserve">
+    <value>Öppna</value>
+  </data>
+  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
+    <value>Den aktuella platsen är skrivskyddad</value>
+  </data>
+  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
+    <value>Ett valt objekt kan inte ändras</value>
+  </data>
+  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
+    <value>Arkivinnehållet kan ändras</value>
+  </data>
+  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
+    <value>Arkivinnehållet är skrivskyddat</value>
+  </data>
+  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
+    <value>Komprimerad storlek</value>
+  </data>
+  <data name="S_PACKED_SIZE" xml:space="preserve">
+    <value>Packad storlek</value>
+  </data>
+  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
+    <value>Komprimeringsgrad</value>
+  </data>
+  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
+    <value>Metod</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX" xml:space="preserve">
+    <value>Syntax</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX_AUTOMATIC" xml:space="preserve">
+    <value>Automatiskt</value>
+  </data>
+  <data name="S_RESTART" xml:space="preserve">
+    <value>Starta om nu</value>
+  </data>
+  <data name="S_UPDATE_MODIFIED_INFO" xml:space="preserve">
+    <value>Försöker justera ändringsdatumet efter filnamnet.
+
+Användbart för foton där fotograferingsdatumet ingår i namnet och ändringsdatumet har skrivits över.</value>
+  </data>
+  <data name="S_PUSH_PACKAGES_INFO" xml:space="preserve">
+    <value>Installerar APK-filer direkt från Windows.</value>
+  </data>
+  <data name="S_DETAILS_PANE_INFO" xml:space="preserve">
+    <value>Anger sidopanelen till detaljläge.
+
+Detaljer kan omfatta miniatyrbild, utökad filinformation, metadata, behörigheter och alternativ för enhetsmontering.</value>
+  </data>
+  <data name="S_PREVIEW_PANE_INFO" xml:space="preserve">
+    <value>Anger sidopanelen till förhandsgranskningsläge.
+
+Objekt som stöds: miniatyrbild, PDF. Andra filer som uppfyller storleksbegränsningen visas som text, med valfri syntaxmarkering, och kan redigeras och sparas om platsen tillåter det.</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO" xml:space="preserve">
+    <value>Inaktiverar kontroller av ADB-sökväg och körbar fil.
+
+Kontrollerna försöker hindra en ovetande användare från att starta en möjligen skadlig fil som utger sig för att vara ADB. De omfattar:
+• Sökvägen får inte vara en fjärransluten UNC-sökväg eller en symbolisk länk
+• Den körbara filen måste vara Authenticode-signerad av Google eller matcha den fördefinierade SHA-256-hashlistan
+• Den måste returnera en läsbar versionssträng när den körs med --version</value>
+  </data>
+  <data name="S_NEW_VERSION_READY" xml:space="preserve">
+    <value>En ny {0}, version {1}, har hämtats och är redo att installeras.</value>
+  </data>
+  <data name="S_UPDATE_ON_CLOSE" xml:space="preserve">
+    <value>Uppdatera vid stängning</value>
+  </data>
+  <data name="S_UPDATE_APPLY_FAILED" xml:space="preserve">
+    <value>Uppdateringen kunde inte förberedas. Kontrollera att en hanterare för .7z finns (Utforskaren, 7-Zip, NanaZip osv.) eller hämta releasen manuellt från GitHub.</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
+    <value>Sök och meddela</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_UPDATE" xml:space="preserve">
+    <value>Uppdatera och installera</value>
+  </data>
+  <data name="S_UPDATE_SIGNATURE_INVALID" xml:space="preserve">
+    <value>Den hämtade uppdateringen är inte signerad med samma certifikat som den här installationen. Uppdateringen kasserades.</value>
+  </data>
+  <data name="S_MENU_STOP_LOADING" xml:space="preserve">
+    <value>Sluta läsa in {0}</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS" xml:space="preserve">
+    <value>Sökalternativ</value>
+  </data>
+  <data name="S_SEARCH_RESULTS_IN" xml:space="preserve">
+    <value>Sökresultat i {0}</value>
+  </data>
+  <data name="S_SEARCH_ALL_SUBFOLDERS" xml:space="preserve">
+    <value>Alla undermappar</value>
+  </data>
+  <data name="S_SEARCH_CURRENT_FOLDER" xml:space="preserve">
+    <value>Aktuell mapp</value>
+  </data>
+  <data name="S_SEARCH" xml:space="preserve">
+    <value>Sök</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS_INFO" xml:space="preserve">
+    <value>Avancerade sökalternativ och filtrering.</value>
+  </data>
+  <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
+    <value>Avsluta sökresultatläget.</value>
+  </data>
+  <data name="S_MENU_COPY_LINK" xml:space="preserve">
+    <value>Kopiera som länk</value>
+  </data>
+  <data name="S_NEW_ARCHIVE" xml:space="preserve">
+    <value>Nytt arkiv</value>
+  </data>
+  <data name="S_MENU_COPY_CONTENTS" xml:space="preserve">
+    <value>Kopiera innehåll</value>
+  </data>
+  <data name="S_MENU_EXTRACT_HERE" xml:space="preserve">
+    <value>Extrahera här</value>
+  </data>
+  <data name="S_MENU_COMPRESS_TO" xml:space="preserve">
+    <value>Komprimera till</value>
+  </data>
+  <data name="S_ACTION_COMPRESS" xml:space="preserve">
+    <value>Komprimera</value>
+  </data>
+  <data name="S_ACTION_EXTRACT" xml:space="preserve">
+    <value>Extrahera</value>
+  </data>
+  <data name="S_MENU_ARCHIVE" xml:space="preserve">
+    <value>Arkiv</value>
+  </data>
+  <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
+    <value>Inte tillgängligt på det här systemet.</value>
+  </data>
+  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
+    <value>Ersätt filerna på målet</value>
+  </data>
+  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
+    <value>Hoppa över dessa filer</value>
+  </data>
+  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
+    <value>Låt mig avgöra för varje fil</value>
+  </data>
+  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
+    <value>Lös {0} konflikter</value>
+  </data>
+  <data name="S_NEWER" xml:space="preserve">
+    <value>nyare</value>
+  </data>
+  <data name="S_BIGGER" xml:space="preserve">
+    <value>större</value>
+  </data>
+  <data name="S_PER_FILE_CONFLICT_TABLE_TITLE" xml:space="preserve">
+    <value>Välj för varje konflikt målet för att hoppa över eller källan för att ersätta.</value>
+  </data>
+  <data name="S_TOOLTIP_REPLACED" xml:space="preserve">
+    <value>Filen ersätts.</value>
+  </data>
+  <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
+    <value>Filen hoppas över.</value>
+  </data>
+  <data name="S_PACKAGE_ID" xml:space="preserve">
+    <value>Paket-ID</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
+    <value>Läser in appikoner</value>
+  </data>
+  <data name="S_MENU_BACKUP_PACKAGE" xml:space="preserve">
+    <value>Säkerhetskopiera</value>
+  </data>
+  <data name="S_APK_BACKUP_OBB_FAILED" xml:space="preserve">
+    <value>Appen installerades, men OBB-filer kunde inte återställas. Öppna appen en gång på enheten och försök igen.</value>
+  </data>
+  <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
+    <value>Skapa en .APKBKP av appinstallationen och OBB-data</value>
+  </data>
+  <data name="S_NAVIGATION_PANE" xml:space="preserve">
+    <value>Navigeringspanel</value>
+  </data>
+  <data name="S_MENU_SHOW" xml:space="preserve">
+    <value>Visa</value>
+  </data>
+  <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
+    <value>A</value>
+  </data>
+  <data name="S_THUMBSIZE_TILES" xml:space="preserve">
+    <value>Rutor</value>
+  </data>
+  <data name="S_THUMBSIZE_CONTENT" xml:space="preserve">
+    <value>Innehåll</value>
+  </data>
+  <data name="S_SCREENSHOT" xml:space="preserve">
+    <value>Skärmbild</value>
+  </data>
+  <data name="S_MENU_PASTE_IMAGE" xml:space="preserve">
+    <value>Klistra in bild</value>
+  </data>
+  <data name="S_MENU_COPY_AS_IMAGE" xml:space="preserve">
+    <value>Kopiera som bild</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE" xml:space="preserve">
+    <value>Skiftlägeskänslig</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE_INFO" xml:space="preserve">
+    <value>Matcha exakt skiftläge vid sökning.</value>
+  </data>
+  <data name="S_SEARCH_CONTENTS" xml:space="preserve">
+    <value>Filinnehåll</value>
+  </data>
+  <data name="S_SEARCH_CONTENTS_INFO" xml:space="preserve">
+    <value>Matcha även filer vars innehåll innehåller söktexten.</value>
+  </data>
+  <data name="S_SEARCH_ARCHIVES" xml:space="preserve">
+    <value>Arkivinnehåll</value>
+  </data>
+  <data name="S_SEARCH_ARCHIVES_INFO" xml:space="preserve">
+    <value>Matcha även filer i arkiv som hittas vid sökning.</value>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE" xml:space="preserve">
+    <value>Visa relativ sökväg</value>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE_INFO" xml:space="preserve">
+    <value>När det är valt visas sökresultat med en sökväg relativ till den aktuella platsen. Annars visas den absoluta sökvägen.</value>
+  </data>
+  <data name="S_BUTTON_VIEW_SIZE" xml:space="preserve">
+    <value>Vystorlek</value>
+  </data>
+  <data name="S_STATUS_CALCULATING_SIZE" xml:space="preserve">
+    <value>Beräknar …</value>
+  </data>
+  <data name="S_VIEW_SIZE_TOOLTIP" xml:space="preserve">
+    <value>Beräknar och visar den sammanlagda storleken för alla filer under den här mappen rekursivt.</value>
+  </data>
+  <data name="S_MENU_REMOVE_SAVED_LOCATION" xml:space="preserve">
+    <value>Ta bort från sparade platser</value>
+  </data>
 </root>
