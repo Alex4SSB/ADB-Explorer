@@ -1474,15 +1474,15 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
     <value>Monteringsalternativ</value>
   </data>
   <data name="S_COLOR_RED" xml:space="preserve">
-    <value>Red</value>
+    <value>Röd</value>
     <comment>The label of the red channel in the color picker</comment>
   </data>
   <data name="S_COLOR_GREEN" xml:space="preserve">
-    <value>Green</value>
+    <value>Grön</value>
     <comment>The label of the green channel in the color picker</comment>
   </data>
   <data name="S_COLOR_BLUE" xml:space="preserve">
-    <value>Blue</value>
+    <value>Blå</value>
     <comment>The label of the blue channel in the color picker</comment>
   </data>
   <data name="S_BUTTON_PAIR" xml:space="preserve">
