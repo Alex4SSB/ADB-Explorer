@@ -1824,4 +1824,25 @@ Kontrollerna försöker hindra en ovetande användare från att starta en möjli
   <data name="S_MENU_REMOVE_SAVED_LOCATION" xml:space="preserve">
     <value>Ta bort från sparade platser</value>
   </data>
+  <data name="S_SETTINGS_NEW_TAB_LOCATION" xml:space="preserve">
+    <value>Ny flik öppnas vid</value>
+  </data>
+  <data name="S_NEW_TAB_DUPLICATE" xml:space="preserve">
+    <value>Duplicera aktuell flik</value>
+  </data>
+  <data name="S_NEW_TAB_NONE" xml:space="preserve">
+    <value>Ingen plats</value>
+  </data>
+  <data name="S_CLOSE_TAB" xml:space="preserve">
+    <value>Stäng flik</value>
+  </data>
+  <data name="S_NEW_TAB" xml:space="preserve">
+    <value>Ny flik</value>
+  </data>
+  <data name="S_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>Öppna i ny flik</value>
+  </data>
+  <data name="S_NEW_TAB_DRIVE_VIEW" xml:space="preserve">
+    <value>Enhetsvy för aktuell enhet</value>
+  </data>
 </root>
