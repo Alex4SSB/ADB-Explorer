@@ -12,47 +12,49 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     private bool _isInitialized;
     private bool _devicesSubscribed;
 
-    [ObservableProperty]
-    public partial ICollectionView ExplorerItemsSource { get; set; }
-
-    [ObservableProperty]
-    public partial IEnumerable<IBrowserItem> ExplorerSource { get; set; }
+    /// <summary>The active tab's full state; only one instance exists for now.</summary>
+    public ExplorerInstance Instance => Data.ActiveExplorerInstance;
 
     public NavigationTreeViewModel Tree { get; }
 
-    partial void OnExplorerSourceChanged(IEnumerable<IBrowserItem> value) => UpdateExplorerView();
-
     private bool _uiListSubscribed;
-
-    [ObservableProperty]
-    public partial ICollectionView DriveItemsSource { get; set; }
-
-    [ObservableProperty]
-    public partial ListSortDirection? SortDirection { get; set; }
-
-    [ObservableProperty]
-    public partial SortingSelector.SortingProperty? SortedColumn { get; set; }
 
     private bool _suppressSortApply;
 
     private readonly DispatcherTimer _filterDebounceTimer;
     private readonly DispatcherTimer _packageSortCatchUpTimer;
 
-    partial void OnSortDirectionChanged(ListSortDirection? value)
+    /// <summary>Reacts to Instance property changes that used to be ObservableProperty On*Changed hooks on this class.</summary>
+    private void Instance_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (!_suppressSortApply)
-            ApplySortToView();
-    }
+        switch (e.PropertyName)
+        {
+            case nameof(ExplorerInstance.SortDirection):
+            case nameof(ExplorerInstance.SortedColumn):
+                if (!_suppressSortApply)
+                    ApplySortToView();
+                break;
 
-    partial void OnSortedColumnChanged(SortingSelector.SortingProperty? value)
-    {
-        if (!_suppressSortApply)
-            ApplySortToView();
+            case nameof(ExplorerInstance.ExplorerSource):
+                UpdateExplorerView();
+                break;
+
+            case nameof(ExplorerInstance.CurrentThumbsSize):
+                OnCurrentThumbsSizeChanged(Instance.CurrentThumbsSize);
+                break;
+
+            case nameof(ExplorerInstance.EffectiveDevice):
+                NotifyDeviceBindings();
+                break;
+
+            default:
+                break;
+        }
     }
 
     private void ApplySortToView()
     {
-        if (SortDirection is not { } dir || SortedColumn is not { } col || ExplorerItemsSource is not { } view)
+        if (Instance.SortDirection is not { } dir || Instance.SortedColumn is not { } col || Instance.ExplorerItemsSource is not { } view)
             return;
 
         // SortExplorer() runs synchronously in _navigateToPath right after FileActions.IsAppDrive
@@ -60,7 +62,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         // the new location's items (packages or files) actually arrive. Applying Package-only or
         // File-only SortDescriptions to the stale, mismatched view here would sort the wrong
         // (soon-to-be-discarded) collection instead of the one about to be shown.
-        var sourceIsPackages = ExplorerSource is IEnumerable<Package>;
+        var sourceIsPackages = Instance.ExplorerSource is IEnumerable<Package>;
         if (Data.FileActions.IsAppDrive != sourceIsPackages)
             return;
 
@@ -121,7 +123,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         // whenever a live-sorted collection reorders, which breaks clicking to select.
         EnablePackageLiveSorting(view);
 
-        PackageTypeColumnSortDirection = col is SortingSelector.SortingProperty.Type ? dir : null;
+        Instance.PackageTypeColumnSortDirection = col is SortingSelector.SortingProperty.Type ? dir : null;
 
         if (Data.Settings.SortingPerLocation)
         {
@@ -158,7 +160,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
         App.SafeBeginInvoke(() =>
         {
-            if (!Data.FileActions.IsAppDrive || ExplorerItemsSource is not { } view)
+            if (!Data.FileActions.IsAppDrive || Instance.ExplorerItemsSource is not { } view)
                 return;
 
             if (active)
@@ -180,7 +182,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
         if (!Data.FileActions.IsAppDrive || ApkIconService.IsLoadInProgress)
             return;
-        if (ExplorerItemsSource is not ListCollectionView { IsLiveSorting: true })
+        if (Instance.ExplorerItemsSource is not ListCollectionView { IsLiveSorting: true })
             return;
         if (Data.Packages is not { Count: > 0 } packages)
             return;
@@ -215,37 +217,16 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     public void SetSort(SortingSelector.SortingProperty column, ListSortDirection direction)
     {
         _suppressSortApply = true;
-        SortedColumn = column;
-        SortDirection = direction;
+        Instance.SortedColumn = column;
+        Instance.SortDirection = direction;
         _suppressSortApply = false;
         ApplySortToView();
     }
 
-    [ObservableProperty]
-    public partial ListSortDirection? PackageTypeColumnSortDirection { get; set; }
-
-    [ObservableProperty]
-    public partial bool IsIconView { get; set; } = false;
-
-    [ObservableProperty]
-    public partial bool IsContentView { get; set; } = false;
-
-    [ObservableProperty]
-    public partial NavigationBox.ViewMode NavigationBoxMode { get; set; }
-
-    [ObservableProperty]
-    public partial bool IsSearchBoxFiltered { get; set; }
-
-    [ObservableProperty]
-    public partial ThumbnailService.ThumbnailSize CurrentThumbsSize { get; set; }
-
-    [ObservableProperty]
-    public partial ObservableList<SavedLocation> SavedItems { get; set; }
-
-    partial void OnCurrentThumbsSizeChanged(ThumbnailService.ThumbnailSize value)
+    private void OnCurrentThumbsSizeChanged(ThumbnailService.ThumbnailSize value)
     {
-        IsIconView = ThumbnailService.IsIconLayout(value);
-        IsContentView = value is ThumbnailService.ThumbnailSize.Content;
+        Instance.IsIconView = ThumbnailService.IsIconLayout(value);
+        Instance.IsContentView = value is ThumbnailService.ThumbnailSize.Content;
 
         // Device without unzip: force details view without clobbering saved sizes.
         // Tiles is drive-view only and must not overwrite the last explorer size.
@@ -263,26 +244,6 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         }
 
         Data.RuntimeSettings.ThumbsSize = value;
-    }
-
-    public int FirstSelectedIndex { get; set; } = -1;
-
-    public int CurrentSelectedIndex { get; set; } = -1;
-
-    public int NextSelectedIndex { get; set; }
-
-    public bool IsMenuOpen { get; set; }
-
-    public bool SelectionInProgress { get; set; }
-
-    /// <summary>
-    /// Sets index to First, Current, and Next
-    /// </summary>
-    public void SetIndexSingle(int value)
-    {
-        FirstSelectedIndex = value;
-        CurrentSelectedIndex = value;
-        NextSelectedIndex = value;
     }
 
     public string SelectedFilesTotalSize => (Data.SelectedFiles is not null && FileHelper.TotalSize(Data.SelectedFiles) is long size and > 0) ? size.BytesToSize(true) : "";
@@ -317,9 +278,11 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         }
     } = null;
 
-    public LogicalDeviceViewModel? CurrentDevice => Data.DevicesObject?.Current;
+    public LogicalDeviceViewModel? EffectiveDevice => Instance.EffectiveDevice;
 
-    public Battery? CurrentDeviceBattery => Data.DevicesObject?.Current?.Battery;
+    public LogicalDeviceViewModel? CurrentDevice => EffectiveDevice;
+
+    public Battery? CurrentDeviceBattery => EffectiveDevice?.Battery;
 
     public Action? RequestModeRefresh { get; set; }
 
@@ -328,12 +291,87 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         && CurrentDeviceBattery?.ChargeState is not Battery.ChargingState.Unknown
         && CurrentDeviceBattery?.Level is not null;
 
+    private ExplorerInstance? _subscribedInstance;
+
+    /// <summary>
+    /// Re-wires the reactive handlers below (sort application, view refresh, drive view,
+    /// column visibility, selection count) to whichever tab is now active, and immediately
+    /// re-derives their outputs - a background tab's own navigation can finish loading while
+    /// unsubscribed, so switching to it must catch up rather than wait for its next change.
+    /// </summary>
+    private void SubscribeActiveInstance()
+    {
+        if (ReferenceEquals(_subscribedInstance, Instance))
+            return;
+
+        var isTabSwitch = _subscribedInstance is not null;
+
+        if (_subscribedInstance is not null)
+        {
+            _subscribedInstance.PropertyChanged -= Instance_PropertyChanged;
+            _subscribedInstance.FileList.Actions.PropertyChanged -= FileActions_PropertyChanged;
+        }
+
+        _subscribedInstance = Instance;
+        Instance.PropertyChanged += Instance_PropertyChanged;
+        Instance.FileList.Actions.PropertyChanged += FileActions_PropertyChanged;
+
+        Instance.IsIconView = ThumbnailService.IsIconLayout(Data.RuntimeSettings.ThumbsSize);
+        Instance.IsContentView = Data.RuntimeSettings.ThumbsSize is ThumbnailService.ThumbnailSize.Content;
+
+        OnPropertyChanged(nameof(SelectedFilesCount));
+        OnPropertyChanged(nameof(SelectedItemsCountVisibility));
+        OnPropertyChanged(nameof(FolderColumnVisibility));
+        OnPropertyChanged(nameof(RecycleBinColumnVisibility));
+        OnPropertyChanged(nameof(PackageColumnVisibility));
+
+        UpdateExplorerView();
+        UpdateDriveView();
+
+        if (!isTabSwitch)
+            return;
+
+        // Device-derived bindings and the tree were last derived from the previous tab. The path
+        // observer already syncs the tree and mode when the path differs, so don't repeat that.
+        NotifyDeviceBindings(syncTree: false);
+
+        var pathChanged = Data.CurrentPathO.Value != Data.CurrentPath;
+        Data.CurrentPathO.Value = Data.CurrentPath;
+
+        if (pathChanged)
+            return;
+
+        RequestModeRefresh?.Invoke();
+        Tree.Sync();
+    }
+
+    /// <summary>Re-derives everything bound to the active tab's device.</summary>
+    private void NotifyDeviceBindings(bool syncTree = true)
+    {
+        OnPropertyChanged(nameof(EffectiveDevice));
+        OnPropertyChanged(nameof(CurrentDevice));
+        OnPropertyChanged(nameof(CurrentDeviceBattery));
+        OnPropertyChanged(nameof(IsBatteryVisible));
+        SubscribeToBattery(CurrentDeviceBattery);
+        UpdateDriveView();
+
+        Tree.SubscribeDriveLists();
+
+        if (syncTree)
+            Tree.Sync();
+    }
+
     public ExplorerViewModel()
     {
-        Tree = new(() => ExplorerSource);
+        Tree = new(() => Instance.ExplorerSource);
 
-        IsIconView = ThumbnailService.IsIconLayout(Data.RuntimeSettings.ThumbsSize);
-        IsContentView = Data.RuntimeSettings.ThumbsSize is ThumbnailService.ThumbnailSize.Content;
+        App.Services.GetService<ExplorerTabsViewModel>().PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(ExplorerTabsViewModel.ActiveTab))
+                SubscribeActiveInstance();
+        };
+
+        SubscribeActiveInstance();
 
         _filterDebounceTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
         _filterDebounceTimer.Tick += (s, e) =>
@@ -351,6 +389,13 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         Data.DevicesObjectCreated += (_, _) => App.SafeInvoke(EnsureDevicesSubscription);
 
         ApkIconService.IconLoadProgressChanged += OnApkIconLoadProgressChanged;
+    }
+
+    /// <summary>Lets the always-visible navigation tree initialize this before the Explorer page is first shown.</summary>
+    public void EnsureInitialized()
+    {
+        if (!_isInitialized)
+            InitializeViewModel();
     }
 
     public Task OnNavigatedToAsync()
@@ -373,7 +418,6 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         Data.Settings.SavedLocations.CollectionChanged += SavedLocations_CollectionChanged;
         SavedLocations_CollectionChanged(null, null);
 
-        Data.FileActions.PropertyChanged += FileActions_PropertyChanged;
         Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
         Data.Settings.PropertyChanged += Settings_PropertyChanged;
 
@@ -386,6 +430,9 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         };
 
         Tree.Sync();
+
+        // The tree shows no current location while a page covers the explorer.
+        Data.CurrentPage.PropertyChanged += (_, _) => Tree.Sync();
 
         _isInitialized = true;
     }
@@ -407,13 +454,22 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     {
         App.SafeBeginInvoke(() =>
         {
-            var deviceId = Data.DevicesObject?.Current?.ID;
-            SavedItems = [.. Data.Settings.SavedLocations
-                .Where(entry => entry.DeviceId == deviceId)
-                .Select(entry => new SavedLocation(entry.Path))];
+            foreach (var instance in AllInstances())
+                instance.RefreshSavedItems();
 
             Tree.Sync();
         });
+    }
+
+    /// <summary>Every open tab, plus the active instance (which isn't in the tab list until
+    /// Explorer is first navigated to).</summary>
+    private static HashSet<ExplorerInstance> AllInstances()
+    {
+        var instances = new HashSet<ExplorerInstance> { Data.ActiveExplorerInstance };
+        if (App.Services.GetService<ExplorerTabsViewModel>() is { } tabs)
+            instances.UnionWith(tabs.Tabs);
+
+        return instances;
     }
 
     private void NotifyBatteryVisibility()
@@ -505,8 +561,8 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
                 break;
 
             case nameof(AppRuntimeSettings.ThumbsSize):
-                IsIconView = ThumbnailService.IsIconLayout(Data.RuntimeSettings.ThumbsSize);
-                IsContentView = Data.RuntimeSettings.ThumbsSize is ThumbnailService.ThumbnailSize.Content;
+                Instance.IsIconView = ThumbnailService.IsIconLayout(Data.RuntimeSettings.ThumbsSize);
+                Instance.IsContentView = Data.RuntimeSettings.ThumbsSize is ThumbnailService.ThumbnailSize.Content;
                 break;
 
             default:
@@ -518,14 +574,13 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     {
         if (e.PropertyName == nameof(Devices.Current))
         {
-            OnPropertyChanged(nameof(CurrentDevice));
-            OnPropertyChanged(nameof(CurrentDeviceBattery));
-            OnPropertyChanged(nameof(IsBatteryVisible));
-            SubscribeToBattery(CurrentDeviceBattery);
-            UpdateDriveView();
+            // A tab pinned to its own device (not tracking the app-wide current one) doesn't
+            // care that Devices.Current moved elsewhere - EffectiveDevice for it is unchanged.
+            foreach (var instance in AllInstances().Where(i => i.TracksAppWideCurrentDevice))
+                instance.NotifyEffectiveDeviceChanged();
+
             Tree.SubscribeDriveLists();
             Tree.Sync();
-            SavedLocations_CollectionChanged(null, null);
         }
         else if (e.PropertyName == nameof(Devices.Count))
         {
@@ -584,7 +639,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     {
         App.SafeInvoke(() =>
         {
-            ExplorerItemsSource?.Refresh();
+            Instance.ExplorerItemsSource?.Refresh();
         });
     }
 
@@ -603,7 +658,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         if (!Data.Settings.SearchContents
             || Data.Settings.SearchBox is not SearchBox.SearchBoxMode.CurrentFolder
             || string.IsNullOrEmpty(query)
-            || Data.DevicesObject?.Current is not { } device)
+            || EffectiveDevice is not { } device)
         {
             if (Data.ContentSearchMatches is not null)
             {
@@ -662,7 +717,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
             if (!Data.FileActions.IsExplorerVisible)
                 return;
 
-            var source = ExplorerSource;
+            var source = Instance.ExplorerSource;
             if (source is null)
                 return;
 
@@ -677,14 +732,14 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
                     : pkg => ((Package)pkg).Type is Package.PackageType.User;
 
                 // Default: Name, ascending.
-                SortDirection ??= ListSortDirection.Ascending;
-                SortedColumn ??= SortingSelector.SortingProperty.Name;
+                Instance.SortDirection ??= ListSortDirection.Ascending;
+                Instance.SortedColumn ??= SortingSelector.SortingProperty.Name;
 
                 // Bind first. DataGrid.OnItemsSourceChanged clears SortDescriptions that
                 // don't match a column SortDirection, which used to wipe the sort applied
                 // just before this assignment.
-                ExplorerItemsSource = view;
-                ApplyPackageSortToView(view, SortedColumn.Value, SortDirection.Value);
+                Instance.ExplorerItemsSource = view;
+                ApplyPackageSortToView(view, Instance.SortedColumn.Value, Instance.SortDirection.Value);
                 return;
             }
             else
@@ -693,19 +748,19 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
                     ? FileHelper.HideFiles()
                     : file => !FileHelper.IsHiddenRecycleItem((FileClass)file);
 
-                SortDirection ??= ListSortDirection.Ascending;
-                SortedColumn ??= SortingSelector.SortingProperty.Name;
+                Instance.SortDirection ??= ListSortDirection.Ascending;
+                Instance.SortedColumn ??= SortingSelector.SortingProperty.Name;
 
                 if (!view.SortDescriptions.Any(d => d.PropertyName
                         is nameof(FileClass.IsTemp)
                         or nameof(FileClass.IsDirectory)
                         or nameof(FileClass.SortName)))
                 {
-                    var dir = SortDirection.Value;
+                    var dir = Instance.SortDirection.Value;
                     view.SortDescriptions.Add(new(nameof(FileClass.IsTemp), ListSortDirection.Descending));
                     view.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListHelper.Invert(dir)));
 
-                    var sortProp = SortedColumn.Value switch
+                    var sortProp = Instance.SortedColumn.Value switch
                     {
                         SortingSelector.SortingProperty.Date => nameof(FileClass.ModifiedTime),
                         SortingSelector.SortingProperty.Size => nameof(FileClass.Size),
@@ -717,7 +772,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
                 }
             }
 
-            ExplorerItemsSource = view;
+            Instance.ExplorerItemsSource = view;
         });
     }
 
@@ -741,9 +796,14 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         Tree.Sync();
     }
 
-    private void UpdateDriveView()
+    private void UpdateDriveView() => UpdateDriveView(Instance);
+
+    /// <summary>Populates the given tab's DriveItemsSource directly, instead of relying on it
+    /// being the one this ViewModel happens to be subscribed to (the active tab) when
+    /// IsDriveViewVisible changes - not guaranteed after an async continuation resumes.</summary>
+    internal void UpdateDriveView(ExplorerInstance instance)
     {
-        var source = Data.DevicesObject?.Current?.Drives;
+        var source = instance.EffectiveDevice?.Drives;
         if (source is null)
             return;
 
@@ -775,7 +835,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
             view.Refresh();
         }
 
-        DriveItemsSource = view;
+        instance.DriveItemsSource = view;
     }
 
 #if DEBUG

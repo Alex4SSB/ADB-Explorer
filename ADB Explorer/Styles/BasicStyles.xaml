@@ -573,23 +573,6 @@
         <Setter Property="FontWeight" Value="Regular" />
     </Style>
 
-    <Style
-        x:Key="ExplorerGridStyle"
-        BasedOn="{StaticResource AdbDataGridStyle}"
-        TargetType="ui:DataGrid">
-        <Setter Property="CanUserDeleteRows" Value="False" />
-        <Setter Property="MinRowHeight" Value="32" />
-        <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRecycleBin}" Value="False">
-                <Setter Property="AllowDrop" Value="True" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-
     <!--<Style BasedOn="{StaticResource DataGridStyle}" TargetType="DataGrid" />-->
 
     <Style x:Key="FluentDataGridRowBorderStyle" TargetType="Border">
@@ -670,10 +653,10 @@
                 <Setter Property="BorderBrush" Value="{DynamicResource SelectedMouseOverBorderBrush}" />
                 <Setter Property="Foreground" Value="{DynamicResource SelectedMouseOverForeground}" />
             </MultiTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="False">
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:InstanceHelper.Instance).FileList.Actions.IsAppDrive}" Value="False">
                 <Setter Property="AllowDrop" Value="{Binding IsDirectory}" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:InstanceHelper.Instance).FileList.Actions.IsAppDrive}" Value="True">
                 <Setter Property="AllowDrop" Value="True" />
             </DataTrigger>
             <MultiDataTrigger>

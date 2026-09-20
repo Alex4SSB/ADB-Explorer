@@ -212,7 +212,7 @@ public partial class NavigationTreeNode : ObservableObject
 
     public static BitmapSource? FolderIcon(string path, string? deviceId = null)
     {
-        deviceId ??= Data.DevicesObject?.Current?.ID;
+        deviceId ??= Data.ActiveDevice?.ID;
 
         string name;
         if (ArchivePath.IsArchivePath(path, deviceId))
@@ -232,7 +232,7 @@ public partial class NavigationTreeNode : ObservableObject
 
     public static string FolderDisplayName(string path, string? deviceId = null)
     {
-        deviceId ??= Data.DevicesObject?.Current?.ID;
+        deviceId ??= Data.ActiveDevice?.ID;
 
         if (ArchivePath.IsArchivePath(path, deviceId))
             return ArchivePath.GetBreadcrumbLabel(path, deviceId);
@@ -266,7 +266,7 @@ public partial class NavigationTreeNode : ObservableObject
         if (string.IsNullOrEmpty(path) || path == "/")
             return path;
 
-        deviceId ??= Data.DevicesObject?.Current?.ID;
+        deviceId ??= Data.ActiveDevice?.ID;
         if (ArchivePath.IsArchivePath(path, deviceId))
             return path;
 

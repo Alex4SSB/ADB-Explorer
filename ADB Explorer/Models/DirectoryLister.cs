@@ -189,6 +189,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
             var drivePath = ArchivePath.IsArchivePath(path, Device.ID) ? ArchivePath.GetArchivePath(path, Device.ID) : path;
             var restrictions = DriveHelper.GetRestrictions(drivePath, Device);
             var preliminary = FileClass.BuildCurrentLocation(path, null, source, Device.ShellIdentity, restrictions, Device.ID);
+            preliminary.Device = Device;
             CurrentLocation = preliminary;
         }).Wait();
 
@@ -250,6 +251,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
                 }
 
                 FileClass item = FileClass.GenerateAndroidFile(fileStat);
+                item.Device = Device;
 
                 if (FileManipulator is not null)
                 {
@@ -339,6 +341,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
             return;
 
         var location = FileClass.BuildCurrentLocation(path, info, source, identity, restrictions, Device.ID);
+        location.Device = Device;
 
         if (!ArchivePath.IsArchivePath(path, Device.ID))
             location.IsCreationTimeResolved = true;

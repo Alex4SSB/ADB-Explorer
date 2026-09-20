@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 
 namespace ADB_Explorer.ViewModels;
@@ -18,24 +18,29 @@ public class SavedLocation : ViewModelBase
 
     public BaseAction NavigateAction { get; }
 
-    private static string? CurrentDeviceId => Data.DevicesObject?.Current?.ID;
+    /// <summary>The device this entry was listed for; the "add current location" placeholder
+    /// has none and acts on whichever tab is active when it's clicked.</summary>
+    private readonly string? ownerDeviceId;
 
-    public SavedLocation(string path = "")
+    private string? DeviceId => ownerDeviceId ?? Data.ActiveDevice?.ID;
+
+    public SavedLocation(string path = "", string? deviceId = null)
     {
         Path = path;
+        ownerDeviceId = deviceId;
 
         DeleteAction = new(
             () => !string.IsNullOrEmpty(Path),
             () =>
             {
-                var entry = Data.Settings.SavedLocations.FirstOrDefault(e => e.DeviceId == CurrentDeviceId && e.Path == Path);
+                var entry = Data.Settings.SavedLocations.FirstOrDefault(e => e.DeviceId == DeviceId && e.Path == Path);
                 if (entry is not null)
                     Data.Settings.SavedLocations.Remove(entry);
             });
 
         AddAction = new(
-            () => string.IsNullOrEmpty(Path) && CurrentDeviceId is not null,
-            () => Data.Settings.SavedLocations.Add(new(CurrentDeviceId, Data.CurrentPath)));
+            () => string.IsNullOrEmpty(Path) && DeviceId is not null,
+            () => Data.Settings.SavedLocations.Add(new(DeviceId, Data.CurrentPath)));
 
         NavigateAction = new(
             () => !string.IsNullOrEmpty(Path),

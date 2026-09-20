@@ -2,6 +2,7 @@
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
+using ADB_Explorer.ViewModels.Pages;
 using ADB_Explorer.Views.Pages;
 using Windows.Management.Deployment;
 
@@ -50,7 +51,12 @@ public static class DeviceHelper
 
     public static void BrowseDeviceAction(LogicalDeviceViewModel device)
     {
-        Data.DevicesObject.DeviceToOpen = device;
+        // Opening runs from DeviceToOpen's change handler, which doesn't fire for the same device -
+        // e.g. browsing the device the selected tab already shows must still return to Explorer.
+        if (Data.DevicesObject.DeviceToOpen?.ID == device.ID)
+            OpenDevice(device);
+        else
+            Data.DevicesObject.DeviceToOpen = device;
     }
 
     public static void SideloadDeviceAction(LogicalDeviceViewModel device)
@@ -356,12 +362,13 @@ public static class DeviceHelper
 
     public static void UpdateDevicesBatInfo(CancellationToken cancellationToken)
     {
-        Data.DevicesObject.Current?.UpdateBattery(cancellationToken);
+        var active = Data.ActiveDevice;
+        active?.UpdateBattery(cancellationToken);
 
         if (DateTime.Now - Data.DevicesObject.LastUpdate <= AdbExplorerConst.BATTERY_UPDATE_INTERVAL && Data.CurrentPage.Value != typeof(DevicesPage))
             return;
 
-        var items = Data.DevicesObject.LogicalDeviceViewModels.Where(device => !device.IsOpen).ToList();
+        var items = Data.DevicesObject.LogicalDeviceViewModels.Where(device => device.ID != active?.ID).ToList();
         foreach (var item in items)
         {
             item.UpdateBattery(cancellationToken);
@@ -606,7 +613,6 @@ public static class DeviceHelper
         FileActionLogic.ClearExplorer();
         Data.FileActions.IsExplorerVisible = false;
 
-        NavHistory.Reset();
         DriveHelper.ClearDrives();
 
         if (string.IsNullOrEmpty(selectedAddress))
@@ -661,9 +667,11 @@ public static class DeviceHelper
         }));
     }
 
-    public static async void InitDevice()
+    public static async void InitDevice(ExplorerInstance instance)
     {
-        var device = Data.DevicesObject.Current;
+        if (instance.Device is not { } device)
+            return;
+
         device.EnsureDefaultDrives();
         var internalDrive = device.Drives.First(d => d.Type is AbstractDrive.DriveType.Internal).Drive as LogicalDrive;
 
@@ -678,7 +686,7 @@ public static class DeviceHelper
         internalDrive.UpdateInternalStorage(device.ID);
 
         // Start drive enumeration and battery update immediately — both are independent of Props
-        FileActionLogic.RefreshDrives(true, CancellationToken.None);
+        FileActionLogic.RefreshDrives(true, CancellationToken.None, device);
         Task.Run(() => device.UpdateBattery(CancellationToken.None));
 
         // Suspend until Props is loaded without blocking the UI thread.
@@ -688,26 +696,29 @@ public static class DeviceHelper
         await featuresTask;
         await shellTask;
 
-        if (Data.DevicesObject.Current != device)
+        // Not Data.DevicesObject.Current - this tab's own device never changes underneath it, and
+        // checking the app-wide current device would abandon this tab whenever another one opened
+        // a different device while this await was in flight. The tab itself may have closed, though.
+        if (App.Services.GetService<ExplorerTabsViewModel>() is not { } tabs || !tabs.Tabs.Contains(instance))
             return;
 
         device.SetAndroidVersion();
-        FolderHelper.CombineDisplayNames();
+        FolderHelper.CombineDisplayNames(device);
 
         var pending = Data.RuntimeSettings.PendingLocationAfterDeviceOpen;
         Data.RuntimeSettings.PendingLocationAfterDeviceOpen = null;
 
-        if (pending is not null
+        var location = pending is not null
             && pending.IsNavigable
-            && pending.Location is not Navigation.SpecialLocation.DriveView)
-        {
-            Data.RuntimeSettings.LocationToNavigate = pending;
-        }
-        else
-        {
-            Data.RuntimeSettings.DriveViewNav = true;
-            NavHistory.Navigate(Navigation.SpecialLocation.DriveView);
-        }
+            && pending.Location is not Navigation.SpecialLocation.DriveView
+                ? pending
+                : new AdbLocation(Navigation.SpecialLocation.DriveView);
+
+        // Calls straight into this tab's own header (even if it's not the active one right now)
+        // instead of the RuntimeSettings-signal path, which only ever reaches whichever tab is
+        // active at the moment this async continuation happens to resume.
+        if (App.Current.MainWindow is ADB_Explorer.Views.Windows.MainWindow mainWindow)
+            mainWindow.GetOrCreateExplorerHeader(instance).NavigateToLocation(location);
 
         if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.OnConnect)
             Task.Run(() => ThumbnailService.ForceLoad(device));
@@ -715,7 +726,7 @@ public static class DeviceHelper
         Data.CopyPaste.GetClipboardPasteItems();
         Data.RuntimeSettings.FilterDrives = true;
 
-        Data.FileActions.PushPackageEnabled = Data.Settings.EnableApk && device?.Type is not DeviceType.Recovery;
+        instance.FileList.Actions.PushPackageEnabled = Data.Settings.EnableApk && device.Type is not DeviceType.Recovery;
 
         Data.FileOpQ.MoveOperationsToPast();
         FileActionLogic.UpdateFileActions();
@@ -834,7 +845,6 @@ public static class DeviceHelper
                     ApkIconService.CancelPending();
                     DriveHelper.ClearDrives();
                     FileActionLogic.ClearExplorer();
-                    NavHistory.Reset();
                     Data.FileActions.IsExplorerVisible = false;
                     Data.DirList = null!;
                     Data.DevicesObject.DeviceToOpen = null;
@@ -853,8 +863,75 @@ public static class DeviceHelper
         }
     }
 
+    /// <summary>
+    /// Browses <paramref name="device"/> in the active tab, which keeps its history - the way the
+    /// Devices page's Browse button and the navigation tree's device nodes work.
+    /// </summary>
     public static void OpenDevice(LogicalDeviceViewModel device)
+        => SwitchTabToDevice(device);
+
+    /// <inheritdoc cref="OpenDevice"/>
+    public static void SwitchTabToDevice(LogicalDeviceViewModel device)
     {
+        var instance = App.Services.GetService<ExplorerTabsViewModel>()?.EnsureActiveTab();
+        if (instance is null)
+            return;
+
+        NavigateTabToDevice(instance, device);
+    }
+
+    /// <summary>True while a tab is being pointed at a device - the tree's own selection callbacks must not start another switch.</summary>
+    internal static bool IsSwitchingTabDevice { get; private set; }
+
+    /// <summary>Points <paramref name="instance"/> (the active tab) at <paramref name="device"/> and opens it there.</summary>
+    public static void NavigateTabToDevice(ExplorerInstance instance, LogicalDeviceViewModel device)
+    {
+        if (IsSwitchingTabDevice)
+            return;
+
+        IsSwitchingTabDevice = true;
+
+        try
+        {
+            instance.Device = device;
+            instance.TracksAppWideCurrentDevice = false;
+            instance.FileList.DirList?.Stop();
+
+            OpenDeviceCore(instance, device);
+        }
+        finally
+        {
+            IsSwitchingTabDevice = false;
+        }
+    }
+
+    /// <summary>Opens <paramref name="device"/> in a new tab, at <paramref name="location"/> (or its drive view).</summary>
+    public static void OpenDeviceInNewTab(LogicalDeviceViewModel device, AdbLocation? location = null)
+    {
+        var tabs = App.Services.GetService<ExplorerTabsViewModel>();
+        if (tabs is null)
+            return;
+
+        IsSwitchingTabDevice = true;
+
+        try
+        {
+            var instance = tabs.AddDeviceTab(device);
+            Data.RuntimeSettings.PendingLocationAfterDeviceOpen = location;
+
+            OpenDeviceCore(instance, device);
+        }
+        finally
+        {
+            IsSwitchingTabDevice = false;
+        }
+    }
+
+    private static void OpenDeviceCore(ExplorerInstance? instance, LogicalDeviceViewModel device)
+    {
+        if (instance is null)
+            return;
+
         Data.DeviceCts.Cancel();
         Data.DeviceCts.Dispose();
         Data.DeviceCts = new();
@@ -865,11 +942,11 @@ public static class DeviceHelper
 
         Data.CurrentPage.Value = typeof(ExplorerPage);
         Data.RuntimeSettings.InitLister = true;
-        
+
         FileActionLogic.ClearExplorer();
-        NavHistory.Reset();
         Data.FileActions.NotifyAppDriveThumbsLocked();
-        InitDevice();
+
+        InitDevice(instance);
     }
 
     public static void ConnectWsaDevice()
@@ -1152,5 +1229,30 @@ public static class DeviceHelper
 
             Task.Run(() => EmulatorHelper.EnsurePoweredOn(snapshot.ID));
         }
+
+        RefreshEmulatorPackageVisibility();
+    }
+
+    private static bool[] lastEmulatorPackageVisibility = [];
+
+    /// <summary>A launch package hides once its logical emulator is online and named, which
+    /// is a property change, not a UIList change - so the view must be refreshed explicitly.</summary>
+    private static void RefreshEmulatorPackageVisibility()
+    {
+        App.SafeInvoke(() =>
+        {
+            if (Data.DevicesObject is not { } devices)
+                return;
+
+            var visibility = devices.UIList.OfType<EmulatorPackageDeviceViewModel>()
+                .Select(pkg => EvaluateDevicePredicate(pkg, devices))
+                .ToArray();
+
+            if (visibility.SequenceEqual(lastEmulatorPackageVisibility))
+                return;
+
+            lastEmulatorPackageVisibility = visibility;
+            App.Services.GetService<DevicesViewModel>()?.EmulatorDevicesView?.Refresh();
+        });
     }
 }

@@ -1,15 +1,15 @@
-﻿using ADB_Explorer.ViewModels.Pages;
+using ADB_Explorer.Models;
 
 namespace ADB_Explorer.Helpers;
 
 public static class SelectionHelper
 {
-    public static void MultiSelect(this DataGrid dataGrid, Key key, ExplorerViewModel vm)
+    public static void MultiSelect(this DataGrid dataGrid, Key key, ExplorerInstance instance)
     {
-        vm.SelectionInProgress = true;
+        instance.SelectionInProgress = true;
 
-        var firstIndex = vm.FirstSelectedIndex;
-        var currentIndex = vm.CurrentSelectedIndex;
+        var firstIndex = instance.FirstSelectedIndex;
+        var currentIndex = instance.CurrentSelectedIndex;
 
         if (key == Key.Up)
             currentIndex--;
@@ -37,12 +37,12 @@ public static class SelectionHelper
             dataGrid.ScrollIntoView(dataGrid.Items[currentIndex]);
 
         if (currentIndex >= 0 && currentIndex < dataGrid.Items.Count)
-            vm.CurrentSelectedIndex = currentIndex;
+            instance.CurrentSelectedIndex = currentIndex;
 
-        vm.SelectionInProgress = false;
+        instance.SelectionInProgress = false;
     }
 
-    public static void SingleSelect(this DataGrid dataGrid, Key key, ExplorerViewModel vm)
+    public static void SingleSelect(this DataGrid dataGrid, Key key, ExplorerInstance instance)
     {
         if (dataGrid.Items.Count == 1 && dataGrid.SelectedIndex == -1)
         {
@@ -50,7 +50,7 @@ public static class SelectionHelper
             return;
         }
 
-        dataGrid.SelectedIndex = vm.CurrentSelectedIndex;
+        dataGrid.SelectedIndex = instance.CurrentSelectedIndex;
 
         if (key == Key.Up)
         {
@@ -75,8 +75,8 @@ public static class SelectionHelper
             dataGrid.SelectedIndex = dataGrid.Items.Count - 1;
         }
 
-        vm.CurrentSelectedIndex = dataGrid.SelectedIndex;
-        vm.FirstSelectedIndex = dataGrid.SelectedIndex;
+        instance.CurrentSelectedIndex = dataGrid.SelectedIndex;
+        instance.FirstSelectedIndex = dataGrid.SelectedIndex;
         if (dataGrid.SelectedIndex > -1)
             dataGrid.ScrollIntoView(dataGrid.SelectedItem);
     }
@@ -84,7 +84,7 @@ public static class SelectionHelper
     public static System.Windows.Controls.ListViewItem GetListViewItemContainer(System.Windows.Controls.ListView listView, int index = -1) =>
         listView.ItemContainerGenerator.ContainerFromIndex(index < 0 ? listView.SelectedIndex : index) as System.Windows.Controls.ListViewItem;
 
-    public static void SingleSelect(this ListView listView, Key key, int step, ExplorerViewModel vm)
+    public static void SingleSelect(this ListView listView, Key key, int step, ExplorerInstance instance)
     {
         if (listView.Items.Count == 0)
             return;
@@ -92,12 +92,12 @@ public static class SelectionHelper
         if (listView.Items.Count == 1 && listView.SelectedIndex == -1)
         {
             listView.SelectedIndex = 0;
-            vm.CurrentSelectedIndex = 0;
-            vm.FirstSelectedIndex = 0;
+            instance.CurrentSelectedIndex = 0;
+            instance.FirstSelectedIndex = 0;
             return;
         }
 
-        listView.SelectedIndex = vm.CurrentSelectedIndex;
+        listView.SelectedIndex = instance.CurrentSelectedIndex;
 
         if (key is Key.Up or Key.Left)
         {
@@ -122,16 +122,16 @@ public static class SelectionHelper
             listView.SelectedIndex = listView.Items.Count - 1;
         }
 
-        vm.CurrentSelectedIndex = listView.SelectedIndex;
-        vm.FirstSelectedIndex = listView.SelectedIndex;
+        instance.CurrentSelectedIndex = listView.SelectedIndex;
+        instance.FirstSelectedIndex = listView.SelectedIndex;
         if (listView.SelectedIndex > -1)
             listView.ScrollIntoView(listView.Items[listView.SelectedIndex]);
     }
 
-    public static void MultiSelect(this ListView listView, Key key, int step, ExplorerViewModel vm)
+    public static void MultiSelect(this ListView listView, Key key, int step, ExplorerInstance instance)
     {
-        var firstIndex = vm.FirstSelectedIndex;
-        var currentIndex = vm.CurrentSelectedIndex;
+        var firstIndex = instance.FirstSelectedIndex;
+        var currentIndex = instance.CurrentSelectedIndex;
 
         if (key is Key.Up or Key.Left)
             currentIndex = Math.Max(0, currentIndex - step);
@@ -159,6 +159,6 @@ public static class SelectionHelper
             listView.ScrollIntoView(listView.Items[currentIndex]);
 
         if (currentIndex >= 0 && currentIndex < listView.Items.Count)
-            vm.CurrentSelectedIndex = currentIndex;
+            instance.CurrentSelectedIndex = currentIndex;
     }
 }

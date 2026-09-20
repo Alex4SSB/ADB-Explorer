@@ -29,7 +29,7 @@ public static partial class ApkIconService
         if (Data.Packages is null || Data.Packages.Count == 0)
             return;
 
-        if (Data.DevicesObject?.Current is not { } device)
+        if (Data.ActiveDevice is not { } device)
             return;
 
         foreach (var package in Data.Packages)

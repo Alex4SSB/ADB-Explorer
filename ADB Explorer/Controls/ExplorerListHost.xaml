@@ -1,4 +1,4 @@
-<UserControl
+﻿<UserControl
     x:Class="ADB_Explorer.Controls.ExplorerListHost"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -23,6 +23,88 @@
         <local:AdbContextMenu x:Key="RowContextMenu" Style="{StaticResource ExplorerContextMenuStyle}" />
         <converters:ColumnSortDirectionConverter x:Key="ColumnSortDirectionConverter" />
         <helpers:BindingProxy x:Key="ViewModelProxy" Data="{Binding}" />
+        <!--
+            Data is set in code-behind (Initialize) to this header's own Instance, not inherited -
+            see the comment there for why a StaticResource can't just reuse ExplorerPageHeader's own.
+        -->
+        <helpers:BindingProxy x:Key="InstanceProxy" />
+        <!--
+            Bound through InstanceProxy, not x:Static Data.FileActions - a snapshot of the first
+            tab's state would keep this collapsed in every other tab.
+        -->
+        <Style x:Key="DriveViewScrollViewerStyle" TargetType="ScrollViewer">
+            <Setter Property="AllowDrop" Value="False" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.FileList.Actions.IsDriveViewVisible}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <!--
+            Empty-folder placeholder styles. Bound through InstanceProxy so each tab reads its own
+            state, not a first-tab x:Static snapshot.
+        -->
+        <Style x:Key="NonRootEmptyFolderStyle" TargetType="StackPanel">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Root}" Value="Enabled">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.FileList.Actions.IsAppDrive}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.IsSearchBoxFiltered}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="EmptyFolderAltPromptStyle" TargetType="TextBlock">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Root}" Value="Enabled">
+                    <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_FOLDER_EMPTY}}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.FileList.Actions.IsAppDrive}" Value="True">
+                    <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_EMPTY_APP_DRIVE}}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.IsSearchBoxFiltered}" Value="True">
+                    <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_EMPTY_FILTER}}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="EmptyFolderGridStyle" TargetType="Grid">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="DataContext" Value="{Binding Source={StaticResource InstanceProxy}, Path=Data.EffectiveDevice}" />
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Items.Count}" Value="0" />
+                        <Condition Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.FileList.Actions.IsExplorerVisible}" Value="True" />
+                        <Condition Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.FileList.Actions.ListingInProgress}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Visibility" Value="Visible" />
+                </MultiDataTrigger>
+                <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.NavigationBoxMode}" Value="None">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style
+            x:Key="ExplorerGridStyle"
+            BasedOn="{StaticResource AdbDataGridStyle}"
+            TargetType="ui:DataGrid">
+            <Setter Property="CanUserDeleteRows" Value="False" />
+            <Setter Property="MinRowHeight" Value="32" />
+            <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.FileList.Actions.IsExplorerVisible}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.FileList.Actions.IsRecycleBin}" Value="False">
+                    <Setter Property="AllowDrop" Value="True" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
         <Style
             x:Key="DataGridCellStyle"
             BasedOn="{StaticResource BaseCellStyle}"
@@ -97,10 +179,10 @@
             <EventSetter Event="Drop" Handler="DataGridRow_Drop" />
             <EventSetter Event="DragOver" Handler="ExplorerGrid_DragOver" />
             <Style.Triggers>
-                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="False">
+                <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.FileList.Actions.IsAppDrive}" Value="False">
                     <Setter Property="AllowDrop" Value="{Binding IsDirectory}" />
                 </DataTrigger>
-                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
+                <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.FileList.Actions.IsAppDrive}" Value="True">
                     <Setter Property="AllowDrop" Value="True" />
                 </DataTrigger>
             </Style.Triggers>
@@ -120,8 +202,8 @@
                         <Style BasedOn="{StaticResource AdbExpanderStyle}" TargetType="Expander">
                             <Setter Property="IsExpanded" Value="{Binding Source={x:Static Member=models:Data.Settings}, Path=HomeLocationsExpanded, Mode=TwoWay}" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding SavedItems.Count}" Value="0">
-                                    <Setter Property="IsExpanded" Value="False" />
+                                <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.SavedItems.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -134,7 +216,7 @@
                     </Expander.Header>
                     <ui:ListView
                         x:Name="HomeSavedLocationsList"
-                        ItemsSource="{Binding SavedItems}"
+                        ItemsSource="{Binding Source={StaticResource InstanceProxy}, Path=Data.SavedItems}"
                         RequestBringIntoView="DriveScrollViewer_RequestBringIntoView"
                         Style="{StaticResource HomeSavedLocationsListStyleNoScroll}">
                         <ui:ListView.ItemsPanel>
@@ -162,7 +244,7 @@
                     <ui:ListView
                         x:Name="DriveList"
                         HorizontalAlignment="Stretch"
-                        ItemsSource="{Binding DriveItemsSource}"
+                        ItemsSource="{Binding Source={StaticResource InstanceProxy}, Path=Data.DriveItemsSource}"
                         PreviewMouseDown="DriveList_PreviewMouseDown"
                         RequestBringIntoView="DriveScrollViewer_RequestBringIntoView"
                         Style="{StaticResource DriveListViewStyle}">
@@ -183,7 +265,7 @@
             ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
             DragOver="ExplorerGrid_DragOver"
             Drop="DataGridRow_Drop"
-            ItemsSource="{Binding ExplorerItemsSource}"
+            ItemsSource="{Binding Source={StaticResource InstanceProxy}, Path=Data.ExplorerItemsSource}"
             MouseMove="IconView_MouseMove"
             PreviewMouseDown="IconView_PreviewMouseDown"
             PreviewMouseUp="IconView_PreviewMouseUp"
@@ -206,13 +288,13 @@
             <local:AdbListView.Style>
                 <Style BasedOn="{StaticResource ListViewStyle}" TargetType="local:AdbListView">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsIconView}" Value="False">
+                        <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.IsIconView}" Value="False">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsDriveViewVisible}" Value="True">
+                        <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.FileList.Actions.IsDriveViewVisible}" Value="True">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRecycleBin}" Value="False">
+                        <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.FileList.Actions.IsRecycleBin}" Value="False">
                             <Setter Property="AllowDrop" Value="True" />
                         </DataTrigger>
                     </Style.Triggers>
@@ -230,10 +312,10 @@
             <Grid.Style>
                 <Style TargetType="Grid">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsIconView}" Value="True">
+                        <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.IsIconView}" Value="True">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding IsContentView}" Value="True">
+                        <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.IsContentView}" Value="True">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                     </Style.Triggers>
@@ -254,7 +336,7 @@
                 GridLinesVisibility="None"
                 HeadersVisibility="Column"
                 IsReadOnly="False"
-                ItemsSource="{Binding ExplorerItemsSource}"
+                ItemsSource="{Binding Source={StaticResource InstanceProxy}, Path=Data.ExplorerItemsSource}"
                 KeyboardNavigation.TabNavigation="Once"
                 MouseDown="ExplorerGrid_MouseDown"
                 MouseMove="ExplorerGrid_MouseMove"
@@ -288,8 +370,8 @@
                         Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
                         <DataGridTemplateColumn.SortDirection>
                             <MultiBinding Converter="{StaticResource ColumnSortDirectionConverter}" ConverterParameter="Name">
-                                <Binding Path="Data.SortDirection" Source="{StaticResource ViewModelProxy}" />
-                                <Binding Path="Data.SortedColumn" Source="{StaticResource ViewModelProxy}" />
+                                <Binding Path="Data.SortDirection" Source="{StaticResource InstanceProxy}" />
+                                <Binding Path="Data.SortedColumn" Source="{StaticResource InstanceProxy}" />
                             </MultiBinding>
                         </DataGridTemplateColumn.SortDirection>
                         <DataGridTemplateColumn.CellTemplate>
@@ -318,7 +400,7 @@
                                         <emoji:TextBlock.HighlightRanges>
                                             <MultiBinding Converter="{StaticResource SearchHighlightRangesConverter}">
                                                 <Binding Path="DisplayName" />
-                                                <Binding Path="ExplorerFilter" Source="{x:Static models:Data.FileActions}" />
+                                                <Binding Path="Data.FileList.Actions.ExplorerFilter" Source="{StaticResource InstanceProxy}" />
                                                 <Binding Path="SearchCaseSensitive" Source="{x:Static models:Data.Settings}" />
                                             </MultiBinding>
                                         </emoji:TextBlock.HighlightRanges>
@@ -362,8 +444,8 @@
                         Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
                         <DataGridTextColumn.SortDirection>
                             <MultiBinding Converter="{StaticResource ColumnSortDirectionConverter}" ConverterParameter="Date">
-                                <Binding Path="Data.SortDirection" Source="{StaticResource ViewModelProxy}" />
-                                <Binding Path="Data.SortedColumn" Source="{StaticResource ViewModelProxy}" />
+                                <Binding Path="Data.SortDirection" Source="{StaticResource InstanceProxy}" />
+                                <Binding Path="Data.SortedColumn" Source="{StaticResource InstanceProxy}" />
                             </MultiBinding>
                         </DataGridTextColumn.SortDirection>
                         <DataGridTextColumn.ElementStyle>
@@ -394,8 +476,8 @@
                         Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
                         <DataGridTemplateColumn.SortDirection>
                             <MultiBinding Converter="{StaticResource ColumnSortDirectionConverter}" ConverterParameter="Type">
-                                <Binding Path="Data.SortDirection" Source="{StaticResource ViewModelProxy}" />
-                                <Binding Path="Data.SortedColumn" Source="{StaticResource ViewModelProxy}" />
+                                <Binding Path="Data.SortDirection" Source="{StaticResource InstanceProxy}" />
+                                <Binding Path="Data.SortedColumn" Source="{StaticResource InstanceProxy}" />
                             </MultiBinding>
                         </DataGridTemplateColumn.SortDirection>
                         <DataGridTemplateColumn.CellTemplate>
@@ -418,8 +500,8 @@
                         Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
                         <DataGridTemplateColumn.SortDirection>
                             <MultiBinding Converter="{StaticResource ColumnSortDirectionConverter}" ConverterParameter="Size">
-                                <Binding Path="Data.SortDirection" Source="{StaticResource ViewModelProxy}" />
-                                <Binding Path="Data.SortedColumn" Source="{StaticResource ViewModelProxy}" />
+                                <Binding Path="Data.SortDirection" Source="{StaticResource InstanceProxy}" />
+                                <Binding Path="Data.SortedColumn" Source="{StaticResource InstanceProxy}" />
                             </MultiBinding>
                         </DataGridTemplateColumn.SortDirection>
                         <DataGridTemplateColumn.CellTemplate>
@@ -500,7 +582,7 @@
                         FontSize="{Binding Source={StaticResource FontSize}}"
                         Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_TYPE}}"
                         IsReadOnly="True"
-                        SortDirection="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageTypeColumnSortDirection}"
+                        SortDirection="{Binding Source={StaticResource InstanceProxy}, Path=Data.PackageTypeColumnSortDirection}"
                         Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageColumnVisibility}">
                         <DataGridTextColumn.ElementStyle>
                             <Style BasedOn="{StaticResource ExplorerGridCellStyle}" TargetType="TextBlock">
@@ -524,8 +606,8 @@
                         </DataGridTextColumn.ElementStyle>
                         <DataGridTextColumn.SortDirection>
                             <MultiBinding Converter="{StaticResource ColumnSortDirectionConverter}" ConverterParameter="UserId">
-                                <Binding Path="Data.SortDirection" Source="{StaticResource ViewModelProxy}" />
-                                <Binding Path="Data.SortedColumn" Source="{StaticResource ViewModelProxy}" />
+                                <Binding Path="Data.SortDirection" Source="{StaticResource InstanceProxy}" />
+                                <Binding Path="Data.SortedColumn" Source="{StaticResource InstanceProxy}" />
                             </MultiBinding>
                         </DataGridTextColumn.SortDirection>
                     </DataGridTextColumn>
@@ -545,8 +627,8 @@
                         </DataGridTextColumn.ElementStyle>
                         <DataGridTextColumn.SortDirection>
                             <MultiBinding Converter="{StaticResource ColumnSortDirectionConverter}" ConverterParameter="Version">
-                                <Binding Path="Data.SortDirection" Source="{StaticResource ViewModelProxy}" />
-                                <Binding Path="Data.SortedColumn" Source="{StaticResource ViewModelProxy}" />
+                                <Binding Path="Data.SortDirection" Source="{StaticResource InstanceProxy}" />
+                                <Binding Path="Data.SortedColumn" Source="{StaticResource InstanceProxy}" />
                             </MultiBinding>
                         </DataGridTextColumn.SortDirection>
                     </DataGridTextColumn>
@@ -557,7 +639,7 @@
             <Grid.Style>
                 <Style TargetType="Grid">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsContentView}" Value="False">
+                        <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.IsContentView}" Value="False">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                     </Style.Triggers>
@@ -580,7 +662,7 @@
                 GridLinesVisibility="None"
                 HeadersVisibility="None"
                 IsReadOnly="False"
-                ItemsSource="{Binding ExplorerItemsSource}"
+                ItemsSource="{Binding Source={StaticResource InstanceProxy}, Path=Data.ExplorerItemsSource}"
                 KeyboardNavigation.TabNavigation="Once"
                 MouseDown="ContentGrid_MouseDown"
                 MouseMove="ExplorerGrid_MouseMove"
@@ -625,7 +707,7 @@
                                             </Image.Style>
                                         </Image>
 
-                                        <!--  Row 0: file name / Row 1: full path — fills the rest of this column  -->
+                                        <!--  Row 0: file name / Row 1: full path - fills the rest of this column  -->
                                         <Grid VerticalAlignment="Center">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="Auto" />
@@ -657,7 +739,7 @@
                                                     <emoji:TextBlock.HighlightRanges>
                                                         <MultiBinding Converter="{StaticResource SearchHighlightRangesConverter}">
                                                             <Binding Path="DisplayName" />
-                                                            <Binding Path="ExplorerFilter" Source="{x:Static models:Data.FileActions}" />
+                                                            <Binding Path="Data.FileList.Actions.ExplorerFilter" Source="{StaticResource InstanceProxy}" />
                                                             <Binding Path="SearchCaseSensitive" Source="{x:Static models:Data.Settings}" />
                                                         </MultiBinding>
                                                     </emoji:TextBlock.HighlightRanges>

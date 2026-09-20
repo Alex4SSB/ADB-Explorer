@@ -84,6 +84,7 @@ public partial class App
 
             services.AddSingleton<ExplorerPage>();
             services.AddSingleton<ExplorerViewModel>();
+            services.AddSingleton<ExplorerTabsViewModel>();
 
             services.AddSingleton<DevicesPage>();
             services.AddSingleton<DevicesViewModel>();

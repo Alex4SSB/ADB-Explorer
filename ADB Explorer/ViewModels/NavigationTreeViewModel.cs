@@ -44,7 +44,11 @@ public partial class NavigationTreeViewModel : ObservableObject
             try
             {
                 SyncDeviceRoots();
-                if (!IsTreeDragBlocked)
+
+                // While the tab shows a page, nothing in the tree is the current location.
+                if (Data.ActiveExplorerInstance.IsShowingPage)
+                    SelectTreeNode(null);
+                else if (!IsTreeDragBlocked)
                     DiscoverAndSelect(Data.CurrentPath);
             }
             finally
@@ -81,12 +85,18 @@ public partial class NavigationTreeViewModel : ObservableObject
     private void Drives_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         => Sync();
 
+    /// <summary>The active tab's device. Not <see cref="LogicalDeviceViewModel.IsOpen"/> or
+    /// <see cref="Devices.Current"/>, which are app-wide and don't follow tab switches.</summary>
+    private static LogicalDeviceViewModel? ActiveDevice => Data.ActiveExplorerInstance.EffectiveDevice;
+
+    private static bool IsActiveDevice(LogicalDeviceViewModel? device)
+        => device is not null && ActiveDevice?.ID == device.ID;
+
     private NavigationTreeNode? CurrentDeviceNode
-        => TreeSource.FirstOrDefault(node => node.Device?.IsOpen == true)
-        ?? TreeSource.FirstOrDefault(node => node.Device == Data.DevicesObject?.Current);
+        => TreeSource.FirstOrDefault(node => IsActiveDevice(node.Device));
 
     private static bool IsOpenedDevice(LogicalDeviceViewModel device)
-        => device.IsOpen || device == Data.DevicesObject?.Current;
+        => IsActiveDevice(device);
 
     private static IEnumerable<LogicalDeviceViewModel> ConnectedDevices()
     {
@@ -95,7 +105,7 @@ public partial class NavigationTreeViewModel : ObservableObject
             return [];
 
         return devices.Where(device =>
-            (device.Status is DeviceStatus.Ok || device.IsOpen)
+            (device.Status is DeviceStatus.Ok || device.IsOpen || IsActiveDevice(device))
             && DeviceHelper.DevicePredicate(device));
     }
 
@@ -371,7 +381,7 @@ public partial class NavigationTreeViewModel : ObservableObject
 
         var allowHidden = Data.Settings.ShowHiddenItems;
         var isInsideArchive = Data.FileActions.IsArchive;
-        var deviceId = Data.DevicesObject?.Current?.ID;
+        var deviceId = ActiveDevice?.ID;
         foreach (var item in source)
         {
             if (item is not FileClass file)
@@ -598,6 +608,7 @@ public partial class NavigationTreeViewModel : ObservableObject
         }
 
         var allowHidden = Data.Settings.ShowHiddenItems;
+        var device = Data.DevicesObject?.LogicalDeviceViewModels.FirstOrDefault(d => d.ID == deviceId);
         var folders = new List<FileClass>();
         var unresolvedLinks = new List<FileStat>();
         foreach (var entry in entries)
@@ -607,7 +618,7 @@ public partial class NavigationTreeViewModel : ObservableObject
 
             if (entry.Type is AbstractFile.FileType.Folder)
             {
-                var file = new FileClass(entry.FullName, entry.FullPath, AbstractFile.FileType.Folder, entry.IsLink);
+                var file = new FileClass(entry.FullName, entry.FullPath, AbstractFile.FileType.Folder, entry.IsLink) { Device = device };
                 if (FileHelper.IsHiddenRecycleItem(file))
                     continue;
 
@@ -620,7 +631,7 @@ public partial class NavigationTreeViewModel : ObservableObject
                 && !entry.IsLink
                 && ArchiveHelper.IsNavigableArchive(entry.FullName, deviceId))
             {
-                var archive = new FileClass(entry.FullName, entry.FullPath, AbstractFile.FileType.File);
+                var archive = new FileClass(entry.FullName, entry.FullPath, AbstractFile.FileType.File) { Device = device };
                 if (FileHelper.IsHiddenRecycleItem(archive))
                     continue;
 
@@ -654,7 +665,8 @@ public partial class NavigationTreeViewModel : ObservableObject
             var entry = unresolvedLinks[i];
             var file = new FileClass(entry.FullName, entry.FullPath, AbstractFile.FileType.Folder, isLink: true)
             {
-                LinkTarget = linkTypes[i].Target
+                LinkTarget = linkTypes[i].Target,
+                Device = device,
             };
 
             if (FileHelper.IsHiddenRecycleItem(file))
@@ -786,7 +798,7 @@ public partial class NavigationTreeViewModel : ObservableObject
 
     private static bool IsCurrentExplorerPath(NavigationTreeNode node)
     {
-        if (node.OwnerDevice is null || !node.OwnerDevice.IsOpen)
+        if (!IsActiveDevice(node.OwnerDevice))
             return false;
 
         if (Data.FileActions.IsDriveViewVisible
@@ -982,25 +994,25 @@ public partial class NavigationTreeViewModel : ObservableObject
 
     private void OnTreeNodeSelected(NavigationTreeNode node)
     {
-        if (_syncing || node.IsInEditMode || node.IsTemp || _editingNode is not null)
+        if (_syncing || node.IsInEditMode || node.IsTemp || _editingNode is not null || DeviceHelper.IsSwitchingTabDevice)
             return;
 
         if (node.Device is { } device)
         {
             Data.RuntimeSettings.PendingLocationAfterDeviceOpen = null;
 
-            if (!device.IsOpen)
-                DeviceHelper.BrowseDeviceAction(device);
-            else if (!Data.FileActions.IsDriveViewVisible)
+            if (!IsActiveDevice(device))
+                DeviceHelper.SwitchTabToDevice(device);
+            else if (!Data.FileActions.IsDriveViewVisible || Data.ActiveExplorerInstance.IsShowingPage)
                 Data.RuntimeSettings.LocationToNavigate = new(Navigation.SpecialLocation.DriveView);
             return;
         }
 
         var owner = GetNodeDevice(node);
-        if (owner is not null && !owner.IsOpen)
+        if (owner is not null && !IsActiveDevice(owner))
         {
             Data.RuntimeSettings.PendingLocationAfterDeviceOpen = new(node.Path);
-            DeviceHelper.BrowseDeviceAction(owner);
+            DeviceHelper.SwitchTabToDevice(owner);
             return;
         }
 
@@ -1008,6 +1020,19 @@ public partial class NavigationTreeViewModel : ObservableObject
             return;
 
         Data.RuntimeSettings.LocationToNavigate = new(node.Path);
+    }
+
+    /// <summary>Opens a device (its drive view), drive or folder node in a new tab.</summary>
+    public void OpenNodeInNewTab(NavigationTreeNode node)
+    {
+        if (node.IsTemp || node.IsInEditMode || GetNodeDevice(node) is not { } device)
+            return;
+
+        AdbLocation? location = null;
+        if (node.Device is null && !string.IsNullOrEmpty(node.Path))
+            location = new(node.Path);
+
+        DeviceHelper.OpenDeviceInNewTab(device, location);
     }
 
     private LogicalDeviceViewModel? GetNodeDevice(NavigationTreeNode node)
@@ -1020,11 +1045,14 @@ public partial class NavigationTreeViewModel : ObservableObject
 
     private bool IsTreeNodeCurrent(NavigationTreeNode node)
     {
+        if (Data.ActiveExplorerInstance.IsShowingPage)
+            return false;
+
         if (node.Device is not null)
-            return node.Device.IsOpen && Data.FileActions.IsDriveViewVisible;
+            return IsActiveDevice(node.Device) && Data.FileActions.IsDriveViewVisible;
 
         var owner = GetNodeDevice(node);
-        if (owner is not null && !owner.IsOpen)
+        if (owner is not null && !IsActiveDevice(owner))
             return false;
 
         if (AdbLocation.LocationFromString(node.Path) is Navigation.SpecialLocation.DriveView)
@@ -1074,11 +1102,11 @@ public partial class NavigationTreeViewModel : ObservableObject
         if (Data.FileActions.IsTemp)
             return FindDrive(AbstractDrive.DriveType.Temp);
 
-        return DriveHelper.GetCurrentDrive(path);
+        return DriveHelper.GetCurrentDrive(path, ActiveDevice);
     }
 
     private static DriveViewModel? FindDrive(AbstractDrive.DriveType type)
-        => Data.DevicesObject?.Current?.Drives.FirstOrDefault(d => d.Type == type);
+        => ActiveDevice?.Drives.FirstOrDefault(d => d.Type == type);
 
     private static bool IsRecycleLocation(string path)
         => AdbExplorerConst.POSSIBLE_RECYCLE_PATHS.Any(recycle =>
@@ -1269,7 +1297,7 @@ public partial class NavigationTreeViewModel : ObservableObject
                 RestoreParentChevron(parent);
             }
 
-            if (deviceId != Data.DevicesObject.Current?.ID || string.IsNullOrEmpty(Data.CurrentPath))
+            if (deviceId != ActiveDevice?.ID || string.IsNullOrEmpty(Data.CurrentPath))
                 return;
 
             var current = NavigationTreeNode.NormalizePath(Data.CurrentPath);
@@ -1299,7 +1327,7 @@ public partial class NavigationTreeViewModel : ObservableObject
                 UpdateSubtreePaths(node, oldPath, newPath);
             }
 
-            if (deviceId != Data.DevicesObject.Current?.ID || string.IsNullOrEmpty(Data.CurrentPath))
+            if (deviceId != ActiveDevice?.ID || string.IsNullOrEmpty(Data.CurrentPath))
                 return;
 
             var current = NavigationTreeNode.NormalizePath(Data.CurrentPath);
@@ -1324,7 +1352,7 @@ public partial class NavigationTreeViewModel : ObservableObject
     /// </summary>
     private static CancellationToken TreeListingToken(NavigationTreeNode node)
     {
-        if (node.OwnerDevice is { } owner && owner == Data.DevicesObject?.Current)
+        if (IsActiveDevice(node.OwnerDevice))
             return Data.DeviceCts.Token;
 
         return CancellationToken.None;

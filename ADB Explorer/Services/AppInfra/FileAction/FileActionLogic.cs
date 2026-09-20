@@ -94,7 +94,7 @@ internal static class FileActionLogic
         Data.CopyPaste.HasClipboardImage
         && Data.FileActions.NewEnabled
         && !Data.FileActions.IsExplorerEditing
-        && Data.DevicesObject?.Current is not null;
+        && Data.ActiveDevice is not null;
 
     /// <summary>
     /// Selection gating for "Paste as image" - the same single-target-selection rule
@@ -518,7 +518,7 @@ internal static class FileActionLogic
         file.IsCreationTimeResolved = false;
 
         if (Data.DirList?.FileList is { } listing
-            && device.ID == (Data.Files.Device?.ID ?? Data.DevicesObject.Current?.ID)
+            && device.ID == (Data.Files.Device?.ID ?? Data.ActiveDevice?.ID)
             && NavigationTreeNode.PathsEqual(Data.CurrentPath, file.ParentPath)
             && listing.IndexOf(file) < 0)
             listing.Insert(0, file);
@@ -541,11 +541,6 @@ internal static class FileActionLogic
         files.Remove(file);
         files.Insert(index, file);
     }
-
-    private static readonly BaseIcon DefaultPasteIcon = new(new PasteIcon(), 18);
-    private static readonly BaseIcon DefaultContextPasteIcon = new(new PasteIcon(), 16);
-    private static readonly BaseIcon ClipboardImagePasteIcon = new(new ClipboardImageIcon(), 18);
-    private static readonly BaseIcon ClipboardImageContextPasteIcon = new(new ClipboardImageIcon(), 16);
 
     public static void IsPasteEnabled()
     {
@@ -605,17 +600,19 @@ internal static class FileActionLogic
         }
     }
 
+    // Each FileActionsEnable is its own tab's - a shared/cached BaseIcon here would have its one
+    // WPF element pulled into whichever tab's toolbar last bound it, leaving the rest blank.
     private static void SetClipboardImagePasteLabels(FileActionsEnable actions)
     {
         actions.PasteDescription.Value = Strings.Resources.S_MENU_PASTE_IMAGE;
-        actions.PasteIcon.Value = ClipboardImagePasteIcon;
-        actions.ContextPasteIcon.Value = ClipboardImageContextPasteIcon;
+        actions.PasteIcon.Value = new BaseIcon(new ClipboardImageIcon(), 18);
+        actions.ContextPasteIcon.Value = new BaseIcon(new ClipboardImageIcon(), 16);
     }
 
     private static void ResetPasteImageLabels(FileActionsEnable actions)
     {
-        actions.PasteIcon.Value = DefaultPasteIcon;
-        actions.ContextPasteIcon.Value = DefaultContextPasteIcon;
+        actions.PasteIcon.Value = new BaseIcon(new PasteIcon(), 18);
+        actions.ContextPasteIcon.Value = new BaseIcon(new PasteIcon(), 16);
     }
 
     private static void SetPasteLabels(FileActionsEnable actions)
@@ -835,7 +832,7 @@ internal static class FileActionLogic
 
     private static bool IsSymlinkPasteAllowed(string targetPath)
     {
-        var deviceId = Data.DevicesObject?.Current?.ID ?? "";
+        var deviceId = Data.ActiveDevice?.ID ?? "";
         var restrictions = DriveHelper.GetRestrictions(targetPath);
         return HasRootShell
             && Data.CopyPaste.Files.Length == 1
@@ -869,7 +866,7 @@ internal static class FileActionLogic
             _ => target.FullPath,
         };
 
-        var deviceId = Data.DevicesObject.Current?.ID ?? "";
+        var deviceId = Data.ActiveDevice?.ID ?? "";
         targetPath = ArchiveHelper.ResolvePasteTargetPath(targetPath, deviceId);
 
         if (!DriveHelper.IsModificationAllowedAt(targetPath, deviceId))
@@ -938,7 +935,7 @@ internal static class FileActionLogic
         if (target.Drive?.Type is AbstractDrive.DriveType.Root)
             return DragDropEffects.None;
 
-        var deviceId = target.OwnerDevice?.ID ?? Data.DevicesObject.Current?.ID ?? "";
+        var deviceId = target.OwnerDevice?.ID ?? Data.ActiveDevice?.ID ?? "";
 
         if (drive.Type is AbstractDrive.DriveType.Package)
         {
@@ -1203,7 +1200,7 @@ internal static class FileActionLogic
         if (!TryGetSelectedNavigableArchive(out var archive) || archive is null)
             return;
 
-        var device = Data.DevicesObject.Current;
+        var device = Data.ActiveDevice;
         var archivePath = archive.FullPath;
         var token = Data.DeviceCts.Token;
 
@@ -1535,30 +1532,30 @@ internal static class FileActionLogic
         ApkIconService.CancelPending();
     }
 
-    public static void RefreshDrives(bool asyncClassify, CancellationToken cancellationToken)
+    /// <param name="device">Defaults to the active tab's device, which can differ from the
+    /// app-wide <see cref="Devices.Current"/> when tabs browse different devices.</param>
+    public static void RefreshDrives(bool asyncClassify, CancellationToken cancellationToken, LogicalDeviceViewModel? device = null)
     {
-        if (Data.DevicesObject.Current is null)
+        device ??= Data.ActiveExplorerInstance.EffectiveDevice;
+        if (device is null)
             return;
 
-        if (!asyncClassify && Data.DevicesObject.Current.Drives?.Count > 0 && !Data.FileActions.IsExplorerVisible)
+        if (!asyncClassify && device.Drives?.Count > 0 && !Data.FileActions.IsExplorerVisible)
             asyncClassify = true;
 
         var driveTask = Task.Run(() =>
         {
-            if (Data.DevicesObject.Current is null)
-                return null;
-
             bool countRecycle = false, countPackages = false, countInstallers = false;
-            if (Data.DevicesObject.Current.Type is not DeviceType.Recovery)
+            if (device.Type is not DeviceType.Recovery)
             {
-                countRecycle = Data.Settings.EnableRecycle && Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Trash);
-                countInstallers = Data.Settings.EnableApk && Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Temp);
-                countPackages = Data.Settings.EnableApk && Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Package);
+                countRecycle = Data.Settings.EnableRecycle && device.Drives.Any(d => d.Type is AbstractDrive.DriveType.Trash);
+                countInstallers = Data.Settings.EnableApk && device.Drives.Any(d => d.Type is AbstractDrive.DriveType.Temp);
+                countPackages = Data.Settings.EnableApk && device.Drives.Any(d => d.Type is AbstractDrive.DriveType.Package);
             }
 
             return ADBService.GetDrives(
-                Data.DevicesObject.Current.ID,
-                Data.DevicesObject.Current.Type,
+                device.ID,
+                device.Type,
                 cancellationToken,
                 countRecycle,
                 countPackages,
@@ -1574,65 +1571,57 @@ internal static class FileActionLogic
             var result = t.Result.Value;
             App.SafeInvoke(async () =>
             {
-                // Read Data.DevicesObject.Current once and reuse it below — re-reading the
-                // property between the type check and the Drives access left a window for
-                // the device to disconnect in between, throwing a NullReferenceException.
-                var device = Data.DevicesObject.Current;
-
-                if (device?.Type is DeviceType.Recovery)
+                if (device.Type is DeviceType.Recovery)
                 {
                     foreach (var item in device.Drives.OfType<VirtualDriveViewModel>())
                         item.SetItemsCount(item.Type is AbstractDrive.DriveType.Package ? -1 : null);
                 }
                 else
                 {
-                    ApplyVirtualDriveCounts(result);
+                    ApplyVirtualDriveCounts(device, result);
                 }
 
-                if (device is null || App.AppDispatcher is null)
+                if (App.AppDispatcher is null)
                     return;
 
                 if (await device.UpdateDrives(result.Drives, App.AppDispatcher, asyncClassify))
                 {
                     Data.RuntimeSettings.FilterDrives = true;
-                    FolderHelper.CombineDisplayNames();
+                    FolderHelper.CombineDisplayNames(device);
                 }
             });
         }, cancellationToken);
     }
 
-    private static void ApplyVirtualDriveCounts(DrivePollResult result)
+    private static void ApplyVirtualDriveCounts(LogicalDeviceViewModel device, DrivePollResult result)
     {
-        if (Data.DevicesObject.Current is null)
-            return;
-
         if (result.RecycleCount is long recycleCount)
         {
-            var trash = Data.DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Trash);
+            var trash = device.Drives.Find(d => d.Type is AbstractDrive.DriveType.Trash);
             ((VirtualDriveViewModel)trash)?.SetItemsCount(recycleCount);
         }
 
         if (result.InstallersCount is ulong installersCount)
         {
-            var temp = Data.DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Temp);
+            var temp = device.Drives.Find(d => d.Type is AbstractDrive.DriveType.Temp);
             ((VirtualDriveViewModel)temp)?.SetItemsCount((long)installersCount);
         }
 
         if (result.PackagesCount is ulong packagesCount)
         {
-            var package = Data.DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Package);
+            var package = device.Drives.Find(d => d.Type is AbstractDrive.DriveType.Package);
             ((VirtualDriveViewModel)package)?.SetItemsCount((int)packagesCount);
         }
     }
 
     public static void UpdateInstallersCount(CancellationToken cancellationToken = default)
     {
-        var countTask = Task.Run(() => ADBService.CountPackages(Data.DevicesObject.Current.ID), cancellationToken);
+        var countTask = Task.Run(() => ADBService.CountPackages(Data.ActiveDevice.ID), cancellationToken);
         countTask.ContinueWith((t) => App.SafeInvoke(() =>
         {
-            if (!t.IsCanceled && Data.DevicesObject.Current is not null)
+            if (!t.IsCanceled && Data.ActiveDevice is not null)
             {
-                var temp = Data.DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Temp);
+                var temp = Data.ActiveDevice.Drives.Find(d => d.Type is AbstractDrive.DriveType.Temp);
                 ((VirtualDriveViewModel)temp)?.SetItemsCount((long)t.Result);
             }
         }), cancellationToken);
@@ -1640,27 +1629,31 @@ internal static class FileActionLogic
 
     public static void UpdatePackagesCount(CancellationToken cancellationToken = default)
     {
-        var packageTask = Task.Run(() => ShellFileOperation.GetPackagesCount(Data.DevicesObject.Current, Data.Settings.ShowSystemPackages), cancellationToken);
+        var packageTask = Task.Run(() => ShellFileOperation.GetPackagesCount(Data.ActiveDevice, Data.Settings.ShowSystemPackages), cancellationToken);
 
         packageTask.ContinueWith((t) =>
         {
-            if (t.IsCanceled || t.Result is null || Data.DevicesObject.Current is null)
+            if (t.IsCanceled || t.Result is null || Data.ActiveDevice is null)
                 return;
 
             App.SafeInvoke(() =>
             {
-                var package = Data.DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Package);
+                var package = Data.ActiveDevice.Drives.Find(d => d.Type is AbstractDrive.DriveType.Package);
                 ((VirtualDriveViewModel)package)?.SetItemsCount((int?)t.Result);
             });
         });
     }
 
-    public static void UpdatePackages(bool updateExplorer = false, CancellationToken cancellationToken = default, bool cacheOnly = false)
+    public static void UpdatePackages(bool updateExplorer = false, CancellationToken cancellationToken = default, bool cacheOnly = false, ExplorerInstance? instance = null)
     {
+        // Defaults to the active tab (fine for Refresh()); a caller navigating a specific tab
+        // should pass it explicitly, since it may no longer be active once this async listing finishes.
+        instance ??= Data.ActiveExplorerInstance;
+
         Data.FileActions.ListingInProgress = true;
 
-        var version = Data.DevicesObject.Current.AndroidVersion;
-        var packageTask = Task.Run(() => ShellFileOperation.GetPackages(Data.DevicesObject.Current, Data.Settings.ShowSystemPackages, version is not null && version >= AdbExplorerConst.MIN_PKG_UID_ANDROID_VER), cancellationToken);
+        var version = Data.ActiveDevice.AndroidVersion;
+        var packageTask = Task.Run(() => ShellFileOperation.GetPackages(Data.ActiveDevice, Data.Settings.ShowSystemPackages, version is not null && version >= AdbExplorerConst.MIN_PKG_UID_ANDROID_VER), cancellationToken);
 
         packageTask.ContinueWith((t) =>
         {
@@ -1681,16 +1674,12 @@ internal static class FileActionLogic
                     Data.Packages = listed;
                 }
 
-                if (updateExplorer)
-                {
-                    var explorer = App.Services.GetService<ExplorerViewModel>();
-                    if (!ReferenceEquals(explorer.ExplorerSource, Data.Packages))
-                        explorer.ExplorerSource = Data.Packages;
-                }
+                if (updateExplorer && !ReferenceEquals(instance.ExplorerSource, Data.Packages))
+                    instance.ExplorerSource = Data.Packages;
 
-                if (!updateExplorer && Data.DevicesObject.Current is not null)
+                if (!updateExplorer && Data.ActiveDevice is not null)
                 {
-                    var package = Data.DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Package);
+                    var package = Data.ActiveDevice.Drives.Find(d => d.Type is AbstractDrive.DriveType.Package);
                     ((VirtualDriveViewModel)package)?.SetItemsCount(Data.Packages.Count);
                 }
 
@@ -1778,7 +1767,11 @@ internal static class FileActionLogic
 
             if (clearDevice)
             {
-                Data.CurrentDisplayNames.Clear();
+                // Only this device's names - the cache is shared by every tab's device.
+                var deviceId = Data.ActiveDevice?.ID;
+                foreach (var key in Data.CurrentDisplayNames.Keys.Where(key => key.DeviceId == deviceId).ToList())
+                    Data.CurrentDisplayNames.Remove(key);
+
                 Data.CurrentPath = "";
                 Data.DirList?.ClearCurrentLocation();
                 Data.RaiseClearNavigationBox();
@@ -1871,6 +1864,17 @@ internal static class FileActionLogic
             actions.IsArchive = ArchivePath.IsArchivePath(listingPath, deviceId);
 
         var isArchive = actions.IsArchive;
+
+        NavigationTreeNode? treeNode = null;
+        if (!ReferenceEquals(list, Data.Files))
+            treeNode = ExplorerTree?.ContextTarget;
+
+        if (treeNode is not null)
+            actions.IsOpenInNewTabEnabled = currentDevice is not null && !treeNode.IsTemp && !treeNode.IsInEditMode;
+        else if (currentDevice is not null && !isRecycleBin)
+            actions.IsOpenInNewTabEnabled = GetNewTabPath(GetNewTabItem(list), currentDevice, isAppDrive, isArchive) is not null;
+        else
+            actions.IsOpenInNewTabEnabled = false;
 
         // CanWrite (when set) is computed by the caller against the actual selected node's own
         // path - e.g. a tree drive node's Path is its parent, so listingPath/restrictions below
@@ -2312,7 +2316,7 @@ internal static class FileActionLogic
         if (string.IsNullOrEmpty(root))
             return Data.FileActions.ExplorerFilter ?? "";
 
-        return Data.CurrentDisplayNames.TryGetValue(root, out var displayName)
+        return Data.CurrentDisplayNames.TryGetValue((Data.ActiveDevice?.ID, root), out var displayName)
             ? displayName
             : FileHelper.GetFullName(root);
     }
@@ -2366,6 +2370,11 @@ internal static class FileActionLogic
     /// </summary>
     private static void PushClipboardImageFile(FileClass file, string stagingPath, LogicalDeviceViewModel device)
     {
+        // Reserved for the whole push so a concurrent details-pane/icon-view thumbnail request can't
+        // pull the still-in-flight target path and win the cache entry over the correct seeded image.
+        var seedReserved = Data.Settings.MaxCustomThumbWeight > 0
+            && ThumbnailService.TryReserveCustomThumbnailSeed(device.SerialNumber, file);
+
         var source = new SyncFile(ShellItem.Open(stagingPath));
         var target = new SyncFile(file.FullPath, FileType.File) { Size = source.Size };
 
@@ -2381,6 +2390,9 @@ internal static class FileActionLogic
 
             if (op.Status is FileOperation.OperationStatus.Completed && Data.Settings.MaxCustomThumbWeight > 0)
                 SeedClipboardImageThumbnail(device, file, stagingPath);
+
+            if (seedReserved)
+                ThumbnailService.ReleaseCustomThumbnailSeed(device.SerialNumber, file);
 
             DeleteClipboardImageStagingFile(stagingPath);
         };
@@ -2436,7 +2448,7 @@ internal static class FileActionLogic
             source.IsDirectory ? FileType.Folder : FileType.File)
             { Size = source.Size };
 
-        device ??= Data.DevicesObject.Current;
+        device ??= Data.ActiveDevice;
         if (device is null)
             return null;
 
@@ -2495,7 +2507,7 @@ internal static class FileActionLogic
         if (op.Status is FileOperation.OperationStatus.Completed)
         {
             // Current path (and device) is where the new file was pushed to and it is not shown yet
-            if (op.Device.ID == Data.DevicesObject.Current?.ID
+            if (op.Device.ID == Data.ActiveDevice?.ID
                 && op.TargetPath.ParentPath == Data.CurrentPath
                 && Data.DirList.FileList.All(f => f.FullName != op.FilePath.FullName))
             {
@@ -2714,7 +2726,7 @@ internal static class FileActionLogic
         IReadOnlySet<string>? replacePaths = null,
         IReadOnlySet<string>? conflictPaths = null)
     {
-        device ??= Data.DevicesObject.Current;
+        device ??= Data.ActiveDevice;
         var deviceId = device.ID;
         replacePaths ??= EmptyPathSet;
         conflictPaths ??= EmptyPathSet;
@@ -2884,7 +2896,7 @@ internal static class FileActionLogic
             ? ArchivePath.Join(file.FullPath, "")
             : file.FullPath;
 
-        if (device is not null && !device.IsOpen)
+        if (device is not null && Data.ActiveDevice?.ID != device.ID)
         {
             Data.RuntimeSettings.PendingLocationAfterDeviceOpen = new(path);
             DeviceHelper.BrowseDeviceAction(device);
@@ -2892,6 +2904,46 @@ internal static class FileActionLogic
         }
 
         Data.RuntimeSettings.LocationToNavigate = new(path);
+    }
+
+    /// <summary>Folder, archive or drive location that opens in a new tab, or null when the item can't.</summary>
+    internal static string? GetNewTabPath(object? item, LogicalDeviceViewModel device, bool isAppDrive, bool isArchive)
+    {
+        return item switch
+        {
+            DriveViewModel drive => drive.Path,
+            FileClass { Type: FileType.Folder } folder => string.IsNullOrEmpty(folder.LinkTarget) ? folder.FullPath : folder.LinkTarget,
+            FileClass archive when !isAppDrive
+                && ArchiveHelper.CanNavigateIntoArchive(archive.FullPath, archive.FullName, device.ID, isArchive) => ArchivePath.Join(archive.FullPath, ""),
+            _ => null,
+        };
+    }
+
+    private static object? GetNewTabItem(FileList list)
+    {
+        if (ReferenceEquals(list, Data.Files) && list.Actions.IsDriveViewVisible)
+            return Data.RuntimeSettings.SelectedDrive;
+
+        if (list.SelectedFiles.Count() == 1)
+            return list.SelectedFiles.First();
+
+        return null;
+    }
+
+    public static void OpenInNewTab()
+    {
+        if (!ReferenceEquals(Data.Active, Data.Files) && ExplorerTree?.ContextTarget is { } node)
+        {
+            ExplorerTree.OpenNodeInNewTab(node);
+            return;
+        }
+
+        if (ActionDevice is not { } device)
+            return;
+
+        var path = GetNewTabPath(GetNewTabItem(ActionList), device, ActionFlags.IsAppDrive, ActionFlags.IsArchive);
+        if (!string.IsNullOrEmpty(path))
+            DeviceHelper.OpenDeviceInNewTab(device, new AdbLocation(path));
     }
 
     internal static bool CanEnterSelection(FileClass file)

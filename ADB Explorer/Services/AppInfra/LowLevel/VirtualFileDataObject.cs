@@ -603,7 +603,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         CopyPasteService.ClearTempFolder();
 
         var source = Data.Active;
-        var device = source.Device ?? Data.DevicesObject.Current;
+        var device = source.Device ?? Data.ActiveDevice;
         if (device is null)
             return null;
 
@@ -647,7 +647,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         CopyPasteService.ClearTempFolder();
 
         var source = Data.Active;
-        var device = source.Device ?? Data.DevicesObject.Current;
+        var device = source.Device ?? Data.ActiveDevice;
         if (device is null)
             return null;
 

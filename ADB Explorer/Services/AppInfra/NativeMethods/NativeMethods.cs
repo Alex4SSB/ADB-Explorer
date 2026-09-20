@@ -415,6 +415,7 @@ public static partial class NativeMethods
     {
         WM_COPYDATA = 0x004A,
         WM_DISPLAYCHANGE = 0x007E,
+        WM_NCLBUTTONDOWN = 0x00A1,
         WM_DPICHANGED = 0x02E0,
     }
 

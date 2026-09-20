@@ -278,15 +278,15 @@
         x:Key="MainToolBarStyle"
         BasedOn="{StaticResource AdbToolBarStyle}"
         TargetType="controls:AdbMenu">
+        <!--  ItemsSource is set per-header in ExplorerPageHeader's constructor, not here - see MainToolBar.Build's comment.  -->
         <Setter Property="Margin" Value="7,0,0,0" />
-        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:MainToolBar.List}}" />
     </Style>
     <Style
         x:Key="NavigationToolBarStyle"
         BasedOn="{StaticResource AdbToolBarStyle}"
         TargetType="controls:AdbMenu">
+        <!--  ItemsSource is set per-header in ExplorerPageHeader's constructor, not here - see NavigationToolBar.Build's comment.  -->
         <Setter Property="Margin" Value="7,0,0,0" />
-        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:NavigationToolBar.List}}" />
     </Style>
     <Style
         x:Key="BaseContextMenuStyle"

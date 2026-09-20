@@ -13,59 +13,53 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     public partial string ApplicationTitle { get; set; } = Properties.AppGlobal.AppDisplayName;
 
-    private readonly NavigationViewItem _logItem = new()
+    /// <summary>Whether the active tab shows the Explorer page - the pane's bottom pages collapse into "More" then.</summary>
+    [ObservableProperty]
+    public partial bool IsExplorerPage { get; set; }
+
+    partial void OnIsExplorerPageChanged(bool value) => UpdateFooterVisibility();
+
+    /// <summary>Whether the pointer is over the pane's bottom items - the collapsed pages show again meanwhile.</summary>
+    [ObservableProperty]
+    public partial bool IsFooterHovered { get; set; }
+
+    partial void OnIsFooterHoveredChanged(bool value) => UpdateFooterVisibility();
+
+    private static NavigationViewItem CreateItem(string title, IconElement icon, Type? pageType = null) => new()
     {
-        Content = new Wpf.Ui.Controls.TextBlock() { FontSize = 12, Text = Strings.Resources.S_BUTTON_LOG, TextTrimming = TextTrimming.CharacterEllipsis },
-        Icon = new FluentPathIcon { Data = FluentPathGeometries.TextBulletListSquare, Width = 22, Height = 22 },
-        TargetPageType = typeof(Views.Pages.LogPage),
-        ToolTip = Strings.Resources.S_BUTTON_LOG,
-        Visibility = Data.Settings.EnableLog ? Visibility.Visible : Visibility.Collapsed
+        Content = new Wpf.Ui.Controls.TextBlock() { Text = title, TextTrimming = TextTrimming.CharacterEllipsis },
+        Icon = icon,
+        TargetPageType = pageType,
     };
 
+    /// <summary>Never shown - only lets the NavigationView select something (and so deselect the others) on the Explorer page.</summary>
+    private readonly NavigationViewItem _explorerItem = new()
+    {
+        Content = Strings.Resources.S_SETTINGS_GROUP_EXPLORER,
+        TargetPageType = typeof(Views.Pages.ExplorerPage),
+        Visibility = Visibility.Collapsed,
+    };
+
+    private readonly NavigationViewItem _devicesItem = CreateItem(Strings.Resources.S_BUTTON_DEVICES, new FontIcon { Glyph = "\uE8CC" }, typeof(Views.Pages.DevicesPage));
+
+    private readonly NavigationViewItem _terminalItem = CreateItem(Strings.Resources.S_TERMINAL, new FontIcon { Glyph = "\uE756" }, typeof(Views.Pages.TerminalPage));
+
+    private readonly NavigationViewItem _operationsItem = CreateItem(Strings.Resources.S_ACTION_OPERATION_PLURAL, new FontIcon { Glyph = "\uEADF" }, typeof(Views.Pages.OperationsPage));
+
+    private readonly NavigationViewItem _logItem = CreateItem(Strings.Resources.S_BUTTON_LOG, new FluentPathIcon { Data = FluentPathGeometries.TextBulletListSquare, Width = 16, Height = 16 }, typeof(Views.Pages.LogPage));
+
+    /// <summary>Stands in for the four items above on the Explorer page, until the pointer is over the pane's bottom.</summary>
+    private readonly NavigationViewItem _moreItem = CreateItem(Strings.Resources.S_MENU_MORE, new FontIcon { Glyph = "\uE712" });
+
+    /// <summary>Sets Settings apart from the pages above it; hidden together with them.</summary>
+    private readonly NavigationViewItemSeparator _settingsSeparator = new();
+
+    /// <summary>Pane top: only the hidden Explorer item - every visible page sits below the tree, in <see cref="FooterMenuItems"/>.</summary>
     [ObservableProperty]
-    public partial ObservableCollection<NavigationViewItem> MenuItems { get; set; } =
-    [
-        new NavigationViewItem()
-        {
-            Content = new Wpf.Ui.Controls.TextBlock() { FontSize = 12, Text = Strings.Resources.S_SETTINGS_GROUP_EXPLORER, TextTrimming = TextTrimming.CharacterEllipsis },
-            Icon = new FontIcon { Glyph = "\uEC50" },
-            TargetPageType = typeof(Views.Pages.ExplorerPage),
-            ToolTip = Strings.Resources.S_SETTINGS_GROUP_EXPLORER
-        },
-        new NavigationViewItem()
-        {
-            Content = new Wpf.Ui.Controls.TextBlock() { FontSize = 12, Text = Strings.Resources.S_BUTTON_DEVICES, TextTrimming = TextTrimming.CharacterEllipsis },
-            Icon = new FontIcon { Glyph = "\uE8CC" },
-            TargetPageType = typeof(Views.Pages.DevicesPage),
-            ToolTip = Strings.Resources.S_BUTTON_DEVICES
-        },
-        new NavigationViewItem()
-        {
-            Content = new Wpf.Ui.Controls.TextBlock() { FontSize = 12, Text = Strings.Resources.S_TERMINAL, TextTrimming = TextTrimming.CharacterEllipsis },
-            Icon = new FontIcon { Glyph = "\uE756" },
-            TargetPageType = typeof(Views.Pages.TerminalPage),
-            ToolTip = Strings.Resources.S_TERMINAL
-        },
-        new NavigationViewItem()
-        {
-            Content = new Wpf.Ui.Controls.TextBlock() { FontSize = 12, Text = Strings.Resources.S_ACTION_OPERATION_PLURAL, TextTrimming = TextTrimming.CharacterEllipsis },
-            Icon = new FontIcon { Glyph = "\uEADF" },
-            TargetPageType = typeof(Views.Pages.OperationsPage),
-            ToolTip = Strings.Resources.S_ACTION_OPERATION_PLURAL
-        }
-    ];
+    public partial ObservableCollection<NavigationViewItem> MenuItems { get; set; } = [];
 
     [ObservableProperty]
-    public partial ObservableCollection<NavigationViewItem> FooterMenuItems { get; set; } =
-    [
-        new NavigationViewItem()
-        {
-            Content = new Wpf.Ui.Controls.TextBlock() { FontSize = 12, Text = Strings.Resources.S_SETTINGS_TITLE, TextTrimming = TextTrimming.CharacterEllipsis },
-            Icon = new FontIcon { Glyph = "\uE713" },
-            TargetPageType = typeof(Views.Pages.SettingsPage),
-            ToolTip = Strings.Resources.S_SETTINGS_TITLE
-        }
-    ];
+    public partial ObservableCollection<object> FooterMenuItems { get; set; } = [];
 
     [ObservableProperty]
     public partial ObservableList<Controls.NotificationBell.Notification> Notifications { get; set; } = [];
@@ -98,14 +92,22 @@ public partial class MainWindowViewModel : ObservableObject
 
     public MainWindowViewModel()
     {
-        MenuItems.Add(_logItem);
+        MenuItems.Add(_explorerItem);
+
+        FooterMenuItems.Add(_devicesItem);
+        FooterMenuItems.Add(_terminalItem);
+        FooterMenuItems.Add(_operationsItem);
+        FooterMenuItems.Add(_logItem);
+        FooterMenuItems.Add(_moreItem);
+        FooterMenuItems.Add(_settingsSeparator);
+        FooterMenuItems.Add(CreateItem(Strings.Resources.S_SETTINGS_TITLE, new FontIcon { Glyph = "\uE713" }, typeof(Views.Pages.SettingsPage)));
+
+        UpdateFooterVisibility();
 
         Data.Settings.PropertyChanged += (s, e) =>
         {
             if (e.PropertyName == nameof(AppSettings.EnableLog))
-            {
-                _logItem.Visibility = Data.Settings.EnableLog ? Visibility.Visible : Visibility.Collapsed;
-            }
+                App.SafeInvoke(UpdateFooterVisibility);
         };
 
         AdbHelper.CurrentAdbState.PropertyChanged += (s, e) =>
@@ -113,10 +115,27 @@ public partial class MainWindowViewModel : ObservableObject
             if (e.PropertyName == nameof(AdbHelper.CurrentAdbState.Status))
             {
                 OnPropertyChanged(nameof(IsNavigationEnabled));
+                App.SafeInvoke(UpdateFooterVisibility);
             }
         };
 
         Task.Run(InitNotifications);
+    }
+
+    private static Visibility Show(bool visible) => visible ? Visibility.Visible : Visibility.Collapsed;
+
+    /// <summary>On the Explorer page the pages collapse into "More", to leave the tree the room - unless the pointer is over them.</summary>
+    private void UpdateFooterVisibility()
+    {
+        var enabled = IsNavigationEnabled;
+        var expanded = enabled && (!IsExplorerPage || IsFooterHovered);
+
+        PaneItemAnimation.SetShown(_devicesItem, expanded);
+        PaneItemAnimation.SetShown(_terminalItem, expanded);
+        PaneItemAnimation.SetShown(_operationsItem, expanded);
+        PaneItemAnimation.SetShown(_logItem, expanded && Data.Settings.EnableLog);
+        PaneItemAnimation.SetShown(_moreItem, enabled && !expanded);
+        _settingsSeparator.Visibility = Show(enabled);
     }
 
     public void UpdateFileOp()

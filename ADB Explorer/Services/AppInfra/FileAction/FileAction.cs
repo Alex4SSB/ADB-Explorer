@@ -3,6 +3,7 @@ using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
+using ADB_Explorer.ViewModels.Pages;
 using static ADB_Explorer.Services.FileAction;
 
 namespace ADB_Explorer.Services;
@@ -12,6 +13,15 @@ public static class AppActions
     private static FileActionsEnable Actions => Data.Active.Actions;
     private static FileActionsEnable Explorer => Data.FileActions;
 
+    private static ExplorerTabsViewModel? Tabs => App.Services.GetService<ExplorerTabsViewModel>();
+
+    public static string Tooltip(FileActionType type)
+    {
+        var action = List.Find(a => a.Name == type);
+
+        return $"{action.Description} ({action.GestureTooltip})";
+    }
+
     private static void RunOnExplorer(Action action)
     {
         using (Data.Use(Data.Files))
@@ -20,11 +30,10 @@ public static class AppActions
 
     private static readonly Dictionary<FileActionType, KeyGesture> Gestures = new()
     {
-        { FileActionType.Home, new(Key.H, ModifierKeys.Alt) },
         { FileActionType.Filter, new(Key.F, ModifierKeys.Control) },
         { FileActionType.Cut, new(Key.X, ModifierKeys.Control) },
         { FileActionType.Copy, new(Key.C, ModifierKeys.Control) },
-        { FileActionType.Restore, new(Key.R, ModifierKeys.Control) },
+        { FileActionType.Refresh, new(Key.R, ModifierKeys.Control) },
         { FileActionType.Delete, new(Key.Delete) },
         { FileActionType.Uninstall, new(Key.F11, ModifierKeys.Shift) },
         { FileActionType.PushPackages, new(Key.I, ModifierKeys.Alt) },
@@ -44,7 +53,6 @@ public static class AppActions
         { FileActionType.FileOpRemove, "\uE711" },
         { FileActionType.PauseLogs, "\uE769" },
         { FileActionType.FollowLink, "\uE838" },
-        { FileActionType.Home, "\uE80F" },
         { FileActionType.Refresh, "\uE72C" },
         { FileActionType.FileOpStop, "\uE768" },
         { FileActionType.ContextRemoveSavedLocation, "\uE8D9" },
@@ -81,17 +89,6 @@ public static class AppActions
 
     public static List<FileAction> List { get; } =
     [
-        new(FileActionType.Home,
-            () => Data.FileActions.HomeEnabled && !Data.FileActions.ListingInProgress,
-            () => Data.RuntimeSettings.LocationToNavigate = new(Navigation.SpecialLocation.DriveView),
-            Strings.Resources.S_BUTTON_DRIVES,
-            Gestures[FileActionType.Home]),
-        new(FileActionType.KeyboardHome,
-            () => Data.FileActions.HomeEnabled && !Data.FileActions.ListingInProgress && !Data.FileActions.IsExplorerEditing,
-            () => Data.RuntimeSettings.LocationToNavigate = new(Navigation.SpecialLocation.DriveView),
-            Strings.Resources.S_BUTTON_DRIVES,
-            Gestures[FileActionType.Home],
-            true),
         new(FileActionType.Back,
             () => NavHistory.BackAvailable && !Data.FileActions.ListingInProgress,
             () => Data.RuntimeSettings.LocationToNavigate = new(Navigation.SpecialLocation.Back),
@@ -105,7 +102,7 @@ public static class AppActions
             new(Key.Right, ModifierKeys.Alt),
             true),
         new(FileActionType.Up,
-            () => Data.FileActions.ParentEnabled && !Data.FileActions.ListingInProgress,
+            () => Data.FileActions.ParentEnabled && !Data.FileActions.ListingInProgress && !Data.ActiveExplorerInstance.IsShowingPage,
             () => Data.RuntimeSettings.LocationToNavigate = new(Navigation.SpecialLocation.Up),
             Strings.Resources.S_BUTTON_UP,
             new(Key.Up, ModifierKeys.Alt),
@@ -172,12 +169,16 @@ public static class AppActions
             Strings.Resources.S_MENU_REFRESH,
             new(Key.F5)),
         new(FileActionType.NavRefresh,
-            () => (Data.FileActions.IsSearchMode && Data.FileActions.ListingInProgress)
-                  || (Data.FileActions.IsRefreshEnabled && !Data.FileActions.ListingInProgress),
+            () => !Data.ActiveExplorerInstance.IsShowingPage
+                  && ((Data.FileActions.IsSearchMode && Data.FileActions.ListingInProgress)
+                      || (Data.FileActions.IsRefreshEnabled && !Data.FileActions.ListingInProgress)),
             FileActionLogic.NavRefresh,
             Data.FileActions.NavRefreshDescription,
             new(Key.F5),
-            true),
+            true)
+        {
+            ExtraGestures = [Gestures[FileActionType.Refresh]],
+        },
         new(FileActionType.CopyCurrentPath,
             () => Data.FileActions.IsCopyCurrentPathEnabled,
             () => Clipboard.SetText(Data.CurrentPath),
@@ -350,24 +351,15 @@ public static class AppActions
             Strings.Resources.S_MENU_RENAME,
             new(Key.F2),
             clearClipboard: true),
-        new(FileActionType.KeyboardRestore,
-            () => Explorer.RestoreEnabled && !Data.FileActions.IsExplorerEditing,
-            () => RunOnExplorer(FileActionLogic.RestoreItems),
-            Data.FileActions.RestoreDescription,
-            Gestures[FileActionType.Restore],
-            true,
-            clearClipboard: true),
         new(FileActionType.Restore,
             () => Explorer.RestoreEnabled,
             () => RunOnExplorer(FileActionLogic.RestoreItems),
             Data.FileActions.RestoreDescription,
-            Gestures[FileActionType.Restore],
             clearClipboard: true),
         new(FileActionType.ContextRestore,
             () => Actions.RestoreEnabled,
             FileActionLogic.RestoreItems,
             Data.FileActions.RestoreDescription,
-            Gestures[FileActionType.Restore],
             clearClipboard: true),
         new(FileActionType.KeyboardDelete,
             () => Explorer.DeleteEnabled && !Data.FileActions.IsExplorerEditing,
@@ -514,6 +506,22 @@ public static class AppActions
             FileActionLogic.EnterFolder,
             Strings.Resources.S_OPEN_FOLDER,
             new(Key.Enter)),
+        new(FileActionType.ContextOpenInNewTab,
+            () => Actions.IsOpenInNewTabEnabled,
+            FileActionLogic.OpenInNewTab,
+            Strings.Resources.S_OPEN_IN_NEW_TAB),
+        new(FileActionType.NewTab,
+            () => Tabs is not null && AdbHelper.CurrentAdbState.Status is AdbHelper.AdbStatus.Valid,
+            () => Tabs?.AddTab(),
+            Strings.Resources.S_NEW_TAB,
+            new(Key.T, ModifierKeys.Control),
+            true),
+        new(FileActionType.CloseTab,
+            () => Tabs is { ActiveTab: not null, Tabs.Count: > 1 },
+            () => Tabs?.CloseTab(Tabs.ActiveTab!),
+            Strings.Resources.S_CLOSE_TAB,
+            new(Key.W, ModifierKeys.Control),
+            true),
         new(FileActionType.ContextRemoveSavedLocation,
             () => Actions.RemoveSavedLocationEnabled,
             FileActionLogic.RemoveSavedLocation,
@@ -522,7 +530,7 @@ public static class AppActions
 
     public static List<KeyBinding> Bindings =>
         [.. List.Where(a => a.UseForGesture)
-            .Select(action => action.KeyBinding)
+            .SelectMany(action => action.ExtraKeyBindings.Prepend(action.KeyBinding))
             .OfType<KeyBinding>()];
 
 }
@@ -532,8 +540,6 @@ public class FileAction : ViewModelBase
     public enum FileActionType
     {
         None,
-        Home,
-        KeyboardHome,
         Back,
         Forward,
         Up,
@@ -581,7 +587,6 @@ public class FileAction : ViewModelBase
         ContextCopyAsImage,
         Rename,
         ContextRename,
-        KeyboardRestore,
         Restore,
         ContextRestore,
         KeyboardDelete,
@@ -617,6 +622,9 @@ public class FileAction : ViewModelBase
         ContextOpenPackageLocation,
         Enter,
         ContextRemoveSavedLocation,
+        ContextOpenInNewTab,
+        NewTab,
+        CloseTab,
     }
 
     public FileActionType Name { get; }
@@ -631,36 +639,39 @@ public class FileAction : ViewModelBase
 
     public bool UseForGesture { get; }
 
-    public string GestureString
+    /// <summary>Additional shortcuts for the same command; listed in the tooltip.</summary>
+    public KeyGesture[] ExtraGestures { get; init; } = [];
+
+    public IEnumerable<KeyBinding> ExtraKeyBindings => ExtraGestures.Select(gesture => new KeyBinding(Command.Command, gesture));
+
+    public string GestureString => Gesture is null ? null : FormatGesture(Gesture);
+
+    public string GestureTooltip => string.Join(", ", ExtraGestures.Prepend(Gesture).OfType<KeyGesture>().Select(FormatGesture));
+
+    private static string FormatGesture(KeyGesture gesture)
     {
-        get
+        string result = "";
+        if (gesture.Modifiers is not ModifierKeys.None)
         {
-            if (Gesture is null)
-                return null;
+            result = gesture.Modifiers.ToString();
 
-            string result = "";
-            if (Gesture.Modifiers is not ModifierKeys.None)
-            {
-                result = Gesture.Modifiers.ToString();
+            result = result.Replace("Control", "Ctrl");
+            result = result.Replace(",", "+");
+            result = result.Replace(" ", "");
 
-                result = result.Replace("Control", "Ctrl");
-                result = result.Replace(",", "+");
-                result = result.Replace(" ", "");
-
-                result += "+";
-            }
-
-            string key = Gesture.Key.ToString();
-            if (key.Length > 1 && key[0] == 'D' && char.IsDigit(key[1]))
-                key = key[1..];
-
-            result += key;
-
-            result = result.Replace("Delete", "Del");
-            result = result.Replace("Return", "Enter");
-
-            return result;
+            result += "+";
         }
+
+        string key = gesture.Key.ToString();
+        if (key.Length > 1 && key[0] == 'D' && char.IsDigit(key[1]))
+            key = key[1..];
+
+        result += key;
+
+        result = result.Replace("Delete", "Del");
+        result = result.Replace("Return", "Enter");
+
+        return result;
     }
 
     public string? Info { get; }

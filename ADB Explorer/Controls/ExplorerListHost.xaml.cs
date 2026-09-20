@@ -1,4 +1,4 @@
-using ADB_Explorer.Controls.Pages;
+﻿using ADB_Explorer.Controls.Pages;
 using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
@@ -42,6 +42,7 @@ public partial class ExplorerListHost : UserControl
     {
         InitializeComponent();
 
+        PreviewMouseUp += ExplorerListHost_PreviewMouseUp;
         SelectionTimer.Tick += SelectionTimer_Tick;
         _apkPriorityTimer.Tick += (_, _) =>
         {
@@ -64,9 +65,48 @@ public partial class ExplorerListHost : UserControl
     /// Links this control back to its owning <see cref="ExplorerPageHeader"/>. Must be called
     /// once, immediately after construction, before any user interaction can reach this control.
     /// </summary>
+    /// <summary>Middle-click on a folder, archive or drive opens it in a new tab.</summary>
+    private void ExplorerListHost_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton is not MouseButton.Middle || e.OriginalSource is not DependencyObject source)
+            return;
+
+        if (Owner.Instance.EffectiveDevice is not { } device || FileActions.ListingInProgress)
+            return;
+
+        var item = FindItemUnder(source);
+        var path = FileActionLogic.GetNewTabPath(item, device, FileActions.IsAppDrive, FileActions.IsArchive);
+
+        if (string.IsNullOrEmpty(path))
+            return;
+
+        e.Handled = true;
+        DeviceHelper.OpenDeviceInNewTab(device, new AdbLocation(path));
+    }
+
+    private object? FindItemUnder(DependencyObject source)
+    {
+        for (var current = source; current is not null && !ReferenceEquals(current, this); current = current is Visual ? VisualTreeHelper.GetParent(current) : LogicalTreeHelper.GetParent(current))
+        {
+            if (current is DataGridRow row)
+                return row.Item;
+
+            if (current is ListBoxItem listItem)
+                return listItem.DataContext;
+        }
+
+        return null;
+    }
+
     internal void Initialize(ExplorerPageHeader owner)
     {
         Owner = owner;
+
+        // Declared locally (not reused from ExplorerPageHeader's own) - StaticResource lookup
+        // can't reach a parent UserControl's Resources from a different XAML file, since a child
+        // resolves its own resources during its own InitializeComponent, before it's attached
+        // as that parent's logical child.
+        ((BindingProxy)Resources["InstanceProxy"]).Data = owner.Instance;
     }
 
     /// <summary>
@@ -96,13 +136,13 @@ public partial class ExplorerListHost : UserControl
     /// Returns the currently active items view (<see cref="IconView"/>, <see cref="ExplorerGrid"/>,
     /// or <see cref="ContentGrid"/>).
     /// </summary>
-    internal Selector ActiveView => ViewModel.IsIconView
+    internal Selector ActiveView => Owner.Instance.IsIconView
         ? IconView
-        : ViewModel.IsContentView ? ContentGrid : ExplorerGrid;
+        : Owner.Instance.IsContentView ? ContentGrid : ExplorerGrid;
 
     /// <summary>
     /// <see cref="ActiveView"/> cast to <see cref="DataGrid"/>. Only valid when
-    /// <see cref="ExplorerViewModel.IsIconView"/> is <see langword="false"/> (i.e. the active view
+    /// <see cref="ExplorerInstance.IsIconView"/> is <see langword="false"/> (i.e. the active view
     /// is <see cref="ExplorerGrid"/> or <see cref="ContentGrid"/>, both of which are DataGrids).
     /// </summary>
     private DataGrid ActiveDataGrid => (DataGrid)ActiveView;
@@ -110,17 +150,17 @@ public partial class ExplorerListHost : UserControl
     /// <summary>
     /// Returns the selected items from the currently active view.
     /// </summary>
-    internal System.Collections.IList ActiveSelectedItems => ViewModel.IsIconView
+    internal System.Collections.IList ActiveSelectedItems => Owner.Instance.IsIconView
         ? IconView.SelectedItems
-        : ViewModel.IsContentView ? ContentGrid.SelectedItems : ExplorerGrid.SelectedItems;
+        : Owner.Instance.IsContentView ? ContentGrid.SelectedItems : ExplorerGrid.SelectedItems;
 
     internal void ActiveUnselectAll()
     {
         try
         {
-            if (ViewModel.IsIconView)
+            if (Owner.Instance.IsIconView)
                 IconView.UnselectAll();
-            else if (ViewModel.IsContentView)
+            else if (Owner.Instance.IsContentView)
                 ContentGrid.UnselectAll();
             else
                 ExplorerGrid.UnselectAll();
@@ -131,9 +171,9 @@ public partial class ExplorerListHost : UserControl
 
     private void ActiveSelectAll()
     {
-        if (ViewModel.IsIconView)
+        if (Owner.Instance.IsIconView)
             IconView.SelectAll();
-        else if (ViewModel.IsContentView)
+        else if (Owner.Instance.IsContentView)
             ContentGrid.SelectAll();
         else
             ExplorerGrid.SelectAll();
@@ -152,7 +192,7 @@ public partial class ExplorerListHost : UserControl
         if (item is null)
             return;
 
-        if (ViewModel.IsIconView)
+        if (Owner.Instance.IsIconView)
             IconView.ScrollIntoView(item);
         else
         {
@@ -189,9 +229,9 @@ public partial class ExplorerListHost : UserControl
         }
     } = null;
 
-    internal ScrollViewer ActiveScrollViewer => ViewModel.IsIconView
+    internal ScrollViewer ActiveScrollViewer => Owner.Instance.IsIconView
         ? IconScrollViewer
-        : ViewModel.IsContentView ? ContentScrollViewer : ExplorerScrollViewer;
+        : Owner.Instance.IsContentView ? ContentScrollViewer : ExplorerScrollViewer;
 
     internal void ResetExplorerHorizontalScroll()
     {
@@ -217,7 +257,7 @@ public partial class ExplorerListHost : UserControl
         DataGridColumn? iconColumn = IconColumn;
         DataGridColumn? nameColumn = NameColumn;
         DataGridColumn? packageColumn = PackageName;
-        if (ViewModel.IsContentView)
+        if (Owner.Instance.IsContentView)
         {
             iconColumn = ContentNameColumn;
             nameColumn = ContentNameColumn;
@@ -228,7 +268,7 @@ public partial class ExplorerListHost : UserControl
             originalSource,
             positionInSelectionRect,
             SelectionRect,
-            ViewModel.IsIconView,
+            Owner.Instance.IsIconView,
             iconColumn,
             nameColumn,
             packageColumn);
@@ -267,7 +307,7 @@ public partial class ExplorerListHost : UserControl
 
         if (SelectionRect.IsActive)
         {
-            SelectionRect.Update(point, MouseDownPoint, scroller, ActiveView, ActiveSelectedItems, ViewModel);
+            SelectionRect.Update(point, MouseDownPoint, scroller, ActiveView, ActiveSelectedItems, Owner.Instance);
             return;
         }
 
@@ -283,21 +323,21 @@ public partial class ExplorerListHost : UserControl
         }
 
         CopyPaste.DragStatus = CopyPasteService.DragState.None;
-        SelectionRect.Update(point, MouseDownPoint, scroller, ActiveView, ActiveSelectedItems, ViewModel);
+        SelectionRect.Update(point, MouseDownPoint, scroller, ActiveView, ActiveSelectedItems, Owner.Instance);
     }
 
     /// <summary>
     /// Skip rubber-band / file drag from this click (open menu, or the click that just closed one).
     /// </summary>
     private bool SuppressExplorerMarquee =>
-        ViewModel.IsMenuOpen || Owner.ToolbarSubmenuDepth > 0 || Owner.SuppressSelectionAfterMenu;
+        Owner.Instance.IsMenuOpen || Owner.ToolbarSubmenuDepth > 0 || Owner.SuppressSelectionAfterMenu;
 
     /// <summary>
     /// Skip clearing selection only while the explorer context menu is open.
     /// Toolbar submenu dismiss is handled by <see cref="SuppressExplorerMarquee"/> so
     /// empty-space unselect still runs on that click.
     /// </summary>
-    private bool SuppressExplorerUnselect => ViewModel.IsMenuOpen;
+    private bool SuppressExplorerUnselect => Owner.Instance.IsMenuOpen;
 
     internal void CancelExplorerMarquee()
     {
@@ -325,7 +365,7 @@ public partial class ExplorerListHost : UserControl
             if (ActiveView.SelectedItem is not FileClass file)
                 return false;
 
-            var vm = ViewModel.IsIconView ? (FileViewModelBase)file.IconViewModel : file.FolderViewModel;
+            var vm = Owner.Instance.IsIconView ? (FileViewModelBase)file.IconViewModel : file.FolderViewModel;
             return vm.IsInEditMode;
         }
         set
@@ -336,7 +376,7 @@ public partial class ExplorerListHost : UserControl
             if (ActiveView.SelectedItem is not FileClass file)
                 return;
 
-            var vm = ViewModel.IsIconView ? (FileViewModelBase)file.IconViewModel : file.FolderViewModel;
+            var vm = Owner.Instance.IsIconView ? (FileViewModelBase)file.IconViewModel : file.FolderViewModel;
             vm.IsInEditMode = value;
             FileActions.IsExplorerEditing = value;
         }
@@ -414,17 +454,17 @@ public partial class ExplorerListHost : UserControl
                 ActiveUnselectAll();
                 break;
 
-            case Key.Left or Key.Right when !ViewModel.IsIconView:
+            case Key.Left or Key.Right when !Owner.Instance.IsIconView:
                 return false;
 
             case Key.Down or Key.Up or Key.Left or Key.Right or Key.Home or Key.End:
                 if (Owner.BfNavigation)
                 {
-                    ViewModel.CurrentSelectedIndex = ActiveView.SelectedIndex;
+                    Owner.Instance.CurrentSelectedIndex = ActiveView.SelectedIndex;
                     Owner.BfNavigation = false;
                 }
 
-                if (ViewModel.IsIconView)
+                if (Owner.Instance.IsIconView)
                 {
                     var navKey = key;
                     if (RuntimeSettings.IsRTL && navKey is Key.Left or Key.Right)
@@ -433,16 +473,16 @@ public partial class ExplorerListHost : UserControl
                     var step = navKey is Key.Left or Key.Right ? 1 : IconView.ItemsPerRow;
 
                     if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
-                        IconView.MultiSelect(navKey, step, ViewModel);
+                        IconView.MultiSelect(navKey, step, Owner.Instance);
                     else
-                        IconView.SingleSelect(navKey, step, ViewModel);
+                        IconView.SingleSelect(navKey, step, Owner.Instance);
                 }
                 else
                 {
                     if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
-                        ActiveDataGrid.MultiSelect(key, ViewModel);
+                        ActiveDataGrid.MultiSelect(key, Owner.Instance);
                     else
-                        ActiveDataGrid.SingleSelect(key, ViewModel);
+                        ActiveDataGrid.SingleSelect(key, Owner.Instance);
                 }
                 break;
 
@@ -496,7 +536,7 @@ public partial class ExplorerListHost : UserControl
                 : files.SelectedFiles.ToList();
         }
 
-        if (DevicesObject.Current is { SupportsLsV2: false })
+        if (ActiveDevice is { SupportsLsV2: false })
         {
             foreach (var file in files.SelectedFiles.Where(f => f.IsRegularFile && f.ShellLsSize is null))
             {
@@ -534,7 +574,7 @@ public partial class ExplorerListHost : UserControl
     private List<Package> CollectVisiblePackages()
     {
         List<Package> visible = [];
-        if (ViewModel.IsIconView)
+        if (Owner.Instance.IsIconView)
         {
             var range = IconView.VisibleRange;
             var count = IconView.Items.Count;
@@ -666,10 +706,10 @@ public partial class ExplorerListHost : UserControl
             SelectOnlyItem(row.Item);
         }
 
-        ViewModel.NextSelectedIndex = current;
-        ViewModel.CurrentSelectedIndex = current;
+        Owner.Instance.NextSelectedIndex = current;
+        Owner.Instance.CurrentSelectedIndex = current;
         if (ExplorerGrid.SelectedItems.Count < 1)
-            ViewModel.FirstSelectedIndex = current;
+            Owner.Instance.FirstSelectedIndex = current;
     }
 
     /// <summary>
@@ -696,7 +736,7 @@ public partial class ExplorerListHost : UserControl
     {
         if (FileActions.IsAppDrive)
         {
-            // Prefer the full package list — ActiveView.Items may omit filtered/system packages
+            // Prefer the full package list - ActiveView.Items may omit filtered/system packages
             // while their IsSelected flags still linger from virtualization.
             var packages = Data.Packages ?? ExplorerGrid.Items.OfType<Package>();
             foreach (var pkg in packages)
@@ -746,7 +786,7 @@ public partial class ExplorerListHost : UserControl
             return;
 
         if (!FileActions.IsAppDrive
-            && DevicesObject.Current is { } device
+            && ActiveDevice is { } device
             && ArchiveHelper.CanNavigateIntoArchive(file.FullPath, file.FullName, device.ID, FileActions.IsArchive))
         {
             if (!FileActions.ListingInProgress)
@@ -823,15 +863,15 @@ public partial class ExplorerListHost : UserControl
             return false;
 
         var current = row.GetIndex();
-        ViewModel.CurrentSelectedIndex = current;
+        Owner.Instance.CurrentSelectedIndex = current;
 
         if (MultiRowSelect(row))
             return true;
 
-        if (ViewModel.FirstSelectedIndex < 0
+        if (Owner.Instance.FirstSelectedIndex < 0
             || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
         {
-            ViewModel.FirstSelectedIndex = current;
+            Owner.Instance.FirstSelectedIndex = current;
         }
 
         if (!row.IsSelected || grid.SelectedItems?.Count != 1)
@@ -872,7 +912,7 @@ public partial class ExplorerListHost : UserControl
         if (grid == ContentGrid && !IsContentViewNameTextHit(originalSource))
             return;
 
-        if (!DevicesObject.Current.HasRootShell
+        if (!ActiveDevice.HasRootShell
             && ((FileClass)cell.DataContext).Type is not (FileType.File or FileType.Folder))
             return;
 
@@ -921,7 +961,7 @@ public partial class ExplorerListHost : UserControl
         {
             grid.UnselectAll();
 
-            var firstSelected = ViewModel.FirstSelectedIndex;
+            var firstSelected = Owner.Instance.FirstSelectedIndex;
             // FirstSelectedIndex defaults to -1 until a plain click sets it. If Shift+click
             // is the very first selection in a session, treat the clicked row as the start
             // of the range instead of indexing into Items[-1] below.
@@ -973,7 +1013,7 @@ public partial class ExplorerListHost : UserControl
 
         TrackExplorerMouseDown(e, e.OriginalSource as DependencyObject, row is not null && row.IsSelected);
 
-        ViewModel.SetIndexSingle(row.GetIndex());
+        Owner.Instance.SetIndexSingle(row.GetIndex());
     }
 
     private void ItemContainer_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -1013,11 +1053,11 @@ public partial class ExplorerListHost : UserControl
                 break;
 
             case Key.Up or Key.Down when Keyboard.Modifiers.HasFlag(ModifierKeys.Shift):
-                grid.MultiSelect(key, ViewModel);
+                grid.MultiSelect(key, Owner.Instance);
                 break;
 
             case Key.Up or Key.Down:
-                grid.SingleSelect(key, ViewModel);
+                grid.SingleSelect(key, Owner.Instance);
                 break;
 
             case Key.F2:
@@ -1116,19 +1156,19 @@ public partial class ExplorerListHost : UserControl
 
     private void ExplorerGrid_ContextMenuClosing(object sender, ContextMenuEventArgs e)
     {
-        ViewModel.IsMenuOpen = false;
+        Owner.Instance.IsMenuOpen = false;
     }
 
     private void ExplorerGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
         // ContentGrid has no headers, so the "clicked the header row" check only applies to the
         // classic (Details) grid; Content view is otherwise treated like Icon view here.
-        if (!ViewModel.IsIconView && !ViewModel.IsContentView)
+        if (!Owner.Instance.IsIconView && !Owner.Instance.IsContentView)
         {
             var point = Mouse.GetPosition(ExplorerGrid);
             if (point.Y < ColumnHeaderHeight || CopyPaste.WasDragging)
             {
-                ViewModel.IsMenuOpen = false;
+                Owner.Instance.IsMenuOpen = false;
                 e.Handled = true;
                 ClearWasDraggingAfterContext();
                 return;
@@ -1136,13 +1176,13 @@ public partial class ExplorerListHost : UserControl
         }
         else if (CopyPaste.WasDragging)
         {
-            ViewModel.IsMenuOpen = false;
+            Owner.Instance.IsMenuOpen = false;
             e.Handled = true;
             ClearWasDraggingAfterContext();
             return;
         }
 
-        ViewModel.IsMenuOpen = true;
+        Owner.Instance.IsMenuOpen = true;
         FileActionLogic.UpdateFileActions();
         ExplorerContextMenu.UpdateSeparators();
 
@@ -1216,19 +1256,19 @@ public partial class ExplorerListHost : UserControl
             }
         }
 
-        ViewModel.CurrentSelectedIndex = selectionIndex;
+        Owner.Instance.CurrentSelectedIndex = selectionIndex;
 
-        if (ViewModel.FirstSelectedIndex < 0
+        if (Owner.Instance.FirstSelectedIndex < 0
             || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
         {
-            ViewModel.FirstSelectedIndex = selectionIndex;
+            Owner.Instance.FirstSelectedIndex = selectionIndex;
         }
     }
 
     /// <summary>
     /// Content view's analog of <see cref="ExplorerGrid_MouseDown"/>. Its single template column
     /// fills the full row width, so there is no "right of the columns" empty space to special-case
-    /// like the classic grid's <c>rightOfRows</c> check — a click is either on a row or on empty
+    /// like the classic grid's <c>rightOfRows</c> check - a click is either on a row or on empty
     /// space below the last row.
     /// </summary>
     private void ContentGrid_MouseDown(object sender, MouseButtonEventArgs e)
@@ -1273,12 +1313,12 @@ public partial class ExplorerListHost : UserControl
             }
         }
 
-        ViewModel.CurrentSelectedIndex = selectionIndex;
+        Owner.Instance.CurrentSelectedIndex = selectionIndex;
 
-        if (ViewModel.FirstSelectedIndex < 0
+        if (Owner.Instance.FirstSelectedIndex < 0
             || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
         {
-            ViewModel.FirstSelectedIndex = selectionIndex;
+            Owner.Instance.FirstSelectedIndex = selectionIndex;
         }
     }
 
@@ -1380,20 +1420,20 @@ public partial class ExplorerListHost : UserControl
             return;
         }
 
-        if (!ViewModel.SelectionInProgress)
+        if (!Owner.Instance.SelectionInProgress)
         {
             if (ActiveSelectedItems.Count == 1)
             {
-                ViewModel.CurrentSelectedIndex = ActiveView.SelectedIndex;
-                if (ViewModel.FirstSelectedIndex < 0
+                Owner.Instance.CurrentSelectedIndex = ActiveView.SelectedIndex;
+                if (Owner.Instance.FirstSelectedIndex < 0
                     || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
                 {
-                    ViewModel.FirstSelectedIndex = ActiveView.SelectedIndex;
+                    Owner.Instance.FirstSelectedIndex = ActiveView.SelectedIndex;
                 }
             }
             else if (ActiveSelectedItems.Count > 1 && e.AddedItems.Count == 1)
             {
-                ViewModel.CurrentSelectedIndex = ActiveView.Items.IndexOf(e.AddedItems[0]);
+                Owner.Instance.CurrentSelectedIndex = ActiveView.Items.IndexOf(e.AddedItems[0]);
             }
         }
 
@@ -1427,7 +1467,7 @@ public partial class ExplorerListHost : UserControl
 
     /// <summary>
     /// Keeps selection consistent across all three overlapping list views (<see cref="IconView"/>,
-    /// <see cref="ExplorerGrid"/>, <see cref="ContentGrid"/>) — only one is visible at a time, but
+    /// <see cref="ExplorerGrid"/>, <see cref="ContentGrid"/>) - only one is visible at a time, but
     /// the other two are kept in sync so switching the active view (or view mode) does not lose or
     /// stale the selection. Also fixes <c>IsSelected</c> on the underlying data items (packages or
     /// files) for virtualized containers that had no container when <c>UnselectAll()</c> was
@@ -1520,7 +1560,7 @@ public partial class ExplorerListHost : UserControl
             };
         }
 
-        var currentDirection = sortedColumn == ViewModel.SortedColumn ? ViewModel.SortDirection : null;
+        var currentDirection = sortedColumn == Owner.Instance.SortedColumn ? Owner.Instance.SortDirection : null;
         var direction = ListHelper.Invert(currentDirection);
         ViewModel.SetSort(sortedColumn, direction);
 
@@ -1556,7 +1596,7 @@ public partial class ExplorerListHost : UserControl
             return;
         }
 
-        var vm = ViewModel.IsIconView ? (FileViewModelBase)file.IconViewModel : file.FolderViewModel;
+        var vm = Owner.Instance.IsIconView ? (FileViewModelBase)file.IconViewModel : file.FolderViewModel;
         if (!vm.IsInEditMode)
         {
             ClearRename();
@@ -1566,7 +1606,7 @@ public partial class ExplorerListHost : UserControl
         if (ActiveSelectedItems.Count == 1 && ReferenceEquals(ActiveSelectedItems[0], file))
             return;
 
-        FileViewModelBase.RenameCommit(_renameTextBox, ViewModel.IsIconView ? ExitIconEditMode : ExitFolderEditMode);
+        FileViewModelBase.RenameCommit(_renameTextBox, Owner.Instance.IsIconView ? ExitIconEditMode : ExitFolderEditMode);
     }
 
     private void ExitFolderEditMode(FileClass file)
@@ -1641,16 +1681,16 @@ public partial class ExplorerListHost : UserControl
 
         SelectionRect.Collapse();
 
-        if (ViewModel.FirstSelectedIndex < 0
+        if (Owner.Instance.FirstSelectedIndex < 0
             || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
         {
-            ViewModel.FirstSelectedIndex = ViewModel.NextSelectedIndex;
+            Owner.Instance.FirstSelectedIndex = Owner.Instance.NextSelectedIndex;
         }
     }
 
     private void SelectionRect_MouseMove(object sender, MouseEventArgs e)
     {
-        if (ViewModel.IsIconView)
+        if (Owner.Instance.IsIconView)
             IconView_MouseMove(sender, e);
         else
             ExplorerGrid_MouseMove(sender, e);
@@ -1717,7 +1757,7 @@ public partial class ExplorerListHost : UserControl
         }
         else
         {
-            // Ignore clicks on scrollbars — do not keep MouseDownPoint or marquee starts
+            // Ignore clicks on scrollbars - do not keep MouseDownPoint or marquee starts
             // when the captured thumb's MouseMove bubbles over the viewport.
             if (HitTestHelper.IsInScrollBar(source))
             {
@@ -1737,12 +1777,12 @@ public partial class ExplorerListHost : UserControl
             }
         }
 
-        ViewModel.CurrentSelectedIndex = selectionIndex;
+        Owner.Instance.CurrentSelectedIndex = selectionIndex;
 
-        if (ViewModel.FirstSelectedIndex < 0
+        if (Owner.Instance.FirstSelectedIndex < 0
             || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
         {
-            ViewModel.FirstSelectedIndex = selectionIndex;
+            Owner.Instance.FirstSelectedIndex = selectionIndex;
         }
     }
 
@@ -1782,7 +1822,7 @@ public partial class ExplorerListHost : UserControl
     {
         var size = RuntimeSettings.ThumbsSize;
         if (size != ThumbnailService.ThumbnailSize.Disabled)
-            ExplorerPageHeader.InvalidateFileIcons();
+            Owner.InvalidateFileIcons();
 
         if (ActiveSelectedItems.Count > 0)
             ScheduleKeepFirstSelectedInView();
@@ -1794,7 +1834,7 @@ public partial class ExplorerListHost : UserControl
 
     private void IconView_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        if (!e.WidthChanged || !ViewModel.IsIconView || ActiveSelectedItems.Count == 0)
+        if (!e.WidthChanged || !Owner.Instance.IsIconView || ActiveSelectedItems.Count == 0)
             return;
 
         ScheduleKeepFirstSelectedInView();

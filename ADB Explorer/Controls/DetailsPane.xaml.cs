@@ -417,7 +417,7 @@ public partial class DetailsPane : UserControl
             {
                 control.NoPreviewTextBlock.Visibility = Visibility.Collapsed;
 
-                var device = Data.DevicesObject.Current;
+                var device = Data.ActiveDevice;
                 var deviceId = device?.ID ?? "";
                 control.SubscribePreviewMounts(device);
                 control.IsEditorReadOnly = IsPreviewTextReadOnly(file, device);
@@ -462,6 +462,16 @@ public partial class DetailsPane : UserControl
 
                         App.SafeInvoke(() =>
                         {
+                            // A NUL byte means binary content (e.g. raw PCM in a .wav). AvalonEdit
+                            // chokes on one huge single-line "document" regardless of word-wrap or
+                            // hex/text mode, so binary content just isn't previewed at all.
+                            if (Array.IndexOf(bytes, (byte)0) >= 0)
+                            {
+                                control.NoPreviewTextBlock.Text = Strings.Resources.S_PREVIEW_INVALID;
+                                control.NoPreviewTextBlock.Visibility = Visibility.Visible;
+                                return;
+                            }
+
                             control._previewBytes = bytes;
                             control.ApplyPreviewContent();
                         });
@@ -542,7 +552,7 @@ public partial class DetailsPane : UserControl
                         && virtualDrive.Type is AbstractDrive.DriveType.Trash)
                         trashDrive = virtualDrive;
                     else if (drive.Type is AbstractDrive.DriveType.Trash)
-                        trashDrive = TrashHelper.GetTrashDrive(Data.DevicesObject.Current);
+                        trashDrive = TrashHelper.GetTrashDrive(Data.ActiveExplorerInstance.EffectiveDevice);
 
                     control.SubscribeTrashCountDrive(drive.Type is AbstractDrive.DriveType.Trash ? trashDrive : null);
                     control.LargeFileIcon.Source = FileToIconConverter.GetDriveIcon(drive.Type, 120, trashDrive?.ItemsCount is null or <= 0);
@@ -594,7 +604,7 @@ public partial class DetailsPane : UserControl
                 else if (Data.FileActions.IsRecycleBin)
                 {
                     control.FileNameTextBlock.Text = Strings.Resources.S_DRIVE_TRASH;
-                    var trashDrive = TrashHelper.GetTrashDrive(Data.DevicesObject.Current);
+                    var trashDrive = TrashHelper.GetTrashDrive(Data.ActiveExplorerInstance.EffectiveDevice);
                     control.SubscribeTrashCountDrive(trashDrive);
                     control.LargeFileIcon.Source = TrashIcon(trashDrive);
                 }
@@ -605,7 +615,7 @@ public partial class DetailsPane : UserControl
                 }
                 else if (Data.FileActions.IsDriveViewVisible)
                 {
-                    control.FileNameTextBlock.Text = Data.DevicesObject.Current?.Name ?? "";
+                    control.FileNameTextBlock.Text = Data.ActiveExplorerInstance.EffectiveDevice?.Name ?? "";
                     control.LargeFileIcon.Source = FileToIconConverter.GetPhoneIcon(120);
                     control.FileNameTextBlock.FlowDirection = FlowDirection.LeftToRight;
                 }
@@ -823,14 +833,14 @@ public partial class DetailsPane : UserControl
             if (SelectedSyntax?.IsHex is true)
             {
                 var bytes = HexText.Parse(EditorText);
-                result = await AdbHelper.WriteBytesFileAsync(Data.DevicesObject.Current, file, bytes, token);
+                result = await AdbHelper.WriteBytesFileAsync(Data.ActiveDevice, file, bytes, token);
                 byteCount = bytes.Length;
                 if (result)
                     _previewBytes = bytes;
             }
             else
             {
-                result = await AdbHelper.WriteTextFileAsync(Data.DevicesObject.Current, file, EditorText ?? "", token);
+                result = await AdbHelper.WriteTextFileAsync(Data.ActiveDevice, file, EditorText ?? "", token);
                 byteCount = Encoding.UTF8.GetByteCount(EditorText ?? "");
                 if (result)
                     _previewBytes = Encoding.UTF8.GetBytes(EditorText ?? "");
@@ -1106,7 +1116,7 @@ public partial class DetailsPane : UserControl
         if (file.Type is not AbstractFile.FileType.File)
             return;
 
-        IsEditorReadOnly = IsPreviewTextReadOnly(file, Data.DevicesObject.Current);
+        IsEditorReadOnly = IsPreviewTextReadOnly(file, Data.ActiveDevice);
     }
 
     private void UnsubscribeMountOptionsDrive()
@@ -1170,7 +1180,7 @@ public partial class DetailsPane : UserControl
 
             if (drive.FSInfo is null)
             {
-                var device = Data.DevicesObject.Current;
+                var device = Data.ActiveDevice;
                 var cts = new CancellationTokenSource();
                 _cancellationToken = cts;
                 _ = Task.Run(() => AdbHelper.ApplyMountInfo(device, cts.Token), cts.Token);
@@ -1199,7 +1209,7 @@ public partial class DetailsPane : UserControl
 
         if (package.VersionName is null || package.LastUpdateTime is null)
         {
-            var device = Data.DevicesObject.Current;
+            var device = Data.ActiveDevice;
             _ = Task.Run(() => AdbHelper.FetchDumpsysInfoAsync(device, package, cts.Token), cts.Token);
         }
     }
@@ -1274,7 +1284,7 @@ public partial class DetailsPane : UserControl
                     : Visibility.Visible).Init());
 
         if (!Data.FileActions.IsRecycleBin
-            && !ArchivePath.IsArchivePath(file.FullPath, Data.DevicesObject?.Current?.ID))
+            && !ArchivePath.IsArchivePath(file.FullPath, Data.ActiveDevice?.ID))
         {
             SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(
                 file,
@@ -1314,7 +1324,7 @@ public partial class DetailsPane : UserControl
                 SelectionInfoItems.Add(new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_VIDEO_BITRATE, f => f.CacheThumbnail!.Value.Info.BitrateString, valueIsLtr: true));
         }
 
-        var deviceId = Data.DevicesObject?.Current?.ID;
+        var deviceId = Data.ActiveDevice?.ID;
         var probeExtraInfo = !Data.FileActions.IsRecycleBin
             && !ArchivePath.IsArchivePath(file.FullPath, deviceId)
             && !file.IsCreationTimeResolved;
@@ -1375,13 +1385,13 @@ public partial class DetailsPane : UserControl
     }
 
     private static string FormatArchiveLocation(FileClass file)
-        => ArchivePath.IsArchivePath(file.ParentPath, Data.DevicesObject?.Current?.ID)
-            ? ArchivePath.FormatDetailsLocation(file.ParentPath, Data.DevicesObject?.Current?.ID)
+        => ArchivePath.IsArchivePath(file.ParentPath, Data.ActiveDevice?.ID)
+            ? ArchivePath.FormatDetailsLocation(file.ParentPath, Data.ActiveDevice?.ID)
             : file.ParentPath;
 
     private static string? TryGetArchiveSummaryPath(FileClass file)
     {
-        var deviceId = Data.DevicesObject?.Current?.ID;
+        var deviceId = Data.ActiveDevice?.ID;
         if (ArchivePath.TryParse(file.FullPath, out var archivePath, out var internalPath, deviceId)
             && string.IsNullOrEmpty(internalPath))
         {
@@ -1422,7 +1432,7 @@ public partial class DetailsPane : UserControl
 
     private void UpdateCanEditPermissions()
     {
-        var allowed = DriveHelper.GetEditableUnixChanges(File, Data.DevicesObject.Current);
+        var allowed = DriveHelper.GetEditableUnixChanges(File, Data.ActiveDevice);
         CanEditPermissions = allowed.Any;
         if (!CanEditPermissions && IsEditingPermissions)
             IsEditingPermissions = false;
@@ -1430,7 +1440,7 @@ public partial class DetailsPane : UserControl
 
     private void SubscribePermissionDevice()
     {
-        var device = Data.DevicesObject.Current;
+        var device = Data.ActiveDevice;
         if (_permissionDevice == device)
             return;
 
@@ -1466,7 +1476,7 @@ public partial class DetailsPane : UserControl
             return;
         }
 
-        var device = Data.DevicesObject.Current;
+        var device = Data.ActiveDevice;
         var allowed = DriveHelper.GetEditableUnixChanges(file, device);
         if (!allowed.Any)
         {
@@ -1517,7 +1527,7 @@ public partial class DetailsPane : UserControl
         if (!IsEditingPermissions || File is not { } file)
             return;
 
-        var device = Data.DevicesObject.Current;
+        var device = Data.ActiveDevice;
         if (device is null)
             return;
 

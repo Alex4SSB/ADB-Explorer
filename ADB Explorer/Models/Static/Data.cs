@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
+using ADB_Explorer.ViewModels.Windows;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ADB_Explorer.Models;
@@ -8,9 +9,18 @@ namespace ADB_Explorer.Models;
 public static class Data
 {
     /// <summary>
+    /// The active tab's full state. Only one instance exists for now; a future extra tab
+    /// would add more and repoint this at whichever is focused.
+    /// </summary>
+    public static ExplorerInstance ActiveExplorerInstance { get; set; } = new();
+
+    /// <summary>Lets XAML bind window-wide state without searching up to a Window that a cached page header may not have.</summary>
+    public static MainWindowViewModel MainWindowVM => App.Services.GetRequiredService<MainWindowViewModel>();
+
+    /// <summary>
     /// Explorer (and later, the active tab). Location-dependent chrome binds here.
     /// </summary>
-    public static FileList Files { get; } = new();
+    public static FileList Files => ActiveExplorerInstance.FileList;
 
     private static FileList? actionTarget;
 
@@ -36,15 +46,14 @@ public static class Data
 
     public static string CurrentPath
     {
-        get;
+        get => Files.Path;
         [param: AllowNull]
         set
         {
-            field = value ?? "";
-            Files.Path = field;
-            CurrentPathO.Value = field;
+            Files.Path = value ?? "";
+            CurrentPathO.Value = Files.Path;
         }
-    } = "";
+    }
     public static string ParentPath => FileHelper.GetParentPath(CurrentPath);
 
     /// <summary>
@@ -77,7 +86,9 @@ public static class Data
     // Created in MainWindow.Initialize after CheckAdbVersion succeeds; not available before then.
     public static FileOperationQueue FileOpQ { get; set; } = null!;
 
-    public static Dictionary<string, string> CurrentDisplayNames { get; set; } = [];
+    /// <summary>Friendly display names for special/drive paths, keyed by owning device so two
+    /// devices open in different tabs don't clobber each other's entries for the same path.</summary>
+    public static Dictionary<(string? DeviceId, string Path), string> CurrentDisplayNames { get; set; } = [];
 
     public static AppSettings Settings { get; set; } = new();
 
@@ -94,6 +105,10 @@ public static class Data
     public static Version AppVersion => new(Properties.AppGlobal.AppVersion);
 
     public static FileActionsEnable FileActions => Files.Actions;
+
+    /// <summary>The active tab's device: its own once pinned to one, else the app-wide current.
+    /// Use this, not <see cref="Devices.Current"/>, for anything acting on the visible tab.</summary>
+    public static LogicalDeviceViewModel? ActiveDevice => ActiveExplorerInstance.EffectiveDevice;
 
     public static DirectoryLister DirList
     {

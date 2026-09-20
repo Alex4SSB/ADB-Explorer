@@ -18,7 +18,7 @@ internal class DriveHelper
         if (AdbLocation.LocationFromString(path) is not Navigation.SpecialLocation.None)
             return null;
 
-        device ??= Data.Active.Device ?? Data.DevicesObject?.Current;
+        device ??= Data.Active.Device ?? Data.ActiveDevice;
         var drives = device?.Drives;
         if (drives is null)
             return null;
@@ -46,7 +46,7 @@ internal class DriveHelper
         if (string.IsNullOrEmpty(path))
             return DriveRestrictions.None;
 
-        device ??= Data.Active.Device ?? Data.DevicesObject?.Current;
+        device ??= Data.Active.Device ?? Data.ActiveDevice;
         var drive = GetCurrentDrive(path, device);
 
         // Overlay/submount writability (e.g. rw /vendor vs ro /) only matters with a root shell.
@@ -124,7 +124,7 @@ internal class DriveHelper
         if (string.IsNullOrEmpty(path))
             return false;
 
-        device ??= Data.Active.Device ?? Data.DevicesObject?.Current;
+        device ??= Data.Active.Device ?? Data.ActiveDevice;
         if (device is null)
             return false;
 
@@ -155,7 +155,7 @@ internal class DriveHelper
         if (file?.Permissions is null)
             return ShellAccessHelper.UnixPermissionChanges.None;
 
-        device ??= Data.Active.Device ?? Data.DevicesObject?.Current;
+        device ??= Data.Active.Device ?? Data.ActiveDevice;
         if (device is null)
             return ShellAccessHelper.UnixPermissionChanges.None;
 

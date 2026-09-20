@@ -32,7 +32,7 @@
             Height="35"
             Padding="-1"
             helpers:ExpanderHelper.ChevronRotation="None"
-            helpers:ExpanderHelper.HeaderTooltip="{Binding Source={x:Static Member=strings:Resources.S_SEARCH}}"
+            helpers:ExpanderHelper.HeaderTooltip="{Binding SearchTooltip}"
             helpers:ExpanderHelper.IsAccentHeader="{Binding IsFiltered}"
             ExpandDirection="Left"
             Expanded="Expander_Expanded"

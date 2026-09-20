@@ -258,7 +258,7 @@ public partial class FileViewModelBase : ObservableObject
         var candidateFullName = _pendingUniqueCheckName;
         var comparison = _pendingUniqueCheckComparison;
 
-        if (file is null || candidateFullName is null || Data.DevicesObject.Current is not { } device)
+        if (file is null || candidateFullName is null || Data.ActiveDevice is not { } device)
         {
             IsCheckingUniqueName = false;
             return;

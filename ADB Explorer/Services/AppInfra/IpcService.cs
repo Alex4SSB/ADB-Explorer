@@ -25,7 +25,7 @@ public class IpcService
                 break;
             case MessageType.FileMoved:
                 var content = msgContent[1].Split('\n');
-                if (Data.DevicesObject.Current.ID != content[0])
+                if (Data.ActiveDevice.ID != content[0])
                     return;
 
                 FilePath file = new(content[1]);

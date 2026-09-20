@@ -431,7 +431,7 @@ public static partial class ApkIconService
             return;
         }
 
-        if (Data.DevicesObject?.Current is not { } device)
+        if (Data.ActiveDevice is not { } device)
         {
             package.IconLoadCompleted = true;
             return;
@@ -497,7 +497,7 @@ public static partial class ApkIconService
         // Full icon pull also writes the label — do not enqueue a separate label-only job.
         BeginLoad(device, package.Path, package.Name, bmp =>
         {
-            if (Data.DevicesObject?.Current?.SerialNumber != device.SerialNumber)
+            if (Data.ActiveDevice?.SerialNumber != device.SerialNumber)
                 return;
 
             ApplyCachedLabel(device, package);
@@ -521,7 +521,7 @@ public static partial class ApkIconService
         if (IsLoadingStopped)
             return;
 
-        if (Data.DevicesObject?.Current is not { } device)
+        if (Data.ActiveDevice is not { } device)
             return;
 
         ApplyCachedLabel(device, package);
@@ -541,7 +541,7 @@ public static partial class ApkIconService
                 {
                     AttachOnReady(iconKey, package.Name, _ =>
                     {
-                        if (Data.DevicesObject?.Current?.SerialNumber != device.SerialNumber)
+                        if (Data.ActiveDevice?.SerialNumber != device.SerialNumber)
                             return;
                         ApplyCachedLabel(device, package);
                     }, priority);
@@ -560,7 +560,7 @@ public static partial class ApkIconService
             {
                 AttachOnReady(pullKey, package.Name, _ =>
                 {
-                    if (Data.DevicesObject?.Current?.SerialNumber != device.SerialNumber)
+                    if (Data.ActiveDevice?.SerialNumber != device.SerialNumber)
                         return;
                     ApplyCachedLabel(device, package);
                 }, priority);
@@ -570,7 +570,7 @@ public static partial class ApkIconService
 
         Enqueue(new LoadRequest(pullKey, device, package.Path, package.Name, _ =>
         {
-            if (Data.DevicesObject?.Current?.SerialNumber != device.SerialNumber)
+            if (Data.ActiveDevice?.SerialNumber != device.SerialNumber)
                 return;
             ApplyCachedLabel(device, package);
         }, LabelOnly: true, priority), priority);
@@ -585,7 +585,7 @@ public static partial class ApkIconService
         if (packages is null || !IsEnabled || IsLoadingStopped)
             return;
 
-        if (Data.DevicesObject?.Current is not { } device || !CanLoadOnDevice(device.ID))
+        if (Data.ActiveDevice is not { } device || !CanLoadOnDevice(device.ID))
             return;
 
         // Single path per package: icon load fetches the label; label-only only when icon is done.
@@ -604,7 +604,7 @@ public static partial class ApkIconService
         if (IsLoadingStopped)
             return;
 
-        if (!IsEnabled || Data.DevicesObject?.Current is not { } device || !CanLoadOnDevice(device.ID))
+        if (!IsEnabled || Data.ActiveDevice is not { } device || !CanLoadOnDevice(device.ID))
             return;
 
         var selectedList = selected?.Where(static p => p is not null).Distinct().ToList() ?? [];
@@ -670,7 +670,7 @@ public static partial class ApkIconService
             return;
         }
 
-        if (Data.DevicesObject?.Current is not { } device || !CanLoadOnDevice(device.ID))
+        if (Data.ActiveDevice is not { } device || !CanLoadOnDevice(device.ID))
         {
             onCompleted?.Invoke("Device unavailable or APK icons disabled");
             return;
@@ -713,7 +713,7 @@ public static partial class ApkIconService
                 {
                     try
                     {
-                        if (Data.DevicesObject?.Current?.SerialNumber == device.SerialNumber)
+                        if (Data.ActiveDevice?.SerialNumber == device.SerialNumber)
                         {
                             ApplyCachedLabel(device, package);
                             if (bmp is not null)
@@ -737,7 +737,7 @@ public static partial class ApkIconService
                 timing.Mark($"ForceReload exception: {e.GetType().Name}: {e.Message}");
                 App.SafeBeginInvoke(() =>
                 {
-                    if (Data.DevicesObject?.Current?.SerialNumber == device.SerialNumber)
+                    if (Data.ActiveDevice?.SerialNumber == device.SerialNumber)
                     {
                         ApplyCachedLabel(device, package);
                         package.IconLoadCompleted = true;
@@ -970,7 +970,7 @@ public static partial class ApkIconService
                 return;
 
             ApkIconUpdated -= Handler;
-            var device = Data.DevicesObject?.Current;
+            var device = Data.ActiveDevice;
             if (device is null || device.SerialNumber != serial)
             {
                 onReady(null);

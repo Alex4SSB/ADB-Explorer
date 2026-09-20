@@ -466,14 +466,14 @@
                             </Setter>
                         </Trigger>
 
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding ElementName=ExpanderToggleButton, Path=IsMouseOver}" Value="True" />
-                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsTransparent)}" Value="True" />
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="BorderBrush" Value="{DynamicResource TextFillColorPrimaryBrush}" />
-                        </MultiDataTrigger>
+                        <!--  MouseOverBorderBrush is transparent except in high contrast.  -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition SourceName="ExpanderToggleButton" Property="IsMouseOver" Value="True" />
+                                <Condition Property="helpers:ExpanderHelper.IsTransparent" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="BorderBrush" Value="{DynamicResource MouseOverBorderBrush}" />
+                        </MultiTrigger>
 
                         <MultiTrigger>
                             <MultiTrigger.Conditions>

@@ -17,7 +17,7 @@ internal static class TrashHelper
 
     public static List<FileClass> GetRecycleBinItems()
     {
-        var device = Data.Active.Device ?? Data.DevicesObject.Current;
+        var device = Data.Active.Device ?? Data.ActiveDevice;
         if (device is null)
             return [];
 
@@ -45,7 +45,7 @@ internal static class TrashHelper
         => device?.Drives.OfType<VirtualDriveViewModel>().FirstOrDefault(d => d.Type is AbstractDrive.DriveType.Trash);
 
     public static void UpdateRecycledItemsCount(CancellationToken cancellationToken = default)
-        => UpdateRecycledItemsCount(Data.DevicesObject.Current, cancellationToken);
+        => UpdateRecycledItemsCount(Data.ActiveDevice, cancellationToken);
 
     public static void UpdateRecycledItemsCount(LogicalDeviceViewModel? device, CancellationToken cancellationToken = default)
     {
@@ -105,7 +105,7 @@ internal static class TrashHelper
 
     public static void ParseIndexers()
     {
-        var device = Data.DevicesObject.Current;
+        var device = Data.ActiveDevice;
         if (device is null)
             return;
 

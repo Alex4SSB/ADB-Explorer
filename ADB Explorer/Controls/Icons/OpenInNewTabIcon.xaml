@@ -1,0 +1,41 @@
+<controls:ScaledPathIcon
+    x:Class="ADB_Explorer.Controls.OpenInNewTabIcon"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:ADB_Explorer.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Name="Icon"
+    ArtboardSize="16"
+    mc:Ignorable="d">
+    <Viewbox
+        Width="{Binding Size}"
+        Height="{Binding Size}"
+        DataContext="{Binding ElementName=Icon}"
+        Stretch="Uniform">
+        <Grid
+            Width="{Binding ArtboardSize}"
+            Height="{Binding ArtboardSize}"
+            Margin="-2,-1,-1,-2">
+            <!--  Tabs (monochrome), with the cut-out left for the badge  -->
+            <Path
+                d:Fill="White"
+                Data="M3 3.5C3 2.11929 4.11929 1 5.5 1H10.5C11.8807 1 13 2.11929 13 3.5V8.5C13 9.71599 12.1319 10.7292 10.9816 10.9537C10.9938 10.8041 11 10.6528 11 10.5C11 10.3057 10.9899 10.1139 10.9703 9.9248C11.5683 9.72751 12 9.16416 12 8.5V4H7.5C6.67157 4 6 3.32843 6 2.5V2H5.5C4.67157 2 4 2.67157 4 3.5V5.20703C3.65136 5.30564 3.31679 5.43777 3 5.59971V3.5ZM10.7927 12.0008C10.6941 12.3494 10.5619 12.684 10.3999 13.0008H10.9987C13.2078 13.0008 14.9987 11.2099 14.9987 9.00077V5.50077C14.9987 4.68368 14.6067 3.95814 14.0005 3.50195V8.50019C14.0005 8.53821 13.9999 8.57609 13.9987 8.61383V9.00077C13.9987 10.6576 12.6555 12.0008 10.9987 12.0008H10.7927ZM7 2V2.5C7 2.77614 7.22386 3 7.5 3H11.9146C11.7087 2.4174 11.1531 2 10.5 2H7Z"
+                Stretch="None"
+                Style="{StaticResource MonochromeIconPathStyle}" />
+            <!--  Arrow badge (accent): database_arrow_up badge moved to the tab-add badge slot, arrow rotated 45 degrees  -->
+            <Path
+                d:Fill="#4CC2FF"
+                Data="M11.5 7C9.015 7 7 9.015 7 11.5C7 13.985 9.015 16 11.5 16C13.985 16 16 13.985 16 11.5C16 9.015 13.985 7 11.5 7ZM13.854 11.854C13.659 12.049 13.342 12.049 13.147 11.854L12.001 10.708V13.501C12.001 13.777 11.777 14.001 11.501 14.001C11.225 14.001 11.001 13.777 11.001 13.501V10.708L9.855 11.854C9.66 12.049 9.343 12.049 9.148 11.854C8.953 11.659 8.953 11.342 9.148 11.147L11.148 9.147L11.151 9.144C11.198 9.097 11.253 9.062 11.311 9.038C11.369 9.014 11.433 9 11.499 9H11.505C11.572 9 11.635 9.014 11.693 9.038C11.752 9.062 11.807 9.099 11.855 9.147L13.855 11.147C14.05 11.342 14.049 11.659 13.854 11.854Z"
+                Stretch="None"
+                Style="{StaticResource IconAccentPathStyle}">
+                <Path.RenderTransform>
+                    <TransformGroup>
+                        <RotateTransform Angle="45" CenterX="11.5" CenterY="11.5" />
+                        <TranslateTransform X="-6" Y="-1" />
+                    </TransformGroup>
+                </Path.RenderTransform>
+            </Path>
+        </Grid>
+    </Viewbox>
+</controls:ScaledPathIcon>

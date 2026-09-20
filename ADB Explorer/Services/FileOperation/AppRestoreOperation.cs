@@ -237,7 +237,7 @@ public partial class AppRestoreOperation : AbstractShellFileOperation
 
     private void RefreshPackagesIfNeeded()
     {
-        if (Device.ID == Data.DevicesObject.Current?.ID && Data.FileActions.IsAppDrive)
+        if (Device.ID == Data.ActiveDevice?.ID && Data.FileActions.IsAppDrive)
             FileActionLogic.UpdatePackages(true);
     }
 }

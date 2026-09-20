@@ -95,7 +95,7 @@ public static class ShellFileOperation
             || op.Status is not FileOperation.OperationStatus.Completed)
             return;
 
-        if (op.Device.ID == Data.DevicesObject.Current?.ID)
+        if (op.Device.ID == Data.ActiveDevice?.ID)
         {
             foreach (var member in op.Members)
                 member.CutState = DragDropEffects.None;
@@ -125,7 +125,7 @@ public static class ShellFileOperation
         if (op.FilePath.TrashIndex is TrashIndexer indexer)
             SilentDelete(op.Device, indexer.IndexerPath);
 
-        if (op.Device.ID == Data.DevicesObject.Current?.ID)
+        if (op.Device.ID == Data.ActiveDevice?.ID)
         {
             // remove file from cut items and clear its trash indexer if current device
             op.FilePath.CutState = DragDropEffects.None;
@@ -166,7 +166,7 @@ public static class ShellFileOperation
         var oldPath = op.FilePath.FullPath;
         var newPath = op.TargetPath.FullPath;
 
-        if (op.Device.ID == Data.DevicesObject.Current?.ID
+        if (op.Device.ID == Data.ActiveDevice?.ID
             && op.FilePath.ParentPath == Data.CurrentPath)
         {
             var file = Data.Files.DirList?.FileList?.Find(f => f.FullPath == oldPath);
@@ -393,7 +393,7 @@ public static class ShellFileOperation
         foreach (var src in op.DeviceSources)
             src.CutState = DragDropEffects.None;
 
-        if (op.Device.ID == Data.DevicesObject.Current?.ID
+        if (op.Device.ID == Data.ActiveDevice?.ID
             && ArchivePath.TryParse(Data.CurrentPath, out var currentArchive, out _, op.Device.ID)
             && currentArchive == op.TarArchivePath)
         {
@@ -415,7 +415,7 @@ public static class ShellFileOperation
 
         op.FilePath.CutState = DragDropEffects.None;
 
-        if (op.Device.ID == Data.DevicesObject.Current.ID
+        if (op.Device.ID == Data.ActiveDevice.ID
             && op.TargetPath.ParentPath == Data.CurrentPath)
         {
             FileClass newFile = new(op.FilePath);
@@ -458,7 +458,7 @@ public static class ShellFileOperation
 
         if (op.Status is FileOperation.OperationStatus.Completed)
         {
-            if (op.Device.ID == Data.DevicesObject.Current?.ID
+            if (op.Device.ID == Data.ActiveDevice?.ID
                 && op.FilePath.ParentPath == Data.CurrentPath)
             {
                 op.FilePath.UpdateType();
@@ -472,7 +472,7 @@ public static class ShellFileOperation
 
         if (op.Status is FileOperation.OperationStatus.Failed or FileOperation.OperationStatus.Canceled)
         {
-            if (op.Device.ID == Data.DevicesObject.Current?.ID
+            if (op.Device.ID == Data.ActiveDevice?.ID
                 && op.FilePath.ParentPath == Data.CurrentPath)
             {
                 Data.DirList!.FileList.Remove(op.FilePath);
@@ -598,7 +598,7 @@ public static class ShellFileOperation
             var removeFromTree = op.OperationName is FileOperation.OperationType.Recycle or FileOperation.OperationType.Move
                 && op.FilePath.IsDirectory;
 
-            if (op.Device.ID == Data.DevicesObject.Current?.ID)
+            if (op.Device.ID == Data.ActiveDevice?.ID)
             {
                 // notify master process of completion
                 if (op.MasterPid > 0 && op.OperationName is not FileOperation.OperationType.Copy)
@@ -871,7 +871,7 @@ public static class ShellFileOperation
         if (e.PropertyName is not nameof(FileOperation.Status) || op.Status is not FileOperation.OperationStatus.Completed)
             return;
 
-        if (op.Device.ID == Data.DevicesObject.Current.ID
+        if (op.Device.ID == Data.ActiveDevice.ID
             && Data.FileActions.IsAppDrive)
         {
             // update UI when on current device and current path
@@ -1004,7 +1004,7 @@ public static class ShellFileOperation
         if (e.PropertyName is not nameof(FileOperation.Status) || op.Status is not FileOperation.OperationStatus.Completed)
             return;
 
-        if (op.Device.ID == Data.DevicesObject.Current.ID
+        if (op.Device.ID == Data.ActiveDevice.ID
             && op.FilePath.ParentPath == Data.CurrentPath)
         {
             // update UI when on current device and current path

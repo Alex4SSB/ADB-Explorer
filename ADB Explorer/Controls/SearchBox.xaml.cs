@@ -1,5 +1,6 @@
-﻿using ADB_Explorer.Models;
-using ADB_Explorer.ViewModels.Pages;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
+using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Controls;
 
@@ -8,6 +9,33 @@ namespace ADB_Explorer.Controls;
 /// </summary>
 public partial class SearchBox : UserControl
 {
+    internal void Initialize(ExplorerInstance instance) => Instance = instance;
+
+    /// <summary>This tab's own state - exposed as a DP so SearchBoxStyle (a shared, app-level
+    /// resource) can reach it via RelativeSource Self instead of the app-wide active tab.</summary>
+    public ExplorerInstance? Instance
+    {
+        get => (ExplorerInstance?)GetValue(InstanceProperty);
+        set => SetValue(InstanceProperty, value);
+    }
+
+    public static readonly DependencyProperty InstanceProperty =
+        DependencyProperty.Register(nameof(Instance), typeof(ExplorerInstance),
+          typeof(SearchBox), new PropertyMetadata(null));
+
+    public string SearchTooltip
+    {
+        get
+        {
+            var gesture = AppActions.List.FirstOrDefault(a => a.Name is FileAction.FileActionType.Filter)?.GestureString;
+
+            if (string.IsNullOrEmpty(gesture))
+                return Strings.Resources.S_SEARCH;
+
+            return $"{Strings.Resources.S_SEARCH} ({gesture})";
+        }
+    }
+
     public enum SearchBoxMode
     {
         CurrentFolder,
@@ -29,10 +57,7 @@ public partial class SearchBox : UserControl
 
     private void Unfocus()
     {
-        if (!IsKeyboardFocusWithin)
-            return;
-
-        UnfocusTarget?.Focus();
+        FocusHelper.ClearFocus(this);
     }
 
     public string Text
@@ -105,16 +130,6 @@ public partial class SearchBox : UserControl
         DependencyProperty.Register("DefaultControlWidth", typeof(double),
           typeof(SearchBox), new PropertyMetadata(null));
 
-    public UIElement? UnfocusTarget
-    {
-        get => (UIElement?)GetValue(UnfocusTargetProperty);
-        set => SetValue(UnfocusTargetProperty, value);
-    }
-
-    public static readonly DependencyProperty UnfocusTargetProperty =
-        DependencyProperty.Register(nameof(UnfocusTarget), typeof(UIElement),
-          typeof(SearchBox), new PropertyMetadata(null));
-
     public void Refresh()
     {
         if (ContentBox.ActualWidth > MaxControlWidth)
@@ -143,10 +158,10 @@ public partial class SearchBox : UserControl
     {
         IsFiltered = !string.IsNullOrEmpty(Text);
 
-        // Mirror onto the ExplorerViewModel so styles that used to bind to this control by
+        // Mirror onto this tab's own Instance so styles that used to bind to this control by
         // ElementName (now out of reach from ExplorerListHost) can react via the view model.
-        if (DataContext is ExplorerViewModel vm)
-            vm.IsSearchBoxFiltered = IsFiltered;
+        if (Instance is not null)
+            Instance.IsSearchBoxFiltered = IsFiltered;
     }
 
     private void ContentBox_Loaded(object sender, RoutedEventArgs e)

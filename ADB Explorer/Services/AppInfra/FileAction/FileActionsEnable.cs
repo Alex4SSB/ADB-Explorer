@@ -195,6 +195,9 @@ public partial class FileActionsEnable : ObservableObject
     [ObservableProperty]
     public partial bool IsSingleFolder { get; set; }
 
+    [ObservableProperty]
+    public partial bool IsOpenInNewTabEnabled { get; set; }
+
     private bool pullEnabled;
     public bool PullEnabled
     {
@@ -248,7 +251,7 @@ public partial class FileActionsEnable : ObservableObject
     /// </summary>
     public bool IsAppDriveThumbsLocked =>
         IsAppDrive
-        && (Data.DevicesObject?.Current is not { } device || !ShellCommands.UnzipExists(device.ID));
+        && (Data.ActiveDevice is not { } device || !ShellCommands.UnzipExists(device.ID));
 
     /// <summary>
     /// Re-raise <see cref="IsAppDriveThumbsLocked"/> when the open device or its

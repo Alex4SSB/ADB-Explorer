@@ -2,6 +2,7 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
+using ADB_Explorer.Views.Pages;
 
 namespace ADB_Explorer.Models
 {
@@ -19,6 +20,11 @@ namespace ADB_Explorer.Models
             SearchMode,
             devNull,
             Unknown,
+            Devices,
+            Settings,
+            Terminal,
+            Operations,
+            Log,
         }
     }
 
@@ -38,9 +44,53 @@ namespace ADB_Explorer.Models
                 Path = path;
         }
 
+        private AdbLocation(AdbLocation other)
+        {
+            Path = other.Path;
+            Location = other.Location;
+        }
+
         public string Path { get; private set; } = "";
 
         public SpecialLocation Location { get; private set; }
+
+        /// <summary>The device this location belongs to, once it's part of a tab's history. Null for pages and not-yet-stamped locations.</summary>
+        public string? DeviceId { get; private set; }
+
+        public AdbLocation WithDevice(string? deviceId) => new(this) { DeviceId = deviceId };
+
+        private static readonly Dictionary<SpecialLocation, (Type Page, string Glyph)> PageLocations = new()
+        {
+            { SpecialLocation.Devices, (typeof(DevicesPage), "\uE8CC") },
+            { SpecialLocation.Settings, (typeof(SettingsPage), "\uE713") },
+            { SpecialLocation.Terminal, (typeof(TerminalPage), "\uE756") },
+            { SpecialLocation.Operations, (typeof(OperationsPage), "\uEADF") },
+            { SpecialLocation.Log, (typeof(LogPage), "\uE8FD") },
+        };
+
+        public bool IsPage => PageLocations.ContainsKey(Location);
+
+        /// <summary>The app page this location stands for, or null for a folder / drive location (shown by the Explorer page).</summary>
+        public Type? PageType => PageLocations.TryGetValue(Location, out var page) ? page.Page : null;
+
+        public static AdbLocation? ForPage(Type? pageType)
+        {
+            foreach (var (location, page) in PageLocations)
+            {
+                if (page.Page == pageType)
+                    return new(location);
+            }
+
+            return null;
+        }
+
+        private LogicalDeviceViewModel? DeviceFor(LogicalDeviceViewModel? fallback)
+        {
+            if (DeviceId is null)
+                return fallback;
+
+            return Data.DevicesObject?.LogicalDeviceViewModels?.FirstOrDefault(device => device.ID == DeviceId);
+        }
 
         public string DisplayName
         {
@@ -58,16 +108,34 @@ namespace ADB_Explorer.Models
                     SpecialLocation.SearchMode => SearchResultsLabel(),
                     SpecialLocation.devNull => Strings.Resources.S_LOCATION_PERM_DEL,
                     SpecialLocation.Unknown => Strings.Resources.S_LOCATION_NA,
+                    SpecialLocation.Devices => Strings.Resources.S_BUTTON_DEVICES,
+                    SpecialLocation.Settings => Strings.Resources.S_SETTINGS_TITLE,
+                    SpecialLocation.Terminal => Strings.Resources.S_TERMINAL,
+                    SpecialLocation.Operations => Strings.Resources.S_ACTION_OPERATION_PLURAL,
+                    SpecialLocation.Log => Strings.Resources.S_BUTTON_LOG,
                     _ => "",
                 };
             }
         }
 
-        public string BreadcrumbLabel => !string.IsNullOrEmpty(Path) && ArchivePath.IsArchivePath(Path, Data.DevicesObject?.Current?.ID)
-            ? ArchivePath.GetBreadcrumbLabel(Path, Data.DevicesObject?.Current?.ID)
-            : Location is SpecialLocation.SearchMode
-                ? SearchResultsLabel()
-                : NavigationName;
+        public string BreadcrumbLabel => GetBreadcrumbLabel(Data.ActiveDevice);
+
+        /// <summary>Same as <see cref="BreadcrumbLabel"/>, against an explicit device - see <see cref="GetIcon"/>.</summary>
+        public string GetBreadcrumbLabel(LogicalDeviceViewModel? device)
+        {
+            device = DeviceFor(device);
+
+            if (IsPage)
+                return DisplayName;
+
+            if (!string.IsNullOrEmpty(Path) && ArchivePath.IsArchivePath(Path, device?.ID))
+                return ArchivePath.GetBreadcrumbLabel(Path, device?.ID);
+
+            if (Location is SpecialLocation.SearchMode)
+                return SearchResultsLabel(device);
+
+            return GetNavigationName(device);
+        }
 
         public bool IsNavigable
         {
@@ -85,7 +153,7 @@ namespace ADB_Explorer.Models
                     SpecialLocation.RecycleBin => true,
                     SpecialLocation.PackageDrive => true,
                     SpecialLocation.SearchMode => true,
-                    _ => false,
+                    _ => IsPage,
                 };
             }
         }
@@ -118,83 +186,123 @@ namespace ADB_Explorer.Models
             return SpecialLocation.None;
         }
 
-        static string SearchResultsLabel()
+        static string SearchResultsLabel(LogicalDeviceViewModel? device = null)
         {
             var root = Data.SearchOriginPath;
             if (string.IsNullOrEmpty(root))
                 return Strings.Resources.S_SEARCH;
 
-            var pathLabel = Data.CurrentDisplayNames.TryGetValue(root, out var displayName)
+            var pathLabel = Data.CurrentDisplayNames.TryGetValue((device?.ID ?? Data.ActiveDevice?.ID, root), out var displayName)
                 ? displayName
                 : FileHelper.GetFullName(root);
 
             return string.Format(Strings.Resources.S_SEARCH_RESULTS_IN, pathLabel);
         }
 
-        public string HistoryName
-        {
-            get
-            {
-                if (Data.CurrentDisplayNames.TryGetValue(DisplayName, out var name))
-                    return name;
+        public string HistoryName => GetHistoryName(Data.ActiveDevice);
 
+        /// <summary>Same as <see cref="HistoryName"/>, against an explicit device - see <see cref="GetIcon"/>.</summary>
+        public string GetHistoryName(LogicalDeviceViewModel? device)
+        {
+            device = DeviceFor(device);
+
+            if (Data.CurrentDisplayNames.TryGetValue((device?.ID, DisplayName), out var name))
+                return name;
+
+            return DisplayName;
+        }
+
+        public string NavigationName => GetNavigationName(Data.ActiveDevice);
+
+        /// <summary>Same as <see cref="NavigationName"/>, against an explicit device - see <see cref="GetIcon"/>.</summary>
+        public string GetNavigationName(LogicalDeviceViewModel? device)
+        {
+            device = DeviceFor(device);
+
+            if (IsPage)
                 return DisplayName;
-            }
+
+            // The device's own name, not the display-name cache, which is only filled once its
+            // props are loaded and can be emptied while another device is being opened.
+            if (Location is SpecialLocation.DriveView && device is not null)
+                return device.Name;
+
+            if (Data.CurrentDisplayNames.TryGetValue((device?.ID, StringFromLocation(Location)), out var name))
+                return name;
+
+            if (Data.CurrentDisplayNames.TryGetValue((device?.ID, DisplayName), out var display))
+                return display;
+
+            return FileHelper.GetFullName(DisplayName);
         }
 
-        public string NavigationName
+        public BaseIcon? Icon => GetIcon(Data.ActiveDevice);
+
+        /// <summary>Same as <see cref="Icon"/>, against an explicit device instead of the app-wide
+        /// current one - for chrome (e.g. the tab strip) that renders a location for a tab that
+        /// isn't necessarily the active one.</summary>
+        public BaseIcon? GetIcon(LogicalDeviceViewModel? device)
         {
-            get
+            device = DeviceFor(device);
+
+            if (PageLocations.TryGetValue(Location, out var page))
+                return new BaseIcon(page.Glyph, 16);
+
+            if (Location is SpecialLocation.DriveView)
+                return new BaseIcon(FileToIconConverter.GetPhoneIcon(16), 16);
+
+            const int size = 16;
+            var lookupKey = !string.IsNullOrEmpty(Path)
+                ? Path
+                : Location is not SpecialLocation.None
+                    ? StringFromLocation(Location)
+                    : null;
+
+            if (lookupKey is not null && AdbExplorerConst.DRIVE_TYPES.TryGetValue(lookupKey, out var driveType))
             {
-                if (Data.CurrentDisplayNames.TryGetValue(StringFromLocation(Location), out var name))
-                    return name;
+                var trashEmpty = driveType is AbstractDrive.DriveType.Trash
+                    && TrashHelper.GetTrashDrive(device)?.ItemsCount is null or <= 0;
 
-                if (Data.CurrentDisplayNames.TryGetValue(DisplayName, out var display))
-                    return display;
-
-                return FileHelper.GetFullName(DisplayName);
+                return DriveViewModel.GetDriveIcon(driveType, size, trashEmpty);
             }
+
+            var drive = device?.Drives.FirstOrDefault(d => d.Path == Path);
+            return drive?.GetIcon(size);
         }
 
-        public BaseIcon? Icon
+        public SubMenu IconSubMenu => GetIconSubMenu(Data.ActiveDevice);
+
+        /// <summary>Same as <see cref="IconSubMenu"/>, against an explicit device - see <see cref="GetIcon"/>.</summary>
+        public SubMenu GetIconSubMenu(LogicalDeviceViewModel? device, bool includeDevice = false)
         {
-            get
-            {
-                if (Location is SpecialLocation.DriveView)
-                    return new BaseIcon(FileToIconConverter.GetPhoneIcon(16), 16);
+            var name = GetHistoryName(device);
+            if (includeDevice && !IsPage && DeviceFor(device) is { } owner)
+                name = $"{name} - {owner.Name}";
 
-                const int size = 16;
-                var lookupKey = !string.IsNullOrEmpty(Path)
-                    ? Path
-                    : Location is not SpecialLocation.None
-                        ? StringFromLocation(Location)
-                        : null;
-
-                if (lookupKey is not null && AdbExplorerConst.DRIVE_TYPES.TryGetValue(lookupKey, out var driveType))
-                {
-                    var trashEmpty = driveType is AbstractDrive.DriveType.Trash
-                        && TrashHelper.GetTrashDrive(Data.DevicesObject.Current)?.ItemsCount is null or <= 0;
-
-                    return DriveViewModel.GetDriveIcon(driveType, size, trashEmpty);
-                }
-
-                var drive = Data.DevicesObject.Current?.Drives.FirstOrDefault(d => d.Path == Path);
-                return drive?.GetIcon(size);
-            }
+            return new SubMenu(new FileAction(FileAction.FileActionType.None, new(() => true, () => Data.RuntimeSettings.LocationToNavigate = this), name), GetIcon(device));
         }
 
-        public SubMenu IconSubMenu =>
-            new SubMenu(new FileAction(FileAction.FileActionType.None, new(() => true, () => Data.RuntimeSettings.LocationToNavigate = this), HistoryName), Icon);
+        public SubMenu ExcessSubMenu => GetExcessSubMenu(Data.ActiveDevice);
 
-        public SubMenu ExcessSubMenu =>
-            new SubMenu(new FileAction(FileAction.FileActionType.None, new(() => true, () => Data.RuntimeSettings.LocationToNavigate = this), NavigationName), Icon);
+        /// <summary>Same as <see cref="ExcessSubMenu"/>, against an explicit device - see <see cref="GetIcon"/>.</summary>
+        public SubMenu GetExcessSubMenu(LogicalDeviceViewModel? device) =>
+            new SubMenu(new FileAction(FileAction.FileActionType.None, new(() => true, () => Data.RuntimeSettings.LocationToNavigate = this), GetNavigationName(device)), GetIcon(device));
 
-        public TextMenu NameSubMenu =>
-            new TextMenu(new FileAction(FileAction.FileActionType.None, new(() => true, () => Data.RuntimeSettings.LocationToNavigate = this), BreadcrumbLabel));
+        public TextMenu NameSubMenu => GetNameSubMenu(Data.ActiveDevice);
+
+        /// <summary>Same as <see cref="NameSubMenu"/>, against an explicit device - see <see cref="GetIcon"/>.</summary>
+        public TextMenu GetNameSubMenu(LogicalDeviceViewModel? device) =>
+            new TextMenu(new FileAction(FileAction.FileActionType.None, new(() => true, () => Data.RuntimeSettings.LocationToNavigate = this), GetBreadcrumbLabel(device)));
 
         public override bool Equals(object? other)
         {
             if (other is not AdbLocation location)
+                return false;
+
+            if (IsPage || location.IsPage)
+                return Location == location.Location;
+
+            if (DeviceId != location.DeviceId)
                 return false;
 
             if (string.IsNullOrEmpty(Path) && string.IsNullOrEmpty(location.Path))
@@ -204,47 +312,30 @@ namespace ADB_Explorer.Models
         }
 
         public override int GetHashCode() => 
-            HashCode.Combine(Path, Location);
+            HashCode.Combine(Path, Location, DeviceId);
     }
 
     public class NavHistory : Navigation
     {
-        public static List<AdbLocation> PathHistory { get; private set; } = [];
+        /// <summary>Delegates to the active instance's own history — was static state directly.</summary>
+        private static InstanceNavHistory Instance => Data.ActiveExplorerInstance.History;
 
-        public static ObservableProperty<IEnumerable<SubMenu>> MenuHistory { get; private set; } = new() { Value = [] };
+        public static List<AdbLocation> PathHistory => Instance.PathHistory;
 
-        private static void UpdateMenuHistory()
-        {
-            MenuHistory.Value = PathHistory
-                .Distinct()
-                .Where(path => !path.Equals(Current))
-                .Select(path => path.IconSubMenu);
-        }
+        public static ObservableProperty<IEnumerable<SubMenu>> MenuHistory => Instance.MenuHistory;
 
         /// <summary>Rebuilds history menu icons, e.g. after the recycle bin's empty/full state changes.</summary>
-        public static void RefreshMenuHistory() => UpdateMenuHistory();
-
-        private static int historyIndex = -1;
-
-        /// <summary>
-        /// Device path left when navigating back; consumed to restore selection in the parent listing.
-        /// </summary>
-        private static string? pendingSelectionPath;
+        public static void RefreshMenuHistory() => Instance.RefreshMenuHistory();
 
         /// <summary>Returns and clears the path to select after a back-navigation completes.</summary>
-        public static string? TakePendingSelectionPath()
-        {
-            var path = pendingSelectionPath;
-            pendingSelectionPath = null;
-            return path;
-        }
+        public static string? TakePendingSelectionPath() => Instance.TakePendingSelectionPath();
 
         public static FileClass? FindBackNavigationItem(string path)
         {
             if (Data.DirList!.FileList.FirstOrDefault(item => item.FullPath == path) is { } exact)
                 return exact;
 
-            var deviceId = Data.DevicesObject.Current?.ID;
+            var deviceId = Data.ActiveDevice?.ID;
             if (deviceId is null || ArchivePath.IsArchivePath(Data.CurrentPath, deviceId))
                 return null;
 
@@ -255,8 +346,8 @@ namespace ADB_Explorer.Models
             return Data.DirList!.FileList.FirstOrDefault(item => item.FullPath == archivePath);
         }
 
-        public static bool BackAvailable { get { return historyIndex > 0; } }
-        public static bool ForwardAvailable { get { return historyIndex < PathHistory.Count - 1; } }
+        public static bool BackAvailable => Instance.BackAvailable;
+        public static bool ForwardAvailable => Instance.ForwardAvailable;
 
         public static bool NavigationAvailable(SpecialLocation direction) => direction switch
         {
@@ -284,70 +375,22 @@ namespace ADB_Explorer.Models
             return true;
         }
 
-        public static AdbLocation GoBack()
-        {
-            if (!BackAvailable) return null;
+        public static AdbLocation GoBack() => Instance.GoBack();
 
-            var departed = PathHistory[historyIndex].Path;
-            pendingSelectionPath = string.IsNullOrEmpty(departed) ? null : departed;
+        public static AdbLocation GoForward() => Instance.GoForward();
 
-            historyIndex--;
+        public static AdbLocation Current => Instance.Current;
 
-            UpdateMenuHistory();
+        public static void Navigate(string path) => Instance.Navigate(path);
 
-            return PathHistory[historyIndex];
-        }
-
-        public static AdbLocation GoForward()
-        {
-            if (!ForwardAvailable) return null;
-
-            pendingSelectionPath = null;
-
-            historyIndex++;
-
-            UpdateMenuHistory();
-
-            return PathHistory[historyIndex];
-        }
-
-        public static AdbLocation Current => PathHistory.Count > 0 ? PathHistory[historyIndex] : null;
-
-        public static void Navigate(string path) => Navigate(new AdbLocation(path));
-
-        public static void Navigate(SpecialLocation location) => Navigate(new AdbLocation(location));
+        public static void Navigate(SpecialLocation location) => Instance.Navigate(location);
 
         /// <summary>
         /// For any non back / forward navigation
         /// </summary>
         /// <param name="path"></param>
-        public static void Navigate(AdbLocation path)
-        {
-            if (PathHistory.Count > 0 && path.Equals(PathHistory[historyIndex]))
-            {
-                return;
-            }
+        public static void Navigate(AdbLocation path) => Instance.Navigate(path);
 
-            pendingSelectionPath = null;
-            
-            if (ForwardAvailable)
-            {
-                PathHistory.RemoveRange(historyIndex + 1, PathHistory.Count - historyIndex - 1);
-            }
-
-            PathHistory.Add(path);
-            historyIndex++;
-
-            UpdateMenuHistory();
-        }
-
-        public static void Reset()
-        {
-            PathHistory.Clear();
-            historyIndex = -1;
-            pendingSelectionPath = null;
-
-            UpdateMenuHistory();
-        }
+        public static void Reset() => Instance.Reset();
     }
 }

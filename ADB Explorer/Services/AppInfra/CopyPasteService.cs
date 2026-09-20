@@ -59,7 +59,7 @@ public partial class CopyPasteService : ObservableObject
                 return "";
 
             string destination = FileHelper.GetFullName(DropTarget);
-            if (Data.CurrentDisplayNames.TryGetValue(DropTarget, out var drive))
+            if (Data.CurrentDisplayNames.TryGetValue((DropTargetDevice?.ID, DropTarget), out var drive))
                 destination = drive;
 
             return destination;
@@ -260,7 +260,7 @@ public partial class CopyPasteService : ObservableObject
         if (listing is not null)
         {
             List<FileClass> cutItems = [];
-            var listingDevice = Data.Files.Device ?? Data.DevicesObject.Current;
+            var listingDevice = Data.Files.Device ?? Data.ActiveDevice;
             if (PasteSource is not DataSource.None && IsFromDevice(listingDevice))
                 cutItems = [.. listing.Where(f => ContainsPath(f.FullPath))];
 
@@ -438,7 +438,7 @@ public partial class CopyPasteService : ObservableObject
                 PasteState = pasteEffect;
         }
 
-        var copyDevice = Data.Active.Device ?? Data.DevicesObject.Current;
+        var copyDevice = Data.Active.Device ?? Data.ActiveDevice;
         if (copyDevice is not null
             && (SourceDevice is null || !ReferenceEquals(Data.Active, Data.Files)))
             SourceDevice = copyDevice;
@@ -519,7 +519,7 @@ public partial class CopyPasteService : ObservableObject
         }
         else if (file is null
             || file.IsDirectory
-            || ArchiveHelper.CanPasteIntoArchiveFile(file.IsLink ? file.LinkTarget : file.FullPath, Data.DevicesObject.Current?.ID ?? ""))
+            || ArchiveHelper.CanPasteIntoArchiveFile(file.IsLink ? file.LinkTarget : file.FullPath, Data.ActiveDevice?.ID ?? ""))
         {
             string rawPath;
             if (file is null)
@@ -527,10 +527,10 @@ public partial class CopyPasteService : ObservableObject
             else
                 rawPath = file.IsLink ? file.LinkTarget : file.FullPath;
 
-            var deviceId = Data.DevicesObject.Current?.ID ?? "";
+            var deviceId = Data.ActiveDevice?.ID ?? "";
             var targetPath = ArchiveHelper.ResolvePasteTargetPath(rawPath, deviceId);
             Data.CopyPaste.DropTarget = targetPath;
-            Data.CopyPaste.DropTargetDevice = Data.DevicesObject.Current;
+            Data.CopyPaste.DropTargetDevice = Data.ActiveDevice;
 
             if (!DriveHelper.IsModificationAllowedAt(targetPath, deviceId))
                 return DragDropEffects.None;
@@ -589,7 +589,7 @@ public partial class CopyPasteService : ObservableObject
             DragFiles = [.. dragList.items.Select(f => FileHelper.ConcatPaths(DragParent, f))];
 
             CurrentSource |= DataSource.Android;
-            var currentId = Data.DevicesObject.Current?.ID;
+            var currentId = Data.ActiveDevice?.ID;
             if (deviceId == currentId)
                 CurrentSource |= DataSource.Self;
             else if (currentId is null && dragList.pid == Environment.ProcessId)
@@ -688,7 +688,7 @@ public partial class CopyPasteService : ObservableObject
     public void AcceptDataObject(System.Windows.DragEventArgs e, FrameworkElement sender)
     {
         var dataContext = sender.DataContext;
-        var deviceId = Data.DevicesObject.Current?.ID ?? "";
+        var deviceId = Data.ActiveDevice?.ID ?? "";
 
         string targetFolder;
         if (dataContext is FileClass file && ArchiveHelper.IsPasteTargetContainer(file, deviceId))
@@ -713,7 +713,11 @@ public partial class CopyPasteService : ObservableObject
 
     public void AcceptDataObject(IDataObject dataObject, IEnumerable<FileClass> selectedFiles, bool isLink = false)
     {
-        var deviceId = Data.DevicesObject.Current?.ID ?? "";
+        // Reads Data.Active, not the globally-open device: a tree context-menu paste scopes
+        // Data.Active to the right-clicked node's own FileList (see Data.Use()), so this must
+        // resolve to that target device rather than always pasting back onto the source device.
+        var device = Data.Active.Device ?? Data.ActiveDevice;
+        var deviceId = device?.ID ?? "";
         string targetFolder;
         if (selectedFiles.Count() == 1
             && selectedFiles.First() is { } item
@@ -723,9 +727,9 @@ public partial class CopyPasteService : ObservableObject
             targetFolder = ArchiveHelper.ResolvePasteTargetPath(path, deviceId);
         }
         else
-            targetFolder = Data.CurrentPath;
+            targetFolder = Data.Active.Path;
 
-        AcceptDataObject(dataObject, targetFolder, isLink);
+        AcceptDataObject(dataObject, targetFolder, isLink, device, Data.Active.Actions.IsAppDrive);
     }
 
     public DragDropEffects GetAllowedTreeDropEffects(IDataObject dataObject, NavigationTreeNode node)
@@ -749,7 +753,7 @@ public partial class CopyPasteService : ObservableObject
         if (allowed is DragDropEffects.None)
             return;
 
-        var device = node.OwnerDevice ?? Data.DevicesObject.Current;
+        var device = node.OwnerDevice ?? Data.ActiveDevice;
         var deviceId = device?.ID ?? "";
         var targetFolder = ArchiveHelper.ResolvePasteTargetPath(node.DropTargetPath, deviceId);
         var isAppDrive = node.Drive?.Type is AbstractDrive.DriveType.Package;
@@ -761,7 +765,7 @@ public partial class CopyPasteService : ObservableObject
     }
 
     public void AcceptDataObject(IDataObject dataObject, string targetFolder, bool isLink = false)
-        => AcceptDataObject(dataObject, targetFolder, isLink, Data.DevicesObject.Current, Data.FileActions.IsAppDrive);
+        => AcceptDataObject(dataObject, targetFolder, isLink, Data.ActiveDevice, Data.FileActions.IsAppDrive);
 
     public void AcceptDataObject(IDataObject dataObject, string targetFolder, bool isLink, LogicalDeviceViewModel? device, bool isAppDrive)
     {
@@ -1018,7 +1022,7 @@ public partial class CopyPasteService : ObservableObject
 
     public static async void VerifyAndPush(string targetPath, IEnumerable<ShellItem> pasteItems, LogicalDeviceViewModel? device = null)
     {
-        device ??= Data.DevicesObject.Current;
+        device ??= Data.ActiveDevice;
         if (device is null)
             return;
 
@@ -1055,7 +1059,7 @@ public partial class CopyPasteService : ObservableObject
 
     public static async void VerifyAndPush(string targetPath, IEnumerable<FileClass> pasteItems, DragDropEffects dropEffects = DragDropEffects.Copy, LogicalDeviceViewModel? device = null)
     {
-        device ??= Data.DevicesObject.Current;
+        device ??= Data.ActiveDevice;
         if (device is null)
             return;
 
@@ -1096,7 +1100,7 @@ public partial class CopyPasteService : ObservableObject
 
     public static FileSyncOperation? VerifyAndPush(string targetPath, FileClass pasteItem, DragDropEffects dropEffects = DragDropEffects.Copy, ShellItem? originalShellItem = null, LogicalDeviceViewModel? device = null)
     {
-        device ??= Data.DevicesObject.Current;
+        device ??= Data.ActiveDevice;
         if (device is null)
             return null;
 
@@ -1238,7 +1242,7 @@ public partial class CopyPasteService : ObservableObject
         if (items.Count == 0)
             return new(items, EmptyPathSet, EmptyPathSet);
 
-        device ??= Data.DevicesObject.Current;
+        device ??= Data.ActiveDevice;
         var sep = FileHelper.GetSeparator(targetPath);
         var caseSensitive = sep is '/' && DriveHelper.GetRestrictions(targetPath, device).CaseInsensitiveNames is not true;
         StringComparer comparer = caseSensitive
@@ -1351,7 +1355,7 @@ public partial class CopyPasteService : ObservableObject
         if (items.Count == 0)
             return new(items, EmptyPathSet, EmptyPathSet);
 
-        device ??= Data.DevicesObject.Current;
+        device ??= Data.ActiveDevice;
         var sep = FileHelper.GetSeparator(targetPath);
         var caseSensitive = sep is '/' && DriveHelper.GetRestrictions(targetPath, device).CaseInsensitiveNames is not true;
         StringComparer comparer = caseSensitive
@@ -1430,7 +1434,7 @@ public partial class CopyPasteService : ObservableObject
 
     private static bool IsExplorerListing(string targetPath, LogicalDeviceViewModel? device)
     {
-        var current = Data.DevicesObject.Current;
+        var current = Data.ActiveDevice;
         if (current is null)
             return false;
         if (device is not null && device.ID != current.ID)
@@ -1459,7 +1463,7 @@ public partial class CopyPasteService : ObservableObject
         IReadOnlyList<FileMergeHelper.ConflictComparisonInfo> comparisons)
     {
         string destination = FileHelper.GetFullName(targetPath);
-        if (Data.CurrentDisplayNames.TryGetValue(targetPath, out var drive))
+        if (Data.CurrentDisplayNames.TryGetValue((Data.ActiveDevice?.ID, targetPath), out var drive))
             destination = drive;
 
         var message = conflictCount == 1

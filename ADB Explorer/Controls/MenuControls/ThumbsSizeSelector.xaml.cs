@@ -29,17 +29,8 @@ public partial class ThumbsSizeSelector : UserControl
                 Name = Strings.Resources.S_MENU_SHOW,
                 Icon = new FontIcon() { Glyph = "\uE138", FontSize = 16, Visibility = Visibility.Hidden },
                 Children = [
-                    new SettingsItem(Strings.Resources.S_NAVIGATION_PANE, () => Data.Settings.IsNavigationPaneOpen, 
-                        new DetailsAndPreviewIcon()
-                        {
-                            Size = 16,
-                            Mode = DetailsPane.SidePaneMode.Preview,
-                            Stretch = Stretch.Uniform,
-                            Invert = true
-                        }),
-                        new Separator(),
-                        new SettingsItem(Strings.Resources.S_SETTINGS_SHOW_EXTENSIONS, () => Data.Settings.ShowExtensions, new FontIcon() { Glyph = "\uE8AC", FontSize = 16 }),
-                        new SettingsItem(Strings.Resources.S_SETTINGS_HIDDEN_ITEMS, () => Data.Settings.ShowHiddenItems, new FontIcon() { Glyph = "\uE8FF", FontSize = 16 })
+                    new SettingsItem(Strings.Resources.S_SETTINGS_SHOW_EXTENSIONS, () => Data.Settings.ShowExtensions, new FontIcon() { Glyph = "\uE8AC", FontSize = 16 }),
+                    new SettingsItem(Strings.Resources.S_SETTINGS_HIDDEN_ITEMS, () => Data.Settings.ShowHiddenItems, new FontIcon() { Glyph = "\uE8FF", FontSize = 16 })
                     ]
             },
         ];

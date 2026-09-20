@@ -147,8 +147,8 @@ public static class ShellCommands
     {
         if (Data.Settings.EnableBusyBox
             && Enum.TryParse<ShellCmd>(cmd, out var enumCmd)
-            && Data.DevicesObject.Current is not null
-            && DeviceCommands.TryGetValue(Data.DevicesObject.Current.ID, out var device)
+            && Data.ActiveDevice is not null
+            && DeviceCommands.TryGetValue(Data.ActiveDevice.ID, out var device)
             && device.Commands.TryGetValue(enumCmd, out var deviceCmd))
             return deviceCmd;
 
@@ -337,7 +337,7 @@ public static class ShellCommands
 
     private static void NotifyAppDriveThumbsLockIfCurrent(string deviceID)
     {
-        if (Data.DevicesObject?.Current?.ID != deviceID)
+        if (Data.ActiveDevice?.ID != deviceID)
             return;
 
         App.SafeBeginInvoke(() => Data.FileActions.NotifyAppDriveThumbsLocked());

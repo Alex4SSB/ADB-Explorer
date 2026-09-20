@@ -213,26 +213,51 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
     #region Device properties (lazy-loaded from ADB)
 
+    /// <summary>Failures aren't cached, but retrying on every access re-runs getprop each time
+    /// (Name reads this, often on the UI thread) - so wait between attempts.</summary>
+    private static readonly TimeSpan PropsRetryDelay = TimeSpan.FromSeconds(10);
+
+    private readonly object propsLock = new();
+
+    private DateTime propsFailedAt = DateTime.MinValue;
+
     public Dictionary<string, string> Props
     {
         get
         {
-            if (field is null)
+            if (field is not null)
+                return field;
+
+            var loadedHere = false;
+
+            // Single flight: concurrent first readers (UI thread, InitDevice, UpdateBrandNames)
+            // wait for one getprop instead of each running their own.
+            lock (propsLock)
             {
-                int exitCode = ADBService.ExecuteDeviceAdbShellCommand(ID, ADBService.GET_PROP, out string stdout, out string stderr, CancellationToken.None);
-                if (exitCode == 0)
+                if (field is null)
                 {
+                    if (DateTime.Now - propsFailedAt < PropsRetryDelay)
+                        return [];
+
+                    int exitCode = ADBService.ExecuteDeviceAdbShellCommand(ID, ADBService.GET_PROP, out string stdout, out string stderr, CancellationToken.None);
+                    if (exitCode != 0)
+                    {
+                        propsFailedAt = DateTime.Now;
+                        return [];
+                    }
+
                     field = stdout.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries).Where(
                         l => l[0] == '[' && l[^1] == ']').TryToDictionary(
                             line => line.Split(':')[0].Trim('[', ']', ' '),
                             line => line.Split(':')[1].Trim('[', ']', ' '));
 
-                    RefreshSerialNumber();
+                    loadedHere = true;
                 }
-                // Do not cache on failure so subsequent attempts can retry
-                else
-                    return [];
             }
+
+            // Outside the lock: raising PropertyChanged may marshal to a UI thread that is itself waiting on it.
+            if (loadedHere)
+                RefreshSerialNumber();
 
             return field;
         }
@@ -247,7 +272,8 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
             if (string.IsNullOrEmpty(field))
             {
-                field = Props.GetValueOrDefault(ADBService.BRAND_NAME) ?? Props.GetValueOrDefault(ADBService.HOST_NAME);
+                var props = Props;
+                field = props.GetValueOrDefault(ADBService.BRAND_NAME) ?? props.GetValueOrDefault(ADBService.HOST_NAME);
             }
 
             return field;
@@ -304,7 +330,9 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         InitDeviceDrives();
         RefreshSerialNumber(notify: false, allowPropLookup: false);
 
-        BrowseCommand = new(() => !IsOpen && device.Status is DeviceStatus.Ok && device.Type is not DeviceType.Sideload,
+        // Not gated on !IsOpen - browsing an already-open device just points the active tab
+        // at it again, so there's no reason to disable this then.
+        BrowseCommand = new(() => device.Status is DeviceStatus.Ok && device.Type is not DeviceType.Sideload,
                             () => DeviceHelper.BrowseDeviceAction(this));
 
         RemoveCommand = DeviceHelper.RemoveDeviceCommand(this);
@@ -441,7 +469,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
         RefreshShellIdentity();
 
-        if (Data.DevicesObject.Current?.ID == ID)
+        if (Data.ActiveDevice?.ID == ID)
             AdbHelper.ApplyMountInfo(this, Data.DeviceCts.Token);
 
         OnPropertyChanged(nameof(Root));
@@ -449,6 +477,9 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
     public void InvalidateRootStatus()
     {
+        // Runs on every status change - a device that just came online deserves a fresh attempt.
+        propsFailedAt = DateTime.MinValue;
+
         SetShellIdentity(null);
 
         if (Root is RootStatus.Unchecked)
@@ -468,11 +499,10 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         OnPropertyChanged(nameof(Root));
         OnPropertyChanged(nameof(RootString));
 
-        if (IsOpen && Status is DeviceStatus.Ok)
+        if (Data.ActiveDevice?.ID == ID && Status is DeviceStatus.Ok)
         {
             RefreshShellIdentity();
-            if (Data.DevicesObject.Current?.ID == ID)
-                AdbHelper.ApplyMountInfo(this, Data.DeviceCts.Token);
+            AdbHelper.ApplyMountInfo(this, Data.DeviceCts.Token);
         }
 
         return true;

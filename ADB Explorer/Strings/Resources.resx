@@ -1944,6 +1944,30 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Sorting column &amp; order saved for each location</value>
     <comment>The setting that enables keeping track of the last sorted column and direction selected for each location / folder</comment>
   </data>
+  <data name="S_SETTINGS_NEW_TAB_LOCATION" xml:space="preserve">
+    <value>New tab opens at</value>
+    <comment>The setting that controls what a newly opened Explorer tab starts at</comment>
+  </data>
+  <data name="S_NEW_TAB_DUPLICATE" xml:space="preserve">
+    <value>Duplicate current tab</value>
+    <comment>New-tab-location option: copy the currently active tab's device and location</comment>
+  </data>
+  <data name="S_NEW_TAB_DRIVE_VIEW" xml:space="preserve">
+    <value>Drive view of current device</value>
+    <comment>New-tab-location option: the drive list of the app's current device</comment>
+  </data>
+  <data name="S_NEW_TAB_NONE" xml:space="preserve">
+    <value>No location</value>
+    <comment>New-tab-location option: an empty tab with no device or path selected yet</comment>
+  </data>
+  <data name="S_CLOSE_TAB" xml:space="preserve">
+    <value>Close tab</value>
+    <comment>Tooltip and action name for closing the current explorer tab</comment>
+  </data>
+  <data name="S_NEW_TAB" xml:space="preserve">
+    <value>New Tab</value>
+    <comment>Fallback tab-strip label for a tab that has not navigated anywhere yet</comment>
+  </data>
   <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
     <value>Max Image Size To Use As Its Own Thumbnail (0 - Disabled)</value>
     <comment>The name of the setting that enables using images for their own thumbnail display, and the maximum size for such images</comment>
@@ -2138,6 +2162,10 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_OPEN_FOLDER" xml:space="preserve">
     <value>Open</value>
     <comment>The name of the action to enter a folder</comment>
+  </data>
+  <data name="S_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>Open in new tab</value>
+    <comment>Context menu action opening a folder, drive or device in a new tab</comment>
   </data>
   <data name="S_RESTART" xml:space="preserve">
     <value>Restart Now</value>

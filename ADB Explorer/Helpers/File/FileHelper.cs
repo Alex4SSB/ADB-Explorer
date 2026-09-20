@@ -19,7 +19,7 @@ public static class FileHelper
             && NavigationTreeNode.PathsEqual(Data.CopyPaste.ParentFolder, Data.DirList.CurrentPath)
             && Data.CopyPaste.ContainsPath(item.FullPath))
         {
-            var listingDevice = Data.Files.Device ?? Data.DevicesObject.Current;
+            var listingDevice = Data.Files.Device ?? Data.ActiveDevice;
             if (Data.CopyPaste.IsFromDevice(listingDevice))
                 item.CutState = Data.CopyPaste.PasteState;
         }
@@ -61,7 +61,7 @@ public static class FileHelper
         if (!Data.FileActions.IsSearchMode || string.IsNullOrEmpty(Data.SearchOriginPath))
             return fileList[0].ParentPath;
 
-        var deviceId = Data.DevicesObject.Current?.ID;
+        var deviceId = Data.ActiveDevice?.ID;
         var parent = GetLowestCommonParent(fileList.Select(f => f.FullPath), deviceId);
 
         return RelationFrom(Data.SearchOriginPath, parent) is RelationType.Self or RelationType.Descendant
@@ -314,7 +314,7 @@ public static class FileHelper
         if (!Data.Settings.ShowExtensions)
             newPath += file.Extension;
 
-        ShellFileOperation.Rename(file, newPath, device ?? Data.Active.Device ?? Data.DevicesObject.Current);
+        ShellFileOperation.Rename(file, newPath, device ?? Data.Active.Device ?? Data.ActiveDevice);
     }
 
     public static string DisplayName(TextBox textBox) => DisplayName(textBox.DataContext as FilePath);
@@ -623,7 +623,7 @@ public static class FileHelper
 
     public static FolderTree[] GetFolderTree(IEnumerable<string> paths, bool isFolder = true, CancellationToken cancellationToken = default, string? deviceId = null)
     {
-        deviceId ??= Data.DevicesObject.Current?.ID;
+        deviceId ??= Data.ActiveDevice?.ID;
         if (string.IsNullOrEmpty(deviceId))
             return [];
 

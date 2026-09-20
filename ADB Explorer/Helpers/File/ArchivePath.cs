@@ -103,7 +103,7 @@ public static class ArchivePath
     }
 
     private static string? ResolveDeviceId(string? deviceId)
-        => deviceId ?? Data.DevicesObject?.Current?.ID;
+        => deviceId ?? Data.ActiveDevice?.ID;
 
     public static bool IsBrowsableArchiveFile(string path, string? deviceId = null)
         => ArchiveHelper.GetFamily(FileHelper.GetFullName(path)) is not ArchiveFamily.None

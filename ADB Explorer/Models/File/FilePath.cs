@@ -143,10 +143,10 @@ public class FilePath : AbstractFile, IBaseFile
         if (PathType is not FilePathType.Android)
             return;
 
-        if (Data.DevicesObject.Current is null || !ShellCommands.StatExists(Data.DevicesObject.Current.ID))
+        if (Data.ActiveDevice is null || !ShellCommands.StatExists(Data.ActiveDevice.ID))
             return;
 
-        var res = ADBService.ExecuteDeviceAdbShellCommand(Data.DevicesObject.Current.ID,
+        var res = ADBService.ExecuteDeviceAdbShellCommand(Data.ActiveDevice.ID,
                                                           "stat",
                                                           out string stdout,
                                                           out _,

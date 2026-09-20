@@ -7,15 +7,19 @@ public static partial class NativeMethods
         private static Action _externalClipAction = null!;
         private static Action<string> _externalIpcAction = null!;
         private static Action<float> _externalScalingAction = null!;
+        private static Action _externalCaptionClickAction = null!;
         private static HwndSource _hwndSource = null!;
 
         public static HANDLE MainWindowHandle { get; private set; } = IntPtr.Zero;
 
-        public static void Init(Window window, Action clipboardAction, Action<string> ipcAction, Action<float> scalingAction)
+        private const int HTCAPTION = 2;
+
+        public static void Init(Window window, Action clipboardAction, Action<string> ipcAction, Action<float> scalingAction, Action captionClickAction)
         {
             _externalClipAction = clipboardAction;
             _externalIpcAction = ipcAction;
             _externalScalingAction = scalingAction;
+            _externalCaptionClickAction = captionClickAction;
             RoutedEventHandler windowLoadedHandler = null;
 
             if (window.IsLoaded)
@@ -74,6 +78,11 @@ public static partial class NativeMethods
             {
                 var point = (UInt16)wParam;
                 _externalScalingAction(MonitorInfo.DpiToScalingFactor(point));
+            }
+            // Empty title bar space is the window's caption, so WPF never sees a mouse-down there.
+            else if ((WindowMessages)msg is WindowMessages.WM_NCLBUTTONDOWN && wParam == HTCAPTION)
+            {
+                _externalCaptionClickAction();
             }
 
             return IntPtr.Zero;

@@ -264,77 +264,60 @@
             </Style.Triggers>
         </Style>
 
-        <ControlTemplate x:Key="HighContrastLeftFluentNavigationViewItemTemplate" TargetType="ui:NavigationViewItem">
+        <!--  Compact left item, as tall as a navigation tree row; the hover outline is a separate overlay so it never repaints the background.  -->
+        <ControlTemplate x:Key="AdbLeftNavigationViewItemTemplate" TargetType="ui:NavigationViewItem">
             <Grid>
                 <Border
                     x:Name="MainBorder"
-                    Height="{StaticResource PaneFluentButtonHeight}"
-                    MinWidth="{StaticResource PaneFluentButtonWidth}"
-                    Padding="4"
-                    HorizontalAlignment="Stretch"
+                    MinWidth="40"
+                    Padding="0,4"
                     Background="Transparent"
-                    BorderBrush="Transparent"
-                    BorderThickness="1"
                     CornerRadius="4">
-                    <Grid>
+                    <Grid Background="Transparent">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <ContentPresenter
+                            x:Name="IconContentPresenter"
+                            Grid.Column="0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Content="{TemplateBinding Icon}"
+                            Focusable="False"
+                            TextElement.FontSize="16"
+                            TextElement.Foreground="{DynamicResource NavigationViewItemForeground}" />
                         <Rectangle
                             x:Name="ActiveRectangle"
+                            Grid.Column="0"
                             Width="3"
-                            Height="24"
-                            Margin="-4,0,0,0"
+                            Height="16"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             Fill="{DynamicResource NavigationViewSelectionIndicatorForeground}"
                             Opacity="0.0"
                             RadiusX="2"
                             RadiusY="2" />
-
-                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
-                            <ContentPresenter
-                                x:Name="IconContentPresenter"
-                                Grid.Row="0"
-                                Margin="0"
-                                Content="{TemplateBinding Icon}"
-                                TextElement.FontSize="{StaticResource NavigationViewFluentIconSize}"
-                                TextElement.Foreground="{DynamicResource NavigationViewItemForegroundLeftFluent}" />
-
-                            <Grid
-                                x:Name="ContentGrid"
-                                Grid.Row="1"
-                                Height="{StaticResource NavigationViewFluentIconSize}"
-                                Margin="0,2,0,0">
-                                <ContentPresenter
-                                    x:Name="ElementContentPresenter"
-                                    HorizontalAlignment="Center"
-                                    Content="{TemplateBinding Content}"
-                                    ContentTemplate="{TemplateBinding ContentTemplate}"
-                                    RecognizesAccessKey="True"
-                                    TextElement.FontSize="{TemplateBinding FontSize}"
-                                    TextElement.Foreground="{DynamicResource NavigationViewItemForegroundLeftFluent}" />
-                            </Grid>
-
-                            <ContentPresenter
-                                x:Name="PART_InfoBadge"
-                                Grid.Row="0"
-                                Margin="0"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Top"
-                                Content="{TemplateBinding InfoBadge}" />
-                        </Grid>
+                        <ContentPresenter
+                            x:Name="ElementContentPresenter"
+                            Grid.Column="1"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            RecognizesAccessKey="True"
+                            TextElement.FontSize="14"
+                            TextElement.Foreground="{TemplateBinding Foreground}" />
+                        <ContentPresenter
+                            x:Name="PART_InfoBadge"
+                            Grid.Column="2"
+                            Content="{TemplateBinding InfoBadge}" />
                     </Grid>
                 </Border>
-                <!--  Border-stroke-only overlay - see the comment above this template.  -->
                 <Border
                     x:Name="HoverBorder"
-                    Height="{StaticResource PaneFluentButtonHeight}"
-                    MinWidth="{StaticResource PaneFluentButtonWidth}"
-                    HorizontalAlignment="Stretch"
-                    Background="Transparent"
                     BorderBrush="{TemplateBinding BorderBrush}"
                     BorderThickness="{TemplateBinding BorderThickness}"
                     CornerRadius="4"
@@ -343,67 +326,16 @@
             <ControlTemplate.Triggers>
                 <Trigger Property="IsActive" Value="True">
                     <Setter TargetName="ActiveRectangle" Property="Opacity" Value="1.0" />
-                    <Setter TargetName="MainBorder" Property="Background" Value="{DynamicResource NavigationViewItemBackgroundSelectedLeftFluent}" />
-                    <Setter TargetName="IconContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource NavigationViewSelectionIndicatorForeground}" />
-                    <Setter TargetName="ElementContentPresenter" Property="Margin" Value="0" />
-                    <Trigger.EnterActions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation
-                                    Storyboard.TargetName="ContentGrid"
-                                    Storyboard.TargetProperty="Height"
-                                    From="{StaticResource NavigationViewFluentIconSize}"
-                                    To="0"
-                                    Duration="0:0:.16" />
-                                <DoubleAnimation
-                                    Storyboard.TargetName="ContentGrid"
-                                    Storyboard.TargetProperty="Opacity"
-                                    From="1"
-                                    To="0"
-                                    Duration="0:0:.16" />
-                                <DoubleAnimation
-                                    Storyboard.TargetName="HoverBorder"
-                                    Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Opacity)"
-                                    From="0"
-                                    To="1"
-                                    Duration="0:0:.16" />
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </Trigger.EnterActions>
-                    <Trigger.ExitActions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation
-                                    Storyboard.TargetName="ContentGrid"
-                                    Storyboard.TargetProperty="Height"
-                                    From="0"
-                                    To="{StaticResource NavigationViewFluentIconSize}"
-                                    Duration="0:0:.16" />
-                                <DoubleAnimation
-                                    Storyboard.TargetName="ContentGrid"
-                                    Storyboard.TargetProperty="Opacity"
-                                    From="0"
-                                    To="1"
-                                    Duration="0:0:.16" />
-                                <DoubleAnimation
-                                    Storyboard.TargetName="HoverBorder"
-                                    Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Opacity)"
-                                    From="1"
-                                    To="0"
-                                    Duration="0:0:.16" />
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </Trigger.ExitActions>
+                    <Setter TargetName="MainBorder" Property="Background" Value="{DynamicResource NavigationViewItemBackgroundSelected}" />
                 </Trigger>
                 <Trigger Property="Icon" Value="{x:Null}">
                     <Setter TargetName="IconContentPresenter" Property="Visibility" Value="Collapsed" />
                 </Trigger>
                 <Trigger Property="InfoBadge" Value="{x:Null}">
-                    <Setter TargetName="PART_InfoBadge" Property="Margin" Value="0" />
                     <Setter TargetName="PART_InfoBadge" Property="Visibility" Value="Collapsed" />
                 </Trigger>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter TargetName="MainBorder" Property="Background" Value="{DynamicResource NavigationViewItemBackgroundSelectedLeftFluent}" />
+                    <Setter TargetName="MainBorder" Property="Background" Value="{DynamicResource NavigationViewItemBackgroundPointerOver}" />
                 </Trigger>
                 <MultiTrigger>
                     <MultiTrigger.Conditions>
@@ -411,10 +343,149 @@
                         <Condition Property="IsActive" Value="False" />
                     </MultiTrigger.Conditions>
                     <MultiTrigger.Setters>
-                        <Setter TargetName="IconContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource NavigationViewItemForegroundPointerOverLeftFluent}" />
-                        <Setter TargetName="ContentGrid" Property="TextElement.Foreground" Value="{DynamicResource NavigationViewItemForegroundPointerOverLeftFluent}" />
+                        <Setter TargetName="IconContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource NavigationViewItemForegroundPointerOver}" />
+                        <Setter TargetName="ElementContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource NavigationViewItemForegroundPointerOver}" />
                     </MultiTrigger.Setters>
                 </MultiTrigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!--  Same faded-edge line the pane draws between the tree and the footer items.  -->
+        <Style TargetType="ui:NavigationViewItemSeparator">
+            <Setter Property="Margin" Value="0,4" />
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ui:NavigationViewItemSeparator">
+                        <Border
+                            Height="1"
+                            Margin="{TemplateBinding Margin}"
+                            Background="{DynamicResource LeftNavigationViewSeparatorBrush}" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--  Left pane with the navigation tree (PaneHeader) between the top items and the footer items.  -->
+        <ControlTemplate x:Key="AdbLeftNavigationViewTemplate" TargetType="ui:NavigationView">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid
+                    x:Name="PaneGrid"
+                    Grid.Column="0"
+                    Width="{TemplateBinding OpenPaneLength}"
+                    Margin="4,0"
+                    Panel.ZIndex="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <ItemsControl
+                            x:Name="PART_MenuItemsItemsControl"
+                            Grid.Row="0"
+                            AutomationProperties.AutomationId="NavigationItems"
+                            Focusable="False"
+                            KeyboardNavigation.DirectionalNavigation="Contained">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Margin="0" IsItemsHost="True" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+
+                        <Border
+                            x:Name="PART_TopSeparator"
+                            Grid.Row="1"
+                            Height="1"
+                            Margin="0,4"
+                            Background="{DynamicResource LeftNavigationViewSeparatorBrush}" />
+
+                        <ContentPresenter
+                            Grid.Row="2"
+                            Margin="0"
+                            Content="{TemplateBinding PaneHeader}" />
+
+                        <Border
+                            x:Name="PART_FooterSeparator"
+                            Grid.Row="3"
+                            Height="1"
+                            Margin="0,4"
+                            Background="{DynamicResource LeftNavigationViewSeparatorBrush}" />
+
+                        <ItemsControl
+                            x:Name="PART_FooterMenuItemsItemsControl"
+                            Grid.Row="4"
+                            Margin="0,0,0,4"
+                            AutomationProperties.AutomationId="NavigationFooterItems"
+                            Background="Transparent"
+                            Focusable="False"
+                            KeyboardNavigation.DirectionalNavigation="Contained">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Margin="0" IsItemsHost="True" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </Grid>
+
+                    <Thumb
+                        x:Name="PART_PaneResizeThumb"
+                        Width="6"
+                        Margin="0,0,-5,0"
+                        HorizontalAlignment="Right"
+                        Cursor="SizeWE"
+                        Opacity="0" />
+                </Grid>
+
+                <Border
+                    Grid.Column="1"
+                    Margin="{TemplateBinding FrameMargin}"
+                    Background="{DynamicResource NavigationViewContentBackground}"
+                    BorderBrush="{DynamicResource NavigationViewContentGridBorderBrush}"
+                    BorderThickness="1,1,0,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <ContentPresenter
+                            Grid.Row="0"
+                            Margin="0"
+                            Content="{TemplateBinding Header}"
+                            Visibility="{TemplateBinding HeaderVisibility}" />
+
+                        <ui:NavigationViewContentPresenter
+                            x:Name="PART_NavigationViewContentPresenter"
+                            Grid.Row="1"
+                            Padding="{TemplateBinding Padding}"
+                            Transition="{TemplateBinding Transition}"
+                            TransitionDuration="{TemplateBinding TransitionDuration}" />
+
+                        <ContentPresenter
+                            Grid.Row="0"
+                            Grid.RowSpan="2"
+                            Margin="0"
+                            Content="{TemplateBinding ContentOverlay}" />
+                    </Grid>
+                </Border>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsTopSeparatorVisible" Value="False">
+                    <Setter TargetName="PART_TopSeparator" Property="Visibility" Value="Collapsed" />
+                </Trigger>
+                <Trigger Property="IsFooterSeparatorVisible" Value="False">
+                    <Setter TargetName="PART_FooterSeparator" Property="Visibility" Value="Collapsed" />
+                </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
     </ui:FluentWindow.Resources>
@@ -430,18 +501,47 @@
         </Grid.Style>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+
+        <!--  The active tab's navigation row: full width, on the same surface the active tab fuses into.  -->
+        <Border
+            x:Name="NavBarSurface"
+            Grid.Row="1"
+            Background="{DynamicResource NavigationViewContentBackground}"
+            BorderBrush="{DynamicResource NavigationViewContentGridBorderBrush}"
+            BorderThickness="0,1,0,0">
+            <ContentPresenter x:Name="NavBarHost" />
+        </Border>
+
         <ui:NavigationView
             x:Name="RootNavigation"
-            Grid.Row="1"
+            Grid.Row="2"
             Padding="42,0,42,10"
             FooterMenuItemsSource="{Binding ViewModel.FooterMenuItems, Mode=OneWay}"
             FrameMargin="0"
             IsBackButtonVisible="Collapsed"
             IsPaneToggleVisible="False"
-            PaneDisplayMode="LeftFluent"
-            PreviewMouseDown="RootNavigation_PreviewMouseDown">
+            IsTopSeparatorVisible="False"
+            ItemTemplate="{StaticResource AdbLeftNavigationViewItemTemplate}"
+            OpenPaneLength="{Binding Source={x:Static Member=models:Data.Settings}, Path=NavigationPaneWidth, Mode=OneWay}"
+            PaneDisplayMode="Left"
+            PreviewMouseDown="RootNavigation_PreviewMouseDown"
+            Template="{StaticResource AdbLeftNavigationViewTemplate}">
+            <ui:NavigationView.PaneHeader>
+                <controls:NavigationPane x:Name="NavigationPane" Margin="0,2,0,0">
+                    <controls:NavigationPane.Style>
+                        <Style TargetType="controls:NavigationPane">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ViewModel.IsNavigationEnabled, RelativeSource={RelativeSource AncestorType=ui:FluentWindow}}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </controls:NavigationPane.Style>
+                </controls:NavigationPane>
+            </ui:NavigationView.PaneHeader>
             <ui:NavigationView.Header>
                 <ContentPresenter x:Name="PageHeader" Height="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ui:NavigationView}, Path=ActualHeight}" />
             </ui:NavigationView.Header>
@@ -469,24 +569,18 @@
             </ui:NavigationView.Resources>
             <ui:NavigationView.Style>
                 <Style BasedOn="{StaticResource DefaultNavigationViewStyle}" TargetType="ui:NavigationView">
-                    <Setter Property="Template" Value="{StaticResource LeftNavigationViewTemplate}" />
-                    <Setter Property="ItemTemplate" Value="{StaticResource LeftFluentNavigationViewItemTemplate}" />
-                    <Setter Property="OpenPaneLength" Value="NaN" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding ViewModel.IsNavigationEnabled}" Value="True">
                             <Setter Property="MenuItemsSource" Value="{Binding ViewModel.MenuItems, Mode=OneWay}" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True">
-                            <Setter Property="ItemTemplate" Value="{StaticResource HighContrastLeftFluentNavigationViewItemTemplate}" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </ui:NavigationView.Style>
         </ui:NavigationView>
 
-        <ui:ContentDialogHost x:Name="RootContentDialog" Grid.Row="1" />
+        <ui:ContentDialogHost x:Name="RootContentDialog" Grid.Row="2" />
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="120" />
                 <ColumnDefinition />
@@ -505,14 +599,9 @@
         </Grid>
 
         <ui:TitleBar x:Name="TitleBar" Grid.Row="0">
-            <ui:TitleBar.Header>
-                <TextBlock
-                    Margin="16,0,0,0"
-                    VerticalAlignment="Center"
-                    FontFamily="{StaticResource Nunito}"
-                    FontSize="20"
-                    Text="{Binding ViewModel.ApplicationTitle}" />
-            </ui:TitleBar.Header>
+            <ui:TitleBar.CenterContent>
+                <controls:ExplorerTabStrip x:Name="TabStrip" Margin="8,10,0,0" />
+            </ui:TitleBar.CenterContent>
             <ui:TitleBar.TrailingContent>
                 <controls:SimpleStackPanel
                     Margin="0,0,10,0"

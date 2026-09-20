@@ -1,4 +1,6 @@
-﻿namespace ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
+
+namespace ADB_Explorer.Controls;
 
 /// <summary>
 /// Interaction logic for PasteAndPullTooltip.xaml
@@ -10,5 +12,12 @@ public partial class PasteAndPullTooltip : UserControl
     public PasteAndPullTooltip()
     {
         InitializeComponent();
+
+        // Tooltip content can't inherit the tab, so its bindings go through this proxy instead.
+        Loaded += (_, _) =>
+        {
+            if (InstanceHelper.GetInstance(this) is { } instance)
+                ((BindingProxy)Resources["ActionsProxy"]).Data = instance.FileList.Actions;
+        };
     }
 }

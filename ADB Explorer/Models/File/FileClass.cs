@@ -10,6 +10,9 @@ namespace ADB_Explorer.Models;
 
 public partial class FileClass : FilePath, IFileStat, IBrowserItem
 {
+    /// <summary>Owning device, set at the main listing construction sites (not yet consulted by anything - groundwork for per-tab devices).</summary>
+    public LogicalDeviceViewModel? Device { get; set; }
+
     #region Notify Properties
 
     public string ParsedFullPath => Data.CurrentDrive?.LinkTargetPath is null
@@ -280,7 +283,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         if (CachedChildren is not null)
             return CachedChildren;
 
-        deviceId ??= Data.DevicesObject?.Current?.ID;
+        deviceId ??= Data.ActiveDevice?.ID;
         FolderTree[] tree;
 
         if (deviceId is not null
@@ -523,7 +526,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         location.ModifiedTimeWithOffset = info.Value.ModifiedTime ?? location.ModifiedTimeWithOffset;
         location.ModifiedTime = info.Value.ModifiedTime?.DateTime.ToLocalTime() ?? location.ModifiedTime;
         location.EffectiveAccess = ShellAccessHelper.ResolveLocationAccess(location.FullPath, info, identity, restrictions);
-        Data.DevicesObject.Current?.RecordUnixIdentity(location.User, location.Group);
+        Data.ActiveDevice?.RecordUnixIdentity(location.User, location.Group);
     }
 
     private void OnSettingsPropertyChanged(object? sender, PropertyChangedEventArgs args)
@@ -577,7 +580,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     public async Task UpdateExtraInfoAsync(CancellationToken cancellationToken)
     {
-        var deviceId = Data.DevicesObject.Current;
+        var deviceId = Data.ActiveDevice;
         var path = FullPath;
         var info = await ADBService.GetFileExtraInfoAsync(deviceId, path, cancellationToken);
         if (cancellationToken.IsCancellationRequested)
@@ -585,7 +588,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
         App.SafeBeginInvoke(() =>
         {
-            if (cancellationToken.IsCancellationRequested || path != FullPath || deviceId != Data.DevicesObject.Current)
+            if (cancellationToken.IsCancellationRequested || path != FullPath || deviceId != Data.ActiveDevice)
                 return;
 
             IsCreationTimeResolved = true;
@@ -617,7 +620,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     public FileSyncOperation PrepareDescriptors(VirtualFileDataObject vfdo, bool includeContent = true)
     {
         var source = Data.Active;
-        var device = source.Device ?? Data.DevicesObject.Current
+        var device = source.Device ?? Data.ActiveDevice
             ?? throw new InvalidOperationException("Cannot prepare file transfer descriptors without a device.");
         return PrepareDescriptors(vfdo, includeContent, device, source);
     }
@@ -803,7 +806,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         if (hResult is NativeMethods.HResult.Ok)
         {
             if (vfdo.CurrentEffect.HasFlag(DragDropEffects.Move)
-                && !ArchivePath.IsArchivePath(FullPath, Data.DevicesObject?.Current?.ID))
+                && !ArchivePath.IsArchivePath(FullPath, Data.ActiveDevice?.ID))
             {
                 var device = vfdo.Operations.First().Device;
 
@@ -811,7 +814,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
                 ShellFileOperation.SilentDelete(device, FullPath);
 
                 // Remove file in UI if present
-                if (device.ID == Data.DevicesObject.Current?.ID
+                if (device.ID == Data.ActiveDevice?.ID
                     && ParentPath == Data.CurrentPath)
                 {
                     App.SafeInvoke(() =>

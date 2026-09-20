@@ -2910,6 +2910,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open in new tab.
+        /// </summary>
+        public static string S_OPEN_IN_NEW_TAB {
+            get {
+                return ResourceManager.GetString("S_OPEN_IN_NEW_TAB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select ADB Executable.
         /// </summary>
         public static string S_OVERRIDE_ADB_BROWSE {
@@ -4317,7 +4326,61 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_SETTINGS_SORTING_PER_LOCATION", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to New tab opens at.
+        /// </summary>
+        public static string S_SETTINGS_NEW_TAB_LOCATION {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_NEW_TAB_LOCATION", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate current tab.
+        /// </summary>
+        public static string S_NEW_TAB_DUPLICATE {
+            get {
+                return ResourceManager.GetString("S_NEW_TAB_DUPLICATE", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Drive view of current device.
+        /// </summary>
+        public static string S_NEW_TAB_DRIVE_VIEW {
+            get {
+                return ResourceManager.GetString("S_NEW_TAB_DRIVE_VIEW", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No location.
+        /// </summary>
+        public static string S_NEW_TAB_NONE {
+            get {
+                return ResourceManager.GetString("S_NEW_TAB_NONE", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Close tab.
+        /// </summary>
+        public static string S_CLOSE_TAB {
+            get {
+                return ResourceManager.GetString("S_CLOSE_TAB", resourceCulture);
+            }
+        }
         
+        /// <summary>
+        ///   Looks up a localized string similar to New Tab.
+        /// </summary>
+        public static string S_NEW_TAB {
+            get {
+                return ResourceManager.GetString("S_NEW_TAB", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Show Icons For Special Folders.
         /// </summary>

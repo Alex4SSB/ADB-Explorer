@@ -15,6 +15,7 @@
     TextElement.FontSize="14"
     mc:Ignorable="d">
     <UserControl.Resources>
+        <helpers:BindingProxy x:Key="ActionsProxy" />
         <ui:FontIcon
             x:Key="ErrorIcon"
             x:Shared="False"
@@ -29,7 +30,7 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsCurrentLocationReadOnly}" Value="False">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsCurrentLocationReadOnly}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -50,10 +51,10 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionFuseProtectedAndroidRoot}" Value="False">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionFuseProtectedAndroidRoot}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.SelectedItemsCount}" Value="0">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -74,13 +75,13 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="False">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionIllegalOnWindows}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalNaming}" Value="True">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionIllegalNaming}" Value="True">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.SelectedItemsCount}" Value="0">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -101,13 +102,13 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWinRoot}" Value="False">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionIllegalOnWinRoot}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="True">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionIllegalOnWindows}" Value="True">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.SelectedItemsCount}" Value="0">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -128,13 +129,13 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionConflictingNames}" Value="False">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionConflictingNames}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="True">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionIllegalOnWindows}" Value="True">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.SelectedItemsCount}" Value="0">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -155,10 +156,10 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalNaming}" Value="False">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionIllegalNaming}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.SelectedItemsCount}" Value="0">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -179,10 +180,10 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingNames}" Value="False">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsPastingConflictingNames}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalNaming}" Value="True">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsPastingIllegalNaming}" Value="True">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -203,7 +204,7 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalNaming}" Value="False">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsPastingIllegalNaming}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -224,10 +225,10 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRegularItem}" Value="True">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsRegularItem}" Value="True">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.SelectedItemsCount}" Value="0">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -260,39 +261,39 @@
                 <Style.Triggers>
                     <MultiDataTrigger>
                         <MultiDataTrigger.Conditions>
-                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsCurrentLocationReadOnly}" Value="False" />
-                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionFuseProtectedAndroidRoot}" Value="False" />
-                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="False" />
-                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalNaming}" Value="False" />
-                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWinRoot}" Value="False" />
-                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionConflictingNames}" Value="False" />
-                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingNames}" Value="False" />
-                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRegularItem}" Value="True" />
+                            <Condition Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsCurrentLocationReadOnly}" Value="False" />
+                            <Condition Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionFuseProtectedAndroidRoot}" Value="False" />
+                            <Condition Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionIllegalOnWindows}" Value="False" />
+                            <Condition Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionIllegalNaming}" Value="False" />
+                            <Condition Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionIllegalOnWinRoot}" Value="False" />
+                            <Condition Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionConflictingNames}" Value="False" />
+                            <Condition Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsPastingConflictingNames}" Value="False" />
+                            <Condition Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsRegularItem}" Value="True" />
                         </MultiDataTrigger.Conditions>
                         <Setter Property="Visibility" Value="Collapsed" />
                     </MultiDataTrigger>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsCurrentLocationReadOnly}" Value="True">
+                    <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsCurrentLocationReadOnly}" Value="True">
                         <Setter Property="Visibility" Value="Visible" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionFuseProtectedAndroidRoot}" Value="True">
+                    <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionFuseProtectedAndroidRoot}" Value="True">
                         <Setter Property="Visibility" Value="Visible" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalNaming}" Value="True">
+                    <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsPastingIllegalNaming}" Value="True">
                         <Setter Property="Visibility" Value="Visible" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingNames}" Value="True">
+                    <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsPastingConflictingNames}" Value="True">
                         <Setter Property="Visibility" Value="Visible" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
+                    <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsExplorerVisible}" Value="False">
                         <Setter Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRecycleBin}" Value="True">
+                    <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsRecycleBin}" Value="True">
                         <Setter Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
+                    <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsAppDrive}" Value="True">
                         <Setter Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding Source={x:Static models:Data.FileActions}, Path=ListingInProgress}" Value="True">
+                    <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.ListingInProgress}" Value="True">
                         <Setter Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
                 </Style.Triggers>

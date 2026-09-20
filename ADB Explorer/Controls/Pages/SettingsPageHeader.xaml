@@ -524,10 +524,10 @@
     </UserControl.Resources>
     <Grid x:Name="RootGrid" Margin="42,10">
         <Grid
+            Width="{Binding ActualWidth, ElementName=RootGrid}"
             MinWidth="600"
             MaxWidth="1200"
-            HorizontalAlignment="Center"
-            Width="{Binding ActualWidth, ElementName=RootGrid}">
+            HorizontalAlignment="Center">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition />

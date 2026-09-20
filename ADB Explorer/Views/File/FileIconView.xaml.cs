@@ -64,7 +64,7 @@ public partial class FileIconView : UserControl
         if (!_wasSelectedOnMouseDown || _wasEditingOnMouseDown || _clickCount > 1)
             return;
 
-        if (DevicesObject.Current.HasRootShell
+        if (ActiveDevice.HasRootShell
             && file.Type is not (AbstractFile.FileType.File or AbstractFile.FileType.Folder))
             return;
 

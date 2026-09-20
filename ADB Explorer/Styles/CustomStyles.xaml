@@ -1,4 +1,4 @@
-<ResourceDictionary
+﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:app_prop="clr-namespace:ADB_Explorer.Properties"
@@ -234,8 +234,8 @@
         <Style.Triggers>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsDriveViewVisible}" Value="False" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:InstanceHelper.Instance).FileList.Actions.IsExplorerVisible}" Value="False" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:InstanceHelper.Instance).FileList.Actions.IsDriveViewVisible}" Value="False" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Visibility" Value="Collapsed" />
             </MultiDataTrigger>
@@ -367,70 +367,21 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="DriveViewScrollViewerStyle" TargetType="ScrollViewer">
-        <Setter Property="AllowDrop" Value="False" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsDriveViewVisible}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
     <Style x:Key="SearchBoxStyle" TargetType="controls:SearchBox">
         <Setter Property="DefaultControlWidth" Value="{Binding Source={x:Static Member=models:AdbExplorerConst.DEFAULT_SEARCH_WIDTH}}" />
         <Setter Property="IsActive" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=IsActive, Mode=OneWay}" />
-        <Setter Property="IsEnabled" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=HomeEnabled}" />
+        <!--
+            Self, not x:Static Data.FileActions - this Style is shared app-wide across every tab's
+            own SearchBox, so a snapshotted active-tab reference would only ever be right for one.
+        -->
+        <Setter Property="IsEnabled" Value="{Binding RelativeSource={RelativeSource Self}, Path=Instance.FileList.Actions.HomeEnabled}" />
         <Setter Property="MaxControlWidth" Value="{Binding Source={x:Static Member=models:AdbExplorerConst.DEFAULT_SEARCH_WIDTH}}" />
         <Setter Property="MinControlWidth" Value="{Binding Source={x:Static Member=models:AdbExplorerConst.MIN_SEARCH_WIDTH}}" />
-        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ExplorerFilter, Mode=TwoWay}" />
+        <Setter Property="Text" Value="{Binding RelativeSource={RelativeSource Self}, Path=Instance.FileList.Actions.ExplorerFilter, Mode=TwoWay}" />
         <Style.Triggers>
             <!--  Search doesn't apply to the recycle bin itself, and must never recurse into it.  -->
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRecycleBin}" Value="True">
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Instance.FileList.Actions.IsRecycleBin}" Value="True">
                 <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="NonRootEmptyFolderStyle" TargetType="StackPanel">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Root}" Value="Enabled">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding DataContext.IsSearchBoxFiltered, RelativeSource={RelativeSource AncestorType=controls:ExplorerListHost}}" Value="True">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="EmptyFolderAltPromptStyle" TargetType="TextBlock">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Root}" Value="Enabled">
-                <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_FOLDER_EMPTY}}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
-                <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_EMPTY_APP_DRIVE}}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding DataContext.IsSearchBoxFiltered, RelativeSource={RelativeSource AncestorType=controls:ExplorerListHost}}" Value="True">
-                <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_EMPTY_FILTER}}" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="EmptyFolderGridStyle" TargetType="Grid">
-        <Setter Property="HorizontalAlignment" Value="Center" />
-        <Setter Property="VerticalAlignment" Value="Top" />
-        <Setter Property="DataContext" Value="{Binding Source={x:Static Member=models:Data.DevicesObject}, Path=Current}" />
-        <Setter Property="Visibility" Value="Collapsed" />
-        <Style.Triggers>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Items.Count}" Value="0" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="True" />
-                    <Condition Binding="{Binding Source={x:Static models:Data.FileActions}, Path=ListingInProgress}" Value="False" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Visibility" Value="Visible" />
-            </MultiDataTrigger>
-            <DataTrigger Binding="{Binding DataContext.NavigationBoxMode, RelativeSource={RelativeSource AncestorType=controls:ExplorerListHost}}" Value="None">
-                <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -479,9 +430,9 @@
         x:Key="ItemsCountStyle"
         BasedOn="{StaticResource MarginedTextBlockStyle}"
         TargetType="TextBlock">
-        <Setter Property="Text" Value="{Binding ExplorerItemsSource.Count}" />
+        <Setter Property="Text" Value="{Binding Instance.ExplorerItemsSource.Count}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:InstanceHelper.Instance).FileList.Actions.IsExplorerVisible}" Value="False">
                 <Setter Property="Text" Value="" />
             </DataTrigger>
         </Style.Triggers>

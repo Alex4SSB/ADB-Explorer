@@ -1,4 +1,4 @@
-using ADB_Explorer.Controls.Pages;
+﻿using ADB_Explorer.Controls.Pages;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
@@ -14,8 +14,8 @@ namespace ADB_Explorer.Views.Windows;
 
 public partial class MainWindow : INavigationWindow
 {
-    private const double LaunchScreenWidthScale = 0.43;
-    private const double LaunchScreenHeightScale = 0.6;
+    private const double LaunchScreenWidthScale = 0.52;
+    private const double LaunchScreenHeightScale = 0.7;
 
     private readonly DragWindow dw = new();
 
@@ -44,9 +44,60 @@ public partial class MainWindow : INavigationWindow
 
         RootNavigation.Navigated += RootNavigation_Navigated;
 
+        // Before the handlers below, so the first tab doesn't try to show a page before the view exists.
+        ExplorerTabs.EnsureActiveTab();
+
+        ExplorerTabs.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is not nameof(ExplorerTabsViewModel.ActiveTab) || ExplorerTabs.ActiveTab is not { } tab)
+                return;
+
+            EnsureActiveHeader();
+            TabPageSync.ShowTabPage(tab);
+
+            if (Data.CurrentPage.Value == typeof(ExplorerPage))
+                PageHeader.Content = GetOrCreateExplorerHeader(tab);
+        };
+
+        ExplorerTabs.Tabs.CollectionChanged += (_, e) =>
+        {
+            if (e.Action != NotifyCollectionChangedAction.Remove)
+                return;
+
+            foreach (ExplorerInstance closed in e.OldItems)
+            {
+                closed.FileList.DirList?.Stop();
+                _explorerHeaders.Remove(closed);
+            }
+        };
+
         Data.CurrentPage.PropertyChanged += (s, e) =>
         {
-            Navigate(e.NewValue);
+            ViewModel.IsExplorerPage = e.NewValue == typeof(ExplorerPage);
+
+            // The navigation view can't show anything until its template is applied; Loaded navigates then.
+            if (RootNavigation.IsLoaded)
+                Navigate(e.NewValue);
+
+            TabPageSync.RecordPage(e.NewValue);
+        };
+
+        MouseUp += MainWindow_MouseUp;
+
+        RootNavigation.Loaded += (_, _) =>
+        {
+            HookPaneResize();
+            HookPaneHover();
+        };
+        Data.DevicesObjectCreated += (_, _) => App.SafeInvoke(InitializeNavigationPane);
+        InitializeNavigationPane();
+        ShowPlaceholderNavBar();
+
+        UpdatePageAreaBorder();
+        Data.RuntimeSettings.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(AppRuntimeSettings.IsHighContrast))
+                UpdatePageAreaBorder();
         };
 
         Deactivated += (s, e) =>
@@ -58,6 +109,76 @@ public partial class MainWindow : INavigationWindow
         StateChanged += (s, e) =>
         {
             Data.Settings.WindowMaximized = WindowState is WindowState.Maximized;
+        };
+    }
+
+    private const double PANE_MIN_WIDTH = 160;
+
+    private void UnfocusNavigationRow()
+    {
+        if (ExplorerTabs.ActiveTab is { } tab && _explorerHeaders.TryGetValue(tab, out var header))
+            header.PathBoxFocus(false);
+
+        Data.RaiseUnfocusSearchBox();
+    }
+
+    private bool _navigationPaneInitialized;
+
+    /// <summary>The tree needs the devices list, so it's wired up once that exists rather than at window creation.</summary>
+    private void InitializeNavigationPane()
+    {
+        if (_navigationPaneInitialized || Data.DevicesObject is null)
+            return;
+
+        _navigationPaneInitialized = true;
+
+        var explorer = App.Services.GetRequiredService<ExplorerViewModel>();
+        explorer.EnsureInitialized();
+        EnsureActiveHeader();
+        NavigationPane.SetBinding(Controls.NavigationPane.TreeItemsProperty, new Binding("Tree.TreeSource") { Source = explorer });
+    }
+
+    /// <summary>
+    /// The active tab's header listens for navigation signals, so it has to exist even while a page
+    /// covers it - and its navigation row is what the window shows above the pane.
+    /// </summary>
+    private void EnsureActiveHeader()
+    {
+        if (Data.DevicesObject is null || ExplorerTabs.ActiveTab is not { } tab)
+            return;
+
+        NavBarHost.Content = GetOrCreateExplorerHeader(tab).NavBar;
+    }
+
+    /// <summary>Until ADB is valid there's no real header, so a disabled bar keeps the row - and the tab fusing into it - intact.</summary>
+    private void ShowPlaceholderNavBar()
+    {
+        if (Data.DevicesObject is not null || NavBarHost.Content is not null || ExplorerTabs.ActiveTab is not { } tab)
+            return;
+
+        NavBarHost.Content = new Controls.ExplorerNavBar(tab) { IsEnabled = false };
+    }
+
+    private void HookPaneHover()
+    {
+        if (RootNavigation.Template.FindName("PART_FooterMenuItemsItemsControl", RootNavigation) is not ItemsControl footer)
+            return;
+
+        footer.MouseEnter += (_, _) => ViewModel.IsFooterHovered = true;
+        footer.MouseLeave += (_, _) => ViewModel.IsFooterHovered = false;
+    }
+
+    private void HookPaneResize()
+    {
+        if (RootNavigation.Template.FindName("PART_PaneResizeThumb", RootNavigation) is not Thumb thumb)
+            return;
+
+        thumb.DragDelta += (_, e) =>
+        {
+            var delta = Data.RuntimeSettings.IsRTL ? -e.HorizontalChange : e.HorizontalChange;
+            var maxWidth = Math.Max(PANE_MIN_WIDTH, ActualWidth / 2);
+            var width = Math.Clamp(Data.Settings.NavigationPaneWidth + delta, PANE_MIN_WIDTH, maxWidth);
+            Data.Settings.NavigationPaneWidth = (int)width;
         };
     }
 
@@ -127,7 +248,8 @@ public partial class MainWindow : INavigationWindow
         NativeMethods.InterceptClipboard.Init(this,
                                               Data.CopyPaste.GetClipboardPasteItems,
                                               IpcService.AcceptIpcMessage,
-                                              scale => Data.RuntimeSettings.MainWindowScalingFactor = scale);
+                                              scale => Data.RuntimeSettings.MainWindowScalingFactor = scale,
+                                              UnfocusNavigationRow);
 
         Data.FileOpQ.PropertyChanged += (s, e) =>
         {
@@ -162,14 +284,33 @@ public partial class MainWindow : INavigationWindow
         }
     } = null;
 
-    private ExplorerPageHeader ExplorerPageHeader
+    private ExplorerTabsViewModel ExplorerTabs => App.Services.GetService<ExplorerTabsViewModel>();
+
+    /// <summary>The page area's outline would run under the fused active tab, so it's removed -
+    /// except in high contrast, where that outline is what separates the areas.</summary>
+    private void UpdatePageAreaBorder()
     {
-        get
+        const string key = "NavigationViewContentGridBorderBrush";
+
+        if (Data.RuntimeSettings.IsHighContrast)
+            Resources.Remove(key);
+        else
+            Resources[key] = Brushes.Transparent;
+    }
+
+    private readonly Dictionary<ExplorerInstance, ExplorerPageHeader> _explorerHeaders = [];
+
+    /// <summary>One header UserControl per tab, created lazily and cached for the tab's lifetime.</summary>
+    internal ExplorerPageHeader GetOrCreateExplorerHeader(ExplorerInstance instance)
+    {
+        if (!_explorerHeaders.TryGetValue(instance, out var header))
         {
-            field ??= new(App.Services.GetService<ExplorerViewModel>()); 
-            return field;
+            header = new(App.Services.GetService<ExplorerViewModel>(), instance);
+            _explorerHeaders[instance] = header;
         }
-    } = null;
+
+        return header;
+    }
 
     private TerminalPageHeader TerminalPageHeader
     {
@@ -204,7 +345,7 @@ public partial class MainWindow : INavigationWindow
         {
             Pages.SettingsPage => SettingsPageHeader,
             Pages.DevicesPage => DevicesPageHeader,
-            Pages.ExplorerPage => ExplorerPageHeader,
+            Pages.ExplorerPage => GetOrCreateExplorerHeader(ExplorerTabs.EnsureActiveTab()),
             Pages.TerminalPage => TerminalPageHeader,
             Pages.LogPage => LogPageHeader,
             Pages.OperationsPage => OperationsPageHeader,
@@ -287,16 +428,36 @@ public partial class MainWindow : INavigationWindow
             return;
 
         if (Data.CurrentPage.Value == typeof(ExplorerPage))
-            ExplorerPageHeader.HandlePreviewKeyDown(e);
+            GetOrCreateExplorerHeader(ExplorerTabs.EnsureActiveTab()).HandlePreviewKeyDown(e);
     }
 
     private void MainWindow_PreviewKeyUp(object sender, KeyEventArgs e)
     {
+        // Releasing Alt on its own would otherwise activate keyboard navigation and move focus around the window.
+        if (e.Key is Key.System && e.SystemKey is Key.LeftAlt or Key.RightAlt)
+        {
+            e.Handled = true;
+            return;
+        }
+
         if (DiskUsagePollingService.ServerUnresponsive)
             return;
 
         if (Data.CurrentPage.Value == typeof(ExplorerPage))
-            ExplorerPageHeader.HandlePreviewKeyUp(e);
+            GetOrCreateExplorerHeader(ExplorerTabs.EnsureActiveTab()).HandlePreviewKeyUp(e);
+    }
+
+    /// <summary>The mouse back / forward buttons work anywhere in the window - the explorer header handles them itself over its own area.</summary>
+    private void MainWindow_MouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton is not (MouseButton.XButton1 or MouseButton.XButton2) || Data.ActiveExplorerInstance.FileList.Actions.ListingInProgress)
+            return;
+
+        var direction = e.ChangedButton is MouseButton.XButton1
+            ? Navigation.SpecialLocation.Back
+            : Navigation.SpecialLocation.Forward;
+
+        e.Handled = NavHistory.NavigateBF(direction);
     }
 
     private void RootNavigation_PreviewMouseDown(object sender, MouseButtonEventArgs e)

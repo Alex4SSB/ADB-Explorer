@@ -1,4 +1,4 @@
-using ADB_Explorer.ViewModels.Pages;
+﻿using ADB_Explorer.Models;
 
 namespace ADB_Explorer.Controls;
 
@@ -62,14 +62,14 @@ public partial class SelectionRectangle : UserControl
     /// <param name="scroller">The <see cref="ScrollViewer"/> inside the active view.</param>
     /// <param name="activeView">The currently active <see cref="Selector"/> (DataGrid or ListView).</param>
     /// <param name="activeSelectedItems">The selected-items list of the active view.</param>
-    /// <param name="viewModel">The <see cref="ExplorerViewModel"/> for updating selection indices.</param>
+    /// <param name="instance">This tab's <see cref="ExplorerInstance"/> for updating selection indices.</param>
     public void Update(
         Point mousePosition,
         Point mouseDownPoint,
         ScrollViewer scroller,
         Selector activeView,
         System.Collections.IList activeSelectedItems,
-        ExplorerViewModel viewModel)
+        ExplorerInstance instance)
     {
         if (scroller is null)
             return;
@@ -114,10 +114,10 @@ public partial class SelectionRectangle : UserControl
         Rect.Height = Math.Abs(origin.Y - mousePosition.Y);
         Rect.Width = Math.Abs(origin.X - mousePosition.X);
 
-        SelectItemsByRect(mousePosition, activeView, activeSelectedItems, viewModel);
+        SelectItemsByRect(mousePosition, activeView, activeSelectedItems, instance);
     }
 
-    private void SelectItemsByRect(Point mousePosition, Selector view, System.Collections.IList activeSelectedItems, ExplorerViewModel viewModel)
+    private void SelectItemsByRect(Point mousePosition, Selector view, System.Collections.IList activeSelectedItems, ExplorerInstance instance)
     {
         Rect selection = new(Canvas.GetLeft(Rect),
                              Canvas.GetTop(Rect),
@@ -150,14 +150,14 @@ public partial class SelectionRectangle : UserControl
             }
 
             if (itemRect.Contains(mousePosition))
-                viewModel.CurrentSelectedIndex = i;
+                instance.CurrentSelectedIndex = i;
         }
 
         if (activeSelectedItems.Count == 1
-            && (viewModel.FirstSelectedIndex < 0
+            && (instance.FirstSelectedIndex < 0
             || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift))
         {
-            viewModel.FirstSelectedIndex = view.SelectedIndex;
+            instance.FirstSelectedIndex = view.SelectedIndex;
         }
     }
 

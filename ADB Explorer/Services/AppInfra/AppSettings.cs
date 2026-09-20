@@ -23,6 +23,14 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
         OnConnect,
     }
 
+    /// <summary>What a newly opened Explorer tab starts at.</summary>
+    public enum NewTabLocationMode
+    {
+        DuplicateCurrentTab,
+        DriveView,
+        NoLocation,
+    }
+
     public enum ThumbnailAge
     {
         Disabled,
@@ -250,10 +258,7 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     public partial DetailsPane.SidePaneMode SidePane { get; set; } = DetailsPane.SidePaneMode.Details;
 
     [ObservableProperty]
-    public partial bool IsNavigationPaneOpen { get; set; } = true;
-
-    [ObservableProperty]
-    public partial int NavigationPaneWidth { get; set; } = 200;
+    public partial int NavigationPaneWidth { get; set; } = 240;
 
     [ObservableProperty]
     public partial int MaxPreviewFileSize { get; set; } = 300;
@@ -407,6 +412,9 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
 
     [ObservableProperty]
     public partial bool ShowHiddenItems { get; set; } = true;
+
+    [ObservableProperty]
+    public partial NewTabLocationMode NewTabLocation { get; set; } = NewTabLocationMode.DriveView;
 
     #endregion
 

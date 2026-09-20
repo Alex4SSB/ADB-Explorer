@@ -348,7 +348,7 @@ public class FileSyncOperation : FileOperation
             return;
         }
 
-        if (Data.DevicesObject.Current is null || !ShellCommands.StatExists(Data.DevicesObject.Current.ID))
+        if (Data.ActiveDevice is null || !ShellCommands.StatExists(Data.ActiveDevice.ID))
             return;
 
         var file = Data.DirList?.FileList?.FirstOrDefault(f => f.FullPath == item.FullPath)

@@ -11,6 +11,20 @@ namespace ADB_Explorer.Controls;
 [ObservableObject]
 public partial class SearchOptionsControl : UserControl
 {
+    /// <summary>The <see cref="Pages.ExplorerPageHeader"/> that hosts this control, set once via <see cref="Initialize"/>.</summary>
+    private Pages.ExplorerPageHeader? Owner { get; set; }
+
+    internal void Initialize(Pages.ExplorerPageHeader owner)
+    {
+        Owner = owner;
+
+        owner.Instance.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(ExplorerInstance.IsSearchExpanded))
+                NotifySearchMenuVisibilityChanged();
+        };
+    }
+
     public SearchOptionsControl()
     {
         Items = [
@@ -51,12 +65,6 @@ public partial class SearchOptionsControl : UserControl
                 NotifySearchMenuVisibilityChanged();
         };
 
-        Data.RuntimeSettings.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName is nameof(AppRuntimeSettings.IsSearchBoxFocused))
-                NotifySearchMenuVisibilityChanged();
-        };
-
         InitializeComponent();
     }
 
@@ -67,14 +75,15 @@ public partial class SearchOptionsControl : UserControl
     public bool IsCloseSearchVisible => !string.IsNullOrEmpty(Data.FileActions.ExplorerFilter);
 
     public bool IsSearchOptionsVisible =>
-        Data.RuntimeSettings.IsSearchBoxFocused || !string.IsNullOrEmpty(Data.FileActions.ExplorerFilter);
+        Owner?.Instance.IsSearchExpanded == true || !string.IsNullOrEmpty(Data.FileActions.ExplorerFilter);
 
     private static bool CanCloseSearch() => !string.IsNullOrEmpty(Data.FileActions.ExplorerFilter);
 
-    private static void CloseSearch()
+    private void CloseSearch()
     {
         Data.FileActions.ExplorerFilter = "";
-        Data.RuntimeSettings.IsSearchBoxFocused = false;
+        if (Owner is not null)
+            Owner.Instance.IsSearchExpanded = false;
     }
 
     private void NotifySearchMenuVisibilityChanged()

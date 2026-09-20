@@ -1,0 +1,52 @@
+<UserControl
+    x:Class="ADB_Explorer.Controls.ExplorerNavBar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
+    xmlns:local="clr-namespace:ADB_Explorer.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="48"
+    d:DesignWidth="800"
+    MouseDown="NavBar_MouseDown"
+    MouseEnter="NavBar_MouseEnter"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <!--  Data is set in code-behind to this bar's own tab, like the explorer header's own proxy.  -->
+        <helpers:BindingProxy x:Key="InstanceProxy" />
+    </UserControl.Resources>
+    <Grid Height="48">
+        <Grid Margin="6,2" VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <local:AdbMenu
+                x:Name="NavigationToolBar"
+                Margin="0,0,6,0"
+                Style="{StaticResource NavigationToolBarStyle}" />
+            <local:NavigationBox
+                x:Name="NavigationBox"
+                Grid.Column="1"
+                SavedItems="{Binding Source={StaticResource InstanceProxy}, Path=Data.SavedItems, Mode=OneWay}" />
+            <!--  Searching only makes sense on a folder, so the box goes away while the tab shows a page.  -->
+            <Grid Grid.Column="2">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.IsShowingPage}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <local:SearchBox
+                    x:Name="SearchBox"
+                    IsExpanded="{Binding Source={StaticResource InstanceProxy}, Path=Data.IsSearchExpanded, Mode=TwoWay}"
+                    Style="{StaticResource SearchBoxStyle}" />
+            </Grid>
+        </Grid>
+        <Separator VerticalAlignment="Bottom" />
+    </Grid>
+</UserControl>

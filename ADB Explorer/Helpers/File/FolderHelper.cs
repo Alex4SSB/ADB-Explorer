@@ -7,16 +7,19 @@ namespace ADB_Explorer.Helpers;
 
 public static class FolderHelper
 {
-    public static void CombineDisplayNames()
+    /// <summary>Populates <see cref="Data.CurrentDisplayNames"/> for <paramref name="device"/>
+    /// (defaults to the active tab's) - explicit so a tab pinned to a different device still
+    /// combines names for its own, not whichever device is active right now.</summary>
+    public static void CombineDisplayNames(LogicalDeviceViewModel? device = null)
     {
-        if (Data.DevicesObject?.Current is not LogicalDeviceViewModel device)
+        device ??= Data.ActiveDevice;
+        if (device is null)
             return;
 
+        var deviceId = device.ID;
         var driveView = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
-        var name = device.Name;
 
-        if (!Data.CurrentDisplayNames.TryAdd(driveView, name))
-            Data.CurrentDisplayNames[driveView] = name;
+        Data.CurrentDisplayNames[(deviceId, driveView)] = device.Name;
 
         // Index USB/OTG drives only while more than one is connected, so DisplayName can tell them apart.
         var externalDrives = device.Drives.OfType<LogicalDriveViewModel>().Where(d => d.Type is AbstractDrive.DriveType.External).ToList();
@@ -27,13 +30,12 @@ public static class FolderHelper
             is not AbstractDrive.DriveType.Root
             and not AbstractDrive.DriveType.Internal))
         {
-            if (!Data.CurrentDisplayNames.TryAdd(drive.Path, drive.DisplayName))
-                Data.CurrentDisplayNames[drive.Path] = drive.DisplayName;
+            Data.CurrentDisplayNames[(deviceId, drive.Path)] = drive.DisplayName;
         }
 
         foreach (var item in AdbExplorerConst.DRIVE_TYPES.Where(d => d.Value is AbstractDrive.DriveType.Root or AbstractDrive.DriveType.Internal))
         {
-            Data.CurrentDisplayNames.TryAdd(item.Key, AbstractDrive.GetDriveDisplayName(item.Value));
+            Data.CurrentDisplayNames.TryAdd((deviceId, item.Key), AbstractDrive.GetDriveDisplayName(item.Value));
         }
 
         foreach (var item in AdbExplorerConst.DRIVE_TYPES)
@@ -44,22 +46,24 @@ public static class FolderHelper
                 .Select(AbstractDrive.GetDriveDisplayName);
 
             if (names.Any())
-                Data.CurrentDisplayNames.TryAdd(item.Key, names.First());
+                Data.CurrentDisplayNames.TryAdd((deviceId, item.Key), names.First());
         }
     }
 
-    public static string FolderExists(string path)
+    public static string FolderExists(string path, LogicalDeviceViewModel? device = null)
     {
+        device ??= Data.ActiveDevice;
+
         if (path == AdbLocation.StringFromLocation(Navigation.SpecialLocation.PackageDrive))
             return path;
 
         if (path == AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin))
             return AdbExplorerConst.RECYCLE_PATH;
 
-        if (ArchivePath.IsArchivePath(path, Data.DevicesObject?.Current?.ID))
+        if (ArchivePath.IsArchivePath(path, device?.ID))
             return path;
 
-        if (Data.DevicesObject?.Current is not { } device)
+        if (device is null)
             return null;
 
         try

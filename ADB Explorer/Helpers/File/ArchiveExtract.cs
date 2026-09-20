@@ -70,7 +70,7 @@ public static class ArchiveExtract
     public static void CleanupAllStaging(string? deviceId = null, CancellationToken cancellationToken = default)
     {
         _ = cancellationToken;
-        deviceId ??= Data.DevicesObject?.Current?.ID;
+        deviceId ??= Data.ActiveDevice?.ID;
         ActiveStagingRoots.Clear();
 
         if (deviceId is null)
@@ -95,7 +95,7 @@ public static class ArchiveExtract
     /// </summary>
     public static void BeginCleanupAllStaging(string? deviceId = null)
     {
-        deviceId ??= Data.DevicesObject?.Current?.ID;
+        deviceId ??= Data.ActiveDevice?.ID;
 
         var roots = ActiveStagingRoots.Keys.ToArray();
         foreach (var root in roots)

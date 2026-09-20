@@ -8,12 +8,10 @@ namespace ADB_Explorer.Services;
 
 internal static class NavigationToolBar
 {
-    public static ObservableList<IMenuItem> List { get; } = [
-        new IconMenu(
-            AppActions.List.Find(a => a.Name is FileAction.FileActionType.Home),
-            AppActions.Icon(FileAction.FileActionType.Home, 16),
-            StyleHelper.ContentAnimation.Bounce,
-            altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardHome)),
+    // Built fresh per header rather than a shared static list: each item's icon is a live WPF
+    // element (only one visual parent allowed) and its enablement targets one tab's own Actions,
+    // so a single app-wide instance would only ever render correctly in the most recent tab.
+    internal static ObservableList<IMenuItem> Build(ExplorerInstance instance) => [
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Back),
             new BaseIcon("\uE72B", 16),
@@ -23,7 +21,7 @@ internal static class NavigationToolBar
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.NavHistory),
             new BaseIcon("\uE70D", 12),
             children:
-            NavHistory.MenuHistory),
+            instance.History.MenuHistory),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Forward),
             new BaseIcon("\uE72A", 16),
@@ -35,7 +33,7 @@ internal static class NavigationToolBar
             StyleHelper.ContentAnimation.Bounce),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.NavRefresh),
-            Data.FileActions.NavRefreshIcon,
+            instance.FileList.Actions.NavRefreshIcon,
             StyleHelper.ContentAnimation.RotateCW,
             mirrorInRTL: true),
         ];
@@ -56,24 +54,26 @@ file static class CompressToMenuHelper
 
 internal static class MainToolBar
 {
-    public static ObservableList<IMenuItem> List { get; } = [
+    // Built fresh per header - see NavigationToolBar.Build's comment for why this can't be a
+    // single shared static list once more than one tab's toolbar can be on screen.
+    internal static ObservableList<IMenuItem> Build(ExplorerInstance instance) => [
         new CompoundIconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Pull),
             new(new PullIcon()),
-            isVisible: Data.FileActions.IsPullCopyVisible),
+            isVisible: instance.FileList.Actions.IsPullCopyVisible),
         new CompoundIconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Push),
             new(new PushIcon()),
             isChevronVisible: true,
-            isVisible: Data.FileActions.IsPushMenuVisible,
+            isVisible: instance.FileList.Actions.IsPushMenuVisible,
             children: 
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFolders), AppActions.Icon(FileAction.FileActionType.PushFolders, 16)),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFiles), AppActions.Icon(FileAction.FileActionType.NewFile, 16)),
-                new SubMenuSeparator(Data.FileActions.IsApkActionsVisible),
+                new SubMenuSeparator(instance.FileList.Actions.IsApkActionsVisible),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushPackages),
                     AppActions.Icon(FileAction.FileActionType.Install, 16),
-                    isVisible: Data.FileActions.IsApkActionsVisible),
+                    isVisible: instance.FileList.Actions.IsApkActionsVisible),
             ]),
         new MenuSeparator(),
         new CompoundIconMenu(
@@ -91,58 +91,58 @@ internal static class MainToolBar
                     AppActions.Icon(FileAction.FileActionType.NewCompressTo, 16),
                     children: CompressToMenuHelper.CompressToFormatMenus()),
             ],
-            isVisible: Data.FileActions.IsNewMenuVisible),
+            isVisible: instance.FileList.Actions.IsNewMenuVisible),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Cut),
             AppActions.Icon(FileAction.FileActionType.Cut, 18),
             StyleHelper.ContentAnimation.UpMarquee,
-            Data.FileActions.IsCutState,
+            instance.FileList.Actions.IsCutState,
             altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardCut),
-            isVisible: Data.FileActions.IsCutPasteDeleteVisible),
+            isVisible: instance.FileList.Actions.IsCutPasteDeleteVisible),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Copy),
             new BaseIcon(new CopyIcon()),
             StyleHelper.ContentAnimation.Bounce,
-            Data.FileActions.IsCopyState,
+            instance.FileList.Actions.IsCopyState,
             altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardCopy),
-            isVisible: Data.FileActions.IsPullCopyVisible),
+            isVisible: instance.FileList.Actions.IsPullCopyVisible),
         new DynamicAltTextMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Paste),
-            Data.FileActions.CutItemsCount,
-            Data.FileActions.PasteIcon,
+            instance.FileList.Actions.CutItemsCount,
+            instance.FileList.Actions.PasteIcon,
             StyleHelper.ContentAnimation.Bounce,
             altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardPaste),
-            isVisible: Data.FileActions.IsPasteVisible),
+            isVisible: instance.FileList.Actions.IsPasteVisible),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Rename),
             new BaseIcon(new RenameAIcon()),
             StyleHelper.ContentAnimation.Bounce,
-            isVisible: Data.FileActions.IsNewMenuVisible),
+            isVisible: instance.FileList.Actions.IsNewMenuVisible),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Restore),
             AppActions.Icon(FileAction.FileActionType.Restore, 18),
-            isVisible: Data.FileActions.IsRestoreMenuVisible),
+            isVisible: instance.FileList.Actions.IsRestoreMenuVisible),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Delete),
             AppActions.Icon(FileAction.FileActionType.Delete, 18),
-            isVisible: Data.FileActions.IsCutPasteDeleteVisible),
+            isVisible: instance.FileList.Actions.IsCutPasteDeleteVisible),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenPackageLocation),
             AppActions.Icon(FileAction.FileActionType.FollowLink, 18),
             StyleHelper.ContentAnimation.RightMarquee,
-            isVisible: Data.FileActions.IsUninstallVisible),
+            isVisible: instance.FileList.Actions.IsUninstallVisible),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.BackupPackage),
             AppActions.Icon(FileAction.FileActionType.BackupPackage, 18),
-            isVisible: Data.FileActions.IsUninstallVisible),
+            isVisible: instance.FileList.Actions.IsUninstallVisible),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Uninstall),
             AppActions.Icon(FileAction.FileActionType.Uninstall, 18),
             StyleHelper.ContentAnimation.DownMarquee,
-            isVisible: Data.FileActions.IsUninstallVisible),
+            isVisible: instance.FileList.Actions.IsUninstallVisible),
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.SearchApkOnWeb),
             AppActions.Icon(FileAction.FileActionType.SearchApkOnWeb, 18),
-            isVisible: Data.FileActions.IsUninstallVisible),
+            isVisible: instance.FileList.Actions.IsUninstallVisible),
         new IconMenu(description: Strings.Resources.S_MENU_MORE,
             icon: AppActions.Icon(FileAction.FileActionType.More, 20),
             children:
@@ -161,7 +161,7 @@ internal static class MainToolBar
                     ]),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Package),
                     new BaseIcon(FluentPathGeometries.Box, 16),
-                    isVisible: Data.FileActions.IsApkActionsVisible,
+                    isVisible: instance.FileList.Actions.IsApkActionsVisible,
                     children:
                     [
                         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.BackupPackage), AppActions.Icon(FileAction.FileActionType.BackupPackage, 16)),
@@ -251,6 +251,10 @@ internal static class ExplorerContextMenu
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Enter),
             new BaseIcon("\uE838", 16)),
         new SubMenu(
+            AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextOpenInNewTab),
+            new BaseIcon(new OpenInNewTabIcon(), 16)),
+        new SubMenuSeparator(),
+        new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPull),
             new BaseIcon(new PullIcon(), 16)),
         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextBackupPackage),
@@ -330,6 +334,8 @@ internal static class DeviceContextMenu
     {
         var items = new List<SubMenu>();
 
+        AddEnabled(items, OpenInNewTabItem(device));
+        AddSeparator(items);
         AddEnabled(items, PushPackagesItem(device));
         AddSeparator(items);
         Add(items, RootItem(device));
@@ -365,6 +371,15 @@ internal static class DeviceContextMenu
         while (items.Count > 0 && items[^1] is SubMenuSeparator)
             items.RemoveAt(items.Count - 1);
     }
+
+    private static SubMenu OpenInNewTabItem(LogicalDeviceViewModel device) =>
+        new(
+            new FileAction(
+                FileAction.FileActionType.None,
+                () => device.Status is DeviceStatus.Ok && device.Type is not DeviceType.Sideload,
+                () => DeviceHelper.OpenDeviceInNewTab(device),
+                Strings.Resources.S_OPEN_IN_NEW_TAB),
+            new BaseIcon(new OpenInNewTabIcon(), 16));
 
     private static SubMenu PushPackagesItem(LogicalDeviceViewModel device) =>
         new(

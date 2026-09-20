@@ -220,6 +220,23 @@ public static partial class ThumbnailService
         MarkCustomThumbnailReady(device.SerialNumber, file, thumbId, resolution, fileSize);
     }
 
+    /// <summary>Blocks a concurrent <see cref="TryPullCustomThumbnail"/> from racing an in-flight push.</summary>
+    public static bool TryReserveCustomThumbnailSeed(string serialNumber, FileClass file)
+    {
+        var pullKey = $"{serialNumber}|{file.ParsedFullPath}";
+
+        lock (PendingCustomPullsLock)
+            return PendingCustomPulls.Add(pullKey);
+    }
+
+    public static void ReleaseCustomThumbnailSeed(string serialNumber, FileClass file)
+    {
+        var pullKey = $"{serialNumber}|{file.ParsedFullPath}";
+
+        lock (PendingCustomPullsLock)
+            PendingCustomPulls.Remove(pullKey);
+    }
+
     public static bool IsCustomThumbnailCandidate(FileClass file) =>
         Data.Settings.ThumbsMode is not AppSettings.ThumbnailMode.Off
         && file.Type is AbstractFile.FileType.File
@@ -249,7 +266,7 @@ public static partial class ThumbnailService
         if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.Off)
             return;
 
-        if (Data.DevicesObject.Current is not { } device)
+        if (Data.ActiveDevice is not { } device)
             return;
 
         var useCustomThumbs = Data.Settings.MaxCustomThumbWeight > 0;
@@ -698,7 +715,7 @@ public static partial class ThumbnailService
             }
 
             Directory.CreateDirectory(targetDir);
-            newId = NewCustomThumbId(file, useOriginalExtension: false);
+            newId = NewCustomThumbId(file, useOriginalExtension: true);
 
             RegisterCustomThumbCacheEntry(ref deviceInfo, file, newId);
             UpdateCache(deviceInfo);

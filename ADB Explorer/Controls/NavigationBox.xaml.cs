@@ -3,7 +3,6 @@ using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
-using ADB_Explorer.ViewModels.Pages;
 
 namespace ADB_Explorer.Controls;
 
@@ -12,6 +11,31 @@ namespace ADB_Explorer.Controls;
 /// </summary>
 public partial class NavigationBox : UserControl
 {
+    /// <summary>The tab this box belongs to, set once via <see cref="Initialize"/>.</summary>
+    private ExplorerInstance? Instance { get; set; }
+
+    internal void Initialize(ExplorerInstance instance)
+    {
+        Instance = instance;
+
+        instance.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(ExplorerInstance.EffectiveDevice))
+                App.SafeInvoke(OnOwnerDeviceChanged);
+        };
+    }
+
+    /// <summary>The breadcrumbs' labels and the drive restrictions were built for the previous
+    /// device, and the path itself may be unchanged, so nothing else would rebuild them.</summary>
+    private void OnOwnerDeviceChanged()
+    {
+        if (string.IsNullOrEmpty(Path))
+            return;
+
+        TrackPathRestrictions();
+        Refresh();
+    }
+
     private LogicalDeviceViewModel? _trackedDevice;
 
     public enum ViewMode
@@ -31,10 +55,22 @@ public partial class NavigationBox : UserControl
 
         SizeChanged += (sender, args) => ArrangeBreadcrumbs();
 
-        Data.ClearNavigationBox += (s, e) => Clear();
+        // App-wide events reach every tab's box, but only the active tab's should react - and the
+        // explorer's clear (e.g. device polling) must not blank the crumb of a page the tab is showing.
+        Data.ClearNavigationBox += (s, e) =>
+        {
+            if (IsOwnedByActiveTab && Instance?.IsShowingPage is not true)
+                Clear();
+        };
 
-        Data.UnfocusNavigationBox += (s, focus) => Unfocus(focus);
+        Data.UnfocusNavigationBox += (s, focus) =>
+        {
+            if (IsOwnedByActiveTab)
+                Unfocus(focus);
+        };
     }
+
+    private bool IsOwnedByActiveTab => Instance is null || ReferenceEquals(Instance, Data.ActiveExplorerInstance);
 
     private void Clear()
     {
@@ -57,7 +93,7 @@ public partial class NavigationBox : UserControl
         if (focus && Mode is not ViewMode.Path)
             Mode = ViewMode.Path;
         else
-            UnfocusTarget?.Focus();
+            FocusHelper.ClearFocus(this);
     }
 
     #region Dependency Properties
@@ -70,6 +106,9 @@ public partial class NavigationBox : UserControl
             bool update = Path != value;
 
             SetValue(PathProperty, value);
+
+            // The saved-locations menu depends on the path, so don't wait for the deferred rebuild below.
+            UpdateSavedItems();
 
             App.SafeBeginInvoke(() =>
             {
@@ -152,16 +191,6 @@ public partial class NavigationBox : UserControl
         DependencyProperty.Register(nameof(IsLoadingProgressVisible), typeof(bool),
           typeof(NavigationBox), new PropertyMetadata(false));
 
-    public UIElement UnfocusTarget
-    {
-        get => (UIElement)GetValue(UnfocusTargetProperty);
-        set => SetValue(UnfocusTargetProperty, value);
-    }
-
-    public static readonly DependencyProperty UnfocusTargetProperty =
-        DependencyProperty.Register(nameof(UnfocusTarget), typeof(UIElement),
-          typeof(NavigationBox), new PropertyMetadata(null));
-
     public Thickness MenuPadding
     {
         get => (Thickness)GetValue(MenuPaddingProperty);
@@ -222,6 +251,18 @@ public partial class NavigationBox : UserControl
         DependencyProperty.Register(nameof(IsCurrentSaved), typeof(bool),
           typeof(NavigationBox), new PropertyMetadata(false));
 
+    /// <summary>False when the saved-locations menu would be empty, e.g. in a device's drive
+    /// view with nothing saved - there is no current location to add there.</summary>
+    public bool HasSavedMenuItems
+    {
+        get => (bool)GetValue(HasSavedMenuItemsProperty);
+        set => SetValue(HasSavedMenuItemsProperty, value);
+    }
+
+    public static readonly DependencyProperty HasSavedMenuItemsProperty =
+        DependencyProperty.Register(nameof(HasSavedMenuItems), typeof(bool),
+          typeof(NavigationBox), new PropertyMetadata(true));
+
     #endregion
 
     public ViewMode Mode
@@ -231,15 +272,15 @@ public partial class NavigationBox : UserControl
         {
             SetValue(ModeProperty, value);
 
-            // Mirror onto the ExplorerViewModel so styles that used to bind to this control by
+            // Mirror onto this tab's own Instance so styles that used to bind to this control by
             // ElementName (now out of reach from ExplorerListHost) can react via the view model.
-            if (DataContext is ExplorerViewModel vm)
-                vm.NavigationBoxMode = value;
+            if (Instance is not null)
+                Instance.NavigationBoxMode = value;
 
             if (value is ViewMode.Path)
                 PathBox.Focus();
-            else if (UnfocusTarget is not null && PathBox.IsFocused)
-                UnfocusTarget?.Focus();
+            else if (PathBox.IsFocused)
+                FocusHelper.ClearFocus(PathBox);
         }
     }
 
@@ -254,14 +295,17 @@ public partial class NavigationBox : UserControl
         if (string.IsNullOrEmpty(path))
             return;
 
+        // A page shows as a single crumb, not under the device's drive view.
         var driveView = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
-        if (path == driveView)
+        if (path == driveView || new AdbLocation(AdbLocation.LocationFromString(path)).IsPage)
             PopulateButtons(path);
         else
             PopulateButtons(driveView + path);
 
         UpdateSavedItems();
     }
+
+    private LogicalDeviceViewModel? OwnerDevice => Instance?.EffectiveDevice;
 
     private void UpdateSavedItems()
     {
@@ -272,11 +316,13 @@ public partial class NavigationBox : UserControl
             _sentinelCollection.Add(_sentinel);
         else if (!sentinelVisible && _sentinelCollection.Count > 0)
             _sentinelCollection.Clear();
+
+        HasSavedMenuItems = sentinelVisible || SavedItems?.Count > 0;
     }
 
     public void Refresh() => AddDevice(Path);
 
-    public static IEnumerable<AdbLocation> SeparatePath(string path)
+    public static IEnumerable<AdbLocation> SeparatePath(string path, LogicalDeviceViewModel? device = null)
     {
         string current = path;
 
@@ -299,7 +345,7 @@ public partial class NavigationBox : UserControl
 
             if (!string.IsNullOrEmpty(pathBeforeSearch))
             {
-                foreach (var loc in SeparatePath($"{driveView}{pathBeforeSearch}"))
+                foreach (var loc in SeparatePath($"{driveView}{pathBeforeSearch}", device))
                 {
                     if (loc.Location is Navigation.SpecialLocation.DriveView)
                         continue;
@@ -319,20 +365,21 @@ public partial class NavigationBox : UserControl
             yield break;
         }
 
-        var pairs = Data.CurrentDisplayNames.Where(kv => current.StartsWith(kv.Key));
+        var deviceId = device?.ID;
+        var pairs = Data.CurrentDisplayNames.Where(kv => kv.Key.DeviceId == deviceId && current.StartsWith(kv.Key.Path));
         var drive = pairs.Count() > 1
-            ? pairs.OrderBy(kv => kv.Key.Length).Last()
+            ? pairs.OrderBy(kv => kv.Key.Path.Length).Last()
             : pairs.FirstOrDefault();
 
-        if (string.IsNullOrEmpty(drive.Key))
+        if (string.IsNullOrEmpty(drive.Key.Path))
             yield break;
 
-        yield return new(drive.Key);
+        yield return new(drive.Key.Path);
 
         if (current.Length == 0)
             yield break;
 
-        var index = drive.Key.Length;
+        var index = drive.Key.Path.Length;
 
         if (current.Length == index)
             yield break;
@@ -341,13 +388,12 @@ public partial class NavigationBox : UserControl
         if (string.IsNullOrEmpty(tail))
             yield break;
 
-        var deviceId = Data.DevicesObject?.Current?.ID;
-        var fullPath = FileHelper.ConcatPaths(drive.Key, tail);
-        var prefix = drive.Key;
+        var fullPath = FileHelper.ConcatPaths(drive.Key.Path, tail);
+        var prefix = drive.Key.Path;
 
         if (ArchivePath.TryParse(fullPath, out var archivePath, out var internalPath, deviceId))
         {
-            var afterDrive = archivePath[drive.Key.Length..].TrimStart('/');
+            var afterDrive = archivePath[drive.Key.Path.Length..].TrimStart('/');
             var deviceSegments = afterDrive.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var segment in deviceSegments[..Math.Max(0, deviceSegments.Length - 1)])
@@ -390,13 +436,14 @@ public partial class NavigationBox : UserControl
         if (string.IsNullOrEmpty(path))
             return;
 
-        locations = SeparatePath(path).ToList();
-        breadcrumbs = [.. locations.Select(item => item.NameSubMenu)];
+        var device = OwnerDevice;
+        locations = SeparatePath(path, device).ToList();
+        breadcrumbs = [.. locations.Select(item => item.GetNameSubMenu(device))];
 
         if (breadcrumbs.Count == 0)
             return;
 
-        if (Data.DevicesObject?.Current?.Root is RootStatus.Enabled)
+        if (device?.Root is RootStatus.Enabled)
             breadcrumbs[0].Appearance = Wpf.Ui.Controls.ControlAppearance.Caution;
 
         breadcrumbs[^1].IsLast = true;
@@ -509,7 +556,7 @@ public partial class NavigationBox : UserControl
             var excessButton = new TextMenu(
                 new FileAction(FileAction.FileActionType.None, () => true, () => { }, "\uE712"))
             {
-                Children = locations[1..(lastHiddenIndex + 1)].Select(item => item.ExcessSubMenu)
+                Children = locations[1..(lastHiddenIndex + 1)].Select(item => item.GetExcessSubMenu(OwnerDevice))
             };
 
             var itemsControl = OverflowItemsControl;
@@ -565,7 +612,7 @@ public partial class NavigationBox : UserControl
 
     private void TrackPathRestrictions()
     {
-        var device = Data.DevicesObject?.Current;
+        var device = OwnerDevice;
         if (_trackedDevice != device)
         {
             UntrackDevice();
@@ -594,12 +641,14 @@ public partial class NavigationBox : UserControl
         if (e.PropertyName is nameof(LogicalDeviceViewModel.Mounts)
             or nameof(LogicalDeviceViewModel.HasRootShell))
             App.SafeInvoke(ApplyDriveRestrictions);
+        else if (e.PropertyName is nameof(LogicalDeviceViewModel.Name))
+            App.SafeInvoke(Refresh);
     }
 
     private void ApplyDriveRestrictions()
     {
         var path = Path;
-        var device = _trackedDevice ?? Data.DevicesObject?.Current;
+        var device = _trackedDevice ?? OwnerDevice;
         var deviceId = device?.ID;
         var isArchive = ArchivePath.IsArchivePath(path ?? "", deviceId);
         var restrictions = DriveHelper.GetRestrictions(path ?? "", device);

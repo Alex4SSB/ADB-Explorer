@@ -209,6 +209,12 @@ public static class UISettings
                 new BoolSetting(() => Settings.ShowExtensions, Strings.Resources.S_SETTINGS_SHOW_EXTENSIONS, icon: new("\uE8AC")),
                 new BoolSetting(() => Settings.ShowHiddenItems, Strings.Resources.S_SETTINGS_HIDDEN_ITEMS, icon: new("\uE8FF")),
                 new BoolSetting(() => Settings.SortingPerLocation, Strings.Resources.S_SETTINGS_SORTING_PER_LOCATION, icon: new("\uE8CB")),
+                new SimpleComboSetting<AppSettings.NewTabLocationMode>(() => Settings.NewTabLocation, Strings.Resources.S_SETTINGS_NEW_TAB_LOCATION,
+                [
+                    new(AppSettings.NewTabLocationMode.DuplicateCurrentTab, Strings.Resources.S_NEW_TAB_DUPLICATE),
+                    new(AppSettings.NewTabLocationMode.DriveView, Strings.Resources.S_NEW_TAB_DRIVE_VIEW),
+                    new(AppSettings.NewTabLocationMode.NoLocation, Strings.Resources.S_NEW_TAB_NONE),
+                ], icon: new(FluentPathGeometries.TabAdd)),
                 new NumericSetting(() => Settings.MaxPreviewFileSize,
                                    Strings.Resources.S_SETTINGS_PREVIEW_MAX_SIZE,
                                    0,

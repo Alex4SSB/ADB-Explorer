@@ -5,6 +5,7 @@
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:local="clr-namespace:ADB_Explorer.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
@@ -42,7 +43,7 @@
                 <emoji:TextBlock.HighlightRanges>
                     <MultiBinding Converter="{StaticResource SearchHighlightRangesConverter}">
                         <Binding Path="DisplayName" />
-                        <Binding Path="ExplorerFilter" Source="{x:Static models:Data.FileActions}" />
+                        <Binding Path="(helpers:InstanceHelper.Instance).FileList.Actions.ExplorerFilter" RelativeSource="{RelativeSource Self}" />
                         <Binding Path="SearchCaseSensitive" Source="{x:Static models:Data.Settings}" />
                     </MultiBinding>
                 </emoji:TextBlock.HighlightRanges>
@@ -56,7 +57,7 @@
                             <DataTrigger Binding="{Binding IsSelected}" Value="True">
                                 <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
                             </DataTrigger>
-                            <!-- After IsSelected: a copied item keeps its accent color even while selected. -->
+                            <!--  After IsSelected: a copied item keeps its accent color even while selected.  -->
                             <DataTrigger Binding="{Binding CutState}" Value="Copy">
                                 <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
                             </DataTrigger>
@@ -115,7 +116,7 @@
                                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
                                     <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
                                 </DataTrigger>
-                                <!-- After IsSelected: a copied item keeps its accent color even while selected. -->
+                                <!--  After IsSelected: a copied item keeps its accent color even while selected.  -->
                                 <DataTrigger Binding="{Binding CutState}" Value="Copy">
                                     <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
                                 </DataTrigger>

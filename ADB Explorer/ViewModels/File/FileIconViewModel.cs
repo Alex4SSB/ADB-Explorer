@@ -72,7 +72,7 @@ public partial class FileIconViewModel : FileViewModelBase
         CancelLoading();
         _currentlyLoadingSize = size;
 
-        if (Data.DevicesObject.Current is null)
+        if (Data.ActiveDevice is null)
             return;
 
         if (Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.Off)
@@ -80,7 +80,7 @@ public partial class FileIconViewModel : FileViewModelBase
 
         var useCustomThumbs = Data.Settings.MaxCustomThumbWeight > 0;
 
-        var serialNumber = Data.DevicesObject.Current.SerialNumber;
+        var serialNumber = Data.ActiveDevice.SerialNumber;
         _cts = new CancellationTokenSource();
         var token = _cts.Token;
 
@@ -95,7 +95,7 @@ public partial class FileIconViewModel : FileViewModelBase
                 if (token.IsCancellationRequested)
                     return;
 
-                if (ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file, size)
+                if (ThumbnailService.LoadThumbnail(Data.ActiveDevice, _file, size)
                     is not ThumbnailService.Thumbnail { Image: not null } thumb)
                 {
                     App.SafeBeginInvoke(() =>
@@ -127,18 +127,18 @@ public partial class FileIconViewModel : FileViewModelBase
                 return;
 
             if (!ThumbnailService.IsInitialized(serialNumber))
-                ThumbnailService.ForceLoad(Data.DevicesObject.Current);
+                ThumbnailService.ForceLoad(Data.ActiveDevice);
 
             if (token.IsCancellationRequested)
                 return;
 
-            var thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file, size);
+            var thumbnail = ThumbnailService.LoadThumbnail(Data.ActiveDevice, _file, size);
 
             var requestedCustom = useCustomThumbs && ThumbnailService.IsCustomThumbnailCandidate(_file);
             if ((thumbnail is null || thumbnail.Value.Image is null) && requestedCustom)
             {
-                ThumbnailService.TryPullCustomThumbnail(Data.DevicesObject.Current, _file);
-                thumbnail = ThumbnailService.LoadThumbnail(Data.DevicesObject.Current, _file, size);
+                ThumbnailService.TryPullCustomThumbnail(Data.ActiveDevice, _file);
+                thumbnail = ThumbnailService.LoadThumbnail(Data.ActiveDevice, _file, size);
             }
 
             if (token.IsCancellationRequested)

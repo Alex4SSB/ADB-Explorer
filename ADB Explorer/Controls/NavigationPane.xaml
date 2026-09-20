@@ -14,7 +14,7 @@
     d:DesignWidth="400"
     mc:Ignorable="d">
     <Grid DataContext="{Binding ElementName=pane}">
-        <Grid x:Name="ContentBox" Width="220">
+        <Grid x:Name="ContentBox">
             <Grid>
                 <TreeView
                     x:Name="Tree"
@@ -153,6 +153,7 @@
                             <EventSetter Event="PreviewMouseLeftButtonDown" Handler="TreeViewItem_PreviewMouseLeftButtonDown" />
                             <EventSetter Event="PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown" />
                             <EventSetter Event="PreviewMouseLeftButtonUp" Handler="TreeViewItem_PreviewMouseLeftButtonUp" />
+                            <EventSetter Event="PreviewMouseUp" Handler="TreeViewItem_PreviewMouseUp" />
                             <EventSetter Event="MouseMove" Handler="TreeViewItem_MouseMove" />
                             <EventSetter Event="DragEnter" Handler="TreeViewItem_DragEnter" />
                             <EventSetter Event="DragLeave" Handler="TreeViewItem_DragLeave" />
@@ -174,7 +175,7 @@
                                                 x:Name="Border"
                                                 Grid.Row="0"
                                                 Background="Transparent"
-                                                CornerRadius="2">
+                                                CornerRadius="4">
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="Auto" MinWidth="19" />
@@ -231,7 +232,7 @@
                                                 Grid.Row="0"
                                                 BorderBrush="{DynamicResource KeyboardFocusBorderColorBrush}"
                                                 BorderThickness="1"
-                                                CornerRadius="2"
+                                                CornerRadius="4"
                                                 IsHitTestVisible="False"
                                                 SnapsToDevicePixels="True"
                                                 Visibility="Collapsed" />
@@ -240,7 +241,7 @@
                                                 Grid.Row="0"
                                                 BorderBrush="{DynamicResource MouseOverBorderBrush}"
                                                 BorderThickness="1"
-                                                CornerRadius="2"
+                                                CornerRadius="4"
                                                 IsHitTestVisible="False"
                                                 SnapsToDevicePixels="True"
                                                 Visibility="Collapsed" />
@@ -303,15 +304,10 @@
                 </TreeView>
             </Grid>
         </Grid>
-        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-            <GridSplitter
-                Width="8"
-                VerticalAlignment="Stretch"
-                Background="Transparent"
-                Cursor="SizeWE"
-                DragDelta="GridSplitter_DragDelta"
-                FocusVisualStyle="{x:Null}" />
-            <Separator />
-        </StackPanel>
+        <controls:RenameTooltip
+            x:Name="RenameTooltipControl"
+            Panel.ZIndex="1"
+            DataContext="{x:Null}"
+            Visibility="Collapsed" />
     </Grid>
 </UserControl>

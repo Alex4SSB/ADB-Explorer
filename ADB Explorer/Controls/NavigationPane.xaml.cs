@@ -4,7 +4,7 @@ using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
 using ADB_Explorer.ViewModels.Pages;
-using ADB_Explorer.Controls.Pages;
+using ADB_Explorer.Views.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -18,36 +18,6 @@ namespace ADB_Explorer.Controls;
 /// </summary>
 public partial class NavigationPane : UserControl
 {
-    public bool IsOpen
-    {
-        get => (bool)GetValue(IsOpenProperty);
-        set => SetValue(IsOpenProperty, value);
-    }
-
-    public static readonly DependencyProperty IsOpenProperty =
-        DependencyProperty.Register(nameof(IsOpen), typeof(bool),
-          typeof(NavigationPane), new PropertyMetadata(false, OnIsOpenChanged));
-
-    public double PaneMinWidth
-    {
-        get => (double)GetValue(PaneMinWidthProperty);
-        set => SetValue(PaneMinWidthProperty, value);
-    }
-
-    public static readonly DependencyProperty PaneMinWidthProperty =
-        DependencyProperty.Register(nameof(PaneMinWidth), typeof(double),
-          typeof(NavigationPane), new PropertyMetadata(100.0));
-
-    public double PaneMaxWidth
-    {
-        get => (double)GetValue(PaneMaxWidthProperty);
-        set => SetValue(PaneMaxWidthProperty, value);
-    }
-
-    public static readonly DependencyProperty PaneMaxWidthProperty =
-        DependencyProperty.Register(nameof(PaneMaxWidth), typeof(double),
-          typeof(NavigationPane), new PropertyMetadata(1000.0));
-
     public IEnumerable<NavigationTreeNode> TreeItems
     {
         get => (IEnumerable<NavigationTreeNode>)GetValue(TreeItemsProperty);
@@ -61,7 +31,11 @@ public partial class NavigationPane : UserControl
     public NavigationPane()
     {
         InitializeComponent();
-        Visibility = IsOpen ? Visibility.Visible : Visibility.Collapsed;
+
+        // The runtime wiring needs app services and static state the XAML designer doesn't have.
+        if (DesignerProperties.GetIsInDesignMode(this))
+            return;
+
         Loaded += NavigationPane_Loaded;
     }
 
@@ -85,21 +59,6 @@ public partial class NavigationPane : UserControl
 
     private void NavigationPane_Unloaded(object sender, RoutedEventArgs e)
         => DragAutoScroll.Unregister(TreeScrollViewer);
-
-    private void GridSplitter_DragDelta(object sender, DragDeltaEventArgs e)
-    {
-        double newWidth = ContentBox.ActualWidth + e.HorizontalChange;
-        if (newWidth > PaneMinWidth && newWidth < PaneMaxWidth)
-            ContentBox.Width = newWidth;
-    }
-
-    private static void OnIsOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-    {
-        if (d is not NavigationPane pane)
-            return;
-
-        pane.Visibility = (bool)e.NewValue ? Visibility.Visible : Visibility.Collapsed;
-    }
 
     private NavigationTreeNode? _selectionBeforeExpander;
     private NavigationTreeNode? _contextTarget;
@@ -163,6 +122,18 @@ public partial class NavigationPane : UserControl
         _treeDragItem = item;
         _treeDragStart = e.GetPosition(null);
         item.CaptureMouse();
+    }
+
+    private void TreeViewItem_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton is not MouseButton.Middle || sender is not TreeViewItem item || e.OriginalSource is not DependencyObject source)
+            return;
+
+        if (!ReferenceEquals(FindOwningTreeViewItem(source), item) || item.DataContext is not NavigationTreeNode node)
+            return;
+
+        e.Handled = true;
+        TreeVm?.OpenNodeInNewTab(node);
     }
 
     private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -454,7 +425,9 @@ public partial class NavigationPane : UserControl
         }
 
         TreeVm?.PrepareRenameTextBox(textBox);
-        FindHeader()?.ShowRenameTooltip(textBox, node);
+        InstanceHelper.SetInstance(RenameTooltipControl, Data.ActiveExplorerInstance);
+        RenameTooltipControl.Visibility = Visibility.Visible;
+        RenameTooltipControl.Show(textBox, node);
         Dispatcher.BeginInvoke(() => FocusTreeRenameBox(textBox, node), DispatcherPriority.Input);
     }
 
@@ -466,22 +439,6 @@ public partial class NavigationPane : UserControl
         Keyboard.Focus(textBox);
         textBox.Focus();
         textBox.SelectAll();
-    }
-
-    private ExplorerPageHeader? FindHeader()
-    {
-        DependencyObject current = this;
-        while (current is not null)
-        {
-            if (current is ExplorerPageHeader header)
-                return header;
-
-            current = current is Visual
-                ? VisualTreeHelper.GetParent(current)
-                : LogicalTreeHelper.GetParent(current);
-        }
-
-        return null;
     }
 
     private static TreeViewItem? FindTreeViewItem(ItemsControl parent, NavigationTreeNode node)
@@ -521,7 +478,7 @@ public partial class NavigationPane : UserControl
             return;
 
         if (e.Key is Key.Left or Key.Right or Key.Up or Key.Down
-            && Data.DevicesObject?.Current is not { IsOpen: true })
+            && Data.ActiveDevice is null)
             e.Handled = true;
     }
 
@@ -549,7 +506,7 @@ public partial class NavigationPane : UserControl
         else
             tree.EscapeEdit(textBox);
 
-        FindHeader()?.FocusActiveListing();
+        (Application.Current.MainWindow as MainWindow)?.GetOrCreateExplorerHeader(Data.ActiveExplorerInstance).FocusActiveListing();
     }
 
     private bool IsFocusInTree()

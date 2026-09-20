@@ -54,7 +54,7 @@ public abstract partial class ActionBase : ViewModelBase, IMenuItem
     [ObservableProperty]
     public partial string? Info { get; protected set; }
 
-    public string Tooltip => $"{Action.Description}{(string.IsNullOrEmpty(Action.GestureString) ? "" : $" ({Action.GestureString})")}";
+    public string Tooltip => $"{Action.Description}{(string.IsNullOrEmpty(Action.GestureTooltip) ? "" : $" ({Action.GestureTooltip})")}";
 
     public bool AnimateOnClick => ActionAnimationSource is AnimationSource.Click;
 

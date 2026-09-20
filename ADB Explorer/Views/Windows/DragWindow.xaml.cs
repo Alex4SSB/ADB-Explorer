@@ -54,7 +54,14 @@ public partial class DragWindow : INotifyPropertyChanged
 #endif
     }
 
-    public void Show() => IsOpen = true;
+    /// <summary>The active tab's actions; re-read on every <see cref="Show"/>.</summary>
+    public FileActionsEnable Actions => Data.FileActions;
+
+    public void Show()
+    {
+        OnPropertyChanged(nameof(Actions));
+        IsOpen = true;
+    }
 
     public void Close()
     {
