@@ -32,9 +32,6 @@
                     <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=DragBitmap}" Value="{x:Null}">
                         <Setter Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=DragWithinSlave}" Value="True">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                    </DataTrigger>
                 </Style.Triggers>
             </Style>
         </Border.Style>
@@ -49,12 +46,73 @@
             <Grid HorizontalAlignment="Left">
                 <Image
                     x:Name="DragImage"
+                    Width="{Binding ViewModel.DragImageWidth}"
                     Height="{Binding ViewModel.DragImageHeight}"
                     IsHitTestVisible="False"
-                    Opacity="0.9"
+                    Opacity="{Binding ViewModel.DragImageOpacity}"
                     RenderOptions.BitmapScalingMode="HighQuality"
                     Source="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=DragBitmap}"
-                    Stretch="Fill" />
+                    Stretch="Fill">
+                    <Image.Style>
+                        <Style TargetType="Image">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=IsTabDrag}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                </Image>
+                <!--  A dragged tab shows its header, as an inactive tab in the strip, instead of an image.  -->
+                <ContentPresenter
+                    x:Name="DragTabHeader"
+                    Width="{Binding ElementName=dragWin, Path=ViewModel.DragImageWidth}"
+                    Height="{Binding ElementName=dragWin, Path=ViewModel.DragImageHeight}"
+                    Content="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=DragTab}"
+                    IsHitTestVisible="False"
+                    Opacity="{Binding ElementName=dragWin, Path=ViewModel.DragImageOpacity}">
+                    <ContentPresenter.Style>
+                        <Style TargetType="ContentPresenter">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=IsTabDrag}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentPresenter.Style>
+                    <ContentPresenter.ContentTemplate>
+                        <DataTemplate DataType="{x:Type models:ExplorerInstance}">
+                            <Border
+                                Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+                                CornerRadius="6"
+                                TextElement.FontSize="{DynamicResource ControlContentThemeFontSize}"
+                                TextElement.Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+                                <Border
+                                    Padding="6,0"
+                                    Background="{DynamicResource NavigationViewContentBackground}"
+                                    CornerRadius="6">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <ContentPresenter
+                                            Width="16"
+                                            Height="16"
+                                            Margin="0,0,6,0"
+                                            VerticalAlignment="Center"
+                                            Content="{Binding TabIcon.IconContent}" />
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding TabDisplayName}"
+                                            TextTrimming="CharacterEllipsis" />
+                                    </Grid>
+                                </Border>
+                            </Border>
+                        </DataTemplate>
+                    </ContentPresenter.ContentTemplate>
+                </ContentPresenter>
                 <TextBlock
                     x:Name="DebugLabel"
                     HorizontalAlignment="Center"
@@ -126,6 +184,9 @@
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=CurrentDropEffect}" Value="Link">
                                         <Setter Property="Glyph" Value="&#xE8AD;" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=IsTabDrag}" Value="True">
+                                        <Setter Property="Glyph" Value="&#xE8A0;" />
                                     </DataTrigger>
                                     <MultiDataTrigger>
                                         <MultiDataTrigger.Conditions>

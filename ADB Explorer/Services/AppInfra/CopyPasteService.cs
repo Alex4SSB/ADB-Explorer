@@ -118,8 +118,21 @@ public partial class CopyPasteService : ObservableObject
     [ObservableProperty]
     public partial BitmapSource? DragBitmap { get; set; } = null;
 
+    /// <summary>True while a tab header is being dragged, which shows <see cref="DragTabTooltip"/> instead of a file transfer's.</summary>
     [ObservableProperty]
-    public partial bool DragWithinSlave { get; set; } = false;
+    public partial bool IsTabDrag { get; set; } = false;
+
+    /// <summary>The tab whose header the drag window shows in place of an image while <see cref="IsTabDrag"/>.</summary>
+    [ObservableProperty]
+    public partial ExplorerInstance? DragTab { get; set; }
+
+    public string? DragTabTooltip { get; set; }
+
+    /// <summary>
+    /// The drag image's bounds in pixels relative to the cursor - so its location is negative when the
+    /// mouse holds it away from its top left - else null for the standard size, above the cursor.
+    /// </summary>
+    public Rect? DragImageRectPx { get; set; }
 
     [ObservableProperty]
     public partial bool MouseWithinApp { get; set; } = true;
@@ -245,8 +258,6 @@ public partial class CopyPasteService : ObservableObject
     }
 
     public int MasterPid { get; private set; }
-
-    public bool IsDragFromMaster => MasterPid != Environment.ProcessId;
 
     public LogicalDeviceViewModel? SourceDevice { get; private set; }
 
@@ -840,10 +851,8 @@ public partial class CopyPasteService : ObservableObject
                                     || pushOp.Status is not FileOperation.OperationStatus.Completed)
                                     return;
 
-                                // Once the second part is done, delete the file from the source device if needed, and notify if its another window
+                                // Once the second part is done, delete the file from the source device if needed
                                 ShellFileOperation.SilentDelete(SourceDevice!, item.FullName);
-                                if (IsDragFromMaster)
-                                    IpcService.NotifyFileMoved(MasterPid, SourceDevice!, item);
                             };
                         };
 
@@ -994,14 +1003,12 @@ public partial class CopyPasteService : ObservableObject
                 }
                 else
                 {
-                    var masterPid = IsDragFromMaster ? MasterPid : 0;
                     VerifyAndPaste(isLink ? DragDropEffects.Link : CurrentEffect,
                                targetFolder,
                                CurrentFiles,
                                App.AppDispatcher,
                                device,
-                               Data.CurrentPath,
-                               masterPid);
+                               Data.CurrentPath);
                 }
             }
             else
@@ -1148,8 +1155,7 @@ public partial class CopyPasteService : ObservableObject
                                IEnumerable<FileClass> pasteItems,
                                Dispatcher dispatcher,
                                LogicalDeviceViewModel device,
-                               string currentPath,
-                               int masterPid = 0)
+                               string currentPath)
     {
         pasteItems = await RemoveAncestor(pasteItems, targetPath, cutType);
         if (!pasteItems.Any())
@@ -1183,8 +1189,7 @@ public partial class CopyPasteService : ObservableObject
             ShellFileOperation.ExtractItems(device: device,
                       items: pasteItems,
                       targetPath: targetPath,
-                      dispatcher: dispatcher,
-                      masterPid: masterPid);
+                      dispatcher: dispatcher);
             return;
         }
 
@@ -1204,8 +1209,7 @@ public partial class CopyPasteService : ObservableObject
                   currentPath: currentPath,
                   existingItems: Data.Files.DirList?.FileList?.Select(f => f.FullName) ?? [],
                   dispatcher: dispatcher,
-                  cutType: cutType,
-                  masterPid: masterPid);
+                  cutType: cutType);
     }
 
     public static SyncFile MergeFolderTree(FileClass folder, string targetPath, IEnumerable<string> filesToReplace)

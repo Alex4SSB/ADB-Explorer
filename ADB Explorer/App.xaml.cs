@@ -119,6 +119,16 @@ public partial class App
     {
         AppDispatcher = Current.Dispatcher;
 
+        if (!AppInstanceGuard.TryClaim())
+        {
+            AppInstanceGuard.ActivateExisting();
+
+            // Exiting directly skips OnExit, which would save settings and kill the running instance's adb.
+            s_adbKillHandled = true;
+            Environment.Exit(0);
+            return;
+        }
+
         // Read to force it to be set to system regional format
         _ = Data.Settings.OriginalCulture;
         // Read to force it to be set to system display language

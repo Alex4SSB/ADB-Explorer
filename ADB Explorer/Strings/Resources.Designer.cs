@@ -910,11 +910,83 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Close bottom pane.
+        /// </summary>
+        public static string S_CLOSE_BOTTOM_PANE {
+            get {
+                return ResourceManager.GetString("S_CLOSE_BOTTOM_PANE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close left pane.
+        /// </summary>
+        public static string S_CLOSE_LEFT_PANE {
+            get {
+                return ResourceManager.GetString("S_CLOSE_LEFT_PANE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close other tabs.
+        /// </summary>
+        public static string S_CLOSE_OTHER_TABS {
+            get {
+                return ResourceManager.GetString("S_CLOSE_OTHER_TABS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close right pane.
+        /// </summary>
+        public static string S_CLOSE_RIGHT_PANE {
+            get {
+                return ResourceManager.GetString("S_CLOSE_RIGHT_PANE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Exit the search results mode..
         /// </summary>
         public static string S_CLOSE_SEARCH_INFO {
             get {
                 return ResourceManager.GetString("S_CLOSE_SEARCH_INFO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close tab.
+        /// </summary>
+        public static string S_CLOSE_TAB {
+            get {
+                return ResourceManager.GetString("S_CLOSE_TAB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close tabs to the left.
+        /// </summary>
+        public static string S_CLOSE_TABS_TO_LEFT {
+            get {
+                return ResourceManager.GetString("S_CLOSE_TABS_TO_LEFT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close tabs to the right.
+        /// </summary>
+        public static string S_CLOSE_TABS_TO_RIGHT {
+            get {
+                return ResourceManager.GetString("S_CLOSE_TABS_TO_RIGHT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close top pane.
+        /// </summary>
+        public static string S_CLOSE_TOP_PANE {
+            get {
+                return ResourceManager.GetString("S_CLOSE_TOP_PANE", resourceCulture);
             }
         }
         
@@ -1701,6 +1773,15 @@ namespace ADB_Explorer.Strings {
         public static string S_DROP {
             get {
                 return ResourceManager.GetString("S_DROP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate tab.
+        /// </summary>
+        public static string S_DUPLICATE_TAB {
+            get {
+                return ResourceManager.GetString("S_DUPLICATE_TAB", resourceCulture);
             }
         }
         
@@ -2556,16 +2637,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_MENU_OPEN_LOCATION", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Remove from saved locations.
-        /// </summary>
-        public static string S_MENU_REMOVE_SAVED_LOCATION {
-            get {
-                return ResourceManager.GetString("S_MENU_REMOVE_SAVED_LOCATION", resourceCulture);
-            }
-        }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Package.
         /// </summary>
@@ -2608,6 +2680,15 @@ namespace ADB_Explorer.Strings {
         public static string S_MENU_REFRESH {
             get {
                 return ResourceManager.GetString("S_MENU_REFRESH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove from saved locations.
+        /// </summary>
+        public static string S_MENU_REMOVE_SAVED_LOCATION {
+            get {
+                return ResourceManager.GetString("S_MENU_REMOVE_SAVED_LOCATION", resourceCulture);
             }
         }
         
@@ -2689,6 +2770,24 @@ namespace ADB_Explorer.Strings {
         public static string S_MERGE_OR_REPLACE {
             get {
                 return ResourceManager.GetString("S_MERGE_OR_REPLACE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Merge with tab to the left.
+        /// </summary>
+        public static string S_MERGE_WITH_LEFT_TAB {
+            get {
+                return ResourceManager.GetString("S_MERGE_WITH_LEFT_TAB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Merge with tab to the right.
+        /// </summary>
+        public static string S_MERGE_WITH_RIGHT_TAB {
+            get {
+                return ResourceManager.GetString("S_MERGE_WITH_RIGHT_TAB", resourceCulture);
             }
         }
         
@@ -2797,6 +2896,42 @@ namespace ADB_Explorer.Strings {
         public static string S_NEW_ITEM {
             get {
                 return ResourceManager.GetString("S_NEW_ITEM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New Tab.
+        /// </summary>
+        public static string S_NEW_TAB {
+            get {
+                return ResourceManager.GetString("S_NEW_TAB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Drive view of current device.
+        /// </summary>
+        public static string S_NEW_TAB_DRIVE_VIEW {
+            get {
+                return ResourceManager.GetString("S_NEW_TAB_DRIVE_VIEW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate current tab.
+        /// </summary>
+        public static string S_NEW_TAB_DUPLICATE {
+            get {
+                return ResourceManager.GetString("S_NEW_TAB_DUPLICATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No location.
+        /// </summary>
+        public static string S_NEW_TAB_NONE {
+            get {
+                return ResourceManager.GetString("S_NEW_TAB_NONE", resourceCulture);
             }
         }
         
@@ -4229,6 +4364,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New tab opens at.
+        /// </summary>
+        public static string S_SETTINGS_NEW_TAB_LOCATION {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_NEW_TAB_LOCATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Override ADB Path.
         /// </summary>
         public static string S_SETTINGS_OVERRIDE_ADB {
@@ -4326,61 +4470,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_SETTINGS_SORTING_PER_LOCATION", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Looks up a localized string similar to New tab opens at.
-        /// </summary>
-        public static string S_SETTINGS_NEW_TAB_LOCATION {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_NEW_TAB_LOCATION", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Duplicate current tab.
-        /// </summary>
-        public static string S_NEW_TAB_DUPLICATE {
-            get {
-                return ResourceManager.GetString("S_NEW_TAB_DUPLICATE", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Drive view of current device.
-        /// </summary>
-        public static string S_NEW_TAB_DRIVE_VIEW {
-            get {
-                return ResourceManager.GetString("S_NEW_TAB_DRIVE_VIEW", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to No location.
-        /// </summary>
-        public static string S_NEW_TAB_NONE {
-            get {
-                return ResourceManager.GetString("S_NEW_TAB_NONE", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Close tab.
-        /// </summary>
-        public static string S_CLOSE_TAB {
-            get {
-                return ResourceManager.GetString("S_CLOSE_TAB", resourceCulture);
-            }
-        }
         
-        /// <summary>
-        ///   Looks up a localized string similar to New Tab.
-        /// </summary>
-        public static string S_NEW_TAB {
-            get {
-                return ResourceManager.GetString("S_NEW_TAB", resourceCulture);
-            }
-        }
-
         /// <summary>
         ///   Looks up a localized string similar to Show Icons For Special Folders.
         /// </summary>
@@ -4616,6 +4706,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Split horizontally.
+        /// </summary>
+        public static string S_SPLIT_HORIZONTALLY {
+            get {
+                return ResourceManager.GetString("S_SPLIT_HORIZONTALLY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Split vertically.
+        /// </summary>
+        public static string S_SPLIT_VERTICALLY {
+            get {
+                return ResourceManager.GetString("S_SPLIT_VERTICALLY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Forbidden.
         /// </summary>
         public static string S_STAT_ROOT_FORBIDDEN {
@@ -4666,6 +4774,15 @@ namespace ADB_Explorer.Strings {
         public static string S_STRING_PASTE {
             get {
                 return ResourceManager.GetString("S_STRING_PASTE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Swap panes.
+        /// </summary>
+        public static string S_SWAP_PANES {
+            get {
+                return ResourceManager.GetString("S_SWAP_PANES", resourceCulture);
             }
         }
         

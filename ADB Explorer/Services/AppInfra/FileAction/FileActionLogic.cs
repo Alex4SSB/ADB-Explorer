@@ -2506,14 +2506,12 @@ internal static class FileActionLogic
         // If operation was cancelled or had failed - don't delete the source, but still perform cleanup
         if (op.Status is FileOperation.OperationStatus.Completed)
         {
-            // Current path (and device) is where the new file was pushed to and it is not shown yet
-            if (op.Device.ID == Data.ActiveDevice?.ID
-                && op.TargetPath.ParentPath == Data.CurrentPath
-                && Data.DirList.FileList.All(f => f.FullName != op.FilePath.FullName))
+            // Every pane listing the folder (and device) the file was pushed to gets it, if not shown yet
+            Data.ForEachListingAt(op.TargetPath.ParentPath, op.Device.ID, (instance, _) =>
             {
-                op.Dispatcher.Invoke(() =>
-                    Data.DirList.FileList.Add(new(op.TargetPath) { ModifiedTime = op.FilePath.DateModified }));
-            }
+                if (instance.FileList.DirList?.FileList is { } listing && listing.All(f => f.FullName != op.FilePath.FullName))
+                    listing.Add(new(op.TargetPath) { ModifiedTime = op.FilePath.DateModified });
+            });
 
             if (op.FilePath.IsDirectory)
                 ExplorerTree?.AddCreatedFolder(op.Device.ID, op.TargetPath.FullPath);

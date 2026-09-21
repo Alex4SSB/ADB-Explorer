@@ -99,16 +99,17 @@ public static class ShellFileOperation
         {
             foreach (var member in op.Members)
                 member.CutState = DragDropEffects.None;
-
-            if (ArchivePath.TryParse(Data.CurrentPath, out var currentArchive, out _, op.Device.ID)
-                && currentArchive == op.TarArchivePath)
-            {
-                foreach (var member in op.Members)
-                    Data.DirList!.FileList.Remove(member);
-
-                FileActionLogic.UpdateFileActions();
-            }
         }
+
+        var memberPaths = op.Members.Select(member => member.FullPath).ToHashSet();
+        var removed = Data.ForEachInstance(
+            instance => instance.EffectiveDevice?.ID == op.Device.ID
+                && ArchivePath.TryParse(instance.FileList.Path, out var archive, out _, op.Device.ID)
+                && archive == op.TarArchivePath,
+            (instance, _) => instance.FileList.DirList?.FileList.RemoveAll(file => memberPaths.Contains(file.FullPath)));
+
+        if (removed)
+            FileActionLogic.UpdateFileActions();
 
         op.PropertyChanged -= ArchiveDeleteOp_PropertyChanged;
     }
@@ -130,14 +131,12 @@ public static class ShellFileOperation
             // remove file from cut items and clear its trash indexer if current device
             op.FilePath.CutState = DragDropEffects.None;
             op.FilePath.TrashIndex = null!;
-
-            // update UI if current path
-            if (op.TargetPath.ParentPath == Data.CurrentPath)
-            {
-                Data.Files.DirList?.FileList.Remove(op.FilePath);
-                FileActionLogic.UpdateFileActions();
-            }
         }
+
+        // update every pane listing the deleted item's folder
+        var deletedPath = op.FilePath.FullPath;
+        if (Data.ForEachListingAt(op.TargetPath.ParentPath, op.Device.ID, (instance, _) => instance.FileList.DirList?.FileList.RemoveAll(file => file.FullPath == deletedPath)))
+            FileActionLogic.UpdateFileActions();
 
         TrashHelper.SyncDriveViewTrashCountAfterDelete(op);
 
@@ -166,26 +165,27 @@ public static class ShellFileOperation
         var oldPath = op.FilePath.FullPath;
         var newPath = op.TargetPath.FullPath;
 
-        if (op.Device.ID == Data.ActiveDevice?.ID
-            && op.FilePath.ParentPath == Data.CurrentPath)
+        var renamed = Data.ForEachListingAt(op.FilePath.ParentPath, op.Device.ID, (instance, isFocused) =>
         {
-            var file = Data.Files.DirList?.FileList?.Find(f => f.FullPath == oldPath);
+            var file = instance.FileList.DirList?.FileList?.Find(f => f.FullPath == oldPath);
+            if (file is null)
+                return;
 
-            if (file is not null)
-            {
-                op.Dispatcher.Invoke(() =>
-                {
-                    file.UpdatePath(newPath);
-                    FileActionLogic.UpdateFileActions();
-                });
+            file.UpdatePath(newPath);
 
-                if (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First() == file)
-                    Data.ItemToSelect.Value = null;
+            // Only the focused pane keeps a selection.
+            if (!isFocused)
+                return;
 
-                if (Data.FileOpQ.TotalCount == 1)
-                    Data.ItemToSelect.Value = file;
-            }
-        }
+            if (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First() == file)
+                Data.ItemToSelect.Value = null;
+
+            if (Data.FileOpQ.TotalCount == 1)
+                Data.ItemToSelect.Value = file;
+        });
+
+        if (renamed)
+            FileActionLogic.UpdateFileActions();
 
         if (op.FilePath.IsDirectory)
             RenameTreeFolder(op.Device.ID, oldPath, newPath);
@@ -313,8 +313,7 @@ public static class ShellFileOperation
     public static void ExtractItems(LogicalDeviceViewModel device,
                                     IEnumerable<FileClass> items,
                                     string targetPath,
-                                    Dispatcher dispatcher,
-                                    int masterPid = 0)
+                                    Dispatcher dispatcher)
     {
         items = [.. items];
         List<FileExtractOperation> fileops = [];
@@ -325,7 +324,7 @@ public static class ShellFileOperation
                 continue;
 
             SyncFile target = new(FileHelper.ConcatPaths(targetPath, item.FullName), item.Type);
-            fileops.Add(new(item, target, device, dispatcher) { MasterPid = masterPid });
+            fileops.Add(new(item, target, device, dispatcher));
         }
 
         if (fileops.Count == 0)
@@ -415,18 +414,18 @@ public static class ShellFileOperation
 
         op.FilePath.CutState = DragDropEffects.None;
 
-        if (op.Device.ID == Data.ActiveDevice.ID
-            && op.TargetPath.ParentPath == Data.CurrentPath)
+        var extracted = Data.ForEachListingAt(op.TargetPath.ParentPath, op.Device.ID, (instance, isFocused) =>
         {
             FileClass newFile = new(op.FilePath);
             newFile.UpdatePath(op.TargetPath.FullPath);
-            Data.DirList!.FileList.Add(newFile);
+            instance.FileList.DirList!.FileList.Add(newFile);
 
-            if (Data.FileOpQ.TotalCount == 1)
+            if (isFocused && Data.FileOpQ.TotalCount == 1)
                 Data.ItemToSelect.Value = newFile;
+        });
 
+        if (extracted)
             FileActionLogic.UpdateFileActions();
-        }
 
         op.PropertyChanged -= ExtractFileOp_PropertyChanged;
     }
@@ -489,8 +488,7 @@ public static class ShellFileOperation
                                  string currentPath,
                                  IEnumerable<string> existingItems,
                                  Dispatcher dispatcher,
-                                 DragDropEffects cutType = DragDropEffects.None,
-                                 int masterPid = 0)
+                                 DragDropEffects cutType = DragDropEffects.None)
     {
         // Only reached when targetPath == RECYCLE_PATH (see dispatch below), so never null here.
         IEnumerable<FileMoveOperation> Recycle()
@@ -557,8 +555,6 @@ public static class ShellFileOperation
         else
             fileops = [.. Move()];
 
-        fileops.ForEach(op => op.MasterPid = masterPid);
-
         dispatcher.Invoke(() =>
         {
             fileops.ForEach(op => op.PropertyChanged += MoveFileOp_PropertyChanged);
@@ -600,61 +596,62 @@ public static class ShellFileOperation
 
             if (op.Device.ID == Data.ActiveDevice?.ID)
             {
-                // notify master process of completion
-                if (op.MasterPid > 0 && op.OperationName is not FileOperation.OperationType.Copy)
-                {
-                    IpcService.NotifyFileMoved(op.MasterPid, op.Device, op.FilePath);
-                }
-
                 // clear file trash indexer if restore / recycle on current device
                 if (op.OperationName is FileOperation.OperationType.Recycle or FileOperation.OperationType.Restore)
                 {
                     op.FilePath.TrashIndex = null!;
                 }
+            }
 
-                var listing = Data.Files.DirList?.FileList;
+            // Every pane listing the source or the target folder is updated, not only the focused one.
+            var sourceParent = op.FilePath.ParentPath;
+            var targetParent = op.TargetPath.ParentPath;
+            var isMoved = op.OperationName is not FileOperation.OperationType.Copy;
+            var listingsChanged = false;
 
-                // update UI when copy / cut target is current path
-                if (listing is not null && op.TargetPath.ParentPath == Data.CurrentPath)
+            // update UI when cut / restore / recycle source is listed
+            if (isMoved && sourceParent != targetParent)
+            {
+                listingsChanged |= Data.ForEachListingAt(sourceParent, op.Device.ID, (instance, _) =>
                 {
-                    if (op.OperationName is FileOperation.OperationType.Copy)
-                    {
-                        FileClass newFile = new(op.FilePath)
-                        {
-                            IsLink = op.isLink
-                        };
-                        newFile.UpdatePath(op.TargetPath.FullPath);
-                        newFile.ModifiedTime = op.DateModified;
-                        
-                        listing.Add(newFile);
+                    if (instance.FileList.DirList?.FileList is not { } listing)
+                        return;
 
-                        // only select the item if there aren't any other operations
-                        if (Data.FileOpQ.TotalCount == 1)
-                            Data.ItemToSelect.Value = newFile;
-                    }
-                    else
-                    {
-                        op.FilePath.UpdatePath(op.TargetPath.FullPath);
-                        listing.Add(op.FilePath);
-
-                        // only select the item if there aren't any other operations
-                        if (Data.FileOpQ.TotalCount == 1)
-                            Data.ItemToSelect.Value = op.FilePath;
-                    }
-
-                    FileActionLogic.UpdateFileActions();
-                }
-
-                // update UI when cut / restore / recycle source is current path
-                else if (listing is not null
-                    && op.FilePath.ParentPath == Data.CurrentPath
-                    && op.OperationName is not FileOperation.OperationType.Copy)
-                {
                     var listed = listing.Find(f => f.FullPath == sourcePath) ?? op.FilePath;
                     listing.Remove(listed);
-                    FileActionLogic.UpdateFileActions();
-                }
+                });
             }
+
+            // update UI when copy / cut target is listed; the moved item itself goes to the first pane, the rest get copies
+            var movedItemUsed = false;
+            listingsChanged |= Data.ForEachListingAt(targetParent, op.Device.ID, (instance, isFocused) =>
+            {
+                if (instance.FileList.DirList?.FileList is not { } listing)
+                    return;
+
+                FileClass added;
+                if (isMoved && !movedItemUsed)
+                {
+                    movedItemUsed = true;
+                    op.FilePath.UpdatePath(op.TargetPath.FullPath);
+                    added = op.FilePath;
+                }
+                else
+                {
+                    added = new(op.FilePath) { IsLink = op.isLink };
+                    added.UpdatePath(op.TargetPath.FullPath);
+                    added.ModifiedTime = op.DateModified;
+                }
+
+                listing.Add(added);
+
+                // only select the item in the focused pane, and only if there aren't any other operations
+                if (isFocused && Data.FileOpQ.TotalCount == 1)
+                    Data.ItemToSelect.Value = added;
+            });
+
+            if (listingsChanged)
+                FileActionLogic.UpdateFileActions();
 
             if (removeFromTree)
                 RemoveDeletedTreeFolder(op.Device.ID, sourcePath);
@@ -1004,12 +1001,13 @@ public static class ShellFileOperation
         if (e.PropertyName is not nameof(FileOperation.Status) || op.Status is not FileOperation.OperationStatus.Completed)
             return;
 
-        if (op.Device.ID == Data.ActiveDevice.ID
-            && op.FilePath.ParentPath == Data.CurrentPath)
+        // update every pane listing the file's folder
+        op.FilePath.ModifiedTime = op.NewDate;
+        Data.ForEachListingAt(op.FilePath.ParentPath, op.Device.ID, (instance, _) =>
         {
-            // update UI when on current device and current path
-            op.FilePath.ModifiedTime = op.NewDate;
-        }
+            if (instance.FileList.DirList?.FileList?.Find(f => f.FullPath == op.FilePath.FullPath) is { } listed)
+                listed.ModifiedTime = op.NewDate;
+        });
 
         op.PropertyChanged -= ChangeModifiedOp_PropertyChanged;
     }

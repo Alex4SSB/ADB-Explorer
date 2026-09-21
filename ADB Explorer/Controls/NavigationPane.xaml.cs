@@ -164,8 +164,12 @@ public partial class NavigationPane : UserControl
             // Swallow this opening (cancel-drag click, including nested TreeViewItems), then allow the next one.
             Dispatcher.BeginInvoke(() =>
             {
-                if (Data.CopyPaste.DragStatus is not CopyPasteService.DragState.Active)
+                // A button may still be held, its release yet to come.
+                if (Data.CopyPaste.DragStatus is not CopyPasteService.DragState.Active
+                    && !MouseState.IsAnyButtonDown)
+                {
                     Data.CopyPaste.WasDragging = false;
+                }
             }, DispatcherPriority.Input);
             return;
         }

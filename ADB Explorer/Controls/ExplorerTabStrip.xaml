@@ -24,6 +24,7 @@
             Click="AddTab_Click"
             CornerRadius="5"
             DockPanel.Dock="Right"
+            PreviewMouseRightButtonUp="AddTab_PreviewMouseRightButtonUp"
             ToolTip="{x:Static strings:Resources.S_NEW_TAB}">
             <ui:Button.Style>
                 <Style BasedOn="{StaticResource {x:Type ui:Button}}" TargetType="ui:Button">
@@ -42,6 +43,7 @@
             Background="Transparent"
             BorderThickness="0"
             ItemsSource="{Binding Tabs}"
+            MouseRightButtonUp="TabsList_MouseRightButtonUp"
             SelectedItem="{Binding ActiveTab, Mode=TwoWay}">
             <!--  No ScrollViewer: it would clip the active tab's flares and its edge flush with the content below.  -->
             <ListBox.Template>
@@ -63,10 +65,26 @@
                     <Setter Property="FocusVisualStyle" Value="{x:Null}" />
                     <Setter Property="Padding" Value="0" />
                     <Setter Property="Margin" Value="3,0" />
+                    <Setter Property="AllowDrop" Value="True" />
+                    <EventSetter Event="PreviewMouseLeftButtonDown" Handler="TabItem_PreviewMouseLeftButtonDown" />
+                    <EventSetter Event="PreviewMouseRightButtonDown" Handler="TabItem_PreviewMouseRightButtonDown" />
+                    <EventSetter Event="MouseMove" Handler="TabItem_MouseMove" />
+                    <EventSetter Event="MouseLeftButtonUp" Handler="TabItem_MouseLeftButtonUp" />
+                    <EventSetter Event="ContextMenuOpening" Handler="TabItem_ContextMenuOpening" />
+                    <EventSetter Event="DragEnter" Handler="TabItem_DragOver" />
+                    <EventSetter Event="DragOver" Handler="TabItem_DragOver" />
+                    <EventSetter Event="DragLeave" Handler="TabItem_DragLeave" />
+                    <EventSetter Event="Drop" Handler="TabItem_Drop" />
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <local:AdbContextMenu Style="{StaticResource TabContextMenuStyle}" />
+                        </Setter.Value>
+                    </Setter>
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="ListBoxItem">
-                                <Grid>
+                                <!--  Transparent, so the whole tab takes clicks - the active tab has no body of its own, and one that misses lands on the title bar, whose menu is the system's.  -->
+                                <Grid Background="Transparent">
                                     <!--  Idle/hover body, kept clear of the bottom edge the active tab reaches.  -->
                                     <Border
                                         x:Name="Bd"

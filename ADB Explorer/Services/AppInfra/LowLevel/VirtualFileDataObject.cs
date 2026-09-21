@@ -827,7 +827,6 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             {
                 Data.CopyPaste.DragBitmap = null;
                 Data.CopyPaste.DragStatus = CopyPasteService.DragState.None;
-                IpcService.NotifyDropCancel(res);
             }
             Data.CopyPaste.DragResult = res;
 

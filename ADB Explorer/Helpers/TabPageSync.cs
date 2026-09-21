@@ -20,6 +20,10 @@ internal static class TabPageSync
 
         var page = tab.History.Current?.PageType ?? typeof(ExplorerPage);
 
+        // A split view is hosted by the Explorer page; a pane showing a page does so inside itself.
+        if (tab.SplitOwner is not null || tab.SplitInstance is not null)
+            page = typeof(ExplorerPage);
+
         App.SafeInvoke(() =>
         {
             _syncing = true;

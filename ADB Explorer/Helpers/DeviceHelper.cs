@@ -699,7 +699,7 @@ public static class DeviceHelper
         // Not Data.DevicesObject.Current - this tab's own device never changes underneath it, and
         // checking the app-wide current device would abandon this tab whenever another one opened
         // a different device while this await was in flight. The tab itself may have closed, though.
-        if (App.Services.GetService<ExplorerTabsViewModel>() is not { } tabs || !tabs.Tabs.Contains(instance))
+        if (App.Services.GetService<ExplorerTabsViewModel>() is not { } tabs || !tabs.OwnsInstance(instance))
             return;
 
         device.SetAndroidVersion();
@@ -864,7 +864,7 @@ public static class DeviceHelper
     }
 
     /// <summary>
-    /// Browses <paramref name="device"/> in the active tab, which keeps its history - the way the
+    /// Browses <paramref name="device"/> in the focused pane, which keeps its history - the way the
     /// Devices page's Browse button and the navigation tree's device nodes work.
     /// </summary>
     public static void OpenDevice(LogicalDeviceViewModel device)
@@ -873,7 +873,7 @@ public static class DeviceHelper
     /// <inheritdoc cref="OpenDevice"/>
     public static void SwitchTabToDevice(LogicalDeviceViewModel device)
     {
-        var instance = App.Services.GetService<ExplorerTabsViewModel>()?.EnsureActiveTab();
+        var instance = App.Services.GetService<ExplorerTabsViewModel>()?.EnsureFocusedPane();
         if (instance is null)
             return;
 

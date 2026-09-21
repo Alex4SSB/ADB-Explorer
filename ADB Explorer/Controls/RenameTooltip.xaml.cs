@@ -1,4 +1,6 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
+using ADB_Explorer.Services;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
@@ -9,6 +11,8 @@ namespace ADB_Explorer.Controls;
 /// </summary>
 public partial class RenameTooltip : UserControl
 {
+    private ExplorerInstance? _watched;
+
     public RenameTooltip()
     {
         InitializeComponent();
@@ -16,9 +20,38 @@ public partial class RenameTooltip : UserControl
 
     public void Show(FrameworkElement anchor, object dataContext, bool centerHorizontally = false)
     {
+        WatchEditing();
+
         DataContext = dataContext;
         TooltipBorder.Opacity = 0;
         App.SafeBeginInvoke(() => Position(anchor, centerHorizontally), DispatcherPriority.Loaded);
+    }
+
+    /// <summary>
+    /// Editing anywhere in the app - the navigation tree included - turns the flag every tooltip is bound
+    /// to, so a tooltip is only shown once positioned, and hidden again when the editing ends.
+    /// </summary>
+    private void WatchEditing()
+    {
+        var instance = InstanceHelper.GetInstance(this);
+        if (ReferenceEquals(instance, _watched))
+            return;
+
+        if (_watched is not null)
+            _watched.FileList.Actions.PropertyChanged -= Actions_PropertyChanged;
+
+        _watched = instance;
+
+        if (_watched is not null)
+            _watched.FileList.Actions.PropertyChanged += Actions_PropertyChanged;
+    }
+
+    private void Actions_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is not nameof(FileActionsEnable.IsExplorerEditing) || sender is not FileActionsEnable { IsExplorerEditing: false })
+            return;
+
+        App.SafeBeginInvoke(() => TooltipBorder.Opacity = 0);
     }
 
     private void Position(FrameworkElement anchor, bool centerHorizontally, bool isRetry = false)

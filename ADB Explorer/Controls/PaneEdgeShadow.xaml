@@ -1,0 +1,42 @@
+<UserControl
+    x:Class="ADB_Explorer.Controls.PaneEdgeShadow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    IsHitTestVisible="False">
+    <UserControl.Resources>
+        <LinearGradientBrush x:Key="EdgeShadowDown" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Offset="0" Color="#2E000000" />
+            <GradientStop Offset="1" Color="#00000000" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="EdgeShadowUp" StartPoint="0,1" EndPoint="0,0">
+            <GradientStop Offset="0" Color="#2E000000" />
+            <GradientStop Offset="1" Color="#00000000" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="EdgeShadowRight" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Offset="0" Color="#2E000000" />
+            <GradientStop Offset="1" Color="#00000000" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="EdgeShadowLeft" StartPoint="1,0" EndPoint="0,0">
+            <GradientStop Offset="0" Color="#2E000000" />
+            <GradientStop Offset="1" Color="#00000000" />
+        </LinearGradientBrush>
+    </UserControl.Resources>
+    <Grid>
+        <Rectangle
+            Height="8"
+            VerticalAlignment="Top"
+            Fill="{StaticResource EdgeShadowDown}" />
+        <Rectangle
+            Height="8"
+            VerticalAlignment="Bottom"
+            Fill="{StaticResource EdgeShadowUp}" />
+        <Rectangle
+            Width="8"
+            HorizontalAlignment="Left"
+            Fill="{StaticResource EdgeShadowRight}" />
+        <Rectangle
+            Width="8"
+            HorizontalAlignment="Right"
+            Fill="{StaticResource EdgeShadowLeft}" />
+    </Grid>
+</UserControl>

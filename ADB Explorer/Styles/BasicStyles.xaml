@@ -567,14 +567,14 @@
         x:Key="DataGridColumnHeaderStyle"
         BasedOn="{StaticResource DefaultUiDataGridColumnHeaderStyle}"
         TargetType="DataGridColumnHeader">
-        <!--  BasedOn="{StaticResource AdbDataGridColumnHeaderStyle}"  -->
-        <!--<Setter Property="Background" Value="Transparent" />-->
-        <!--<Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />-->
+        <Style.Resources>
+            <!--  Square, so the separator on the header's right edge runs its full height instead of curving at the ends.  -->
+            <CornerRadius x:Key="ControlCornerRadius">0</CornerRadius>
+        </Style.Resources>
+        <Setter Property="BorderBrush" Value="{DynamicResource DividerStrokeColorDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,1,0" />
         <Setter Property="FontWeight" Value="Regular" />
     </Style>
-
-    <!--<Style BasedOn="{StaticResource DataGridStyle}" TargetType="DataGrid" />-->
-
     <Style x:Key="FluentDataGridRowBorderStyle" TargetType="Border">
         <Setter Property="CornerRadius" Value="3" />
         <Setter Property="Margin" Value="0,2" />

@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
+using ADB_Explorer.ViewModels.Pages;
 using ADB_Explorer.ViewModels.Windows;
 using System.Diagnostics.CodeAnalysis;
 
@@ -30,6 +31,57 @@ public static class Data
     public static FileList Active => actionTarget ?? Files;
 
     public static FileListScope Use(FileList list) => new(list);
+
+    /// <summary>Makes <paramref name="instance"/> the active one until disposed, so the static forwarders above read its state.</summary>
+    public static InstanceScope UseInstance(ExplorerInstance instance) => new(instance);
+
+    /// <summary>
+    /// Runs <paramref name="action"/> for every open pane (any tab, split panes included) that
+    /// satisfies <paramref name="match"/>, with that pane made active for the duration. The second
+    /// argument tells whether it is the pane that was active beforehand. Returns whether any matched.
+    /// </summary>
+    public static bool ForEachInstance(Func<ExplorerInstance, bool> match, Action<ExplorerInstance, bool> action)
+    {
+        var any = false;
+
+        // On the UI thread, since the active instance is swapped while each pane runs.
+        App.SafeInvoke(() =>
+        {
+            var focused = ActiveExplorerInstance;
+            var instances = new HashSet<ExplorerInstance> { focused };
+
+            if (App.Services.GetService<ExplorerTabsViewModel>() is { } tabs)
+                instances.UnionWith(tabs.AllInstances);
+
+            var matching = instances.Where(match).ToList();
+            foreach (var instance in matching)
+            {
+                using (UseInstance(instance))
+                    action(instance, ReferenceEquals(instance, focused));
+            }
+
+            any = matching.Count > 0;
+        });
+
+        return any;
+    }
+
+    /// <summary>Runs <paramref name="action"/> for every pane listing <paramref name="path"/> on the device <paramref name="deviceId"/>.</summary>
+    public static bool ForEachListingAt(string path, string? deviceId, Action<ExplorerInstance, bool> action)
+        => ForEachInstance(instance => instance.EffectiveDevice?.ID == deviceId && instance.FileList.Path == path, action);
+
+    public readonly struct InstanceScope : IDisposable
+    {
+        private readonly ExplorerInstance previous;
+
+        internal InstanceScope(ExplorerInstance instance)
+        {
+            previous = ActiveExplorerInstance;
+            ActiveExplorerInstance = instance;
+        }
+
+        public void Dispose() => ActiveExplorerInstance = previous;
+    }
 
     public readonly struct FileListScope : IDisposable
     {

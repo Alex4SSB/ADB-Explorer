@@ -413,19 +413,9 @@ public static partial class NativeMethods
 
     public enum WindowMessages
     {
-        WM_COPYDATA = 0x004A,
         WM_DISPLAYCHANGE = 0x007E,
         WM_NCLBUTTONDOWN = 0x00A1,
         WM_DPICHANGED = 0x02E0,
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct COPYDATASTRUCT
-    {
-        public HANDLE dwData;
-        public int cbData;
-        [MarshalAs(UnmanagedType.LPTStr)]
-        public string lpData;
     }
 
     [Flags]
@@ -712,15 +702,6 @@ public static partial class NativeMethods
     }
 
     #endregion
-
-    [DllImport("User32.dll", CharSet = CharSet.Auto)]
-    private static extern IntPtr SendMessage(HANDLE hWnd, uint Msg, IntPtr wParam, ref COPYDATASTRUCT lParam);
-
-    public static bool SendMessage(HANDLE windowHandle, WindowMessages messageType, ref COPYDATASTRUCT data)
-    {
-        var result = SendMessage(windowHandle, (uint)messageType, IntPtr.Zero, ref data);
-        return result != IntPtr.Zero;
-    }
 
     public static void RefreshExplorerDirectory(string directoryPath)
     {

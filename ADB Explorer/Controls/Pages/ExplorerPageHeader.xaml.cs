@@ -31,13 +31,19 @@ public partial class ExplorerPageHeader : UserControl
     /// </summary>
     private int _detailsPaneMaxWidthGeneration;
 
-    internal int ToolbarSubmenuDepth => _toolbarSubmenuDepth;
+    internal int ToolbarSubmenuDepth => Chrome._toolbarSubmenuDepth;
+
+    private bool _suppressSelectionAfterMenu;
 
     /// <summary>
     /// True after a toolbar submenu closed while the left button was still down -
     /// the dismiss click should not start rubber-band selection (it may still unselect).
     /// </summary>
-    internal bool SuppressSelectionAfterMenu { get; set; }
+    internal bool SuppressSelectionAfterMenu
+    {
+        get => Chrome._suppressSelectionAfterMenu;
+        set => Chrome._suppressSelectionAfterMenu = value;
+    }
 
     private ExplorerViewModel ViewModel { get; }
 
@@ -53,7 +59,35 @@ public partial class ExplorerPageHeader : UserControl
 
     private AdbMenu NavigationToolBar => NavBar.NavigationToolBar;
 
-    internal DetailsPane DetailsPaneControl => DetailsPane;
+    /// <summary>The header whose toolbar, details pane and status bar serve this one: itself, or
+    /// for a split view's second pane, the tab's own header.</summary>
+    private ExplorerPageHeader? _chromeOwner;
+
+    private ExplorerPageHeader Chrome => _chromeOwner ?? this;
+
+    /// <summary>The split view's second pane hosted beside this header's list, if any.</summary>
+    private ExplorerPageHeader? _secondaryHeader;
+
+    /// <summary>The pane the shared toolbar, sort and view selectors currently act on.</summary>
+    private ExplorerInstance _chromeInstance;
+
+    private readonly Dictionary<ExplorerInstance, ObservableList<IMenuItem>> _toolbars = [];
+
+    private const double MIN_PANE_WIDTH = 200;
+
+    internal DetailsPane DetailsPaneControl => Chrome.DetailsPane;
+
+    /// <summary>The area of this header's list - explorer grid, drive view or icon view - in <paramref name="relativeTo"/>'s space, or null while it isn't shown.</summary>
+    internal Rect? ListBounds(UIElement relativeTo)
+    {
+        if (!ExplorerList.IsVisible || ExplorerList.ActualWidth <= 0 || ExplorerList.ActualHeight <= 0)
+            return null;
+
+        var topLeft = ExplorerList.TranslatePoint(new Point(0, 0), relativeTo);
+        var bottomRight = ExplorerList.TranslatePoint(new Point(ExplorerList.ActualWidth, ExplorerList.ActualHeight), relativeTo);
+
+        return new Rect(topLeft, bottomRight);
+    }
 
     private void HookToolbarMenu(AdbMenu? menu)
     {
@@ -73,6 +107,7 @@ public partial class ExplorerPageHeader : UserControl
             return;
 
         ExplorerList.CancelExplorerMarquee();
+        _secondaryHeader?.ExplorerList.CancelExplorerMarquee();
 
         // Outside click dismisses with the button still down; Escape does not.
         if (Mouse.LeftButton is MouseButtonState.Pressed)
@@ -93,6 +128,7 @@ public partial class ExplorerPageHeader : UserControl
         Thread.CurrentThread.CurrentCulture = Settings.ActualFormatCulture;
 
         Instance = instance;
+        _chromeInstance = instance;
         NavBar = new(instance);
         DataContext =
         ViewModel = viewModel;
@@ -135,8 +171,16 @@ public partial class ExplorerPageHeader : UserControl
         InitializeComponent();
 
         ((BindingProxy)Resources["InstanceProxy"]).Data = Instance;
+        ((BindingProxy)Resources["ChromeInstanceProxy"]).Data = Instance;
+
+        UpdateCloseButtons(false);
+
+        PrimaryStatus.Instance = Instance;
+        StatusBar.LayoutUpdated += (_, _) => PositionSecondaryStatus();
 
         ExplorerList.Initialize(this);
+        ExplorerList.PreviewMouseDown += (_, _) => FocusOwnPane();
+        ExplorerList.GotKeyboardFocus += (_, _) => FocusOwnPane();
         SearchOptionsControl.Initialize(this);
 
         SyncNavigationBoxWithHistory();
@@ -149,7 +193,8 @@ public partial class ExplorerPageHeader : UserControl
         };
 
         // Built per header, not bound to a shared static list - see MainToolBar.Build's comment.
-        MainToolBar.ItemsSource = ADB_Explorer.Services.MainToolBar.Build(Instance);
+        _toolbars[Instance] = ADB_Explorer.Services.MainToolBar.Build(Instance);
+        MainToolBar.ItemsSource = _toolbars[Instance];
 
         Loaded += (_, _) =>
         {
@@ -188,6 +233,9 @@ public partial class ExplorerPageHeader : UserControl
 
         ItemToSelect.PropertyChanged += (s, e) =>
         {
+            if (!ReferenceEquals(Instance, Data.ActiveExplorerInstance))
+                return;
+
             ExplorerList.ActiveView.SelectedItem = ItemToSelect.Value;
             if (ItemToSelect is not null)
                 ExplorerList.ActiveScrollIntoView(ItemToSelect.Value);
@@ -196,7 +244,14 @@ public partial class ExplorerPageHeader : UserControl
         Instance.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName is nameof(ExplorerInstance.IsShowingPage))
+            {
                 SyncNavigationBoxWithHistory();
+                SyncPagePane();
+                Chrome.RefreshChromeEnabled();
+                Chrome.RefreshDetailsAvailability();
+                Chrome.RefreshPaneVisuals();
+                Chrome._secondaryHeader?.RefreshPaneVisuals();
+            }
 
             if (e.PropertyName is nameof(ExplorerInstance.IsIconView)
                 or nameof(ExplorerInstance.IsContentView)
@@ -212,14 +267,408 @@ public partial class ExplorerPageHeader : UserControl
     /// shown wins) and re-derives the details pane, which reads app-wide state that changes per tab.</summary>
     private void ActivateHeader()
     {
+        var chrome = Chrome;
+
         ViewModel.RequestModeRefresh = () =>
         {
-            DetailsPane.RequestModeRefresh?.Invoke();
-            DetailsControl.RequestModeRefresh?.Invoke();
+            chrome.DetailsPane.RequestModeRefresh?.Invoke();
+            chrome.DetailsControl.RequestModeRefresh?.Invoke();
         };
 
-        if (DetailsPane.IsOpen && ReferenceEquals(Instance, Data.ActiveExplorerInstance))
-            DetailsPane.RefreshSelection();
+        if (chrome.DetailsPane.IsOpen && ReferenceEquals(chrome._chromeInstance, Data.ActiveExplorerInstance))
+            chrome.DetailsPane.RefreshSelection();
+    }
+
+    internal void ClearSelection()
+    {
+        ExplorerList.ActiveUnselectAll();
+
+        if (ExplorerList.DriveListView.SelectedIndex > -1)
+            ExplorerList.DriveListView.SelectedIndex = -1;
+    }
+
+    /// <summary>In a split view the focused pane is tinted and the other shadowed at its edges; a single pane shows neither.</summary>
+    internal void RefreshPaneVisuals()
+    {
+        // With a page in either pane there is no pair of explorers to tell apart.
+        var isSplit = Instance.OwningTab.SplitInstance is { } split
+            && !Instance.OwningTab.IsShowingPage
+            && !split.IsShowingPage
+            && !RuntimeSettings.IsHighContrast;
+        var isActive = ReferenceEquals(Instance, Data.ActiveExplorerInstance);
+
+        ActivePaneTint.Visibility = isSplit && isActive ? Visibility.Visible : Visibility.Collapsed;
+        InactivePaneShadow.Visibility = isSplit && !isActive ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private Type? _pagePaneType;
+
+    private readonly Dictionary<Type, UserControl> _pageHeaders = [];
+
+    /// <summary>In a split view a pane showing an app page displays it in place of its list; on its own, the window shows the page.</summary>
+    internal void SyncPagePane()
+    {
+        Type? pageType = null;
+
+        if (Instance.IsShowingPage && Instance.OwningTab.SplitInstance is not null)
+            pageType = Instance.History.Current?.PageType;
+
+        if (pageType == _pagePaneType)
+            return;
+
+        _pagePaneType = pageType;
+
+        UserControl? pageHeader = null;
+        if (pageType is not null && !_pageHeaders.TryGetValue(pageType, out pageHeader))
+        {
+            pageHeader = PageHeaderFactory.Create(pageType);
+
+            if (pageHeader is not null)
+                _pageHeaders[pageType] = pageHeader;
+        }
+
+        PagePaneHost.Content = pageHeader;
+        PagePane.Visibility = pageHeader is null ? Visibility.Collapsed : Visibility.Visible;
+        ExplorerList.Visibility = pageHeader is null ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    /// <summary>The details pane serves the explorer next to it, so it is gone while that pane shows a page.</summary>
+    internal void RefreshDetailsAvailability()
+    {
+        if (_chromeOwner is not null)
+            return;
+
+        var adjacent = _secondaryHeader?.Instance ?? Instance;
+        var available = !adjacent.IsShowingPage;
+
+        DetailsHost.Visibility = available ? Visibility.Visible : Visibility.Collapsed;
+        DetailsControl.IsEnabled = available;
+    }
+
+    /// <summary>The toolbar acts on a pane's listing, so it is off while the focused pane shows a page instead.</summary>
+    internal void RefreshChromeEnabled()
+        => ToolbarRow.IsEnabled = !(_chromeInstance.IsShowingPage && Instance.OwningTab.SplitInstance is not null);
+
+    private void FocusOwnPane()
+    {
+        if (!ReferenceEquals(Instance, Data.ActiveExplorerInstance))
+            App.Services.GetService<ExplorerTabsViewModel>()?.FocusPane(Instance);
+
+        // Keyboard focus follows, or a closing menu would return it to the other pane and take the focus back there.
+        if (!ExplorerList.IsKeyboardFocusWithin && !Instance.IsShowingPage)
+            FocusActiveListing();
+    }
+
+    /// <summary>Makes this header the second pane of a split view: only its list shows, the tab's own header supplying the rest.</summary>
+    internal void SetPaneOnly(ExplorerPageHeader chromeOwner)
+    {
+        _chromeOwner = chromeOwner;
+
+        ToolbarRow.Visibility = Visibility.Collapsed;
+        StatusBar.Visibility = Visibility.Collapsed;
+        DetailsHost.Visibility = Visibility.Collapsed;
+
+        // Its toolbar's icons are live elements the owner's toolbar shows for this pane; only one can hold them.
+        MainToolBar.ItemsSource = null;
+
+        SyncPagePane();
+    }
+
+    /// <summary>Makes a header that was a split view's second pane a whole one again.</summary>
+    internal void ClearPaneOnly()
+    {
+        _chromeOwner = null;
+
+        ToolbarRow.Visibility = Visibility.Visible;
+        StatusBar.Visibility = Visibility.Visible;
+        MainToolBar.ItemsSource = _toolbars[Instance];
+
+        SyncPagePane();
+        RefreshDetailsAvailability();
+        RefreshChromeEnabled();
+    }
+
+    private const double MIN_PANE_HEIGHT = 120;
+
+    /// <summary>Whether the second pane is shown below this header's list instead of beside it.</summary>
+    internal bool IsStacked { get; private set; }
+
+    /// <summary>The primary and second panes' widths - heights when stacked - so a swap can keep the splitter where the user put it.</summary>
+    internal (GridLength Primary, GridLength Secondary) PaneSizes
+    {
+        get
+        {
+            if (IsStacked)
+                return (PrimaryPaneRow.Height, SecondaryPaneRow.Height);
+
+            return (PrimaryPaneColumn.Width, SecondaryPaneColumn.Width);
+        }
+    }
+
+    internal void SetPaneSizes(GridLength primary, GridLength secondary)
+    {
+        if (IsStacked)
+        {
+            PrimaryPaneRow.Height = primary;
+            SecondaryPaneRow.Height = secondary;
+        }
+        else
+        {
+            PrimaryPaneColumn.Width = primary;
+            SecondaryPaneColumn.Width = secondary;
+        }
+    }
+
+    /// <summary>Side by side, the first pane is on the left except in right-to-left layouts; stacked, the icons turn to point up and down.</summary>
+    private void UpdateCloseButtons(bool stacked)
+    {
+        if (stacked)
+        {
+            ClosePrimaryPaneButton.ToolTip = Strings.Resources.S_CLOSE_TOP_PANE;
+            CloseSecondaryPaneButton.ToolTip = Strings.Resources.S_CLOSE_BOTTOM_PANE;
+
+            return;
+        }
+
+        var isRtl = RuntimeSettings.IsRTL;
+        ClosePrimaryPaneButton.ToolTip = isRtl ? Strings.Resources.S_CLOSE_RIGHT_PANE : Strings.Resources.S_CLOSE_LEFT_PANE;
+        CloseSecondaryPaneButton.ToolTip = isRtl ? Strings.Resources.S_CLOSE_LEFT_PANE : Strings.Resources.S_CLOSE_RIGHT_PANE;
+    }
+
+    private static void PlaceInGrid(UIElement element, int row, int rowSpan, int column, int columnSpan)
+    {
+        Grid.SetRow(element, row);
+        Grid.SetRowSpan(element, rowSpan);
+        Grid.SetColumn(element, column);
+        Grid.SetColumnSpan(element, columnSpan);
+    }
+
+    /// <summary>Lays the two panes out side by side, or one above the other, along with their splitter and buttons.</summary>
+    private void ApplyPaneLayout(bool stacked)
+    {
+        IsStacked = stacked;
+
+        foreach (var layer in new UIElement[] { ExplorerList, PagePane, ActivePaneTint, InactivePaneShadow })
+        {
+            if (stacked)
+                PlaceInGrid(layer, 0, 1, 0, 3);
+            else
+                PlaceInGrid(layer, 0, 3, 0, 1);
+        }
+
+        if (stacked)
+        {
+            PlaceInGrid(SecondaryPaneHost, 2, 1, 0, 3);
+            PlaceInGrid(PaneSplitter, 1, 1, 0, 3);
+            PlaceInGrid(SwapPanesHost, 1, 1, 0, 3);
+        }
+        else
+        {
+            PlaceInGrid(SecondaryPaneHost, 0, 3, 2, 1);
+            PlaceInGrid(PaneSplitter, 0, 3, 1, 1);
+            PlaceInGrid(SwapPanesHost, 0, 3, 1, 1);
+        }
+
+        PaneSplitter.Width = stacked ? double.NaN : 20;
+        PaneSplitter.Cursor = stacked ? Cursors.SizeNS : Cursors.SizeWE;
+        PaneSplitter.ResizeDirection = stacked ? GridResizeDirection.Rows : GridResizeDirection.Columns;
+
+        // The buttons sit in the middle of the splitter, along it.
+        SwapPanesHost.Width = stacked ? double.NaN : 20;
+        SwapPanesHost.HorizontalAlignment = stacked ? HorizontalAlignment.Center : HorizontalAlignment.Stretch;
+        SwapPanesButtons.Orientation = stacked ? Orientation.Horizontal : Orientation.Vertical;
+
+        SwapPanesButton.Width = stacked ? 24 : double.NaN;
+        SwitchOrientationButton.Width = stacked ? 24 : double.NaN;
+        SwapPanesButtons.Height = stacked ? HANDLE_STRIP_HEIGHT : double.NaN;
+
+        ArrangeCloseHandles(stacked);
+
+        // The arrows point along the panes' direction.
+        SwapPanesIcon.LayoutTransform = stacked ? new RotateTransform(90) : Transform.Identity;
+
+        // The switch shows the layout it changes to.
+        SwitchOrientationIcon.Data = stacked ? FluentPathGeometries.LayoutColumnTwo : FluentPathGeometries.LayoutRowTwo;
+        SwitchOrientationButton.ToolTip = stacked ? Strings.Resources.S_SPLIT_HORIZONTALLY : Strings.Resources.S_SPLIT_VERTICALLY;
+
+        UpdateCloseButtons(stacked);
+    }
+
+    private const double HANDLE_DEPTH = 16;
+    private const double HANDLE_LENGTH = 24;
+    private const double HANDLE_FLARE = 6;
+
+    /// <summary>The stacked splitter's strip: room for a handle on each of its edges, with a gap between.</summary>
+    private const double HANDLE_STRIP_HEIGHT = 28;
+
+    /// <summary>Puts each close button on its own pane's side of the splitter - as a handle growing out of that pane, with the buttons between them.</summary>
+    private void ArrangeCloseHandles(bool stacked)
+    {
+        var gap = HANDLE_FLARE + 2;
+
+        ClosePrimaryFlare.AttachedEdge = stacked ? Dock.Top : Dock.Left;
+        CloseSecondaryFlare.AttachedEdge = stacked ? Dock.Bottom : Dock.Right;
+
+        foreach (var handle in new[] { ClosePrimaryHandle, CloseSecondaryHandle })
+        {
+            handle.Width = stacked ? HANDLE_LENGTH : HANDLE_DEPTH;
+            handle.Height = stacked ? HANDLE_DEPTH : HANDLE_LENGTH;
+        }
+
+        foreach (var button in new[] { ClosePrimaryPaneButton, CloseSecondaryPaneButton })
+        {
+            button.Width = stacked ? HANDLE_LENGTH : HANDLE_DEPTH;
+            button.Height = stacked ? HANDLE_DEPTH : HANDLE_LENGTH;
+        }
+
+        if (stacked)
+        {
+            ClosePrimaryHandle.VerticalAlignment = VerticalAlignment.Top;
+            CloseSecondaryHandle.VerticalAlignment = VerticalAlignment.Bottom;
+            ClosePrimaryHandle.HorizontalAlignment = HorizontalAlignment.Left;
+            CloseSecondaryHandle.HorizontalAlignment = HorizontalAlignment.Left;
+        }
+        else
+        {
+            ClosePrimaryHandle.VerticalAlignment = VerticalAlignment.Top;
+            CloseSecondaryHandle.VerticalAlignment = VerticalAlignment.Top;
+            ClosePrimaryHandle.HorizontalAlignment = HorizontalAlignment.Left;
+            CloseSecondaryHandle.HorizontalAlignment = HorizontalAlignment.Right;
+        }
+
+        SwapPanesButton.VerticalAlignment = VerticalAlignment.Center;
+        SwitchOrientationButton.VerticalAlignment = VerticalAlignment.Center;
+    }
+
+    /// <summary>Each pane's status sits with it: side by side, the second one's starts where its pane does; stacked, the first pane's is in the splitter's strip.</summary>
+    private void UpdateStatusArrangement()
+    {
+        var split = _secondaryHeader is not null;
+        var splitStacked = split && IsStacked;
+
+        PrimaryStatus.Instance = Instance;
+        PrimaryStatus.Visibility = splitStacked ? Visibility.Collapsed : Visibility.Visible;
+        PrimaryStatus.MaxWidth = double.PositiveInfinity;
+
+        SplitterStatus.Instance = splitStacked ? Instance : null;
+        SplitterStatus.Visibility = splitStacked ? Visibility.Visible : Visibility.Collapsed;
+
+        SecondaryStatus.Instance = _secondaryHeader?.Instance;
+        SecondaryStatus.Visibility = split ? Visibility.Visible : Visibility.Collapsed;
+        SecondaryStatus.Margin = new Thickness(0);
+
+        PositionSecondaryStatus();
+    }
+
+    /// <summary>Side by side, keeps the second pane's status under that pane, wherever the splitter has put it.</summary>
+    private void PositionSecondaryStatus()
+    {
+        if (_secondaryHeader is null || IsStacked || !SecondaryPaneHost.IsVisible)
+            return;
+
+        var left = Math.Max(0, SecondaryPaneHost.TranslatePoint(new Point(0, 0), StatusBar).X);
+
+        if (Math.Abs(SecondaryStatus.Margin.Left - left) > 0.5)
+            SecondaryStatus.Margin = new Thickness(left, 0, 0, 0);
+
+        PrimaryStatus.MaxWidth = left;
+    }
+
+    /// <summary>The panes' and splitter's rows and columns, sized to share the space equally.</summary>
+    private void SetSharedPaneSizes(bool stacked)
+    {
+        PrimaryPaneColumn.MinWidth = stacked ? 0 : MIN_PANE_WIDTH;
+        SecondaryPaneColumn.MinWidth = stacked ? 0 : MIN_PANE_WIDTH;
+        PrimaryPaneColumn.Width = new(1, GridUnitType.Star);
+        SecondaryPaneColumn.Width = stacked ? new(0) : new(1, GridUnitType.Star);
+
+        PrimaryPaneRow.MinHeight = stacked ? MIN_PANE_HEIGHT : 0;
+        SecondaryPaneRow.MinHeight = stacked ? MIN_PANE_HEIGHT : 0;
+        PrimaryPaneRow.Height = new(1, GridUnitType.Star);
+        SplitterRow.Height = stacked ? GridLength.Auto : new(0);
+        SecondaryPaneRow.Height = stacked ? new(1, GridUnitType.Star) : new(0);
+    }
+
+    private void ClosePrimaryPane_Click(object sender, RoutedEventArgs e)
+        => App.Services.GetService<ExplorerTabsViewModel>()?.ClosePane(Instance.OwningTab, closeFirst: true);
+
+    private void CloseSecondaryPane_Click(object sender, RoutedEventArgs e)
+        => App.Services.GetService<ExplorerTabsViewModel>()?.ClosePane(Instance.OwningTab, closeFirst: false);
+
+    private void SwapPanes_Click(object sender, RoutedEventArgs e)
+        => App.Services.GetService<ExplorerTabsViewModel>()?.SwapPanes(Instance.OwningTab);
+
+    /// <summary>Shows <paramref name="secondary"/> beside or below this header's list, with a splitter between them.</summary>
+    internal void ShowSecondary(ExplorerPageHeader secondary, bool stacked)
+    {
+        _secondaryHeader = secondary;
+        secondary.SetPaneOnly(this);
+        SecondaryPaneHost.Content = secondary;
+        ApplyPaneLayout(stacked);
+        SyncPagePane();
+
+        SetSharedPaneSizes(stacked);
+        PaneSplitter.Visibility = Visibility.Visible;
+        SwapPanesHost.Visibility = Visibility.Visible;
+        UpdateStatusArrangement();
+
+        RefreshDetailsAvailability();
+    }
+
+    /// <summary>Resets the splitter to give both panes half of the space each.</summary>
+    private void PaneSplitter_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        SetSharedPaneSizes(IsStacked);
+        e.Handled = true;
+    }
+
+    private void SwitchOrientation_Click(object sender, RoutedEventArgs e)
+        => App.Services.GetService<ExplorerTabsViewModel>()?.SwitchSplitOrientation(Instance.OwningTab);
+
+    internal void HideSecondary()
+    {
+        SecondaryPaneHost.Content = null;
+        _secondaryHeader = null;
+
+        PaneSplitter.Visibility = Visibility.Collapsed;
+        SwapPanesHost.Visibility = Visibility.Collapsed;
+        ApplyPaneLayout(false);
+        SyncPagePane();
+
+        SetSharedPaneSizes(false);
+        PrimaryPaneColumn.MinWidth = 0;
+        SecondaryPaneColumn.MinWidth = 0;
+        SecondaryPaneColumn.Width = new(0);
+        UpdateStatusArrangement();
+
+        // The details pane was off while the second pane, now gone, showed a page beside it.
+        RefreshDetailsAvailability();
+
+        SetChromeInstance(Instance);
+    }
+
+    /// <summary>Points the toolbar, sort / view selectors and status bar at <paramref name="target"/>, the focused pane.</summary>
+    internal void SetChromeInstance(ExplorerInstance target)
+    {
+        if (ReferenceEquals(_chromeInstance, target))
+            return;
+
+        _chromeInstance = target;
+
+        if (!_toolbars.TryGetValue(target, out var toolbar))
+        {
+            toolbar = ADB_Explorer.Services.MainToolBar.Build(target);
+            _toolbars[target] = toolbar;
+        }
+
+        ((BindingProxy)Resources["ChromeInstanceProxy"]).Data = target;
+        InstanceHelper.SetInstance(ToolbarRow, target);
+        InstanceHelper.SetInstance(StatusBar, target);
+        MainToolBar.ItemsSource = toolbar;
+        SearchOptionsControl.SetInstance(target);
+        RefreshChromeEnabled();
+
+        ActivateHeader();
     }
 
     private void ExplorerPageHeader_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -229,7 +678,7 @@ public partial class ExplorerPageHeader : UserControl
             return;
 
         if (SearchBox.IsFocused || SearchBox.IsKeyboardFocusWithin
-            || DetailsPane.IsEditorFocused
+            || DetailsPaneControl.IsEditorFocused
             || NavigationBox.Mode is NavigationBox.ViewMode.Path
             || Instance.FileList.Actions.IsExplorerEditing)
             return;
@@ -264,7 +713,7 @@ public partial class ExplorerPageHeader : UserControl
         if (Keyboard.Modifiers.HasFlag(ModifierKeys.Alt)
             || SearchBox.IsKeyboardFocusWithin
             || NavigationBox.IsKeyboardFocusWithin
-            || DetailsPane.IsEditorFocused
+            || DetailsPaneControl.IsEditorFocused
             || Instance.FileList.Actions.IsExplorerEditing)
             return;
 
@@ -471,7 +920,7 @@ public partial class ExplorerPageHeader : UserControl
         }
     }
 
-    private void FilterFileActions() => App.SafeInvoke(() => MainToolBar.Items?.Refresh());
+    private void FilterFileActions() => App.SafeInvoke(() => Chrome.MainToolBar.Items?.Refresh());
 
     private void NewItem(bool isFolder)
     {
@@ -575,12 +1024,12 @@ public partial class ExplorerPageHeader : UserControl
             case nameof(DirectoryLister.CurrentLocation):
                 // Empty selection shows CurrentLocation in the details pane. Refresh on location
                 // changes only (preliminary + final). InProgress no longer re-triggers the same load.
-                if (DetailsPane.IsOpen && ExplorerList.ActiveSelectedItems.Count == 0)
-                    DetailsPane.RefreshSelection();
+                if (DetailsPaneControl.IsOpen && ExplorerList.ActiveSelectedItems.Count == 0)
+                    DetailsPaneControl.RefreshSelection();
                 break;
 
             case nameof(DirectoryLister.IsProgressVisible):
-                UnfinishedBlock.Visible(Instance.FileList.DirList.IsProgressVisible);
+                Instance.IsListingUnfinished = Instance.FileList.DirList.IsProgressVisible;
                 NavigationBox.IsLoadingProgressVisible = Instance.FileList.DirList.IsProgressVisible;
                 break;
 
@@ -691,8 +1140,8 @@ public partial class ExplorerPageHeader : UserControl
         Instance.CurrentSelectedIndex = -1;
         ExplorerList.ActiveUnselectAll();
 
-        if (DetailsPane.IsOpen)
-            DetailsPane.SelectedFiles = [];
+        if (DetailsPaneControl.IsOpen)
+            DetailsPaneControl.SelectedFiles = [];
 
         ExplorerList.ActiveView.Focus();
 
@@ -827,8 +1276,8 @@ public partial class ExplorerPageHeader : UserControl
         Instance.CurrentSelectedIndex = -1;
         ExplorerList.ActiveUnselectAll();
 
-        if (DetailsPane.IsOpen)
-            DetailsPane.SelectedFiles = [];
+        if (DetailsPaneControl.IsOpen)
+            DetailsPaneControl.SelectedFiles = [];
 
         ApplyLocationThumbSize();
 
@@ -838,8 +1287,8 @@ public partial class ExplorerPageHeader : UserControl
         FileActionLogic.UpdateFileActions();
         ExplorerList.ResetExplorerHorizontalScroll();
 
-        if (DetailsPane.IsOpen)
-            DetailsPane.RefreshSelection();
+        if (DetailsPaneControl.IsOpen)
+            DetailsPaneControl.RefreshSelection();
     }
 
     private void ExitSearchMode()
@@ -1116,7 +1565,14 @@ public partial class ExplorerPageHeader : UserControl
         DeviceCts = new();
         ApkIconService.CancelPending();
 
-        FileActionLogic.ClearExplorer(false);
+        // Clears this pane's listing, not the focused one's, and leaves the focused pane's stray-selection guard alone.
+        var wasLoaded = RuntimeSettings.IsExplorerLoaded;
+        using (Data.UseInstance(Instance))
+            FileActionLogic.ClearExplorer(false);
+
+        if (!ReferenceEquals(Instance, Data.ActiveExplorerInstance))
+            RuntimeSettings.IsExplorerLoaded = wasLoaded;
+
         Instance.FileList.Actions.IsDriveViewVisible = true;
 
         NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
@@ -1141,13 +1597,13 @@ public partial class ExplorerPageHeader : UserControl
         {
             SelectionHelper.GetListViewItemContainer(ExplorerList.DriveListView).Focus();
 
-            if (DetailsPane.IsOpen)
-                DetailsPane.SelectedFiles = ExplorerList.DriveListView.SelectedItem is DriveViewModel selectedDrive ? [selectedDrive] : [];
+            if (DetailsPaneControl.IsOpen)
+                DetailsPaneControl.SelectedFiles = ExplorerList.DriveListView.SelectedItem is DriveViewModel selectedDrive ? [selectedDrive] : [];
         }
-        else if (DetailsPane.IsOpen)
+        else if (DetailsPaneControl.IsOpen)
         {
-            DetailsPane.SelectedFiles = [];
-            DetailsPane.RefreshSelection();
+            DetailsPaneControl.SelectedFiles = [];
+            DetailsPaneControl.RefreshSelection();
         }
 
         RuntimeSettings.SelectedDrive = ExplorerList.DriveListView.SelectedItem as DriveViewModel;
@@ -1174,7 +1630,7 @@ public partial class ExplorerPageHeader : UserControl
 
         // Tunneling: run before UnselectAll so a nested MouseMove cannot start a rubber-band
         // from a stale down-point (item that was selected when the menu opened).
-        if (_toolbarSubmenuDepth > 0 || SuppressSelectionAfterMenu)
+        if (ToolbarSubmenuDepth > 0 || SuppressSelectionAfterMenu)
         {
             SuppressSelectionAfterMenu = true;
             ExplorerList.CancelExplorerMarquee();
@@ -1198,7 +1654,12 @@ public partial class ExplorerPageHeader : UserControl
     private void Window_MouseUp(object sender, MouseButtonEventArgs e)
     {
         if (e.ChangedButton is MouseButton.Left)
+        {
             ExplorerList.EndExplorerMouseGesture();
+
+            // After the cells had their say, which the flag is kept for.
+            ExplorerList.ClearWasDraggingIfIdle();
+        }
 
         if (Instance.FileList.Actions.ListingInProgress && e.ChangedButton is MouseButton.XButton1 or MouseButton.XButton2)
         {

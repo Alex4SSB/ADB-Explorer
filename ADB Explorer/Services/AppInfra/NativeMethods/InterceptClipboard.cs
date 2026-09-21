@@ -5,7 +5,6 @@ public static partial class NativeMethods
     public sealed partial class InterceptClipboard : IDisposable
     {
         private static Action _externalClipAction = null!;
-        private static Action<string> _externalIpcAction = null!;
         private static Action<float> _externalScalingAction = null!;
         private static Action _externalCaptionClickAction = null!;
         private static HwndSource _hwndSource = null!;
@@ -14,10 +13,9 @@ public static partial class NativeMethods
 
         private const int HTCAPTION = 2;
 
-        public static void Init(Window window, Action clipboardAction, Action<string> ipcAction, Action<float> scalingAction, Action captionClickAction)
+        public static void Init(Window window, Action clipboardAction, Action<float> scalingAction, Action captionClickAction)
         {
             _externalClipAction = clipboardAction;
-            _externalIpcAction = ipcAction;
             _externalScalingAction = scalingAction;
             _externalCaptionClickAction = captionClickAction;
             RoutedEventHandler windowLoadedHandler = null;
@@ -64,11 +62,6 @@ public static partial class NativeMethods
             {
                 _externalClipAction();
                 handled = true;
-            }
-            else if ((WindowMessages)msg is WindowMessages.WM_COPYDATA)
-            {
-                var cds = Marshal.PtrToStructure<COPYDATASTRUCT>(lParam);
-                _externalIpcAction(cds.lpData);
             }
             // The HIWORD of the wParam contains the Y-axis value of the new dpi of the window.
             // The LOWORD of the wParam contains the X-axis value of the new DPI of the window.

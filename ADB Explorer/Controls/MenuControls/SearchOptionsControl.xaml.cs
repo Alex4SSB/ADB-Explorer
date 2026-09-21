@@ -11,18 +11,26 @@ namespace ADB_Explorer.Controls;
 [ObservableObject]
 public partial class SearchOptionsControl : UserControl
 {
-    /// <summary>The <see cref="Pages.ExplorerPageHeader"/> that hosts this control, set once via <see cref="Initialize"/>.</summary>
-    private Pages.ExplorerPageHeader? Owner { get; set; }
+    /// <summary>The pane whose search state this control shows - the focused one in a split view.</summary>
+    private ExplorerInstance? _instance;
 
-    internal void Initialize(Pages.ExplorerPageHeader owner)
+    internal void Initialize(Pages.ExplorerPageHeader owner) => SetInstance(owner.Instance);
+
+    internal void SetInstance(ExplorerInstance instance)
     {
-        Owner = owner;
+        if (_instance is not null)
+            _instance.PropertyChanged -= Instance_PropertyChanged;
 
-        owner.Instance.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName is nameof(ExplorerInstance.IsSearchExpanded))
-                NotifySearchMenuVisibilityChanged();
-        };
+        _instance = instance;
+        _instance.PropertyChanged += Instance_PropertyChanged;
+
+        NotifySearchMenuVisibilityChanged();
+    }
+
+    private void Instance_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(ExplorerInstance.IsSearchExpanded))
+            NotifySearchMenuVisibilityChanged();
     }
 
     public SearchOptionsControl()
@@ -75,15 +83,15 @@ public partial class SearchOptionsControl : UserControl
     public bool IsCloseSearchVisible => !string.IsNullOrEmpty(Data.FileActions.ExplorerFilter);
 
     public bool IsSearchOptionsVisible =>
-        Owner?.Instance.IsSearchExpanded == true || !string.IsNullOrEmpty(Data.FileActions.ExplorerFilter);
+        _instance?.IsSearchExpanded == true || !string.IsNullOrEmpty(Data.FileActions.ExplorerFilter);
 
     private static bool CanCloseSearch() => !string.IsNullOrEmpty(Data.FileActions.ExplorerFilter);
 
     private void CloseSearch()
     {
         Data.FileActions.ExplorerFilter = "";
-        if (Owner is not null)
-            Owner.Instance.IsSearchExpanded = false;
+        if (_instance is not null)
+            _instance.IsSearchExpanded = false;
     }
 
     private void NotifySearchMenuVisibilityChanged()

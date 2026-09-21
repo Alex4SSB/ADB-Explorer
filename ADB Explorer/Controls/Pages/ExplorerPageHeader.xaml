@@ -23,9 +23,13 @@
     SizeChanged="ExplorerHeader_SizeChanged"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <!--  Data is set in code-behind to this header's own Instance - unlike ViewModel.Instance,
-              which is shared across every tab's header and only ever reflects the active one.  -->
+        <!--
+            Data is set in code-behind to this header's own Instance - unlike ViewModel.Instance,
+            which is shared across every tab's header and only ever reflects the active one.
+        -->
         <helpers:BindingProxy x:Key="InstanceProxy" />
+        <!--  Like InstanceProxy, but follows whichever split pane has focus, for the toolbar it shares with the other pane.  -->
+        <helpers:BindingProxy x:Key="ChromeInstanceProxy" />
     </UserControl.Resources>
     <UserControl.Style>
         <Style TargetType="UserControl">
@@ -57,7 +61,7 @@
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Grid Height="48">
+        <Grid x:Name="ToolbarRow" Height="48">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
@@ -77,7 +81,7 @@
                                 <DataTrigger Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsDebug}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.FileList.Actions.IsAppDrive}" Value="False">
+                                <DataTrigger Binding="{Binding Source={StaticResource ChromeInstanceProxy}, Path=Data.FileList.Actions.IsAppDrive}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -121,9 +125,9 @@
                 </Separator>
                 <local:SortingSelector
                     x:Name="SortingSelector"
-                    SortDirection="{Binding Source={StaticResource InstanceProxy}, Path=Data.SortDirection, Mode=TwoWay}"
-                    SortOption="{Binding Source={StaticResource InstanceProxy}, Path=Data.SortedColumn, Mode=TwoWay}" />
-                <local:ThumbsSizeSelector x:Name="ThumbsSizeSelector" ThumbnailSize="{Binding Source={StaticResource InstanceProxy}, Path=Data.CurrentThumbsSize, Mode=TwoWay}" />
+                    SortDirection="{Binding Source={StaticResource ChromeInstanceProxy}, Path=Data.SortDirection, Mode=TwoWay}"
+                    SortOption="{Binding Source={StaticResource ChromeInstanceProxy}, Path=Data.SortedColumn, Mode=TwoWay}" />
+                <local:ThumbsSizeSelector x:Name="ThumbsSizeSelector" ThumbnailSize="{Binding Source={StaticResource ChromeInstanceProxy}, Path=Data.CurrentThumbsSize, Mode=TwoWay}" />
                 <Separator Margin="0,2">
                     <Separator.Style>
                         <Style BasedOn="{StaticResource {x:Type Separator}}" TargetType="Separator">
@@ -166,11 +170,144 @@
                         <ColumnDefinition />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <local:ExplorerListHost x:Name="ExplorerList" />
-                    <local:DetailsPane
-                        x:Name="DetailsPane"
-                        Grid.Column="1"
-                        IsOpen="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsDetailsPaneOpen, Mode=OneWay}" />
+                    <Grid x:Name="PanesGrid">
+                        <!--  Side by side, the panes share row 0 and the splitter spans it; stacked, each has a row of its own. See ApplyPaneLayout.  -->
+                        <Grid.RowDefinitions>
+                            <RowDefinition x:Name="PrimaryPaneRow" />
+                            <RowDefinition x:Name="SplitterRow" Height="0" />
+                            <RowDefinition x:Name="SecondaryPaneRow" Height="0" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition x:Name="PrimaryPaneColumn" />
+                            <ColumnDefinition x:Name="SplitterColumn" Width="Auto" />
+                            <ColumnDefinition x:Name="SecondaryPaneColumn" Width="0" />
+                        </Grid.ColumnDefinitions>
+                        <local:ExplorerListHost x:Name="ExplorerList" Grid.RowSpan="3" />
+                        <!--  Split view only: an app page (Settings, Devices...) shown in place of the list.  -->
+                        <Border
+                            x:Name="PagePane"
+                            Grid.RowSpan="3"
+                            Background="{DynamicResource NavigationViewContentBackground}"
+                            Visibility="Collapsed">
+                            <ContentPresenter x:Name="PagePaneHost" />
+                        </Border>
+                        <!--  Split view only: the focused pane is tinted, the other gets a faint inner shadow.  -->
+                        <Border
+                            x:Name="ActivePaneTint"
+                            Grid.RowSpan="3"
+                            Background="{DynamicResource SubtleFillColorSecondaryBrush}"
+                            IsHitTestVisible="False"
+                            Visibility="Collapsed" />
+                        <local:PaneEdgeShadow
+                            x:Name="InactivePaneShadow"
+                            Grid.RowSpan="3"
+                            Visibility="Collapsed" />
+                        <GridSplitter
+                            x:Name="PaneSplitter"
+                            Grid.RowSpan="3"
+                            Grid.Column="1"
+                            Width="20"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Cursor="SizeWE"
+                            Focusable="False"
+                            MouseDoubleClick="PaneSplitter_MouseDoubleClick"
+                            ResizeBehavior="PreviousAndNext"
+                            ResizeDirection="Columns"
+                            ShowsPreview="False"
+                            Visibility="Collapsed">
+                            <GridSplitter.Template>
+                                <ControlTemplate TargetType="GridSplitter">
+                                    <Border Background="Transparent" />
+                                </ControlTemplate>
+                            </GridSplitter.Template>
+                        </GridSplitter>
+                        <ContentPresenter
+                            x:Name="SecondaryPaneHost"
+                            Grid.RowSpan="3"
+                            Grid.Column="2" />
+                        <!--  Stacked, the splitter's strip also shows the first pane's status, which the window's own status bar shows for the second.  -->
+                        <local:PaneStatus
+                            x:Name="SplitterStatus"
+                            Grid.Row="1"
+                            Grid.ColumnSpan="3"
+                            Margin="6,0,0,0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Visibility="Collapsed" />
+                        <Border
+                            x:Name="SwapPanesHost"
+                            Grid.RowSpan="3"
+                            Grid.Column="1"
+                            Width="20"
+                            VerticalAlignment="Center"
+                            Visibility="Collapsed">
+                            <local:SimpleStackPanel x:Name="SwapPanesButtons" Spacing="6">
+                                <local:SimpleStackPanel.Resources>
+                                    <Style BasedOn="{StaticResource {x:Type ui:Button}}" TargetType="ui:Button">
+                                        <Setter Property="Height" Value="24" />
+                                        <Setter Property="MinWidth" Value="0" />
+                                        <Setter Property="Margin" Value="1" />
+                                        <Setter Property="Padding" Value="0" />
+                                    </Style>
+                                </local:SimpleStackPanel.Resources>
+                                <!--  Each close button is a handle growing out of the pane it closes, on the side it is on.  -->
+                                <Grid x:Name="ClosePrimaryHandle">
+                                    <local:PaneHandleBackground
+                                        x:Name="ClosePrimaryFlare"
+                                        Fill="{DynamicResource SubtleFillColorSecondaryBrush}"
+                                        Stroke="{DynamicResource NavigationViewContentGridBorderBrush}" />
+                                    <ui:Button
+                                        x:Name="ClosePrimaryPaneButton"
+                                        Margin="0"
+                                        Appearance="Transparent"
+                                        BorderThickness="0"
+                                        Click="ClosePrimaryPane_Click">
+                                        <ui:SymbolIcon FontSize="12" Symbol="Dismiss16" />
+                                    </ui:Button>
+                                </Grid>
+                                <Grid x:Name="CloseSecondaryHandle">
+                                    <local:PaneHandleBackground
+                                        x:Name="CloseSecondaryFlare"
+                                        Fill="{DynamicResource SubtleFillColorSecondaryBrush}"
+                                        Stroke="{DynamicResource NavigationViewContentGridBorderBrush}" />
+                                    <ui:Button
+                                        x:Name="CloseSecondaryPaneButton"
+                                        Margin="0"
+                                        Appearance="Transparent"
+                                        BorderThickness="0"
+                                        Click="CloseSecondaryPane_Click">
+                                        <ui:SymbolIcon FontSize="12" Symbol="Dismiss16" />
+                                    </ui:Button>
+                                </Grid>
+                                <ui:Button
+                                    x:Name="SwapPanesButton"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Click="SwapPanes_Click"
+                                    ToolTip="{x:Static strings:Resources.S_SWAP_PANES}">
+                                    <ui:FontIcon
+                                        x:Name="SwapPanesIcon"
+                                        FontSize="12"
+                                        Glyph="&#xE8AB;" />
+                                </ui:Button>
+                                <ui:Button
+                                    x:Name="SwitchOrientationButton"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Click="SwitchOrientation_Click">
+                                    <local:FluentPathIcon
+                                        x:Name="SwitchOrientationIcon"
+                                        Width="14"
+                                        Height="14" />
+                                </ui:Button>
+                            </local:SimpleStackPanel>
+                        </Border>
+                    </Grid>
+                    <!--  Availability collapses this host, not the pane itself, whose own open / close animation sets its Visibility.  -->
+                    <Border x:Name="DetailsHost" Grid.Column="1">
+                        <local:DetailsPane x:Name="DetailsPane" IsOpen="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsDetailsPaneOpen, Mode=OneWay}" />
+                    </Border>
                 </Grid>
                 <local:RenameTooltip
                     x:Name="RenameTooltipControl"
@@ -179,6 +316,7 @@
             </Grid>
         </Border>
         <Grid
+            x:Name="StatusBar"
             Grid.Row="2"
             Height="30"
             Margin="6,0">
@@ -194,31 +332,17 @@
                 Grid.ColumnSpan="3"
                 Margin="-6,0"
                 VerticalAlignment="Top" />
-            <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountContainerStyle}">
-                <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountStackPanelStyle}">
-                    <TextBlock x:Name="ItemsCountBlock" Style="{StaticResource ItemsCountStyle}" />
-                    <TextBlock Text=" " />
-                    <TextBlock Style="{StaticResource ItemsCountSuffixStyle}" />
-                    <TextBlock
-                        x:Name="UnfinishedBlock"
-                        Style="{StaticResource UnfinishedTextblockStyle}"
-                        Text=" *" />
-                </StackPanel>
-                <Separator Style="{StaticResource StatusBarSeparatorStyle}" Visibility="{Binding SelectedItemsCountVisibility}" />
-                <StackPanel
-                    x:Name="SelectedItemsCountContainer"
-                    Orientation="Horizontal"
-                    Visibility="{Binding SelectedItemsCountVisibility}">
-                    <TextBlock x:Name="SelectedItemsBlock" Style="{StaticResource SelectedItemsStyle}" />
-                    <TextBlock Text=" " />
-                    <TextBlock Style="{StaticResource SelectedItemsSuffixStyle}" />
-                    <TextBlock
-                        Margin="6,4,0,4"
-                        Text="{Binding SelectedFilesTotalSize}"
-                        Visibility="{Binding SelectedFilesTotalSizeVisibility}" />
-                </StackPanel>
-                <local:PasteAndPullTooltip Margin="10,0" />
-            </StackPanel>
+            <!--  Side by side, the second pane's status starts where that pane does (see PositionSecondaryStatus); stacked, it is the bottom pane's, and the first pane's is in the splitter's strip.  -->
+            <local:PaneStatus
+                x:Name="PrimaryStatus"
+                Grid.ColumnSpan="3"
+                HorizontalAlignment="Left"
+                ClipToBounds="True" />
+            <local:PaneStatus
+                x:Name="SecondaryStatus"
+                Grid.ColumnSpan="3"
+                HorizontalAlignment="Left"
+                Visibility="Collapsed" />
             <StackPanel
                 Grid.Column="2"
                 HorizontalAlignment="Right"

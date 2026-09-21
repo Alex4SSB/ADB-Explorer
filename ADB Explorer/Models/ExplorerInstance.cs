@@ -6,6 +6,24 @@ using ADB_Explorer.ViewModels.Pages;
 
 namespace ADB_Explorer.Models;
 
+/// <summary>Which edge of a tab's page area a new split pane is placed against.</summary>
+public enum SplitSide
+{
+    Left,
+    Right,
+    Top,
+    Bottom,
+}
+
+public static class SplitSideExtensions
+{
+    /// <summary>The pane goes above or below the tab's own, rather than beside it.</summary>
+    public static bool IsStacked(this SplitSide side) => side is SplitSide.Top or SplitSide.Bottom;
+
+    /// <summary>The pane takes the tab's own place in the list, the left or top one.</summary>
+    public static bool IsFirst(this SplitSide side) => side is SplitSide.Left or SplitSide.Top;
+}
+
 /// <summary>
 /// Per-tab explorer state: the file-browsing session (<see cref="FileList"/>), its own
 /// navigation history, and the view state a header UserControl binds to (sort, thumbnails,
@@ -38,6 +56,7 @@ public partial class ExplorerInstance : ObservableObject
     {
         OnPropertyChanged(nameof(EffectiveDevice));
         RefreshSavedItems();
+        NotifyOwnerTabChanged();
     }
 
     /// <summary>Saved locations of this tab's own device - per tab, not shared, so switching
@@ -59,10 +78,23 @@ public partial class ExplorerInstance : ObservableObject
             .Select(entry => new SavedLocation(entry.Path, deviceId))];
     }
 
-    /// <summary>Tab-strip label: whatever the nav tree would show for this same node - the device
+    /// <summary>Tab-strip label: this pane's own label, joined with the split view's second
+    /// pane's label (" | ") while the tab is split.</summary>
+    public string TabDisplayName
+    {
+        get
+        {
+            if (SplitInstance is not { } split)
+                return OwnDisplayName;
+
+            return $"{OwnDisplayName} | {split.OwnDisplayName}";
+        }
+    }
+
+    /// <summary>This pane's label: whatever the nav tree would show for this same node - the device
     /// name for drive view, a drive's own name (Internal storage, SD card...) for its root, this
     /// tab's current folder name for a plain path, or a placeholder before it has navigated anywhere.</summary>
-    public string TabDisplayName
+    private string OwnDisplayName
     {
         get
         {
@@ -88,9 +120,29 @@ public partial class ExplorerInstance : ObservableObject
         }
     }
 
+    /// <summary>Tab-strip tooltip: both panes' paths (" | ") while the tab is split.</summary>
+    public string TabTooltipPath
+    {
+        get
+        {
+            var own = OwnTooltipPath;
+            if (SplitInstance is not { } split)
+                return own;
+
+            var other = split.OwnTooltipPath;
+            if (own.Length == 0)
+                return other;
+
+            if (other.Length == 0)
+                return own;
+
+            return $"{own} | {other}";
+        }
+    }
+
     /// <summary>Full current path for the tab strip's tooltip - empty for a special location, whose
     /// short name is already everything there is to show.</summary>
-    public string TabTooltipPath
+    private string OwnTooltipPath
     {
         get
         {
@@ -138,8 +190,45 @@ public partial class ExplorerInstance : ObservableObject
         OnPropertyChanged(nameof(TabIcon));
         OnPropertyChanged(nameof(IsShowingPage));
 
+        NotifyOwnerTabChanged();
         TabPageSync.ShowTabPage(this);
     }
+
+    /// <summary>A split view's second pane feeds its tab's merged label, so the tab refreshes too.</summary>
+    private void NotifyOwnerTabChanged()
+    {
+        if (SplitOwner is not { } owner)
+            return;
+
+        owner.OnPropertyChanged(nameof(TabDisplayName));
+        owner.OnPropertyChanged(nameof(TabTooltipPath));
+    }
+
+    /// <summary>The second pane shown beside this tab's own while it is in split view, else null.</summary>
+    [ObservableProperty]
+    public partial ExplorerInstance? SplitInstance { get; set; }
+
+    partial void OnSplitInstanceChanged(ExplorerInstance? value)
+    {
+        OnPropertyChanged(nameof(TabDisplayName));
+        OnPropertyChanged(nameof(TabTooltipPath));
+    }
+
+    /// <summary>Whether this pane's directory listing is still running past its short grace period, which the status bar marks with an asterisk.</summary>
+    [ObservableProperty]
+    public partial bool IsListingUnfinished { get; set; }
+
+    /// <summary>Whether this tab's split view has its panes one above the other instead of side by side.</summary>
+    public bool IsSplitStacked { get; set; }
+
+    /// <summary>For a split view's second pane, the tab that hosts it; null for a tab's own instance.</summary>
+    public ExplorerInstance? SplitOwner { get; set; }
+
+    /// <summary>The tab this instance belongs to - itself, unless it is a split view's second pane.</summary>
+    public ExplorerInstance OwningTab => SplitOwner ?? this;
+
+    /// <summary>The pane last focused in this tab, restored when the tab is switched back to.</summary>
+    public ExplorerInstance? LastFocusedPane { get; set; }
 
     /// <summary>True until this tab is explicitly pointed at a device - while true, it follows
     /// <see cref="Devices.Current"/> the way the single pre-tabs instance always did.</summary>

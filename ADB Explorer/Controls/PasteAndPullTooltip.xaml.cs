@@ -1,4 +1,5 @@
 using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 
 namespace ADB_Explorer.Controls;
 
@@ -13,11 +14,14 @@ public partial class PasteAndPullTooltip : UserControl
     {
         InitializeComponent();
 
-        // Tooltip content can't inherit the tab, so its bindings go through this proxy instead.
         Loaded += (_, _) =>
         {
             if (InstanceHelper.GetInstance(this) is { } instance)
-                ((BindingProxy)Resources["ActionsProxy"]).Data = instance.FileList.Actions;
+                SetInstance(instance);
         };
     }
+
+    /// <summary>Tooltip content can't inherit the tab, so its bindings go through a proxy pointed at the pane's actions.</summary>
+    public void SetInstance(ExplorerInstance? instance)
+        => ((BindingProxy)Resources["ActionsProxy"]).Data = instance?.FileList.Actions;
 }

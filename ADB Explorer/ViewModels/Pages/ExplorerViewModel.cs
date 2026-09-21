@@ -306,6 +306,9 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
         var isTabSwitch = _subscribedInstance is not null;
 
+        // Moving focus between a split view's panes keeps both panes' views: rebuilding them would drop the click's selection.
+        var isPaneSwitch = isTabSwitch && ReferenceEquals(_subscribedInstance!.OwningTab, Instance.OwningTab);
+
         if (_subscribedInstance is not null)
         {
             _subscribedInstance.PropertyChanged -= Instance_PropertyChanged;
@@ -316,8 +319,11 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         Instance.PropertyChanged += Instance_PropertyChanged;
         Instance.FileList.Actions.PropertyChanged += FileActions_PropertyChanged;
 
-        Instance.IsIconView = ThumbnailService.IsIconLayout(Data.RuntimeSettings.ThumbsSize);
-        Instance.IsContentView = Data.RuntimeSettings.ThumbsSize is ThumbnailService.ThumbnailSize.Content;
+        if (!isPaneSwitch)
+        {
+            Instance.IsIconView = ThumbnailService.IsIconLayout(Data.RuntimeSettings.ThumbsSize);
+            Instance.IsContentView = Data.RuntimeSettings.ThumbsSize is ThumbnailService.ThumbnailSize.Content;
+        }
 
         OnPropertyChanged(nameof(SelectedFilesCount));
         OnPropertyChanged(nameof(SelectedItemsCountVisibility));
@@ -325,15 +331,18 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         OnPropertyChanged(nameof(RecycleBinColumnVisibility));
         OnPropertyChanged(nameof(PackageColumnVisibility));
 
-        UpdateExplorerView();
-        UpdateDriveView();
+        if (!isPaneSwitch || Instance.ExplorerItemsSource is null)
+            UpdateExplorerView();
+
+        if (!isPaneSwitch || Instance.DriveItemsSource is null)
+            UpdateDriveView();
 
         if (!isTabSwitch)
             return;
 
         // Device-derived bindings and the tree were last derived from the previous tab. The path
         // observer already syncs the tree and mode when the path differs, so don't repeat that.
-        NotifyDeviceBindings(syncTree: false);
+        NotifyDeviceBindings(syncTree: false, rebuildDrives: !isPaneSwitch);
 
         var pathChanged = Data.CurrentPathO.Value != Data.CurrentPath;
         Data.CurrentPathO.Value = Data.CurrentPath;
@@ -346,14 +355,16 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     }
 
     /// <summary>Re-derives everything bound to the active tab's device.</summary>
-    private void NotifyDeviceBindings(bool syncTree = true)
+    private void NotifyDeviceBindings(bool syncTree = true, bool rebuildDrives = true)
     {
         OnPropertyChanged(nameof(EffectiveDevice));
         OnPropertyChanged(nameof(CurrentDevice));
         OnPropertyChanged(nameof(CurrentDeviceBattery));
         OnPropertyChanged(nameof(IsBatteryVisible));
         SubscribeToBattery(CurrentDeviceBattery);
-        UpdateDriveView();
+
+        if (rebuildDrives)
+            UpdateDriveView();
 
         Tree.SubscribeDriveLists();
 
@@ -367,7 +378,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
         App.Services.GetService<ExplorerTabsViewModel>().PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName is nameof(ExplorerTabsViewModel.ActiveTab))
+            if (e.PropertyName is nameof(ExplorerTabsViewModel.ActiveTab) or nameof(ExplorerTabsViewModel.FocusedPane))
                 SubscribeActiveInstance();
         };
 
@@ -461,13 +472,13 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         });
     }
 
-    /// <summary>Every open tab, plus the active instance (which isn't in the tab list until
-    /// Explorer is first navigated to).</summary>
+    /// <summary>Every open tab and split pane, plus the active instance (which isn't in the tab
+    /// list until Explorer is first navigated to).</summary>
     private static HashSet<ExplorerInstance> AllInstances()
     {
         var instances = new HashSet<ExplorerInstance> { Data.ActiveExplorerInstance };
         if (App.Services.GetService<ExplorerTabsViewModel>() is { } tabs)
-            instances.UnionWith(tabs.Tabs);
+            instances.UnionWith(tabs.AllInstances);
 
         return instances;
     }

@@ -3,6 +3,7 @@ using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
+using ADB_Explorer.ViewModels.Pages;
 
 namespace ADB_Explorer.Services;
 
@@ -439,6 +440,132 @@ internal static class DeviceContextMenu
                 device.SideloadCommand,
                 Strings.Resources.S_REBOOT_SIDELOAD),
             new BaseIcon("\uE67A", 16));
+}
+
+internal static class TabContextMenu
+{
+    public static ObservableList<SubMenu> VisibleList { get; } = [];
+
+    /// <summary>Lists what can be done with <paramref name="tab"/> right now; an action that can't be done isn't listed.</summary>
+    public static void SetFor(ExplorerInstance tab)
+    {
+        VisibleList.RemoveAll();
+
+        if (App.Services.GetService<ExplorerTabsViewModel>() is not { } tabs)
+            return;
+
+        // "Right" and "left" are as the tab strip shows them, so they trade places in right-to-left layouts.
+        var isRtl = Data.RuntimeSettings.IsRTL;
+        var rightOffset = 1;
+        if (isRtl)
+            rightOffset = -1;
+
+        List<List<SubMenu>> groups = [[], [], []];
+
+        // The app's own New tab action, which carries its key binding for the menu to show.
+        groups[0].Add(new SubMenu(
+            AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewTab),
+            new BaseIcon(FluentPathGeometries.TabDesktopMultipleAdd, 16)));
+        groups[0].Add(Item(Strings.Resources.S_DUPLICATE_TAB, () => tabs.DuplicateTab(tab), new BaseIcon(FluentPathGeometries.TabDesktopCopy, 16)));
+
+        AddSplitItems(groups[1], tabs, tab, rightOffset, isRtl);
+        AddCloseItems(groups[2], tabs, tab, rightOffset);
+
+        foreach (var group in groups.Where(group => group.Count > 0))
+        {
+            if (VisibleList.Count > 0)
+                VisibleList.Add(new SubMenuSeparator());
+
+            foreach (var item in group)
+                VisibleList.Add(item);
+        }
+    }
+
+    private static void AddSplitItems(List<SubMenu> items, ExplorerTabsViewModel tabs, ExplorerInstance tab, int rightOffset, bool isRtl)
+    {
+        if (tab.SplitInstance is null)
+        {
+            items.Add(Item(Strings.Resources.S_SPLIT_HORIZONTALLY, () => tabs.ToggleSplit(tab), new BaseIcon(FluentPathGeometries.LayoutColumnTwo, 16)));
+            items.Add(Item(Strings.Resources.S_SPLIT_VERTICALLY, () => tabs.ToggleSplit(tab, stacked: true), new BaseIcon(FluentPathGeometries.LayoutRowTwo, 16)));
+        }
+
+        // The icons show a side of the screen, so they aren't mirrored in right-to-left layouts.
+        if (tabs.CanMergeWithNeighbor(tab, rightOffset))
+        {
+            var icon = new BaseIcon(FluentPathGeometries.LayoutColumnTwoFocusRight, 16, rtlBehavior: RtlBehavior.ForceLtr);
+            items.Add(Item(Strings.Resources.S_MERGE_WITH_RIGHT_TAB, () => tabs.MergeWithNeighbor(tab, rightOffset), icon));
+        }
+
+        if (tabs.CanMergeWithNeighbor(tab, -rightOffset))
+        {
+            var icon = new BaseIcon(FluentPathGeometries.LayoutColumnTwoFocusLeft, 16, rtlBehavior: RtlBehavior.ForceLtr);
+            items.Add(Item(Strings.Resources.S_MERGE_WITH_LEFT_TAB, () => tabs.MergeWithNeighbor(tab, -rightOffset), icon));
+        }
+
+        if (tab.SplitInstance is null)
+            return;
+
+        // The first pane is on the left, except in right-to-left layouts, and on top when stacked.
+        string firstPane;
+        string secondPane;
+
+        if (tab.IsSplitStacked)
+        {
+            firstPane = Strings.Resources.S_CLOSE_TOP_PANE;
+            secondPane = Strings.Resources.S_CLOSE_BOTTOM_PANE;
+        }
+        else if (isRtl)
+        {
+            firstPane = Strings.Resources.S_CLOSE_RIGHT_PANE;
+            secondPane = Strings.Resources.S_CLOSE_LEFT_PANE;
+        }
+        else
+        {
+            firstPane = Strings.Resources.S_CLOSE_LEFT_PANE;
+            secondPane = Strings.Resources.S_CLOSE_RIGHT_PANE;
+        }
+
+        items.Add(Item(firstPane, () => tabs.ClosePane(tab, closeFirst: true)));
+        items.Add(Item(secondPane, () => tabs.ClosePane(tab, closeFirst: false)));
+    }
+
+    private static void AddCloseItems(List<SubMenu> items, ExplorerTabsViewModel tabs, ExplorerInstance tab, int rightOffset)
+    {
+        if (tabs.Tabs.Count < 2)
+            return;
+
+        var before = tabs.TabsBefore(tab);
+        var after = tabs.TabsAfter(tab);
+        var right = after;
+        var left = before;
+
+        if (rightOffset < 0)
+        {
+            right = before;
+            left = after;
+        }
+
+        items.Add(Item(Strings.Resources.S_CLOSE_TAB, () => tabs.CloseTab(tab), new BaseIcon("\uE711", 16)));
+        items.Add(Item(Strings.Resources.S_CLOSE_OTHER_TABS, () => tabs.CloseTabs(tabs.Tabs.ToList(), tab)));
+
+        // From an edge tab, closing the tabs on its one side is closing all the others.
+        if (right.Count == 0 || left.Count == 0)
+            return;
+
+        items.Add(Item(Strings.Resources.S_CLOSE_TABS_TO_RIGHT, () => tabs.CloseTabs(right, tab)));
+        items.Add(Item(Strings.Resources.S_CLOSE_TABS_TO_LEFT, () => tabs.CloseTabs(left, tab)));
+    }
+
+    private static SubMenu Item(string description, Action action, BaseIcon? icon = null)
+    {
+        var fileAction = new FileAction(
+            FileAction.FileActionType.None,
+            () => Data.DevicesObject is not null,
+            action,
+            description);
+
+        return new SubMenu(fileAction, icon);
+    }
 }
 
 internal static class PathContextMenu

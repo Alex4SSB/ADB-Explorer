@@ -219,45 +219,6 @@
         <Setter Property="Margin" Value="0,0,4,0" />
         <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_RESTART_APP}}" />
     </Style>
-    <Style x:Key="ItemsCountStackPanelStyle" TargetType="StackPanel">
-        <Setter Property="Visibility" Value="Visible" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="0">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="ItemsCountContainerStyle" TargetType="StackPanel">
-        <Style.Triggers>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:InstanceHelper.Instance).FileList.Actions.IsExplorerVisible}" Value="False" />
-                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:InstanceHelper.Instance).FileList.Actions.IsDriveViewVisible}" Value="False" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Visibility" Value="Collapsed" />
-            </MultiDataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="SelectedItemsStyle"
-        BasedOn="{StaticResource MarginedTextBlockStyle}"
-        TargetType="TextBlock">
-        <Setter Property="Text" Value="{Binding SelectedFilesCount}" />
-    </Style>
-    <Style
-        x:Key="SelectedItemsSuffixStyle"
-        BasedOn="{StaticResource MarginedTextBlockStyle}"
-        TargetType="TextBlock">
-        <Setter Property="Text" Value="{Binding Source={x:Static strings:Resources.S_ITEMS_SELECTED_PLURAL}}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding SelectedFilesCount}" Value="1">
-                <Setter Property="Text" Value="{Binding Source={x:Static strings:Resources.S_ITEMS_SELECTED}}" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
     <Style
         x:Key="UnsupportedIconStyle"
         BasedOn="{StaticResource GlyphFont}"
@@ -412,29 +373,6 @@
             <Trigger Property="Visibility" Value="Visible">
                 <Setter Property="Cursor" Value="AppStarting" />
             </Trigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="ItemsCountSuffixStyle"
-        BasedOn="{StaticResource MarginedTextBlockStyle}"
-        TargetType="TextBlock">
-        <Setter Property="Text" Value="{Binding Source={x:Static strings:Resources.S_BROWSER_ITEMS_PLURAL}}" />
-        <Setter Property="Margin" Value="0,4" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="1">
-                <Setter Property="Text" Value="{Binding Source={x:Static strings:Resources.S_BROWSER_ITEMS}}" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="ItemsCountStyle"
-        BasedOn="{StaticResource MarginedTextBlockStyle}"
-        TargetType="TextBlock">
-        <Setter Property="Text" Value="{Binding Instance.ExplorerItemsSource.Count}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:InstanceHelper.Instance).FileList.Actions.IsExplorerVisible}" Value="False">
-                <Setter Property="Text" Value="" />
-            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style x:Key="ListViewItemContainerStyle" TargetType="ui:ListViewItem">

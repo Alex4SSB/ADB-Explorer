@@ -1964,6 +1964,58 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Close tab</value>
     <comment>Tooltip and action name for closing the current explorer tab</comment>
   </data>
+  <data name="S_CLOSE_LEFT_PANE" xml:space="preserve">
+    <value>Close left pane</value>
+    <comment>Tooltip of the split view button that closes the pane on the left, keeping the other one</comment>
+  </data>
+  <data name="S_CLOSE_RIGHT_PANE" xml:space="preserve">
+    <value>Close right pane</value>
+    <comment>Tooltip of the split view button that closes the pane on the right, keeping the other one</comment>
+  </data>
+  <data name="S_CLOSE_TOP_PANE" xml:space="preserve">
+    <value>Close top pane</value>
+    <comment>Tooltip of the split view button that closes the upper pane of two stacked panes, keeping the other one</comment>
+  </data>
+  <data name="S_CLOSE_BOTTOM_PANE" xml:space="preserve">
+    <value>Close bottom pane</value>
+    <comment>Tooltip of the split view button that closes the lower pane of two stacked panes, keeping the other one</comment>
+  </data>
+  <data name="S_SPLIT_HORIZONTALLY" xml:space="preserve">
+    <value>Split horizontally</value>
+    <comment>Drag tooltip shown while a tab header is dragged over the place where dropping it puts it side by side with the current tab</comment>
+  </data>
+  <data name="S_SPLIT_VERTICALLY" xml:space="preserve">
+    <value>Split vertically</value>
+    <comment>Drag tooltip shown while a tab header is dragged over the place where dropping it puts it above or below the current tab</comment>
+  </data>
+  <data name="S_SWAP_PANES" xml:space="preserve">
+    <value>Swap panes</value>
+    <comment>Tooltip of the button that exchanges the two panes of a split view</comment>
+  </data>
+  <data name="S_CLOSE_OTHER_TABS" xml:space="preserve">
+    <value>Close other tabs</value>
+    <comment>Tab context menu action closing every tab but the one clicked</comment>
+  </data>
+  <data name="S_CLOSE_TABS_TO_RIGHT" xml:space="preserve">
+    <value>Close tabs to the right</value>
+    <comment>Tab context menu action closing the tabs listed after the one clicked</comment>
+  </data>
+  <data name="S_CLOSE_TABS_TO_LEFT" xml:space="preserve">
+    <value>Close tabs to the left</value>
+    <comment>Tab context menu action closing the tabs listed before the one clicked</comment>
+  </data>
+  <data name="S_MERGE_WITH_RIGHT_TAB" xml:space="preserve">
+    <value>Merge with tab to the right</value>
+    <comment>Tab context menu action combining the tab with the one after it into a side by side split view</comment>
+  </data>
+  <data name="S_MERGE_WITH_LEFT_TAB" xml:space="preserve">
+    <value>Merge with tab to the left</value>
+    <comment>Tab context menu action combining the tab with the one before it into a side by side split view</comment>
+  </data>
+  <data name="S_DUPLICATE_TAB" xml:space="preserve">
+    <value>Duplicate tab</value>
+    <comment>Tab context menu action opening a new tab at the same location as the one clicked</comment>
+  </data>
   <data name="S_NEW_TAB" xml:space="preserve">
     <value>New Tab</value>
     <comment>Fallback tab-strip label for a tab that has not navigated anywhere yet</comment>

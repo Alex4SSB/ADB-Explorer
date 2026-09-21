@@ -514,7 +514,10 @@ public partial class ExplorerListHost : UserControl
     private void SelectionTimer_Tick(object? sender, EventArgs e)
     {
         SelectionTimer.Stop();
-        ApplySelectionEffects();
+
+        // A split view's other pane was left since this fired; its effects would clobber the focused one's.
+        if (ReferenceEquals(Owner.Instance, Data.ActiveExplorerInstance))
+            ApplySelectionEffects();
     }
 
     private void ApplySelectionEffects()
@@ -831,7 +834,7 @@ public partial class ExplorerListHost : UserControl
 
         if (CopyPaste.DragStatus is CopyPasteService.DragState.Active || CopyPaste.WasDragging)
         {
-            CopyPaste.WasDragging = false;
+            ClearWasDraggingIfIdle();
             return true;
         }
 
@@ -1074,7 +1077,10 @@ public partial class ExplorerListHost : UserControl
 
     private void DataGridRow_Drop(object sender, DragEventArgs e)
     {
-        CopyPaste.AcceptDataObject(e, (FrameworkElement)sender);
+        // The pane under the mouse is the drop location, whichever pane is focused.
+        using (Data.UseInstance(Owner.Instance))
+            CopyPaste.AcceptDataObject(e, (FrameworkElement)sender);
+
         e.Handled = true;
     }
 
@@ -1097,6 +1103,13 @@ public partial class ExplorerListHost : UserControl
     }
 
     private void ExplorerGrid_DragOver(object sender, DragEventArgs e)
+    {
+        // The pane under the mouse is the drop location, whichever pane is focused.
+        using (Data.UseInstance(Owner.Instance))
+            DragOverCore(sender, e);
+    }
+
+    private void DragOverCore(object sender, DragEventArgs e)
     {
         var allowed = CopyPaste.GetAllowedDragEffects(e.Data, (FrameworkElement)sender);
 
@@ -1195,8 +1208,20 @@ public partial class ExplorerListHost : UserControl
         Dispatcher.BeginInvoke(() =>
         {
             if (CopyPaste.DragStatus is not CopyPasteService.DragState.Active)
-                CopyPaste.WasDragging = false;
+                ClearWasDraggingIfIdle();
         }, DispatcherPriority.Input);
+    }
+
+    /// <summary>
+    /// A drag cancelled with the right button leaves the left one held, and both releases must still
+    /// be swallowed, in either order - so the flag stays until no button is down.
+    /// </summary>
+    internal void ClearWasDraggingIfIdle()
+    {
+        if (MouseState.IsAnyButtonDown)
+            return;
+
+        CopyPaste.WasDragging = false;
     }
 
     private AdbContextMenu CreateRowContextMenu() => new()
@@ -1702,7 +1727,6 @@ public partial class ExplorerListHost : UserControl
             SelectionRect.Collapse();
 
         MouseDownPoint = NullPoint;
-        CopyPaste.WasDragging = false;
         Owner.SuppressSelectionAfterMenu = false;
     }
 

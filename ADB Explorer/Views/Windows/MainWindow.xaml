@@ -528,6 +528,7 @@
             OpenPaneLength="{Binding Source={x:Static Member=models:Data.Settings}, Path=NavigationPaneWidth, Mode=OneWay}"
             PaneDisplayMode="Left"
             PreviewMouseDown="RootNavigation_PreviewMouseDown"
+            PreviewMouseUp="RootNavigation_PreviewMouseUp"
             Template="{StaticResource AdbLeftNavigationViewTemplate}">
             <ui:NavigationView.PaneHeader>
                 <controls:NavigationPane x:Name="NavigationPane" Margin="0,2,0,0">
@@ -596,6 +597,30 @@
                 MaxWidth="800"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Bottom" />
+        </Grid>
+
+        <!--  While a tab header is dragged, covers the page area to take the drop and hint which side the tab would take.  -->
+        <Grid
+            x:Name="TabDropOverlay"
+            Grid.Row="2"
+            AllowDrop="True"
+            Background="Transparent"
+            DragEnter="TabDropOverlay_DragOver"
+            DragLeave="TabDropOverlay_DragLeave"
+            DragOver="TabDropOverlay_DragOver"
+            Drop="TabDropOverlay_Drop"
+            Visibility="Collapsed">
+            <Canvas x:Name="TabDropRegion" IsHitTestVisible="False">
+                <!--  One hint that slides and resizes to the zone the pointer is in, see ShowDropHint.  -->
+                <Border
+                    x:Name="DropHint"
+                    Background="{DynamicResource AccentFillColorDefaultBrush}"
+                    BorderBrush="{DynamicResource AccentFillColorDefaultBrush}"
+                    BorderThickness="2"
+                    CornerRadius="6"
+                    Opacity="0.35"
+                    Visibility="Collapsed" />
+            </Canvas>
         </Grid>
 
         <ui:TitleBar x:Name="TitleBar" Grid.Row="0">

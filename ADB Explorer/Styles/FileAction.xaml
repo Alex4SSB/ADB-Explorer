@@ -316,6 +316,12 @@
         <Setter Property="ShowInputGestures" Value="False" />
     </Style>
     <Style
+        x:Key="TabContextMenuStyle"
+        BasedOn="{StaticResource BaseContextMenuStyle}"
+        TargetType="controls:AdbContextMenu">
+        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:TabContextMenu.VisibleList}}" />
+    </Style>
+    <Style
         x:Key="PathBoxContextMenuStyle"
         BasedOn="{StaticResource BaseContextMenuStyle}"
         TargetType="controls:AdbContextMenu">

@@ -98,6 +98,16 @@ public partial class DragWindow : INotifyPropertyChanged
         App.SafeInvoke(() =>
         {
             DragTooltip.Inlines.Clear();
+
+            // A dragged tab header says what dropping it does, when it can be dropped.
+            if (Data.CopyPaste.IsTabDrag)
+            {
+                if (Data.CopyPaste.CurrentDropEffect is not DragDropEffects.None && Data.CopyPaste.DragTabTooltip is { } tabTooltip)
+                    DragTooltip.Inlines.Add(new Run(tabTooltip));
+
+                return;
+            }
+
             if (Data.CopyPaste.DragFiles.Length == 0 || Data.CopyPaste.CurrentDropEffect is DragDropEffects.None)
             {
                 return;
@@ -289,6 +299,9 @@ public partial class DragWindow : INotifyPropertyChanged
     {
         UpdatePosition(InterceptMouse.GetCursorPosition());
 
+        // The main window may have come to the front since the drag window was last used.
+        Services.WindowStyle.BringToTop(dragWindowHandle);
+
 #if DEBUG
         Data.CopyPaste.MouseWithinApp = true;
 #else
@@ -325,8 +338,33 @@ public partial class DragWindow : INotifyPropertyChanged
         if (bitmap is null)
             return;
 
-        ViewModel.DragImageHeight = 96 * (1 / MonitorInfo.GetScalingFromWindow(dragWindowHandle));
+        var windowScaling = MonitorInfo.GetScalingFromWindow(dragWindowHandle);
+
+        if (Data.CopyPaste.DragImageRectPx is { } imageRect)
+        {
+            // An image with a set size is shown pixel for pixel; the scaling factor is 96 / dpi, so it converts pixels to DIPs.
+            ViewModel.DragImageHeight = imageRect.Height * windowScaling;
+            ViewModel.DragImageWidth = imageRect.Width * windowScaling;
+
+            // A tab header is drawn partly see-through, as the drag image of anything else isn't.
+            ViewModel.DragImageOpacity = Data.CopyPaste.IsTabDrag ? 0.9 : 1;
+        }
+        else
+        {
+            ViewModel.DragImageHeight = 96 * (1 / windowScaling);
+            ViewModel.DragImageWidth = double.NaN;
+            ViewModel.DragImageOpacity = 0.9;
+        }
+
         var actualPoint = MonitorInfo.MousePositionToDpi(point, startingScaling);
+
+        // An image with a set rect stays where it was held, instead of hovering above the cursor.
+        if (Data.CopyPaste.DragImageRectPx is { } rect)
+        {
+            VerticalOffset = actualPoint.Y + rect.Y * startingScaling;
+            HorizontalOffset = actualPoint.X + rect.X * startingScaling;
+            return;
+        }
 
         double imageHeight = DragImage.ActualHeight >= 1
             ? DragImage.ActualHeight
@@ -361,13 +399,8 @@ public partial class DragWindow : INotifyPropertyChanged
         if (!Data.CopyPaste.MouseWithinApp && Data.CopyPaste.DragStatus is CopyPasteService.DragState.None)
             Data.CopyPaste.DragBitmap = null;
 
-        if (!Data.CopyPaste.MouseWithinApp)
-        {
-            if (wasWithinApp)
-                Data.CopyPaste.PasteState = DragDropEffects.None;
-        }
-        else
-            Data.CopyPaste.DragWithinSlave = false;
+        if (!Data.CopyPaste.MouseWithinApp && wasWithinApp)
+            Data.CopyPaste.PasteState = DragDropEffects.None;
     }
 
     private void Border_MouseUp(object sender, MouseButtonEventArgs e)
