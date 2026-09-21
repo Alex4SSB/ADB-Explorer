@@ -361,8 +361,16 @@ public partial class DragWindow : INotifyPropertyChanged
         // An image with a set rect stays where it was held, instead of hovering above the cursor.
         if (Data.CopyPaste.DragImageRectPx is { } rect)
         {
+            var horizontalOffset = actualPoint.X + rect.X * startingScaling;
+
+            // A right-to-left popup is placed by its right edge, not its left.
+            if (FlowDirection is FlowDirection.RightToLeft)
+                horizontalOffset += ViewModel.DragImageWidth;
+
+            // Each offset is set once, as every set moves the popup and an intermediate one would flicker.
             VerticalOffset = actualPoint.Y + rect.Y * startingScaling;
-            HorizontalOffset = actualPoint.X + rect.X * startingScaling;
+            HorizontalOffset = horizontalOffset;
+
             return;
         }
 

@@ -115,8 +115,13 @@ public partial class ExplorerTabStrip : UserControl
         var scale = VisualTreeHelper.GetDpi(item).DpiScaleX;
 
         // Held where the header was grabbed, at the size of its body.
+        // In right-to-left layouts the press point is measured from the header's right edge.
+        var pressX = _pressPointInItem.X;
+        if (item.FlowDirection is FlowDirection.RightToLeft)
+            pressX = item.ActualWidth - pressX;
+
         Data.CopyPaste.DragImageRectPx = new Rect(
-            -_pressPointInItem.X * scale,
+            -pressX * scale,
             -_pressPointInItem.Y * scale,
             item.ActualWidth * scale,
             TabBodyHeight(item) * scale);
