@@ -1819,4 +1819,25 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MENU_REMOVE_SAVED_LOCATION" xml:space="preserve">
     <value>从已保存位置删除</value>
   </data>
+  <data name="S_SETTINGS_NEW_TAB_LOCATION" xml:space="preserve">
+    <value>新标签页打开位置</value>
+  </data>
+  <data name="S_NEW_TAB_DUPLICATE" xml:space="preserve">
+    <value>重复当前标签页</value>
+  </data>
+  <data name="S_NEW_TAB_DRIVE_VIEW" xml:space="preserve">
+    <value>当前设备的驱动器视图</value>
+  </data>
+  <data name="S_NEW_TAB_NONE" xml:space="preserve">
+    <value>无位置</value>
+  </data>
+  <data name="S_CLOSE_TAB" xml:space="preserve">
+    <value>关闭标签页</value>
+  </data>
+  <data name="S_NEW_TAB" xml:space="preserve">
+    <value>新标签页</value>
+  </data>
+  <data name="S_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>在新标签页中打开</value>
+  </data>
 </root>
