@@ -1840,4 +1840,43 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_OPEN_IN_NEW_TAB" xml:space="preserve">
     <value>在新标签页中打开</value>
   </data>
+  <data name="S_CLOSE_LEFT_PANE" xml:space="preserve">
+    <value>关闭左栏侧窗格</value>
+  </data>
+  <data name="S_CLOSE_RIGHT_PANE" xml:space="preserve">
+    <value>关闭右侧窗格</value>
+  </data>
+  <data name="S_CLOSE_TOP_PANE" xml:space="preserve">
+    <value>关闭顶部窗格</value>
+  </data>
+  <data name="S_CLOSE_BOTTOM_PANE" xml:space="preserve">
+    <value>关闭底部窗格</value>
+  </data>
+  <data name="S_SPLIT_HORIZONTALLY" xml:space="preserve">
+    <value>水平分割</value>
+  </data>
+  <data name="S_SPLIT_VERTICALLY" xml:space="preserve">
+    <value>垂直分割</value>
+  </data>
+  <data name="S_SWAP_PANES" xml:space="preserve">
+    <value>交换窗格</value>
+  </data>
+  <data name="S_CLOSE_OTHER_TABS" xml:space="preserve">
+    <value>关闭其他标签页</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_RIGHT" xml:space="preserve">
+    <value>关闭右侧标签页</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_LEFT" xml:space="preserve">
+    <value>关闭左侧标签页</value>
+  </data>
+  <data name="S_MERGE_WITH_RIGHT_TAB" xml:space="preserve">
+    <value>与右侧标签页合并</value>
+  </data>
+  <data name="S_MERGE_WITH_LEFT_TAB" xml:space="preserve">
+    <value>与左侧标签页合并</value>
+  </data>
+  <data name="S_DUPLICATE_TAB" xml:space="preserve">
+    <value>复制标签页</value>
+  </data>
 </root>
