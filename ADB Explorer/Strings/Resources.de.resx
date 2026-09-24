@@ -402,7 +402,7 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
     <value>Es gibt {0} miteinander in Konflikt stehende Elemente in {1}</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Konflikte beim Einfügen</value>
+    <value>Dateien ersetzen oder überspringen</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Ordner auswählen, um zu pushen</value>
@@ -441,7 +441,7 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
     <value>Stopen Sie das Polling bei Push/Pull</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>Gleichzeitige Operationen</value>
+    <value>Max. gleichzeitige Operationen</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
     <value>Media-Rescan erzwingen bei Push</value>
@@ -529,7 +529,7 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
     <value>Absturzbericht-Dialog anzeigen</value>
   </data>
   <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
-    <value>Fehlerberichterstattung</value>
+    <value>Absturzberichterstattung</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>Quellenangaben und Lizenzen von Drittanbietern</value>
@@ -541,7 +541,7 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
     <value>Einstellungen suchen</value>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
-    <value>Suche beenden</value>
+    <value>Suche schließen</value>
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
     <value>Suchansicht</value>
@@ -559,13 +559,13 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
     <value>OK</value>
   </data>
   <data name="S_FILTER_FILE_OPS" xml:space="preserve">
-    <value>Filter-Dateioperationen</value>
+    <value>Dateivorgänge filtern</value>
   </data>
   <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
     <value>Automatische Ausführung aktivieren</value>
   </data>
   <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
-    <value>Automatische Wiedergabe deaktivieren
+    <value>Automatische Ausführung deaktivieren
 Alle laufenden Vorgänge abbrechen</value>
   </data>
   <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
@@ -1566,5 +1566,41 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_RESTART" xml:space="preserve">
     <value>Jetzt neu starten</value>
+  </data>
+  <data name="S_UPDATE_ON_CLOSE" xml:space="preserve">
+    <value>Beim Schließen aktualisieren</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Datenschutzerklärung aktualisiert</value>
+  </data>
+  <data name="S_NEW_ARCHIVE" xml:space="preserve">
+    <value>Neues Archiv</value>
+  </data>
+  <data name="S_SCREENSHOT" xml:space="preserve">
+    <value>Bildschirmfoto</value>
+  </data>
+  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
+    <value>Dateien im Ziel ersetzen</value>
+  </data>
+  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
+    <value>Diese Dateien überspringen</value>
+  </data>
+  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
+    <value>{0} Konflikte beheben</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
+    <value>Prüfen und benachrichtigen</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_UPDATE" xml:space="preserve">
+    <value>Aktualisieren und installieren</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
+    <value>Speicherort der App-Daten</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
+    <value>Standard verwenden</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
+    <value>App-Datenordner auswählen</value>
   </data>
 </root>
