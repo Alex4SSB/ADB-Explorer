@@ -1819,4 +1819,64 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_MENU_REMOVE_SAVED_LOCATION" xml:space="preserve">
     <value>Удалить из сохраненных мест</value>
   </data>
+  <data name="S_SETTINGS_NEW_TAB_LOCATION" xml:space="preserve">
+    <value>Новая вкладка открывается по адресу</value>
+  </data>
+  <data name="S_NEW_TAB_DUPLICATE" xml:space="preserve">
+    <value>Дублировать текущую вкладку</value>
+  </data>
+  <data name="S_NEW_TAB_DRIVE_VIEW" xml:space="preserve">
+    <value>Вид диска текущего устройства</value>
+  </data>
+  <data name="S_NEW_TAB_NONE" xml:space="preserve">
+    <value>Местоположение не указано</value>
+  </data>
+  <data name="S_CLOSE_TAB" xml:space="preserve">
+    <value>Закрыть вкладку</value>
+  </data>
+  <data name="S_CLOSE_LEFT_PANE" xml:space="preserve">
+    <value>Закрыть левую панель</value>
+  </data>
+  <data name="S_CLOSE_RIGHT_PANE" xml:space="preserve">
+    <value>Закрыть правую панель</value>
+  </data>
+  <data name="S_CLOSE_TOP_PANE" xml:space="preserve">
+    <value>Закрыть верхнюю панель</value>
+  </data>
+  <data name="S_CLOSE_BOTTOM_PANE" xml:space="preserve">
+    <value>Закрыть нижнюю панель</value>
+  </data>
+  <data name="S_SPLIT_HORIZONTALLY" xml:space="preserve">
+    <value>Разделить по горизонтали</value>
+  </data>
+  <data name="S_SPLIT_VERTICALLY" xml:space="preserve">
+    <value>Разделить по вертикали</value>
+  </data>
+  <data name="S_SWAP_PANES" xml:space="preserve">
+    <value>Переключение панелей</value>
+  </data>
+  <data name="S_CLOSE_OTHER_TABS" xml:space="preserve">
+    <value>Закройте остальные вкладки</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_RIGHT" xml:space="preserve">
+    <value>Закрыть вкладки справа</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_LEFT" xml:space="preserve">
+    <value>Закрыть вкладки слева</value>
+  </data>
+  <data name="S_MERGE_WITH_RIGHT_TAB" xml:space="preserve">
+    <value>Объединить с вкладкой справа</value>
+  </data>
+  <data name="S_MERGE_WITH_LEFT_TAB" xml:space="preserve">
+    <value>Объединить с вкладкой слева</value>
+  </data>
+  <data name="S_DUPLICATE_TAB" xml:space="preserve">
+    <value>Дубликат вкладки</value>
+  </data>
+  <data name="S_NEW_TAB" xml:space="preserve">
+    <value>Новая вкладка</value>
+  </data>
+  <data name="S_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>Открыть в новой вкладке</value>
+  </data>
 </root>
