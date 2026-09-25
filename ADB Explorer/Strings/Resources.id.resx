@@ -1809,4 +1809,76 @@ Pemeriksaan ini berupaya mencegah pengguna yang tidak menyadari risiko menjalank
   <data name="S_SEARCH_DISPLAY_PATH_RELATIVE_INFO" xml:space="preserve">
     <value>Saat dipilih, hasil pencarian ditampilkan dengan jalur yang relatif terhadap lokasi saat ini. Jika tidak, jalur yang ditampilkan bersifat absolut.</value>
   </data>
+  <data name="S_MENU_REMOVE_SAVED_LOCATION" xml:space="preserve">
+    <value>Hapus dari lokasi tersimpan</value>
+  </data>
+  <data name="S_BUTTON_VIEW_SIZE" xml:space="preserve">
+    <value>Lihat ukuran</value>
+  </data>
+  <data name="S_STATUS_CALCULATING_SIZE" xml:space="preserve">
+    <value>Menghitung…</value>
+  </data>
+  <data name="S_SETTINGS_NEW_TAB_LOCATION" xml:space="preserve">
+    <value>Tab baru dibuka di</value>
+  </data>
+  <data name="S_NEW_TAB_DUPLICATE" xml:space="preserve">
+    <value>Duplikat tab saat ini</value>
+  </data>
+  <data name="S_NEW_TAB_DRIVE_VIEW" xml:space="preserve">
+    <value>Tampilan drive perangkat saat ini</value>
+  </data>
+  <data name="S_NEW_TAB_NONE" xml:space="preserve">
+    <value>Tidak ada lokasi</value>
+  </data>
+  <data name="S_CLOSE_TAB" xml:space="preserve">
+    <value>Tutup tab</value>
+  </data>
+  <data name="S_CLOSE_LEFT_PANE" xml:space="preserve">
+    <value>Tutup panel kiri</value>
+  </data>
+  <data name="S_CLOSE_RIGHT_PANE" xml:space="preserve">
+    <value>Tutup panel kanan</value>
+  </data>
+  <data name="S_CLOSE_TOP_PANE" xml:space="preserve">
+    <value>Tutup panel atas</value>
+  </data>
+  <data name="S_CLOSE_BOTTOM_PANE" xml:space="preserve">
+    <value>Tutup panel bawah</value>
+  </data>
+  <data name="S_SPLIT_HORIZONTALLY" xml:space="preserve">
+    <value>Bagi secara horizontal</value>
+  </data>
+  <data name="S_SPLIT_VERTICALLY" xml:space="preserve">
+    <value>Bagi secara vertikal</value>
+  </data>
+  <data name="S_SWAP_PANES" xml:space="preserve">
+    <value>Tukar panel</value>
+  </data>
+  <data name="S_CLOSE_OTHER_TABS" xml:space="preserve">
+    <value>Tutup tab lainnya</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_RIGHT" xml:space="preserve">
+    <value>Tutup tab di sebelah kanan</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_LEFT" xml:space="preserve">
+    <value>Tutup tab di sebelah kiri</value>
+  </data>
+  <data name="S_MERGE_WITH_RIGHT_TAB" xml:space="preserve">
+    <value>Gabungkan dengan tab di sebelah kanan</value>
+  </data>
+  <data name="S_MERGE_WITH_LEFT_TAB" xml:space="preserve">
+    <value>Gabungkan dengan tab di sebelah kiri</value>
+  </data>
+  <data name="S_DUPLICATE_TAB" xml:space="preserve">
+    <value>Duplikat tab</value>
+  </data>
+  <data name="S_NEW_TAB" xml:space="preserve">
+    <value>Tab Baru</value>
+  </data>
+  <data name="S_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>Buka di tab baru</value>
+  </data>
+  <data name="S_VIEW_SIZE_TOOLTIP" xml:space="preserve">
+    <value>Menghitung dan menampilkan total ukuran seluruh berkas di dalam folder ini secara rekursif.</value>
+  </data>
 </root>
