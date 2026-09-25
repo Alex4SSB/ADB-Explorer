@@ -2612,6 +2612,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invert selection.
+        /// </summary>
+        public static string S_MENU_INVERT_SELECTION {
+            get {
+                return ResourceManager.GetString("S_MENU_INVERT_SELECTION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to More.
         /// </summary>
         public static string S_MENU_MORE {
@@ -2720,11 +2729,20 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Select All.
+        ///   Looks up a localized string similar to Select all.
         /// </summary>
         public static string S_MENU_SELECT_ALL {
             get {
                 return ResourceManager.GetString("S_MENU_SELECT_ALL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select none.
+        /// </summary>
+        public static string S_MENU_SELECT_NONE {
+            get {
+                return ResourceManager.GetString("S_MENU_SELECT_NONE", resourceCulture);
             }
         }
         

@@ -785,8 +785,16 @@ Cancel All Running</value>
     <comment>The menu used to create a new file</comment>
   </data>
   <data name="S_MENU_SELECT_ALL" xml:space="preserve">
-    <value>Select All</value>
+    <value>Select all</value>
     <comment>The menu used to select all items currently visible in the file browser</comment>
+  </data>
+  <data name="S_MENU_SELECT_NONE" xml:space="preserve">
+    <value>Select none</value>
+    <comment>The menu used to clear the selection in the file browser</comment>
+  </data>
+  <data name="S_MENU_INVERT_SELECTION" xml:space="preserve">
+    <value>Invert selection</value>
+    <comment>The menu used to select the unselected items in the file browser, and unselect the selected ones</comment>
   </data>
   <data name="S_MENU_CUT" xml:space="preserve">
     <value>Cut</value>
