@@ -1677,7 +1677,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>תצוגת גודל קובץ</value>
   </data>
   <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
-    <value>ספרות אחרי הנקודה העשרונית בגדול קובץ</value>
+    <value>ספרות אחרי הנקודה העשרונית בגודל קובץ</value>
   </data>
   <data name="S_OPEN_FOLDER" xml:space="preserve">
     <value>פתח</value>
@@ -1818,5 +1818,65 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_VIEW_SIZE_TOOLTIP" xml:space="preserve">
     <value>מחשב ומציג את הגודל הכולל של כל הקבצים תחת תיקיה זו בצורה רקורסיבית.</value>
+  </data>
+  <data name="S_SETTINGS_NEW_TAB_LOCATION" xml:space="preserve">
+    <value>כרטיסיה חדשה נפתחת ב</value>
+  </data>
+  <data name="S_NEW_TAB_DUPLICATE" xml:space="preserve">
+    <value>שכפל כרטיסיה נוכחית</value>
+  </data>
+  <data name="S_NEW_TAB_DRIVE_VIEW" xml:space="preserve">
+    <value>תצוגת כוננים של המכשיר הנוכחי</value>
+  </data>
+  <data name="S_NEW_TAB_NONE" xml:space="preserve">
+    <value>ללא מיקום</value>
+  </data>
+  <data name="S_CLOSE_TAB" xml:space="preserve">
+    <value>סגור כרטיסיה</value>
+  </data>
+  <data name="S_CLOSE_LEFT_PANE" xml:space="preserve">
+    <value>סגור את החלונית השמאלית</value>
+  </data>
+  <data name="S_CLOSE_RIGHT_PANE" xml:space="preserve">
+    <value>סגור את החלונית הימנית</value>
+  </data>
+  <data name="S_CLOSE_TOP_PANE" xml:space="preserve">
+    <value>סגור את החלונית העליונה</value>
+  </data>
+  <data name="S_CLOSE_BOTTOM_PANE" xml:space="preserve">
+    <value>סגור את החלונית התחתונה</value>
+  </data>
+  <data name="S_SPLIT_HORIZONTALLY" xml:space="preserve">
+    <value>פַּצל אופקית</value>
+  </data>
+  <data name="S_SPLIT_VERTICALLY" xml:space="preserve">
+    <value>פַּצל אנכית</value>
+  </data>
+  <data name="S_SWAP_PANES" xml:space="preserve">
+    <value>החלף חלוניות</value>
+  </data>
+  <data name="S_CLOSE_OTHER_TABS" xml:space="preserve">
+    <value>סגור את שאר הכרטיסיות</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_RIGHT" xml:space="preserve">
+    <value>סגור כרטיסיות מימין</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_LEFT" xml:space="preserve">
+    <value>סגור כרטיסיות משמאל</value>
+  </data>
+  <data name="S_MERGE_WITH_RIGHT_TAB" xml:space="preserve">
+    <value>מַזג עם הכרטיסיה מימין</value>
+  </data>
+  <data name="S_MERGE_WITH_LEFT_TAB" xml:space="preserve">
+    <value>מַזג עם הכרטיסיה משמאל</value>
+  </data>
+  <data name="S_DUPLICATE_TAB" xml:space="preserve">
+    <value>שכפל כרטיסיה</value>
+  </data>
+  <data name="S_NEW_TAB" xml:space="preserve">
+    <value>כרטיסיה חדשה</value>
+  </data>
+  <data name="S_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>פתח בכרטיסיה חדשה</value>
   </data>
 </root>
