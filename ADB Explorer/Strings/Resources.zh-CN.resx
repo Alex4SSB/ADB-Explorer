@@ -1879,4 +1879,10 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_DUPLICATE_TAB" xml:space="preserve">
     <value>复制标签页</value>
   </data>
+  <data name="S_MENU_SELECT_NONE" xml:space="preserve">
+    <value>全不选</value>
+  </data>
+  <data name="S_MENU_INVERT_SELECTION" xml:space="preserve">
+    <value>反选</value>
+  </data>
 </root>
