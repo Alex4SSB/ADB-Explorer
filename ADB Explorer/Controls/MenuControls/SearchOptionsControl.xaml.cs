@@ -37,25 +37,25 @@ public partial class SearchOptionsControl : UserControl
             new SettingToggleItem(
                 Strings.Resources.S_SEARCH_CASE_SENSITIVE,
                 () => Data.Settings.SearchCaseSensitive,
-                new TextChangeCaseIcon(),
+                LtrIcon(new TextChangeCaseIcon()),
                 Strings.Resources.S_SEARCH_CASE_SENSITIVE_INFO),
             new SettingToggleItem(
                 Strings.Resources.S_SEARCH_CONTENTS,
                 () => Data.Settings.SearchContents,
-                new DocumentSearchIcon(),
+                LtrIcon(new DocumentSearchIcon()),
                 Strings.Resources.S_SEARCH_CONTENTS_INFO,
                 () => !Data.FileActions.IsAppDrive),
             new SettingToggleItem(
                 Strings.Resources.S_SEARCH_ARCHIVES,
                 () => Data.Settings.SearchArchives,
-                new ZipIcon(),
+                LtrIcon(new ZipIcon()),
                 Strings.Resources.S_SEARCH_ARCHIVES_INFO,
                 () => !Data.FileActions.IsAppDrive),
             new Separator(),
             new SettingToggleItem(
                 Strings.Resources.S_SEARCH_DISPLAY_PATH_RELATIVE,
                 () => Data.Settings.SearchDisplayPathRelative,
-                new ItemPathIcon(),
+                LtrIcon(new ItemPathIcon()),
                 Strings.Resources.S_SEARCH_DISPLAY_PATH_RELATIVE_INFO,
                 () => !Data.FileActions.IsAppDrive)
         ];
@@ -95,10 +95,12 @@ public partial class SearchOptionsControl : UserControl
         OnPropertyChanged(nameof(IsSearchOptionsVisible));
     }
 
+    private static UIElement LtrIcon(UserControl icon) => (UIElement)new BaseIcon(icon, 16, RtlBehavior.ForceLtr).IconContent;
+
     static Dictionary<SearchBox.SearchBoxMode, UIElement> SearchBoxModeIcons => new()
     {
-        { SearchBox.SearchBoxMode.CurrentFolder, new FolderSearchIcon() },
-        { SearchBox.SearchBoxMode.AllSubfolders, new FolderMultipleIcon() },
+        { SearchBox.SearchBoxMode.CurrentFolder, LtrIcon(new FolderSearchIcon()) },
+        { SearchBox.SearchBoxMode.AllSubfolders, LtrIcon(new FolderMultipleIcon()) },
     };
 
     public class SearchBoxModeItem : SelectorItem

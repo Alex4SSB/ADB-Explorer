@@ -162,6 +162,10 @@ internal static class MainToolBar
                         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Install), AppActions.Icon(FileAction.FileActionType.Install, 16)),
                         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.SubMenuUninstall), AppActions.Icon(FileAction.FileActionType.Uninstall, 16)),
                     ]),
+                new SubMenuSeparator(),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.SelectAll), new BaseIcon(new SelectAllIcon(), 16)),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.SelectNone), new BaseIcon(new SelectNoneIcon(), 16)),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.InvertSelection), new BaseIcon(new InvertSelectionIcon(), 16)),
             ]),
     ];
 }

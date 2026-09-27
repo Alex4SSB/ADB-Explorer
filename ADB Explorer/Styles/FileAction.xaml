@@ -74,8 +74,17 @@
                 Grid.Column="1"
                 Height="{Binding IconSize}"
                 Margin="0,0,0,4"
-                Text="{Binding Tooltip}"
-                Visibility="{Binding IsNameDisplayed, Converter={StaticResource BoolToVisibility}}" />
+                Text="{Binding Tooltip}">
+                <TextBlock.Style>
+                    <Style BasedOn="{StaticResource ToolbarLabelStyle}" TargetType="TextBlock">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsNameDisplayed}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
             <ui:FontIcon
                 Margin="0,2,0,0"
                 FontSize="8"

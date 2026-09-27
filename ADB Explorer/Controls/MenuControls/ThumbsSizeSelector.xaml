@@ -19,7 +19,10 @@
             <local:AdbMenuItem.Header>
                 <local:SimpleStackPanel Orientation="Horizontal" Spacing="6">
                     <ContentPresenter Content="{Binding SelectedIcon}" />
-                    <TextBlock Margin="0,0,0,2" Text="{Binding Source={x:Static Member=strings:Resources.S_THUMBSIZE_TITLE}}" />
+                    <TextBlock
+                        Margin="0,0,0,2"
+                        Style="{StaticResource ToolbarLabelStyle}"
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_THUMBSIZE_TITLE}}" />
                     <ui:FontIcon
                         Margin="0,2,0,0"
                         FontSize="8"

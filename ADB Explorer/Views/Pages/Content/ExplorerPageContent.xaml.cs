@@ -11,12 +11,6 @@ public partial class ExplorerPageContent : UserControl
     /// <summary>Open toolbar submenu depth (Main / Navigation / sorting / etc.).</summary>
     private int _toolbarSubmenuDepth;
 
-    /// <summary>
-    /// Coalesces <see cref="ExplorerPageContent_SizeChanged"/>'s DetailsPane.MaxWidth recalculation -
-    /// see that handler's own comment for why this is deferred rather than applied inline.
-    /// </summary>
-    private int _detailsPaneMaxWidthGeneration;
-
     internal int ToolbarSubmenuDepth => Chrome._toolbarSubmenuDepth;
 
     private bool _suppressSelectionAfterMenu;
@@ -160,6 +154,16 @@ public partial class ExplorerPageContent : UserControl
         ExplorerList.GotKeyboardFocus += (_, _) => FocusOwnPane();
         SearchOptionsControl.Initialize(this);
 
+        // Labels go in this order as the window narrows - from the row's far end back to the New menu.
+        ToolbarItems.LabelHosts =
+        [
+            SearchOptionsControl.CloseSearchItem,
+            SearchOptionsControl.SearchOptionsItem,
+            ThumbsSizeSelector,
+            SortingSelector,
+            MainToolBar,
+        ];
+
         SyncNavigationBoxWithHistory();
 
         NavBar.PointerEntered += (_, _) => ExplorerList.ClearMouseDownPointIfIdle();
@@ -258,13 +262,7 @@ public partial class ExplorerPageContent : UserControl
         if (!e.WidthChanged)
             return;
 
-        var generation = ++_detailsPaneMaxWidthGeneration;
-        App.SafeBeginInvoke(() =>
-        {
-            if (generation != _detailsPaneMaxWidthGeneration)
-                return;
-
-            DetailsPane.MaxWidth = ActualWidth - 100;
-        }, DispatcherPriority.Loaded);
+        // Applied in this layout pass - deferring it rendered a frame at the old limit, then laid out again.
+        DetailsPane.MaxWidth = Math.Max(0, ActualWidth - 100);
     }
 }

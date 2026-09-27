@@ -34,6 +34,17 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    <!--  A toolbar item's text label, hidden when its row runs out of room (see LabelCompactingPanel).  -->
+    <Style
+        x:Key="ToolbarLabelStyle"
+        BasedOn="{StaticResource {x:Type TextBlock}}"
+        TargetType="TextBlock">
+        <Style.Triggers>
+            <Trigger Property="helpers:StyleHelper.IsLabelHidden" Value="True">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
     <Style x:Key="GlyphFont" TargetType="ui:FontIcon">
         <Setter Property="FontFamily" Value="{StaticResource FluentSymbolThemeFontFamily}" />
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
@@ -229,7 +240,11 @@
     <sys:Double x:Key="AccentButtonBackgroundMouseOverOpacity">0.9</sys:Double>
     <sys:Double x:Key="AccentButtonBackgroundPressedOpacity">0.8</sys:Double>
     <sys:Double x:Key="AccentButtonForegroundPressedOrDisabledOpacity">0.5</sys:Double>
-    <ContextMenu x:Key="VScrollBarContextMenu" x:Shared="true">
+    <!--  Menus inherit from the element they open on, and the scroll bars turn layout rounding off - which blurs a menu.  -->
+    <ContextMenu
+        x:Key="VScrollBarContextMenu"
+        x:Shared="true"
+        UseLayoutRounding="True">
         <MenuItem
             Command="ScrollBar.ScrollHereCommand"
             CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
@@ -262,7 +277,10 @@
             CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
             Header="{Binding Source={x:Static Member=strings:Resources.ScrollBar_LineDownCommand}}" />
     </ContextMenu>
-    <ContextMenu x:Key="HScrollBarContextMenu" x:Shared="true">
+    <ContextMenu
+        x:Key="HScrollBarContextMenu"
+        x:Shared="true"
+        UseLayoutRounding="True">
         <MenuItem
             Command="ScrollBar.ScrollHereCommand"
             CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"

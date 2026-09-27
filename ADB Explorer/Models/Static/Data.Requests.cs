@@ -7,6 +7,8 @@ public enum ExplorerRequest
     PasteClipboardImage,
     Rename,
     SelectAll,
+    SelectNone,
+    InvertSelection,
     ToggleSearch,
     FilterActions,
     FilterDrives,

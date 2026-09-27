@@ -106,6 +106,20 @@ public static class StyleHelper
             typeof(StyleHelper),
             new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.Inherits));
 
+    public static bool GetIsLabelHidden(DependencyObject element) =>
+        (bool)element.GetValue(IsLabelHiddenProperty);
+
+    public static void SetIsLabelHidden(DependencyObject element, bool value) =>
+        element.SetValue(IsLabelHiddenProperty, value);
+
+    /// <summary>Hides the text labels (<c>ToolbarLabelStyle</c>) under this element, leaving their icons.</summary>
+    public static readonly DependencyProperty IsLabelHiddenProperty =
+        DependencyProperty.RegisterAttached(
+            "IsLabelHidden",
+            typeof(bool),
+            typeof(StyleHelper),
+            new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.Inherits));
+
     public static bool GetIsWindowActive(DependencyObject element) =>
         (bool)element.GetValue(IsWindowActiveProperty);
 

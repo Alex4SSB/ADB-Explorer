@@ -20,7 +20,7 @@ public partial class ExplorerListHost
         { }
     }
 
-    private void ActiveSelectAll()
+    internal void ActiveSelectAll()
     {
         if (Owner.Instance.IsIconView)
             IconView.SelectAll();
@@ -36,6 +36,14 @@ public partial class ExplorerListHost
             ActiveUnselectAll();
         else
             ActiveSelectAll();
+    }
+
+    internal void InvertSelection()
+    {
+        var selected = ActiveSelectedItems.Cast<object>().ToHashSet();
+        var inverted = ActiveView.Items.Cast<object>().Where(item => !selected.Contains(item)).ToList();
+
+        CopySelection(ActiveView, inverted);
     }
 
     /// <summary>

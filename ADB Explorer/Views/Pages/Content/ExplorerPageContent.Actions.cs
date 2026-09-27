@@ -64,7 +64,15 @@ public partial class ExplorerPageContent
                     break;
 
                 case ExplorerRequest.SelectAll:
-                    ExplorerList.ToggleSelectAll();
+                    ExplorerList.ActiveSelectAll();
+                    break;
+
+                case ExplorerRequest.SelectNone:
+                    ExplorerList.ActiveUnselectAll();
+                    break;
+
+                case ExplorerRequest.InvertSelection:
+                    ExplorerList.InvertSelection();
                     break;
 
                 case ExplorerRequest.ToggleSearch:

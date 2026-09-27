@@ -35,13 +35,17 @@
             </Style>
         </local:AdbMenu.Style>
         <local:AdbMenuItem
+            x:Name="SearchOptionsItem"
             ItemContainerStyle="{StaticResource SelectorMenuItemStyle}"
             ItemsSource="{Binding Items}"
             ToolTip="{Binding Source={x:Static Member=strings:Resources.S_SEARCH_OPTIONS_INFO}}">
             <local:AdbMenuItem.Header>
                 <local:SimpleStackPanel Orientation="Horizontal" Spacing="6">
                     <local:SearchSettingsIcon Margin="0,-2,0,0" Size="20" />
-                    <TextBlock Margin="0,0,0,2" Text="{Binding Source={x:Static Member=strings:Resources.S_SEARCH_OPTIONS}}" />
+                    <TextBlock
+                        Margin="0,0,0,2"
+                        Style="{StaticResource ToolbarLabelStyle}"
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_SEARCH_OPTIONS}}" />
                     <ui:FontIcon
                         Margin="0,2,0,0"
                         FontSize="8"
@@ -58,6 +62,7 @@
             </local:AdbMenuItem.ItemTemplate>
         </local:AdbMenuItem>
         <local:AdbMenuItem
+            x:Name="CloseSearchItem"
             Command="{Binding CloseSearchAction.Command}"
             ToolTip="{Binding Source={x:Static Member=strings:Resources.S_CLOSE_SEARCH_INFO}}"
             Visibility="{Binding IsCloseSearchVisible, Converter={StaticResource BoolToVisibility}}">
@@ -67,7 +72,7 @@
                         FontSize="22"
                         Glyph="&#xE947;"
                         Style="{StaticResource IconAccentGlyphStyle}" />
-                    <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_EXIT_SEARCH}}" />
+                    <TextBlock Style="{StaticResource ToolbarLabelStyle}" Text="{Binding Source={x:Static Member=strings:Resources.S_EXIT_SEARCH}}" />
                 </local:SimpleStackPanel>
             </local:AdbMenuItem.Header>
         </local:AdbMenuItem>
