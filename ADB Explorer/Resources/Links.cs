@@ -1,6 +1,4 @@
-﻿using ADB_Explorer.Models;
-
-namespace ADB_Explorer.Resources;
+﻿namespace ADB_Explorer.Resources;
 
 public static class Links
 {

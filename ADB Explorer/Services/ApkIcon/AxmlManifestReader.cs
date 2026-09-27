@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace ADB_Explorer.Services;
 
 /// <summary>

@@ -1,6 +1,3 @@
-using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-
 namespace ADB_Explorer.ViewModels;
 
 public partial class PermissionsEditViewModel : ObservableObject
@@ -105,7 +102,7 @@ public partial class PermissionsEditViewModel : ObservableObject
 
         if (ModeChanged && CanChangeMode)
         {
-            var error = await ADBService.ChangeFileModeAsync(deviceId, file.FullPath, EditedMode, cancellationToken);
+            var error = await AdbService.ChangeFileModeAsync(deviceId, file.FullPath, EditedMode, cancellationToken);
             if (!string.IsNullOrEmpty(error))
                 errors.Add(error);
         }
@@ -113,7 +110,7 @@ public partial class PermissionsEditViewModel : ObservableObject
         var user = NormalizeIdentity(SelectedUser);
         if (UserChanged && CanChangeOwner && user is not null)
         {
-            var error = await ADBService.ChangeFileUserAsync(deviceId, file.FullPath, user, noDeref, cancellationToken);
+            var error = await AdbService.ChangeFileUserAsync(deviceId, file.FullPath, user, noDeref, cancellationToken);
             if (!string.IsNullOrEmpty(error))
                 errors.Add(error);
         }
@@ -121,7 +118,7 @@ public partial class PermissionsEditViewModel : ObservableObject
         var group = NormalizeIdentity(SelectedGroup);
         if (GroupChanged && CanChangeGroup && group is not null)
         {
-            var error = await ADBService.ChangeFileGroupAsync(deviceId, file.FullPath, group, noDeref, cancellationToken);
+            var error = await AdbService.ChangeFileGroupAsync(deviceId, file.FullPath, group, noDeref, cancellationToken);
             if (!string.IsNullOrEmpty(error))
                 errors.Add(error);
         }

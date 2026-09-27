@@ -1,9 +1,3 @@
-using ADB_Explorer.Controls;
-using ADB_Explorer.Converters;
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.ViewModels;
-
 namespace ADB_Explorer.Services;
 
 /// <summary>
@@ -44,59 +38,22 @@ public class AppBackupOperation : AbstractShellFileOperation
 
     public override void Start()
     {
-        if (Status == OperationStatus.InProgress)
-            throw new Exception("Cannot start an already active operation!");
-
-        Status = OperationStatus.InProgress;
-        StatusInfo = new InProgShellProgressViewModel();
+        BeginInProgress();
 
         var operationTask = CreateArchiveAsync();
 
-        operationTask.ContinueWith(t =>
+        TrackTask(operationTask, "Backup failed", result =>
         {
-            if (t.Result == "")
+            if (result == "")
             {
-                Status = OperationStatus.Completed;
-                StatusInfo = new CompletedShellProgressViewModel();
+                SetCompleted();
                 Dispatcher.Invoke(EnqueuePull);
                 return;
             }
 
             CleanupTempArchive();
-
-            if (CancelTokenSource?.IsCancellationRequested == true || t.Result == "Canceled")
-            {
-                Status = OperationStatus.Canceled;
-                StatusInfo = new CanceledOpProgressViewModel();
-                return;
-            }
-
-            Status = OperationStatus.Failed;
-            StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(
-                typeof(ShellErrorInfo),
-                failed: -1,
-                message: t.Result,
-                total: true));
-        }, TaskContinuationOptions.OnlyOnRanToCompletion);
-
-        operationTask.ContinueWith(_ =>
-        {
-            CleanupTempArchive();
-            Status = OperationStatus.Canceled;
-            StatusInfo = new CanceledOpProgressViewModel();
-        }, TaskContinuationOptions.OnlyOnCanceled);
-
-        operationTask.ContinueWith(t =>
-        {
-            CleanupTempArchive();
-            Status = OperationStatus.Failed;
-            var message = t.Exception?.InnerException?.Message ?? t.Exception?.Message ?? "Backup failed";
-            StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(
-                typeof(ShellErrorInfo),
-                failed: -1,
-                message: message,
-                total: true));
-        }, TaskContinuationOptions.OnlyOnFaulted);
+            SetArchiveResult(result);
+        }, onAborted: CleanupTempArchive);
     }
 
     private async Task<string> CreateArchiveAsync()
@@ -143,23 +100,8 @@ public class AppBackupOperation : AbstractShellFileOperation
 
         var pull = FileSyncOperation.PullFile(source, target, Device, Dispatcher);
         pull.OriginalShellItem = null;
-        pull.PropertyChanged += Pull_PropertyChanged;
+        pull.WhenFinished(_ => CleanupTempArchive());
         Data.FileOpQ.AddOperation(pull);
-    }
-
-    private void Pull_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (sender is not FileSyncOperation op)
-            return;
-
-        if (e.PropertyName is not nameof(Status))
-            return;
-
-        if (op.Status is OperationStatus.Completed or OperationStatus.Failed or OperationStatus.Canceled)
-        {
-            CleanupTempArchive();
-            op.PropertyChanged -= Pull_PropertyChanged;
-        }
     }
 
     private void CleanupTempArchive()

@@ -1,54 +1,7 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services.AppInfra;
-using ADB_Explorer.ViewModels;
-using ADB_Explorer.ViewModels.Pages;
-using AdvancedSharpAdbClient;
-using AdvancedSharpAdbClient.Models;
-using Vanara.Windows.Shell;
+﻿namespace ADB_Explorer.Services;
 
-namespace ADB_Explorer.Services;
-
-public abstract class AbstractShellFileOperation : FileOperation
+public static partial class ShellFileOperation
 {
-    public override FileClass FilePath { get; }
-
-    public override SyncFile AndroidPath => TargetPath;
-
-    protected AbstractShellFileOperation(FileClass filePath, LogicalDeviceViewModel device, Dispatcher dispatcher)
-        : base(filePath, device, dispatcher)
-    {
-        FilePath = filePath;
-        TargetPath = new(filePath);
-    }
-
-    public override void ClearChildren()
-    {
-        if (AndroidPath is null)
-            return;
-
-        AndroidPath.Children.Clear();
-        AndroidPath.ProgressUpdates.Clear();
-    }
-
-    public override void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
-        => AndroidPath?.AddUpdates(newUpdates);
-
-    public override void AddUpdates(params FileOpProgressInfo[] newUpdates)
-        => AndroidPath?.AddUpdates(newUpdates);
-}
-
-public static class ShellFileOperation
-{
-    public static void SilentDelete(LogicalDeviceViewModel device, IEnumerable<FilePath> items)
-        => SilentDelete(device, items.Select(item => item.FullPath).ToArray());
-
-    public static void SilentDelete(LogicalDeviceViewModel device, params string[] items)
-    {
-        string[] args = ["-rf", .. items.Select(item => ADBService.EscapeAdbShellString(item))];
-        ADBService.ExecuteDeviceAdbShellCommand(device.ID, "rm", out _, out _, CancellationToken.None, args);
-    }
-
     public static void DeleteItems(LogicalDeviceViewModel device, IEnumerable<FileClass> items, Dispatcher dispatcher)
     {
         var archiveGroups = new Dictionary<string, List<FileClass>>(StringComparer.Ordinal);
@@ -73,28 +26,21 @@ public static class ShellFileOperation
         foreach (var (archivePath, members) in archiveGroups)
         {
             var fileOp = FileArchiveDeleteOperation.Create(members, archivePath, device, dispatcher);
-            fileOp.PropertyChanged += ArchiveDeleteOp_PropertyChanged;
+            fileOp.WhenCompleted(() => OnArchiveDeleteCompleted(fileOp));
             Data.FileOpQ.AddOperation(fileOp);
         }
 
         foreach (var item in regular)
         {
             var fileOp = new FileDeleteOperation(dispatcher, device, item);
-            fileOp.PropertyChanged += DeleteFileOp_PropertyChanged;
+            fileOp.WhenCompleted(() => OnDeleteCompleted(fileOp));
 
             Data.FileOpQ.AddOperation(fileOp);
         }
     }
 
-    private static void ArchiveDeleteOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private static void OnArchiveDeleteCompleted(FileArchiveDeleteOperation op)
     {
-        if (sender is not FileArchiveDeleteOperation op)
-            return;
-
-        if (e.PropertyName is not nameof(FileOperation.Status)
-            || op.Status is not FileOperation.OperationStatus.Completed)
-            return;
-
         if (op.Device.ID == Data.ActiveDevice?.ID)
         {
             foreach (var member in op.Members)
@@ -110,18 +56,10 @@ public static class ShellFileOperation
 
         if (removed)
             FileActionLogic.UpdateFileActions();
-
-        op.PropertyChanged -= ArchiveDeleteOp_PropertyChanged;
     }
 
-    private static void DeleteFileOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private static void OnDeleteCompleted(FileDeleteOperation op)
     {
-        var op = sender as FileDeleteOperation;
-
-        // when operation completes, remove this event handler anyway
-        if (e.PropertyName is not nameof(FileOperation.Status) || op.Status is not FileOperation.OperationStatus.Completed)
-            return;
-
         // delete file trash indexer if present, even if not current device
         if (op.FilePath.TrashIndex is TrashIndexer indexer)
             SilentDelete(op.Device, indexer.IndexerPath);
@@ -133,45 +71,54 @@ public static class ShellFileOperation
             op.FilePath.TrashIndex = null!;
         }
 
-        // update every pane listing the deleted item's folder
+        // update every pane listing the deleted item's folder, or a search that found it or something inside it
         var deletedPath = op.FilePath.FullPath;
-        if (Data.ForEachListingAt(op.TargetPath.ParentPath, op.Device.ID, (instance, _) => instance.FileList.DirList?.FileList.RemoveAll(file => file.FullPath == deletedPath)))
+        var removed = Data.ForEachListingHolding(op.TargetPath.ParentPath, op.Device.ID, (instance, _) =>
+            instance.FileList.DirList?.FileList.RemoveAll(file => file.FullPath == deletedPath
+                || FileHelper.RelationFrom(deletedPath, file.FullPath) is AbstractFile.RelationType.Descendant));
+
+        if (removed)
             FileActionLogic.UpdateFileActions();
 
         TrashHelper.SyncDriveViewTrashCountAfterDelete(op);
 
         if (op.FilePath.IsDirectory)
             RemoveDeletedTreeFolder(op.Device.ID, op.FilePath.FullPath);
-
-        op.PropertyChanged -= DeleteFileOp_PropertyChanged;
     }
 
     public static void Rename(FileClass item, string targetPath, LogicalDeviceViewModel device)
     {
         var fileOp = new FileRenameOperation(item, targetPath, device, App.AppDispatcher);
-        fileOp.PropertyChanged += RenameFileOp_PropertyChanged;
+        fileOp.WhenCompleted(() => OnRenameCompleted(fileOp));
 
         Data.FileOpQ.AddOperation(fileOp);
     }
 
-    private static void RenameFileOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private static void OnRenameCompleted(FileRenameOperation op)
     {
-        var op = sender as FileRenameOperation;
-
-        // when operation completes, remove this event handler anyway
-        if (e.PropertyName is not nameof(FileOperation.Status) || op.Status is not FileOperation.OperationStatus.Completed)
-            return;
-
         var oldPath = op.FilePath.FullPath;
         var newPath = op.TargetPath.FullPath;
 
-        var renamed = Data.ForEachListingAt(op.FilePath.ParentPath, op.Device.ID, (instance, isFocused) =>
+        var renamed = Data.ForEachListingHolding(op.FilePath.ParentPath, op.Device.ID, (instance, isFocused) =>
         {
+            // A search can list what is inside the renamed folder, which moves with it.
+            if (op.FilePath.IsDirectory && instance.FileList.DirList?.FileList is { } listing)
+            {
+                foreach (var inner in listing.Where(f => FileHelper.RelationFrom(oldPath, f.FullPath) is AbstractFile.RelationType.Descendant).ToList())
+                    inner.UpdatePath(newPath + inner.FullPath[oldPath.Length..]);
+            }
+
             var file = instance.FileList.DirList?.FileList?.Find(f => f.FullPath == oldPath);
             if (file is null)
                 return;
 
             file.UpdatePath(newPath);
+
+            if (!StillMatchesSearch(instance, file))
+            {
+                instance.FileList.DirList!.FileList.Remove(file);
+                return;
+            }
 
             // Only the focused pane keeps a selection.
             if (!isFocused)
@@ -189,104 +136,25 @@ public static class ShellFileOperation
 
         if (op.FilePath.IsDirectory)
             RenameTreeFolder(op.Device.ID, oldPath, newPath);
-
-        op.PropertyChanged -= RenameFileOp_PropertyChanged;
-    }
-
-    public static bool SilentCopy(LogicalDeviceViewModel device, string fullPath, string targetPath, out string stderr, bool throwOnError = false)
-    {
-        var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
-                                                               "cp",
-                                                               out _,
-                                                               out stderr,
-                                                               CancellationToken.None,
-                                                               "-p",
-                                                               ADBService.EscapeAdbShellString(fullPath),
-                                                               ADBService.EscapeAdbShellString(targetPath));
-
-        if (exitCode != 0 && throwOnError)
-            throw new Exception(stderr);
-
-        return exitCode == 0;
-    }
-
-    public static bool SilentCopy(LogicalDeviceViewModel device, string fullPath, string targetPath, bool throwOnError = false)
-        => SilentCopy(device, fullPath, targetPath, out _, throwOnError);
-
-    public static bool SilentMove(LogicalDeviceViewModel device, FilePath item, string targetPath) => SilentMove(device, item.FullPath, targetPath);
-
-    public static bool SilentMove(LogicalDeviceViewModel device, string fullPath, string targetPath, bool throwOnError = true)
-    {
-        var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
-                                                               "mv",
-                                                               out _,
-                                                               out var stderr,
-                                                               CancellationToken.None,
-                                                               ADBService.EscapeAdbShellString(fullPath),
-                                                               ADBService.EscapeAdbShellString(targetPath));
-
-        if (exitCode != 0 && throwOnError)
-        {
-            throw new Exception(stderr);
-        }
-
-        return exitCode == 0;
     }
 
     /// <summary>
-    /// Pushes a Windows file or folder tree to <paramref name="androidDestPath"/> via AdvancedSharpAdbClient sync
-    /// (no classic <c>adb push</c>).
+    /// Whether a renamed item still belongs in its pane's search results. With content search on, a
+    /// file may have been found by its contents, which a rename doesn't change, so it is kept.
     /// </summary>
-    public static void SilentPush(
-        LogicalDeviceViewModel device,
-        ShellItem windowsItem,
-        string androidDestPath,
-        CancellationToken cancellationToken = default)
+    private static bool StillMatchesSearch(ExplorerInstance instance, FileClass file)
     {
-        if (!File.Exists(windowsItem.ParsingName) && !Directory.Exists(windowsItem.ParsingName))
-            throw new FileNotFoundException(Strings.Resources.S_SYNC_FILE_NOT_FOUND, windowsItem.ParsingName);
-        
-        var source = new SyncFile(windowsItem, includeContent: true);
-        try
-        {
-            IEnumerable<SyncFile> files = [source, .. source.AllChildren()];
+        if (!instance.FileList.Actions.IsSearchMode)
+            return true;
 
-            if (source.IsDirectory)
-            {
-                var dirPaths = FolderHelper.GetBottomMostFolders(files)
-                    .Select(f => FileHelper.ConcatPaths(
-                        androidDestPath,
-                        FileHelper.ExtractRelativePath(f.FullPath, source.FullPath, false)));
+        var query = instance.FileList.Actions.ExplorerFilter?.Trim();
+        if (string.IsNullOrEmpty(query))
+            return true;
 
-                MakeDirs(device.ID, dirPaths).GetAwaiter().GetResult();
-            }
+        if (Data.Settings.SearchContents && file.Type is AbstractFile.FileType.File)
+            return true;
 
-            UnixFileStatus fileMode = UnixFileStatus.AllPermissions | UnixFileStatus.Regular;
-            var useSyncV2 = device.SupportsSyncV2;
-            var isCanceled = false;
-            using var cancelReg = cancellationToken.Register(() => isCanceled = true);
-
-            foreach (var item in files.Where(f => !f.IsDirectory))
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                var targetPath = source.IsDirectory
-                    ? FileHelper.ConcatPaths(androidDestPath, FileHelper.ExtractRelativePath(item.FullPath, source.FullPath))
-                    : androidDestPath;
-
-                using SyncService service = new(device.DeviceData);
-                using var stream = new FileStream(item.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-
-                var lastWriteTime = item.DateModified ?? DateTime.Now;
-                service.Push(stream, targetPath, fileMode, lastWriteTime, _ => { }, useSyncV2, in isCanceled);
-
-                SyncTransferTracker.AddPushBytes(stream.Length);
-            }
-        }
-        finally
-        {
-            source.ClearAll();
-        }
+        return FileHelper.MatchesSearchQuery(FileHelper.GetFullName(file.FullPath), query);
     }
 
     public static void MoveItems(LogicalDeviceViewModel device,
@@ -305,182 +173,6 @@ public static class ShellFileOperation
                      fileList?.Select(f => f.FullName) ?? [],
                      dispatcher,
                      cutType);
-
-    /// <summary>
-    /// Extracts archive selections to <paramref name="targetPath"/> (device paste from archive clipboard).
-    /// Caller must have already resolved name conflicts (merge/replace/skip); existing targets are replaced.
-    /// </summary>
-    public static void ExtractItems(LogicalDeviceViewModel device,
-                                    IEnumerable<FileClass> items,
-                                    string targetPath,
-                                    Dispatcher dispatcher)
-    {
-        items = [.. items];
-        List<FileExtractOperation> fileops = [];
-
-        foreach (var item in items)
-        {
-            if (!ArchivePath.TryParse(item.FullPath, out _, out _, device.ID))
-                continue;
-
-            SyncFile target = new(FileHelper.ConcatPaths(targetPath, item.FullName), item.Type);
-            fileops.Add(new(item, target, device, dispatcher));
-        }
-
-        if (fileops.Count == 0)
-            return;
-
-        dispatcher.Invoke(() =>
-        {
-            fileops.ForEach(op => op.PropertyChanged += ExtractFileOp_PropertyChanged);
-            Data.FileOpQ.AddOperations(fileops);
-        });
-    }
-
-    /// <summary>
-    /// Pastes device files into a modifiable tar archive (extract + overlay + repack).
-    /// </summary>
-    public static void PasteItemsToTar(
-        LogicalDeviceViewModel device,
-        IEnumerable<FileClass> items,
-        string archiveTargetComposite,
-        Dispatcher dispatcher,
-        DragDropEffects cutType = DragDropEffects.Copy)
-    {
-        List<FileClass> list = [.. items];
-        if (list.Count == 0)
-            return;
-
-        var op = FileArchiveModifyOperation.FromDevicePaste(list, archiveTargetComposite, device, dispatcher, cutType);
-        dispatcher.Invoke(() =>
-        {
-            op.PropertyChanged += ArchiveModifyOp_PropertyChanged;
-            Data.FileOpQ.AddOperation(op);
-        });
-    }
-
-    /// <summary>
-    /// Pushes Windows items into a modifiable tar archive (extract + push overlay + repack).
-    /// </summary>
-    public static void PushItemsToTar(
-        LogicalDeviceViewModel device,
-        IEnumerable<ShellItem> items,
-        string archiveTargetComposite,
-        Dispatcher dispatcher)
-    {
-        List<ShellItem> list = [.. items];
-        if (list.Count == 0)
-            return;
-
-        var op = FileArchiveModifyOperation.FromWindowsPush(list, archiveTargetComposite, device, dispatcher);
-        dispatcher.Invoke(() =>
-        {
-            op.PropertyChanged += ArchiveModifyOp_PropertyChanged;
-            Data.FileOpQ.AddOperation(op);
-        });
-    }
-
-    private static void ArchiveModifyOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (sender is not FileArchiveModifyOperation op)
-            return;
-
-        if (e.PropertyName is not nameof(FileOperation.Status)
-            || op.Status is not FileOperation.OperationStatus.Completed)
-            return;
-
-        foreach (var src in op.DeviceSources)
-            src.CutState = DragDropEffects.None;
-
-        if (op.Device.ID == Data.ActiveDevice?.ID
-            && ArchivePath.TryParse(Data.CurrentPath, out var currentArchive, out _, op.Device.ID)
-            && currentArchive == op.TarArchivePath)
-        {
-            Data.RuntimeSettings.Refresh = true;
-            FileActionLogic.UpdateFileActions();
-        }
-
-        op.PropertyChanged -= ArchiveModifyOp_PropertyChanged;
-    }
-
-    private static void ExtractFileOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (sender is not FileExtractOperation op)
-            return;
-
-        if (e.PropertyName is not nameof(FileOperation.Status)
-            || op.Status is not FileOperation.OperationStatus.Completed)
-            return;
-
-        op.FilePath.CutState = DragDropEffects.None;
-
-        var extracted = Data.ForEachListingAt(op.TargetPath.ParentPath, op.Device.ID, (instance, isFocused) =>
-        {
-            FileClass newFile = new(op.FilePath);
-            newFile.UpdatePath(op.TargetPath.FullPath);
-            instance.FileList.DirList!.FileList.Add(newFile);
-
-            if (isFocused && Data.FileOpQ.TotalCount == 1)
-                Data.ItemToSelect.Value = newFile;
-        });
-
-        if (extracted)
-            FileActionLogic.UpdateFileActions();
-
-        op.PropertyChanged -= ExtractFileOp_PropertyChanged;
-    }
-
-    /// <summary>
-    /// Creates a tar-family archive at <paramref name="archiveFile"/> from <paramref name="sourcePaths"/>.
-    /// </summary>
-    public static void CompressArchive(
-        LogicalDeviceViewModel device,
-        FileClass archiveFile,
-        IReadOnlyList<string> sourcePaths,
-        Dispatcher dispatcher)
-    {
-        var op = new FileCompressOperation(archiveFile, sourcePaths, device, dispatcher);
-        dispatcher.Invoke(() =>
-        {
-            op.PropertyChanged += CompressOp_PropertyChanged;
-            Data.FileOpQ.AddOperation(op);
-        });
-    }
-
-    private static void CompressOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (sender is not FileCompressOperation op)
-            return;
-
-        if (e.PropertyName is not nameof(FileOperation.Status))
-            return;
-
-        if (op.Status is FileOperation.OperationStatus.Completed)
-        {
-            if (op.Device.ID == Data.ActiveDevice?.ID
-                && op.FilePath.ParentPath == Data.CurrentPath)
-            {
-                op.FilePath.UpdateType();
-                FileActionLogic.UpdateFileActions();
-                _ = op.FilePath.UpdateExtraInfoAsync(CancellationToken.None);
-            }
-
-            op.PropertyChanged -= CompressOp_PropertyChanged;
-            return;
-        }
-
-        if (op.Status is FileOperation.OperationStatus.Failed or FileOperation.OperationStatus.Canceled)
-        {
-            if (op.Device.ID == Data.ActiveDevice?.ID
-                && op.FilePath.ParentPath == Data.CurrentPath)
-            {
-                Data.DirList!.FileList.Remove(op.FilePath);
-                FileActionLogic.UpdateFileActions();
-            }
-
-            op.PropertyChanged -= CompressOp_PropertyChanged;
-        }
-    }
 
     public static void MoveItems(LogicalDeviceViewModel device,
                                  IEnumerable<FileClass> items,
@@ -557,407 +249,111 @@ public static class ShellFileOperation
 
         dispatcher.Invoke(() =>
         {
-            fileops.ForEach(op => op.PropertyChanged += MoveFileOp_PropertyChanged);
+            fileops.ForEach(op => op.WhenCompleted(() => OnMoveCompleted(op)));
             Data.FileOpQ.AddOperations(fileops);
         });
     }
 
-    private static void MoveFileOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private static void OnMoveCompleted(FileMoveOperation op)
     {
-        var op = sender as FileMoveOperation;
-
-        // when operation completes, remove this event handler anyway
-        if (e.PropertyName is nameof(FileOperation.Status)
-            && op.Status is FileOperation.OperationStatus.Completed)
+        // write or delete indexer, even if not current device
+        if (op.OperationName is FileOperation.OperationType.Recycle)
         {
-            // write or delete indexer, even if not current device
-            if (op.OperationName is FileOperation.OperationType.Recycle)
+            TrashIndexer indexer = new(op);
+            WriteLine(op.Device, op.IndexerPath, AdbService.EscapeAdbShellString(indexer.ToString()));
+
+            if (TrashHelper.GetTrashDrive(op.Device) is { } trash)
             {
-                TrashIndexer indexer = new(op);
-                WriteLine(op.Device, op.IndexerPath, ADBService.EscapeAdbShellString(indexer.ToString()));
-
-                if (TrashHelper.GetTrashDrive(op.Device) is { } trash)
-                {
-                    var baseline = trash.ItemsCount is null or <= 0 ? 0 : trash.ItemsCount.Value;
-                    trash.SetItemsCount(baseline + 1);
-                }
+                var baseline = trash.ItemsCount is null or <= 0 ? 0 : trash.ItemsCount.Value;
+                trash.SetItemsCount(baseline + 1);
             }
-            else if (op.OperationName is FileOperation.OperationType.Restore)
+        }
+        else if (op.OperationName is FileOperation.OperationType.Restore)
+        {
+            SilentDelete(op.Device, op.IndexerPath);
+        }
+
+        // remove file from cut items
+        op.FilePath.CutState = DragDropEffects.None;
+
+        var sourcePath = op.FilePath.FullPath;
+        var removeFromTree = op.OperationName is FileOperation.OperationType.Recycle or FileOperation.OperationType.Move
+            && op.FilePath.IsDirectory;
+
+        if (op.Device.ID == Data.ActiveDevice?.ID)
+        {
+            // clear file trash indexer if restore / recycle on current device
+            if (op.OperationName is FileOperation.OperationType.Recycle or FileOperation.OperationType.Restore)
             {
-                SilentDelete(op.Device, op.IndexerPath);
+                op.FilePath.TrashIndex = null!;
             }
+        }
 
-            // remove file from cut items
-            op.FilePath.CutState = DragDropEffects.None;
+        // Every pane listing the source or the target folder is updated, not only the focused one.
+        var sourceParent = op.FilePath.ParentPath;
+        var targetParent = op.TargetPath.ParentPath;
+        var isMoved = op.OperationName is not FileOperation.OperationType.Copy;
+        var listingsChanged = false;
 
-            var sourcePath = op.FilePath.FullPath;
-            var removeFromTree = op.OperationName is FileOperation.OperationType.Recycle or FileOperation.OperationType.Move
-                && op.FilePath.IsDirectory;
-
-            if (op.Device.ID == Data.ActiveDevice?.ID)
-            {
-                // clear file trash indexer if restore / recycle on current device
-                if (op.OperationName is FileOperation.OperationType.Recycle or FileOperation.OperationType.Restore)
-                {
-                    op.FilePath.TrashIndex = null!;
-                }
-            }
-
-            // Every pane listing the source or the target folder is updated, not only the focused one.
-            var sourceParent = op.FilePath.ParentPath;
-            var targetParent = op.TargetPath.ParentPath;
-            var isMoved = op.OperationName is not FileOperation.OperationType.Copy;
-            var listingsChanged = false;
-
-            // update UI when cut / restore / recycle source is listed
-            if (isMoved && sourceParent != targetParent)
-            {
-                listingsChanged |= Data.ForEachListingAt(sourceParent, op.Device.ID, (instance, _) =>
-                {
-                    if (instance.FileList.DirList?.FileList is not { } listing)
-                        return;
-
-                    var listed = listing.Find(f => f.FullPath == sourcePath) ?? op.FilePath;
-                    listing.Remove(listed);
-                });
-            }
-
-            // update UI when copy / cut target is listed; the moved item itself goes to the first pane, the rest get copies
-            var movedItemUsed = false;
-            listingsChanged |= Data.ForEachListingAt(targetParent, op.Device.ID, (instance, isFocused) =>
+        // update UI when cut / restore / recycle source is listed
+        if (isMoved && sourceParent != targetParent)
+        {
+            listingsChanged |= Data.ForEachListingHolding(sourceParent, op.Device.ID, (instance, _) =>
             {
                 if (instance.FileList.DirList?.FileList is not { } listing)
                     return;
 
-                FileClass added;
-                if (isMoved && !movedItemUsed)
-                {
-                    movedItemUsed = true;
-                    op.FilePath.UpdatePath(op.TargetPath.FullPath);
-                    added = op.FilePath;
-                }
-                else
-                {
-                    added = new(op.FilePath) { IsLink = op.isLink };
-                    added.UpdatePath(op.TargetPath.FullPath);
-                    added.ModifiedTime = op.DateModified;
-                }
+                var listed = listing.Find(f => f.FullPath == sourcePath) ?? op.FilePath;
+                listing.Remove(listed);
 
-                listing.Add(added);
-
-                // only select the item in the focused pane, and only if there aren't any other operations
-                if (isFocused && Data.FileOpQ.TotalCount == 1)
-                    Data.ItemToSelect.Value = added;
+                if (op.FilePath.IsDirectory)
+                    listing.RemoveAll(f => FileHelper.RelationFrom(sourcePath, f.FullPath) is AbstractFile.RelationType.Descendant);
             });
-
-            if (listingsChanged)
-                FileActionLogic.UpdateFileActions();
-
-            if (removeFromTree)
-                RemoveDeletedTreeFolder(op.Device.ID, sourcePath);
-
-            // A move/copy that lands a folder in a new location needs the same tree update a push gets:
-            // add it under its (already loaded) destination parent, if that parent is visible in the tree.
-            if (op.FilePath.IsDirectory && op.OperationName is FileOperation.OperationType.Move or FileOperation.OperationType.Copy)
-                AddCreatedTreeFolder(op.Device.ID, op.TargetPath.FullPath);
-
-            op.PropertyChanged -= MoveFileOp_PropertyChanged;
-        }
-    }
-
-    public static async Task MakeDir(LogicalDeviceViewModel device, string fullPath)
-        => await MakeDirs(device.ID, [fullPath]);
-
-    public static async Task TryMakeDir(LogicalDeviceViewModel device, string fullPath)
-    {
-        try
-        {
-            await MakeDir(device, fullPath);
-        }
-        catch
-        {
-        }
-    }
-
-    public static async Task MakeDirs(LogicalDeviceViewModel device, IEnumerable<string> paths)
-        => await MakeDirs(device.ID, paths);
-
-    public static async Task MakeDirs(string deviceId, IEnumerable<string> paths)
-    {
-        var result = await ADBService.ExecuteVoidShellCommand(deviceId,
-                                                              CancellationToken.None,
-                                                              "mkdir",
-                                                              ["-p", .. paths.Select(path => ADBService.EscapeAdbShellString(path))]);
-
-        if (!string.IsNullOrEmpty(result))
-            throw new Exception(result);
-    }
-
-    public static async Task MakeFile(LogicalDeviceViewModel device, string fullPath)
-    {
-        var result = await ADBService.ExecuteVoidShellCommand(device.ID,
-                                                              CancellationToken.None,
-                                                              "touch",
-                                                              ADBService.EscapeAdbShellString(fullPath));
-
-        if (!string.IsNullOrEmpty(result))
-            throw new Exception(result);
-    }
-
-    public static async void WriteLine(LogicalDeviceViewModel device, string fullPath, string newLine)
-    {
-        var result = await ADBService.ExecuteVoidShellCommand(device.ID,
-                                                              CancellationToken.None,
-                                                              "echo",
-                                                              [newLine, ">>", ADBService.EscapeAdbShellString(fullPath)]);
-
-        if (!string.IsNullOrEmpty(result))
-        {
-            throw new Exception(result);
-        }
-    }
-
-    public static string ReadAllText(LogicalDeviceViewModel device, params string[] paths)
-    {
-        if (paths.Length == 0)
-            return string.Empty;
-
-        var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
-                                                               "cat",
-                                                               out string stdout,
-                                                               out string stderr,
-                                                               CancellationToken.None, [.. paths.Select(path => ADBService.EscapeAdbShellString(path))]);
-
-        if (exitCode != 0)
-            throw new Exception(stderr);
-
-        return stdout;
-    }
-
-    public static string GetPackageName(LogicalDeviceViewModel device, string fullPath)
-    {
-        ADBService.ExecuteDeviceAdbShellCommand(device.ID,
-                                                "pm",
-                                                out string stdout,
-                                                out _,
-                                                CancellationToken.None,
-                                                "install",
-                                                "-R",
-                                                "--pkg",
-                                                "''",
-                                                ADBService.EscapeAdbShellString(fullPath));
-
-        var match = AdbRegEx.RE_PACKAGE_NAME().Match(stdout);
-        return match.Success ? match.Groups["package"].Value : fullPath[..fullPath.LastIndexOf('.')][(fullPath.LastIndexOf('/') + 1)..];
-    }
-
-    public static void InstallPackages(LogicalDeviceViewModel device, IEnumerable<FileClass> items, Dispatcher dispatcher)
-    {
-        foreach (var item in items)
-        {
-            if (AppBackupHelper.IsApkBackup(item.FullName))
-            {
-                RestorePackageBackup(device, item, dispatcher);
-                continue;
-            }
-
-            var op = new PackageInstallOperation(dispatcher, device, item);
-            op.PropertyChanged += InstallOp_PropertyChanged;
-
-            Data.FileOpQ.AddOperation(op);
-        }
-    }
-
-    public static void PushPackages(LogicalDeviceViewModel device, IEnumerable<ShellItem> items, Dispatcher dispatcher)
-    {
-        foreach (var item in items)
-        {
-            if (AppBackupHelper.IsApkBackup(item.ParsingName) || AppBackupHelper.IsApkBackup(item.Name))
-            {
-                RestorePackageBackup(device, item, dispatcher);
-                continue;
-            }
-
-            var op = new PackageInstallOperation(dispatcher, device, new(new FilePath(item)), pushPackage: true);
-            op.PropertyChanged += InstallOp_PropertyChanged;
-            
-            Data.FileOpQ.AddOperation(op);
-        }
-    }
-
-    public static void BackupPackages(
-        LogicalDeviceViewModel device,
-        IEnumerable<Package> packages,
-        string windowsFolder,
-        Dispatcher dispatcher)
-    {
-        foreach (var package in packages)
-        {
-            var destName = FileHelper.DuplicateFile(
-                Directory.Exists(windowsFolder) ? Directory.GetFiles(windowsFolder).Select(Path.GetFileName) : [],
-                AppBackupHelper.WindowsBackupFileName(package.Name));
-            var windowsDest = FileHelper.ConcatPaths(windowsFolder, destName, '\\');
-            Directory.CreateDirectory(windowsFolder);
-            var tempArchive = AppBackupHelper.DeviceTempArchivePath();
-            var display = new FileClass(destName, windowsDest, AbstractFile.FileType.File);
-
-            var op = new AppBackupOperation(display, tempArchive, windowsDest, package, device, dispatcher);
-            Data.FileOpQ.AddOperation(op);
-        }
-    }
-
-    public static void RestorePackageBackup(LogicalDeviceViewModel device, FileClass deviceFile, Dispatcher dispatcher)
-    {
-        var tempArchive = AppBackupHelper.DeviceTempArchivePath();
-        if (!SilentCopy(device, deviceFile.FullPath, tempArchive, out var stderr))
-        {
-            DialogService.ShowMessage(
-                stderr,
-                Strings.Resources.S_MENU_INSTALL,
-                DialogService.DialogIcon.Critical,
-                copyToClipboard: true);
-            return;
         }
 
-        Data.FileOpQ.AddOperation(new AppRestoreOperation(deviceFile, tempArchive, device, dispatcher));
-    }
-
-    public static void RestorePackageBackup(LogicalDeviceViewModel device, ShellItem windowsItem, Dispatcher dispatcher)
-    {
-        var tempArchive = AppBackupHelper.DeviceTempArchivePath();
-        var source = new SyncFile(windowsItem);
-        var target = new SyncFile(tempArchive);
-        var push = FileSyncOperation.PushFile(source, target, device, dispatcher);
-        var display = new FileClass(windowsItem);
-
-        push.PropertyChanged += (_, e) =>
+        // update UI when copy / cut target is listed; the moved item itself goes to the first pane, the rest get copies
+        var movedItemUsed = false;
+        listingsChanged |= Data.ForEachListingAt(targetParent, op.Device.ID, (instance, isFocused) =>
         {
-            if (e.PropertyName is not nameof(FileOperation.Status))
+            if (instance.FileList.DirList?.FileList is not { } listing)
                 return;
 
-            if (push.Status is FileOperation.OperationStatus.Completed)
+            FileClass added;
+            if (isMoved && !movedItemUsed)
             {
-                dispatcher.Invoke(() =>
-                    Data.FileOpQ.AddOperation(new AppRestoreOperation(display, tempArchive, device, dispatcher)));
+                movedItemUsed = true;
+                op.FilePath.UpdatePath(op.TargetPath.FullPath);
+                added = op.FilePath;
             }
-            else if (push.Status is FileOperation.OperationStatus.Failed or FileOperation.OperationStatus.Canceled)
+            else
             {
-                SilentDelete(device, tempArchive);
+                added = new(op.FilePath) { IsLink = op.isLink };
+                added.UpdatePath(op.TargetPath.FullPath);
+                added.ModifiedTime = op.DateModified;
             }
-        };
 
-        Data.FileOpQ.AddOperation(push);
-    }
+            listing.Add(added);
 
-    public static void UninstallPackages(LogicalDeviceViewModel device, IEnumerable<string> packages, Dispatcher dispatcher)
-    {
-        foreach (var item in packages)
-        {
-            var op = new PackageInstallOperation(dispatcher, device, packageName: item);
-            op.PropertyChanged += InstallOp_PropertyChanged;
+            // only select the item in the focused pane, and only if there aren't any other operations
+            if (isFocused && Data.FileOpQ.TotalCount == 1)
+                Data.ItemToSelect.Value = added;
+        });
 
-            Data.FileOpQ.AddOperation(op);
-        }
-    }
+        if (listingsChanged)
+            FileActionLogic.UpdateFileActions();
 
-    private static void InstallOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        var op = sender as PackageInstallOperation;
+        if (removeFromTree)
+            RemoveDeletedTreeFolder(op.Device.ID, sourcePath);
 
-        // when operation completes, remove this event handler anyway
-        if (e.PropertyName is not nameof(FileOperation.Status) || op.Status is not FileOperation.OperationStatus.Completed)
-            return;
-
-        if (op.Device.ID == Data.ActiveDevice.ID
-            && Data.FileActions.IsAppDrive)
-        {
-            // update UI when on current device and current path
-            if (op.IsUninstall)
-                Data.Packages.RemoveAll(pkg => pkg.Name == op.PackageName);
-            else if (op.PushPackage)
-                Data.FileActions.RefreshPackages = true;
-        }
-
-        op.PropertyChanged -= InstallOp_PropertyChanged;
-    }
-
-    public static ulong? GetPackagesCount(LogicalDeviceViewModel device, bool includeSystem = true)
-    {
-        string[] args = includeSystem
-            ? ["list", "packages", "|", "wc", "-l"]
-            : ["list", "packages", "-3", "|", "wc", "-l"];
-
-        var result = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out string stdout, out _, CancellationToken.None, args);
-        if (result != 0 || !ulong.TryParse(stdout, out ulong value))
-            return null;
-
-        return value;
-    }
-
-    private static readonly string PKG_LIST_SYSTEM = $"{AdbExplorerConst.ADB_UNIT_SEP}SYS{AdbExplorerConst.ADB_UNIT_SEP}";
-    private static readonly string PKG_LIST_USER = $"{AdbExplorerConst.ADB_UNIT_SEP}USER{AdbExplorerConst.ADB_UNIT_SEP}";
-
-    public static ObservableList<Package> GetPackages(LogicalDeviceViewModel device, bool includeSystem = true, bool optionalParams = true)
-    {
-        // More package-specific info can be acquired using dumpsys package [package_name]
-
-        var optional = optionalParams ? " -U --show-versioncode" : "";
-        var userCmd = $"pm list packages -3 -f{optional}";
-        var script = includeSystem
-            ? string.Join("; ",
-                $"echo {PKG_LIST_SYSTEM}",
-                $"pm list packages -s -f{optional}",
-                $"echo {AdbExplorerConst.ADB_FIELD_SEP}",
-                $"echo {PKG_LIST_USER}",
-                userCmd,
-                $"echo {AdbExplorerConst.ADB_FIELD_SEP}")
-            : userCmd;
-
-        var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, script, out string stdout, out _, CancellationToken.None);
-        if (exitCode != 0 || string.IsNullOrWhiteSpace(stdout))
-            return [];
-
-        ObservableList<Package> packages = [];
-
-        if (includeSystem)
-        {
-            packages.AddRange(ParsePackageSection(ExtractPackageListSection(stdout, PKG_LIST_SYSTEM), Package.PackageType.System, device.SerialNumber));
-            packages.AddRange(ParsePackageSection(ExtractPackageListSection(stdout, PKG_LIST_USER), Package.PackageType.User, device.SerialNumber));
-        }
-        else
-        {
-            packages.AddRange(ParsePackageSection(stdout, Package.PackageType.User, device.SerialNumber));
-        }
-
-        return packages;
-    }
-
-    private static IEnumerable<Package> ParsePackageSection(string section, Package.PackageType type, string serialNumber)
-        => section.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries)
-                  .Select(pkg => Package.New(pkg, type))
-                  .OfType<Package>()
-                  .Select(pkg =>
-                  {
-                      pkg.DeviceSerial = serialNumber;
-                      return pkg;
-                  });
-
-    private static string ExtractPackageListSection(string stdout, string label)
-    {
-        var start = stdout.IndexOf(label, StringComparison.Ordinal);
-        if (start < 0)
-            return "";
-
-        var end = stdout.IndexOf(AdbExplorerConst.ADB_FIELD_SEP, start + label.Length);
-        if (end < 0)
-            end = stdout.Length;
-
-        return stdout[(start + label.Length)..end].Trim(AdbExplorerConst.ADB_FIELD_SEP, ' ', '\r', '\n');
+        // A move/copy that lands a folder in a new location needs the same tree update a push gets:
+        // add it under its (already loaded) destination parent, if that parent is visible in the tree.
+        if (op.FilePath.IsDirectory && op.OperationName is FileOperation.OperationType.Move or FileOperation.OperationType.Copy)
+            AddCreatedTreeFolder(op.Device.ID, op.TargetPath.FullPath);
     }
 
     public static void ChangeDateFromName(LogicalDeviceViewModel device, IEnumerable<FileClass> items, Dispatcher dispatcher)
     {
-        List<FileOperation> operations = [];
+        List<FileChangeModifiedOperation> operations = [];
 
         foreach (var item in items)
         {
@@ -989,18 +385,12 @@ public static class ShellFileOperation
             }
         }
 
-        operations.ForEach(op => op.PropertyChanged += ChangeModifiedOp_PropertyChanged);
+        operations.ForEach(op => op.WhenCompleted(() => OnChangeModifiedCompleted(op)));
         Data.FileOpQ.AddOperations(operations);
     }
 
-    private static void ChangeModifiedOp_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private static void OnChangeModifiedCompleted(FileChangeModifiedOperation op)
     {
-        var op = sender as FileChangeModifiedOperation;
-
-        // when operation completes, remove this event handler anyway
-        if (e.PropertyName is not nameof(FileOperation.Status) || op.Status is not FileOperation.OperationStatus.Completed)
-            return;
-
         // update every pane listing the file's folder
         op.FilePath.ModifiedTime = op.NewDate;
         Data.ForEachListingAt(op.FilePath.ParentPath, op.Device.ID, (instance, _) =>
@@ -1008,8 +398,6 @@ public static class ShellFileOperation
             if (instance.FileList.DirList?.FileList?.Find(f => f.FullPath == op.FilePath.FullPath) is { } listed)
                 listed.ModifiedTime = op.NewDate;
         });
-
-        op.PropertyChanged -= ChangeModifiedOp_PropertyChanged;
     }
 
     private static void RemoveDeletedTreeFolder(string deviceId, string path)

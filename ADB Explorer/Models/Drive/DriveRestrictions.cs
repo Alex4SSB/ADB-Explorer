@@ -18,6 +18,10 @@ public readonly record struct DriveRestrictions(
     public bool CaseInsensitiveNames => NoExec;
     public bool NoApkInstall => NoExec;
 
+    public char[] InvalidNameChars => RestrictedNaming
+        ? AdbExplorerConst.INVALID_NTFS_CHARS
+        : AdbExplorerConst.INVALID_UNIX_CHARS;
+
     public static DriveRestrictions From(string[]? mountOptions)
     {
         if (mountOptions is null || mountOptions.Length == 0)

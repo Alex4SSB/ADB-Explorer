@@ -359,13 +359,6 @@
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
     </Style>
 
-    <Style
-        x:Key="DevicesListStyle"
-        BasedOn="{StaticResource SplitViewBorderStyle}"
-        TargetType="Border">
-        <Setter Property="BorderThickness" Value="0,1,1,0" />
-        <Setter Property="BorderBrush" Value="{DynamicResource SeparatorForeground}" />
-    </Style>
     <Style x:Key="NewDeviceStackPanelStyle" TargetType="controls:SimpleStackPanel">
         <Style.Resources>
             <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">

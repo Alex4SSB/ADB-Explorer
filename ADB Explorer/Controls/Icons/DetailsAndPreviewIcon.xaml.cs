@@ -5,15 +5,15 @@
 /// </summary>
 public partial class DetailsAndPreviewIcon : UserControl
 {
-    public DetailsPane.SidePaneMode Mode
+    public SidePaneMode Mode
     {
-        get => (DetailsPane.SidePaneMode)GetValue(ModeProperty);
+        get => (SidePaneMode)GetValue(ModeProperty);
         set => SetValue(ModeProperty, value);
     }
 
     public static readonly DependencyProperty ModeProperty =
-        DependencyProperty.Register(nameof(Mode), typeof(DetailsPane.SidePaneMode),
-          typeof(DetailsAndPreviewIcon), new PropertyMetadata(DetailsPane.SidePaneMode.Details));
+        DependencyProperty.Register(nameof(Mode), typeof(SidePaneMode),
+          typeof(DetailsAndPreviewIcon), new PropertyMetadata(SidePaneMode.Details));
 
     public double Size
     {

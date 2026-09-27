@@ -4,7 +4,7 @@ namespace ADB_Explorer.Services;
 
 /// <summary>
 /// Android "bugdroid" head silhouette (no body/antennae shadow, just the head), used as the small
-/// overlay badge composited onto the root drive icon (<see cref="Helpers.FileToIconConverter.ComposeRootDriveIcon"/>),
+/// overlay badge composited onto the root drive icon (<see cref="Helpers.FileIconProvider.ComposeRootDriveIcon"/>),
 /// mirroring how Windows paints its logo over the C: drive icon. Sourced from the official Android
 /// brand assets as an SVG path (originally <c>Assets/Android_robot_head.svg</c>) and kept as code so
 /// it renders sharp at any requested pixel size instead of being scaled from a stored raster/vector asset.

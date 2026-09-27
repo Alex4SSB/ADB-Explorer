@@ -460,7 +460,7 @@ public class ArchivePathTests
 
         var driveView = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
         var searchMode = AdbLocation.StringFromLocation(Navigation.SpecialLocation.SearchMode);
-        var crumbs = NavigationBox.SeparatePath($"{driveView}{searchMode}").ToList();
+        var crumbs = AdbLocation.SeparatePath($"{driveView}{searchMode}").ToList();
 
         Assert.HasCount(2, crumbs);
         Assert.AreEqual(Navigation.SpecialLocation.DriveView, crumbs[0].Location);
@@ -474,7 +474,7 @@ public class ArchivePathTests
         Data.CurrentDisplayNames[(null, "/sdcard")] = "Internal";
 
         var driveView = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
-        var crumbs = NavigationBox.SeparatePath($"{driveView}/sdcard/Download/app.zip/WpfApp2/WpfApp2")
+        var crumbs = AdbLocation.SeparatePath($"{driveView}/sdcard/Download/app.zip/WpfApp2/WpfApp2")
             .Select(l => l.Path)
             .ToList();
 

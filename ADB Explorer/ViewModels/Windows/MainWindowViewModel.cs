@@ -1,8 +1,4 @@
-﻿using ADB_Explorer.Controls;
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
-using ADB_Explorer.Services;
+﻿using ADB_Explorer.Resources;
 using System.Windows.Shell;
 using Wpf.Ui.Controls;
 
@@ -14,16 +10,26 @@ public partial class MainWindowViewModel : ObservableObject
     public partial string ApplicationTitle { get; set; } = Properties.AppGlobal.AppDisplayName;
 
     /// <summary>Whether the active tab shows the Explorer page - the pane's bottom pages collapse into "More" then.</summary>
-    [ObservableProperty]
-    public partial bool IsExplorerPage { get; set; }
-
-    partial void OnIsExplorerPageChanged(bool value) => UpdateFooterVisibility();
+    public bool IsExplorerPage
+    {
+        get;
+        set
+        {
+            if (FieldHelper.TrySet(ref field, value))
+                UpdateFooterVisibility();
+        }
+    }
 
     /// <summary>Whether the pointer is over the pane's bottom items - the collapsed pages show again meanwhile.</summary>
-    [ObservableProperty]
-    public partial bool IsFooterHovered { get; set; }
-
-    partial void OnIsFooterHoveredChanged(bool value) => UpdateFooterVisibility();
+    public bool IsFooterHovered
+    {
+        get;
+        set
+        {
+            if (FieldHelper.TrySet(ref field, value))
+                UpdateFooterVisibility();
+        }
+    }
 
     private static NavigationViewItem CreateItem(string title, IconElement icon, Type? pageType = null) => new()
     {

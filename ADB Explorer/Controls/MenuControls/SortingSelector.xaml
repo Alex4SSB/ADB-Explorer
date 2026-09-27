@@ -42,70 +42,7 @@
             </local:AdbMenuItem.Resources>
             <local:AdbMenuItem.Header>
                 <local:SimpleStackPanel Orientation="Horizontal" Spacing="6">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <ui:FontIcon
-                            d:FontSize="14"
-                            d:FontWeight="Bold"
-                            d:Foreground="#4CC2FF"
-                            Glyph="&#xE7EB;">
-                            <ui:FontIcon.Style>
-                                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                                    <Setter Property="FontSize" Value="10" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding SortDirection}" Value="Ascending">
-                                            <Setter Property="FontWeight" Value="Bold" />
-                                            <Setter Property="Foreground" Value="{DynamicResource IconAccentBrush}" />
-                                            <Setter Property="FontSize" Value="14" />
-                                        </DataTrigger>
-                                        <!--  IconAccentBrush above is a Style Setter with no hover awareness of its own — same IsMenuHighlighted flip as IconAccentGlyphStyle, so the active-direction arrow still reacts to hovering the Sort menu item.  -->
-                                        <MultiDataTrigger>
-                                            <MultiDataTrigger.Conditions>
-                                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True" />
-                                                <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}" Value="True" />
-                                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:StyleHelper.IsMenuHighlighted)}" Value="True" />
-                                            </MultiDataTrigger.Conditions>
-                                            <Setter Property="Foreground" Value="{DynamicResource MouseOverForeground}" />
-                                        </MultiDataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ui:FontIcon.Style>
-                        </ui:FontIcon>
-                        <ui:FontIcon
-                            Grid.Column="1"
-                            Margin="-4,0,0,0"
-                            d:FontSize="10"
-                            Glyph="&#xE7EB;"
-                            RenderTransformOrigin="0.5,0.5">
-                            <ui:FontIcon.RenderTransform>
-                                <RotateTransform Angle="180" />
-                            </ui:FontIcon.RenderTransform>
-                            <ui:FontIcon.Style>
-                                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                                    <Setter Property="FontSize" Value="10" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding SortDirection}" Value="Descending">
-                                            <Setter Property="FontWeight" Value="Bold" />
-                                            <Setter Property="Foreground" Value="{DynamicResource IconAccentBrush}" />
-                                            <Setter Property="FontSize" Value="14" />
-                                        </DataTrigger>
-                                        <!--  Same hover flip as the ascending arrow above — see its comment.  -->
-                                        <MultiDataTrigger>
-                                            <MultiDataTrigger.Conditions>
-                                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True" />
-                                                <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}" Value="True" />
-                                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:StyleHelper.IsMenuHighlighted)}" Value="True" />
-                                            </MultiDataTrigger.Conditions>
-                                            <Setter Property="Foreground" Value="{DynamicResource MouseOverForeground}" />
-                                        </MultiDataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ui:FontIcon.Style>
-                        </ui:FontIcon>
-                    </Grid>
+                    <local:SortDirectionIcon Direction="{Binding SortDirection}" />
                     <TextBlock Margin="0,0,0,2" Text="{Binding Source={x:Static Member=strings:Resources.S_SORT}}" />
                     <ui:FontIcon
                         Margin="0,2,0,0"

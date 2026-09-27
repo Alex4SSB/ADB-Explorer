@@ -1,7 +1,3 @@
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-
 namespace ADB_Explorer.ViewModels.Pages;
 
 /// <summary>
@@ -13,8 +9,8 @@ public partial class ExplorerTabsViewModel : ObservableObject
 {
     public ObservableList<ExplorerInstance> Tabs { get; } = [];
 
-    /// <summary>Whether the open tabs are browsing more than one device.</summary>
-    public bool SpansMultipleDevices => Tabs
+    /// <summary>Whether the open tabs, split panes included, are browsing more than one device.</summary>
+    public bool SpansMultipleDevices => AllInstances
         .Select(tab => tab.EffectiveDevice?.ID)
         .OfType<string>()
         .Distinct()
@@ -26,17 +22,18 @@ public partial class ExplorerTabsViewModel : ObservableObject
     public ExplorerTabsViewModel()
     {
         Tabs.CollectionChanged += (_, _) => TabsChanged();
+        SplitChanged += (_, _) => TabsChanged();
     }
 
     private void TabsChanged()
     {
-        foreach (var gone in _watchedTabs.Except(Tabs).ToList())
+        foreach (var gone in _watchedTabs.Except(AllInstances).ToList())
         {
             gone.PropertyChanged -= Tab_PropertyChanged;
             _watchedTabs.Remove(gone);
         }
 
-        foreach (var tab in Tabs)
+        foreach (var tab in AllInstances)
         {
             if (_watchedTabs.Add(tab))
                 tab.PropertyChanged += Tab_PropertyChanged;
@@ -194,15 +191,15 @@ public partial class ExplorerTabsViewModel : ObservableObject
         NavigateFocusedPaneLike(tab);
     }
 
-    /// <summary>Points the focused pane's header at the location <paramref name="source"/> shows, through the app-wide navigation signals that only the focused header reacts to.</summary>
+    /// <summary>Points the focused pane's explorer content at the location <paramref name="source"/> shows, through the app-wide navigation signals that only the focused one reacts to.</summary>
     private static void NavigateFocusedPaneLike(ExplorerInstance source)
     {
-        Data.RuntimeSettings.InitLister = true;
+        Data.RequestExplorer(ExplorerRequest.InitLister);
 
         if (source.FileList.Actions.IsDriveViewVisible)
-            Data.RuntimeSettings.DriveViewNav = true;
+            Data.RequestExplorer(ExplorerRequest.DriveViewNav);
         else if (!string.IsNullOrEmpty(source.FileList.Path))
-            Data.RuntimeSettings.PathBoxNavigation = source.FileList.Path;
+            Data.RequestPathNavigation(source.FileList.Path);
     }
 
     /// <summary>Tabs being folded into a split view: they leave the tab list but stay alive as panes.</summary>
@@ -392,13 +389,13 @@ public partial class ExplorerTabsViewModel : ObservableObject
         Tabs.Add(instance);
         ActiveTab = instance;
 
-        // ActiveTab is now this instance, so these (guarded) app-wide signals reach its header.
-        Data.RuntimeSettings.InitLister = true;
+        // ActiveTab is now this instance, so these (guarded) app-wide signals reach its explorer content.
+        Data.RequestExplorer(ExplorerRequest.InitLister);
 
         if (mode is AppSettings.NewTabLocationMode.DriveView)
-            Data.RuntimeSettings.DriveViewNav = true;
+            Data.RequestExplorer(ExplorerRequest.DriveViewNav);
         else if (mode is AppSettings.NewTabLocationMode.DuplicateCurrentTab && !string.IsNullOrEmpty(instance.FileList.Path))
-            Data.RuntimeSettings.PathBoxNavigation = instance.FileList.Path;
+            Data.RequestPathNavigation(instance.FileList.Path);
 
         return instance;
     }
@@ -541,10 +538,13 @@ public partial class ExplorerTabsViewModel : ObservableObject
         if (index < 0)
             return;
 
+        // Removing the selected item makes the tab list clear ActiveTab, so whether it was active is read first.
+        var wasActive = ReferenceEquals(ActiveTab, tab);
+
         tab.SplitInstance?.FileList.DirList?.Stop();
         Tabs.RemoveAt(index);
 
-        if (ReferenceEquals(ActiveTab, tab))
+        if (wasActive)
             ActiveTab = Tabs[Math.Max(0, index - 1)];
     }
 }

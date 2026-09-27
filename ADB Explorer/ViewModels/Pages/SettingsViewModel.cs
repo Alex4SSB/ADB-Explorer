@@ -1,7 +1,3 @@
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-using ADB_Explorer.ViewModels.Windows;
 using Wpf.Ui.Abstractions.Controls;
 
 namespace ADB_Explorer.ViewModels.Pages;
@@ -77,6 +73,10 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
             else if (e.PropertyName is nameof(AppSettings.AccentColor) && Data.Settings.UseCustomAccent)
             {
                 AdbThemeService.SetAccent(Data.Settings.AccentColor);
+            }
+            else if (e.PropertyName is nameof(AppSettings.EnableMdns))
+            {
+                AdbHelper.EnableMdns();
             }
         };
 

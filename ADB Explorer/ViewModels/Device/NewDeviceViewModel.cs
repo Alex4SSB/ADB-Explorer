@@ -1,34 +1,31 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-
-namespace ADB_Explorer.ViewModels;
+﻿namespace ADB_Explorer.ViewModels;
 
 public class NewDeviceViewModel : PairingDeviceViewModel
 {
     #region Full properties
 
-    private NewDevice device = null!;
+    private NewDevice _device = null!;
     protected new NewDevice Device
     {
-        get => device;
-        set => Set(ref device, value);
+        get => _device;
+        set => SetProperty(ref _device, value);
     }
 
-    private bool isPairingEnabled = false;
+    private bool _isPairingEnabled = false;
     public bool IsPairingEnabled
     {
-        get => isPairingEnabled;
-        set => Set(ref isPairingEnabled, value);
+        get => _isPairingEnabled;
+        set => SetProperty(ref _isPairingEnabled, value);
     }
 
-    private string uiPairingCode = "";
+    private string _uiPairingCode = "";
     public string UIPairingCode
     {
-        get => uiPairingCode;
+        get => _uiPairingCode;
         set
         {
-            if (Set(ref uiPairingCode, value))
-                SetPairingCode(uiPairingCode?.Replace("-", ""));
+            if (SetProperty(ref _uiPairingCode, value))
+                SetPairingCode(_uiPairingCode?.Replace("-", ""));
         }
     }
 

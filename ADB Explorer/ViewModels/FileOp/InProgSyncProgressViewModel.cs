@@ -1,17 +1,14 @@
-﻿using ADB_Explorer.Converters;
-using ADB_Explorer.Services;
-
-namespace ADB_Explorer.ViewModels;
+﻿namespace ADB_Explorer.ViewModels;
 
 internal class InProgSyncProgressViewModel : FileOpProgressViewModel, IDisposable
 {
-    private readonly AdbSyncProgressInfo? adbInfo = null;
-    private readonly DateTime? transferStart = null;
-    private readonly long? totalFileBytes = null;
-    private readonly long? totalBytesTransferred = null;
-    private readonly bool showElapsedTime;
-    private DispatcherTimer? elapsedTimer;
-    private bool disposed;
+    private readonly AdbSyncProgressInfo? _adbInfo = null;
+    private readonly DateTime? _transferStart = null;
+    private readonly long? _totalFileBytes = null;
+    private readonly long? _totalBytesTransferred = null;
+    private readonly bool _showElapsedTime;
+    private DispatcherTimer? _elapsedTimer;
+    private bool _disposed;
 
     public InProgSyncProgressViewModel() : base(FileOperation.OperationStatus.InProgress)
     {
@@ -25,29 +22,29 @@ internal class InProgSyncProgressViewModel : FileOpProgressViewModel, IDisposabl
         long? totalBytesTransferred,
         bool showElapsedTime = false) : this()
     {
-        this.adbInfo = adbInfo;
-        this.transferStart = transferStart;
-        this.totalFileBytes = totalFileBytes;
-        this.totalBytesTransferred = totalBytesTransferred;
-        this.showElapsedTime = showElapsedTime;
+        _adbInfo = adbInfo;
+        _transferStart = transferStart;
+        _totalFileBytes = totalFileBytes;
+        _totalBytesTransferred = totalBytesTransferred;
+        _showElapsedTime = showElapsedTime;
 
         if (showElapsedTime)
             App.SafeBeginInvoke(StartElapsedTimer);
     }
 
-    public string PercentageString => $"{adbInfo?.TotalPercentage:0.0}";
+    public string PercentageString => $"{_adbInfo?.TotalPercentage:0.0}";
 
-    public double? TotalPercentage => adbInfo?.TotalPercentage;
+    public double? TotalPercentage => _adbInfo?.TotalPercentage;
 
-    public long? TotalBytesTransferred => adbInfo?.TotalBytesTransferred;
+    public long? TotalBytesTransferred => _adbInfo?.TotalBytesTransferred;
 
     public string TotalBytes => TotalBytesTransferred?.BytesToSize();
 
-    public double? CurrentFilePercentage => adbInfo?.CurrentFilePercentage;
+    public double? CurrentFilePercentage => _adbInfo?.CurrentFilePercentage;
 
     public string CurrentPercentageString => $"{CurrentFilePercentage:0.0}";
 
-    public string CurrentFilePath => adbInfo?.AndroidPath;
+    public string CurrentFilePath => _adbInfo?.AndroidPath;
 
     public string CurrentFileName => Path.GetFileName(CurrentFilePath);
 
@@ -57,29 +54,29 @@ internal class InProgSyncProgressViewModel : FileOpProgressViewModel, IDisposabl
     {
         get
         {
-            if (showElapsedTime)
+            if (_showElapsedTime)
             {
-                if (transferStart is null)
+                if (_transferStart is null)
                     return null;
 
-                var elapsed = (DateTime.Now - transferStart.Value).TotalSeconds;
+                var elapsed = (DateTime.Now - _transferStart.Value).TotalSeconds;
                 if (elapsed < 0)
                     return 0;
                 return elapsed;
             }
 
-            if (transferStart is null || totalFileBytes is null or 0 || totalBytesTransferred is null or <= 0)
+            if (_transferStart is null || _totalFileBytes is null or 0 || _totalBytesTransferred is null or <= 0)
                 return null;
 
-            var estimateElapsed = (DateTime.Now - transferStart.Value).TotalSeconds;
+            var estimateElapsed = (DateTime.Now - _transferStart.Value).TotalSeconds;
             if (estimateElapsed <= 0)
                 return null;
 
-            var bytesPerSecond = totalBytesTransferred.Value / estimateElapsed;
+            var bytesPerSecond = _totalBytesTransferred.Value / estimateElapsed;
             if (bytesPerSecond <= 0)
                 return null;
 
-            var remaining = totalFileBytes.Value - totalBytesTransferred.Value;
+            var remaining = _totalFileBytes.Value - _totalBytesTransferred.Value;
             if (remaining <= 0)
                 return null;
 
@@ -100,31 +97,31 @@ internal class InProgSyncProgressViewModel : FileOpProgressViewModel, IDisposabl
 
     public void Dispose()
     {
-        if (disposed)
+        if (_disposed)
             return;
 
-        disposed = true;
+        _disposed = true;
         App.SafeBeginInvoke(StopElapsedTimer);
     }
 
     private void StartElapsedTimer()
     {
-        if (disposed || elapsedTimer is not null)
+        if (_disposed || _elapsedTimer is not null)
             return;
 
-        elapsedTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-        elapsedTimer.Tick += ElapsedTimer_Tick;
-        elapsedTimer.Start();
+        _elapsedTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _elapsedTimer.Tick += ElapsedTimer_Tick;
+        _elapsedTimer.Start();
     }
 
     private void StopElapsedTimer()
     {
-        if (elapsedTimer is null)
+        if (_elapsedTimer is null)
             return;
 
-        elapsedTimer.Tick -= ElapsedTimer_Tick;
-        elapsedTimer.Stop();
-        elapsedTimer = null;
+        _elapsedTimer.Tick -= ElapsedTimer_Tick;
+        _elapsedTimer.Stop();
+        _elapsedTimer = null;
     }
 
     private void ElapsedTimer_Tick(object? sender, EventArgs e)

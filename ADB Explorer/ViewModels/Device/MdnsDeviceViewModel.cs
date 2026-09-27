@@ -1,5 +1,4 @@
-﻿using ADB_Explorer.Models;
-namespace ADB_Explorer.ViewModels;
+﻿namespace ADB_Explorer.ViewModels;
 
 public class MdnsDeviceViewModel : DeviceViewModel
 {

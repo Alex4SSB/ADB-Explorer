@@ -1,5 +1,4 @@
-﻿using ADB_Explorer.Models;
-namespace ADB_Explorer.Views;
+﻿namespace ADB_Explorer.Views;
 
 /// <summary>
 /// Interaction logic for MdnsDeviceControl.xaml

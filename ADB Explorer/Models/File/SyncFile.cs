@@ -1,7 +1,4 @@
-﻿using ADB_Explorer.Converters;
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Services;
-using Vanara.Windows.Shell;
+﻿using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Models;
 
@@ -21,7 +18,7 @@ public class SyncFile : FilePath
 
     public double? UnixTime { get; set; }
 
-    private readonly DateTime? dateModified;
+    private readonly DateTime? _dateModified;
     public DateTime? DateModified
     {
         get
@@ -29,7 +26,7 @@ public class SyncFile : FilePath
             if (!Data.Settings.KeepDateModified)
                 return null;
 
-            return dateModified ?? UnixTime.FromUnixTime();
+            return _dateModified ?? UnixTime.FromUnixTime();
         }
     }
 
@@ -42,7 +39,7 @@ public class SyncFile : FilePath
     public SyncFile(ShellItem windowsPath, bool includeContent = false)
         : base(windowsPath)
     {
-        (Size, dateModified) = FileHelper.GetShellSizeDate(windowsPath, IsDirectory);
+        (Size, _dateModified) = FileHelper.GetShellSizeDate(windowsPath, IsDirectory);
 
         if (includeContent && IsDirectory)
         {
@@ -139,7 +136,7 @@ public class SyncFile : FilePath
     public void AddUpdates(params FileOpProgressInfo[] newUpdates)
         => AddUpdates(newUpdates.Where(o => o is not null));
 
-    public void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates, FileOperation? fileOp = null, bool executeInDispatcher = true)
+    public void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates, FileOperation? fileOp = null)
     {
         if (!newUpdates.Any())
             return;
@@ -179,12 +176,8 @@ public class SyncFile : FilePath
                     PathType = PathType
                 };
 
-                ExecuteInDispatcher(() =>
-                {
-                    Children.Add(file);
-
-                    OnPropertyChanged(nameof(Children));
-                }, executeInDispatcher);
+                Children.Add(file);
+                OnPropertyChanged(nameof(Children));
             }
 
             file.AddUpdates(group);
@@ -233,21 +226,5 @@ public class SyncFile : FilePath
         }
 
         Children.Clear();
-    }
-}
-
-public class SyncFileComparer : IEqualityComparer<SyncFile>
-{
-    public bool Equals(SyncFile? x, SyncFile? y)
-    {
-        if (x is null || y is null)
-            return x is null && y is null;
-
-        return x.FullPath.Equals(y.FullPath);
-    }
-
-    public int GetHashCode([DisallowNull] SyncFile obj)
-    {
-        throw new NotImplementedException();
     }
 }

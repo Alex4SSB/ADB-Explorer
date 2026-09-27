@@ -1,6 +1,4 @@
-﻿using ADB_Explorer.Models;
-
-namespace ADB_Explorer.Helpers;
+﻿namespace ADB_Explorer.Helpers;
 
 public static class StyleHelper
 {
@@ -107,6 +105,20 @@ public static class StyleHelper
             typeof(bool),
             typeof(StyleHelper),
             new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.Inherits));
+
+    public static bool GetIsWindowActive(DependencyObject element) =>
+        (bool)element.GetValue(IsWindowActiveProperty);
+
+    public static void SetIsWindowActive(DependencyObject element, bool value) =>
+        element.SetValue(IsWindowActiveProperty, value);
+
+    /// <summary>Whether the hosting window is active. Set on the window; it also passes into the pages its Frame hosts.</summary>
+    public static readonly DependencyProperty IsWindowActiveProperty =
+        DependencyProperty.RegisterAttached(
+            "IsWindowActive",
+            typeof(bool),
+            typeof(StyleHelper),
+            new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.OverridesInheritanceBehavior));
 
     public static Brush GetMenuItemForeground(UIElement control) =>
         (Brush)control.GetValue(MenuItemForegroundProperty);

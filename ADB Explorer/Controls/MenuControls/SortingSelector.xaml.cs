@@ -1,10 +1,4 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-
-namespace ADB_Explorer.Controls;
+﻿namespace ADB_Explorer.Controls;
 
 /// <summary>
 /// Interaction logic for SortingSelector.xaml

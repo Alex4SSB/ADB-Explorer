@@ -6,7 +6,7 @@
 // Copied from WPF UI project
 namespace ADB_Explorer.Converters;
 
-internal class AnimationFactorToValueConverter : IMultiValueConverter
+public class AnimationFactorToValueConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {

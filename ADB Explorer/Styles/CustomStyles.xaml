@@ -7,7 +7,6 @@
     xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
-    xmlns:services="clr-namespace:ADB_Explorer.Services"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     <converters:TrimmedTooltipConverter x:Key="TrimmedTooltip" />
@@ -36,13 +35,6 @@
         <Setter Property="HorizontalAlignment" Value="Stretch" />
     </Style>
     <Style
-        x:Key="StretchRadioButton"
-        BasedOn="{StaticResource DefaultRadioButtonStyle}"
-        TargetType="RadioButton">
-        <Setter Property="HorizontalAlignment" Value="Stretch" />
-        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-    </Style>
-    <Style
         x:Key="FluentProgressBarStyle"
         BasedOn="{StaticResource {x:Type ProgressBar}}"
         TargetType="ProgressBar">
@@ -65,11 +57,6 @@
                 <Setter Property="BorderBrush" Value="{DynamicResource SystemColorButtonTextBrush}" />
             </DataTrigger>
         </Style.Triggers>
-    </Style>
-    <Style x:Key="FluentProgressRingStyle" TargetType="ui:ProgressRing" />
-    <Style x:Key="MenuStyle" TargetType="Menu">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="False" />
     </Style>
     <Style
         x:Key="NumericTextBoxStyle"
@@ -104,26 +91,6 @@
         <Setter Property="FlowDirection" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=PlacementTarget.FlowDirection}" />
         <Setter Property="MaxWidth" Value="800" />
     </Style>
-    <Style
-        x:Key="TooltipTextBoxStyle"
-        BasedOn="{StaticResource NumericTextBoxStyle}"
-        TargetType="ui:TextBox">
-        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
-        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" />
-        <Style.Resources>
-            <Style BasedOn="{StaticResource TrimmedTextTooltipStyle}" TargetType="ToolTip" />
-        </Style.Resources>
-    </Style>
-    <Style
-        x:Key="TooltipTextBoxFluentStyle"
-        BasedOn="{StaticResource AdbTextBoxStyle}"
-        TargetType="ui:TextBox">
-        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
-        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" />
-        <Style.Resources>
-            <Style BasedOn="{StaticResource TrimmedTextTooltipStyle}" TargetType="ToolTip" />
-        </Style.Resources>
-    </Style>
     <Style x:Key="TooltipTextBlockStyle" TargetType="TextBlock">
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
@@ -146,6 +113,21 @@
         x:Key="FileNameTextBlockStyle"
         BasedOn="{StaticResource TooltipTextBlockStyle}"
         TargetType="TextBlock" />
+    <!--  File name label of the icon view: faded while cut, accented while copied.  -->
+    <Style x:Key="FileItemStateTextStyle" TargetType="TextBlock">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding CutState}" Value="Move">
+                <Setter Property="Opacity" Value="0.5" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
+            </DataTrigger>
+            <!--  After IsSelected: a copied item keeps its accent color even while selected.  -->
+            <DataTrigger Binding="{Binding CutState}" Value="Copy">
+                <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
     <Style
         x:Key="ExplorerGridCellStyle"
         BasedOn="{StaticResource FileNameTextBlockStyle}"
@@ -196,9 +178,6 @@
                 <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
             </Trigger>
         </Style.Triggers>
-    </Style>
-    <Style x:Key="ExplorerViewBackgroundStyle" TargetType="Border">
-        <Setter Property="Background" Value="{DynamicResource ControlBackground}" />
     </Style>
     <Style
         x:Key="RestartAppButtonStyle"
@@ -253,14 +232,9 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <Style x:Key="BlueDotTextBlockStyle" TargetType="TextBlock">
-        <Setter Property="Text" Value="•" />
-        <Setter Property="FontSize" Value="20" />
-        <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
-    </Style>
     <DataTemplate x:Key="FileIconTemplate">
         <Grid>
-            <Grid>
+            <Grid FlowDirection="LeftToRight">
                 <Grid.Style>
                     <Style TargetType="Grid">
                         <Setter Property="Visibility" Value="Collapsed" />
@@ -330,7 +304,7 @@
     </Style>
     <Style x:Key="SearchBoxStyle" TargetType="controls:SearchBox">
         <Setter Property="DefaultControlWidth" Value="{Binding Source={x:Static Member=models:AdbExplorerConst.DEFAULT_SEARCH_WIDTH}}" />
-        <Setter Property="IsActive" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=IsActive, Mode=OneWay}" />
+        <Setter Property="IsActive" Value="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:StyleHelper.IsWindowActive)}" />
         <!--
             Self, not x:Static Data.FileActions - this Style is shared app-wide across every tab's
             own SearchBox, so a snapshotted active-tab reference would only ever be right for one.
@@ -461,21 +435,6 @@
         </Style.Triggers>
     </Style>
     <Style
-        x:Key="DriveItemStyle"
-        BasedOn="{StaticResource HomeViewItemStyle}"
-        TargetType="ui:Button">
-        <Setter Property="Height" Value="60" />
-        <Style.Triggers>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="False" />
-                    <Condition Binding="{Binding IsSelected}" Value="False" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Background" Value="Transparent" />
-            </MultiDataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
         x:Key="DriveUsageBarStyle"
         BasedOn="{StaticResource FluentProgressBarStyle}"
         TargetType="ProgressBar">
@@ -584,12 +543,5 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-    </Style>
-    <Style
-        x:Key="FileOpFilterCheckBox"
-        BasedOn="{StaticResource StretchCheckBoxStyle}"
-        TargetType="CheckBox">
-        <Setter Property="IsChecked" Value="{Binding IsChecked, Mode=TwoWay}" />
-        <Setter Property="IsEnabled" Value="{Binding IsEnabled, Mode=OneWay}" />
     </Style>
 </ResourceDictionary>

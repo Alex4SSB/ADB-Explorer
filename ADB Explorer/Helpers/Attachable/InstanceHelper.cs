@@ -1,9 +1,7 @@
-using ADB_Explorer.Models;
-
 namespace ADB_Explorer.Helpers;
 
 /// <summary>
-/// Carries the owning tab's <see cref="ExplorerInstance"/> down an Explorer header's tree, so
+/// Carries the owning tab's <see cref="ExplorerInstance"/> down an explorer content's tree, so
 /// shared styles read per-tab state instead of the active-tab-only <c>Data.*</c> statics.
 /// </summary>
 public static class InstanceHelper

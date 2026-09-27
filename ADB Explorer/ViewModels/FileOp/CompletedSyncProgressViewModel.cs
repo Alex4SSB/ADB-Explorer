@@ -1,26 +1,23 @@
-﻿using ADB_Explorer.Converters;
-using ADB_Explorer.Services;
-
-namespace ADB_Explorer.ViewModels;
+﻿namespace ADB_Explorer.ViewModels;
 
 public class CompletedSyncProgressViewModel : FileOpProgressViewModel
 {
-    private readonly AdbSyncStatsInfo adbInfo;
+    private readonly AdbSyncStatsInfo _adbInfo;
 
     public CompletedSyncProgressViewModel(AdbSyncStatsInfo adbInfo) : base(FileOperation.OperationStatus.Completed)
     {
-        this.adbInfo = adbInfo;
+        _adbInfo = adbInfo;
     }
 
-    public long FilesTransferred => adbInfo.FilesTransferred;
+    public long FilesTransferred => _adbInfo.FilesTransferred;
 
-    public long FilesSkipped => adbInfo.FilesSkipped;
+    public long FilesSkipped => _adbInfo.FilesSkipped;
 
-    public double? AverageRateMBps => adbInfo.AverageRate;
+    public double? AverageRateMBps => _adbInfo.AverageRate;
 
-    public long? TotalBytes => adbInfo.TotalBytes;
+    public long? TotalBytes => _adbInfo.TotalBytes;
 
-    public double? TotalSeconds => adbInfo.TotalTime;
+    public double? TotalSeconds => _adbInfo.TotalTime;
 
     public int FileCountCompletedRate => (int)((float)FilesTransferred / (FilesTransferred + FilesSkipped) * 100.0);
 
@@ -35,13 +32,13 @@ public class CompletedSyncProgressViewModel : FileOpProgressViewModel
                 if (AverageRateMBps.Value <= 0)
                     return string.Empty;
 
-                return string.Format(Strings.Resources.S_SECONDS_SHORT, $"{UnitConverter.BytesToSize((long)(AverageRateMBps.Value * 1024 * 1024))}/");
+                return string.Format(Strings.Resources.S_SECONDS_SHORT, $"{UnitFormatter.BytesToSize((long)(AverageRateMBps.Value * 1024 * 1024))}/");
             }
             else
             {
                 if (TotalBytes.HasValue && TotalSeconds.HasValue && TotalSeconds.Value > 0)
                 {
-                    return string.Format(Strings.Resources.S_SECONDS_SHORT, $"{UnitConverter.BytesToSize(TotalBytes.Value / (long)TotalSeconds.Value)}/");
+                    return string.Format(Strings.Resources.S_SECONDS_SHORT, $"{UnitFormatter.BytesToSize(TotalBytes.Value / (long)TotalSeconds.Value)}/");
                 }
 
                 return string.Empty;
@@ -49,7 +46,7 @@ public class CompletedSyncProgressViewModel : FileOpProgressViewModel
         }
     }
 
-    public string TotalSize => TotalBytes.HasValue ? UnitConverter.BytesToSize(TotalBytes.Value) : string.Empty;
+    public string TotalSize => TotalBytes.HasValue ? UnitFormatter.BytesToSize(TotalBytes.Value) : string.Empty;
 
-    public string TotalTime => TotalSeconds.HasValue ? UnitConverter.ToTime(TotalSeconds.Value) : string.Empty;
+    public string TotalTime => TotalSeconds.HasValue ? UnitFormatter.ToTime(TotalSeconds.Value) : string.Empty;
 }

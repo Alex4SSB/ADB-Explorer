@@ -1,15 +1,12 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-
-namespace ADB_Explorer.ViewModels;
+﻿namespace ADB_Explorer.ViewModels;
 
 public class WsaPkgDeviceViewModel : DeviceViewModel
 {
-    private WsaPkgDevice device = null!;
+    private WsaPkgDevice _device = null!;
     protected new WsaPkgDevice Device
     {
-        get => device;
-        set => Set(ref device, value);
+        get => _device;
+        set => SetProperty(ref _device, value);
     }
 
     public DateTime LastLaunch => Device.LastLaunch;
@@ -30,7 +27,6 @@ public class WsaPkgDeviceViewModel : DeviceViewModel
     public void SetLastLaunch(DateTime? newDate = null)
     {
         Device.LastLaunch = newDate is null ? DateTime.Now : newDate.Value;
-        OnPropertyChanged(nameof(LastLaunch));
     }
 
 }

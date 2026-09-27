@@ -1,6 +1,4 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using Wpf.Ui.Abstractions.Controls;
+﻿using Wpf.Ui.Abstractions.Controls;
 
 namespace ADB_Explorer.ViewModels.Pages;
 
@@ -65,8 +63,27 @@ public partial class DevicesViewModel : ObservableObject, INavigationAware
         SecondaryDevicesView = CollectionViewSource.GetDefaultView(Data.DevicesObject.SecondaryDevices);
         SecondaryDevicesView.Filter = DeviceHelper.DevicesFilter;
 
+        // The filter depends on the whole device list and a few settings, not just each item.
+        Data.DevicesObject.UIList.CollectionChanged += (_, _) => RefreshViewsOnUi();
+        Data.DevicesObject.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(Devices.UIList))
+                RefreshViewsOnUi();
+        };
+        Data.Settings.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(AppSettings.EnableMdns) or nameof(AppSettings.EnableEmulatorDiscovery))
+                RefreshViewsOnUi();
+        };
+
         _isInitialized = true;
     }
+
+    private void RefreshViewsOnUi() => App.SafeInvoke(() =>
+    {
+        Thread.CurrentThread.CurrentCulture = Data.Settings.ActualFormatCulture;
+        RefreshViews();
+    });
 
     private void RefreshViews()
     {

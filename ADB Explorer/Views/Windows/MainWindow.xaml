@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:ADB_Explorer.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:local="clr-namespace:ADB_Explorer.Views.Windows"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
@@ -19,6 +20,7 @@
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     ContentRendered="FluentWindow_Loaded"
     ExtendsContentIntoTitleBar="True"
+    helpers:StyleHelper.IsWindowActive="{Binding IsActive, RelativeSource={RelativeSource Self}}"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     PreviewKeyDown="MainWindow_PreviewKeyDown"
     PreviewKeyUp="MainWindow_PreviewKeyUp"
@@ -36,6 +38,10 @@
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=WindowMaximized}" Value="True">
                     <Setter Property="WindowState" Value="Maximized" />
+                </DataTrigger>
+                <!--  On the window, not its content: that mirrors the native window too, so it resizes from the right edge like an LTR one does from the left.  -->
+                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
+                    <Setter Property="FlowDirection" Value="RightToLeft" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -490,15 +496,6 @@
         </ControlTemplate>
     </ui:FluentWindow.Resources>
     <Grid>
-        <Grid.Style>
-            <Style TargetType="Grid">
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
-                        <Setter Property="FlowDirection" Value="RightToLeft" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Grid.Style>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -518,7 +515,7 @@
         <ui:NavigationView
             x:Name="RootNavigation"
             Grid.Row="2"
-            Padding="42,0,42,10"
+            Padding="0"
             FooterMenuItemsSource="{Binding ViewModel.FooterMenuItems, Mode=OneWay}"
             FrameMargin="0"
             IsBackButtonVisible="Collapsed"
@@ -529,7 +526,8 @@
             PaneDisplayMode="Left"
             PreviewMouseDown="RootNavigation_PreviewMouseDown"
             PreviewMouseUp="RootNavigation_PreviewMouseUp"
-            Template="{StaticResource AdbLeftNavigationViewTemplate}">
+            Template="{StaticResource AdbLeftNavigationViewTemplate}"
+            TransitionDuration="0">
             <ui:NavigationView.PaneHeader>
                 <controls:NavigationPane x:Name="NavigationPane" Margin="0,2,0,0">
                     <controls:NavigationPane.Style>
@@ -543,9 +541,6 @@
                     </controls:NavigationPane.Style>
                 </controls:NavigationPane>
             </ui:NavigationView.PaneHeader>
-            <ui:NavigationView.Header>
-                <ContentPresenter x:Name="PageHeader" Height="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ui:NavigationView}, Path=ActualHeight}" />
-            </ui:NavigationView.Header>
             <ui:NavigationView.Resources>
                 <Style BasedOn="{StaticResource NavigationViewItemDefaultStyle}" TargetType="{x:Type ui:NavigationViewItem}">
                     <Setter Property="BorderThickness" Value="1" />

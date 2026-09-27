@@ -1,25 +1,21 @@
-﻿using ADB_Explorer.Controls;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services;
+﻿namespace ADB_Explorer.ViewModels;
 
-namespace ADB_Explorer.ViewModels;
-
-public abstract class DeviceViewModel : ViewModelBase
+public abstract class DeviceViewModel : ObservableObject
 {
     #region Full properties
 
-    private Device device = null!;
+    private Device _device = null!;
     protected Device Device
     {
-        get => device;
-        set => Set(ref device, value);
+        get => _device;
+        set => SetProperty(ref _device, value);
     }
 
-    private bool deviceSelected;
+    private bool _deviceSelected;
     public bool DeviceSelected
     {
-        get => deviceSelected;
-        set => Set(ref deviceSelected, value);
+        get => _deviceSelected;
+        set => SetProperty(ref _deviceSelected, value);
     }
 
     public string IpAddress
@@ -145,7 +141,7 @@ public abstract class DeviceViewModel : ViewModelBase
                 && logical.IsOpen
                 && logical.Root is RootStatus.Enabled
                 && Data.Settings.UnrootOnDisconnect is true)
-                ADBService.Unroot(ID);
+                AdbService.Unroot(ID);
 
             logical.InvalidateRootStatus();
         }
@@ -165,11 +161,11 @@ public abstract class PairingDeviceViewModel : DeviceViewModel
 {
     #region Full properties
 
-    private PairingDevice device = null!;
+    private PairingDevice _device = null!;
     protected new PairingDevice Device
     {
-        get => device;
-        set => Set(ref device, value);
+        get => _device;
+        set => SetProperty(ref _device, value);
     }
 
     public string PairingPort
@@ -233,20 +229,4 @@ public abstract class PairingDeviceViewModel : DeviceViewModel
     }
 
     #endregion
-}
-
-public class DeviceViewModelEqualityComparer : IEqualityComparer<DeviceViewModel>
-{
-    public bool Equals(DeviceViewModel? x, DeviceViewModel? y)
-    {
-        if (x is null || y is null)
-            return x is null && y is null;
-
-        return x.ID == y.ID && x.Status == y.Status;
-    }
-
-    public int GetHashCode([DisallowNull] DeviceViewModel obj)
-    {
-        throw new NotImplementedException();
-    }
 }

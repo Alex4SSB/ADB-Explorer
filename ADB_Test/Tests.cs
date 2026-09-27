@@ -56,8 +56,8 @@ namespace ADB_Test
         [TestMethod]
         public void ToTimeTest()
         {
-            Assert.AreEqual("50ms", UnitConverter.ToTime(.05));
-            Assert.AreEqual("1:00:00h", UnitConverter.ToTime(3600));
+            Assert.AreEqual("50ms", UnitFormatter.ToTime(.05));
+            Assert.AreEqual("1:00:00h", UnitFormatter.ToTime(3600));
         }
 
         [TestMethod]
@@ -799,10 +799,10 @@ namespace ADB_Test
                   0x00000010: ffffffff                            '....            ')
                 """;
 
-            Assert.AreEqual(-340000L, ADBService.ParseBatteryPropertyValue(chargingUsb));
-            Assert.AreEqual(-138183L, ADBService.ParseBatteryPropertyValue(discharging));
-            Assert.IsNull(ADBService.ParseBatteryPropertyValue("Result: Parcel(00000000    '....')"));
-            Assert.IsNull(ADBService.ParseBatteryPropertyValue("Result: Parcel(Error: 0xffffffffffffffb6 \"Not a data message\")"));
+            Assert.AreEqual(-340000L, AdbService.ParseBatteryPropertyValue(chargingUsb));
+            Assert.AreEqual(-138183L, AdbService.ParseBatteryPropertyValue(discharging));
+            Assert.IsNull(AdbService.ParseBatteryPropertyValue("Result: Parcel(00000000    '....')"));
+            Assert.IsNull(AdbService.ParseBatteryPropertyValue("Result: Parcel(Error: 0xffffffffffffffb6 \"Not a data message\")"));
         }
 
         [TestMethod]
@@ -834,7 +834,7 @@ namespace ADB_Test
         public void ParseLocationInfoTest()
         {
             var stdout = """
-                media_rw§media_rw§1023§1023§771§2024-01-02 03:04:05.000000000 +0000§2024-01-02 03:04:05.000000000 +0000§2024-01-02 03:04:05.000000000 +0000
+                media_rw§media_rw§1023§1023§771§2024-01-02 03:04:05.000000000 +0000§2024-01-02 03:04:05.000000000 +0000
                 ADB_ACCESS:101
                 """.Replace('§', AdbExplorerConst.ADB_FIELD_SEP);
 
@@ -868,7 +868,7 @@ namespace ADB_Test
             var noInfo = ShellAccessHelper.ResolveLocationAccess("/sdcard/Download/folder.zip/New Folder", null, identity, DriveRestrictions.None);
             Assert.AreEqual(AccessMask.All, noInfo);
 
-            var emptyInfo = new LocationInfo(null, null, null, null, null, AccessMask.None, null, null, null);
+            var emptyInfo = new LocationInfo(null, null, null, null, null, AccessMask.None, null, null);
             var withEmpty = ShellAccessHelper.ResolveLocationAccess("/sdcard/Download/folder.zip/New Folder", emptyInfo, identity, DriveRestrictions.None);
             Assert.AreEqual(AccessMask.All, withEmpty);
         }
@@ -878,7 +878,7 @@ namespace ADB_Test
         {
             var identity = new ShellIdentity("shell", 2000, 2000, new HashSet<int> { 1023 });
             var mode = (System.IO.UnixFileMode)Convert.ToInt32("771", 8);
-            var info = new LocationInfo("media_rw", "media_rw", 1023, 1023, mode, AccessMask.Read | AccessMask.Execute, null, null, null);
+            var info = new LocationInfo("media_rw", "media_rw", 1023, 1023, mode, AccessMask.Read | AccessMask.Execute, null, null);
 
             var access = ShellAccessHelper.ResolveLocationAccess("/sdcard/folder.zip/subdir", info, identity, DriveRestrictions.None);
 
@@ -898,15 +898,16 @@ namespace ADB_Test
         [TestMethod]
         public void GoBack_PendingSelectionPath_IsDepartedLocation()
         {
-            NavHistory.Reset();
-            NavHistory.Navigate("/sdcard/Download");
-            NavHistory.Navigate("/sdcard/Download/archive.zip/");
+            // A fresh tab, so no device opened by another test gets stamped on the entries.
+            var history = new ExplorerInstance().History;
+            history.Navigate("/sdcard/Download");
+            history.Navigate("/sdcard/Download/archive.zip/");
 
-            var back = NavHistory.GoBack();
+            var back = history.GoBack();
 
-            Assert.AreEqual("/sdcard/Download", back.Path);
-            Assert.AreEqual("/sdcard/Download/archive.zip/", NavHistory.TakePendingSelectionPath());
-            Assert.IsNull(NavHistory.TakePendingSelectionPath());
+            Assert.AreEqual("/sdcard/Download", back!.Path);
+            Assert.AreEqual("/sdcard/Download/archive.zip/", history.TakePendingSelectionPath());
+            Assert.IsNull(history.TakePendingSelectionPath());
         }
 
         [TestMethod]
@@ -919,7 +920,7 @@ namespace ADB_Test
 
             var access = ShellAccessHelper.ResolveLocationAccess(
                 "/sdcard/Android",
-                new LocationInfo(null, null, null, null, null, AccessMask.Read | AccessMask.Write | AccessMask.Execute, null, null, null),
+                new LocationInfo(null, null, null, null, null, AccessMask.Read | AccessMask.Write | AccessMask.Execute, null, null),
                 new ShellIdentity("shell", 2000, 2000, new HashSet<int> { 2000 }),
                 DriveRestrictions.None);
 

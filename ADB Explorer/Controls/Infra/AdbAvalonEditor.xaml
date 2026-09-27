@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:local="clr-namespace:ADB_Explorer.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="editor"
@@ -12,7 +11,7 @@
     d:DesignWidth="300"
     mc:Ignorable="d">
     <Grid DataContext="{Binding ElementName=editor}">
-        <helpers:ThemeAwareTextEditor
+        <local:ThemeAwareTextEditor
             x:Name="EditorTextBox"
             Padding="4,4,14,4"
             Foreground="{DynamicResource TextFillColorPrimaryBrush}"
@@ -41,7 +40,7 @@
                     </Style.Triggers>
                 </Style>
             </avalonEdit:TextEditor.Style>
-        </helpers:ThemeAwareTextEditor>
+        </local:ThemeAwareTextEditor>
         <Border x:Name="Border" CornerRadius="4">
             <Border.Style>
                 <Style TargetType="Border">

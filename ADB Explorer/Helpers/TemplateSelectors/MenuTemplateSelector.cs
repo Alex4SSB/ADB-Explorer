@@ -1,6 +1,4 @@
-﻿using ADB_Explorer.Services;
-
-namespace ADB_Explorer.Helpers;
+﻿namespace ADB_Explorer.Helpers;
 
 internal class MenuTemplateSelector : DataTemplateSelector
 {
@@ -34,6 +32,7 @@ internal class MenuStyleSelector : StyleSelector
     public Style? DynamicAltTextStyle { get; set; }
     public Style? SeparatorStyle { get; set; }
     public Style? SubMenuStyle { get; set; }
+    public Style? SelectorSubMenuStyle { get; set; }
     public Style? SubMenuSeparatorStyle { get; set; }
     public Style? CompoundIconMenuStyle { get; set; }
     public Style? DualActionButtonStyle { get; set; }
@@ -45,6 +44,7 @@ internal class MenuStyleSelector : StyleSelector
         DummySubMenu => DummySubMenuStyle,
         SubMenuSeparator => SubMenuSeparatorStyle,
         MenuSeparator => SeparatorStyle,
+        SelectorSubMenu => SelectorSubMenuStyle,
         SubMenu or string => SubMenuStyle,
         AltTextMenu => DynamicAltTextStyle,
         IconMenu => IconMenuStyle,

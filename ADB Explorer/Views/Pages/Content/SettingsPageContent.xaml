@@ -1,0 +1,815 @@
+﻿<UserControl
+    x:Class="ADB_Explorer.Views.Pages.SettingsPageContent"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:ADB_Explorer.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
+    xmlns:local="clr-namespace:ADB_Explorer.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:pages="clr-namespace:ADB_Explorer.ViewModels.Pages"
+    xmlns:resources="clr-namespace:ADB_Explorer.Resources"
+    xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    d:DataContext="{d:DesignInstance Type=pages:SettingsViewModel}"
+    d:DesignHeight="50"
+    d:DesignWidth="600"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <converters:ControlAppearanceToCardBrushConverter x:Key="ControlAppearanceToCardBrushConverter" />
+        <Style x:Key="CollapsedTextBlock" TargetType="TextBlock">
+            <Style.Triggers>
+                <Trigger Property="Text" Value="">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </Trigger>
+                <Trigger Property="Text" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="RightHorizontalItemsControlStyle" TargetType="ItemsControl">
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <WrapPanel FlowDirection="RightToLeft" />
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileOpQ}, Path=IsActive}" Value="True">
+                    <Setter Property="IsEnabled" Value="False" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style
+            x:Key="LinkTooltipStyle"
+            BasedOn="{StaticResource FluentTooltipStyle}"
+            TargetType="ToolTip">
+            <Setter Property="FlowDirection" Value="LeftToRight" />
+        </Style>
+        <DataTemplate x:Key="SettingsActionTemplate" DataType="viewmodels:SettingsAction">
+            <ui:Button
+                Appearance="Primary"
+                Command="{Binding Command}"
+                Style="{StaticResource RestartAppButtonStyle}"
+                ToolTip="{Binding Tooltip}">
+                <ui:FontIcon Glyph="{Binding Icon}" />
+            </ui:Button>
+        </DataTemplate>
+        <Grid
+            x:Key="SettingsCardHeader"
+            MinHeight="37"
+            x:Shared="False">
+            <TextBlock
+                VerticalAlignment="Center"
+                Text="{Binding Description}"
+                TextWrapping="Wrap" />
+        </Grid>
+        <Style
+            x:Key="SettingsCardHeaderStyle"
+            BasedOn="{StaticResource DefaultUiCardControlStyle}"
+            TargetType="ui:CardControl">
+            <Setter Property="MinHeight" Value="70" />
+            <Setter Property="Icon" Value="{Binding IconContent}" />
+            <Setter Property="Header" Value="{StaticResource SettingsCardHeader}" />
+            <Setter Property="Background">
+                <Setter.Value>
+                    <Binding Converter="{StaticResource ControlAppearanceToCardBrushConverter}" Path="CardAppearance" />
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BorderBrush">
+                <Setter.Value>
+                    <Binding
+                        Converter="{StaticResource ControlAppearanceToCardBrushConverter}"
+                        ConverterParameter="Border"
+                        Path="CardAppearance" />
+                </Setter.Value>
+            </Setter>
+            <Setter Property="ToolTip">
+                <Setter.Value>
+                    <ToolTip MaxWidth="600" Style="{StaticResource FluentTooltipStyle}">
+                        <TextBlock Text="{Binding Info}" TextWrapping="Wrap" />
+                    </ToolTip>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
+            <Setter Property="ToolTipService.InitialShowDelay" Value="0" />
+            <Setter Property="ToolTipService.ShowDuration" Value="60000" />
+            <Setter Property="ToolTipService.Placement" Value="Bottom" />
+            <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding CardAppearance}" Value="{x:Null}">
+                    <Setter Property="Background" Value="{DynamicResource CardBackground}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Info}" Value="{x:Null}">
+                    <Setter Property="ToolTip" Value="{x:Null}" />
+                </DataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="{DynamicResource CardBackgroundPointerOver}" />
+                    <Setter Property="Foreground" Value="{DynamicResource CardForegroundPointerOver}" />
+                </MultiDataTrigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="{DynamicResource CardBackgroundDisabled}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrushDisabled}" />
+                    <Setter Property="Foreground" Value="{DynamicResource CardForegroundDisabled}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style
+            x:Key="SettingsCardExpanderStyle"
+            BasedOn="{StaticResource DefaultUiCardExpanderStyle}"
+            TargetType="ui:CardExpander">
+            <Setter Property="Icon" Value="{Binding IconContent}" />
+            <Setter Property="Header" Value="{StaticResource SettingsCardHeader}" />
+            <Style.Triggers>
+                <!--  Same HC-only hover fix as SettingsCardHeaderStyle above; CardExpander's header row is TemplateBound to Background/Foreground the same way CardControl's is.  -->
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="{DynamicResource CardBackgroundPointerOver}" />
+                    <Setter Property="Foreground" Value="{DynamicResource CardForegroundPointerOver}" />
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style
+            x:Key="SettingsCardActionStyle"
+            BasedOn="{StaticResource DefaultUiCardActionStyle}"
+            TargetType="ui:CardAction">
+            <Setter Property="MinHeight" Value="70" />
+            <Setter Property="IsChevronVisible" Value="False" />
+            <Setter Property="Command" Value="{Binding Command.Command}" />
+            <Setter Property="ToolTip">
+                <Setter.Value>
+                    <ToolTip Content="{Binding ToolTip}" Style="{StaticResource LinkTooltipStyle}" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <DataTemplate x:Key="InfoSettingTemplate" DataType="viewmodels:InfoSetting">
+            <ui:CardControl Style="{StaticResource SettingsCardHeaderStyle}">
+                <ui:CardControl.Header>
+                    <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HeaderAlignment}" Value="Center">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontFamily="{Binding FontFamily}"
+                            FontSize="{Binding FontSize}"
+                            Text="{Binding Description}"
+                            TextAlignment="{Binding HeaderAlignment}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Style="{StaticResource CollapsedTextBlock}"
+                            Text="{Binding AltText}"
+                            TextAlignment="{Binding HeaderAlignment}" />
+                    </Grid>
+                </ui:CardControl.Header>
+            </ui:CardControl>
+        </DataTemplate>
+        <DataTemplate x:Key="LinkSettingTemplate" DataType="viewmodels:LinkSetting">
+            <ui:CardAction Style="{StaticResource SettingsCardActionStyle}">
+                <ui:CardAction.Content>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <ContentPresenter
+                            Grid.RowSpan="2"
+                            Margin="0,0,10,0"
+                            Content="{Binding IconContent}"
+                            FlowDirection="LeftToRight" />
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Text="{Binding Description}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Style="{StaticResource CollapsedTextBlock}"
+                            Text="{Binding AltText}" />
+                        <ui:FontIcon
+                            Grid.Column="2"
+                            HorizontalAlignment="Right"
+                            Glyph="&#xE8A7;">
+                            <ui:FontIcon.Style>
+                                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL}" Value="True">
+                                            <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+                                            <Setter Property="RenderTransform">
+                                                <Setter.Value>
+                                                    <ScaleTransform ScaleX="-1" />
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:FontIcon.Style>
+                        </ui:FontIcon>
+                    </Grid>
+                </ui:CardAction.Content>
+            </ui:CardAction>
+        </DataTemplate>
+        <DataTemplate x:Key="MultiLinkSettingTemplate" DataType="viewmodels:MultiLinkSetting">
+            <ui:CardExpander Style="{StaticResource SettingsCardExpanderStyle}">
+                <ItemsControl FlowDirection="LeftToRight" ItemsSource="{Binding Links}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="2" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ui:HyperlinkButton Content="{Binding Description}" NavigateUri="{Binding Url}">
+                                <ui:HyperlinkButton.Style>
+                                    <Style BasedOn="{StaticResource DefaultUiHyperlinkButtonStyle}" TargetType="ui:HyperlinkButton">
+                                        <Setter Property="ToolTip">
+                                            <Setter.Value>
+                                                <ToolTip Content="{Binding Url}" Style="{StaticResource LinkTooltipStyle}" />
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ui:HyperlinkButton.Style>
+                            </ui:HyperlinkButton>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ui:CardExpander>
+        </DataTemplate>
+        <DataTemplate x:Key="LongDescriptionSettingTemplate" DataType="viewmodels:LongDescriptionSetting">
+            <ui:CardExpander Style="{StaticResource SettingsCardExpanderStyle}">
+                <TextBlock Text="{Binding AltText}" TextWrapping="Wrap" />
+            </ui:CardExpander>
+        </DataTemplate>
+        <DataTemplate x:Key="BoolSettingTemplate" DataType="viewmodels:BoolSetting">
+            <ui:CardControl Style="{StaticResource SettingsCardHeaderStyle}">
+                <Grid>
+                    <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <ItemsControl
+                            Margin="0,0,0,4"
+                            ItemTemplate="{StaticResource SettingsActionTemplate}"
+                            ItemsSource="{Binding Commands}"
+                            Style="{StaticResource RightHorizontalItemsControlStyle}" />
+                        <local:SimpleStackPanel
+                            Grid.Row="1"
+                            Orientation="Horizontal"
+                            Spacing="10">
+                            <TextBlock Text="{Binding Label}" />
+                            <ui:ToggleSwitch IsChecked="{Binding Value, Mode=TwoWay}" />
+                        </local:SimpleStackPanel>
+                    </Grid>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Text="{x:Static strings:Resources.S_SETTINGS_UNAVAILABLE_ON_SYSTEM}"
+                        TextWrapping="Wrap">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+            </ui:CardControl>
+        </DataTemplate>
+        <DataTemplate x:Key="CultureInfoSettingTemplate" DataType="viewmodels:ComboSetting">
+            <ui:CardControl Style="{StaticResource SettingsCardHeaderStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <ItemsControl
+                        Margin="0,0,0,4"
+                        ItemTemplate="{StaticResource SettingsActionTemplate}"
+                        ItemsSource="{Binding Commands}"
+                        Style="{StaticResource RightHorizontalItemsControlStyle}" />
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Margin="6,0"
+                            VerticalAlignment="Center"
+                            Text="{Binding AltLabel}" />
+                        <ComboBox
+                            Grid.Column="1"
+                            VerticalContentAlignment="Center"
+                            ContextMenu="{x:Null}"
+                            ItemsSource="{Binding Options}"
+                            MaxDropDownHeight="287"
+                            SelectedValue="{Binding Value, Mode=TwoWay}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid HorizontalAlignment="Stretch">
+                                        <Grid>
+                                            <Grid.Style>
+                                                <Style TargetType="Grid">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding ThreeLetterISOLanguageName}" Value="ivl">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Grid.Style>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock HorizontalAlignment="Left" Text="{Binding NativeName}">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="FlowDirection" Value="LeftToRight" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding TextInfo.IsRightToLeft}" Value="True">
+                                                                <Setter Property="FlowDirection" Value="RightToLeft" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                Margin="16,2,0,0"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center"
+                                                FontFamily="{StaticResource ConsoleFont}"
+                                                FontSize="12"
+                                                Text="{Binding Name}" />
+                                        </Grid>
+                                        <TextBlock Text="{x:Static strings:Resources.S_SETTINGS_THEME_DEFAULT}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding ThreeLetterISOLanguageName}" Value="ivl">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+                </Grid>
+            </ui:CardControl>
+        </DataTemplate>
+        <DataTemplate x:Key="GroupedEnumSettingTemplate" DataType="viewmodels:SimpleComboSetting`1">
+            <ui:CardControl Style="{StaticResource SettingsCardHeaderStyle}">
+                <ComboBox
+                    ContextMenu="{x:Null}"
+                    DisplayMemberPath="Name"
+                    ItemsSource="{Binding Options}"
+                    SelectedValue="{Binding Value, Mode=TwoWay}"
+                    SelectedValuePath="Key">
+                    <ComboBox.ItemContainerStyle>
+                        <Style BasedOn="{StaticResource DefaultComboBoxItemStyle}" TargetType="ComboBoxItem">
+                            <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
+                        </Style>
+                    </ComboBox.ItemContainerStyle>
+                </ComboBox>
+            </ui:CardControl>
+        </DataTemplate>
+        <DataTemplate x:Key="TextboxSettingTemplate" DataType="viewmodels:TextboxSetting">
+            <ui:CardControl Style="{StaticResource SettingsCardHeaderStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <ItemsControl
+                        Margin="0,0,0,4"
+                        ItemTemplate="{StaticResource SettingsActionTemplate}"
+                        ItemsSource="{Binding Commands}"
+                        Style="{StaticResource RightHorizontalItemsControlStyle}" />
+                    <ui:TextBox
+                        Grid.Row="1"
+                        Width="250"
+                        IsReadOnly="True"
+                        PlaceholderText="{x:Static strings:Resources.S_PLACEHOLDER_NOT_SET}"
+                        Text="{Binding Value}">
+                        <ui:TextBox.Style>
+                            <Style BasedOn="{StaticResource AdbTextBoxStyle}" TargetType="ui:TextBox">
+                                <Setter Property="FlowDirection" Value="LeftToRight" />
+                                <Style.Triggers>
+                                    <Trigger Property="Text" Value="">
+                                        <Setter Property="FlowDirection" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Path=FlowDirection}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:TextBox.Style>
+                    </ui:TextBox>
+                </Grid>
+            </ui:CardControl>
+        </DataTemplate>
+        <DataTemplate x:Key="NumericSettingTemplate" DataType="viewmodels:NumericSetting">
+            <ui:CardControl Style="{StaticResource SettingsCardHeaderStyle}">
+                <local:SimpleStackPanel
+                    FlowDirection="LeftToRight"
+                    Orientation="Horizontal"
+                    Spacing="6">
+                    <ui:NumberBox
+                        ClearButtonEnabled="False"
+                        ContextMenu="{x:Null}"
+                        Maximum="{Binding MaxValue}"
+                        Minimum="{Binding MinValue}"
+                        SmallChange="1"
+                        Value="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock VerticalAlignment="Center" Text="{Binding Unit}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <Trigger Property="Text" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </local:SimpleStackPanel>
+            </ui:CardControl>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ColorSettingTemplate" DataType="viewmodels:ColorSetting">
+            <ui:CardControl Style="{StaticResource SettingsCardHeaderStyle}">
+                <ui:Button HorizontalAlignment="Right" Command="{Binding PickColorCommand}">
+                    <local:SimpleStackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_MENU_EDIT}}" />
+                        <Border Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ui:Button}, Path=ActualHeight}" CornerRadius="4">
+                            <Border.Background>
+                                <SolidColorBrush Color="{Binding PickerColor}" />
+                            </Border.Background>
+                        </Border>
+                    </local:SimpleStackPanel>
+                </ui:Button>
+            </ui:CardControl>
+        </DataTemplate>
+
+        <helpers:SettingsTemplateSelector
+            x:Key="GroupedSettingsTemplateSelector"
+            BoolSettingTemplate="{StaticResource BoolSettingTemplate}"
+            ColorSettingTemplate="{StaticResource ColorSettingTemplate}"
+            CultureInfoSettingTemplate="{StaticResource CultureInfoSettingTemplate}"
+            EnumSettingTemplate="{StaticResource GroupedEnumSettingTemplate}"
+            InfoSettingTemplate="{StaticResource InfoSettingTemplate}"
+            LinkSettingTemplate="{StaticResource LinkSettingTemplate}"
+            LongDescriptionTemplate="{StaticResource LongDescriptionSettingTemplate}"
+            MultiLinkSettingTemplate="{StaticResource MultiLinkSettingTemplate}"
+            NumericTemplate="{StaticResource NumericSettingTemplate}"
+            TextboxSettingTemplate="{StaticResource TextboxSettingTemplate}" />
+        <Style
+            x:Key="SettingsContainerStyle"
+            BasedOn="{StaticResource StretchListViewItem}"
+            TargetType="ui:ListViewItem">
+            <Setter Property="Margin" Value="0,4,0,0" />
+            <Setter Property="Visibility" Value="{Binding Visibility}" />
+        </Style>
+    </UserControl.Resources>
+    <Grid x:Name="RootGrid" Margin="42,10">
+        <Grid
+            Width="{Binding ActualWidth, ElementName=RootGrid}"
+            MinWidth="600"
+            MaxWidth="1200"
+            HorizontalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Border
+                Margin="0,0,0,8"
+                BorderBrush="Gray"
+                BorderThickness="0,0,0,1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ui:Button
+                        Margin="4,0,8,0"
+                        Padding="11,5,11,5"
+                        Command="{Binding SortSettingsCommand}">
+                        <ui:Button.Style>
+                            <Style BasedOn="{StaticResource DefaultUiButtonStyle}" TargetType="ui:Button">
+                                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_SEARCH_VIEW}}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SortedView}" Value="True">
+                                        <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_EXIT_SEARCH}}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
+                        <ui:FontIcon FontSize="20">
+                            <ui:FontIcon.Style>
+                                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                    <Setter Property="Glyph" Value="&#xE721;" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SortedView}" Value="True">
+                                            <Setter Property="Glyph" Value="&#xF78A;" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:FontIcon.Style>
+                        </ui:FontIcon>
+                    </ui:Button>
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="0,0,0,4"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        FontSize="24"
+                        FontWeight="SemiBold"
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_SETTINGS_TITLE}}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SortedView}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <Grid Grid.Column="1">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SortedView}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <ui:TextBox
+                            x:Name="SettingsSearchBox"
+                            Height="32"
+                            Padding="30,5,30,6"
+                            PlaceholderText="{x:Static strings:Resources.S_SEARCH_SETTINGS}"
+                            Style="{StaticResource AdbTextBoxStyle}"
+                            Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <ui:FontIcon
+                            Margin="6,0,0,0"
+                            HorizontalAlignment="Left"
+                            Glyph="&#xE721;"
+                            IsHitTestVisible="False"
+                            Opacity="0.7" />
+                    </Grid>
+                    <ui:Button
+                        Grid.Column="2"
+                        Margin="8,4,4,4"
+                        Padding="8,4"
+                        Command="{Binding ResetSettingsCommand}"
+                        ToolTip="{Binding Source={x:Static Member=strings:Resources.S_RESET_SETTINGS_TITLE}}">
+                        <ui:Button.Style>
+                            <Style BasedOn="{StaticResource {x:Type ui:Button}}" TargetType="ui:Button">
+                                <Setter Property="Appearance" Value="Danger" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True">
+                                        <Setter Property="Appearance" Value="Secondary" />
+                                        <Setter Property="Background" Value="{DynamicResource TitleBarBackgroundBrush}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource TitleBarForegroundBrush}" />
+                                    </DataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True" />
+                                            <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Background" Value="{DynamicResource TitleBarForegroundBrush}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource TitleBarBackgroundBrush}" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
+                        <Path
+                            Width="24"
+                            Height="24"
+                            Data="M10.163 3.18741C10.6055 3.09567 10.9993 3.44993 10.9993 3.90185C10.9993 4.28205 10.7165 4.59936 10.3456 4.68283C9.49903 4.87334 8.70663 5.207 7.99518 5.65707C7.67405 5.86021 7.25008 5.83556 6.98138 5.56687C6.66171 5.2472 6.68983 4.71808 7.0678 4.47004C7.99464 3.86181 9.04053 3.42009 10.163 3.18741ZM12.9993 3.90185C12.9993 4.28205 13.282 4.59936 13.6529 4.68283C14.9647 4.97802 16.1464 5.61693 17.0984 6.5H15.75C15.3358 6.5 15 6.83579 15 7.25C15 7.66421 15.3358 8 15.75 8H18.75C19.1642 8 19.5 7.66421 19.5 7.25V4.25C19.5 3.83579 19.1642 3.5 18.75 3.5C18.3358 3.5 18 3.83579 18 4.25V5.29228C16.8423 4.25588 15.4147 3.51479 13.8356 3.18743C13.3931 3.09569 12.9993 3.44993 12.9993 3.90185ZM7.99355 18.3418C7.67242 18.1385 7.24835 18.1631 6.9796 18.4318C6.65999 18.7515 6.68804 19.2805 7.06588 19.5286C7.99319 20.1374 9.03976 20.5796 10.163 20.8125C10.6055 20.9042 10.9993 20.5499 10.9993 20.098C10.9993 19.7178 10.7165 19.4005 10.3456 19.317C9.49839 19.1264 8.70543 18.7923 7.99355 18.3418ZM4.68186 13.6523C4.59845 13.2813 4.28111 12.9985 3.90086 12.9985C3.449 12.9985 3.09476 13.3922 3.1864 13.8347C3.41895 14.9574 3.86065 16.0036 4.46895 16.9307C4.71697 17.3087 5.24612 17.3369 5.56581 17.0172C5.83449 16.7485 5.85915 16.3246 5.65605 16.0035C5.20592 15.2918 4.87227 14.4991 4.68186 13.6523ZM5.65707 7.99477C5.8603 7.67364 5.83569 7.2496 5.56696 6.98087C5.24732 6.66124 4.71828 6.68932 4.47021 7.0672C3.86182 7.99392 3.41993 9.03972 3.18705 10.1621C3.09523 10.6046 3.44951 10.9985 3.90148 10.9985C4.28164 10.9985 4.59892 10.7159 4.68245 10.345C4.8731 9.49847 5.20689 8.70614 5.65707 7.99477ZM14.2772 13.9759C14.592 15.0661 13.9376 16.1995 12.836 16.4721L12.2518 16.6166C12.2069 16.9043 12.1836 17.1995 12.1836 17.5003C12.1836 17.815 12.2091 18.1235 12.2582 18.4237L12.7976 18.5536C13.9102 18.8216 14.5715 19.9666 14.2476 21.0641L14.0613 21.6954C14.5005 22.081 15.0009 22.3942 15.5455 22.6169L16.0388 22.0982C16.8273 21.269 18.1496 21.2692 18.9379 22.0987L19.4366 22.6235C19.9801 22.4032 20.4801 22.093 20.9194 21.7106L20.7214 21.0247C20.4066 19.9344 21.061 18.801 22.1626 18.5285L22.7463 18.384C22.7912 18.0963 22.8145 17.8011 22.8145 17.5003C22.8145 17.1856 22.789 16.877 22.7399 16.5767L22.2009 16.4469C21.0884 16.179 20.4271 15.034 20.751 13.9364L20.9371 13.3056C20.498 12.9198 19.9975 12.6066 19.4529 12.3838L18.9598 12.9023C18.1713 13.7316 16.849 13.7313 16.0607 12.9018L15.5619 12.377C15.0184 12.5972 14.5184 12.9073 14.0791 13.2897L14.2772 13.9759ZM17.4991 19.0003C16.6984 19.0003 16.0494 18.3287 16.0494 17.5003C16.0494 16.6719 16.6984 16.0003 17.4991 16.0003C18.2997 16.0003 18.9487 16.6719 18.9487 17.5003C18.9487 18.3287 18.2997 19.0003 17.4991 19.0003Z"
+                            Stretch="Uniform"
+                            Style="{StaticResource MonochromeIconPathStyle}" />
+                    </ui:Button>
+                </Grid>
+            </Border>
+            <ui:DynamicScrollViewer Grid.Row="1">
+                <ui:ListView
+                    x:Name="SortedSettings"
+                    Margin="0,0,14,0"
+                    FocusVisualStyle="{x:Null}"
+                    ItemContainerStyle="{StaticResource SettingsContainerStyle}"
+                    ItemTemplateSelector="{StaticResource GroupedSettingsTemplateSelector}"
+                    ItemsSource="{Binding SortedSettings}"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ui:ListView.Style>
+                        <Style BasedOn="{StaticResource ListViewStyle}" TargetType="ui:ListView">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SortedView}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:ListView.Style>
+                </ui:ListView>
+            </ui:DynamicScrollViewer>
+            <Grid Grid.Row="1" Margin="0,0,0,4">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SortedView}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Border
+                    Grid.RowSpan="2"
+                    Margin="0,0,6,0"
+                    VerticalAlignment="Top"
+                    BorderBrush="Gray"
+                    BorderThickness="0,0,1,0">
+                    <ui:ListView
+                        x:Name="SettingsGroupList"
+                        Margin="6,3"
+                        ItemsSource="{Binding SettingsList}"
+                        SelectedItem="{Binding SelectedGroup, Mode=TwoWay}">
+                        <ui:ListView.ItemContainerStyle>
+                            <Style BasedOn="{StaticResource ListViewItemStyle}" TargetType="ui:ListViewItem">
+                                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                            </Style>
+                        </ui:ListView.ItemContainerStyle>
+                        <ui:ListView.ItemTemplate>
+                            <DataTemplate DataType="viewmodels:SettingsGroup">
+                                <StackPanel Margin="4,0,10,0" Orientation="Horizontal">
+                                    <ContentPresenter
+                                        Margin="0,0,10,0"
+                                        Content="{Binding IconContent}"
+                                        FlowDirection="LeftToRight" />
+                                    <TextBlock Text="{Binding Name}" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Name}" Value="ADB">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Source={x:Static Member=helpers:AdbHelper.CurrentAdbState}, Path=Version}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                        <TextBlock Text=" - " />
+                                        <TextBlock Text="{Binding Source={x:Static Member=helpers:AdbHelper.CurrentAdbState}, Path=VersionString}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ui:ListView.ItemTemplate>
+                    </ui:ListView>
+                </Border>
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="10,6"
+                    FontSize="24"
+                    Text="{Binding SelectedGroup.Name}" />
+                <ui:DynamicScrollViewer Grid.Row="1" Grid.Column="1">
+                    <ui:ListView
+                        Margin="0,0,14,0"
+                        ItemContainerStyle="{StaticResource SettingsContainerStyle}"
+                        ItemTemplateSelector="{StaticResource GroupedSettingsTemplateSelector}"
+                        ItemsSource="{Binding GroupContent}"
+                        ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
+                </ui:DynamicScrollViewer>
+            </Grid>
+            <Grid Grid.Row="2" Margin="0,10">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Static Member=helpers:AdbHelper.CurrentAdbState}, Path=Status}" Value="Valid">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <ui:CardControl>
+                    <ui:CardControl.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="10" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <ui:FontIcon
+                                FontSize="24"
+                                Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                                Glyph="&#xEB90;" />
+                            <TextBlock
+                                Grid.Column="2"
+                                VerticalAlignment="Center"
+                                Text="{Binding AdbStatus}"
+                                TextWrapping="Wrap" />
+                            <ui:Button
+                                Grid.Column="4"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Click="Button_Click"
+                                ToolTip="{Binding Source={x:Static Member=strings:Resources.S_TOOLTIP_MORE_INFO}}">
+                                <ui:Button.Content>
+                                    <ui:FontIcon Glyph="&#xE897;" />
+                                </ui:Button.Content>
+                            </ui:Button>
+                            <ui:HyperlinkButton
+                                Grid.Row="2"
+                                Grid.Column="2"
+                                HorizontalAlignment="Center"
+                                NavigateUri="{Binding Source={x:Static Member=resources:Links.L_ADB_PAGE}}">
+                                <ui:HyperlinkButton.ToolTip>
+                                    <ToolTip
+                                        MaxWidth="800"
+                                        Content="{Binding Source={x:Static Member=resources:Links.L_ADB_PAGE}}"
+                                        FlowDirection="LeftToRight" />
+                                </ui:HyperlinkButton.ToolTip>
+                                <ui:HyperlinkButton.Style>
+                                    <Style BasedOn="{StaticResource DefaultUiHyperlinkButtonStyle}" TargetType="ui:HyperlinkButton">
+                                        <Setter Property="Content" Value="{Binding Source={x:Static Member=strings:Resources.S_ADB_DOWNLOAD}}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsAppPackaged}" Value="True">
+                                                <Setter Property="Content" Value="{Binding Source={x:Static Member=strings:Resources.S_ADB_LEARN_MORE}}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:HyperlinkButton.Style>
+                            </ui:HyperlinkButton>
+                        </Grid>
+                    </ui:CardControl.Header>
+                </ui:CardControl>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

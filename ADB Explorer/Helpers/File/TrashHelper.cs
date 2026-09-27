@@ -1,8 +1,4 @@
-﻿using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-using ADB_Explorer.ViewModels;
-
-namespace ADB_Explorer.Helpers;
+﻿namespace ADB_Explorer.Helpers;
 
 internal static class TrashHelper
 {
@@ -23,7 +19,7 @@ internal static class TrashHelper
 
         ParseIndexers();
 
-        var paths = ADBService.FindFilesInPath(device.ID,
+        var paths = AdbService.FindFilesInPath(device.ID,
                                                AdbExplorerConst.RECYCLE_PATH,
                                                excludeNames: ["*" + AdbExplorerConst.RECYCLE_INDEX_SUFFIX]);
 
@@ -85,13 +81,13 @@ internal static class TrashHelper
 
     private static long CountRecycleOnDevice(LogicalDeviceViewModel device)
     {
-        var count = ADBService.CountRecycle(device.ID);
+        var count = AdbService.CountRecycle(device.ID);
         if (count >= 1)
             return count;
 
         try
         {
-            ADBService.TranslateDevicePath(device.ID, AdbExplorerConst.RECYCLE_PATH);
+            AdbService.TranslateDevicePath(device.ID, AdbExplorerConst.RECYCLE_PATH);
             return 0;
         }
         catch
@@ -112,7 +108,7 @@ internal static class TrashHelper
         string text;
         try
         {
-            var indexers = ADBService.FindFilesInPath(device.ID,
+            var indexers = AdbService.FindFilesInPath(device.ID,
                                                       AdbExplorerConst.RECYCLE_PATH,
                                                       includeNames: ["*" + AdbExplorerConst.RECYCLE_INDEX_SUFFIX]);
 

@@ -1,12 +1,4 @@
-﻿using ADB_Explorer.Controls;
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-using ADB_Explorer.ViewModels.Pages;
-using ADB_Explorer.ViewModels.Windows;
-using ADB_Explorer.Views.Pages;
-using ADB_Explorer.Views.Windows;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System.Runtime.ExceptionServices;
 using Wpf.Ui;
@@ -33,9 +25,9 @@ public partial class App
     /// <summary>
     /// After the crash dialog completes, the original exception is rethrown and must not be handled again.
     /// </summary>
-    private static bool s_crashDialogCompleted;
+    private static bool _crashDialogCompleted;
 
-    private static bool s_adbKillHandled;
+    private static bool _adbKillHandled;
 
     private static readonly TimeSpan HostStopTimeout = TimeSpan.FromSeconds(1);
 
@@ -124,7 +116,7 @@ public partial class App
             AppInstanceGuard.ActivateExisting();
 
             // Exiting directly skips OnExit, which would save settings and kill the running instance's adb.
-            s_adbKillHandled = true;
+            _adbKillHandled = true;
             Environment.Exit(0);
             return;
         }
@@ -208,7 +200,7 @@ public partial class App
             settingsService?.Save();
 
         if (Data.Settings.UnrootOnDisconnect is true)
-            ADBService.Unroot(Data.DevicesObject.Current.ID);
+            AdbService.Unroot(Data.DevicesObject.Current.ID);
 
         ClearFoldersInAppData();
 
@@ -218,9 +210,9 @@ public partial class App
 
         if (Data.Settings.KillAdbOnExit is true)
         {
-            ADBService.CancelAllCommands();
-            ADBService.KillAllAdbProcesses();
-            ADBService.WaitForCommands(TimeSpan.FromSeconds(1));
+            AdbService.CancelAllCommands();
+            AdbService.KillAllAdbProcesses();
+            AdbService.WaitForCommands(TimeSpan.FromSeconds(1));
         }
 
         StopHost();
@@ -245,19 +237,19 @@ public partial class App
 
     private static void EnsureAdbKilledOnExit()
     {
-        if (s_adbKillHandled || Data.Settings?.KillAdbOnExit is not true)
+        if (_adbKillHandled || Data.Settings?.KillAdbOnExit is not true)
             return;
 
         try
         {
-            ADBService.KillAllAdbProcesses();
+            AdbService.KillAllAdbProcesses();
         }
         catch
         {
         }
         finally
         {
-            s_adbKillHandled = true;
+            _adbKillHandled = true;
         }
     }
 
@@ -293,7 +285,7 @@ public partial class App
         if (IsShuttingDown || App.Current is null || App.Current.Dispatcher is null)
             e.Handled = true;
 
-        if (s_crashDialogCompleted)
+        if (_crashDialogCompleted)
         {
             e.Handled = false;
             return;
@@ -400,7 +392,7 @@ public partial class App
         if (IsShuttingDown)
             return;
 
-        s_crashDialogCompleted = true;
+        _crashDialogCompleted = true;
 
         var dispatcher = AppDispatcher;
         if (dispatcher is null || dispatcher.HasShutdownStarted)

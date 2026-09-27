@@ -1,4 +1,3 @@
-using ADB_Explorer.Models;
 using Wpf.Ui.Abstractions.Controls;
 
 namespace ADB_Explorer.ViewModels.Pages;
@@ -30,6 +29,21 @@ public partial class TerminalViewModel : ObservableObject, INavigationAware
     }
 
     public Task OnNavigatedFromAsync() => Task.CompletedTask;
+
+    /// <summary>Runs <paramref name="input"/> on the selected target; null when nothing is selected.</summary>
+    public (string StdOut, string StdErr)? Execute(string input)
+    {
+        string stdout, stderr;
+
+        if (SelectedDevice is LogicalDeviceViewModel selectedDevice)
+            AdbService.ExecuteDeviceAdbShellCommand(selectedDevice.ID, "", out stdout, out stderr, CancellationToken.None, input);
+        else if (SelectedDevice is AdbTerminalDevice)
+            AdbService.ExecuteAdbCommand("", out stdout, out stderr, CancellationToken.None, input);
+        else
+            return null;
+
+        return (stdout, stderr);
+    }
 
     private void InitializeViewModel()
     {

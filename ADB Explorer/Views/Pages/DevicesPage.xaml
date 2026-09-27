@@ -11,4 +11,7 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     ScrollViewer.CanContentScroll="False"
-    mc:Ignorable="d" />
+    Style="{StaticResource AppPageStyle}"
+    mc:Ignorable="d">
+    <local:DevicesPageContent DataContext="{Binding ViewModel}" />
+</Page>

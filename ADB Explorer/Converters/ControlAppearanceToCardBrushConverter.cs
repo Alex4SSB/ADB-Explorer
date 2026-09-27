@@ -1,4 +1,3 @@
-using ADB_Explorer.Models;
 using Wpf.Ui.Controls;
 
 namespace ADB_Explorer.Converters;
@@ -16,7 +15,7 @@ public class ControlAppearanceToCardBrushConverter : IValueConverter
         var useBorder = string.Equals(parameter as string, "Border", StringComparison.OrdinalIgnoreCase);
 
         // In HC, Danger/Caution cards use the same inverted title-bar accent as the reset-settings
-        // button (see SettingsPageHeader.xaml's own comment on that button) instead of
+        // button (see SettingsPageContent.xaml's own comment on that button) instead of
         // SystemFillColorCritical/CautionBrush — faded the same 0.12 opacity as every other card's
         // idle fill below. Border and the HC hover trigger (SettingsCardHeaderStyle/
         // SettingsCardExpanderStyle) are untouched, so hover stays exactly as it already was.

@@ -36,6 +36,7 @@
             </Style>
         </Border.Style>
         <Grid
+            x:Name="ContentGrid"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             IsHitTestVisible="False">
@@ -48,6 +49,7 @@
                     x:Name="DragImage"
                     Width="{Binding ViewModel.DragImageWidth}"
                     Height="{Binding ViewModel.DragImageHeight}"
+                    FlowDirection="LeftToRight"
                     IsHitTestVisible="False"
                     Opacity="{Binding ViewModel.DragImageOpacity}"
                     RenderOptions.BitmapScalingMode="HighQuality"

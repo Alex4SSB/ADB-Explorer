@@ -1,7 +1,4 @@
-﻿using ADB_Explorer.Models;
-using ADB_Explorer.ViewModels;
-
-namespace ADB_Explorer.Services;
+﻿namespace ADB_Explorer.Services;
 
 public class FileChangeModifiedOperation : AbstractShellFileOperation
 {
@@ -16,47 +13,16 @@ public class FileChangeModifiedOperation : AbstractShellFileOperation
 
     public override void Start()
     {
-        if (Status == OperationStatus.InProgress)
-        {
-            throw new Exception("Cannot start an already active operation!");
-        }
+        BeginInProgress();
 
-        Status = OperationStatus.InProgress;
-        StatusInfo = new InProgShellProgressViewModel();
-
-        var operationTask = ADBService.ExecuteVoidShellCommand(Device.ID,
+        var operationTask = AdbService.ExecuteVoidShellCommand(Device.ID,
                                                                     CancelTokenSource!.Token,
                                                                     "touch",
                                                                     "-m",
                                                                     "-t",
                                                                     NewDate.ToString("yyyyMMddHHmm.ss"),
-                                                                    ADBService.EscapeAdbShellString(FilePath.FullPath));
+                                                                    AdbService.EscapeAdbShellString(FilePath.FullPath));
 
-        operationTask.ContinueWith((t) =>
-        {
-            if (t.Result == "")
-            {
-                Status = OperationStatus.Completed;
-                StatusInfo = new CompletedShellProgressViewModel();
-            }
-            else
-            {
-                Status = OperationStatus.Failed;
-                StatusInfo = new FailedOpProgressViewModel(t.Result);
-            }
-
-        }, TaskContinuationOptions.OnlyOnRanToCompletion);
-
-        operationTask.ContinueWith((t) =>
-        {
-            Status = OperationStatus.Canceled;
-            StatusInfo = new CanceledOpProgressViewModel();
-        }, TaskContinuationOptions.OnlyOnCanceled);
-
-        operationTask.ContinueWith((t) =>
-        {
-            Status = OperationStatus.Failed;
-            StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);
-        }, TaskContinuationOptions.OnlyOnFaulted);
+        TrackTask(operationTask, "Update failed", SetShellResult);
     }
 }

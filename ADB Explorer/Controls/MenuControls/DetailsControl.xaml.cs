@@ -1,6 +1,4 @@
-﻿using ADB_Explorer.Models;
-
-namespace ADB_Explorer.Controls;
+﻿namespace ADB_Explorer.Controls;
 
 /// <summary>
 /// Interaction logic for DetailsControl.xaml
@@ -18,15 +16,15 @@ public partial class DetailsControl : UserControl
         DependencyProperty.Register(nameof(IsChecked), typeof(bool),
           typeof(DetailsControl), new PropertyMetadata(false));
 
-    public DetailsPane.SidePaneMode Mode
+    public SidePaneMode Mode
     {
-        get => (DetailsPane.SidePaneMode)GetValue(ModeProperty);
+        get => (SidePaneMode)GetValue(ModeProperty);
         set => SetValue(ModeProperty, value);
     }
 
     public static readonly DependencyProperty ModeProperty =
-        DependencyProperty.Register(nameof(Mode), typeof(DetailsPane.SidePaneMode),
-          typeof(DetailsControl), new PropertyMetadata(DetailsPane.SidePaneMode.Details));
+        DependencyProperty.Register(nameof(Mode), typeof(SidePaneMode),
+          typeof(DetailsControl), new PropertyMetadata(SidePaneMode.Details));
 
     public Action RequestModeRefresh
     {
@@ -44,9 +42,9 @@ public partial class DetailsControl : UserControl
 
         RequestModeRefresh = () =>
         {
-            Mode = DetailsPane.IsPreviewAllowed()
+            Mode = Data.FileActions.IsPreviewAllowed
                 ? Data.Settings.SidePane
-                : DetailsPane.SidePaneMode.Details;
+                : SidePaneMode.Details;
         };
     }
 }

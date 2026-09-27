@@ -1,10 +1,3 @@
-using ADB_Explorer.Controls;
-using ADB_Explorer.Converters;
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services.AppInfra;
-using ADB_Explorer.ViewModels;
-
 namespace ADB_Explorer.Services;
 
 /// <summary>
@@ -36,39 +29,17 @@ public partial class AppRestoreOperation : AbstractShellFileOperation
 
     public override void Start()
     {
-        if (Status == OperationStatus.InProgress)
-            throw new Exception("Cannot start an already active operation!");
-
-        Status = OperationStatus.InProgress;
-        StatusInfo = new InProgShellProgressViewModel();
+        BeginInProgress();
 
         var operationTask = Task.Run(() => Restore(CancelTokenSource!.Token), CancelTokenSource!.Token);
 
-        operationTask.ContinueWith(_ =>
-        {
-            Status = OperationStatus.Completed;
-            StatusInfo = new CompletedShellProgressViewModel();
-            Dispatcher.Invoke(RefreshPackagesIfNeeded);
-        }, TaskContinuationOptions.OnlyOnRanToCompletion);
-
-        operationTask.ContinueWith(_ =>
-        {
-            Cleanup(CancellationToken.None);
-            Status = OperationStatus.Canceled;
-            StatusInfo = new CanceledOpProgressViewModel();
-        }, TaskContinuationOptions.OnlyOnCanceled);
-
-        operationTask.ContinueWith(t =>
-        {
-            Cleanup(CancellationToken.None);
-            Status = OperationStatus.Failed;
-            var message = t.Exception?.InnerException?.Message ?? t.Exception?.Message ?? "Restore failed";
-            StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(
-                typeof(ShellErrorInfo),
-                failed: -1,
-                message: message,
-                total: true));
-        }, TaskContinuationOptions.OnlyOnFaulted);
+        TrackTask(operationTask, "Restore failed",
+            onCompleted: () =>
+            {
+                SetCompleted();
+                Dispatcher.Invoke(RefreshPackagesIfNeeded);
+            },
+            onAborted: () => Cleanup(CancellationToken.None));
     }
 
     private void Restore(CancellationToken cancellationToken)
@@ -139,14 +110,14 @@ public partial class AppRestoreOperation : AbstractShellFileOperation
 
         if (apkPaths.Count == 1)
         {
-            var single = ADBService.ExecuteVoidShellCommand(
+            var single = AdbService.ExecuteVoidShellCommand(
                 deviceId,
                 cancellationToken,
                 "pm",
                 "install",
                 "-r",
                 "-d",
-                ADBService.EscapeAdbShellString(apkPaths[0])).GetAwaiter().GetResult();
+                AdbService.EscapeAdbShellString(apkPaths[0])).GetAwaiter().GetResult();
 
             if (!string.IsNullOrEmpty(single))
                 throw new IOException(single);
@@ -154,7 +125,7 @@ public partial class AppRestoreOperation : AbstractShellFileOperation
             return;
         }
 
-        var createExit = ADBService.ExecuteDeviceAdbShellCommand(
+        var createExit = AdbService.ExecuteDeviceAdbShellCommand(
             deviceId,
             "pm",
             out var createStdout,
@@ -164,8 +135,7 @@ public partial class AppRestoreOperation : AbstractShellFileOperation
             "-r",
             "-d");
 
-        if (createExit != 0)
-            throw new IOException(string.IsNullOrWhiteSpace(createStderr) ? createStdout : createStderr);
+        AdbService.ThrowIfFailed(createExit, createStdout, createStderr);
 
         var sessionMatch = SessionId().Match(createStdout);
         if (!sessionMatch.Success)
@@ -187,24 +157,23 @@ public partial class AppRestoreOperation : AbstractShellFileOperation
                 if (!string.IsNullOrEmpty(ext))
                     splitName = splitName[..^ext.Length];
 
-                var pathEsc = ADBService.EscapeAdbShellString(apk);
-                var nameEsc = ADBService.EscapeAdbShellString(splitName);
+                var pathEsc = AdbService.EscapeAdbShellString(apk);
+                var nameEsc = AdbService.EscapeAdbShellString(splitName);
                 var script = $"pm install-write -S $(stat -c%s {pathEsc}) {session} {nameEsc} < {pathEsc}";
 
-                var writeExit = ADBService.ExecuteDeviceAdbShellCommand(
+                var writeExit = AdbService.ExecuteDeviceAdbShellCommand(
                     deviceId,
                     "sh",
                     out var writeStdout,
                     out var writeStderr,
                     cancellationToken,
                     "-c",
-                    ADBService.EscapeAdbShellString(script));
+                    AdbService.EscapeAdbShellString(script));
 
-                if (writeExit != 0)
-                    throw new IOException(string.IsNullOrWhiteSpace(writeStderr) ? writeStdout : writeStderr);
+                AdbService.ThrowIfFailed(writeExit, writeStdout, writeStderr);
             }
 
-            var commit = ADBService.ExecuteVoidShellCommand(
+            var commit = AdbService.ExecuteVoidShellCommand(
                 deviceId,
                 cancellationToken,
                 "pm",
@@ -216,7 +185,7 @@ public partial class AppRestoreOperation : AbstractShellFileOperation
         }
         catch
         {
-            _ = ADBService.ExecuteDeviceAdbShellCommand(
+            _ = AdbService.ExecuteDeviceAdbShellCommand(
                 deviceId,
                 "pm",
                 out _,

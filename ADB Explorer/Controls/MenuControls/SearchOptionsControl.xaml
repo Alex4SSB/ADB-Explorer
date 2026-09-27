@@ -9,6 +9,7 @@
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     x:Name="searchOptions"
     mc:Ignorable="d">
     <UserControl.Style>
@@ -22,12 +23,6 @@
     </UserControl.Style>
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
-        <ToolTip
-            x:Key="InfoTooltip"
-            MaxWidth="400"
-            Style="{StaticResource FluentTooltipStyle}">
-            <TextBlock Text="{Binding Info}" TextWrapping="Wrap" />
-        </ToolTip>
     </UserControl.Resources>
     <local:AdbMenu d:Visibility="Visible" DataContext="{Binding ElementName=searchOptions}">
         <local:AdbMenu.Style>
@@ -39,28 +34,10 @@
                 </Style.Triggers>
             </Style>
         </local:AdbMenu.Style>
-        <local:AdbMenuItem ItemsSource="{Binding Items}" ToolTip="{Binding Source={x:Static Member=strings:Resources.S_SEARCH_OPTIONS_INFO}}">
-            <local:AdbMenuItem.Resources>
-                <ui:FontIcon x:Key="ThumbCheckedIcon" x:Shared="False">
-                    <ui:FontIcon.Style>
-                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                            <Setter Property="Glyph" Value="&#xF137;" />
-                            <Setter Property="FontSize" Value="6" />
-                            <Setter Property="Margin" Value="14,0" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsChecked}" Value="False">
-                                    <Setter Property="Visibility" Value="Hidden" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsRadioButton}" Value="False">
-                                    <Setter Property="Glyph" Value="&#xE73E;" />
-                                    <Setter Property="FontSize" Value="12" />
-                                    <Setter Property="Margin" Value="11,0" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ui:FontIcon.Style>
-                </ui:FontIcon>
-            </local:AdbMenuItem.Resources>
+        <local:AdbMenuItem
+            ItemContainerStyle="{StaticResource SelectorMenuItemStyle}"
+            ItemsSource="{Binding Items}"
+            ToolTip="{Binding Source={x:Static Member=strings:Resources.S_SEARCH_OPTIONS_INFO}}">
             <local:AdbMenuItem.Header>
                 <local:SimpleStackPanel Orientation="Horizontal" Spacing="6">
                     <local:SearchSettingsIcon Margin="0,-2,0,0" Size="20" />
@@ -71,21 +48,8 @@
                         Glyph="&#xE70D;" />
                 </local:SimpleStackPanel>
             </local:AdbMenuItem.Header>
-            <local:AdbMenuItem.ItemContainerStyle>
-                <!--  BasedOn=AdbMenuItemStyle so leaf items pick up the Role=SubmenuItem template that pairs Background+Foreground on real IsMouseOver (see AdbMenuItemHoverStyle's comment); without it these items fell back to the native MenuItem template, whose checked-indicator and header text never reacted to actual hover.  -->
-                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="local:AdbMenuItem">
-                    <Setter Property="Icon" Value="{StaticResource ThumbCheckedIcon}" />
-                    <Setter Property="Command" Value="{Binding Action.Command}" />
-                    <Setter Property="ToolTip" Value="{StaticResource InfoTooltip}" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Info}" Value="{x:Null}">
-                            <Setter Property="ToolTip" Value="{x:Null}" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </local:AdbMenuItem.ItemContainerStyle>
             <local:AdbMenuItem.ItemTemplate>
-                <DataTemplate DataType="local:ThumbsSizeSelector.ThumbSizeItem">
+                <DataTemplate DataType="viewmodels:SelectorItem">
                     <local:SimpleStackPanel Orientation="Horizontal" Spacing="8">
                         <ContentPresenter Content="{Binding Icon}" />
                         <TextBlock Text="{Binding Name}" />

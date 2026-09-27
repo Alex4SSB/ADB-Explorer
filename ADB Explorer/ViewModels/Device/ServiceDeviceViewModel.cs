@@ -1,44 +1,36 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-
-namespace ADB_Explorer.ViewModels;
+﻿namespace ADB_Explorer.ViewModels;
 
 public class ServiceDeviceViewModel : PairingDeviceViewModel
 {
     #region Full properties
 
-    private ServiceDevice device = null!;
+    private ServiceDevice _device = null!;
     protected new ServiceDevice Device
     {
-        get => device;
-        set => Set(ref device, value);
+        get => _device;
+        set => SetProperty(ref _device, value);
     }
 
-    private string uiPairingCode = "";
+    private string _uiPairingCode = "";
     public string UIPairingCode
     {
-        get => uiPairingCode;
+        get => _uiPairingCode;
         set
         {
-            if (Set(ref uiPairingCode, value))
-                SetPairingCode(uiPairingCode?.Replace("-", ""));
+            if (SetProperty(ref _uiPairingCode, value))
+                SetPairingCode(_uiPairingCode?.Replace("-", ""));
         }
     }
 
-    private bool isPairingInProgress;
-    public bool IsPairingInProgress
-    {
-        get => isPairingInProgress;
-        private set => Set(ref isPairingInProgress, value);
-    }
+    public bool IsPairingInProgress { get; private set; }
 
-    private string pairingError = "";
+    private string _pairingError = "";
     public string PairingError
     {
-        get => pairingError;
+        get => _pairingError;
         private set
         {
-            if (Set(ref pairingError, value))
+            if (SetProperty(ref _pairingError, value))
                 OnPropertyChanged(nameof(HasPairingError));
         }
     }
@@ -75,7 +67,7 @@ public class ServiceDeviceViewModel : PairingDeviceViewModel
 
         UpdateServiceStatus();
 
-        PairCommand = new(() => !IsPairingInProgress && IsPairingCodeValid && device.Status is DeviceStatus.Unauthorized,
+        PairCommand = new(() => !IsPairingInProgress && IsPairingCodeValid && _device.Status is DeviceStatus.Unauthorized,
                           () => _ = DeviceHelper.PairService(this, CancellationToken.None));
     }
 

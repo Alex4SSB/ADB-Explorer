@@ -1,8 +1,4 @@
-﻿using ADB_Explorer.Controls;
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-
-namespace ADB_Explorer.ViewModels;
+﻿namespace ADB_Explorer.ViewModels;
 
 public partial class DriveViewModel : AbstractDrive, IBrowserItem
 {
@@ -40,7 +36,6 @@ public partial class DriveViewModel : AbstractDrive, IBrowserItem
         OnPropertyChanged(nameof(FileSystem));
         OnPropertyChanged(nameof(MountPoint));
         OnPropertyChanged(nameof(MountOptions));
-        OnPropertyChanged(nameof(Restrictions));
         OnPropertyChanged(nameof(HasDriveRestrictions));
         OnPropertyChanged(nameof(RestrictionsTooltip));
     }
@@ -69,7 +64,7 @@ public partial class DriveViewModel : AbstractDrive, IBrowserItem
         if (type is DriveType.Unknown)
             return null;
 
-        return new(FileToIconConverter.GetDriveIcon(type, pixelSize ?? (int)size, trashEmpty), size);
+        return new(FileIconProvider.GetDriveIcon(type, pixelSize ?? (int)size, trashEmpty), size);
     }
 
     #endregion
@@ -84,7 +79,7 @@ public partial class DriveViewModel : AbstractDrive, IBrowserItem
     {
         Drive = drive;
 
-        BrowseCommand = new(() => true, () => Data.RuntimeSettings.BrowseDrive = this);
+        BrowseCommand = new(() => true, () => Data.RequestBrowseDrive(this));
     }
 
     public void SetType(DriveType type)

@@ -5,6 +5,7 @@
     xmlns:controls="clr-namespace:ADB_Explorer.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
+    xmlns:local="clr-namespace:ADB_Explorer.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
@@ -74,62 +75,7 @@
                     <ui:FontIcon Glyph="&#xE774;" ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_HOST}}" />
                     <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDeviceIpBoxStyle}" />
                 </Grid>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <ui:FontIcon Glyph="&#xE177;" ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PORT}}" />
-                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePortBoxStyle}" />
-                </Grid>
-                <Grid>
-                    <Grid.Resources>
-                        <Style TargetType="Separator">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsPairingEnabled}" Value="False">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Grid.Resources>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <Separator />
-                    <ui:Button
-                        Grid.Column="1"
-                        Margin="4,0"
-                        Style="{StaticResource ConnectNewDeviceButtonStyle}" />
-                    <Separator Grid.Column="2" />
-                </Grid>
-                <Grid Style="{StaticResource NewDevicePairingGrid}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <ui:FontIcon Glyph="&#xE8F9;" ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_CODE}}" />
-                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePairingCodeBoxStyle}" />
-                </Grid>
-                <Grid Style="{StaticResource NewDevicePairingGrid}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <Grid Margin="-1,0,4,0">
-                        <ui:FontIcon
-                            Margin="0"
-                            Glyph="&#xE177;"
-                            ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_PORT}}" />
-                        <ui:FontIcon
-                            Margin="0,4,-6,0"
-                            Glyph="&#xEA21;"
-                            Style="{StaticResource GlyphFont}"
-                            ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_PORT}}" />
-                    </Grid>
-                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePairingPortBoxStyle}" />
-                </Grid>
+                <local:DevicePairingFields />
             </controls:SimpleStackPanel>
         </Grid>
     </ui:CardControl>

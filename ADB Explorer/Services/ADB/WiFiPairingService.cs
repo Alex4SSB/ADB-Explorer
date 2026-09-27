@@ -1,5 +1,4 @@
-﻿using ADB_Explorer.Models;
-using static ADB_Explorer.Models.AdbExplorerConst;
+﻿using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.AdbRegEx;
 
 namespace ADB_Explorer.Services;
@@ -16,7 +15,7 @@ public class WiFiPairingService
 
     public static IEnumerable<ServiceSnapshot> GetServices(CancellationToken cancellationToken)
     {
-        ADBService.ExecuteAdbCommand("mdns", out string services, out _, cancellationToken, "services");
+        AdbService.ExecuteAdbCommand("mdns", out string services, out _, cancellationToken, "services");
 
         return RE_MDNS_SERVICE().Matches(services).Select(ServiceSnapshot.Parse).Where(s => s).Distinct();
     }

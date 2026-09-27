@@ -26,25 +26,11 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
-            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
-                <StackPanel.Resources>
-                    <Style BasedOn="{StaticResource DriveNameTextBlockStyle}" TargetType="TextBlock" />
-                </StackPanel.Resources>
-                <StackPanel.Style>
-                    <Style TargetType="StackPanel">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
-                                <Setter Property="FlowDirection" Value="RightToLeft" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </StackPanel.Style>
-                <TextBlock Text="{Binding DisplayName}" />
-            </StackPanel>
+            <TextBlock Style="{StaticResource DriveNameTextBlockStyle}" Text="{Binding DisplayName}" />
             <ProgressBar
                 Grid.Row="1"
-                Margin="0,6"
                 Height="6"
+                Margin="0,6"
                 Value="{Binding UsageP, Mode=OneWay}">
                 <ProgressBar.Style>
                     <Style BasedOn="{StaticResource DriveUsageBarStyle}" TargetType="ProgressBar">
@@ -56,25 +42,23 @@
                     </Style>
                 </ProgressBar.Style>
             </ProgressBar>
-            <StackPanel Grid.Row="2" Orientation="Horizontal">
-                <StackPanel.Style>
-                    <Style TargetType="StackPanel">
+            <TextBlock Grid.Row="2" TextTrimming="CharacterEllipsis">
+                <TextBlock.Style>
+                    <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding UsageP}" Value="-1">
                                 <Setter Property="Visibility" Value="Hidden" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
-                </StackPanel.Style>
-                <TextBlock Style="{StaticResource TextBlockStyle}" TextTrimming="CharacterEllipsis">
-                    <TextBlock.Text>
-                        <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_DRIVE_FREE_SPACE}">
-                            <Binding Path="Available" />
-                            <Binding Path="Size" />
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
-            </StackPanel>
+                </TextBlock.Style>
+                <TextBlock.Text>
+                    <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_DRIVE_FREE_SPACE}">
+                        <Binding Path="Available" />
+                        <Binding Path="Size" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
         </Grid>
     </ui:CardAction>
 </views:DriveControl>

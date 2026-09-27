@@ -59,7 +59,7 @@ public class TabStripPanel : Panel
         set => SetValue(SeparatorBottomInsetProperty, value);
     }
 
-    private double slotWidth;
+    private double _slotWidth;
 
     public TabStripPanel()
     {
@@ -75,7 +75,7 @@ public class TabStripPanel : Panel
         var count = InternalChildren.Count;
         if (count == 0)
         {
-            slotWidth = 0;
+            _slotWidth = 0;
             return default;
         }
 
@@ -83,18 +83,18 @@ public class TabStripPanel : Panel
         var max = MaxTabWidth + margin;
         var min = Math.Min(MinTabWidth + margin, max);
 
-        slotWidth = double.IsInfinity(availableSize.Width)
+        _slotWidth = double.IsInfinity(availableSize.Width)
             ? max
             : Math.Clamp(Math.Floor(availableSize.Width / count), min, max);
 
         var height = 0d;
         foreach (UIElement child in InternalChildren)
         {
-            child.Measure(new Size(slotWidth, availableSize.Height));
+            child.Measure(new Size(_slotWidth, availableSize.Height));
             height = Math.Max(height, child.DesiredSize.Height);
         }
 
-        return new Size(slotWidth * count, height);
+        return new Size(_slotWidth * count, height);
     }
 
     protected override Size ArrangeOverride(Size finalSize)
@@ -102,8 +102,8 @@ public class TabStripPanel : Panel
         var x = 0d;
         foreach (UIElement child in InternalChildren)
         {
-            child.Arrange(new Rect(x, 0, slotWidth, finalSize.Height));
-            x += slotWidth;
+            child.Arrange(new Rect(x, 0, _slotWidth, finalSize.Height));
+            x += _slotWidth;
         }
 
         InvalidateVisual();
@@ -124,7 +124,7 @@ public class TabStripPanel : Panel
             if (InternalChildren[i - 1] is ListBoxItem { IsSelected: true } || InternalChildren[i] is ListBoxItem { IsSelected: true })
                 continue;
 
-            var x = Math.Round(i * slotWidth);
+            var x = Math.Round(i * _slotWidth);
             drawingContext.DrawLine(pen, new Point(x, top), new Point(x, top + SeparatorHeight));
         }
     }

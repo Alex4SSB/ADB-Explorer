@@ -1,9 +1,4 @@
-﻿using ADB_Explorer.Controls;
-using ADB_Explorer.Converters;
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-using Wpf.Ui.Abstractions.Controls;
+﻿using Wpf.Ui.Abstractions.Controls;
 
 namespace ADB_Explorer.ViewModels.Pages;
 
@@ -235,12 +230,18 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
             || Data.FileActions.IsAppDriveThumbsLocked)
             return;
 
-        if (Data.Settings.ThumbSizePerLocation && Data.CurrentPath is not null)
+        // Search mode's sizes apply to the search only, never to a location or the fallback.
+        if (!Instance.FileList.Actions.IsSearchMode)
         {
-            if (Data.Settings.LocationThumbSize.ContainsKey(Data.CurrentPath))
-                Data.Settings.LocationThumbSize[Data.CurrentPath] = value;
-            else
-                Data.Settings.LocationThumbSize.Add(Data.CurrentPath, value);
+            if (Data.Settings.ThumbSizePerLocation && Data.CurrentPath is not null)
+            {
+                if (Data.Settings.LocationThumbSize.ContainsKey(Data.CurrentPath))
+                    Data.Settings.LocationThumbSize[Data.CurrentPath] = value;
+                else
+                    Data.Settings.LocationThumbSize.Add(Data.CurrentPath, value);
+            }
+
+            Data.RuntimeSettings.BrowseThumbsSize = value;
         }
 
         Data.RuntimeSettings.ThumbsSize = value;
@@ -265,7 +266,6 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     public void NotifySelectedFilesTotalSize()
     {
         OnPropertyChanged(nameof(SelectedFilesTotalSize));
-        OnPropertyChanged(nameof(SelectedFilesTotalSizeVisibility));
     }
 
     public FileClass GalleryFile
@@ -319,14 +319,17 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         Instance.PropertyChanged += Instance_PropertyChanged;
         Instance.FileList.Actions.PropertyChanged += FileActions_PropertyChanged;
 
+        // The tab's own size, as its selector shows - the app-wide one is only what a location falls back to.
         if (!isPaneSwitch)
         {
-            Instance.IsIconView = ThumbnailService.IsIconLayout(Data.RuntimeSettings.ThumbsSize);
-            Instance.IsContentView = Data.RuntimeSettings.ThumbsSize is ThumbnailService.ThumbnailSize.Content;
+            Instance.IsIconView = ThumbnailService.IsIconLayout(Instance.CurrentThumbsSize);
+            Instance.IsContentView = Instance.CurrentThumbsSize is ThumbnailService.ThumbnailSize.Content;
+
+            if (Instance.CurrentThumbsSize is not ThumbnailService.ThumbnailSize.Tiles
+                && Data.RuntimeSettings.ThumbsSize != Instance.CurrentThumbsSize)
+                Data.RuntimeSettings.ThumbsSize = Instance.CurrentThumbsSize;
         }
 
-        OnPropertyChanged(nameof(SelectedFilesCount));
-        OnPropertyChanged(nameof(SelectedItemsCountVisibility));
         OnPropertyChanged(nameof(FolderColumnVisibility));
         OnPropertyChanged(nameof(RecycleBinColumnVisibility));
         OnPropertyChanged(nameof(PackageColumnVisibility));
@@ -430,6 +433,11 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         SavedLocations_CollectionChanged(null, null);
 
         Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
+        Data.ExplorerRequested += (_, request) =>
+        {
+            if (request is ExplorerRequest.FilterDrives)
+                UpdateDriveView();
+        };
         Data.Settings.PropertyChanged += Settings_PropertyChanged;
 
         EnsureDevicesSubscription();
@@ -567,10 +575,6 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
     {
         switch (e.PropertyName)
         {
-            case nameof(AppRuntimeSettings.FilterDrives):
-                UpdateDriveView();
-                break;
-
             case nameof(AppRuntimeSettings.ThumbsSize):
                 Instance.IsIconView = ThumbnailService.IsIconLayout(Data.RuntimeSettings.ThumbsSize);
                 Instance.IsContentView = Data.RuntimeSettings.ThumbsSize is ThumbnailService.ThumbnailSize.Content;
@@ -605,8 +609,6 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         switch (e.PropertyName)
         {
             case nameof(FileActionsEnable.SelectedItemsCount):
-                OnPropertyChanged(nameof(SelectedFilesCount));
-                OnPropertyChanged(nameof(SelectedItemsCountVisibility));
                 break;
 
             case nameof(FileActionsEnable.IsAppDrive):
@@ -698,7 +700,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
                 else
                 {
                     matches = [];
-                    foreach (var fileStat in ADBService.SearchContentsStreaming(device.ID, path, query, recursive: false, cts.Token, caseSensitive))
+                    foreach (var fileStat in AdbService.SearchContentsStreaming(device.ID, path, query, recursive: false, cts.Token, caseSensitive))
                         matches.Add(fileStat.FullPath);
                 }
             }

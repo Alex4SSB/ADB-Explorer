@@ -1,6 +1,4 @@
-﻿using ADB_Explorer.Services;
-
-namespace ADB_Explorer.Models;
+﻿namespace ADB_Explorer.Models;
 
 public enum ServiceConnectionKind { Pairing, Connect }
 

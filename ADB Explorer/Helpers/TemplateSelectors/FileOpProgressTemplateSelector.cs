@@ -1,6 +1,4 @@
-﻿using ADB_Explorer.ViewModels;
-
-namespace ADB_Explorer.Helpers;
+﻿namespace ADB_Explorer.Helpers;
 
 internal class FileOpProgressTemplateSelector : DataTemplateSelector
 {

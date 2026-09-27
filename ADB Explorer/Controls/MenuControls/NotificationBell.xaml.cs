@@ -1,6 +1,4 @@
-﻿using ADB_Explorer.Helpers;
-
-namespace ADB_Explorer.Controls;
+﻿namespace ADB_Explorer.Controls;
 
 /// <summary>
 /// Interaction logic for NotificationBell.xaml

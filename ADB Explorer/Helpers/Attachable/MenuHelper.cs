@@ -1,6 +1,4 @@
-﻿using Windows.UI.Popups;
-
-namespace ADB_Explorer.Helpers;
+﻿namespace ADB_Explorer.Helpers;
 
 public static class MenuHelper
 {

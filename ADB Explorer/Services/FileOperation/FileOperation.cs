@@ -1,13 +1,9 @@
-using ADB_Explorer.Controls;
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.ViewModels;
 using Wpf.Ui.Controls;
 using static ADB_Explorer.Services.FileAction;
 
 namespace ADB_Explorer.Services;
 
-public abstract class FileOperation : ViewModelBase
+public abstract class FileOperation : ObservableObject
 {
     public enum OperationStatus
     {
@@ -37,13 +33,13 @@ public abstract class FileOperation : ViewModelBase
 
     #region Notifiable Properties
 
-    private OperationType operationType;
+    private OperationType _operationType;
     public OperationType OperationName
     {
-        get => operationType;
+        get => _operationType;
         protected set
         {
-            if (Set(ref operationType, value))
+            if (SetProperty(ref _operationType, value))
             {
                 OnPropertyChanged(nameof(OpIcon));
             }
@@ -52,13 +48,13 @@ public abstract class FileOperation : ViewModelBase
 
     // Volatile so the spin-wait on the UI thread can see updates written by background pull threads
     // without going through the dispatcher (which would deadlock while Thread.Sleep is running).
-    private volatile OperationStatus status = OperationStatus.None;
+    private volatile OperationStatus _status = OperationStatus.None;
     public OperationStatus Status
     {
-        get => status;
+        get => _status;
         protected set
         {
-            if (status == value) return;
+            if (_status == value) return;
 
             // Recorded before the volatile write below so it's safely visible to any thread that
             // observes the new Status (e.g. to know when a finished operation's grace period, for
@@ -67,12 +63,11 @@ public abstract class FileOperation : ViewModelBase
                 ? null
                 : DateTime.UtcNow;
 
-            status = value; // Immediately visible to any thread reading the volatile field
+            _status = value; // Immediately visible to any thread reading the volatile field
             CancelTokenSource = value is OperationStatus.InProgress or OperationStatus.Waiting ? new() : null;
 
             App.SafeBeginInvoke(() =>
             {
-                OnPropertyChanged(nameof(ValidationAllowed));
 
                 LastProgress = 0;
 
@@ -95,33 +90,33 @@ public abstract class FileOperation : ViewModelBase
         Status is OperationStatus.InProgress
         || (FinishedAt is { } finishedAt && DateTime.UtcNow - finishedAt < gracePeriod);
 
-    private FileOpProgressViewModel statusInfo = new WaitingOpProgressViewModel();
+    private FileOpProgressViewModel _statusInfo = new WaitingOpProgressViewModel();
     public FileOpProgressViewModel StatusInfo
     {
-        get => statusInfo;
+        get => _statusInfo;
         // BeginInvoke (fire-and-forget) so background pull threads are never blocked waiting
         // for the UI thread to process the update (which would deadlock with the spin-wait).
         set => Dispatcher.BeginInvoke(() =>
         {
-            if (!ReferenceEquals(statusInfo, value) && statusInfo is IDisposable disposable)
+            if (!ReferenceEquals(_statusInfo, value) && _statusInfo is IDisposable disposable)
                 disposable.Dispose();
 
-            Set(ref statusInfo, value);
+            SetProperty(ref _statusInfo, value);
         });
     }
 
-    private bool isPastOp = false;
+    private bool _isPastOp = false;
     public bool IsPastOp
     {
-        get => isPastOp;
-        set => Set(ref isPastOp, value);
+        get => _isPastOp;
+        set => SetProperty(ref _isPastOp, value);
     }
 
-    private bool isValidated = false;
+    private bool _isValidated = false;
     public bool IsValidated
     {
-        get => isValidated;
-        set => Set(ref isValidated, value);
+        get => _isValidated;
+        set => SetProperty(ref _isValidated, value);
     }
 
     #endregion
@@ -133,6 +128,22 @@ public abstract class FileOperation : ViewModelBase
     public Dispatcher Dispatcher { get; }
 
     public LogicalDeviceViewModel Device { get; }
+
+    private LogicalDeviceViewModel? _targetDevice;
+    /// <summary>
+    /// The device receiving the files when it differs from <see cref="Device"/> (device to device transfers).
+    /// </summary>
+    public LogicalDeviceViewModel? TargetDevice
+    {
+        get => _targetDevice;
+        protected set
+        {
+            _targetDevice = value;
+
+            if (value is not null)
+                PropertyChangedEventManager.AddHandler(value, OnDeviceNameChanged, nameof(LogicalDeviceViewModel.Name));
+        }
+    }
 
     public virtual FilePath FilePath { get; }
 
@@ -174,7 +185,16 @@ public abstract class FileOperation : ViewModelBase
     /// <summary>
     /// The type of operation and the device ID it is being performed on.
     /// </summary>
-    public string TypeOnDevice => $"{OperationName}@{Device?.ID}";
+    public string TypeOnDevice => TargetDevice is null
+        ? $"{OperationName}@{Device?.ID}"
+        : $"{OperationName}@{Device?.ID}>{TargetDevice.ID}";
+
+    /// <summary>
+    /// The device the operation is performed on, or "source → target" for a device to device transfer.
+    /// </summary>
+    public string DeviceName => TargetDevice is null
+        ? Device.Name
+        : $"{Device.Name} → {TargetDevice.Name}";
 
     public ObservableList<SyncFile> Children => AndroidPath?.Children;
 
@@ -288,11 +308,31 @@ public abstract class FileOperation : ViewModelBase
                 && (StatusInfo.IsValidationInProgress || Device.Status is not DeviceStatus.Ok))
                 return false;
 
+            // The archive is unpacked into a staging folder that is gone by the time the operation completes.
+            if (this is FileTransferOperation { TargetStagingRoot: not null })
+                return false;
+
             // Archive pull / extract-to-device: prefer cksum -HNPL (IEEE CRC), else MD5.
             if (TryGetArchiveValidationSource(out var archivePath, out _, out _))
             {
                 var androidDest = TargetPath?.PathType is AbstractFile.FilePathType.Android;
-                return ArchiveHelper.SupportsHashValidation(archivePath, Device.ID, androidDest);
+                if (!ArchiveHelper.SupportsHashValidation(archivePath, Device.ID, androidDest))
+                    return false;
+
+                if (TargetDevice is null)
+                    return true;
+
+                var archiveMode = ArchiveHelper.UsesCrc32Validation(archivePath, Device.ID, androidDest)
+                    ? ValidationHashMode.Crc32
+                    : ValidationHashMode.Md5;
+
+                return TargetDevice.Status is DeviceStatus.Ok && ShellCommands.SupportsHashMode(TargetDevice.ID, archiveMode);
+            }
+
+            if (TargetDevice is not null)
+            {
+                return TargetDevice.Status is DeviceStatus.Ok
+                    && ShellCommands.GetSharedValidationHashMode(Device.ID, TargetDevice.ID) is not ValidationHashMode.None;
             }
 
             return ShellCommands.GetValidationHashMode(Device.ID) is not ValidationHashMode.None;
@@ -302,7 +342,7 @@ public abstract class FileOperation : ViewModelBase
     /// <summary>Archive pull or copy-extract ops that can be validated against the original archive.</summary>
     public bool TryGetArchiveValidationSource(out string archivePath, out string internalPath, out bool isDirectory)
     {
-        if (this is FileSyncOperation { IsArchivePull: true, ArchiveSourcePath: { } pullArchive } pullOp)
+        if (this is AbstractSyncFileOperation { IsArchivePull: true, ArchiveSourcePath: { } pullArchive } pullOp)
         {
             archivePath = pullArchive;
             internalPath = pullOp.ArchiveInternalPath ?? "";
@@ -328,7 +368,7 @@ public abstract class FileOperation : ViewModelBase
                 || (Device.Status is DeviceStatus.Ok && AltSource.IsNoneOrNavigable);
 
     public bool IsTargetNavigable => TargetPath?.PathType is AbstractFile.FilePathType.Windows
-                || (Device.Status is DeviceStatus.Ok && AltTarget.IsNoneOrNavigable);
+                || ((TargetDevice ?? Device).Status is DeviceStatus.Ok && AltTarget.IsNoneOrNavigable);
 
     #endregion
 
@@ -343,6 +383,9 @@ public abstract class FileOperation : ViewModelBase
         Device = device;
         FilePath = filePath;
 
+        if (device is not null)
+            PropertyChangedEventManager.AddHandler(device, OnDeviceNameChanged, nameof(LogicalDeviceViewModel.Name));
+
         SourceAction = new(
             () => IsSourceNavigable && !Data.FileActions.ListingInProgress,
             () => OpenLocation(false));
@@ -351,6 +394,9 @@ public abstract class FileOperation : ViewModelBase
             () => IsTargetNavigable && !Data.FileActions.ListingInProgress,
             () => OpenLocation(true));
     }
+
+    private void OnDeviceNameChanged(object? sender, PropertyChangedEventArgs e)
+        => OnPropertyChanged(nameof(DeviceName));
 
     private void OpenLocation(bool target)
     {
@@ -371,25 +417,27 @@ public abstract class FileOperation : ViewModelBase
             }
             else
             {
-                NavigateDeviceLocation(new(file.ParentPath));
+                NavigateDeviceLocation(new(file.ParentPath), target);
             }
         }
         else if (location is AdbLocation loc)
         {
-            NavigateDeviceLocation(loc);
+            NavigateDeviceLocation(loc, target);
         }
         else
             throw new NotSupportedException();
     }
 
-    private void NavigateDeviceLocation(AdbLocation location)
+    private void NavigateDeviceLocation(AdbLocation location, bool target)
     {
-        if (!Device.IsOpen)
-            Data.DevicesObject.DeviceToOpen = Device;
+        var device = target ? TargetDevice ?? Device : Device;
+
+        if (!device.IsOpen)
+            Data.DevicesObject.DeviceToOpen = device;
         else if (Data.CurrentPage.Value != typeof(Views.Pages.ExplorerPage))
             Data.CurrentPage.Value = typeof(Views.Pages.ExplorerPage);
 
-        Data.RuntimeSettings.LocationToNavigate = location;
+        Data.RequestNavigation(location);
     }
 
     public void SetValidation(bool value)
@@ -397,10 +445,32 @@ public abstract class FileOperation : ViewModelBase
         StatusInfo ??= new CompletedShellProgressViewModel();
 
         StatusInfo.IsValidationInProgress = value;
-        OnPropertyChanged(nameof(ValidationAllowed));
     }
 
     public abstract void Start();
+
+    /// <summary>Runs <paramref name="onFinished"/> once, when the operation completes, fails or is canceled.</summary>
+    public void WhenFinished(Action<OperationStatus> onFinished)
+    {
+        void Handler(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName is not nameof(Status)
+                || Status is OperationStatus.None or OperationStatus.Waiting or OperationStatus.InProgress)
+                return;
+
+            PropertyChanged -= Handler;
+            onFinished(Status);
+        }
+
+        PropertyChanged += Handler;
+    }
+
+    /// <summary>Runs <paramref name="onCompleted"/> once, if the operation completes successfully.</summary>
+    public void WhenCompleted(Action onCompleted) => WhenFinished(status =>
+    {
+        if (status is OperationStatus.Completed)
+            onCompleted();
+    });
 
     /// <summary>
     /// Changes the operation status from None to Waiting.

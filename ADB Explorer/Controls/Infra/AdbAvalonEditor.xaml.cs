@@ -1,5 +1,3 @@
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
 using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Highlighting;
 using Wpf.Ui.Appearance;

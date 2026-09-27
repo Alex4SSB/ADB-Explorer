@@ -1,10 +1,4 @@
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.ViewModels;
-using AlphaOmega.Debug;
-using AlphaOmega.Debug.Manifest;
 using SkiaSharp;
-using Wpf.Ui.Appearance;
 
 namespace ADB_Explorer.Services;
 
@@ -47,12 +41,10 @@ public static partial class ApkIconService
         return ApkVectorIconRenderer.ToBitmapSource(canvasBitmap);
     }
 
-
     private static bool IsDeskclockPackage(string? packageName)
         => !string.IsNullOrEmpty(packageName)
            && (packageName.Contains("deskclock", StringComparison.OrdinalIgnoreCase)
                || packageName.Equals("com.google.android.deskclock", StringComparison.OrdinalIgnoreCase));
-
 
     /// <summary>
     /// Analog hands at <paramref name="time"/> (white hour/minute, black second), scaled to the inner face circle.
@@ -87,7 +79,6 @@ public static partial class ApkIconService
         paint.Color = SKColors.White;
         canvas.DrawCircle(cx, cy, radius * 0.09f, paint);
     }
-
 
     /// <summary>
     /// True when the cached clock face already contains 1–3 thin radial hands
@@ -147,7 +138,6 @@ public static partial class ApkIconService
         return CountRadialHandPeaks(coverage) is >= 1 and <= 3;
     }
 
-
     /// <summary>
     /// Mode of quantized samples on a ring inside the face (hands occupy few angles).
     /// </summary>
@@ -189,13 +179,11 @@ public static partial class ApkIconService
         return new SKColor(best);
     }
 
-
     private static uint QuantizeClockColor(SKColor p)
         => ((uint)(p.Alpha & 0xF0) << 24)
            | ((uint)(p.Red & 0xF0) << 16)
            | ((uint)(p.Green & 0xF0) << 8)
            | (uint)(p.Blue & 0xF0);
-
 
     /// <summary>
     /// Thin radial spikes in the inner ring. Walks from a gap so a hand that
@@ -246,7 +234,6 @@ public static partial class ApkIconService
         return peaks;
     }
 
-
     private static void DrawClockHand(
         SKCanvas canvas,
         float cx,
@@ -265,7 +252,6 @@ public static partial class ApkIconService
             paint);
         canvas.Restore();
     }
-
 
     /// <summary>
     /// Radius of the inner disc around the center (the analog face), not the outer plate.
@@ -325,7 +311,6 @@ public static partial class ApkIconService
         return radius;
     }
 
-
     private static int RgbDistanceSq(SKColor a, SKColor b)
     {
         var dr = a.Red - b.Red;
@@ -333,7 +318,6 @@ public static partial class ApkIconService
         var db = a.Blue - b.Blue;
         return dr * dr + dg * dg + db * db;
     }
-
 
     /// <summary>
     /// Live overlay only when this device's clock face is a blank disc.
@@ -354,7 +338,6 @@ public static partial class ApkIconService
         }
     }
 
-
     private static string? InspectClockHandsField(string? packageName, BitmapSource? bitmap)
     {
         if (!IsDeskclockPackage(packageName) || bitmap is null)
@@ -366,7 +349,6 @@ public static partial class ApkIconService
 
         return ClockFaceAlreadyHasHands(sk) ? ClockHandsBaked : ClockHandsOverlay;
     }
-
 
     /// <summary>
     /// Legacy cache rows without field 6: inspect off the UI thread and persist.
@@ -425,7 +407,6 @@ public static partial class ApkIconService
         });
     }
 
-
     private static string? NormalizeClockHandsField(string field)
     {
         if (string.IsNullOrWhiteSpace(field))
@@ -439,7 +420,6 @@ public static partial class ApkIconService
 
         return null;
     }
-
 
     private static bool TryParseClockHandsField(string? field, out bool hasBakedHands)
     {

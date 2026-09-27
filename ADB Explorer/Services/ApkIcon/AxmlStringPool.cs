@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace ADB_Explorer.Services;
 
 /// <summary>

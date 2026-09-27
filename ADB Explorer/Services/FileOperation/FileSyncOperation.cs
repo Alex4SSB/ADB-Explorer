@@ -1,33 +1,27 @@
-﻿using ADB_Explorer.Converters;
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.ViewModels;
-using AdvancedSharpAdbClient;
+﻿using AdvancedSharpAdbClient;
 using AdvancedSharpAdbClient.Models;
 using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Services;
 
-public class FileSyncOperation : FileOperation
+public class FileSyncOperation : AbstractSyncFileOperation
 {
     // Both created in Start(), not the constructor — an operation exists in a
     // "not started" state before that, where neither is meaningful yet.
-    private CancellationTokenSource cancelTokenSource = null!;
+    private CancellationTokenSource _cancelTokenSource = null!;
     public ObservableList<FileOpProgressInfo> ProgressUpdates = null!;
 
-    private readonly ConcurrentDictionary<string, long> lastReportedBytes = new();
-    private readonly ConcurrentDictionary<string, ulong> lastRawReceivedBytes = new();
-    private readonly ConcurrentDictionary<string, long> receivedBytesCarry = new();
+    private readonly ConcurrentDictionary<string, long> _lastReportedBytes = new();
+    private readonly ConcurrentDictionary<string, ulong> _lastRawReceivedBytes = new();
+    private readonly ConcurrentDictionary<string, long> _receivedBytesCarry = new();
 
     // Progress callbacks can fire thousands of times per second across all parallel
     // transfers; gate how often they reach the (dispatcher-marshaled) UI collection
     // instead of forwarding every single one, which was freezing the UI thread.
-    private long lastUiUpdateTicks;
+    private long _lastUiUpdateTicks;
     private static readonly long UiUpdateThrottleTicks = TimeSpan.FromMilliseconds(150).Ticks;
 
-    private bool useSyncV2;
-
-    public override SyncFile FilePath { get; }
+    private bool _useSyncV2;
 
     public override SyncFile AndroidPath => FilePath.PathType is AbstractFile.FilePathType.Android
         ? FilePath
@@ -35,16 +29,16 @@ public class FileSyncOperation : FileOperation
 
     public VirtualFileDataObject? VFDO { get; set; }
 
-    private DragDropEffects dropEffects = DragDropEffects.None;
+    private DragDropEffects _dropEffects = DragDropEffects.None;
     public DragDropEffects DropEffects
     {
         get
         {
-            return VFDO is null ? dropEffects : VFDO.CurrentEffect;
+            return VFDO is null ? _dropEffects : VFDO.CurrentEffect;
         }
         set
         {
-            dropEffects = value;
+            _dropEffects = value;
         }
     }
 
@@ -53,30 +47,15 @@ public class FileSyncOperation : FileOperation
     public DateTime TransferStart { get; private set; }
     public DateTime TransferEnd { get; private set; }
 
-    public int? MaxThreads { get; set; }
-
-    /// <summary>Device temp root used when pulling from an archive; cleaned when the op finishes.</summary>
-    public string? ArchivePullStagingRoot { get; set; }
-
-    /// <summary>Original archive file path for hash validation (<c>tar --to-command</c> / <c>-O</c>).</summary>
-    public string? ArchiveSourcePath { get; set; }
-
-    /// <summary>Internal archive path of the selected member (empty = archive root).</summary>
-    public string? ArchiveInternalPath { get; set; }
-
-    public bool IsArchivePull => !string.IsNullOrEmpty(ArchiveSourcePath);
-
-    IEnumerable<SyncFile> Files => [FilePath, .. FilePath.AllChildren()];
     private long? TotalBytes => Files.Sum(f => f.Size);
     private IEnumerable<SyncFile> ActiveFiles => Files.Where(f => f.CurrentPercentage is > 0 and < 100);
 
-    private bool isCanceled = false;
+    private bool _isCanceled = false;
 
     public FileSyncOperation(OperationType operationName, FileDescriptor sourcePath, SyncFile targetPath, LogicalDeviceViewModel device, FailedOpProgressViewModel status)
-        : base(new FileClass(sourcePath), device, App.AppDispatcher)
+        : base(new SyncFile(new FileClass(sourcePath)), device, App.AppDispatcher)
     {
         OperationName = operationName;
-        FilePath = new(new FileClass(sourcePath));
         TargetPath = targetPath;
 
         StatusInfo = status;
@@ -92,7 +71,6 @@ public class FileSyncOperation : FileOperation
         Dispatcher dispatcher) : base(sourcePath, device, dispatcher)
     {
         OperationName = operationName;
-        FilePath = sourcePath;
         TargetPath = targetPath;
     }
 
@@ -105,20 +83,20 @@ public class FileSyncOperation : FileOperation
 
         Status = OperationStatus.InProgress;
         StatusInfo = new InProgSyncProgressViewModel();
-        cancelTokenSource = new CancellationTokenSource();
+        _cancelTokenSource = new CancellationTokenSource();
 
         ProgressUpdates = [];
         ProgressUpdates.CollectionChanged += ProgressUpdates_CollectionChanged;
-        lastReportedBytes.Clear();
-        lastRawReceivedBytes.Clear();
-        receivedBytesCarry.Clear();
-        Interlocked.Exchange(ref lastUiUpdateTicks, 0);
+        _lastReportedBytes.Clear();
+        _lastRawReceivedBytes.Clear();
+        _receivedBytesCarry.Clear();
+        Interlocked.Exchange(ref _lastUiUpdateTicks, 0);
 
         if (OperationName is OperationType.Push &&
             !File.Exists(FilePath.FullPath) && !Directory.Exists(FilePath.FullPath))
         {
             Status = OperationStatus.Failed;
-            StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(typeof(SyncErrorInfo), message: Strings.Resources.S_SYNC_FILE_NOT_FOUND, total: true));
+            StatusInfo = new FailedOpProgressViewModel(FileOpStatusFormatter.StatusString(typeof(SyncErrorInfo), message: Strings.Resources.S_SYNC_FILE_NOT_FOUND, total: true));
 
             return;
         }
@@ -157,7 +135,7 @@ public class FileSyncOperation : FileOperation
             {
                 MaxDegreeOfParallelism = MaxThreads.Value
             };
-            useSyncV2 = Device.SupportsSyncV2;
+            _useSyncV2 = Device.SupportsSyncV2;
 
             Parallel.ForEach(Files.Where(f => !f.IsDirectory), options, (item) =>
             {
@@ -183,19 +161,19 @@ public class FileSyncOperation : FileOperation
 
                         // target = [Android parent folder]\[relative path from Windows parent folder to current item]
                         using var stream = new FileStream(item.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        service.Push(stream, targetPath, fileMode, lastWriteTime, SyncProgressCallback, useSyncV2, in isCanceled);
+                        service.Push(stream, targetPath, fileMode, lastWriteTime, SyncProgressCallback, _useSyncV2, in _isCanceled);
                     }
                     else
                     {
                         if (Data.Settings.EnableLog && !Data.IsLogPaused)
                             Data.CommandLog.Add(new($"@AdvancedSharpAdbClient: pull {item.FullPath} -> {targetPath}"));
 
-                        if (!useSyncV2)
+                        if (!_useSyncV2)
                             ResolvePullFileSize(item);
 
                         // target = [Windows parent folder]\[relative path from Android parent folder to current item]
                         using var stream = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.Read);
-                        service.Pull(item.FullPath, stream, SyncProgressCallback, useSyncV2, in isCanceled);
+                        service.Pull(item.FullPath, stream, SyncProgressCallback, _useSyncV2, in _isCanceled);
 
                         if (item.DateModified is not null)
                             File.SetLastWriteTime(targetPath, item.DateModified.Value);
@@ -232,7 +210,7 @@ public class FileSyncOperation : FileOperation
                     : ProgressUpdates.OfType<SyncErrorInfo>().LastOrDefault()?.Message;
 
                 Status = OperationStatus.Failed;
-                StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(typeof(SyncErrorInfo), message: message, total: true));
+                StatusInfo = new FailedOpProgressViewModel(FileOpStatusFormatter.StatusString(typeof(SyncErrorInfo), message: message, total: true));
             }
             else
             {
@@ -265,7 +243,7 @@ public class FileSyncOperation : FileOperation
                 : t.Exception.InnerException.Message;
 
             Status = OperationStatus.Failed;
-            StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(typeof(SyncErrorInfo), message: message, total: true));
+            StatusInfo = new FailedOpProgressViewModel(FileOpStatusFormatter.StatusString(typeof(SyncErrorInfo), message: message, total: true));
 
             ReleaseTransferResources();
         }, TaskContinuationOptions.OnlyOnFaulted);
@@ -273,12 +251,12 @@ public class FileSyncOperation : FileOperation
 
     private void AddUpdates(SyncFile item, SyncProgressChangedEventArgs eventArgs, Mutex mutex)
     {
-        if (item.Size is null && useSyncV2 && eventArgs.TotalBytesToReceive > 0)
+        if (item.Size is null && _useSyncV2 && eventArgs.TotalBytesToReceive > 0)
             item.Size = (long)eventArgs.TotalBytesToReceive;
 
         var currentBytes = CorrectReceivedBytes(item.FullPath, eventArgs.ReceivedBytesSize);
-        var previousBytes = lastReportedBytes.GetOrAdd(item.FullPath, 0L);
-        lastReportedBytes[item.FullPath] = currentBytes;
+        var previousBytes = _lastReportedBytes.GetOrAdd(item.FullPath, 0L);
+        _lastReportedBytes[item.FullPath] = currentBytes;
         var deltaBytes = currentBytes - previousBytes;
         if (deltaBytes > 0)
         {
@@ -304,10 +282,10 @@ public class FileSyncOperation : FileOperation
         TransferEnd = DateTime.Now;
 
         var nowTicks = DateTime.UtcNow.Ticks;
-        if (nowTicks - Interlocked.Read(ref lastUiUpdateTicks) < UiUpdateThrottleTicks)
+        if (nowTicks - Interlocked.Read(ref _lastUiUpdateTicks) < UiUpdateThrottleTicks)
             return;
 
-        Interlocked.Exchange(ref lastUiUpdateTicks, nowTicks);
+        Interlocked.Exchange(ref _lastUiUpdateTicks, nowTicks);
 
         mutex.WaitOne();
         ProgressUpdates.Add(progressInfo);
@@ -330,13 +308,13 @@ public class FileSyncOperation : FileOperation
 
     private long CorrectReceivedBytes(string path, ulong rawReceived)
     {
-        var lastRaw = lastRawReceivedBytes.GetOrAdd(path, 0);
-        var carry = receivedBytesCarry.GetOrAdd(path, 0L);
+        var lastRaw = _lastRawReceivedBytes.GetOrAdd(path, 0);
+        var carry = _receivedBytesCarry.GetOrAdd(path, 0L);
 
         if (rawReceived < lastRaw)
-            receivedBytesCarry[path] = carry += 1L << 32;
+            _receivedBytesCarry[path] = carry += 1L << 32;
 
-        lastRawReceivedBytes[path] = rawReceived;
+        _lastRawReceivedBytes[path] = rawReceived;
         return carry + (long)rawReceived;
     }
 
@@ -394,8 +372,8 @@ public class FileSyncOperation : FileOperation
             throw new Exception("Cannot cancel a deactivated operation!");
         }
 
-        isCanceled = true;
-        cancelTokenSource.Cancel();
+        _isCanceled = true;
+        _cancelTokenSource.Cancel();
     }
 
     public override void ClearChildren()
@@ -438,17 +416,6 @@ public class FileSyncOperation : FileOperation
         CleanupArchiveStaging();
     }
 
-    private void CleanupArchiveStaging()
-    {
-        if (string.IsNullOrEmpty(ArchivePullStagingRoot))
-            return;
-
-        var root = ArchivePullStagingRoot;
-        ArchivePullStagingRoot = null;
-        var deviceId = Device.ID;
-        Task.Run(() => ArchiveExtract.CleanupStaging(deviceId, root));
-    }
-
     public override void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
         => FilePath.AddUpdates(newUpdates, this);
 
@@ -457,14 +424,6 @@ public class FileSyncOperation : FileOperation
 
     public static FileSyncOperation PullFile(SyncFile sourcePath, SyncFile targetPath, LogicalDeviceViewModel device, Dispatcher dispatcher)
         => new(OperationType.Pull, sourcePath, targetPath, device, dispatcher);
-
-    public void SetArchivePullSource(string archivePath, string internalPath, string stagingRoot, string displayPath)
-    {
-        ArchiveSourcePath = archivePath;
-        ArchiveInternalPath = internalPath;
-        ArchivePullStagingRoot = stagingRoot;
-        AltSource = new(displayPath);
-    }
 
     public static FileSyncOperation PushFile(SyncFile sourcePath, SyncFile targetPath, LogicalDeviceViewModel device, Dispatcher dispatcher)
         => new(OperationType.Push, sourcePath, targetPath, device, dispatcher);
@@ -480,7 +439,7 @@ public class FileSyncOperation : FileOperation
         var progressInfo = new AdbSyncProgressInfo(source.FullPath, percentage, percentage, null);
         op.Status = OperationStatus.InProgress;
         op.StatusInfo = new InProgSyncProgressViewModel(progressInfo, DateTime.Now, null, null);
-        op.cancelTokenSource = new();
+        op._cancelTokenSource = new();
 
         return op;
     }

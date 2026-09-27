@@ -35,6 +35,7 @@
                 MaxHeight="{Binding ThumbsSize, Source={x:Static models:Data.RuntimeSettings}, Converter={StaticResource ThumbnailSizeConverter}, ConverterParameter=LabelMaxHeight}"
                 FlowDirection="{Binding NameFlowDirection}"
                 HighlightStyle="{StaticResource SearchHighlightStyle}"
+                Style="{StaticResource FileItemStateTextStyle}"
                 Text="{Binding DisplayName}"
                 TextAlignment="Center"
                 TextTrimming="CharacterEllipsis"
@@ -47,23 +48,6 @@
                         <Binding Path="SearchCaseSensitive" Source="{x:Static models:Data.Settings}" />
                     </MultiBinding>
                 </emoji:TextBlock.HighlightRanges>
-                <emoji:TextBlock.Style>
-                    <Style TargetType="emoji:TextBlock">
-                        <Setter Property="Opacity" Value="1" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding CutState}" Value="Move">
-                                <Setter Property="Opacity" Value="0.5" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
-                            </DataTrigger>
-                            <!--  After IsSelected: a copied item keeps its accent color even while selected.  -->
-                            <DataTrigger Binding="{Binding CutState}" Value="Copy">
-                                <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </emoji:TextBlock.Style>
             </emoji:TextBlock>
         </DataTemplate>
         <DataTemplate x:Key="IconViewLabelEditableTemplate">
@@ -104,21 +88,10 @@
                     TextWrapping="Wrap"
                     ToolTip="{x:Null}">
                     <emoji:TextBlock.Style>
-                        <Style TargetType="emoji:TextBlock">
-                            <Setter Property="Opacity" Value="1" />
+                        <Style BasedOn="{StaticResource FileItemStateTextStyle}" TargetType="emoji:TextBlock">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IconViewModel.IsInEditMode}" Value="True">
                                     <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding CutState}" Value="Move">
-                                    <Setter Property="Opacity" Value="0.5" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                    <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
-                                </DataTrigger>
-                                <!--  After IsSelected: a copied item keeps its accent color even while selected.  -->
-                                <DataTrigger Binding="{Binding CutState}" Value="Copy">
-                                    <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

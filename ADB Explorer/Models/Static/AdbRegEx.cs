@@ -1,97 +1,96 @@
-﻿namespace ADB_Explorer.Models
+﻿namespace ADB_Explorer.Models;
+
+public static partial class AdbRegEx
 {
-    public static partial class AdbRegEx
-    {
-        [GeneratedRegex(@"^(?<Mode>[0-9a-f]+) (?<Size>[0-9a-f]+) (?<Time>[0-9a-f]+) (?<Name>[^/]+?)\r?$", RegexOptions.IgnoreCase)]
-        public static partial Regex RE_LS_FILE_ENTRY();
+    [GeneratedRegex(@"^(?<Mode>[0-9a-f]+) (?<Size>[0-9a-f]+) (?<Time>[0-9a-f]+) (?<Name>[^/]+?)\r?$", RegexOptions.IgnoreCase)]
+    public static partial Regex RE_LS_FILE_ENTRY();
 
-        [GeneratedRegex(@"^(?<id>[\w.:-]+?) +(?<status>unauthorized|device|offline|authorizing|recovery|sideload)(?: +.*(?:model:(?<model>\w+)))?(?: +.*(?:device:(?<device>\w+)))?[^\r\n]*", RegexOptions.Multiline)]
-        public static partial Regex RE_DEVICE_NAME();
+    [GeneratedRegex(@"^(?<id>[\w.:-]+?) +(?<status>unauthorized|device|offline|authorizing|recovery|sideload)(?: +.*(?:model:(?<model>\w+)))?(?: +.*(?:device:(?<device>\w+)))?[^\r\n]*", RegexOptions.Multiline)]
+    public static partial Regex RE_DEVICE_NAME();
 
-        [GeneratedRegex(@"^\w+: (?<Message>(?<AndroidPath>[^':]+):.*)$", RegexOptions.Multiline)]
-        public static partial Regex RE_SHELL_ERROR();
+    [GeneratedRegex(@"^\w+: (?<Message>(?<AndroidPath>[^':]+):.*)$", RegexOptions.Multiline)]
+    public static partial Regex RE_SHELL_ERROR();
 
-        [GeneratedRegex(@"(?<FileSystem>[\w\/]+)\s+(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>.*?)[\r\n]")]
-        public static partial Regex RE_EMULATED_STORAGE_SINGLE();
+    [GeneratedRegex(@"(?<FileSystem>[\w\/]+)\s+(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>.*?)[\r\n]")]
+    public static partial Regex RE_EMULATED_STORAGE_SINGLE();
 
-        [GeneratedRegex(@"(?<FileSystem>[\w\/]+)\s+(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>\/(?:storage|mnt\/media_rw)\/[\w-]+?)[\r\n]", RegexOptions.Multiline)]
-        public static partial Regex RE_EMULATED_ONLY();
+    [GeneratedRegex(@"(?<FileSystem>[\w\/]+)\s+(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>\/(?:storage|mnt\/media_rw)\/[\w-]+?)[\r\n]", RegexOptions.Multiline)]
+    public static partial Regex RE_EMULATED_ONLY();
 
-        [GeneratedRegex(@"(?<ID>[^\s]+)\t*_adb-tls-(?<PortType>pairing|connect)\._tcp\.*\t*(?<IpAddress>[^:]+):(?<Port>\d+)")]
-        public static partial Regex RE_MDNS_SERVICE();
+    [GeneratedRegex(@"(?<ID>[^\s]+)\t*_adb-tls-(?<PortType>pairing|connect)\._tcp\.*\t*(?<IpAddress>[^:]+):(?<Port>\d+)")]
+    public static partial Regex RE_MDNS_SERVICE();
 
-        [GeneratedRegex(@"^Version[\t ]*(?<version>[\d.]+)[\s\S]*^Installed as (?<Path>.+)$", RegexOptions.Multiline)]
-        public static partial Regex RE_ADB_VERSION();
+    [GeneratedRegex(@"^Version[\t ]*(?<version>[\d.]+)[\s\S]*^Installed as (?<Path>.+)$", RegexOptions.Multiline)]
+    public static partial Regex RE_ADB_VERSION();
 
-        [GeneratedRegex(@"EXE SHA-256: (?<Hash>[0-9a-zA-Z]+)$", RegexOptions.Multiline)]
-        public static partial Regex RE_ADB_LIST_HASH();
+    [GeneratedRegex(@"EXE SHA-256: (?<Hash>[0-9a-zA-Z]+)$", RegexOptions.Multiline)]
+    public static partial Regex RE_ADB_LIST_HASH();
 
-        [GeneratedRegex(@"(?:INSTALL_FAILED_INVALID_APK.*?)(?<package>com\.[\w.]+)(?:])")]
-        public static partial Regex RE_PACKAGE_NAME();
+    [GeneratedRegex(@"(?:INSTALL_FAILED_INVALID_APK.*?)(?<package>com\.[\w.]+)(?:])")]
+    public static partial Regex RE_PACKAGE_NAME();
 
-        [GeneratedRegex(@"package:(?<Path>\S+\.apk)=(?<Name>\S+) versionCode:(?<Version>\d+) uid:(?<Uid>\d+)")]
-        public static partial Regex RE_PACKAGE_LISTING();
+    [GeneratedRegex(@"package:(?<Path>\S+\.apk)=(?<Name>\S+) versionCode:(?<Version>\d+) uid:(?<Uid>\d+)")]
+    public static partial Regex RE_PACKAGE_LISTING();
 
-        [GeneratedRegex(@"(?:(?<!\d)(?<Date>\d{8})[^\d](?:(?<=[-_])(?<Time>\d{6}))?[^\d])|(?:(?<!\d)(?<DnT>\d{4}(?:[-_]\d{2}){5})[^\d])")]
-        public static partial Regex RE_FILE_NAME_DATE();
+    [GeneratedRegex(@"(?:(?<!\d)(?<Date>\d{8})[^\d](?:(?<=[-_])(?<Time>\d{6}))?[^\d])|(?:(?<!\d)(?<DnT>\d{4}(?:[-_]\d{2}){5})[^\d])")]
+    public static partial Regex RE_FILE_NAME_DATE();
 
-        [GeneratedRegex(@"inet (?<IP>[\d.]+)")]
-        public static partial Regex RE_DEVICE_WLAN_INET();
+    [GeneratedRegex(@"inet (?<IP>[\d.]+)")]
+    public static partial Regex RE_DEVICE_WLAN_INET();
 
-        [GeneratedRegex(@"^ *TCP +(?<IP>[\d.]+):(?<Port>[\d]+)", RegexOptions.Multiline)]
-        public static partial Regex RE_NETSTAT_TCP_SOCK();
+    [GeneratedRegex(@"^ *TCP +(?<IP>[\d.]+):(?<Port>[\d]+)", RegexOptions.Multiline)]
+    public static partial Regex RE_NETSTAT_TCP_SOCK();
 
-        [GeneratedRegex(@"^(?<Hash>\w+)[ -]+(?<Path>.+)$", RegexOptions.Multiline)]
-        public static partial Regex RE_ANDROID_FIND_HASH();
+    [GeneratedRegex(@"^(?<Hash>\w+)[ -]+(?<Path>.+)$", RegexOptions.Multiline)]
+    public static partial Regex RE_ANDROID_FIND_HASH();
 
-        [GeneratedRegex(@"""*([^""]+\.exe)""*")]
-        public static partial Regex RE_EXE_FROM_REG();
+    [GeneratedRegex(@"""*([^""]+\.exe)""*")]
+    public static partial Regex RE_EXE_FROM_REG();
 
-        [GeneratedRegex(@"^\w:\\$")]
-        public static partial Regex RE_WINDOWS_DRIVE_ROOT();
+    [GeneratedRegex(@"^\w:\\$")]
+    public static partial Regex RE_WINDOWS_DRIVE_ROOT();
 
-        [GeneratedRegex(@"(?<Alias>[^=\s]+)='(?<Target>.+)'")]
-        public static partial Regex RE_GET_ALIAS();
+    [GeneratedRegex(@"(?<Alias>[^=\s]+)='(?<Target>.+)'")]
+    public static partial Regex RE_GET_ALIAS();
 
-        [GeneratedRegex(@"[\d.]+")]
-        public static partial Regex RE_GITHUB_VERSION();
+    [GeneratedRegex(@"[\d.]+")]
+    public static partial Regex RE_GITHUB_VERSION();
 
-        [GeneratedRegex(@"^\s*(?<Length>\d+)\s+(?<Method>\S+)\s+(?<Compressed>\d+)\s+(?<Ratio>\d+%)\s+(?<Date>[\d-]+ [\d:]+)\s+(?<Crc>[0-9a-f]+)\s+(?<Name>.+)", RegexOptions.Multiline)]
-        public static partial Regex RE_UNZIP_VERBOSE_ENTRY();
+    [GeneratedRegex(@"^\s*(?<Length>\d+)\s+(?<Method>\S+)\s+(?<Compressed>\d+)\s+(?<Ratio>\d+%)\s+(?<Date>[\d-]+ [\d:]+)\s+(?<Crc>[0-9a-f]+)\s+(?<Name>.+)", RegexOptions.Multiline)]
+    public static partial Regex RE_UNZIP_VERBOSE_ENTRY();
 
-        [GeneratedRegex(@"^\s*(?<Length>\d+)\s+(?<Compressed>\d+)\s+(?<Ratio>\d+%)\s+(?<Count>\d+)\s+files?\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase)]
-        public static partial Regex RE_UNZIP_VERBOSE_SUMMARY();
+    [GeneratedRegex(@"^\s*(?<Length>\d+)\s+(?<Compressed>\d+)\s+(?<Ratio>\d+%)\s+(?<Count>\d+)\s+files?\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase)]
+    public static partial Regex RE_UNZIP_VERBOSE_SUMMARY();
 
-        // Name is ".+" so members with spaces match; link targets are stripped in ParseTarToc.
-        [GeneratedRegex(@"^(?<Mode>[\w-]+)\s+\S+\s+(?<Size>\d+)\s+(?<Date>[\d-]+ [\d:]+)\s+(?<Name>.+)$")]
-        public static partial Regex RE_TAR_LIST();
+    // Name is ".+" so members with spaces match; link targets are stripped in ParseTarToc.
+    [GeneratedRegex(@"^(?<Mode>[\w-]+)\s+\S+\s+(?<Size>\d+)\s+(?<Date>[\d-]+ [\d:]+)\s+(?<Name>.+)$")]
+    public static partial Regex RE_TAR_LIST();
 
-        [GeneratedRegex(@"^\s*versionName=(?<VersionName>.+?)\s*$", RegexOptions.Multiline)]
-        public static partial Regex RE_DUMPSYS_VERSION_NAME();
+    [GeneratedRegex(@"^\s*versionName=(?<VersionName>.+?)\s*$", RegexOptions.Multiline)]
+    public static partial Regex RE_DUMPSYS_VERSION_NAME();
 
-        [GeneratedRegex(@"^\s*lastUpdateTime=(?<LastUpdateTime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s*$", RegexOptions.Multiline)]
-        public static partial Regex RE_DUMPSYS_LAST_UPDATE();
+    [GeneratedRegex(@"^\s*lastUpdateTime=(?<LastUpdateTime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s*$", RegexOptions.Multiline)]
+    public static partial Regex RE_DUMPSYS_LAST_UPDATE();
 
-        [GeneratedRegex(@"(?<BlockDev>.+) on (?<MntPt>.+) type (?<Type>.+) \((?<Attr>.+)\)", RegexOptions.Multiline)]
-        public static partial Regex RE_MOUNT_PARSE();
+    [GeneratedRegex(@"(?<BlockDev>.+) on (?<MntPt>.+) type (?<Type>.+) \((?<Attr>.+)\)", RegexOptions.Multiline)]
+    public static partial Regex RE_MOUNT_PARSE();
 
-        [GeneratedRegex(@"\b([0-9a-fA-F]{8})\b")]
-        public static partial Regex RE_SERVICE_CALL_WORD();
+    [GeneratedRegex(@"\b([0-9a-fA-F]{8})\b")]
+    public static partial Regex RE_SERVICE_CALL_WORD();
 
-        /// <summary>Busybox/GNU style: <c>-r</c> followed by an Append description.</summary>
-        [GeneratedRegex(@"-r\s+Append", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
-        public static partial Regex RE_TAR_APPEND_BUSYBOX();
+    /// <summary>Busybox/GNU style: <c>-r</c> followed by an Append description.</summary>
+    [GeneratedRegex(@"-r\s+Append", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+    public static partial Regex RE_TAR_APPEND_BUSYBOX();
 
-        /// <summary>Toybox tabular help: <c>r</c> column with an Append description (no leading dash).</summary>
-        [GeneratedRegex(@"(?m)^r\s{2,}Append\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
-        public static partial Regex RE_TAR_APPEND_TOYBOX();
+    /// <summary>Toybox tabular help: <c>r</c> column with an Append description (no leading dash).</summary>
+    [GeneratedRegex(@"(?m)^r\s{2,}Append\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+    public static partial Regex RE_TAR_APPEND_TOYBOX();
 
-        /// <summary><c>dumpsys mount</c> disk entry: removable-media flag (<c>SD</c>/<c>USB</c>) and manufacturer/product label.</summary>
-        [GeneratedRegex(@"DiskInfo\{disk:(?<Disk>[\d,]+)\}:\s*\r?\n\s*flags=(?<Flags>\S+)\s+size=\S+\s+label=(?<Label>.*?)\s*\r?\n")]
-        public static partial Regex RE_DUMPSYS_MOUNT_DISK();
+    /// <summary><c>dumpsys mount</c> disk entry: removable-media flag (<c>SD</c>/<c>USB</c>) and manufacturer/product label.</summary>
+    [GeneratedRegex(@"DiskInfo\{disk:(?<Disk>[\d,]+)\}:\s*\r?\n\s*flags=(?<Flags>\S+)\s+size=\S+\s+label=(?<Label>.*?)\s*\r?\n")]
+    public static partial Regex RE_DUMPSYS_MOUNT_DISK();
 
-        /// <summary><c>dumpsys mount</c> public volume entry: owning disk, user-visible volume label, and mount path.</summary>
-        [GeneratedRegex(@"VolumeInfo\{public:[\d,]+\}:\s*\r?\n\s*type=PUBLIC diskId=disk:(?<Disk>[\d,]+)[^\r\n]*\r?\n\s*fsType=\S*\s+fsUuid=\S*\s+fsLabel=(?<FsLabel>.*?)\s*\r?\n\s*path=(?<Path>\S+)")]
-        public static partial Regex RE_DUMPSYS_MOUNT_VOLUME();
-    }
+    /// <summary><c>dumpsys mount</c> public volume entry: owning disk, user-visible volume label, and mount path.</summary>
+    [GeneratedRegex(@"VolumeInfo\{public:[\d,]+\}:\s*\r?\n\s*type=PUBLIC diskId=disk:(?<Disk>[\d,]+)[^\r\n]*\r?\n\s*fsType=\S*\s+fsUuid=\S*\s+fsLabel=(?<FsLabel>.*?)\s*\r?\n\s*path=(?<Path>\S+)")]
+    public static partial Regex RE_DUMPSYS_MOUNT_VOLUME();
 }

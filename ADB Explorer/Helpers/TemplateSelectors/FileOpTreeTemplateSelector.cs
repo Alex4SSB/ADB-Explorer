@@ -1,6 +1,4 @@
-﻿using ADB_Explorer.Models;
-
-namespace ADB_Explorer.Helpers;
+﻿namespace ADB_Explorer.Helpers;
 
 internal class FileOpTreeTemplateSelector : DataTemplateSelector
 {

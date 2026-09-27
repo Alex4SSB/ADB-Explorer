@@ -1,29 +1,25 @@
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.ViewModels;
-
 namespace ADB_Explorer.Services;
 
-public class FileOperationQueue : ViewModelBase
+public class FileOperationQueue : ObservableObject
 {
     #region Full properties
 
-    private bool isActive;
+    private bool _isActive;
     public bool IsActive
     {
-        get => isActive; 
-        set => Set(ref isActive, value);
+        get => _isActive; 
+        set => SetProperty(ref _isActive, value);
     }
 
-    private bool isAutoPlayStopped = false;
+    private bool _isAutoPlayStopped = false;
     public bool IsAutoPlayStopped
     {
-        get => isAutoPlayStopped;
+        get => _isAutoPlayStopped;
         set
         {
-            if (Set(ref isAutoPlayStopped, value))
+            if (SetProperty(ref _isAutoPlayStopped, value))
             {
-                if (isAutoPlayStopped)
+                if (_isAutoPlayStopped)
                     Stop();
                 else
                     Start();
@@ -31,16 +27,15 @@ public class FileOperationQueue : ViewModelBase
         }
     }
 
-    private double progress = 0.0;
+    private double _progress = 0.0;
     public double Progress
     {
-        get => progress;
+        get => _progress;
         set
         {
-            if (Set(ref progress, value))
+            if (SetProperty(ref _progress, value))
             {
                 OnPropertyChanged(nameof(AnyFailedOperations));
-                OnPropertyChanged(nameof(StringProgress));
             }
         }
     }
@@ -50,8 +45,6 @@ public class FileOperationQueue : ViewModelBase
     #region Read only properties
 
     public ObservableList<FileOperation> Operations { get; } = [];
-
-    public bool CurrentChanged { get => false; set => OnPropertyChanged(); }
 
     public static string[] NotifyProperties => [nameof(IsActive), nameof(AnyFailedOperations), nameof(Progress)];
 
@@ -67,7 +60,7 @@ public class FileOperationQueue : ViewModelBase
 
     #endregion
 
-    private readonly Mutex mutex = new();
+    private readonly Mutex _mutex = new();
 
     public FileOperationQueue()
     {
@@ -77,7 +70,7 @@ public class FileOperationQueue : ViewModelBase
             if (e.PropertyName is nameof(AppSettings.StopPollingOnSync))
             {
                 Data.RuntimeSettings.IsPollingStopped = Data.Settings.StopPollingOnSync
-                    && Operations.Any(op => op is FileSyncOperation && op.Status is FileOperation.OperationStatus.InProgress);
+                    && Operations.Any(op => op is FileSyncOperation or FileTransferOperation && op.Status is FileOperation.OperationStatus.InProgress);
             }
         };
     }
@@ -86,16 +79,15 @@ public class FileOperationQueue : ViewModelBase
     {
         try
         {
-            mutex.WaitOne();
+            _mutex.WaitOne();
 
             Operations.Add(fileOp);
-            OnPropertyChanged(nameof(HasIncompleteOperations));
 
             Start();
         } 
         finally
         {
-            mutex.ReleaseMutex();
+            _mutex.ReleaseMutex();
         }
     }
 
@@ -103,16 +95,15 @@ public class FileOperationQueue : ViewModelBase
     {
         try
         {
-            mutex.WaitOne();
+            _mutex.WaitOne();
 
             Operations.AddRange(operations);
-            OnPropertyChanged(nameof(HasIncompleteOperations));
 
             Start();
         }
         finally
         {
-            mutex.ReleaseMutex();
+            _mutex.ReleaseMutex();
         }
     }
 
@@ -120,7 +111,7 @@ public class FileOperationQueue : ViewModelBase
     {
         try
         {
-            mutex.WaitOne();
+            _mutex.WaitOne();
 
             if (fileOp.Status is FileOperation.OperationStatus.InProgress)
             {
@@ -132,7 +123,7 @@ public class FileOperationQueue : ViewModelBase
         }
         finally
         {
-            mutex.ReleaseMutex();
+            _mutex.ReleaseMutex();
         }
     }
 
@@ -140,10 +131,10 @@ public class FileOperationQueue : ViewModelBase
     {
         try
         {
-            mutex.WaitOne();
+            _mutex.WaitOne();
 
             Func<FileOperation, bool> predicate = op => {
-                if (device is not null && op.Device.ID != device.ID)
+                if (device is not null && op.Device.ID != device.ID && op.TargetDevice?.ID != device.ID)
                     return false;
 
                 return includeAll || op.Status
@@ -158,7 +149,7 @@ public class FileOperationQueue : ViewModelBase
         }
         finally
         {
-            mutex.ReleaseMutex();
+            _mutex.ReleaseMutex();
         }
     }
 
@@ -201,23 +192,22 @@ public class FileOperationQueue : ViewModelBase
         IsActive = false;
         
         if (isPush && !App.IsShuttingDown)
-            Data.RuntimeSettings.Refresh = true;
+            App.SafeBeginInvoke(FileActionLogic.Refresh);
     }
 
     private void MoveToCompleted(FileOperation op)
     {
         try
         {
-            mutex.WaitOne();
+            _mutex.WaitOne();
 
             op.PropertyChanged -= CurrentOperation_PropertyChanged;
             UpdateProgress();
 
-            OnPropertyChanged(nameof(HasIncompleteOperations));
         }
         finally
         { 
-            mutex.ReleaseMutex();
+            _mutex.ReleaseMutex();
         }
     }
 
@@ -225,7 +215,7 @@ public class FileOperationQueue : ViewModelBase
     {
         try
         {
-            mutex.WaitOne();
+            _mutex.WaitOne();
 
             var pending = Operations.Where(op => op.Status is FileOperation.OperationStatus.Waiting);
             if (pending.Any())
@@ -261,25 +251,25 @@ public class FileOperationQueue : ViewModelBase
                         op.Start();
                     }
 
-                    CurrentChanged = true;
                 }
             }
             else if (!Operations.Any(op => op.Status is FileOperation.OperationStatus.InProgress))
             {
                 IsActive = false;
-                CurrentChanged = true;
             }
         }
         finally
         {
-            mutex.ReleaseMutex();
+            _mutex.ReleaseMutex();
         }
     }
 
     private void CheckForRescan(FileOperation fileOp)
     {
+        // A device to device transfer writes to its target device.
+        var device = fileOp.TargetDevice ?? fileOp.Device;
         var target = fileOp.TargetPath.ParentPath;
-        if (fileOp.Device.AndroidVersion < AdbExplorerConst.MIN_MEDIA_SCAN_ANDROID_VER
+        if (device.AndroidVersion < AdbExplorerConst.MIN_MEDIA_SCAN_ANDROID_VER
             || Operations.Any(op =>
                 op.TypeOnDevice == fileOp.TypeOnDevice
                 && op.TargetPath.ParentPath == target
@@ -288,7 +278,7 @@ public class FileOperationQueue : ViewModelBase
             return;
         }
 
-        ADBService.ForceMediaScan(fileOp.Device);
+        AdbService.ForceMediaScan(device);
     }
 
     private void CurrentOperation_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -300,7 +290,7 @@ public class FileOperationQueue : ViewModelBase
         if (e.PropertyName is nameof(FileOperation.Status))
         {
             Data.RuntimeSettings.IsPollingStopped = Data.Settings.StopPollingOnSync
-                && Operations.Any(op => op is FileSyncOperation && op.Status is FileOperation.OperationStatus.InProgress);
+                && Operations.Any(op => op is FileSyncOperation or FileTransferOperation && op.Status is FileOperation.OperationStatus.InProgress);
 
             if (op.Status
                 is not FileOperation.OperationStatus.Waiting
@@ -311,7 +301,7 @@ public class FileOperationQueue : ViewModelBase
                 if (!IsAutoPlayStopped)
                     MoveToNextOperation();
 
-                if (op.OperationName is FileOperation.OperationType.Push
+                if ((op.OperationName is FileOperation.OperationType.Push || op is FileTransferOperation)
                     && Data.Settings.RescanOnPush)
                     Task.Run(() => CheckForRescan(op));
             }
@@ -328,7 +318,6 @@ public class FileOperationQueue : ViewModelBase
 
     private void Operations_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        OnPropertyChanged(nameof(TotalCount));
         UpdateProgress();
 
         if (e.Action is not NotifyCollectionChangedAction.Reset && e.NewItems is null)

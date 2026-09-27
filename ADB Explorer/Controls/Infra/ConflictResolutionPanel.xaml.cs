@@ -1,4 +1,3 @@
-using ADB_Explorer.Helpers;
 using Wpf.Ui.Controls;
 
 namespace ADB_Explorer.Controls;

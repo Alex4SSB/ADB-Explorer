@@ -1,8 +1,3 @@
-using ADB_Explorer.Converters;
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.ViewModels;
-
 namespace ADB_Explorer.Controls;
 
 public partial class ConflictPerFilePanel : UserControl
@@ -65,7 +60,7 @@ public partial class ConflictPerFilePanel : UserControl
     }
 }
 
-public partial class ConflictItemDecision : ViewModelBase
+public partial class ConflictItemDecision : ObservableObject
 {
     private const string EmptyFolderMarker = "—";
 
@@ -84,24 +79,24 @@ public partial class ConflictItemDecision : ViewModelBase
 
     public bool IsLast { get; }
 
-    private bool replace = true;
+    private bool _replace = true;
     public bool Replace
     {
-        get => replace;
+        get => _replace;
         set
         {
-            if (Set(ref replace, value) && value)
+            if (SetProperty(ref _replace, value) && value)
                 Skip = false;
         }
     }
 
-    private bool skip;
+    private bool _skip;
     public bool Skip
     {
-        get => skip;
+        get => _skip;
         set
         {
-            if (Set(ref skip, value) && value)
+            if (SetProperty(ref _skip, value) && value)
                 Replace = false;
         }
     }
@@ -119,8 +114,8 @@ public partial class ConflictItemDecision : ViewModelBase
         if (info.IsIdentical)
         {
             // Prefer keeping the destination when size and date already match.
-            replace = false;
-            skip = true;
+            _replace = false;
+            _skip = true;
             return;
         }
 
@@ -137,15 +132,15 @@ public partial class ConflictItemDecision : ViewModelBase
         {
             DestDateComparison = Strings.Resources.S_NEWER;
             // Prefer the newer (destination).
-            replace = false;
-            skip = true;
+            _replace = false;
+            _skip = true;
         }
         else if (info.SourceMtimeUtc > info.DestMtimeUtc)
         {
             SourceDateComparison = Strings.Resources.S_NEWER;
             // Prefer the newer (source).
-            replace = true;
-            skip = false;
+            _replace = true;
+            _skip = false;
         }
     }
 

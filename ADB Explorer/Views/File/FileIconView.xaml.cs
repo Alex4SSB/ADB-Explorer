@@ -1,5 +1,3 @@
-using ADB_Explorer.Models;
-using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.Data;
 
@@ -109,7 +107,7 @@ public partial class FileIconView : UserControl
         if (sender is not System.Windows.Controls.TextBox textBox)
             return;
 
-        FileViewModelBase.PrepareRenameTextBox(textBox);
+        RenameBox.PrepareFile(textBox);
 
         if (DataContext is FileClass)
             RenameStarted?.Invoke(this, textBox);
@@ -130,7 +128,7 @@ public partial class FileIconView : UserControl
         if (textBox.DataContext is FileClass file && !file.IconViewModel.IsInEditMode)
             return;
 
-        FileViewModelBase.RenameCommit(textBox, ExitIconEditMode);
+        RenameBox.FileCommit(textBox, ExitIconEditMode);
     }
 
     private void IconViewNameEdit_KeyDown(object sender, KeyEventArgs e)
@@ -138,7 +136,7 @@ public partial class FileIconView : UserControl
         if (sender is not System.Windows.Controls.TextBox textBox)
             return;
 
-        FileViewModelBase.RenameKeyDown(textBox, e.Key, ExitIconEditMode);
+        RenameBox.FileKeyDown(textBox, e.Key, ExitIconEditMode);
         if (e.Key is Key.Escape or Key.F2 or Key.Enter)
             e.Handled = true;
     }
@@ -148,6 +146,6 @@ public partial class FileIconView : UserControl
         if (sender is not System.Windows.Controls.TextBox textBox)
             return;
 
-        FileViewModelBase.RenameTextChanged(textBox);
+        RenameBox.FileTextChanged(textBox);
     }
 }

@@ -1,5 +1,3 @@
-using ADB_Explorer.Converters;
-using ADB_Explorer.Models;
 using static ADB_Explorer.Models.AbstractFile;
 
 namespace ADB_Explorer.ViewModels;
@@ -9,11 +7,9 @@ public partial class FolderViewModel(FileClass file) : FileViewModelBase(file)
     [ObservableProperty]
     public partial bool ExtensionIsGlyph { get; set; }
 
-    [ObservableProperty]
-    public partial bool ExtensionIsFontIcon { get; set; }
+    public bool ExtensionIsFontIcon { get; set; }
 
-    [ObservableProperty]
-    public partial bool IsCalculatingSize { get; set; }
+    public bool IsCalculatingSize { get; set; }
 
     private long? _calculatedSize;
     private bool HasCalculatedSize => _calculatedSize is not null;

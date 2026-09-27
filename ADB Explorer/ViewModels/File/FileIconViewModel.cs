@@ -1,8 +1,4 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-
-namespace ADB_Explorer.ViewModels;
+﻿namespace ADB_Explorer.ViewModels;
 
 public partial class FileIconViewModel : FileViewModelBase
 {
@@ -13,7 +9,7 @@ public partial class FileIconViewModel : FileViewModelBase
     private ThumbnailService.ThumbnailSize _cachedSize;
     private ThumbnailService.ThumbnailSize _currentlyLoadingSize;
 
-    private BitmapSource LargeFileIcon => FileToIconConverter.GetImage(_file, (int)(ThumbnailService.GetPixelSize(Data.RuntimeSettings.ThumbsSize) / Data.RuntimeSettings.MainWindowScalingFactor)).First();
+    private BitmapSource LargeFileIcon => FileIconProvider.GetImage(_file, (int)(ThumbnailService.GetPixelSize(Data.RuntimeSettings.ThumbsSize) / Data.RuntimeSettings.MainWindowScalingFactor)).First();
     public BitmapSource? LargeIcon
     {
         get
@@ -58,7 +54,7 @@ public partial class FileIconViewModel : FileViewModelBase
     {
         if (_file.SpecialType.HasFlag(AbstractFile.SpecialFileType.LinkOverlay))
         {
-            var icons = FileToIconConverter.GetImage(_file, 64);
+            var icons = FileIconProvider.GetImage(_file, 64);
             LargeIconOverlay = icons.Skip(1).FirstOrDefault();
         }
         else
@@ -203,7 +199,7 @@ public partial class FileIconViewModel : FileViewModelBase
     {
         if (thumb.Info.Type is ThumbnailService.MediaType.video)
         {
-            VideoIconOverlay = FileToIconConverter.GetImage(_file, 32).FirstOrDefault();
+            VideoIconOverlay = FileIconProvider.GetImage(_file, 32).FirstOrDefault();
         }
     }
 

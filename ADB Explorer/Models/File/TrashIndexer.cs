@@ -1,18 +1,13 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Services;
-
-namespace ADB_Explorer.Models;
+﻿namespace ADB_Explorer.Models;
 
 public partial class TrashIndexer : ObservableObject
 {
-    [ObservableProperty]
-    public partial string RecycleName { get; set; }
+    public string RecycleName { get; set; }
 
     [ObservableProperty]
     public partial string OriginalPath { get; set; }
 
-    [ObservableProperty]
-    public partial DateTime? DateModified { get; set; }
+    public DateTime? DateModified { get; set; }
 
     public string ModifiedTimeString => TabularDateFormatter.Format(DateModified, Data.Settings.ActualFormatCulture);
 
@@ -78,7 +73,7 @@ public partial class TrashIndexer : ObservableObject
             return [];
 
         List<TrashIndexer> result = [];
-        foreach (var line in text.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries))
+        foreach (var line in text.Split(AdbService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries))
         {
             if (TryParse(line, out var indexer))
                 result.Add(indexer);

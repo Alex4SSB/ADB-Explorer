@@ -1,8 +1,4 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.ViewModels;
-
-namespace ADB_Explorer.Services;
+﻿namespace ADB_Explorer.Services;
 
 public class FileRenameOperation : AbstractShellFileOperation
 {
@@ -16,14 +12,7 @@ public class FileRenameOperation : AbstractShellFileOperation
 
     public override void Start()
     {
-        if (Status == OperationStatus.InProgress)
-        {
-            throw new Exception("Cannot start an already active operation!");
-        }
-
-        Status = OperationStatus.InProgress;
-        StatusInfo = new InProgShellProgressViewModel();
-        CancelTokenSource = new();
+        BeginInProgress();
 
         Task operationTask;
         if (ArchivePath.TryParse(FilePath.FullPath, out var archivePath, out var oldInternal, Device.ID)
@@ -56,47 +45,16 @@ public class FileRenameOperation : AbstractShellFileOperation
         }
         else
         {
-            operationTask = ADBService.ExecuteVoidShellCommand(Device.ID,
+            operationTask = AdbService.ExecuteVoidShellCommand(Device.ID,
                 CancelTokenSource!.Token,
                 "mv",
-                ADBService.EscapeAdbShellString(FilePath.FullPath),
-                ADBService.EscapeAdbShellString(TargetPath.FullPath));
+                AdbService.EscapeAdbShellString(FilePath.FullPath),
+                AdbService.EscapeAdbShellString(TargetPath.FullPath));
         }
 
-        operationTask.ContinueWith((t) =>
-        {
-            if (t is Task<string> shellTask)
-            {
-                if (shellTask.Result == "")
-                {
-                    Status = OperationStatus.Completed;
-                    StatusInfo = new CompletedShellProgressViewModel();
-                }
-                else
-                {
-                    Status = OperationStatus.Failed;
-                    StatusInfo = new FailedOpProgressViewModel(shellTask.Result);
-                }
-            }
-            else
-            {
-                Status = OperationStatus.Completed;
-                StatusInfo = new CompletedShellProgressViewModel();
-            }
-
-        }, TaskContinuationOptions.OnlyOnRanToCompletion);
-
-        operationTask.ContinueWith((t) =>
-        {
-            Status = OperationStatus.Canceled;
-            StatusInfo = new CanceledOpProgressViewModel();
-        }, TaskContinuationOptions.OnlyOnCanceled);
-
-        operationTask.ContinueWith((t) =>
-        {
-            Status = OperationStatus.Failed;
-            var message = t.Exception?.InnerException?.Message ?? t.Exception?.Message ?? "Rename failed";
-            StatusInfo = new FailedOpProgressViewModel(message);
-        }, TaskContinuationOptions.OnlyOnFaulted);
+        if (operationTask is Task<string> shellTask)
+            TrackTask(shellTask, "Rename failed", SetShellResult);
+        else
+            TrackTask(operationTask, "Rename failed");
     }
 }

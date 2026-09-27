@@ -1,8 +1,4 @@
-﻿using ADB_Explorer.Converters;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-using ADB_Explorer.ViewModels;
-using Vanara.PInvoke;
+﻿using Vanara.PInvoke;
 using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
 using static ADB_Explorer.Models.AdbExplorerConst;
@@ -187,16 +183,16 @@ public static class FileHelper
         return GetWildcardRegex(query, caseSensitive).IsMatch(text);
     }
 
-    private static (string Query, bool CaseSensitive, Regex Regex)? cachedWildcardRegex;
+    private static (string Query, bool CaseSensitive, Regex Regex)? _cachedWildcardRegex;
 
     private static Regex GetWildcardRegex(string query, bool caseSensitive)
     {
-        if (cachedWildcardRegex is { } cached && cached.Query == query && cached.CaseSensitive == caseSensitive)
+        if (_cachedWildcardRegex is { } cached && cached.Query == query && cached.CaseSensitive == caseSensitive)
             return cached.Regex;
 
         var options = RegexOptions.Singleline | (caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
         var regex = new Regex(WildcardToRegexPattern(query), options);
-        cachedWildcardRegex = (query, caseSensitive, regex);
+        _cachedWildcardRegex = (query, caseSensitive, regex);
 
         return regex;
     }
@@ -278,16 +274,16 @@ public static class FileHelper
         return sb.Append('$').ToString();
     }
 
-    private static (string Query, bool CaseSensitive, Regex Regex)? cachedWildcardHighlightRegex;
+    private static (string Query, bool CaseSensitive, Regex Regex)? _cachedWildcardHighlightRegex;
 
     private static Regex GetWildcardHighlightRegex(string query, bool caseSensitive)
     {
-        if (cachedWildcardHighlightRegex is { } cached && cached.Query == query && cached.CaseSensitive == caseSensitive)
+        if (_cachedWildcardHighlightRegex is { } cached && cached.Query == query && cached.CaseSensitive == caseSensitive)
             return cached.Regex;
 
         var options = RegexOptions.Singleline | (caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
         var regex = new Regex(WildcardToHighlightRegexPattern(query), options);
-        cachedWildcardHighlightRegex = (query, caseSensitive, regex);
+        _cachedWildcardHighlightRegex = (query, caseSensitive, regex);
 
         return regex;
     }
@@ -317,11 +313,9 @@ public static class FileHelper
         ShellFileOperation.Rename(file, newPath, device ?? Data.Active.Device ?? Data.ActiveDevice);
     }
 
-    public static string DisplayName(TextBox textBox) => DisplayName(textBox.DataContext as FilePath);
-
     public static string DisplayName(FilePath file) => Data.Settings.ShowExtensions ? file?.FullName : file?.NoExtName;
 
-    public static FileClass GetFromCell(DataGridCellInfo cell) => CellConverter.GetDataGridCell(cell).DataContext as FileClass;
+    public static FileClass GetFromCell(DataGridCellInfo cell) => DataGridHelper.GetDataGridCell(cell).DataContext as FileClass;
 
     public static string ConcatPaths(FilePath path1, string path2) => 
         ConcatPaths(path1.FullPath, path2, path1.PathType is FilePathType.Android ? '/' : '\\');
@@ -631,7 +625,7 @@ public static class FileHelper
             return GetFolderTreeViaAdbLs(deviceId, paths, isFolder, cancellationToken);
 
         string stdout = "";
-        var files = string.Join(" ", paths.Select(p => ADBService.EscapeAdbShellString(p)));
+        var files = string.Join(" ", paths.Select(p => AdbService.EscapeAdbShellString(p)));
         var depth = isFolder ? "-mindepth 1" : "";
 
         if (ShellCommands.FindPrintf(deviceId))
@@ -647,7 +641,7 @@ public static class FileHelper
                 "2>/dev/null"
             ];
 
-            ADBService.ExecuteDeviceAdbShellCommand(deviceId, "find", out stdout, out _, cancellationToken, args);
+            AdbService.ExecuteDeviceAdbShellCommand(deviceId, "find", out stdout, out _, cancellationToken, args);
         }
         else // when find does not support -printf
         {
@@ -663,10 +657,10 @@ public static class FileHelper
                 """fi; done;"""
             ];
 
-            ADBService.ExecuteDeviceAdbShellCommand(deviceId, "find", out stdout, out _, cancellationToken, args);
+            AdbService.ExecuteDeviceAdbShellCommand(deviceId, "find", out stdout, out _, cancellationToken, args);
         }
 
-        return [.. stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries)
+        return [.. stdout.Split(AdbService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries)
             .Select(ParseFolderTreeLine)
             .Where(line => line.HasValue)
             .Select(line => line!.Value)];
@@ -680,7 +674,7 @@ public static class FileHelper
         {
             if (isFolder)
             {
-                foreach (var entry in ADBService.ListDirectoryRecursive(deviceId, path, cancellationToken))
+                foreach (var entry in AdbService.ListDirectoryRecursive(deviceId, path, cancellationToken))
                     results.Add(FileStatToFolderTree(entry));
             }
             else
@@ -688,7 +682,7 @@ public static class FileHelper
                 var parent = GetParentPath(path);
                 var name = GetFullName(path);
 
-                foreach (var entry in ADBService.ListDirectoryEntries(deviceId, parent, cancellationToken))
+                foreach (var entry in AdbService.ListDirectoryEntries(deviceId, parent, cancellationToken))
                 {
                     if (entry.FullName == name)
                         results.Add(FileStatToFolderTree(entry));
@@ -805,5 +799,21 @@ public static class FileHelper
         }
 
         return null;
+    }
+
+    /// <summary>Decodes text bytes, honoring a byte order mark when present.</summary>
+    public static string DecodeText(byte[] bytes)
+    {
+        using var reader = new StreamReader(new MemoryStream(bytes), detectEncodingFromByteOrderMarks: true);
+        return reader.ReadToEnd();
+    }
+
+    public static bool IsPreviewTextReadOnly(FileClass file, LogicalDeviceViewModel? device)
+    {
+        var deviceId = device?.ID ?? "";
+        if (ArchiveHelper.IsMemberPreviewReadOnly(file.FullPath, deviceId))
+            return true;
+
+        return DriveHelper.GetRestrictions(file.FullPath, device).ReadOnly;
     }
 }

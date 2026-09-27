@@ -1,5 +1,4 @@
 ﻿using AdvancedSharpAdbClient.Models;
-using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Models;
 

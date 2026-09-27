@@ -1,6 +1,3 @@
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services;
 using AdvancedSharpAdbClient.Models;
 using System.Net;
 
@@ -13,19 +10,19 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     [ObservableProperty]
     public new partial LogicalDevice Device { get; set; }
 
-    private bool isOpen;
+    private bool _isOpen;
     /// <summary>
     /// Device is open for browsing
     /// </summary>
     public bool IsOpen
     {
-        get => isOpen;
+        get => _isOpen;
         private set
         {
-            if (Set(ref isOpen, value) && Root is RootStatus.Enabled)
+            if (SetProperty(ref _isOpen, value) && Root is RootStatus.Enabled)
             {
                 if (!value && Data.Settings.UnrootOnDisconnect is true)
-                    ADBService.Unroot(Device.ID);
+                    AdbService.Unroot(Device.ID);
             }
         }
     }
@@ -37,8 +34,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     [ObservableProperty]
     public partial bool UseIdForName { get; set; }
 
-    [ObservableProperty]
-    public partial ObservableList<DriveViewModel> Drives { get; set; } = [];
+    public ObservableList<DriveViewModel> Drives { get; set; } = [];
 
     [ObservableProperty]
     public partial MountTable Mounts { get; set; } = MountTable.Empty;
@@ -74,7 +70,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
     public string BaseID => Type is DeviceType.Service ? ID.Split('.')[0] : ID;
 
-    private string serialNumber = "";
+    private string _serialNumber = "";
     /// <summary>
     /// Stable device identifier used for comparison and on-disk storage (USB ID, <c>ro.serialno</c>, mDNS serial, or AVD name).
     /// </summary>
@@ -82,33 +78,33 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     {
         get
         {
-            if (Type is DeviceType.Remote && string.IsNullOrEmpty(serialNumber))
+            if (Type is DeviceType.Remote && string.IsNullOrEmpty(_serialNumber))
                 RefreshSerialNumber();
 
-            return serialNumber;
+            return _serialNumber;
         }
     }
 
     public RootStatus Root => Device.Root;
 
-    private ShellIdentity? shellIdentity;
-    public ShellIdentity? ShellIdentity => shellIdentity;
+    private ShellIdentity? _shellIdentity;
+    public ShellIdentity? ShellIdentity => _shellIdentity;
 
     public ShellIdentity? GetOrLoadShellIdentity()
     {
-        shellIdentity ??= ADBService.GetShellIdentity(ID);
-        return shellIdentity;
+        _shellIdentity ??= AdbService.GetShellIdentity(ID);
+        return _shellIdentity;
     }
 
     public void RefreshShellIdentity()
     {
-        shellIdentity = ADBService.GetShellIdentity(ID);
+        _shellIdentity = AdbService.GetShellIdentity(ID);
         OnPropertyChanged(nameof(HasRootShell));
     }
 
     public void SetShellIdentity(ShellIdentity? identity)
     {
-        shellIdentity = identity;
+        _shellIdentity = identity;
         OnPropertyChanged(nameof(HasRootShell));
     }
 
@@ -138,7 +134,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
                 return;
         }
 
-        var (users, groups) = ADBService.GetKnownUsersAndGroups(ID);
+        var (users, groups) = AdbService.GetKnownUsersAndGroups(ID);
         lock (_unixIdLock)
         {
             foreach (var user in users)
@@ -217,9 +213,9 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     /// (Name reads this, often on the UI thread) - so wait between attempts.</summary>
     private static readonly TimeSpan PropsRetryDelay = TimeSpan.FromSeconds(10);
 
-    private readonly object propsLock = new();
+    private readonly object _propsLock = new();
 
-    private DateTime propsFailedAt = DateTime.MinValue;
+    private DateTime _propsFailedAt = DateTime.MinValue;
 
     public Dictionary<string, string> Props
     {
@@ -232,17 +228,17 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
             // Single flight: concurrent first readers (UI thread, InitDevice, UpdateBrandNames)
             // wait for one getprop instead of each running their own.
-            lock (propsLock)
+            lock (_propsLock)
             {
                 if (field is null)
                 {
-                    if (DateTime.Now - propsFailedAt < PropsRetryDelay)
+                    if (DateTime.Now - _propsFailedAt < PropsRetryDelay)
                         return [];
 
-                    int exitCode = ADBService.ExecuteDeviceAdbShellCommand(ID, ADBService.GET_PROP, out string stdout, out string stderr, CancellationToken.None);
+                    int exitCode = AdbService.ExecuteDeviceAdbShellCommand(ID, AdbService.GET_PROP, out string stdout, out string stderr, CancellationToken.None);
                     if (exitCode != 0)
                     {
-                        propsFailedAt = DateTime.Now;
+                        _propsFailedAt = DateTime.Now;
                         return [];
                     }
 
@@ -273,7 +269,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
             if (string.IsNullOrEmpty(field))
             {
                 var props = Props;
-                field = props.GetValueOrDefault(ADBService.BRAND_NAME) ?? props.GetValueOrDefault(ADBService.HOST_NAME);
+                field = props.GetValueOrDefault(AdbService.BRAND_NAME) ?? props.GetValueOrDefault(AdbService.HOST_NAME);
             }
 
             return field;
@@ -286,7 +282,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         {
             if (string.IsNullOrEmpty(field))
             {
-                field = Props.GetValueOrDefault(ADBService.ANDROID_VERSION, "");
+                field = Props.GetValueOrDefault(AdbService.ANDROID_VERSION, "");
             }
             return field;
         }
@@ -296,14 +292,14 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     {
         get
         {
-            field ??= ADBService.GetDeviceFeatures(DeviceData);
+            field ??= AdbService.GetDeviceFeatures(DeviceData);
             return field;
         }
     }
 
-    public bool SupportsSyncV2 => AdbFeatures.Contains(ADBService.FEATURE_SEND_RECV_V2);
+    public bool SupportsSyncV2 => AdbFeatures.Contains(AdbService.FEATURE_SEND_RECV_V2);
 
-    public bool SupportsLsV2 => AdbFeatures.Contains(ADBService.FEATURE_LS_V2);
+    public bool SupportsLsV2 => AdbFeatures.Contains(AdbService.FEATURE_LS_V2);
 
     #endregion
 
@@ -328,7 +324,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         Device = device;
 
         InitDeviceDrives();
-        RefreshSerialNumber(notify: false, allowPropLookup: false);
+        RefreshSerialNumber(allowPropLookup: false);
 
         // Not gated on !IsOpen - browsing an already-open device just points the active tab
         // at it again, so there's no reason to disable this then.
@@ -403,8 +399,8 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         if (Device.Type is not DeviceType.Emulator)
             return null;
 
-        return Props.GetValueOrDefault(ADBService.QEMU_BOOT_AVD_NAME)
-            ?? Props.GetValueOrDefault(ADBService.QEMU_KERNEL_AVD_NAME);
+        return Props.GetValueOrDefault(AdbService.QEMU_BOOT_AVD_NAME)
+            ?? Props.GetValueOrDefault(AdbService.QEMU_KERNEL_AVD_NAME);
     }
 
     public void SetAvdName(string? avdName)
@@ -420,15 +416,13 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         RefreshSerialNumber();
     }
 
-    private void RefreshSerialNumber(bool notify = true, bool allowPropLookup = true)
+    private void RefreshSerialNumber(bool allowPropLookup = true)
     {
         var next = ResolveSerialNumber(allowPropLookup);
-        if (serialNumber == next)
+        if (_serialNumber == next)
             return;
 
-        serialNumber = next;
-        if (notify)
-            OnPropertyChanged(nameof(SerialNumber));
+        _serialNumber = next;
     }
 
     private string ResolveSerialNumber(bool allowPropLookup) => Type switch
@@ -436,7 +430,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         DeviceType.Local or DeviceType.Recovery or DeviceType.Sideload or DeviceType.WSA => ID,
         DeviceType.Service => ParseMdnsSerial(ID),
         DeviceType.Remote when !allowPropLookup => GetRemoteSerialFallback(ID),
-        DeviceType.Remote => Props.GetValueOrDefault(ADBService.SERIAL_NO) ?? GetRemoteSerialFallback(ID),
+        DeviceType.Remote => Props.GetValueOrDefault(AdbService.SERIAL_NO) ?? GetRemoteSerialFallback(ID),
         DeviceType.Emulator => !string.IsNullOrEmpty(AvdName) ? AvdName : ID,
         _ => ID,
     };
@@ -464,8 +458,8 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     public void EnableRoot(bool enable)
     {
         Device.Root = enable
-            ? ADBService.Root(Device.ID) ? RootStatus.Enabled : RootStatus.Forbidden
-            : ADBService.Unroot(Device.ID) ? RootStatus.Disabled : RootStatus.Unchecked;
+            ? AdbService.Root(Device.ID) ? RootStatus.Enabled : RootStatus.Forbidden
+            : AdbService.Unroot(Device.ID) ? RootStatus.Disabled : RootStatus.Unchecked;
 
         RefreshShellIdentity();
 
@@ -478,7 +472,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     public void InvalidateRootStatus()
     {
         // Runs on every status change - a device that just came online deserves a fresh attempt.
-        propsFailedAt = DateTime.MinValue;
+        _propsFailedAt = DateTime.MinValue;
 
         SetShellIdentity(null);
 
@@ -510,7 +504,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
     public void UpdateBattery(CancellationToken cancellationToken)
     {
-        Device.Battery.Update(ADBService.GetBatteryInfo(this, cancellationToken));
+        Device.Battery.Update(AdbService.GetBatteryInfo(this, cancellationToken));
     }
 
     public void UpdateName() => OnPropertyChanged(nameof(Name));
@@ -563,7 +557,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
     private void UpdateExtensionDrives(IEnumerable<DriveSnapshot> snapshots, Dispatcher dispatcher)
     {
-        var mountTask = Task.Run(() => ADBService.GetRemovableDriveInfo(ID));
+        var mountTask = Task.Run(() => AdbService.GetRemovableDriveInfo(ID));
         mountTask.ContinueWith(t =>
         {
             if (t.IsCanceled)
@@ -575,10 +569,10 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
     /// <summary>
     /// Classifies every drive still of unknown type as SD/expansion or USB/OTG (with its manufacturer
-    /// and volume label when known), using the mount info gathered by <see cref="ADBService.GetRemovableDriveInfo"/>.
+    /// and volume label when known), using the mount info gathered by <see cref="AdbService.GetRemovableDriveInfo"/>.
     /// Drives with no matching mount info default to <see cref="AbstractDrive.DriveType.External"/>.
     /// </summary>
-    private void ApplyRemovableDriveInfo(Dictionary<string, ADBService.DriveMountInfo> mountInfo)
+    private void ApplyRemovableDriveInfo(Dictionary<string, AdbService.DriveMountInfo> mountInfo)
     {
         foreach (var drive in Drives.OfType<LogicalDriveViewModel>().Where(d => d.Type is AbstractDrive.DriveType.Unknown))
         {
@@ -595,7 +589,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
         await Task.Run(() =>
         {
-            var mountInfo = ADBService.GetRemovableDriveInfo(ID);
+            var mountInfo = AdbService.GetRemovableDriveInfo(ID);
 
             for (int i = 0; i < list.Count; i++)
             {

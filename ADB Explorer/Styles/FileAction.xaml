@@ -5,7 +5,7 @@
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
-    xmlns:services="clr-namespace:ADB_Explorer.Services"
+    xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     <converters:MenuItemConverter x:Key="MenuItemConverter" />
     <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
@@ -200,6 +200,40 @@
         Style="{StaticResource FluentTooltipStyle}">
         <TextBlock Text="{Binding Info}" TextWrapping="Wrap" />
     </ToolTip>
+    <!--  Check mark of a selector menu's items: a dot for radio items, a tick for toggles.  -->
+    <ui:FontIcon x:Key="MenuCheckIcon" x:Shared="False">
+        <ui:FontIcon.Style>
+            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                <Setter Property="Glyph" Value="&#xF137;" />
+                <Setter Property="FontSize" Value="6" />
+                <Setter Property="Margin" Value="14,0" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsChecked}" Value="False">
+                        <Setter Property="Visibility" Value="Hidden" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsRadioButton}" Value="False">
+                        <Setter Property="Glyph" Value="&#xE73E;" />
+                        <Setter Property="FontSize" Value="12" />
+                        <Setter Property="Margin" Value="11,0" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ui:FontIcon.Style>
+    </ui:FontIcon>
+    <!--  Items of a selector menu (search options, view options): BasedOn AdbMenuItemStyle for the hover-aware SubmenuItem template.  -->
+    <Style
+        x:Key="SelectorMenuItemStyle"
+        BasedOn="{StaticResource AdbMenuItemStyle}"
+        TargetType="controls:AdbMenuItem">
+        <Setter Property="Icon" Value="{StaticResource MenuCheckIcon}" />
+        <Setter Property="Command" Value="{Binding Action.Command}" />
+        <Setter Property="ToolTip" Value="{StaticResource SubMenuInfoTooltip}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Info}" Value="{x:Null}">
+                <Setter Property="ToolTip" Value="{x:Null}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
     <Style
         x:Key="SubMenuItemStyle"
         BasedOn="{StaticResource ActionMenuItemStyle}"
@@ -216,6 +250,35 @@
                 <Setter Property="InputGestureText" Value="" />
             </DataTrigger>
         </Style.Triggers>
+    </Style>
+    <DataTemplate x:Key="SelectorSubMenuHeaderTemplate">
+        <controls:SimpleStackPanel Orientation="Horizontal" Spacing="8">
+            <!--  A ContentControl, not a ContentPresenter: the latter re-points its own DataContext at its content, which would break the trigger's binding.  -->
+            <ContentControl
+                Content="{Binding IconContent}"
+                Focusable="False"
+                IsTabStop="False">
+                <ContentControl.Style>
+                    <Style TargetType="ContentControl">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IconContent}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
+            </ContentControl>
+            <TextBlock Text="{Binding Action.Description}" />
+        </controls:SimpleStackPanel>
+    </DataTemplate>
+    <!--  Radio choice of a context menu's Sort / View submenu: the dot marks the current choice, and the item's own icon, if any, leads its text.  -->
+    <Style
+        x:Key="SelectorSubMenuItemStyle"
+        BasedOn="{StaticResource SubMenuItemStyle}"
+        TargetType="controls:AdbMenuItem">
+        <Setter Property="Icon" Value="{StaticResource MenuCheckIcon}" />
+        <Setter Property="Header" Value="{Binding}" />
+        <Setter Property="HeaderTemplate" Value="{StaticResource SelectorSubMenuHeaderTemplate}" />
     </Style>
     <Style
         x:Key="DummySubMenuStyle"
@@ -235,20 +298,6 @@
         <Setter Property="IsChecked" Value="{Binding IsChecked}" />
         <!--<Setter Property="helpers:MenuHelper.CheckBackground" Value="{Binding CheckBackground}" />-->
     </Style>
-    <Style
-        x:Key="GeneralSubMenuStyle"
-        BasedOn="{StaticResource AdbMenuItemHoverStyle}"
-        TargetType="controls:AdbMenuItem">
-        <Setter Property="FlowDirection" Value="LeftToRight" />
-        <Setter Property="Header" Value="{Binding Content}" />
-        <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding IsDropDown}" Value="True">
-                <Setter Property="StaysOpenOnClick" Value="True" />
-                <Setter Property="helpers:MenuHelper.IsMouseSelectionVisible" Value="False" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
     <helpers:MenuStyleSelector
         x:Key="MenuStyleSelector"
         CompoundIconMenuStyle="{StaticResource CompoundIconMenuStyle}"
@@ -256,13 +305,10 @@
         DummySubMenuStyle="{StaticResource DummySubMenuStyle}"
         DynamicAltTextStyle="{StaticResource DynamicAltTextStyle}"
         IconMenuStyle="{StaticResource IconMenuStyle}"
+        SelectorSubMenuStyle="{StaticResource SelectorSubMenuItemStyle}"
         SeparatorStyle="{StaticResource MenuSeparatorStyle}"
         SubMenuSeparatorStyle="{StaticResource SubMenuSeparatorStyle}"
         SubMenuStyle="{StaticResource SubMenuItemStyle}" />
-    <Style
-        x:Key="ToolBarStyle"
-        x:Shared="False"
-        TargetType="controls:AdbMenu" />
     <Style
         x:Key="AdbToolBarStyle"
         x:Shared="False"
@@ -278,14 +324,14 @@
         x:Key="MainToolBarStyle"
         BasedOn="{StaticResource AdbToolBarStyle}"
         TargetType="controls:AdbMenu">
-        <!--  ItemsSource is set per-header in ExplorerPageHeader's constructor, not here - see MainToolBar.Build's comment.  -->
+        <!--  ItemsSource is set per tab in ExplorerPageContent's constructor, not here - see MainToolBar.Build's comment.  -->
         <Setter Property="Margin" Value="7,0,0,0" />
     </Style>
     <Style
         x:Key="NavigationToolBarStyle"
         BasedOn="{StaticResource AdbToolBarStyle}"
         TargetType="controls:AdbMenu">
-        <!--  ItemsSource is set per-header in ExplorerPageHeader's constructor, not here - see NavigationToolBar.Build's comment.  -->
+        <!--  ItemsSource is set per tab in ExplorerPageContent's constructor, not here - see NavigationToolBar.Build's comment.  -->
         <Setter Property="Margin" Value="7,0,0,0" />
     </Style>
     <Style
@@ -300,7 +346,7 @@
         x:Key="ExplorerContextMenuStyle"
         BasedOn="{StaticResource BaseContextMenuStyle}"
         TargetType="controls:AdbContextMenu">
-        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:ExplorerContextMenu.VisibleList}}" />
+        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=viewmodels:ExplorerContextMenu.VisibleList}}" />
     </Style>
     <Style
         x:Key="TreeContextMenuStyle"
@@ -312,20 +358,20 @@
         x:Key="DeviceContextMenuStyle"
         BasedOn="{StaticResource BaseContextMenuStyle}"
         TargetType="controls:AdbContextMenu">
-        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:DeviceContextMenu.VisibleList}}" />
+        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=viewmodels:DeviceContextMenu.VisibleList}}" />
         <Setter Property="ShowInputGestures" Value="False" />
     </Style>
     <Style
         x:Key="TabContextMenuStyle"
         BasedOn="{StaticResource BaseContextMenuStyle}"
         TargetType="controls:AdbContextMenu">
-        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:TabContextMenu.VisibleList}}" />
+        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=viewmodels:TabContextMenu.VisibleList}}" />
     </Style>
     <Style
         x:Key="PathBoxContextMenuStyle"
         BasedOn="{StaticResource BaseContextMenuStyle}"
         TargetType="controls:AdbContextMenu">
-        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:PathContextMenu.List}}" />
+        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=viewmodels:PathContextMenu.List}}" />
     </Style>
     <ItemsPanelTemplate x:Key="VerticalItemsPanel">
         <WrapPanel FlowDirection="RightToLeft" Orientation="Vertical" />
@@ -334,7 +380,7 @@
         x:Key="LogControlsPanelStyle"
         BasedOn="{StaticResource AdbToolBarStyle}"
         TargetType="controls:AdbMenu">
-        <Setter Property="ItemsControl.ItemsSource" Value="{Binding Source={x:Static Member=services:LogControls.List}}" />
+        <Setter Property="ItemsControl.ItemsSource" Value="{Binding Source={x:Static Member=viewmodels:LogControls.List}}" />
         <Setter Property="ItemsPanel" Value="{StaticResource VerticalItemsPanel}" />
         <Setter Property="helpers:MenuHelper.ItemMargin" Value="3" />
         <Setter Property="helpers:MenuHelper.ItemPadding" Value="9,7" />

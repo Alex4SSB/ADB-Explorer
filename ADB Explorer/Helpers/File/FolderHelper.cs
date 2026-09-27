@@ -1,7 +1,4 @@
-﻿using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-using ADB_Explorer.ViewModels;
-using Vanara.Windows.Shell;
+﻿using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Helpers;
 
@@ -68,7 +65,7 @@ public static class FolderHelper
 
         try
         {
-            return ADBService.TranslateDevicePath(device.ID, path);
+            return AdbService.TranslateDevicePath(device.ID, path);
         }
         catch (Exception e)
         {

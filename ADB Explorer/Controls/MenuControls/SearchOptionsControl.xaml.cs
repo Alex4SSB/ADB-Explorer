@@ -1,9 +1,4 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-using System.Linq.Expressions;
-
-namespace ADB_Explorer.Controls;
+﻿namespace ADB_Explorer.Controls;
 
 /// <summary>
 /// Interaction logic for SearchOptionsControl.xaml
@@ -14,7 +9,7 @@ public partial class SearchOptionsControl : UserControl
     /// <summary>The pane whose search state this control shows - the focused one in a split view.</summary>
     private ExplorerInstance? _instance;
 
-    internal void Initialize(Pages.ExplorerPageHeader owner) => SetInstance(owner.Instance);
+    internal void Initialize(ExplorerPageContent owner) => SetInstance(owner.Instance);
 
     internal void SetInstance(ExplorerInstance instance)
     {
@@ -39,28 +34,28 @@ public partial class SearchOptionsControl : UserControl
             new SearchBoxModeItem(Strings.Resources.S_SEARCH_ALL_SUBFOLDERS, SearchBox.SearchBoxMode.AllSubfolders),
             new SearchBoxModeItem(Strings.Resources.S_SEARCH_CURRENT_FOLDER, SearchBox.SearchBoxMode.CurrentFolder),
             new Separator(),
-            new SearchToggleItem(
+            new SettingToggleItem(
                 Strings.Resources.S_SEARCH_CASE_SENSITIVE,
-                new TextChangeCaseIcon(),
                 () => Data.Settings.SearchCaseSensitive,
+                new TextChangeCaseIcon(),
                 Strings.Resources.S_SEARCH_CASE_SENSITIVE_INFO),
-            new SearchToggleItem(
+            new SettingToggleItem(
                 Strings.Resources.S_SEARCH_CONTENTS,
-                new DocumentSearchIcon(),
                 () => Data.Settings.SearchContents,
+                new DocumentSearchIcon(),
                 Strings.Resources.S_SEARCH_CONTENTS_INFO,
                 () => !Data.FileActions.IsAppDrive),
-            new SearchToggleItem(
+            new SettingToggleItem(
                 Strings.Resources.S_SEARCH_ARCHIVES,
-                new ZipIcon(),
                 () => Data.Settings.SearchArchives,
+                new ZipIcon(),
                 Strings.Resources.S_SEARCH_ARCHIVES_INFO,
                 () => !Data.FileActions.IsAppDrive),
             new Separator(),
-            new SearchToggleItem(
+            new SettingToggleItem(
                 Strings.Resources.S_SEARCH_DISPLAY_PATH_RELATIVE,
-                new ItemPathIcon(),
                 () => Data.Settings.SearchDisplayPathRelative,
+                new ItemPathIcon(),
                 Strings.Resources.S_SEARCH_DISPLAY_PATH_RELATIVE_INFO,
                 () => !Data.FileActions.IsAppDrive)
         ];
@@ -106,24 +101,10 @@ public partial class SearchOptionsControl : UserControl
         { SearchBox.SearchBoxMode.AllSubfolders, new FolderMultipleIcon() },
     };
 
-    public abstract partial class SearchOptionsBaseItem : ObservableObject
+    public class SearchBoxModeItem : SelectorItem
     {
-        public virtual BaseAction Action { get; set; } = null!;
-        public virtual UIElement Icon { get; set; } = null!;
-        public virtual string? Info { get; set; } = null;
-        public virtual bool IsChecked { get; set; }
-        public virtual bool IsRadioButton { get; set; } = true;
-        public virtual string Name { get; set; } = "";
-    }
-
-    public partial class SearchBoxModeItem : SearchOptionsBaseItem
-    {
-        [ObservableProperty]
-        public override partial bool IsChecked { get; set; } = false;
-
-        public SearchBoxModeItem(string name, SearchBox.SearchBoxMode mode, string? info = null)
+        public SearchBoxModeItem(string name, SearchBox.SearchBoxMode mode)
         {
-            Info = info;
             Name = name;
             Mode = mode;
             Icon = SearchBoxModeIcons[mode];
@@ -168,57 +149,5 @@ public partial class SearchOptionsControl : UserControl
         }
 
         private SearchBox.SearchBoxMode Mode { get; }
-    }
-
-    /// <summary>A checkable (non-exclusive) search option backed by a single boolean <see cref="AppSettings"/> property.</summary>
-    public partial class SearchToggleItem : SearchOptionsBaseItem
-    {
-        [ObservableProperty]
-        public override partial bool IsChecked { get; set; } = false;
-
-        private readonly PropertyInfo? valueProp;
-
-        public bool Value
-        {
-            get => (bool)(valueProp!.GetValue(Data.Settings) ?? false);
-            set
-            {
-                valueProp!.SetValue(Data.Settings, value);
-                IsChecked = Action.IsEnabled && value;
-            }
-        }
-
-        public SearchToggleItem(string name, UIElement icon, Expression<Func<bool>> propertyExpr, string? info = null, Func<bool>? isAllowed = null)
-        {
-            valueProp = AbstractSetting.ExtractPropertyInfo(propertyExpr);
-
-            Name = name;
-            Icon = icon;
-            Info = info;
-            IsRadioButton = false;
-
-            if (isAllowed != null)
-            {
-                Data.FileActions.PropertyChanged += (_, e) =>
-                {
-                    if (e.PropertyName is nameof(FileActionsEnable.IsAppDrive))
-                    {
-                        IsChecked = Action.IsEnabled && Value;
-                    }
-                };
-            }
-            else
-                isAllowed = () => true;
-
-            Action = new(isAllowed, () => Value ^= true);
-
-            Data.Settings.PropertyChanged += (_, e) =>
-            {
-                if (e.PropertyName == valueProp?.Name)
-                    OnPropertyChanged(nameof(Value));
-            };
-
-            IsChecked = Action.IsEnabled && Value;
-        }
     }
 }

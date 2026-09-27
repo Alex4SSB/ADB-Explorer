@@ -1,8 +1,6 @@
-﻿using ADB_Explorer.ViewModels;
+﻿namespace ADB_Explorer.Converters;
 
-namespace ADB_Explorer.Converters;
-
-internal class CompletedStatsConverter : IValueConverter
+public class CompletedStatsConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {

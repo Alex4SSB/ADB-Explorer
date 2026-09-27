@@ -1,7 +1,4 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.ViewModels;
-
-namespace ADB_Explorer.Models;
+﻿namespace ADB_Explorer.Models;
 
 public partial class Package : ObservableObject, IBrowserItem
 {
@@ -70,19 +67,46 @@ public partial class Package : ObservableObject, IBrowserItem
         TextHelper.ContainsRtl(DisplayName) ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ContentViewTypeText))]
     public partial PackageType Type { get; set; }
 
     [ObservableProperty]
     public partial long? Uid { get; set; } = null;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ContentViewVersionText))]
     public partial long? Version { get; set; } = null;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ContentViewVersionText))]
     public partial string VersionName { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ContentViewModifiedTimeText))]
     public partial DateTime? LastUpdateTime { get; set; }
+
+    /// <summary>Set once the version name and update time were asked for by a Content view row, so it asks only once.</summary>
+    public bool IsInfoRequested { get; set; }
+
+    /// <summary>"Type: {Type}", for the Content view's type column.</summary>
+    public string ContentViewTypeText => FileViewModelBase.FormatLabeledValue(Strings.Resources.S_COLUMN_TYPE, $"{Type}", false);
+
+    /// <summary>"Date modified: {LastUpdateTime}", for the Content view's date / version column.</summary>
+    public string ContentViewModifiedTimeText => FileViewModelBase.FormatLabeledValue(
+        Strings.Resources.S_COLUMN_DATE_MODIFIED,
+        TabularDateFormatter.Format(LastUpdateTime, Data.Settings.ActualFormatCulture),
+        false);
+
+    /// <summary>"Version: {VersionName}", or the version code until the name is known.</summary>
+    public string ContentViewVersionText
+    {
+        get
+        {
+            var version = string.IsNullOrEmpty(VersionName) ? $"{Version}" : VersionName;
+
+            return FileViewModelBase.FormatLabeledValue(Strings.Resources.S_COLUMN_VERSION, version, false);
+        }
+    }
 
     [ObservableProperty]
     public partial bool IsSelected { get; set; }

@@ -1,7 +1,3 @@
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-
 namespace ADB_Explorer.ViewModels;
 
 public partial class Devices : ObservableObject
@@ -93,8 +89,6 @@ public partial class Devices : ObservableObject
 
     public int Count => UIList.Count(d => DeviceHelper.DevicePredicate(d) && d is not HistoryDeviceViewModel and not NewDeviceViewModel);
 
-    public ObservableProperty<string> ObservableCount = new();
-
     #endregion
 
     public Devices()
@@ -107,15 +101,6 @@ public partial class Devices : ObservableObject
             UIList.AddRange(RetrieveHistoryDevices());
 
         UIList.CollectionChanged += UIList_CollectionChanged;
-        PropertyChanged += Devices_PropertyChanged;
-
-        ObservableCount.Value = "0";
-    }
-
-    private void Devices_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(Count))
-            ObservableCount.Value = Count.ToString();
     }
 
     private void UIList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -365,7 +350,7 @@ public partial class Devices : ObservableObject
                 }
             }
 
-            await Task.Run(() => result |= ADBService.GetDeviceIp(item));
+            await Task.Run(() => result |= AdbService.GetDeviceIp(item));
         }
 
         return result;

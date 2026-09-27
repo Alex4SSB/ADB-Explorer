@@ -50,7 +50,7 @@ public partial class TransferIndicator : UserControl
                 Header = "adb kill-server",
                 FontFamily = (FontFamily)self.FindResource("ConsoleFont"),
                 Style = (Style)self.FindResource("AdbMenuItemStyle"),
-                Command = new RelayCommand(() => Task.Run(() => Services.ADBService.KillAdbServer())),
+                Command = new RelayCommand(() => Task.Run(() => Services.AdbService.KillAdbServer())),
             });
 
             self.RootMenuItem.Items.Add(new AdbMenuItem
@@ -58,7 +58,7 @@ public partial class TransferIndicator : UserControl
                 Header = "taskkill /f /im adb.exe",
                 FontFamily = (FontFamily)self.FindResource("ConsoleFont"),
                 Style = (Style)self.FindResource("AdbMenuItemStyle"),
-                Command = new RelayCommand(() => Task.Run(() => Services.ADBService.KillAdbProcess())),
+                Command = new RelayCommand(() => Task.Run(() => Services.AdbService.KillAdbProcess())),
             });
         }
         else

@@ -1,8 +1,3 @@
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.ViewModels;
-using AlphaOmega.Debug;
-using AlphaOmega.Debug.Manifest;
 using SkiaSharp;
 using Wpf.Ui.Appearance;
 
@@ -19,7 +14,6 @@ public static partial class ApkIconService
         _themeContrastHooked = true;
         ApplicationThemeManager.Changed += (_, _) => App.SafeBeginInvoke(OnAppThemeChanged);
     }
-
 
     /// <summary>
     /// Re-applies contrast plates after light/dark switch without re-pulling APKs.
@@ -42,7 +36,6 @@ public static partial class ApkIconService
                 package.Icon = refreshed;
         }
     }
-
 
     /// <summary>
     /// Theme-aware presentation: contrast plate for monochrome glyphs, knockout art whose
@@ -70,7 +63,6 @@ public static partial class ApkIconService
         return source;
     }
 
-
     private static BitmapSource? TryApplyThemeContrastPlate(SKBitmap sk, bool isDarkInk)
     {
         var appIsDark = AdbThemeService.IsDarkChrome();
@@ -89,7 +81,6 @@ public static partial class ApkIconService
         canvas.DrawBitmap(sk, 0, 0, PixelCopySampling);
         return ApkVectorIconRenderer.ToBitmapSource(canvasBitmap);
     }
-
 
     /// <summary>
     /// Knockout art whose prevalent near-neutral ink disappears against the icon-view
@@ -212,7 +203,6 @@ public static partial class ApkIconService
         return true;
     }
 
-
     /// <summary>
     /// Compact knockout mark (opaque bbox under 40% tall and 20% of canvas area).
     /// Treated as dark ink so dark mode paints a white plate; light mode is unchanged.
@@ -284,7 +274,6 @@ public static partial class ApkIconService
         isDarkInk = true;
         return true;
     }
-
 
     /// <summary>
     /// True when opaque ink is one filled square, rounded square, or circle whose width at
@@ -392,7 +381,6 @@ public static partial class ApkIconService
         return best * 10 >= bboxArea * 9;
     }
 
-
     /// <summary>
     /// True when at least 90% of the outer silhouette already contrasts with the
     /// icon-view background. Interior holes are ignored.
@@ -428,7 +416,6 @@ public static partial class ApkIconService
         return contrasting * 10 >= outline * 9;
     }
 
-
     private static bool TouchesExterior(bool[] exterior, int w, int h, int x, int y)
     {
         if (x == 0 || y == 0 || x == w - 1 || y == h - 1)
@@ -441,7 +428,6 @@ public static partial class ApkIconService
             return true;
         return exterior[(y + 1) * w + x];
     }
-
 
     private static void MarkExteriorTransparent(
         byte[] buffer, int w, int h, int stride, bool[] exterior)
@@ -483,7 +469,6 @@ public static partial class ApkIconService
         }
     }
 
-
     private static void TryEnqueueExterior(
         Queue<int> queue, bool[] exterior, byte[] buffer, int w, int h, int stride, int x, int y)
     {
@@ -497,7 +482,6 @@ public static partial class ApkIconService
         exterior[i] = true;
         queue.Enqueue(i);
     }
-
 
     private static long FloodCount(bool[] ink, int w, int h, int seed)
     {
@@ -525,7 +509,6 @@ public static partial class ApkIconService
         return n;
     }
 
-
     private static void TryEnqueueFlood(
         Queue<int> queue, bool[] visited, bool[] ink, int w, int h, int x, int y)
     {
@@ -539,7 +522,6 @@ public static partial class ApkIconService
         visited[i] = true;
         queue.Enqueue(i);
     }
-
 
     private static bool InRoundedRect(int x, int y, int minX, int minY, int maxX, int maxY, int radius)
     {
@@ -565,14 +547,12 @@ public static partial class ApkIconService
         return DistSq(x, y, ix1, iy1) <= rSq;
     }
 
-
     private static int DistSq(int x0, int y0, int x1, int y1)
     {
         var dx = x0 - x1;
         var dy = y0 - y1;
         return dx * dx + dy * dy;
     }
-
 
     private static bool IsTooSimilarToIconViewBackground(SKColor color, SKColor background)
     {
@@ -581,7 +561,6 @@ public static partial class ApkIconService
         var db = color.Blue - background.Blue;
         return dr * dr + dg * dg + db * db <= IconViewBackgroundSimilaritySq;
     }
-
 
     private static int ChannelChroma(byte r, byte g, byte b)
     {
@@ -598,10 +577,8 @@ public static partial class ApkIconService
         return max - min;
     }
 
-
     private static int Rec709Luma(byte r, byte g, byte b)
         => (r * 54 + g * 183 + b * 19) >> 8;
-
 
     private static bool CornersAreFullyTransparent(byte[] buffer, int w, int h, int stride)
     {
@@ -622,7 +599,6 @@ public static partial class ApkIconService
 
         return true;
     }
-
 
     /// <summary>
     /// True when the bitmap is sparse transparent ink that is almost entirely dark or light
@@ -695,7 +671,6 @@ public static partial class ApkIconService
 
         return false;
     }
-
 
     private static SKBitmap? BitmapSourceToSkBitmap(BitmapSource source)
     {

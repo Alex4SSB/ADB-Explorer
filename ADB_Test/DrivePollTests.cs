@@ -42,7 +42,7 @@ public class DrivePollTests
             "2\n" +
             $"{fs}\n";
 
-        var result = ADBService.ParseDrivePollOutput(
+        var result = AdbService.ParseDrivePollOutput(
             stdout,
             DeviceType.Local,
             countRecycle: true,
@@ -76,7 +76,7 @@ public class DrivePollTests
             $"{us}TRASH{us}\n0\n{fs}\n" +
             $"{us}TRASH_EXISTS{us}\n0\n{fs}\n";
 
-        var result = ADBService.ParseDrivePollOutput(
+        var result = AdbService.ParseDrivePollOutput(
             stdout,
             DeviceType.Local,
             countRecycle: true,
@@ -118,7 +118,7 @@ public class DrivePollTests
             "    fsType=null fsUuid=null fsLabel=null \n" +
             "    path=/storage/emulated internalPath=/data/media \n";
 
-        var result = ADBService.ParseMountDump(stdout);
+        var result = AdbService.ParseMountDump(stdout);
 
         Assert.AreEqual(2, result.Count);
 

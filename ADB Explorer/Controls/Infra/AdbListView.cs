@@ -1,6 +1,4 @@
-﻿using ADB_Explorer.Helpers;
-
-namespace ADB_Explorer.Controls;
+﻿namespace ADB_Explorer.Controls;
 
 public class AdbListView : Wpf.Ui.Controls.ListView
 {
@@ -32,6 +30,9 @@ public class AdbListView : Wpf.Ui.Controls.ListView
     {
         PreviewMouseWheel += GridListView_PreviewMouseWheel;
     }
+
+    /// <summary>Replaces the selection with <paramref name="items"/> as one selection change, not one per item.</summary>
+    public void SelectOnly(IEnumerable<object> items) => SetSelectedItems(items);
 
     public ScrollViewer ScrollViewer
     {

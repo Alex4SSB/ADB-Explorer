@@ -1,7 +1,3 @@
-using ADB_Explorer.Converters;
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.ViewModels;
 using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
 
@@ -110,11 +106,7 @@ public class FileArchiveModifyOperation : AbstractShellFileOperation
 
     public override void Start()
     {
-        if (Status == OperationStatus.InProgress)
-            throw new Exception("Cannot start an already active operation!");
-
-        Status = OperationStatus.InProgress;
-        StatusInfo = new InProgShellProgressViewModel();
+        BeginInProgress();
 
         var operationTask = Task.Run(() =>
         {
@@ -140,28 +132,7 @@ public class FileArchiveModifyOperation : AbstractShellFileOperation
                 ShellFileOperation.SilentDelete(Device, DeviceSources);
         }, CancelTokenSource!.Token);
 
-        operationTask.ContinueWith(_ =>
-        {
-            Status = OperationStatus.Completed;
-            StatusInfo = new CompletedShellProgressViewModel();
-        }, TaskContinuationOptions.OnlyOnRanToCompletion);
-
-        operationTask.ContinueWith(_ =>
-        {
-            Status = OperationStatus.Canceled;
-            StatusInfo = new CanceledOpProgressViewModel();
-        }, TaskContinuationOptions.OnlyOnCanceled);
-
-        operationTask.ContinueWith(t =>
-        {
-            Status = OperationStatus.Failed;
-            var message = t.Exception?.InnerException?.Message ?? t.Exception?.Message ?? "Archive modify failed";
-            StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(
-                typeof(ShellErrorInfo),
-                failed: -1,
-                message: message,
-                total: true));
-        }, TaskContinuationOptions.OnlyOnFaulted);
+        TrackTask(operationTask, "Archive modify failed");
     }
 
     private void PopulateOverlay(string overlayDest, CancellationToken cancellationToken)
@@ -174,14 +145,14 @@ public class FileArchiveModifyOperation : AbstractShellFileOperation
                 var dest = FileHelper.ConcatPaths(overlayDest, item.Name);
 
                 // Clear any conflicting extracted member (file vs directory) before push.
-                ADBService.ExecuteDeviceAdbShellCommand(
+                AdbService.ExecuteDeviceAdbShellCommand(
                     Device.ID,
                     "rm",
                     out _,
                     out _,
                     cancellationToken,
                     "-rf",
-                    ADBService.EscapeAdbShellString(dest));
+                    AdbService.EscapeAdbShellString(dest));
 
                 ShellFileOperation.SilentPush(Device, item, dest, cancellationToken);
             }
@@ -194,31 +165,27 @@ public class FileArchiveModifyOperation : AbstractShellFileOperation
             cancellationToken.ThrowIfCancellationRequested();
             var dest = FileHelper.ConcatPaths(overlayDest, item.FullName);
 
-            ADBService.ExecuteDeviceAdbShellCommand(
+            AdbService.ExecuteDeviceAdbShellCommand(
                 Device.ID,
                 "rm",
                 out _,
                 out _,
                 cancellationToken,
                 "-rf",
-                ADBService.EscapeAdbShellString(dest));
+                AdbService.EscapeAdbShellString(dest));
 
             // Always copy into the staging tree; move deletes sources only after a successful repack.
-            var exit = ADBService.ExecuteDeviceAdbShellCommand(
+            var exit = AdbService.ExecuteDeviceAdbShellCommand(
                 Device.ID,
                 "cp",
                 out var stdout,
                 out var stderr,
                 cancellationToken,
                 "-a",
-                ADBService.EscapeAdbShellString(item.FullPath),
-                ADBService.EscapeAdbShellString(dest));
+                AdbService.EscapeAdbShellString(item.FullPath),
+                AdbService.EscapeAdbShellString(dest));
 
-            if (exit != 0)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                throw new IOException(string.IsNullOrWhiteSpace(stderr) ? stdout : stderr);
-            }
+            AdbService.ThrowIfFailed(exit, stdout, stderr, cancellationToken);
         }
     }
 }

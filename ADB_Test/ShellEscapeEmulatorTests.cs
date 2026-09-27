@@ -11,8 +11,8 @@ using System.Text;
 namespace ADB_Test;
 
 /// <summary>
-/// Exercises <see cref="ADBService.EscapeAdbShellString"/> against a live device using the
-/// same Process argument joining as <see cref="ADBService"/>. Special-char names are created
+/// Exercises <see cref="AdbService.EscapeAdbShellString"/> against a live device using the
+/// same Process argument joining as <see cref="AdbService"/>. Special-char names are created
 /// under <see cref="AdbExplorerConst.TEMP_PATH"/> only.
 /// Run: dotnet test --filter ShellEscape
 /// </summary>
@@ -56,7 +56,7 @@ public class ShellEscapeEmulatorTests
         var result = RunAdb(
         [
             "-s", _deviceId, "shell", "sh", "-c",
-            ADBService.EscapeAdbShellString(script),
+            AdbService.EscapeAdbShellString(script),
         ]);
 
         Assert.AreEqual(0, result.ExitCode, result.Stderr);
@@ -78,8 +78,8 @@ public class ShellEscapeEmulatorTests
             Log($"\n=== {path} ({note}) ===");
 
             var minimal = MinimalShellQuote(path);
-            var pathQuoted = ADBService.EscapeAdbShellString(path);
-            var scriptQuoted = ADBService.EscapeAdbShellString(path);
+            var pathQuoted = AdbService.EscapeAdbShellString(path);
+            var scriptQuoted = AdbService.EscapeAdbShellString(path);
 
             Log($"minimal:  {minimal}");
             Log($"path:     {pathQuoted}");
@@ -131,7 +131,7 @@ public class ShellEscapeEmulatorTests
         {
             var path = $"{TestDir}/{fileName}";
             var minimalStat = RunShellStat(_deviceId, MinimalShellQuote(path));
-            var pathStat = RunShellStat(_deviceId, ADBService.EscapeAdbShellString(path));
+            var pathStat = RunShellStat(_deviceId, AdbService.EscapeAdbShellString(path));
 
             Log($"{note} {fileName}: minimal exit={minimalStat.ExitCode}, path exit={pathStat.ExitCode}");
 
@@ -190,14 +190,14 @@ public class ShellEscapeEmulatorTests
 
     private static void EnsureTestFiles(string deviceId)
     {
-        RunAdb(["-s", deviceId, "shell", "mkdir", "-p", ADBService.EscapeAdbShellString(TestDir)]);
-        RunAdb(["-s", deviceId, "shell", "mkdir", "-p", ADBService.EscapeAdbShellString(IncrementalDir)]);
-        RunAdb(["-s", deviceId, "shell", "touch", ADBService.EscapeAdbShellString($"{IncrementalDir}/base.apk")]);
+        RunAdb(["-s", deviceId, "shell", "mkdir", "-p", AdbService.EscapeAdbShellString(TestDir)]);
+        RunAdb(["-s", deviceId, "shell", "mkdir", "-p", AdbService.EscapeAdbShellString(IncrementalDir)]);
+        RunAdb(["-s", deviceId, "shell", "touch", AdbService.EscapeAdbShellString($"{IncrementalDir}/base.apk")]);
 
         foreach (var (fileName, _) in SpecialFileNames)
         {
             var path = $"{TestDir}/{fileName}";
-            RunAdb(["-s", deviceId, "shell", "touch", ADBService.EscapeAdbShellString(path)]);
+            RunAdb(["-s", deviceId, "shell", "touch", AdbService.EscapeAdbShellString(path)]);
         }
     }
 
@@ -208,7 +208,7 @@ public class ShellEscapeEmulatorTests
     private static ProcessResult RunShellStat(string deviceId, string pathArg)
         => RunAdb(["-s", deviceId, "shell", "stat", "-c", "%s", pathArg]);
 
-    /// <summary>Matches <see cref="ADBService.StartCommandProcess"/> argument joining.</summary>
+    /// <summary>Matches <see cref="AdbService.StartCommandProcess"/> argument joining.</summary>
     private static ProcessResult RunAdb(string[] args)
     {
         var arguments = string.Join(' ', args.Where(a => !string.IsNullOrEmpty(a)));

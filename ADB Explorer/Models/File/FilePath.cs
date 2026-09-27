@@ -1,11 +1,8 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Services;
-using ADB_Explorer.ViewModels;
-using Vanara.Windows.Shell;
+﻿using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Models;
 
-public abstract class AbstractFile : ViewModelBase
+public abstract class AbstractFile : ObservableObject
 {
     public enum FilePathType
     {
@@ -77,20 +74,20 @@ public class FilePath : AbstractFile, IBaseFile
 
     public bool IsDirectory => SpecialType.HasFlag(SpecialFileType.Folder);
 
-    private string fullPath = "";
+    private string _fullPath = "";
     public string FullPath
     {
-        get => fullPath;
-        protected set => Set(ref fullPath, value);
+        get => _fullPath;
+        protected set => SetProperty(ref _fullPath, value);
     }
 
     public string ParentPath => FileHelper.GetParentPath(FullPath);
 
-    private string fullName = "";
+    private string _fullName = "";
     public string FullName
     {
-        get => fullName;
-        protected set => Set(ref fullName, value);
+        get => _fullName;
+        protected set => SetProperty(ref _fullName, value);
     }
     public string NoExtName => IsRegularFile ? FullName[..^Extension.Length] : FullName;
     public bool NameIsRtl => TextHelper.ContainsRtl(NoExtName);
@@ -113,11 +110,11 @@ public class FilePath : AbstractFile, IBaseFile
 
     public bool IsHidden => FullName.StartsWith('.');
 
-    private bool isSelected;
+    private bool _isSelected;
     public bool IsSelected
     {
-        get => isSelected;
-        set => Set(ref isSelected, value);
+        get => _isSelected;
+        set => SetProperty(ref _isSelected, value);
     }
 
     /// <summary>
@@ -131,7 +128,7 @@ public class FilePath : AbstractFile, IBaseFile
         get;
         set
         {
-            if (Set(ref field, value))
+            if (SetProperty(ref field, value))
                 OnShellLsSizeChanged(value);
         }
     } = null;
@@ -146,14 +143,14 @@ public class FilePath : AbstractFile, IBaseFile
         if (Data.ActiveDevice is null || !ShellCommands.StatExists(Data.ActiveDevice.ID))
             return;
 
-        var res = ADBService.ExecuteDeviceAdbShellCommand(Data.ActiveDevice.ID,
+        var res = AdbService.ExecuteDeviceAdbShellCommand(Data.ActiveDevice.ID,
                                                           "stat",
                                                           out string stdout,
                                                           out _,
                                                           cancellationToken,
                                                           "-c",
                                                           "%s",
-                                                          ADBService.EscapeAdbShellString(FullPath));
+                                                          AdbService.EscapeAdbShellString(FullPath));
 
         if (res != 0 || string.IsNullOrEmpty(stdout)
             || !long.TryParse(stdout.Trim(), out long size))
@@ -226,7 +223,6 @@ public class FilePath : AbstractFile, IBaseFile
         FullName = FileHelper.GetFullName(newPath);
 
         OnPropertyChanged(nameof(NoExtName));
-        OnPropertyChanged(nameof(Extension));
         OnPropertyChanged(nameof(DisplayName));
     }
 

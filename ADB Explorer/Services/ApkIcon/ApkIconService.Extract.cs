@@ -1,11 +1,3 @@
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.ViewModels;
-using AlphaOmega.Debug;
-using AlphaOmega.Debug.Manifest;
-using SkiaSharp;
-using Wpf.Ui.Appearance;
-
 namespace ADB_Explorer.Services;
 
 public static partial class ApkIconService
@@ -102,10 +94,8 @@ public static partial class ApkIconService
             if (pending.Count == 0)
                 return;
 
-            #if DEBUG
             MarkLoadStep(
                 $"batch EnsureMembers ({pending.Count}) from {Path.GetFileName(apkPath)}: {string.Join(',', pending)}");
-            #endif
 
             var stagingRoot = EnsureStagingRoot(cancellationToken);
             await Task.Run(
@@ -196,9 +186,7 @@ public static partial class ApkIconService
 
             if (_stagingRoot is not null)
             {
-                #if DEBUG
                 MarkLoadStep($"ApkIconExtractSession dispose: {_stagingRoot}");
-                #endif
                 try { ArchiveExtract.CleanupStaging(device.ID, _stagingRoot, CancellationToken.None); }
                 catch { /* best-effort */ }
                 _stagingRoot = null;
@@ -217,9 +205,7 @@ public static partial class ApkIconService
             _stagingRoot = ArchiveExtract.CreateStagingRoot(device.ID, cancellationToken);
             // Single mkdir for the package; unzip -d writes members under this root.
             ShellFileOperation.MakeDirs(device.ID, [_stagingRoot]).GetAwaiter().GetResult();
-            #if DEBUG
             MarkLoadStep($"package staging created: {_stagingRoot}");
-            #endif
             return _stagingRoot;
         }
 
@@ -229,28 +215,26 @@ public static partial class ApkIconService
             CancellationToken cancellationToken)
         {
             var find = ShellCommands.TranslateCommand("find");
-            _ = ADBService.ExecuteDeviceAdbShellCommand(
+            _ = AdbService.ExecuteDeviceAdbShellCommand(
                 deviceId,
                 find,
                 out var stdout,
                 out _,
                 cancellationToken,
-                ADBService.EscapeAdbShellString(stagingRoot),
+                AdbService.EscapeAdbShellString(stagingRoot),
                 "-type",
                 "f");
 
             var prefix = stagingRoot.TrimEnd('/') + "/";
             var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var line in stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var line in stdout.Split(AdbService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries))
             {
                 var path = line.Trim();
                 if (path.StartsWith(prefix, StringComparison.Ordinal))
                     result.Add(path[prefix.Length..]);
             }
 
-            #if DEBUG
             MarkLoadStep($"staging find under {stagingRoot}: {result.Count} file(s)");
-            #endif
             return result;
         }
     }

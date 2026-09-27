@@ -1,6 +1,4 @@
-﻿using ADB_Explorer.Services;
-
-namespace ADB_Explorer.Models;
+﻿namespace ADB_Explorer.Models;
 
 public partial class LogicalDrive : Drive
 {
@@ -16,23 +14,19 @@ public partial class LogicalDrive : Drive
     [ObservableProperty]
     public partial sbyte UsageP { get; set; }
 
-    [ObservableProperty]
-    public partial string LinkTargetPath { get; set; }
+    public string LinkTargetPath { get; set; }
 
     [ObservableProperty]
     public partial string FileSystem { get; set; } = "";
 
     /// <summary>Disk manufacturer/product label reported by <c>dumpsys mount</c> (e.g. "SanDisk"), when known.</summary>
-    [ObservableProperty]
-    public partial string? Manufacturer { get; set; }
+    public string? Manufacturer { get; set; }
 
     /// <summary>User-visible volume label reported by <c>dumpsys mount</c> (e.g. "Micro SD"), when known.</summary>
-    [ObservableProperty]
-    public partial string? VolumeLabel { get; set; }
+    public string? VolumeLabel { get; set; }
 
     /// <summary>1-based position among this device's currently connected USB/OTG drives, set only when there is more than one.</summary>
-    [ObservableProperty]
-    public partial int? DriveIndex { get; set; }
+    public int? DriveIndex { get; set; }
 
     public string ID => Path.Count(c => c == '/') > 1 ? Path[(Path.LastIndexOf('/') + 1)..] : Path;
 
@@ -107,7 +101,7 @@ public partial class LogicalDrive : Drive
 
         var task = Task.Run(() =>
         {
-            var result = ADBService.ExecuteDeviceAdbShellCommand(deviceId,
+            var result = AdbService.ExecuteDeviceAdbShellCommand(deviceId,
                                                                 resolveScript,
                                                                 out string stdout,
                                                                 out string stderr,

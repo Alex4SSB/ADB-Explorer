@@ -1,6 +1,3 @@
-using ADB_Explorer.Converters;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services;
 using static ADB_Explorer.Models.AbstractFile;
 
 namespace ADB_Explorer.Helpers;
@@ -102,7 +99,7 @@ public static class FileMergeHelper
     {
         try
         {
-            return ADBService.ListDirectoryEntries(deviceId, targetPath, CancellationToken.None)
+            return AdbService.ListDirectoryEntries(deviceId, targetPath, CancellationToken.None)
                 .GroupBy(e => e.FullName, comparer)
                 .ToDictionary(g => g.Key, g => g.First(), comparer);
         }
@@ -176,14 +173,13 @@ public static class FileMergeHelper
     /// </summary>
     public static bool FilterIdenticalPushTree(SyncFile source, string androidRoot, string deviceId)
     {
-        _ = deviceId;
         if (source is null || string.IsNullOrEmpty(androidRoot))
             return source is not null;
 
         Dictionary<string, (long? Size, DateTime? MtimeUtc)> destIndex;
         try
         {
-            var tree = FileHelper.GetFolderTree([androidRoot], isFolder: source.IsDirectory, CancellationToken.None);
+            var tree = FileHelper.GetFolderTree([androidRoot], isFolder: source.IsDirectory, CancellationToken.None, deviceId);
             destIndex = tree
                 .Where(t => !t.IsFolder)
                 .GroupBy(t => t.Name, StringComparer.Ordinal)
@@ -298,7 +294,8 @@ public static class FileMergeHelper
         bool targetIsWindows,
         string? deviceId,
         StringComparer comparer,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        string? sourceDeviceId = null)
     {
         var targetSep = targetIsWindows ? '\\' : '/';
         var results = new List<ConflictComparisonInfo>();
@@ -319,7 +316,8 @@ public static class FileMergeHelper
                     targetIsWindows,
                     deviceId,
                     comparer,
-                    cancellationToken));
+                    cancellationToken,
+                    sourceDeviceId));
                 continue;
             }
 
@@ -351,7 +349,8 @@ public static class FileMergeHelper
         bool targetIsWindows,
         string? deviceId,
         StringComparer comparer,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        string? sourceDeviceId)
     {
         var targetSep = targetIsWindows ? '\\' : '/';
         var sourceIsWindows = sourceFolderPath.Contains('\\')
@@ -366,7 +365,7 @@ public static class FileMergeHelper
 
         var sourceIndex = sourceIsWindows
             ? IndexWindowsTree(sourceFolderPath, comparer)
-            : IndexAndroidTree(sourceFolderPath, deviceId, comparer, cancellationToken);
+            : IndexAndroidTree(sourceFolderPath, sourceDeviceId ?? deviceId, comparer, cancellationToken);
 
         var results = new List<ConflictComparisonInfo>();
 
@@ -445,7 +444,7 @@ public static class FileMergeHelper
 
         try
         {
-            var tree = FileHelper.GetFolderTree([destFolderPath], isFolder: true, cancellationToken);
+            var tree = FileHelper.GetFolderTree([destFolderPath], isFolder: true, cancellationToken, deviceId);
             foreach (var entry in tree)
             {
                 var relative = FileHelper.ExtractRelativePath(entry.Name, destFolderPath).Replace('\\', '/');

@@ -1,6 +1,4 @@
-﻿using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-using Wpf.Ui.Abstractions.Controls;
+﻿using Wpf.Ui.Abstractions.Controls;
 
 namespace ADB_Explorer.ViewModels.Pages;
 
@@ -39,8 +37,8 @@ public partial class LogViewModel : ObservableObject, INavigationAware
 
     /// <summary>
     /// Rebuild the log UI from <see cref="Data.CommandLog"/>.
-    /// Call when the log header is loaded — OnNavigatedTo runs before the header is in the visual tree,
-    /// and LogPageHeader ignores appends while unloaded.
+    /// Call when the log page content is loaded — OnNavigatedTo runs before it is in the visual tree,
+    /// and LogPageContent ignores appends while unloaded.
     /// </summary>
     public void RefreshDisplayedLog()
     {

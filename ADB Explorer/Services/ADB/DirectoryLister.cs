@@ -1,0 +1,408 @@
+using static ADB_Explorer.Models.AbstractFile;
+using static ADB_Explorer.Models.AdbExplorerConst;
+
+namespace ADB_Explorer.Services;
+
+public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewModel device, Func<FileClass, FileClass>? fileManipulator = null) : ObservableObject
+{
+    public LogicalDeviceViewModel Device { get; } = device;
+    public ObservableList<FileClass> FileList { get; } = [];
+
+    private string _currentPath = "";
+    public string CurrentPath
+    {
+        get => _currentPath;
+        private set => FieldHelper.TrySet(ref _currentPath, value);
+    }
+
+    private bool _inProgress;
+    public bool InProgress
+    { 
+        get => _inProgress;
+        private set => SetProperty(ref _inProgress, value);
+    }
+
+    private bool _isProgressVisible = false;
+    public bool IsProgressVisible
+    {
+        get => _isProgressVisible;
+        private set => SetProperty(ref _isProgressVisible, value);
+    }
+
+    private bool _isLinkListingFinished = false;
+    public bool IsLinkListingFinished
+    {
+        get => _isLinkListingFinished;
+        private set => SetProperty(ref _isLinkListingFinished, value);
+    }
+
+    private Dispatcher Dispatcher { get; } = dispatcher;
+    private Task? UpdateTask { get; set; }
+    private TimeSpan UpdateInterval { get; set; }
+    private int MinUpdateThreshold { get; set; }
+    private Task? ReadTask { get; set; } = null;
+    private CancellationTokenSource? CurrentCancellationToken { get; set; }
+    private CancellationTokenSource? LinkListCancellation { get; set; }
+    private Func<FileClass, FileClass>? FileManipulator { get; } = fileManipulator;
+
+    private ConcurrentQueue<FileStat>? _currentFileQueue;
+
+    private bool _isSearchListing;
+
+    private FileClass? _locationSource;
+    
+    [ObservableProperty]
+    public partial FileClass? CurrentLocation { get; private set; }
+
+    public void Navigate(string path, FileClass? locationSource = null)
+    {
+        ArchivePath.InvalidateCache();
+
+        _locationSource = locationSource;
+        StartDirectoryList(path);
+    }
+
+    public void Search(string rootPath, string query, CancellationToken cancellationToken)
+    {
+        ArchivePath.InvalidateCache();
+
+        _locationSource = null;
+
+        var searchLocation = AdbLocation.StringFromLocation(Navigation.SpecialLocation.SearchMode);
+
+        Dispatcher.BeginInvoke(() =>
+        {
+            IsLinkListingFinished = false;
+
+            LinkListCancellation?.Cancel();
+            StopDirectoryList();
+            FileList.RemoveAll();
+
+            _isSearchListing = true;
+            InProgress = true;
+            IsProgressVisible = false;
+            CurrentPath = searchLocation;
+            CurrentLocation = null;
+        }).Wait();
+
+        CurrentCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        LinkListCancellation = new();
+        _currentFileQueue = new ConcurrentQueue<FileStat>();
+
+        ReadTask = Task.Run(() =>
+        {
+            try
+            {
+                var matchedPaths = new HashSet<string>();
+
+                foreach (var fileStat in AdbService.SearchResultsStreaming(Device.ID, rootPath, query, CurrentCancellationToken.Token, Data.Settings.SearchCaseSensitive))
+                {
+                    if (CurrentCancellationToken.IsCancellationRequested)
+                        break;
+
+                    matchedPaths.Add(fileStat.FullPath);
+                    _currentFileQueue.Enqueue(fileStat);
+                }
+
+                if (Data.Settings.SearchContents && !CurrentCancellationToken.IsCancellationRequested)
+                {
+                    foreach (var fileStat in AdbService.SearchContentsStreaming(Device.ID, rootPath, query, recursive: true, CurrentCancellationToken.Token, Data.Settings.SearchCaseSensitive))
+                    {
+                        if (CurrentCancellationToken.IsCancellationRequested)
+                            break;
+
+                        if (matchedPaths.Add(fileStat.FullPath))
+                            _currentFileQueue.Enqueue(fileStat);
+                    }
+                }
+
+                // Archive filenames only - never grep inside an archive reached by an outside traversal.
+                if (Data.Settings.SearchArchives && !CurrentCancellationToken.IsCancellationRequested)
+                {
+                    foreach (var fileStat in ArchiveHelper.SearchArchiveEntries(Device.ID, rootPath, query, CurrentCancellationToken.Token))
+                    {
+                        if (CurrentCancellationToken.IsCancellationRequested)
+                            break;
+
+                        if (matchedPaths.Add(fileStat.FullPath))
+                            _currentFileQueue.Enqueue(fileStat);
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            { }
+        }, CurrentCancellationToken.Token);
+
+        ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(() => StopDirectoryList()), CurrentCancellationToken.Token);
+
+        Task.Delay(DIR_LIST_VISIBLE_PROGRESS_DELAY).ContinueWith(
+            (t) => Dispatcher.BeginInvoke(() => IsProgressVisible = InProgress),
+            CurrentCancellationToken.Token);
+
+        ScheduleUpdate();
+    }
+
+    public void RefreshLocationAccess()
+    {
+        if (string.IsNullOrEmpty(_currentPath))
+            return;
+
+        var path = _currentPath;
+        var source = CurrentLocation;
+        var token = LinkListCancellation?.Token ?? Data.DeviceCts.Token;
+
+        Task.Run(() => UpdateLocationAccess(path, source, token), token);
+    }
+
+    public void ClearCurrentLocation() => CurrentLocation = null;
+
+    public void Stop()
+    {
+        LinkListCancellation?.Cancel();
+        StopDirectoryList();
+        IsLinkListingFinished = true;
+    }
+
+    private void StartDirectoryList(string path)
+    {
+        FileClass? source;
+        Dispatcher.BeginInvoke(() =>
+        {
+            IsLinkListingFinished = false;
+
+            LinkListCancellation?.Cancel();
+            StopDirectoryList();
+            FileList.RemoveAll();
+
+            _isSearchListing = false;
+            InProgress = true;
+            IsProgressVisible = false;
+            CurrentPath = path;
+
+            source = _locationSource;
+            _locationSource = null;
+
+            var drivePath = ArchivePath.IsArchivePath(path, Device.ID) ? ArchivePath.GetArchivePath(path, Device.ID) : path;
+            var restrictions = DriveHelper.GetRestrictions(drivePath, Device);
+            var preliminary = FileClass.BuildCurrentLocation(path, null, source, Device.ShellIdentity, restrictions, Device.ID);
+            preliminary.Device = Device;
+            CurrentLocation = preliminary;
+        }).Wait();
+
+        CurrentCancellationToken = new();
+        LinkListCancellation = new();
+        _currentFileQueue = new ConcurrentQueue<FileStat>();
+
+        ReadTask = Task.Run(() =>
+            AdbService.ListDirectory(Device.ID, path, ref _currentFileQueue, Dispatcher, CurrentCancellationToken.Token),
+            CurrentCancellationToken.Token);
+        ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(() => StopDirectoryList()), CurrentCancellationToken.Token);
+
+        Task.Delay(DIR_LIST_VISIBLE_PROGRESS_DELAY).ContinueWith((t) => Dispatcher.BeginInvoke(() => IsProgressVisible = InProgress), CurrentCancellationToken.Token);
+
+        ScheduleUpdate();
+    }
+
+    private void ScheduleUpdate()
+    {
+        UpdateDelays(_currentFileQueue?.Count ?? 0);
+
+        UpdateTask = Task.Delay(UpdateInterval);
+        UpdateTask.ContinueWith(
+            (t) => Dispatcher.BeginInvoke(() => UpdateDirectoryList(!InProgress)),
+            CurrentCancellationToken?.Token ?? CancellationToken.None,
+            TaskContinuationOptions.OnlyOnRanToCompletion,
+            TaskScheduler.Default);
+    }
+
+    private void UpdateDelays(int queueCount)
+    {
+        bool manyPendingFilesExist = queueCount >= DIR_LIST_UPDATE_THRESHOLD_MAX;
+        bool isListingStarting = FileList.Count < DIR_LIST_START_COUNT;
+
+        if (isListingStarting || manyPendingFilesExist)
+        {
+            UpdateInterval = DIR_LIST_UPDATE_START_INTERVAL;
+            MinUpdateThreshold = DIR_LIST_UPDATE_START_THRESHOLD_MIN;
+        }
+        else
+        {
+            UpdateInterval = DIR_LIST_UPDATE_INTERVAL;
+            MinUpdateThreshold = DIR_LIST_UPDATE_THRESHOLD_MIN;
+        }
+    }
+
+    private void UpdateDirectoryList(bool finish)
+    {
+        if (_currentFileQueue is null)
+            return;
+
+        if (finish || (_currentFileQueue.Count >= MinUpdateThreshold))
+        {
+            for (int i = 0; finish || (i < DIR_LIST_UPDATE_THRESHOLD_MAX); i++)
+            {
+                if (!_currentFileQueue.TryDequeue(out FileStat fileStat))
+                {
+                    break;
+                }
+
+                FileClass item = FileClass.GenerateAndroidFile(fileStat);
+                item.Device = Device;
+
+                if (FileManipulator is not null)
+                {
+                    item = FileManipulator(item);
+                }
+
+                FileList.Add(item);
+            }
+        }
+
+        if (!finish)
+        {
+            ScheduleUpdate();
+        }
+    }
+
+    private void StopDirectoryList()
+    {
+        if (ReadTask == null)
+        {
+           return;
+        }
+
+        CurrentCancellationToken?.Cancel();
+
+        try
+        {
+            ReadTask.Wait();
+        }
+        catch (AggregateException e) when (e.InnerException is OperationCanceledException)
+        { }
+
+        UpdateDirectoryList(true);
+
+        InProgress = false;
+        IsProgressVisible = false;
+        ReadTask = null;
+        CurrentCancellationToken = null;
+
+        if (_isSearchListing)
+        {
+            _isSearchListing = false;
+            IsLinkListingFinished = true;
+            return;
+        }
+
+        var path = _currentPath;
+        var source = CurrentLocation;
+        var token = LinkListCancellation?.Token ?? CancellationToken.None;
+
+        if (_currentFileQueue is null
+            || (_currentFileQueue.IsEmpty && !FileList.Any())
+            || ArchivePath.IsArchivePath(path, Device.ID))
+        {
+            IsLinkListingFinished = true;
+            Task.Run(() => UpdateLocationAccess(path, source, token), token);
+            return;
+        }
+
+        Task.Run(async () =>
+        {
+            try
+            {
+                await Task.WhenAll(
+                    ListLinksAsync(token),
+                    Task.Run(() => UpdateLocationAccess(path, source, token), token));
+            }
+            catch (OperationCanceledException)
+            { }
+        }, token);
+    }
+
+    private void UpdateLocationAccess(string path, FileClass? source, CancellationToken cancellationToken)
+    {
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
+        var identity = Device.GetOrLoadShellIdentity();
+        var drivePath = ArchivePath.IsArchivePath(path, Device.ID) ? ArchivePath.GetArchivePath(path, Device.ID) : path;
+        var restrictions = DriveHelper.GetRestrictions(drivePath, Device);
+
+        LocationInfo? info = null;
+        if (!ArchivePath.IsArchivePath(path, Device.ID))
+            info = AdbService.GetLocationInfo(Device.ID, path, cancellationToken);
+
+        if (cancellationToken.IsCancellationRequested)
+            return;
+
+        var location = FileClass.BuildCurrentLocation(path, info, source, identity, restrictions, Device.ID);
+        location.Device = Device;
+
+        if (!ArchivePath.IsArchivePath(path, Device.ID))
+            location.IsCreationTimeResolved = true;
+
+        Dispatcher.Invoke(() =>
+        {
+            if (path != _currentPath)
+                return;
+
+            if (ArchivePath.IsArchivePath(path, Device.ID)
+                && ArchivePath.TryParse(path, out var archivePath, out var internalPath, Device.ID))
+            {
+                location.EffectiveAccess = ArchiveHelper.CanModify(FileHelper.GetFullName(archivePath), Device.ID)
+                    ? AccessMask.Read | AccessMask.Write
+                    : AccessMask.Read;
+
+                if (string.IsNullOrEmpty(internalPath)
+                    && ArchiveListing.TryGetArchiveSummary(archivePath, out var summary))
+                {
+                    location.CompressedSize = summary.CompressedSize;
+                    location.CompressionRatio = summary.Ratio;
+                }
+            }
+
+            CurrentLocation = location;
+            FileActionLogic.UpdateFileActions();
+        });
+    }
+
+    private async Task ListLinksAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await AsyncHelper.WaitUntil(() => FileList.Count > 0, DIR_LIST_UPDATE_INTERVAL, TimeSpan.FromMilliseconds(20), cancellationToken);
+
+            var items = FileList.Where(f => f.IsLink && f.Type is FileType.Unknown).ToList();
+            if (items.Count < 1)
+                return;
+
+            List<(string, FileType)> result;
+            try
+            {
+                result = [.. AdbService.GetLinkType(Device.ID, items.Select(f => f.FullPath), cancellationToken)];
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+
+            for (var i = 0; i < items.Count; i++)
+            {
+                var file = items[i];
+                var target = result[i];
+
+                Dispatcher.Invoke(() =>
+                {
+                    file.LinkTarget = target.Item1;
+                    file.Type = target.Item2;
+                    file.UpdateType();
+                });
+            }
+        }
+        finally
+        {
+            Dispatcher.BeginInvoke(() => IsLinkListingFinished = true);
+        }
+    }
+}

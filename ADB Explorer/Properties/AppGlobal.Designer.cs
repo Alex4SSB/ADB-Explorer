@@ -24,9 +24,9 @@ namespace ADB_Explorer.Properties {
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class AppGlobal {
         
-        private static global::System.Resources.ResourceManager resourceMan;
+        private static global::System.Resources.ResourceManager _resourceMan;
         
-        private static global::System.Globalization.CultureInfo resourceCulture;
+        private static global::System.Globalization.CultureInfo _resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal AppGlobal() {
@@ -38,11 +38,11 @@ namespace ADB_Explorer.Properties {
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
-                if (object.ReferenceEquals(resourceMan, null)) {
+                if (object.ReferenceEquals(_resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ADB_Explorer.Properties.AppGlobal", typeof(AppGlobal).Assembly);
-                    resourceMan = temp;
+                    _resourceMan = temp;
                 }
-                return resourceMan;
+                return _resourceMan;
             }
         }
         
@@ -53,10 +53,10 @@ namespace ADB_Explorer.Properties {
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         public static global::System.Globalization.CultureInfo Culture {
             get {
-                return resourceCulture;
+                return _resourceCulture;
             }
             set {
-                resourceCulture = value;
+                _resourceCulture = value;
             }
         }
         
@@ -65,7 +65,7 @@ namespace ADB_Explorer.Properties {
         /// </summary>
         public static System.Drawing.Icon APK_icon {
             get {
-                object obj = ResourceManager.GetObject("APK_icon", resourceCulture);
+                object obj = ResourceManager.GetObject("APK_icon", _resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -75,7 +75,7 @@ namespace ADB_Explorer.Properties {
         /// </summary>
         public static System.Drawing.Icon APK_icon_256px {
             get {
-                object obj = ResourceManager.GetObject("APK_icon_256px", resourceCulture);
+                object obj = ResourceManager.GetObject("APK_icon_256px", _resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
@@ -85,7 +85,7 @@ namespace ADB_Explorer.Properties {
         /// </summary>
         public static string AppDisplayName {
             get {
-                return ResourceManager.GetString("AppDisplayName", resourceCulture);
+                return ResourceManager.GetString("AppDisplayName", _resourceCulture);
             }
         }
         
@@ -94,7 +94,7 @@ namespace ADB_Explorer.Properties {
         /// </summary>
         public static string AppVersion {
             get {
-                return ResourceManager.GetString("AppVersion", resourceCulture);
+                return ResourceManager.GetString("AppVersion", _resourceCulture);
             }
         }
         
@@ -103,7 +103,7 @@ namespace ADB_Explorer.Properties {
         /// </summary>
         public static string DragDropLogPath {
             get {
-                return ResourceManager.GetString("DragDropLogPath", resourceCulture);
+                return ResourceManager.GetString("DragDropLogPath", _resourceCulture);
             }
         }
     }

@@ -1,9 +1,4 @@
-﻿using ADB_Explorer.Converters;
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.ViewModels;
-
-namespace ADB_Explorer.Services;
+﻿namespace ADB_Explorer.Services;
 
 public class FileMoveOperation : AbstractShellFileOperation
 {
@@ -36,13 +31,7 @@ public class FileMoveOperation : AbstractShellFileOperation
 
     public override void Start()
     {
-        if (Status == OperationStatus.InProgress)
-        {
-            throw new Exception("Cannot start an already active operation!");
-        }
-
-        Status = OperationStatus.InProgress;
-        StatusInfo = new InProgShellProgressViewModel();
+        BeginInProgress();
 
         if (OperationName is OperationType.Recycle)
         {
@@ -81,54 +70,16 @@ public class FileMoveOperation : AbstractShellFileOperation
         if (OperationName is OperationType.Copy or OperationType.Recycle)
             DateModified = DateTime.Now;
 
-        var operationTask = ADBService.ExecuteVoidShellCommand(Device.ID, CancelTokenSource!.Token, cmd, flag,
-            ADBService.EscapeAdbShellString(FilePath.FullPath),
-            ADBService.EscapeAdbShellString(TargetPath.FullPath));
+        var operationTask = AdbService.ExecuteVoidShellCommand(Device.ID, CancelTokenSource!.Token, cmd, flag,
+            AdbService.EscapeAdbShellString(FilePath.FullPath),
+            AdbService.EscapeAdbShellString(TargetPath.FullPath));
 
-        operationTask.ContinueWith((t) =>
+        TrackTask(operationTask, "Move failed", result =>
         {
-            if (t.Result == "")
-            {
-                Status = OperationStatus.Completed;
-                StatusInfo = new CompletedShellProgressViewModel();
-            }
-            else
-            {
-                Status = OperationStatus.Failed;
+            SetParsedShellResult(result);
 
-                var res = AdbRegEx.RE_SHELL_ERROR().Matches(t.Result);
-                var updates = res.Where(m => m.Success).Select(m => new ShellErrorInfo(m, FilePath.FullPath));
-                AddUpdates(updates);
-
-                var message = updates.Any() ? updates.Last().Message : t.Result;
-                if (message.Contains(':'))
-                    message = message.Split(':').Last().TrimStart();
-
-                var errorString = FileOpStatusConverter.StatusString(typeof(ShellErrorInfo),
-                                                   failed: Children.Count > 0 ? updates.Count() : -1,
-                                                   message: message,
-                                                   total: true);
-
-                StatusInfo = new FailedOpProgressViewModel(errorString);
-
-                if (OperationName is OperationType.Recycle)
-                {
-                    ShellFileOperation.SilentDelete(Device, TargetPath.FullPath, IndexerPath);
-                }
-            }
-
-        }, TaskContinuationOptions.OnlyOnRanToCompletion);
-
-        operationTask.ContinueWith((t) =>
-        {
-            Status = OperationStatus.Canceled;
-            StatusInfo = new CanceledOpProgressViewModel();
-        }, TaskContinuationOptions.OnlyOnCanceled);
-
-        operationTask.ContinueWith((t) =>
-        {
-            Status = OperationStatus.Failed;
-            StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);
-        }, TaskContinuationOptions.OnlyOnFaulted);
+            if (Status is OperationStatus.Failed && OperationName is OperationType.Recycle)
+                ShellFileOperation.SilentDelete(Device, TargetPath.FullPath, IndexerPath);
+        });
     }
 }

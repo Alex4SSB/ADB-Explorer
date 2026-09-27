@@ -1,8 +1,6 @@
-﻿using ADB_Explorer.Models;
+﻿namespace ADB_Explorer.ViewModels;
 
-namespace ADB_Explorer.ViewModels;
-
-public abstract class FileOpProgressViewModel : ViewModelBase
+public abstract class FileOpProgressViewModel : ObservableObject
 {
     public Services.FileOperation.OperationStatus Status { get; }
 
@@ -18,11 +16,11 @@ public abstract class FileOpProgressViewModel : ViewModelBase
 
     public string Name => FileOpFilter.GetFilterName(FilterType);
 
-    private bool isValidationInProgress = false;
+    private bool _isValidationInProgress = false;
     public bool IsValidationInProgress
     {
-        get => isValidationInProgress;
-        set => Set(ref isValidationInProgress, value);
+        get => _isValidationInProgress;
+        set => SetProperty(ref _isValidationInProgress, value);
     }
 
     public FileOpProgressViewModel(Services.FileOperation.OperationStatus status)

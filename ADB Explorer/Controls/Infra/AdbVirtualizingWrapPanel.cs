@@ -1,5 +1,3 @@
-using ADB_Explorer.Models;
-
 namespace ADB_Explorer.Controls;
 
 public class AdbVirtualizingWrapPanel : Wpf.Ui.Controls.VirtualizingWrapPanel

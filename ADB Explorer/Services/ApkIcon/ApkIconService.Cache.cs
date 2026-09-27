@@ -1,10 +1,6 @@
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.ViewModels;
 using AlphaOmega.Debug;
 using AlphaOmega.Debug.Manifest;
 using SkiaSharp;
-using Wpf.Ui.Appearance;
 
 namespace ADB_Explorer.Services;
 
@@ -30,11 +26,9 @@ public static partial class ApkIconService
         }
     }
 
-
     /// <param name="packageName">Android package id used as the CSV / local-file cache key.</param>
     public static BitmapSource? TryGetCachedIcon(LogicalDeviceViewModel device, string packageName)
         => TryGetCachedIconCore(device, packageName, requireToday: true);
-
 
     /// <summary>
     /// Last successful icon on disk, including a previous day's entry. Used to keep the tile
@@ -42,7 +36,6 @@ public static partial class ApkIconService
     /// </summary>
     private static BitmapSource? TryGetStoredIcon(LogicalDeviceViewModel device, string packageName)
         => TryGetCachedIconCore(device, packageName, requireToday: false);
-
 
     private static BitmapSource? TryGetCachedIconCore(
         LogicalDeviceViewModel device,
@@ -81,7 +74,6 @@ public static partial class ApkIconService
         }
     }
 
-
     private static bool IsIconFreshToday(LogicalDeviceViewModel device, string packageName)
     {
         if (device is null || string.IsNullOrEmpty(packageName))
@@ -95,7 +87,6 @@ public static partial class ApkIconService
                    && IsSuccessfulIconExt(entry.IconExt);
         }
     }
-
 
     public static string? TryGetCachedLabel(LogicalDeviceViewModel device, string packageName)
     {
@@ -115,7 +106,6 @@ public static partial class ApkIconService
         }
     }
 
-
     private static void ApplyCachedLabel(LogicalDeviceViewModel device, Package package)
     {
         if (string.IsNullOrEmpty(package.Name))
@@ -125,7 +115,6 @@ public static partial class ApkIconService
         if (!string.IsNullOrWhiteSpace(label))
             package.Label = label;
     }
-
 
     /// <summary>
     /// Restores launcher icons and labels from the on-disk cache without pulling APKs.
@@ -162,7 +151,6 @@ public static partial class ApkIconService
         }
     }
 
-
     /// <summary>
     /// True when this package already has a settled "no icon" result that must not
     /// trigger another APK unzip: a <see cref="FailMarker"/> (any day — overlays never
@@ -182,7 +170,6 @@ public static partial class ApkIconService
         }
     }
 
-
     private static bool IsSettledIconMiss(in ApkIconCacheEntry entry, string packageName)
     {
         if (IsCalendarPackage(packageName) || IsSuccessfulIconExt(entry.IconExt))
@@ -190,7 +177,6 @@ public static partial class ApkIconService
 
         return entry.IconExt == FailMarker;
     }
-
 
     private static bool NeedsLabelFetch(LogicalDeviceViewModel device, string packageName)
     {
@@ -219,14 +205,12 @@ public static partial class ApkIconService
         }
     }
 
-
     /// <summary>True when a display label is real (not missing, fail marker, pseudo-locale, or lossy junk).</summary>
     private static bool IsUsableDisplayLabel(string? label)
         => !string.IsNullOrWhiteSpace(label)
            && label != FailMarker
            && !ArscResourceResolver.IsPseudoAccentLabel(label)
            && !IsCorruptCachedLabel(label);
-
 
     /// <summary>
     /// Detects labels mangled by ANSI/Default round-trips (Hebrew → <c>????</c>) or bad UTF-8 (<c>U+FFFD</c>).
@@ -273,7 +257,6 @@ public static partial class ApkIconService
         return significant > 0 && placeholders * 2 >= significant;
     }
 
-
     /// <summary>
     /// Stable CSV key for the current app UI language (<c>fr</c>, <c>he</c>, <c>en</c>, …).
     /// Uses <see cref="AppSettings.ActualUICulture"/> so an unset (invariant) preference
@@ -291,7 +274,6 @@ public static partial class ApkIconService
 
         return lang.ToLowerInvariant();
     }
-
 
     private static Dictionary<string, string> ParseLocalizedLabels(string? field)
     {
@@ -343,7 +325,6 @@ public static partial class ApkIconService
         return result;
     }
 
-
     private static IEnumerable<string> SplitLocalizedLabelParts(string field)
     {
         var start = 0;
@@ -367,13 +348,11 @@ public static partial class ApkIconService
             yield return field[start..];
     }
 
-
     private static string EscapeLocalizedLabelValue(string value)
         => value.Replace("\\", "\\\\", StringComparison.Ordinal)
                 .Replace(";", "\\;", StringComparison.Ordinal)
                 .Replace("=", "\\=", StringComparison.Ordinal)
                 .Replace("|", "\\|", StringComparison.Ordinal);
-
 
     private static string UnescapeLocalizedLabelValue(string value)
     {
@@ -393,7 +372,6 @@ public static partial class ApkIconService
         return sb.ToString();
     }
 
-
     private static string EncodeLocalizedLabels(IReadOnlyDictionary<string, string> map)
     {
         if (map.Count == 0)
@@ -404,7 +382,6 @@ public static partial class ApkIconService
             .Select(kv => $"{kv.Key}={EscapeLocalizedLabelValue(kv.Value)}"));
     }
 
-
     /// <summary>Merges <paramref name="localeValue"/> for the current UI locale into an existing label field.</summary>
     private static string MergeLocaleLabel(string? existingField, string localeValue)
     {
@@ -412,7 +389,6 @@ public static partial class ApkIconService
         map[GetAppLocaleKey()] = localeValue;
         return EncodeLocalizedLabels(map);
     }
-
 
     private static string? PickLocalizedLabel(string? field)
     {
@@ -449,7 +425,6 @@ public static partial class ApkIconService
         return map.Values.FirstOrDefault(IsUsableDisplayLabel);
     }
 
-
     private static void EnsureUiLanguageHook()
     {
         if (_uiLanguageHooked)
@@ -464,7 +439,6 @@ public static partial class ApkIconService
             App.SafeBeginInvoke(OnUiLanguageChanged);
         };
     }
-
 
     private static void OnUiLanguageChanged()
     {
@@ -481,12 +455,10 @@ public static partial class ApkIconService
         }
     }
 
-
     private static bool IsSuccessfulIconExt(string? iconExt)
         => !string.IsNullOrEmpty(iconExt)
            && iconExt != FailMarker
            && iconExt.StartsWith('.');
-
 
     private static string SanitizePackageFileName(string packageName)
     {
@@ -502,14 +474,11 @@ public static partial class ApkIconService
         return string.IsNullOrWhiteSpace(name) ? "unknown" : name;
     }
 
-
     private static string NormalizeCrc(string crc)
         => crc.Trim().ToUpperInvariant();
 
-
     private static string GetLocalIconDirectory(string serialNumber)
         => Path.Combine(Data.AppDataPath, serialNumber, ICONS_SUBFOLDER);
-
 
     private static string GetLocalIconPath(string serialNumber, string packageName, string iconExt)
     {
@@ -518,7 +487,6 @@ public static partial class ApkIconService
             fileName += DynamicLauncherIconTag;
         return Path.Combine(GetLocalIconDirectory(serialNumber), fileName + iconExt);
     }
-
 
     private static BitmapSource? TryDecodeExistingIconFile(string serialNumber, string packageName)
     {
@@ -534,7 +502,6 @@ public static partial class ApkIconService
 
         return null;
     }
-
 
     private static IEnumerable<string> EnumerateLocalIconCandidatePaths(string serialNumber, string packageName)
     {
@@ -552,10 +519,8 @@ public static partial class ApkIconService
         }
     }
 
-
     private static object GetDeviceLock(string serialNumber)
         => DeviceLocks.GetOrAdd(serialNumber, _ => new object());
-
 
     private static Dictionary<string, ApkIconCacheEntry> GetOrLoadCache(string serialNumber)
     {
@@ -566,7 +531,6 @@ public static partial class ApkIconService
         DeviceCaches[serialNumber] = loaded;
         return loaded;
     }
-
 
     private static Dictionary<string, ApkIconCacheEntry> ReadCache(string serialNumber)
     {
@@ -598,7 +562,6 @@ public static partial class ApkIconService
 
         return result;
     }
-
 
     /// <summary>
     /// <c>package|crc|yyyy-MM-dd|ext|label[|baked|overlay]</c>.
@@ -651,7 +614,6 @@ public static partial class ApkIconService
         return true;
     }
 
-
     /// <summary>
     /// Accepts extension-only values (<c>.webp</c>), fail marker, or legacy full filenames (<c>pkg.webp</c>).
     /// </summary>
@@ -671,7 +633,6 @@ public static partial class ApkIconService
         return string.IsNullOrEmpty(ext) ? "" : ext.ToLowerInvariant();
     }
 
-
     private static string? NormalizeLabelField(string field)
     {
         if (string.IsNullOrWhiteSpace(field))
@@ -690,7 +651,6 @@ public static partial class ApkIconService
         return EncodeLocalizedLabels(map);
     }
 
-
     private static void WriteCache(string serialNumber, Dictionary<string, ApkIconCacheEntry> cache)
     {
         var deviceDir = Path.Combine(Data.AppDataPath, serialNumber);
@@ -707,7 +667,6 @@ public static partial class ApkIconService
         });
         File.WriteAllText(csvPath, string.Join(Environment.NewLine, lines), CsvEncoding);
     }
-
 
     private static BitmapSource? DecodeBitmap(string localPath)
     {
@@ -728,7 +687,6 @@ public static partial class ApkIconService
         }
     }
 
-
     private static BitmapSource? DecodeBitmapWithWic(string localPath)
     {
         using var stream = new FileStream(localPath, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -740,7 +698,6 @@ public static partial class ApkIconService
         bitmap.Freeze();
         return bitmap;
     }
-
 
     private static BitmapSource? DecodeWebpWithAlpha(string localPath)
     {
@@ -765,7 +722,6 @@ public static partial class ApkIconService
         return writeable;
     }
 
-
     private static bool FileLooksLikeWebp(string localPath)
     {
         try
@@ -780,7 +736,6 @@ public static partial class ApkIconService
             return false;
         }
     }
-
 
     private static string? TryReadPackageName(byte[] manifestBytes, byte[] resourcesBytes)
     {

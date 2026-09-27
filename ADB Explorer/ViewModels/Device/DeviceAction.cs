@@ -1,6 +1,3 @@
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Services;
-
 namespace ADB_Explorer.ViewModels;
 
 public class DeviceAction : BaseAction
@@ -32,7 +29,7 @@ public class RebootCommand : DeviceAction
 
     public RebootCommand(LogicalDeviceViewModel device, RebootType type)
         : base(null,
-            () => Task.Run(() => ADBService.Reboot(device.ID, RebootParam(type))),
+            () => Task.Run(() => AdbService.Reboot(device.ID, RebootParam(type))),
             RebootString(type))
     { }
 

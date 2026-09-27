@@ -1,8 +1,4 @@
-﻿using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-using ADB_Explorer.Services.AppInfra;
-
-namespace ADB_Explorer.ViewModels;
+﻿namespace ADB_Explorer.ViewModels;
 
 public partial class VirtualDriveViewModel : DriveViewModel
 {
@@ -44,7 +40,6 @@ public partial class VirtualDriveViewModel : DriveViewModel
         if (Drive.MountPoint != snapshot.MountPoint)
         {
             Drive.MountPoint = snapshot.MountPoint;
-            OnPropertyChanged(nameof(DfMountPoint));
         }
     }
 

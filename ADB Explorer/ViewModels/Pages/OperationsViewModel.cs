@@ -1,7 +1,4 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-using Wpf.Ui.Abstractions.Controls;
+﻿using Wpf.Ui.Abstractions.Controls;
 
 namespace ADB_Explorer.ViewModels.Pages;
 
@@ -55,7 +52,7 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
     }
 
     /// <summary>
-    /// Called on every <c>Loaded</c> of <c>OperationsPageHeader</c>. Links each XAML
+    /// Called on every <c>Loaded</c> of <c>OperationsPageContent</c>. Links each XAML
     /// <see cref="DataGridColumn"/> to its config and restores the saved display order.
     /// Safe to call on every navigation — configs are created only once.
     /// </summary>
@@ -108,13 +105,13 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
 
     #region Selected file ops
 
-    private IEnumerable<FileOperation> selectedFileOps = [];
+    private IEnumerable<FileOperation> _selectedFileOps = [];
     public IEnumerable<FileOperation> SelectedFileOps
     {
-        get => selectedFileOps;
+        get => _selectedFileOps;
         set
         {
-            if (SetProperty(ref selectedFileOps, value))
+            if (FieldHelper.TrySet(ref _selectedFileOps, value))
             {
                 UpdateTooltips();
                 ValidateOpAction.NotifyIsEnabledChanged();

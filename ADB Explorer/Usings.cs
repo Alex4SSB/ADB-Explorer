@@ -34,5 +34,16 @@ global using System.Windows.Interop;
 global using System.Windows.Media;
 global using System.Windows.Media.Imaging;
 global using System.Windows.Threading;
+global using ADB_Explorer.Controls;
+global using ADB_Explorer.Converters;
+global using ADB_Explorer.Helpers;
+global using ADB_Explorer.Models;
+global using ADB_Explorer.Services;
+global using ADB_Explorer.ViewModels;
+global using ADB_Explorer.ViewModels.Pages;
+global using ADB_Explorer.ViewModels.Windows;
+global using ADB_Explorer.Views;
+global using ADB_Explorer.Views.Pages;
+global using ADB_Explorer.Views.Windows;
 global using HANDLE = nint;
 

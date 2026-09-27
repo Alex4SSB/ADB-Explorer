@@ -1,7 +1,4 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-
-namespace ADB_Explorer.Services;
+﻿namespace ADB_Explorer.Services;
 
 public enum ValidationHashMode
 {
@@ -137,6 +134,28 @@ public static class ShellCommands
         return ValidationHashMode.None;
     }
 
+    public static bool SupportsHashMode(string deviceId, ValidationHashMode mode) => mode switch
+    {
+        ValidationHashMode.Crc32 => Crc32Exists(deviceId),
+        ValidationHashMode.Md5 => Md5SumExists(deviceId),
+        _ => false,
+    };
+
+    /// <summary>The strongest hash mode both devices support, so their hashes can be compared.</summary>
+    public static ValidationHashMode GetSharedValidationHashMode(string deviceId, string otherDeviceId)
+    {
+        var mode = GetValidationHashMode(deviceId);
+        var otherMode = GetValidationHashMode(otherDeviceId);
+
+        if (mode == otherMode)
+            return mode;
+
+        if (Md5SumExists(deviceId) && Md5SumExists(otherDeviceId))
+            return ValidationHashMode.Md5;
+
+        return ValidationHashMode.None;
+    }
+
     public static string? GetCrc32Command(string deviceId)
         => DeviceCommands.TryGetValue(deviceId, out var commands) ? commands.Crc32Command : null;
 
@@ -166,16 +185,16 @@ public static class ShellCommands
 
         int returnCode = 0;
 
-        returnCode = ADBService.ExecuteDeviceAdbShellCommand(deviceID, "busybox", out string helpResult, out _, CancellationToken.None, "--help");
+        returnCode = AdbService.ExecuteDeviceAdbShellCommand(deviceID, "busybox", out string helpResult, out _, CancellationToken.None, "--help");
         var busyBoxExists = returnCode == 0;
 
-        returnCode = ADBService.ExecuteDeviceAdbShellCommand(deviceID, "echo", out string echoResult, out _, CancellationToken.None, "$PATH");
+        returnCode = AdbService.ExecuteDeviceAdbShellCommand(deviceID, "echo", out string echoResult, out _, CancellationToken.None, "$PATH");
         if (returnCode == 127)
         {
             if (!busyBoxExists)
                 throw new Exception("echo command not found");
 
-            if (ADBService.ExecuteDeviceAdbShellCommand(deviceID, "busybox echo", out echoResult, out _, CancellationToken.None, "$PATH") != 0)
+            if (AdbService.ExecuteDeviceAdbShellCommand(deviceID, "busybox echo", out echoResult, out _, CancellationToken.None, "$PATH") != 0)
                 echoResult = null;
         }
 
@@ -188,12 +207,12 @@ public static class ShellCommands
         }
         else
         {
-            cmdPaths = [.. echoResult.TrimEnd(ADBService.LINE_SEPARATORS).Split(':')];
+            cmdPaths = [.. echoResult.TrimEnd(AdbService.LINE_SEPARATORS).Split(':')];
             mainPath = (cmdPaths.Contains(SYS_BIN) ? SYS_BIN : cmdPaths[0]);
         }
 
         bool sysFindAvailable = true;
-        returnCode = ADBService.ExecuteDeviceAdbShellCommand(deviceID,
+        returnCode = AdbService.ExecuteDeviceAdbShellCommand(deviceID,
                                                              "find",
                                                              out string findResult,
                                                              out _,
@@ -205,7 +224,7 @@ public static class ShellCommands
                 throw new Exception("find command not found");
 
             sysFindAvailable = false;
-            ADBService.ExecuteDeviceAdbShellCommand(deviceID,
+            AdbService.ExecuteDeviceAdbShellCommand(deviceID,
                                                     "busybox find",
                                                     out findResult,
                                                     out _,
@@ -215,7 +234,7 @@ public static class ShellCommands
 
         var findPrintf = ProbeFind(deviceID, busyBoxExists).FindPrintf;
 
-        var sysBinCmds = findResult.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Select(FileHelper.GetFullName).ToList();
+        var sysBinCmds = findResult.Split(AdbService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Select(FileHelper.GetFullName).ToList();
         var missingCmds = Commands.Except(sysBinCmds).ToList();
 
         if (!cmdPaths.Remove(SYS_BIN))
@@ -226,14 +245,14 @@ public static class ShellCommands
             if (missingCmds.Count < 1)
                 break;
 
-            ADBService.ExecuteDeviceAdbShellCommand(deviceID,
+            AdbService.ExecuteDeviceAdbShellCommand(deviceID,
                                                     $"{(sysFindAvailable ? "" : "busybox ")}find",
                                                     out findResult,
                                                     out _,
                                                     CancellationToken.None,
                                                     [.. missingCmds.Select(c => FileHelper.ConcatPaths(cmdPath, c)), "2>/dev/null"]);
 
-            var newCmds = findResult.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries)
+            var newCmds = findResult.Split(AdbService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries)
                                     .Select(FileHelper.GetFullName);
 
             foreach (var item in newCmds)
@@ -245,7 +264,7 @@ public static class ShellCommands
 
         if (missingCmds.Count > 0)
         {
-            ADBService.ExecuteDeviceAdbShellCommand(deviceID, "alias", out string aliasResult, out _, CancellationToken.None);
+            AdbService.ExecuteDeviceAdbShellCommand(deviceID, "alias", out string aliasResult, out _, CancellationToken.None);
 
             var matches = AdbRegEx.RE_GET_ALIAS().Matches(aliasResult);
 
@@ -298,18 +317,18 @@ public static class ShellCommands
 
     private static void ProbeShellCommands(string deviceID)
     {
-        var busyBoxExists = ADBService.ExecuteDeviceAdbShellCommand(deviceID, "busybox", out _, out _, CancellationToken.None, "--help") == 0;
+        var busyBoxExists = AdbService.ExecuteDeviceAdbShellCommand(deviceID, "busybox", out _, out _, CancellationToken.None, "--help") == 0;
         var (findExists, findPrintf) = ProbeFind(deviceID, busyBoxExists);
 
         var statCmd = busyBoxExists ? "busybox stat" : "stat";
-        var statExists = ADBService.ExecuteDeviceAdbShellCommand(deviceID,
+        var statExists = AdbService.ExecuteDeviceAdbShellCommand(deviceID,
                                                                  statCmd,
                                                                  out _,
                                                                  out _,
                                                                  CancellationToken.None,
                                                                  "-c",
                                                                  "%s",
-                                                                 ADBService.EscapeAdbShellString("/")) == 0;
+                                                                 AdbService.EscapeAdbShellString("/")) == 0;
 
         var archiveProbe = ProbeArchiveCapabilities(deviceID, busyBoxExists);
         var hashProbe = ProbeHashCommands(deviceID, busyBoxExists);
@@ -345,7 +364,7 @@ public static class ShellCommands
 
     private static HashProbeResult ProbeHashCommands(string deviceID, bool busyBoxExists)
     {
-        ADBService.ExecuteDeviceAdbShellCommand(deviceID,
+        AdbService.ExecuteDeviceAdbShellCommand(deviceID,
                                                 BuildHashProbeScript(busyBoxExists),
                                                 out string stdout,
                                                 out _,
@@ -391,7 +410,7 @@ public static class ShellCommands
 
     private static (bool FindExists, bool FindPrintf) ProbeFind(string deviceID, bool busyBoxExists)
     {
-        var exitCode = ADBService.ExecuteDeviceAdbShellCommand(deviceID,
+        var exitCode = AdbService.ExecuteDeviceAdbShellCommand(deviceID,
                                                                busyBoxExists ? "busybox find" : "find",
                                                                out var findHelp,
                                                                out _,
@@ -403,7 +422,7 @@ public static class ShellCommands
 
     private static ArchiveProbeResult ProbeArchiveCapabilities(string deviceID, bool busyBoxExists)
     {
-        ADBService.ExecuteDeviceAdbShellCommand(deviceID,
+        AdbService.ExecuteDeviceAdbShellCommand(deviceID,
                                                 BuildArchiveProbeScript(busyBoxExists),
                                                 out string stdout,
                                                 out _,

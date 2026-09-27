@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace ADB_Test;
 
 /// <summary>
-/// Device-free checks for <see cref="ADBService.EscapeAdbShellString"/>.
+/// Device-free checks for <see cref="AdbService.EscapeAdbShellString"/>.
 /// Live <c>adb shell</c> coverage is in <see cref="ShellEscapeEmulatorTests"/>.
 /// </summary>
 [TestClass]
@@ -17,7 +17,7 @@ public class ShellEscapeTests
     [TestMethod]
     public void EscapeAdbShellString_DoesNotBackslashTildeInIncrementalAppDir()
     {
-        var escaped = ADBService.EscapeAdbShellString(IncrementalAppDir);
+        var escaped = AdbService.EscapeAdbShellString(IncrementalAppDir);
 
         Assert.DoesNotContain(@"\~", escaped);
         StringAssert.Contains(escaped, "~~YpQ0dzQS2vI-67ptyyetpg==");
@@ -34,7 +34,7 @@ public class ShellEscapeTests
             IncrementalAppDir,
             ["base.apk"],
             null);
-        var shC = ADBService.EscapeAdbShellString(script);
+        var shC = AdbService.EscapeAdbShellString(script);
 
         Assert.DoesNotContain(@"\~", script);
         Assert.DoesNotContain(@"\~", shC);
@@ -44,7 +44,7 @@ public class ShellEscapeTests
     [TestMethod]
     public void EscapeAdbShellString_StillEscapesDollarAndBacktick()
     {
-        var escaped = ADBService.EscapeAdbShellString("a$b`c");
+        var escaped = AdbService.EscapeAdbShellString("a$b`c");
 
         StringAssert.Contains(escaped, @"\$");
         StringAssert.Contains(escaped, @"\`");

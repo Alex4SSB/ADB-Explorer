@@ -1,13 +1,6 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Services;
-using ADB_Explorer.ViewModels;
-using ADB_Explorer.ViewModels.Pages;
-using ADB_Explorer.ViewModels.Windows;
-using System.Diagnostics.CodeAnalysis;
+﻿namespace ADB_Explorer.Models;
 
-namespace ADB_Explorer.Models;
-
-public static class Data
+public static partial class Data
 {
     /// <summary>
     /// The active tab's full state. Only one instance exists for now; a future extra tab
@@ -15,7 +8,7 @@ public static class Data
     /// </summary>
     public static ExplorerInstance ActiveExplorerInstance { get; set; } = new();
 
-    /// <summary>Lets XAML bind window-wide state without searching up to a Window that a cached page header may not have.</summary>
+    /// <summary>Lets XAML bind window-wide state without searching up to a Window that a cached page content control may not have.</summary>
     public static MainWindowViewModel MainWindowVM => App.Services.GetRequiredService<MainWindowViewModel>();
 
     /// <summary>
@@ -23,12 +16,12 @@ public static class Data
     /// </summary>
     public static FileList Files => ActiveExplorerInstance.FileList;
 
-    private static FileList? actionTarget;
+    private static FileList? _actionTarget;
 
     /// <summary>
     /// Action target: a tree context list, an inactive tab, or <see cref="Files"/>.
     /// </summary>
-    public static FileList Active => actionTarget ?? Files;
+    public static FileList Active => _actionTarget ?? Files;
 
     public static FileListScope Use(FileList list) => new(list);
 
@@ -70,30 +63,40 @@ public static class Data
     public static bool ForEachListingAt(string path, string? deviceId, Action<ExplorerInstance, bool> action)
         => ForEachInstance(instance => instance.EffectiveDevice?.ID == deviceId && instance.FileList.Path == path, action);
 
+    /// <summary>
+    /// Like <see cref="ForEachListingAt"/>, plus panes showing search results, which list items from any folder.
+    /// For changes to an existing item only - a search doesn't gain items it never matched.
+    /// </summary>
+    public static bool ForEachListingHolding(string path, string? deviceId, Action<ExplorerInstance, bool> action)
+        => ForEachInstance(
+            instance => instance.EffectiveDevice?.ID == deviceId
+                && (instance.FileList.Path == path || instance.FileList.Actions.IsSearchMode),
+            action);
+
     public readonly struct InstanceScope : IDisposable
     {
-        private readonly ExplorerInstance previous;
+        private readonly ExplorerInstance _previous;
 
         internal InstanceScope(ExplorerInstance instance)
         {
-            previous = ActiveExplorerInstance;
+            _previous = ActiveExplorerInstance;
             ActiveExplorerInstance = instance;
         }
 
-        public void Dispose() => ActiveExplorerInstance = previous;
+        public void Dispose() => ActiveExplorerInstance = _previous;
     }
 
     public readonly struct FileListScope : IDisposable
     {
-        private readonly FileList? previous;
+        private readonly FileList? _previous;
 
         internal FileListScope(FileList list)
         {
-            previous = actionTarget;
-            actionTarget = list;
+            _previous = _actionTarget;
+            _actionTarget = list;
         }
 
-        public void Dispose() => actionTarget = previous;
+        public void Dispose() => _actionTarget = _previous;
     }
 
     public static string CurrentPath
@@ -109,19 +112,31 @@ public static class Data
     public static string ParentPath => FileHelper.GetParentPath(CurrentPath);
 
     /// <summary>
-    /// Device path active when the user entered explorer search mode.
+    /// Device path active when the focused pane entered explorer search mode.
     /// </summary>
-    public static string? SearchOriginPath { get; set; }
+    public static string? SearchOriginPath
+    {
+        get => Files.SearchOriginPath;
+        set => Files.SearchOriginPath = value;
+    }
 
     /// <summary>
-    /// Whether the search root allowed modifications when search mode was entered.
+    /// Whether the focused pane's search root allowed modifications when search mode was entered.
     /// </summary>
-    public static bool SearchOriginCanWrite { get; set; }
+    public static bool SearchOriginCanWrite
+    {
+        get => Files.SearchOriginCanWrite;
+        set => Files.SearchOriginCanWrite = value;
+    }
 
     /// <summary>
-    /// Optimized common parent for the current search-mode transfer batch.
+    /// Optimized common parent for the focused pane's current search-mode transfer batch.
     /// </summary>
-    public static string? SearchTransferParent { get; set; }
+    public static string? SearchTransferParent
+    {
+        get => Files.SearchTransferParent;
+        set => Files.SearchTransferParent = value;
+    }
 
     /// <summary>Full paths matched by the "File contents" search option in Current Folder scope;
     /// <see langword="null"/> when not applicable/stale.</summary>
@@ -177,7 +192,7 @@ public static class Data
 
     internal static void RaiseDevicesObjectCreated() => DevicesObjectCreated?.Invoke(null, EventArgs.Empty);
 
-    public static MDNS MdnsService { get; } = new();
+    public static MdnsService MdnsService { get; } = new();
 
     public static IEnumerable<FileClass> SelectedFiles
     {
@@ -192,25 +207,6 @@ public static class Data
     }
 
     public static ObservableProperty<Type> CurrentPage { get; set; } = new();
-
-    public static event EventHandler? ClearLogs;
-
-    public static void RaiseClearLogs() => ClearLogs?.Invoke(null, EventArgs.Empty);
-
-    public static event EventHandler? ClearNavigationBox;
-    public static void RaiseClearNavigationBox() => ClearNavigationBox?.Invoke(null, EventArgs.Empty);
-
-    public static event EventHandler<bool>? UnfocusNavigationBox;
-    public static void RaiseFocusNavigationBox(bool focus) => UnfocusNavigationBox?.Invoke(null, focus);
-
-    public static event EventHandler? UnfocusSearchBox;
-    public static void RaiseUnfocusSearchBox() => UnfocusSearchBox?.Invoke(null, EventArgs.Empty);
-
-    public static event EventHandler? RunExplorerSearch;
-    public static void RaiseRunExplorerSearch() => RunExplorerSearch?.Invoke(null, EventArgs.Empty);
-
-    public static event EventHandler? ExitSearchMode;
-    public static void RaiseExitSearchMode() => ExitSearchMode?.Invoke(null, EventArgs.Empty);
 
     public static ObservableProperty<bool> IsLogPaused { get; set; } = new();
 

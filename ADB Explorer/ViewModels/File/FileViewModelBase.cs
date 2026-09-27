@@ -1,9 +1,3 @@
-using ADB_Explorer.Converters;
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-using ADB_Explorer.Services.AppInfra;
-
 namespace ADB_Explorer.ViewModels;
 
 public partial class FileViewModelBase : ObservableObject
@@ -18,7 +12,6 @@ public partial class FileViewModelBase : ObservableObject
         {
             if (SetProperty(ref _typeName, value))
             {
-                OnPropertyChanged(nameof(TypeIsRtl));
                 OnPropertyChanged(nameof(TypeFlowDirection));
                 OnPropertyChanged(nameof(ContentViewTypeText));
             }
@@ -37,7 +30,7 @@ public partial class FileViewModelBase : ObservableObject
     /// <summary>"Size: {SizeString}", for the Content view's date/size column.</summary>
     public string ContentViewSizeText => FormatLabeledValue(Strings.Resources.S_COLUMN_SIZE, SizeString, false);
 
-    private static string FormatLabeledValue(string label, string value, bool valueIsRtl)
+    internal static string FormatLabeledValue(string label, string value, bool valueIsRtl)
     {
         if (string.IsNullOrEmpty(value))
             return "";
@@ -155,43 +148,16 @@ public partial class FileViewModelBase : ObservableObject
         _typeName = GetTypeName();
     }
 
-    public static void PrepareRenameTextBox(TextBox textBox)
+    public void UpdateRenameLegality(string text, DriveRestrictions restrictions)
     {
-        if (textBox.DataContext is not FileClass file)
-            return;
-
-        textBox.ClearValue(TextBox.TextProperty);
-        if (textBox.GetBindingExpression(TextBox.TextProperty) is { } expression)
-            expression.UpdateTarget();
-        else
-            textBox.Text = FileHelper.DisplayName(file);
-
-        RenameTextChanged(textBox);
-        textBox.Focus();
-        textBox.SelectAll();
-    }
-
-    public static void RenameTextChanged(TextBox textBox)
-    {
-        // Data.DirList can turn null mid-rename (navigation/refresh); guard it like CurrentDrive.
-        if (textBox.DataContext is not FileClass file || Data.CurrentDrive is null || Data.DirList is null)
-            return;
-
-        var restrictions = DriveHelper.GetRestrictions(file.FullPath);
-        textBox.FilterString(restrictions.RestrictedNaming
-            ? AdbExplorerConst.INVALID_NTFS_CHARS
-            : AdbExplorerConst.INVALID_UNIX_CHARS);
-
-        var vm = file.ActiveViewModel;
-
-        vm.IsRenameUnixLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Unix);
-        vm.IsRenameNamingLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.RestrictedNaming);
-        vm.IsRenameWindowsLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Windows);
-        vm.IsRenameDriveRootLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.WinRoot);
+        IsRenameUnixLegal = FileHelper.FileNameLegal(text, FileHelper.RenameTarget.Unix);
+        IsRenameNamingLegal = FileHelper.FileNameLegal(text, FileHelper.RenameTarget.RestrictedNaming);
+        IsRenameWindowsLegal = FileHelper.FileNameLegal(text, FileHelper.RenameTarget.Windows);
+        IsRenameDriveRootLegal = FileHelper.FileNameLegal(text, FileHelper.RenameTarget.WinRoot);
 
         var fullName = Data.Settings.ShowExtensions
-            ? textBox.Text
-            : textBox.Text + file.Extension;
+            ? text
+            : text + _file.Extension;
 
         var comparison = restrictions.CaseInsensitiveNames
             ? StringComparison.InvariantCultureIgnoreCase
@@ -201,12 +167,12 @@ public partial class FileViewModelBase : ObservableObject
         {
             // Data.DirList here is the search-results listing, not the item's real parent folder -
             // validate against the folder the item actually lives in instead (async + debounced).
-            vm.QueueSearchModeUniqueNameCheck(file, fullName, comparison);
+            QueueSearchModeUniqueNameCheck(_file, fullName, comparison);
         }
         else
         {
-            vm.CancelUniqueNameCheck();
-            vm.IsRenameUnique = !Data.DirList.FileList.Except([file]).Any(f => f.FullName.Equals(fullName, comparison));
+            CancelUniqueNameCheck();
+            IsRenameUnique = !Data.DirList.FileList.Except([_file]).Any(f => f.FullName.Equals(fullName, comparison));
         }
     }
 
@@ -276,7 +242,7 @@ public partial class FileViewModelBase : ObservableObject
             bool isUnique;
             try
             {
-                isUnique = !ADBService.ListDirectoryEntries(deviceId, parentPath, token)
+                isUnique = !AdbService.ListDirectoryEntries(deviceId, parentPath, token)
                     .Any(entry => entry.FullPath != originalFullPath && entry.FullName.Equals(candidateFullName, comparison));
             }
             catch (OperationCanceledException)
@@ -309,59 +275,6 @@ public partial class FileViewModelBase : ObservableObject
         _uniqueCheckCts?.Dispose();
         _uniqueCheckCts = null;
         IsCheckingUniqueName = false;
-    }
-
-    public static void RenameKeyDown(TextBox textBox, Key key, Action<FileClass> exitEditMode)
-    {
-        if (textBox.DataContext is not FileClass file)
-            return;
-
-        if (key is Key.Escape or Key.F2)
-        {
-            file.ActiveViewModel.CancelUniqueNameCheck();
-
-            if (file.IsTemp && key is Key.Escape)
-            {
-                FileActionLogic.CancelPendingCompress(file);
-                FileActionLogic.CancelPendingClipboardImage(file);
-                Data.DirList.FileList.Remove(file);
-            }
-            else
-            {
-                var name = FileHelper.DisplayName(textBox);
-                if (string.IsNullOrEmpty(name))
-                {
-                    FileActionLogic.CancelPendingCompress(file);
-                    FileActionLogic.CancelPendingClipboardImage(file);
-                    Data.DirList.FileList.Remove(file);
-                }
-                else
-                    textBox.Text = name;
-            }
-
-            exitEditMode(file);
-        }
-        else if (key is Key.Enter)
-        {
-            RenameCommit(textBox, exitEditMode);
-        }
-    }
-
-    /// <summary>
-    /// Commits the rename - unless a search-mode unique-name check is still debouncing / in flight,
-    /// in which case the commit (from Enter or clicking away) is refused until it resolves.
-    /// </summary>
-    public static void RenameCommit(TextBox textBox, Action<FileClass> exitEditMode)
-    {
-        if (textBox.DataContext is not FileClass file)
-            return;
-
-        if (file.ActiveViewModel.IsCheckingUniqueName)
-            return;
-
-        FileActionLogic.Rename(textBox);
-        file.ActiveViewModel.CancelUniqueNameCheck();
-        exitEditMode(file);
     }
 
     public virtual void UpdateType()
@@ -437,13 +350,11 @@ public partial class FileViewModelBase : ObservableObject
     public void OnModifiedTimeChanged()
     {
         OnPropertyChanged(nameof(ModifiedTimeString));
-        OnPropertyChanged(nameof(ModifiedTimeWithOffsetString));
         OnPropertyChanged(nameof(ContentViewModifiedTimeText));
     }
 
     public virtual void OnSizeChanged()
     {
-        OnPropertyChanged(nameof(SizeString));
         OnPropertyChanged(nameof(ContentViewSizeText));
     }
 

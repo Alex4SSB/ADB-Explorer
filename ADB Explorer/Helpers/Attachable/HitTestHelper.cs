@@ -1,4 +1,3 @@
-using ADB_Explorer.Views;
 using System.Windows.Media.Media3D;
 
 namespace ADB_Explorer.Helpers;

@@ -1,8 +1,4 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-using ADB_Explorer.ViewModels.Windows;
-using System.Windows.Documents;
+﻿using System.Windows.Documents;
 using Wpf.Ui.Appearance;
 using static ADB_Explorer.Services.NativeMethods;
 
@@ -26,13 +22,13 @@ public partial class DragWindow : INotifyPropertyChanged
 
     private readonly DispatcherTimer DragTimer = new() { Interval = TimeSpan.FromMilliseconds(200) };
 
-    private HANDLE dragWindowHandle;
+    private HANDLE _dragWindowHandle;
 
     /// <summary>
     /// The scaling factor of the primary monitor when the window is loaded. 
     /// Used to calculate the offset of the drag image from the mouse cursor.
     /// </summary>
-    private float startingScaling;
+    private float _startingScaling;
 
     public DragWindowViewModel ViewModel { get; } = new();
 
@@ -78,22 +74,22 @@ public partial class DragWindow : INotifyPropertyChanged
             GetPathUnderMouse();
     }
 
-    private DateTime lastUpdate;
-    private bool waitingForUpdate = false;
-    private readonly SolidColorBrush blueBrush = new(Colors.DodgerBlue);
+    private DateTime _lastUpdate;
+    private bool _waitingForUpdate = false;
+    private readonly SolidColorBrush _blueBrush = new(Colors.DodgerBlue);
 
     private void GetPathUnderMouse()
     {
-        if (waitingForUpdate)
+        if (_waitingForUpdate)
             return;
 
-        if (DateTime.Now - lastUpdate < TimeSpan.FromMilliseconds(50))
+        if (DateTime.Now - _lastUpdate < TimeSpan.FromMilliseconds(50))
         {
-            waitingForUpdate = true;
+            _waitingForUpdate = true;
             Task.Delay(50);
-            waitingForUpdate = false;
+            _waitingForUpdate = false;
         }
-        lastUpdate = DateTime.Now;
+        _lastUpdate = DateTime.Now;
 
         App.SafeInvoke(() =>
         {
@@ -114,7 +110,7 @@ public partial class DragWindow : INotifyPropertyChanged
             }
 
             // Shouldn't happen. But if it does, we don't want to do anything.
-            if (hwndUnderMouse == dragWindowHandle)
+            if (_hwndUnderMouse == _dragWindowHandle)
                 return;
 
             string target = "";
@@ -150,9 +146,9 @@ public partial class DragWindow : INotifyPropertyChanged
                     result = string.Format(Strings.Resources.S_DRAG_INSTALL_SINGLE, source);
                     var apkSplit = result.Split(source);
 
-                    DragTooltip.Inlines.Add(new Run(apkSplit[0]) { Foreground = blueBrush });
+                    DragTooltip.Inlines.Add(new Run(apkSplit[0]) { Foreground = _blueBrush });
                     DragTooltip.Inlines.Add(source);
-                    DragTooltip.Inlines.Add(new Run(apkSplit[1]) { Foreground = blueBrush });
+                    DragTooltip.Inlines.Add(new Run(apkSplit[1]) { Foreground = _blueBrush });
 
                     return;
                 }
@@ -187,26 +183,26 @@ public partial class DragWindow : INotifyPropertyChanged
                 {
                     split = result.Split(target);
 
-                    DragTooltip.Inlines.Add(new Run(split[0]) { Foreground = blueBrush });
+                    DragTooltip.Inlines.Add(new Run(split[0]) { Foreground = _blueBrush });
                     DragTooltip.Inlines.Add(target);
 
                     if (split.Length > 1)
-                        DragTooltip.Inlines.Add(new Run(split[1]) { Foreground = blueBrush });
+                        DragTooltip.Inlines.Add(new Run(split[1]) { Foreground = _blueBrush });
                 }
                 else
                 {
                     split = result.Split(source);
 
-                    DragTooltip.Inlines.Add(new Run(split[0]) { Foreground = blueBrush });
+                    DragTooltip.Inlines.Add(new Run(split[0]) { Foreground = _blueBrush });
                     DragTooltip.Inlines.Add(source);
 
                     split = split[1].Split(target);
 
-                    DragTooltip.Inlines.Add(new Run(split[0]) { Foreground = blueBrush });
+                    DragTooltip.Inlines.Add(new Run(split[0]) { Foreground = _blueBrush });
                     if (split.Length > 1)
                     {
                         DragTooltip.Inlines.Add(target);
-                        DragTooltip.Inlines.Add(new Run(split[1]) { Foreground = blueBrush });
+                        DragTooltip.Inlines.Add(new Run(split[1]) { Foreground = _blueBrush });
                     }
                 }
             }
@@ -215,7 +211,7 @@ public partial class DragWindow : INotifyPropertyChanged
                 if (Data.FileActions.IsAppDrive && Data.CopyPaste.MouseWithinApp)
                 {
                     result = string.Format(Strings.Resources.S_DRAG_INSTALL_MULTIPLE, count);
-                    DragTooltip.Inlines.Add(new Run(result) { Foreground = blueBrush });
+                    DragTooltip.Inlines.Add(new Run(result) { Foreground = _blueBrush });
 
                     return;
                 }
@@ -242,20 +238,24 @@ public partial class DragWindow : INotifyPropertyChanged
 
                 var split = result.Split(target);
 
-                DragTooltip.Inlines.Add(new Run(split[0]) { Foreground = blueBrush });
+                DragTooltip.Inlines.Add(new Run(split[0]) { Foreground = _blueBrush });
                 if (split.Length > 1)
                     DragTooltip.Inlines.Add(target);
             }
         });
     }
 
-    private HANDLE hwndUnderMouse = IntPtr.Zero;
+    private HANDLE _hwndUnderMouse = IntPtr.Zero;
 
     private void Popup_Opened(object sender, EventArgs e)
     {
         FlowDirection = Data.RuntimeSettings.IsRTL ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
         if (Data.RuntimeSettings.IsRTL)
+        {
             HORIZONTAL_OFFSET = -2;
+
+            ContentGrid.HorizontalAlignment = HorizontalAlignment.Left;
+        }
 
         Data.CopyPaste.PropertyChanged += (s, e) =>
         {
@@ -283,11 +283,11 @@ public partial class DragWindow : INotifyPropertyChanged
 
         if (Child is not null && PresentationSource.FromVisual(Child) is HwndSource hwndSource)
         {
-            dragWindowHandle = hwndSource.Handle;
-            Services.WindowStyle.SetWindowHidden(dragWindowHandle);
+            _dragWindowHandle = hwndSource.Handle;
+            Services.WindowStyle.SetWindowHidden(_dragWindowHandle);
         }
 
-        startingScaling = MonitorInfo.DpiToScalingFactor(MonitorInfo.PrimaryMonitorDpi());
+        _startingScaling = MonitorInfo.DpiToScalingFactor(MonitorInfo.PrimaryMonitorDpi());
     }
 
     /// <summary>
@@ -300,7 +300,7 @@ public partial class DragWindow : INotifyPropertyChanged
         UpdatePosition(InterceptMouse.GetCursorPosition());
 
         // The main window may have come to the front since the drag window was last used.
-        Services.WindowStyle.BringToTop(dragWindowHandle);
+        Services.WindowStyle.BringToTop(_dragWindowHandle);
 
 #if DEBUG
         Data.CopyPaste.MouseWithinApp = true;
@@ -338,7 +338,7 @@ public partial class DragWindow : INotifyPropertyChanged
         if (bitmap is null)
             return;
 
-        var windowScaling = MonitorInfo.GetScalingFromWindow(dragWindowHandle);
+        var windowScaling = MonitorInfo.GetScalingFromWindow(_dragWindowHandle);
 
         if (Data.CopyPaste.DragImageRectPx is { } imageRect)
         {
@@ -356,19 +356,19 @@ public partial class DragWindow : INotifyPropertyChanged
             ViewModel.DragImageOpacity = 0.9;
         }
 
-        var actualPoint = MonitorInfo.MousePositionToDpi(point, startingScaling);
+        var actualPoint = MonitorInfo.MousePositionToDpi(point, _startingScaling);
 
         // An image with a set rect stays where it was held, instead of hovering above the cursor.
         if (Data.CopyPaste.DragImageRectPx is { } rect)
         {
-            var horizontalOffset = actualPoint.X + rect.X * startingScaling;
+            var horizontalOffset = actualPoint.X + rect.X * _startingScaling;
 
             // A right-to-left popup is placed by its right edge, not its left.
             if (FlowDirection is FlowDirection.RightToLeft)
                 horizontalOffset += ViewModel.DragImageWidth;
 
             // Each offset is set once, as every set moves the popup and an intermediate one would flicker.
-            VerticalOffset = actualPoint.Y + rect.Y * startingScaling;
+            VerticalOffset = actualPoint.Y + rect.Y * _startingScaling;
             HorizontalOffset = horizontalOffset;
 
             return;
@@ -395,14 +395,14 @@ public partial class DragWindow : INotifyPropertyChanged
 
         UpdatePosition(point);
 
-        hwndUnderMouse = InterceptMouse.GetWindowUnderMouse();
+        _hwndUnderMouse = InterceptMouse.GetWindowUnderMouse();
 
         // Shouldn't happen. But if it does, we don't want to do anything.
-        if (hwndUnderMouse == dragWindowHandle)
+        if (_hwndUnderMouse == _dragWindowHandle)
             return;
 
         var wasWithinApp = Data.CopyPaste.MouseWithinApp;
-        Data.CopyPaste.MouseWithinApp = hwndUnderMouse == InterceptClipboard.MainWindowHandle;
+        Data.CopyPaste.MouseWithinApp = _hwndUnderMouse == InterceptClipboard.MainWindowHandle;
 
         if (!Data.CopyPaste.MouseWithinApp && Data.CopyPaste.DragStatus is CopyPasteService.DragState.None)
             Data.CopyPaste.DragBitmap = null;
@@ -416,4 +416,3 @@ public partial class DragWindow : INotifyPropertyChanged
         Data.CopyPaste.DragBitmap = null;
     }
 }
-

@@ -1,15 +1,12 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-
-namespace ADB_Explorer.ViewModels;
+﻿namespace ADB_Explorer.ViewModels;
 
 public class HistoryDeviceViewModel : NewDeviceViewModel
 {
-    private HistoryDevice device = null!;
+    private HistoryDevice _device = null!;
     protected new HistoryDevice Device
     {
-        get => device;
-        set => Set(ref device, value);
+        get => _device;
+        set => SetProperty(ref _device, value);
     }
 
     #region Read only properties

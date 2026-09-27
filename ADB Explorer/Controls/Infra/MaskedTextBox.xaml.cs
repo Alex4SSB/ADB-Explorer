@@ -1,5 +1,4 @@
-﻿using ADB_Explorer.Helpers;
-using static ADB_Explorer.Helpers.TextHelper;
+﻿using static ADB_Explorer.Helpers.TextHelper;
 
 namespace ADB_Explorer.Controls;
 

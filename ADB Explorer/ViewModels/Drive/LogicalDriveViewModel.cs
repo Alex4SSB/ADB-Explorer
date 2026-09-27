@@ -1,7 +1,4 @@
-﻿using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-
-namespace ADB_Explorer.ViewModels;
+﻿namespace ADB_Explorer.ViewModels;
 
 public partial class LogicalDriveViewModel : DriveViewModel
 {
@@ -111,7 +108,7 @@ public partial class LogicalDriveViewModel : DriveViewModel
 
     /// <summary>
     /// Classifies a drive as SD/expansion or USB/OTG, and records the manufacturer + volume label
-    /// (from <see cref="ADBService.DriveMountInfo"/>) so <see cref="DriveViewModel.DisplayName"/>
+    /// (from <see cref="AdbService.DriveMountInfo"/>) so <see cref="DriveViewModel.DisplayName"/>
     /// can show Android's own friendly name instead of the generic "SD card"/"OTG drive" text.
     /// </summary>
     public void SetRemovableInfo(DriveType type, string? manufacturer, string? volumeLabel)

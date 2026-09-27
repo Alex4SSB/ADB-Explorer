@@ -1,5 +1,3 @@
-using ADB_Explorer.ViewModels;
-
 namespace ADB_Explorer.Views;
 
 public class DriveControl : UserControl

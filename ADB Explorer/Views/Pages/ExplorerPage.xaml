@@ -13,5 +13,9 @@
     d:DesignWidth="800"
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-    mc:Ignorable="d" />
+    ScrollViewer.CanContentScroll="False"
+    Style="{StaticResource AppPageStyle}"
+    mc:Ignorable="d">
+    <!--  Shows the active tab's explorer content, set by the main window.  -->
+    <ContentPresenter x:Name="ContentHost" />
+</Page>

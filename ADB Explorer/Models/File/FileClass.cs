@@ -1,9 +1,4 @@
-﻿using ADB_Explorer.Converters;
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Services;
-using ADB_Explorer.Services.AppInfra;
-using ADB_Explorer.ViewModels;
-using Vanara.PInvoke;
+﻿using Vanara.PInvoke;
 using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Models;
@@ -49,21 +44,19 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     [ObservableProperty]
     public partial int? OwnerGid { get; set; }
 
-    [ObservableProperty]
-    public partial AccessMask? ProbedAccess { get; set; }
+    public AccessMask? ProbedAccess { get; set; }
 
-    [ObservableProperty]
-    public partial AccessMask EffectiveAccess { get; set; }
+    public AccessMask EffectiveAccess { get; set; }
 
     public bool CanWriteLocation => EffectiveAccess.HasFlag(AccessMask.Write);
 
-    private bool isLink;
+    private bool _isLink;
     public bool IsLink
     {
-        get => isLink;
+        get => _isLink;
         set
         {
-            if (Set(ref isLink, value))
+            if (SetProperty(ref _isLink, value))
                 UpdateSpecialType();
         }
     }
@@ -77,13 +70,13 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     /// <summary>Files support F2 / delayed-click rename in icon view; packages do not.</summary>
     public bool SupportsIconRename => true;
     
-    private FileType type;
+    private FileType _type;
     public FileType Type
     {
-        get => type;
+        get => _type;
         set
         {
-            if (Set(ref type, value))
+            if (SetProperty(ref _type, value))
                 UpdateSpecialType();
         }
     }
@@ -104,24 +97,20 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     [ObservableProperty]
     public partial bool IsCreationTimeResolved { get; set; }
 
-    [ObservableProperty]
-    public partial long? CompressedSize { get; set; }
+    public long? CompressedSize { get; set; }
 
-    [ObservableProperty]
-    public partial string? CompressionMethod { get; set; }
+    public string? CompressionMethod { get; set; }
 
-    [ObservableProperty]
-    public partial string? CompressionRatio { get; set; }
+    public string? CompressionRatio { get; set; }
 
-    [ObservableProperty]
-    public partial string? Crc32 { get; set; }
+    public string? Crc32 { get; set; }
 
     public DateTime? ModifiedTime
     {
         get;
         set
         {
-            if (Set(ref field, value))
+            if (SetProperty(ref field, value))
             {
                 _folderViewModel?.OnModifiedTimeChanged();
                 _iconViewModel?.OnModifiedTimeChanged();
@@ -134,7 +123,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         get;
         set
         {
-            if (Set(ref field, value))
+            if (SetProperty(ref field, value))
             {
                 _folderViewModel?.OnModifiedTimeChanged();
                 _iconViewModel?.OnModifiedTimeChanged();
@@ -199,7 +188,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             ? LargeFileIcon
             : CacheThumbnail?.Image ?? LargeFileIcon);
 
-    private BitmapSource LargeFileIcon => ApkIcon ?? FileToIconConverter.GetImage(this, 120).First();
+    private BitmapSource LargeFileIcon => ApkIcon ?? FileIconProvider.GetImage(this, 120).First();
 
     public ThumbnailService.Thumbnail? CacheThumbnail => ThumbnailService.GetPaneThumbnail(this);
 
@@ -215,7 +204,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         OnPropertyChanged(nameof(DragImage));
     }
 
-    public BitmapSource FileIcon32 => FileToIconConverter.GetImage(this, 32).First();
+    public BitmapSource FileIcon32 => FileIconProvider.GetImage(this, 32).First();
 
     private FileIconViewModel? _iconViewModel;
     public FileIconViewModel IconViewModel 
@@ -246,20 +235,19 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     [ObservableProperty]
     public partial DragDropEffects CutState { get; set; }
 
-    private TrashIndexer? trashIndex;
+    private TrashIndexer? _trashIndex;
     public TrashIndexer? TrashIndex
     {
-        get => trashIndex;
+        get => _trashIndex;
         set
         {
-            Set(ref trashIndex, value);
+            SetProperty(ref _trashIndex, value);
             if (value is not null && value.OriginalPath is not null)
             {
                 FullName = FileHelper.GetFullName(value.OriginalPath);
                 SortName = new(FullName);
                 OnPropertyChanged(nameof(DisplayName));
                 OnPropertyChanged(nameof(NoExtName));
-                OnPropertyChanged(nameof(Extension));
             }
         }
     }
@@ -312,7 +300,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     public IEnumerable<FileDescriptor>? Descriptors { get; private set; }
 
     /// <summary>Device temp root used when staging archive extract for pull; cleaned after VFDO completes.</summary>
-    private string? archivePullStagingRoot;
+    private string? _archivePullStagingRoot;
 
     #region Read Only Properties
 
@@ -522,7 +510,10 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         location.Permissions = info.Value.Permissions ?? location.Permissions;
         location.ProbedAccess = info.Value.ProbedAccess;
         location.LastAccessTime = info.Value.AccessTime ?? location.LastAccessTime;
-        location.CreationTime = info.Value.CreationTime ?? location.CreationTime;
+
+        if (DriveHelper.HasNoAccessTime(location.FullPath))
+            location.CreationTime = info.Value.AccessTime ?? location.CreationTime;
+
         location.ModifiedTimeWithOffset = info.Value.ModifiedTime ?? location.ModifiedTimeWithOffset;
         location.ModifiedTime = info.Value.ModifiedTime?.DateTime.ToLocalTime() ?? location.ModifiedTime;
         location.EffectiveAccess = ShellAccessHelper.ResolveLocationAccess(location.FullPath, info, identity, restrictions);
@@ -582,7 +573,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     {
         var deviceId = Data.ActiveDevice;
         var path = FullPath;
-        var info = await ADBService.GetFileExtraInfoAsync(deviceId, path, cancellationToken);
+        var info = await AdbService.GetFileExtraInfoAsync(deviceId, path, cancellationToken);
         if (cancellationToken.IsCancellationRequested)
             return;
 
@@ -601,7 +592,11 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             OwnerUid = info.Value.OwnerUid ?? OwnerUid;
             OwnerGid = info.Value.OwnerGid ?? OwnerGid;
             LastAccessTime = info.Value.AccessTime;
-            CreationTime = info.Value.CreationTime;
+
+            // With noatime the access time is never updated, so it stays the time the file was created.
+            if (DriveHelper.HasNoAccessTime(FullPath))
+                CreationTime = info.Value.AccessTime;
+
             ModifiedTimeWithOffset = info.Value.ModifiedTime;
             ModifiedTime = info.Value.ModifiedTime.DateTime.ToLocalTime();
             Permissions = info.Value.Permissions;
@@ -660,7 +655,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
                 IsDirectory,
                 Data.DeviceCts.Token);
 
-            archivePullStagingRoot = stagingRoot;
+            _archivePullStagingRoot = stagingRoot;
             children = tree;
             descriptorParent = FileHelper.GetParentPath(extractedPath);
 
@@ -796,10 +791,10 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             return;
 
         // Clean device-side archive extract staging regardless of success.
-        if (archivePullStagingRoot is not null && vfdo.Operations?.FirstOrDefault()?.Device is { } stagingDevice)
+        if (_archivePullStagingRoot is not null && vfdo.Operations?.FirstOrDefault()?.Device is { } stagingDevice)
         {
-            var root = archivePullStagingRoot;
-            archivePullStagingRoot = null;
+            var root = _archivePullStagingRoot;
+            _archivePullStagingRoot = null;
             Task.Run(() => ArchiveExtract.CleanupStaging(stagingDevice.ID, root));
         }
 
@@ -842,7 +837,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             return;
         }
 
-        var icons = FileToIconConverter.GetImage(this, 16).ToArray();
+        var icons = FileIconProvider.GetImage(this, 16).ToArray();
 
         if (icons.Length > 0 && icons[0] is BitmapSource icon)
             _icon = icon;
@@ -873,16 +868,13 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         }
     }
 
-    protected override bool Set<T>(ref T storage, T value, [CallerMemberName] string? propertyName = null)
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
-        if (!base.Set(ref storage, value, propertyName))
-            return false;
+        base.OnPropertyChanged(e);
 
         // Refresh after the new value is stored — UpdateType reads Type / FullName / IsLink.
-        if (propertyName is nameof(FullName) or nameof(Type) or nameof(IsLink))
+        if (e.PropertyName is nameof(FullName) or nameof(Type) or nameof(IsLink))
             UpdateType();
-
-        return true;
     }
 
     public static explicit operator SyncFile(FileClass self)
