@@ -1879,4 +1879,10 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_OPEN_IN_NEW_TAB" xml:space="preserve">
     <value>Відкрити в новій вкладці</value>
   </data>
+  <data name="S_MENU_SELECT_NONE" xml:space="preserve">
+    <value>Виберіть нічого</value>
+  </data>
+  <data name="S_MENU_INVERT_SELECTION" xml:space="preserve">
+    <value>Інвертувати виділення</value>
+  </data>
 </root>
