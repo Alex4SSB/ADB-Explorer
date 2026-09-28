@@ -106,7 +106,9 @@ public partial class ExplorerPageContent
                     {
                         SortExplorer();
 
-                        if (!TrySelectBackNavigationItem())
+                        // ActiveView.Items can still be empty here - DirList.Stop() fires this
+                        // event before ExplorerSource is reassigned to the new folder's list.
+                        if (!TrySelectBackNavigationItem() && ExplorerList.ActiveView.Items.Count > 0)
                         {
                             ExplorerList.ActiveScrollIntoView(ExplorerList.ActiveView.Items[0]);
 

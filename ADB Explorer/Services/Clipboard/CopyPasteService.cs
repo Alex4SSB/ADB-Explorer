@@ -207,13 +207,14 @@ public partial class CopyPasteService : ObservableObject
         {
             foreach (var file in DragFiles)
             {
-                // Skip files removed from disk after being copied but before paste.
+                // Skip files removed from disk, or on a drive that's gone (ejected/disconnected),
+                // after being copied but before paste.
                 ShellItem item;
                 try
                 {
                     item = ShellItem.Open(file);
                 }
-                catch (FileNotFoundException)
+                catch (Exception ex) when (ex is FileNotFoundException or Win32Exception)
                 {
                     continue;
                 }

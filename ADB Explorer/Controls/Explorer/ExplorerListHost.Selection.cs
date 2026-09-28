@@ -161,8 +161,9 @@ public partial class ExplorerListHost
         if (FileActions.IsAppDrive)
         {
             // Prefer the full package list - ActiveView.Items may omit filtered/system packages
-            // while their IsSelected flags still linger from virtualization.
-            var packages = Data.Packages ?? ExplorerGrid.Items.OfType<Package>();
+            // while their IsSelected flags still linger from virtualization. Snapshot first -
+            // setting IsSelected can trigger a live filter/sort that mutates this collection.
+            var packages = (Data.Packages ?? ExplorerGrid.Items.OfType<Package>()).ToList();
             foreach (var pkg in packages)
             {
                 if (pkg.IsSelected)
@@ -174,7 +175,9 @@ public partial class ExplorerListHost
         if (DirList?.FileList is null)
             return;
 
-        foreach (var file in DirList.FileList)
+        // Snapshot before enumerating - clearing IsSelected below can trigger a live
+        // filter/sort that mutates FileList mid-loop ("Collection was modified").
+        foreach (var file in DirList.FileList.ToList())
         {
             if (file.IsSelected)
                 file.IsSelected = false;
@@ -322,8 +325,9 @@ public partial class ExplorerListHost
         if (FileActions.IsAppDrive)
         {
             // Fix IsSelected on Package items whose containers were recycled by virtualization
-            // so UnselectAll() could not propagate through the TwoWay binding.
-            var packages = Data.Packages ?? ActiveView.Items.OfType<Package>();
+            // so UnselectAll() could not propagate through the TwoWay binding. Snapshot first -
+            // same "Collection was modified" risk as ClearDataItemSelectionFlags.
+            var packages = (Data.Packages ?? ActiveView.Items.OfType<Package>()).ToList();
             foreach (var pkg in packages)
             {
                 var shouldSelect = sourceSet.Contains(pkg);
@@ -335,8 +339,8 @@ public partial class ExplorerListHost
         {
             // Fix IsSelected on underlying data items for virtualized containers
             // that had no container when UnselectAll() was called, and were therefore
-            // skipped by the TwoWay binding propagation.
-            var files = DirList?.FileList ?? ExplorerGrid.Items.OfType<FilePath>();
+            // skipped by the TwoWay binding propagation. Snapshot first - same reason as above.
+            var files = (DirList?.FileList ?? ExplorerGrid.Items.OfType<FilePath>()).ToList();
             foreach (var item in files)
             {
                 var shouldSelect = sourceSet.Contains(item);
