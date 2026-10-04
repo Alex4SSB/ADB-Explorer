@@ -693,7 +693,7 @@ Zrušit všechny probíhající operace</value>
     <value>Soubor</value>
   </data>
   <data name="S_MENU_SELECT_ALL" xml:space="preserve">
-    <value>Zvolit vše</value>
+    <value>Vybrat vše</value>
   </data>
   <data name="S_MENU_CUT" xml:space="preserve">
     <value>Vyjmout</value>
@@ -1975,5 +1975,140 @@ Kontroly se snaží zabránit tomu, aby nic netušící uživatel spustil potenc
   </data>
   <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
     <value>Načítání ikon aplikací</value>
+  </data>
+  <data name="S_SCREENSHOT" xml:space="preserve">
+    <value>Snímek obrazovky</value>
+  </data>
+  <data name="S_MENU_SELECT_NONE" xml:space="preserve">
+    <value>Zrušit výběr</value>
+  </data>
+  <data name="S_MENU_INVERT_SELECTION" xml:space="preserve">
+    <value>Invertovat výběr</value>
+  </data>
+  <data name="S_MENU_PASTE_IMAGE" xml:space="preserve">
+    <value>Vložit obrázek</value>
+  </data>
+  <data name="S_MENU_COPY_AS_IMAGE" xml:space="preserve">
+    <value>Kopírovat jako obrázek</value>
+  </data>
+  <data name="S_MENU_BACKUP_PACKAGE" xml:space="preserve">
+    <value>Zálohovat</value>
+  </data>
+  <data name="S_APK_BACKUP_OBB_FAILED" xml:space="preserve">
+    <value>Aplikace byla nainstalována, ale soubory OBB se nepodařilo obnovit. Spusťte aplikaci jednou na zařízení a zkuste to znovu.</value>
+  </data>
+  <data name="S_MENU_REMOVE_SAVED_LOCATION" xml:space="preserve">
+    <value>Odebrat z uložených umístění</value>
+  </data>
+  <data name="S_BUTTON_VIEW_SIZE" xml:space="preserve">
+    <value>Zobrazit velikost</value>
+  </data>
+  <data name="S_STATUS_CALCULATING_SIZE" xml:space="preserve">
+    <value>Výpočet…</value>
+  </data>
+  <data name="S_THUMBSIZE_TILES" xml:space="preserve">
+    <value>Dlaždice</value>
+  </data>
+  <data name="S_SETTINGS_NEW_TAB_LOCATION" xml:space="preserve">
+    <value>Počáteční umístění nové záložky</value>
+  </data>
+  <data name="S_NEW_TAB_DUPLICATE" xml:space="preserve">
+    <value>Duplikovat aktuální záložku</value>
+  </data>
+  <data name="S_NEW_TAB_DRIVE_VIEW" xml:space="preserve">
+    <value>Zobrazení jednotek aktuálního zařízení</value>
+  </data>
+  <data name="S_NEW_TAB_NONE" xml:space="preserve">
+    <value>Žádné umístění</value>
+  </data>
+  <data name="S_CLOSE_TAB" xml:space="preserve">
+    <value>Zavřít záložku</value>
+  </data>
+  <data name="S_CLOSE_LEFT_PANE" xml:space="preserve">
+    <value>Zavřít levý panel</value>
+  </data>
+  <data name="S_CLOSE_RIGHT_PANE" xml:space="preserve">
+    <value>Zavřít pravý panel</value>
+  </data>
+  <data name="S_CLOSE_TOP_PANE" xml:space="preserve">
+    <value>Zavřít horní panel</value>
+  </data>
+  <data name="S_CLOSE_BOTTOM_PANE" xml:space="preserve">
+    <value>Zavřít dolní panel</value>
+  </data>
+  <data name="S_SPLIT_HORIZONTALLY" xml:space="preserve">
+    <value>Rozdělit vodorovně</value>
+  </data>
+  <data name="S_SPLIT_VERTICALLY" xml:space="preserve">
+    <value>Rozdělit svisle</value>
+  </data>
+  <data name="S_SWAP_PANES" xml:space="preserve">
+    <value>Prohodit panely</value>
+  </data>
+  <data name="S_CLOSE_OTHER_TABS" xml:space="preserve">
+    <value>Zavřít ostatní záložky</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_RIGHT" xml:space="preserve">
+    <value>Zavřít záložky vpravo</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_LEFT" xml:space="preserve">
+    <value>Zavřít záložky vlevo</value>
+  </data>
+  <data name="S_MERGE_WITH_RIGHT_TAB" xml:space="preserve">
+    <value>Sloučit se záložkou vpravo</value>
+  </data>
+  <data name="S_MERGE_WITH_LEFT_TAB" xml:space="preserve">
+    <value>Sloučit se záložkou vlevo</value>
+  </data>
+  <data name="S_DUPLICATE_TAB" xml:space="preserve">
+    <value>Duplikovat záložku</value>
+  </data>
+  <data name="S_NEW_TAB" xml:space="preserve">
+    <value>Nová záložka</value>
+  </data>
+  <data name="S_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>Otevřít v nové záložce</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE" xml:space="preserve">
+    <value>Rozlišovat velká a malá písmena</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE_INFO" xml:space="preserve">
+    <value>Při hledání přesně rozlišovat velká a malá písmena.</value>
+  </data>
+  <data name="S_SEARCH_CONTENTS" xml:space="preserve">
+    <value>Obsah souborů</value>
+  </data>
+  <data name="S_SEARCH_CONTENTS_INFO" xml:space="preserve">
+    <value>Vyhledat také soubory, jejichž obsah zahrnuje hledaný text.</value>
+  </data>
+  <data name="S_SEARCH_ARCHIVES" xml:space="preserve">
+    <value>Obsah archivů</value>
+  </data>
+  <data name="S_SEARCH_ARCHIVES_INFO" xml:space="preserve">
+    <value>Vyhledat také soubory uvnitř archivů nalezených při hledání.</value>
+  </data>
+  <data name="S_NAVIGATION_PANE" xml:space="preserve">
+    <value>Navigační panel</value>
+  </data>
+  <data name="S_MENU_SHOW" xml:space="preserve">
+    <value>Zobrazit</value>
+  </data>
+  <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
+    <value>A</value>
+  </data>
+  <data name="S_THUMBSIZE_CONTENT" xml:space="preserve">
+    <value>Obsah</value>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE" xml:space="preserve">
+    <value>Zobrazit relativní cestu</value>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE_INFO" xml:space="preserve">
+    <value>Je-li tato volba vybrána, výsledky hledání se zobrazí s cestou relativní vůči aktuálnímu umístění. Jinak se zobrazí absolutní cesta.</value>
+  </data>
+  <data name="S_VIEW_SIZE_TOOLTIP" xml:space="preserve">
+    <value>Vypočítá a zobrazí celkovou velikost všech souborů v této složce včetně podsložek.</value>
+  </data>
+  <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
+    <value>Vytvořit soubor .APKBKP s instalací aplikace a daty OBB</value>
   </data>
 </root>
