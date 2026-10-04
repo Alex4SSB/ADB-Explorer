@@ -1569,4 +1569,10 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   <data name="S_OPEN_FOLDER" xml:space="preserve">
     <value>Otwórz</value>
   </data>
+  <data name="S_NEW_VERSION_READY" xml:space="preserve">
+    <value>Nowa wersja {1} {0} została pobrana i jest gotowa do instalacji.</value>
+  </data>
+  <data name="S_UPDATE_ON_CLOSE" xml:space="preserve">
+    <value>Aktualizuj przy zamknięciu</value>
+  </data>
 </root>
