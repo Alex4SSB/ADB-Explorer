@@ -1553,11 +1553,11 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
     <value>Sparuj</value>
   </data>
   <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
-    <value>Zabij process ADB przy zamknięciu aplikacji</value>
+    <value>Zabij proces ADB przy zamknięciu aplikacji</value>
     <comment>The setting that enables killing ADB server when closing the app</comment>
   </data>
   <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
-    <value>Niestandardowa lokalizacja nie może być w C:\Users\…\AppData - proszę zaznaczyć inną lokalizacje</value>
+    <value>Niestandardowa lokalizacja nie może być w C:\Users\…\AppData - proszę wybrać inną lokalizację</value>
     <comment>An error displayed when choosing a wrong custom app data location</comment>
   </data>
   <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
@@ -1574,5 +1574,244 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   </data>
   <data name="S_UPDATE_ON_CLOSE" xml:space="preserve">
     <value>Aktualizuj przy zamknięciu</value>
+  </data>
+  <data name="S_UPDATE_APPLY_FAILED" xml:space="preserve">
+    <value>Nie udało się przygotować aktualizacji. Upewnij się, że masz dostępne narzędzie obsługujące pliki .7z (np. Eksplorator Windows, 7-Zip czy NanaZip) albo pobierz wydanie ręcznie z GitHuba.</value>
+  </data>
+  <data name="S_SCREENSHOT" xml:space="preserve">
+    <value>Zrzut</value>
+  </data>
+  <data name="S_NEW_ARCHIVE" xml:space="preserve">
+    <value>Nowe archiwum</value>
+  </data>
+  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
+    <value>Zastąp pliki w miejscu docelowym</value>
+  </data>
+  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
+    <value>Pomiń te pliki</value>
+  </data>
+  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
+    <value>Pozwól mi zdecydować dla każdego przypadku</value>
+  </data>
+  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
+    <value>Rozwiąż konflikty w {0}</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
+    <value>Sprawdź i powiadom</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_UPDATE" xml:space="preserve">
+    <value>Zaktualizuj i zainstaluj</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
+    <value>Folder danych aplikacji</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
+    <value>Użyj domyślnego</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
+    <value>Wybierz folder danych aplikacji</value>
+  </data>
+  <data name="S_MENU_STOP_LOADING" xml:space="preserve">
+    <value>Zatrzymaj ładowanie {0}</value>
+  </data>
+  <data name="S_MENU_SELECT_NONE" xml:space="preserve">
+    <value>Odznacz wszystko</value>
+  </data>
+  <data name="S_MENU_INVERT_SELECTION" xml:space="preserve">
+    <value>Odwróć zaznaczenie</value>
+  </data>
+  <data name="S_MENU_PASTE_IMAGE" xml:space="preserve">
+    <value>Wklej obraz</value>
+  </data>
+  <data name="S_MENU_COPY_LINK" xml:space="preserve">
+    <value>Kopiuj jako ścieżkę</value>
+  </data>
+  <data name="S_MENU_COPY_AS_IMAGE" xml:space="preserve">
+    <value>Kopiuj jako obraz</value>
+  </data>
+  <data name="S_MENU_COPY_CONTENTS" xml:space="preserve">
+    <value>Kopiuj zawartość</value>
+  </data>
+  <data name="S_MENU_EXTRACT_HERE" xml:space="preserve">
+    <value>Wypakuj tutaj</value>
+  </data>
+  <data name="S_MENU_COMPRESS_TO" xml:space="preserve">
+    <value>Kompresuj jako</value>
+  </data>
+  <data name="S_ACTION_COMPRESS" xml:space="preserve">
+    <value>Kompresuj</value>
+  </data>
+  <data name="S_ACTION_EXTRACT" xml:space="preserve">
+    <value>Wypakuj</value>
+  </data>
+  <data name="S_MENU_ARCHIVE" xml:space="preserve">
+    <value>Archiwum</value>
+  </data>
+  <data name="S_MENU_BACKUP_PACKAGE" xml:space="preserve">
+    <value>Wykonaj kopię zapasową</value>
+  </data>
+  <data name="S_APK_BACKUP_OBB_FAILED" xml:space="preserve">
+    <value>Aplikacja jest zainstalowana, ale nie udało się uzyskać jej plików OBB. Otwórz aplikację na urządzeniu i spróbuj ponownie.</value>
+  </data>
+  <data name="S_MENU_REMOVE_SAVED_LOCATION" xml:space="preserve">
+    <value>Usuń z zapisanych lokalizacji</value>
+  </data>
+  <data name="S_BUTTON_VIEW_SIZE" xml:space="preserve">
+    <value>Pokaż rozmiar</value>
+  </data>
+  <data name="S_STATUS_CALCULATING_SIZE" xml:space="preserve">
+    <value>Obliczanie…</value>
+  </data>
+  <data name="S_PACKAGE_ID" xml:space="preserve">
+    <value>ID pakietu</value>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - offline</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>Status: {0}</value>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} (Łącze)</value>
+  </data>
+  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
+    <value>Otwarty katalog jest tylko do odczytu</value>
+  </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>Status roota: {0}</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
+    <value>Ładowanie ikon aplikacji</value>
+  </data>
+  <data name="S_THUMBSIZE_TILES" xml:space="preserve">
+    <value>Kafelki</value>
+  </data>
+  <data name="S_SETTINGS_NEW_TAB_LOCATION" xml:space="preserve">
+    <value>Przy otwarciu nowej karty</value>
+  </data>
+  <data name="S_NEW_TAB_DUPLICATE" xml:space="preserve">
+    <value>Zduplikuj obecną kartę</value>
+  </data>
+  <data name="S_NEW_TAB_DRIVE_VIEW" xml:space="preserve">
+    <value>Widok dysku aktualnego urządzenia</value>
+  </data>
+  <data name="S_NEW_TAB_NONE" xml:space="preserve">
+    <value>Pusta karta</value>
+  </data>
+  <data name="S_CLOSE_TAB" xml:space="preserve">
+    <value>Zamknij kartę</value>
+  </data>
+  <data name="S_CLOSE_LEFT_PANE" xml:space="preserve">
+    <value>Zamknij panel po lewej stronie</value>
+  </data>
+  <data name="S_CLOSE_RIGHT_PANE" xml:space="preserve">
+    <value>Zamknij panel po prawej stronie</value>
+  </data>
+  <data name="S_CLOSE_TOP_PANE" xml:space="preserve">
+    <value>Zamknij panel u góry</value>
+  </data>
+  <data name="S_CLOSE_BOTTOM_PANE" xml:space="preserve">
+    <value>Zamknij panel na dole</value>
+  </data>
+  <data name="S_SPLIT_HORIZONTALLY" xml:space="preserve">
+    <value>Podziel pionowo</value>
+  </data>
+  <data name="S_SPLIT_VERTICALLY" xml:space="preserve">
+    <value>Podziel poziomo</value>
+  </data>
+  <data name="S_SWAP_PANES" xml:space="preserve">
+    <value>Zamień panele miejscami</value>
+  </data>
+  <data name="S_CLOSE_OTHER_TABS" xml:space="preserve">
+    <value>Zamknij inne karty</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_RIGHT" xml:space="preserve">
+    <value>Zamknij karty po prawej stronie</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_LEFT" xml:space="preserve">
+    <value>Zamknij karty po lewej stronie</value>
+  </data>
+  <data name="S_MERGE_WITH_RIGHT_TAB" xml:space="preserve">
+    <value>Złącz z kartą po prawej</value>
+  </data>
+  <data name="S_MERGE_WITH_LEFT_TAB" xml:space="preserve">
+    <value>Złącz z kartą po lewej</value>
+  </data>
+  <data name="S_DUPLICATE_TAB" xml:space="preserve">
+    <value>Zduplikuj kartę</value>
+  </data>
+  <data name="S_NEW_TAB" xml:space="preserve">
+    <value>Nowa karta</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX" xml:space="preserve">
+    <value>Składnia</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX_AUTOMATIC" xml:space="preserve">
+    <value>Automatyczna</value>
+  </data>
+  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
+    <value>Można zmienić zawartość archiwum</value>
+  </data>
+  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
+    <value>Archiwum tylko do odczytu</value>
+  </data>
+  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
+    <value>Rozmiar po kompresji</value>
+  </data>
+  <data name="S_PACKED_SIZE" xml:space="preserve">
+    <value>Rozmiar przed kompresją</value>
+  </data>
+  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
+    <value>Proporcja</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
+    <value>Zezwalaj na ADB z nieznanych źródeł</value>
+  </data>
+  <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
+    <value>Niedostępne w tym systemie.</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_MODE" xml:space="preserve">
+    <value>Wyświetlaj rozmiar pliku jako</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
+    <value>Dokładność rozmiaru pliku (liczba miejsc po przecinku)</value>
+  </data>
+  <data name="S_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>Otwórz w nowej karcie</value>
+  </data>
+  <data name="S_RESTART" xml:space="preserve">
+    <value>Zrestartuj</value>
+  </data>
+  <data name="S_UPDATE_MODIFIED_INFO" xml:space="preserve">
+    <value>Spróbuj dopasować datę modyfikacji do nazwy pliku.
+
+Ta opcja jest przydatna w przypadku zdjęć, które mają datę wykonania w nazwie pliku i została ona nadpisana.</value>
+  </data>
+  <data name="S_PUSH_PACKAGES_INFO" xml:space="preserve">
+    <value>Instaluje plik(i) APK bezpośrednio z Windowsa.</value>
+  </data>
+  <data name="S_DETAILS_PANE_INFO" xml:space="preserve">
+    <value>Przełącza panel boczny w tryb szczegółów.
+
+W ich skład mogą wchodzić: miniatura, rozszerzone dane o pliku, metadane, uprawnienia i opcje montowania dysku.</value>
+  </data>
+  <data name="S_PREVIEW_PANE_INFO" xml:space="preserve">
+    <value>Przełącza panel boczny w tryb podglądu.
+
+Wspierane elementy: miniatura, pliki PDF. Inne pliki, które spełniają ograniczenie dot. limitu, są wyświetlane jako tekst z opcjonalnym podświetlaniem składni; mogą one być edytowane i zapisywane, jeśli lokalizacja na to pozwala.</value>
+  </data>
+  <data name="S_UPDATE_SIGNATURE_INVALID" xml:space="preserve">
+    <value>Pobrana aktualizacja nie jest podpisana tym samym certyfikatem co ta instalacja. Aktualizacja została anulowana.</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO" xml:space="preserve">
+    <value>Wyłącza sprawdzanie ścieżki oraz pliku wykonywalnego ADB.
+
+Sprawdzanie ma na celu zapobieżenie uruchomieniu przez niczego niespodziewającego się użytkownika potencjalnie groźnego pliku ukrywającego się jako ADB:
+• ścieżka nie może być zasobem sieciowym czy nawiązaniem symbolicznym,
+• plik wykonywalny musi być podpisany przez Google'a poprzez Authenticode lub pasować do predefiniowanej listy haszów SHA-256,
+• plik musi zwracać czytelną wersję, gdy wykonywany jest z parametrem --version</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS" xml:space="preserve">
+    <value>Opcje wyszukiwania</value>
   </data>
 </root>
