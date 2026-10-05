@@ -211,7 +211,7 @@
     <value>Instaluj pakiety</value>
   </data>
   <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
-    <value>Sparuj i/lub podłącz urządzenie WiFi (bez użycia mDNS)</value>
+    <value>Sparuj i/lub podłącz urządzenie Wi-Fi (bez użycia mDNS)</value>
   </data>
   <data name="S_RESTART_APP" xml:space="preserve">
     <value>Zrestartuj aplikację, aby zastosować zmiany</value>
@@ -235,7 +235,7 @@
     <value>Pobierz</value>
   </data>
   <data name="S_PULL_ACTION_LINK" xml:space="preserve">
-    <value>Pobierz (Cel Łącza)</value>
+    <value>Pobierz (cel łącza)</value>
   </data>
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Przywróć</value>
@@ -307,7 +307,7 @@ Aby zatwierdzić ADB, otwórz ustawienia zaawansowane WSA.</value>
     <value>Przejdź do informacji o wydaniu</value>
   </data>
   <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
-    <value>Zaktualizowano polityke prywatności</value>
+    <value>Zaktualizowano politykę prywatności</value>
   </data>
   <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
     <value>Ta wersja aplikacji została wydana po aktualizacji polityki prywatności.
@@ -523,13 +523,13 @@ Widoczna zawartość może być niekompletna.</value>
     <value>Folder danych aplikacji</value>
   </data>
   <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
-    <value>Ta dystrybucja aplikacji zapisuje dane w wirtualizowanej (i ciężko do dostania się) lokalizacji, which is cleared on app uninstall.
+    <value>Ta dystrybucja aplikacji zapisuje dane w wirtualizowanej (i ciężkiej do dostania się) lokalizacji, która jest czyszczona przy odinstalowywaniu aplikacji.
 
-Zaznacz Niestandardową lokalizacje która nie będzie usunięta podczas dezinstalacji. Niestandardowa lokalizacja nie może być w C:\Users\…\AppData</value>
+Wybierz niestandardową lokalizację, która nie będzie usunięta podczas dezinstalacji. Niestandardową lokalizacją nie może być katalog w folderze C:\Users\…\AppData</value>
     <comment>Explains virtualized vs custom app data location for packaged installs</comment>
   </data>
   <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
-    <value>Custom</value>
+    <value>Własny</value>
     <comment>Button to pick a non-virtualized custom app data folder</comment>
   </data>
   <data name="S_GITHUB_REPO" xml:space="preserve">
@@ -657,7 +657,7 @@ Anuluj wszystkie uruchomione</value>
     <value>Paczka</value>
   </data>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
-    <value>Czas aktualizacji zmodyfikowano</value>
+    <value>Zaktualizuj czas modyfikacji</value>
   </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Zapisz zmiany</value>
@@ -678,7 +678,7 @@ Anuluj wszystkie uruchomione</value>
     <value>Kopiuj do schowka</value>
   </data>
   <data name="S_ADB_DISK_USAGE" xml:space="preserve">
-    <value>Wykorzystanie dysku ADB</value>
+    <value>Wykorzystanie dysku przez ADB</value>
   </data>
   <data name="S_DISK_USAGE_READ" xml:space="preserve">
     <value>Odczyt: {0}</value>
@@ -726,7 +726,7 @@ Anuluj wszystkie uruchomione</value>
     <value>Źródło</value>
   </data>
   <data name="S_COLUMN_DESTINATION" xml:space="preserve">
-    <value>Miejsce docelowe</value>
+    <value>Cel</value>
   </data>
   <data name="S_COLUMN_ADDED" xml:space="preserve">
     <value>Dodano</value>
@@ -765,7 +765,7 @@ Anuluj wszystkie uruchomione</value>
     <value>Czas od ostatniej odpowiedzi serwera</value>
   </data>
   <data name="S_SECONDS_SHORT" xml:space="preserve">
-    <value>{0}s</value>
+    <value>{0} s</value>
   </data>
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>Odśwież urządzenia</value>
@@ -780,7 +780,7 @@ Anuluj wszystkie uruchomione</value>
     <value>Oczekiwanie na odpowiedź: {0}</value>
   </data>
   <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
-    <value>{0}ms</value>
+    <value>{0} ms</value>
   </data>
   <data name="S_MINUTES_SHORT" xml:space="preserve">
     <value>{0}m</value>
@@ -795,13 +795,13 @@ Anuluj wszystkie uruchomione</value>
     <value>Ograniczone wsparcie</value>
   </data>
   <data name="S_ROOT_ENABLED" xml:space="preserve">
-    <value>Dostęp Root włączony</value>
+    <value>Włączono dostęp do roota</value>
   </data>
   <data name="S_ROOT_POSSIBLE" xml:space="preserve">
-    <value>Dostęp Root może być włączony</value>
+    <value>Można włączyć dostęp do roota</value>
   </data>
   <data name="S_RECOVERY_MODE" xml:space="preserve">
-    <value>Odzyskiwanie</value>
+    <value>Recovery</value>
   </data>
   <data name="S_BAT_VOLT" xml:space="preserve">
     <value>Napięcie: {0}v</value>
@@ -825,7 +825,7 @@ Anuluj wszystkie uruchomione</value>
     <value>Tryb Sideload</value>
   </data>
   <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
-    <value>Tryb Sideload (Automatyczne Uruchomienie)</value>
+    <value>Tryb Sideload (autom. uruchomienie)</value>
   </data>
   <data name="S_STATUS_UNAUTH" xml:space="preserve">
     <value>{0} - Nieautoryzowane</value>
@@ -849,7 +849,7 @@ Anuluj wszystkie uruchomione</value>
     <value>Nieznany stan baterii</value>
   </data>
   <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
-    <value>{0}%, Podłączony</value>
+    <value>{0}%, podłączony</value>
   </data>
   <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
     <value>Bezprzewodowy</value>
@@ -951,7 +951,7 @@ Anuluj wszystkie uruchomione</value>
     <value>Zainstalowane aplikacje</value>
   </data>
   <data name="S_DRIVE_SD" xml:space="preserve">
-    <value>Karta micro SD</value>
+    <value>Karta microSD</value>
   </data>
   <data name="S_DRIVE_OTG" xml:space="preserve">
     <value>Dysk OTG</value>
@@ -960,7 +960,7 @@ Anuluj wszystkie uruchomione</value>
     <value>Emulowany dysk</value>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
-    <value>Podręczny</value>
+    <value>Tymczasowy</value>
   </data>
   <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
     <value>Niezgodność treści</value>
@@ -1026,7 +1026,7 @@ Anuluj wszystkie uruchomione</value>
     <value>Aplikacja WSA</value>
   </data>
   <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
-    <value>Nie sprawdzony</value>
+    <value>Nie sprawdzono</value>
   </data>
   <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
     <value>Zabroniony</value>
@@ -1068,7 +1068,7 @@ Anuluj wszystkie uruchomione</value>
     <value>Dodaj nowe urządzenie</value>
   </data>
   <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
-    <value>[Nieautoryzowane]</value>
+    <value>[Niezautoryzowane]</value>
   </data>
   <data name="S_SERVICE_NONAME" xml:space="preserve">
     <value>[Usługa]</value>
@@ -1107,7 +1107,7 @@ Anuluj wszystkie uruchomione</value>
     <value>Ukończono</value>
   </data>
   <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
-    <value>{0} Niepowodzenie</value>
+    <value>Niepowodzenie: {0} elementów</value>
   </data>
   <data name="S_FILEOP_TOTAL" xml:space="preserve">
     <value>Całkowity:</value>
@@ -1140,7 +1140,7 @@ Anuluj wszystkie uruchomione</value>
     <value>Aktualizuj</value>
   </data>
   <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
-    <value>{0}% Używane</value>
+    <value>Używane {0}%</value>
   </data>
   <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
     <value>Przewiń tutaj</value>
@@ -1229,7 +1229,7 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
     <value>Dodaj obecną lokalizację</value>
   </data>
   <data name="S_REMOVE" xml:space="preserve">
-    <value>Usunąć</value>
+    <value>Usuń</value>
   </data>
   <data name="S_SAVED_LOCATIONS" xml:space="preserve">
     <value>Zapisane lokalizacje</value>
@@ -1271,7 +1271,7 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
     <value>Przenieś {0} elementów</value>
   </data>
   <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
-    <value>Wklej 1 Wycięty element</value>
+    <value>Wklej 1 wycięty element</value>
   </data>
   <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
     <value>Wklej 1 skopiowany element</value>
@@ -1280,7 +1280,7 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
     <value>Wklej {0} skopiowanych elementów</value>
   </data>
   <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
-    <value>Wklej {0} Wyciętych elementów</value>
+    <value>Wklej {0} wyciętych elementów</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} w {1} ({2})</value>
@@ -1301,7 +1301,7 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
     <value>Przenieś {0} do {1}</value>
   </data>
   <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
-    <value>Plik nie znaleziony</value>
+    <value>Nie znaleziono pliku</value>
   </data>
   <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
     <value>Zakończono bez potwierdzenia</value>
@@ -1430,7 +1430,7 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
     <value>Duże ikony</value>
   </data>
   <data name="S_THUMBSIZE_XL" xml:space="preserve">
-    <value>Extra duże ikony</value>
+    <value>Bardzo duże ikony</value>
   </data>
   <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
     <value>Opcje układu i widoku</value>
@@ -1672,7 +1672,7 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
     <value>Status: {0}</value>
   </data>
   <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
-    <value>{0} (Łącze)</value>
+    <value>{0} (łącze)</value>
   </data>
   <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
     <value>Otwarty katalog jest tylko do odczytu</value>
@@ -1807,11 +1807,86 @@ Wspierane elementy: miniatura, pliki PDF. Inne pliki, które spełniają ogranic
     <value>Wyłącza sprawdzanie ścieżki oraz pliku wykonywalnego ADB.
 
 Sprawdzanie ma na celu zapobieżenie uruchomieniu przez niczego niespodziewającego się użytkownika potencjalnie groźnego pliku ukrywającego się jako ADB:
-• ścieżka nie może być zasobem sieciowym czy nawiązaniem symbolicznym,
+• ścieżka nie może być zdalną ścieżką UNC czy nawiązaniem symbolicznym,
 • plik wykonywalny musi być podpisany przez Google'a poprzez Authenticode lub pasować do predefiniowanej listy haszów SHA-256,
 • plik musi zwracać czytelną wersję, gdy wykonywany jest z parametrem --version</value>
   </data>
   <data name="S_SEARCH_OPTIONS" xml:space="preserve">
     <value>Opcje wyszukiwania</value>
+  </data>
+  <data name="S_SEARCH_RESULTS_IN" xml:space="preserve">
+    <value>Wyniki wyszukiwania dla {0}</value>
+  </data>
+  <data name="S_SEARCH_ALL_SUBFOLDERS" xml:space="preserve">
+    <value>Wszystkie podkatalogi</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE" xml:space="preserve">
+    <value>Rozróżniaj wielkość liter</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE_INFO" xml:space="preserve">
+    <value>Wynik wyszukiwania musi uwzględniać dokładnie wielkość liter.</value>
+  </data>
+  <data name="S_SEARCH_CONTENTS" xml:space="preserve">
+    <value>Zawartość pliku</value>
+  </data>
+  <data name="S_SEARCH_CONTENTS_INFO" xml:space="preserve">
+    <value>Uwzględniaj również pliki, których zawartość zawiera wyszukiwany tekst.</value>
+  </data>
+  <data name="S_SEARCH_ARCHIVES" xml:space="preserve">
+    <value>Zawartość archiwów</value>
+  </data>
+  <data name="S_SEARCH_ARCHIVES_INFO" xml:space="preserve">
+    <value>Uwzględniaj również pliki wewnątrz archiwów odnalezionych podczas wyszukiwania.</value>
+  </data>
+  <data name="S_SEARCH_CURRENT_FOLDER" xml:space="preserve">
+    <value>Aktualny folder</value>
+  </data>
+  <data name="S_SEARCH" xml:space="preserve">
+    <value>Szukaj</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS_INFO" xml:space="preserve">
+    <value>Zaawansowane opcje wyszukiwania i filtrowania.</value>
+  </data>
+  <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
+    <value>Wyjdź z trybu wyników wyszukiwania.</value>
+  </data>
+  <data name="S_NEWER" xml:space="preserve">
+    <value>nowsze</value>
+  </data>
+  <data name="S_BIGGER" xml:space="preserve">
+    <value>większe</value>
+  </data>
+  <data name="S_TOOLTIP_REPLACED" xml:space="preserve">
+    <value>Plik zostanie zastąpiony.</value>
+  </data>
+  <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
+    <value>Plik zostanie pominięty.</value>
+  </data>
+  <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
+    <value>Utwórz plik .APKBKP z instalacją aplikacji i danymi OBB</value>
+  </data>
+  <data name="S_NAVIGATION_PANE" xml:space="preserve">
+    <value>Panel nawigacji</value>
+  </data>
+  <data name="S_MENU_SHOW" xml:space="preserve">
+    <value>Pokaż</value>
+  </data>
+  <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
+    <value>A</value>
+  </data>
+  <data name="S_THUMBSIZE_CONTENT" xml:space="preserve">
+    <value>Zawartość</value>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE" xml:space="preserve">
+    <value>Wyświetlaj ścieżkę względną</value>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE_INFO" xml:space="preserve">
+    <value>Jeśli wybrano tę opcję, wyniki wyszukiwania będą wyświetlane z ścieżką względną do obecnej lokalizacji. W przeciwnym wypadku wyświetlana ścieżka jest bezwzględna.</value>
+  </data>
+  <data name="S_VIEW_SIZE_TOOLTIP" xml:space="preserve">
+    <value>Oblicza i wyświetla łączny rozmiar wszystkich plików w tym folderze (rekursywnie).</value>
+  </data>
+  <data name="S_PER_FILE_CONFLICT_TABLE_TITLE" xml:space="preserve">
+    <value>W każdym konflikcie wybierz cel, aby pominąć plik, lub źródło, aby go zastąpić.</value>
   </data>
 </root>
