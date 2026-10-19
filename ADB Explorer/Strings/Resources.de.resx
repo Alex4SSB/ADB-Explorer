@@ -1603,4 +1603,7 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
     <value>App-Datenordner auswählen</value>
   </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE" xml:space="preserve">
+    <value>Relativen Pfad anzeigen</value>
+  </data>
 </root>
