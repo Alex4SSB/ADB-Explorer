@@ -201,13 +201,21 @@
                                 <DataTrigger Binding="{Binding Status}" Value="Ok">
                                     <Setter Property="IsEnabled" Value="True" />
                                 </DataTrigger>
+                                <!-- An unauthorized or offline device must still be removable, to disconnect and retry -->
+                                <DataTrigger Binding="{Binding RemoveCommand.IsEnabled}" Value="True">
+                                    <Setter Property="IsEnabled" Value="True" />
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </controls:AdbMenu.Style>
                     <controls:AdbMenuItem Height="38" ToolTip="{Binding Source={x:Static strings:Resources.S_ROOT_FORBID_TITLE}}">
                         <controls:AdbMenuItem.Style>
                             <Style BasedOn="{StaticResource DeviceActionsMenuItemStyle}" TargetType="controls:AdbMenuItem">
+                                <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Status}" Value="Ok">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
                                     <DataTrigger Binding="{Binding Type}" Value="Sideload">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
@@ -281,10 +289,17 @@
                             </controls:AdbMenuItem.Header>
                         </controls:AdbMenuItem>
                     </controls:AdbMenuItem>
-                    <controls:AdbMenuItem
-                        Height="38"
-                        Style="{StaticResource DeviceActionsMenuItemStyle}"
-                        ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_DEVICE_REBOOT_TITLE}}">
+                    <controls:AdbMenuItem Height="38" ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_DEVICE_REBOOT_TITLE}}">
+                        <controls:AdbMenuItem.Style>
+                            <Style BasedOn="{StaticResource DeviceActionsMenuItemStyle}" TargetType="controls:AdbMenuItem">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Status}" Value="Ok">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </controls:AdbMenuItem.Style>
                         <controls:AdbMenuItem.Resources>
                             <helpers:BindingProxy x:Key="DeviceProxy" Data="{Binding}" />
                         </controls:AdbMenuItem.Resources>

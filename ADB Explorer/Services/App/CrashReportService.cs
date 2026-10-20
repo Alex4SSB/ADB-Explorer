@@ -12,6 +12,16 @@ public static class CrashReportService
 {
     private const string LocalAlloyCollectorUrl = "http://127.0.0.1:12347/collect";
 
+    private static readonly HashSet<string> PageViewModelNames =
+    [
+        nameof(ExplorerViewModel),
+        nameof(SettingsViewModel),
+        nameof(LogViewModel),
+        nameof(TerminalViewModel),
+        nameof(DevicesViewModel),
+        nameof(OperationsViewModel),
+    ];
+
     private static readonly string SessionId = Guid.NewGuid().ToString("N");
     private static readonly Lazy<Uri?> CollectorUrl = new(ResolveCollectorUrl);
 
@@ -232,10 +242,7 @@ public static class CrashReportService
 
     private static string GetCurrentViewName(Exception exception)
     {
-        var page = Data.CurrentPage.Value;
-        if (page is not null)
-            return PageTypeNameToViewName(page.Name);
-
+        // The stack wins: CurrentPage can lag behind a page that crashes while navigating to itself.
         foreach (var frame in new StackTrace(exception, true).GetFrames() ?? [])
         {
             var declaringType = frame.GetMethod()?.DeclaringType?.FullName;
@@ -247,6 +254,10 @@ public static class CrashReportService
                 return viewName;
         }
 
+        var page = Data.CurrentPage.Value;
+        if (page is not null)
+            return PageTypeNameToViewName(page.Name);
+
         return "Unknown";
     }
 
@@ -257,10 +268,24 @@ public static class CrashReportService
 
     private static string? ViewNameFromDeclaringType(string declaringTypeFullName)
     {
-        if (declaringTypeFullName.Contains("ADB_Explorer.Views.Pages."))
-            return declaringTypeFullName.Replace("ADB_Explorer.Views.Pages.", "").Replace("Page", "");
+        const string viewsPrefix = "ADB_Explorer.Views.Pages.";
+        const string viewModelsPrefix = "ADB_Explorer.ViewModels.Pages.";
+
+        if (declaringTypeFullName.StartsWith(viewsPrefix, StringComparison.Ordinal))
+            return TrimNested(declaringTypeFullName[viewsPrefix.Length..]).Replace("Page", "");
+
+        if (declaringTypeFullName.StartsWith(viewModelsPrefix, StringComparison.Ordinal))
+        {
+            var viewModelName = TrimNested(declaringTypeFullName[viewModelsPrefix.Length..]);
+
+            // Only a page's own view model; helpers in this namespace (tabs, pane status) aren't pages.
+            if (PageViewModelNames.Contains(viewModelName))
+                return viewModelName.Replace("ViewModel", "");
+        }
 
         return null;
+
+        static string TrimNested(string typeName) => typeName.Split('+')[0];
     }
 
     private static JObject? BuildStacktraceJObject(Exception exception)
@@ -316,9 +341,72 @@ public static class CrashReportService
         if (reportable.InnerException is not null)
             context["innerException"] = FormatExceptionChain(reportable.InnerException);
 
+        AddExplorerLayoutContext(context);
+
         context["fullException"] = original.ToString();
 
         return context;
+    }
+
+    /// <summary>
+    /// Adds the open tabs and split view state (counts, active tab, focused pane, location kind - never paths).
+    /// Best effort: the exception may come from any thread, so a failed read is skipped.
+    /// </summary>
+    private static void AddExplorerLayoutContext(JObject context)
+    {
+        try
+        {
+            if (App.Services.GetService<ExplorerTabsViewModel>() is not { } tabsViewModel)
+                return;
+
+            var tabs = tabsViewModel.Tabs.ToList();
+            var active = tabsViewModel.ActiveTab;
+            var focused = tabsViewModel.FocusedPane;
+
+            context["tabCount"] = tabs.Count;
+            context["splitTabCount"] = tabs.Count(tab => tab.SplitInstance is not null);
+            context["activeTabIndex"] = active is null ? -1 : tabs.IndexOf(active);
+            context["activeTabSplit"] = active?.SplitInstance is not null;
+
+            if (active?.SplitInstance is not null)
+                context["splitOrientation"] = active.IsSplitStacked ? "stacked" : "sideBySide";
+
+            context["focusedPane"] = DescribeFocusedPane(focused);
+            context["focusedPaneLocation"] = DescribeLocation(focused);
+
+            if (active?.SplitInstance is { } split)
+            {
+                var otherPane = ReferenceEquals(focused, split) ? active : split;
+                context["otherPaneLocation"] = DescribeLocation(otherPane);
+            }
+        }
+        catch
+        { }
+    }
+
+    private static string DescribeFocusedPane(ExplorerInstance? focused)
+    {
+        if (focused is null)
+            return "none";
+
+        if (focused.SplitOwner is null)
+            return focused.SplitInstance is null ? "single" : "first";
+
+        return "second";
+    }
+
+    private static string DescribeLocation(ExplorerInstance? pane)
+    {
+        if (pane?.History.Current is not { } location)
+            return "none";
+
+        if (location.IsPage)
+            return "page";
+
+        if (location.Location is not Navigation.SpecialLocation.None)
+            return location.Location.ToString();
+
+        return "folder";
     }
 
     private static string FormatExceptionChain(Exception exception)

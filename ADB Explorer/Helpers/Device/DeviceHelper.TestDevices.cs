@@ -46,14 +46,16 @@ public static partial class DeviceHelper
     public static void TestDevices_AddUnauthorized()
     {
         int n = ++_testDeviceCounter;
-        var vm = MakeLogicalVM($"Unauthorized Device {n}", $"TEST_UNAUTH_{n}", "", DeviceType.Local, DeviceStatus.Unauthorized);
+        var ip = $"192.168.{n / 256}.{n % 256}";
+        var vm = MakeLogicalVM($"Unauthorized Device {n}", $"{ip}:5555", ip, DeviceType.Remote, DeviceStatus.Unauthorized);
         Data.DevicesObject.UpdateDevices([.. CurrentLogical(), vm]);
     }
 
     public static void TestDevices_AddOffline()
     {
         int n = ++_testDeviceCounter;
-        var vm = MakeLogicalVM($"Offline Device {n}", $"TEST_OFFLINE_{n}", "", DeviceType.Local, DeviceStatus.Offline);
+        var ip = $"192.168.{n / 256}.{n % 256}";
+        var vm = MakeLogicalVM($"Offline Device {n}", $"{ip}:5555", ip, DeviceType.Remote, DeviceStatus.Offline);
         Data.DevicesObject.UpdateDevices([.. CurrentLogical(), vm]);
     }
 

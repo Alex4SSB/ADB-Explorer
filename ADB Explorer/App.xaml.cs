@@ -111,6 +111,9 @@ public partial class App
     {
         AppDispatcher = Current.Dispatcher;
 
+        // A shader the GPU/driver rejects would otherwise crash the app; WPF just skips the effect when handled.
+        System.Windows.Media.Effects.PixelShader.InvalidPixelShaderEncountered += (_, _) => { };
+
         if (!AppInstanceGuard.TryClaim())
         {
             AppInstanceGuard.ActivateExisting();
