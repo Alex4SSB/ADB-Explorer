@@ -15,6 +15,12 @@ public class FileSyncOperation : AbstractSyncFileOperation
     private readonly ConcurrentDictionary<string, ulong> _lastRawReceivedBytes = new();
     private readonly ConcurrentDictionary<string, long> _receivedBytesCarry = new();
 
+    // Kept as running totals, so a progress update doesn't walk every file (slow with tens of thousands)
+    private long _totalBytes;
+    private long _bytesTransferred;
+    private bool _isSingleFile;
+    private readonly ConcurrentDictionary<SyncFile, double> _activeFiles = new();
+
     // Progress callbacks can fire thousands of times per second across all parallel
     // transfers; gate how often they reach the (dispatcher-marshaled) UI collection
     // instead of forwarding every single one, which was freezing the UI thread.
@@ -46,9 +52,6 @@ public class FileSyncOperation : AbstractSyncFileOperation
 
     public DateTime TransferStart { get; private set; }
     public DateTime TransferEnd { get; private set; }
-
-    private long? TotalBytes => Files.Sum(f => f.Size);
-    private IEnumerable<SyncFile> ActiveFiles => Files.Where(f => f.CurrentPercentage is > 0 and < 100);
 
     private bool _isCanceled = false;
 
@@ -90,7 +93,13 @@ public class FileSyncOperation : AbstractSyncFileOperation
         _lastReportedBytes.Clear();
         _lastRawReceivedBytes.Clear();
         _receivedBytesCarry.Clear();
+        _activeFiles.Clear();
         Interlocked.Exchange(ref _lastUiUpdateTicks, 0);
+        Interlocked.Exchange(ref _bytesTransferred, 0);
+
+        var files = Files.ToList();
+        Interlocked.Exchange(ref _totalBytes, files.Sum(f => f.Size ?? 0));
+        _isSingleFile = files.Count == 1;
 
         if (OperationName is OperationType.Push &&
             !File.Exists(FilePath.FullPath) && !Directory.Exists(FilePath.FullPath))
@@ -235,7 +244,7 @@ public class FileSyncOperation : AbstractSyncFileOperation
                 if (totalSeconds < 0)
                     totalSeconds = 0;
 
-                AdbSyncStatsInfo adbInfo = new(FilePath.FullPath, TotalBytes, totalSeconds, completed, filesCount - completed);
+                AdbSyncStatsInfo adbInfo = new(FilePath.FullPath, Interlocked.Read(ref _totalBytes), totalSeconds, completed, filesCount - completed);
                 StatusInfo = new CompletedSyncProgressViewModel(adbInfo);
             }
 
@@ -484,7 +493,6 @@ public class FileSyncOperation : AbstractSyncFileOperation
         }
         catch (Exception) when (!_isCanceled && other is not null)
         {
-            ResetProgress(item);
             other.Claim(item.Size ?? 0);
 
             // Succeeding over the other lane means the fault was this lane's, not the file's.
@@ -520,8 +528,16 @@ public class FileSyncOperation : AbstractSyncFileOperation
         {
             SyncFileOver(lane, item, SyncProgressCallback, fileMode);
         }
+        catch
+        {
+            // A failed file's partial bytes leave the total, and a retry starts it over
+            ResetProgress(item);
+            throw;
+        }
         finally
         {
+            _activeFiles.TryRemove(item, out _);
+
             // A shared lane outlives this op, so settle the claim to what synced: a file of unknown size
             // was claimed as 0, and a failed one won't sync the rest.
             lane.Claim(synced - claimed);
@@ -556,20 +572,31 @@ public class FileSyncOperation : AbstractSyncFileOperation
                 Data.CommandLog.Add(new($"@AdvancedSharpAdbClient: pull {item.FullPath} -> {targetPath}{via}"));
 
             if (!_useSyncV2)
+            {
+                var knownSize = item.Size ?? 0;
                 ResolvePullFileSize(item);
+                Interlocked.Add(ref _totalBytes, (item.Size ?? 0) - knownSize);
+            }
 
             // target = [Windows parent folder]\[relative path from Android parent folder to current item]
             using var stream = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.Read);
             service.Pull(item.FullPath, stream, progressCallback, _useSyncV2, in _isCanceled);
 
+            // On the handle we already hold, rather than opening the file again for it
             if (item.DateModified is not null)
-                File.SetLastWriteTime(targetPath, item.DateModified.Value);
+            {
+                stream.Flush();
+                File.SetLastWriteTime(stream.SafeFileHandle, item.DateModified.Value);
+            }
         }
     }
 
     /// <summary>A retry starts the file over, so its byte counters must too.</summary>
     private void ResetProgress(SyncFile item)
     {
+        if (_lastReportedBytes.TryGetValue(item.FullPath, out var reported))
+            Interlocked.Add(ref _bytesTransferred, -reported);
+
         _lastReportedBytes[item.FullPath] = 0;
         _lastRawReceivedBytes[item.FullPath] = 0;
         _receivedBytesCarry[item.FullPath] = 0;
@@ -579,12 +606,17 @@ public class FileSyncOperation : AbstractSyncFileOperation
     private long AddUpdates(SyncFile item, SyncProgressChangedEventArgs eventArgs, Mutex mutex)
     {
         if (item.Size is null && _useSyncV2 && eventArgs.TotalBytesToReceive > 0)
+        {
             item.Size = (long)eventArgs.TotalBytesToReceive;
+            Interlocked.Add(ref _totalBytes, item.Size.Value);
+        }
 
         var currentBytes = CorrectReceivedBytes(item.FullPath, eventArgs.ReceivedBytesSize);
         var previousBytes = _lastReportedBytes.GetOrAdd(item.FullPath, 0L);
         _lastReportedBytes[item.FullPath] = currentBytes;
         var deltaBytes = currentBytes - previousBytes;
+        Interlocked.Add(ref _bytesTransferred, deltaBytes);
+
         if (deltaBytes > 0)
         {
             if (OperationName is OperationType.Pull)
@@ -600,10 +632,14 @@ public class FileSyncOperation : AbstractSyncFileOperation
             // Empty files have nothing to transfer; avoid leaving percentage null (counted as skipped).
             filePercentage = 100.0;
 
+        if (filePercentage is > 0 and < 100)
+            _activeFiles[item] = filePercentage.Value;
+        else
+            _activeFiles.TryRemove(item, out _);
+
         var progressInfo = new AdbSyncProgressInfo(item.FullPath, null, filePercentage, currentBytes);
 
-        // Update the individual SyncFile's progress so that Files.Sum(f => f.BytesTransferred)
-        // in ProgressUpdates_CollectionChanged returns the correct running total.
+        // The file's own progress, for its row and its completed state
         item.AddUpdates(progressInfo);
 
         TransferEnd = DateTime.Now;
@@ -674,23 +710,25 @@ public class FileSyncOperation : AbstractSyncFileOperation
 
         if (ProgressUpdates.LastOrDefault() is AdbSyncProgressInfo currProgress and not null)
         {
-            var total = (double)(Files.Sum(f => f.BytesTransferred) ?? 0) / (TotalBytes ?? 0);
-            currProgress.TotalPercentage = total * 100;
+            var transferred = Interlocked.Read(ref _bytesTransferred);
+            var totalBytes = Interlocked.Read(ref _totalBytes);
+            currProgress.TotalPercentage = (double)transferred / totalBytes * 100;
 
             AdbSyncProgressInfo info = currProgress;
+            var active = _activeFiles.Values.ToArray();
 
             // Total percentage is displayed for single file
-            if (Files.Count() == 1)
+            if (_isSingleFile)
                 info = new(currProgress.AndroidPath, currProgress.TotalPercentage, null, currProgress.CurrentFileBytesTransferred);
-            else if (ActiveFiles.Count() > 1)
+            else if (active.Length > 1)
             {
-                info = new(string.Format(Strings.Resources.S_FILES_PLURAL, ActiveFiles.Count()),
+                info = new(string.Format(Strings.Resources.S_FILES_PLURAL, active.Length),
                            currProgress.TotalPercentage,
-                           (int)(ActiveFiles.Average(f => f.CurrentPercentage) ?? 0),
+                           (int)active.Average(),
                            currProgress.TotalBytesTransferred);
             }
 
-            StatusInfo = new InProgSyncProgressViewModel(info, TransferStart, TotalBytes, Files.Sum(f => f.BytesTransferred));
+            StatusInfo = new InProgSyncProgressViewModel(info, TransferStart, totalBytes, transferred);
         }
     }
 
