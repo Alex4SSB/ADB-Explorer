@@ -138,25 +138,60 @@ public partial class Devices : ObservableObject
 
     #region Service device handling
 
-    public void UpdateServices(IEnumerable<ServiceDeviceViewModel> other) => UpdateServices(UIList, other);
+    /// <summary>Every advertised mDNS service - owned by a device (see <see cref="AssignServices"/>) or listed on its own.</summary>
+    private List<ServiceDeviceViewModel> _services = [];
 
-    public static void UpdateServices(ObservableList<DeviceViewModel> self, IEnumerable<ServiceDeviceViewModel> other)
+    public IReadOnlyList<ServiceDeviceViewModel> AllServices => _services;
+
+    public void UpdateServices(IEnumerable<ServiceDeviceViewModel> other)
     {
-        self.RemoveAll(thisDevice => thisDevice is ServiceDeviceViewModel
-            && !thisDevice.IsTestDevice
-            && !other.Any(otherDevice => otherDevice.ID == thisDevice.ID));
-
-        foreach (var item in other)
+        if (App.AppDispatcher is { } dispatcher && !dispatcher.CheckAccess())
         {
-            if (self?.Find(thisDevice => thisDevice.ID == item.ID) is ServiceDeviceViewModel service)
+            dispatcher.Invoke(() => UpdateServices(other));
+            return;
+        }
+
+        var incoming = other.ToList();
+        List<ServiceDeviceViewModel> next = [.. _services.Where(s => s.IsTestDevice && !incoming.Contains(s))];
+
+        // Keep the existing objects - they hold pairing state. Pairing and connect services share a name.
+        foreach (var item in incoming)
+        {
+            if (_services.Find(s => s.ID == item.ID && s.ConnectionKind == item.ConnectionKind) is { } existing)
             {
-                service.UpdateService(item);
+                existing.UpdateService(item);
+                next.Add(existing);
             }
             else
             {
-                self.Add(item);
+                next.Add(item);
             }
         }
+
+        _services = next;
+        AssignServices();
+    }
+
+    /// <summary>Gives each service to the online device it advertises; the rest are listed on their own.</summary>
+    private void AssignServices()
+    {
+        var devices = LogicalDeviceViewModels.ToList();
+        var owned = devices.ToDictionary(d => d, _ => new List<ServiceDeviceViewModel>());
+        List<ServiceDeviceViewModel> unowned = [];
+
+        foreach (var service in _services)
+        {
+            if (devices.FirstOrDefault(d => d.OwnsService(service)) is { } owner)
+                owned[owner].Add(service);
+            else
+                unowned.Add(service);
+        }
+
+        foreach (var (device, services) in owned)
+            device.SetServices(services);
+
+        UIList.RemoveAll(d => d is ServiceDeviceViewModel s && !unowned.Contains(s));
+        UIList.AddRange(unowned.Where(s => !UIList.Contains(s)));
     }
 
     public bool ServicesChanged(IEnumerable<ServiceSnapshot> snapshots)
@@ -165,32 +200,30 @@ public partial class Devices : ObservableObject
         if (snapshots is null)
             return false;
 
-        // if the list is empty, we need to update (and remove all items)
-        if (!snapshots.Any())
-            return ServiceDeviceViewModels.Any(s => !s.IsTestDevice);
+        var incoming = snapshots.OrderBy(s => s.ID).ThenBy(s => s.ConnectionKind).ToList();
+        var existing = _services.Where(s => !s.IsTestDevice).OrderBy(s => s.ID).ThenBy(s => s.ConnectionKind).ToList();
 
-        var pairing = snapshots.Where(s => s.ConnectionKind is ServiceConnectionKind.Pairing).OrderBy(s => s.ID).ToList();
-        var existing = ServiceDeviceViewModels.Where(s => !s.IsTestDevice).OrderBy(d => d.ID).ToList();
-
-        // if there's any service whose ID is not found in any logical device,
-        // AND an ordering of both new and old lists doesn't match up all IDs
-        return pairing.Any(s => !LogicalDeviceViewModels.Any(d => d.Status == DeviceStatus.Ok && d.BaseID == s.ID || d.IpAddress == s.IpAddress))
-            && (existing.Count != pairing.Count
-                || existing.Zip(pairing).Any(p =>
-                    p.First.ID != p.Second.ID
-                    || string.IsNullOrEmpty(p.First.PairingPort) != string.IsNullOrEmpty(p.Second.Port)));
+        return existing.Count != incoming.Count
+            || existing.Zip(incoming).Any(p =>
+                p.First.ID != p.Second.ID
+                || p.First.ConnectionKind != p.Second.ConnectionKind
+                || p.First.PairingPort != p.Second.Port
+                || p.First.MdnsType != p.Second.MdnsType);
     }
 
     #endregion
 
     #region Logical device handling
 
-    public bool UpdateDevices(IEnumerable<LogicalDeviceViewModel> other)
+    /// <param name="revivable">Devices no longer listed (e.g. held by past file ops) that may take their transports back.</param>
+    public bool UpdateDevices(IEnumerable<LogicalDeviceViewModel> other, IEnumerable<LogicalDeviceViewModel>? revivable = null)
     {
         var result = App.AppDispatcher is not null
-            ? App.AppDispatcher.Invoke(() => UpdateDevices(UIList, other))
-            : UpdateDevices(UIList, other);
+            ? App.AppDispatcher.Invoke(() => UpdateDevices(UIList, other, revivable ?? []))
+            : UpdateDevices(UIList, other, revivable ?? []);
         ClaimUnclaimedSavedLocations();
+        MigrateSavedLocations();
+        AssignServices();
         OnPropertyChanged(nameof(Count));
 
         UpdateLogicalIp();
@@ -218,45 +251,150 @@ public partial class Devices : ObservableObject
 
         _unclaimedSavedLocationsClaimed = true;
         foreach (var entry in Data.Settings.SavedLocations.Where(e => string.IsNullOrEmpty(e.DeviceId)))
-            entry.DeviceId = device.ID;
+            entry.DeviceId = device.SavedLocationsKey;
     }
 
-    private static bool UpdateDevices(ObservableList<DeviceViewModel> self, IEnumerable<LogicalDeviceViewModel> other)
+    /// <summary>Re-keys saved locations stored under a transport serial to their device's <see cref="LogicalDeviceViewModel.SavedLocationsKey"/>.</summary>
+    private void MigrateSavedLocations()
+    {
+        var saved = Data.Settings.SavedLocations;
+        foreach (var device in LogicalDeviceViewModels.ToList())
+        {
+            var key = device.SavedLocationsKey;
+            for (int i = 0; i < saved.Count; i++)
+            {
+                // Replaced rather than edited: DeviceId isn't observable, and only collection changes get saved.
+                if (saved[i].DeviceId != key && device.Matches(saved[i].DeviceId))
+                    saved[i] = new(key, saved[i].Path);
+            }
+        }
+    }
+
+    private static bool UpdateDevices(ObservableList<DeviceViewModel> self, IEnumerable<LogicalDeviceViewModel> other, IEnumerable<LogicalDeviceViewModel> revivable)
     {
         bool isCurrentTypeUpdated = false;
 
-        // First remove all non-test devices that no longer exist
-        var devicesToRemove = self.Where(thisDevice => thisDevice is LogicalDeviceViewModel
-            && !thisDevice.IsTestDevice
-            && !other.Any(otherDevice => otherDevice.ID == thisDevice.ID));
-        foreach (var item in devicesToRemove)
+        var listed = self.OfType<LogicalDeviceViewModel>().ToList();
+        List<LogicalDeviceViewModel> candidates = [.. listed, .. revivable.Where(r => !listed.Contains(r)).Distinct()];
+        var incoming = other.SelectMany(source => source.Connections.Select(connection => (Source: source, Connection: connection))).ToList();
+
+        // Nodes 0..candidates-1 are known devices, the rest are listed transports; each cluster is one physical device.
+        var clusters = new DisjointSet(candidates.Count + incoming.Count);
+        for (int i = 0; i < incoming.Count; i++)
         {
-            // Set status as offline for file op mechanism
-            item.SetStatus(DeviceStatus.Offline);
+            var (source, connection) = incoming[i];
+            var node = candidates.Count + i;
+
+            for (int c = 0; c < candidates.Count; c++)
+            {
+                if (BelongsTo(candidates[c], source, connection))
+                    clusters.Union(node, c);
+            }
+
+            for (int j = 0; j < i; j++)
+            {
+                if (SameDevice(incoming[i], incoming[j]))
+                    clusters.Union(node, candidates.Count + j);
+            }
         }
-        self.RemoveAll(devicesToRemove);
 
-        // Then update existing devices' statuses and names
-        foreach (var item in other)
+        var groups = Enumerable.Range(0, candidates.Count + incoming.Count).GroupBy(clusters.Find);
+        foreach (var group in groups)
         {
-            if (self?.Find(thisDevice => thisDevice.ID == item.ID) is LogicalDeviceViewModel device)
-            {
-                // Return (at the end of the function) true if current device status has changed
-                if (device is not null && device.IsOpen && device.Status != item.Status)
-                    isCurrentTypeUpdated = true;
+            var devices = group.Where(n => n < candidates.Count).Select(n => candidates[n]).ToList();
+            var connections = group.Where(n => n >= candidates.Count).Select(n => incoming[n - candidates.Count]).ToList();
 
-                device.UpdateDevice(item);
-            }
-            else
+            if (connections.Count == 0)
             {
-                // And add the new devices
-                self.Add(item);
-                if (item.Status is DeviceStatus.Ok)
-                    Task.Run(() => ShellCommands.FindCommands(item.ID));
+                // No longer listed on any transport. Test devices stay; offline status is for the file op mechanism.
+                foreach (var gone in devices.Where(d => listed.Contains(d) && !d.IsTestDevice))
+                {
+                    gone.SetStatus(DeviceStatus.Offline);
+                    gone.ClearTransportRoutes();
+                    self.Remove(gone);
+                }
+
+                continue;
             }
+
+            var preferred = connections.MinBy(c => c.Connection.Rank);
+            var device = devices.OrderByDescending(d => d.IsOpen).ThenByDescending(listed.Contains).FirstOrDefault() ?? preferred.Source;
+
+            if (device.IsOpen && device.Status != preferred.Connection.Status)
+                isCurrentTypeUpdated = true;
+
+            foreach (var duplicate in devices.Where(d => !ReferenceEquals(d, device)))
+            {
+                device.Absorb(duplicate);
+                self.Remove(duplicate);
+            }
+
+            var wasListed = listed.Contains(device);
+            device.UpdateDevice(preferred.Source, [.. connections.Select(c => c.Connection).DistinctBy(c => c.ID)]);
+
+            if (wasListed)
+                continue;
+
+            self.Add(device);
+            if (device.Status is DeviceStatus.Ok)
+                Task.Run(() => ShellCommands.FindCommands(device.ID));
         }
 
         return isCurrentTypeUpdated;
+    }
+
+    /// <summary>Whether a listed transport belongs to an already known device.</summary>
+    private static bool BelongsTo(LogicalDeviceViewModel device, LogicalDeviceViewModel source, DeviceConnection connection)
+    {
+        if (ReferenceEquals(device, source))
+            return true;
+
+        if (device.IsTestDevice != source.IsTestDevice)
+            return false;
+
+        if (device.Connections.Any(c => c.ID == connection.ID) || device.Matches(connection.ID))
+            return true;
+
+        if (!string.IsNullOrEmpty(connection.Serial))
+        {
+            return device.SerialNumber == connection.Serial
+                && !device.Connections.Any(c => IpConflicts(c, connection));
+        }
+
+        // An IP transport whose serial couldn't be read yet (e.g. unauthorized) still joins by address.
+        return connection.Type is DeviceType.Remote
+            && device.Type is not DeviceType.Emulator and not DeviceType.WSA
+            && device.IsIpAddressValid
+            && device.IpAddress == connection.IpAddress;
+    }
+
+    private static bool SameDevice((LogicalDeviceViewModel Source, DeviceConnection Connection) a, (LogicalDeviceViewModel Source, DeviceConnection Connection) b)
+        => a.Source.IsTestDevice == b.Source.IsTestDevice
+           && !string.IsNullOrEmpty(a.Connection.Serial)
+           && a.Connection.Serial == b.Connection.Serial
+           && !IpConflicts(a.Connection, b.Connection);
+
+    /// <summary>Two IP transports at different addresses are different devices, even with the same (e.g. placeholder) serial.</summary>
+    private static bool IpConflicts(DeviceConnection a, DeviceConnection b)
+        => a.Type is DeviceType.Remote
+           && b.Type is DeviceType.Remote
+           && !string.IsNullOrEmpty(a.IpAddress)
+           && !string.IsNullOrEmpty(b.IpAddress)
+           && a.IpAddress != b.IpAddress;
+
+    private sealed class DisjointSet(int size)
+    {
+        private readonly int[] _parent = [.. Enumerable.Range(0, size)];
+
+        public int Find(int node)
+        {
+            while (_parent[node] != node)
+                node = _parent[node] = _parent[_parent[node]];
+
+            return node;
+        }
+
+        public void Union(int a, int b) => _parent[Find(a)] = Find(b);
     }
 
     public bool DevicesChanged(IEnumerable<DeviceSnapshot> snapshots)
@@ -264,7 +402,7 @@ public partial class Devices : ObservableObject
         if (snapshots is null)
             return false;
 
-        var existing = LogicalDeviceViewModels.Where(d => !d.IsTestDevice).OrderBy(d => d.ID).ToList();
+        var existing = LogicalDeviceViewModels.Where(d => !d.IsTestDevice).SelectMany(d => d.Connections).OrderBy(c => c.ID).ToList();
         var incoming = snapshots.OrderBy(s => s.ID).ToList();
 
         return existing.Count != incoming.Count
@@ -340,14 +478,11 @@ public partial class Devices : ObservableObject
         var items = devices.OfType<LogicalDeviceViewModel>().Where(d => d.Type is DeviceType.Service or DeviceType.Local && !d.IsIpAddressValid).ToList();
         foreach (var item in items)
         {
-            if (item.Type is DeviceType.Service)
+            var listed = devices.OfType<ServiceDeviceViewModel>().Where(srv => srv.ID == item.ID || srv.ID == item.BaseID);
+            if (item.Services.Concat(listed).FirstOrDefault(srv => srv.IsIpAddressValid) is { } service)
             {
-                var service = devices.Where(d => d is ServiceDeviceViewModel srv && (srv.ID == item.ID || srv.ID == item.BaseID) && srv.IsIpAddressValid);
-                if (service.Any())
-                {
-                    item.SetIpAddress(service.First().IpAddress);
-                    continue;
-                }
+                item.SetIpAddress(service.IpAddress);
+                continue;
             }
 
             await Task.Run(() => result |= AdbService.GetDeviceIp(item));
@@ -366,7 +501,7 @@ public partial class Devices : ObservableObject
     }
 
     public bool SetOpenDevice(string selectedId)
-        => SetOpenDevice(AvailableDevices().FirstOrDefault(device => device.ID == selectedId));
+        => SetOpenDevice(AvailableDevices().FirstOrDefault(device => device.Matches(selectedId)));
 
     public static bool SetOpenDevice(LogicalDeviceViewModel? device)
     {

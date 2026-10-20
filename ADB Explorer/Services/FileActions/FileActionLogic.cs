@@ -267,7 +267,7 @@ internal static partial class FileActionLogic
         if (ExplorerTree?.ContextTarget is not { IsSavedLocation: true } node)
             return;
 
-        var deviceId = node.OwnerDevice?.ID;
+        var deviceId = node.OwnerDevice?.SavedLocationsKey;
         var entry = Data.Settings.SavedLocations.FirstOrDefault(e =>
             e.DeviceId == deviceId && NavigationTreeNode.PathsEqual(e.Path, node.Path));
 

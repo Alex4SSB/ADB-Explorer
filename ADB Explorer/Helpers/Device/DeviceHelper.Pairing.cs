@@ -18,7 +18,7 @@ public static partial class DeviceHelper
         if (qrClass is null)
             return;
 
-        var qrServices = Data.DevicesObject.ServiceDeviceViewModels.Where(service =>
+        var qrServices = Data.DevicesObject.AllServices.Where(service =>
             service.MdnsType == ServiceDevice.PairingMode.QrCode
             && service.ID == qrClass.ServiceName);
 

@@ -60,7 +60,7 @@ public partial class ExplorerInstance : ObservableObject
 
     public void RefreshSavedItems()
     {
-        var deviceId = EffectiveDevice?.ID;
+        var deviceId = EffectiveDevice?.SavedLocationsKey;
         if (Data.Settings.SavedLocations is not { } saved)
         {
             SavedItems = [];
@@ -353,7 +353,7 @@ public class InstanceNavHistory(ExplorerInstance owner)
         if (entry.IsPage || entry.DeviceId is null)
             return true;
 
-        return Data.DevicesObject?.LogicalDeviceViewModels?.Any(device => device.ID == entry.DeviceId && device.Status is DeviceStatus.Ok) is true;
+        return Data.DevicesObject?.LogicalDeviceViewModels?.Any(device => device.Matches(entry.DeviceId) && device.Status is DeviceStatus.Ok) is true;
     }
 
     private void UpdateMenuHistory(LogicalDeviceViewModel? device)

@@ -130,60 +130,75 @@ public class FileSyncOperation : AbstractSyncFileOperation
             }
 
             MaxThreads ??= Data.Settings.MaxSimultaneousOps;
+            _useSyncV2 = Device.SupportsSyncV2;
 
+            var lanes = GetTransferLanes(MaxThreads.Value);
+            var queue = new TransferQueue(Files.Where(f => !f.IsDirectory));
             ParallelOptions options = new()
             {
                 MaxDegreeOfParallelism = MaxThreads.Value
             };
-            _useSyncV2 = Device.SupportsSyncV2;
 
-            Parallel.ForEach(Files.Where(f => !f.IsDirectory), options, (item) =>
+            // A retired lane leaves its share to the other, unless none is left to take it.
+            bool IsDraining(TransferLane lane) => !lane.IsRetired || lanes.All(l => l.IsRetired);
+
+            TransferLane? OtherLane(TransferLane lane) => lanes.FirstOrDefault(l => l != lane && !l.IsRetired);
+
+            // Workers of this op still on each lane
+            var workers = new int[lanes.Count];
+
+            void DrainLane(TransferLane lane)
             {
-                void SyncProgressCallback(SyncProgressChangedEventArgs eventArgs) => AddUpdates(item, eventArgs, mutex);
-
-                var targetPath = FilePath.IsDirectory
-                        ? FileHelper.ConcatPaths(TargetPath, FileHelper.ExtractRelativePath(item.FullPath, FilePath.FullPath))
-                        : TargetPath.FullPath;
+                var index = lanes.IndexOf(lane);
+                var left = false;
+                Interlocked.Increment(ref workers[index]);
 
                 try
                 {
-                    // Open a new connection for each file to allow parallel transfers, maximizing throughput of the medium.
-                    // Connecting by both USB and WiFi at the same time causes instability and doesn't seem to improve the speed further.
-                    // SyncService ctor / Open can throw (e.g. device offline) — keep it inside the try so Parallel.ForEach does not fault the task.
-                    using SyncService service = new(Device.DeviceData);
-
-                    if (OperationName is OperationType.Push)
+                    while (!_isCanceled && IsDraining(lane))
                     {
-                        if (Data.Settings.EnableLog && !Data.IsLogPaused)
-                            Data.CommandLog.Add(new($"@AdvancedSharpAdbClient: push {item.FullPath} -> {targetPath}"));
+                        var take = queue.TryTake(lane, OtherLane(lane), out var item);
+                        if (take is TakeResult.Empty)
+                            return;
 
-                        var lastWriteTime = item.DateModified ?? DateTime.Now;
+                        // Not this lane's turn yet - the rates and in-flight bytes it was judged by keep changing.
+                        // The lane's last worker stays to poll; the rest leave rather than hold pool threads.
+                        if (take is TakeResult.Wait)
+                        {
+                            if (Interlocked.Decrement(ref workers[index]) > 0)
+                            {
+                                left = true;
+                                return;
+                            }
 
-                        // target = [Android parent folder]\[relative path from Windows parent folder to current item]
-                        using var stream = new FileStream(item.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        service.Push(stream, targetPath, fileMode, lastWriteTime, SyncProgressCallback, _useSyncV2, in _isCanceled);
-                    }
-                    else
-                    {
-                        if (Data.Settings.EnableLog && !Data.IsLogPaused)
-                            Data.CommandLog.Add(new($"@AdvancedSharpAdbClient: pull {item.FullPath} -> {targetPath}"));
+                            Interlocked.Increment(ref workers[index]);
+                            Thread.Sleep(LaneRetryDelay);
+                            continue;
+                        }
 
-                        if (!_useSyncV2)
-                            ResolvePullFileSize(item);
-
-                        // target = [Windows parent folder]\[relative path from Android parent folder to current item]
-                        using var stream = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.Read);
-                        service.Pull(item.FullPath, stream, SyncProgressCallback, _useSyncV2, in _isCanceled);
-
-                        if (item.DateModified is not null)
-                            File.SetLastWriteTime(targetPath, item.DateModified.Value);
+                        TransferFile(item!, lane, OtherLane(lane), mutex, fileMode);
                     }
                 }
-                catch (Exception e)
+                finally
                 {
-                    AddUpdates([new SyncErrorInfo(item.FullPath, e.Message)]);
+                    if (!left)
+                        Interlocked.Decrement(ref workers[index]);
                 }
-            });
+            }
+
+            // With two lanes, a thread each, so one lane's workers can't starve the other's start.
+            // Each worker opens its own connection per file, so transfers run in parallel on every lane.
+            var creation = lanes.Count > 1 ? TaskCreationOptions.LongRunning : TaskCreationOptions.None;
+            try
+            {
+                await Task.WhenAll(lanes.Select(lane => Task.Factory.StartNew(
+                    () => Parallel.For(0, MaxThreads.Value, options, _ => DrainLane(lane)),
+                    creation)));
+            }
+            finally
+            {
+                lanes.ForEach(lane => lane.Release());
+            }
 
         });
 
@@ -249,7 +264,319 @@ public class FileSyncOperation : AbstractSyncFileOperation
         }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
-    private void AddUpdates(SyncFile item, SyncProgressChangedEventArgs eventArgs, Mutex mutex)
+    /// <summary>A transport files are synced over, which end of the <see cref="TransferQueue"/> it drains, and how fast.</summary>
+    private sealed class TransferLane(DeviceData deviceData, bool takesLargest, string? name = null, double nominalRate = 0)
+    {
+        private static readonly Dictionary<string, TransferLane> SharedLanes = [];
+
+        public DeviceData DeviceData { get; } = deviceData;
+
+        public bool TakesLargest { get; } = takesLargest;
+
+        /// <summary>Only set when files are split across lanes; shown in the command log.</summary>
+        public string? Name { get; } = name;
+
+        /// <summary>Consecutive files that failed here but then synced over the other lane.</summary>
+        public int Strikes;
+
+        public bool IsRetired => Volatile.Read(ref Strikes) >= 3;
+
+        private readonly Stopwatch _busy = new();
+        private string? _sharedKey;
+        private int _users;
+        private long _claimedBytes;
+        private long _doneBytes;
+
+        /// <summary>
+        /// Operations running at once on the same transport and direction (e.g. one per selected file) share its lane,
+        /// so each one balances against what the others have in flight too. Only a new lane reads its nominal rate.
+        /// </summary>
+        public static TransferLane Acquire(DeviceData deviceData, OperationType direction, bool takesLargest, string name, Func<double> nominalRate)
+        {
+            var key = $"{deviceData.Serial}|{direction}|{name}";
+
+            lock (SharedLanes)
+            {
+                if (!SharedLanes.TryGetValue(key, out var lane))
+                    SharedLanes[key] = lane = new(deviceData, takesLargest, name, nominalRate()) { _sharedKey = key };
+
+                lane._users++;
+
+                return lane;
+            }
+        }
+
+        public void Release()
+        {
+            if (_sharedKey is null)
+                return;
+
+            lock (SharedLanes)
+            {
+                if (--_users == 0)
+                    SharedLanes.Remove(_sharedKey);
+            }
+        }
+
+        public void Claim(long bytes)
+        {
+            Interlocked.Add(ref _claimedBytes, bytes);
+            UpdateBusy();
+        }
+
+        public void Done(long bytes)
+        {
+            Interlocked.Add(ref _doneBytes, bytes);
+            UpdateBusy();
+        }
+
+        /// <summary>Never negative, though a file of unknown size reports bytes before its claim is settled.</summary>
+        public long InFlightBytes => Math.Max(0, Interlocked.Read(ref _claimedBytes) - Interlocked.Read(ref _doneBytes));
+
+        // Times only while files are in flight, so a lane left idle doesn't look slower.
+        private void UpdateBusy()
+        {
+            // Most progress calls don't change the state, so they skip the lock
+            if (_busy.IsRunning == InFlightBytes > 0)
+                return;
+
+            lock (_busy)
+            {
+                if (InFlightBytes > 0)
+                    _busy.Start();
+                else
+                    _busy.Stop();
+            }
+        }
+
+        /// <summary>
+        /// Bytes per second: the link's nominal rate (by USB version / Wi-Fi link speed) until the lane
+        /// has been busy a couple of seconds, then what it has measured so far, updated as it goes.
+        /// </summary>
+        public double Rate()
+        {
+            var done = Interlocked.Read(ref _doneBytes);
+            double busy;
+            lock (_busy)
+                busy = _busy.Elapsed.TotalSeconds;
+
+            if (busy < 2 || done == 0)
+                return nominalRate;
+
+            return done / busy;
+        }
+    }
+
+    private enum TakeResult { Taken, Wait, Empty }
+
+    private static readonly TimeSpan LaneRetryDelay = TimeSpan.FromMilliseconds(200);
+
+    /// <summary>Files by size. With two lanes, one takes the smallest and the other the largest, meeting wherever their speeds balance.</summary>
+    private sealed class TransferQueue
+    {
+        private readonly SyncFile[] _files;
+        // Shared by all queues, since ops sharing lanes must each see the others' claims before deciding.
+        private static readonly Lock ClaimLock = new();
+        private int _first;
+        private int _last;
+        private long _remainingBytes;
+
+        public TransferQueue(IEnumerable<SyncFile> files)
+        {
+            _files = [.. files.OrderBy(f => f.Size ?? 0)];
+            _last = _files.Length - 1;
+            _remainingBytes = _files.Sum(f => f.Size ?? 0);
+        }
+
+        /// <summary>While <paramref name="other"/> works too, a lane waits instead of claiming a file it shouldn't take yet.</summary>
+        public TakeResult TryTake(TransferLane lane, TransferLane? other, out SyncFile? file)
+        {
+            lock (ClaimLock)
+            {
+                file = null;
+                if (_first > _last)
+                    return TakeResult.Empty;
+
+                var candidate = lane.TakesLargest ? _files[_last] : _files[_first];
+                var size = candidate.Size ?? 0;
+
+                if (other is not null && !ShouldTake(lane, other, size))
+                    return TakeResult.Wait;
+
+                if (lane.TakesLargest)
+                    _last--;
+                else
+                    _first++;
+
+                _remainingBytes -= size;
+                lane.Claim(size);
+                file = candidate;
+
+                return TakeResult.Taken;
+            }
+        }
+
+        /// <summary>
+        /// Take it if this lane still finishes by when an even split of all the work would end, or sooner than
+        /// <paramref name="other"/> could finish it even if it took it next. Once both lanes are idle, one always qualifies.
+        /// </summary>
+        private bool ShouldTake(TransferLane lane, TransferLane other, long size)
+        {
+            var rate = lane.Rate();
+            var otherRate = other.Rate();
+            var finish = (lane.InFlightBytes + size) / rate;
+            var evenFinish = (lane.InFlightBytes + other.InFlightBytes + _remainingBytes) / (rate + otherRate);
+
+            return finish <= evenFinish || finish <= (other.InFlightBytes + size) / otherRate;
+        }
+    }
+
+    /// <summary>
+    /// On a device connected over both USB and Wi-Fi, USB takes the small files (lower latency per file)
+    /// and Wi-Fi the large ones, at the same time. Otherwise everything goes over the preferred transport.
+    /// </summary>
+    private List<TransferLane> GetTransferLanes(int maxThreads)
+    {
+        var online = Device.Connections.Where(c => c.Status is DeviceStatus.Ok).ToList();
+        var usb = online.FirstOrDefault(c => c.Type is DeviceType.Local);
+        var wifi = online.Where(c => c.IsWifi).MinBy(c => c.Rank);
+
+        // A single-threaded op (e.g. thumbnails) stays sequential. Largest first, so no worker is left with a big file at the end.
+        if (usb is null || wifi is null || maxThreads < 2)
+            return [new(Device.DeviceData, true)];
+
+        return
+        [
+            TransferLane.Acquire(usb.DeviceData, OperationName, false, "USB", () => NominalUsbRate(Device.UsbVersion)),
+            TransferLane.Acquire(wifi.DeviceData, OperationName, true, "Wi-Fi", CurrentWifiRate),
+        ];
+    }
+
+    /// <summary>Re-reads the Wi-Fi rates first, as they shift with the signal.</summary>
+    private double CurrentWifiRate()
+    {
+        Device.RefreshWifiSpeeds();
+
+        // A push is bound by the rate the device receives at, a pull by the rate it sends at
+        var wifiMbps = OperationName is OperationType.Push ? Device.WifiRxMbps : Device.WifiTxMbps;
+
+        return NominalWifiRate(wifiMbps);
+    }
+
+    /// <summary>Typical sync throughput in bytes per second, until a lane measures its own.</summary>
+    private static double NominalUsbRate(string? version) => version switch
+    {
+        "1.1" => 1 * 1_048_576.0,
+        "3.0" => 300 * 1_048_576.0,
+        "3.1" => 600 * 1_048_576.0,
+        _ => 40 * 1_048_576.0,
+    };
+
+    /// <summary>adb sync gets roughly 60% of the Wi-Fi link rate.</summary>
+    private static double NominalWifiRate(int? linkMbps) => (linkMbps ?? 150) * 1_000_000.0 / 8 * 0.6;
+
+    private void TransferFile(SyncFile item, TransferLane lane, TransferLane? other, Mutex mutex, UnixFileStatus fileMode)
+    {
+        try
+        {
+            SyncFileOver(lane, item, mutex, fileMode);
+            Interlocked.Exchange(ref lane.Strikes, 0);
+        }
+        catch (Exception) when (!_isCanceled && other is not null)
+        {
+            ResetProgress(item);
+            other.Claim(item.Size ?? 0);
+
+            // Succeeding over the other lane means the fault was this lane's, not the file's.
+            try
+            {
+                SyncFileOver(other, item, mutex, fileMode);
+                Interlocked.Increment(ref lane.Strikes);
+            }
+            catch (Exception e)
+            {
+                AddUpdates([new SyncErrorInfo(item.FullPath, e.Message)]);
+            }
+        }
+        catch (Exception e)
+        {
+            AddUpdates([new SyncErrorInfo(item.FullPath, e.Message)]);
+        }
+    }
+
+    private void SyncFileOver(TransferLane lane, SyncFile item, Mutex mutex, UnixFileStatus fileMode)
+    {
+        var claimed = item.Size ?? 0;
+        long synced = 0;
+
+        void SyncProgressCallback(SyncProgressChangedEventArgs eventArgs)
+        {
+            var delta = AddUpdates(item, eventArgs, mutex);
+            synced += delta;
+            lane.Done(delta);
+        }
+
+        try
+        {
+            SyncFileOver(lane, item, SyncProgressCallback, fileMode);
+        }
+        finally
+        {
+            // A shared lane outlives this op, so settle the claim to what synced: a file of unknown size
+            // was claimed as 0, and a failed one won't sync the rest.
+            lane.Claim(synced - claimed);
+        }
+    }
+
+    private void SyncFileOver(TransferLane lane, SyncFile item, Action<SyncProgressChangedEventArgs> progressCallback, UnixFileStatus fileMode)
+    {
+        var targetPath = FilePath.IsDirectory
+                ? FileHelper.ConcatPaths(TargetPath, FileHelper.ExtractRelativePath(item.FullPath, FilePath.FullPath))
+                : TargetPath.FullPath;
+
+        var via = lane.Name is null ? "" : $" ({lane.Name})";
+
+        // A new connection per file; its ctor / Open can throw (e.g. device offline), which the caller reports.
+        using SyncService service = new(lane.DeviceData);
+
+        if (OperationName is OperationType.Push)
+        {
+            if (Data.Settings.EnableLog && !Data.IsLogPaused)
+                Data.CommandLog.Add(new($"@AdvancedSharpAdbClient: push {item.FullPath} -> {targetPath}{via}"));
+
+            var lastWriteTime = item.DateModified ?? DateTime.Now;
+
+            // target = [Android parent folder]\[relative path from Windows parent folder to current item]
+            using var stream = new FileStream(item.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            service.Push(stream, targetPath, fileMode, lastWriteTime, progressCallback, _useSyncV2, in _isCanceled);
+        }
+        else
+        {
+            if (Data.Settings.EnableLog && !Data.IsLogPaused)
+                Data.CommandLog.Add(new($"@AdvancedSharpAdbClient: pull {item.FullPath} -> {targetPath}{via}"));
+
+            if (!_useSyncV2)
+                ResolvePullFileSize(item);
+
+            // target = [Windows parent folder]\[relative path from Android parent folder to current item]
+            using var stream = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.Read);
+            service.Pull(item.FullPath, stream, progressCallback, _useSyncV2, in _isCanceled);
+
+            if (item.DateModified is not null)
+                File.SetLastWriteTime(targetPath, item.DateModified.Value);
+        }
+    }
+
+    /// <summary>A retry starts the file over, so its byte counters must too.</summary>
+    private void ResetProgress(SyncFile item)
+    {
+        _lastReportedBytes[item.FullPath] = 0;
+        _lastRawReceivedBytes[item.FullPath] = 0;
+        _receivedBytesCarry[item.FullPath] = 0;
+    }
+
+    /// <returns>The bytes transferred since the previous update of this file.</returns>
+    private long AddUpdates(SyncFile item, SyncProgressChangedEventArgs eventArgs, Mutex mutex)
     {
         if (item.Size is null && _useSyncV2 && eventArgs.TotalBytesToReceive > 0)
             item.Size = (long)eventArgs.TotalBytesToReceive;
@@ -283,13 +610,15 @@ public class FileSyncOperation : AbstractSyncFileOperation
 
         var nowTicks = DateTime.UtcNow.Ticks;
         if (nowTicks - Interlocked.Read(ref _lastUiUpdateTicks) < UiUpdateThrottleTicks)
-            return;
+            return Math.Max(deltaBytes, 0);
 
         Interlocked.Exchange(ref _lastUiUpdateTicks, nowTicks);
 
         mutex.WaitOne();
         ProgressUpdates.Add(progressInfo);
         mutex.ReleaseMutex();
+
+        return Math.Max(deltaBytes, 0);
     }
 
     /// <summary>

@@ -16,90 +16,155 @@
     <ui:CardControl Style="{StaticResource DeviceExpanderStyle}">
         <ui:CardControl.Header>
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Grid>
-                    <Grid
-                        Width="28"
-                        Height="28"
-                        ToolTip="{Binding Tooltip}">
-                        <ContentPresenter
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Content="{Binding TypeIconContent}" />
-                    </Grid>
-                    <Grid Style="{StaticResource DeviceStatusGridStyle}">
-                        <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
-                        <ui:FontIcon
-                            Foreground="{DynamicResource FlyoutBackground}"
-                            Glyph="{Binding StatusIcon}"
-                            Style="{StaticResource DeviceStatusFontSizeStyle}" />
-                    </Grid>
-                </Grid>
-                <TextBlock
-                    Grid.Column="1"
-                    Margin="4"
-                    FlowDirection="LeftToRight">
-                    <TextBlock.Style>
-                        <Style BasedOn="{StaticResource DeviceNameTextBlockStyle}" TargetType="TextBlock">
-                            <Setter Property="Text" Value="{Binding Name}" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsOpen}" Value="True">
-                                    <Setter Property="FontWeight" Value="Bold" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Status}" Value="Unauthorized">
-                                    <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DEVICE_UNAUTH_NONAME}}" />
-                                </DataTrigger>
-                                <MultiDataTrigger>
-                                    <MultiDataTrigger.Conditions>
-                                        <Condition Binding="{Binding Type}" Value="Service" />
-                                        <Condition Binding="{Binding Name}" Value="" />
-                                    </MultiDataTrigger.Conditions>
-                                    <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_SERVICE_NONAME}}" />
-                                </MultiDataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-                <controls:SimpleStackPanel
-                    Grid.Column="2"
-                    Margin="2,0,0,0"
-                    VerticalAlignment="Center"
-                    Orientation="Horizontal"
-                    Spacing="6">
-                    <ui:FontIcon Glyph="&#xE7EF;" Style="{StaticResource RootIconStyle}" />
-                    <ui:FontIcon Glyph="&#xE838;">
-                        <ui:FontIcon.Style>
-                            <Style BasedOn="{StaticResource DeviceHeaderIcon}" TargetType="ui:FontIcon">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid Margin="0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <controls:FluentPathIcon Style="{StaticResource DeviceStatusPathIcon}" />
+                    <TextBlock Grid.Column="1" FlowDirection="LeftToRight">
+                        <TextBlock.Style>
+                            <Style BasedOn="{StaticResource DeviceNameTextBlockStyle}" TargetType="TextBlock">
+                                <Setter Property="Text" Value="{Binding Name}" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsOpen}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    <DataTrigger Binding="{Binding Status}" Value="Unauthorized">
+                                        <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DEVICE_UNAUTH_NONAME}}" />
                                     </DataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding Type}" Value="Service" />
+                                            <Condition Binding="{Binding Name}" Value="" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_SERVICE_NONAME}}" />
+                                    </MultiDataTrigger>
                                 </Style.Triggers>
-                                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_TOOLTIP_BROWSING}}" />
                             </Style>
-                        </ui:FontIcon.Style>
-                    </ui:FontIcon>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+                <Separator Grid.Row="1" Margin="0,4,0,8" />
+                <controls:SimpleStackPanel
+                    Grid.Row="2"
+                    Orientation="Horizontal"
+                    Spacing="12">
                     <Grid>
+                        <Grid
+                            Width="28"
+                            Height="28"
+                            VerticalAlignment="Top"
+                            ToolTip="{Binding Tooltip}">
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ShowsConnectionIcons}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Content="{Binding TypeIconContent}" />
+                        </Grid>
+                        <!--  One column per transport: USB with its negotiated version, Wi-Fi / mDNS with the link speed  -->
+                        <controls:SimpleStackPanel
+                            Orientation="Horizontal"
+                            Spacing="10"
+                            Visibility="{Binding ShowsConnectionIcons, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <StackPanel ToolTip="{Binding Tooltip}" Visibility="{Binding HasUsbConnection, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <Grid Height="24">
+                                    <controls:FluentPathIcon
+                                        Width="28"
+                                        Height="16"
+                                        Data="{x:Static controls:FluentPathGeometries.UsbDevice}"
+                                        FlowDirection="LeftToRight" />
+                                </Grid>
+                                <TextBlock
+                                    FlowDirection="LeftToRight"
+                                    Style="{StaticResource DeviceIconCaptionStyle}"
+                                    Text="{Binding UsbVersion}" />
+                            </StackPanel>
+                            <StackPanel Visibility="{Binding HasWifiConnection, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <Grid
+                                    Width="24"
+                                    Height="24"
+                                    ToolTip="{Binding Source={x:Static Member=strings:Resources.S_TYPE_WIFI}}">
+                                    <controls:FluentPathIcon
+                                        Width="24"
+                                        Height="24"
+                                        Data="{x:Static controls:FluentPathGeometries.Wifi}"
+                                        FlowDirection="LeftToRight">
+                                        <controls:FluentPathIcon.Style>
+                                            <Style BasedOn="{StaticResource BaseIconPathStyle}" TargetType="controls:FluentPathIcon">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HasMdnsConnection}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </controls:FluentPathIcon.Style>
+                                    </controls:FluentPathIcon>
+                                    <controls:WifiSearchIcon
+                                        FlowDirection="LeftToRight"
+                                        Size="24"
+                                        Visibility="{Binding HasMdnsConnection, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                </Grid>
+                                <TextBlock
+                                    FlowDirection="LeftToRight"
+                                    Style="{StaticResource DeviceIconCaptionStyle}"
+                                    Text="{Binding WifiLinkSpeed}" />
+                            </StackPanel>
+                        </controls:SimpleStackPanel>
+                    </Grid>
+                    <ui:FontIcon
+                        Height="24"
+                        VerticalAlignment="Top"
+                        Glyph="&#xE7EF;"
+                        Style="{StaticResource RootIconStyle}" />
+                    <Grid VerticalAlignment="Top">
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding IsOpen}" Value="False" />
-                                            <Condition Binding="{Binding Status}" Value="Ok" />
-                                        </MultiDataTrigger.Conditions>
+                                    <DataTrigger Binding="{Binding Status}" Value="Ok">
                                         <Setter Property="Visibility" Value="Visible" />
-                                    </MultiDataTrigger>
+                                    </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
                         <views:CompactBatteryControl DataContext="{Binding Battery}" />
                     </Grid>
+                    <StackPanel VerticalAlignment="Top">
+                        <StackPanel.ToolTip>
+                            <TextBlock Text="{Binding AndroidVersionString, StringFormat=Android {0}}" />
+                        </StackPanel.ToolTip>
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AndroidVersion}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <Grid Height="24">
+                            <controls:FluentPathIcon
+                                Width="24"
+                                Height="14"
+                                Data="{x:Static controls:FluentPathGeometries.AndroidHead}"
+                                FlowDirection="LeftToRight" />
+                        </Grid>
+                        <TextBlock
+                            FlowDirection="LeftToRight"
+                            Style="{StaticResource DeviceIconCaptionStyle}"
+                            Text="{Binding AndroidVersion}" />
+                    </StackPanel>
                 </controls:SimpleStackPanel>
             </Grid>
         </ui:CardControl.Header>

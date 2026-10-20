@@ -75,7 +75,6 @@ public class ServiceDeviceViewModel : PairingDeviceViewModel
     {
         Device.Status = Device.MdnsType is ServiceDevice.PairingMode.QrCode ? DeviceStatus.Ok : DeviceStatus.Unauthorized;
         OnPropertyChanged(nameof(Status));
-        OnPropertyChanged(nameof(StatusIcon));
     }
 
     /// <summary>

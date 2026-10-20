@@ -1,0 +1,45 @@
+<controls:ScaledPathIcon
+    x:Class="ADB_Explorer.Controls.WifiSearchIcon"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:ADB_Explorer.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Name="Icon"
+    ArtboardSize="24"
+    mc:Ignorable="d">
+    <Viewbox
+        Width="{Binding Size}"
+        Height="{Binding Size}"
+        DataContext="{Binding ElementName=Icon}"
+        Stretch="Uniform">
+        <Grid Margin="-2" Width="{Binding ArtboardSize}" Height="{Binding ArtboardSize}">
+            <!--  Wi-Fi (monochrome); knocked out around the loupe, clear of the dot  -->
+            <Path
+                d:Fill="White"
+                Data="{x:Static controls:FluentPathGeometries.Wifi}"
+                Stretch="None"
+                Style="{StaticResource MonochromeIconPathStyle}">
+                <Path.Clip>
+                    <CombinedGeometry GeometryCombineMode="Exclude">
+                        <CombinedGeometry.Geometry1>
+                            <RectangleGeometry Rect="0,0,24,24" />
+                        </CombinedGeometry.Geometry1>
+                        <CombinedGeometry.Geometry2>
+                            <EllipseGeometry
+                                Center="5.5,15.5"
+                                RadiusX="5.35"
+                                RadiusY="5.35" />
+                        </CombinedGeometry.Geometry2>
+                    </CombinedGeometry>
+                </Path.Clip>
+            </Path>
+            <!--  Search badge from ic_fluent_screen_search_24_regular (accent when enabled)  -->
+            <Path
+                d:Fill="#4CC2FF"
+                Data="M5.5 20C6.47187 20 7.37179 19.6919 8.1074 19.1681L10.7197 21.7803C11.0126 22.0732 11.4874 22.0732 11.7803 21.7803C12.0732 21.4874 12.0732 21.0126 11.7803 20.7197L9.16806 18.1074C9.69191 17.3718 10 16.4719 10 15.5C10 13.0147 7.98528 11 5.5 11C3.01472 11 1 13.0147 1 15.5C1 17.9853 3.01472 20 5.5 20ZM5.5 18.5C3.84315 18.5 2.5 17.1569 2.5 15.5C2.5 13.8431 3.84315 12.5 5.5 12.5C7.15685 12.5 8.5 13.8431 8.5 15.5C8.5 17.1569 7.15685 18.5 5.5 18.5Z"
+                Stretch="None"
+                Style="{StaticResource IconAccentPathStyle}" />
+        </Grid>
+    </Viewbox>
+</controls:ScaledPathIcon>

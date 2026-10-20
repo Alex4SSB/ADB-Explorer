@@ -183,15 +183,31 @@ public partial class AdbService
         }
     }
 
+    /// <summary>Device ID → serial of the transport its commands currently go through.</summary>
+    private static readonly ConcurrentDictionary<string, string> TransportRoutes = new();
+
+    public static void SetTransportRoute(string deviceId, string transportId)
+    {
+        if (deviceId == transportId)
+            TransportRoutes.TryRemove(deviceId, out _);
+        else
+            TransportRoutes[deviceId] = transportId;
+    }
+
+    public static void RemoveTransportRoute(string deviceId) => TransportRoutes.TryRemove(deviceId, out _);
+
+    private static string RouteToTransport(string deviceId) => TransportRoutes.GetValueOrDefault(deviceId, deviceId);
+
     public static int ExecuteDeviceAdbCommand(string deviceSerial, string cmd, out string stdout, out string stderr, CancellationToken cancellationToken, params string[] args)
     {
-        return ExecuteAdbCommand("-s", out stdout, out stderr, cancellationToken, [deviceSerial, cmd, .. args]);
+        return ExecuteAdbCommand("-s", out stdout, out stderr, cancellationToken, [RouteToTransport(deviceSerial), cmd, .. args]);
     }
 
     public static async Task<string> ExecuteDeviceAdbCommand(string deviceId, CancellationToken cancellationToken, string cmd, params string[] args)
     {
         string stdout = "", stderr = "";
-        var res = await Task.Run(() => ExecuteAdbCommand("-s", out stdout, out stderr, cancellationToken, [deviceId, cmd, .. args]), cancellationToken);
+        var transport = RouteToTransport(deviceId);
+        var res = await Task.Run(() => ExecuteAdbCommand("-s", out stdout, out stderr, cancellationToken, [transport, cmd, .. args]), cancellationToken);
 
         if (res == 0)
             return "";
@@ -323,7 +339,7 @@ public partial class AdbService
 
     public static IEnumerable<string> ExecuteDeviceAdbCommandAsync(string deviceSerial, string cmd, CancellationToken cancellationToken, params string[] args)
     {
-        return ExecuteAdbCommandAsync("-s", cancellationToken, [deviceSerial, cmd, .. args]);
+        return ExecuteAdbCommandAsync("-s", cancellationToken, [RouteToTransport(deviceSerial), cmd, .. args]);
     }
 
     public static int ExecuteDeviceAdbShellCommand(string deviceId, string cmd, out string stdout, out string stderr, CancellationToken cancellationToken, params string[] args)

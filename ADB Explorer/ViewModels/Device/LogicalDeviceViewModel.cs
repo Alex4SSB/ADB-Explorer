@@ -68,7 +68,141 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
     public string AvdName => Device.AvdName ?? "";
 
-    public string BaseID => Type is DeviceType.Service ? ID.Split('.')[0] : ID;
+    public string BaseID => Connections.FirstOrDefault(c => c.Type is DeviceType.Service)?.ID.Split('.')[0] ?? ID;
+
+    public IReadOnlyList<DeviceConnection> Connections => Device.Connections;
+
+    public bool HasUsbConnection => Connections.Any(c => c.IsUsb);
+
+    public bool HasWifiConnection => Connections.Any(c => c.IsWifi);
+
+    public bool HasMdnsConnection => Connections.Any(c => c.Type is DeviceType.Service);
+
+    /// <summary>USB, mDNS and IP devices show an icon per transport instead of <see cref="DeviceViewModel.TypeIconContent"/>.</summary>
+    public bool ShowsConnectionIcons => Connections.All(c => c.Type is DeviceType.Local or DeviceType.Service or DeviceType.Remote);
+
+    /// <summary>The USB version actually negotiated, e.g. <c>2.0</c>.</summary>
+    [ObservableProperty]
+    public partial string? UsbVersion { get; private set; }
+
+    /// <summary>Wi-Fi rate the device sends at, so pulls are bound by it.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(WifiLinkSpeed))]
+    public partial int? WifiTxMbps { get; private set; }
+
+    /// <summary>Wi-Fi rate the device receives at, so pushes are bound by it.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(WifiLinkSpeed))]
+    public partial int? WifiRxMbps { get; private set; }
+
+    /// <summary>The faster Wi-Fi direction in the network's own (untranslated) unit, e.g. <c>1200 Mbps</c>.</summary>
+    public string? WifiLinkSpeed
+    {
+        get
+        {
+            var mbps = Math.Max(WifiTxMbps ?? 0, WifiRxMbps ?? 0);
+
+            return mbps > 0 ? $"{mbps} Mbps" : null;
+        }
+    }
+
+    /// <summary>Transports whose speed was read - once each, until they disconnect.</summary>
+    private readonly HashSet<string> _measuredConnections = [];
+
+    private void MeasureNewConnections()
+    {
+        _measuredConnections.RemoveWhere(id => Connections.All(c => c.ID != id));
+
+        if (IsTestDevice)
+            return;
+
+        foreach (var connection in Connections.Where(c => c.Status is DeviceStatus.Ok))
+        {
+            if (!_measuredConnections.Add(connection.ID))
+                continue;
+
+            if (connection.Type is DeviceType.Local)
+                Task.Run(() => UsbVersion = NativeMethods.GetUsbLinkVersion(connection.ID));
+            else if (connection.IsWifi)
+                Task.Run(RefreshWifiSpeeds);
+        }
+    }
+
+    /// <summary>Re-reads the Wi-Fi rates, which shift with the signal. Blocks on adb, so call it off the UI thread.</summary>
+    public void RefreshWifiSpeeds()
+    {
+        if (IsTestDevice || !Connections.Any(c => c.IsWifi && c.Status is DeviceStatus.Ok))
+            return;
+
+        var (tx, rx) = AdbService.GetWifiLinkSpeeds(ID);
+
+        // A failed read keeps the last rates rather than blanking them
+        if (tx is null && rx is null)
+            return;
+
+        WifiTxMbps = tx;
+        WifiRxMbps = rx;
+    }
+
+    /// <summary>Every transport serial this device has been listed under, so IDs stored earlier still resolve to it.</summary>
+    private readonly HashSet<string> _knownIds = new(StringComparer.Ordinal);
+
+    [ObservableProperty]
+    public partial IReadOnlyList<ServiceDeviceViewModel> Services { get; private set; } = [];
+
+    public void SetServices(List<ServiceDeviceViewModel> services)
+    {
+        if (!Services.SequenceEqual(services))
+            Services = services;
+    }
+
+    /// <summary>An online device owns the mDNS services it advertises: by the serial in their name, or by IP.</summary>
+    public bool OwnsService(ServiceDeviceViewModel service)
+    {
+        if (Status is DeviceStatus.Offline || IsTestDevice != service.IsTestDevice)
+            return false;
+
+        if (service.ID.StartsWith("adb-", StringComparison.Ordinal) && DeviceHelper.ParseMdnsSerial(service.ID) == SerialNumber)
+            return true;
+
+        return IsIpAddressValid && IpAddress == service.IpAddress;
+    }
+
+    /// <summary>IDs of duplicate objects merged into this one; their commands follow this device's transport too.</summary>
+    private readonly List<string> _absorbedIds = [];
+
+    public void Absorb(LogicalDeviceViewModel duplicate)
+    {
+        _absorbedIds.Add(duplicate.ID);
+        _absorbedIds.AddRange(duplicate._absorbedIds);
+        lock (_knownIds)
+        {
+            _knownIds.Add(duplicate.ID);
+            _knownIds.UnionWith(duplicate._knownIds);
+        }
+    }
+
+    public void ClearTransportRoutes()
+    {
+        foreach (var id in _absorbedIds.Prepend(ID))
+            AdbService.RemoveTransportRoute(id);
+    }
+
+    public bool Matches(string? id)
+    {
+        if (string.IsNullOrEmpty(id))
+            return false;
+
+        if (id == ID || id == SerialNumber)
+            return true;
+
+        // Updated on the UI thread, looked up from background ones too
+        lock (_knownIds)
+            return _knownIds.Contains(id);
+    }
+
+    /// <summary>Saved locations are keyed by serial, so they follow the device across transports and sessions.</summary>
+    public string SavedLocationsKey => string.IsNullOrEmpty(SerialNumber) ? ID : SerialNumber;
 
     private string _serialNumber = "";
     /// <summary>
@@ -253,7 +387,10 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
             // Outside the lock: raising PropertyChanged may marshal to a UI thread that is itself waiting on it.
             if (loadedHere)
+            {
                 RefreshSerialNumber();
+                OnPropertyChanged(nameof(AndroidVersion));
+            }
 
             return field;
         }
@@ -323,6 +460,9 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
         Device = device;
 
+        foreach (var connection in device.Connections)
+            _knownIds.Add(connection.ID);
+
         InitDeviceDrives();
         RefreshSerialNumber(allowPropLookup: false);
 
@@ -371,27 +511,67 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         OnPropertyChanged(nameof(AndroidVersion));
     }
 
-    public void UpdateDevice(LogicalDeviceViewModel other) => UpdateDevice(other.Device);
-
-    public void UpdateDevice(LogicalDevice other)
+    /// <summary>
+    /// Takes the transports this device is currently listed on; <paramref name="source"/> is the freshly
+    /// listed device of the preferred one, for its name.
+    /// </summary>
+    public void UpdateDevice(LogicalDeviceViewModel source, IReadOnlyCollection<DeviceConnection> connections)
     {
         if (Device.Type is DeviceType.Emulator)
         {
-            if (!string.IsNullOrEmpty(other.AvdName))
-                Device.AvdName = other.AvdName;
+            if (!string.IsNullOrEmpty(source.Device.AvdName))
+                Device.AvdName = source.Device.AvdName;
         }
         else if (string.IsNullOrEmpty(BrandName))
         {
-            Device.Name = other.Name;
+            Device.Name = source.Device.Name;
         }
 
-        SetStatus(other.Status);
-        Device.DeviceData = other.DeviceData;
+        SetConnections(connections);
 
-        if (other.Status is DeviceStatus.Offline)
+        if (Status is DeviceStatus.Offline)
             SetAvdName(null);
+    }
+
+    public void SetConnections(IReadOnlyCollection<DeviceConnection> connections)
+    {
+        var previousType = Type;
+        var previousIp = IpAddress;
+
+        Device.SetConnections(connections);
+
+        lock (_knownIds)
+            _knownIds.UnionWith(connections.Select(c => c.ID));
+
+        foreach (var id in _absorbedIds.Prepend(ID))
+            AdbService.SetTransportRoute(id, Device.Primary.ID);
 
         RefreshSerialNumber();
+        SetStatus(Device.Primary.Status);
+
+        OnPropertyChanged(nameof(Connections));
+        OnPropertyChanged(nameof(HasUsbConnection));
+        OnPropertyChanged(nameof(HasWifiConnection));
+        OnPropertyChanged(nameof(HasMdnsConnection));
+        OnPropertyChanged(nameof(ShowsConnectionIcons));
+        OnPropertyChanged(nameof(DeviceData));
+        OnPropertyChanged(nameof(BaseID));
+
+        MeasureNewConnections();
+
+        if (previousIp != IpAddress)
+        {
+            OnPropertyChanged(nameof(IpAddress));
+            OnPropertyChanged(nameof(IsIpAddressValid));
+        }
+
+        if (previousType == Type)
+            return;
+
+        OnPropertyChanged(nameof(Type));
+        OnPropertyChanged(nameof(TypeIcon));
+        OnPropertyChanged(nameof(TypeIconContent));
+        OnPropertyChanged(nameof(Tooltip));
     }
 
     public string? GetAvdNameFromProps()
@@ -425,25 +605,23 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         _serialNumber = next;
     }
 
-    private string ResolveSerialNumber(bool allowPropLookup) => Type switch
+    private string ResolveSerialNumber(bool allowPropLookup)
     {
-        DeviceType.Local or DeviceType.Recovery or DeviceType.Sideload or DeviceType.WSA => ID,
-        DeviceType.Service => ParseMdnsSerial(ID),
-        DeviceType.Remote when !allowPropLookup => GetRemoteSerialFallback(ID),
-        DeviceType.Remote => Props.GetValueOrDefault(AdbService.SERIAL_NO) ?? GetRemoteSerialFallback(ID),
-        DeviceType.Emulator => !string.IsNullOrEmpty(AvdName) ? AvdName : ID,
-        _ => ID,
-    };
+        if (Type is DeviceType.Emulator)
+            return !string.IsNullOrEmpty(AvdName) ? AvdName : ID;
 
-    private static string ParseMdnsSerial(string id)
-    {
-        var baseId = id.Split('.')[0];
-        if (!baseId.StartsWith("adb-", StringComparison.Ordinal))
-            return baseId;
+        if (Type is DeviceType.WSA)
+            return ID;
 
-        var withoutPrefix = baseId["adb-".Length..];
-        var lastDash = withoutPrefix.LastIndexOf('-');
-        return lastDash > 0 ? withoutPrefix[..lastDash] : withoutPrefix;
+        if (Connections.FirstOrDefault(c => !string.IsNullOrEmpty(c.Serial)) is { } known)
+            return known.Serial;
+
+        return Type switch
+        {
+            DeviceType.Remote when !allowPropLookup => GetRemoteSerialFallback(ID),
+            DeviceType.Remote => Props.GetValueOrDefault(AdbService.SERIAL_NO) ?? GetRemoteSerialFallback(ID),
+            _ => ID,
+        };
     }
 
     private static string GetRemoteSerialFallback(string id)
@@ -650,20 +828,4 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     }
 
     #endregion
-}
-
-public class LogicalDeviceViewModelEqualityComparer : IEqualityComparer<LogicalDeviceViewModel>
-{
-    public bool Equals(LogicalDeviceViewModel? x, LogicalDeviceViewModel? y)
-    {
-        if (x is null || y is null)
-            return x is null && y is null;
-
-        return x.ID == y.ID && x.Status == y.Status && x.DeviceData == y.DeviceData;
-    }
-
-    public int GetHashCode([DisallowNull] LogicalDeviceViewModel obj)
-    {
-        return (obj.ID.GetHashCode() + obj.Status.GetHashCode()).GetHashCode();
-    }
 }

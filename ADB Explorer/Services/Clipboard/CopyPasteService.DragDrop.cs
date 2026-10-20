@@ -136,7 +136,7 @@ public partial class CopyPasteService
             var dragList = NativeMethods.ADBDRAGLIST.FromStream(adbStream);
             var deviceId = dragList.deviceId;
 
-            var device = Data.DevicesObject.UIList.OfType<LogicalDeviceViewModel>().FirstOrDefault(d => d.ID == deviceId && d.Status is DeviceStatus.Ok);
+            var device = Data.DevicesObject.UIList.OfType<LogicalDeviceViewModel>().FirstOrDefault(d => d.Matches(deviceId) && d.Status is DeviceStatus.Ok);
             if (device is null && SourceDevice?.ID == deviceId)
                 device = SourceDevice;
 

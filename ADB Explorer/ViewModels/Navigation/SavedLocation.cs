@@ -19,7 +19,7 @@ public class SavedLocation : ObservableObject
     /// has none and acts on whichever tab is active when it's clicked.</summary>
     private readonly string? _ownerDeviceId;
 
-    private string? DeviceId => _ownerDeviceId ?? Data.ActiveDevice?.ID;
+    private string? DeviceId => _ownerDeviceId ?? Data.ActiveDevice?.SavedLocationsKey;
 
     public SavedLocation(string path = "", string? deviceId = null)
     {

@@ -141,7 +141,7 @@ public partial class NavigationTreeViewModel
     /// <summary>Saved-location nodes always occupy the front of the device node's children, ahead of drives.</summary>
     private void SyncSavedLocationsForDevice(NavigationTreeNode deviceNode, LogicalDeviceViewModel device)
     {
-        var entries = Data.Settings.SavedLocations.Where(e => e.DeviceId == device.ID).ToList();
+        var entries = Data.Settings.SavedLocations.Where(e => e.DeviceId == device.SavedLocationsKey).ToList();
         var remaining = new HashSet<NavigationTreeNode>();
 
         for (var i = 0; i < entries.Count; i++)

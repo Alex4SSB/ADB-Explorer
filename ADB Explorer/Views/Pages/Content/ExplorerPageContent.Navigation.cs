@@ -303,7 +303,7 @@ public partial class ExplorerPageContent
     private void SwitchToEntryDevice(AdbLocation location)
     {
         var device = Data.DevicesObject?.LogicalDeviceViewModels?
-            .FirstOrDefault(d => d.ID == location.DeviceId && d.Status is DeviceStatus.Ok);
+            .FirstOrDefault(d => d.Matches(location.DeviceId) && d.Status is DeviceStatus.Ok);
 
         if (device is null)
             return;

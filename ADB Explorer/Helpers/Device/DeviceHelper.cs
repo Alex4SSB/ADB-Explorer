@@ -41,6 +41,18 @@ public static partial class DeviceHelper
         return name.Replace('_', ' ');
     }
 
+    /// <summary>Extracts the serial from an mDNS name like <c>adb-SERIAL-xYz123._adb-tls-connect._tcp</c>.</summary>
+    public static string ParseMdnsSerial(string id)
+    {
+        var baseId = id.Split('.')[0];
+        if (!baseId.StartsWith("adb-", StringComparison.Ordinal))
+            return baseId;
+
+        var withoutPrefix = baseId["adb-".Length..];
+        var lastDash = withoutPrefix.LastIndexOf('-');
+        return lastDash > 0 ? withoutPrefix[..lastDash] : withoutPrefix;
+    }
+
     public static bool EvaluateDevicePredicate(DeviceViewModel device, Devices devicesObject)
     {
         if (devicesObject is null)
@@ -53,34 +65,9 @@ public static partial class DeviceHelper
         if (device is LogicalDeviceViewModel { IsOpen: true })
             return true;
 
-        if (device is LogicalDeviceViewModel logDev && device.Type is DeviceType.Service)
-        {
-            if (device.Status is DeviceStatus.Offline)
-            {
-                // if a logical service is offline, and we have one of its services - hide the logical service
-                return devicesObject.ServiceDeviceViewModels.All(s => s.IpAddress != device.IpAddress);
-            }
-
-            // if a USB device with the same serial is online - hide the mDNS service
-            var res = !devicesObject.LogicalDeviceViewModels.Any(l => l.Type is DeviceType.Local
-                                                    && l.Status is DeviceStatus.Ok
-                                                    && logDev.SerialNumber == l.SerialNumber);
-
-            if (res)
-                logDev.UseIdForName = false;
-
-            return res;
-        }
-
-        if (device is LogicalDeviceViewModel remote && device.Type is DeviceType.Remote)
-        {
-            // hide WiFi when the same device is connected over USB or mDNS
-            return !devicesObject.LogicalDeviceViewModels.Any(other => 
-                other.Status is DeviceStatus.Ok
-                && (remote.SerialNumber == other.SerialNumber || remote.IpAddress == other.IpAddress)
-                && (other.Type is DeviceType.Local or DeviceType.Service)
-            );
-        }
+        // if a logical service is offline, and we have one of its services - hide the logical service
+        if (device is LogicalDeviceViewModel && device.Type is DeviceType.Service && device.Status is DeviceStatus.Offline)
+            return devicesObject.ServiceDeviceViewModels.All(s => s.IpAddress != device.IpAddress);
 
         if (device is HistoryDeviceViewModel hist)
         {
@@ -182,6 +169,31 @@ public static partial class DeviceHelper
         Data.DevicesObject.LastUpdate = DateTime.Now;
     }
 
+    private static int _wifiSpeedsRefreshing;
+
+    /// <summary>Reads all devices' Wi-Fi rates at once, off the poll; skipped while the previous round still runs.</summary>
+    public static void UpdateDevicesWifiSpeeds()
+    {
+        if (Interlocked.Exchange(ref _wifiSpeedsRefreshing, 1) == 1)
+            return;
+
+        // Snapshot on the UI thread, where UIList changes
+        List<LogicalDeviceViewModel> devices = [];
+        App.SafeInvoke(() => devices = Data.DevicesObject.LogicalDeviceViewModels.ToList());
+
+        Task.Run(() =>
+        {
+            try
+            {
+                Parallel.ForEach(devices, device => device.RefreshWifiSpeeds());
+            }
+            finally
+            {
+                Volatile.Write(ref _wifiSpeedsRefreshing, 0);
+            }
+        });
+    }
+
     public static void UpdateDevicesRootAccess()
     {
         var devices = Data.DevicesObject.LogicalDeviceViewModels
@@ -202,20 +214,13 @@ public static partial class DeviceHelper
         }
     }
 
-    public static IEnumerable<LogicalDeviceViewModel> ReconnectFileOpDevice(IEnumerable<LogicalDeviceViewModel> devices)
+    /// <summary>Devices of past file ops, so a reconnecting device gets its old object (and its ops) back.</summary>
+    private static IEnumerable<LogicalDeviceViewModel> PastFileOpDevices()
     {
         if (Data.FileOpQ is null)
             return [];
 
-        var pastOps = Data.FileOpQ.Operations.Where(op => op.IsPastOp);
-
-        // get the newly acquired devices with similar IDs to devices of the past file ops [the objects of] which also do not exist in the devices UI list
-        var exceptDevices = devices.Where(d => pastOps.Any(op => op.Device.ID == d.ID && !Data.DevicesObject.UIList.Contains(op.Device)));
-
-        // get the corresponding file op devices
-        var fileOpDevices = pastOps.Select(op => op.Device).Where(d => exceptDevices.Any(e => e.ID == d.ID));
-
-        return devices.Except(exceptDevices, new LogicalDeviceViewModelEqualityComparer()).AppendRange(fileOpDevices.Distinct());
+        return Data.FileOpQ.Operations.Where(op => op.IsPastOp).Select(op => op.Device).Distinct().ToList();
     }
 
     /// <summary>Points tabs still holding a device's replaced (offline) view-model at its current one.</summary>
@@ -229,7 +234,7 @@ public static partial class DeviceHelper
             if (instance.Device is not { } stale)
                 continue;
 
-            var current = Data.DevicesObject.LogicalDeviceViewModels.FirstOrDefault(d => d.ID == stale.ID);
+            var current = Data.DevicesObject.LogicalDeviceViewModels.FirstOrDefault(d => d.Matches(stale.ID));
             if (current is not null && !ReferenceEquals(current, stale))
                 instance.Device = current;
         }
@@ -244,7 +249,7 @@ public static partial class DeviceHelper
             return false;
 
         var device = Data.DevicesObject.LogicalDeviceViewModels
-            .FirstOrDefault(d => d.ID == tabDevice.ID && d.Status is DeviceStatus.Ok);
+            .FirstOrDefault(d => d.Matches(tabDevice.ID) && d.Status is DeviceStatus.Ok);
 
         if (device is null)
             return false;
@@ -257,14 +262,18 @@ public static partial class DeviceHelper
 
     public static void DeviceListSetup(string selectedAddress = "")
     {
-        Task.Run(() => AdbService.GetDevices(CancellationToken.None)).ContinueWith((t) 
-            => App.SafeInvoke(() => DeviceListSetup(t.Result.Select(s => new LogicalDeviceViewModel(LogicalDevice.From(s))), selectedAddress)));
+        Task.Run(() =>
+        {
+            var snapshots = AdbService.GetDevices(CancellationToken.None).ToList();
+            AdbService.ResolveRemoteSerials(snapshots, CancellationToken.None);
+
+            return snapshots;
+        }).ContinueWith((t) => App.SafeInvoke(() => DeviceListSetup(t.Result.Select(s => new LogicalDeviceViewModel(LogicalDevice.From(s))), selectedAddress)));
     }
 
     public static void DeviceListSetup(IEnumerable<LogicalDeviceViewModel> devices, string selectedAddress = "")
     {
-        devices = ReconnectFileOpDevice(devices);
-        Data.DevicesObject.UpdateDevices(devices);
+        Data.DevicesObject.UpdateDevices(devices, PastFileOpDevices());
         RebindTabDevices();
 
         if (Data.DevicesObject.Current is null || Data.DevicesObject.Current.IsOpen && Data.DevicesObject.Current.Status is not DeviceStatus.Ok)

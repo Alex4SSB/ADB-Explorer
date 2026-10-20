@@ -253,7 +253,7 @@ public partial class NavigationTreeViewModel
         }
 
         var allowHidden = Data.Settings.ShowHiddenItems;
-        var device = Data.DevicesObject?.LogicalDeviceViewModels.FirstOrDefault(d => d.ID == deviceId);
+        var device = Data.DevicesObject?.LogicalDeviceViewModels.FirstOrDefault(d => d.Matches(deviceId));
         var folders = new List<FileClass>();
         var unresolvedLinks = new List<FileStat>();
         foreach (var entry in entries)

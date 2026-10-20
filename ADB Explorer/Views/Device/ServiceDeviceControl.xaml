@@ -31,20 +31,27 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <Grid>
-                    <Grid Width="28" Height="28" ToolTip="{Binding Tooltip}">
-                        <ContentPresenter
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Content="{Binding TypeIconContent}" />
-                    </Grid>
-                    <Grid Style="{StaticResource DeviceStatusGridStyle}">
-                        <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
-                        <ui:FontIcon Foreground="{Binding RelativeSource={RelativeSource AncestorType=Border, Mode=FindAncestor, AncestorLevel=2}, Path=Background}" Glyph="{Binding StatusIcon}" />
-                    </Grid>
+                <Grid
+                    Width="28"
+                    Height="28"
+                    ToolTip="{Binding Tooltip}">
+                    <ContentPresenter
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Content="{Binding TypeIconContent}" />
                 </Grid>
                 <StackPanel Grid.Column="1" Margin="4">
-                    <TextBlock Style="{StaticResource DeviceNameTextBlockStyle}" Text="{Binding IpAddress}" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <controls:FluentPathIcon Style="{StaticResource DeviceStatusPathIcon}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Style="{StaticResource DeviceNameTextBlockStyle}"
+                            Text="{Binding IpAddress}" />
+                    </Grid>
                     <TextBlock
                         FontSize="12"
                         Foreground="{DynamicResource SystemFillColorCriticalBrush}"

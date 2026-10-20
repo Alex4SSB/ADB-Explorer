@@ -90,6 +90,7 @@ public class Battery : ObservableObject
             if (SetProperty(ref _level, value))
             {
                 OnPropertyChanged(nameof(BatteryIcon));
+                OnPropertyChanged(nameof(LevelString));
                 OnPropertyChanged(nameof(CompactStateString));
                 OnPropertyChanged(nameof(BatteryLow));
                 OnPropertyChanged(nameof(FullyCharged));
@@ -169,14 +170,16 @@ public class Battery : ObservableObject
             else
             {
                 if (ChargeState is not ChargingState.Charging)
-                    return Data.RuntimeSettings.IsRTL
-                        ? $"%{Level}"
-                        : $"{Level}%";
+                    return LevelString;
 
                 return string.Format(Strings.Resources.S_BAT_STATUS_PLUGGED, Level);
             }
         }
     }
+
+    public string LevelString => Data.RuntimeSettings.IsRTL
+        ? $"%{Level}"
+        : $"{Level}%";
 
     public string VoltageString => Voltage switch
     {

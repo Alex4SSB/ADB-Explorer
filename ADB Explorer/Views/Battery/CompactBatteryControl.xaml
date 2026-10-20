@@ -21,31 +21,39 @@
             </Style.Triggers>
         </Style>
     </UserControl.Style>
-    <controls:FluentPathIcon VerticalAlignment="Center" Data="{Binding BatteryIcon}">
-        <controls:FluentPathIcon.Style>
-            <Style BasedOn="{StaticResource DeviceHeaderPathIcon}" TargetType="controls:FluentPathIcon">
-                <Setter Property="ToolTip">
-                    <Setter.Value>
-                        <ToolTip>
-                            <TextBlock
-                                NumberSubstitution.Substitution="NativeNational"
-                                Style="{StaticResource TextBlockStyle}"
-                                Text="{Binding CompactStateString}" />
-                        </ToolTip>
-                    </Setter.Value>
-                </Setter>
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding FullyCharged}" Value="True">
-                        <Setter Property="Foreground" Value="#FF107C0F" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding BatteryLow}" Value="True">
-                        <Setter Property="Foreground" Value="#FFF44336" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding ChargeState}" Value="Charging">
-                        <Setter Property="Margin" Value="0,-5,0,0" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </controls:FluentPathIcon.Style>
-    </controls:FluentPathIcon>
+    <StackPanel>
+        <Grid Height="24">
+            <controls:FluentPathIcon VerticalAlignment="Center" Data="{Binding BatteryIcon}">
+                <controls:FluentPathIcon.Style>
+                    <Style BasedOn="{StaticResource DeviceHeaderPathIcon}" TargetType="controls:FluentPathIcon">
+                        <Setter Property="ToolTip">
+                            <Setter.Value>
+                                <ToolTip>
+                                    <TextBlock
+                                        NumberSubstitution.Substitution="NativeNational"
+                                        Style="{StaticResource TextBlockStyle}"
+                                        Text="{Binding CompactStateString}" />
+                                </ToolTip>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding FullyCharged}" Value="True">
+                                <Setter Property="Foreground" Value="#FF107C0F" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding BatteryLow}" Value="True">
+                                <Setter Property="Foreground" Value="#FFF44336" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding ChargeState}" Value="Charging">
+                                <Setter Property="Margin" Value="0,-5,0,0" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </controls:FluentPathIcon.Style>
+            </controls:FluentPathIcon>
+        </Grid>
+        <TextBlock
+            NumberSubstitution.Substitution="NativeNational"
+            Style="{StaticResource DeviceIconCaptionStyle}"
+            Text="{Binding LevelString}" />
+    </StackPanel>
 </UserControl>

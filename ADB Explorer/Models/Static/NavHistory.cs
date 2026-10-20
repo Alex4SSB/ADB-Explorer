@@ -99,7 +99,7 @@ public class AdbLocation : Navigation
         if (DeviceId is null)
             return fallback;
 
-        return Data.DevicesObject?.LogicalDeviceViewModels?.FirstOrDefault(device => device.ID == DeviceId);
+        return Data.DevicesObject?.LogicalDeviceViewModels?.FirstOrDefault(device => device.Matches(DeviceId));
     }
 
     public string DisplayName

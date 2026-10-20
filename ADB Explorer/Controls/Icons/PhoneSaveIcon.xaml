@@ -1,0 +1,34 @@
+<controls:ScaledPathIcon
+    x:Class="ADB_Explorer.Controls.PhoneSaveIcon"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:ADB_Explorer.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Name="Icon"
+    ArtboardSize="24"
+    mc:Ignorable="d">
+    <Viewbox
+        Width="{Binding Size}"
+        Height="{Binding Size}"
+        DataContext="{Binding ElementName=Icon}"
+        Stretch="Uniform">
+        <Grid
+            Width="{Binding ArtboardSize}"
+            Height="{Binding ArtboardSize}"
+            Margin="-4,-2,-2,-2">
+            <!--  Phone (monochrome), with the cut-out left for the disk  -->
+            <Path
+                d:Fill="White"
+                Data="M13.75 2C14.9926 2 16 3.00736 16 4.25V11H15.75C15.2999 11 14.875 11.1081 14.5 11.2999V4.25C14.5 3.83579 14.1642 3.5 13.75 3.5H6.25C5.83579 3.5 5.5 3.83579 5.5 4.25V19.75C5.5 20.1642 5.83579 20.5 6.25 20.5H11V21.5C11 21.6712 11.0172 21.8384 11.05 22H6.25C5.00736 22 4 20.9926 4 19.75V4.25C4 3.00736 5.00736 2 6.25 2H13.75ZM8.74887 17.5038L11 17.5004V19.0004L8.75113 19.0038C8.33692 19.0044 8.00062 18.6691 8 18.2549C7.99938 17.8407 8.33466 17.5044 8.74887 17.5038Z"
+                Stretch="None"
+                Style="{StaticResource MonochromeIconPathStyle}" />
+            <!--  Save disk (accent)  -->
+            <Path
+                d:Fill="#4CC2FF"
+                Data="M16 12H19V14H16V12ZM13.5 12H15V14.5C15 14.7761 15.22386 15 15.5 15H19.5C19.77614 15 20 14.7761 20 14.5V12H20.37868C20.7765 12 21.158 12.158 21.4393 12.4393L22.5607 13.5607C22.842 13.842 23 14.2235 23 14.6213V21.5C23 22.3284 22.3284 23 21.5 23H21V17.5C21 17.2239 20.77614 17 20.5 17H14.5C14.22386 17 14 17.2239 14 17.5V23H13.5C12.67157 23 12 22.3284 12 21.5V13.5C12 12.6716 12.67157 12 13.5 12ZM20 18V23H15V18H20Z"
+                Stretch="None"
+                Style="{StaticResource IconAccentPathStyle}" />
+        </Grid>
+    </Viewbox>
+</controls:ScaledPathIcon>

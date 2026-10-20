@@ -79,6 +79,7 @@ public class DevicePollingService : BackgroundService
             return;
 
         Data.DevicesObject.UpdateLogicalIp();
+        DeviceHelper.UpdateDevicesWifiSpeeds();
 
         if (Data.MdnsService?.State is MdnsService.MdnsState.Running)
             DeviceHelper.ListServices(WiFiPairingService.GetServices(cancellationToken), cancellationToken);
@@ -97,13 +98,17 @@ public class DevicePollingService : BackgroundService
         if (snapshots is null)
             return;
 
-        if (!Data.DevicesObject.DevicesChanged(snapshots))
+        var list = snapshots.ToList();
+
+        // A serial read late (its first read failed) regroups the devices even if the list itself is unchanged
+        var serialsResolved = AdbService.ResolveRemoteSerials(list, CancellationToken.None);
+        if (!serialsResolved && !Data.DevicesObject.DevicesChanged(list))
             return;
 
         // Construct device VMs on the UI thread so InitDeviceDrives / CollectionViews stay dispatcher-affine.
         App.SafeInvoke(() =>
         {
-            var deviceVMs = snapshots.Select(s => new LogicalDeviceViewModel(LogicalDevice.From(s))).ToList();
+            var deviceVMs = list.Select(s => new LogicalDeviceViewModel(LogicalDevice.From(s))).ToList();
             DeviceHelper.DeviceListSetup(deviceVMs);
 
             if (!Data.Settings.AutoRoot)

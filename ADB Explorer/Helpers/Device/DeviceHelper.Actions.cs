@@ -70,11 +70,12 @@ public static partial class DeviceHelper
                 return;
             }
         }
-        else if (device.Type is DeviceType.Remote)
+        else if (device is LogicalDeviceViewModel logical && logical.Connections.Any(c => c.Type is DeviceType.Remote))
         {
             try
             {
-                AdbService.DisconnectNetworkDevice(device.ID, CancellationToken.None);
+                foreach (var connection in logical.Connections.Where(c => c.Type is DeviceType.Remote))
+                    AdbService.DisconnectNetworkDevice(connection.ID, CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -93,21 +94,35 @@ public static partial class DeviceHelper
             throw new NotImplementedException();
         }
 
+        // Still reachable over USB or mDNS - only its IP connections were dropped.
+        if (device is LogicalDeviceViewModel { Connections: var connections } && connections.Any(c => c.Type is not DeviceType.Remote))
+        {
+            DeviceListSetup();
+            return;
+        }
+
         RemoveDevice(device);
     }
 
     public static DeviceAction RemoveDeviceCommand(DeviceViewModel device) => new(
             () => device.Type is DeviceType.History
-                || !Data.DevicesObject.IsManualPairingInProgress
-                    && device.Type is DeviceType.Remote or DeviceType.Emulator,
+                || !Data.DevicesObject.IsManualPairingInProgress && IsRemovable(device),
             () => RemoveDeviceAction(device),
             device.Type switch
             {
-                DeviceType.Remote => Strings.Resources.S_REM_DEV,
                 DeviceType.Emulator => Strings.Resources.S_REM_EMU,
                 DeviceType.History => Strings.Resources.S_REM_HIST_DEV,
+                _ when device is LogicalDeviceViewModel => Strings.Resources.S_REM_DEV,
                 _ => "",
             });
+
+    private static bool IsRemovable(DeviceViewModel device)
+    {
+        if (device.Type is DeviceType.Emulator)
+            return true;
+
+        return device is LogicalDeviceViewModel logical && logical.Connections.Any(c => c.Type is DeviceType.Remote);
+    }
 
     public static DeviceAction ToggleRootDeviceCommand(LogicalDeviceViewModel device) => new(
         () => device.Root is not RootStatus.Forbidden

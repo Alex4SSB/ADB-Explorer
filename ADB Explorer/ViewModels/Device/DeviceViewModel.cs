@@ -45,7 +45,7 @@ public abstract class DeviceViewModel : ObservableObject
         DeviceType.Recovery => "\uED10",
         DeviceType.Sideload => "\uE67A",
         DeviceType.New => "",
-        DeviceType.History => "\uE823",
+        DeviceType.History => "",
         DeviceType.WSA => "\uE78A",
         _ => throw new NotImplementedException(),
     };
@@ -53,16 +53,14 @@ public abstract class DeviceViewModel : ObservableObject
     public object TypeIconContent => Type switch
     {
         DeviceType.Local => new BaseIcon(FluentPathGeometries.UsbDevice, 28, rtlBehavior: RtlBehavior.ForceLtr).IconContent,
-        DeviceType.New => new BaseIcon(FluentPathGeometries.PhoneAdd, 28).IconContent,
+        DeviceType.Remote => new BaseIcon(FluentPathGeometries.Wifi, 28, rtlBehavior: RtlBehavior.ForceLtr).IconContent,
+        DeviceType.Emulator => new BaseIcon(FluentPathGeometries.Bot, 28).IconContent,
+        DeviceType.EmulatorPackage => new BaseIcon(FluentPathGeometries.BotFilled, 28).IconContent,
+        DeviceType.Service when Device is not ServiceDevice { MdnsType: ServiceDevice.PairingMode.QrCode }
+            => new BaseIcon(() => new WifiSearchIcon(), 28, RtlBehavior.ForceLtr).IconContent,
+        DeviceType.New => new BaseIcon(() => new PhoneAddIcon(), 28).IconContent,
+        DeviceType.History => new BaseIcon(new PhoneSaveIcon(), 28).IconContent,
         _ => new BaseIcon(TypeIcon, 28).IconContent,
-    };
-
-    public string StatusIcon => Status switch
-    {
-        DeviceStatus.Ok => "",
-        DeviceStatus.Offline => "\uEBFF",
-        DeviceStatus.Unauthorized => "\uEC00",
-        _ => throw new NotImplementedException(),
     };
 
     /// <summary>
@@ -129,7 +127,6 @@ public abstract class DeviceViewModel : ObservableObject
         Device.Status = status;
 
         OnPropertyChanged(nameof(Status));
-        OnPropertyChanged(nameof(StatusIcon));
 
         if (this is LogicalDeviceViewModel logical)
         {

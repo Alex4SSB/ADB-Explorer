@@ -15,6 +15,72 @@ public partial class AdbService
         return RE_DEVICE_NAME().Matches(stdout).Select(DeviceSnapshot.Parse).Where(s => s);
     }
 
+    /// <summary>
+    /// The device's Wi-Fi transmit (to us) and receive link rates in Mbps; each <see langword="null"/> when unknown.
+    /// Only those fields leave the device - the rest of the status holds network identifiers.
+    /// </summary>
+    public static (int? TxMbps, int? RxMbps) GetWifiLinkSpeeds(string deviceId)
+    {
+        const string cmd = "(cmd wifi status 2>/dev/null || dumpsys wifi | grep -m1 mWifiInfo) | grep -oE ', (Tx |Rx )?Link speed: -?[0-9]+Mbps' | head -n3";
+
+        if (ExecuteDeviceAdbShellCommand(deviceId, cmd, out string stdout, out _, CancellationToken.None) != 0)
+            return (null, null);
+
+        int? link = null, tx = null, rx = null;
+        foreach (Match match in RE_WIFI_LINK_SPEED().Matches(stdout))
+        {
+            // Android reports -1 for a rate it doesn't know
+            if (!int.TryParse(match.Groups["Mbps"].Value, out var mbps) || mbps <= 0)
+                continue;
+
+            switch (match.Groups["Direction"].Value)
+            {
+                case "Tx ":
+                    tx = mbps;
+                    break;
+                case "Rx ":
+                    rx = mbps;
+                    break;
+                default:
+                    link = mbps;
+                    break;
+            }
+        }
+
+        // Before Android 10 there's only the plain link speed - the transmit rate, and our best guess at receive.
+        return (tx ?? link, rx ?? link);
+    }
+
+    /// <summary>IP transport ID → <c>ro.serialno</c>, read once per connection so it can join its device.</summary>
+    private static readonly ConcurrentDictionary<string, string> RemoteSerials = new();
+
+    public static string GetCachedRemoteSerial(string transportId) => RemoteSerials.GetValueOrDefault(transportId, "");
+
+    /// <returns>Whether a serial was newly read. A failed read is retried on the next call.</returns>
+    public static bool ResolveRemoteSerials(IReadOnlyCollection<DeviceSnapshot> snapshots, CancellationToken cancellationToken)
+    {
+        foreach (var stale in RemoteSerials.Keys.Where(id => snapshots.All(s => s.ID != id)))
+            RemoteSerials.TryRemove(stale, out _);
+
+        var pending = snapshots.Where(s => s.Type is DeviceType.Remote
+                                           && s.Status is DeviceStatus.Ok
+                                           && !RemoteSerials.ContainsKey(s.ID));
+
+        var resolved = false;
+
+        // Straight to the transport: routing would send this over the device's preferred connection.
+        foreach (var snapshot in pending)
+        {
+            if (ExecuteAdbCommand("-s", out string stdout, out _, cancellationToken, snapshot.ID, "shell", GET_PROP, SERIAL_NO) == 0)
+            {
+                RemoteSerials[snapshot.ID] = stdout.Trim();
+                resolved = true;
+            }
+        }
+
+        return resolved;
+    }
+
     public static void ConnectNetworkDevice(string fullAddress, CancellationToken cancellationToken) => NetworkDeviceOperation("connect", fullAddress, cancellationToken);
 
     public static void DisconnectNetworkDevice(string fullAddress, CancellationToken cancellationToken) => NetworkDeviceOperation("disconnect", fullAddress, cancellationToken);

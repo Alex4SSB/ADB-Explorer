@@ -11,6 +11,10 @@ public static partial class AdbRegEx
     [GeneratedRegex(@"^\w+: (?<Message>(?<AndroidPath>[^':]+):.*)$", RegexOptions.Multiline)]
     public static partial Regex RE_SHELL_ERROR();
 
+    /// <summary>The plain, Tx and Rx <c>Link speed</c> fields of <c>WifiInfo</c> - not their <c>Max Supported</c> variants.</summary>
+    [GeneratedRegex(@"(?:^|, )(?<Direction>Tx |Rx )?Link speed: (?<Mbps>-?\d+)Mbps", RegexOptions.Multiline)]
+    public static partial Regex RE_WIFI_LINK_SPEED();
+
     [GeneratedRegex(@"(?<FileSystem>[\w\/]+)\s+(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>.*?)[\r\n]")]
     public static partial Regex RE_EMULATED_STORAGE_SINGLE();
 
