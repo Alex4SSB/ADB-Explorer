@@ -25,13 +25,90 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <controls:FluentPathIcon Style="{StaticResource DeviceStatusPathIcon}" />
+                    <TextBox
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        FlowDirection="LeftToRight"
+                        IsVisibleChanged="NameTextBox_IsVisibleChanged"
+                        PreviewKeyDown="NameTextBox_PreviewKeyDown"
+                        Text="{Binding EditedName, UpdateSourceTrigger=PropertyChanged}">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Return" Command="{Binding EditNameCommand.Command}" />
+                        </TextBox.InputBindings>
+                        <TextBox.Style>
+                            <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="TextBox">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsEditingName}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <controls:SimpleStackPanel
+                        Grid.Column="2"
+                        Margin="8,0,0,0"
+                        Orientation="Horizontal"
+                        Spacing="2">
+                        <ui:Button
+                            Appearance="Primary"
+                            Command="{Binding ClearNameCommand.Command}"
+                            ToolTip="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_CLEAR}}">
+                            <ui:Button.Style>
+                                <Style BasedOn="{StaticResource RestartAppButtonStyle}" TargetType="ui:Button">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsEditingName}" Value="False">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:Button.Style>
+                            <ui:FontIcon FontSize="14" Glyph="&#xE711;" />
+                        </ui:Button>
+                        <ui:Button
+                            Appearance="Primary"
+                            Command="{Binding EditNameCommand.Command}"
+                            Style="{StaticResource RestartAppButtonStyle}">
+                            <ui:Button.Resources>
+                                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                    <Setter Property="FontSize" Value="14" />
+                                    <Setter Property="Glyph" Value="&#xE70F;" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsEditingName}" Value="True">
+                                            <Setter Property="Glyph" Value="&#xE73E;" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:Button.Resources>
+                            <ui:Button.ToolTip>
+                                <TextBlock>
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_MENU_EDIT}}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsEditingName}" Value="True">
+                                                    <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_MENU_SAVE_CHANGES}}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </ui:Button.ToolTip>
+                            <ui:FontIcon />
+                        </ui:Button>
+                    </controls:SimpleStackPanel>
                     <TextBlock Grid.Column="1" FlowDirection="LeftToRight">
                         <TextBlock.Style>
                             <Style BasedOn="{StaticResource DeviceNameTextBlockStyle}" TargetType="TextBlock">
                                 <Setter Property="Text" Value="{Binding Name}" />
                                 <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsEditingName}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
                                     <DataTrigger Binding="{Binding Status}" Value="Unauthorized">
                                         <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DEVICE_UNAUTH_NONAME}}" />
                                     </DataTrigger>
@@ -201,7 +278,7 @@
                                 <DataTrigger Binding="{Binding Status}" Value="Ok">
                                     <Setter Property="IsEnabled" Value="True" />
                                 </DataTrigger>
-                                <!-- An unauthorized or offline device must still be removable, to disconnect and retry -->
+                                <!--  An unauthorized or offline device must still be removable, to disconnect and retry  -->
                                 <DataTrigger Binding="{Binding RemoveCommand.IsEnabled}" Value="True">
                                     <Setter Property="IsEnabled" Value="True" />
                                 </DataTrigger>

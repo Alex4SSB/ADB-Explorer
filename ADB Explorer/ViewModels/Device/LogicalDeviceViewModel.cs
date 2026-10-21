@@ -34,6 +34,12 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     [ObservableProperty]
     public partial bool UseIdForName { get; set; }
 
+    [ObservableProperty]
+    public partial bool IsEditingName { get; set; }
+
+    [ObservableProperty]
+    public partial string? EditedName { get; set; }
+
     public ObservableList<DriveViewModel> Drives { get; set; } = [];
 
     [ObservableProperty]
@@ -43,7 +49,24 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
     #region Read only properties
 
-    public string Name
+    /// <summary>The name set by the user, or <see langword="null"/> when the device shows its regular name.</summary>
+    public string? CustomName
+    {
+        get
+        {
+            if (Data.Settings?.CustomDeviceNames is { } names && names.TryGetValue(SavedLocationsKey, out var name) && !string.IsNullOrWhiteSpace(name))
+                return name;
+
+            return null;
+        }
+    }
+
+    public bool HasCustomName => CustomName is not null;
+
+    public string Name => CustomName ?? DefaultName;
+
+    /// <summary>The device name derived from the device itself, ignoring <see cref="CustomName"/>.</summary>
+    public string DefaultName
     {
         get
         {
@@ -450,6 +473,8 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     public DeviceAction RemoveCommand { get; }
     public DeviceAction ToggleRootCommand { get; }
     public DeviceAction SideloadCommand { get; }
+    public DeviceAction EditNameCommand { get; }
+    public DeviceAction ClearNameCommand { get; }
     public List<RebootCommand> RebootCommands { get; } = [];
 
     #endregion
@@ -474,6 +499,9 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         RemoveCommand = DeviceHelper.RemoveDeviceCommand(this);
 
         ToggleRootCommand = DeviceHelper.ToggleRootDeviceCommand(this);
+
+        EditNameCommand = new(() => true, ToggleNameEdit);
+        ClearNameCommand = new(() => true, ClearCustomName);
 
         App.SafeInvoke(() =>
         {
@@ -685,7 +713,41 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         Device.Battery.Update(AdbService.GetBatteryInfo(this, cancellationToken));
     }
 
-    public void UpdateName() => OnPropertyChanged(nameof(Name));
+    public void UpdateName()
+    {
+        OnPropertyChanged(nameof(Name));
+        OnPropertyChanged(nameof(HasCustomName));
+    }
+
+    /// <summary>Starts editing the name; when already editing, applies the edit.</summary>
+    private void ToggleNameEdit()
+    {
+        if (!IsEditingName)
+        {
+            EditedName = Name;
+            IsEditingName = true;
+            return;
+        }
+
+        var text = EditedName?.Trim() ?? "";
+        if (text.Length == 0 || text == DefaultName)
+            Data.Settings.CustomDeviceNames.Remove(SavedLocationsKey);
+        else
+            Data.Settings.CustomDeviceNames[SavedLocationsKey] = text;
+
+        IsEditingName = false;
+        UpdateName();
+    }
+
+    private void ClearCustomName()
+    {
+        Data.Settings.CustomDeviceNames.Remove(SavedLocationsKey);
+
+        IsEditingName = false;
+        UpdateName();
+    }
+
+    public void CancelNameEdit() => IsEditingName = false;
 
     #endregion
 

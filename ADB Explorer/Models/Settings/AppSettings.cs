@@ -160,6 +160,7 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
         _locationThumbSize ??= [];
         _locationSorting ??= [];
         SavedLocations ??= [];
+        CustomDeviceNames ??= [];
 
         LocationThumbSize = _locationThumbSize;
         LocationSorting = _locationSorting;
@@ -213,6 +214,9 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     [JsonConverter(typeof(SavedLocationsJsonConverter))]
     [ObservableProperty]
     public partial ObservableCollection<SavedLocationEntry> SavedLocations { get; set; } = [];
+
+    /// <summary>User-defined device names, keyed by <see cref="LogicalDeviceViewModel.SavedLocationsKey"/>.</summary>
+    public Dictionary<string, string> CustomDeviceNames { get; set; } = [];
 
     [ObservableProperty]
     public partial StorageDevice[] StorageDevices { get; set; }
