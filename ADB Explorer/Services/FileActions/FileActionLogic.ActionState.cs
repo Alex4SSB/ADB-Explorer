@@ -220,7 +220,13 @@ internal static partial class FileActionLogic
         actions.IsOpenItemLocationEnabled = !c.IsRecycleBin && c.IsSearchMode && c.SelectedFile is not null;
         actions.IsArchive = c.IsArchive;
 
-        actions.IsCurrentLocationReadOnly = (c.IsExplorerFolder || c.CanPasteIntoTar) && !c.IsWritable;
+        // With a single folder selected, paste targets that folder rather than the listing.
+        var pasteTargetWritable = c.IsWritable;
+        if (c.SelectedFile is not null
+            && ArchiveHelper.IsPasteTargetContainer(c.SelectedFile, c.DeviceId ?? ""))
+            pasteTargetWritable = IsSelectedTargetModifiable(c);
+
+        actions.IsCurrentLocationReadOnly = (c.IsExplorerFolder || c.CanPasteIntoTar) && !pasteTargetWritable;
         actions.IsSelectionFuseProtectedAndroidRoot = c.HasFileSelection && c.FuseProtectedRoot;
 
         actions.IsSelectionIllegalOnWindows = c.HasFileSelection
@@ -316,13 +322,17 @@ internal static partial class FileActionLogic
         var singlePasteTarget = c.SelectedFile is not null
             && ArchiveHelper.IsPasteTargetContainer(c.SelectedFile, c.DeviceId ?? "");
 
-        actions.ContextPushEnabled = c.IsWritable
+        // A selected folder is the push target, so its own path decides writability,
+        // not the listing it sits in (e.g. /data selected from the read-only root).
+        bool contextPushWritable;
+        if (singlePasteTarget)
+            contextPushWritable = IsSelectedTargetModifiable(c);
+        else
+            contextPushWritable = c.IsWritable && c.ArchiveAllowsModify && !c.IsSearchMode && !c.HasFileSelection;
+
+        actions.ContextPushEnabled = contextPushWritable
             && !c.IsRecycleBin
-            && !c.IsAppDrive
-            && c.ArchiveAllowsModify
-            && (c.IsSearchMode
-                ? singlePasteTarget
-                : !c.HasFileSelection || singlePasteTarget);
+            && !c.IsAppDrive;
 
         var contextNewOnFolder = c.IsTreeList && c.SelectedFile is { IsDirectory: true };
 
@@ -342,6 +352,17 @@ internal static partial class FileActionLogic
             && !c.IsTreeList
             && !c.HasFileSelection
             && !c.HasPackageSelection;
+    }
+
+    private static bool IsSelectedTargetModifiable(ActionContext c)
+    {
+        if (c.SelectedFile is not { } selected || c.DeviceId is null)
+            return false;
+
+        var path = selected.IsLink ? selected.LinkTarget : selected.FullPath;
+        path = ArchiveHelper.ResolvePasteTargetPath(path, c.DeviceId);
+
+        return DriveHelper.IsModificationAllowedAt(path, c.DeviceId);
     }
 
     private static void UpdateDeleteActions(ActionContext c)
