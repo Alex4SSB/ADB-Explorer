@@ -2310,7 +2310,16 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_ITEM_LOCATION", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0} items.
+        /// </summary>
+        public static string S_ITEMS_PLURAL {
+            get {
+                return ResourceManager.GetString("S_ITEMS_PLURAL", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to item selected.
         /// </summary>

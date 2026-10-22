@@ -333,7 +333,8 @@ public partial class NavigationBox : UserControl
         if (_breadcrumbs.Count == 0)
             return;
 
-        if (device?.Root is RootStatus.Enabled)
+        // A page's single crumb is the page name, not the device
+        if (device?.Root is RootStatus.Enabled && !_locations[0].IsPage)
             _breadcrumbs[0].Appearance = Wpf.Ui.Controls.ControlAppearance.Caution;
 
         _breadcrumbs[^1].IsLast = true;
