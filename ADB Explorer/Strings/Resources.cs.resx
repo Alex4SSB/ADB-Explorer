@@ -2111,4 +2111,7 @@ Kontroly se snaží zabránit tomu, aby nic netušící uživatel spustil potenc
   <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
     <value>Vytvořit soubor .APKBKP s instalací aplikace a daty OBB</value>
   </data>
+  <data name="S_ITEMS_PLURAL" xml:space="preserve">
+    <value>Položky: {0}</value>
+  </data>
 </root>
