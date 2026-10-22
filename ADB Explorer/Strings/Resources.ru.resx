@@ -1885,4 +1885,7 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_MENU_INVERT_SELECTION" xml:space="preserve">
     <value>Инвертировать выделение</value>
   </data>
+  <data name="S_ITEMS_PLURAL" xml:space="preserve">
+    <value>{0} элементы</value>
+  </data>
 </root>
