@@ -43,6 +43,7 @@ public class FileTransferOperation : AbstractSyncFileOperation
     private long _lastUiUpdateTicks;
     private int _activeFiles;
     private bool _isCanceled;
+    private int _autoRetries;
 
     public override SyncFile AndroidPath => FilePath;
 
@@ -76,9 +77,25 @@ public class FileTransferOperation : AbstractSyncFileOperation
         AltTarget = new(archiveDisplayPath);
     }
 
+    /// <summary>One op for <paramref name="items"/> sharing a parent folder, transferred into <paramref name="targetFolder"/>.</summary>
+    public static FileTransferOperation TransferBatch(
+        IReadOnlyList<SyncFile> items,
+        SyncFile targetFolder,
+        LogicalDeviceViewModel sourceDevice,
+        LogicalDeviceViewModel targetDevice,
+        bool isMove,
+        Dispatcher dispatcher)
+    {
+        var op = new FileTransferOperation(CreateBatchRoot(items), targetFolder, sourceDevice, targetDevice, isMove, dispatcher);
+        op.SetBatchItems(items);
+
+        return op;
+    }
+
     public void RemoveSource()
     {
-        ShellFileOperation.SilentDelete(Device, FilePath.FullPath);
+        // A batch's root is the parent folder, which holds more than what was transferred.
+        ShellFileOperation.SilentDelete(Device, [.. TransferredItems.Select(item => item.Source.FullPath)]);
         SourceRemoved = true;
     }
 
@@ -91,6 +108,7 @@ public class FileTransferOperation : AbstractSyncFileOperation
         StatusInfo = new InProgSyncProgressViewModel();
 
         _isCanceled = false;
+        _autoRetries = Data.Settings.AutoRetryFailedItems;
         _activeFiles = 0;
         _progress.Clear();
         Interlocked.Exchange(ref _lastUiUpdateTicks, 0);
@@ -143,7 +161,32 @@ public class FileTransferOperation : AbstractSyncFileOperation
 
     private void TransferFile(SyncFile item)
     {
-        var progress = _progress.GetOrAdd(item.FullPath, _ => new());
+        for (var retriesLeft = _autoRetries; ; retriesLeft--)
+        {
+            var error = TryTransferFile(item);
+            if (error is null)
+                return;
+
+            // A device that dropped won't take the file on a retry either
+            var failedAt = Stopwatch.GetTimestamp();
+            if (_isCanceled
+                || retriesLeft <= 0
+                || !AdbService.IsTransportOnline(Device.DeviceData, failedAt)
+                || !AdbService.IsTransportOnline(TargetDevice!.DeviceData, failedAt))
+            {
+                item.AddUpdates(new SyncErrorInfo(item.FullPath, error.Message));
+                return;
+            }
+        }
+    }
+
+    /// <returns>Why the file failed, or null once it made it to the target.</returns>
+    private Exception? TryTransferFile(SyncFile item)
+    {
+        // A retry starts the file over
+        var progress = new FileProgress();
+        _progress[item.FullPath] = progress;
+
         var stagedPath = Path.Combine(_stagingRoot, Guid.NewGuid().ToString("N"));
 
         var targetPath = FilePath.IsDirectory
@@ -171,10 +214,12 @@ public class FileTransferOperation : AbstractSyncFileOperation
             }
 
             item.AddUpdates(new AdbSyncProgressInfo(item.FullPath, null, 100, item.Size));
+
+            return null;
         }
         catch (Exception e)
         {
-            item.AddUpdates(new SyncErrorInfo(item.FullPath, e.Message));
+            return e;
         }
         finally
         {
@@ -256,7 +301,8 @@ public class FileTransferOperation : AbstractSyncFileOperation
             completed = 1;
         }
 
-        if (completed == 0)
+        // A retry whose files all failed again still has what the runs before it completed
+        if (completed == 0 && !HasCompletedBefore)
         {
             var message = files.Select(f => f.LastUpdate).OfType<SyncErrorInfo>().LastOrDefault()?.Message ?? "";
 
@@ -273,7 +319,8 @@ public class FileTransferOperation : AbstractSyncFileOperation
             RemoveSource();
 
         var totalSeconds = Math.Max(0, (DateTime.Now - TransferStart).TotalSeconds);
-        AdbSyncStatsInfo stats = new(FilePath.FullPath, Files.Sum(f => f.Size ?? 0), totalSeconds, completed, skipped);
+        var (completedTotal, bytesTotal) = RecordRunResult(completed, Files.Sum(f => f.Size ?? 0));
+        AdbSyncStatsInfo stats = new(FilePath.FullPath, bytesTotal, totalSeconds, completedTotal, skipped);
 
         Status = OperationStatus.Completed;
         StatusInfo = new CompletedSyncProgressViewModel(stats);
@@ -281,6 +328,9 @@ public class FileTransferOperation : AbstractSyncFileOperation
 
     private void ReleaseResources()
     {
+        KeepFailedFiles();
+
+
         // Only the files that failed are kept, so the details view can show why.
         var faulty = Files.Where(f => !f.IsDirectory && f.LastUpdate is SyncErrorInfo)
                           .Take(20)

@@ -308,7 +308,7 @@ internal static class ExplorerContextMenu
         new SubMenuSeparator(),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Enter),
-            new BaseIcon("\uE838", 16)),
+            new BaseIcon(new FolderOpenIcon(), 16)),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextOpenInNewTab),
             new BaseIcon(new OpenInNewTabIcon(), 16)),

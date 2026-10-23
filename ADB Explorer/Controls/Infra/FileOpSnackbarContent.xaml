@@ -33,6 +33,9 @@
                 <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="True">
                     <Setter Property="Text" Value="{Binding FilePath.FullName}" />
                 </DataTrigger>
+                <DataTrigger Binding="{Binding IsBatch}" Value="True">
+                    <Setter Property="Text" Value="{Binding BatchName}" />
+                </DataTrigger>
                 <DataTrigger Binding="{Binding OperationName}" Value="Rename">
                     <Setter Property="Text" Value="{Binding TargetPath.NoExtName}" />
                 </DataTrigger>
@@ -131,12 +134,27 @@
             <emoji:TextBlock Margin="4,0,0,0" Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
         </DataTemplate>
 
+        <DataTemplate x:Key="CompactBatchOpFileNameTemplate">
+            <Grid Margin="4,0,0,0" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <controls:DocumentMultipleIcon
+                    Margin="0,0,4,0"
+                    IsMonochrome="True"
+                    Size="16" />
+                <emoji:TextBlock Grid.Column="1" Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
+            </Grid>
+        </DataTemplate>
+
         <DataTemplate x:Key="UninstallOpFileNameTemplate">
             <TextBlock Margin="4,0,0,0" Text="{Binding PackageName}" />
         </DataTemplate>
 
         <helpers:FileOpFileNameTemplateSelector
             x:Key="CompactFileOpFileNameTemplateSelector"
+            BatchOpFileNameTemplate="{StaticResource CompactBatchOpFileNameTemplate}"
             FolderCompletedOpFileNameTemplate="{StaticResource CompactFolderInProgOpFileNameInnerTemplate}"
             FolderInProgOpFileNameTemplate="{StaticResource CompactFolderInProgOpFileNameInnerTemplate}"
             RegularOpFileNameTemplate="{StaticResource RegularOpFileNameTemplate}"

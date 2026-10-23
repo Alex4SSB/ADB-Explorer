@@ -141,6 +141,8 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     public const int MaxSimultaneousOpsMax = 999;
     public const int MaxSimultaneousOpsDefault = 32;
 
+    public const int AutoRetryFailedItemsMax = 10;
+
     /// <summary>
     /// Concurrent thumbnail pulls and APK icon loads: ⌈<see cref="MaxSimultaneousOps"/> / 6⌉.
     /// Each of those jobs fans out into several adb processes, so the full ops limit is too high.
@@ -510,6 +512,13 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     [JsonConverter(typeof(MaxSimultaneousOpsJsonConverter))]
     [ObservableProperty]
     public partial int MaxSimultaneousOps { get; set; } = MaxSimultaneousOpsDefault;
+
+    /// <summary>
+    /// How many more times a file that failed to sync is tried before it is left failed (0 - never).
+    /// A lane that disconnects doesn't use these up, its files move to the other lane.
+    /// </summary>
+    [ObservableProperty]
+    public partial int AutoRetryFailedItems { get; set; } = 1;
 
     [ObservableProperty]
     public partial bool RescanOnPush { get; set; } = true;

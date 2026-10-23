@@ -199,11 +199,13 @@ public static class Security
     /// <summary>
     /// On-device folder/file hashes via <c>find … -exec cksum -HNPL|md5sum</c>.
     /// Keys are relative to <paramref name="path"/> (basename for a single file).
+    /// With <paramref name="itemNames"/>, only those children of <paramref name="path"/> are hashed.
     /// </summary>
     public static Dictionary<string, string> CalculateAndroidFolderHash(
         FilePath path,
         string deviceId,
-        ValidationHashMode mode = ValidationHashMode.Md5)
+        ValidationHashMode mode = ValidationHashMode.Md5,
+        IEnumerable<string>? itemNames = null)
     {
         var hashCmd = mode switch
         {
@@ -214,9 +216,11 @@ public static class Security
         if (hashCmd is null)
             return [];
 
+        var startPaths = itemNames?.Select(name => FileHelper.ConcatPaths(path.FullPath, name)) ?? [path.FullPath];
+
         // cksum -HNPL / md5sum both print "HASH PATH".
         string[] args =
-            [AdbService.EscapeAdbShellString(path.FullPath), "-type", "f", "-exec", .. hashCmd.Split(' '), "{}", @"\;"];
+            [.. startPaths.Select(p => AdbService.EscapeAdbShellString(p)), "-type", "f", "-exec", .. hashCmd.Split(' '), "{}", @"\;"];
 
         AdbService.ExecuteDeviceAdbShellCommand(deviceId, "find", out string stdout, out _, new(), args);
 
@@ -486,13 +490,18 @@ public static class Security
             return CalculateAndroidFolderHash(op.TargetPath, (op.TargetDevice ?? op.Device).ID, hashMode);
         }
 
+        // A batch's paths are the parent folders, of which only its items were transferred
+        IEnumerable<string>? itemNames = null;
+        if (op is AbstractSyncFileOperation { IsBatch: true } batch)
+            itemNames = batch.BatchItems.Select(item => item.FullName);
+
         if (op.TargetDevice is not null)
         {
             var sharedMode = ShellCommands.GetSharedValidationHashMode(op.Device.ID, op.TargetDevice.ID);
             if (isSource)
-                return CalculateAndroidFolderHash(op.FilePath, op.Device.ID, sharedMode);
+                return CalculateAndroidFolderHash(op.FilePath, op.Device.ID, sharedMode, itemNames);
 
-            return CalculateAndroidFolderHash(op.TargetPath, op.TargetDevice.ID, sharedMode);
+            return CalculateAndroidFolderHash(op.TargetPath, op.TargetDevice.ID, sharedMode, itemNames);
         }
 
         if (mode is ValidationHashMode.None)
@@ -500,10 +509,21 @@ public static class Security
 
         var path = isSource ? op.FilePath : op.TargetPath;
         if (path.PathType is AbstractFile.FilePathType.Android)
-            return CalculateAndroidFolderHash(path, op.Device.ID, mode);
+            return CalculateAndroidFolderHash(path, op.Device.ID, mode, itemNames);
 
-        return mode is ValidationHashMode.Crc32
-            ? CalculateWindowsFolderCrc32(path.FullPath)
-            : CalculateWindowsFolderHash(path.FullPath);
+        return CalculateWindowsHashes(path.FullPath, mode is ValidationHashMode.Crc32, itemNames);
+    }
+
+    /// <summary>With <paramref name="itemNames"/>, only those children of <paramref name="path"/> are hashed, keyed relative to it.</summary>
+    private static Dictionary<string, string> CalculateWindowsHashes(string path, bool useCrc, IEnumerable<string>? itemNames)
+    {
+        Func<string, string, Dictionary<string, string>> hash = useCrc ? CalculateWindowsFolderCrc32 : CalculateWindowsFolderHash;
+
+        if (itemNames is null)
+            return hash(path, "");
+
+        return itemNames.AsParallel()
+                        .SelectMany(name => hash(FileHelper.ConcatPaths(path, name, '\\'), path))
+                        .ToDictionary();
     }
 }

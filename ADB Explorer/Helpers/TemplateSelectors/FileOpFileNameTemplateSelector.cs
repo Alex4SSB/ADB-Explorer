@@ -7,6 +7,7 @@ internal class FileOpFileNameTemplateSelector : DataTemplateSelector
     public DataTemplate? FolderCompletedOpFileNameTemplate { get; set; }
     public DataTemplate? FolderInProgOpFileNameTemplate { get; set; }
     public DataTemplate? RegularOpFileNameTemplate { get; set; }
+    public DataTemplate? BatchOpFileNameTemplate { get; set; }
 
     public override DataTemplate SelectTemplate(object item, DependencyObject container)
     {
@@ -15,6 +16,10 @@ internal class FileOpFileNameTemplateSelector : DataTemplateSelector
 
         if (fileop is PackageInstallOperation pkgInstall && pkgInstall.IsUninstall)
             return UninstallOpFileNameTemplate ?? new();
+
+        // A batch's root is the items' parent folder, but it shows as "x items", not as a folder
+        if (fileop.IsBatch)
+            return BatchOpFileNameTemplate ?? new();
 
         if (fileop.FilePath.IsDirectory)
             return (fileop.Status is FileOperation.OperationStatus.InProgress ? FolderInProgOpFileNameTemplate : FolderCompletedOpFileNameTemplate) ?? new();

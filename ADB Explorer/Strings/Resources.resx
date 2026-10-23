@@ -1239,6 +1239,18 @@ Cancel All Running</value>
     <value>Validate {0}</value>
     <comment>Validate a file operation, by comparing MD5 of source and target files</comment>
   </data>
+  <data name="S_ACTION_RETRY" xml:space="preserve">
+    <value>Retry failed items of {0}</value>
+    <comment>Transfer again the files that failed in the selected file operations. 0 = operation / operations</comment>
+  </data>
+  <data name="S_SETTINGS_AUTO_RETRY" xml:space="preserve">
+    <value>Auto retry failed items</value>
+    <comment>The setting used to set how many times a file that failed to transfer is retried automatically (0 = never)</comment>
+  </data>
+  <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
+    <value>times</value>
+    <comment>The unit displayed next to a setting counting repetitions, e.g. "1 times"</comment>
+  </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>Link</value>
     <comment>A link to an unknown file type</comment>

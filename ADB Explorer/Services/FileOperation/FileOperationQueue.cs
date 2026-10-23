@@ -268,11 +268,11 @@ public class FileOperationQueue : ObservableObject
     {
         // A device to device transfer writes to its target device.
         var device = fileOp.TargetDevice ?? fileOp.Device;
-        var target = fileOp.TargetPath.ParentPath;
+        var target = fileOp.TargetFolderPath;
         if (device.AndroidVersion < AdbExplorerConst.MIN_MEDIA_SCAN_ANDROID_VER
             || Operations.Any(op =>
                 op.TypeOnDevice == fileOp.TypeOnDevice
-                && op.TargetPath.ParentPath == target
+                && op.TargetFolderPath == target
                 && op.Status is FileOperation.OperationStatus.Waiting or FileOperation.OperationStatus.InProgress))
         {
             return;

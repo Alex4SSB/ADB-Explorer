@@ -198,6 +198,14 @@ public abstract class FileOperation : ObservableObject
 
     public ObservableList<SyncFile> Children => AndroidPath?.Children;
 
+    /// <summary>Whether this op carries several selected items, its <see cref="FilePath"/> and <see cref="TargetPath"/> being their parent folders.</summary>
+    public virtual bool IsBatch => false;
+
+    /// <summary>The folder holding the target - the target itself for a batch.</summary>
+    public string TargetFolderPath => IsBatch ? TargetPath.FullPath : TargetPath.ParentPath;
+
+    private string ContainingFolder(FilePath path) => IsBatch ? path.FullPath : path.ParentPath;
+
     public string SourcePathString
     {
         get
@@ -226,7 +234,7 @@ public abstract class FileOperation : ObservableObject
                 }
             }
 
-            return FilePath.ParentPath;
+            return ContainingFolder(FilePath);
         }
     }
 
@@ -240,7 +248,7 @@ public abstract class FileOperation : ObservableObject
             if (TargetPath is null)
                 return "";
 
-            return TargetPath.ParentPath;
+            return TargetFolderPath;
         }
     }
 
@@ -413,11 +421,11 @@ public abstract class FileOperation : ObservableObject
                 if (this is FileSyncOperation sync && sync.OriginalShellItem is not null)
                     sync.OriginalShellItem.ViewInExplorer();
                 else
-                    Process.Start("explorer.exe", file.ParentPath);
+                    Process.Start("explorer.exe", ContainingFolder(file));
             }
             else
             {
-                NavigateDeviceLocation(new(file.ParentPath), target);
+                NavigateDeviceLocation(new(ContainingFolder(file)), target);
             }
         }
         else if (location is AdbLocation loc)
@@ -449,16 +457,30 @@ public abstract class FileOperation : ObservableObject
 
     public abstract void Start();
 
-    /// <summary>Runs <paramref name="onFinished"/> once, when the operation completes, fails or is canceled.</summary>
+    /// <summary>
+    /// Runs <paramref name="onFinished"/> once the operation completes, fails or is canceled -
+    /// and once more after each retry of it.
+    /// </summary>
     public void WhenFinished(Action<OperationStatus> onFinished)
     {
+        var isArmed = true;
+
         void Handler(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName is not nameof(Status)
-                || Status is OperationStatus.None or OperationStatus.Waiting or OperationStatus.InProgress)
+            if (e.PropertyName is not nameof(Status))
                 return;
 
-            PropertyChanged -= Handler;
+            // Waiting again means a retry, whose end is reported too
+            if (Status is OperationStatus.None or OperationStatus.Waiting or OperationStatus.InProgress)
+            {
+                isArmed = true;
+                return;
+            }
+
+            if (!isArmed)
+                return;
+
+            isArmed = false;
             onFinished(Status);
         }
 

@@ -186,6 +186,46 @@ public partial class AdbService
         }
     }
 
+    private static readonly Lock TransportCheckLock = new();
+    private static readonly TimeSpan TransportCheckInterval = TimeSpan.FromMilliseconds(250);
+    private static HashSet<string> _onlineSerials = [];
+    private static long _onlineSerialsQueriedAt;
+
+    /// <summary>
+    /// Whether the adb server lists this transport as online, as asked after <paramref name="since"/> (a <see cref="Stopwatch"/> timestamp).
+    /// One query answers every check made before it started, and queries are spaced out, so a burst of failures doesn't flood the adb server.
+    /// </summary>
+    public static bool IsTransportOnline(DeviceData deviceData, long since)
+    {
+        lock (TransportCheckLock)
+        {
+            if (_onlineSerialsQueriedAt < since)
+            {
+                var wait = TransportCheckInterval - Stopwatch.GetElapsedTime(_onlineSerialsQueriedAt);
+                if (wait > TimeSpan.Zero)
+                    Thread.Sleep(wait);
+
+                _onlineSerialsQueriedAt = Stopwatch.GetTimestamp();
+                _onlineSerials = QueryOnlineSerials();
+            }
+
+            return _onlineSerials.Contains(deviceData.Serial);
+        }
+    }
+
+    // Asked of the adb server directly, since the app's device list only catches up on its next poll
+    private static HashSet<string> QueryOnlineSerials()
+    {
+        try
+        {
+            return [.. new AdbClient().GetDevices().Where(d => d.State is DeviceState.Online).Select(d => d.Serial)];
+        }
+        catch
+        {
+            return [];
+        }
+    }
+
     private static readonly string[] INET_ARGS = ["-f", "inet", "addr", "show", "wlan0"];
 
     public static void Reboot(string deviceId, string arg)

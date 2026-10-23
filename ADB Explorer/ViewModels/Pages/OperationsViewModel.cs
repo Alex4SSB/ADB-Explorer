@@ -115,6 +115,7 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
             {
                 UpdateTooltips();
                 ValidateOpAction.NotifyIsEnabledChanged();
+                RetryOpAction.NotifyIsEnabledChanged();
             }
         }
     }
@@ -125,6 +126,8 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
 
     public BaseAction ValidateOpAction { get; private set; }
 
+    public BaseAction RetryOpAction { get; private set; }
+
     public BaseAction AddTestOpAction { get; private set; }
 
     [ObservableProperty]
@@ -133,12 +136,16 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
     [ObservableProperty]
     public partial string ValidateTooltip { get; private set; }
 
+    [ObservableProperty]
+    public partial string RetryTooltip { get; private set; }
+
     public OperationsViewModel()
     {
         _operationsSource.Source = Array.Empty<FileOperation>();
 
         RemoveOpAction = new(() => false, () => { });
         ValidateOpAction = new(() => false, () => { });
+        RetryOpAction = new(() => false, () => { });
         AddTestOpAction = new(() => false, () => { });
 
         InitColumns();
@@ -203,6 +210,14 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
             }
         });
 
+        RetryOpAction = new(() => SelectedFileOps.Any(op => op is AbstractSyncFileOperation { CanRetry: true }), () =>
+        {
+            foreach (var item in SelectedFileOps.OfType<AbstractSyncFileOperation>())
+            {
+                item.Retry();
+            }
+        });
+
         AddTestOpAction = new(() => Data.DevicesObject?.Current is not null, () =>
         {
             var device = Data.DevicesObject?.Current;
@@ -231,5 +246,6 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
 
         RemoveTooltip = string.Format(Strings.Resources.S_REM_DEVICE_TITLE, opString);
         ValidateTooltip = string.Format(Strings.Resources.S_ACTION_VALIDATE, opString);
+        RetryTooltip = string.Format(Strings.Resources.S_ACTION_RETRY, opString);
     }
 }

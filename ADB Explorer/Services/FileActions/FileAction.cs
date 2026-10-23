@@ -67,6 +67,7 @@ public static class AppActions
         FileActionType.CompressTo or FileActionType.NewCompressTo or FileActionType.BackupPackage => new(new ZipIcon(), size, RtlBehavior.ForceLtr),
         FileActionType.PasteLink => new(new DocumentLinkIcon(), size),
         FileActionType.SearchApkOnWeb => new(new GlobeSearchIcon(), size),
+        FileActionType.FollowLink => new(new FolderOpenIcon(), size),
         _ => new(Icons[type], size),
     };
 

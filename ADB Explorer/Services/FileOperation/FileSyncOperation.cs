@@ -28,6 +28,7 @@ public class FileSyncOperation : AbstractSyncFileOperation
     private static readonly long UiUpdateThrottleTicks = TimeSpan.FromMilliseconds(150).Ticks;
 
     private bool _useSyncV2;
+    private int _autoRetries;
 
     public override SyncFile AndroidPath => FilePath.PathType is AbstractFile.FilePathType.Android
         ? FilePath
@@ -87,6 +88,8 @@ public class FileSyncOperation : AbstractSyncFileOperation
         Status = OperationStatus.InProgress;
         StatusInfo = new InProgSyncProgressViewModel();
         _cancelTokenSource = new CancellationTokenSource();
+        _isCanceled = false;
+        _autoRetries = Data.Settings.AutoRetryFailedItems;
 
         ProgressUpdates = [];
         ProgressUpdates.CollectionChanged += ProgressUpdates_CollectionChanged;
@@ -227,7 +230,8 @@ public class FileSyncOperation : AbstractSyncFileOperation
                 completed = 1;
             }
 
-            if (filesCount == 1 && completed == 0)
+            // A retry whose file failed again still has what the runs before it completed
+            if (filesCount == 1 && completed == 0 && !HasCompletedBefore)
             {
                 string message = FilePath.LastUpdate is SyncErrorInfo errorInfo
                     ? errorInfo.Message
@@ -244,7 +248,8 @@ public class FileSyncOperation : AbstractSyncFileOperation
                 if (totalSeconds < 0)
                     totalSeconds = 0;
 
-                AdbSyncStatsInfo adbInfo = new(FilePath.FullPath, Interlocked.Read(ref _totalBytes), totalSeconds, completed, filesCount - completed);
+                var (completedTotal, bytesTotal) = RecordRunResult(completed, Interlocked.Read(ref _totalBytes));
+                AdbSyncStatsInfo adbInfo = new(FilePath.FullPath, bytesTotal, totalSeconds, completedTotal, filesCount - completed);
                 StatusInfo = new CompletedSyncProgressViewModel(adbInfo);
             }
 
@@ -486,29 +491,65 @@ public class FileSyncOperation : AbstractSyncFileOperation
 
     private void TransferFile(SyncFile item, TransferLane lane, TransferLane? other, Mutex mutex, UnixFileStatus fileMode)
     {
+        for (var retriesLeft = _autoRetries; ; retriesLeft--)
+        {
+            var (error, failedLane, failedAt) = TryTransferFile(item, lane, other, mutex, fileMode);
+            if (error is null)
+                return;
+
+            // A lane that dropped already left the file to the other one; only a live lane's failure is retried
+            if (_isCanceled || retriesLeft <= 0 || !AdbService.IsTransportOnline(failedLane.DeviceData, failedAt))
+            {
+                AddUpdates([new SyncErrorInfo(item.FullPath, error.Message)]);
+                return;
+            }
+
+            if (failedLane != lane)
+            {
+                other = lane;
+                lane = failedLane;
+            }
+
+            lane.Claim(item.Size ?? 0);
+        }
+    }
+
+    /// <returns>The error, the lane and the <see cref="Stopwatch"/> timestamp it happened on - or a null error once the file synced.</returns>
+    private (Exception? Error, TransferLane Lane, long FailedAt) TryTransferFile(SyncFile item, TransferLane lane, TransferLane? other, Mutex mutex, UnixFileStatus fileMode)
+    {
         try
         {
             SyncFileOver(lane, item, mutex, fileMode);
             Interlocked.Exchange(ref lane.Strikes, 0);
+
+            return (null, lane, 0);
         }
-        catch (Exception) when (!_isCanceled && other is not null)
+        catch (Exception e) when (!_isCanceled && other is not null)
         {
+            var failedAt = Stopwatch.GetTimestamp();
+
+            // While the lane is still there, the fault is the file's - left to the auto retries
+            if (AdbService.IsTransportOnline(lane.DeviceData, failedAt))
+                return (e, lane, failedAt);
+
             other.Claim(item.Size ?? 0);
 
-            // Succeeding over the other lane means the fault was this lane's, not the file's.
+            // The lane was lost, so the file moves to the other one
             try
             {
                 SyncFileOver(other, item, mutex, fileMode);
                 Interlocked.Increment(ref lane.Strikes);
+
+                return (null, other, 0);
             }
-            catch (Exception e)
+            catch (Exception otherError)
             {
-                AddUpdates([new SyncErrorInfo(item.FullPath, e.Message)]);
+                return (otherError, other, Stopwatch.GetTimestamp());
             }
         }
         catch (Exception e)
         {
-            AddUpdates([new SyncErrorInfo(item.FullPath, e.Message)]);
+            return (e, lane, Stopwatch.GetTimestamp());
         }
     }
 
@@ -751,6 +792,8 @@ public class FileSyncOperation : AbstractSyncFileOperation
 
     private void ReleaseTransferResources()
     {
+        KeepFailedFiles();
+
         if (StatusInfo is CompletedSyncProgressViewModel completed && completed.FilesSkipped > 0)
         {
             var faultyFiles = Files.Where(f => !f.IsDirectory && f.LastUpdate is SyncErrorInfo)
@@ -794,6 +837,15 @@ public class FileSyncOperation : AbstractSyncFileOperation
 
     public static FileSyncOperation PushFile(SyncFile sourcePath, SyncFile targetPath, LogicalDeviceViewModel device, Dispatcher dispatcher)
         => new(OperationType.Push, sourcePath, targetPath, device, dispatcher);
+
+    /// <summary>One op for <paramref name="items"/> sharing a parent folder, synced into <paramref name="targetFolder"/>.</summary>
+    public static FileSyncOperation SyncBatch(OperationType operationName, IReadOnlyList<SyncFile> items, SyncFile targetFolder, LogicalDeviceViewModel device, Dispatcher dispatcher)
+    {
+        var op = new FileSyncOperation(operationName, CreateBatchRoot(items), targetFolder, device, dispatcher);
+        op.SetBatchItems(items);
+
+        return op;
+    }
 
     public static FileSyncOperation CreateTestPullOp(LogicalDeviceViewModel device, int percentage)
     {

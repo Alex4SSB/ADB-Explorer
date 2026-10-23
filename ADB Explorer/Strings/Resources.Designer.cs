@@ -187,6 +187,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Retry failed items of {0}.
+        /// </summary>
+        public static string S_ACTION_RETRY {
+            get {
+                return ResourceManager.GetString("S_ACTION_RETRY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Update.
         /// </summary>
         public static string S_ACTION_UPDATE {
@@ -2310,7 +2319,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_ITEM_LOCATION", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to {0} items.
         /// </summary>
@@ -2319,7 +2328,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_ITEMS_PLURAL", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to item selected.
         /// </summary>
@@ -4143,6 +4152,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Auto retry failed items.
+        /// </summary>
+        public static string S_SETTINGS_AUTO_RETRY {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_AUTO_RETRY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Automatically Enable Root.
         /// </summary>
         public static string S_SETTINGS_AUTO_ROOT {
@@ -4621,6 +4639,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_UNAVAILABLE_ON_SYSTEM {
             get {
                 return ResourceManager.GetString("S_SETTINGS_UNAVAILABLE_ON_SYSTEM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to times.
+        /// </summary>
+        public static string S_SETTINGS_UNIT_TIMES {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_UNIT_TIMES", resourceCulture);
             }
         }
         
