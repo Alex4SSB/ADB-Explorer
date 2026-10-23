@@ -49,5 +49,14 @@
     "ApkInstallers_other": "{{count}} קבצי התקנת APK",
     "Packages_one": "חבילה אחת",
     "Packages_two": "שתי חבילות",
-    "Packages_other": "{{count}} חבילות"
+    "Packages_other": "{{count}} חבילות",
+    "RemoveOperations_one": "הסר פעולה אחת",
+    "RemoveOperations_two": "הסר שתי פעולות",
+    "RemoveOperations_other": "הסר {{count}} פעולות",
+    "ValidateOperations_one": "אימות פעולה אחת",
+    "ValidateOperations_two": "אימות שתי פעולות",
+    "ValidateOperations_other": "אימות {{count}} פעולות",
+    "RetryOperations_one": "נסה שוב פריטים שנכשלו בפעולה אחת",
+    "RetryOperations_two": "נסה שוב פריטים שנכשלו בשתי פעולות",
+    "RetryOperations_other": "נסה שוב פריטים שנכשלו ב-{{count}} פעולות"
 }
