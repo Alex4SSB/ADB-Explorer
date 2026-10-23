@@ -1809,4 +1809,19 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_OPEN_IN_NEW_TAB" xml:space="preserve">
     <value>פתח בכרטיסיה חדשה</value>
   </data>
+  <data name="S_MENU_SELECT_NONE" xml:space="preserve">
+    <value>בחר כלום</value>
+  </data>
+  <data name="S_MENU_INVERT_SELECTION" xml:space="preserve">
+    <value>החלף בחירה</value>
+  </data>
+  <data name="S_ACTION_RETRY" xml:space="preserve">
+    <value>נסה שוב פריטים שנכשלו ב{0}</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_RETRY" xml:space="preserve">
+    <value>אוטומטית נסה מחדש פריטים שנכשלו</value>
+  </data>
+  <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
+    <value>פעמים</value>
+  </data>
 </root>
