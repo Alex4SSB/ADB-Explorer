@@ -2114,4 +2114,13 @@ Kontroly se snaží zabránit tomu, aby nic netušící uživatel spustil potenc
   <data name="S_ITEMS_PLURAL" xml:space="preserve">
     <value>Položky: {0}</value>
   </data>
+  <data name="S_ACTION_RETRY" xml:space="preserve">
+    <value>Znovu přenést položky s chybou ({0})</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_RETRY" xml:space="preserve">
+    <value>Automaticky opakovat přenos položek s chybou</value>
+  </data>
+  <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
+    <value>krát</value>
+  </data>
 </root>
