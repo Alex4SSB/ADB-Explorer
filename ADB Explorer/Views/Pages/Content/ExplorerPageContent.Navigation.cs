@@ -101,6 +101,7 @@ public partial class ExplorerPageContent
             case nameof(DirectoryLister.IsLinkListingFinished):
                 {
                     ViewModel.NotifyDirectoryLinksResolved();
+                    NavigationBox.RefreshCurrentFolderDropDown();
 
                     if (Instance.FileList.DirList.FileList.Count > 0)
                     {

@@ -33,6 +33,7 @@ internal class MenuStyleSelector : StyleSelector
     public Style? SeparatorStyle { get; set; }
     public Style? SubMenuStyle { get; set; }
     public Style? SelectorSubMenuStyle { get; set; }
+    public Style? LocationSubMenuStyle { get; set; }
     public Style? SubMenuSeparatorStyle { get; set; }
     public Style? CompoundIconMenuStyle { get; set; }
     public Style? DualActionButtonStyle { get; set; }
@@ -45,6 +46,7 @@ internal class MenuStyleSelector : StyleSelector
         SubMenuSeparator => SubMenuSeparatorStyle,
         MenuSeparator => SeparatorStyle,
         SelectorSubMenu => SelectorSubMenuStyle,
+        LocationSubMenu => LocationSubMenuStyle,
         SubMenu or string => SubMenuStyle,
         AltTextMenu => DynamicAltTextStyle,
         IconMenu => IconMenuStyle,

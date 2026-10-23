@@ -22,7 +22,17 @@
                 Icon="{Binding IconContent}"
                 Style="{StaticResource AdbMenuItemHoverStyle}">
                 <local:AdbMenuItem.Header>
-                    <TextBlock Text="{Binding Action.Description}" TextOptions.TextFormattingMode="Display" />
+                    <emoji:TextBlock Text="{Binding Action.Description}" TextOptions.TextFormattingMode="Display">
+                        <emoji:TextBlock.Style>
+                            <Style TargetType="emoji:TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsInPath}" Value="True">
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </emoji:TextBlock.Style>
+                    </emoji:TextBlock>
                 </local:AdbMenuItem.Header>
             </local:AdbMenuItem>
         </DataTemplate>
@@ -85,10 +95,14 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
         <DataTemplate x:Key="BreadcrumbTemplate">
-            <StackPanel Orientation="Horizontal">
+            <!--  Background so the margins around the split button keep the crumb hovered  -->
+            <StackPanel
+                x:Name="CrumbPanel"
+                Background="Transparent"
+                Orientation="Horizontal">
                 <ui:Button
                     Height="24"
-                    Margin="2,0"
+                    Margin="2,0,0,0"
                     Padding="8,1"
                     Appearance="{Binding Appearance}"
                     Click="BreadcrumbButton_Click"
@@ -140,6 +154,7 @@
                                 </ui:FontIcon>
                                 <emoji:TextBlock
                                     Grid.Column="1"
+                                    Margin="0,0,0,1"
                                     FlowDirection="{Binding FlowDirection}"
                                     Text="{Binding Action.Description}"
                                     TextOptions.TextFormattingMode="Display">
@@ -191,13 +206,37 @@
                                 </Setter.Value>
                             </Setter>
                             <Style.Triggers>
+                                <!--  The split button's outline shows while the crumb is hovered, but only the hovered half is filled  -->
                                 <MultiDataTrigger>
                                     <MultiDataTrigger.Conditions>
                                         <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="False" />
                                         <Condition Binding="{Binding Appearance}" Value="Secondary" />
                                     </MultiDataTrigger.Conditions>
-                                    <Setter Property="BorderBrush" Value="Transparent" />
                                     <Setter Property="Background" Value="Transparent" />
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding ElementName=CrumbPanel, Path=IsMouseOver}" Value="False" />
+                                        <Condition Binding="{Binding IsDropDownOpen}" Value="False" />
+                                        <Condition Binding="{Binding Appearance}" Value="Secondary" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                </MultiDataTrigger>
+                                <!--
+                                    One split button with the chevron: outer corners only, the chevron's border is the divider.
+                                    This button is always left-to-right, so its sides are swapped by hand in right-to-left.
+                                -->
+                                <DataTrigger Binding="{Binding HasDropDown}" Value="True">
+                                    <Setter Property="CornerRadius" Value="4,0,0,4" />
+                                    <Setter Property="BorderThickness" Value="1,1,0,1" />
+                                </DataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding HasDropDown}" Value="True" />
+                                        <Condition Binding="{Binding ElementName=CrumbPanel, Path=FlowDirection}" Value="RightToLeft" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="CornerRadius" Value="0,4,4,0" />
+                                    <Setter Property="BorderThickness" Value="0,1,1,1" />
                                 </MultiDataTrigger>
                                 <DataTrigger Binding="{Binding Appearance}" Value="Caution">
                                     <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_ROOT_ENABLED}}" />
@@ -207,25 +246,84 @@
                         </Style>
                     </ui:Button.Style>
                 </ui:Button>
-                <ui:FontIcon
-                    Margin="2,0"
-                    VerticalAlignment="Center"
-                    FontSize="8">
-                    <ui:FontIcon.Style>
-                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                            <Setter Property="Glyph" Value="&#xE970;" />
+                <!--  The split button's chevron half - lists the folders under this crumb  -->
+                <ui:Button
+                    Width="22"
+                    Height="24"
+                    Margin="0,0,2,0"
+                    Padding="0"
+                    Appearance="Secondary"
+                    Click="BreadcrumbChevron_Click"
+                    CornerRadius="0,4,4,0">
+                    <ui:FontIcon
+                        Margin="0,1,0,0"
+                        FontSize="12"
+                        RenderTransformOrigin="0.5,0.5">
+                        <ui:FontIcon.RenderTransform>
+                            <RotateTransform x:Name="ChevronRotateTransform" />
+                        </ui:FontIcon.RenderTransform>
+                        <ui:FontIcon.Style>
+                            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                <Setter Property="Glyph" Value="&#xE76C;" />
+                                <Style.Triggers>
+                                    <Trigger Property="FlowDirection" Value="RightToLeft">
+                                        <Setter Property="Glyph" Value="&#xE76B;" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:FontIcon.Style>
+                    </ui:FontIcon>
+                    <ui:Button.Style>
+                        <Style BasedOn="{StaticResource DefaultUiButtonStyle}" TargetType="ui:Button">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsLast}" Value="True">
+                                <DataTrigger Binding="{Binding HasDropDown}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                <Trigger Property="FlowDirection" Value="RightToLeft">
-                                    <Setter Property="Glyph" Value="&#xE973;" />
-                                </Trigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="False" />
+                                        <Condition Binding="{Binding IsDropDownOpen}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Background" Value="Transparent" />
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding ElementName=CrumbPanel, Path=IsMouseOver}" Value="False" />
+                                        <Condition Binding="{Binding IsDropDownOpen}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                </MultiDataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </ui:FontIcon.Style>
-                </ui:FontIcon>
+                    </ui:Button.Style>
+                </ui:Button>
             </StackPanel>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsDropDownOpen}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation
+                                    Storyboard.TargetName="ChevronRotateTransform"
+                                    Storyboard.TargetProperty="Angle"
+                                    To="90"
+                                    Duration="{StaticResource TreeChevronAnimationDuration}" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation
+                                    Storyboard.TargetName="ChevronRotateTransform"
+                                    Storyboard.TargetProperty="Angle"
+                                    To="0"
+                                    Duration="{StaticResource TreeChevronAnimationDuration}" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </DataTemplate.Triggers>
         </DataTemplate>
     </UserControl.Resources>
     <Grid
@@ -453,24 +551,42 @@
         <Popup
             x:Name="OverflowPopup"
             AllowsTransparency="True"
+            Closed="OverflowPopup_Closed"
+            HorizontalOffset="-12"
+            Opened="OverflowPopup_Opened"
             Placement="Bottom"
-            StaysOpen="False">
-            <Border
-                Padding="0,3"
-                Background="{DynamicResource FlyoutBackground}"
-                BorderBrush="{DynamicResource FlyoutBorderBrush}"
-                BorderThickness="1"
-                CornerRadius="8">
-                <Border.Effect>
-                    <DropShadowEffect
-                        BlurRadius="20"
-                        Direction="270"
-                        Opacity="0.135"
-                        ShadowDepth="10"
-                        Color="#202020" />
-                </Border.Effect>
-                <ItemsControl x:Name="OverflowItemsControl" ItemTemplate="{StaticResource BreadcrumbFlyoutItemTemplate}" />
-            </Border>
+            StaysOpen="False"
+            VerticalOffset="1">
+            <!--  Laid out like WPF UI's submenu popup: the margin and offsets leave room for the shadow, and the slide
+                  is on an inner element, since a popup places itself by its direct child's transform.  -->
+            <Grid>
+                <Border
+                    Margin="12,0,12,18"
+                    Padding="0,3"
+                    Background="{DynamicResource FlyoutBackground}"
+                    BorderBrush="{DynamicResource FlyoutBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <!--  Slid in when the dropdown opens, see OverflowPopup_Opened  -->
+                    <Border.RenderTransform>
+                        <TranslateTransform x:Name="DropDownTranslate" />
+                    </Border.RenderTransform>
+                    <Border.Effect>
+                        <DropShadowEffect
+                            BlurRadius="20"
+                            Direction="270"
+                            Opacity="0.135"
+                            ShadowDepth="10"
+                            Color="#202020" />
+                    </Border.Effect>
+                    <ScrollViewer MaxHeight="480" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl
+                            x:Name="OverflowItemsControl"
+                            ItemTemplate="{StaticResource BreadcrumbFlyoutItemTemplate}"
+                            MenuItem.Click="OverflowItems_Click" />
+                    </ScrollViewer>
+                </Border>
+            </Grid>
         </Popup>
     </Grid>
 </UserControl>

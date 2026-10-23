@@ -280,7 +280,7 @@ public partial class NavigationTreeViewModel
         => AdbExplorerConst.POSSIBLE_RECYCLE_PATHS.Any(recycle =>
             path == recycle || path.StartsWith($"{recycle}/", StringComparison.Ordinal));
 
-    private static IEnumerable<DriveViewModel> VisibleDrives(LogicalDeviceViewModel device)
+    internal static IEnumerable<DriveViewModel> VisibleDrives(LogicalDeviceViewModel device)
     {
         return device.Drives.Where(drive => drive.Type switch
         {

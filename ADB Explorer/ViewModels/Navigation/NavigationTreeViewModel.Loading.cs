@@ -22,11 +22,15 @@ public partial class NavigationTreeViewModel
     {
         var source = _currentExplorerItems();
         if (source is null)
-            yield break;
+            return [];
 
+        return SubfoldersOf(source, ActiveDevice?.ID, Data.FileActions.IsArchive);
+    }
+
+    /// <summary>The items of a folder's listing that can be navigated into: folders and navigable archives.</summary>
+    internal static IEnumerable<FileClass> SubfoldersOf(IEnumerable<IBrowserItem> source, string? deviceId, bool isInsideArchive)
+    {
         var allowHidden = Data.Settings.ShowHiddenItems;
-        var isInsideArchive = Data.FileActions.IsArchive;
-        var deviceId = ActiveDevice?.ID;
         foreach (var item in source)
         {
             if (item is not FileClass file)
@@ -236,7 +240,7 @@ public partial class NavigationTreeViewModel
         });
     }
 
-    private static List<FileClass> ListTreeSubfolders(string deviceId, string path, CancellationToken token)
+    internal static List<FileClass> ListTreeSubfolders(string deviceId, string path, CancellationToken token)
     {
         IEnumerable<FileStat> entries;
         var listingInsideArchive = ArchivePath.TryParse(path, out var archivePath, out var internalPath, deviceId);

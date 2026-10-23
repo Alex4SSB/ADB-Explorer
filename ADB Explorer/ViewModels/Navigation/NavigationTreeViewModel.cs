@@ -240,7 +240,7 @@ public partial class NavigationTreeViewModel : ObservableObject
         return child;
     }
 
-    private static string TreeItemPath(FileClass file, string? deviceId)
+    internal static string TreeItemPath(FileClass file, string? deviceId)
     {
         if (deviceId is not null
             && ArchiveHelper.CanNavigateIntoArchive(

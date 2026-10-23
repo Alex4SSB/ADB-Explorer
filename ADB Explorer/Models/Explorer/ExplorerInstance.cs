@@ -206,11 +206,7 @@ public partial class ExplorerInstance : ObservableObject
             if (History.Current is not { } location)
                 return new BaseIcon(FileIconProvider.GetPhoneIcon(16), 16);
 
-            if (location.GetIcon(EffectiveDevice) is { } locationIcon)
-                return locationIcon;
-
-            var bitmap = NavigationTreeNode.FolderIcon(location.Path, EffectiveDevice?.ID);
-            return bitmap is null ? null : new BaseIcon(bitmap, 16);
+            return location.GetIconOrFolderIcon(EffectiveDevice);
         }
     }
 

@@ -286,6 +286,19 @@ public class AdbLocation : Navigation
         return drive?.GetIcon(size);
     }
 
+    /// <summary><see cref="GetIcon"/>, falling back for a plain folder to the same special-folder-aware icon the Explorer list uses.</summary>
+    public BaseIcon? GetIconOrFolderIcon(LogicalDeviceViewModel? device)
+    {
+        if (GetIcon(device) is { } icon)
+            return icon;
+
+        if (string.IsNullOrEmpty(Path))
+            return null;
+
+        var bitmap = NavigationTreeNode.FolderIcon(Path, DeviceFor(device)?.ID);
+        return bitmap is null ? null : new BaseIcon(bitmap, 16);
+    }
+
     public SubMenu IconSubMenu => GetIconSubMenu(Data.ActiveDevice);
 
     /// <summary>Same as <see cref="IconSubMenu"/>, against an explicit device - see <see cref="GetIcon"/>.</summary>
@@ -295,20 +308,23 @@ public class AdbLocation : Navigation
         if (includeDevice && !IsPage && DeviceFor(device) is { } owner)
             name = $"{name} - {owner.Name}";
 
-        return new SubMenu(new FileAction(FileAction.FileActionType.None, new(() => true, () => Data.RequestNavigation(this)), name), GetIcon(device));
+        return new LocationSubMenu(new FileAction(FileAction.FileActionType.None, new(() => true, () => Data.RequestNavigation(this)), name), GetIconOrFolderIcon(device));
     }
 
     public SubMenu ExcessSubMenu => GetExcessSubMenu(Data.ActiveDevice);
 
     /// <summary>Same as <see cref="ExcessSubMenu"/>, against an explicit device - see <see cref="GetIcon"/>.</summary>
     public SubMenu GetExcessSubMenu(LogicalDeviceViewModel? device) =>
-        new SubMenu(new FileAction(FileAction.FileActionType.None, new(() => true, () => Data.RequestNavigation(this)), GetNavigationName(device)), GetIcon(device));
+        new LocationSubMenu(new FileAction(FileAction.FileActionType.None, new(() => true, () => Data.RequestNavigation(this)), GetNavigationName(device)), GetIconOrFolderIcon(device));
 
     public TextMenu NameSubMenu => GetNameSubMenu(Data.ActiveDevice);
 
     /// <summary>Same as <see cref="NameSubMenu"/>, against an explicit device - see <see cref="GetIcon"/>.</summary>
     public TextMenu GetNameSubMenu(LogicalDeviceViewModel? device) =>
-        new TextMenu(new FileAction(FileAction.FileActionType.None, new(() => true, () => Data.RequestNavigation(this)), GetBreadcrumbLabel(device)));
+        new TextMenu(new FileAction(FileAction.FileActionType.None, new(() => true, () => Data.RequestNavigation(this)), GetBreadcrumbLabel(device)))
+        {
+            Location = this,
+        };
 
     public override bool Equals(object? other)
     {

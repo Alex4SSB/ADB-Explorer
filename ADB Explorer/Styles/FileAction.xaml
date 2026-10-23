@@ -3,6 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:ADB_Explorer.Controls"
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
+    xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
@@ -289,6 +290,16 @@
         <Setter Property="Header" Value="{Binding}" />
         <Setter Property="HeaderTemplate" Value="{StaticResource SelectorSubMenuHeaderTemplate}" />
     </Style>
+    <DataTemplate x:Key="LocationSubMenuHeaderTemplate">
+        <emoji:TextBlock Text="{Binding}" TextOptions.TextFormattingMode="Display" />
+    </DataTemplate>
+    <!--  A folder / drive entry, e.g. in the navigation history: folder names may hold emoji.  -->
+    <Style
+        x:Key="LocationSubMenuItemStyle"
+        BasedOn="{StaticResource SubMenuItemStyle}"
+        TargetType="controls:AdbMenuItem">
+        <Setter Property="HeaderTemplate" Value="{StaticResource LocationSubMenuHeaderTemplate}" />
+    </Style>
     <Style
         x:Key="DummySubMenuStyle"
         BasedOn="{StaticResource SubMenuItemStyle}"
@@ -314,6 +325,7 @@
         DummySubMenuStyle="{StaticResource DummySubMenuStyle}"
         DynamicAltTextStyle="{StaticResource DynamicAltTextStyle}"
         IconMenuStyle="{StaticResource IconMenuStyle}"
+        LocationSubMenuStyle="{StaticResource LocationSubMenuItemStyle}"
         SelectorSubMenuStyle="{StaticResource SelectorSubMenuItemStyle}"
         SeparatorStyle="{StaticResource MenuSeparatorStyle}"
         SubMenuSeparatorStyle="{StaticResource SubMenuSeparatorStyle}"

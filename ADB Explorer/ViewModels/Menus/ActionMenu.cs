@@ -305,7 +305,7 @@ public class CompoundIconMenu : ActionMenu
     }
 }
 
-public class TextMenu : ActionMenu
+public partial class TextMenu : ActionMenu
 {
     public bool IsLast { get; set; } = false;
 
@@ -315,9 +315,32 @@ public class TextMenu : ActionMenu
         ? FlowDirection.RightToLeft
         : FlowDirection.LeftToRight;
 
+    /// <summary>The breadcrumb's location; null for the overflow crumb.</summary>
+    public AdbLocation? Location { get; init; }
+
+    /// <summary>Whether the breadcrumb is a split button whose chevron lists the folders under it.</summary>
+    [ObservableProperty]
+    public partial bool HasDropDown { get; set; }
+
+    [ObservableProperty]
+    public partial bool IsDropDownOpen { get; set; }
+
     public TextMenu(FileAction fileAction)
         : base(fileAction, null)
     { }
+}
+
+/// <summary>A location entry (breadcrumb dropdowns, navigation history) - its name may hold emoji,
+/// and in a breadcrumb dropdown the one the path continues into is shown bold.</summary>
+public class LocationSubMenu : SubMenu
+{
+    public bool IsInPath { get; }
+
+    public LocationSubMenu(FileAction fileAction, BaseIcon? icon, bool isInPath = false)
+        : base(fileAction, icon)
+    {
+        IsInPath = isInPath;
+    }
 }
 
 public class SubMenu : ActionMenu
