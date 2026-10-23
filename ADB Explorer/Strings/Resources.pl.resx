@@ -1889,4 +1889,7 @@ Sprawdzanie ma na celu zapobieżenie uruchomieniu przez niczego niespodziewając
   <data name="S_PER_FILE_CONFLICT_TABLE_TITLE" xml:space="preserve">
     <value>W każdym konflikcie wybierz cel, aby pominąć plik, lub źródło, aby go zastąpić.</value>
   </data>
+  <data name="S_ITEMS_PLURAL" xml:space="preserve">
+    <value>{0} elementów</value>
+  </data>
 </root>
