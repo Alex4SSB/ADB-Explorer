@@ -956,14 +956,8 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_DROP" xml:space="preserve">
     <value>גרירה</value>
   </data>
-  <data name="S_ACTION_OPERATION" xml:space="preserve">
-    <value>פעולה</value>
-  </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>פעולות</value>
-  </data>
-  <data name="S_ACTION_VALIDATE" xml:space="preserve">
-    <value>אימות {0}</value>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>קישור</value>
@@ -1814,9 +1808,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_MENU_INVERT_SELECTION" xml:space="preserve">
     <value>החלף בחירה</value>
-  </data>
-  <data name="S_ACTION_RETRY" xml:space="preserve">
-    <value>נסה שוב פריטים שנכשלו ב{0}</value>
   </data>
   <data name="S_SETTINGS_AUTO_RETRY" xml:space="preserve">
     <value>אוטומטית נסה מחדש פריטים שנכשלו</value>

@@ -32,5 +32,11 @@
     "ApkInstallers_one": "{{count}} APK Installer",
     "ApkInstallers_other": "{{count}} APK Installers",
     "Packages_one": "{{count}} Package",
-    "Packages_other": "{{count}} Packages"
+    "Packages_other": "{{count}} Packages",
+    "RemoveOperations_one": "Remove {{count}} Operation",
+    "RemoveOperations_other": "Remove {{count}} Operations",
+    "ValidateOperations_one": "Validate {{count}} Operation",
+    "ValidateOperations_other": "Validate {{count}} Operations",
+    "RetryOperations_one": "Retry failed items of {{count}} Operation",
+    "RetryOperations_other": "Retry failed items of {{count}} Operations"
 }

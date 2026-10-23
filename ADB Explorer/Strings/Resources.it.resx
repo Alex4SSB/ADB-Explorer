@@ -849,14 +849,8 @@ Annulla tutte le operazioni in corso</value>
   <data name="S_DROP" xml:space="preserve">
     <value>Rilascio</value>
   </data>
-  <data name="S_ACTION_OPERATION" xml:space="preserve">
-    <value>operazione</value>
-  </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>operazioni</value>
-  </data>
-  <data name="S_ACTION_VALIDATE" xml:space="preserve">
-    <value>Valida {0}</value>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>Collegamento</value>

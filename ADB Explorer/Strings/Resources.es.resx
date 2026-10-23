@@ -899,14 +899,8 @@ Cancelar Todas las Activas</value>
   <data name="S_DROP" xml:space="preserve">
     <value>Soltar</value>
   </data>
-  <data name="S_ACTION_OPERATION" xml:space="preserve">
-    <value>Operación</value>
-  </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Operaciones</value>
-  </data>
-  <data name="S_ACTION_VALIDATE" xml:space="preserve">
-    <value>Validar {0}</value>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>Enlace</value>

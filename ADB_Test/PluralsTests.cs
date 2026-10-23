@@ -41,15 +41,20 @@ public class PluralsTests
     }
 
     [TestMethod]
-    public void Lookup_FallsBackToOtherThenSourceLanguage()
+    public void Lookup_FallsBackToGeneralFormThenSourceLanguage()
     {
         var ru = Plurals.Table("ru")!;
 
         Assert.AreEqual(ru["Items_one"], Plurals.Lookup(Culture("ru"), "Items", 21));
 
-        // ru.json has no "few" form yet
-        Assert.IsFalse(ru.ContainsKey("Items_few"));
-        Assert.AreEqual(ru["Items_other"], Plurals.Lookup(Culture("ru"), "Items", 2));
+        // Weblate gives ru no "other" form, so an untranslated "few" falls back to "many"
+        Assert.IsFalse(ru.ContainsKey("Items_other"));
+        var few = ru.GetValueOrDefault("Items_few") is { Length: > 0 } text ? text : ru["Items_many"];
+        Assert.AreEqual(few, Plurals.Lookup(Culture("ru"), "Items", 2));
+
+        // a form that spells out its number never stands in for another count
+        var he = Plurals.Table("he-IL")!;
+        Assert.AreEqual(he["Items_other"], Plurals.Lookup(Culture("he-IL"), "Items", 5));
 
         Assert.AreEqual(Plurals.Table("de")!["Items_one"], Plurals.Lookup(Culture("de-AT"), "Items", 1));
         Assert.AreEqual("{{count}} item", Plurals.Lookup(Culture("ro"), "Items", 1));
@@ -104,8 +109,14 @@ public class PluralsTests
             Assert.IsNotNull(table, language);
 
             var categories = NativeMethods.PluralRules.Categories(Culture(language));
+            var singleNumber = categories.Where(category => IsSingleNumber(Culture(language), category)).ToHashSet();
+
             foreach (var (key, text) in table)
             {
+                // Weblate writes untranslated forms as empty strings
+                if (text == "")
+                    continue;
+
                 var baseKey = Plurals.BaseKey(key);
                 var category = key[(baseKey.Length + 1)..];
 
@@ -116,14 +127,45 @@ public class PluralsTests
                 var actual = Placeholders(text);
                 Assert.IsTrue(actual.IsSubsetOf(known), $"{language}: {key} has an unknown placeholder");
 
-                // a form for one exact number may spell the number out
-                if (category is "zero" or "one" or "two")
+                // a form for one exact number may spell the number out (he: "פריט אחד")
+                if (singleNumber.Contains(category))
                     known.Remove("count");
 
                 Assert.IsTrue(known.IsSubsetOf(actual), $"{language}: {key} is missing a placeholder");
             }
         }
     }
+
+    [TestMethod]
+    public void WholeNumberCategories_MatchWeblateForms()
+    {
+        CollectionAssert.AreEquivalent(new[] { "one", "few", "many" }, NativeMethods.PluralRules.WholeNumberCategories(Culture("ru")).ToArray());
+        CollectionAssert.AreEquivalent(new[] { "one", "few", "many" }, NativeMethods.PluralRules.WholeNumberCategories(Culture("pl")).ToArray());
+        CollectionAssert.AreEquivalent(new[] { "one", "two", "other" }, NativeMethods.PluralRules.WholeNumberCategories(Culture("he-IL")).ToArray());
+        CollectionAssert.AreEquivalent(new[] { "one", "few", "other" }, NativeMethods.PluralRules.WholeNumberCategories(Culture("cs")).ToArray());
+    }
+
+    [TestMethod]
+    public void IsSingleNumber_OnlyForCategoriesOfOneWholeNumber()
+    {
+        Assert.IsTrue(IsSingleNumber(Culture("he"), "one"));
+        Assert.IsTrue(IsSingleNumber(Culture("he"), "two"));
+        Assert.IsTrue(IsSingleNumber(Culture("ar"), "zero"));
+        Assert.IsTrue(IsSingleNumber(Culture("de"), "one"));
+
+        // one also covers 21, 31... (ru) or 0 (fr, pt-BR)
+        Assert.IsFalse(IsSingleNumber(Culture("ru"), "one"));
+        Assert.IsFalse(IsSingleNumber(Culture("fr"), "one"));
+        Assert.IsFalse(IsSingleNumber(Culture("pt-BR"), "one"));
+        Assert.IsFalse(IsSingleNumber(Culture("ar"), "few"));
+    }
+
+    /// <summary>
+    /// Whether <paramref name="category"/> covers exactly one whole number - CLDR integer rules repeat
+    /// within 0-999. Weblate also lets such forms drop the count, but accepts 0-and-1 too, which this doesn't.
+    /// </summary>
+    private static bool IsSingleNumber(CultureInfo culture, string category)
+        => Enumerable.Range(0, 1000).Count(n => NativeMethods.PluralRules.Select(culture, n) == category) == 1;
 
     private static HashSet<string> Placeholders(string text)
         => Placeholder.Matches(text).Select(m => m.Groups[1].Value).ToHashSet();

@@ -968,17 +968,9 @@ Zrušit všechny probíhající operace</value>
     <value>Upustit</value>
     <comment>The file drop operation</comment>
   </data>
-  <data name="S_ACTION_OPERATION" xml:space="preserve">
-    <value>Operace</value>
-    <comment>Used for file operation actions</comment>
-  </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Operace</value>
     <comment>Used for file operation actions, plural</comment>
-  </data>
-  <data name="S_ACTION_VALIDATE" xml:space="preserve">
-    <value>Ověřit {0}</value>
-    <comment>Validate a file operation, by comparing MD5 of source and target files</comment>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>Odkaz</value>
@@ -2035,9 +2027,6 @@ Kontroly se snaží zabránit tomu, aby nic netušící uživatel spustil potenc
   </data>
   <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
     <value>Vytvořit soubor .APKBKP s instalací aplikace a daty OBB</value>
-  </data>
-  <data name="S_ACTION_RETRY" xml:space="preserve">
-    <value>Znovu přenést položky s chybou ({0})</value>
   </data>
   <data name="S_SETTINGS_AUTO_RETRY" xml:space="preserve">
     <value>Automaticky opakovat přenos položek s chybou</value>

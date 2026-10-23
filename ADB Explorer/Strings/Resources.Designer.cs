@@ -160,15 +160,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Operation.
-        /// </summary>
-        public static string S_ACTION_OPERATION {
-            get {
-                return ResourceManager.GetString("S_ACTION_OPERATION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Operations.
         /// </summary>
         public static string S_ACTION_OPERATION_PLURAL {
@@ -187,29 +178,11 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Retry failed items of {0}.
-        /// </summary>
-        public static string S_ACTION_RETRY {
-            get {
-                return ResourceManager.GetString("S_ACTION_RETRY", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Update.
         /// </summary>
         public static string S_ACTION_UPDATE {
             get {
                 return ResourceManager.GetString("S_ACTION_UPDATE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Validate {0}.
-        /// </summary>
-        public static string S_ACTION_VALIDATE {
-            get {
-                return ResourceManager.GetString("S_ACTION_VALIDATE", resourceCulture);
             }
         }
         

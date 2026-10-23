@@ -465,10 +465,6 @@
     <value>Drop</value>
     <comment>The file drop operation</comment>
   </data>
-  <data name="S_ACTION_OPERATION" xml:space="preserve">
-    <value>Operation</value>
-    <comment>Used for file operation actions</comment>
-  </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Operations</value>
     <comment>Used for file operation actions, plural</comment>

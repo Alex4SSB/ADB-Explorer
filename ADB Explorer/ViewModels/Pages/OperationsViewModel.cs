@@ -239,13 +239,11 @@ public partial class OperationsViewModel : ObservableObject, INavigationAware
 
     public void UpdateTooltips()
     {
-        var plural = SelectedFileOps.Count() != 1;
-        var opString = plural
-            ? Strings.Resources.S_ACTION_OPERATION_PLURAL
-            : Strings.Resources.S_ACTION_OPERATION;
+        var selected = SelectedFileOps.Count();
 
-        RemoveTooltip = string.Format(Strings.Resources.S_REM_DEVICE_TITLE, opString);
-        ValidateTooltip = string.Format(Strings.Resources.S_ACTION_VALIDATE, opString);
-        RetryTooltip = string.Format(Strings.Resources.S_ACTION_RETRY, opString);
+        // With nothing selected, Remove clears the whole queue
+        RemoveTooltip = Strings.Plurals.RemoveOperations(selected > 0 ? selected : Data.FileOpQ.Operations.Count);
+        ValidateTooltip = Strings.Plurals.ValidateOperations(selected);
+        RetryTooltip = Strings.Plurals.RetryOperations(selected);
     }
 }

@@ -914,14 +914,8 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_DROP" xml:space="preserve">
     <value>拖拉</value>
   </data>
-  <data name="S_ACTION_OPERATION" xml:space="preserve">
-    <value>操作</value>
-  </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>操作</value>
-  </data>
-  <data name="S_ACTION_VALIDATE" xml:space="preserve">
-    <value>檢查 {0} 的有效性</value>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>連結</value>

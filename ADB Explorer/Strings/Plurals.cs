@@ -41,7 +41,17 @@ public static class Plurals
 
     public static string Packages(long? count) => Format(nameof(Packages), count);
 
+    public static string RemoveOperations(long count) => Format(nameof(RemoveOperations), count);
+
+    public static string ValidateOperations(long count) => Format(nameof(ValidateOperations), count);
+
+    public static string RetryOperations(long count) => Format(nameof(RetryOperations), count);
+
     internal const string SourceLanguage = "en";
+
+    // Weblate has no "other" form for one/few/many languages (ru, uk, pl).
+    // zero/one/two may spell out their number, so they never stand in for another count.
+    private static readonly string[] _fallbackCategories = [NativeMethods.PluralRules.Other, "many", "few"];
 
     private const string ResourcePrefix = "ADB_Explorer.Strings.Plurals.";
 
@@ -63,7 +73,7 @@ public static class Plurals
 
     /// <summary>
     /// Walks the culture's fallback chain down to the source language, and returns the first file's form
-    /// for <paramref name="count"/>, or its <c>other</c> form when the needed one isn't translated yet.
+    /// for <paramref name="count"/>, or a general form when the needed one isn't translated yet.
     /// </summary>
     internal static string Lookup(CultureInfo culture, string key, long? count)
     {
@@ -79,8 +89,11 @@ public static class Plurals
             if (table.TryGetValue($"{key}_{category}", out var text) && text != "")
                 return text;
 
-            if (table.TryGetValue($"{key}_{NativeMethods.PluralRules.Other}", out text) && text != "")
-                return text;
+            foreach (var fallback in _fallbackCategories)
+            {
+                if (table.TryGetValue($"{key}_{fallback}", out text) && text != "")
+                    return text;
+            }
         }
 
         return key;
@@ -88,7 +101,7 @@ public static class Plurals
 
     /// <summary>
     /// Counts the source strings, and how many of them <paramref name="culture"/>'s own file translates
-    /// in every form its language distinguishes.
+    /// in every form whole numbers need in its language.
     /// </summary>
     internal static (int Translated, int Total) TranslationProgress(CultureInfo culture)
     {
@@ -97,7 +110,7 @@ public static class Plurals
         if (table is null)
             return (0, keys.Count);
 
-        var categories = NativeMethods.PluralRules.Categories(culture);
+        var categories = NativeMethods.PluralRules.WholeNumberCategories(culture);
         var translated = keys.Count(key => categories.All(category =>
             table.TryGetValue($"{key}_{category}", out var text) && text != ""));
 

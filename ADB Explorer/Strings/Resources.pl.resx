@@ -886,14 +886,8 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_DROP" xml:space="preserve">
     <value>Upuść</value>
   </data>
-  <data name="S_ACTION_OPERATION" xml:space="preserve">
-    <value>Operacja</value>
-  </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Operacje</value>
-  </data>
-  <data name="S_ACTION_VALIDATE" xml:space="preserve">
-    <value>Sprawdź {0}</value>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>Link</value>

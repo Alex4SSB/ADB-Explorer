@@ -870,14 +870,8 @@ Alle laufenden Vorgänge abbrechen</value>
   <data name="S_DROP" xml:space="preserve">
     <value>Ablegen</value>
   </data>
-  <data name="S_ACTION_OPERATION" xml:space="preserve">
-    <value>Operation</value>
-  </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Operationen</value>
-  </data>
-  <data name="S_ACTION_VALIDATE" xml:space="preserve">
-    <value>{0} validieren</value>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>Verknüpfung</value>

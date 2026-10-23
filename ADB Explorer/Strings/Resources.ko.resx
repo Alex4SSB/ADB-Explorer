@@ -858,14 +858,8 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_DROP" xml:space="preserve">
     <value>놓기</value>
   </data>
-  <data name="S_ACTION_OPERATION" xml:space="preserve">
-    <value>작업</value>
-  </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>작업</value>
-  </data>
-  <data name="S_ACTION_VALIDATE" xml:space="preserve">
-    <value>{0} 검증</value>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>링크</value>

@@ -904,14 +904,8 @@ Select Custom to use a location that will not be removed on uninstall. The custo
   <data name="S_DROP" xml:space="preserve">
     <value>கைவிடு</value>
   </data>
-  <data name="S_ACTION_OPERATION" xml:space="preserve">
-    <value>செயல்பாடு</value>
-  </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>செயல்பாடுகள்</value>
-  </data>
-  <data name="S_ACTION_VALIDATE" xml:space="preserve">
-    <value>{0}ஐச் சரிபார்</value>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>இணைப்பு</value>

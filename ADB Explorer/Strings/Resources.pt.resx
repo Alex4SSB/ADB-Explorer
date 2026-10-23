@@ -1004,17 +1004,9 @@ Cancelar Todas a Serem Reproduzidas</value>
     <value>Largar</value>
     <comment>The file drop operation</comment>
   </data>
-  <data name="S_ACTION_OPERATION" xml:space="preserve">
-    <value>Operação</value>
-    <comment>Used for file operation actions</comment>
-  </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Operações</value>
     <comment>Used for file operation actions, plural</comment>
-  </data>
-  <data name="S_ACTION_VALIDATE" xml:space="preserve">
-    <value>Validar {0}</value>
-    <comment>Validate a file operation, by comparing MD5 of source and target files</comment>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>Link</value>

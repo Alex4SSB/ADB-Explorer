@@ -14,6 +14,8 @@ public static partial class NativeMethods
 
         private static readonly ConcurrentDictionary<string, nint> _rules = new();
 
+        private static readonly ConcurrentDictionary<string, IReadOnlyList<string>> _wholeNumberCategories = new();
+
         /// <summary>Returns the CLDR category (zero, one, two, few, many or other) of <paramref name="count"/>.</summary>
         public static unsafe string Select(CultureInfo culture, long count)
         {
@@ -58,6 +60,14 @@ public static partial class NativeMethods
                 uenum_close(keywords);
             }
         }
+
+        /// <summary>
+        /// The categories whole numbers fall into - the forms Weblate asks for. CLDR integer rules repeat
+        /// within 0-999, and some categories only hold fractions (ru "other").
+        /// </summary>
+        public static IReadOnlyList<string> WholeNumberCategories(CultureInfo culture)
+            => _wholeNumberCategories.GetOrAdd(culture.Name,
+                _ => [.. Enumerable.Range(0, 1000).Select(n => Select(culture, n)).Distinct()]);
 
         // ICU locale IDs separate the region with an underscore (pt_BR)
         private static nint GetRules(CultureInfo culture)

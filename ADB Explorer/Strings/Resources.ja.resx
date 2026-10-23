@@ -849,14 +849,8 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   <data name="S_DROP" xml:space="preserve">
     <value>ドロップ</value>
   </data>
-  <data name="S_ACTION_OPERATION" xml:space="preserve">
-    <value>操作</value>
-  </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>操作</value>
-  </data>
-  <data name="S_ACTION_VALIDATE" xml:space="preserve">
-    <value>{0} を検証</value>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>リンク</value>
