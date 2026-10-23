@@ -253,9 +253,7 @@ public partial class CopyPasteService
         if (Data.CurrentDisplayNames.TryGetValue((deviceId ?? Data.ActiveDevice?.ID, targetPath), out var drive))
             destination = drive;
 
-        var message = conflictCount == 1
-            ? string.Format(Strings.Resources.S_CONFLICT_ITEMS_DESTINATION, destination)
-            : string.Format(Strings.Resources.S_CONFLICT_ITEMS_PLURAL_DESTINATION, conflictCount, destination);
+        var message = Strings.Plurals.ConflictingItemsIn(conflictCount, destination);
 
         var choice = await DialogService.ShowConflictResolution(message, Strings.Resources.S_PASTE_CONFLICTS_TITLE);
 

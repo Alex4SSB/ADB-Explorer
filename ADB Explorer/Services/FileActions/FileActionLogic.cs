@@ -76,9 +76,7 @@ internal static partial class FileActionLogic
                 if (existingItems.Length is int count and > 0)
                 {
                     var result = await DialogService.ShowConfirmation(
-                        count == 1
-                            ? Strings.Resources.S_CONFLICT_ITEMS
-                            : string.Format(Strings.Resources.S_CONFLICT_ITEMS_PLURAL, count),
+                        Strings.Plurals.ConflictingItems(count),
                         Strings.Resources.S_RESTORE_CONF_TITLE,
                         primaryText: merge
                             ? Strings.Resources.S_MERGE_OR_REPLACE
@@ -434,16 +432,12 @@ internal static partial class FileActionLogic
         string deletedString;
         if (itemsToDelete.Count == 1)
             deletedString = FileHelper.DisplayName(itemsToDelete.First());
+        else if (itemsToDelete.All(item => item.IsDirectory))
+            deletedString = Strings.Plurals.Folders(itemsToDelete.Count);
+        else if (itemsToDelete.All(item => !item.IsDirectory))
+            deletedString = Strings.Plurals.Files(itemsToDelete.Count);
         else
-        {
-            deletedString = $"{itemsToDelete.Count} ";
-            if (itemsToDelete.All(item => item.IsDirectory))
-                deletedString += Strings.Resources.S_MENU_FOLDERS;
-            else if (itemsToDelete.All(item => !item.IsDirectory))
-                deletedString += Strings.Resources.S_MENU_FILES;
-            else
-                deletedString += Strings.Resources.S_BROWSER_ITEMS_PLURAL;
-        }
+            deletedString = Strings.Plurals.Items(itemsToDelete.Count);
 
         if (!isRecycleBin && !emptyTrashFromDriveView && Data.Settings.EnableRecycle && !permanent.Value)
         {

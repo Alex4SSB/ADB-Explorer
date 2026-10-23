@@ -71,57 +71,7 @@
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Style>
-                    <TextBlock>
-                        <TextBlock.Style>
-                            <Style BasedOn="{StaticResource DriveItemsCountTextBlockStyle}" TargetType="TextBlock">
-                                <Setter Property="Text" Value="{Binding ItemsCount}" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ItemsCount}" Value="{x:Null}">
-                                        <Setter Property="Text" Value="??" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    <TextBlock Text=" " />
-                    <TextBlock>
-                        <TextBlock.Style>
-                            <Style BasedOn="{StaticResource DriveItemsCountTextBlockStyle}" TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Type}" Value="Trash">
-                                        <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_BROWSER_ITEMS_PLURAL}}" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Type}" Value="Temp">
-                                        <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DRIVE_APK_ITEMS_PLURAL}}" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Type}" Value="Package">
-                                        <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DRIVE_PACKAGE_PLURAL}}" />
-                                    </DataTrigger>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding Type}" Value="Trash" />
-                                            <Condition Binding="{Binding ItemsCount}" Value="1" />
-                                        </MultiDataTrigger.Conditions>
-                                        <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_BROWSER_ITEMS}}" />
-                                    </MultiDataTrigger>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding Type}" Value="Temp" />
-                                            <Condition Binding="{Binding ItemsCount}" Value="1" />
-                                        </MultiDataTrigger.Conditions>
-                                        <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DRIVE_APK_ITEMS}}" />
-                                    </MultiDataTrigger>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding Type}" Value="Package" />
-                                            <Condition Binding="{Binding ItemsCount}" Value="1" />
-                                        </MultiDataTrigger.Conditions>
-                                        <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_MENU_PACKAGE}}" />
-                                    </MultiDataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                    <TextBlock Text="{Binding ItemsCountText}" />
                 </StackPanel>
                 <TextBlock HorizontalAlignment="Left">
                     <TextBlock.Style>

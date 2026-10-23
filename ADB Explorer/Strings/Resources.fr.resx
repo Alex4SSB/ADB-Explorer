@@ -270,9 +270,6 @@ Cette action est irréversible. Voulez-vous continuer ?</value>
     <value>Sélectionnez Lancer si ADB est déjà autorisé dans WSA.
 Pour autoriser ADB, ouvrez les paramètres avancés de WSA.</value>
   </data>
-  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
-    <value>{0} des fichiers sélectionnés ne peuvent pas être créés à la racine d’un lecteur Windows.</value>
-  </data>
   <data name="S_ADB_LEARN_MORE" xml:space="preserve">
     <value>En savoir plus sur ADB</value>
   </data>
@@ -367,10 +364,6 @@ Le contenu visible peut être incomplet.</value>
     <value>Le suivant vas etre supprimer:
 {0}</value>
   </data>
-  <data name="S_REM_APK_PLURAL" xml:space="preserve">
-    <value>Les éléments suivants seront supprimés :
-{0} paquets</value>
-  </data>
   <data name="S_UNINSTALL" xml:space="preserve">
     <value>Désinstaller</value>
   </data>
@@ -388,18 +381,6 @@ Le contenu visible peut être incomplet.</value>
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Fusionner ou remplacer</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value>Il y a 1 objet en conflit</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>Il y a 1 objet en conflit dans {0}</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value>Il y a {0} objets en conflit</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value>Il y a {0} objets en conflit dans {1}</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
     <value>Remplacer ou ignorer des fichiers</value>
@@ -676,12 +657,6 @@ Annuler tout en cours</value>
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>À propos</value>
   </data>
-  <data name="S_BROWSER_ITEMS" xml:space="preserve">
-    <value>élément</value>
-  </data>
-  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
-    <value>éléments</value>
-  </data>
   <data name="S_FOLDER_EMPTY" xml:space="preserve">
     <value>Ce dossier est vide.</value>
   </data>
@@ -693,12 +668,6 @@ Annuler tout en cours</value>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
     <value>&lt;Span&gt;Ce dossier &lt;Italic&gt;semble&lt;/Italic&gt; vide&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… à l'oeil nu&lt;/Span&gt;&lt;/Span&gt;</value>
-  </data>
-  <data name="S_ITEMS_SELECTED" xml:space="preserve">
-    <value>élément sélectionné</value>
-  </data>
-  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
-    <value>éléments sélectionnés</value>
   </data>
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
     <value>Type d'opération</value>
@@ -1093,15 +1062,6 @@ Annuler tout en cours</value>
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
     <value>Vide</value>
   </data>
-  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
-    <value>Installateur APK</value>
-  </data>
-  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
-    <value>Installateurs APK</value>
-  </data>
-  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
-    <value>Paquets</value>
-  </data>
   <data name="S_FILEOP_ERROR" xml:space="preserve">
     <value>Erreur : {0}</value>
   </data>
@@ -1257,32 +1217,8 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="BYTES" xml:space="preserve">
     <value>{0} O</value>
   </data>
-  <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>Copier {0} éléments</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>Copier {0} éléments vers {1}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>Déplacer {0} éléments vers {1}</value>
-  </data>
   <data name="S_DRAGDROP_LINK" xml:space="preserve">
     <value>Créer lien dans {0}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>Déplacer {0} éléments</value>
-  </data>
-  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
-    <value>Coller 1 élément coupé</value>
-  </data>
-  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
-    <value>Coller 1 élément copié</value>
-  </data>
-  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
-    <value>Coller {0} éléments copiés</value>
-  </data>
-  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
-    <value>Coller {0} éléments coupés</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} en {1} ({2})</value>
@@ -1314,9 +1250,6 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
     <value>Validation…</value>
   </data>
-  <data name="S_FILES_PLURAL" xml:space="preserve">
-    <value>{0} fichiers</value>
-  </data>
   <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
     <value>Sélection de la ROM pour chargement déporté</value>
   </data>
@@ -1331,9 +1264,6 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   </data>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
     <value>Installer {0}</value>
-  </data>
-  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
-    <value>Installer {0} APKs</value>
   </data>
   <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
     <value>Activé</value>

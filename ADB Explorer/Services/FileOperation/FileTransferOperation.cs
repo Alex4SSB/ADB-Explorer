@@ -279,7 +279,7 @@ public class FileTransferOperation : AbstractSyncFileOperation
 
         var currentName = current.FullPath;
         if (_activeFiles > 1)
-            currentName = string.Format(Strings.Resources.S_FILES_PLURAL, _activeFiles);
+            currentName = Strings.Plurals.Files(_activeFiles);
 
         AdbSyncProgressInfo info = new(currentName, totalPercentage, null, transferred);
         StatusInfo = new InProgSyncProgressViewModel(info, TransferStart, totalBytes, transferred);

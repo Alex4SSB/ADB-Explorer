@@ -258,9 +258,6 @@ Bu işlem geri alınamaz. Emin misiniz?</value>
     <value>ADB, WSA'da zaten yetkilendirilmişse Başlat'ı seçin.
 ADB'yi onaylamak için WSA gelişmiş ayarlarını açın.</value>
   </data>
-  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
-    <value>Seçilen dosyaların {0} tanesi Windows sürücüsünün kök dizininde oluşturulamıyor.</value>
-  </data>
   <data name="S_ADB_LEARN_MORE" xml:space="preserve">
     <value>ADB Hakkında Daha Fazla Bilgi Edin</value>
   </data>
@@ -355,10 +352,6 @@ Görünen içerik eksik olabilir.</value>
     <value>Aşağıdakiler kaldırılacaktır:
 {0}</value>
   </data>
-  <data name="S_REM_APK_PLURAL" xml:space="preserve">
-    <value>Aşağıdakiler kaldırılacaktır:
-{0} paket</value>
-  </data>
   <data name="S_UNINSTALL" xml:space="preserve">
     <value>Kaldır</value>
   </data>
@@ -376,18 +369,6 @@ Görünen içerik eksik olabilir.</value>
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Birleştir veya Değiştir</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value>1 adet çakışan öğe var</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>{0} içinde 1 çakışan öğe var</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value>{0} çakışan öğe var</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value>{1} içinde {0} çakışan öğe var</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
     <value>Yapıştırma Çakışmaları</value>

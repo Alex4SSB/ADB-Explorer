@@ -46,6 +46,16 @@
     <Content Include="Assets\app_icon_2023_combined.ico" />
   </ItemGroup>
 
+  <!-- Count-dependent strings (Strings.Plurals), translated in Weblate as i18next v4 JSON.
+       Embedded in the main assembly - no satellite assemblies, so the culture isn't inferred from the name. -->
+  <ItemGroup>
+    <None Remove="Strings\Plurals\*.json" />
+    <EmbeddedResource Include="Strings\Plurals\*.json">
+      <LogicalName>ADB_Explorer.Strings.Plurals.%(Filename).json</LogicalName>
+      <WithCulture>false</WithCulture>
+    </EmbeddedResource>
+  </ItemGroup>
+
   <ItemGroup Condition="Exists('FaroCollector.url') And '$(Configuration)' != 'Debug'">
     <EmbeddedResource Include="FaroCollector.url">
       <LogicalName>FaroCollector.url</LogicalName>

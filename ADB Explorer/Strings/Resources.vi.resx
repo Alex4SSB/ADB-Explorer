@@ -172,9 +172,6 @@
   <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
     <value>Hạn chế ổ đĩa:</value>
   </data>
-  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
-    <value>không thể tạo {0} tệp đã chọn dưới thư mục gốc ổ đĩa Windows.</value>
-  </data>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>Tải xuống ADB</value>
   </data>
@@ -204,9 +201,6 @@
   </data>
   <data name="S_REM_APK" xml:space="preserve">
     <value>The following will be removed: {0}</value>
-  </data>
-  <data name="S_REM_APK_PLURAL" xml:space="preserve">
-    <value>The following will be removed: {0} packages</value>
   </data>
   <data name="S_UNINSTALL" xml:space="preserve">
     <value>Gỡ cài đặt</value>
@@ -406,14 +400,8 @@
   <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
     <value>Sao chép {0}</value>
   </data>
-  <data name="S_FILES_PLURAL" xml:space="preserve">
-    <value>{0} tệp</value>
-  </data>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
     <value>Cài đặt {0}</value>
-  </data>
-  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
-    <value>Cài đặt {0} APKs</value>
   </data>
   <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
     <value>Trình giả lập Khởi chạy</value>

@@ -17,10 +17,7 @@ public partial class PaneStatusViewModel : ObservableObject
     public partial Visibility ContainerVisibility { get; set; } = Visibility.Collapsed;
 
     [ObservableProperty]
-    public partial string ItemsCount { get; set; } = "";
-
-    [ObservableProperty]
-    public partial string ItemsSuffix { get; set; } = "";
+    public partial string ItemsText { get; set; } = "";
 
     [ObservableProperty]
     public partial Visibility ItemsVisibility { get; set; } = Visibility.Collapsed;
@@ -29,10 +26,7 @@ public partial class PaneStatusViewModel : ObservableObject
     public partial Visibility UnfinishedVisibility { get; set; } = Visibility.Collapsed;
 
     [ObservableProperty]
-    public partial string SelectedCount { get; set; } = "0";
-
-    [ObservableProperty]
-    public partial string SelectedSuffix { get; set; } = "";
+    public partial string SelectedText { get; set; } = "";
 
     [ObservableProperty]
     public partial Visibility SelectedVisibility { get; set; } = Visibility.Collapsed;
@@ -190,9 +184,9 @@ public partial class PaneStatusViewModel : ObservableObject
 
         ContainerVisibility = isExplorer || actions.IsDriveViewVisible ? Visibility.Visible : Visibility.Collapsed;
 
-        ItemsCount = isExplorer ? $"{CountOf(instance.ExplorerItemsSource)}" : "";
-        ItemsVisibility = ItemsCount is "" or "0" ? Visibility.Collapsed : Visibility.Visible;
-        ItemsSuffix = ItemsCount is "1" ? Strings.Resources.S_BROWSER_ITEMS : Strings.Resources.S_BROWSER_ITEMS_PLURAL;
+        var itemsCount = isExplorer ? CountOf(instance.ExplorerItemsSource) : 0;
+        ItemsVisibility = itemsCount == 0 ? Visibility.Collapsed : Visibility.Visible;
+        ItemsText = Strings.Plurals.Items(itemsCount);
         UnfinishedVisibility = instance.IsListingUnfinished ? Visibility.Visible : Visibility.Collapsed;
 
         var selectedFiles = instance.FileList.SelectedFiles ?? [];
@@ -200,9 +194,8 @@ public partial class PaneStatusViewModel : ObservableObject
             ? (instance.FileList.SelectedPackages ?? []).Count()
             : selectedFiles.Count();
 
-        SelectedCount = $"{selected}";
         SelectedVisibility = selected == 0 ? Visibility.Collapsed : Visibility.Visible;
-        SelectedSuffix = selected == 1 ? Strings.Resources.S_ITEMS_SELECTED : Strings.Resources.S_ITEMS_SELECTED_PLURAL;
+        SelectedText = Strings.Plurals.ItemsSelected(selected);
 
         var totalSize = FileHelper.TotalSize(selectedFiles);
         SelectedTotalSize = totalSize > 0 ? totalSize.BytesToSize(true) : "";

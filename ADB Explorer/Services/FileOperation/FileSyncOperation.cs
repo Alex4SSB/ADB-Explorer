@@ -763,7 +763,7 @@ public class FileSyncOperation : AbstractSyncFileOperation
                 info = new(currProgress.AndroidPath, currProgress.TotalPercentage, null, currProgress.CurrentFileBytesTransferred);
             else if (active.Length > 1)
             {
-                info = new(string.Format(Strings.Resources.S_FILES_PLURAL, active.Length),
+                info = new(Strings.Plurals.Files(active.Length),
                            currProgress.TotalPercentage,
                            (int)active.Average(),
                            currProgress.TotalBytesTransferred);

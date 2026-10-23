@@ -1,0 +1,7 @@
+{
+    "Items_one": "{{count}} item",
+    "Items_other": "{{count}} items",
+    "Folders_other": "{{count}} Folders",
+    "Packages_one": "{{count}} Package",
+    "Packages_other": "{{count}} Packages"
+}

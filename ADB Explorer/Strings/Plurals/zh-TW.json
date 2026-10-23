@@ -1,0 +1,19 @@
+{
+    "Items_other": "{{count}} 項目",
+    "ItemsSelected_other": "{{count}} 選定的項目",
+    "Files_other": "{{count}} 個檔案",
+    "Folders_other": "{{count}} 資料夾",
+    "ConflictingItems_other": "有 {{count}} 個衝突",
+    "ConflictingItemsIn_other": "於 {{destination}} 有 {{count}} 個衝突",
+    "PackagesToRemove_other": "會移除:\n{{count}} 套件",
+    "InstallApks_other": "安裝 {{count}} 個 APK",
+    "PasteCutItems_other": "貼上 {{count}} 個剪下項",
+    "PasteCopiedItems_other": "貼上 {{count}} 個複製項",
+    "CopyItems_other": "複製 {{count}} 項",
+    "CopyItemsTo_other": "複製 {{count}} 項到 {{target}}",
+    "MoveItems_other": "移動 {{count}} 項",
+    "MoveItemsTo_other": "移動 {{count}} 項到 {{target}}",
+    "FilesInvalidAtDriveRoot_other": "無法在 Windows 磁碟機根目錄下建立 {{count}} 個所選檔案。",
+    "ApkInstallers_other": "{{count}} APK 安裝程式",
+    "Packages_other": "{{count}} 套件"
+}

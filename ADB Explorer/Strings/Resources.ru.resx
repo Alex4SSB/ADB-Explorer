@@ -270,9 +270,6 @@
     <value>Выберите Запустить, если ADB уже авторизован в WSA.
 Чтобы разрешить ADB, откройте расширенные настройки WSA.</value>
   </data>
-  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
-    <value>{0} выбранных файлов не могут быть созданы в корне диска Windows.</value>
-  </data>
   <data name="S_ADB_LEARN_MORE" xml:space="preserve">
     <value>Узнайте больше про ADB</value>
   </data>
@@ -374,10 +371,6 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Следующие элементы будут удалены:
 {0}</value>
   </data>
-  <data name="S_REM_APK_PLURAL" xml:space="preserve">
-    <value>Следующие элементы будут удалены:
-{0} пакетов</value>
-  </data>
   <data name="S_UNINSTALL" xml:space="preserve">
     <value>Деинсталлировать</value>
   </data>
@@ -395,18 +388,6 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Объединить или заменить</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value>Есть 1 конфликтный элемент</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>Имеется 1 конфликтный элемент в {0}</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value>Имеется {0} конфликтующих элементов</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value>Есть {0} конфликтующих элементов в {1}</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
     <value>Заменить или пропустить файлы</value>
@@ -696,12 +677,6 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>О программе</value>
   </data>
-  <data name="S_BROWSER_ITEMS" xml:space="preserve">
-    <value>Элемент</value>
-  </data>
-  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
-    <value>Элементы</value>
-  </data>
   <data name="S_FOLDER_EMPTY" xml:space="preserve">
     <value>Эта папка пуста.</value>
   </data>
@@ -713,12 +688,6 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
     <value>&lt;Span&gt;Эта папка &lt;Italic&gt;выглядит&lt;/Italic&gt; пустой&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… по крайней мере невооруженным взглядом&lt;/Span&gt;&lt;/Span&gt;</value>
-  </data>
-  <data name="S_ITEMS_SELECTED" xml:space="preserve">
-    <value>Выбранный элемент</value>
-  </data>
-  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
-    <value>Выбранные элементы</value>
   </data>
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
     <value>Тип операции</value>
@@ -1113,15 +1082,6 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
     <value>Корзина пуста</value>
   </data>
-  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
-    <value>Установщик APK</value>
-  </data>
-  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
-    <value>Установщиков APK</value>
-  </data>
-  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
-    <value>Пакеты</value>
-  </data>
   <data name="S_FILEOP_ERROR" xml:space="preserve">
     <value>Ошибка: {0}</value>
   </data>
@@ -1280,32 +1240,8 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="BYTES" xml:space="preserve">
     <value>{0} Б</value>
   </data>
-  <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>Копировать {0} элементов</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>Копировать {0} элементов в {1}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>Переместить {0} элементов в {1}</value>
-  </data>
   <data name="S_DRAGDROP_LINK" xml:space="preserve">
     <value>Создать ссылку в {0}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>Переместить {0} элементов</value>
-  </data>
-  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
-    <value>Вставить 1 вырезанный элемент</value>
-  </data>
-  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
-    <value>Вставить 1 скопированный элемент</value>
-  </data>
-  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
-    <value>Вставить {0} скопированных элементов</value>
-  </data>
-  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
-    <value>Вставить {0} вырезанных элементов</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} в {1} ({2})</value>
@@ -1337,9 +1273,6 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
     <value>Проверка…</value>
   </data>
-  <data name="S_FILES_PLURAL" xml:space="preserve">
-    <value>{0} файлов</value>
-  </data>
   <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
     <value>Выберите ROM для sideload</value>
   </data>
@@ -1354,9 +1287,6 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
     <value>Установить {0}</value>
-  </data>
-  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
-    <value>Установить {0} APKs</value>
   </data>
   <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
     <value>Вкл.</value>
@@ -1884,8 +1814,5 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_MENU_INVERT_SELECTION" xml:space="preserve">
     <value>Инвертировать выделение</value>
-  </data>
-  <data name="S_ITEMS_PLURAL" xml:space="preserve">
-    <value>{0} элементы</value>
   </data>
 </root>

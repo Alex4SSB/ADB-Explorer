@@ -1,0 +1,19 @@
+{
+    "Items_other": "{{count}} item",
+    "ItemsSelected_other": "{{count}} item dipilih",
+    "Files_other": "{{count}} file",
+    "Folders_other": "{{count}} Folder",
+    "ConflictingItems_other": "Ada {{count}} item yang konflik",
+    "ConflictingItemsIn_other": "Ada {{count}} item yang konflik di {{destination}}",
+    "PackagesToRemove_other": "Berikut akan dihapus:\n{{count}} paket",
+    "InstallApks_other": "Instal {{count}} APK",
+    "PasteCutItems_other": "Tempel {{count}} Item yang Dipotong",
+    "PasteCopiedItems_other": "Tempel {{count}} Item yang Disalin",
+    "CopyItems_other": "Salin {{count}} item",
+    "CopyItemsTo_other": "Salin {{count}} item ke {{target}}",
+    "MoveItems_other": "Pindahkan {{count}} item",
+    "MoveItemsTo_other": "Pindahkan {{count}} item ke {{target}}",
+    "FilesInvalidAtDriveRoot_other": "{{count}} dari berkas yang dipilih tidak dapat dibuat di bawah akar drive Windows.",
+    "ApkInstallers_other": "{{count}} Penginstal APK",
+    "Packages_other": "{{count}} Paket"
+}

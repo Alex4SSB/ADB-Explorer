@@ -649,24 +649,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to item.
-        /// </summary>
-        public static string S_BROWSER_ITEMS {
-            get {
-                return ResourceManager.GetString("S_BROWSER_ITEMS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to items.
-        /// </summary>
-        public static string S_BROWSER_ITEMS_PLURAL {
-            get {
-                return ResourceManager.GetString("S_BROWSER_ITEMS_PLURAL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Abort.
         /// </summary>
         public static string S_BUTTON_ABORT {
@@ -1225,42 +1207,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There is 1 conflicting item.
-        /// </summary>
-        public static string S_CONFLICT_ITEMS {
-            get {
-                return ResourceManager.GetString("S_CONFLICT_ITEMS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to There is 1 conflicting item in {0}.
-        /// </summary>
-        public static string S_CONFLICT_ITEMS_DESTINATION {
-            get {
-                return ResourceManager.GetString("S_CONFLICT_ITEMS_DESTINATION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to There are {0} conflicting items.
-        /// </summary>
-        public static string S_CONFLICT_ITEMS_PLURAL {
-            get {
-                return ResourceManager.GetString("S_CONFLICT_ITEMS_PLURAL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to There are {0} conflicting items in {1}.
-        /// </summary>
-        public static string S_CONFLICT_ITEMS_PLURAL_DESTINATION {
-            get {
-                return ResourceManager.GetString("S_CONFLICT_ITEMS_PLURAL_DESTINATION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Copy Package Name.
         /// </summary>
         public static string S_COPY_APK_NAME {
@@ -1543,15 +1489,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Install {0} APKs.
-        /// </summary>
-        public static string S_DRAG_INSTALL_MULTIPLE {
-            get {
-                return ResourceManager.GetString("S_DRAG_INSTALL_MULTIPLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Install {0}.
         /// </summary>
         public static string S_DRAG_INSTALL_SINGLE {
@@ -1561,29 +1498,11 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copy {0} items.
-        /// </summary>
-        public static string S_DRAGDROP_COPY {
-            get {
-                return ResourceManager.GetString("S_DRAGDROP_COPY", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Copy {0}.
         /// </summary>
         public static string S_DRAGDROP_COPY_SINGLE {
             get {
                 return ResourceManager.GetString("S_DRAGDROP_COPY_SINGLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Copy {0} items to {1}.
-        /// </summary>
-        public static string S_DRAGDROP_COPY_TARGET {
-            get {
-                return ResourceManager.GetString("S_DRAGDROP_COPY_TARGET", resourceCulture);
             }
         }
         
@@ -1606,15 +1525,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Move {0} items.
-        /// </summary>
-        public static string S_DRAGDROP_MOVE {
-            get {
-                return ResourceManager.GetString("S_DRAGDROP_MOVE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Move {0}.
         /// </summary>
         public static string S_DRAGDROP_MOVE_SINGLE {
@@ -1624,38 +1534,11 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Move {0} items to {1}.
-        /// </summary>
-        public static string S_DRAGDROP_MOVE_TARGET {
-            get {
-                return ResourceManager.GetString("S_DRAGDROP_MOVE_TARGET", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Move {0} to {1}.
         /// </summary>
         public static string S_DRAGDROP_MOVE_TARGET_SINGLE {
             get {
                 return ResourceManager.GetString("S_DRAGDROP_MOVE_TARGET_SINGLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to APK Installer.
-        /// </summary>
-        public static string S_DRIVE_APK_ITEMS {
-            get {
-                return ResourceManager.GetString("S_DRIVE_APK_ITEMS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to APK Installers.
-        /// </summary>
-        public static string S_DRIVE_APK_ITEMS_PLURAL {
-            get {
-                return ResourceManager.GetString("S_DRIVE_APK_ITEMS_PLURAL", resourceCulture);
             }
         }
         
@@ -1710,15 +1593,6 @@ namespace ADB_Explorer.Strings {
         public static string S_DRIVE_OTG {
             get {
                 return ResourceManager.GetString("S_DRIVE_OTG", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Packages.
-        /// </summary>
-        public static string S_DRIVE_PACKAGE_PLURAL {
-            get {
-                return ResourceManager.GetString("S_DRIVE_PACKAGE_PLURAL", resourceCulture);
             }
         }
         
@@ -2155,15 +2029,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} files.
-        /// </summary>
-        public static string S_FILES_PLURAL {
-            get {
-                return ResourceManager.GetString("S_FILES_PLURAL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Filter File Operations.
         /// </summary>
         public static string S_FILTER_FILE_OPS {
@@ -2317,33 +2182,6 @@ namespace ADB_Explorer.Strings {
         public static string S_ITEM_LOCATION {
             get {
                 return ResourceManager.GetString("S_ITEM_LOCATION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} items.
-        /// </summary>
-        public static string S_ITEMS_PLURAL {
-            get {
-                return ResourceManager.GetString("S_ITEMS_PLURAL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to item selected.
-        /// </summary>
-        public static string S_ITEMS_SELECTED {
-            get {
-                return ResourceManager.GetString("S_ITEMS_SELECTED", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to items selected.
-        /// </summary>
-        public static string S_ITEMS_SELECTED_PLURAL {
-            get {
-                return ResourceManager.GetString("S_ITEMS_SELECTED_PLURAL", resourceCulture);
             }
         }
         
@@ -3162,42 +3000,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Paste 1 Copied Item.
-        /// </summary>
-        public static string S_PASTE_ONE_COPIED_ITEM {
-            get {
-                return ResourceManager.GetString("S_PASTE_ONE_COPIED_ITEM", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Paste 1 Cut Item.
-        /// </summary>
-        public static string S_PASTE_ONE_CUT_ITEM {
-            get {
-                return ResourceManager.GetString("S_PASTE_ONE_CUT_ITEM", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Paste {0} Copied Items.
-        /// </summary>
-        public static string S_PASTE_PLURAL_COPIED_ITEMS {
-            get {
-                return ResourceManager.GetString("S_PASTE_PLURAL_COPIED_ITEMS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Paste {0} Cut Items.
-        /// </summary>
-        public static string S_PASTE_PLURAL_CUT_ITEMS {
-            get {
-                return ResourceManager.GetString("S_PASTE_PLURAL_CUT_ITEMS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Argument must specify full path of a new or existing settings file..
         /// </summary>
         public static string S_PATH_INVALID {
@@ -3621,16 +3423,6 @@ namespace ADB_Explorer.Strings {
         public static string S_REM_APK {
             get {
                 return ResourceManager.GetString("S_REM_APK", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The following will be removed:
-        ///{0} packages.
-        /// </summary>
-        public static string S_REM_APK_PLURAL {
-            get {
-                return ResourceManager.GetString("S_REM_APK_PLURAL", resourceCulture);
             }
         }
         
@@ -5163,15 +4955,6 @@ namespace ADB_Explorer.Strings {
         public static string S_VIEW_SIZE_TOOLTIP {
             get {
                 return ResourceManager.GetString("S_VIEW_SIZE_TOOLTIP", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} of the selected files cannot be created under a Windows drive root..
-        /// </summary>
-        public static string S_WIN_ROOT_ILLEGAL {
-            get {
-                return ResourceManager.GetString("S_WIN_ROOT_ILLEGAL", resourceCulture);
             }
         }
         

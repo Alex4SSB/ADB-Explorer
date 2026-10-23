@@ -81,45 +81,26 @@ internal static partial class FileActionLogic
     {
         ResetPasteImageLabels(actions);
 
-        actions.CutItemsCount.Value = Data.CopyPaste.Files.Length.ToString();
+        var count = Data.CopyPaste.Files.Length;
+        actions.CutItemsCount.Value = count.ToString();
 
-        if (Data.CopyPaste.Files.Length > 1)
-        {
-            if (actions.IsAppDrive)
-            {
-                actions.PasteDescription.Value = string.Format(
-                    Strings.Resources.S_DRAG_INSTALL_MULTIPLE,
-                    Data.CopyPaste.Files.Length);
-            }
-            else if (Data.CopyPaste.PasteState is DragDropEffects.Move)
-            {
-                actions.PasteDescription.Value = string.Format(
-                    Strings.Resources.S_PASTE_PLURAL_CUT_ITEMS,
-                    Data.CopyPaste.Files.Length);
-            }
-            else
-            {
-                actions.PasteDescription.Value = string.Format(
-                    Strings.Resources.S_PASTE_PLURAL_COPIED_ITEMS,
-                    Data.CopyPaste.Files.Length);
-            }
-
-            return;
-        }
-
-        if (actions.IsAppDrive)
+        if (actions.IsAppDrive && count == 1)
         {
             actions.PasteDescription.Value = string.Format(
                 Strings.Resources.S_DRAG_INSTALL_SINGLE,
                 Data.CopyPaste.CurrentFiles.FirstOrDefault()?.NoExtName);
         }
+        else if (actions.IsAppDrive)
+        {
+            actions.PasteDescription.Value = Strings.Plurals.InstallApks(count);
+        }
         else if (Data.CopyPaste.PasteState is DragDropEffects.Move)
         {
-            actions.PasteDescription.Value = Strings.Resources.S_PASTE_ONE_CUT_ITEM;
+            actions.PasteDescription.Value = Strings.Plurals.PasteCutItems(count);
         }
         else
         {
-            actions.PasteDescription.Value = Strings.Resources.S_PASTE_ONE_COPIED_ITEM;
+            actions.PasteDescription.Value = Strings.Plurals.PasteCopiedItems(count);
         }
     }
 

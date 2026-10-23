@@ -272,9 +272,6 @@ Tento krok nelze vrátit zpět. Opravdu chcete pokračovat?</value>
     <value>Pokud je ADB ve WSA již autorizováno, vyberte možnost Spustit.
 Chcete-li ADB povolit, otevřete pokročilá nastavení WSA.</value>
   </data>
-  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
-    <value>{0} z vybraných souborů nelze vytvořit v kořeni jednotky Windows.</value>
-  </data>
   <data name="S_ADB_LEARN_MORE" xml:space="preserve">
     <value>Dozvěte se více o ADB</value>
   </data>
@@ -380,10 +377,6 @@ Zobrazený obsah nemusí být úplný.</value>
     <value>Budou odebrány tyto položky:
 {0}</value>
   </data>
-  <data name="S_REM_APK_PLURAL" xml:space="preserve">
-    <value>Budou odebrány tyto položky:
-{0} balíčků</value>
-  </data>
   <data name="S_UNINSTALL" xml:space="preserve">
     <value>Odinstalovat</value>
   </data>
@@ -401,18 +394,6 @@ Zobrazený obsah nemusí být úplný.</value>
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Sloučit nebo nahradit</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value>Existuje 1 konfliktní položka</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>V umístění {0} existuje 1 konfliktní položka</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value>Existuje {0} konfliktních položek</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value>V umístění {1} existuje {0} konfliktních položek</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
     <value>Nahradit nebo přeskočit soubory</value>
@@ -744,12 +725,6 @@ Zrušit všechny probíhající operace</value>
     <value>O aplikaci</value>
     <comment>The title of the settings about group</comment>
   </data>
-  <data name="S_BROWSER_ITEMS" xml:space="preserve">
-    <value>položka</value>
-  </data>
-  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
-    <value>položky</value>
-  </data>
   <data name="S_FOLDER_EMPTY" xml:space="preserve">
     <value>Tato složka je prázdná.</value>
   </data>
@@ -760,12 +735,6 @@ Zrušit všechny probíhající operace</value>
   <data name="S_EMPTY_FILTER" xml:space="preserve">
     <value>No items match current filter.</value>
     <comment>The notification displayed when a non empty folder / package view is filtered such that no items match</comment>
-  </data>
-  <data name="S_ITEMS_SELECTED" xml:space="preserve">
-    <value>položka vybrána</value>
-  </data>
-  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
-    <value>položky vybrány</value>
   </data>
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
     <value>Typ operace</value>
@@ -1220,16 +1189,6 @@ Zrušit všechny probíhající operace</value>
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
     <value>Prázdno</value>
   </data>
-  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
-    <value>Instalace APK</value>
-  </data>
-  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
-    <value>Instalace APK</value>
-  </data>
-  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
-    <value>Balíčky</value>
-    <comment>The installed apps drive items count display, plural</comment>
-  </data>
   <data name="S_FILEOP_ERROR" xml:space="preserve">
     <value>Chyba: {0}</value>
     <comment>0 = an internal error message</comment>
@@ -1420,36 +1379,9 @@ Pomozte nám prosím lokalizovat aplikaci do svého jazyka na Weblate.</value>
     <value>{0} B</value>
     <comment>The notation for Bytes when displaying file size or drive usage</comment>
   </data>
-  <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>Zkopírovat {0} položek</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>Kopírovat {0} položek do {1}</value>
-    <comment>The drag tooltip in copy mode when the target is known. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>Přesunout {0} položek do {1}</value>
-    <comment>The drag tooltip in move mode when the target is known. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
-  </data>
   <data name="S_DRAGDROP_LINK" xml:space="preserve">
     <value>Vytvořit odkaz v {0}</value>
     <comment>The drag tooltip in link mode. 0 - the destination under the mouse</comment>
-  </data>
-  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>Přesunout {0} položek</value>
-    <comment>The drag tooltip in move mode. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
-  </data>
-  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
-    <value>Vložit 1 vyjmutou položku</value>
-  </data>
-  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
-    <value>Vložit 1 zkopírovanou položku</value>
-  </data>
-  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
-    <value>Vložit {0} zkopírovaných položek</value>
-  </data>
-  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
-    <value>Vložit {0} vyjmutých položek</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} za {1} ({2})</value>
@@ -1489,9 +1421,6 @@ Pomozte nám prosím lokalizovat aplikaci do svého jazyka na Weblate.</value>
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
     <value>Ověřuji…</value>
   </data>
-  <data name="S_FILES_PLURAL" xml:space="preserve">
-    <value>{0} souborů</value>
-  </data>
   <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
     <value>Vyberte ROM pro sideload</value>
     <comment>The title of the open file dialog for selecting a ROM image to sideload</comment>
@@ -1510,10 +1439,6 @@ Pomozte nám prosím lokalizovat aplikaci do svého jazyka na Weblate.</value>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
     <value>Nainstalovat {0}</value>
     <comment>The drag tooltip when dragging a single APK file over the installed apps view. 0 - the name of the APK</comment>
-  </data>
-  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
-    <value>Nainstalovat {0} souborů APK</value>
-    <comment>The drag tooltip when dragging multiple APK files over the installed apps view. 0 - number of APKs being dragged</comment>
   </data>
   <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
     <value>Zapnuto</value>
@@ -2110,9 +2035,6 @@ Kontroly se snaží zabránit tomu, aby nic netušící uživatel spustil potenc
   </data>
   <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
     <value>Vytvořit soubor .APKBKP s instalací aplikace a daty OBB</value>
-  </data>
-  <data name="S_ITEMS_PLURAL" xml:space="preserve">
-    <value>Položky: {0}</value>
   </data>
   <data name="S_ACTION_RETRY" xml:space="preserve">
     <value>Znovu přenést položky s chybou ({0})</value>

@@ -406,14 +406,6 @@
     <value>About</value>
     <comment>The title of the settings about group</comment>
   </data>
-  <data name="S_BROWSER_ITEMS" xml:space="preserve">
-    <value>item</value>
-    <comment>The toolbar folder items count display, singular</comment>
-  </data>
-  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
-    <value>items</value>
-    <comment>The toolbar folder items count display, plural</comment>
-  </data>
   <data name="S_EMPTY_FILTER" xml:space="preserve">
     <value>No items match current filter.</value>
     <comment>The notification displayed when a non empty folder / package view is filtered such that no items match</comment>
@@ -621,10 +613,6 @@
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
     <value>Empty</value>
     <comment>The notification displayed on the recycle bin drive when it is empty</comment>
-  </data>
-  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
-    <value>Packages</value>
-    <comment>The installed apps drive items count display, plural</comment>
   </data>
   <data name="S_FILEOP_VALIDATED" xml:space="preserve">
     <value>Validated</value>

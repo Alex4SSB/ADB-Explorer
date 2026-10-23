@@ -478,7 +478,7 @@ internal static partial class FileActionLogic
 
         if (match.Success && invalidFiles.Count > 0)
         {
-            var result = await DialogService.ShowConfirmation(string.Format(Strings.Resources.S_WIN_ROOT_ILLEGAL, invalidFiles.Count),
+            var result = await DialogService.ShowConfirmation(Strings.Plurals.FilesInvalidAtDriveRoot(invalidFiles.Count),
                                                  Strings.Resources.S_WIN_ROOT_ILLEGAL_TITLE,
                                                  primaryText: Strings.Resources.S_SKIP,
                                                  icon: DialogService.DialogIcon.Exclamation,

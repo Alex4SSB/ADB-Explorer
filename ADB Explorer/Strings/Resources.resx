@@ -273,9 +273,6 @@ This cannot be undone. Are you sure?</value>
     <value>Select Launch if ADB is already authorized in WSA.
 To approve ADB, open WSA advanced settings.</value>
   </data>
-  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
-    <value>{0} of the selected files cannot be created under a Windows drive root.</value>
-  </data>
   <data name="S_ADB_LEARN_MORE" xml:space="preserve">
     <value>Learn More About ADB</value>
   </data>
@@ -405,10 +402,6 @@ Visible content may be incomplete.</value>
     <value>The following will be removed:
 {0}</value>
   </data>
-  <data name="S_REM_APK_PLURAL" xml:space="preserve">
-    <value>The following will be removed:
-{0} packages</value>
-  </data>
   <data name="S_UNINSTALL" xml:space="preserve">
     <value>Uninstall</value>
   </data>
@@ -445,18 +438,6 @@ Visible content may be incomplete.</value>
   </data>
   <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
     <value>Resolve {0} conflicts</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value>There is 1 conflicting item</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>There is 1 conflicting item in {0}</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value>There are {0} conflicting items</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value>There are {0} conflicting items in {1}</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
     <value>Replace or Skip Files</value>
@@ -903,14 +884,6 @@ Cancel All Running</value>
     <value>About</value>
     <comment>The title of the settings about group</comment>
   </data>
-  <data name="S_BROWSER_ITEMS" xml:space="preserve">
-    <value>item</value>
-    <comment>The toolbar folder items count display, singular</comment>
-  </data>
-  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
-    <value>items</value>
-    <comment>The toolbar folder items count display, plural</comment>
-  </data>
   <data name="S_FOLDER_EMPTY" xml:space="preserve">
     <value>This folder is empty.</value>
     <comment>The notification displayed when a folder is empty on a rooted device</comment>
@@ -926,14 +899,6 @@ Cancel All Running</value>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
     <value>&lt;Span&gt;This folder &lt;Italic&gt;looks&lt;/Italic&gt; empty&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… to the naked eye&lt;/Span&gt;&lt;/Span&gt;</value>
     <comment>The sentence which is being translated here: This folder looks empty … to the naked eye</comment>
-  </data>
-  <data name="S_ITEMS_SELECTED" xml:space="preserve">
-    <value>item selected</value>
-    <comment>The toolbar folder items selected count</comment>
-  </data>
-  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
-    <value>items selected</value>
-    <comment>The toolbar folder items selected count, plural form</comment>
   </data>
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
     <value>Operation Type</value>
@@ -1482,18 +1447,6 @@ Cancel All Running</value>
     <value>Empty</value>
     <comment>The notification displayed on the recycle bin drive when it is empty</comment>
   </data>
-  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
-    <value>APK Installer</value>
-    <comment>The item count on the temp drive, singular</comment>
-  </data>
-  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
-    <value>APK Installers</value>
-    <comment>The item count on the temp drive, plural</comment>
-  </data>
-  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
-    <value>Packages</value>
-    <comment>The installed apps drive items count display, plural</comment>
-  </data>
   <data name="S_FILEOP_ERROR" xml:space="preserve">
     <value>Error: {0}</value>
     <comment>0 = an internal error message</comment>
@@ -1704,37 +1657,9 @@ Please help us localize the app to your language on Weblate.</value>
     <value>{0} B</value>
     <comment>The notation for Bytes when displaying file size or drive usage</comment>
   </data>
-  <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>Copy {0} items</value>
-    <comment>The drag tooltip in copy mode. 0 - number of items being dragged</comment>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>Copy {0} items to {1}</value>
-    <comment>The drag tooltip in copy mode when the target is known. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>Move {0} items to {1}</value>
-    <comment>The drag tooltip in move mode when the target is known. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
-  </data>
   <data name="S_DRAGDROP_LINK" xml:space="preserve">
     <value>Create link in {0}</value>
     <comment>The drag tooltip in link mode. 0 - the destination under the mouse</comment>
-  </data>
-  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>Move {0} items</value>
-    <comment>The drag tooltip in move mode. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
-  </data>
-  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
-    <value>Paste 1 Cut Item</value>
-  </data>
-  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
-    <value>Paste 1 Copied Item</value>
-  </data>
-  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
-    <value>Paste {0} Copied Items</value>
-  </data>
-  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
-    <value>Paste {0} Cut Items</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} in {1} ({2})</value>
@@ -1776,14 +1701,6 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Validating…</value>
     <comment>The info displayed in file operation progress during content validation</comment>
   </data>
-  <data name="S_FILES_PLURAL" xml:space="preserve">
-    <value>{0} files</value>
-    <comment>The indication of the number of currently active files (being transferred)</comment>
-  </data>
-  <data name="S_ITEMS_PLURAL" xml:space="preserve">
-    <value>{0} items</value>
-    <comment>The name of a file operation transferring several selected files and folders together</comment>
-  </data>
   <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
     <value>Select ROM for sideload</value>
     <comment>The title of the open file dialog for selecting a ROM image to sideload</comment>
@@ -1803,10 +1720,6 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
     <value>Install {0}</value>
     <comment>The drag tooltip when dragging a single APK file over the installed apps view. 0 - the name of the APK</comment>
-  </data>
-  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
-    <value>Install {0} APKs</value>
-    <comment>The drag tooltip when dragging multiple APK files over the installed apps view. 0 - number of APKs being dragged</comment>
   </data>
   <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
     <value>On</value>

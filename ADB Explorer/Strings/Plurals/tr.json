@@ -1,0 +1,9 @@
+{
+    "Folders_other": "{{count}} Folders",
+    "ConflictingItems_one": "{{count}} adet çakışan öğe var",
+    "ConflictingItems_other": "{{count}} çakışan öğe var",
+    "ConflictingItemsIn_one": "{{destination}} içinde {{count}} çakışan öğe var",
+    "ConflictingItemsIn_other": "{{destination}} içinde {{count}} çakışan öğe var",
+    "PackagesToRemove_other": "Aşağıdakiler kaldırılacaktır:\n{{count}} paket",
+    "FilesInvalidAtDriveRoot_other": "Seçilen dosyaların {{count}} tanesi Windows sürücüsünün kök dizininde oluşturulamıyor."
+}

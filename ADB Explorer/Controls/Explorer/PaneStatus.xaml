@@ -11,16 +11,12 @@
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal" Visibility="{Binding ContainerVisibility}">
         <StackPanel Orientation="Horizontal" Visibility="{Binding ItemsVisibility}">
-            <TextBlock Text="{Binding ItemsCount}" />
-            <TextBlock Text=" " />
-            <TextBlock Margin="0,4" Text="{Binding ItemsSuffix}" />
+            <TextBlock Text="{Binding ItemsText}" />
             <TextBlock Style="{StaticResource UnfinishedTextblockStyle}" Text=" *" Visibility="{Binding UnfinishedVisibility}" />
         </StackPanel>
         <Separator Style="{StaticResource StatusBarSeparatorStyle}" Visibility="{Binding SelectedVisibility}" />
         <StackPanel Orientation="Horizontal" Visibility="{Binding SelectedVisibility}">
-            <TextBlock Text="{Binding SelectedCount}" />
-            <TextBlock Text=" " />
-            <TextBlock Text="{Binding SelectedSuffix}" />
+            <TextBlock Text="{Binding SelectedText}" />
             <TextBlock
                 Margin="6,4,0,4"
                 Text="{Binding SelectedTotalSize}"

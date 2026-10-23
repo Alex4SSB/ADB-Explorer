@@ -28,7 +28,7 @@ public abstract class AbstractSyncFileOperation : FileOperation
 
     public override bool IsBatch => BatchItems.Count > 0;
 
-    public string BatchName => string.Format(Strings.Resources.S_ITEMS_PLURAL, BatchItems.Count);
+    public string BatchName => Strings.Plurals.Items(BatchItems.Count);
 
     /// <summary>Each top-level item with where it goes - the batch items, or the op's own source and target.</summary>
     public IEnumerable<(SyncFile Source, SyncFile Target)> TransferredItems

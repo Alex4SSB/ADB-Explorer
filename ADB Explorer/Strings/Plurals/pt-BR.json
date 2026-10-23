@@ -1,0 +1,15 @@
+{
+    "Items_one": "{{count}} item",
+    "Items_other": "{{count}} itens",
+    "ItemsSelected_one": "{{count}} item selecionado",
+    "ItemsSelected_other": "{{count}} itens selecionados",
+    "Folders_other": "{{count}} Pastas",
+    "ConflictingItems_one": "Tem {{count}} item conflitando",
+    "ConflictingItems_other": "Tem {{count}} itens conflitando",
+    "ConflictingItemsIn_one": "Tem {{count}} item conflitando em {{destination}}",
+    "ConflictingItemsIn_other": "Tem {{count}} itens conflitando em {{destination}}",
+    "PackagesToRemove_other": "Os a seguir serão removidos:\n{{count}} pacotes",
+    "FilesInvalidAtDriveRoot_other": "{{count}} dos arquivos selecionados não puderam ser criados na raíz do disco do Windows.",
+    "Packages_one": "{{count}} Pacote",
+    "Packages_other": "{{count}} Packages"
+}

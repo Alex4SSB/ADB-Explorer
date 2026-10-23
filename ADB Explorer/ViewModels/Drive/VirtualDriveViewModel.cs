@@ -7,6 +7,13 @@ public partial class VirtualDriveViewModel : DriveViewModel
 
     public long? ItemsCount => Drive.ItemsCount;
 
+    public string ItemsCountText => Type switch
+    {
+        AbstractDrive.DriveType.Temp => Strings.Plurals.ApkInstallers(ItemsCount),
+        AbstractDrive.DriveType.Package => Strings.Plurals.Packages(ItemsCount),
+        _ => Strings.Plurals.Items(ItemsCount),
+    };
+
     public string? DfMountPoint => Drive.MountPoint;
 
     public VirtualDriveViewModel(VirtualDrive drive) : base(drive)
@@ -23,6 +30,7 @@ public partial class VirtualDriveViewModel : DriveViewModel
             var emptyChanged = (Drive.ItemsCount is null or <= 0) != (newCount is null or <= 0);
             Drive.ItemsCount = newCount;
             OnPropertyChanged(nameof(ItemsCount));
+            OnPropertyChanged(nameof(ItemsCountText));
 
             if (emptyChanged)
                 OnPropertyChanged(nameof(DriveIcon));

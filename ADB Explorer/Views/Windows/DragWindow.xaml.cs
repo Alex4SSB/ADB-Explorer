@@ -210,7 +210,7 @@ public partial class DragWindow : INotifyPropertyChanged
             {
                 if (Data.FileActions.IsAppDrive && Data.CopyPaste.MouseWithinApp)
                 {
-                    result = string.Format(Strings.Resources.S_DRAG_INSTALL_MULTIPLE, count);
+                    result = Strings.Plurals.InstallApks(count);
                     DragTooltip.Inlines.Add(new Run(result) { Foreground = _blueBrush });
 
                     return;
@@ -218,22 +218,15 @@ public partial class DragWindow : INotifyPropertyChanged
 
                 if (Data.CopyPaste.CurrentDropEffect is DragDropEffects.Move)
                 {
-                    format = string.IsNullOrEmpty(target)
-                        ? Strings.Resources.S_DRAGDROP_MOVE
-                        : Strings.Resources.S_DRAGDROP_MOVE_TARGET;
+                    result = string.IsNullOrEmpty(target)
+                        ? Strings.Plurals.MoveItems(count)
+                        : Strings.Plurals.MoveItemsTo(count, target);
                 }
                 else if (Data.CopyPaste.CurrentDropEffect is DragDropEffects.Copy)
                 {
-                    format = string.IsNullOrEmpty(target)
-                        ? Strings.Resources.S_DRAGDROP_COPY
-                        : Strings.Resources.S_DRAGDROP_COPY_TARGET;
-                }
-
-                if (result == "")
-                {
-                    result = string.Format(format, string.IsNullOrEmpty(target)
-                        ? [count]
-                        : [count, target]);
+                    result = string.IsNullOrEmpty(target)
+                        ? Strings.Plurals.CopyItems(count)
+                        : Strings.Plurals.CopyItemsTo(count, target);
                 }
 
                 var split = result.Split(target);

@@ -258,9 +258,6 @@
     <value>WSA에서 ADB가 이미 승인된 경우 '실행'을 선택하십시오.
 ADB를 승인하려면 WSA 고급 설정을 여십시오.</value>
   </data>
-  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
-    <value>선택한 파일 중 {0}개는 Windows 드라이브 루트 아래에 생성할 수 없습니다.</value>
-  </data>
   <data name="S_ADB_LEARN_MORE" xml:space="preserve">
     <value>ADB에 대해 자세히 알아보기</value>
   </data>
@@ -355,10 +352,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
     <value>다음 항목이 제거됩니다:
 {0}</value>
   </data>
-  <data name="S_REM_APK_PLURAL" xml:space="preserve">
-    <value>다음 항목이 제거됩니다:
-{0}개의 패키지</value>
-  </data>
   <data name="S_UNINSTALL" xml:space="preserve">
     <value>제거</value>
   </data>
@@ -376,18 +369,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>병합 또는 바꾸기</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value>충돌하는 항목이 1개 있습니다</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>{0}에 충돌하는 항목이 1개 있습니다</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value>충돌하는 항목이 {0}개 있습니다</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value>{1}에 충돌하는 항목이 {0}개 있습니다</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
     <value>붙여넣기 충돌</value>
@@ -655,12 +636,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>정보</value>
   </data>
-  <data name="S_BROWSER_ITEMS" xml:space="preserve">
-    <value>항목</value>
-  </data>
-  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
-    <value>항목</value>
-  </data>
   <data name="S_FOLDER_EMPTY" xml:space="preserve">
     <value>이 폴더는 비어 있습니다.</value>
   </data>
@@ -672,12 +647,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
     <value>&lt;Span&gt;이 폴더는 &lt;Italic&gt;비어 있는 것처럼&lt;/Italic&gt; 보입니다&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… 겉보기에는&lt;/Span&gt;&lt;/Span&gt;</value>
-  </data>
-  <data name="S_ITEMS_SELECTED" xml:space="preserve">
-    <value>항목 선택됨</value>
-  </data>
-  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
-    <value>항목 선택됨</value>
   </data>
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
     <value>작업 유형</value>
@@ -1057,15 +1026,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
     <value>비어 있음</value>
   </data>
-  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
-    <value>APK 설치 프로그램</value>
-  </data>
-  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
-    <value>APK 설치 프로그램</value>
-  </data>
-  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
-    <value>패키지</value>
-  </data>
   <data name="S_FILEOP_ERROR" xml:space="preserve">
     <value>오류: {0}</value>
   </data>
@@ -1224,32 +1184,8 @@ Weblate에서 앱을 해당 언어로 현지화하는 데 도움을 주세요.</
   <data name="BYTES" xml:space="preserve">
     <value>{0} B</value>
   </data>
-  <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>{0}개 항목 복사</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>{0}개 항목을 {1}에 복사</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>{0}개 항목을 {1}(으)로 이동</value>
-  </data>
   <data name="S_DRAGDROP_LINK" xml:space="preserve">
     <value>{0}에 링크 만들기</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>{0}개 항목 이동</value>
-  </data>
-  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
-    <value>잘라낸 항목 1개 붙여넣기</value>
-  </data>
-  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
-    <value>복사한 항목 1개 붙여넣기</value>
-  </data>
-  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
-    <value>복사한 항목 {0}개 붙여넣기</value>
-  </data>
-  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
-    <value>잘라낸 항목 {0}개 붙여넣기</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{1}에서 {0} ({2})</value>
@@ -1281,9 +1217,6 @@ Weblate에서 앱을 해당 언어로 현지화하는 데 도움을 주세요.</
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
     <value>검증 중…</value>
   </data>
-  <data name="S_FILES_PLURAL" xml:space="preserve">
-    <value>{0}개 파일</value>
-  </data>
   <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
     <value>사이드로드할 ROM 선택</value>
   </data>
@@ -1298,9 +1231,6 @@ Weblate에서 앱을 해당 언어로 현지화하는 데 도움을 주세요.</
   </data>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
     <value>{0} 설치</value>
-  </data>
-  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
-    <value>{0}개 APK 설치</value>
   </data>
   <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
     <value>켜기</value>

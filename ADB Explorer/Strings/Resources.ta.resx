@@ -270,9 +270,6 @@
     <value>ADB ஏற்கனவே WSA இல் அங்கீகரிக்கப்பட்டிருந்தால், தொடங்கு என்பதைத் தேர்ந்தெடுக்கவும். 
 ADBஐ அங்கீகரிக்க, WSA மேம்பட்ட அமைப்புகளைத் திறக்கவும்.</value>
   </data>
-  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
-    <value>தேர்ந்தெடுக்கப்பட்ட கோப்புகளில் {0}ஐ சாளரங்கள் இயக்கி ரூட்டின் கீழ் உருவாக்க முடியாது.</value>
-  </data>
   <data name="S_ADB_LEARN_MORE" xml:space="preserve">
     <value>ADB பற்றி மேலும் அறிக</value>
   </data>
@@ -374,10 +371,6 @@ SDK இயங்குதளக் கருவிகளைப் பதிவ�
     <value>பின்வருபவை அகற்றப்படும்: 
 {0}</value>
   </data>
-  <data name="S_REM_APK_PLURAL" xml:space="preserve">
-    <value>பின்வருபவை அகற்றப்படும்: 
-{0} தொகுப்புகள்</value>
-  </data>
   <data name="S_UNINSTALL" xml:space="preserve">
     <value>நிறுவல் நீக்கவும்</value>
   </data>
@@ -395,18 +388,6 @@ SDK இயங்குதளக் கருவிகளைப் பதிவ�
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>ஒன்றிணைக்கவும் அல்லது மாற்றவும்</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value>1 முரண்பாடான உருப்படி உள்ளது</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>{0} இல் 1 முரண்பாடான உருப்படி உள்ளது</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value>{0} முரண்பட்ட உருப்படிகள் உள்ளன</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value>{1} இல் {0} முரண்பட்ட உருப்படிகள் உள்ளன</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
     <value>முரண்பாடுகளை ஒட்டவும்</value>
@@ -701,12 +682,6 @@ Select Custom to use a location that will not be removed on uninstall. The custo
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>பற்றி</value>
   </data>
-  <data name="S_BROWSER_ITEMS" xml:space="preserve">
-    <value>பொருள்</value>
-  </data>
-  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
-    <value>பொருட்கள்</value>
-  </data>
   <data name="S_FOLDER_EMPTY" xml:space="preserve">
     <value>இந்தக் கோப்புறை காலியாக உள்ளது.</value>
   </data>
@@ -718,12 +693,6 @@ Select Custom to use a location that will not be removed on uninstall. The custo
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
     <value>&lt;Span&gt;இந்தக் கோப்புறை &lt;Italic&gt;தோன்றுகிறது&lt;/Italic&gt;&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… நிர்வாணக் கண்ணுக்கு&lt;/Span&gt;&lt;/Span&gt;</value>
-  </data>
-  <data name="S_ITEMS_SELECTED" xml:space="preserve">
-    <value>உருப்படி தேர்ந்தெடுக்கப்பட்டது</value>
-  </data>
-  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
-    <value>தேர்ந்தெடுக்கப்பட்ட பொருட்கள்</value>
   </data>
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
     <value>செயல்பாட்டு வகை</value>
@@ -1112,15 +1081,6 @@ Select Custom to use a location that will not be removed on uninstall. The custo
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
     <value>காலி</value>
   </data>
-  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
-    <value>APK நிறுவி</value>
-  </data>
-  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
-    <value>APK நிறுவிகள்</value>
-  </data>
-  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
-    <value>தொகுப்பு</value>
-  </data>
   <data name="S_FILEOP_ERROR" xml:space="preserve">
     <value>பிழை: {0}</value>
   </data>
@@ -1279,32 +1239,8 @@ Weblate இல் உங்கள் மொழியில் பயன்பா
   <data name="BYTES" xml:space="preserve">
     <value>{0} பி</value>
   </data>
-  <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>{0} உருப்படிகளை நகலெடுக்கவும்</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>{0} உருப்படிகளை {1} க்கு நகலெடுக்கவும்</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>{0} உருப்படிகளை {1} க்கு நகர்த்து</value>
-  </data>
   <data name="S_DRAGDROP_LINK" xml:space="preserve">
     <value>{0} இல் இணைப்பை உருவாக்கவும்</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>{0} உருப்படிகளை நகர்த்தவும்</value>
-  </data>
-  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
-    <value>1 வெட்டு உருப்படியை ஒட்டவும்</value>
-  </data>
-  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
-    <value>1 நகலெடுக்கப்பட்ட உருப்படியை ஒட்டவும்</value>
-  </data>
-  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
-    <value>நகலெடுக்கப்பட்ட {0} உருப்படிகளை ஒட்டவும்</value>
-  </data>
-  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
-    <value>{0} வெட்டு உருப்படிகளை ஒட்டவும்</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{1} இல் {0} ({2})</value>
@@ -1336,9 +1272,6 @@ Weblate இல் உங்கள் மொழியில் பயன்பா
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
     <value>சரிபார்க்கிறது…</value>
   </data>
-  <data name="S_FILES_PLURAL" xml:space="preserve">
-    <value>{0} கோப்புகள்</value>
-  </data>
   <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
     <value>பக்கச்சுமைக்கு ROM ஐத் தேர்ந்தெடுக்கவும்</value>
   </data>
@@ -1353,9 +1286,6 @@ Weblate இல் உங்கள் மொழியில் பயன்பா
   </data>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
     <value>நிறுவு {0}</value>
-  </data>
-  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
-    <value>{0} APKகளை நிறுவவும்</value>
   </data>
   <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
     <value>அன்று</value>

@@ -1,0 +1,19 @@
+{
+    "Items_other": "{{count}} 項目",
+    "ItemsSelected_other": "{{count}} 個の項目を選択",
+    "Files_other": "{{count}} ファイル",
+    "Folders_other": "{{count}} フォルダー",
+    "ConflictingItems_other": "競合する項目が {{count}} 件あります",
+    "ConflictingItemsIn_other": "{{destination}} には競合する項目が {{count}} 件あります",
+    "PackagesToRemove_other": "以下のパッケージが削除されます:\n{{count}} パッケージ",
+    "InstallApks_other": "{{count}} 個のAPKをインストールする",
+    "PasteCutItems_other": "切り取りした項目を{{count}}件貼り付ける",
+    "PasteCopiedItems_other": "コピーした項目を{{count}}件貼り付ける",
+    "CopyItems_other": "{{count}} 個の項目をコピー",
+    "CopyItemsTo_other": "{{count}} 個の項目を {{target}} にコピー",
+    "MoveItems_other": "{{count}} 個の項目を移動",
+    "MoveItemsTo_other": "{{count}} 個の項目を {{target}} に移動",
+    "FilesInvalidAtDriveRoot_other": "選択したファイルのうち {{count}} 個は Windows ドライブの直下に作成できません。",
+    "ApkInstallers_other": "{{count}} APKインストーラー",
+    "Packages_other": "{{count}} パッケージ"
+}

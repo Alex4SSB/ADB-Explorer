@@ -251,7 +251,7 @@ public partial class DetailsPane : UserControl
             DetachPackage();
             File = null;
             Package = null;
-            SetHeader($"{count} {Strings.Resources.S_ITEMS_SELECTED_PLURAL}", UiFlowDirection, FileIconProvider.GetMultipleFilesIcon(120));
+            SetHeader(Strings.Plurals.ItemsSelected(count), UiFlowDirection, FileIconProvider.GetMultipleFilesIcon(120));
         }
         else
             ShowLocationDetails();

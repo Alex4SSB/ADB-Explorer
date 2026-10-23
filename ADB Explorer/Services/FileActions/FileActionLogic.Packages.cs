@@ -11,7 +11,7 @@ internal static partial class FileActionLogic
         if (count == 1)
             return string.Format(Strings.Resources.S_REM_APK, objects.First().DisplayName);
 
-        return string.Format(Strings.Resources.S_REM_APK_PLURAL, count);
+        return Strings.Plurals.PackagesToRemove(count);
     }
 
     public static async void UninstallPackages()

@@ -270,9 +270,6 @@
     <value>若 ADB 已在 WSA 中授权，请直接点击启动。
 如需授权 ADB，请打开 WSA 高级设置。</value>
   </data>
-  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
-    <value>无法在 Windows 驱动器根目录下创建所选文件 {0}。</value>
-  </data>
   <data name="S_ADB_LEARN_MORE" xml:space="preserve">
     <value>了解有关 ADB 的更多信息</value>
   </data>
@@ -374,10 +371,6 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>以下内容将被删除：
 {0}</value>
   </data>
-  <data name="S_REM_APK_PLURAL" xml:space="preserve">
-    <value>以下内容将被卸载：
-{0} 软件包</value>
-  </data>
   <data name="S_UNINSTALL" xml:space="preserve">
     <value>卸载</value>
   </data>
@@ -395,18 +388,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>合并或替换</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value>有 1 个冲突项</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>在 {0} 中有 1 个冲突项</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value>有 {0} 个冲突项</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value>在 {1} 中有 {0} 个冲突项</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
     <value>替换或跳过文件</value>
@@ -696,12 +677,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
     <value>关于</value>
   </data>
-  <data name="S_BROWSER_ITEMS" xml:space="preserve">
-    <value>项目</value>
-  </data>
-  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
-    <value>项目</value>
-  </data>
   <data name="S_FOLDER_EMPTY" xml:space="preserve">
     <value>此文件夹为空。</value>
   </data>
@@ -713,12 +688,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
     <value>&lt;Span&gt;此文件夹 &lt;Italic&gt;似乎&lt;/Italic&gt; 为空&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… 对肉眼来说&lt;/Span&gt;&lt;/Span&gt;</value>
-  </data>
-  <data name="S_ITEMS_SELECTED" xml:space="preserve">
-    <value>选中的项目</value>
-  </data>
-  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
-    <value>选中的项目</value>
   </data>
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
     <value>操作类型</value>
@@ -1113,15 +1082,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
     <value>空</value>
   </data>
-  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
-    <value>APK 安装程序</value>
-  </data>
-  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
-    <value>APK 安装程序</value>
-  </data>
-  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
-    <value>软件包</value>
-  </data>
   <data name="S_FILEOP_ERROR" xml:space="preserve">
     <value>错误：{0}</value>
   </data>
@@ -1280,32 +1240,8 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="BYTES" xml:space="preserve">
     <value>{0} B</value>
   </data>
-  <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>复制{0}项</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>复制{0}项至{1}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>移动{0}项至{1}</value>
-  </data>
   <data name="S_DRAGDROP_LINK" xml:space="preserve">
     <value>在{0}处创建链接</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>移动{0}项</value>
-  </data>
-  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
-    <value>粘贴1剪切项</value>
-  </data>
-  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
-    <value>粘贴1复制项</value>
-  </data>
-  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
-    <value>粘贴{0}复制项</value>
-  </data>
-  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
-    <value>粘贴{0}剪切项</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0}预计{1}（{2}）</value>
@@ -1337,9 +1273,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
     <value>正在验证……</value>
   </data>
-  <data name="S_FILES_PLURAL" xml:space="preserve">
-    <value>{0}个文件</value>
-  </data>
   <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
     <value>请选择侧载的ROM</value>
   </data>
@@ -1354,9 +1287,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
     <value>安装 {0}</value>
-  </data>
-  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
-    <value>安装 {0} 个 APK</value>
   </data>
   <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
     <value>开</value>
@@ -1884,8 +1814,5 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_MENU_INVERT_SELECTION" xml:space="preserve">
     <value>反选</value>
-  </data>
-  <data name="S_ITEMS_PLURAL" xml:space="preserve">
-    <value>{0} 项</value>
   </data>
 </root>

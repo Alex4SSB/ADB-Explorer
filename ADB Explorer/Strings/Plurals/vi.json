@@ -1,0 +1,6 @@
+{
+    "Files_other": "{{count}} tệp",
+    "PackagesToRemove_other": "The following will be removed: {{count}} packages",
+    "InstallApks_other": "Cài đặt {{count}} APKs",
+    "FilesInvalidAtDriveRoot_other": "không thể tạo {{count}} tệp đã chọn dưới thư mục gốc ổ đĩa Windows."
+}

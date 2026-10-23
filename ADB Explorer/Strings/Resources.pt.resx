@@ -272,9 +272,6 @@ Esta ação não poderá ser revertida. Tem a certeza?</value>
     <value>Selecione "Iniciar" caso o ADB já tenha sido autorizado no WSA.
 Para aprovar o ADB, abra as definiçõe avançadas do WSA.</value>
   </data>
-  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
-    <value>{0} dos ficheiros selecionados não puderam ser criados na raiz do disco do Windows.</value>
-  </data>
   <data name="S_ADB_LEARN_MORE" xml:space="preserve">
     <value>Aprenda Mais Sobre o ADB</value>
   </data>
@@ -378,10 +375,6 @@ O conteúdo visível pode estar incompleto.</value>
     <value>Os seguintes serão removidos:
 {0}</value>
   </data>
-  <data name="S_REM_APK_PLURAL" xml:space="preserve">
-    <value>Os seguintes serão removidos:
-{0} pacotes</value>
-  </data>
   <data name="S_UNINSTALL" xml:space="preserve">
     <value>Desinstalar</value>
   </data>
@@ -399,18 +392,6 @@ O conteúdo visível pode estar incompleto.</value>
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Juntar ou Substituir</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value>Existe 1 elemento em conflito</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>Existe 1 elemento conflituoso em {0}</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value>Existem {0} elementos em conflito</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value>Existem {0} elementos conflituosos em {1}</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
     <value>Colar Conflitos</value>
@@ -759,14 +740,6 @@ Cancelar Todas a Serem Reproduzidas</value>
     <value>Sobre</value>
     <comment>The title of the settings about group</comment>
   </data>
-  <data name="S_BROWSER_ITEMS" xml:space="preserve">
-    <value>item</value>
-    <comment>The toolbar folder items count display, singular</comment>
-  </data>
-  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
-    <value>items</value>
-    <comment>The toolbar folder items count display, plural</comment>
-  </data>
   <data name="S_FOLDER_EMPTY" xml:space="preserve">
     <value>Esta pasta está vazia.</value>
     <comment>The notification displayed when a folder is empty on a rooted device</comment>
@@ -778,14 +751,6 @@ Cancelar Todas a Serem Reproduzidas</value>
   <data name="S_EMPTY_FILTER" xml:space="preserve">
     <value>Não existem resultados para a sua pesquisa.</value>
     <comment>The notification displayed when a non empty folder / package view is filtered such that no items match</comment>
-  </data>
-  <data name="S_ITEMS_SELECTED" xml:space="preserve">
-    <value>elemento selecionado</value>
-    <comment>The toolbar folder items selected count</comment>
-  </data>
-  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
-    <value>elementos selecionados</value>
-    <comment>The toolbar folder items selected count, plural form</comment>
   </data>
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
     <value>Tipo de Operação</value>
@@ -1193,10 +1158,6 @@ Cancelar Todas a Serem Reproduzidas</value>
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
     <value>Vazio</value>
     <comment>The notification displayed on the recycle bin drive when it is empty</comment>
-  </data>
-  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
-    <value>Pacotes</value>
-    <comment>The installed apps drive items count display, plural</comment>
   </data>
   <data name="S_FILEOP_VALIDATED" xml:space="preserve">
     <value>Validado</value>
@@ -1624,12 +1585,6 @@ Items suportados: miniaturas de imagem, PDF; outros ficheiros cujo tamanho estej
   <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
     <value>{0} disponíveis de {1} totais</value>
   </data>
-  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
-    <value>Intalador de Ficheiros APK</value>
-  </data>
-  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
-    <value>Instaladores de Ficheiros APK</value>
-  </data>
   <data name="S_FILEOP_ERROR" xml:space="preserve">
     <value>Erro: {0}</value>
   </data>
@@ -1710,32 +1665,8 @@ Ajude-nos a traduzir a aplicação para o seu idioma na plataforma Weblate.</val
   <data name="S_SAVED_LOCATIONS" xml:space="preserve">
     <value>Localizações Guardadas</value>
   </data>
-  <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>Copiar {0} elementos</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>Copiar {0} elementos para {1}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>Mover {0} elementos para {1}</value>
-  </data>
   <data name="S_DRAGDROP_LINK" xml:space="preserve">
     <value>Criar link em {0}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>Mover {0} elementos</value>
-  </data>
-  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
-    <value>Colar 1 Elemento Cortado</value>
-  </data>
-  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
-    <value>Colar 1 Elemento Copiado</value>
-  </data>
-  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
-    <value>Colar {0} Elementos Copiados</value>
-  </data>
-  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
-    <value>Colar {0} Elementos Cortados</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} em {1} ({2})</value>
@@ -1764,9 +1695,6 @@ Ajude-nos a traduzir a aplicação para o seu idioma na plataforma Weblate.</val
   <data name="S_VALIDATION_ERROR" xml:space="preserve">
     <value>Erro de validação: {0}</value>
   </data>
-  <data name="S_FILES_PLURAL" xml:space="preserve">
-    <value>{0} ficheiros</value>
-  </data>
   <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
     <value>Selecionar a ROM para executar o sideload</value>
   </data>
@@ -1778,9 +1706,6 @@ Ajude-nos a traduzir a aplicação para o seu idioma na plataforma Weblate.</val
   </data>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
     <value>Instalar {0}</value>
-  </data>
-  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
-    <value>Instalar {0} ficheiros APK</value>
   </data>
   <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
     <value>A verificar o estado do servidor mDNS…</value>
