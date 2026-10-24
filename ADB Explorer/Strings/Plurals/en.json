@@ -27,16 +27,16 @@
     "MoveItems_other": "Move {{count}} items",
     "MoveItemsTo_one": "Move one item to {{target}}",
     "MoveItemsTo_other": "Move {{count}} items to {{target}}",
-    "FilesInvalidAtDriveRoot_one": "{{count}} of the selected files cannot be created under a Windows drive root.",
+    "FilesInvalidAtDriveRoot_one": "One of the selected files cannot be created under a Windows drive root.",
     "FilesInvalidAtDriveRoot_other": "{{count}} of the selected files cannot be created under a Windows drive root.",
-    "ApkInstallers_one": "{{count}} APK Installer",
+    "ApkInstallers_one": "one APK Installer",
     "ApkInstallers_other": "{{count}} APK Installers",
-    "Packages_one": "{{count}} Package",
-    "Packages_other": "{{count}} Packages",
+    "Packages_one": "one package",
+    "Packages_other": "{{count}} packages",
     "RemoveOperations_one": "Remove one operation",
-    "RemoveOperations_other": "Remove {{count}} Operations",
+    "RemoveOperations_other": "Remove {{count}} operations",
     "ValidateOperations_one": "Validate one operation",
     "ValidateOperations_other": "Validate {{count}} operations",
     "RetryOperations_one": "Retry failed items of one operation",
-    "RetryOperations_other": "Retry failed items of {{count}} Operations"
+    "RetryOperations_other": "Retry failed items of {{count}} operations"
 }
