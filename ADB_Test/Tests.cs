@@ -541,17 +541,6 @@ namespace ADB_Test
             Assert.IsTrue(Eval(vm));
         }
 
-        [TestMethod]
-        public void ServiceLogical_Online_DuplicateRemoteOnline_Shown()
-        {
-            var remote = MakeLogical("192.168.1.20:5555", "Phone", DeviceType.Remote, DeviceStatus.Ok, "192.168.1.20");
-            var svcLogical = MakeLogical("adb-SERIALABC-QXjCrW._adb-tls-connect._tcp.", "Phone", DeviceType.Service, DeviceStatus.Ok, "192.168.1.20");
-            Data.DevicesObject.UIList.Add(remote);
-            Data.DevicesObject.UIList.Add(svcLogical);
-            Assert.IsTrue(Eval(svcLogical));
-            Assert.IsFalse(Eval(remote));
-        }
-
         // ── DeviceType.Remote ─────────────────────────────────────────────────
 
         [TestMethod]
@@ -562,24 +551,45 @@ namespace ADB_Test
             Assert.IsTrue(Eval(vm));
         }
 
+        // ── Same phone over several transports ────────────────────────────────
+        // Devices.UpdateDevices merges these into one device (instead of the predicate hiding duplicates).
+        // Only the matching rule is tested: the merge itself reads the device's props over adb.
+
+        private static bool BelongsTo(LogicalDeviceViewModel device, LogicalDeviceViewModel transport)
+            => Devices.BelongsTo(device, transport, transport.Connections[0]);
+
         [TestMethod]
-        public void RemoteDevice_UsbDuplicateByIp_Hidden()
+        public void RemoteTransport_JoinsMdnsDeviceAtSameIp()
         {
-            var usb = MakeLogical("SERIALABC", "Phone", DeviceType.Local, DeviceStatus.Ok, "192.168.1.30");
-            var remote = MakeLogical("192.168.1.30:5555", "Phone", DeviceType.Remote, DeviceStatus.Ok, "192.168.1.30");
-            Data.DevicesObject.UIList.Add(usb);
-            Data.DevicesObject.UIList.Add(remote);
-            Assert.IsFalse(Eval(remote));
+            var mdns = MakeLogical("adb-SERIALABC-QXjCrW._adb-tls-connect._tcp.", "Phone", DeviceType.Service, DeviceStatus.Ok, "192.168.1.20");
+            var remote = MakeLogical("192.168.1.20:5555", "Phone", DeviceType.Remote, DeviceStatus.Ok, "192.168.1.20");
+            Assert.IsTrue(BelongsTo(mdns, remote));
         }
 
         [TestMethod]
-        public void RemoteDevice_UsbDuplicateById_Hidden()
+        public void RemoteTransport_JoinsUsbDeviceAtSameIp()
+        {
+            var usb = MakeLogical("SERIALABC", "Phone", DeviceType.Local, DeviceStatus.Ok, "192.168.1.30");
+            var remote = MakeLogical("192.168.1.30:5555", "Phone", DeviceType.Remote, DeviceStatus.Ok, "192.168.1.30");
+            Assert.IsTrue(BelongsTo(usb, remote));
+        }
+
+        [TestMethod]
+        public void MdnsTransport_JoinsUsbDeviceBySerial()
         {
             var usb = MakeLogical("SERIALABC", "Phone", DeviceType.Local, DeviceStatus.Ok, "");
-            var remote = MakeLogical("SERIALABC:5555", "Phone", DeviceType.Remote, DeviceStatus.Ok, "192.168.1.31");
-            Data.DevicesObject.UIList.Add(usb);
-            Data.DevicesObject.UIList.Add(remote);
-            Assert.IsFalse(Eval(remote));
+            var mdns = MakeLogical("adb-SERIALABC-QXjCrW._adb-tls-connect._tcp.", "Phone", DeviceType.Service, DeviceStatus.Ok, "192.168.1.31");
+            Assert.IsTrue(BelongsTo(usb, mdns));
+        }
+
+        [TestMethod]
+        public void Transports_OfOtherPhones_StaySeparate()
+        {
+            var usb = MakeLogical("SERIALABC", "Phone", DeviceType.Local, DeviceStatus.Ok, "192.168.1.30");
+            var remote = MakeLogical("192.168.1.99:5555", "Phone", DeviceType.Remote, DeviceStatus.Ok, "192.168.1.99");
+            var mdns = MakeLogical("adb-SERIALXYZ-QXjCrW._adb-tls-connect._tcp.", "Phone", DeviceType.Service, DeviceStatus.Ok, "192.168.1.98");
+            Assert.IsFalse(BelongsTo(usb, remote));
+            Assert.IsFalse(BelongsTo(usb, mdns));
         }
 
         // ── HistoryDeviceViewModel ────────────────────────────────────────────

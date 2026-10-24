@@ -344,7 +344,7 @@ public partial class Devices : ObservableObject
     }
 
     /// <summary>Whether a listed transport belongs to an already known device.</summary>
-    private static bool BelongsTo(LogicalDeviceViewModel device, LogicalDeviceViewModel source, DeviceConnection connection)
+    internal static bool BelongsTo(LogicalDeviceViewModel device, LogicalDeviceViewModel source, DeviceConnection connection)
     {
         if (ReferenceEquals(device, source))
             return true;

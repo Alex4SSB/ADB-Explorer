@@ -71,9 +71,9 @@
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Style>
-                    <TextBlock Text="{Binding ItemsCountText}" />
+                    <TextBlock FontSize="13" Text="{Binding ItemsCountText}" />
                 </StackPanel>
-                <TextBlock HorizontalAlignment="Left">
+                <TextBlock HorizontalAlignment="Left" FontSize="13">
                     <TextBlock.Style>
                         <Style BasedOn="{StaticResource DriveItemsCountTextBlockStyle}" TargetType="TextBlock">
                             <Setter Property="Visibility" Value="Collapsed" />

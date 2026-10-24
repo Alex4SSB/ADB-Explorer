@@ -42,7 +42,10 @@
                     </Style>
                 </ProgressBar.Style>
             </ProgressBar>
-            <TextBlock Grid.Row="2" TextTrimming="CharacterEllipsis">
+            <TextBlock
+                Grid.Row="2"
+                FontSize="13"
+                TextTrimming="CharacterEllipsis">
                 <TextBlock.Style>
                     <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
                         <Style.Triggers>

@@ -23,6 +23,19 @@ public class ScaledPathIcon : UserControl
         typeof(ScaledPathIcon),
         new PropertyMetadata(16.0d));
 
+    /// <summary>How the icon reacts to an RTL UI culture, applied by <see cref="BaseIcon"/>.</summary>
+    public RtlBehavior RtlBehavior
+    {
+        get => (RtlBehavior)GetValue(RtlBehaviorProperty);
+        set => SetValue(RtlBehaviorProperty, value);
+    }
+
+    public static readonly DependencyProperty RtlBehaviorProperty = DependencyProperty.Register(
+        nameof(RtlBehavior),
+        typeof(RtlBehavior),
+        typeof(ScaledPathIcon),
+        new PropertyMetadata(RtlBehavior.None));
+
     /// <summary>Fluent SVG viewBox dimension (16, 20, or 24).</summary>
     public double ArtboardSize
     {

@@ -550,13 +550,13 @@ internal static class TabContextMenu
         // The icons show a side of the screen, so they aren't mirrored in right-to-left layouts.
         if (tabs.CanMergeWithNeighbor(tab, rightOffset))
         {
-            var icon = new BaseIcon(FluentPathGeometries.LayoutColumnTwoFocusRight, 16, rtlBehavior: RtlBehavior.ForceLtr);
+            var icon = new BaseIcon(FluentPathGeometries.LayoutColumnTwoFocusRight, 16);
             items.Add(Item(Strings.Resources.S_MERGE_WITH_RIGHT_TAB, () => tabs.MergeWithNeighbor(tab, rightOffset), icon));
         }
 
         if (tabs.CanMergeWithNeighbor(tab, -rightOffset))
         {
-            var icon = new BaseIcon(FluentPathGeometries.LayoutColumnTwoFocusLeft, 16, rtlBehavior: RtlBehavior.ForceLtr);
+            var icon = new BaseIcon(FluentPathGeometries.LayoutColumnTwoFocusLeft, 16);
             items.Add(Item(Strings.Resources.S_MERGE_WITH_LEFT_TAB, () => tabs.MergeWithNeighbor(tab, -rightOffset), icon));
         }
 

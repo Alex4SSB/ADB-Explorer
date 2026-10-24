@@ -25,9 +25,10 @@ public class BaseIcon
     /// <summary>Created on first read, so an icon can be declared off the UI thread (e.g. in static state).</summary>
     public object IconContent => _iconContent ??= _create();
 
+    // An explicit rtlBehavior overrides the one declared by the icon definition.
     public double Size { get; }
 
-    public BaseIcon(string glyph, double fontSize = 22, string? brush = null, RtlBehavior rtlBehavior = RtlBehavior.None)
+    public BaseIcon(string glyph, double fontSize = 22, string? brush = null, RtlBehavior? rtlBehavior = null)
     {
         Size = fontSize;
         _create = () =>
@@ -39,12 +40,12 @@ public class BaseIcon
                 Style = CreateForegroundStyle(typeof(FontIcon), "BaseIconFontStyle", brush ?? DefaultForegroundBrush),
             };
 
-            ApplyRtlBehavior(fontIcon, rtlBehavior);
+            ApplyRtlBehavior(fontIcon, rtlBehavior ?? RtlBehavior.None);
             return fontIcon;
         };
     }
 
-    public BaseIcon(Geometry data, double height = 22, string? brush = null, Stretch stretch = Stretch.Uniform, RtlBehavior rtlBehavior = RtlBehavior.None)
+    public BaseIcon(Geometry data, double height = 22, string? brush = null, Stretch stretch = Stretch.Uniform, RtlBehavior? rtlBehavior = null)
     {
         Size = height;
         _create = () =>
@@ -58,7 +59,7 @@ public class BaseIcon
                 Style = CreateForegroundStyle(typeof(FluentPathIcon), "BaseIconPathStyle", brush ?? DefaultForegroundBrush),
             };
 
-            ApplyRtlBehavior(icon, rtlBehavior);
+            ApplyRtlBehavior(icon, rtlBehavior ?? FluentPathGeometries.GetRtlBehavior(data));
             return icon;
         };
     }
@@ -120,11 +121,11 @@ public class BaseIcon
         _create = () => createContent();
     }
 
-    public BaseIcon(UserControl content, double size = 18, RtlBehavior rtlBehavior = RtlBehavior.None)
+    public BaseIcon(UserControl content, double size = 18, RtlBehavior? rtlBehavior = null)
         : this(() => content, size, rtlBehavior)
     { }
 
-    public BaseIcon(Func<UserControl> createContent, double size = 18, RtlBehavior rtlBehavior = RtlBehavior.None)
+    public BaseIcon(Func<UserControl> createContent, double size = 18, RtlBehavior? rtlBehavior = null)
     {
         Size = size;
         _create = () =>
@@ -136,7 +137,7 @@ public class BaseIcon
             content.Width = size;
             content.Height = size;
 
-            ApplyRtlBehavior(content, rtlBehavior);
+            ApplyRtlBehavior(content, rtlBehavior ?? (content as ScaledPathIcon)?.RtlBehavior ?? RtlBehavior.None);
             return content;
         };
     }

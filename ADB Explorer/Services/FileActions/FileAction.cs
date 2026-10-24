@@ -64,7 +64,7 @@ public static class AppActions
         FileActionType.ContextCopyAsImage => new(new ClipboardImageIcon(), size),
         FileActionType.CopyContents => new(new CopyArrowRightIcon(), size),
         FileActionType.ExtractHere => new(new FolderArrowRightIcon(), size),
-        FileActionType.CompressTo or FileActionType.NewCompressTo or FileActionType.BackupPackage => new(new ZipIcon(), size, RtlBehavior.ForceLtr),
+        FileActionType.CompressTo or FileActionType.NewCompressTo or FileActionType.BackupPackage => new(new ZipIcon(), size),
         FileActionType.PasteLink => new(new DocumentLinkIcon(), size),
         FileActionType.SearchApkOnWeb => new(new GlobeSearchIcon(), size),
         FileActionType.FollowLink => new(new FolderOpenIcon(), size),

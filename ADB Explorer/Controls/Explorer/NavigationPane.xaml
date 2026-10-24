@@ -101,6 +101,11 @@
                                             <!--  Tooltip lives on the row Grid so icon + text share one hover target  -->
                                             <Setter Property="ToolTip" Value="{x:Null}" />
                                             <Style.Triggers>
+                                                <!--  Latin names keep LTR so punctuation such as trailing parentheses isn't mirrored in an RTL app; Left aligns to the row start  -->
+                                                <DataTrigger Binding="{Binding IsRtlName}" Value="False">
+                                                    <Setter Property="FlowDirection" Value="LeftToRight" />
+                                                    <Setter Property="HorizontalAlignment" Value="Left" />
+                                                </DataTrigger>
                                                 <DataTrigger Binding="{Binding IsInEditMode}" Value="True">
                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                 </DataTrigger>

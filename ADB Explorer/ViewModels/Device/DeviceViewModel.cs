@@ -52,12 +52,12 @@ public abstract class DeviceViewModel : ObservableObject
 
     public object TypeIconContent => Type switch
     {
-        DeviceType.Local => new BaseIcon(FluentPathGeometries.UsbDevice, 28, rtlBehavior: RtlBehavior.ForceLtr).IconContent,
-        DeviceType.Remote => new BaseIcon(FluentPathGeometries.Wifi, 28, rtlBehavior: RtlBehavior.ForceLtr).IconContent,
+        DeviceType.Local => new BaseIcon(FluentPathGeometries.UsbDevice, 28).IconContent,
+        DeviceType.Remote => new BaseIcon(FluentPathGeometries.Wifi, 28).IconContent,
         DeviceType.Emulator => new BaseIcon(FluentPathGeometries.Bot, 28).IconContent,
         DeviceType.EmulatorPackage => new BaseIcon(FluentPathGeometries.BotFilled, 28).IconContent,
         DeviceType.Service when Device is not ServiceDevice { MdnsType: ServiceDevice.PairingMode.QrCode }
-            => new BaseIcon(() => new WifiSearchIcon(), 28, RtlBehavior.ForceLtr).IconContent,
+            => new BaseIcon(() => new WifiSearchIcon(), 28).IconContent,
         DeviceType.New => new BaseIcon(() => new PhoneAddIcon(), 28).IconContent,
         DeviceType.History => new BaseIcon(new PhoneSaveIcon(), 28).IconContent,
         _ => new BaseIcon(TypeIcon, 28).IconContent,
