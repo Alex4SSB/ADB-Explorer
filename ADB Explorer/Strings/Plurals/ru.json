@@ -49,5 +49,11 @@
     "MoveItemsTo_many": "Переместить {{count}} элементов в {{target}}",
     "FilesInvalidAtDriveRoot_one": "{{count}} выбранный файл нельзя создать в корневом каталоге диска Windows.",
     "FilesInvalidAtDriveRoot_few": "{{count}} выбранных файла нельзя создать в корневом каталоге диска Windows.",
-    "FilesInvalidAtDriveRoot_many": "{{count}} выбранных файлов нельзя создать в корневом каталоге диска Windows."
+    "FilesInvalidAtDriveRoot_many": "{{count}} выбранных файлов нельзя создать в корневом каталоге диска Windows.",
+    "RemoveOperations_one": "Удалить {{count}} операцию",
+    "RemoveOperations_few": "Удалить {{count}} операции",
+    "RemoveOperations_many": "Удалить {{count}} операций",
+    "ValidateOperations_one": "Проверить {{count}} операцию",
+    "ValidateOperations_few": "Проверить {{count}} операции",
+    "ValidateOperations_many": "Проверить {{count}} операций"
 }
