@@ -633,9 +633,6 @@ Alle laufenden Vorgänge abbrechen</value>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>Befehlsprotokoll löschen</value>
   </data>
-  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
-    <value></value>
-  </data>
   <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
     <value>Im Browser suchen</value>
   </data>
