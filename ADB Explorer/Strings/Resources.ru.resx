@@ -1809,4 +1809,10 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_MENU_INVERT_SELECTION" xml:space="preserve">
     <value>Инвертировать выделение</value>
   </data>
+  <data name="S_SETTINGS_AUTO_RETRY" xml:space="preserve">
+    <value>Автоматическое повторение неудачных элементов</value>
+  </data>
+  <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
+    <value>время</value>
+  </data>
 </root>
