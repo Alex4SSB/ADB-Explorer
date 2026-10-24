@@ -510,7 +510,7 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>Språk</value>
   </data>
   <data name="S_BUTTON_OK" xml:space="preserve">
-    <value>OK</value>
+    <value>Ok</value>
   </data>
   <data name="S_FILTER_FILE_OPS" xml:space="preserve">
     <value>Filtrera filåtgärder</value>
@@ -1768,5 +1768,56 @@ Kontrollerna försöker hindra en ovetande användare från att starta en möjli
   </data>
   <data name="S_NEW_TAB_DRIVE_VIEW" xml:space="preserve">
     <value>Enhetsvy för aktuell enhet</value>
+  </data>
+  <data name="S_MENU_SELECT_NONE" xml:space="preserve">
+    <value>Avmarkera alla</value>
+  </data>
+  <data name="S_MENU_INVERT_SELECTION" xml:space="preserve">
+    <value>Invertera markering</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_RETRY" xml:space="preserve">
+    <value>Försök igen automatiskt med misslyckade objekt</value>
+  </data>
+  <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
+    <value>gånger</value>
+  </data>
+  <data name="S_CLOSE_LEFT_PANE" xml:space="preserve">
+    <value>Stäng vänster panel</value>
+  </data>
+  <data name="S_CLOSE_RIGHT_PANE" xml:space="preserve">
+    <value>Stäng höger panel</value>
+  </data>
+  <data name="S_CLOSE_TOP_PANE" xml:space="preserve">
+    <value>Stäng övre panel</value>
+  </data>
+  <data name="S_CLOSE_BOTTOM_PANE" xml:space="preserve">
+    <value>Stäng nedre panel</value>
+  </data>
+  <data name="S_SPLIT_HORIZONTALLY" xml:space="preserve">
+    <value>Dela vågrätt</value>
+  </data>
+  <data name="S_SPLIT_VERTICALLY" xml:space="preserve">
+    <value>Dela lodrätt</value>
+  </data>
+  <data name="S_SWAP_PANES" xml:space="preserve">
+    <value>Byt plats på panelerna</value>
+  </data>
+  <data name="S_CLOSE_OTHER_TABS" xml:space="preserve">
+    <value>Stäng övriga flikar</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_RIGHT" xml:space="preserve">
+    <value>Stäng flikarna till höger</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_LEFT" xml:space="preserve">
+    <value>Stäng flikarna till vänster</value>
+  </data>
+  <data name="S_MERGE_WITH_RIGHT_TAB" xml:space="preserve">
+    <value>Sammanfoga med fliken till höger</value>
+  </data>
+  <data name="S_MERGE_WITH_LEFT_TAB" xml:space="preserve">
+    <value>Sammanfoga med fliken till vänster</value>
+  </data>
+  <data name="S_DUPLICATE_TAB" xml:space="preserve">
+    <value>Duplicera flik</value>
   </data>
 </root>
