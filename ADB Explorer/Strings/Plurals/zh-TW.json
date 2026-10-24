@@ -15,5 +15,7 @@
     "MoveItemsTo_other": "移動 {{count}} 項到 {{target}}",
     "FilesInvalidAtDriveRoot_other": "無法在 Windows 磁碟機根目錄下建立 {{count}} 個所選檔案。",
     "ApkInstallers_other": "{{count}} APK 安裝程式",
-    "Packages_other": "{{count}} 套件"
+    "Packages_other": "{{count}} 套件",
+    "RemoveOperations_other": "移除 {{count}} 個操作",
+    "ValidateOperations_other": "驗證 {{count}} 個操作"
 }
