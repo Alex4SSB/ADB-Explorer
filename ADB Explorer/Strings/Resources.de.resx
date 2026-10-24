@@ -622,7 +622,7 @@ Alle laufenden Vorgänge abbrechen</value>
     <value>Paket</value>
   </data>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
-    <value>Änderungszeit aktualisieren</value>
+    <value>Aktualisierungszeit geändert</value>
   </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Änderungen speichern</value>
@@ -634,7 +634,7 @@ Alle laufenden Vorgänge abbrechen</value>
     <value>Befehlsprotokoll löschen</value>
   </data>
   <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
-    <value>Offener Stück Drehort</value>
+    <value></value>
   </data>
   <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
     <value>Im Browser suchen</value>
@@ -991,7 +991,7 @@ Alle laufenden Vorgänge abbrechen</value>
     <value>Kopplungscode</value>
   </data>
   <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
-    <value>IP-Adresse / Hostname</value>
+    <value>IP-Adresse/Hostname</value>
   </data>
   <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
     <value>Port</value>
@@ -1000,7 +1000,7 @@ Alle laufenden Vorgänge abbrechen</value>
     <value>Kopplungsport</value>
   </data>
   <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
-    <value>Koppeln und verbinden</value>
+    <value>Koppeln &amp; verbinden</value>
   </data>
   <data name="S_DEVICE_SAVED" xml:space="preserve">
     <value>Gespeichertes Gerät</value>
@@ -1529,5 +1529,62 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_SEARCH_DISPLAY_PATH_RELATIVE" xml:space="preserve">
     <value>Relativen Pfad anzeigen</value>
+  </data>
+  <data name="S_NEW_VERSION_READY" xml:space="preserve">
+    <value>Eine neue {0}, Version {1}, wurde heruntergeladen und ist bereit zur Installation.</value>
+  </data>
+  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
+    <value>Lass mich für jede Datei selbst entscheiden</value>
+  </data>
+  <data name="S_MENU_SELECT_NONE" xml:space="preserve">
+    <value>Keine auswählen</value>
+  </data>
+  <data name="S_MENU_INVERT_SELECTION" xml:space="preserve">
+    <value>Auswahl umkehren</value>
+  </data>
+  <data name="S_MENU_PASTE_IMAGE" xml:space="preserve">
+    <value>Bild einfügen</value>
+  </data>
+  <data name="S_MENU_COPY_LINK" xml:space="preserve">
+    <value>Als Link kopieren</value>
+  </data>
+  <data name="S_MENU_COPY_AS_IMAGE" xml:space="preserve">
+    <value>Als Bild kopieren</value>
+  </data>
+  <data name="S_MENU_COPY_CONTENTS" xml:space="preserve">
+    <value>Inhalt kopieren</value>
+  </data>
+  <data name="S_MENU_EXTRACT_HERE" xml:space="preserve">
+    <value>Hier entpacken</value>
+  </data>
+  <data name="S_MENU_COMPRESS_TO" xml:space="preserve">
+    <value>Komprimieren zu</value>
+  </data>
+  <data name="S_ACTION_COMPRESS" xml:space="preserve">
+    <value>Komprimieren</value>
+  </data>
+  <data name="S_ACTION_EXTRACT" xml:space="preserve">
+    <value>Entpacken</value>
+  </data>
+  <data name="S_MENU_ARCHIVE" xml:space="preserve">
+    <value>Archiv</value>
+  </data>
+  <data name="S_MENU_BACKUP_PACKAGE" xml:space="preserve">
+    <value>Sicherung</value>
+  </data>
+  <data name="S_MENU_REMOVE_SAVED_LOCATION" xml:space="preserve">
+    <value>Aus den gespeicherten Orten entfernen</value>
+  </data>
+  <data name="S_STATUS_CALCULATING_SIZE" xml:space="preserve">
+    <value>Wird berechnet …</value>
+  </data>
+  <data name="S_PACKAGE_ID" xml:space="preserve">
+    <value>Paketkennung</value>
+  </data>
+  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
+    <value>Der aktuelle Ort ist schreibgeschützt</value>
+  </data>
+  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
+    <value>Ein ausgewähltes Element kann nicht geändert werden</value>
   </data>
 </root>
