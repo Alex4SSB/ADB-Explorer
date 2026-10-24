@@ -42,6 +42,14 @@
     </Reference>
   </ItemGroup>
 
+  <!-- AdvancedSharpAdbClient, built from our fork (github.com/Alex4SSB/AdvancedSharpAdbClient,
+       branch fix/push-short-read) until the Push short-read fix is released upstream. -->
+  <ItemGroup>
+    <Reference Include="AdvancedSharpAdbClient">
+      <HintPath>Libs\AdvancedSharpAdbClient\AdvancedSharpAdbClient.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
   <ItemGroup>
     <Content Include="Assets\app_icon_2023_combined.ico" />
   </ItemGroup>
@@ -71,7 +79,6 @@
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="AdvancedSharpAdbClient" Version="3.6.16" />
     <PackageReference Include="AlphaOmega.ApkReader" Version="2.0.10" />
     <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />

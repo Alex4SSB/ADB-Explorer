@@ -30,6 +30,14 @@
     <ProjectReference Include="..\ADB Explorer\ADB Explorer.csproj" />
   </ItemGroup>
 
+  <!-- The app references AdvancedSharpAdbClient as a raw DLL (our fork), which, unlike
+       the NuGet package, doesn't flow to this project through the ProjectReference. -->
+  <ItemGroup>
+    <Reference Include="AdvancedSharpAdbClient">
+      <HintPath>..\ADB Explorer\Libs\AdvancedSharpAdbClient\AdvancedSharpAdbClient.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
   <ItemGroup Condition="Exists('..\ADB Explorer\FaroCollector.url')">
     <Content Include="..\ADB Explorer\FaroCollector.url" Link="FaroCollector.url" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

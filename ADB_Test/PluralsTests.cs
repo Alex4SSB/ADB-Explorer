@@ -57,8 +57,11 @@ public class PluralsTests
         Assert.AreEqual(he["Items_other"], Plurals.Lookup(Culture("he-IL"), "Items", 5));
 
         Assert.AreEqual(Plurals.Table("de")!["Items_one"], Plurals.Lookup(Culture("de-AT"), "Items", 1));
-        Assert.AreEqual("{{count}} item", Plurals.Lookup(Culture("ro"), "Items", 1));
-        Assert.AreEqual("{{count}} items", Plurals.Lookup(Culture("en-US"), "Items", null));
+
+        // ro has no Items forms, so it gets the source language's
+        var source = Plurals.Table(Plurals.SourceLanguage)!;
+        Assert.AreEqual(source["Items_one"], Plurals.Lookup(Culture("ro"), "Items", 1));
+        Assert.AreEqual(source["Items_other"], Plurals.Lookup(Culture("en-US"), "Items", null));
     }
 
     [TestMethod]
@@ -69,7 +72,8 @@ public class PluralsTests
         {
             Resources.Culture = Culture("en");
 
-            Assert.AreEqual("1 item", Plurals.Items(1));
+            // The source's one forms spell out the number, so 2 is the count that shows the placeholder filled
+            Assert.AreEqual("2 items", Plurals.Items(2));
             Assert.AreEqual("?? items", Plurals.Items(null));
             Assert.AreEqual("Copy 3 items to Download", Plurals.CopyItemsTo(3, "Download"));
         }
