@@ -1809,4 +1809,10 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MENU_INVERT_SELECTION" xml:space="preserve">
     <value>反选</value>
   </data>
+  <data name="S_SETTINGS_AUTO_RETRY" xml:space="preserve">
+    <value>自动重试传输失败文件项目</value>
+  </data>
+  <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
+    <value>次数</value>
+  </data>
 </root>
