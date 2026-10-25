@@ -394,7 +394,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>合併或取代</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>貼上時衝突</value>
+    <value>取代或略過檔案</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>選擇要複製過去的資料夾</value>
@@ -433,7 +433,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>停止 複製進來 / 複製過去 時的輪詢</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>不同裝置的同時操作</value>
+    <value>同時操作數的上限</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
     <value>在複製過去時强制媒體重新掃描</value>
@@ -1614,5 +1614,38 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
     <value>名</value>
+  </data>
+  <data name="S_SCREENSHOT" xml:space="preserve">
+    <value>螢幕截圖</value>
+  </data>
+  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
+    <value>每個檔都讓我決定</value>
+  </data>
+  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
+    <value>解決 {0} 個衝突</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
+    <value>檢查與通知</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_UPDATE" xml:space="preserve">
+    <value>更新與安裝</value>
+  </data>
+  <data name="S_MENU_STOP_LOADING" xml:space="preserve">
+    <value>停止載入 {0}</value>
+  </data>
+  <data name="S_MENU_SELECT_NONE" xml:space="preserve">
+    <value>全不選</value>
+  </data>
+  <data name="S_MENU_INVERT_SELECTION" xml:space="preserve">
+    <value>反轉所選</value>
+  </data>
+  <data name="S_MENU_PASTE_IMAGE" xml:space="preserve">
+    <value>貼上圖像</value>
+  </data>
+  <data name="S_MENU_COPY_LINK" xml:space="preserve">
+    <value>複製其連結</value>
+  </data>
+  <data name="S_MENU_COPY_AS_IMAGE" xml:space="preserve">
+    <value>複製成圖像</value>
   </data>
 </root>
