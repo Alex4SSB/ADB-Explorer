@@ -1648,4 +1648,19 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MENU_COPY_AS_IMAGE" xml:space="preserve">
     <value>複製成圖像</value>
   </data>
+  <data name="S_MENU_COMPRESS_TO" xml:space="preserve">
+    <value>壓縮到</value>
+  </data>
+  <data name="S_ACTION_COMPRESS" xml:space="preserve">
+    <value>壓縮</value>
+  </data>
+  <data name="S_ACTION_EXTRACT" xml:space="preserve">
+    <value>提取</value>
+  </data>
+  <data name="S_MENU_ARCHIVE" xml:space="preserve">
+    <value>建立壓縮檔</value>
+  </data>
+  <data name="S_MENU_BACKUP_PACKAGE" xml:space="preserve">
+    <value>備份</value>
+  </data>
 </root>
