@@ -1663,4 +1663,10 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MENU_BACKUP_PACKAGE" xml:space="preserve">
     <value>備份</value>
   </data>
+  <data name="S_MENU_COPY_CONTENTS" xml:space="preserve">
+    <value>複製內容</value>
+  </data>
+  <data name="S_MENU_EXTRACT_HERE" xml:space="preserve">
+    <value>提取到此</value>
+  </data>
 </root>
