@@ -5,7 +5,7 @@ namespace ADB_Explorer.Services;
 
 /// <summary>
 /// Drags that hold only FileDrop (no shell IDs) come from apps with no shell namespace of their own,
-/// and some create their files only when dropped: 7-Zip extracts them then, the new Outlook (Chromium) after.
+/// and some create their files only when dropped: 7-Zip and WinRAR extract them then, the new Outlook (Chromium) after.
 /// </summary>
 public partial class CopyPasteService
 {
@@ -123,6 +123,22 @@ public partial class CopyPasteService
         }
     }
 
+    /// <summary>
+    /// The dragged files exist only from the drop: unnamed until then (<see cref="HasUnnamedFiles"/>),
+    /// or named relative to the archive WinRAR extracts them from, which lists them by those names.
+    /// </summary>
+    public bool HasPendingFiles
+    {
+        get;
+        private set
+        {
+            if (field != value)
+                _currentFiles = null;
+
+            field = value;
+        }
+    }
+
     /// <returns>Whether the drag can be dropped here; it can't when its files appear only where a target-detect source sees it dropped.</returns>
     private bool PreviewFileDrop(IDataObject dataObject)
     {
@@ -130,9 +146,15 @@ public partial class CopyPasteService
 
         // 7-Zip drags out of an archive name only the empty folder it extracts to at the drop.
         // Not its format, which it also offers for files dragged from a regular folder.
-        var isSevenZip = paths?.All(IsSevenZipTempFolder) is true;
-        var isDelayed = paths is null && IsAsyncSource(dataObject);
-        if (paths is null && !isDelayed)
+        var isSevenZip = paths?.All(IsExtractorTempFolder) is true;
+
+        // WinRAR names them relative to the archive root, and extracts them at the drop
+        string[]? relativeNames = null;
+        if (paths is null)
+            relativeNames = GetRelativeDropNames(dataObject);
+
+        var isDelayed = paths is null && relativeNames is null && IsAsyncSource(dataObject);
+        if (paths is null && !isDelayed && relativeNames is null)
             return false;
 
         SourceDevice = null;
@@ -140,6 +162,7 @@ public partial class CopyPasteService
         IsFileDropOnly = true;
         IsDelayedFileDrop = isDelayed;
         HasUnnamedFiles = isSevenZip || isDelayed;
+        HasPendingFiles = HasUnnamedFiles || relativeNames is not null;
 
         // Its files are created after the drop, so that's where they're read from
         if (isDelayed)
@@ -149,6 +172,12 @@ public partial class CopyPasteService
         {
             Descriptors = [];
             DragFiles = [""];
+        }
+        else if (relativeNames is not null)
+        {
+            // Dropped by these names, so the drag is shown and checked as any other
+            Descriptors = [];
+            DragFiles = [.. relativeNames.Select(name => FileHelper.GetFullName(name.Replace('/', '\\')))];
         }
         else
         {
@@ -160,8 +189,8 @@ public partial class CopyPasteService
     }
 
     /// <summary>
-    /// FileDrop's paths when they all exist. A target-detect drag (WinRAR) names files it only creates
-    /// once it sees where it was dropped, and Chromium refuses to name them before the drop.
+    /// FileDrop's paths when they all exist. A target-detect drag names files it only creates once it sees where it
+    /// was dropped, WinRAR names them relative to its archive until the drop, and Chromium refuses to name them before it.
     /// </summary>
     internal static string[]? GetExistingDropFiles(IDataObject dataObject)
     {
@@ -184,14 +213,34 @@ public partial class CopyPasteService
         return null;
     }
 
+    /// <summary>FileDrop's names when it holds no paths yet, only names relative to the archive they'll be extracted from (WinRAR).</summary>
+    internal static string[]? GetRelativeDropNames(IDataObject dataObject)
+    {
+        try
+        {
+            if (dataObject.GetDataPresent(AdbDataFormats.FileDrop)
+                && dataObject.GetData(AdbDataFormats.FileDrop) is string[] { Length: > 0 } names
+                && names.All(name => !string.IsNullOrEmpty(name) && !Path.IsPathRooted(name) && !FileHelper.HasParentReference(name)))
+            {
+                return names;
+            }
+        }
+        catch (Exception e) when (e is COMException or ExternalException or OutOfMemoryException)
+        {
+            // The source refused the data
+        }
+
+        return null;
+    }
+
     /// <returns>The staging folder the files were moved to, if they were.</returns>
     private string? TakeDroppedFiles(IDataObject dataObject)
     {
         if (GetDroppedFiles(dataObject, out var staging) is not { } paths)
             return null;
 
-        // Before DragFiles, which drops the files listed from the unnamed state
-        HasUnnamedFiles = false;
+        // Before DragFiles, which drops the files listed from the pending state
+        HasUnnamedFiles = HasPendingFiles = false;
         DragFiles = paths;
 
         return staging;
@@ -200,8 +249,9 @@ public partial class CopyPasteService
     internal static string[]? GetDroppedFiles(IDataObject dataObject) => GetDroppedFiles(dataObject, out _);
 
     /// <summary>
-    /// The files dropped, read again: 7-Zip extracts them only now, to a temp folder it removes as soon as
-    /// the drop returns, so they're moved to ours (<paramref name="staging"/>) first. Other sources keep their files where they are.
+    /// The files dropped, read again: 7-Zip and WinRAR extract them only now, to a temp folder 7-Zip removes as soon as
+    /// the drop returns (WinRAR when it closes), so they're moved to ours (<paramref name="staging"/>) first.
+    /// Other sources keep their files where they are.
     /// </summary>
     internal static string[]? GetDroppedFiles(IDataObject dataObject, out string? staging)
     {
@@ -209,8 +259,8 @@ public partial class CopyPasteService
         if (GetExistingDropFiles(dataObject) is not { } paths)
             return null;
 
-        // Only files 7-Zip extracted; one dragged from a regular folder is the user's own
-        if (paths.All(IsInSevenZipTemp))
+        // Only files an archiver extracted; one dragged from a regular folder is the user's own
+        if (paths.All(IsInExtractorTemp))
         {
             var folder = staging = NewDropStaging();
             paths = [.. paths.Select(path => MoveInto(path, folder))];
@@ -223,11 +273,13 @@ public partial class CopyPasteService
     private static string[] WithoutParentReferences(IEnumerable<string> paths)
         => [.. paths.Where(path => !FileHelper.HasParentReference(path))];
 
-    // 7-Zip extracts a drag out of an archive to %TEMP%\7zE*
-    private static bool IsInSevenZipTemp(string path) => IsSevenZipTempFolder(FileHelper.GetParentPath(path));
+    // Where a drag out of an archive is extracted: %TEMP%\7zE* (7-Zip), %TEMP%\Rar$DR* (WinRAR)
+    private static readonly string[] ExtractorTempPrefixes = ["7zE", "Rar$DR"];
 
-    private static bool IsSevenZipTempFolder(string path)
-        => FileHelper.GetFullName(path).StartsWith("7zE", StringComparison.OrdinalIgnoreCase)
+    private static bool IsInExtractorTemp(string path) => IsExtractorTempFolder(FileHelper.GetParentPath(path));
+
+    private static bool IsExtractorTempFolder(string path)
+        => ExtractorTempPrefixes.Any(prefix => FileHelper.GetFullName(path).StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
             && string.Equals(FileHelper.GetParentPath(path).TrimEnd('\\'), Path.GetTempPath().TrimEnd('\\'), StringComparison.OrdinalIgnoreCase);
 
     // The drag the user cancelled with a right click, refused from then on. Known by the source's own object, as WPF

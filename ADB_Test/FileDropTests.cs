@@ -63,19 +63,74 @@ public class FileDropTests
         File.WriteAllText(file, "hello");
         File.WriteAllText(Path.Combine(folder, "sub", "a.txt"), "a");
 
+        string? staging = null;
         try
         {
-            var dropped = CopyPasteService.GetDroppedFiles(new DataObject(DataFormats.FileDrop, new[] { file, folder }));
+            var dropped = CopyPasteService.GetDroppedFiles(new DataObject(DataFormats.FileDrop, new[] { file, folder }), out staging);
 
             Assert.IsNotNull(dropped);
+            Assert.IsNotNull(staging);
             Assert.IsFalse(File.Exists(file) || Directory.Exists(folder), "Moved, not copied");
             Assert.AreEqual("hello", File.ReadAllText(dropped[0]));
             Assert.AreEqual("a", File.ReadAllText(Path.Combine(dropped[1], "sub", "a.txt")));
-            Assert.IsFalse(dropped.Any(path => path.StartsWith(sevenZipTemp, StringComparison.OrdinalIgnoreCase)));
+            Assert.IsTrue(dropped.All(path => path.StartsWith(staging, StringComparison.OrdinalIgnoreCase)));
         }
         finally
         {
             Directory.Delete(sevenZipTemp, true);
+            if (staging is not null)
+                Directory.Delete(staging, true);
+        }
+    }
+
+    [TestMethod]
+    public void FileDrop_WinRarDragListsItsItems()
+    {
+        // While dragging, WinRAR names its items relative to the archive root; nothing is extracted yet
+        var service = new CopyPasteService();
+        service.PreviewDataObject(new DataObject(DataFormats.FileDrop, new[] { "top.txt", @"folder\sub" }));
+
+        Assert.IsFalse(service.HasUnnamedFiles, "Its items are listed by name");
+        Assert.IsTrue(service.HasPendingFiles);
+        Assert.IsTrue(service.IsFileDropOnly);
+        Assert.IsFalse(service.IsDelayedFileDrop, "Its files are named again at the drop, not after it");
+        CollectionAssert.AreEqual(new[] { "top.txt", "sub" }, service.DragFiles);
+
+        var current = service.CurrentFiles.ToArray();
+        CollectionAssert.AreEqual(new[] { "top.txt", "sub" }, current.Select(f => f.FullName).ToArray());
+        Assert.IsFalse(current[0].IsDirectory);
+        Assert.IsTrue(current[1].IsDirectory, "No extension, so most likely a folder");
+
+        Assert.IsNull(CopyPasteService.GetRelativeDropNames(new DataObject(DataFormats.FileDrop, new[] { @"..\top.txt" })));
+    }
+
+    [TestMethod]
+    public void FileDrop_WinRarItemsAreMovedOutOfItsTempFolder()
+    {
+        // At the drop WinRAR extracts to %TEMP%\Rar$DRa<pid>.<n>.rartemp and names the files there; it removes them when it closes
+        var winRarTemp = Path.Combine(Path.GetTempPath(), $"Rar$DRa{Random.Shared.Next(100000)}.{Random.Shared.Next(100000)}.rartemp");
+        var file = Path.Combine(winRarTemp, "top.txt");
+        var folder = Path.Combine(winRarTemp, "folder");
+        Directory.CreateDirectory(Path.Combine(folder, "sub"));
+        File.WriteAllText(file, "top");
+        File.WriteAllText(Path.Combine(folder, "sub", "b.txt"), "b");
+
+        string? staging = null;
+        try
+        {
+            var dropped = CopyPasteService.GetDroppedFiles(new DataObject(DataFormats.FileDrop, new[] { file, folder }), out staging);
+
+            Assert.IsNotNull(dropped);
+            Assert.IsNotNull(staging);
+            Assert.IsFalse(File.Exists(file) || Directory.Exists(folder), "Moved, not copied");
+            Assert.AreEqual("top", File.ReadAllText(dropped[0]));
+            Assert.AreEqual("b", File.ReadAllText(Path.Combine(dropped[1], "sub", "b.txt")));
+        }
+        finally
+        {
+            Directory.Delete(winRarTemp, true);
+            if (staging is not null)
+                Directory.Delete(staging, true);
         }
     }
 

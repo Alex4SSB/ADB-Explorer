@@ -130,7 +130,7 @@ public partial class CopyPasteService
     public void PreviewDataObject(IDataObject dataObject)
     {
         CurrentSource &= ~(DataSource.Android | DataSource.Virtual);
-        IsFileDropOnly = IsDelayedFileDrop = HasUnnamedFiles = false;
+        IsFileDropOnly = IsDelayedFileDrop = HasUnnamedFiles = HasPendingFiles = false;
 
         DragParent = "";
         string[] oldFiles = [.. DragFiles];
@@ -224,8 +224,8 @@ public partial class CopyPasteService
             if (dataObject.GetDataPresent(AdbDataFormats.FileContents))
                 CurrentSource &= ~DataSource.Android;
         }
-        // FileDrop alone: an app with no shell namespace of its own (7-Zip, the new Outlook).
-        // Otherwise it's probably dropping by target detect, which we can't support (WinRAR, etc.)
+        // FileDrop alone: an app with no shell namespace of its own (7-Zip, WinRAR, the new Outlook).
+        // Otherwise it's probably dropping by target detect, which we can't support
         else if (!PreviewFileDrop(dataObject))
         {
             SourceDevice = null;
@@ -559,6 +559,10 @@ public partial class CopyPasteService
                 string? staging = null;
                 if (IsFileDropOnly)
                     staging = TakeDroppedFiles(dataObject);
+
+                // Nothing was extracted, so there are only the stand-ins listed while dragging
+                if (HasPendingFiles)
+                    return;
 
                 if (isAppDrive)
                 {

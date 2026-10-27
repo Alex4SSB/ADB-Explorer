@@ -207,6 +207,19 @@ public partial class CopyPasteService : ObservableObject
         if (HasUnnamedFiles)
             yield break;
 
+        // Not extracted until the drop, so stand-ins by name, for the drag image and name checks
+        if (HasPendingFiles)
+        {
+            foreach (var name in DragFiles)
+            {
+                // Whether it's a folder isn't known; one with no extension most likely is
+                var type = string.IsNullOrEmpty(Path.GetExtension(name)) ? FileType.Folder : FileType.File;
+                yield return new(name, name, type) { PathType = FilePathType.Windows };
+            }
+
+            yield break;
+        }
+
         if (IsWindows && !IsVirtual)
         {
             foreach (var file in DragFiles)
