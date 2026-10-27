@@ -934,7 +934,13 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     {
         var fmtEtc = CreateFormat(AdbDataFormats.FileContents, index);
 
+        // A source that registers its contents as memory refuses a request for a stream alone (Firefox's link shortcuts)
+        fmtEtc.tymed |= TYMED.TYMED_HGLOBAL;
+
         dataObject.GetData(ref fmtEtc, out STGMEDIUM medium);
+
+        if (medium.tymed is TYMED.TYMED_HGLOBAL)
+            return NativeMethods.TakeHGlobalAsStream(ref medium);
 
         // The wrapper holds its own reference, so the one the medium handed over is released
         var stream = Marshal.GetObjectForIUnknown(medium.unionmember);

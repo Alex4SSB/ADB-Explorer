@@ -164,15 +164,6 @@ public static partial class NativeMethods
         public bool fWide;  // Unicode flag (usually TRUE)
     }
 
-    [DllImport("Shlwapi.dll", CharSet = CharSet.Unicode)]
-    private static extern HResult SHCreateStreamOnFileEx(
-        [MarshalAs(UnmanagedType.LPWStr)] string pszFile,
-        Vanara.PInvoke.STGM grfMode,
-        FileFlagsAndAttributes dwAttributes,
-        [MarshalAs(UnmanagedType.Bool)] bool fCreate,
-        IStream? pstmTemplate,
-        out IStream ppstm);
-
     /// <summary>
     /// IStream with its buffers as pointers, so a stream we serve doesn't get a managed array
     /// allocated and copied for every Read the shell makes.
@@ -200,6 +191,37 @@ public static partial class NativeMethods
 
     [DllImport("Ole32.dll")]
     private static extern void ReleaseStgMedium(ref STGMEDIUM pmedium);
+
+    /// <summary>
+    /// A stream over a copy of <paramref name="medium"/>'s memory, which is then released.
+    /// Copied, as the source may own that memory (pUnkForRelease).
+    /// </summary>
+    public static IStream TakeHGlobalAsStream(ref STGMEDIUM medium)
+    {
+        byte[] content;
+        try
+        {
+            var size = (int)GlobalSize(medium.unionmember);
+            var data = GlobalLock(medium.unionmember);
+            content = new byte[size];
+
+            if (data != 0)
+            {
+                Marshal.Copy(data, content, 0, size);
+                GlobalUnlock(medium.unionmember);
+            }
+        }
+        finally
+        {
+            ReleaseStgMedium(ref medium);
+        }
+
+        var stream = CreateStreamOnHGlobal(0, true);
+        stream.Write(content, content.Length, 0);
+        stream.Seek(0, 0, 0);
+
+        return stream;
+    }
 
     /// <summary>The paths in a data object's CF_HDROP, read from the source's own COM object.</summary>
     public static string[] GetFileDropPaths(IDataObject dataObject)
@@ -277,24 +299,18 @@ public static partial class NativeMethods
         keybd_event(VK_ESCAPE, 0, KEYEVENTF_KEYUP, IntPtr.Zero);
     }
 
-    public static void SaveComStreamToFile(IStream source, string filePath)
+    public static unsafe void SaveComStreamToFile(IStream source, string filePath)
     {
-        // Create a writable stream on a new file
-        SHCreateStreamOnFileEx(filePath,
-            Vanara.PInvoke.STGM.STGM_CREATE | Vanara.PInvoke.STGM.STGM_WRITE | Vanara.PInvoke.STGM.STGM_SHARE_EXCLUSIVE,
-            0,
-            true,
-            null,
-            out IStream dest);
-
-        try
+        // Read, not IStream.CopyTo, which some sources don't implement (Firefox)
+        using var file = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
+        var buffer = new byte[81920];
+        int read;
+        do
         {
-            source.CopyTo(dest, long.MaxValue, IntPtr.Zero, IntPtr.Zero);
-            dest.Commit(0);
+            read = 0;
+            source.Read(buffer, buffer.Length, (HANDLE)(&read));
+            file.Write(buffer, 0, read);
         }
-        finally
-        {
-            Marshal.ReleaseComObject(dest);
-        }
+        while (read > 0);
     }
 }

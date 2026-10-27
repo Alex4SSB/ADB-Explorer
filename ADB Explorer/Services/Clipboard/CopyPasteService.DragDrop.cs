@@ -496,13 +496,21 @@ public partial class CopyPasteService
                             if (Descriptors[i].IsDirectory)
                                 continue;
 
-                            System.Runtime.InteropServices.ComTypes.IStream stream;
                             try
                             {
                                 // Try to acquire the stream of each descriptor
-                                stream = VirtualFileDataObject.GetFileContents(dataObject, i);
+                                var stream = VirtualFileDataObject.GetFileContents(dataObject, i);
+
+                                // Save the stream to the temp folder, create the parent folder if it doesn't exist
+                                Directory.CreateDirectory(FileHelper.GetParentPath(files[i]));
+
+                                NativeMethods.SaveComStreamToFile(stream, files[i]);
+
+                                // A descriptor without FD_WRITESTIME reads as 1601
+                                if (Descriptors[i].ChangeTimeUtc is { Year: > 1601 } changeTimeUtc)
+                                    File.SetLastWriteTime(files[i], changeTimeUtc.ToLocalTime());
                             }
-                            catch (COMException e)
+                            catch (Exception e) when (e is COMException or IOException or UnauthorizedAccessException)
                             {
                                 // If failed, add a failed operation to the queue
                                 App.SafeInvoke(() =>
@@ -516,17 +524,9 @@ public partial class CopyPasteService
                                             new FailedOpProgressViewModel(e.Message)));
                                 });
 
-                                continue;
+                                // Neither listed nor pushed below
+                                files[i] = "";
                             }
-
-                            // Save the stream to the temp folder, create the parent folder if it doesn't exist
-                            Directory.CreateDirectory(FileHelper.GetParentPath(files[i]));
-
-                            NativeMethods.SaveComStreamToFile(stream, files[i]);
-
-                            var changeTimeUtc = Descriptors[i].ChangeTimeUtc;
-                            if (changeTimeUtc is not null)
-                                File.SetLastWriteTime(files[i], changeTimeUtc.Value.ToLocalTime());
                         }
 
                         IEnumerable<FileClass> shItems = [];
