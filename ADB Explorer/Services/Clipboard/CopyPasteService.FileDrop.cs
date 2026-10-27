@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.Json;
 using Vanara.Windows.Shell;
 using ComDataObject = System.Runtime.InteropServices.ComTypes.IDataObject;
 
@@ -33,6 +35,9 @@ public partial class CopyPasteService
                     };
                     queue.Operations.CollectionChanged += (_, _) => App.SafeBeginInvoke(SweepDropStaging);
                 }
+
+                // As may the pushed files being read for their image data
+                ThumbnailService.PushedMediaRead += () => App.SafeBeginInvoke(SweepDropStaging);
             }
         }
 
@@ -71,7 +76,7 @@ public partial class CopyPasteService
     /// </summary>
     private static void SweepDropStaging()
     {
-        if (Data.FileOpQ is not { } queue || queue.HasIncompleteOperations)
+        if (Data.FileOpQ is not { } queue || queue.HasIncompleteOperations || ThumbnailService.IsReadingPushedMedia)
             return;
 
         List<string> deletable;
@@ -86,8 +91,11 @@ public partial class CopyPasteService
             _releasedDropStaging.ExceptWith(deletable);
         }
 
-        if (deletable.Count > 0)
-            Task.Run(() => deletable.ForEach(DeleteDropStaging));
+        if (deletable.Count == 0)
+            return;
+
+        deletable.ForEach(ThumbnailService.ForgetPushThumbnails);
+        Task.Run(() => deletable.ForEach(DeleteDropStaging));
     }
 
     private static void DeleteDropStaging(string path)
@@ -124,8 +132,8 @@ public partial class CopyPasteService
     }
 
     /// <summary>
-    /// The dragged files exist only from the drop: unnamed until then (<see cref="HasUnnamedFiles"/>),
-    /// or named relative to the archive WinRAR extracts them from, which lists them by those names.
+    /// The dragged files exist only from the drop: unnamed until then (<see cref="HasUnnamedFiles"/>), named relative to
+    /// the archive WinRAR extracts them from, or named in the new Outlook's description of its drag, listed by those names.
     /// </summary>
     public bool HasPendingFiles
     {
@@ -139,8 +147,227 @@ public partial class CopyPasteService
         }
     }
 
+    // The pending names are known to be files (the new Outlook's attachments), not possibly folders (WinRAR's)
+    private bool _pendingAreFiles;
+
+    /// <summary>
+    /// The thumbnail the new Outlook offers of what it drags (as FileContents), shown as the drag image
+    /// and kept as the dropped image's thumbnail. Read once per drag, in the background.
+    /// </summary>
+    public BitmapSource? DragThumbnail { get; private set; }
+
+    // The drag DragThumbnail was read for, held weakly like the cancelled drag
+    private WeakReference<object>? _thumbnailDrag;
+
+    /// <summary>Forgets the thumbnail of a drag other than <paramref name="dataObject"/>.</summary>
+    private void ForgetOtherDragThumbnail(IDataObject dataObject)
+    {
+        object drag = (object?)GetSourceDataObject(dataObject) ?? dataObject;
+        if (_thumbnailDrag?.TryGetTarget(out var current) is true && ReferenceEquals(current, drag))
+            return;
+
+        _thumbnailDrag = null;
+        DragThumbnail = null;
+    }
+
+    /// <summary>
+    /// Starts reading the thumbnail the drag offers, unless it's already read (previews run on every move).
+    /// Read while dragging, not dropped, so only when it weighs no more than a custom thumbnail may.
+    /// </summary>
+    private void LoadDragThumbnail(IDataObject dataObject)
+    {
+        if (_thumbnailDrag is not null
+            || !dataObject.GetDataPresent(AdbDataFormats.FileContents)
+            || GetSourceDataObject(dataObject) is not { } source)
+        {
+            return;
+        }
+
+        var drag = new WeakReference<object>(source);
+        _thumbnailDrag = drag;
+
+        var maxBytes = (long)Data.Settings.MaxCustomThumbWeight * 1024;
+        if (maxBytes <= 0 || GetDragThumbnailSize(dataObject) > maxBytes)
+            return;
+
+        // Its source may take a while to hand it over, which mustn't hold up the drag
+        var takeSource = NativeMethods.MarshalToThread(source);
+        Task.Run(() =>
+        {
+            var image = ReadDragThumbnail(takeSource(), maxBytes);
+            if (image is not null)
+                App.SafeBeginInvoke(() =>
+                {
+                    if (ReferenceEquals(_thumbnailDrag, drag))
+                        DragThumbnail = image;
+                });
+        });
+    }
+
+    /// <summary>
+    /// The size of the drag's thumbnail from its descriptor (which is the thumbnail's), or null when it doesn't say.
+    /// Chromium's never does (it sets only FD_LINKUI), so its content's own size decides instead.
+    /// </summary>
+    internal static long? GetDragThumbnailSize(IDataObject dataObject)
+        => FileDescriptor.GetDescriptors(dataObject) is [{ Length: { } size }, ..] ? size : null;
+
+    /// <summary>
+    /// The image in the drag's first FileContents, or null when it doesn't read as one,
+    /// or its content doesn't state its size or states more than <paramref name="maxBytes"/>.
+    /// </summary>
+    internal static BitmapSource? ReadDragThumbnail(ComDataObject dataObject, long maxBytes)
+    {
+        try
+        {
+            using var content = ShellContentStream.FromDataObject(dataObject, 0);
+            if (content.StatedLength is not { } size || size > maxBytes)
+                return null;
+
+            using var buffer = new MemoryStream();
+            content.CopyTo(buffer);
+            buffer.Position = 0;
+
+            // Not a BitmapFrame: frozen, it still keeps its decoder, which only this thread may touch
+            var image = new BitmapImage();
+            image.BeginInit();
+            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.StreamSource = buffer;
+            image.EndInit();
+            image.Freeze();
+
+            return image;
+        }
+        catch (Exception e) when (e is COMException or IOException or NotSupportedException or ArgumentException
+            or InvalidOperationException or FormatException or UnauthorizedAccessException)
+        {
+            return null;
+        }
+    }
+
+    // Chromium apps (the new Outlook) put the data a page set for the drag here
+    private const string ChromiumCustomDataFormat = "Chromium Web Custom MIME Data Format";
+
+    /// <summary>
+    /// The drag's Chromium custom data by type: null when it has none (not from a Chromium app),
+    /// empty when it has some that can't be read.
+    /// </summary>
+    internal static Dictionary<string, string>? GetChromiumCustomData(IDataObject dataObject)
+    {
+        try
+        {
+            if (!dataObject.GetDataPresent(ChromiumCustomDataFormat))
+                return null;
+
+            if (dataObject.GetData(ChromiumCustomDataFormat) is not MemoryStream stream)
+                return [];
+
+            return ParseChromiumCustomData(stream.ToArray());
+        }
+        catch (Exception e) when (e is COMException or ExternalException or OutOfMemoryException)
+        {
+            return [];
+        }
+    }
+
+    /// <summary>
+    /// Chromium's custom data pickle: its payload size, the number of entries, then each entry's type and data,
+    /// each a UTF-16 string as its length in chars and the chars, padded to 4 bytes. Empty when it doesn't read as one.
+    /// </summary>
+    internal static Dictionary<string, string> ParseChromiumCustomData(byte[] data)
+    {
+        Dictionary<string, string> entries = [];
+        try
+        {
+            using var reader = new BinaryReader(new MemoryStream(data));
+            reader.ReadUInt32();
+            var count = reader.ReadUInt32();
+            for (var i = 0; i < count; i++)
+            {
+                var type = ReadString16(reader);
+                entries[type] = ReadString16(reader);
+            }
+        }
+        catch (EndOfStreamException)
+        {
+            return [];
+        }
+
+        return entries;
+
+        static string ReadString16(BinaryReader reader)
+        {
+            var length = reader.ReadInt32();
+            if (length < 0 || length * 2L > reader.BaseStream.Length - reader.BaseStream.Position)
+                throw new EndOfStreamException();
+
+            var text = Encoding.Unicode.GetString(reader.ReadBytes(length * 2));
+            if (length % 2 != 0)
+                reader.ReadBytes(2);
+
+            return text;
+        }
+    }
+
+    /// <summary>
+    /// A drag the new Outlook describes (its items under "attachment"). Its FileGroupDescriptor and FileContents, when there,
+    /// hold only a thumbnail named by a random ID; the files themselves come only through FileDrop, after the drop.
+    /// </summary>
+    internal static bool IsOutlookDescribedDrag(IDataObject dataObject)
+        => GetChromiumCustomData(dataObject)?.ContainsKey(OutlookDescriptionType) is true;
+
+    private const string OutlookDescriptionType = "attachment";
+
+    /// <summary>
+    /// The files the new Outlook's drag describes as attachments, or null for anything else it drags
+    /// (its whole emails are "multimaillistconversationrows"), or a description that doesn't read as expected.
+    /// </summary>
+    internal static string[]? GetChromiumAttachmentNames(IReadOnlyDictionary<string, string> customData)
+    {
+        if (!customData.TryGetValue(OutlookDescriptionType, out var json))
+            return null;
+
+        try
+        {
+            using var document = JsonDocument.Parse(json);
+            var root = document.RootElement;
+            if (root.ValueKind is not JsonValueKind.Object
+                || !root.TryGetProperty("itemType", out var itemType)
+                || itemType.ValueKind is not JsonValueKind.String
+                || itemType.GetString() != "attachment"
+                || !root.TryGetProperty("attachmentFiles", out var files)
+                || files.ValueKind is not JsonValueKind.Array)
+            {
+                return null;
+            }
+
+            List<string> names = [];
+            foreach (var file in files.EnumerateArray())
+            {
+                if (file.ValueKind is not JsonValueKind.Object
+                    || !file.TryGetProperty("name", out var name)
+                    || name.ValueKind is not JsonValueKind.String)
+                {
+                    return null;
+                }
+
+                // A file name, never a path
+                var text = name.GetString();
+                if (string.IsNullOrWhiteSpace(text) || text.IndexOfAny(['\\', '/']) >= 0 || text is "." or "..")
+                    return null;
+
+                names.Add(text);
+            }
+
+            return names.Count > 0 ? [.. names] : null;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
     /// <returns>Whether the drag can be dropped here; it can't when its files appear only where a target-detect source sees it dropped.</returns>
-    private bool PreviewFileDrop(IDataObject dataObject)
+    internal bool PreviewFileDrop(IDataObject dataObject)
     {
         var paths = GetExistingDropFiles(dataObject);
 
@@ -148,12 +375,23 @@ public partial class CopyPasteService
         // Not its format, which it also offers for files dragged from a regular folder.
         var isSevenZip = paths?.All(IsExtractorTempFolder) is true;
 
-        // WinRAR names them relative to the archive root, and extracts them at the drop
         string[]? relativeNames = null;
-        if (paths is null)
+        string[]? describedNames = null;
+        if (paths is null && GetChromiumCustomData(dataObject) is { } customData)
+        {
+            // A Chromium app names nothing in FileDrop until after the drop, and may write nothing even then (the new
+            // Outlook's whole emails), so only a drag it describes as files is taken: as a copy, once it wrote them
+            describedNames = GetChromiumAttachmentNames(customData);
+            if (describedNames is null || !IsAsyncSource(dataObject))
+                return false;
+        }
+        else if (paths is null)
+        {
+            // WinRAR names them relative to the archive root, and extracts them at the drop
             relativeNames = GetRelativeDropNames(dataObject);
+        }
 
-        var isDelayed = paths is null && relativeNames is null && IsAsyncSource(dataObject);
+        var isDelayed = describedNames is not null || (paths is null && relativeNames is null && IsAsyncSource(dataObject));
         if (paths is null && !isDelayed && relativeNames is null)
             return false;
 
@@ -161,8 +399,12 @@ public partial class CopyPasteService
         CurrentSource &= ~DataSource.Android;
         IsFileDropOnly = true;
         IsDelayedFileDrop = isDelayed;
-        HasUnnamedFiles = isSevenZip || isDelayed;
-        HasPendingFiles = HasUnnamedFiles || relativeNames is not null;
+        HasUnnamedFiles = isSevenZip || (isDelayed && describedNames is null);
+        HasPendingFiles = HasUnnamedFiles || relativeNames is not null || describedNames is not null;
+        _pendingAreFiles = describedNames is not null;
+
+        if (describedNames is not null)
+            LoadDragThumbnail(dataObject);
 
         // Its files are created after the drop, so that's where they're read from
         if (isDelayed)
@@ -178,6 +420,11 @@ public partial class CopyPasteService
             // Dropped by these names, so the drag is shown and checked as any other
             Descriptors = [];
             DragFiles = [.. relativeNames.Select(name => FileHelper.GetFullName(name.Replace('/', '\\')))];
+        }
+        else if (describedNames is not null)
+        {
+            Descriptors = [];
+            DragFiles = describedNames;
         }
         else
         {
@@ -365,7 +612,8 @@ public partial class CopyPasteService
     /// Takes files that the source creates after the drop: it's told now that we'll ask for them,
     /// and once the drag is over they're asked for (which waits until they're written), copied, and pushed.
     /// </summary>
-    internal static void PushDelayedFileDrop(IDataObject dataObject, string targetFolder, LogicalDeviceViewModel device)
+    /// <param name="thumbnail">An image of the file with this name, kept as its thumbnail once it's pushed (if it's a photo).</param>
+    internal static void PushDelayedFileDrop(IDataObject dataObject, string targetFolder, LogicalDeviceViewModel device, (string Name, BitmapSource Image)? thumbnail = null)
     {
         if (GetSourceDataObject(dataObject) is not { } source || source is not IAsyncOperation asyncOperation)
             return;
@@ -408,6 +656,13 @@ public partial class CopyPasteService
             {
                 ReleaseDropStaging(staging);
                 return;
+            }
+
+            if (thumbnail is { } shot
+                && staged.FirstOrDefault(path => Path.GetFileName(path).Equals(shot.Name, StringComparison.OrdinalIgnoreCase)) is { } thumbnailOf
+                && AdbExplorerConst.COMMON_PHOTO_EXT.Contains(Path.GetExtension(thumbnailOf), StringComparer.InvariantCultureIgnoreCase))
+            {
+                ThumbnailService.RegisterPushThumbnail(thumbnailOf, shot.Image);
             }
 
             App.SafeInvoke(() => ReleaseDropStagingAfter(

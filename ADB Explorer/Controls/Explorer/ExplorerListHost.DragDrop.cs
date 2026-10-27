@@ -75,6 +75,10 @@ public partial class ExplorerListHost
         {
             CopyPaste.DragBitmap = FileIconProvider.GetMultipleFilesIcon(120);
         }
+        else if (CopyPaste.DragThumbnail is { } thumbnail)
+        {
+            CopyPaste.DragBitmap = thumbnail;
+        }
         else if (CopyPaste.CurrentFiles.Any())
         {
             CopyPaste.DragBitmap = CopyPaste.CurrentFiles.First().DragImage;

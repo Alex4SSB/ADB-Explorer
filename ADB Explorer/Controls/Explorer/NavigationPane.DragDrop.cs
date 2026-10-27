@@ -205,6 +205,10 @@ public partial class NavigationPane
         {
             Data.CopyPaste.DragBitmap = FileIconProvider.GetMultipleFilesIcon(120);
         }
+        else if (Data.CopyPaste.DragThumbnail is { } thumbnail)
+        {
+            Data.CopyPaste.DragBitmap = thumbnail;
+        }
         else if (Data.CopyPaste.CurrentFiles.Any())
         {
             Data.CopyPaste.DragBitmap = Data.CopyPaste.CurrentFiles.First().DragImage;

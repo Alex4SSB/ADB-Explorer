@@ -212,8 +212,8 @@ public partial class CopyPasteService : ObservableObject
         {
             foreach (var name in DragFiles)
             {
-                // Whether it's a folder isn't known; one with no extension most likely is
-                var type = string.IsNullOrEmpty(Path.GetExtension(name)) ? FileType.Folder : FileType.File;
+                // Whether WinRAR's is a folder isn't known; one with no extension most likely is
+                var type = !_pendingAreFiles && string.IsNullOrEmpty(Path.GetExtension(name)) ? FileType.Folder : FileType.File;
                 yield return new(name, name, type) { PathType = FilePathType.Windows };
             }
 

@@ -152,7 +152,14 @@ public static partial class ThumbnailService
                 if (!waitingForPull)
                 {
                     ClearPaneLoadToken(file, token);
-                    App.SafeBeginInvoke(() => file.NotifyPaneThumbnailChanged());
+                    App.SafeBeginInvoke(() =>
+                    {
+                        // No image, but the file's data (e.g. read when it was pushed) is still shown
+                        if (thumbnail is { } infoOnly && state.Cache?.Image is null)
+                            state.Cache = infoOnly;
+
+                        file.NotifyPaneThumbnailChanged();
+                    });
                 }
                 // else: waiting for async custom pull via ThumbnailUpdated; keep CTS/handler
             }

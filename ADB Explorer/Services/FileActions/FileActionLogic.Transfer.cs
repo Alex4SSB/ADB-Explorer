@@ -391,6 +391,12 @@ internal static partial class FileActionLogic
 
     private static void OnItemPushed(FileSyncOperation op, SyncFile source, SyncFile target)
     {
+        // An image that came with the file (the new Outlook's thumbnail of it), seeded before the listing would pull one
+        ThumbnailService.SeedPushThumbnail(op.Device, source, target);
+
+        // Its image or video data, which the device's media database may lack (or not have yet)
+        ThumbnailService.RecordPushedMediaInfo(op.Device, source, target);
+
         // Every pane listing the folder (and device) the file was pushed to gets it, if not shown yet
         Data.ForEachListingAt(target.ParentPath, op.Device.ID, (instance, _) =>
         {

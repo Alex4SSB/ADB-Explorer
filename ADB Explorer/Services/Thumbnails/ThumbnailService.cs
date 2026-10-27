@@ -44,6 +44,20 @@ public static partial class ThumbnailService
         public readonly string ExposureTimeString => ExposureTime.HasValue ? $"1/{(int)(1 / ExposureTime.Value)} {Strings.Resources.S_SECONDS_SHORT.Trim("{0}")}" : "";
         public readonly string BitrateString => Bitrate.HasValue ? string.Format(Strings.Resources.S_SECONDS_SHORT,$"{string.Format(Strings.Resources.KILO, Bitrate.Value / 1024)}/") : "";
 
+        /// <summary>Holds only the file's image or video data (read when it was pushed), with no thumbnail of it.</summary>
+        public readonly bool IsInfoOnly => string.IsNullOrEmpty(Id);
+
+        /// <summary>This entry with the image or video data <paramref name="media"/> has, which wins over its own.</summary>
+        public readonly ThumbnailInfo WithMediaInfo(ThumbnailInfo media) => this with
+        {
+            Resolution = media.Resolution ?? Resolution,
+            Duration = media.Duration ?? Duration,
+            FNumber = media.FNumber ?? FNumber,
+            ISO = media.ISO ?? ISO,
+            ExposureTime = media.ExposureTime ?? ExposureTime,
+            Bitrate = media.Bitrate ?? Bitrate,
+        };
+
         public readonly string ToCsv() => $"{Id}|{Type}|{Resolution?.Width}|{Resolution?.Height}|{Duration?.TotalMilliseconds}|{(LastUpdate == DateTime.MinValue ? null : LastUpdate.ToString(CsvDateFormat))}|{LocalFolder}|{FNumber}|{ISO}|{ExposureTime}|{Bitrate}|{FileSize}";
 
         public static ThumbnailInfo? FromCsv(string csv)
@@ -296,6 +310,9 @@ public static partial class ThumbnailService
 
         if (!deviceInfo.ThumbnailPathCache.TryGetValue(filePath, out var info))
             return null;
+
+        if (info.IsInfoOnly)
+            return new(null, info);
 
         var localThumbnailDir = GetLocalThumbDirectory(deviceInfo, info);
         if (string.IsNullOrEmpty(info.LocalFolder) && string.IsNullOrEmpty(localThumbnailDir))

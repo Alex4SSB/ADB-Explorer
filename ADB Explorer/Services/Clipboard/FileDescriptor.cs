@@ -250,7 +250,7 @@ struct FILEDESCRIPTOR : IByteStruct
         Name = descriptor.cFileName,
         IsDirectory = descriptor.dwFlags.HasFlag(FD_FLAGS.FD_ATTRIBUTES) && descriptor.dwFileAttributes.HasFlag(FileFlagsAndAttributes.FILE_ATTRIBUTE_DIRECTORY),
         Length = descriptor.dwFlags.HasFlag(FD_FLAGS.FD_FILESIZE) ? descriptor.nFileSize.GetSize() : null,
-        ChangeTimeUtc = descriptor.ftLastWriteTime.DateTimeUTC,
+        ChangeTimeUtc = descriptor.dwFlags.HasFlag(FD_FLAGS.FD_WRITESTIME) ? descriptor.ftLastWriteTime.SafeDateTimeUTC : null,
     };
 
     public static FILEDESCRIPTOR FromBytes(IEnumerable<byte> bytes) => StructureFromBytes<FILEDESCRIPTOR>(bytes);

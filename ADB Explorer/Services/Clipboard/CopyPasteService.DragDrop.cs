@@ -131,6 +131,7 @@ public partial class CopyPasteService
     {
         CurrentSource &= ~(DataSource.Android | DataSource.Virtual);
         IsFileDropOnly = IsDelayedFileDrop = HasUnnamedFiles = HasPendingFiles = false;
+        ForgetOtherDragThumbnail(dataObject);
 
         DragParent = "";
         string[] oldFiles = [.. DragFiles];
@@ -213,7 +214,8 @@ public partial class CopyPasteService
         }
         // VFDO (FileGroupDescriptor + FileContents) - the only viable format for virtual files not mapped to a drive.
         // This is the format we supply to File Explorer. Also provided by File Explorer for contents of ZIP archives (introduced in Windows ME).
-        else if (dataObject.GetDataPresent(AdbDataFormats.FileDescriptor))
+        // Not the new Outlook's, which is only a thumbnail of what it drags; its files come through FileDrop
+        else if (dataObject.GetDataPresent(AdbDataFormats.FileDescriptor) && !IsOutlookDescribedDrag(dataObject))
         {
             SourceDevice = null;
             GetDescriptors(dataObject);
@@ -421,7 +423,14 @@ public partial class CopyPasteService
                 else if (IsDelayedFileDrop)
                 {
                     if (!isAppDrive)
-                        PushDelayedFileDrop(dataObject, targetFolder, device);
+                    {
+                        // The new Outlook's thumbnail is of the first attachment it describes
+                        (string, BitmapSource)? thumbnail = null;
+                        if (_pendingAreFiles && DragThumbnail is { } image && DragFiles.Length > 0)
+                            thumbnail = (DragFiles[0], image);
+
+                        PushDelayedFileDrop(dataObject, targetFolder, device, thumbnail);
+                    }
                 }
                 // From archives, phones over MTP & DLNA servers, read straight from the shell.
                 // The source stays where it is, as it did when this went through the temp folder.

@@ -129,7 +129,11 @@ public static partial class ThumbnailService
 
         foreach (var kvp in deviceCache)
         {
-            deviceInfo.ThumbnailPathCache.TryAdd(kvp.Key, kvp.Value);
+            // The device's thumbnail replaces an entry with only the data read when the file was pushed, keeping that data
+            if (deviceInfo.ThumbnailPathCache.TryGetValue(kvp.Key, out var pushed) && pushed.IsInfoOnly)
+                deviceInfo.ThumbnailPathCache[kvp.Key] = kvp.Value.WithMediaInfo(pushed);
+            else
+                deviceInfo.ThumbnailPathCache.TryAdd(kvp.Key, kvp.Value);
         }
 
         UpdateCache(deviceInfo);

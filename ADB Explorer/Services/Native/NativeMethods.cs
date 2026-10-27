@@ -553,6 +553,12 @@ public static partial class NativeMethods
 
         public readonly DateTime DateTimeUTC => DateTime.FromFileTime(dwDateTime).ToUniversalTime();
 
+        // Another app's FILETIME may hold anything, which DateTime can't always represent
+        public readonly DateTime? SafeDateTimeUTC
+            => dwDateTime >= 0 && dwDateTime <= MaxFileTime ? DateTime.FromFileTimeUtc(dwDateTime) : null;
+
+        private static readonly long MaxFileTime = DateTime.MaxValue.ToFileTimeUtc();
+
         public readonly DateTime DateTimeLocal => DateTime.FromFileTime(dwDateTime).ToLocalTime();
 
         public override readonly string ToString() => DateTimeUTC.ToString(CultureInfo.CurrentCulture);

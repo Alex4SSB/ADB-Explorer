@@ -4,13 +4,18 @@ using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using ComDataObject = System.Runtime.InteropServices.ComTypes.IDataObject;
 
 namespace ADB_Test;
@@ -278,10 +283,192 @@ public class FileDropTests
         }
     }
 
+    [TestMethod]
+    public void FileDrop_ChromiumCustomDataIsRead()
+    {
+        var data = ChromiumCustomData(
+            ("chromium/x-drag-id", "D74021194D492181FA126277D0926F95"),
+            ("attachment", AttachmentJson("1000090559.jpg", "notes")));
+
+        var entries = CopyPasteService.ParseChromiumCustomData(data);
+        Assert.AreEqual("D74021194D492181FA126277D0926F95", entries["chromium/x-drag-id"]);
+        CollectionAssert.AreEqual(new[] { "1000090559.jpg", "notes" }, CopyPasteService.GetChromiumAttachmentNames(entries));
+
+        Assert.IsEmpty(CopyPasteService.ParseChromiumCustomData(data[..^10]), "Cut short");
+
+        // Whole emails, and names that aren't plain file names, aren't taken
+        Assert.IsNull(CopyPasteService.GetChromiumAttachmentNames(new Dictionary<string, string> { ["attachment"] = """{"itemType":"multimaillistconversationrows"}""" }));
+        Assert.IsNull(CopyPasteService.GetChromiumAttachmentNames(new Dictionary<string, string> { ["attachment"] = AttachmentJson(@"..\escape.jpg") }));
+        Assert.IsNull(CopyPasteService.GetChromiumAttachmentNames(new Dictionary<string, string> { ["attachment"] = "not json" }));
+    }
+
+    [TestMethod]
+    public void FileDrop_OutlookThumbnailIsNotTheFile()
+    {
+        var local = NewDir();
+
+        try
+        {
+            // Its FileGroupDescriptor and FileContents are a thumbnail named by a random ID; the image comes through FileDrop
+            var source = new ChromiumLikeSource(Path.Combine(local, "1000090458.jpg"),
+                ChromiumCustomData(("attachment", AttachmentJson("1000090458.jpg"))), hasThumbnail: true);
+
+            var service = new CopyPasteService();
+            service.PreviewDataObject(new DataObject(source));
+
+            Assert.IsTrue(service.IsDelayedFileDrop, "Read from FileDrop after the drop");
+            Assert.IsEmpty(service.Descriptors, "The thumbnail's descriptor isn't used");
+            CollectionAssert.AreEqual(new[] { "1000090458.jpg" }, service.DragFiles);
+
+            // A drag of the thumbnail alone has no file to give, so it's refused
+            var thumbnailOnly = new DataObject(new ChromiumLikeSource(Path.Combine(local, "x.jpg"),
+                ChromiumCustomData(("attachment", AttachmentJson("1000090458.jpg"))), hasThumbnail: true, hasFileDrop: false));
+
+            Assert.IsTrue(CopyPasteService.IsOutlookDescribedDrag(thumbnailOnly));
+            Assert.IsFalse(new CopyPasteService().PreviewFileDrop(thumbnailOnly));
+
+            // Its image still serves as the drag image and the dropped image's thumbnail. Its descriptor gives no size
+            // (nor reading it throws), so the content's own size decides whether it's read
+            Assert.IsNull(CopyPasteService.GetDragThumbnailSize(new DataObject(source)));
+            Assert.IsNull(CopyPasteService.ReadDragThumbnail(source, ChromiumLikeSource.ThumbnailPng.Length - 1));
+
+            var thumbnail = CopyPasteService.ReadDragThumbnail(source, ChromiumLikeSource.ThumbnailPng.Length);
+            Assert.IsNotNull(thumbnail);
+            Assert.AreEqual(3, thumbnail.PixelWidth);
+            Assert.AreEqual(2, thumbnail.PixelHeight);
+
+            // Read off the UI thread, it must still encode on another, as seeding it does
+            var readOff = Task.Run(() => CopyPasteService.ReadDragThumbnail(source, ChromiumLikeSource.ThumbnailPng.Length)).Result;
+            Assert.IsNotNull(readOff);
+            new PngBitmapEncoder().Frames.Add(BitmapFrame.Create(readOff));
+
+            // A photo within the limit is its own thumbnail once pushed; a heavier one keeps the drag's
+            var photo = Path.Combine(local, "photo.png");
+            File.WriteAllBytes(photo, PngOf(5, 4));
+            Assert.AreEqual(5, ThumbnailService.ChoosePushThumbnail(photo, thumbnail, new FileInfo(photo).Length).PixelWidth);
+            Assert.AreSame(thumbnail, ThumbnailService.ChoosePushThumbnail(photo, thumbnail, new FileInfo(photo).Length - 1));
+
+            var staged = Path.Combine(local, "staging", "1000090458.jpg");
+            ThumbnailService.RegisterPushThumbnail(staged, thumbnail);
+            Assert.AreSame(thumbnail, ThumbnailService.TakePushThumbnail(staged));
+            Assert.IsNull(ThumbnailService.TakePushThumbnail(staged), "Taken once");
+
+            ThumbnailService.RegisterPushThumbnail(staged, thumbnail);
+            ThumbnailService.ForgetPushThumbnails(Path.Combine(local, "staging"));
+            Assert.IsNull(ThumbnailService.TakePushThumbnail(staged), "Forgotten with its staging folder");
+        }
+        finally
+        {
+            Directory.Delete(local, true);
+        }
+    }
+
+    [TestMethod]
+    public void FileDrop_OutlookAttachmentsAreNamedCopies()
+    {
+        var local = NewDir();
+
+        try
+        {
+            var source = new ChromiumLikeSource(Path.Combine(local, "attachment.pdf"),
+                ChromiumCustomData(("attachment", AttachmentJson("report.pdf", "README"))));
+
+            var service = new CopyPasteService();
+            service.PreviewDataObject(new DataObject(source));
+
+            Assert.IsFalse(service.HasUnnamedFiles, "Listed by the names it describes");
+            Assert.IsTrue(service.HasPendingFiles);
+            Assert.IsTrue(service.IsDelayedFileDrop, "Still read once it has written them");
+            Assert.IsTrue(service.CurrentSource.HasFlag(CopyPasteService.DataSource.Virtual), "Copied, never moved");
+            CollectionAssert.AreEqual(new[] { "report.pdf", "README" }, service.DragFiles);
+            Assert.IsFalse(service.CurrentFiles.Any(file => file.IsDirectory), "Attachments are files, extension or not");
+        }
+        finally
+        {
+            Directory.Delete(local, true);
+        }
+    }
+
+    [TestMethod]
+    public void FileDrop_OutlookEmailsAreRefused()
+    {
+        var local = NewDir();
+
+        try
+        {
+            // Its FileDrop is there, but nothing is written for it after the drop
+            var source = new ChromiumLikeSource(Path.Combine(local, "mail.eml"),
+                ChromiumCustomData(("attachment", """{"itemType":"multimaillistconversationrows"}""")));
+
+            // Refused, which leaves the drag with no files (and so no drop effect)
+            var service = new CopyPasteService();
+            Assert.IsFalse(service.PreviewFileDrop(new DataObject(source)));
+            Assert.IsFalse(service.IsFileDropOnly);
+        }
+        finally
+        {
+            Directory.Delete(local, true);
+        }
+    }
+
+    private static byte[] PngOf(int width, int height)
+    {
+        var bitmap = BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgra32, null, new byte[width * height * 4], width * 4);
+        var encoder = new PngBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(bitmap));
+
+        using var png = new MemoryStream();
+        encoder.Save(png);
+
+        return png.ToArray();
+    }
+
+    private static string AttachmentJson(params string[] names)
+        => JsonSerializer.Serialize(new
+        {
+            itemType = "attachment",
+            attachmentFiles = names.Select(name => new { name, size = 1234, ContentType = "application/octet-stream" }),
+        });
+
+    /// <summary>Chromium's custom data pickle: payload size, entry count, then each type and data as UTF-16 padded to 4 bytes.</summary>
+    private static byte[] ChromiumCustomData(params (string Type, string Data)[] entries)
+    {
+        using var payload = new MemoryStream();
+        using var writer = new BinaryWriter(payload);
+        writer.Write((uint)entries.Length);
+        foreach (var (type, data) in entries)
+        {
+            foreach (var text in new[] { type, data })
+            {
+                writer.Write(text.Length);
+                writer.Write(Encoding.Unicode.GetBytes(text));
+                if (text.Length % 2 != 0)
+                    writer.Write((short)0);
+            }
+        }
+
+        writer.Flush();
+        return [.. BitConverter.GetBytes((uint)payload.Length), .. payload.ToArray()];
+    }
+
     /// <summary>Chromium's DataObjectImpl as far as a drop target sees it, for a dragged download.</summary>
-    private sealed class ChromiumLikeSource(string filePath) : ComDataObject, IAsyncOperation
+    /// <param name="hasThumbnail">Also offers a FileGroupDescriptor and FileContents, as the new Outlook does for a thumbnail.</param>
+    private sealed class ChromiumLikeSource(string filePath, byte[]? customData = null, bool hasThumbnail = false, bool hasFileDrop = true)
+        : ComDataObject, IAsyncOperation
     {
         private static readonly short HDrop = (short)DataFormats.GetDataFormat(DataFormats.FileDrop).Id;
+        private static readonly short CustomData = (short)DataFormats.GetDataFormat("Chromium Web Custom MIME Data Format").Id;
+        private static readonly short GroupDescriptor = (short)DataFormats.GetDataFormat("FileGroupDescriptorW").Id;
+        private static readonly short Contents = (short)DataFormats.GetDataFormat("FileContents").Id;
+
+        // A 3x2 image, the thumbnail's content
+        public static readonly byte[] ThumbnailPng = PngOf(3, 2);
+
+        // Formats it offers; the thumbnail's are never read by the app, so asking for them fails the test
+        private bool Offers(short format)
+            => (format == HDrop && hasFileDrop)
+                || (format == CustomData && customData is not null)
+                || ((format == GroupDescriptor || format == Contents) && hasThumbnail);
 
         public string FilePath => filePath;
         public volatile bool InDragLoop = true;
@@ -292,25 +479,58 @@ public class FileDropTests
         public void GetData(ref FORMATETC format, out STGMEDIUM medium)
         {
             medium = default;
-            if (format.cfFormat != HDrop || InDragLoop || !WasStarted)
+
+            // What the page set for the drag, there during it, and the thumbnail (never taken as the dragged file)
+            byte[] bytes;
+            if (format.cfFormat == CustomData && customData is not null)
+                bytes = customData;
+            else if (format.cfFormat == Contents && hasThumbnail)
+                bytes = ThumbnailPng;
+            else if (format.cfFormat == GroupDescriptor && hasThumbnail)
+                bytes = ThumbnailDescriptor();
+            else if (format.cfFormat != HDrop || !hasFileDrop || InDragLoop || !WasStarted)
                 throw new COMException("DV_E_FORMATETC", unchecked((int)0x80040064));
+            else
+            {
+                // The download
+                File.WriteAllBytes(filePath, [1, 2, 3]);
+                bytes = new NativeMethods.CFHDROP([filePath]).Bytes.ToArray();
+            }
 
-            // The download
-            File.WriteAllBytes(filePath, [1, 2, 3]);
-
-            var bytes = new NativeMethods.CFHDROP([filePath]).Bytes.ToArray();
             medium.tymed = TYMED.TYMED_HGLOBAL;
             medium.unionmember = Marshal.AllocHGlobal(bytes.Length);
             Marshal.Copy(bytes, 0, medium.unionmember, bytes.Length);
         }
 
-        public int QueryGetData(ref FORMATETC format) => format.cfFormat == HDrop ? 0 : unchecked((int)0x80040064);
+        public int QueryGetData(ref FORMATETC format) => Offers(format.cfFormat) ? 0 : unchecked((int)0x80040064);
 
         public IEnumFORMATETC EnumFormatEtc(DATADIR direction)
         {
-            SHCreateStdEnumFmtEtc(1, [new() { cfFormat = HDrop, dwAspect = DVASPECT.DVASPECT_CONTENT, lindex = -1, tymed = TYMED.TYMED_HGLOBAL }], out var formats);
+            FORMATETC[] available = [.. new[] { HDrop, CustomData, GroupDescriptor, Contents }
+                .Where(Offers)
+                .Select(format => new FORMATETC
+                {
+                    cfFormat = format,
+                    dwAspect = DVASPECT.DVASPECT_CONTENT,
+                    lindex = -1,
+                    tymed = TYMED.TYMED_HGLOBAL,
+                })];
+
+            SHCreateStdEnumFmtEtc((uint)available.Length, available, out var formats);
 
             return formats;
+        }
+
+        // Chromium's: only FD_LINKUI set, so no size, and its unflagged fields may hold anything (an unrepresentable time here)
+        private static byte[] ThumbnailDescriptor()
+        {
+            var bytes = new byte[4 + 592];
+            BitConverter.GetBytes(1u).CopyTo(bytes, 0);
+            BitConverter.GetBytes(0x8000u).CopyTo(bytes, 4);
+            BitConverter.GetBytes(-1L).CopyTo(bytes, 4 + 56);
+            Encoding.Unicode.GetBytes("0a771a4e-3057-47f8-b955-6152d261ce4f.jpg").CopyTo(bytes, 4 + 72);
+
+            return bytes;
         }
 
         public void SetAsyncMode(int fDoOpAsync) { }

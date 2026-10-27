@@ -68,6 +68,62 @@ public static partial class ThumbnailService
         MarkCustomThumbnailReady(device.SerialNumber, file, thumbId, resolution, fileSize);
     }
 
+    // Images that came with files pushed from these Windows paths (the new Outlook's thumbnails), seeded once they're on the device
+    private static readonly ConcurrentDictionary<string, BitmapSource> PushThumbnails = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Uses <paramref name="image"/> as the thumbnail of the file pushed from <paramref name="windowsPath"/>, once it's pushed.</summary>
+    public static void RegisterPushThumbnail(string windowsPath, BitmapSource image) => PushThumbnails[windowsPath] = image;
+
+    public static BitmapSource? TakePushThumbnail(string windowsPath) => PushThumbnails.TryRemove(windowsPath, out var image) ? image : null;
+
+    /// <summary>Seeds the thumbnail registered for <paramref name="source"/> as that of <paramref name="target"/>, just pushed from it.</summary>
+    public static void SeedPushThumbnail(LogicalDeviceViewModel device, SyncFile source, SyncFile target)
+    {
+        if (source.IsDirectory || TakePushThumbnail(source.FullPath) is not { } thumbnail)
+            return;
+
+        try
+        {
+            var image = ChoosePushThumbnail(source.FullPath, thumbnail, (long)Data.Settings.MaxCustomThumbWeight * 1024);
+            SeedCustomThumbnail(device, new FileClass(target), image);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or NotSupportedException)
+        { }
+    }
+
+    /// <summary>
+    /// The photo at <paramref name="windowsPath"/> itself when it weighs no more than a custom thumbnail may
+    /// (as it would be pulled for one), otherwise <paramref name="thumbnail"/>.
+    /// </summary>
+    internal static BitmapSource ChoosePushThumbnail(string windowsPath, BitmapSource thumbnail, long maxBytes)
+    {
+        try
+        {
+            if (new FileInfo(windowsPath).Length > maxBytes)
+                return thumbnail;
+
+            var photo = new BitmapImage();
+            photo.BeginInit();
+            photo.CacheOption = BitmapCacheOption.OnLoad;
+            photo.UriSource = new Uri(windowsPath);
+            photo.EndInit();
+            photo.Freeze();
+
+            return photo;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or NotSupportedException or ArgumentException or InvalidOperationException)
+        {
+            return thumbnail;
+        }
+    }
+
+    /// <summary>Drops the thumbnails of files under <paramref name="folder"/> that weren't pushed, as it's being removed.</summary>
+    public static void ForgetPushThumbnails(string folder)
+    {
+        foreach (var path in PushThumbnails.Keys.Where(path => path.StartsWith(folder.TrimEnd('\\') + '\\', StringComparison.OrdinalIgnoreCase)))
+            PushThumbnails.TryRemove(path, out _);
+    }
+
     /// <summary>Blocks a concurrent <see cref="TryPullCustomThumbnail"/> from racing an in-flight push.</summary>
     public static bool TryReserveCustomThumbnailSeed(string serialNumber, FileClass file)
     {
@@ -142,8 +198,10 @@ public static partial class ThumbnailService
             return;
         }
 
-        if (deviceInfo.ThumbnailPathCache.TryGetValue(filePath, out var cachedInfo)
+        // An entry with only the file's data has no thumbnail to pull under its ID
+        if ((deviceInfo.ThumbnailPathCache.TryGetValue(filePath, out var cachedInfo)
             || (file.FullPath != filePath && deviceInfo.ThumbnailPathCache.TryGetValue(file.FullPath, out cachedInfo)))
+            && !cachedInfo.IsInfoOnly)
         {
             var localDir = string.IsNullOrEmpty(cachedInfo.LocalFolder)
                 ? GetLocalThumbPath(device)
@@ -187,7 +245,7 @@ public static partial class ThumbnailService
                 return;
             }
 
-            if (deviceInfo.ThumbnailPathCache.ContainsKey(filePath))
+            if (deviceInfo.ThumbnailPathCache.TryGetValue(filePath, out var raced) && !raced.IsInfoOnly)
             {
                 CancelCustomPull(pullKey);
                 return;
@@ -227,8 +285,9 @@ public static partial class ThumbnailService
                 return;
             }
 
-            if (deviceInfo.ThumbnailPathCache.TryGetValue(file.FullPath, out var existing)
+            if ((deviceInfo.ThumbnailPathCache.TryGetValue(file.FullPath, out var existing)
                 || deviceInfo.ThumbnailPathCache.TryGetValue(file.ParsedFullPath, out existing))
+                && !existing.IsInfoOnly)
             {
                 thumbId = existing.Id;
                 var existingLocal = Path.Combine(targetDir, thumbId);
@@ -323,6 +382,11 @@ public static partial class ThumbnailService
     private static void RegisterCustomThumbCacheEntry(ref DeviceThumbnailInfo deviceInfo, FileClass file, string thumbId)
     {
         var entry = new ThumbnailInfo(thumbId, MediaType.images, null, null, DateTime.MinValue, CUSTOM_PHOTOS_SUBFOLDER);
+
+        // Keeps the data read when the file was pushed
+        if (deviceInfo.ThumbnailPathCache.TryGetValue(file.FullPath, out var existing) && existing.IsInfoOnly)
+            entry = entry.WithMediaInfo(existing);
+
         deviceInfo.ThumbnailPathCache[file.FullPath] = entry;
         if (!string.Equals(file.ParsedFullPath, file.FullPath, StringComparison.Ordinal))
             deviceInfo.ThumbnailPathCache[file.ParsedFullPath] = entry;

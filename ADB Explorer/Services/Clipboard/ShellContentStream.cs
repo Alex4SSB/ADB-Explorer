@@ -47,6 +47,29 @@ public sealed unsafe class ShellContentStream : Stream
     public override long Length => throw new NotSupportedException();
     public override long Position { get => throw new NotSupportedException(); set => throw new NotSupportedException(); }
 
+    /// <summary>The size the COM stream states for itself, before anything is read, or null when it doesn't say.</summary>
+    public long? StatedLength
+    {
+        get
+        {
+            ObjectDisposedException.ThrowIf(_comStream is null, this);
+
+            if (_comStream is not IStream stream)
+                return null;
+
+            try
+            {
+                stream.Stat(out var stat, 1); // STATFLAG_NONAME
+
+                return stat.cbSize >= 0 ? stat.cbSize : null;
+            }
+            catch (Exception e) when (e is COMException or NotImplementedException)
+            {
+                return null;
+            }
+        }
+    }
+
     public override int Read(byte[] buffer, int offset, int count) => Read(buffer.AsSpan(offset, count));
 
     public override int Read(Span<byte> buffer)
