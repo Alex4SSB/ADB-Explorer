@@ -515,7 +515,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             location.CreationTime = info.Value.AccessTime ?? location.CreationTime;
 
         location.ModifiedTimeWithOffset = info.Value.ModifiedTime ?? location.ModifiedTimeWithOffset;
-        location.ModifiedTime = info.Value.ModifiedTime?.DateTime.ToLocalTime() ?? location.ModifiedTime;
+        location.ModifiedTime = info.Value.ModifiedTime?.LocalDateTime ?? location.ModifiedTime;
         location.EffectiveAccess = ShellAccessHelper.ResolveLocationAccess(location.FullPath, info, identity, restrictions);
         Data.ActiveDevice?.RecordUnixIdentity(location.User, location.Group);
     }
@@ -598,7 +598,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
                 CreationTime = info.Value.AccessTime;
 
             ModifiedTimeWithOffset = info.Value.ModifiedTime;
-            ModifiedTime = info.Value.ModifiedTime.DateTime.ToLocalTime();
+            ModifiedTime = info.Value.ModifiedTime.LocalDateTime;
             Permissions = info.Value.Permissions;
             deviceId?.RecordUnixIdentity(info.Value.User, info.Value.Group);
 

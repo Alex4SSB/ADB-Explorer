@@ -38,7 +38,7 @@ internal static partial class FileActionLogic
             return;
 
         Data.DeviceCts.Cancel();
-        Data.DirList?.Stop();
+        Data.DirList?.Stop(keepPending: true);
         ApkIconService.CancelPending();
     }
 

@@ -61,6 +61,7 @@ public static class AdbExplorerConst
     public static readonly TimeSpan DIR_LIST_VISIBLE_PROGRESS_DELAY = TimeSpan.FromMilliseconds(500);
     public static readonly TimeSpan DIR_LIST_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(500);
     public static readonly TimeSpan DIR_LIST_UPDATE_START_INTERVAL = TimeSpan.FromMilliseconds(100);
+    public static readonly TimeSpan DIR_LIST_UPDATE_SLICE_BUDGET = TimeSpan.FromMilliseconds(30);
     public static readonly TimeSpan MOUSE_DOWN_VALID = TimeSpan.FromMilliseconds(150);
     public static readonly TimeSpan RENAME_CLICK_DELAY = TimeSpan.FromMilliseconds(500);
     public static readonly TimeSpan DRIVE_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(2000);

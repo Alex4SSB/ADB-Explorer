@@ -541,7 +541,8 @@ public partial class NavigationBox : UserControl
     }
 
     /// <summary>The current folder's subfolders, read from its listing - empty while that listing is of another folder.</summary>
-    private IEnumerable<FileClass> CurrentFolderSubfolders()
+    /// <param name="items">Part of the listing to check instead of all of it.</param>
+    private IEnumerable<FileClass> CurrentFolderSubfolders(IEnumerable<FileClass>? items = null)
     {
         if (_locations.Count == 0 || Instance?.FileList.DirList is not { } dirList)
             return [];
@@ -551,7 +552,7 @@ public partial class NavigationBox : UserControl
         if (!IsFolderLocation(location) || !NavigationTreeNode.PathsEqual(dirList.CurrentPath, location.Path, deviceId))
             return [];
 
-        return NavigationTreeViewModel.SubfoldersOf(dirList.FileList, deviceId, Instance.FileList.Actions.IsArchive);
+        return NavigationTreeViewModel.SubfoldersOf(items ?? dirList.FileList, deviceId, Instance.FileList.Actions.IsArchive);
     }
 
     private void TrackCurrentListing()
@@ -574,9 +575,16 @@ public partial class NavigationBox : UserControl
         if (_breadcrumbs.Count == 0)
             return;
 
-        // Adds can only turn the chevron on, so a growing listing isn't rescanned per item.
-        if (e.Action is NotifyCollectionChangedAction.Add && _breadcrumbs[^1].HasDropDown)
+        // Adds can only turn the chevron on, so only the added items are checked, not the whole listing.
+        if (e.Action is NotifyCollectionChangedAction.Add)
+        {
+            if (!_breadcrumbs[^1].HasDropDown
+                && e.NewItems is not null
+                && CurrentFolderSubfolders(e.NewItems.OfType<FileClass>()).Any())
+                RefreshCurrentFolderDropDown();
+
             return;
+        }
 
         RefreshCurrentFolderDropDown();
     });

@@ -141,9 +141,26 @@ public partial class DetailsPane : UserControl
     private CancellationTokenSource? _extraInfoCts;
     private string? _extraInfoPath;
 
-    private static void OnSelectedFilesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => App.SafeBeginInvoke(
-        () => ((DetailsPane)d).ApplySelection(e.OldValue as IEnumerable<IBrowserItem>, (IEnumerable<IBrowserItem>)e.NewValue),
-        DispatcherPriority.Render);
+    private bool _isSelectionApplyPending;
+
+    private static void OnSelectedFilesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var pane = (DetailsPane)d;
+
+        // Changes made together (an unselect, then a select) are applied once with the final selection,
+        // so the pane never shows the empty selection in between.
+        if (pane._isSelectionApplyPending)
+            return;
+
+        pane._isSelectionApplyPending = true;
+        var oldFiles = e.OldValue as IEnumerable<IBrowserItem>;
+
+        App.SafeBeginInvoke(() =>
+        {
+            pane._isSelectionApplyPending = false;
+            pane.ApplySelection(oldFiles, pane.SelectedFiles);
+        }, DispatcherPriority.Render);
+    }
 
     private void ApplySelection(IEnumerable<IBrowserItem>? oldFiles, IEnumerable<IBrowserItem> files)
     {

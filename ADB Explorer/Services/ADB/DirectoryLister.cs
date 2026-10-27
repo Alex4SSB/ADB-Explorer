@@ -41,6 +41,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
     private TimeSpan UpdateInterval { get; set; }
     private int MinUpdateThreshold { get; set; }
     private Task? ReadTask { get; set; } = null;
+    private bool _isReadComplete;
     private CancellationTokenSource? CurrentCancellationToken { get; set; }
     private CancellationTokenSource? LinkListCancellation { get; set; }
     private Func<FileClass, FileClass>? FileManipulator { get; } = fileManipulator;
@@ -75,7 +76,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
             IsLinkListingFinished = false;
 
             LinkListCancellation?.Cancel();
-            StopDirectoryList();
+            StopDirectoryList(discardPending: true);
             FileList.RemoveAll();
 
             _isSearchListing = true;
@@ -133,7 +134,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
             { }
         }, CurrentCancellationToken.Token);
 
-        ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(() => StopDirectoryList()), CurrentCancellationToken.Token);
+        ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(() => OnReadComplete(t)), CurrentCancellationToken.Token);
 
         Task.Delay(DIR_LIST_VISIBLE_PROGRESS_DELAY).ContinueWith(
             (t) => Dispatcher.BeginInvoke(() => IsProgressVisible = InProgress),
@@ -156,10 +157,11 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
 
     public void ClearCurrentLocation() => CurrentLocation = null;
 
-    public void Stop()
+    /// <param name="keepPending">Add what was already read instead of dropping it, e.g. when a search is stopped.</param>
+    public void Stop(bool keepPending = false)
     {
         LinkListCancellation?.Cancel();
-        StopDirectoryList();
+        StopDirectoryList(discardPending: !keepPending);
         IsLinkListingFinished = true;
     }
 
@@ -171,7 +173,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
             IsLinkListingFinished = false;
 
             LinkListCancellation?.Cancel();
-            StopDirectoryList();
+            StopDirectoryList(discardPending: true);
             FileList.RemoveAll();
 
             _isSearchListing = false;
@@ -196,20 +198,55 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
         ReadTask = Task.Run(() =>
             AdbService.ListDirectory(Device.ID, path, ref _currentFileQueue, Dispatcher, CurrentCancellationToken.Token),
             CurrentCancellationToken.Token);
-        ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(() => StopDirectoryList()), CurrentCancellationToken.Token);
+        ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(() => OnReadComplete(t)), CurrentCancellationToken.Token);
 
         Task.Delay(DIR_LIST_VISIBLE_PROGRESS_DELAY).ContinueWith((t) => Dispatcher.BeginInvoke(() => IsProgressVisible = InProgress), CurrentCancellationToken.Token);
 
         ScheduleUpdate();
     }
 
+    /// <summary>
+    /// What is still queued once the device has listed everything goes in slices between renders,
+    /// so the list and the progress bar keep moving.
+    /// </summary>
+    /// <param name="readTask">The read that finished, ignored if a newer listing has replaced it since.</param>
+    private void OnReadComplete(Task readTask)
+    {
+        if (readTask != ReadTask)
+            return;
+
+        _isReadComplete = true;
+
+        if (_currentFileQueue is null || _currentFileQueue.IsEmpty)
+            StopDirectoryList();
+        else
+            ScheduleUpdate();
+    }
+
     private void ScheduleUpdate()
     {
+        if (_isReadComplete)
+        {
+            var token = CurrentCancellationToken?.Token ?? CancellationToken.None;
+            Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
+            {
+                if (!token.IsCancellationRequested)
+                    UpdateDirectoryList(false);
+            });
+
+            return;
+        }
+
         UpdateDelays(_currentFileQueue?.Count ?? 0);
 
         UpdateTask = Task.Delay(UpdateInterval);
         UpdateTask.ContinueWith(
-            (t) => Dispatcher.BeginInvoke(() => UpdateDirectoryList(!InProgress)),
+            (t) => Dispatcher.BeginInvoke(() =>
+            {
+                // Once the read is done, the slices scheduled by OnReadComplete take over
+                if (!_isReadComplete)
+                    UpdateDirectoryList(!InProgress);
+            }),
             CurrentCancellationToken?.Token ?? CancellationToken.None,
             TaskContinuationOptions.OnlyOnRanToCompletion,
             TaskScheduler.Default);
@@ -237,10 +274,15 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
         if (_currentFileQueue is null)
             return;
 
-        if (finish || (_currentFileQueue.Count >= MinUpdateThreshold))
+        if (finish || _isReadComplete || (_currentFileQueue.Count >= MinUpdateThreshold))
         {
+            // Each add costs more as the list grows, so a slice is also cut short by time
+            var sliceStart = Stopwatch.GetTimestamp();
             for (int i = 0; finish || (i < DIR_LIST_UPDATE_THRESHOLD_MAX); i++)
             {
+                if (!finish && Stopwatch.GetElapsedTime(sliceStart) > DIR_LIST_UPDATE_SLICE_BUDGET)
+                    break;
+
                 if (!_currentFileQueue.TryDequeue(out FileStat fileStat))
                 {
                     break;
@@ -258,13 +300,17 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
             }
         }
 
-        if (!finish)
-        {
+        if (finish)
+            return;
+
+        if (_isReadComplete && _currentFileQueue.IsEmpty)
+            StopDirectoryList();
+        else
             ScheduleUpdate();
-        }
     }
 
-    private void StopDirectoryList()
+    /// <param name="discardPending">Drop what is still queued instead of adding it, for a listing about to be cleared.</param>
+    private void StopDirectoryList(bool discardPending = false)
     {
         if (ReadTask == null)
         {
@@ -272,6 +318,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
         }
 
         CurrentCancellationToken?.Cancel();
+        _isReadComplete = false;
 
         try
         {
@@ -279,6 +326,9 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
         }
         catch (AggregateException e) when (e.InnerException is OperationCanceledException)
         { }
+
+        if (discardPending)
+            _currentFileQueue?.Clear();
 
         UpdateDirectoryList(true);
 
