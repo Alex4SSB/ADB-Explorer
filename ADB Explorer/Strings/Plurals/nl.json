@@ -1,6 +1,8 @@
 {
     "Items_one": "{{count}} item",
     "Items_other": "{{count}} items",
+    "ItemCount_one": "{{count}} item",
+    "ItemCount_other": "{{count}} items",
     "Folders_other": "{{count}} Folders",
     "Packages_one": "{{count}} Package",
     "Packages_other": "{{count}} Packages"

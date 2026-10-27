@@ -186,7 +186,7 @@ public partial class PaneStatusViewModel : ObservableObject
 
         var itemsCount = isExplorer ? CountOf(instance.ExplorerItemsSource) : 0;
         ItemsVisibility = itemsCount == 0 ? Visibility.Collapsed : Visibility.Visible;
-        ItemsText = Strings.Plurals.Items(itemsCount);
+        ItemsText = Strings.Plurals.ItemCount(itemsCount);
         UnfinishedVisibility = instance.IsListingUnfinished ? Visibility.Visible : Visibility.Collapsed;
 
         var selectedFiles = instance.FileList.SelectedFiles ?? [];

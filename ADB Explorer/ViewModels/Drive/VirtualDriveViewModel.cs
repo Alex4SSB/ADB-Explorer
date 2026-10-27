@@ -11,7 +11,7 @@ public partial class VirtualDriveViewModel : DriveViewModel
     {
         AbstractDrive.DriveType.Temp => Strings.Plurals.ApkInstallers(ItemsCount),
         AbstractDrive.DriveType.Package => Strings.Plurals.Packages(ItemsCount),
-        _ => Strings.Plurals.Items(ItemsCount),
+        _ => Strings.Plurals.ItemCount(ItemsCount),
     };
 
     public string? DfMountPoint => Drive.MountPoint;

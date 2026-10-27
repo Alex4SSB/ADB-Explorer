@@ -72,9 +72,11 @@ public class PluralsTests
         {
             Resources.Culture = Culture("en");
 
-            // The source's one forms spell out the number, so 2 is the count that shows the placeholder filled
+            // Dialog strings spell out one ("one item"), counters never do
+            Assert.AreEqual("one item", Plurals.Items(1));
             Assert.AreEqual("2 items", Plurals.Items(2));
-            Assert.AreEqual("?? items", Plurals.Items(null));
+            Assert.AreEqual("1 item", Plurals.ItemCount(1));
+            Assert.AreEqual("?? items", Plurals.ItemCount(null));
             Assert.AreEqual("Copy 3 items to Download", Plurals.CopyItemsTo(3, "Download"));
         }
         finally
@@ -113,7 +115,7 @@ public class PluralsTests
             Assert.IsNotNull(table, language);
 
             var categories = NativeMethods.PluralRules.Categories(Culture(language));
-            var singleNumber = categories.Where(category => IsSingleNumber(Culture(language), category)).ToHashSet();
+            var spellable = categories.Where(category => MayOmitCount(Culture(language), category)).ToHashSet();
 
             foreach (var (key, text) in table)
             {
@@ -131,8 +133,8 @@ public class PluralsTests
                 var actual = Placeholders(text);
                 Assert.IsTrue(actual.IsSubsetOf(known), $"{language}: {key} has an unknown placeholder");
 
-                // a form for one exact number may spell the number out (he: "פריט אחד")
-                if (singleNumber.Contains(category))
+                // a dialog form for one exact number may spell it out (he: "פריט אחד"), a counter's may not
+                if (!Plurals.Counters.Contains(baseKey) && spellable.Contains(category))
                     known.Remove("count");
 
                 Assert.IsTrue(known.IsSubsetOf(actual), $"{language}: {key} is missing a placeholder");
@@ -150,26 +152,33 @@ public class PluralsTests
     }
 
     [TestMethod]
-    public void IsSingleNumber_OnlyForCategoriesOfOneWholeNumber()
+    public void MayOmitCount_OnlyForOneNumberOrZeroAndOne()
     {
-        Assert.IsTrue(IsSingleNumber(Culture("he"), "one"));
-        Assert.IsTrue(IsSingleNumber(Culture("he"), "two"));
-        Assert.IsTrue(IsSingleNumber(Culture("ar"), "zero"));
-        Assert.IsTrue(IsSingleNumber(Culture("de"), "one"));
+        Assert.IsTrue(MayOmitCount(Culture("he"), "one"));
+        Assert.IsTrue(MayOmitCount(Culture("he"), "two"));
+        Assert.IsTrue(MayOmitCount(Culture("ar"), "zero"));
+        Assert.IsTrue(MayOmitCount(Culture("de"), "one"));
 
-        // one also covers 21, 31... (ru) or 0 (fr, pt-BR)
-        Assert.IsFalse(IsSingleNumber(Culture("ru"), "one"));
-        Assert.IsFalse(IsSingleNumber(Culture("fr"), "one"));
-        Assert.IsFalse(IsSingleNumber(Culture("pt-BR"), "one"));
-        Assert.IsFalse(IsSingleNumber(Culture("ar"), "few"));
+        // one covers 0 too - dialogs never show 0
+        Assert.IsTrue(MayOmitCount(Culture("fr"), "one"));
+        Assert.IsTrue(MayOmitCount(Culture("pt-BR"), "one"));
+
+        // one also covers 21, 31...
+        Assert.IsFalse(MayOmitCount(Culture("ru"), "one"));
+        Assert.IsFalse(MayOmitCount(Culture("uk"), "one"));
+        Assert.IsFalse(MayOmitCount(Culture("ar"), "few"));
     }
 
     /// <summary>
-    /// Whether <paramref name="category"/> covers exactly one whole number - CLDR integer rules repeat
-    /// within 0-999. Weblate also lets such forms drop the count, but accepts 0-and-1 too, which this doesn't.
+    /// Whether <paramref name="category"/> covers one whole number, or just 0 and 1 (fr, pt-BR) - the same leeway
+    /// Weblate's placeholder check gives. CLDR integer rules repeat within 0-999.
     /// </summary>
-    private static bool IsSingleNumber(CultureInfo culture, string category)
-        => Enumerable.Range(0, 1000).Count(n => NativeMethods.PluralRules.Select(culture, n) == category) == 1;
+    private static bool MayOmitCount(CultureInfo culture, string category)
+    {
+        var numbers = Enumerable.Range(0, 1000).Where(n => NativeMethods.PluralRules.Select(culture, n) == category).ToList();
+
+        return numbers.Count == 1 || numbers.SequenceEqual([0, 1]);
+    }
 
     private static HashSet<string> Placeholders(string text)
         => Placeholder.Matches(text).Select(m => m.Groups[1].Value).ToHashSet();

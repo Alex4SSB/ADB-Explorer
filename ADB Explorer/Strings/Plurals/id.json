@@ -1,5 +1,6 @@
 {
     "Items_other": "{{count}} item",
+    "ItemCount_other": "{{count}} item",
     "ItemsSelected_other": "{{count}} item dipilih",
     "Files_other": "{{count}} file",
     "Folders_other": "{{count}} folder",

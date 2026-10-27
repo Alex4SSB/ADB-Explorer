@@ -1,6 +1,8 @@
 {
     "Items_one": "{{count}} item",
     "Items_other": "{{count}} itens",
+    "ItemCount_one": "{{count}} item",
+    "ItemCount_other": "{{count}} itens",
     "ItemsSelected_one": "{{count}} item selecionado",
     "ItemsSelected_other": "{{count}} itens selecionados",
     "Folders_other": "{{count}} Pastas",

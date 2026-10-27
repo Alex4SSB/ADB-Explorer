@@ -6,7 +6,10 @@ namespace ADB_Explorer.Strings;
 /// </summary>
 public static class Plurals
 {
-    public static string Items(long? count) => Format(nameof(Items), count);
+    public static string Items(long count) => Format(nameof(Items), count);
+
+    /// <summary>A folder's or drive's item count. Unlike <see cref="Items"/>, always shows the digit.</summary>
+    public static string ItemCount(long? count) => Format(nameof(ItemCount), count);
 
     public static string ItemsSelected(long count) => Format(nameof(ItemsSelected), count);
 
@@ -48,6 +51,18 @@ public static class Plurals
     public static string RetryOperations(long count) => Format(nameof(RetryOperations), count);
 
     internal const string SourceLanguage = "en";
+
+    /// <summary>
+    /// Counters (status bar, details pane header, drive cards) sit side by side, so every form shows the digit.
+    /// Dialog strings may spell out a single number ("one item").
+    /// </summary>
+    internal static readonly IReadOnlySet<string> Counters = new HashSet<string>
+    {
+        nameof(ItemCount),
+        nameof(ItemsSelected),
+        nameof(ApkInstallers),
+        nameof(Packages),
+    };
 
     // Weblate has no "other" form for one/few/many languages (ru, uk, pl).
     // zero/one/two may spell out their number, so they never stand in for another count.

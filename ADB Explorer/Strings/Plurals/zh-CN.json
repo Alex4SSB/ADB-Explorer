@@ -1,5 +1,6 @@
 {
     "Items_other": "{{count}} 项",
+    "ItemCount_other": "{{count}} 项",
     "ItemsSelected_other": "{{count}} 选中的项目",
     "Files_other": "{{count}}个文件",
     "Folders_other": "{{count}} 选择文件夹",

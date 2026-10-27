@@ -1,5 +1,6 @@
 {
     "Items_other": "{{count}} 항목",
+    "ItemCount_other": "{{count}} 항목",
     "ItemsSelected_other": "{{count}} 항목 선택됨",
     "Files_other": "{{count}}개 파일",
     "Folders_other": "{{count}} 폴더",

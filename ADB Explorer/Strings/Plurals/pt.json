@@ -1,6 +1,8 @@
 {
     "Items_one": "{{count}} item",
     "Items_other": "{{count}} items",
+    "ItemCount_one": "{{count}} item",
+    "ItemCount_other": "{{count}} items",
     "ItemsSelected_one": "{{count}} elemento selecionado",
     "ItemsSelected_other": "{{count}} elementos selecionados",
     "Files_other": "{{count}} ficheiros",

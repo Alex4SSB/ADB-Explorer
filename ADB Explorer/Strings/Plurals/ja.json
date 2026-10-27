@@ -1,5 +1,6 @@
 {
     "Items_other": "{{count}} 項目",
+    "ItemCount_other": "{{count}} 項目",
     "ItemsSelected_other": "{{count}} 個の項目を選択",
     "Files_other": "{{count}} ファイル",
     "Folders_other": "{{count}} フォルダー",

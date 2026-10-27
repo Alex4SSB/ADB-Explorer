@@ -1,6 +1,8 @@
 {
     "Items_one": "{{count}} பொருள்",
     "Items_other": "{{count}} பொருட்கள்",
+    "ItemCount_one": "{{count}} பொருள்",
+    "ItemCount_other": "{{count}} பொருட்கள்",
     "ItemsSelected_one": "{{count}} உருப்படி தேர்ந்தெடுக்கப்பட்டது",
     "ItemsSelected_other": "{{count}} தேர்ந்தெடுக்கப்பட்ட பொருட்கள்",
     "Files_other": "{{count}} கோப்புகள்",
