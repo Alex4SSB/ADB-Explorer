@@ -130,7 +130,14 @@ public static class FolderHelper
     {
         // A regular file has IsFolder = false, so we get a short-circuit here.
         // But an archive file (e.g. .zip) has IsFolder = true as well, so we need to check the attributes too.
-        return self.IsFolder && self.FileInfo?.Attributes.HasFlag(FileAttributes.Directory) is true;
+        if (!self.IsFolder)
+            return false;
+
+        if (self.IsFileSystem)
+            return self.FileInfo?.Attributes.HasFlag(FileAttributes.Directory) is true;
+
+        // No file system attributes (in a zip, on a phone): an archive is the folder that's also a stream
+        return !self.Attributes.HasFlag(ShellItemAttribute.Stream);
     }
 
     /// <summary>

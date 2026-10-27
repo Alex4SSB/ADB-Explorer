@@ -27,13 +27,13 @@ public static class Plurals
 
     public static string PasteCopiedItems(long count) => Format(nameof(PasteCopiedItems), count);
 
-    public static string CopyItems(long count) => Format(nameof(CopyItems), count);
+    public static string CopyItems(long? count) => Format(nameof(CopyItems), count);
 
-    public static string CopyItemsTo(long count, string target) => Format(nameof(CopyItemsTo), count, ("target", target));
+    public static string CopyItemsTo(long? count, string target) => Format(nameof(CopyItemsTo), count, ("target", target));
 
-    public static string MoveItems(long count) => Format(nameof(MoveItems), count);
+    public static string MoveItems(long? count) => Format(nameof(MoveItems), count);
 
-    public static string MoveItemsTo(long count, string target) => Format(nameof(MoveItemsTo), count, ("target", target));
+    public static string MoveItemsTo(long? count, string target) => Format(nameof(MoveItemsTo), count, ("target", target));
 
     public static string FilesInvalidAtDriveRoot(long count) => Format(nameof(FilesInvalidAtDriveRoot), count);
 

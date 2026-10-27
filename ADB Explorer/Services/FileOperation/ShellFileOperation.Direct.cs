@@ -65,7 +65,7 @@ public static partial class ShellFileOperation
         string androidDestPath,
         CancellationToken cancellationToken = default)
     {
-        if (!File.Exists(windowsItem.ParsingName) && !Directory.Exists(windowsItem.ParsingName))
+        if (windowsItem.IsFileSystem && !File.Exists(windowsItem.ParsingName) && !Directory.Exists(windowsItem.ParsingName))
             throw new FileNotFoundException(Strings.Resources.S_SYNC_FILE_NOT_FOUND, windowsItem.ParsingName);
         
         var source = new SyncFile(windowsItem, includeContent: true);
@@ -97,12 +97,13 @@ public static partial class ShellFileOperation
                     : androidDestPath;
 
                 using SyncService service = new(device.DeviceData);
-                using var stream = new FileStream(item.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                using var stream = item.OpenRead();
 
                 var lastWriteTime = item.DateModified ?? DateTime.Now;
                 service.Push(stream, targetPath, fileMode, lastWriteTime, _ => { }, useSyncV2, in isCanceled);
 
-                SyncTransferTracker.AddPushBytes(stream.Length);
+                // A virtual file's stream has no length
+                SyncTransferTracker.AddPushBytes(stream.CanSeek ? stream.Length : item.Size ?? 0);
             }
         }
         finally

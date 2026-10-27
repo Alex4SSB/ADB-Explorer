@@ -565,6 +565,9 @@ public static class FileHelper
         name.Length > 0
         && name is not "." and not "..";
 
+    /// <summary>An incoming name or path that steps up a folder (".."), so it could land outside where it's put.</summary>
+    public static bool HasParentReference(string path) => path.Split('\\', '/').Any(segment => segment == "..");
+
     public static bool FileNameLegal(string fileName, RenameTarget target)
         => FileNameLegal([fileName], target);
 

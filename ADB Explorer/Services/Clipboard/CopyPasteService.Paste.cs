@@ -43,6 +43,10 @@ public partial class CopyPasteService
     }
 
     public static async void VerifyAndPush(string targetPath, IEnumerable<FileClass> pasteItems, DragDropEffects dropEffects = DragDropEffects.Copy, LogicalDeviceViewModel? device = null)
+        => await VerifyAndPushAsync(targetPath, pasteItems, dropEffects, device);
+
+    /// <summary>Completes once the pushes are queued, or nothing is to be pushed.</summary>
+    public static async Task VerifyAndPushAsync(string targetPath, IEnumerable<FileClass> pasteItems, DragDropEffects dropEffects = DragDropEffects.Copy, LogicalDeviceViewModel? device = null)
     {
         device ??= Data.ActiveDevice;
         if (device is null)
@@ -126,6 +130,112 @@ public partial class CopyPasteService
             replacePaths,
             conflictPaths,
             device);
+    }
+
+    /// <summary>
+    /// Resolves conflicts at the target, then pushes the files a FileGroupDescriptor describes,
+    /// each read from the data object's FileContents as it's pushed.
+    /// </summary>
+    public static async void VerifyAndPushContents(
+        string targetPath,
+        System.Runtime.InteropServices.ComTypes.IDataObject dataObject,
+        FileDescriptor[] descriptors,
+        LogicalDeviceViewModel? device)
+    {
+        device ??= Data.ActiveDevice;
+        if (device is null)
+            return;
+
+        var roots = GetContentTrees(dataObject, descriptors);
+        if (roots.Count == 0)
+            return;
+
+        // Conflicts inside a folder are found by listing its tree, which only exists here
+        roots.ForEach(SyncFile.RegisterVirtualRoot);
+
+        try
+        {
+            var candidates = roots.Select(root => new FileClass(
+                root.FullName,
+                root.FullPath,
+                root.IsDirectory ? FileType.Folder : FileType.File,
+                size: root.Size,
+                modifiedTime: root.SourceModified) { PathType = FilePathType.Windows });
+
+            var outcome = await MergeFiles(targetPath, candidates, device);
+            if (outcome.Items.Count == 0)
+                return;
+
+            var kept = outcome.Items.Select(f => f.FullPath).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            FileActionLogic.PushVirtualItems(
+                [.. roots.Where(root => kept.Contains(root.FullPath))],
+                targetPath,
+                outcome.ReplaceRelativePaths,
+                outcome.ConflictRelativePaths,
+                device);
+        }
+        finally
+        {
+            roots.ForEach(SyncFile.UnregisterVirtualRoot);
+        }
+    }
+
+    /// <summary>
+    /// The described files as trees, their content opened from the data object when pushed. Their paths are
+    /// under the temp folder only to have a Windows shape; nothing is written there.
+    /// </summary>
+    internal static List<SyncFile> GetContentTrees(System.Runtime.InteropServices.ComTypes.IDataObject dataObject, FileDescriptor[] descriptors)
+    {
+        // A folder of their own, so trees of two pastes with the same names are told apart while registered
+        var root = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath.TrimEnd('\\'), Guid.NewGuid().ToString("N"), '\\');
+        Dictionary<string, SyncFile> nodes = new(StringComparer.OrdinalIgnoreCase);
+
+        for (var i = 0; i < descriptors.Length; i++)
+        {
+            var descriptor = descriptors[i];
+            if (FileHelper.HasParentReference(descriptor.Name))
+                continue;
+
+            var index = i;
+            var path = FileHelper.ConcatPaths(root, descriptor.Name, '\\');
+
+            // A descriptor without FD_WRITESTIME reads as 1601
+            DateTime? modified = descriptor.ChangeTimeUtc is { Year: > 1601 } time ? time : null;
+
+            Func<Stream>? openContent = null;
+            if (!descriptor.IsDirectory)
+                openContent = () => ShellContentStream.FromDataObject(dataObject, index);
+
+            nodes[path] = new(path, descriptor.IsDirectory, descriptor.Length, modified, openContent);
+        }
+
+        // Linked once all exist, as a folder may be described after its files, or not at all
+        List<SyncFile> roots = [];
+        foreach (var node in nodes.Values.ToList())
+        {
+            var child = node;
+            var parentPath = FileHelper.GetParentPath(child.FullPath);
+            while (parentPath.Length > root.Length)
+            {
+                if (nodes.TryGetValue(parentPath, out var parent))
+                {
+                    parent.Children.Add(child);
+                    child = null;
+                    break;
+                }
+
+                parent = new SyncFile(parentPath, true, null, null, null);
+                nodes[parentPath] = parent;
+                parent.Children.Add(child);
+                child = parent;
+                parentPath = FileHelper.GetParentPath(parentPath);
+            }
+
+            if (child is not null)
+                roots.Add(child);
+        }
+
+        return roots;
     }
 
     /// <summary>Resolves conflicts at the target, then queues a device to device transfer.</summary>

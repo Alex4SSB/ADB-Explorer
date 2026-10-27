@@ -1,3 +1,4 @@
+using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
 
 namespace ADB_Explorer.Helpers;
@@ -259,8 +260,8 @@ public static class FileMergeHelper
         catch
         { }
 
-        srcUtc ??= source.DateModified?.ToUniversalTime()
-            ?? source.UnixTime.FromUnixTime(asLocal: false);
+        // Not DateModified, which is null when dates aren't kept on the target
+        srcUtc ??= source.SourceModified?.ToUniversalTime();
 
         return AreIdenticalForMerge(source.Size, srcUtc, dest.Size, dest.MtimeUtc);
     }
@@ -409,7 +410,7 @@ public static class FileMergeHelper
     {
         var index = new Dictionary<string, DestEntry>(comparer);
         if (!Directory.Exists(destFolderPath))
-            return index;
+            return IndexVirtualTree(destFolderPath, comparer);
 
         try
         {
@@ -428,6 +429,37 @@ public static class FileMergeHelper
         }
         catch
         { }
+
+        return index;
+    }
+
+    /// <summary>A source folder with no path on disk: a FileContents tree, or a shell folder (in a zip, on a phone over MTP).</summary>
+    private static Dictionary<string, DestEntry> IndexVirtualTree(string folderPath, StringComparer comparer)
+    {
+        var index = new Dictionary<string, DestEntry>(comparer);
+
+        var root = SyncFile.FindVirtualRoot(folderPath);
+        if (root is null)
+        {
+            try
+            {
+                using var item = ShellItem.Open(folderPath);
+                if (item.IsFileSystem || !item.IsFolder)
+                    return index;
+
+                root = new SyncFile(item, includeContent: true);
+            }
+            catch
+            {
+                return index;
+            }
+        }
+
+        foreach (var node in root.AllChildren())
+        {
+            var relative = FileHelper.ExtractRelativePath(node.FullPath, root.FullPath).Replace('\\', '/');
+            index[relative] = new(true, node.IsDirectory, node.Size, node.SourceModified?.ToUniversalTime());
+        }
 
         return index;
     }

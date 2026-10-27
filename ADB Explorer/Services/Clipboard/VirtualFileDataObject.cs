@@ -139,7 +139,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             // Find the best match
             var dataObject = _dataObjects.FirstOrDefault(d =>
                     d.FORMATETC.cfFormat == formatCopy.cfFormat
-                    && d.FORMATETC.dwAspect == formatCopy.dwAspect
+                    && 0 != (d.FORMATETC.dwAspect & formatCopy.dwAspect)
                     && 0 != (d.FORMATETC.tymed & formatCopy.tymed)
                     && d.FORMATETC.lindex == formatCopy.lindex);
 
@@ -225,7 +225,8 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             {
                 return NativeMethods.HResult.DV_E_TYMED;
             }
-            var aspectMatches = tymedMatches.Where(d => d.FORMATETC.dwAspect == formatCopy.dwAspect);
+            // The shell's drop target may ask with more than one aspect (e.g. content | thumbnail)
+            var aspectMatches = tymedMatches.Where(d => 0 != (d.FORMATETC.dwAspect & formatCopy.dwAspect));
             if (!aspectMatches.Any())
             {
                 return NativeMethods.HResult.DV_E_DVASPECT;
@@ -387,11 +388,9 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         FORMATETC = CreateFormat(dataFormat, index),
         GetData = () =>
         {
-            var iStream = streamData();
-            if (iStream is null)
+            var ptr = streamData();
+            if (ptr == 0)
                 return (IntPtr.Zero, NativeMethods.HResult.DV_E_FORMATETC);
-            var ptr = Marshal.GetComInterfaceForObject(iStream, typeof(IStream));
-            Marshal.ReleaseComObject(iStream);
 
             return (ptr, NativeMethods.HResult.Ok);
         },
@@ -629,7 +628,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
                 files[0].ApplyApkIcon(package.Icon);
         }
 
-        vfdo.Operations = [.. files.Select(f => f.PrepareDescriptors(vfdo, true, device, source))];
+        vfdo.Operations = CreateShellPulls(vfdo, [.. files.Select(f => f.PrepareDescriptors(vfdo, true, device, source))], device, App.AppDispatcher);
         vfdo.SetFileDescriptors(files.SelectMany(f => f.Descriptors ?? []));
         vfdo.SetAdbDrag(files, device);
 
@@ -678,7 +677,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             Task.Run(() =>
             {
                 // Prepare file ops recursively for folders
-                return fileSnapshot.Select(f => f.PrepareDescriptors(vfdo, true, device, source)).ToList();
+                return CreateShellPulls(vfdo, [.. fileSnapshot.Select(f => f.PrepareDescriptors(vfdo, true, device, source))], device, App.AppDispatcher);
             }).ContinueWith(t =>
             {
                 if (t.IsFaulted)
@@ -731,6 +730,48 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         return vfdo;
     }
 
+    /// <summary>
+    /// The ops the shell's streams are pulled through: one per group of items sharing a parent, as with a regular pull.
+    /// An item staged out of an archive has a staging of its own to clean up, so an op of its own.
+    /// </summary>
+    internal static List<FileSyncOperation> CreateShellPulls(VirtualFileDataObject vfdo, IReadOnlyList<FileClass.ShellPullItem> items, LogicalDeviceViewModel device, Dispatcher dispatcher)
+    {
+        // Unused, as the files go to the shell; the op shows its destination as Windows
+        SyncFile target = new(Data.RuntimeSettings.TempDragPath, AbstractFile.FileType.Folder) { PathType = AbstractFile.FilePathType.Windows };
+        List<(FileSyncOperation Op, List<FileClass.ShellPullItem> Items)> groups = [];
+
+        foreach (var item in items.Where(i => i.StagingRoot is not null))
+        {
+            var op = FileSyncOperation.PullFile(item.Source, target, device, dispatcher);
+            op.SetArchivePullSource(item.ArchivePath!, item.InternalPath!, item.StagingRoot!, item.File.FullPath);
+            groups.Add((op, [item]));
+        }
+
+        foreach (var group in items.Where(i => i.StagingRoot is null).GroupBy(i => i.Source.ParentPath))
+        {
+            List<FileClass.ShellPullItem> members = [.. group];
+
+            FileSyncOperation op;
+            if (members.Count == 1)
+                op = FileSyncOperation.PullFile(members[0].Source, target, device, dispatcher);
+            else
+                op = FileSyncOperation.SyncBatch(FileOperation.OperationType.Pull, [.. members.Select(m => m.Source)], target, device, dispatcher);
+
+            groups.Add((op, members));
+        }
+
+        foreach (var (op, members) in groups)
+        {
+            op.StreamToShell(members.SelectMany(m => m.StreamOrder));
+            vfdo.OperationCompleted += (_, hResult) => op.EndShellStream(hResult is NativeMethods.HResult.Ok);
+
+            foreach (var member in members)
+                member.File.AttachShellPull(op);
+        }
+
+        return [.. groups.Select(g => g.Op)];
+    }
+
     public enum DataObjectMethod
     {
         DragDrop,
@@ -751,6 +792,11 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             {
                 CurrentEffect = allowedEffects;
                 PerformedDropEffect = allowedEffects;
+
+                // Files streamed live from a device don't belong in clipboard history or on the user's other devices
+                UpdateData(AdbDataFormats.CanIncludeInClipboardHistory, BitConverter.GetBytes(0));
+                UpdateData(AdbDataFormats.CanUploadToCloudClipboard, BitConverter.GetBytes(0));
+
                 Clipboard.SetDataObject(this);
             }
             else
@@ -773,6 +819,9 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     /// </remarks>
     public void DoDragDrop(DependencyObject? dragSource, DragDropEffects allowedEffects)
     {
+        // Tells targets the drag is still on, so they hold off on the file contents until the drop
+        UpdateData(AdbDataFormats.DragLoop, BitConverter.GetBytes(1));
+
         try
         {
             NativeMethods.MDoDragDrop(this, new DropSource(this), allowedEffects);
@@ -782,6 +831,10 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
 #if !DEPLOY
             DebugLog.PrintLine($"Exception in DoDragDrop: {e.Message}");
 #endif
+        }
+        finally
+        {
+            UpdateData(AdbDataFormats.DragLoop, BitConverter.GetBytes(0));
         }
     }
 
@@ -874,12 +927,19 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         => GetFileContents((System.Runtime.InteropServices.ComTypes.IDataObject)dataObject, index);
 
     public static IStream GetFileContents(System.Runtime.InteropServices.ComTypes.IDataObject dataObject, int index)
+        => (IStream)GetFileContentsObject(dataObject, index);
+
+    /// <summary>The FileContents stream: a COM proxy, or the managed stream itself when served in this process.</summary>
+    public static object GetFileContentsObject(System.Runtime.InteropServices.ComTypes.IDataObject dataObject, int index)
     {
         var fmtEtc = CreateFormat(AdbDataFormats.FileContents, index);
 
         dataObject.GetData(ref fmtEtc, out STGMEDIUM medium);
 
-        var stream = (IStream)Marshal.GetObjectForIUnknown(medium.unionmember);
+        // The wrapper holds its own reference, so the one the medium handed over is released
+        var stream = Marshal.GetObjectForIUnknown(medium.unionmember);
+        Marshal.Release(medium.unionmember);
+
         return stream;
     }
 }

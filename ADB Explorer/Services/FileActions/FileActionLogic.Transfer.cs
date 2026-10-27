@@ -348,12 +348,31 @@ internal static partial class FileActionLogic
         var sources = items.Select(item => GetPushSource(item, targetPath, pushDevice.ID, replacePaths ?? EmptyPathSet, conflictPaths ?? EmptyPathSet))
                            .OfType<SyncFile>();
 
+        QueuePushes(sources, targetPath, dropEffects, pushDevice);
+    }
+
+    /// <summary>Pushes trees of virtual files with no shell item behind them, each file read from its own content.</summary>
+    public static void PushVirtualItems(
+        IReadOnlyList<SyncFile> roots,
+        string targetPath,
+        IReadOnlySet<string> replacePaths,
+        IReadOnlySet<string> conflictPaths,
+        LogicalDeviceViewModel device)
+    {
+        var sources = roots.Where(root => FilterPushTree(root, FileHelper.ConcatPaths(targetPath, root.FullName), device.ID, replacePaths, conflictPaths));
+
+        // The source has nothing to remove
+        QueuePushes(sources, targetPath, DragDropEffects.Copy, device);
+    }
+
+    private static void QueuePushes(IEnumerable<SyncFile> sources, string targetPath, DragDropEffects dropEffects, LogicalDeviceViewModel device)
+    {
         foreach (var group in GroupByParent(sources))
         {
             if (group.Count == 1)
-                QueuePush(() => FileSyncOperation.PushFile(group[0], DestinationOf(group[0], targetPath), pushDevice, App.AppDispatcher), dropEffects);
+                QueuePush(() => FileSyncOperation.PushFile(group[0], DestinationOf(group[0], targetPath), device, App.AppDispatcher), dropEffects);
             else
-                QueuePush(() => FileSyncOperation.SyncBatch(FileOperation.OperationType.Push, group, new(targetPath, FileType.Folder), pushDevice, App.AppDispatcher), dropEffects);
+                QueuePush(() => FileSyncOperation.SyncBatch(FileOperation.OperationType.Push, group, new(targetPath, FileType.Folder), device, App.AppDispatcher), dropEffects);
         }
     }
 
@@ -389,10 +408,12 @@ internal static partial class FileActionLogic
             var parentPath = source.FullPath;
             foreach (var folder in empty)
             {
-                if (string.IsNullOrEmpty(folder.FileSystemPath) || string.IsNullOrEmpty(parentPath))
+                // A folder in a zip or on a phone has no file system path
+                var folderPath = string.IsNullOrEmpty(folder.FileSystemPath) ? folder.ParsingName : folder.FileSystemPath;
+                if (string.IsNullOrEmpty(folderPath) || string.IsNullOrEmpty(parentPath))
                     continue;
 
-                string relative = FileHelper.ExtractRelativePath(folder.FileSystemPath, parentPath).Replace('\\', '/');
+                string relative = FileHelper.ExtractRelativePath(folderPath, parentPath).Replace('\\', '/');
                 _ = ShellFileOperation.TryMakeDir(op.Device, FileHelper.ConcatPaths(target.FullPath, relative));
             }
         }

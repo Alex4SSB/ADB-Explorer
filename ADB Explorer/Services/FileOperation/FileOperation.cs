@@ -320,6 +320,10 @@ public abstract class FileOperation : ObservableObject
             if (this is FileTransferOperation { TargetStagingRoot: not null })
                 return false;
 
+            // Files handed to the shell are wherever it put them
+            if (this is FileSyncOperation { IsShellStream: true })
+                return false;
+
             // Archive pull / extract-to-device: prefer cksum -HNPL (IEEE CRC), else MD5.
             if (TryGetArchiveValidationSource(out var archivePath, out _, out _))
             {
@@ -372,11 +376,13 @@ public abstract class FileOperation : ObservableObject
         return false;
     }
 
-    public bool IsSourceNavigable => FilePath?.PathType is AbstractFile.FilePathType.Windows
-                || (Device.Status is DeviceStatus.Ok && AltSource.IsNoneOrNavigable);
+    // A source standing in for a special location (e.g. files from another app) can't be opened
+    public bool IsSourceNavigable => AltSource.IsNoneOrNavigable
+                && (FilePath?.PathType is AbstractFile.FilePathType.Windows || Device.Status is DeviceStatus.Ok);
 
-    public bool IsTargetNavigable => TargetPath?.PathType is AbstractFile.FilePathType.Windows
-                || ((TargetDevice ?? Device).Status is DeviceStatus.Ok && AltTarget.IsNoneOrNavigable);
+    // A target standing in for a special location (e.g. files handed to the Windows shell) can't be opened
+    public bool IsTargetNavigable => AltTarget.IsNoneOrNavigable
+                && (TargetPath?.PathType is AbstractFile.FilePathType.Windows || (TargetDevice ?? Device).Status is DeviceStatus.Ok);
 
     #endregion
 

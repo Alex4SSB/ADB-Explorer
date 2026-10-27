@@ -399,6 +399,8 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
                     Size = info.Length;
                     ModifiedTime = info.LastWriteTime;
                 }
+                else // Not on the file system (a zip member, a file on a phone over MTP)
+                    (Size, ModifiedTime) = FileHelper.GetShellSizeDate(windowsPath, false);
             }
             catch
             { }
@@ -612,15 +614,24 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     public SyncFile GetSyncFile(string? deviceId = null) => new(this, GetChildren(deviceId));
 
-    public FileSyncOperation PrepareDescriptors(VirtualFileDataObject vfdo, bool includeContent = true)
-    {
-        var source = Data.Active;
-        var device = source.Device ?? Data.ActiveDevice
-            ?? throw new InvalidOperationException("Cannot prepare file transfer descriptors without a device.");
-        return PrepareDescriptors(vfdo, includeContent, device, source);
-    }
+    /// <summary>
+    /// What a dragged or copied item is pulled from for the shell: its tree (or that of its copy staged out of an archive),
+    /// and its files' device paths in the order the shell reads them.
+    /// </summary>
+    public sealed record ShellPullItem(
+        FileClass File,
+        SyncFile Source,
+        IReadOnlyList<string> StreamOrder,
+        string? ArchivePath,
+        string? InternalPath,
+        string? StagingRoot);
 
-    public FileSyncOperation PrepareDescriptors(
+    // The op this item's streams are pulled through, once the dragged items are grouped into ops
+    private FileSyncOperation? _shellPull;
+
+    public void AttachShellPull(FileSyncOperation op) => _shellPull = op;
+
+    public ShellPullItem PrepareDescriptors(
         VirtualFileDataObject vfdo,
         bool includeContent,
         LogicalDeviceViewModel device,
@@ -631,9 +642,6 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             name = source.SelectedPackages.FirstOrDefault(pkg => pkg.Path == FullPath)?.Name + ".apk";
         else
             name = FullName;
-
-        SyncFile target = new(FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, name, '\\'))
-            { PathType = FilePathType.Windows };
 
         var deviceId = device.ID;
         SyncFile pullSource;
@@ -677,10 +685,6 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             pullSource = new SyncFile(this, children);
         }
 
-        var fileOp = FileSyncOperation.PullFile(pullSource, target, device, App.AppDispatcher);
-        if (stagingRoot is not null)
-            fileOp.SetArchivePullSource(archivePath!, internalPath!, stagingRoot, FullPath);
-
         vfdo.OperationCompleted += VFDO_OperationCompleted;
 
         var treeName = source.Actions.IsSearchMode ? FullPath : name;
@@ -690,7 +694,10 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             items = [.. items, .. children];
         }
 
-        Descriptors = items.Select(item =>
+        // Where each item is pulled from: the selected item (or its staged archive copy), then its tree
+        var devicePaths = items.Select((item, i) => i == 0 ? pullSource.FullPath : item.Name).ToArray();
+
+        Descriptors = items.Select((item, i) =>
         {
             var relativeName = FileHelper.ExtractRelativePath(item.Name, descriptorParent).Replace('/', '\\');
 
@@ -701,26 +708,26 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
                 IsDirectory = item.IsFolder,
                 Length = item.Size,
                 ChangeTimeUtc = item.Date.FromUnixTime(),
-                Stream = () => CreateDescriptorStream(vfdo, fileOp, relativeName, includeContent),
+                Stream = () => CreateDescriptorStream(vfdo, _shellPull, devicePaths[i], item, includeContent),
             };
         });
 
-        return fileOp;
+        return new(this, pullSource, [.. devicePaths.Where((_, i) => !items[i].IsFolder)], archivePath, internalPath, stagingRoot);
     }
 
-    private static System.Runtime.InteropServices.ComTypes.IStream? CreateDescriptorStream(VirtualFileDataObject vfdo, FileSyncOperation fileOp, string relativeName, bool includeContent)
+    private static HANDLE CreateDescriptorStream(VirtualFileDataObject vfdo, FileSyncOperation? fileOp, string devicePath, FolderTree item, bool includeContent)
     {
+        if (fileOp is null || !includeContent || item.IsFolder)
+            return 0;
+
         var isActive = App.AppDispatcher?.Invoke(() => App.Current?.MainWindow?.IsActive == true) == true;
         var operations = vfdo.Operations.Where(op => op.Status is FileOperation.OperationStatus.None);
 
         // When a VFDO that does not contain folders is sent to the clipboard, the shell immediately requests the file contents.
         // To prevent this, we refuse to give data when the app is focused.
         // When a legitimate request for data is made, the app can't be focused during the first file, but it can become focused again for the next files.
-        if ((Data.CopyPaste.IsClipboard && isActive && operations.Any())
-            || !includeContent)
-        {
-            return null;
-        }
+        if (Data.CopyPaste.IsClipboard && isActive && operations.Any())
+            return 0;
 
 #if !DEPLOY
         DebugLog.PrintLine($"Total uninitiated operations: {operations.Count()}");
@@ -728,17 +735,21 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
         // Add all uninitiated operations to the queue.
         // For all consecutive files this list will be empty.
-        foreach (var op in operations)
+        List<FileSyncOperation> toQueue = [.. operations];
+
+        // The shell may ask before vfdo.Operations is assigned
+        if (fileOp.Status is FileOperation.OperationStatus.None && !toQueue.Contains(fileOp))
+            toQueue.Add(fileOp);
+
+        foreach (var op in toQueue)
         {
             App.Current.Dispatcher.Invoke(() => Data.FileOpQ.AddOperation(op));
         }
 
-        // Wait for the operation to complete.
-        // When called on the UI thread (clipboard path), pump the dispatcher on each iteration
-        // so that queued BeginInvoke items (StatusInfo progress updates) are processed and
-        // visible in the UI during the transfer. Thread.Sleep alone would block the dispatcher
-        // queue, causing all progress notifications to arrive only after the transfer finishes.
-        while (fileOp.Status is FileOperation.OperationStatus.InProgress or FileOperation.OperationStatus.Waiting)
+        // Wait for the queue to start the op, so its progress is ready for the pull to report to.
+        // On the UI thread (clipboard path), pump the dispatcher so queued progress updates still run.
+        while (fileOp.Status is FileOperation.OperationStatus.Waiting or FileOperation.OperationStatus.None
+            || (fileOp.Status is FileOperation.OperationStatus.InProgress && !fileOp.IsShellStreamReady))
         {
             if (App.AppDispatcher?.CheckAccess() == true)
             {
@@ -755,34 +766,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             }
         }
 
-        var file = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, relativeName, '\\');
-
-        if (Directory.Exists(file))
-            return null;
-
-        // Try 10 times to read from the file and write to the stream,
-        // in case the file is still in use by ADB or hasn't appeared yet
-        for (int i = 0; i < 10; i++)
-        {
-            try
-            {
-                var stream = NativeMethods.GetComStreamFromFile(file);
-
-                if (stream is not null)
-                    return stream;
-            }
-            catch (Exception e)
-            {
-#if !DEPLOY
-                DebugLog.PrintLine($"Failed to open stream on {file}: {e.Message}");
-#endif
-
-                Thread.Sleep(100);
-                continue;
-            }
-        }
-
-        return null;
+        return fileOp.OpenShellStream(devicePath, item.Size);
     }
 
     private void VFDO_OperationCompleted(object? sender, NativeMethods.HResult hResult)

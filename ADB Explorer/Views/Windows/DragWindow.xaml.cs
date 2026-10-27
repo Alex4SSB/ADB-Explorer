@@ -131,7 +131,12 @@ public partial class DragWindow : INotifyPropertyChanged
             string result = "";
             var count = Data.CopyPaste.DragFiles.Length;
 
-            if (count == 1)
+            // 7-Zip and the new Outlook name their files only at the drop, so they're shown as "??"
+            long? shownCount = count;
+            if (Data.CopyPaste.HasUnnamedFiles)
+                shownCount = null;
+
+            if (count == 1 && shownCount is not null)
             {
                 int sourceLength = target is null ? 30 : 45 - target.Length;
                 var source = FileHelper.GetShortFileName(Data.CopyPaste.DragFiles[0], sourceLength);
@@ -219,14 +224,14 @@ public partial class DragWindow : INotifyPropertyChanged
                 if (Data.CopyPaste.CurrentDropEffect is DragDropEffects.Move)
                 {
                     result = string.IsNullOrEmpty(target)
-                        ? Strings.Plurals.MoveItems(count)
-                        : Strings.Plurals.MoveItemsTo(count, target);
+                        ? Strings.Plurals.MoveItems(shownCount)
+                        : Strings.Plurals.MoveItemsTo(shownCount, target);
                 }
                 else if (Data.CopyPaste.CurrentDropEffect is DragDropEffects.Copy)
                 {
                     result = string.IsNullOrEmpty(target)
-                        ? Strings.Plurals.CopyItems(count)
-                        : Strings.Plurals.CopyItemsTo(count, target);
+                        ? Strings.Plurals.CopyItems(shownCount)
+                        : Strings.Plurals.CopyItemsTo(shownCount, target);
                 }
 
                 var split = result.Split(target);
@@ -298,7 +303,7 @@ public partial class DragWindow : INotifyPropertyChanged
 #if DEBUG
         Data.CopyPaste.MouseWithinApp = true;
 #else
-        InterceptMouse.Init(UpdateMouse, CancelDrag, DragAutoScroll.OnMouseWheel);
+        InterceptMouse.Init(UpdateMouse, CancelDrag, DragAutoScroll.OnMouseWheel, EndOnEscape);
 #endif
 
         DragTimer.Start();
@@ -317,7 +322,14 @@ public partial class DragWindow : INotifyPropertyChanged
 #endif
     }
 
-    private void CancelDrag() => Data.CopyPaste.DragBitmap = null;
+    private void CancelDrag()
+    {
+        Data.CopyPaste.CancelExternalDrag();
+        Data.CopyPaste.DragBitmap = null;
+    }
+
+    // An external drag's source cancels on Esc without telling us, as the key reaches only the source
+    private void EndOnEscape() => Data.CopyPaste.DragBitmap = null;
 
     /// <summary>
     /// Places the drag window relative to the given screen point. Image dimensions are derived from

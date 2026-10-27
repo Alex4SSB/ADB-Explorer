@@ -46,7 +46,11 @@ public partial class CopyPasteService
             DragPasteSource = DataSource.None;
         }
         else
+        {
             DragPasteSource &= ~DataSource.None;
+            if (TrackDrag(dataObject))
+                return DragDropEffects.None;
+        }
 
         PreviewDataObject(dataObject);
         if (DragFiles.Length < 1)
@@ -126,6 +130,7 @@ public partial class CopyPasteService
     public void PreviewDataObject(IDataObject dataObject)
     {
         CurrentSource &= ~(DataSource.Android | DataSource.Virtual);
+        IsFileDropOnly = IsDelayedFileDrop = HasUnnamedFiles = false;
 
         DragParent = "";
         string[] oldFiles = [.. DragFiles];
@@ -213,14 +218,15 @@ public partial class CopyPasteService
             SourceDevice = null;
             GetDescriptors(dataObject);
 
-            DragFiles = [.. Descriptors.Where(d => !d.Name.Contains('\\')).Select(d => d.Name)];
+            DragFiles = [.. Descriptors.Where(d => !d.Name.Contains('\\') && !FileHelper.HasParentReference(d.Name)).Select(d => d.Name)];
 
             CurrentSource |= DataSource.Virtual;
             if (dataObject.GetDataPresent(AdbDataFormats.FileContents))
                 CurrentSource &= ~DataSource.Android;
         }
-        // If the data object only has FileDrop, then it's probably dropping by target detect, which we can't support (7-Zip, WinRAR, etc.)
-        else
+        // FileDrop alone: an app with no shell namespace of its own (7-Zip, the new Outlook).
+        // Otherwise it's probably dropping by target detect, which we can't support (WinRAR, etc.)
+        else if (!PreviewFileDrop(dataObject))
         {
             SourceDevice = null;
             DragFiles = [];
@@ -296,6 +302,8 @@ public partial class CopyPasteService
         // but an external Explorer drag never goes through that, so it must happen here too.
         DragPasteSource &= ~DataSource.None;
         DropTargetDevice = node.OwnerDevice ?? Data.ActiveDevice;
+        if (TrackDrag(dataObject))
+            return DragDropEffects.None;
 
         PreviewDataObject(dataObject);
         if (DragFiles.Length < 1)
@@ -409,7 +417,20 @@ public partial class CopyPasteService
                         Data.FileOpQ.AddOperation(pullOp);
                     }
                 }
-                // From archives, UNC paths, & DLNA servers
+                // Files the source creates after the drop (the new Outlook); with no names, they can't be packages
+                else if (IsDelayedFileDrop)
+                {
+                    if (!isAppDrive)
+                        PushDelayedFileDrop(dataObject, targetFolder, device);
+                }
+                // From archives, phones over MTP & DLNA servers, read straight from the shell.
+                // The source stays where it is, as it did when this went through the temp folder.
+                else if (dataObject.GetDataPresent(AdbDataFormats.ShellidList) && !isAppDrive)
+                {
+                    var shItems = ShellItemArray.FromDataObject((System.Runtime.InteropServices.ComTypes.IDataObject)dataObject);
+                    VerifyAndPush(targetFolder, [.. shItems.Select(sh => new FileClass(sh))], DragDropEffects.Copy, device);
+                }
+                // Packages are installed from files on disk, so they go through the temp folder
                 else if (dataObject.GetDataPresent(AdbDataFormats.ShellidList))
                 {
                     ShellFolder tempDrag = new(Data.RuntimeSettings.TempDragPath);
@@ -419,7 +440,6 @@ public partial class CopyPasteService
                     shItems.ForEach(shia => shFileOp.QueueCopyOperation(shia, tempDrag));
 
                     ShellItem lastTopItem = null;
-                    ShellItem lastTopSource = null;
                     shFileOp.PostCopyItem += (s, e) =>
                     {
                         // Skip non top level items
@@ -427,40 +447,36 @@ public partial class CopyPasteService
                             return;
 
                         // A new top level item means the previous one is done
-                        if (lastTopItem is not null && lastTopItem.ParsingName != e.DestItem.ParsingName)
+                        if (lastTopItem is not null
+                            && lastTopItem.ParsingName != e.DestItem.ParsingName
+                            && FileHelper.AllFilesAreApks(DragFiles))
                         {
-                            if (isAppDrive)
-                            {
-                                if (FileHelper.AllFilesAreApks(DragFiles))
-                                    ShellFileOperation.PushPackages(device, [lastTopItem], App.AppDispatcher);
-                            }
-                            else
-                                VerifyAndPush(targetFolder, new FileClass(lastTopItem), CurrentEffect, lastTopSource, device);
+                            ShellFileOperation.PushPackages(device, [lastTopItem], App.AppDispatcher);
                         }
 
                         lastTopItem = e.DestItem;
-                        lastTopSource = e.SourceItem;
                     };
 
                     shFileOp.FinishOperations += (s, e) =>
                     {
                         // The last item is not caught by the PostCopyItem event
-                        if (lastTopItem is not null)
-                        {
-                            if (isAppDrive)
-                            {
-                                if (FileHelper.AllFilesAreApks(DragFiles))
-                                    ShellFileOperation.PushPackages(device, [lastTopItem], App.AppDispatcher);
-                            }
-                            else
-                                VerifyAndPush(targetFolder, new FileClass(lastTopItem), CurrentEffect, lastTopSource, device);
-                        }
+                        if (lastTopItem is not null && FileHelper.AllFilesAreApks(DragFiles))
+                            ShellFileOperation.PushPackages(device, [lastTopItem], App.AppDispatcher);
                     };
 
                     shFileOp.PerformOperations();
                 }
+                // Pasted virtual files with no ShellID List Array (e.g. mail attachments), read as they're pushed.
+                // The clipboard keeps the source's data available meanwhile; a drag's may be gone once dropped.
+                else if (dataObject.GetDataPresent(AdbDataFormats.FileContents)
+                    && !IsDrag
+                    && !isAppDrive
+                    && !ArchiveHelper.CanPasteIntoArchive(targetFolder, deviceId))
+                {
+                    VerifyAndPushContents(targetFolder, (System.Runtime.InteropServices.ComTypes.IDataObject)dataObject, Descriptors, device);
+                }
+                // Packages, a target archive, or a dragged source that must be read now: through the temp folder.
                 // Was supposed to be the main method for zip archives, but Vanara covers that in ShellItemArray.
-                // Will be left in to support any virtual files that don't provide ShellID List Array.
                 else if (dataObject.GetDataPresent(AdbDataFormats.FileContents))
                 {
                     Task.Run(() =>
@@ -469,6 +485,13 @@ public partial class CopyPasteService
 
                         for (int i = 0; i < Descriptors.Length; i++)
                         {
+                            // A name stepping up a folder would be written outside the temp folder
+                            if (FileHelper.HasParentReference(Descriptors[i].Name))
+                            {
+                                files[i] = "";
+                                continue;
+                            }
+
                             files[i] = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, Descriptors[i].Name, '\\');
                             if (Descriptors[i].IsDirectory)
                                 continue;
@@ -532,11 +555,21 @@ public partial class CopyPasteService
             }
             else if (IsWindows) // FileDrop format
             {
+                // The source may have created its files just now (7-Zip extracts at the drop)
+                string? staging = null;
+                if (IsFileDropOnly)
+                    staging = TakeDroppedFiles(dataObject);
+
                 if (isAppDrive)
                 {
                     if (FileHelper.AllFilesAreApks(DragFiles))
                         ShellFileOperation.PushPackages(device, CurrentFiles.Select(f => f.ShellItem).OfType<ShellItem>(), App.AppDispatcher);
+
+                    if (staging is not null)
+                        ReleaseDropStaging(staging);
                 }
+                else if (staging is not null)
+                    ReleaseDropStagingAfter(VerifyAndPushAsync(targetFolder, CurrentFiles, CurrentEffect, device), staging);
                 else
                     VerifyAndPush(targetFolder, CurrentFiles, CurrentEffect, device);
             }

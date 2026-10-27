@@ -39,7 +39,8 @@ public class FileDescriptor
     // Absent for descriptors built from an inbound drag/clipboard source outside our filesystem.
     public string? SourcePath { get; set; }
 
-    public delegate System.Runtime.InteropServices.ComTypes.IStream? StreamContents();
+    /// <summary>A COM IStream pointer whose reference the caller takes over, or 0 when there's no data to give.</summary>
+    public delegate HANDLE StreamContents();
 
     // Only set for descriptors we offer as drag/clipboard data; unset for inbound descriptors.
     public StreamContents? Stream { get; set; }

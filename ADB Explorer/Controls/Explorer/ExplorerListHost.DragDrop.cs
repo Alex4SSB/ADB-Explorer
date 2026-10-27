@@ -47,6 +47,13 @@ public partial class ExplorerListHost
         CopyPaste.DropEffect =
         CopyPaste.CurrentDropEffect = e.Effects;
 
+        // A drag cancelled with a right click stays without its drag window
+        if (CopyPaste.IsDragCanceled)
+        {
+            e.Handled = true;
+            return;
+        }
+
         if (FileActions.IsAppDrive)
         {
             // Incoming APK / APKBKP install: always the default package large icon, not the
@@ -63,6 +70,10 @@ public partial class ExplorerListHost
                 if (packageIcon is not null)
                     CopyPaste.DragBitmap = packageIcon;
             }
+        }
+        else if (CopyPaste.HasUnnamedFiles)
+        {
+            CopyPaste.DragBitmap = FileIconProvider.GetMultipleFilesIcon(120);
         }
         else if (CopyPaste.CurrentFiles.Any())
         {

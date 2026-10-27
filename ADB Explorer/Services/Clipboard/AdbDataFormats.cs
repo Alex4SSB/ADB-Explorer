@@ -11,6 +11,8 @@ public static class AdbDataFormats
     public static AdbDataFormat PerformedDropEffect { get; } = new("Performed DropEffect");
     public static AdbDataFormat PreferredDropEffect { get; } = new("Preferred DropEffect");
     public static AdbDataFormat DragLoop { get; } = new("InShellDragLoop");
+    public static AdbDataFormat CanIncludeInClipboardHistory { get; } = new("CanIncludeInClipboardHistory");
+    public static AdbDataFormat CanUploadToCloudClipboard { get; } = new("CanUploadToCloudClipboard");
     public static AdbDataFormat FileName { get; } = new("FileName");
     public static AdbDataFormat FileNameW { get; } = new("FileNameW");
     public static AdbDataFormat ShellidList { get; } = new("Shell IDList Array");
@@ -31,6 +33,8 @@ public static class AdbDataFormats
         { PerformedDropEffect, nameof(PerformedDropEffect) },
         { PreferredDropEffect, nameof(PreferredDropEffect) },
         { DragLoop, nameof(DragLoop) },
+        { CanIncludeInClipboardHistory, nameof(CanIncludeInClipboardHistory) },
+        { CanUploadToCloudClipboard, nameof(CanUploadToCloudClipboard) },
         { FileName, nameof(FileName) },
         { FileNameW, nameof(FileNameW) },
         { ShellidList, nameof(ShellidList) },
@@ -49,6 +53,8 @@ public static class AdbDataFormats
         { PerformedDropEffect, PerformedDropEffect },
         { PreferredDropEffect, PreferredDropEffect },
         { DragLoop, DragLoop },
+        { CanIncludeInClipboardHistory, CanIncludeInClipboardHistory },
+        { CanUploadToCloudClipboard, CanUploadToCloudClipboard },
         { FileName, FileName },
         { FileNameW, FileNameW },
         { ShellidList, ShellidList },

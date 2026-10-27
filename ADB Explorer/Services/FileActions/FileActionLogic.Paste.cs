@@ -301,7 +301,8 @@ internal static partial class FileActionLogic
 
     public static DragDropEffects EnableTreeDropPaste(NavigationTreeNode target)
     {
-        if (!Data.CopyPaste.CurrentFiles.Any())
+        var isUnnamed = Data.CopyPaste.HasUnnamedFiles;
+        if (!Data.CopyPaste.CurrentFiles.Any() && !isUnnamed)
             return DragDropEffects.None;
 
         if (target.Device is not null || target.IsTemp || target.IsInEditMode)
@@ -341,9 +342,13 @@ internal static partial class FileActionLogic
             is RelationType.Self or RelationType.Ancestor)
             return DragDropEffects.Move;
 
-        UpdatePastingRestrictions(targetPath, [.. Data.CopyPaste.CurrentFiles.Select(f => f.FullPath)]);
-        if (Data.FileActions.IsPastingIllegalNaming || Data.FileActions.IsPastingConflictingNames)
-            return DragDropEffects.None;
+        // Names known only at the drop can't be checked here
+        if (!isUnnamed)
+        {
+            UpdatePastingRestrictions(targetPath, [.. Data.CopyPaste.CurrentFiles.Select(f => f.FullPath)]);
+            if (Data.FileActions.IsPastingIllegalNaming || Data.FileActions.IsPastingConflictingNames)
+                return DragDropEffects.None;
+        }
 
         var fromArchive = ArchiveExtract.IsArchiveSource(Data.CopyPaste.CurrentFiles, deviceId);
         var intoArchive = ArchivePath.IsArchivePath(targetPath, deviceId);

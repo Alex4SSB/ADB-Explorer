@@ -19,6 +19,8 @@ public abstract class Navigation
         Terminal,
         Operations,
         Log,
+        /// <summary>Files handed to the Windows shell (dragged or copied out), with no folder of ours to show.</summary>
+        Windows,
     }
 }
 
@@ -123,6 +125,7 @@ public class AdbLocation : Navigation
                 SpecialLocation.Terminal => Strings.Resources.S_TERMINAL,
                 SpecialLocation.Operations => Strings.Resources.S_ACTION_OPERATION_PLURAL,
                 SpecialLocation.Log => Strings.Resources.S_BUTTON_LOG,
+                SpecialLocation.Windows => "Windows",
                 _ => "",
             };
         }

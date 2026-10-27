@@ -40,6 +40,12 @@ public static partial class NativeMethods
         /// <summary>E_FAIL</summary>
         Fail = -2147467259, // 0x80004005
 
+        /// <summary>E_NOTIMPL</summary>
+        NotImplemented = -2147467263, // 0x80004001
+
+        /// <summary>STG_E_INVALIDFUNCTION</summary>
+        StgInvalidFunction = -2147287039, // 0x80030001
+
         /// <summary>E_ELEMENTNOTFOUND</summary>
         ElementNotFound = -2147023728, // 0x80070490
 

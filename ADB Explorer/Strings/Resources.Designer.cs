@@ -4399,6 +4399,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Transfer buffer.
+        /// </summary>
+        public static string S_SETTINGS_TRANSFER_MEMORY {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_TRANSFER_MEMORY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to How much RAM memory may hold files downloaded from the device ahead of Windows, when copying them to Windows by drag &amp; drop or clipboard..
+        /// </summary>
+        public static string S_SETTINGS_TRANSFER_MEMORY_INFO {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_TRANSFER_MEMORY_INFO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unavailable on this system..
         /// </summary>
         public static string S_SETTINGS_UNAVAILABLE_ON_SYSTEM {

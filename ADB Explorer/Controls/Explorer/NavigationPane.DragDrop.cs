@@ -188,6 +188,10 @@ public partial class NavigationPane
         Data.CopyPaste.DropTarget = node.Path;
         Data.CopyPaste.DropTargetDevice = node.OwnerDevice;
 
+        // A drag cancelled with a right click stays without its drag window
+        if (Data.CopyPaste.IsDragCanceled)
+            return;
+
         // Foreign drags (e.g. from Windows Explorer) never set a drag image on drag start like our own
         // drags do, so DragWindow stays hidden unless something sets one while dragging over a drop
         // target - mirrors ExplorerGrid_DragOver's equivalent handling for the explorer grid.
@@ -196,6 +200,10 @@ public partial class NavigationPane
         {
             if (!Data.CopyPaste.IsSelf && FileHelper.AllFilesAreApks(Data.CopyPaste.DragFiles))
                 Data.CopyPaste.DragBitmap = DefaultAndroidPackageIcon.Bitmap;
+        }
+        else if (Data.CopyPaste.HasUnnamedFiles)
+        {
+            Data.CopyPaste.DragBitmap = FileIconProvider.GetMultipleFilesIcon(120);
         }
         else if (Data.CopyPaste.CurrentFiles.Any())
         {

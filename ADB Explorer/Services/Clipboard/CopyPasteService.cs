@@ -203,6 +203,10 @@ public partial class CopyPasteService : ObservableObject
 
     private IEnumerable<FileClass> GetCurrentFiles()
     {
+        // Named only at the drop
+        if (HasUnnamedFiles)
+            yield break;
+
         if (IsWindows && !IsVirtual)
         {
             foreach (var file in DragFiles)

@@ -54,7 +54,7 @@ public abstract class AbstractSyncFileOperation : FileOperation
 
     /// <summary>A folder standing for the parent of <paramref name="items"/>, so they sync as one tree.</summary>
     protected static SyncFile CreateBatchRoot(IReadOnlyList<SyncFile> items)
-        => new(items[0].ParentPath, AbstractFile.FileType.Folder) { PathType = items[0].PathType };
+        => new(items[0].ParentPath, AbstractFile.FileType.Folder) { PathType = items[0].PathType, IsVirtual = items[0].IsVirtual };
 
     protected void SetBatchItems(IReadOnlyList<SyncFile> items)
     {
@@ -73,11 +73,15 @@ public abstract class AbstractSyncFileOperation : FileOperation
 
     protected bool HasCompletedBefore => _completedBefore > 0;
 
-    /// <summary>Not for staged archive sources and targets, which are cleaned up once the op finishes.</summary>
+    /// <summary>
+    /// Not for staged archive sources and targets, which are cleaned up once the op finishes,
+    /// nor for files streamed to the shell, which has nothing left to read them again.
+    /// </summary>
     public bool CanRetry => FailedFiles.Count > 0
         && Status is not (OperationStatus.InProgress or OperationStatus.Waiting)
         && !IsArchivePull
-        && this is not FileTransferOperation { TargetStagingRoot: not null };
+        && this is not FileTransferOperation { TargetStagingRoot: not null }
+        && this is not FileSyncOperation { IsShellStream: true };
 
     /// <summary>Adds the runs before a retry to this run's completed files and bytes.</summary>
     protected (int Completed, long Bytes) RecordRunResult(int completed, long bytes)

@@ -173,18 +173,108 @@ public static partial class NativeMethods
         IStream? pstmTemplate,
         out IStream ppstm);
 
-    public static IStream GetComStreamFromFile(string filePath)
+    /// <summary>
+    /// IStream with its buffers as pointers, so a stream we serve doesn't get a managed array
+    /// allocated and copied for every Read the shell makes.
+    /// </summary>
+    [ComImport]
+    [Guid("0000000c-0000-0000-C000-000000000046")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IPointerStream
     {
-        var result = SHCreateStreamOnFileEx(filePath,
-            Vanara.PInvoke.STGM.STGM_READ | Vanara.PInvoke.STGM.STGM_SHARE_DENY_NONE | Vanara.PInvoke.STGM.STGM_DELETEONRELEASE,
-            0,
-            false,
-            null,
-            out IStream stream);
+        [PreserveSig] HResult Read(HANDLE pv, int cb, HANDLE pcbRead);
+        [PreserveSig] HResult Write(HANDLE pv, int cb, HANDLE pcbWritten);
+        [PreserveSig] HResult Seek(long dlibMove, SeekOrigin dwOrigin, HANDLE plibNewPosition);
+        [PreserveSig] HResult SetSize(long libNewSize);
+        [PreserveSig] HResult CopyTo(HANDLE pstm, long cb, HANDLE pcbRead, HANDLE pcbWritten);
+        [PreserveSig] HResult Commit(int grfCommitFlags);
+        [PreserveSig] HResult Revert();
+        [PreserveSig] HResult LockRegion(long libOffset, long cb, int dwLockType);
+        [PreserveSig] HResult UnlockRegion(long libOffset, long cb, int dwLockType);
+        [PreserveSig] HResult Stat(out STATSTG pstatstg, int grfStatFlag);
+        [PreserveSig] HResult Clone(out HANDLE ppstm);
+    }
 
-        return result is HResult.Ok
-            ? stream
-            : null;
+    [DllImport("Shell32.dll", CharSet = CharSet.Unicode)]
+    private static extern uint DragQueryFile(HANDLE hDrop, uint iFile, StringBuilder? lpszFile, uint cch);
+
+    [DllImport("Ole32.dll")]
+    private static extern void ReleaseStgMedium(ref STGMEDIUM pmedium);
+
+    /// <summary>The paths in a data object's CF_HDROP, read from the source's own COM object.</summary>
+    public static string[] GetFileDropPaths(IDataObject dataObject)
+    {
+        var format = new FORMATETC
+        {
+            cfFormat = AdbDataFormats.FileDrop,
+            dwAspect = DVASPECT.DVASPECT_CONTENT,
+            lindex = -1,
+            tymed = TYMED.TYMED_HGLOBAL,
+        };
+
+        dataObject.GetData(ref format, out var medium);
+        try
+        {
+            var count = DragQueryFile(medium.unionmember, uint.MaxValue, null, 0);
+            var paths = new string[count];
+            for (uint i = 0; i < count; i++)
+            {
+                var path = new StringBuilder((int)DragQueryFile(medium.unionmember, i, null, 0) + 1);
+                DragQueryFile(medium.unionmember, i, path, (uint)path.Capacity);
+                paths[i] = path.ToString();
+            }
+
+            return paths;
+        }
+        finally
+        {
+            ReleaseStgMedium(ref medium);
+        }
+    }
+
+    [DllImport("Ole32.dll", PreserveSig = false)]
+    private static extern HANDLE CoMarshalInterThreadInterfaceInStream(in Guid riid, [MarshalAs(UnmanagedType.Interface)] object pUnk);
+
+    [DllImport("Ole32.dll", PreserveSig = false)]
+    [return: MarshalAs(UnmanagedType.Interface)]
+    private static extern object CoGetInterfaceAndReleaseStream(HANDLE pStm, in Guid iid);
+
+    /// <summary>
+    /// Hands a COM object to another thread: <paramref name="dataObject"/> is marshaled here, and the returned
+    /// function unmarshals it on the thread that calls it (once), so its calls don't go through this one.
+    /// </summary>
+    public static Func<IDataObject> MarshalToThread(IDataObject dataObject)
+    {
+        var iid = typeof(IDataObject).GUID;
+        var stream = CoMarshalInterThreadInterfaceInStream(iid, dataObject);
+
+        return () => (IDataObject)CoGetInterfaceAndReleaseStream(stream, iid);
+    }
+
+    [LibraryImport("User32.dll")]
+    private static partial HANDLE GetForegroundWindow();
+
+    [LibraryImport("User32.dll")]
+    private static partial uint GetWindowThreadProcessId(HANDLE hWnd, out uint lpdwProcessId);
+
+    [LibraryImport("User32.dll")]
+    private static partial void keybd_event(byte bVk, byte bScan, uint dwFlags, HANDLE dwExtraInfo);
+
+    private const byte VK_ESCAPE = 0x1B;
+    private const uint KEYEVENTF_KEYUP = 0x2;
+
+    /// <summary>
+    /// Presses Esc for the app in the foreground, the source of an external drag, whose drag loop takes it as a cancel.
+    /// Never for this app, whose own drags are cancelled by their drop source.
+    /// </summary>
+    public static void CancelForegroundDrag()
+    {
+        GetWindowThreadProcessId(GetForegroundWindow(), out var processId);
+        if (processId == Environment.ProcessId)
+            return;
+
+        keybd_event(VK_ESCAPE, 0, 0, IntPtr.Zero);
+        keybd_event(VK_ESCAPE, 0, KEYEVENTF_KEYUP, IntPtr.Zero);
     }
 
     public static void SaveComStreamToFile(IStream source, string filePath)

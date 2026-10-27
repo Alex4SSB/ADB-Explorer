@@ -29,6 +29,32 @@ public class FileSyncOperation : AbstractSyncFileOperation
 
     private bool _useSyncV2;
     private int _autoRetries;
+    private Mutex _progressMutex = null!;
+
+    // Shell streaming: a pull per file the shell reads, keyed by device path
+    private sealed class ShellPull(SyncPipe pipe)
+    {
+        public SyncPipe Pipe { get; } = pipe;
+
+        public Task Task { get; set; } = Task.CompletedTask;
+    }
+
+    private List<string> _shellOrder = [];
+    private List<TransferLane>? _shellLanes;
+    private int _shellNext;
+    private int _shellActive;
+    private readonly Dictionary<string, ShellPull> _shellPulls = [];
+    private Dictionary<string, SyncFile> _shellFiles = [];
+    private readonly ConcurrentDictionary<string, byte> _shellFilesDone = new();
+    private TaskCompletionSource? _shellDone;
+    private int _shellFilesLeft;
+    private volatile bool _isShellEnded;
+
+    /// <summary>The files go to the shell as streams, pulled as it reads them, instead of into files.</summary>
+    public bool IsShellStream { get; private set; }
+
+    /// <summary>Set once <see cref="Start"/> has prepared what <see cref="OpenShellStream"/> needs.</summary>
+    public bool IsShellStreamReady { get; private set; }
 
     public override SyncFile AndroidPath => FilePath.PathType is AbstractFile.FilePathType.Android
         ? FilePath
@@ -64,7 +90,7 @@ public class FileSyncOperation : AbstractSyncFileOperation
 
         StatusInfo = status;
         Status = OperationStatus.Failed;
-        AltSource = new(Navigation.SpecialLocation.Unknown);
+        AltSource = new(Navigation.SpecialLocation.Windows);
     }
 
     public FileSyncOperation(
@@ -76,6 +102,19 @@ public class FileSyncOperation : AbstractSyncFileOperation
     {
         OperationName = operationName;
         TargetPath = targetPath;
+
+        // Virtual files from another app (or staged copies of them) have no source folder to show
+        if (operationName is OperationType.Push && IsUnderTempDragPath(sourcePath.FullPath))
+            AltSource = new(Navigation.SpecialLocation.Windows);
+    }
+
+    private static bool IsUnderTempDragPath(string path)
+    {
+        var tempDrag = Data.RuntimeSettings?.TempDragPath.TrimEnd('\\');
+
+        return !string.IsNullOrEmpty(tempDrag)
+            && (path.Equals(tempDrag, StringComparison.OrdinalIgnoreCase)
+                || path.StartsWith(tempDrag + '\\', StringComparison.OrdinalIgnoreCase));
     }
 
     public override void Start()
@@ -85,6 +124,7 @@ public class FileSyncOperation : AbstractSyncFileOperation
             throw new Exception("Cannot start an already active operation!");
         }
 
+        IsShellStreamReady = false;
         Status = OperationStatus.InProgress;
         StatusInfo = new InProgSyncProgressViewModel();
         _cancelTokenSource = new CancellationTokenSource();
@@ -104,8 +144,9 @@ public class FileSyncOperation : AbstractSyncFileOperation
         Interlocked.Exchange(ref _totalBytes, files.Sum(f => f.Size ?? 0));
         _isSingleFile = files.Count == 1;
 
-        if (OperationName is OperationType.Push &&
-            !File.Exists(FilePath.FullPath) && !Directory.Exists(FilePath.FullPath))
+        if (OperationName is OperationType.Push
+            && !FilePath.IsVirtual
+            && !File.Exists(FilePath.FullPath) && !Directory.Exists(FilePath.FullPath))
         {
             Status = OperationStatus.Failed;
             StatusInfo = new FailedOpProgressViewModel(FileOpStatusFormatter.StatusString(typeof(SyncErrorInfo), message: Strings.Resources.S_SYNC_FILE_NOT_FOUND, total: true));
@@ -115,11 +156,21 @@ public class FileSyncOperation : AbstractSyncFileOperation
 
         UnixFileStatus fileMode = UnixFileStatus.AllPermissions | UnixFileStatus.Regular;
 
-        Mutex mutex = new();
+        _progressMutex = new();
+
+        if (IsShellStream)
+            PrepareShellStream(files);
 
         var task = Task.Run(async () =>
         {
             TransferStart = DateTime.Now;
+
+            // The shell drives the pulls, and the op ends with the last of them
+            if (IsShellStream)
+            {
+                await _shellDone!.Task;
+                return;
+            }
 
             if (OperationName is OperationType.Push)
             {
@@ -188,7 +239,7 @@ public class FileSyncOperation : AbstractSyncFileOperation
                             continue;
                         }
 
-                        TransferFile(item!, lane, OtherLane(lane), mutex, fileMode);
+                        TransferFile(item!, lane, OtherLane(lane), _progressMutex, fileMode);
                     }
                 }
                 finally
@@ -604,7 +655,7 @@ public class FileSyncOperation : AbstractSyncFileOperation
             var lastWriteTime = item.DateModified ?? DateTime.Now;
 
             // target = [Android parent folder]\[relative path from Windows parent folder to current item]
-            using var stream = new FileStream(item.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var stream = item.OpenRead();
             service.Push(stream, targetPath, fileMode, lastWriteTime, progressCallback, _useSyncV2, in _isCanceled);
         }
         else
@@ -773,6 +824,237 @@ public class FileSyncOperation : AbstractSyncFileOperation
         }
     }
 
+    /// <param name="order">The files' device paths, in the order the shell reads them.</param>
+    public void StreamToShell(IEnumerable<string> order)
+    {
+        IsShellStream = true;
+        _shellOrder = [.. order];
+        AltTarget = new(Navigation.SpecialLocation.Windows);
+    }
+
+    private void PrepareShellStream(List<SyncFile> files)
+    {
+        _useSyncV2 = Device.SupportsSyncV2;
+        _shellFiles = [];
+        foreach (var file in files.Where(f => !f.IsDirectory))
+            _shellFiles.TryAdd(file.FullPath, file);
+
+        _shellFilesDone.Clear();
+        _shellFilesLeft = _shellFiles.Count;
+        _shellDone = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        // Folders only (the shell creates those), or the shell finished before the op got to start
+        if (_shellFilesLeft == 0 || _isShellEnded)
+            _shellDone.TrySetResult();
+
+        IsShellStreamReady = true;
+    }
+
+    /// <summary>
+    /// The stream the shell reads <paramref name="devicePath"/> from, its pull started along with the next files' once it's read.
+    /// Once the op is over (e.g. the clipboard is pasted again), the files still stream, just untracked.
+    /// </summary>
+    public HANDLE OpenShellStream(string devicePath, long? size)
+    {
+        var pull = GetShellPull(devicePath, size, startOver: true);
+
+        // A stream opened but never read (e.g. by a clipboard reader, not a paste) doesn't fill memory with the files after it
+        return new DevicePullStream(pull.Pipe, size, () => ReadAheadFrom(devicePath)).ToComPointer();
+    }
+
+    private void ReadAheadFrom(string devicePath)
+    {
+        var index = _shellOrder.IndexOf(devicePath);
+        if (index < 0)
+            return;
+
+        lock (_shellPulls)
+            _shellNext = Math.Max(_shellNext, index + 1);
+
+        PumpShellPulls();
+    }
+
+    /// <summary>
+    /// Starts pulls of the files the shell reads next, in its order, as many at once as the op syncs.
+    /// They fill <see cref="TransferMemory"/> ahead of it, so it finds them buffered.
+    /// </summary>
+    private void PumpShellPulls()
+    {
+        if (Status is not OperationStatus.InProgress)
+            return;
+
+        var limit = MaxThreads ?? Data.Settings.MaxSimultaneousOps;
+        lock (_shellPulls)
+        {
+            while (_shellActive < limit && _shellNext < _shellOrder.Count)
+            {
+                var next = _shellOrder[_shellNext++];
+                GetShellPull(next, _shellFiles.GetValueOrDefault(next)?.Size, startOver: false);
+            }
+        }
+    }
+
+    /// <param name="startOver">A file the shell already read from (or gave up on, or that failed unread) is pulled again.</param>
+    private ShellPull GetShellPull(string devicePath, long? size, bool startOver)
+    {
+        lock (_shellPulls)
+        {
+            if (_shellPulls.TryGetValue(devicePath, out var current)
+                && (!startOver || (current.Pipe.BytesRead == 0 && !current.Pipe.IsReaderClosed && !current.Pipe.IsFailed)))
+            {
+                return current;
+            }
+
+            current?.Pipe.CloseReader();
+
+            var pull = new ShellPull(new SyncPipe(size, canBorrow: true));
+            _shellActive++;
+            pull.Task = Task.Factory.StartNew(() => PullToShell(devicePath, pull), CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            _shellPulls[devicePath] = pull;
+
+            // A file is done once the shell has read it all, not once it's all buffered
+            pull.Pipe.Drained.ContinueWith(_ => OnShellFileDone(devicePath, pull), TaskScheduler.Default);
+
+            return pull;
+        }
+    }
+
+    /// <summary>The lane that would finish a file of <paramref name="size"/> first.</summary>
+    private TransferLane PickShellLane(long size)
+    {
+        List<TransferLane> lanes;
+        lock (_shellPulls)
+            lanes = _shellLanes ??= GetTransferLanes(MaxThreads ?? Data.Settings.MaxSimultaneousOps);
+
+        if (lanes.Count == 1)
+            return lanes[0];
+
+        var active = lanes.Where(l => !l.IsRetired).ToList();
+        if (active.Count == 0)
+            active = lanes;
+
+        return active.MinBy(l => (l.InFlightBytes + size) / l.Rate())!;
+    }
+
+    private void PullToShell(string devicePath, ShellPull pull)
+    {
+        // Progress goes to the op only while it runs
+        bool IsTracked() => Status is OperationStatus.InProgress && _shellFiles.ContainsKey(devicePath);
+
+        var item = _shellFiles.GetValueOrDefault(devicePath);
+        var claimed = item?.Size ?? 0;
+        var lane = PickShellLane(claimed);
+        long reported = 0;
+        Exception? error = null;
+
+        lane.Claim(claimed);
+
+        try
+        {
+            if (Data.Settings.EnableLog && !Data.IsLogPaused)
+                Data.CommandLog.Add(new($"@AdvancedSharpAdbClient: pull {devicePath} -> shell"));
+
+            if (item is not null && IsTracked())
+            {
+                ResetProgress(item);
+
+                if (!_useSyncV2)
+                {
+                    var knownSize = item.Size ?? 0;
+                    ResolvePullFileSize(item);
+                    Interlocked.Add(ref _totalBytes, (item.Size ?? 0) - knownSize);
+                }
+            }
+
+            using SyncService service = new(lane.DeviceData);
+            service.Pull(devicePath, pull.Pipe.Writer, args =>
+            {
+                var written = pull.Pipe.BytesWritten;
+                lane.Done(written - reported);
+                reported = written;
+
+                if (item is not null && IsTracked())
+                    AddUpdates(item, args, _progressMutex);
+            }, _useSyncV2, in _isCanceled);
+
+            // A canceled pull just stops, which would end the shell's file early instead of failing it
+            if (_isCanceled)
+                throw new OperationCanceledException();
+        }
+        catch (Exception e)
+        {
+            error = e;
+        }
+        finally
+        {
+            pull.Pipe.Complete(error);
+            lane.Done(Math.Max(0, claimed - reported));
+
+            lock (_shellPulls)
+                _shellActive--;
+        }
+
+        PumpShellPulls();
+
+        lock (_shellPulls)
+        {
+            // A pull replaced by a newer one for the same file doesn't count
+            if (item is null || !IsTracked() || _shellPulls.GetValueOrDefault(devicePath) != pull)
+                return;
+        }
+
+        if (error is not null)
+            AddUpdates([new SyncErrorInfo(item.FullPath, error.Message)]);
+        else if (pull.Pipe.BytesWritten == 0)
+            OnShellFileDone(devicePath, pull); // The shell may create an empty file without reading it
+    }
+
+    private void OnShellFileDone(string devicePath, ShellPull pull)
+    {
+        lock (_shellPulls)
+        {
+            if (Status is not OperationStatus.InProgress || !_shellFiles.ContainsKey(devicePath) || _shellPulls.GetValueOrDefault(devicePath) != pull)
+                return;
+        }
+
+        if (_shellFilesDone.TryAdd(devicePath, 0) && Interlocked.Decrement(ref _shellFilesLeft) == 0)
+            _shellDone?.TrySetResult();
+    }
+
+    /// <summary>The shell is done with the streams, as it reported to the data object.</summary>
+    public void EndShellStream(bool succeeded)
+    {
+        if (!IsShellStream)
+            return;
+
+        _isShellEnded = true;
+
+        if (succeeded)
+        {
+            // Files the shell skipped (e.g. on a name conflict) count as skipped
+            _shellDone?.TrySetResult();
+            return;
+        }
+
+        AbortShellPulls(unreadOnly: false);
+        _shellDone?.TrySetCanceled();
+    }
+
+    /// <summary>Fails the shell's reads and frees the pulls and what they buffered, so none waits on a stream nobody reads anymore.</summary>
+    private void AbortShellPulls(bool unreadOnly)
+    {
+        List<ShellPull> pulls;
+        lock (_shellPulls)
+            pulls = [.. _shellPulls.Values];
+
+        var error = new OperationCanceledException();
+        foreach (var pull in pulls.Where(p => !unreadOnly || p.Pipe.BytesRead == 0))
+        {
+            pull.Pipe.Complete(error);
+            pull.Pipe.CloseReader();
+        }
+    }
+
     public override void Cancel()
     {
         if (Status != OperationStatus.InProgress)
@@ -782,6 +1064,12 @@ public class FileSyncOperation : AbstractSyncFileOperation
 
         _isCanceled = true;
         _cancelTokenSource.Cancel();
+
+        if (IsShellStream)
+        {
+            AbortShellPulls(unreadOnly: false);
+            _shellDone?.TrySetCanceled();
+        }
     }
 
     public override void ClearChildren()
@@ -816,6 +1104,13 @@ public class FileSyncOperation : AbstractSyncFileOperation
         }
 
         ProgressUpdates?.Clear();
+
+        // Read-ahead pulls of files the shell skipped, and what they buffered
+        if (IsShellStream)
+        {
+            AbortShellPulls(unreadOnly: true);
+            _shellLanes?.ForEach(lane => lane.Release());
+        }
 
         if (OriginalShellItem is IDisposable disposable)
         {

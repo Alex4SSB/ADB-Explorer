@@ -1204,6 +1204,14 @@ Cancel All Running</value>
     <value>times</value>
     <comment>The unit displayed next to a setting counting repetitions, e.g. "1 times"</comment>
   </data>
+  <data name="S_SETTINGS_TRANSFER_MEMORY" xml:space="preserve">
+    <value>Transfer buffer</value>
+    <comment>The setting used to set how much memory (in MB) files copied from the device to Windows may be buffered in ahead of Windows writing them (0 = none)</comment>
+  </data>
+  <data name="S_SETTINGS_TRANSFER_MEMORY_INFO" xml:space="preserve">
+    <value>How much RAM memory may hold files downloaded from the device ahead of Windows, when copying them to Windows by drag &amp; drop or clipboard.</value>
+    <comment>Tooltip explaining the "Transfer buffer" setting</comment>
+  </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>Link</value>
     <comment>A link to an unknown file type</comment>

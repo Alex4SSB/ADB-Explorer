@@ -4,8 +4,8 @@ using AdvancedSharpAdbClient.Models;
 namespace ADB_Explorer.Services;
 
 /// <summary>
-/// Copies or moves files between two Android devices. Each file is staged in a Windows temp
-/// folder: pulled from the source device, then pushed to the target device.
+/// Copies or moves files between two Android devices. Each file is pulled from the source device
+/// and pushed to the target device at the same time, through a <see cref="SyncPipe"/>.
 /// </summary>
 public class FileTransferOperation : AbstractSyncFileOperation
 {
@@ -37,7 +37,6 @@ public class FileTransferOperation : AbstractSyncFileOperation
         public ByteCounter Push { get; } = new();
     }
 
-    private readonly string _stagingRoot = Path.Combine(Path.GetTempPath(), "ADB Explorer", "Transfer", Guid.NewGuid().ToString("N"));
     private readonly ConcurrentDictionary<string, FileProgress> _progress = new();
 
     private long _lastUiUpdateTicks;
@@ -124,7 +123,6 @@ public class FileTransferOperation : AbstractSyncFileOperation
         try
         {
             TransferStart = DateTime.Now;
-            Directory.CreateDirectory(_stagingRoot);
 
             var folders = FolderHelper.GetBottomMostFolders(Files)
                 .Select(f => FileHelper.ConcatPaths(TargetPath.FullPath, FileHelper.ExtractRelativePath(f.FullPath, FilePath.FullPath, false)));
@@ -187,56 +185,77 @@ public class FileTransferOperation : AbstractSyncFileOperation
         var progress = new FileProgress();
         _progress[item.FullPath] = progress;
 
-        var stagedPath = Path.Combine(_stagingRoot, Guid.NewGuid().ToString("N"));
-
         var targetPath = FilePath.IsDirectory
             ? FileHelper.ConcatPaths(TargetPath, FileHelper.ExtractRelativePath(item.FullPath, FilePath.FullPath))
             : TargetPath.FullPath;
 
         Interlocked.Increment(ref _activeFiles);
+        Log($"pull {item.FullPath} ({Device.Name}) -> push {targetPath} ({TargetDevice!.Name})");
+
+        var pipe = new SyncPipe(item.Size);
+        Exception? pullError = null;
+        Exception? pushError = null;
+
+        // Its own thread, as the push below holds this pool thread for as long as the pull runs
+        var pull = Task.Factory.StartNew(() =>
+        {
+            try
+            {
+                using SyncService source = new(Device.DeviceData);
+                source.Pull(item.FullPath, pipe.Writer, args => ReportProgress(item, progress, true, args), Device.SupportsSyncV2, in _isCanceled);
+
+                // A canceled pull just stops, and ending the pipe normally would commit a truncated file
+                if (_isCanceled)
+                    throw new OperationCanceledException();
+            }
+            catch (Exception e)
+            {
+                pullError = e;
+            }
+            finally
+            {
+                pipe.Complete(pullError);
+            }
+        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
         try
         {
-            using (SyncService source = new(Device.DeviceData))
-            using (var stream = new FileStream(stagedPath, FileMode.Create, FileAccess.Write, FileShare.Read))
-            {
-                Log($"pull {item.FullPath} -> {stagedPath} ({Device.Name})");
-                source.Pull(item.FullPath, stream, args => ReportProgress(item, progress.Pull, true, args), Device.SupportsSyncV2, in _isCanceled);
-            }
+            using SyncService target = new(TargetDevice.DeviceData);
+            var fileMode = UnixFileStatus.AllPermissions | UnixFileStatus.Regular;
+            target.Push(pipe.Reader, targetPath, fileMode, item.DateModified ?? DateTime.Now, args => ReportProgress(item, progress, false, args), TargetDevice.SupportsSyncV2, in _isCanceled);
+        }
+        catch (Exception e)
+        {
+            pushError = e;
+        }
+        finally
+        {
+            // A pull stuck on a full pipe fails instead of waiting for a push that's gone
+            pipe.CloseReader();
+        }
 
-            using (SyncService target = new(TargetDevice!.DeviceData))
-            using (var stream = new FileStream(stagedPath, FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                Log($"push {stagedPath} -> {targetPath} ({TargetDevice.Name})");
+        pull.Wait();
+        Interlocked.Decrement(ref _activeFiles);
 
-                var fileMode = UnixFileStatus.AllPermissions | UnixFileStatus.Regular;
-                target.Push(stream, targetPath, fileMode, item.DateModified ?? DateTime.Now, args => ReportProgress(item, progress.Push, false, args), TargetDevice.SupportsSyncV2, in _isCanceled);
-            }
-
+        if (pullError is null && pushError is null)
+        {
             item.AddUpdates(new AdbSyncProgressInfo(item.FullPath, null, 100, item.Size));
 
             return null;
         }
-        catch (Exception e)
-        {
-            return e;
-        }
-        finally
-        {
-            Interlocked.Decrement(ref _activeFiles);
 
-            try
-            {
-                File.Delete(stagedPath);
-            }
-            catch
-            {
-            }
-        }
+        // A source lost mid-file leaves the bytes pushed so far on some devices (sync v2)
+        if (pullError is not null && pipe.BytesRead > 0)
+            ShellFileOperation.SilentDelete(TargetDevice, targetPath);
+
+        // A failed push fails the pull too (its pipe closes), so the push's error is the one that explains it.
+        // A failed pull reaches the push as an error carrying the pull's message.
+        return pushError ?? pullError;
     }
 
-    private void ReportProgress(SyncFile item, ByteCounter counter, bool isPull, SyncProgressChangedEventArgs args)
+    private void ReportProgress(SyncFile item, FileProgress progress, bool isPull, SyncProgressChangedEventArgs args)
     {
+        var counter = isPull ? progress.Pull : progress.Push;
         var previous = counter.Current;
         var delta = counter.Update(args.ReceivedBytesSize) - previous;
 
@@ -258,7 +277,10 @@ public class FileTransferOperation : AbstractSyncFileOperation
             return;
 
         Interlocked.Exchange(ref _lastUiUpdateTicks, nowTicks);
-        UpdateProgress(item);
+
+        // The pull and the push of a file report at the same time, and its updates list isn't thread safe
+        lock (progress)
+            UpdateProgress(item);
     }
 
     // Both phases count toward progress, so the byte total is twice the size of the files.
@@ -347,14 +369,6 @@ public class FileTransferOperation : AbstractSyncFileOperation
         FilePath.Children.AddRange(faulty.Select(f => f.File));
 
         CleanupArchiveStaging();
-
-        try
-        {
-            Directory.Delete(_stagingRoot, true);
-        }
-        catch
-        {
-        }
     }
 
     private static void Log(string message)

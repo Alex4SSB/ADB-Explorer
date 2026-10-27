@@ -30,6 +30,27 @@ public class SyncFile : FilePath
         }
     }
 
+    /// <summary>Has no path on the file system (a zip member, a file on a phone over MTP, a FileContents stream).</summary>
+    public bool IsVirtual { get; set; }
+
+    /// <summary>Opens a virtual file's content; not set for files on the file system.</summary>
+    public Func<Stream>? OpenContent { get; set; }
+
+    /// <summary>When the source file was last modified, regardless of whether it's kept on the target.</summary>
+    public DateTime? SourceModified => _dateModified ?? UnixTime.FromUnixTime();
+
+    public Stream OpenRead()
+        => OpenContent?.Invoke() ?? new FileStream(FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+    // Virtual trees with no shell folder to list them from (FileContents), by root path, while they're being pushed
+    private static readonly ConcurrentDictionary<string, SyncFile> _virtualRoots = new(StringComparer.OrdinalIgnoreCase);
+
+    public static void RegisterVirtualRoot(SyncFile root) => _virtualRoots[root.FullPath] = root;
+
+    public static void UnregisterVirtualRoot(SyncFile root) => _virtualRoots.TryRemove(root.FullPath, out _);
+
+    public static SyncFile? FindVirtualRoot(string path) => _virtualRoots.GetValueOrDefault(path);
+
     public SyncFile(string androidPath, FileType fileType = FileType.File)
         : base(androidPath, fileType: fileType)
     {
@@ -41,10 +62,29 @@ public class SyncFile : FilePath
     {
         (Size, _dateModified) = FileHelper.GetShellSizeDate(windowsPath, IsDirectory);
 
+        if (!windowsPath.IsFileSystem)
+        {
+            IsVirtual = true;
+            if (!IsDirectory)
+                OpenContent = () => ShellContentStream.Open(ShellItem, FullPath);
+        }
+
         if (includeContent && IsDirectory)
         {
             Children = [.. GetFolderTree((ShellFolder)windowsPath)];
         }
+    }
+
+    /// <summary>A file or folder described by the shell (e.g. in a FileGroupDescriptor) with no path on disk.</summary>
+    public SyncFile(string windowsPath, bool isDirectory, long? size, DateTime? modified, Func<Stream>? openContent)
+        : base(windowsPath, fileType: isDirectory ? FileType.Folder : FileType.File)
+    {
+        PathType = FilePathType.Windows;
+        IsVirtual = true;
+        Size = isDirectory ? null : size;
+        _dateModified = modified;
+        OpenContent = openContent;
+        ProgressUpdates = [new AdbSyncProgressInfo(windowsPath, null, null, null)];
     }
 
     public SyncFile(FileClass fileClass, IEnumerable<FolderTree>? tree = null)
