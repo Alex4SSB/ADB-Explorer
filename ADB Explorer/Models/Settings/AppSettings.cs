@@ -468,12 +468,6 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     #region adb
 
     /// <summary>
-    /// Runs ADB server with mDNS enabled, polling for services is enabled in the connection expander
-    /// </summary>
-    [ObservableProperty]
-    public partial bool EnableMdns { get; set; } = true;
-
-    /// <summary>
     /// <see langword="false"/> - disables polling for both ADB devices and mDNS services. Enables manual refresh button
     /// </summary>
     [ObservableProperty]

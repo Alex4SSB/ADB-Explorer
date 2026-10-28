@@ -148,9 +148,6 @@
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Lỗi ghi tệp</value>
   </data>
-  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>Vô hiệu hóa mDNS</value>
-  </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
     <value>Khởi chạy WSA trong nền</value>
   </data>

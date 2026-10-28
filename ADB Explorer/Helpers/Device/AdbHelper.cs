@@ -65,28 +65,6 @@ public static class AdbHelper
         });
     }
 
-    public static void EnableMdns() => App.SafeInvoke(async () =>
-    {
-        AdbService.IsMdnsEnabled = Data.Settings.EnableMdns;
-        if (Data.Settings.EnableMdns)
-        {
-            Data.MdnsService.Enable();
-        }
-        else if (Data.MdnsService.State is MdnsService.MdnsState.Running)
-        {
-            var result = await DialogService.ShowConfirmation(Strings.Resources.S_DISABLE_MDNS,
-                                                              Strings.Resources.S_DISABLE_MDNS_TITLE,
-                                                              Strings.Resources.S_RESTART_ADB_NOW,
-                                                              cancelText: Strings.Resources.S_RESTART_LATER,
-                                                              icon: DialogService.DialogIcon.Informational);
-
-            if (result.Item1 is Wpf.Ui.Controls.ContentDialogResult.Primary)
-                AdbService.KillAdbServer();
-
-            Data.MdnsService.Disable();
-        }
-    });
-
     public static Task<bool> WriteTextFileAsync(LogicalDeviceViewModel device, FileClass file, string content, CancellationToken cancellationToken = default) =>
         WriteFileWithUiAsync(() => WriteFileAsync(device, file, content, cancellationToken));
 

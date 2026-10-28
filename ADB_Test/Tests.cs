@@ -483,19 +483,10 @@ namespace ADB_Test
         // ── MdnsDeviceViewModel ────────────────────────────────────────────────
 
         [TestMethod]
-        public void MdnsDevice_HiddenWhenMdnsDisabled()
+        public void MdnsDevice_ShownUnlessUserDisabledMdns()
         {
-            Data.Settings.EnableMdns = false;
             var vm = new MdnsDeviceViewModel(new MdnsDevice());
-            Assert.IsFalse(Eval(vm));
-        }
-
-        [TestMethod]
-        public void MdnsDevice_ShownWhenMdnsEnabled()
-        {
-            Data.Settings.EnableMdns = true;
-            var vm = new MdnsDeviceViewModel(new MdnsDevice());
-            Assert.IsTrue(Eval(vm));
+            Assert.AreEqual(!AdbService.IsMdnsDisabledByUser, Eval(vm));
         }
 
         // ── LogicalDeviceViewModel — open device always shown ─────────────────

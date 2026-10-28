@@ -222,12 +222,6 @@
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Erreur d'écriture du fichier</value>
   </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>Le serveur ADB doit être redémarré pour désactiver mDNS.</value>
-  </data>
-  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>Désactiver mDNS</value>
-  </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
     <value>Exécuter WSA en arrière-plan</value>
   </data>
@@ -316,12 +310,6 @@ Malheureusement, nous ne pouvons pas inclure ADB dans l’application en raison 
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
     <value>Aide sur ADB</value>
   </data>
-  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>Redémarrer ADB maintenant</value>
-  </data>
-  <data name="S_RESTART_LATER" xml:space="preserve">
-    <value>Redémarrer plus tard</value>
-  </data>
   <data name="S_ITEM_DESTINATION" xml:space="preserve">
     <value>Sélectionnez la destination pour {0}</value>
   </data>
@@ -399,9 +387,6 @@ Le contenu visible peut être incomplet.</value>
   </data>
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
     <value>Vider</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>Sondage en cours pour appareils</value>

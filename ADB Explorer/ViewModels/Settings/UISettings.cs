@@ -163,7 +163,6 @@ public static class UISettings
         [
             new SettingsGroup("ADB",
             [
-                new BoolSetting(() => Settings.EnableMdns, Strings.Resources.S_SETTINGS_ENABLE_MDNS, icon: new("\uED14")),
                 new BoolSetting(() => Settings.PollDevices, Strings.Resources.S_SETTINGS_POLL_DEVICES, icon: new("\uEBDE")),
                 new BoolSetting(() => Settings.PollBattery, Strings.Resources.S_SETTINGS_POLL_BATTERY, icon: new("\uEE63")),
                 new BoolSetting(() => Settings.KillAdbOnExit, Strings.Resources.S_SETTINGS_KILL_ADB_ON_EXIT, icon: new("\uF71D")),

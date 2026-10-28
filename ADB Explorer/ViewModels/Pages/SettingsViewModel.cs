@@ -74,10 +74,6 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
             {
                 AdbThemeService.SetAccent(Data.Settings.AccentColor);
             }
-            else if (e.PropertyName is nameof(AppSettings.EnableMdns))
-            {
-                AdbHelper.EnableMdns();
-            }
         };
 
         PropertyChanged += (_, e) =>

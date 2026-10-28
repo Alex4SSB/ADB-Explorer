@@ -185,8 +185,6 @@ public partial class MainWindow : INavigationWindow
         AdbThemeService.SetTheme(Data.Settings.Theme, this);
         AdbThemeService.SetAccent(Data.Settings.UseCustomAccent ? Data.Settings.AccentColor : null);
 
-        AdbService.IsMdnsEnabled = Data.Settings.EnableMdns;
-
         AttachAdbStateHandler();
 
         if (!await AdbHelper.CheckAdbVersion())
@@ -225,7 +223,7 @@ public partial class MainWindow : INavigationWindow
         Data.DevicesObject = new();
         Data.RaiseDevicesObjectCreated();
 
-        if (Data.Settings.EnableMdns)
+        if (!AdbService.IsMdnsDisabledByUser)
             Data.MdnsService.Enable();
 
         Data.RuntimeSettings.DefaultBrowserPath = Network.GetDefaultBrowser();

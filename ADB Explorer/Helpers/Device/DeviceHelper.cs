@@ -59,7 +59,7 @@ public static partial class DeviceHelper
             return false;
         // The mDNS device cannot hide itself when in a listview
         if (device is MdnsDeviceViewModel)
-            return Data.Settings.EnableMdns;
+            return !AdbService.IsMdnsDisabledByUser;
 
         // current device cannot be hidden
         if (device is LogicalDeviceViewModel { IsOpen: true })

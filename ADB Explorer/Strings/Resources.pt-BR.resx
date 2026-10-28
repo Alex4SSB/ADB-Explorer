@@ -222,12 +222,6 @@
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Erro ao gravar o arquivo</value>
   </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>O servidor do ADB precisa ser reinicializado para desativar o mDNS.</value>
-  </data>
-  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>Desativar mDNS</value>
-  </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
     <value>Iniciar WSA em segundo plano</value>
   </data>
@@ -323,12 +317,6 @@ Infelizmento, nós não podemos te providenciar o ADB junto com o app, por conta
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
     <value>Ajuda com o ADB</value>
   </data>
-  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>Reiniciar o ADB Agora</value>
-  </data>
-  <data name="S_RESTART_LATER" xml:space="preserve">
-    <value>Reiniciar Mais Tarde</value>
-  </data>
   <data name="S_ITEM_DESTINATION" xml:space="preserve">
     <value>Selecione o destino para o {0}</value>
   </data>
@@ -406,9 +394,6 @@ O conteúdo visível pode estar incompleto.</value>
   </data>
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
     <value>Limpar</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>Consultando os Dispositivos</value>

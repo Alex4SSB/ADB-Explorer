@@ -222,12 +222,6 @@
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>寫入檔案時出錯</value>
   </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>需要重啓 ADB 服務以停用 mDNS。</value>
-  </data>
-  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>停用 mDNS</value>
-  </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
     <value>在背景啓動 WSA</value>
   </data>
@@ -327,12 +321,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
     <value>ADB 說明</value>
   </data>
-  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>立即重新啓動 ADB</value>
-  </data>
-  <data name="S_RESTART_LATER" xml:space="preserve">
-    <value>稍後重新啓動</value>
-  </data>
   <data name="S_ITEM_DESTINATION" xml:space="preserve">
     <value>為 {0} 選擇目標資料夾</value>
   </data>
@@ -410,9 +398,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
     <value>清空</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>對各裝置輪詢</value>

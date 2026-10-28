@@ -222,12 +222,6 @@
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Помилка запису файла</value>
   </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>Щоб вимкнути mDNS, потрібно перезапустити сервер ADB.</value>
-  </data>
-  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>Вимкнути mDNS</value>
-  </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
     <value>Запустити WSA у фоні</value>
   </data>
@@ -323,12 +317,6 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
     <value>Допомога з ADB</value>
   </data>
-  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>Перезапустити ADB Зараз</value>
-  </data>
-  <data name="S_RESTART_LATER" xml:space="preserve">
-    <value>Перезапустити пізніше</value>
-  </data>
   <data name="S_ITEM_DESTINATION" xml:space="preserve">
     <value>Виберіть призначення для {0}</value>
   </data>
@@ -406,9 +394,6 @@ ADB доступний як частина Android SDK Platform Tools.
   </data>
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
     <value>Очистити</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>Запит від пристроїв</value>

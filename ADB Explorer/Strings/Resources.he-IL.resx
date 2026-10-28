@@ -222,12 +222,6 @@
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>שגיאה בכתיבת קובץ</value>
   </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>כיבוי ה-mDNS דורש הפעלה מחדש של שרת ה-ADB.</value>
-  </data>
-  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>כבה שרת mDNS</value>
-  </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
     <value>התחל את WSA ברקע</value>
   </data>
@@ -332,12 +326,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
     <value>עזרה לגבי ADB</value>
   </data>
-  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>הפעל את ADB מחדש עכשיו</value>
-  </data>
-  <data name="S_RESTART_LATER" xml:space="preserve">
-    <value>הפעל מחדש אח"כ</value>
-  </data>
   <data name="S_ITEM_DESTINATION" xml:space="preserve">
     <value>בחר יעד עבור {0}</value>
   </data>
@@ -430,9 +418,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
     <value>נקה</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>סריקה אחר מכשירים</value>

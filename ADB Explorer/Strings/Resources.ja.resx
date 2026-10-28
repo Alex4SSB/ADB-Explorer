@@ -222,12 +222,6 @@
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>ファイルの書き込みエラー</value>
   </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>mDNS を無効にするには、ADB サーバーを再起動する必要があります。</value>
-  </data>
-  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>mDNSを無効にする</value>
-  </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
     <value>WSAをバックグラウンドで起動</value>
   </data>
@@ -303,12 +297,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   </data>
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
     <value>ADBのヘルプ</value>
-  </data>
-  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>今すぐADBを再起動</value>
-  </data>
-  <data name="S_RESTART_LATER" xml:space="preserve">
-    <value>後で再起動</value>
   </data>
   <data name="S_ITEM_DESTINATION" xml:space="preserve">
     <value>{0} の宛先を選択</value>
@@ -387,9 +375,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   </data>
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
     <value>クリア</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>mDNSを有効にする</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>デバイスのポーリング</value>

@@ -72,7 +72,7 @@ public partial class DevicesViewModel : ObservableObject, INavigationAware
         };
         Data.Settings.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName is nameof(AppSettings.EnableMdns) or nameof(AppSettings.EnableEmulatorDiscovery))
+            if (e.PropertyName is nameof(AppSettings.EnableEmulatorDiscovery))
                 RefreshViewsOnUi();
         };
 

@@ -222,12 +222,6 @@
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Fehler beim Schreiben der Datei</value>
   </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>Der ADB-Server muss neu gestartet werden, um mDNS zu deaktivieren.</value>
-  </data>
-  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>mDNS deaktivieren</value>
-  </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
     <value>WSA im Hintergrund starten</value>
   </data>
@@ -316,12 +310,6 @@ Leider können wir ADB mit der App aufgrund von Lizenzbeschränkungen nicht bere
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
     <value>Hilfe über ADB</value>
   </data>
-  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>Jetzt ADB neu starten</value>
-  </data>
-  <data name="S_RESTART_LATER" xml:space="preserve">
-    <value>Später neustarten</value>
-  </data>
   <data name="S_ITEM_DESTINATION" xml:space="preserve">
     <value>Ziel für {0} auswählen</value>
   </data>
@@ -399,9 +387,6 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
   </data>
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
     <value>Löschen</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>Abfragung von Geräten</value>

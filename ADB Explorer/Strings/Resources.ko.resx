@@ -222,12 +222,6 @@
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>파일 쓰기 오류</value>
   </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>mDNS를 비활성화하려면 ADB 서버를 다시 시작해야 합니다.</value>
-  </data>
-  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>mDNS 비활성화</value>
-  </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
     <value>백그라운드에서 WSA 실행</value>
   </data>
@@ -303,12 +297,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   </data>
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
     <value>ADB 도움말</value>
-  </data>
-  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>지금 ADB 다시 시작</value>
-  </data>
-  <data name="S_RESTART_LATER" xml:space="preserve">
-    <value>나중에 다시 시작</value>
   </data>
   <data name="S_ITEM_DESTINATION" xml:space="preserve">
     <value>{0}의 대상 선택</value>
@@ -387,9 +375,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   </data>
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
     <value>지우기</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>장치 폴링</value>

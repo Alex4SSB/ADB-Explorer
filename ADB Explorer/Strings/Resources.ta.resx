@@ -222,12 +222,6 @@
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>கோப்பு எழுதுவதில் பிழை</value>
   </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>mDNS ஐ முடக்க, ADB சேவையகத்தை மறுதொடக்கம் செய்ய வேண்டும்.</value>
-  </data>
-  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>mDNS ஐ முடக்கு</value>
-  </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
     <value>பின்னணியில் WSA ஐ இயக்கவும்</value>
   </data>
@@ -323,12 +317,6 @@ SDK இயங்குதளக் கருவிகளைப் பதிவ�
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
     <value>ADB இல் உதவி</value>
   </data>
-  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>இப்போது ADB ஐ மீண்டும் தொடங்கவும்</value>
-  </data>
-  <data name="S_RESTART_LATER" xml:space="preserve">
-    <value>பின்னர் மறுதொடக்கம் செய்யுங்கள்</value>
-  </data>
   <data name="S_ITEM_DESTINATION" xml:space="preserve">
     <value>{0}க்கான இலக்கைத் தேர்ந்தெடுக்கவும்</value>
   </data>
@@ -406,9 +394,6 @@ SDK இயங்குதளக் கருவிகளைப் பதிவ�
   </data>
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
     <value>தெளிவு</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>சாதனங்களுக்கான வாக்கெடுப்பு</value>

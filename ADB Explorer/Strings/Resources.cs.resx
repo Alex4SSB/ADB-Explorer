@@ -222,12 +222,6 @@
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Chyba zápisu souboru</value>
   </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>Je třeba restartovat server ADB, aby se deaktivovala služba mDNS.</value>
-  </data>
-  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>Zakázat mDNS</value>
-  </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
     <value>Spustit WSA v pozadí</value>
   </data>
@@ -327,12 +321,6 @@ Z licenčních důvodů bohužel nemůžeme ADB přibalit k aplikaci.</value>
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
     <value>Pomoc pro ADB</value>
   </data>
-  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>Restartovat ADB nyní</value>
-  </data>
-  <data name="S_RESTART_LATER" xml:space="preserve">
-    <value>Restartovat později</value>
-  </data>
   <data name="S_ITEM_DESTINATION" xml:space="preserve">
     <value>Zvolte cíl pro {0}</value>
   </data>
@@ -412,9 +400,6 @@ Zobrazený obsah nemusí být úplný.</value>
   </data>
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
     <value>Vyčistit</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>Pravidelně zjišťovat zařízení</value>

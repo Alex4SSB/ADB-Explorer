@@ -222,12 +222,6 @@
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Fel vid skrivning av fil</value>
   </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>ADB-servern måste startas om för att inaktivera mDNS.</value>
-  </data>
-  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>Inaktivera mDNS</value>
-  </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
     <value>Starta WSA i bakgrunden</value>
   </data>
@@ -303,12 +297,6 @@ Vi kan tyvärr inte distribuera ADB med appen på grund av licensbegränsningar.
   </data>
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
     <value>Hjälp om ADB</value>
-  </data>
-  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>Starta om ADB nu</value>
-  </data>
-  <data name="S_RESTART_LATER" xml:space="preserve">
-    <value>Starta om senare</value>
   </data>
   <data name="S_ITEM_DESTINATION" xml:space="preserve">
     <value>Välj mål för {0}</value>
@@ -387,9 +375,6 @@ Synligt innehåll kan vara ofullständigt.</value>
   </data>
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
     <value>Rensa</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>Avsöker enheter</value>

@@ -222,12 +222,6 @@
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>خطأ في كتابة الملف</value>
   </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>خادم ADB يحتاج لاعاده التشغيل لتعطيل mDNS.</value>
-  </data>
-  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>تعطيل mDNS</value>
-  </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
     <value>بدء WSA في الخلفية</value>
   </data>
@@ -293,10 +287,6 @@
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
     <value>Clear</value>
     <comment>The tooltip of a button used to clear a textbox</comment>
-  </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>mDNS</value>
-    <comment>The setting used to toggle mDNS enabled state</comment>
   </data>
   <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
     <value>Light</value>

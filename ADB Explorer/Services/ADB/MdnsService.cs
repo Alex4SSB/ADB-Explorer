@@ -81,12 +81,6 @@ public class MdnsService : ObservableObject
         Check();
     }
 
-    public void Disable()
-    {
-        QrClass = null;
-        State = MdnsState.Disabled;
-    }
-
     public void Restart()
     {
         AdbService.KillAdbServer();
@@ -103,13 +97,12 @@ public class MdnsService : ObservableObject
         {
             MdnsState newState = ProbeMdnsState();
 
-            // Settings want mDNS, but the server was started without it (or with a backend that failed).
+            // The server was started without mDNS (e.g. by another tool) or its backend failed.
             // Restart ADB once so the next server inherits ADB_MDNS_OPENSCREEN, instead of showing "down".
-            if (newState is MdnsState.NotRunning && Data.Settings.EnableMdns)
+            if (newState is MdnsState.NotRunning && !AdbService.IsMdnsDisabledByUser)
             {
                 try
                 {
-                    AdbService.IsMdnsEnabled = true;
                     AdbService.KillAdbServer(restart: true);
                     newState = ProbeMdnsState();
                 }

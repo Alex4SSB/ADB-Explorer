@@ -222,12 +222,6 @@
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Błąd przy zapisywaniu pliku</value>
   </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>Serwer ADB musi zostać uruchomiony ponownie, żeby wyłączyć mDNS.</value>
-  </data>
-  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>Wyłącz mDNS</value>
-  </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
     <value>Uruchom WSA w tle</value>
   </data>
@@ -323,12 +317,6 @@ Niestety, ze względu na ograniczenia licencyjne nie możemy udostępnić ADB wr
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
     <value>Pomoc dotycząca ADB</value>
   </data>
-  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>Zrestartuj ADB teraz</value>
-  </data>
-  <data name="S_RESTART_LATER" xml:space="preserve">
-    <value>Zrestartuj później</value>
-  </data>
   <data name="S_ITEM_DESTINATION" xml:space="preserve">
     <value>Wybierz miejsce docelowe dla {0}</value>
   </data>
@@ -406,9 +394,6 @@ Widoczna zawartość może być niekompletna.</value>
   </data>
   <data name="S_BUTTON_CLEAR" xml:space="preserve">
     <value>Wyczyść</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>Statystyki dla urządzeń</value>

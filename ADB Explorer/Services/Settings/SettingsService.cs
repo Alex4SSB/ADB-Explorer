@@ -39,11 +39,6 @@ public class SettingsService
             Data.Settings = JsonSerializer.Deserialize<AppSettings>(json, _options) ?? new AppSettings();
         }
 
-        // Set the mDNS flag before starting the vault load: that load may re-evaluate ADB on a background
-        // thread (running "adb version", which can start the ADB server). Assigning it first ensures the
-        // Task.Run happens-before edge makes the correct value visible, so a server we start carries mDNS.
-        AdbService.IsMdnsEnabled = Data.Settings.EnableMdns;
-
         // Load vault-backed settings off the UI thread; a slow/unresponsive vault must not block startup.
         _ = Data.Settings.LoadVaultSettingsAsync();
     }

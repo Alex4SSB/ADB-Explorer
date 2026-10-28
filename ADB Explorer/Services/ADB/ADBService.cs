@@ -10,9 +10,11 @@ namespace ADB_Explorer.Services;
 public partial class AdbService
 {
     private const string GET_DEVICES = "devices";
-    private const string ENABLE_MDNS = "ADB_MDNS_OPENSCREEN";
+    private const string MDNS_OPENSCREEN = "ADB_MDNS_OPENSCREEN";
+    private const string MDNS = "ADB_MDNS";
 
-    public static bool IsMdnsEnabled { get; set; }
+    /// <summary>The user opted out of adb's mDNS discovery by setting <c>ADB_MDNS=0</c> in their environment.</summary>
+    public static bool IsMdnsDisabledByUser { get; } = Environment.GetEnvironmentVariable(MDNS) == "0";
 
     private static int _activeCommandCount = 0;
     public static bool IsCommandActive => _activeCommandCount > 0;
@@ -69,8 +71,10 @@ public partial class AdbService
             cmdProcess.StartInfo.StandardOutputEncoding = encoding;
         }
 
-        if (IsMdnsEnabled)
-            cmdProcess.StartInfo.EnvironmentVariables[ENABLE_MDNS] = "1";
+        // ADB before 35.0.2 runs mDNS only with Openscreen forced; newer versions ignore it.
+        // Respect a value the user already set (e.g. 0 to select Bonjour).
+        if (!cmdProcess.StartInfo.EnvironmentVariables.ContainsKey(MDNS_OPENSCREEN))
+            cmdProcess.StartInfo.EnvironmentVariables[MDNS_OPENSCREEN] = "1";
 
         cmdProcess.Start();
 

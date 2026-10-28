@@ -185,10 +185,6 @@
     <value>Clear</value>
     <comment>The tooltip of a button used to clear a textbox</comment>
   </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>mDNS</value>
-    <comment>The setting used to toggle mDNS enabled state</comment>
-  </data>
   <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
     <value>Light</value>
     <comment>The setting used to force light theme in the app</comment>

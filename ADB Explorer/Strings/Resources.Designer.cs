@@ -1390,24 +1390,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ADB server needs to be restarted in order to disable mDNS..
-        /// </summary>
-        public static string S_DISABLE_MDNS {
-            get {
-                return ResourceManager.GetString("S_DISABLE_MDNS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Disable mDNS.
-        /// </summary>
-        public static string S_DISABLE_MDNS_TITLE {
-            get {
-                return ResourceManager.GetString("S_DISABLE_MDNS_TITLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Disabled.
         /// </summary>
         public static string S_DISABLED {
@@ -3518,29 +3500,11 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Restart ADB Now.
-        /// </summary>
-        public static string S_RESTART_ADB_NOW {
-            get {
-                return ResourceManager.GetString("S_RESTART_ADB_NOW", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Restart app for changes to take effect.
         /// </summary>
         public static string S_RESTART_APP {
             get {
                 return ResourceManager.GetString("S_RESTART_APP", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Restart Later.
-        /// </summary>
-        public static string S_RESTART_LATER {
-            get {
-                return ResourceManager.GetString("S_RESTART_LATER", resourceCulture);
             }
         }
         
@@ -4008,15 +3972,6 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_EMULATOR_DISCOVERY {
             get {
                 return ResourceManager.GetString("S_SETTINGS_EMULATOR_DISCOVERY", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to mDNS.
-        /// </summary>
-        public static string S_SETTINGS_ENABLE_MDNS {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_ENABLE_MDNS", resourceCulture);
             }
         }
         
