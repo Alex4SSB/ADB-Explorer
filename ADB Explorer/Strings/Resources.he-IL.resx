@@ -1815,4 +1815,10 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
     <value>פעמים</value>
   </data>
+  <data name="S_SETTINGS_TRANSFER_MEMORY" xml:space="preserve">
+    <value>באפר העברות</value>
+  </data>
+  <data name="S_SETTINGS_TRANSFER_MEMORY_INFO" xml:space="preserve">
+    <value>כמה זיכרון RAM יכול להכיל הורדות קבצים מהטלפון עבור וינדוס, כאשר הקבצים מועתקים לוינדוס ע"י גרירה או העתק-הדבק.</value>
+  </data>
 </root>
