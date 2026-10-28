@@ -2019,10 +2019,4 @@ Kontroly se snaží zabránit tomu, aby nic netušící uživatel spustil potenc
   <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
     <value>krát</value>
   </data>
-  <data name="S_SETTINGS_TRANSFER_MEMORY" xml:space="preserve">
-    <value>Vyrovnávací paměť přenosu</value>
-  </data>
-  <data name="S_SETTINGS_TRANSFER_MEMORY_INFO" xml:space="preserve">
-    <value>Kolik paměti RAM lze využít k předběžnému ukládání souborů stahovaných ze zařízení při jejich kopírování do Windows přetažením nebo přes schránku.</value>
-  </data>
 </root>

@@ -1805,7 +1805,4 @@ Kontrollerna försöker hindra en ovetande användare från att starta en möjli
   <data name="S_DUPLICATE_TAB" xml:space="preserve">
     <value>Duplicera flik</value>
   </data>
-  <data name="S_SETTINGS_TRANSFER_MEMORY" xml:space="preserve">
-    <value>Överföringsbuffert</value>
-  </data>
 </root>

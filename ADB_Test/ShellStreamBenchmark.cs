@@ -23,7 +23,7 @@ using ComDataObject = System.Runtime.InteropServices.ComTypes.IDataObject;
 namespace ADB_Test;
 
 /// <summary>
-/// Timings of a device folder pulled to Windows: streamed to the shell, with and without read-ahead memory,
+/// Timings of a device folder pulled to Windows: streamed to the shell, with and without read-ahead (spilled to disk),
 /// and 7-Zip's way (pulled in parallel to temp, then moved). Opt in with ADB_EXPLORER_BENCH=1, and
 /// ADB_EXPLORER_BENCH_DRIVE=F:\ for a destination on another drive. Run: dotnet test --filter ShellStream_Benchmark
 /// </summary>
@@ -32,7 +32,6 @@ public partial class ShellStreamTests
     private const string BenchRoot = "/sdcard/adb-explorer-bench";
     private const int SmallFileCount = 1500;
     private const int LargeFileCount = 3;
-    private const int ReadAheadMB = 1024;
 
     private record BenchResult(string Dataset, string Lanes, string Method, double Seconds, long Bytes, long PeakPrivateMB);
 
@@ -79,11 +78,11 @@ public partial class ShellStreamTests
                 {
                     List<(string Method, Func<double> Run)> methods = [];
 
-                    // As before: each file through its own small buffer, 4 files ahead, over one connection
+                    // As before: 4 files ahead, over one connection
                     if (lanes == "USB")
-                        methods.Add(("Stream, 4 ahead, no memory", () => Stream(device, usb.Serial, dataset.Folder, localC, dataset.Count, 0, 5)));
+                        methods.Add(("Stream, 4 ahead", () => Stream(device, usb.Serial, dataset.Folder, localC, dataset.Count, 5)));
 
-                    methods.Add(($"Stream, {ReadAheadMB} MB read-ahead", () => Stream(device, usb.Serial, dataset.Folder, localC, dataset.Count, ReadAheadMB, null)));
+                    methods.Add(("Stream, read-ahead", () => Stream(device, usb.Serial, dataset.Folder, localC, dataset.Count, null)));
                     methods.Add(("Pull to temp + move (same drive)", () => PullThenMove(device, usb.Serial, dataset.Folder, localC, localC)));
                     if (localOther is not null)
                         methods.Add(("Pull to temp + copy (other drive)", () => PullThenMove(device, usb.Serial, dataset.Folder, localC, localOther)));
@@ -108,7 +107,6 @@ public partial class ShellStreamTests
         }
         finally
         {
-            Data.Settings.TransferMemoryMB = AppSettings.TransferMemoryMBDefault;
             Shell(usb, $"rm -rf {BenchRoot}");
 
             foreach (var dir in new[] { localC, localOther }.OfType<string>().Where(Directory.Exists))
@@ -294,10 +292,8 @@ public partial class ShellStreamTests
         return seconds;
     }
 
-    private static double Stream(LogicalDeviceViewModel device, string serial, string remoteFolder, string localParent, int count, int readAheadMB, int? maxThreads)
+    private static double Stream(LogicalDeviceViewModel device, string serial, string remoteFolder, string localParent, int count, int? maxThreads)
     {
-        Data.Settings.TransferMemoryMB = readAheadMB;
-
         var (folderClass, tree, items) = BenchTree(serial, remoteFolder);
         List<FileClass.ShellPullItem> pullItems =
             [new(folderClass, new SyncFile(folderClass, tree), [.. items.Where(i => !i.IsFolder).Select(i => i.Name)], null, null, null)];
@@ -331,7 +327,6 @@ public partial class ShellStreamTests
 
         Assert.AreEqual(FileOperation.OperationStatus.Completed, op.Status);
         Assert.IsEmpty(op.FailedFiles);
-        Assert.AreEqual(0, TransferMemory.Reserved, "All read-ahead memory went back");
 
         return sw.Elapsed.TotalSeconds;
     }

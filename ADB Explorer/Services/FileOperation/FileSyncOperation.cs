@@ -32,9 +32,18 @@ public class FileSyncOperation : AbstractSyncFileOperation
     private Mutex _progressMutex = null!;
 
     // Shell streaming: a pull per file the shell reads, keyed by device path
-    private sealed class ShellPull(SyncPipe pipe)
+    private sealed class ShellPull(SyncPipe pipe, long? size, TransferLane lane, long claimed)
     {
         public SyncPipe Pipe { get; } = pipe;
+
+        public long? Size { get; } = size;
+
+        // Claimed as the pull is created, so the next one picked sees the lane busy
+        public TransferLane Lane { get; } = lane;
+
+        public long Claimed { get; } = claimed;
+
+        public volatile bool IsPulling = true;
 
         public Task Task { get; set; } = Task.CompletedTask;
     }
@@ -876,8 +885,13 @@ public class FileSyncOperation : AbstractSyncFileOperation
 
     /// <summary>
     /// Starts pulls of the files the shell reads next, in its order, as many at once as the op syncs.
-    /// They fill <see cref="TransferMemory"/> ahead of it, so it finds them buffered.
+    /// What they pull ahead of it is spilled to disk, so it finds them buffered.
     /// </summary>
+    /// <remarks>
+    /// Each lane keeps a few files pulling. Others start only if they fit whole in a pipe's own memory (small files),
+    /// as spilling them all would only move the files' order onto the disk.
+    /// As with a regular pull, the lane that takes the largest files starts the largest one first, wherever the shell reads it.
+    /// </remarks>
     private void PumpShellPulls()
     {
         if (Status is not OperationStatus.InProgress)
@@ -886,16 +900,58 @@ public class FileSyncOperation : AbstractSyncFileOperation
         var limit = MaxThreads ?? Data.Settings.MaxSimultaneousOps;
         lock (_shellPulls)
         {
+            var lanes = (_shellLanes ??= GetTransferLanes(limit)).Count;
+            StartLargestShellPull();
+
+            var unread = _shellPulls.Values.Count(p => !p.Pipe.Drained.IsCompleted);
+
             while (_shellActive < limit && _shellNext < _shellOrder.Count)
             {
-                var next = _shellOrder[_shellNext++];
-                GetShellPull(next, _shellFiles.GetValueOrDefault(next)?.Size, startOver: false);
+                var next = _shellOrder[_shellNext];
+                if (_shellPulls.ContainsKey(next))
+                {
+                    // Started out of order, as the largest
+                    _shellNext++;
+                    continue;
+                }
+
+                var size = _shellFiles.GetValueOrDefault(next)?.Size;
+                var keepsLaneBusy = unread < lanes || (_shellActive < lanes * ShellPullsPerLane && SyncPipe.HasSpillRoom(size ?? 0));
+                if (!keepsLaneBusy && size is not <= SyncPipe.Capacity)
+                    break;
+
+                _shellNext++;
+                GetShellPull(next, size, startOver: false);
+                unread++;
             }
         }
     }
 
+    /// <summary>Starts the largest file not started yet on the idle lane that takes the largest files, if it can spill it.</summary>
+    private void StartLargestShellPull()
+    {
+        if (_shellLanes is not { Count: > 1 } lanes
+            || lanes.FirstOrDefault(l => l.TakesLargest && !l.IsRetired && PullsOn(l) == 0) is not { } lane)
+        {
+            return;
+        }
+
+        string? largest = null;
+        long largestSize = 0;
+        for (var i = _shellNext; i < _shellOrder.Count; i++)
+        {
+            var path = _shellOrder[i];
+            if (!_shellPulls.ContainsKey(path) && _shellFiles.GetValueOrDefault(path)?.Size is { } size && size > largestSize)
+                (largest, largestSize) = (path, size);
+        }
+
+        if (largest is not null && SyncPipe.HasSpillRoom(largestSize))
+            GetShellPull(largest, largestSize, startOver: false, lane);
+    }
+
     /// <param name="startOver">A file the shell already read from (or gave up on, or that failed unread) is pulled again.</param>
-    private ShellPull GetShellPull(string devicePath, long? size, bool startOver)
+    /// <param name="lane">The lane to pull it over, rather than the one picked for it.</param>
+    private ShellPull GetShellPull(string devicePath, long? size, bool startOver, TransferLane? lane = null)
     {
         lock (_shellPulls)
         {
@@ -907,16 +963,34 @@ public class FileSyncOperation : AbstractSyncFileOperation
 
             current?.Pipe.CloseReader();
 
-            var pull = new ShellPull(new SyncPipe(size, canBorrow: true));
+            var claimed = _shellFiles.GetValueOrDefault(devicePath)?.Size ?? 0;
+            lane ??= PickShellLane(claimed);
+            lane.Claim(claimed);
+
+            var pull = new ShellPull(new SyncPipe(size, canSpill: true), size, lane, claimed);
             _shellActive++;
             pull.Task = Task.Factory.StartNew(() => PullToShell(devicePath, pull), CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             _shellPulls[devicePath] = pull;
 
-            // A file is done once the shell has read it all, not once it's all buffered
-            pull.Pipe.Drained.ContinueWith(_ => OnShellFileDone(devicePath, pull), TaskScheduler.Default);
+            // A file is done once the shell has read it all, not once it's all buffered,
+            // and the memory it was counted for may let the next files start
+            pull.Pipe.Drained.ContinueWith(_ =>
+            {
+                OnShellFileDone(devicePath, pull);
+                PumpShellPulls();
+            }, TaskScheduler.Default);
 
             return pull;
         }
+    }
+
+    // A single adb sync connection doesn't fill a lane; a few at once do
+    private const int ShellPullsPerLane = 3;
+
+    private int PullsOn(TransferLane lane)
+    {
+        lock (_shellPulls)
+            return _shellPulls.Values.Count(p => p.IsPulling && p.Lane == lane);
     }
 
     /// <summary>The lane that would finish a file of <paramref name="size"/> first.</summary>
@@ -933,6 +1007,12 @@ public class FileSyncOperation : AbstractSyncFileOperation
         if (active.Count == 0)
             active = lanes;
 
+        // A lane with room for another pull first: sharing a full one slows the file the shell may be waiting for,
+        // however fast that lane seems. Of those, the lane not kept for the largest files
+        var open = active.Where(l => PullsOn(l) < ShellPullsPerLane).ToList();
+        if (open.Count > 0)
+            active = open.Any(l => !l.TakesLargest) ? [.. open.Where(l => !l.TakesLargest)] : open;
+
         return active.MinBy(l => (l.InFlightBytes + size) / l.Rate())!;
     }
 
@@ -942,12 +1022,10 @@ public class FileSyncOperation : AbstractSyncFileOperation
         bool IsTracked() => Status is OperationStatus.InProgress && _shellFiles.ContainsKey(devicePath);
 
         var item = _shellFiles.GetValueOrDefault(devicePath);
-        var claimed = item?.Size ?? 0;
-        var lane = PickShellLane(claimed);
+        var claimed = pull.Claimed;
+        var lane = pull.Lane;
         long reported = 0;
         Exception? error = null;
-
-        lane.Claim(claimed);
 
         try
         {
@@ -988,6 +1066,7 @@ public class FileSyncOperation : AbstractSyncFileOperation
         finally
         {
             pull.Pipe.Complete(error);
+            pull.IsPulling = false;
             lane.Done(Math.Max(0, claimed - reported));
 
             lock (_shellPulls)

@@ -152,57 +152,46 @@ public class StreamingTransferTests
     private static nint OpenStream(SyncPipe pipe) => new DevicePullStream(pipe, 4).ToComPointer();
 
     [TestMethod]
-    public void SyncPipe_BorrowsMemoryAheadOfReaderAndReturnsIt()
+    public void SyncPipe_SpillsPastItsCapacityInOrder()
     {
-        Data.Settings.TransferMemoryMB = 8;
+        var spillsBefore = SpillFiles();
+        var data = new byte[6 * 1024 * 1024 + 13];
+        Random.Shared.NextBytes(data);
+        var half = data.Length / 2;
 
-        try
-        {
-            var data = new byte[3 * 1024 * 1024 + 7];
-            Random.Shared.NextBytes(data);
+        // Past its own memory the writer goes on to disk instead of waiting
+        var pipe = new SyncPipe(data.Length, canSpill: true);
+        Assert.IsTrue(Task.Run(() => pipe.Write(data.AsSpan(0, half))).Wait(2000), "The writer shouldn't wait for the reader");
+        Assert.HasCount(spillsBefore.Count + 1, SpillFiles());
 
-            // All of it fits in the pipe's own buffer plus borrowed memory, so the writer never waits
-            var pipe = new SyncPipe(data.Length, canBorrow: true);
-            Assert.IsTrue(Task.Run(() => pipe.Write(data)).Wait(2000), "The writer shouldn't wait for the reader");
-            pipe.Complete();
-            Assert.IsGreaterThan(0L, TransferMemory.Reserved);
+        // Read part way (through the memory into the spill), then the rest written: it all comes back in order
+        var read = new byte[data.Length];
+        var first = pipe.Read(read.AsSpan(0, 2 * 1024 * 1024));
+        Assert.IsTrue(Task.Run(() => pipe.Write(data.AsSpan(half))).Wait(2000));
+        pipe.Complete();
 
-            var read = new byte[data.Length];
-            Assert.AreEqual(data.Length, pipe.Read(read));
-            Assert.AreEqual(0, pipe.Read(read));
-            CollectionAssert.AreEqual(data, read);
-            Assert.AreEqual(0, TransferMemory.Reserved, "Read memory goes back to the budget");
-            Assert.IsTrue(pipe.Drained.IsCompleted);
-        }
-        finally
-        {
-            Data.Settings.TransferMemoryMB = AppSettings.TransferMemoryMBDefault;
-        }
+        Assert.AreEqual(data.Length - first, pipe.Read(read.AsSpan(first)));
+        Assert.AreEqual(0, pipe.Read(read));
+        CollectionAssert.AreEqual(data, read);
+        Assert.IsTrue(pipe.Drained.IsCompleted);
+        CollectionAssert.AreEquivalent(spillsBefore, SpillFiles(), "Read to the end, the spill file is deleted");
     }
 
     [TestMethod]
-    public void SyncPipe_BorrowsNoMoreThanTheBudget()
+    public void SyncPipe_ClosedReaderDeletesTheSpill()
     {
-        Data.Settings.TransferMemoryMB = 1;
+        var spillsBefore = SpillFiles();
 
-        try
-        {
-            var pipe = new SyncPipe(10 * 1024 * 1024, canBorrow: true);
-            var writer = Task.Run(() => pipe.Write(new byte[4 * 1024 * 1024]));
+        var pipe = new SyncPipe(4 * 1024 * 1024, canSpill: true);
+        pipe.Write(new byte[4 * 1024 * 1024]);
+        Assert.HasCount(spillsBefore.Count + 1, SpillFiles());
 
-            Assert.IsFalse(writer.Wait(300), "Past the budget the writer waits");
-            Assert.IsLessThanOrEqualTo(1024L * 1024, TransferMemory.Reserved);
-
-            // A closed reader frees what was buffered
-            pipe.CloseReader();
-            Assert.ThrowsExactly<AggregateException>(() => writer.Wait(2000));
-            Assert.AreEqual(0, TransferMemory.Reserved);
-        }
-        finally
-        {
-            Data.Settings.TransferMemoryMB = AppSettings.TransferMemoryMBDefault;
-        }
+        pipe.CloseReader();
+        CollectionAssert.AreEquivalent(spillsBefore, SpillFiles());
+        Assert.ThrowsExactly<IOException>(() => pipe.Write(new byte[1]));
     }
+
+    private static System.Collections.Generic.List<string> SpillFiles() => [.. Directory.EnumerateFiles(Path.GetTempPath(), "ADB Explorer spill *")];
 
     [TestMethod]
     public void StreamingTransfer_CopiesFileBetweenDevices()

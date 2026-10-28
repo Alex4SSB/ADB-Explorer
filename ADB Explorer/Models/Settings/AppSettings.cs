@@ -143,9 +143,6 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
 
     public const int AutoRetryFailedItemsMax = 10;
 
-    public const int TransferMemoryMBMax = 16384;
-    public const int TransferMemoryMBDefault = 300;
-
     /// <summary>
     /// Concurrent thumbnail pulls and APK icon loads: ⌈<see cref="MaxSimultaneousOps"/> / 6⌉.
     /// Each of those jobs fans out into several adb processes, so the full ops limit is too high.
@@ -516,13 +513,6 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     /// </summary>
     [ObservableProperty]
     public partial int AutoRetryFailedItems { get; set; } = 1;
-
-    /// <summary>
-    /// Memory (MB) that pulls to Windows may fill ahead of the shell reading them, shared by all of them.
-    /// 0 - each file still streams through its own small buffer.
-    /// </summary>
-    [ObservableProperty]
-    public partial int TransferMemoryMB { get; set; } = TransferMemoryMBDefault;
 
     [ObservableProperty]
     public partial bool RescanOnPush { get; set; } = true;

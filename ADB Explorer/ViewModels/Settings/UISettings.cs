@@ -189,15 +189,6 @@ public static class UISettings
                                    AppSettings.AutoRetryFailedItemsMax,
                                    Strings.Resources.S_SETTINGS_UNIT_TIMES,
                                    icon: new("\uE72C")),
-                new NumericSetting(() => Settings.TransferMemoryMB,
-                                   Strings.Resources.S_SETTINGS_TRANSFER_MEMORY,
-                                   0,
-                                   AppSettings.TransferMemoryMBMax,
-                                   string.Format(Strings.Resources.MEGA, "").Trim(),
-                                   icon: new(FluentPathGeometries.Ram))
-                {
-                    Info = Strings.Resources.S_SETTINGS_TRANSFER_MEMORY_INFO,
-                },
                 new BoolSetting(() => Settings.RescanOnPush, Strings.Resources.S_SETTINGS_MEDIA_RESCAN, icon: new("\uE7C5")),
                 new BoolSetting(() => Settings.KeepDateModified, Strings.Resources.S_SETTINGS_KEEP_MODIFIED_DATE, icon: new("\uEC92")),
             ], new("\uEADF")),

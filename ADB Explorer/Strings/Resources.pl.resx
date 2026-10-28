@@ -1804,10 +1804,4 @@ Sprawdzanie ma na celu zapobieżenie uruchomieniu przez niczego niespodziewając
   <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
     <value>razy</value>
   </data>
-  <data name="S_SETTINGS_TRANSFER_MEMORY" xml:space="preserve">
-    <value>Bufor transferu</value>
-  </data>
-  <data name="S_SETTINGS_TRANSFER_MEMORY_INFO" xml:space="preserve">
-    <value>Jak dużo pamięci RAM mogą utrzymywać pliki pobrane z urządzenia, gdy kopiujesz je do Windowsa za pomocą metody przeciągnij i upuść albo ze schowka.</value>
-  </data>
 </root>
