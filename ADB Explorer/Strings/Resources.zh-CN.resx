@@ -1815,4 +1815,10 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
     <value>次数</value>
   </data>
+  <data name="S_SETTINGS_TRANSFER_MEMORY" xml:space="preserve">
+    <value>传输缓冲</value>
+  </data>
+  <data name="S_SETTINGS_TRANSFER_MEMORY_INFO" xml:space="preserve">
+    <value>把从这台设备下载的文件通过拖放或剪贴板复制到 Windows 系统时，分配多少 RAM 内存来容纳它们。</value>
+  </data>
 </root>
