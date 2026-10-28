@@ -1815,4 +1815,10 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
     <value>время</value>
   </data>
+  <data name="S_SETTINGS_TRANSFER_MEMORY" xml:space="preserve">
+    <value>Буфер передачи</value>
+  </data>
+  <data name="S_SETTINGS_TRANSFER_MEMORY_INFO" xml:space="preserve">
+    <value>Сколько RAM памяти могут хранить файлы, загруженные с устройства перед запуском Windows, при копировании их в Windows с помощью перетаскивания или буфера обмена.</value>
+  </data>
 </root>
