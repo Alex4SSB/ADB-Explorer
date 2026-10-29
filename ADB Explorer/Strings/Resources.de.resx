@@ -562,7 +562,7 @@ Alle laufenden Vorgänge abbrechen</value>
     <value>Geräte</value>
   </data>
   <data name="S_BUTTON_PUSH" xml:space="preserve">
-    <value>Upload auf das Gerät</value>
+    <value>Push</value>
   </data>
   <data name="S_MENU_FOLDERS" xml:space="preserve">
     <value>Ordner</value>
@@ -643,7 +643,7 @@ Alle laufenden Vorgänge abbrechen</value>
     <value>Liste kann nicht abgerufen werden.</value>
   </data>
   <data name="S_EMPTY_FILTER" xml:space="preserve">
-    <value>Es gibt keine Elemente, die dem aktuellen Filter entsprechen.</value>
+    <value>Es gibt keine Elemente, die der aktuellen Suche entsprechen.</value>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
     <value>&lt;Span&gt;Dieser Ordner &lt;Italic&gt;sieht&lt;/Italic&gt; leer aus&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… mit dem bloßen Auge&lt;/Span&gt;&lt;/Span&gt;</value>
@@ -1093,10 +1093,10 @@ Alle laufenden Vorgänge abbrechen</value>
     <value>Rechter Rand</value>
   </data>
   <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
-    <value>Seite links</value>
+    <value>Bild links</value>
   </data>
   <data name="ScrollBar_PageRightCommand" xml:space="preserve">
-    <value>Seite rechts</value>
+    <value>Bild rechts</value>
   </data>
   <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
     <value>Nach links scrollen</value>
@@ -1206,7 +1206,7 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
     <value>Validierungsfehler: {0}</value>
   </data>
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
-    <value>Wird validiert…</value>
+    <value>Wird validiert …</value>
   </data>
   <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
     <value>ROM zum Querladen auswählen</value>
@@ -1568,5 +1568,128 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
     <value>Ein ausgewähltes Element kann nicht geändert werden</value>
+  </data>
+  <data name="S_MENU_STOP_LOADING" xml:space="preserve">
+    <value>Laden von {0} stoppen</value>
+  </data>
+  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
+    <value>Element-Speicherort öffnen</value>
+  </data>
+  <data name="S_BUTTON_VIEW_SIZE" xml:space="preserve">
+    <value>Größe ansehen</value>
+  </data>
+  <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
+    <value>Male</value>
+  </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{0} in {1} ({2})</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
+    <value>App-Symbole werden geladen</value>
+  </data>
+  <data name="S_THUMBSIZE_TILES" xml:space="preserve">
+    <value>Kacheln</value>
+  </data>
+  <data name="S_NEW_TAB_DUPLICATE" xml:space="preserve">
+    <value>Aktuellen Tab duplizieren</value>
+  </data>
+  <data name="S_NEW_TAB_DRIVE_VIEW" xml:space="preserve">
+    <value>Laufwerksansicht des aktuellen Geräts</value>
+  </data>
+  <data name="S_NEW_TAB_NONE" xml:space="preserve">
+    <value>Kein Ort</value>
+  </data>
+  <data name="S_CLOSE_TAB" xml:space="preserve">
+    <value>Tab schließen</value>
+  </data>
+  <data name="S_CLOSE_LEFT_PANE" xml:space="preserve">
+    <value>Linken Bereich schließen</value>
+  </data>
+  <data name="S_CLOSE_RIGHT_PANE" xml:space="preserve">
+    <value>Rechten Bereich schließen</value>
+  </data>
+  <data name="S_CLOSE_TOP_PANE" xml:space="preserve">
+    <value>Oberen Bereich schließen</value>
+  </data>
+  <data name="S_CLOSE_BOTTOM_PANE" xml:space="preserve">
+    <value>Unteren Bereich schließen</value>
+  </data>
+  <data name="S_SPLIT_HORIZONTALLY" xml:space="preserve">
+    <value>Horizontal teilen</value>
+  </data>
+  <data name="S_SPLIT_VERTICALLY" xml:space="preserve">
+    <value>Vertikal teilen</value>
+  </data>
+  <data name="S_SWAP_PANES" xml:space="preserve">
+    <value>Bereiche tauschen</value>
+  </data>
+  <data name="S_CLOSE_OTHER_TABS" xml:space="preserve">
+    <value>Andere Tabs schließen</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_RIGHT" xml:space="preserve">
+    <value>Tabs rechts davon schließen</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_LEFT" xml:space="preserve">
+    <value>Tabs links davon schließen</value>
+  </data>
+  <data name="S_MERGE_WITH_RIGHT_TAB" xml:space="preserve">
+    <value>Mit dem Tab rechts davon zusammenführen</value>
+  </data>
+  <data name="S_MERGE_WITH_LEFT_TAB" xml:space="preserve">
+    <value>Mit dem Tab links davon zusammenführen</value>
+  </data>
+  <data name="S_DUPLICATE_TAB" xml:space="preserve">
+    <value>Tab duplizieren</value>
+  </data>
+  <data name="S_NEW_TAB" xml:space="preserve">
+    <value>Neuer Tab</value>
+  </data>
+  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
+    <value>Archivinhalte können geändert werden</value>
+  </data>
+  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
+    <value>Archivinhalte können nur gelesen werden</value>
+  </data>
+  <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
+    <value>Auf diesem System nicht verfügbar.</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_MODE" xml:space="preserve">
+    <value>Anzeige der Dateigröße</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
+    <value>Dezimalstellen der Dateigröße</value>
+  </data>
+  <data name="S_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>In neuem Tab öffnen</value>
+  </data>
+  <data name="S_PUSH_PACKAGES_INFO" xml:space="preserve">
+    <value>Installiert APK(s) direkt aus Windows heraus.</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE" xml:space="preserve">
+    <value>Groß-/Kleinschreibung beachten</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE_INFO" xml:space="preserve">
+    <value>Bei der Suche die Groß-/Kleinschreibung genau beachten.</value>
+  </data>
+  <data name="S_SEARCH_CONTENTS" xml:space="preserve">
+    <value>Dateiinhalte</value>
+  </data>
+  <data name="S_SEARCH_ARCHIVES" xml:space="preserve">
+    <value>Archivinhalte</value>
+  </data>
+  <data name="S_NAVIGATION_PANE" xml:space="preserve">
+    <value>Navigationsbereich</value>
+  </data>
+  <data name="S_MENU_SHOW" xml:space="preserve">
+    <value>Anzeigen</value>
+  </data>
+  <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
+    <value>A</value>
+  </data>
+  <data name="S_THUMBSIZE_CONTENT" xml:space="preserve">
+    <value>Inhalt</value>
+  </data>
+  <data name="S_VIEW_SIZE_TOOLTIP" xml:space="preserve">
+    <value>Berechnet und zeigt die Gesamtgröße aller Dateien in diesem Ordner rekursiv an.</value>
   </data>
 </root>
