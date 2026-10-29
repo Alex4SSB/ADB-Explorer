@@ -1098,7 +1098,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Переместить</value>
   </data>
   <data name="S_ACTION_RECYCLE" xml:space="preserve">
-    <value>В корзину</value>
+    <value>Переместить в корзину</value>
   </data>
   <data name="S_ACTION_UPDATE" xml:space="preserve">
     <value>Обновление</value>
