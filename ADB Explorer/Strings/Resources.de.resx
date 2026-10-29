@@ -1692,4 +1692,22 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_VIEW_SIZE_TOOLTIP" xml:space="preserve">
     <value>Berechnet und zeigt die Gesamtgröße aller Dateien in diesem Ordner rekursiv an.</value>
   </data>
+  <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
+    <value>Suchergebnismodus verlassen.</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS_INFO" xml:space="preserve">
+    <value>Erweiterte Suchoptionen und Filterung.</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
+    <value>ADB aus nicht vertrauenswürdigen Quellen zulassen</value>
+  </data>
+  <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
+    <value>ADB abwürgen, wenn die App geschlossen wird</value>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value>Für weitere Informationen einen einzelnen Eintrag auswählen.</value>
+  </data>
+  <data name="S_SETTINGS_NEW_TAB_LOCATION" xml:space="preserve">
+    <value>Neuer Tab wird geöffnet bei</value>
+  </data>
 </root>
