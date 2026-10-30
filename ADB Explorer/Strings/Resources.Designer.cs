@@ -1993,6 +1993,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0}, {1}.
+        /// </summary>
+        public static string S_FOLDER_CONTENT_VALUE {
+            get {
+                return ResourceManager.GetString("S_FOLDER_CONTENT_VALUE", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to This folder is empty..
         /// </summary>
         public static string S_FOLDER_EMPTY {

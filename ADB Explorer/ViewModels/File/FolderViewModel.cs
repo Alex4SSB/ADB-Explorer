@@ -14,6 +14,14 @@ public partial class FolderViewModel(FileClass file) : FileViewModelBase(file)
     private long? _calculatedSize;
     private bool HasCalculatedSize => _calculatedSize is not null;
 
+    private int _folderCount;
+    private int _fileCount;
+
+    /// <summary>The folders and files under this folder, at any depth - blank until its size is calculated.</summary>
+    public string ContentText => HasCalculatedSize
+        ? string.Format(Strings.Resources.S_FOLDER_CONTENT_VALUE, Strings.Plurals.Folders(_folderCount), Strings.Plurals.Files(_fileCount))
+        : "";
+
     public bool ShowCalculateSizeButton =>
         _file.IsDirectory && !_file.IsLink && !IsCalculatingSize && _calculatedSize is null;
 
@@ -90,6 +98,8 @@ public partial class FolderViewModel(FileClass file) : FileViewModelBase(file)
     private void ApplyCalculatedSize(FolderTree[]? tree)
     {
         _calculatedSize = tree?.Where(t => !t.IsFolder).Sum(t => t.Size ?? 0) ?? 0;
+        _folderCount = tree?.Count(t => t.IsFolder) ?? 0;
+        _fileCount = tree?.Count(t => !t.IsFolder) ?? 0;
         NotifySizeStateChanged();
     }
 
@@ -98,6 +108,7 @@ public partial class FolderViewModel(FileClass file) : FileViewModelBase(file)
         OnPropertyChanged(nameof(ShowCalculateSizeButton));
         OnPropertyChanged(nameof(ShowSizeText));
         OnPropertyChanged(nameof(SizeColumnText));
+        OnPropertyChanged(nameof(ContentText));
     }
 
     /// <summary>Cancels any in-flight calculation and forgets a completed result - called when the row leaves the current folder.</summary>

@@ -820,7 +820,9 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     public void DoDragDrop(DependencyObject? dragSource, DragDropEffects allowedEffects)
     {
         // Tells targets the drag is still on, so they hold off on the file contents until the drop
-        UpdateData(AdbDataFormats.DragLoop, BitConverter.GetBytes(1));
+        var contentIncluded = IsContentIncluded;
+        if (contentIncluded)
+            UpdateData(AdbDataFormats.DragLoop, BitConverter.GetBytes(1));
 
         try
         {
@@ -834,7 +836,8 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         }
         finally
         {
-            UpdateData(AdbDataFormats.DragLoop, BitConverter.GetBytes(0));
+            if (contentIncluded)
+                UpdateData(AdbDataFormats.DragLoop, BitConverter.GetBytes(0));
         }
     }
 

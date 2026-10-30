@@ -146,6 +146,9 @@ public partial class CopyPasteService : ObservableObject
     /// <summary>The data comes from the device the drop or paste is aimed at.</summary>
     public bool IsSelf => IsFromDevice(IsDrag ? DropTargetDevice : Data.Active.Device ?? Data.ActiveDevice);
 
+    /// <summary>The data comes from the recycle bin, whose items can only be moved out of it on their own device.</summary>
+    public bool IsFromTrash => FileHelper.IsInTrash(CurrentParent);
+
     public bool IsSelfClipboard => IsSelf && IsClipboard;
     public bool IsWindows => !CurrentSource.HasFlag(DataSource.None) && !CurrentSource.HasFlag(DataSource.Android);
     public bool IsVirtual => CurrentSource.HasFlag(DataSource.Virtual);

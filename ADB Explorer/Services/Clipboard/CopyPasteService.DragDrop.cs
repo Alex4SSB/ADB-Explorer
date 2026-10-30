@@ -337,7 +337,10 @@ public partial class CopyPasteService
     public void AcceptDataObject(IDataObject dataObject, string targetFolder, bool isLink, LogicalDeviceViewModel? device, bool isAppDrive)
     {
         var deviceId = device?.ID ?? "";
-        if (device is null || FileHelper.IsSearchLocation(targetFolder))
+        if (device is null || FileHelper.IsSearchLocation(targetFolder) || FileHelper.IsInTrash(targetFolder))
+            return;
+
+        if (IsFromTrash && !IsFromDevice(device))
             return;
 
         // Packages pulled from app drive are not dropped back onto it.

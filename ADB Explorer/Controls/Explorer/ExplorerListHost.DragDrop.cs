@@ -15,7 +15,8 @@ public partial class ExplorerListHost
 
     private void Row_PreviewDragEnter(object sender, DragEventArgs e)
     {
-        if (((FrameworkElement)sender).DataContext is FileClass file)
+        // Nothing in the recycle bin is a drop target
+        if (((FrameworkElement)sender).DataContext is FileClass file && !FileHelper.IsInTrash(file.FullPath))
             file.FolderViewModel.IsDragOver = true;
     }
 
@@ -40,6 +41,16 @@ public partial class ExplorerListHost
 
     private void DragOverCore(object sender, DragEventArgs e)
     {
+        // The recycle bin never accepts drops, so there's no drag data to read or target to resolve
+        if (FileHelper.IsInTrash(Data.CurrentPath))
+        {
+            e.Effects = DragDropEffects.None;
+            CopyPaste.DropEffect =
+            CopyPaste.CurrentDropEffect = DragDropEffects.None;
+            e.Handled = true;
+            return;
+        }
+
         var allowed = CopyPaste.GetAllowedDragEffects(e.Data, (FrameworkElement)sender);
 
         e.Effects = CopyPasteService.ResolveDropEffect(allowed, e.KeyStates, CopyPaste.IsSelf);

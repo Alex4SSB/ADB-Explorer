@@ -101,6 +101,37 @@ public class DateDetailsViewModel : ObservableObject, IDetailsViewModel
     public Visibility RowVisibility => Visibility.Visible;
 }
 
+/// <summary>
+/// A folder's size row: its calculated size, "Calculating…", or - while unknown - the explorer's View size button.
+/// </summary>
+public class FolderSizeDetailsViewModel : ObservableObject, IDetailsViewModel
+{
+    public FolderViewModel Folder { get; }
+
+    public FolderSizeDetailsViewModel(FolderViewModel folder)
+    {
+        Folder = folder;
+
+        folder.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(FolderViewModel.SizeColumnText))
+                OnPropertyChanged(nameof(Value));
+        };
+    }
+
+    public string Label => Strings.Resources.S_COLUMN_SIZE;
+
+    public string Value => Folder.SizeColumnText;
+
+    public bool ValueIsLtr => true;
+
+    public bool ValueConsoleFont => false;
+
+    public bool LabelConsoleFont => false;
+
+    public Visibility RowVisibility => Visibility.Visible;
+}
+
 public class ItemDetailsViewModel<T>(T item, string label, Func<T, string> valueSelector, bool valueIsLtr = false, bool useConsoleFont = false, Func<T, Visibility>? rowVisibility = null)
     : ObservableObject, IDetailsViewModel where T : INotifyPropertyChanged
 {

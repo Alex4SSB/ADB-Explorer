@@ -616,6 +616,10 @@ public static class FileHelper
         return RelationType.Unrelated;
     }
 
+    /// <summary>The path is the recycle bin or one of its subfolders.</summary>
+    public static bool IsInTrash(string path)
+        => RelationFrom(path, AdbExplorerConst.RECYCLE_PATH) is RelationType.Self or RelationType.Ancestor;
+
     public static IEnumerable<FileClass> GetFilesFromTree(FolderTree[] tree) => tree.Select(t => new FileClass(t));
 
     public static FolderTree[] GetFolderTree(IEnumerable<string> paths, bool isFolder = true, CancellationToken cancellationToken = default, string? deviceId = null)

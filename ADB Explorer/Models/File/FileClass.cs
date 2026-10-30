@@ -673,7 +673,12 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         }
         else
         {
-            children = GetChildren(deviceId);
+            // The tree is only read to stream contents - never for trash items, which stay on their device
+            if (includeContent)
+                children = GetChildren(deviceId);
+            else
+                children = null;
+
             if (source.Actions.IsSearchMode && !string.IsNullOrEmpty(Data.SearchOriginPath))
             {
                 IEnumerable<FileClass> transferFiles = source.SelectedFiles.Any() ? source.SelectedFiles : [this];

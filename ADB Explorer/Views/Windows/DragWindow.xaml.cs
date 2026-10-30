@@ -139,7 +139,12 @@ public partial class DragWindow : INotifyPropertyChanged
             if (count == 1 && shownCount is not null)
             {
                 int sourceLength = target is null ? 30 : 45 - target.Length;
-                var source = FileHelper.GetShortFileName(Data.CopyPaste.DragFiles[0], sourceLength);
+                // Trash items are dragged by their indexer name; show the name they were deleted with
+                var sourceName = Data.CopyPaste.DragFiles[0];
+                if (Data.CopyPaste.IsFromTrash && Data.CopyPaste.CurrentFiles.FirstOrDefault() is { TrashIndex: not null } trashItem)
+                    sourceName = trashItem.FullName;
+
+                var source = FileHelper.GetShortFileName(sourceName, sourceLength);
 
                 if (Data.FileActions.IsAppDrive && Data.CopyPaste.MouseWithinApp)
                 {

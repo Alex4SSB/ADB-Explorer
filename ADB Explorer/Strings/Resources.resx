@@ -872,6 +872,10 @@ Cancel All Running</value>
     <value>This folder is empty.</value>
     <comment>The notification displayed when a folder is empty on a rooted device</comment>
   </data>
+  <data name="S_FOLDER_CONTENT_VALUE" xml:space="preserve">
+    <value>{0}, {1}</value>
+    <comment>Details pane folder content. {0} is the folder count (e.g. "3 folders"), {1} is the file count (e.g. "12 files")</comment>
+  </data>
   <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
     <value>Unable to get list.</value>
     <comment>The notification displayed when the package view is empty</comment>
@@ -2252,7 +2256,7 @@ The checks attempt to prevent an unsuspecting user from launching a possibly mal
   </data>
   <data name="S_THUMBSIZE_CONTENT" xml:space="preserve">
     <value>Content</value>
-    <comment>Thumbnail size - content</comment>
+    <comment>Thumbnail size - content. Also the details pane label for how many folders and files a folder holds</comment>
   </data>
   <data name="S_SEARCH_DISPLAY_PATH_RELATIVE" xml:space="preserve">
     <value>Display relative path</value>

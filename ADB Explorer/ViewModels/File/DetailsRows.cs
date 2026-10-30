@@ -87,6 +87,18 @@ public static class DetailsRows
             if (file.Type is AbstractFile.FileType.File && file.Size.HasValue)
                 yield return new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COLUMN_SIZE, f => f.FolderViewModel.SizeString).Init(nameof(FileClass.Size), nameof(FileClass.ShellLsSize));
 
+            // Same as the explorer's size column: a link isn't followed to size its target
+            if (file.IsDirectory && !file.IsLink)
+            {
+                yield return new FolderSizeDetailsViewModel(file.FolderViewModel);
+
+                yield return new ItemDetailsViewModel<FolderViewModel>(
+                    file.FolderViewModel,
+                    Strings.Resources.S_THUMBSIZE_CONTENT,
+                    f => f.ContentText,
+                    rowVisibility: _ => Visibility.Visible).Init(nameof(FolderViewModel.ContentText));
+            }
+
             if (file.CompressedSize is long compressedSize)
                 yield return new ItemDetailsViewModel<FileClass>(file, Strings.Resources.S_COMPRESSED_SIZE, _ => compressedSize.BytesToSize(true), valueIsLtr: true);
 

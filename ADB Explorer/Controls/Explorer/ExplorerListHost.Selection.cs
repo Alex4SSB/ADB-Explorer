@@ -83,8 +83,14 @@ public partial class ExplorerListHost
         SelectionTimer.Stop();
 
         // A split view's other pane was left since this fired; its effects would clobber the focused one's.
-        if (ReferenceEquals(Owner.Instance, Data.ActiveExplorerInstance))
-            ApplySelectionEffects();
+        if (!ReferenceEquals(Owner.Instance, Data.ActiveExplorerInstance))
+            return;
+
+        ApplySelectionEffects();
+
+        // No input follows a timer tick, so commands would keep the enabled state WPF last queried
+        // (e.g. mid rubber-band, from before the latest added items) until the next click or key.
+        CommandManager.InvalidateRequerySuggested();
     }
 
     private void ApplySelectionEffects()

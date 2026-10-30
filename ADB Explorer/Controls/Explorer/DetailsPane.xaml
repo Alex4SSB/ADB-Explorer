@@ -5,6 +5,7 @@
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:local="clr-namespace:ADB_Explorer.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
@@ -76,6 +77,63 @@
                 </TextBlock>
             </Grid>
         </DataTemplate>
+        <DataTemplate x:Key="FolderSizeDetailsTemplate" DataType="{x:Type viewmodels:FolderSizeDetailsViewModel}">
+            <Grid Margin="0,3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Foreground="{DynamicResource InfoBadgeInformationalSeverityBackgroundBrush}"
+                    Text="{Binding Label}" />
+                <TextBlock
+                    Grid.Column="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    FlowDirection="LeftToRight"
+                    FontSize="12"
+                    Foreground="{DynamicResource InfoBadgeInformationalSeverityBackgroundBrush}"
+                    Text="{Binding Value}"
+                    TextTrimming="CharacterEllipsis">
+                    <TextBlock.Style>
+                        <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Folder.ShowCalculateSizeButton}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <ui:HyperlinkButton
+                    Grid.Column="2"
+                    Padding="4,0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Command="{Binding Folder.CalculateSizeCommand}"
+                    Content="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_VIEW_SIZE}}"
+                    FontSize="12"
+                    ToolTip="{Binding Source={x:Static Member=strings:Resources.S_VIEW_SIZE_TOOLTIP}}">
+                    <ui:HyperlinkButton.Style>
+                        <Style BasedOn="{StaticResource {x:Type ui:HyperlinkButton}}" TargetType="ui:HyperlinkButton">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Folder.ShowCalculateSizeButton}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:HyperlinkButton.Style>
+                </ui:HyperlinkButton>
+            </Grid>
+        </DataTemplate>
+        <helpers:DetailsTemplateSelector
+            x:Key="DetailsTemplateSelector"
+            DetailsTemplate="{StaticResource FileDetailsTemplate}"
+            FolderSizeTemplate="{StaticResource FolderSizeDetailsTemplate}" />
         <Style
             x:Key="PermissionToggleStyle"
             BasedOn="{StaticResource DefaultToggleButtonStyle}"
@@ -380,7 +438,7 @@
                                     FontSize="12"
                                     FontWeight="SemiBold"
                                     Text="{Binding Source={x:Static Member=strings:Resources.S_THUMBSIZE_DETAILS}}" />
-                                <ItemsControl ItemTemplate="{StaticResource FileDetailsTemplate}" ItemsSource="{Binding SelectionInfoItems}" />
+                                <ItemsControl ItemTemplateSelector="{StaticResource DetailsTemplateSelector}" ItemsSource="{Binding SelectionInfoItems}" />
                             </StackPanel>
                             <StackPanel>
                                 <StackPanel.Style>

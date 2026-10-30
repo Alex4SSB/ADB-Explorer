@@ -113,6 +113,9 @@ internal static partial class FileActionLogic
         if (ActionFlags.IsRecycleBin || ActionList.ForbidPaste)
             return false;
 
+        if (Data.CopyPaste.IsFromTrash && !Data.CopyPaste.IsFromDevice(ActionDevice))
+            return false;
+
         string[] files = Data.CopyPaste.Files;
         if (Data.CopyPaste.IsWindows
             && Data.CopyPaste.IsVirtual
@@ -238,8 +241,8 @@ internal static partial class FileActionLogic
         if (target is null && Data.FileActions.IsSearchMode)
             return DragDropEffects.None;
 
-        if (FileHelper.RelationFrom(Data.CopyPaste.DragParent, AdbExplorerConst.RECYCLE_PATH) is RelationType.Self or RelationType.Ancestor)
-            return DragDropEffects.Move;
+        if (Data.CopyPaste.IsFromTrash)
+            return Data.CopyPaste.IsSelf ? DragDropEffects.Move : DragDropEffects.None;
 
         string targetPath = target switch
         {
@@ -338,9 +341,8 @@ internal static partial class FileActionLogic
             && !ArchiveHelper.CanPasteIntoArchive(targetPath, deviceId))
             return DragDropEffects.None;
 
-        if (FileHelper.RelationFrom(Data.CopyPaste.DragParent, AdbExplorerConst.RECYCLE_PATH)
-            is RelationType.Self or RelationType.Ancestor)
-            return DragDropEffects.Move;
+        if (Data.CopyPaste.IsFromTrash)
+            return Data.CopyPaste.IsFromDevice(target.OwnerDevice) ? DragDropEffects.Move : DragDropEffects.None;
 
         // Names known only at the drop can't be checked here
         if (!isUnnamed)

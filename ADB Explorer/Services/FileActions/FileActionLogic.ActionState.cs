@@ -215,7 +215,7 @@ internal static partial class FileActionLogic
         var selectedFiles = c.SelectedFiles;
 
         actions.IsRegularItem = c.IsRegularItem;
-        actions.IsSingleFolder = c.SelectedFile is not null && CanEnterSelection(c.SelectedFile);
+        actions.IsSingleFolder = !c.IsRecycleBin && c.SelectedFile is not null && CanEnterSelection(c.SelectedFile);
         actions.IsFollowLinkEnabled = c.IsFollowLinkEnabled;
         actions.IsOpenItemLocationEnabled = !c.IsRecycleBin && c.IsSearchMode && c.SelectedFile is not null;
         actions.IsArchive = c.IsArchive;
