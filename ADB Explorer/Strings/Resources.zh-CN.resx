@@ -1098,7 +1098,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>移动</value>
   </data>
   <data name="S_ACTION_RECYCLE" xml:space="preserve">
-    <value>回收</value>
+    <value>移动到回收站</value>
   </data>
   <data name="S_ACTION_UPDATE" xml:space="preserve">
     <value>更新</value>
