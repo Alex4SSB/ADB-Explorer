@@ -2019,4 +2019,7 @@ Kontroly se snaží zabránit tomu, aby nic netušící uživatel spustil potenc
   <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
     <value>krát</value>
   </data>
+  <data name="S_FOLDER_CONTENT_VALUE" xml:space="preserve">
+    <value>{0}, {1}</value>
+  </data>
 </root>
