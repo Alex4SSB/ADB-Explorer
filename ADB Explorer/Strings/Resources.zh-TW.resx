@@ -684,7 +684,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>無法獲取清單。</value>
   </data>
   <data name="S_EMPTY_FILTER" xml:space="preserve">
-    <value>沒有符合當前篩選條件的項目。</value>
+    <value>沒有符合您的搜尋的項目。</value>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
     <value>&lt;Span&gt;此資料夾&lt;Italic&gt;看來&lt;/Italic&gt;爲空&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;...對肉眼來説&lt;/Span&gt;&lt;/Span&gt;</value>
@@ -1420,7 +1420,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <comment>0 - the number of file operations currently not displayed</comment>
   </data>
   <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
-    <value>顯示或隱藏詳細資料與與懶窗格。</value>
+    <value>顯示或隱藏詳細資料與預覽窗格。</value>
     <comment>The tooltip of the button that controls the details pane visibility</comment>
   </data>
   <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
@@ -1432,7 +1432,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <comment>The maximum size of a file for preview</comment>
   </data>
   <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
-    <value>雙點按檔案，拉到預設資料夾</value>
+    <value>雙點按檔案，以拉到預設資料夾</value>
     <comment>The setting that enables pulling a file to the default folder on double click</comment>
   </data>
   <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
@@ -1653,5 +1653,134 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_MENU_EXTRACT_HERE" xml:space="preserve">
     <value>提取到此</value>
+  </data>
+  <data name="S_APK_BACKUP_OBB_FAILED" xml:space="preserve">
+    <value>應用程式已安裝，但是 OBB 檔無法儲存。於裝置開啟應用程式，再試一次。</value>
+  </data>
+  <data name="S_MENU_REMOVE_SAVED_LOCATION" xml:space="preserve">
+    <value>從儲存的位置移除</value>
+  </data>
+  <data name="S_BUTTON_VIEW_SIZE" xml:space="preserve">
+    <value>檢視大小</value>
+  </data>
+  <data name="S_STATUS_CALCULATING_SIZE" xml:space="preserve">
+    <value>計算中…</value>
+  </data>
+  <data name="S_PACKAGE_ID" xml:space="preserve">
+    <value>套件 ID</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_RETRY" xml:space="preserve">
+    <value>自動重試失敗的項目</value>
+  </data>
+  <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
+    <value>次</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
+    <value>載入應用程式圖示</value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>中圖示</value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>大圖示</value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>特大圖示</value>
+  </data>
+  <data name="S_THUMBSIZE_TILES" xml:space="preserve">
+    <value>方塊</value>
+  </data>
+  <data name="S_SETTINGS_NEW_TAB_LOCATION" xml:space="preserve">
+    <value>新分頁開啟在</value>
+  </data>
+  <data name="S_NEW_TAB_DUPLICATE" xml:space="preserve">
+    <value>再製目前分頁</value>
+  </data>
+  <data name="S_NEW_TAB_DRIVE_VIEW" xml:space="preserve">
+    <value>目前裝置的磁碟檢視</value>
+  </data>
+  <data name="S_NEW_TAB_NONE" xml:space="preserve">
+    <value>無位置</value>
+  </data>
+  <data name="S_CLOSE_TAB" xml:space="preserve">
+    <value>關閉分頁</value>
+  </data>
+  <data name="S_CLOSE_LEFT_PANE" xml:space="preserve">
+    <value>關閉左窗格</value>
+  </data>
+  <data name="S_CLOSE_RIGHT_PANE" xml:space="preserve">
+    <value>關閉右窗格</value>
+  </data>
+  <data name="S_CLOSE_TOP_PANE" xml:space="preserve">
+    <value>關閉頂窗格</value>
+  </data>
+  <data name="S_CLOSE_BOTTOM_PANE" xml:space="preserve">
+    <value>關閉底窗格</value>
+  </data>
+  <data name="S_SPLIT_HORIZONTALLY" xml:space="preserve">
+    <value>水平分割</value>
+  </data>
+  <data name="S_SPLIT_VERTICALLY" xml:space="preserve">
+    <value>垂直分割</value>
+  </data>
+  <data name="S_SWAP_PANES" xml:space="preserve">
+    <value>窗格互換</value>
+  </data>
+  <data name="S_CLOSE_OTHER_TABS" xml:space="preserve">
+    <value>關閉其他分頁</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_RIGHT" xml:space="preserve">
+    <value>關閉右方分頁</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_LEFT" xml:space="preserve">
+    <value>關閉左方分頁</value>
+  </data>
+  <data name="S_MERGE_WITH_RIGHT_TAB" xml:space="preserve">
+    <value>此分頁與後一分頁改成並排顯示</value>
+  </data>
+  <data name="S_MERGE_WITH_LEFT_TAB" xml:space="preserve">
+    <value>此分頁與前一分頁改成並排顯示</value>
+  </data>
+  <data name="S_DUPLICATE_TAB" xml:space="preserve">
+    <value>再製分頁</value>
+  </data>
+  <data name="S_NEW_TAB" xml:space="preserve">
+    <value>新分頁</value>
+  </data>
+  <data name="S_FILE_SYSTEM" xml:space="preserve">
+    <value>檔案系統</value>
+  </data>
+  <data name="S_MOUNT_POINT" xml:space="preserve">
+    <value>掛載點</value>
+  </data>
+  <data name="S_MOUNT_OPTIONS" xml:space="preserve">
+    <value>掛載選項</value>
+  </data>
+  <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
+    <value>本系統無此。</value>
+  </data>
+  <data name="S_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>於新分頁開啟</value>
+  </data>
+  <data name="S_RESTART" xml:space="preserve">
+    <value>現在重新啟動</value>
+  </data>
+  <data name="S_PUSH_PACKAGES_INFO" xml:space="preserve">
+    <value>直接從 Windows 安裝一或多個 APK。</value>
+  </data>
+  <data name="S_DETAILS_PANE_INFO" xml:space="preserve">
+    <value>將側邊窗格設成細節模式。
+
+細節包括: 縮圖、延伸的檔案資訊、後設資料、權限與磁碟掛載選項。</value>
+  </data>
+  <data name="S_UPDATE_MODIFIED_INFO" xml:space="preserve">
+    <value>試著根據檔名來對齊修改日。
+
+對後面相片有用：檔名含有拍攝日期，而修改日又被覆蓋。</value>
+  </data>
+  <data name="S_PREVIEW_PANE_INFO" xml:space="preserve">
+    <value>將側邊窗格設成預覽模式。
+
+支援的項目: 縮圖、PDF；符合大小限制的其他檔會以文字顯示，可選擇語法專用字強調顯示，而且只要位置允許，也可編輯與儲存。</value>
   </data>
 </root>
