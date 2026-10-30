@@ -1073,7 +1073,7 @@ Anuluj wszystkie uruchomione</value>
     <value>Przenieś</value>
   </data>
   <data name="S_ACTION_RECYCLE" xml:space="preserve">
-    <value>Odzyskaj</value>
+    <value>Przenieś do kosza</value>
   </data>
   <data name="S_ACTION_UPDATE" xml:space="preserve">
     <value>Aktualizuj</value>
