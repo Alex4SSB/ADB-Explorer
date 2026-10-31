@@ -1800,4 +1800,10 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
     <value>час</value>
   </data>
+  <data name="S_REPORT_ISSUE" xml:space="preserve">
+    <value>Повідомити про проблему</value>
+  </data>
+  <data name="S_FOLDER_CONTENT_VALUE" xml:space="preserve">
+    <value>{0}, {1}</value>
+  </data>
 </root>
