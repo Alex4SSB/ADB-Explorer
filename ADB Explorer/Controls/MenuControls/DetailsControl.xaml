@@ -10,38 +10,101 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     x:Name="dc"
     mc:Ignorable="d">
-    <local:AdbMenu DataContext="{Binding ElementName=dc}">
-        <local:AdbMenu.Style>
-            <Style BasedOn="{StaticResource AdbMenuStyle}" TargetType="local:AdbMenu">
+    <UserControl.Resources>
+        <Style
+            x:Key="DetailsSplitHalfStyle"
+            BasedOn="{StaticResource DefaultUiButtonStyle}"
+            TargetType="ui:Button">
+            <Setter Property="Appearance" Value="Secondary" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Style.Triggers>
+                <!--  Same as the breadcrumbs: the outline shows while either half is hovered, but only the hovered half is filled  -->
+                <Trigger Property="IsMouseOver" Value="False">
+                    <Setter Property="Background" Value="Transparent" />
+                </Trigger>
+                <DataTrigger Binding="{Binding ElementName=SplitPanel, Path=IsMouseOver}" Value="False">
+                    <Setter Property="BorderBrush" Value="Transparent" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <!--  Background so the gap between the halves keeps the split button hovered  -->
+    <StackPanel
+        x:Name="SplitPanel"
+        Margin="4"
+        VerticalAlignment="Center"
+        Background="Transparent"
+        DataContext="{Binding ElementName=dc}"
+        MouseLeave="SplitPanel_MouseLeave"
+        Orientation="Horizontal">
+        <StackPanel.Style>
+            <Style TargetType="StackPanel">
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.DevicesObject}, Path=Current}" Value="{x:Null}">
                         <Setter Property="IsEnabled" Value="False" />
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-        </local:AdbMenu.Style>
-        <local:AdbMenuItem
-            IsCheckable="True"
-            IsChecked="{Binding IsChecked, Mode=TwoWay}"
-            Style="{StaticResource AdbMenuItemHoverStyle}"
-            ToolTip="{Binding Source={x:Static Member=strings:Resources.S_DETAILS_PANE_TOOLTIP}}">
-            <local:AdbMenuItem.Header>
-                <local:SimpleStackPanel Orientation="Horizontal" Spacing="6">
-                    <local:DetailsAndPreviewIcon Margin="0,-2,0,0" Mode="{Binding Mode}" />
-                    <TextBlock>
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_THUMBSIZE_DETAILS}}" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Mode}" Value="Preview">
-                                        <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_SIDE_PANE_PREVIEW}}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </local:SimpleStackPanel>
-            </local:AdbMenuItem.Header>
-        </local:AdbMenuItem>
-    </local:AdbMenu>
+        </StackPanel.Style>
+        <!--  The split button's icon half - switches the pane mode  -->
+        <ui:Button
+            x:Name="ModeButton"
+            Padding="5,9"
+            BorderThickness="1"
+            Click="ModeButton_Click"
+            CornerRadius="4,0,0,4"
+            MouseEnter="SplitHalf_MouseEnter">
+            <local:DetailsAndPreviewIcon Margin="0,-2,0,0" Mode="{Binding Mode}" />
+            <ui:Button.ToolTip>
+                <!--  Shows the mode a click would switch to  -->
+                <ToolTip>
+                    <ToolTip.Style>
+                        <Style BasedOn="{StaticResource {x:Type ToolTip}}" TargetType="ToolTip">
+                            <Setter Property="Content" Value="{Binding Source={x:Static Member=strings:Resources.S_PREVIEW_PANE_INFO}}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=PlacementTarget.DataContext.Mode}" Value="Preview">
+                                    <Setter Property="Content" Value="{Binding Source={x:Static Member=strings:Resources.S_DETAILS_PANE_INFO}}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ToolTip.Style>
+                </ToolTip>
+            </ui:Button.ToolTip>
+            <ui:Button.Style>
+                <Style BasedOn="{StaticResource DetailsSplitHalfStyle}" TargetType="ui:Button">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsModeSwitchAllowed}" Value="False">
+                            <Setter Property="IsEnabled" Value="False" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ui:Button.Style>
+        </ui:Button>
+        <!--  The split button's text half - opens and closes the pane  -->
+        <ui:Button
+            x:Name="PaneButton"
+            Padding="5,9"
+            BorderThickness="0,1,1,1"
+            Click="PaneButton_Click"
+            CornerRadius="0,4,4,0"
+            MouseEnter="SplitHalf_MouseEnter"
+            Style="{StaticResource DetailsSplitHalfStyle}">
+            <ui:Button.ToolTip>
+                <ToolTip Content="{Binding Source={x:Static Member=strings:Resources.S_DETAILS_PANE_TOOLTIP}}" />
+            </ui:Button.ToolTip>
+            <TextBlock>
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_THUMBSIZE_DETAILS}}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Mode}" Value="Preview">
+                                <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_SIDE_PANE_PREVIEW}}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </ui:Button>
+    </StackPanel>
 </UserControl>
