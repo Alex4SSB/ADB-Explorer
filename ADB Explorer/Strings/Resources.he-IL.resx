@@ -1155,7 +1155,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>הזזה</value>
   </data>
   <data name="S_ACTION_RECYCLE" xml:space="preserve">
-    <value>מיחזור</value>
+    <value>נשלח לפח אשפה</value>
   </data>
   <data name="S_ACTION_UPDATE" xml:space="preserve">
     <value>עדכון</value>
@@ -1799,5 +1799,11 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
     <value>פעמים</value>
+  </data>
+  <data name="S_REPORT_ISSUE" xml:space="preserve">
+    <value>דיווח תקלה</value>
+  </data>
+  <data name="S_FOLDER_CONTENT_VALUE" xml:space="preserve">
+    <value>{0}, {1}</value>
   </data>
 </root>
