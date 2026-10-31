@@ -416,6 +416,10 @@ Visible content may be incomplete.</value>
     <value>Replace the files in the destination</value>
     <comment>Primary action in the paste/pull conflict dialog</comment>
   </data>
+  <data name="S_REPORT_ISSUE" xml:space="preserve">
+    <value>Report an Issue</value>
+    <comment>Tooltip of the title bar button that opens a new GitHub issue in the browser</comment>
+  </data>
   <data name="S_SKIP_THESE_FILES" xml:space="preserve">
     <value>Skip these files</value>
     <comment>Skip all conflicting items in the conflict dialog</comment>

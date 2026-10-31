@@ -14,6 +14,7 @@ public static class Links
     public static readonly Uri ICONS8 = new("https://icons8.com");
     public static readonly Uri ADB_EXPLORER_PRIVACY = new("https://github.com/Alex4SSB/ADB-Explorer/blob/master/Privacy.md");
     public static readonly Uri ADB_EXPLORER_GITHUB = new("https://github.com/Alex4SSB/ADB-Explorer");
+    public static readonly Uri ADB_EXPLORER_ISSUES = new("https://github.com/Alex4SSB/ADB-Explorer/issues");
     public static readonly Uri LGPL3 = new("https://opensource.org/license/lgpl-3-0");
     public static readonly Uri SPONSOR = new("https://github.com/sponsors/Alex4SSB");
     public static readonly Uri WEBLATE = new("https://hosted.weblate.org/engage/adb-explorer/");

@@ -68,7 +68,7 @@ public partial class MainWindowViewModel : ObservableObject
     public partial ObservableCollection<object> FooterMenuItems { get; set; } = [];
 
     [ObservableProperty]
-    public partial ObservableList<Controls.NotificationBell.Notification> Notifications { get; set; } = [];
+    public partial ObservableList<Controls.TitleBarMenu.Notification> Notifications { get; set; } = [];
 
     public bool IsNavigationEnabled => AdbHelper.CurrentAdbState.Status is AdbHelper.AdbStatus.Valid;
 

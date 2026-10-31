@@ -3470,7 +3470,16 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_REPLACE_FILES_IN_DESTINATION", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Report an Issue.
+        /// </summary>
+        public static string S_REPORT_ISSUE {
+            get {
+                return ResourceManager.GetString("S_REPORT_ISSUE", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to All app settings will be reset upon closing the app.
         ///This cannot be undone. Are you sure?.
