@@ -178,9 +178,21 @@ public static partial class DeviceHelper
                     return;
             }
 
-            device.SetLastLaunch();
-            device.SetStatus(DeviceStatus.Unauthorized);
-            Process.Start($"{AdbExplorerConst.WSA_PROCESS_NAME}.exe");
+            try
+            {
+                device.SetLastLaunch();
+                device.SetStatus(DeviceStatus.Unauthorized);
+                Process.Start($"{AdbExplorerConst.WSA_PROCESS_NAME}.exe");
+            }
+            catch (Exception ex)
+            {
+                device.SetStatus(DeviceStatus.Ok);
+                DialogService.ShowMessage(ex.Message,
+                                          Strings.Resources.S_WSA_DIALOG_TITLE,
+                                          DialogService.DialogIcon.Critical,
+                                          copyToClipboard: true,
+                                          error: DialogError.WsaLaunchFailed);
+            }
         });
 
     public static DeviceAction LaunchEmulator(EmulatorPackageDeviceViewModel device) => new(

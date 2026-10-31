@@ -16,7 +16,6 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
 {
     public static FileGroup? SelfFileGroup { get; private set; }
     public static IEnumerable<FileClass>? SelfFiles { get; private set; }
-    public static string DummyFileName { get; private set; } = "";
     public bool IsContentIncluded { get; private set; } = true;
 
     /// <summary>

@@ -228,17 +228,24 @@ public static partial class ThumbnailService
         if (!PaneThumbnails.TryGetValue(file, out var state))
             return;
 
-        if (state.Cts is null || state.Cts.Token != token)
-            return;
-
-        if (state.UpdatedHandler is not null)
+        // Clear runs on load threads while Cancel runs on the UI thread; only one may dispose the CTS.
+        CancellationTokenSource? cts;
+        lock (state)
         {
-            ThumbnailUpdated -= state.UpdatedHandler;
-            state.UpdatedHandler = null;
+            if (state.Cts is null || state.Cts.Token != token)
+                return;
+
+            if (state.UpdatedHandler is not null)
+            {
+                ThumbnailUpdated -= state.UpdatedHandler;
+                state.UpdatedHandler = null;
+            }
+
+            cts = state.Cts;
+            state.Cts = null;
         }
 
-        state.Cts.Dispose();
-        state.Cts = null;
+        cts.Dispose();
     }
 
     public static void CancelPaneThumbnailLoad(FileClass file)
@@ -246,15 +253,21 @@ public static partial class ThumbnailService
         if (!PaneThumbnails.TryGetValue(file, out var state))
             return;
 
-        if (state.UpdatedHandler is not null)
+        CancellationTokenSource? cts;
+        lock (state)
         {
-            ThumbnailUpdated -= state.UpdatedHandler;
-            state.UpdatedHandler = null;
+            if (state.UpdatedHandler is not null)
+            {
+                ThumbnailUpdated -= state.UpdatedHandler;
+                state.UpdatedHandler = null;
+            }
+
+            cts = state.Cts;
+            state.Cts = null;
         }
 
-        state.Cts?.Cancel();
-        state.Cts?.Dispose();
-        state.Cts = null;
+        cts?.Cancel();
+        cts?.Dispose();
     }
 
     public static void ApplyPaneThumbnail(FileClass file, Thumbnail thumb, ThumbnailSize size)

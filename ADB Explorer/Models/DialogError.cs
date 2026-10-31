@@ -20,6 +20,7 @@ public enum DialogError
     EmulatorLaunchFailed = 1203,
     PairingFailed = 1204,
     ConnectionFailed = 1205,
+    WsaLaunchFailed = 1206,
 
     InvalidDefaultFolder = 1300,
     InvalidAppDataLocation = 1301,
