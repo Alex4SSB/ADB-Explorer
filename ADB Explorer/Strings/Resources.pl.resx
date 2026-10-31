@@ -1804,4 +1804,7 @@ Sprawdzanie ma na celu zapobieżenie uruchomieniu przez niczego niespodziewając
   <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
     <value>razy</value>
   </data>
+  <data name="S_FOLDER_CONTENT_VALUE" xml:space="preserve">
+    <value>{0}, {1}</value>
+  </data>
 </root>
