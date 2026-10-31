@@ -687,7 +687,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>沒有符合您的搜尋的項目。</value>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
-    <value>&lt;Span&gt;此資料夾&lt;Italic&gt;看來&lt;/Italic&gt;爲空&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;...對肉眼來説&lt;/Span&gt;&lt;/Span&gt;</value>
+    <value>&lt;Span&gt;此資料夾&lt;Italic&gt;看來&lt;/Italic&gt;爲空&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;...以眼見而言&lt;/Span&gt;&lt;/Span&gt;</value>
   </data>
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
     <value>操作類型</value>
@@ -1116,7 +1116,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>移動</value>
   </data>
   <data name="S_ACTION_RECYCLE" xml:space="preserve">
-    <value>移入回收筒</value>
+    <value>移到回收筒</value>
   </data>
   <data name="S_ACTION_UPDATE" xml:space="preserve">
     <value>更新</value>
@@ -1814,5 +1814,62 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_SEARCH_CONTENTS" xml:space="preserve">
     <value>檔案內容</value>
+  </data>
+  <data name="S_SEARCH_CONTENTS_INFO" xml:space="preserve">
+    <value>也尋找含搜尋文字的檔案。</value>
+  </data>
+  <data name="S_SEARCH_ARCHIVES" xml:space="preserve">
+    <value>壓縮檔內容</value>
+  </data>
+  <data name="S_SEARCH_ARCHIVES_INFO" xml:space="preserve">
+    <value>也尋找壓縮黨內的檔案。</value>
+  </data>
+  <data name="S_SEARCH_CURRENT_FOLDER" xml:space="preserve">
+    <value>目前資料夾</value>
+  </data>
+  <data name="S_SEARCH" xml:space="preserve">
+    <value>搜尋</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS_INFO" xml:space="preserve">
+    <value>進階搜尋選項與篩選。</value>
+  </data>
+  <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
+    <value>離開搜尋結果模式。</value>
+  </data>
+  <data name="S_NEWER" xml:space="preserve">
+    <value>較新的</value>
+  </data>
+  <data name="S_BIGGER" xml:space="preserve">
+    <value>較大的</value>
+  </data>
+  <data name="S_PER_FILE_CONFLICT_TABLE_TITLE" xml:space="preserve">
+    <value>處理衝突時，選目標，就會跳過，或選來源，就會取代。</value>
+  </data>
+  <data name="S_TOOLTIP_REPLACED" xml:space="preserve">
+    <value>檔案會被取代。</value>
+  </data>
+  <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
+    <value>檔案會被跳過。</value>
+  </data>
+  <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
+    <value>建立一個應用程式安裝與 OBB 資料的 .APKBKP</value>
+  </data>
+  <data name="S_NAVIGATION_PANE" xml:space="preserve">
+    <value>瀏覽窗格</value>
+  </data>
+  <data name="S_MENU_SHOW" xml:space="preserve">
+    <value>顯示</value>
+  </data>
+  <data name="S_THUMBSIZE_CONTENT" xml:space="preserve">
+    <value>內容</value>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE" xml:space="preserve">
+    <value>顯示相對路徑</value>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE_INFO" xml:space="preserve">
+    <value>若勾選，搜尋結果會以相對於目前位置的路徑顯示。否則會顯示絕對路徑。</value>
+  </data>
+  <data name="S_VIEW_SIZE_TOOLTIP" xml:space="preserve">
+    <value>遞迴計算與顯示此資料夾下所又檔案的總大小。</value>
   </data>
 </root>
