@@ -1783,4 +1783,36 @@ ADB 包含在 Android SDK Platform Tools 中。
 
 支援的項目: 縮圖、PDF；符合大小限制的其他檔會以文字顯示，可選擇語法專用字強調顯示，而且只要位置允許，也可編輯與儲存。</value>
   </data>
+  <data name="S_FOLDER_CONTENT_VALUE" xml:space="preserve">
+    <value>{0} 個資料夾, {1} 個檔案</value>
+  </data>
+  <data name="S_UPDATE_SIGNATURE_INVALID" xml:space="preserve">
+    <value>下載的更新沒有用與前安裝檔相同的憑證的簽署。已丟棄更新。</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO" xml:space="preserve">
+    <value>停用  ADB 路徑 &amp; 可執行檔檢查。
+
+檢查是為了防止無警覺性的使用者啟動一個冒充成 ADB 的可能有害檔，包括:
+• 路徑一定不可以是個遠端 UNC 或一個符號連結
+• 可執行檔一定得使用 Google 的授權碼簽署，或符合規定的 SHA-256 雜湊清單
+• 若執行 --version，一定得傳回一個可識別的版本字串</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS" xml:space="preserve">
+    <value>搜尋選項</value>
+  </data>
+  <data name="S_SEARCH_RESULTS_IN" xml:space="preserve">
+    <value>搜尋 {0} 的結果</value>
+  </data>
+  <data name="S_SEARCH_ALL_SUBFOLDERS" xml:space="preserve">
+    <value>所有下層資料夾</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE" xml:space="preserve">
+    <value>區分大小寫</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE_INFO" xml:space="preserve">
+    <value>搜尋時大小寫必須完全符合。</value>
+  </data>
+  <data name="S_SEARCH_CONTENTS" xml:space="preserve">
+    <value>檔案內容</value>
+  </data>
 </root>
