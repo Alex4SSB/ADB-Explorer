@@ -18,6 +18,14 @@ public static partial class ThumbnailService
         && !file.IsLink
         && AdbExplorerConst.COMMON_PHOTO_EXT.Contains(file.Extension, StringComparer.InvariantCultureIgnoreCase);
 
+    /// <summary>A video whose device thumbnail can stand in as its preview.</summary>
+    public static bool IsVideoPaneThumbnailCandidate(FileClass file) =>
+        Data.Settings.ThumbsMode is not AppSettings.ThumbnailMode.Off
+        && Data.Settings.MovieThumbsEnabled
+        && file.Type is AbstractFile.FileType.File
+        && !file.IsLink
+        && GetPerceivedMediaType(file.Extension) is MediaType.video;
+
     public static Thumbnail? GetPaneThumbnail(FileClass file) =>
         Data.Settings.ThumbsMode is AppSettings.ThumbnailMode.Off
             ? null

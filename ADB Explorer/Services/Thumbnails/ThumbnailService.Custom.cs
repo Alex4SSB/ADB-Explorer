@@ -50,7 +50,7 @@ public static partial class ThumbnailService
                 return;
 
             thumbId = NewCustomThumbId(file, useOriginalExtension: true);
-            RegisterCustomThumbCacheEntry(ref deviceInfo, file, thumbId);
+            RegisterCustomThumbCacheEntry(deviceInfo.ThumbnailPathCache, file, thumbId);
             UpdateCache(deviceInfo);
             WriteThumbsCacheToCsvFile(deviceInfo.DeviceId, deviceInfo.ThumbnailPathCache);
         }
@@ -254,7 +254,7 @@ public static partial class ThumbnailService
             Directory.CreateDirectory(targetDir);
             newId = NewCustomThumbId(file, useOriginalExtension: true);
 
-            RegisterCustomThumbCacheEntry(ref deviceInfo, file, newId);
+            RegisterCustomThumbCacheEntry(deviceInfo.ThumbnailPathCache, file, newId);
             UpdateCache(deviceInfo);
             WriteThumbsCacheToCsvFile(deviceInfo.DeviceId, deviceInfo.ThumbnailPathCache);
         }
@@ -307,7 +307,7 @@ public static partial class ThumbnailService
             else
             {
                 thumbId = NewCustomThumbId(file, useOriginalExtension: true);
-                RegisterCustomThumbCacheEntry(ref deviceInfo, file, thumbId);
+                RegisterCustomThumbCacheEntry(deviceInfo.ThumbnailPathCache, file, thumbId);
                 UpdateCache(deviceInfo);
                 WriteThumbsCacheToCsvFile(deviceInfo.DeviceId, deviceInfo.ThumbnailPathCache);
             }
@@ -379,17 +379,17 @@ public static partial class ThumbnailService
         return $"{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}_{prefix}{ext}";
     }
 
-    private static void RegisterCustomThumbCacheEntry(ref DeviceThumbnailInfo deviceInfo, FileClass file, string thumbId)
+    private static void RegisterCustomThumbCacheEntry(Dictionary<string, ThumbnailInfo> cache, FileClass file, string thumbId)
     {
         var entry = new ThumbnailInfo(thumbId, MediaType.images, null, null, DateTime.MinValue, CUSTOM_PHOTOS_SUBFOLDER);
 
         // Keeps the data read when the file was pushed
-        if (deviceInfo.ThumbnailPathCache.TryGetValue(file.FullPath, out var existing) && existing.IsInfoOnly)
+        if (cache.TryGetValue(file.FullPath, out var existing) && existing.IsInfoOnly)
             entry = entry.WithMediaInfo(existing);
 
-        deviceInfo.ThumbnailPathCache[file.FullPath] = entry;
+        cache[file.FullPath] = entry;
         if (!string.Equals(file.ParsedFullPath, file.FullPath, StringComparison.Ordinal))
-            deviceInfo.ThumbnailPathCache[file.ParsedFullPath] = entry;
+            cache[file.ParsedFullPath] = entry;
     }
 
     /// <summary>

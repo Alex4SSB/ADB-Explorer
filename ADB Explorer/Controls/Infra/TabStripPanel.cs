@@ -116,16 +116,29 @@ public class TabStripPanel : Panel
         if (SeparatorBrush is not { } brush || InternalChildren.Count < 2)
             return;
 
-        var pen = new Pen(brush, 1);
         var top = (ActualHeight - SeparatorBottomInset - SeparatorHeight) / 2;
+
+        // A whole number of device pixels wide, with guidelines snapping both edges to pixels:
+        // a 1 DIP line at a fractional scale straddles one pixel or two, depending on where it falls.
+        var scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
+        var width = Math.Max(1, Math.Round(scale)) / scale;
 
         for (var i = 1; i < InternalChildren.Count; i++)
         {
             if (InternalChildren[i - 1] is ListBoxItem { IsSelected: true } || InternalChildren[i] is ListBoxItem { IsSelected: true })
                 continue;
 
-            var x = Math.Round(i * _slotWidth);
-            drawingContext.DrawLine(pen, new Point(x, top), new Point(x, top + SeparatorHeight));
+            var separator = new Rect(i * _slotWidth - width / 2, top, width, SeparatorHeight);
+
+            drawingContext.PushGuidelineSet(new GuidelineSet([separator.Left, separator.Right], []));
+            drawingContext.DrawRectangle(brush, null, separator);
+            drawingContext.Pop();
         }
+    }
+
+    protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
+    {
+        base.OnDpiChanged(oldDpi, newDpi);
+        InvalidateVisual();
     }
 }

@@ -19,6 +19,16 @@ public class AdbVirtualizingWrapPanel : Wpf.Ui.Controls.VirtualizingWrapPanel
     private int _earliestPlaceholderIndex = -1;
     private double _viewportHeight;
     private Wpf.Ui.Controls.ItemRange _visibleRange;
+    private bool _itemRangeUpdated;
+    private bool _remeasureScheduled;
+    private bool _itemsReset;
+
+    /// <summary>Rows realized from the top of the viewport since the last Reset, or -1 once the full range is.</summary>
+    private int _resetRealizedRows = -1;
+    private bool _rowGrowthScheduled;
+
+    /// <summary>Rows realized in the layout pass right after a Reset, before the rest follow at Background priority.</summary>
+    private const int ResetInitialRows = 2;
 
     public int ItemsInView => ChildSize.Height > 0 && ItemsPerRowCount > 0
         ? (int)Math.Ceiling(_viewportHeight / ChildSize.Height) * ItemsPerRowCount
@@ -41,7 +51,13 @@ public class AdbVirtualizingWrapPanel : Wpf.Ui.Controls.VirtualizingWrapPanel
         availableSize = ShrinkWidthForScrollbar(availableSize);
 
         _viewportHeight = availableSize.Height;
+        _itemRangeUpdated = false;
         var result = base.MeasureOverride(availableSize);
+
+        // The base skips realizing items while the ScrollViewer measures with its Auto scrollbar collapsed,
+        // which it does before re-measuring. After a Reset (e.g. a sort) that leaves only the first item.
+        if (!_itemRangeUpdated)
+            ScheduleRemeasure();
 
         // base.MeasureOverride calls UpdateChildSize (which reads the pre-measure DesiredSize to set
         // ChildSize) and then measures children (updating their DesiredSize). If the two differ, the
@@ -59,9 +75,84 @@ public class AdbVirtualizingWrapPanel : Wpf.Ui.Controls.VirtualizingWrapPanel
         return finalSize;
     }
 
+    /// <summary>Measures again once the current layout pass is over - invalidating from within it is ignored.</summary>
+    private void ScheduleRemeasure()
+    {
+        if (_remeasureScheduled)
+            return;
+
+        _remeasureScheduled = true;
+        Dispatcher.BeginInvoke(() =>
+        {
+            _remeasureScheduled = false;
+            InvalidateMeasure();
+        }, DispatcherPriority.Render);
+    }
+
+    protected override void OnItemsChanged(object sender, ItemsChangedEventArgs args)
+    {
+        base.OnItemsChanged(sender, args);
+
+        if (args.Action is NotifyCollectionChangedAction.Reset)
+            _itemsReset = true;
+    }
+
+    /// <summary>
+    /// A Reset (e.g. a sort) drops every container, and rebuilding a full viewport of tiles blocks the UI.
+    /// Realize the top rows right away and the rest one row per Background pass, top-down.
+    /// </summary>
+    private Wpf.Ui.Controls.ItemRange LimitRangeAfterReset(Wpf.Ui.Controls.ItemRange range)
+    {
+        if (_itemsReset)
+        {
+            _itemsReset = false;
+            _resetRealizedRows = ResetInitialRows;
+        }
+
+        if (_resetRealizedRows < 0)
+            return range;
+
+        if (Items.Count == 0 || ChildSize.Height <= 0 || ItemsPerRowCount <= 0)
+        {
+            _resetRealizedRows = -1;
+            return range;
+        }
+
+        var firstRow = (int)(Offset.Y / ChildSize.Height);
+        var start = Math.Max(range.StartIndex, firstRow * ItemsPerRowCount);
+        var end = Math.Min(range.EndIndex, ((firstRow + _resetRealizedRows) * ItemsPerRowCount) - 1);
+
+        if (end >= range.EndIndex)
+        {
+            _resetRealizedRows = -1;
+            return range;
+        }
+
+        ScheduleRowGrowth();
+        return new(start, end);
+    }
+
+    private void ScheduleRowGrowth()
+    {
+        if (_rowGrowthScheduled)
+            return;
+
+        _rowGrowthScheduled = true;
+        Dispatcher.BeginInvoke(() =>
+        {
+            _rowGrowthScheduled = false;
+            if (_resetRealizedRows < 0)
+                return;
+
+            _resetRealizedRows++;
+            InvalidateMeasure();
+        }, DispatcherPriority.Background);
+    }
+
     protected override Wpf.Ui.Controls.ItemRange UpdateItemRange()
     {
-        var range = base.UpdateItemRange();
+        _itemRangeUpdated = true;
+        var range = LimitRangeAfterReset(base.UpdateItemRange());
         _visibleRange = range;
 
         // Reset tracking when the items collection changes (e.g. navigation to a new folder).

@@ -67,10 +67,6 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
             return;
         }
 
-        view.SortDescriptions.Clear();
-        view.SortDescriptions.Add(new(nameof(FileClass.IsTemp), ListSortDirection.Descending));
-        view.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListHelper.Invert(dir)));
-
         var sortProp = col switch
         {
             SortingSelector.SortingProperty.Date => nameof(FileClass.ModifiedTime),
@@ -79,7 +75,14 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
             _ => nameof(FileClass.SortName),
         };
 
-        view.SortDescriptions.Add(new(sortProp, dir));
+        // Each SortDescriptions change re-sorts and resets every bound list - only sort once.
+        using (view.DeferRefresh())
+        {
+            view.SortDescriptions.Clear();
+            view.SortDescriptions.Add(new(nameof(FileClass.IsTemp), ListSortDirection.Descending));
+            view.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListHelper.Invert(dir)));
+            view.SortDescriptions.Add(new(sortProp, dir));
+        }
 
         if (Data.Settings.SortingPerLocation)
         {
@@ -96,8 +99,6 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
 
     private void ApplyPackageSortToView(ICollectionView view, SortingSelector.SortingProperty col, ListSortDirection dir)
     {
-        view.SortDescriptions.Clear();
-
         var sortProp = col switch
         {
             SortingSelector.SortingProperty.Type => nameof(Package.Type),
@@ -106,11 +107,15 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
             _ => nameof(Package.DisplayName),
         };
 
-        view.SortDescriptions.Add(new(sortProp, dir));
+        using (view.DeferRefresh())
+        {
+            view.SortDescriptions.Clear();
+            view.SortDescriptions.Add(new(sortProp, dir));
 
-        // Secondary name sort (same direction) when the primary column is not name.
-        if (col is not SortingSelector.SortingProperty.Name)
-            view.SortDescriptions.Add(new(nameof(Package.DisplayName), dir));
+            // Secondary name sort (same direction) when the primary column is not name.
+            if (col is not SortingSelector.SortingProperty.Name)
+                view.SortDescriptions.Add(new(nameof(Package.DisplayName), dir));
+        }
 
         // Live-sort on DisplayName so labels arriving later re-order tiles without
         // ICollectionView.Refresh() (which resets virtualization and blanks all icons).

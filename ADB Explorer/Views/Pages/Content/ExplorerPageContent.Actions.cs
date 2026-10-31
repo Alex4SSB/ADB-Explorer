@@ -311,6 +311,13 @@ public partial class ExplorerPageContent
             file.InvalidateIconViewModelThumbnail();
     }
 
+    // Icons that missed the device's thumbnails while they were still being read gave up - ask again
+    private void OnDeviceThumbnailCacheMerged(string serialNumber) => App.SafeBeginInvoke(() =>
+    {
+        if (Instance.EffectiveDevice?.SerialNumber == serialNumber)
+            InvalidateFileIcons();
+    });
+
     internal void DisposeFileIcons()
     {
         if (Instance.FileList.DirList?.FileList is not { } files)

@@ -9,6 +9,8 @@ public partial class MainWindow
     private void TabStrip_TabDragStarted(ExplorerInstance tab)
     {
         _draggedTab = tab;
+        TabReorderOverlay.Visibility = Visibility.Visible;
+
         // Laid out first, as the list's place is measured against the overlay.
         TabDropOverlay.Visibility = Visibility.Visible;
         TabDropOverlay.UpdateLayout();
@@ -50,6 +52,40 @@ public partial class MainWindow
         _draggedTab = null;
         TabDropOverlay.Visibility = Visibility.Collapsed;
         HideTabDropHints();
+
+        TabReorderOverlay.Visibility = Visibility.Collapsed;
+        TabStrip.HideReorderTarget();
+    }
+
+    /// <summary>Over the title bar and navigation row, the dragged tab would move along the strip; the pill marks where.</summary>
+    private void TabReorderOverlay_DragOver(object sender, DragEventArgs e)
+    {
+        e.Handled = true;
+
+        if (_draggedTab is not { } dragged)
+        {
+            e.Effects = DragDropEffects.None;
+            return;
+        }
+
+        e.Effects = DragDropEffects.Move;
+        Data.CopyPaste.DragTabTooltip = null;
+        Data.CopyPaste.CurrentDropEffect = DragDropEffects.Move;
+        TabStrip.ShowReorderTarget(dragged, e);
+    }
+
+    private void TabReorderOverlay_DragLeave(object sender, DragEventArgs e)
+    {
+        Data.CopyPaste.CurrentDropEffect = DragDropEffects.None;
+        TabStrip.HideReorderTarget();
+    }
+
+    private void TabReorderOverlay_Drop(object sender, DragEventArgs e)
+    {
+        e.Handled = true;
+
+        if (_draggedTab is { } dragged)
+            TabStrip.DropReorderTarget(dragged, e);
     }
 
     /// <summary>The zone last hinted, kept while the pointer is in the region's center.</summary>

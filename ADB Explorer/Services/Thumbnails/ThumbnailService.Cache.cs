@@ -123,20 +123,22 @@ public static partial class ThumbnailService
 
     private static void MergeDeviceWithLocalCache(DeviceThumbnailInfo deviceInfo)
     {
-        if (!deviceInfo.HasThumbnailSupport)
+        if (!deviceInfo.HasThumbnailSupport || deviceInfo.ThumbnailPathCache is not { } cache)
             return;
+
         var deviceCache = GetThumbsCacheFromDevice(deviceInfo);
 
         foreach (var kvp in deviceCache)
         {
             // The device's thumbnail replaces an entry with only the data read when the file was pushed, keeping that data
-            if (deviceInfo.ThumbnailPathCache.TryGetValue(kvp.Key, out var pushed) && pushed.IsInfoOnly)
-                deviceInfo.ThumbnailPathCache[kvp.Key] = kvp.Value.WithMediaInfo(pushed);
+            if (cache.TryGetValue(kvp.Key, out var pushed) && pushed.IsInfoOnly)
+                cache[kvp.Key] = kvp.Value.WithMediaInfo(pushed);
             else
-                deviceInfo.ThumbnailPathCache.TryAdd(kvp.Key, kvp.Value);
+                cache.TryAdd(kvp.Key, kvp.Value);
         }
 
         UpdateCache(deviceInfo);
+        DeviceCacheMerged?.Invoke(deviceInfo.DeviceId);
         PullThumbnails(deviceInfo);
     }
 
@@ -160,9 +162,10 @@ public static partial class ThumbnailService
     {
         ThumbnailProgressChanged?.Invoke(ThumbnailStep.ReadingDatabase, true);
 
-        var ct = Data.DeviceCts.Token;
+        // Not DeviceCts: every navigation cancels it, which would cut off the video query and cache an empty result
+        var ct = CancellationToken.None;
         var picsResponse = GetThumbsFromDevice(deviceInfo, MediaType.images, ct);
-        var thumbnailMap = ParseThumbnailMap(picsResponse, MediaType.images).ToList();
+        var thumbnailMap = ParseThumbnailMap(picsResponse, MediaType.images);
 
         string moviesResponse = Data.Settings.MovieThumbsEnabled
             ? GetThumbsFromDevice(deviceInfo, MediaType.video, ct)
@@ -172,12 +175,13 @@ public static partial class ThumbnailService
 
         ThumbnailProgressChanged?.Invoke(ThumbnailStep.ReadingDatabase, false);
 
-        if (thumbnailMap is null || thumbnailMap.Count == 0)
+        IEnumerable<KeyValuePair<string, ThumbnailInfo>> entries = [.. thumbnailMap, .. moviesThumbnailMap];
+        var combined = entries.ToDictionary();
+        if (combined.Count == 0)
             // Cache an almost empty dictionary to avoid repeated ADB calls
             return new([new KeyValuePair<string, ThumbnailInfo>("", new())]);
-        
-        IEnumerable<KeyValuePair<string, ThumbnailInfo>> combined = [.. thumbnailMap, .. moviesThumbnailMap];
-        return combined.ToDictionary();
+
+        return combined;
     }
 
     private static void UpdateThumbnailInfo(string serialNumber, string id, Size? resolution = null, long? fileSize = null)
@@ -343,10 +347,10 @@ public static partial class ThumbnailService
 
         IEnumerable<string> filesToReplace = [];
 
-        if (Directory.Exists(deviceInfo.LocalThumbnailDir) && deviceInfo.ThumbnailPathCache.Count > 1)
+        if (Directory.Exists(deviceInfo.LocalThumbnailDir) && deviceInfo.ThumbnailPathCache is { Count: > 1 } cache)
         {
             var parent = FileHelper.GetParentPath(deviceInfo.LocalThumbnailDir);
-            filesToReplace = deviceInfo.ThumbnailPathCache.Where(kvp => kvp.Value.LastUpdate != DateTime.MinValue && kvp.Value.IsOverdue).Select(thumb => Path.Combine(parent, thumb.Value.Id));
+            filesToReplace = cache.Where(kvp => kvp.Value.LastUpdate != DateTime.MinValue && kvp.Value.IsOverdue).Select(thumb => Path.Combine(parent, thumb.Value.Id));
         }
         else
         {

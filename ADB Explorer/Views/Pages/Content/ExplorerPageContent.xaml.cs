@@ -181,6 +181,7 @@ public partial class ExplorerPageContent : UserControl
         {
             DragAutoScroll.Register(ExplorerList.ExplorerScrollViewer);
             DragAutoScroll.Register(ExplorerList.IconScrollViewer);
+            ThumbnailService.DeviceCacheMerged += OnDeviceThumbnailCacheMerged;
 
             ActivateContent();
         };
@@ -188,6 +189,7 @@ public partial class ExplorerPageContent : UserControl
         {
             DragAutoScroll.Unregister(ExplorerList.ExplorerScrollViewer);
             DragAutoScroll.Unregister(ExplorerList.IconScrollViewer);
+            ThumbnailService.DeviceCacheMerged -= OnDeviceThumbnailCacheMerged;
         };
 
         HookToolbarMenu(MainToolBar);

@@ -27,7 +27,8 @@ public partial class DetailsPane
             return;
         }
 
-        if (ThumbnailService.IsPhotoPaneThumbnailCandidate(file))
+        if (ThumbnailService.IsPhotoPaneThumbnailCandidate(file)
+            || ThumbnailService.IsVideoPaneThumbnailCandidate(file))
         {
             ShowPhotoPreview(file);
             return;
@@ -225,20 +226,19 @@ public partial class DetailsPane
         file.PropertyChanged += OnFileFullPathChanged;
 
         // Never use DragImage here — it falls back to the shell file icon.
-        PhotoPreviewImage.Source = null;
-        PhotoPreviewImage.Visibility = Visibility.Collapsed;
+        ClearPhotoPreview();
         NoPreviewTextBlock.Visibility = Visibility.Collapsed;
 
         if (file.CacheThumbnail?.Image is BitmapSource cached)
         {
-            ApplyPhotoPreviewImage(cached);
+            ApplyPhotoPreviewImage(file, cached);
             return;
         }
 
         file.BeginLoadCacheThumbnail();
 
         if (file.CacheThumbnail?.Image is BitmapSource afterLoad)
-            ApplyPhotoPreviewImage(afterLoad);
+            ApplyPhotoPreviewImage(file, afterLoad);
         else if (!ThumbnailService.IsPaneThumbnailLoading(file))
             NoPreviewTextBlock.Visibility = Visibility.Visible;
     }
@@ -250,7 +250,7 @@ public partial class DetailsPane
 
         if (file.CacheThumbnail?.Image is BitmapSource image)
         {
-            ApplyPhotoPreviewImage(image);
+            ApplyPhotoPreviewImage(file, image);
             return;
         }
 
@@ -261,17 +261,19 @@ public partial class DetailsPane
         NoPreviewTextBlock.Visibility = Visibility.Visible;
     }
 
-    private void ApplyPhotoPreviewImage(BitmapSource image)
+    private void ApplyPhotoPreviewImage(FileClass file, BitmapSource image)
     {
         NoPreviewTextBlock.Visibility = Visibility.Collapsed;
-        PhotoPreviewImage.Visibility = Visibility.Visible;
+        PhotoPreviewGrid.Visibility = Visibility.Visible;
         PhotoPreviewImage.Source = image;
+        PhotoPreviewOverlay.Source = ThumbnailService.IsVideoPaneThumbnailCandidate(file) ? file.FileIcon32 : null;
     }
 
     private void ClearPhotoPreview()
     {
         PhotoPreviewImage.Source = null;
-        PhotoPreviewImage.Visibility = Visibility.Collapsed;
+        PhotoPreviewOverlay.Source = null;
+        PhotoPreviewGrid.Visibility = Visibility.Collapsed;
     }
 
     private void ApplyPreviewContent()

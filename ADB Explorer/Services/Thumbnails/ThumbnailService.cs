@@ -151,6 +151,12 @@ public static partial class ThumbnailService
 
     public static event Action<string, string>? ThumbnailUpdated;
 
+    /// <summary>
+    /// Raised with the device serial number once its media DB entries are merged into a cache read from the CSV.
+    /// Lookups made before that missed them, so views should ask again.
+    /// </summary>
+    public static event Action<string>? DeviceCacheMerged;
+
     private static readonly Mutex _mutex = new(false);
     private static readonly Mutex _listMutex = new(false);
 
@@ -183,9 +189,10 @@ public static partial class ThumbnailService
         public bool HasThumbnailSupport { get; set; }
 
         /// <summary>
-        /// Key: Original file path on the device, Value: Thumbnail info (including thumbnail ID which corresponds to the local thumbnail file name)
+        /// Key: Original file path on the device, Value: Thumbnail info (including thumbnail ID which corresponds to the local thumbnail file name).
+        /// Null until loaded from the CSV or the device - an empty default would skip that load.
         /// </summary>
-        public Dictionary<string, ThumbnailInfo> ThumbnailPathCache { get; set; } = [];
+        public Dictionary<string, ThumbnailInfo>? ThumbnailPathCache { get; set; }
     }
 
     private static DeviceThumbnailInfo? GetDeviceThumbsInfo(string serialNumber)

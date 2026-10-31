@@ -12,7 +12,7 @@ public partial class ExplorerTabStrip : UserControl
 
     private ExplorerInstance? _dragHoverTab;
 
-    /// <summary>Data format of a tab header being dragged out to become a split view's pane.</summary>
+    /// <summary>Data format of a tab header being dragged to a new place in the strip, or out to become a split view's pane.</summary>
     private const string TabDragFormat = "ADBExplorer.TabHeader";
 
     /// <summary>Raised around a tab header drag, so the window can show where the tab would be dropped.</summary>
@@ -25,6 +25,9 @@ public partial class ExplorerTabStrip : UserControl
     private Point _pressPoint;
 
     private Point _pressPointInItem;
+
+    /// <summary>Where the dragged tab lands if dropped now, as last marked; -1 when nothing is marked.</summary>
+    private int _reorderIndex = -1;
 
     public ExplorerTabStrip()
     {
@@ -100,6 +103,74 @@ public partial class ExplorerTabStrip : UserControl
         _pressedTab = null;
         item.ReleaseMouseCapture();
 
+        StartTabDrag(item, tab, _pressPointInItem);
+    }
+
+    /// <summary>
+    /// Marks where <paramref name="tab"/> lands if dropped at <paramref name="e"/>'s position: the gap between tabs nearest
+    /// the pointer, as a DataGrid picks for a dragged column header. The pill goes on the left side of that place.
+    /// </summary>
+    public void ShowReorderTarget(ExplorerInstance tab, DragEventArgs e)
+    {
+        var tabs = ((ExplorerTabsViewModel)DataContext).Tabs;
+        var from = tabs.IndexOf(tab);
+        var containers = Enumerable.Range(0, tabs.Count)
+            .Select(i => TabsList.ItemContainerGenerator.ContainerFromIndex(i) as FrameworkElement)
+            .ToList();
+
+        if (from < 0 || containers.Any(c => c is null))
+        {
+            HideReorderTarget();
+            return;
+        }
+
+        var x = e.GetPosition(TabsList).X;
+        var gap = containers.Count(c => c!.TranslatePoint(new Point(c.ActualWidth / 2, 0), TabsList).X < x);
+
+        // The gap after the tab leaves it in place too, so the pill stays on its own left side.
+        if (gap == from + 1)
+            gap = from;
+
+        _reorderIndex = gap;
+        if (gap > from)
+            _reorderIndex = gap - 1;
+
+        // Centered between the tabs' margins, and on their bodies.
+        var neighbor = containers[Math.Min(gap, containers.Count - 1)]!;
+        var edge = neighbor.TranslatePoint(new Point(-neighbor.Margin.Left, 0), ReorderCanvas);
+        if (gap == containers.Count)
+            edge = neighbor.TranslatePoint(new Point(neighbor.ActualWidth + neighbor.Margin.Right, 0), ReorderCanvas);
+
+        var left = Math.Clamp(edge.X - ReorderIndicator.Width / 2, 0, Math.Max(0, ReorderCanvas.ActualWidth - ReorderIndicator.Width));
+        Canvas.SetLeft(ReorderIndicator, left);
+        Canvas.SetTop(ReorderIndicator, edge.Y + (TabBodyHeight(neighbor) - ReorderIndicator.Height) / 2);
+        ReorderIndicator.Visibility = Visibility.Visible;
+    }
+
+    public void HideReorderTarget()
+    {
+        _reorderIndex = -1;
+        ReorderIndicator.Visibility = Visibility.Collapsed;
+    }
+
+    /// <summary>Moves <paramref name="tab"/> to where it was dropped and switches to it, as releasing a pressed tab does.</summary>
+    public void DropReorderTarget(ExplorerInstance tab, DragEventArgs e)
+    {
+        ShowReorderTarget(tab, e);
+
+        var target = _reorderIndex;
+        HideReorderTarget();
+
+        var tabs = (ExplorerTabsViewModel)DataContext;
+        var from = tabs.Tabs.IndexOf(tab);
+        if (target >= 0 && from >= 0 && target != from)
+            tabs.Tabs.Move(from, target);
+
+        tabs.ActiveTab = tab;
+    }
+
+    private void StartTabDrag(FrameworkElement item, ExplorerInstance tab, Point pressPointInItem)
+    {
         TabDragStarted?.Invoke(tab);
 
         // The app's drag window follows the cursor, showing the tab's header where a drag image would be.
@@ -111,13 +182,13 @@ public partial class ExplorerTabStrip : UserControl
 
         // Held where the header was grabbed, at the size of its body.
         // In right-to-left layouts the press point is measured from the header's right edge.
-        var pressX = _pressPointInItem.X;
+        var pressX = pressPointInItem.X;
         if (item.FlowDirection is FlowDirection.RightToLeft)
             pressX = item.ActualWidth - pressX;
 
         Data.CopyPaste.DragImageRectPx = new Rect(
             -pressX * scale,
-            -_pressPointInItem.Y * scale,
+            -pressPointInItem.Y * scale,
             item.ActualWidth * scale,
             TabBodyHeight(item) * scale);
 

@@ -633,5 +633,18 @@
             </ui:TitleBar.TrailingContent>
         </ui:TitleBar>
 
+        <!--  While a tab header is dragged, covers the title bar and navigation row, where dropping it moves it along the strip.  -->
+        <Grid
+            x:Name="TabReorderOverlay"
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            AllowDrop="True"
+            Background="Transparent"
+            DragEnter="TabReorderOverlay_DragOver"
+            DragLeave="TabReorderOverlay_DragLeave"
+            DragOver="TabReorderOverlay_DragOver"
+            Drop="TabReorderOverlay_Drop"
+            Visibility="Collapsed" />
+
     </Grid>
 </ui:FluentWindow>

@@ -260,14 +260,22 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
-                <Image
-                    x:Name="PhotoPreviewImage"
+                <Grid
+                    x:Name="PhotoPreviewGrid"
                     Margin="4"
-                    FlowDirection="LeftToRight"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Stretch="Uniform"
-                    Visibility="Collapsed" />
+                    FlowDirection="LeftToRight"
+                    Visibility="Collapsed">
+                    <Image x:Name="PhotoPreviewImage" Stretch="Uniform" />
+                    <Image
+                        x:Name="PhotoPreviewOverlay"
+                        Width="32"
+                        Height="32"
+                        Margin="0,0,-4,-4"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom" />
+                </Grid>
                 <TextBlock
                     x:Name="NoPreviewTextBlock"
                     HorizontalAlignment="Center"
