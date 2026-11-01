@@ -1807,4 +1807,7 @@ Sprawdzanie ma na celu zapobieżenie uruchomieniu przez niczego niespodziewając
   <data name="S_FOLDER_CONTENT_VALUE" xml:space="preserve">
     <value>{0}, {1}</value>
   </data>
+  <data name="S_REPORT_ISSUE" xml:space="preserve">
+    <value>Zgłoś problem</value>
+  </data>
 </root>
