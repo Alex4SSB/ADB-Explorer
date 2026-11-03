@@ -1027,7 +1027,7 @@ Avbryt alla pågående</value>
     <value>Flytta</value>
   </data>
   <data name="S_ACTION_RECYCLE" xml:space="preserve">
-    <value>Flytta till papperskorgen</value>
+    <value>Flytta till papperskorg</value>
   </data>
   <data name="S_ACTION_UPDATE" xml:space="preserve">
     <value>Uppdatera</value>
@@ -1804,5 +1804,11 @@ Kontrollerna försöker hindra en ovetande användare från att starta en möjli
   </data>
   <data name="S_DUPLICATE_TAB" xml:space="preserve">
     <value>Duplicera flik</value>
+  </data>
+  <data name="S_REPORT_ISSUE" xml:space="preserve">
+    <value>Rapportera ett problem</value>
+  </data>
+  <data name="S_FOLDER_CONTENT_VALUE" xml:space="preserve">
+    <value>{0}, {1}</value>
   </data>
 </root>
