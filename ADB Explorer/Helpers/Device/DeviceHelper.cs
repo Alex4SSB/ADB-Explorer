@@ -34,9 +34,7 @@ public static partial class DeviceHelper
 
     public static string ParseDeviceName(string model, string device)
     {
-        var name = device;
-        if (device.Equals(device, StringComparison.InvariantCultureIgnoreCase))
-            name = model;
+        var name = string.IsNullOrEmpty(model) ? device : model;
 
         return name.Replace('_', ' ');
     }
@@ -197,7 +195,7 @@ public static partial class DeviceHelper
     public static void UpdateDevicesRootAccess()
     {
         var devices = Data.DevicesObject.LogicalDeviceViewModels
-            .Where(d => d.Status is DeviceStatus.Ok && d.Root is RootStatus.Unchecked)
+            .Where(d => d.Status is DeviceStatus.Ok && d.Root is RootStatus.Unchecked && d.IsShellIdentityStale())
             .ToList();
         foreach (var device in devices)
         {
@@ -370,7 +368,7 @@ public static partial class DeviceHelper
         // Props (getprop) is needed by CombineDisplayNames (BrandName) and SetAndroidVersion.
         // AdbFeatures is needed for sync/list size capability checks.
         // GetInternalStorage (readlink) is independent and updates the internal drive path.
-        var propsTask = Task.Run(() => device.Props);
+        var propsTask = Task.Run(device.LoadProps);
         var featuresTask = Task.Run(() => device.AdbFeatures);
         var shellTask = Task.Run(() => device.GetOrLoadShellIdentity());
 

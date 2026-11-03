@@ -97,4 +97,8 @@ public static partial class AdbRegEx
     /// <summary><c>dumpsys mount</c> public volume entry: owning disk, user-visible volume label, and mount path.</summary>
     [GeneratedRegex(@"VolumeInfo\{public:[\d,]+\}:\s*\r?\n\s*type=PUBLIC diskId=disk:(?<Disk>[\d,]+)[^\r\n]*\r?\n\s*fsType=\S*\s+fsUuid=\S*\s+fsLabel=(?<FsLabel>.*?)\s*\r?\n\s*path=(?<Path>\S+)")]
     public static partial Regex RE_DUMPSYS_MOUNT_VOLUME();
+
+    /// <summary>Toybox <c>find</c>'s report of an entry it listed but couldn't stat - quoted, unlike a folder it couldn't open.</summary>
+    [GeneratedRegex(@"^find: '(?<Path>.+)': (?!loop detected)")]
+    public static partial Regex RE_FIND_STAT_ERROR();
 }

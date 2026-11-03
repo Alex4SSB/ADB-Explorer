@@ -75,17 +75,9 @@ public partial class ExplorerPageContent
 
             case nameof(DirectoryLister.InProgress):
                 {
-                    Task.Run(() =>
-                    {
-                        if (!Instance.FileList.DirList.InProgress)
-                            Task.Delay(EMPTY_FOLDER_NOTICE_DELAY);
-
-                        App.SafeInvoke(() =>
-                        {
-                            Instance.FileList.Actions.ListingInProgress = Instance.FileList.DirList.InProgress;
-                            FileActionLogic.UpdateFileActions();
-                        });
-                    });
+                    // The empty folder notice delays itself (IsEmptyFolderNoticeAllowed), nothing else waits
+                    Instance.FileList.Actions.ListingInProgress = Instance.FileList.DirList.InProgress;
+                    FileActionLogic.UpdateFileActions();
 
                     if (Instance.FileList.DirList.InProgress)
                         return;

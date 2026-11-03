@@ -44,6 +44,7 @@
                 Grid.Column="1"
                 Margin="4"
                 HorizontalAlignment="Left"
+                ContextMenu="{x:Null}"
                 DisplayMemberPath="Name"
                 FlowDirection="LeftToRight"
                 ItemsSource="{Binding DevicesView}"

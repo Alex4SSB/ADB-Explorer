@@ -23,6 +23,48 @@ public partial class ExplorerTabsViewModel : ObservableObject
     {
         Tabs.CollectionChanged += (_, _) => TabsChanged();
         SplitChanged += (_, _) => TabsChanged();
+
+        Data.Settings.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(AppSettings.EnableLog) && !Data.Settings.EnableLog)
+                App.SafeInvoke(() => ClosePage(typeof(Views.Pages.LogPage)));
+        };
+    }
+
+    private static bool ShowsPage(ExplorerInstance pane, Type pageType) => pane.History.Current?.PageType == pageType;
+
+    /// <summary>Closes every tab and pane showing <paramref name="pageType"/>; the last tab left goes back to its explorer instead.</summary>
+    public void ClosePage(Type pageType)
+    {
+        foreach (var tab in Tabs.ToList())
+        {
+            if (tab.SplitInstance is { } split && ShowsPage(split, pageType))
+                CloseSplit(tab);
+
+            if (!ShowsPage(tab, pageType))
+                continue;
+
+            if (tab.SplitInstance is not null)
+                ClosePane(tab, closeFirst: true);
+            else if (Tabs.Count > 1)
+                CloseTab(tab);
+            else
+                LeavePage(tab);
+        }
+    }
+
+    /// <summary>Shows the tab's explorer again, where it was left under the page - or its drives if it never browsed.</summary>
+    private void LeavePage(ExplorerInstance tab)
+    {
+        if (tab.History.LastExplorerLocation is { } location)
+        {
+            tab.History.Navigate(location);
+            tab.NotifyTabChanged();
+            return;
+        }
+
+        FocusPane(tab);
+        Data.RequestNavigation(new(Navigation.SpecialLocation.DriveView));
     }
 
     private void TabsChanged()

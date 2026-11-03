@@ -66,6 +66,8 @@ public static class AdbExplorerConst
     public static readonly TimeSpan RENAME_CLICK_DELAY = TimeSpan.FromMilliseconds(500);
     public static readonly TimeSpan DRIVE_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(2000);
     public static readonly TimeSpan BATTERY_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(8000);
+    public static readonly TimeSpan ROOT_CHANGE_GRACE_PERIOD = TimeSpan.FromSeconds(30);
+    public static readonly TimeSpan SHELL_IDENTITY_RECHECK_INTERVAL = TimeSpan.FromSeconds(60);
     public static readonly TimeSpan MDNS_STATUS_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(15);
     public static readonly TimeSpan RESPONSE_TIMER_INTERVAL = TimeSpan.FromMilliseconds(1000);
     public static readonly TimeSpan SERVER_RESPONSE_TIMEOUT = TimeSpan.FromMilliseconds(13000);

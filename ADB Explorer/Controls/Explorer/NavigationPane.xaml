@@ -264,6 +264,10 @@
                                             <DataTrigger Binding="{Binding CanExpand}" Value="True">
                                                 <Setter TargetName="Expander" Property="Visibility" Value="Visible" />
                                             </DataTrigger>
+                                            <!--  Expanding an unlisted folder lists it on the device first  -->
+                                            <DataTrigger Binding="{Binding ChildrenLoading}" Value="True">
+                                                <Setter TargetName="Border" Property="Cursor" Value="Wait" />
+                                            </DataTrigger>
                                             <Trigger Property="IsExpanded" Value="True">
                                                 <Setter TargetName="ItemsHost" Property="Visibility" Value="Visible" />
                                             </Trigger>

@@ -50,15 +50,17 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
 
     private bool _isSearchListing;
 
+    /// <summary>The last listing of <see cref="CurrentPath"/> ran to the end.</summary>
+    private bool _isListingComplete;
+
     private FileClass? _locationSource;
     
     [ObservableProperty]
     public partial FileClass? CurrentLocation { get; private set; }
 
+    /// <summary>Lists <paramref name="path"/> - the caller clears <see cref="ArchivePath"/>'s cache, having just used it to classify the path.</summary>
     public void Navigate(string path, FileClass? locationSource = null)
     {
-        ArchivePath.InvalidateCache();
-
         _locationSource = locationSource;
         StartDirectoryList(path);
     }
@@ -151,8 +153,9 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
         var path = _currentPath;
         var source = CurrentLocation;
         var token = LinkListCancellation?.Token ?? Data.DeviceCts.Token;
+        var listingComplete = _isListingComplete;
 
-        Task.Run(() => UpdateLocationAccess(path, source, token), token);
+        Task.Run(() => UpdateLocationAccess(path, source, listingComplete, token), token);
     }
 
     public void ClearCurrentLocation() => CurrentLocation = null;
@@ -177,6 +180,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
             FileList.RemoveAll();
 
             _isSearchListing = false;
+            _isListingComplete = false;
             InProgress = true;
             IsProgressVisible = false;
             CurrentPath = path;
@@ -318,6 +322,10 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
         }
 
         CurrentCancellationToken?.Cancel();
+
+        // Everything the device listed is in FileList - not so for a listing cut short
+        var listingComplete = _isReadComplete && !discardPending;
+        _isListingComplete = listingComplete && !_isSearchListing;
         _isReadComplete = false;
 
         try
@@ -353,7 +361,7 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
             || ArchivePath.IsArchivePath(path, Device.ID))
         {
             IsLinkListingFinished = true;
-            Task.Run(() => UpdateLocationAccess(path, source, token), token);
+            Task.Run(() => UpdateLocationAccess(path, source, listingComplete, token), token);
             return;
         }
 
@@ -363,14 +371,14 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
             {
                 await Task.WhenAll(
                     ListLinksAsync(token),
-                    Task.Run(() => UpdateLocationAccess(path, source, token), token));
+                    Task.Run(() => UpdateLocationAccess(path, source, listingComplete, token), token));
             }
             catch (OperationCanceledException)
             { }
         }, token);
     }
 
-    private void UpdateLocationAccess(string path, FileClass? source, CancellationToken cancellationToken)
+    private void UpdateLocationAccess(string path, FileClass? source, bool listingComplete, CancellationToken cancellationToken)
     {
         if (cancellationToken.IsCancellationRequested)
             return;
@@ -412,9 +420,33 @@ public partial class DirectoryLister(Dispatcher dispatcher, LogicalDeviceViewMod
                 }
             }
 
+            if (listingComplete)
+            {
+                WatchFileList();
+                location.FolderViewModel.SetSizeFromListing(FileList);
+            }
+
             CurrentLocation = location;
             FileActionLogic.UpdateFileActions();
         });
+    }
+
+    private bool _isWatchingFileList;
+
+    private void WatchFileList()
+    {
+        if (_isWatchingFileList)
+            return;
+
+        _isWatchingFileList = true;
+        FileList.CollectionChanged += FileList_CollectionChanged;
+    }
+
+    /// <summary>Items added or removed after a complete listing (paste, delete...) - a size taken from the listing follows them.</summary>
+    private void FileList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (_isListingComplete && !InProgress && CurrentLocation is { } location)
+            location.FolderViewModel.SetSizeFromListing(FileList);
     }
 
     private async Task ListLinksAsync(CancellationToken cancellationToken)

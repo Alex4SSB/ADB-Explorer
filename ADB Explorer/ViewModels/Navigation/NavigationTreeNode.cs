@@ -20,7 +20,8 @@ public partial class NavigationTreeNode : ObservableObject
 
     public bool ChildrenLoaded { get; set; }
 
-    public bool ChildrenLoading { get; set; }
+    [ObservableProperty]
+    public partial bool ChildrenLoading { get; set; }
 
     public int ChildrenLoadEpoch { get; set; }
 

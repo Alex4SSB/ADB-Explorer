@@ -95,11 +95,47 @@ public partial class FolderViewModel(FileClass file) : FileViewModelBase(file)
         ApplyCalculatedSize(tree);
     }
 
+    /// <summary>The size and content came from this folder's listing, and follow it as it changes.</summary>
+    private bool _isSizeFromListing;
+
+    private static bool IsSubfolder(FileClass item) => item.Type is FileType.Folder && !item.IsLink;
+
+    /// <summary>Takes the size and content from a complete listing of this folder - which holds all of it while there are no subfolders.
+    /// Call again whenever the listing changes.</summary>
+    public void SetSizeFromListing(IReadOnlyCollection<FileClass> items)
+    {
+        if (IsCalculatingSize || (_calculatedSize is not null && !_isSizeFromListing))
+            return;
+
+        if (items.Any(IsSubfolder))
+        {
+            // A subfolder appeared - only a calculation can tell its content now
+            if (_isSizeFromListing)
+            {
+                _isSizeFromListing = false;
+                _calculatedSize = null;
+                NotifySizeStateChanged();
+            }
+
+            return;
+        }
+
+        // Same as the calculation: only regular files have a size, but everything counts as a file
+        _isSizeFromListing = true;
+        _calculatedSize = items.Where(f => f.Type is FileType.File && !f.IsLink).Sum(f => f.Size ?? 0);
+        _folderCount = 0;
+        _fileCount = items.Count;
+        NotifySizeStateChanged();
+    }
+
     private void ApplyCalculatedSize(FolderTree[]? tree)
     {
+        _isSizeFromListing = false;
         _calculatedSize = tree?.Where(t => !t.IsFolder).Sum(t => t.Size ?? 0) ?? 0;
         _folderCount = tree?.Count(t => t.IsFolder) ?? 0;
-        _fileCount = tree?.Count(t => !t.IsFolder) ?? 0;
+
+        // Anything that isn't a folder counts as a file, links and unknown types included
+        _fileCount = (tree?.Count(t => !t.IsFolder) ?? 0) + _file.CachedOtherCount;
         NotifySizeStateChanged();
     }
 
@@ -121,8 +157,10 @@ public partial class FolderViewModel(FileClass file) : FileViewModelBase(file)
         _sizeCalcCts?.Dispose();
         _sizeCalcCts = null;
         _calculatedSize = null;
+        _isSizeFromListing = false;
         IsCalculatingSize = false;
         _file.CachedChildren = null;
+        _file.CachedOtherCount = 0;
 
         NotifySizeStateChanged();
     }

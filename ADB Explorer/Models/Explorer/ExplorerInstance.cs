@@ -346,6 +346,10 @@ public class InstanceNavHistory(ExplorerInstance owner)
 
     private static bool IsReachable(AdbLocation entry)
     {
+        // Its pane item is hidden and its tabs closed while the log is off
+        if (entry.Location is Navigation.SpecialLocation.Log)
+            return Data.Settings.EnableLog;
+
         if (entry.IsPage || entry.DeviceId is null)
             return true;
 

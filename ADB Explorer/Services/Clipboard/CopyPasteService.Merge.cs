@@ -4,13 +4,25 @@ namespace ADB_Explorer.Services;
 
 public partial class CopyPasteService
 {
-    public static SyncFile MergeFolderTree(FileClass folder, string targetPath, IEnumerable<string> filesToReplace)
+    /// <param name="modifiedAfter">Considers only files modified after this device Unix time - the rest are known to be in <paramref name="targetPath"/> already.</param>
+    public static SyncFile MergeFolderTree(FileClass folder, string targetPath, IEnumerable<string> filesToReplace, string? deviceId = null, long? modifiedAfter = null)
     {
         StringComparer comparer = StringComparer.InvariantCultureIgnoreCase;
 
-        var children = folder.GetChildren();
+        FolderTree[]? children;
+        if (modifiedAfter is null)
+            children = folder.GetChildren(deviceId);
+        else
+        {
+            children = FileHelper.GetFolderTree([folder.FullPath], out _, cancellationToken: Data.DeviceCts.Token, deviceId: deviceId, modifiedAfter: modifiedAfter);
+
+            // Nothing new - listing the whole folder below would undo the point
+            if (children.Length == 0)
+                return new(folder, children);
+        }
+
         if (children is null || children.Length == 0)
-            return folder.GetSyncFile();
+            return folder.GetSyncFile(deviceId);
 
         var parent = folder.ParentPath;
 

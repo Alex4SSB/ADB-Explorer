@@ -229,6 +229,7 @@ public partial class MainWindow : INavigationWindow
         Data.RuntimeSettings.DefaultBrowserPath = Network.GetDefaultBrowser();
         Data.FileOpQ = new();
         App.Services.GetRequiredService<AdbSnackbarService>().SubscribeQueue(Data.FileOpQ);
+        App.Services.GetRequiredService<ExplorerViewModel>().Tree.SubscribeFileOps(Data.FileOpQ);
 
         NativeMethods.InterceptClipboard.Init(this,
                                               Data.CopyPaste.GetClipboardPasteItems,

@@ -113,19 +113,12 @@ public partial class CopyPasteService
 
         DragParent = transferParent;
 
-        // FileDescriptors may still be the empty placeholder while PrepareDescriptors runs
-        // (especially archive extract-to-tmp). Fall back to SelfFiles until they are ready.
+        // The dragged items themselves - descriptors also list every file nested in a dragged folder
+        DragFiles = [.. VirtualFileDataObject.SelfFiles.Select(FileHelper.GetSearchTransferName)];
+
+        // FileDescriptors may still be the empty placeholder while PrepareDescriptors runs (especially archive extract-to-tmp)
         var descriptors = VirtualFileDataObject.SelfFileGroup?.FileDescriptors?.ToArray();
-        if (descriptors is { Length: > 0 })
-        {
-            DragFiles = [.. descriptors.Select(d => d.Name)];
-            Descriptors = descriptors;
-        }
-        else
-        {
-            DragFiles = [.. VirtualFileDataObject.SelfFiles.Select(FileHelper.GetSearchTransferName)];
-            Descriptors = [];
-        }
+        Descriptors = descriptors is { Length: > 0 } ? descriptors : [];
 
         if (!isDrag)
         {

@@ -15,7 +15,7 @@ public partial class NavigationTreeViewModel
         ApplyTreeFolders(node, CurrentSubfolders().ToList());
         node.ChildrenLoaded = true;
         node.ChildrenLoading = false;
-        _ = ProbeTreeCanExpandAsync(node);
+        UpdateCanExpand(node);
     }
 
     private IEnumerable<FileClass> CurrentSubfolders()
@@ -94,7 +94,7 @@ public partial class NavigationTreeViewModel
         {
             ApplyTreeFolders(node, CurrentSubfolders().ToList());
             node.ChildrenLoaded = true;
-            await ProbeTreeCanExpandAsync(node);
+            UpdateCanExpand(node);
             return;
         }
 
@@ -122,7 +122,6 @@ public partial class NavigationTreeViewModel
             return;
         }
 
-        var applied = false;
         App.SafeInvoke(() =>
         {
             if (epoch != node.ChildrenLoadEpoch
@@ -136,11 +135,8 @@ public partial class NavigationTreeViewModel
             ApplyTreeFolders(node, folders);
             node.ChildrenLoaded = true;
             node.ChildrenLoading = false;
-            applied = true;
+            UpdateCanExpand(node);
         });
-
-        if (applied)
-            await ProbeTreeCanExpandAsync(node);
     }
 
     private void ApplyTreeFolders(NavigationTreeNode node, List<FileClass> folders)
@@ -167,89 +163,24 @@ public partial class NavigationTreeViewModel
         }
     }
 
-    private async Task ProbeTreeCanExpandAsync(NavigationTreeNode node)
+    /// <summary>Folders show a chevron until expanding them finds no subfolders.</summary>
+    private static void UpdateCanExpand(NavigationTreeNode node)
     {
-        var deviceId = node.OwnerDevice?.ID;
-        if (string.IsNullOrEmpty(deviceId) || !IsTreeNodeAttached(node))
-            return;
-
-        var epoch = node.ChildrenLoadEpoch;
-
-        var childPaths = node.Children
-            .Where(child => child.Drive is null)
-            .Select(child => child.Path)
-            .ToList();
-
-        if (childPaths.Count == 0)
-        {
-            if (!node.AlwaysExpandable)
-                node.CanExpand = false;
-            return;
-        }
-
-        var token = TreeListingToken(node);
-        var probePath = node.DropTargetPath;
-
-        HashSet<string> withSubfolders;
-        try
-        {
-            withSubfolders = await Task.Run(
-                () => FoldersWithSubfolders(deviceId, node.Path, probePath, childPaths, token),
-                token);
-        }
-        catch (OperationCanceledException)
-        {
-            return;
-        }
-        catch
-        {
-            App.SafeInvoke(() =>
-            {
-                if (epoch != node.ChildrenLoadEpoch)
-                    return;
-
-                foreach (var child in node.Children.Where(c => c.Drive is null))
-                {
-                    if (IsArchiveRootNode(child))
-                        RefreshArchiveCanExpand(child);
-                    else
-                        child.CanExpand = true;
-                }
-            });
-            return;
-        }
-
-        App.SafeInvoke(() =>
-        {
-            if (epoch != node.ChildrenLoadEpoch || !IsTreeNodeAttached(node))
-                return;
-
-            foreach (var child in node.Children)
-            {
-                if (child.Drive is not null)
-                    continue;
-
-                if (IsArchiveRootNode(child))
-                    RefreshArchiveCanExpand(child);
-                else
-                    child.CanExpand = withSubfolders.Any(path => NavigationTreeNode.PathsEqual(path, child.Path));
-            }
-
-            if (!node.AlwaysExpandable)
-                node.CanExpand = node.Children.Count > 0;
-        });
+        if (!node.AlwaysExpandable)
+            node.CanExpand = node.Children.Count > 0;
     }
 
     internal static List<FileClass> ListTreeSubfolders(string deviceId, string path, CancellationToken token)
     {
-        IEnumerable<FileStat> entries;
+        List<FileStat> entries;
         var listingInsideArchive = ArchivePath.TryParse(path, out var archivePath, out var internalPath, deviceId);
         try
         {
+            // Materialize here - the listing is lazy, so failures would otherwise escape this catch
             if (listingInsideArchive)
-                entries = ArchiveListing.TryListCachedEntries(archivePath, internalPath);
+                entries = [.. ArchiveListing.ListEntries(deviceId, archivePath, internalPath, token)];
             else
-                entries = AdbService.ListDirectoryEntries(deviceId, path, token);
+                entries = [.. AdbService.ListDirectoryEntries(deviceId, path, token)];
         }
         catch (AdbService.ProcessFailedException)
         {
@@ -327,87 +258,6 @@ public partial class NavigationTreeViewModel
         return folders;
     }
 
-    private static HashSet<string> FoldersWithSubfolders(
-        string deviceId,
-        string parentPath,
-        string resolvedParentPath,
-        List<string> childPaths,
-        CancellationToken token)
-    {
-        var result = new HashSet<string>(StringComparer.Ordinal);
-
-        if (ArchivePath.IsArchivePath(parentPath, deviceId))
-        {
-            foreach (var childPath in childPaths)
-            {
-                if (HasTreeSubfolder(deviceId, childPath, token))
-                    result.Add(childPath);
-            }
-
-            return result;
-        }
-
-        CollectFindSubfolderParents(deviceId, parentPath, token, result);
-        if (result.Count == 0
-            && !NavigationTreeNode.PathsEqual(parentPath, resolvedParentPath))
-        {
-            CollectFindSubfolderParents(deviceId, resolvedParentPath, token, result);
-        }
-
-        foreach (var childPath in childPaths)
-        {
-            if (result.Any(path => NavigationTreeNode.PathsEqual(path, childPath)))
-                continue;
-
-            if (HasTreeSubfolder(deviceId, childPath, token))
-                result.Add(childPath);
-        }
-
-        return result;
-    }
-
-    private static void CollectFindSubfolderParents(
-        string deviceId,
-        string parentPath,
-        CancellationToken token,
-        HashSet<string> result)
-    {
-        var exit = AdbService.ExecuteDeviceAdbShellCommand(
-            deviceId,
-            "find",
-            out var stdout,
-            out _,
-            token,
-            "-H",
-            AdbService.EscapeAdbShellString(parentPath),
-            "-mindepth",
-            "2",
-            "-maxdepth",
-            "2",
-            "-type",
-            "d",
-            "2>/dev/null");
-
-        if (exit != 0 && string.IsNullOrWhiteSpace(stdout))
-            return;
-
-        var allowHidden = Data.Settings.ShowHiddenItems;
-        foreach (var line in stdout.Split(AdbService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries))
-        {
-            var grandchild = line.Trim();
-            if (string.IsNullOrEmpty(grandchild) || grandchild.StartsWith("find:", StringComparison.Ordinal))
-                continue;
-
-            if (!allowHidden && FileHelper.GetFullName(grandchild).StartsWith('.'))
-                continue;
-
-            result.Add(FileHelper.GetParentPath(grandchild));
-        }
-    }
-
-    private static bool HasTreeSubfolder(string deviceId, string path, CancellationToken token)
-        => ListTreeSubfolders(deviceId, path, token).Count > 0;
-
     private void InvalidateTreeChildrenLoaded()
     {
         _childLoadTasks.Clear();
@@ -456,5 +306,48 @@ public partial class NavigationTreeViewModel
             return Data.DeviceCts.Token;
 
         return CancellationToken.None;
+    }
+
+    private readonly HashSet<FileOperation> _watchedFileOps = [];
+
+    /// <summary>Watches file ops, so a tree folder that just received items (drop / paste) shows them when next expanded.</summary>
+    public void SubscribeFileOps(FileOperationQueue queue)
+    {
+        queue.Operations.CollectionChanged += (_, _) => App.SafeInvoke(() => WatchFileOps(queue));
+        WatchFileOps(queue);
+    }
+
+    // Batch adds raise Reset, which carries no items - diff against the ops already watched
+    private void WatchFileOps(FileOperationQueue queue)
+    {
+        _watchedFileOps.IntersectWith(queue.Operations);
+
+        foreach (var op in queue.Operations.Where(_watchedFileOps.Add).ToList())
+            op.WhenCompleted(() => App.SafeInvoke(() => OnFileOpCompleted(op)));
+    }
+
+    private void OnFileOpCompleted(FileOperation op)
+    {
+        if (op.TargetPath is not { PathType: AbstractFile.FilePathType.Android })
+            return;
+
+        var deviceId = (op.TargetDevice ?? op.Device).ID;
+        var folder = op.TargetFolderPath;
+        var node = FindNode(TreeSource, n => n.Device is null
+                                          && n.Drive is null
+                                          && n.OwnerDevice?.ID == deviceId
+                                          && NavigationTreeNode.PathsEqual(n.DropTargetPath, folder));
+
+        // The current folder follows its own listing
+        if (node is null || IsCurrentExplorerPath(node))
+            return;
+
+        // Lazy again: its children are reloaded on the next expand, and an empty folder regains its chevron
+        node.CanExpand = true;
+        node.ChildrenLoaded = false;
+        node.ChildrenLoadEpoch++;
+
+        if (node.IsExpanded)
+            _ = LoadTreeChildrenAsync(node);
     }
 }

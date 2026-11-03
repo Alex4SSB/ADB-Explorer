@@ -461,7 +461,7 @@ public partial class Devices : ObservableObject
         // concurrently (device connect/disconnect), which threw InvalidOperationException.
         var devices = UIList.OfType<LogicalDeviceViewModel>().ToList();
 
-        await Task.Run(() => devices.ForEach(d => _ = d.BrandName));
+        await Task.Run(() => devices.ForEach(d => d.LoadProps()));
 
         App.SafeInvoke(() => devices.ForEach(d => d.UpdateName()));
     }

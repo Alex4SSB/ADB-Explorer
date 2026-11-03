@@ -331,6 +331,11 @@
         <MenuItem Command="ApplicationCommands.SelectAll" Header="{Binding Source={x:Static Member=strings:Resources.S_MENU_SELECT_ALL}}" />
     </ContextMenu>
 
+    <!--  A context menu inherits its host's font - console text boxes would hand it theirs  -->
+    <Style BasedOn="{StaticResource {x:Type ContextMenu}}" TargetType="ContextMenu">
+        <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}" />
+    </Style>
+
     <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="ScrollBar">
         <Setter Property="UseLayoutRounding" Value="False" />
         <Style.Triggers>
@@ -397,6 +402,11 @@
         <Setter Property="helpers:ContextMenuHelper.EnableAutoClose" Value="True" />
     </Style>
     <Style BasedOn="{StaticResource AdbTextBoxStyle}" TargetType="ui:TextBox" />
+    <!--  WPF's own rich text menu is a ContextMenu subclass, which the implicit ContextMenu style misses  -->
+    <Style BasedOn="{StaticResource DefaultUiRichTextBoxStyle}" TargetType="ui:RichTextBox">
+        <Setter Property="ContextMenu" Value="{StaticResource TextBoxContextMenu}" />
+        <Setter Property="helpers:ContextMenuHelper.EnableAutoClose" Value="True" />
+    </Style>
     <Style
         x:Key="AdbCardControl"
         BasedOn="{StaticResource DefaultUiCardControlStyle}"

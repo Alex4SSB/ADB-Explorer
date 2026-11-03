@@ -429,7 +429,7 @@ public class AdbLocation : Navigation
 
             foreach (var segment in deviceSegments[..Math.Max(0, deviceSegments.Length - 1)])
             {
-                prefix = $"{prefix}/{segment}";
+                prefix = $"{prefix.TrimEnd('/')}/{segment}";
                 yield return new(prefix);
             }
 
@@ -450,9 +450,10 @@ public class AdbLocation : Navigation
             yield break;
         }
 
+        // Trimmed, or the root drive "/" would give "//system"
         foreach (var segment in tail.Split('/', StringSplitOptions.RemoveEmptyEntries))
         {
-            prefix = $"{prefix}/{segment}";
+            prefix = $"{prefix.TrimEnd('/')}/{segment}";
             yield return new(prefix);
         }
     }

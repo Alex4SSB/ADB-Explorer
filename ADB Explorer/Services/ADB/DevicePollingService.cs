@@ -32,6 +32,18 @@ public class DevicePollingService : BackgroundService
                 await Task.Delay(pollingInterval, stoppingToken);
             }
             catch (OperationCanceledException) { }
+            catch (Exception e)
+            {
+                // A single failed poll must not fault the background service, which would stop polling permanently
+#if !DEPLOY
+                DebugLog.PrintLine($"Device polling failed: {e.Message}");
+#endif
+                try
+                {
+                    await Task.Delay(pollingInterval, stoppingToken);
+                }
+                catch (OperationCanceledException) { }
+            }
         }
     }
 

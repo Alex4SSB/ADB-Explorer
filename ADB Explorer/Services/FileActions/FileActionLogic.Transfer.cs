@@ -561,7 +561,8 @@ internal static partial class FileActionLogic
         }
     }
 
-    public static IEnumerable<FileSyncOperation> SilentPullFiles(LogicalDeviceViewModel device, string target, int maxThreads, IEnumerable<string> filesToReplace, params IEnumerable<FileClass> pullItems)
+    /// <param name="modifiedAfter">Pulls only files modified after this device Unix time, or <see langword="null"/> to check every file.</param>
+    public static IEnumerable<FileSyncOperation> SilentPullFiles(LogicalDeviceViewModel device, string target, int maxThreads, IEnumerable<string> filesToReplace, long? modifiedAfter, params IEnumerable<FileClass> pullItems)
     {
         maxThreads = Math.Max(1, maxThreads);
         foreach (var item in pullItems)
@@ -569,7 +570,7 @@ internal static partial class FileActionLogic
             if (item.Type is not FileType.Folder)
                 continue;
 
-            var syncFile = CopyPasteService.MergeFolderTree(item, target, filesToReplace);
+            var syncFile = CopyPasteService.MergeFolderTree(item, target, filesToReplace, device.ID, modifiedAfter);
             if (syncFile.Children.Count == 0)
                 continue;
 

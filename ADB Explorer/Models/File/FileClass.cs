@@ -261,6 +261,9 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     /// <summary>Tree fetched by the "View size" button or a drag/drop, reused by whichever needs it next.</summary>
     public FolderTree[]? CachedChildren { get; set; }
 
+    /// <summary>Links and other non-regular files under the folder - not in <see cref="CachedChildren"/>, but still counted as files.</summary>
+    public int CachedOtherCount { get; set; }
+
     public void CancelFolderSizeCalculation() => _folderViewModel?.CancelSizeCalculation();
 
     public FolderTree[]? GetChildren(string? deviceId = null)
@@ -273,6 +276,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
         deviceId ??= Data.ActiveDevice?.ID;
         FolderTree[] tree;
+        var otherCount = 0;
 
         if (deviceId is not null
             && ArchivePath.TryParse(FullPath, out var archivePath, out var internalPath, deviceId))
@@ -285,10 +289,11 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         }
         else
         {
-            tree = FileHelper.GetFolderTree([FullPath], cancellationToken: Data.DeviceCts.Token, deviceId: deviceId);
+            tree = FileHelper.GetFolderTree([FullPath], out otherCount, cancellationToken: Data.DeviceCts.Token, deviceId: deviceId);
         }
 
         CachedChildren = tree;
+        CachedOtherCount = otherCount;
 
         // A drag/drop also just fetched the tree - update the "View size" column with it, if shown.
         if (_folderViewModel is { } vm)

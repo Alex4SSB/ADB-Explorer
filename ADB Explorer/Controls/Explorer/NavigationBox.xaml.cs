@@ -701,16 +701,20 @@ public partial class NavigationBox : UserControl
                 .Select(drive => DropDownItem(new(drive.Path), drive.DisplayName, drive.GetIcon(16), next, device.ID))];
         }
 
-        List<FileClass> folders;
+        List<(string Path, string Name, BitmapSource? Icon)> folders;
         if (crumb.IsLast)
-            folders = [.. CurrentFolderSubfolders()];
+            folders = [.. CurrentFolderSubfolders().Select(folder => FolderEntry(folder, device.ID))];
+        else if (App.Services.GetService<ExplorerViewModel>()?.Tree.LoadedSubfolders(device.ID, location.Path) is { } nodes)
+            // The tree already listed this folder - listing it again can take seconds (e.g. /system/bin's hundreds of links)
+            folders = [.. nodes.Select(node => (node.Path, node.DisplayName, node.Icon))];
         else
         {
             var deviceId = device.ID;
             var path = location.Path;
             try
             {
-                folders = await Task.Run(() => NavigationTreeViewModel.ListTreeSubfolders(deviceId, path, CancellationToken.None));
+                var listed = await Task.Run(() => NavigationTreeViewModel.ListTreeSubfolders(deviceId, path, CancellationToken.None));
+                folders = [.. listed.Select(folder => FolderEntry(folder, deviceId))];
             }
             catch
             {
@@ -719,14 +723,17 @@ public partial class NavigationBox : UserControl
         }
 
         return [.. folders
-            .OrderBy(folder => folder.DisplayName, Comparer<string>.Create(NativeMethods.StringCompareLogical))
+            .OrderBy(folder => folder.Name, Comparer<string>.Create(NativeMethods.StringCompareLogical))
             .Select(folder => DropDownItem(
-                new(NavigationTreeViewModel.TreeItemPath(folder, device.ID)),
-                folder.DisplayName,
-                new BaseIcon(folder.Icon, 16),
+                new(folder.Path),
+                folder.Name,
+                folder.Icon is null ? null : new BaseIcon(folder.Icon, 16),
                 next,
                 device.ID))];
     }
+
+    private static (string Path, string Name, BitmapSource? Icon) FolderEntry(FileClass folder, string deviceId)
+        => (NavigationTreeViewModel.TreeItemPath(folder, deviceId), folder.DisplayName, folder.Icon);
 
     private static LocationSubMenu DropDownItem(AdbLocation target, string name, BaseIcon? icon, AdbLocation? next, string deviceId)
     {

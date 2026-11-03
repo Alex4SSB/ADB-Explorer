@@ -622,33 +622,55 @@ public static class FileHelper
 
     public static IEnumerable<FileClass> GetFilesFromTree(FolderTree[] tree) => tree.Select(t => new FileClass(t));
 
+    private const string FOLDER_TREE_OTHER = "o";
+
     public static FolderTree[] GetFolderTree(IEnumerable<string> paths, bool isFolder = true, CancellationToken cancellationToken = default, string? deviceId = null)
+        => GetFolderTree(paths, out _, isFolder, cancellationToken, deviceId);
+
+    /// <param name="otherCount">Entries that are neither folders nor regular files (links, sockets, devices…), which the tree leaves out.</param>
+    /// <param name="modifiedAfter">Lists only files modified after this device Unix time - where the device's find supports it, else all of them.</param>
+    public static FolderTree[] GetFolderTree(IEnumerable<string> paths, out int otherCount, bool isFolder = true, CancellationToken cancellationToken = default, string? deviceId = null, long? modifiedAfter = null)
     {
+        otherCount = 0;
         deviceId ??= Data.ActiveDevice?.ID;
         if (string.IsNullOrEmpty(deviceId))
             return [];
 
+        // adb ls lists every entry type, so nothing is left out
         if (!ShellCommands.FindExists(deviceId))
             return GetFolderTreeViaAdbLs(deviceId, paths, isFolder, cancellationToken);
 
         string stdout = "";
+        var unstatableCount = 0;
         var files = string.Join(" ", paths.Select(p => AdbService.EscapeAdbShellString(p)));
         var depth = isFolder ? "-mindepth 1" : "";
 
         if (ShellCommands.FindPrintf(deviceId))
         {
-            // get absolute paths, sizes and dates of all files, directries are marked with 'd'
+            var newerThan = modifiedAfter is { } after ? $"-newermt @{after}" : "";
+
+            // get absolute paths, sizes and dates of all files, directries are marked with 'd', anything else with 'o'.
+            // Toybox's -mindepth is a test in place, so the alternatives are grouped under it - or the root falls through to 'o'
             string[] args =
             [
                 files,
                 depth,
+                """\(""",
                 $"""\( -type d -printf '%p{ADB_FIELD_SEP}d{ADB_FIELD_SEP}d{ADB_FIELD_SEP}\n' \)""",
                 "-o",
-                $"""\( -type f -printf '%p{ADB_FIELD_SEP}%s{ADB_FIELD_SEP}{(Data.Settings.KeepDateModified ? "%T@" : "d")}{ADB_FIELD_SEP}\n' \)""",
-                "2>/dev/null"
+                $"""\( -type f {newerThan} -printf '%p{ADB_FIELD_SEP}%s{ADB_FIELD_SEP}{(Data.Settings.KeepDateModified ? "%T@" : "d")}{ADB_FIELD_SEP}\n' \)""",
+                "-o",
+                $"""-printf '%p{ADB_FIELD_SEP}{FOLDER_TREE_OTHER}{ADB_FIELD_SEP}{FOLDER_TREE_OTHER}{ADB_FIELD_SEP}\n'""",
+                """\)""",
             ];
 
-            AdbService.ExecuteDeviceAdbShellCommand(deviceId, "find", out stdout, out _, cancellationToken, args);
+            var exitCode = AdbService.ExecuteDeviceAdbShellCommand(deviceId, "find", out stdout, out var stderr, cancellationToken, args);
+
+            // A find without -newermt (older toybox) fails outright - list everything instead
+            if (modifiedAfter is not null && exitCode != 0 && string.IsNullOrWhiteSpace(stdout))
+                return GetFolderTree(paths, out otherCount, isFolder, cancellationToken, deviceId);
+
+            unstatableCount = CountUnstatableEntries(stdout + '\n' + stderr, paths);
         }
         else // when find does not support -printf
         {
@@ -667,11 +689,21 @@ public static class FileHelper
             AdbService.ExecuteDeviceAdbShellCommand(deviceId, "find", out stdout, out _, cancellationToken, args);
         }
 
-        return [.. stdout.Split(AdbService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries)
+        var lines = stdout.Split(AdbService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries);
+        otherCount = lines.Count(line => line.Split(ADB_FIELD_SEP) is [_, FOLDER_TREE_OTHER, ..]) + unstatableCount;
+
+        // Other entries fail to parse a size, so they stay out of the tree
+        return [.. lines
             .Select(ParseFolderTreeLine)
             .Where(line => line.HasValue)
             .Select(line => line!.Value)];
     }
+
+    /// <summary>Entries find listed but couldn't stat (e.g. denied by SELinux) - reported only as errors, which may arrive on either stream.</summary>
+    private static int CountUnstatableEntries(string output, IEnumerable<string> roots)
+        => output.Split(AdbService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries)
+            .Select(line => AdbRegEx.RE_FIND_STAT_ERROR().Match(line))
+            .Count(match => match.Success && !roots.Contains(match.Groups["Path"].Value));
 
     private static FolderTree[] GetFolderTreeViaAdbLs(string deviceId, IEnumerable<string> paths, bool isFolder, CancellationToken cancellationToken)
     {

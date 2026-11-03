@@ -32,12 +32,28 @@ public partial class AdbService
     public static Dictionary<string, string> GetBatteryInfo(string deviceId, CancellationToken cancellationToken)
     {
         Dictionary<string, string> info = null;
+        long? currentMicroAmps = null;
 
-        if (ExecuteDeviceAdbShellCommand(deviceId, BATTERY, out string stdout, out _, cancellationToken) == 0)
+        // dumpsys lacked the current when the probe was cached, so read the cached source in the same call
+        if (BatteryCurrentProbeCache.TryGetValue(deviceId, out var state) && GetCurrentCommand(state) is string[] currentCommand)
         {
-            info = stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Where(l => l.Contains(':')).ToDictionary(
-                line => line.Split(':')[0].Trim(),
-                line => line.Split(':')[1].Trim());
+            ExecuteDeviceAdbShellCommand(deviceId, BATTERY, out string stdout, out _, cancellationToken, ["&&", "echo", $"{AdbExplorerConst.ADB_UNIT_SEP}", ";", .. currentCommand]);
+
+            // No separator means dumpsys failed
+            var parts = stdout.Split(AdbExplorerConst.ADB_UNIT_SEP, 2);
+            if (parts.Length == 2)
+            {
+                info = ParseBatteryInfo(parts[0]);
+                currentMicroAmps = ParseCurrent(state, parts[1]);
+
+                // The cached source stopped working - drop it so the fallback below probes afresh
+                if (currentMicroAmps is null)
+                    BatteryCurrentProbeCache.TryRemove(deviceId, out _);
+            }
+        }
+        else if (ExecuteDeviceAdbShellCommand(deviceId, BATTERY, out string stdout, out _, cancellationToken) == 0)
+        {
+            info = ParseBatteryInfo(stdout);
         }
 
         if (info is not null && TryGetDumpsysCurrentMicroAmps(info) is long dumpsysCurrent)
@@ -46,13 +62,30 @@ public partial class AdbService
             return info;
         }
 
-        var currentMicroAmps = TryGetBatteryCurrentMicroAmps(deviceId, cancellationToken);
+        currentMicroAmps ??= TryGetBatteryCurrentMicroAmps(deviceId, cancellationToken);
         if (currentMicroAmps is null && info is null)
             return null;
 
         info ??= [];
         if (currentMicroAmps is not null)
             info["Current now"] = currentMicroAmps.Value.ToString();
+
+        return info;
+    }
+
+    public static Dictionary<string, string> ParseBatteryInfo(string dumpsysOutput)
+    {
+        // Some vendors (e.g. Samsung) append log buffers with timestamped lines, producing duplicate keys.
+        // Keep the first occurrence, which belongs to the standard battery service section.
+        Dictionary<string, string> info = [];
+        foreach (var line in dumpsysOutput.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries))
+        {
+            var parts = line.Split(':', 2);
+            if (parts.Length < 2 || string.IsNullOrWhiteSpace(parts[0]))
+                continue;
+
+            info.TryAdd(parts[0].Trim(), parts[1].Trim());
+        }
 
         return info;
     }
@@ -111,26 +144,41 @@ public partial class AdbService
         return null;
     }
 
+    private static string[] SysfsCurrentCommand(string path) => ["cat", path, "2>/dev/null"];
+
+    private static string[] BatteryPropertiesCurrentCommand(int transaction) =>
+        ["service", "call", "batteryproperties", transaction.ToString(), "i32", BATTERY_PROPERTY_CURRENT_NOW.ToString()];
+
+    private static string[]? GetCurrentCommand(BatteryCurrentProbeState state) => state.Source switch
+    {
+        BatteryCurrentProbeSource.Sysfs when state.SysfsPath is not null => SysfsCurrentCommand(state.SysfsPath),
+        BatteryCurrentProbeSource.BatteryProperties when state.Transaction is int transaction => BatteryPropertiesCurrentCommand(transaction),
+        _ => null,
+    };
+
+    private static long? ParseCurrent(BatteryCurrentProbeState state, string output) => state.Source switch
+    {
+        BatteryCurrentProbeSource.Sysfs => ParseSysfsCurrent(output),
+        BatteryCurrentProbeSource.BatteryProperties => ParseBatteryPropertyValue(output),
+        _ => null,
+    };
+
+    private static long? ParseSysfsCurrent(string output) =>
+        long.TryParse(output.Trim(LINE_SEPARATORS), out long microAmps) ? microAmps : null;
+
     private static long? TryReadSysfsCurrent(string deviceId, string path, CancellationToken cancellationToken)
     {
-        if (ExecuteDeviceAdbShellCommand(deviceId, "cat", out string stdout, out _, cancellationToken, path, "2>/dev/null") != 0)
+        var command = SysfsCurrentCommand(path);
+        if (ExecuteDeviceAdbShellCommand(deviceId, command[0], out string stdout, out _, cancellationToken, command[1..]) != 0)
             return null;
 
-        return long.TryParse(stdout.Trim(LINE_SEPARATORS), out long microAmps) ? microAmps : null;
+        return ParseSysfsCurrent(stdout);
     }
 
     private static long? TryReadBatteryPropertiesCurrent(string deviceId, int transaction, CancellationToken cancellationToken)
     {
-        if (ExecuteDeviceAdbShellCommand(deviceId,
-                                         "service",
-                                         out string stdout,
-                                         out _,
-                                         cancellationToken,
-                                         "call",
-                                         "batteryproperties",
-                                         transaction.ToString(),
-                                         "i32",
-                                         BATTERY_PROPERTY_CURRENT_NOW.ToString()) != 0)
+        var command = BatteryPropertiesCurrentCommand(transaction);
+        if (ExecuteDeviceAdbShellCommand(deviceId, command[0], out string stdout, out _, cancellationToken, command[1..]) != 0)
             return null;
 
         return ParseBatteryPropertyValue(stdout);

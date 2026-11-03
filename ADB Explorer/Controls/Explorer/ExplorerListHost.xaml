@@ -80,7 +80,7 @@
                     <MultiDataTrigger.Conditions>
                         <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Items.Count}" Value="0" />
                         <Condition Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.FileList.Actions.IsExplorerVisible}" Value="True" />
-                        <Condition Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.FileList.Actions.ListingInProgress}" Value="False" />
+                        <Condition Binding="{Binding Source={StaticResource InstanceProxy}, Path=Data.FileList.Actions.IsEmptyFolderNoticeAllowed}" Value="True" />
                     </MultiDataTrigger.Conditions>
                     <Setter Property="Visibility" Value="Visible" />
                 </MultiDataTrigger>

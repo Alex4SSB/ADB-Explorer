@@ -132,8 +132,7 @@ public partial class NavigationTreeViewModel : ObservableObject
                     currentNode = FindOrCreateChild(currentNode, chain[i]);
                     if (i < chain.Count - 1)
                     {
-                        if (!IsArchiveRootNode(currentNode))
-                            currentNode.CanExpand = true;
+                        currentNode.CanExpand = true;
                         currentNode.IsExpanded = true;
                     }
                 }
@@ -216,7 +215,6 @@ public partial class NavigationTreeViewModel : ObservableObject
                 existing.File ??= file;
             }
             existing.CutState = CutStateFor(existing);
-            RefreshArchiveCanExpand(existing);
             return existing;
         }
 
@@ -234,7 +232,6 @@ public partial class NavigationTreeViewModel : ObservableObject
             File = file
         };
         child.CutState = CutStateFor(child);
-        RefreshArchiveCanExpand(child);
 
         InsertChild(parent, child);
         return child;
@@ -251,25 +248,6 @@ public partial class NavigationTreeViewModel : ObservableObject
             return ArchivePath.Join(file.FullPath, "");
 
         return file.FullPath;
-    }
-
-    private static bool IsArchiveRootNode(NavigationTreeNode node)
-    {
-        var deviceId = node.OwnerDevice?.ID;
-        return deviceId is not null
-            && ArchivePath.TryParse(node.Path, out _, out var internalPath, deviceId)
-            && string.IsNullOrEmpty(internalPath);
-    }
-
-    private static void RefreshArchiveCanExpand(NavigationTreeNode node)
-    {
-        var deviceId = node.OwnerDevice?.ID;
-        if (string.IsNullOrEmpty(deviceId)
-            || !ArchivePath.TryParse(node.Path, out var archivePath, out var internalPath, deviceId)
-            || !string.IsNullOrEmpty(internalPath))
-            return;
-
-        node.CanExpand = ArchiveListing.HasCachedToc(archivePath);
     }
 
     private static void InsertChild(NavigationTreeNode parent, NavigationTreeNode child)
@@ -442,6 +420,20 @@ public partial class NavigationTreeViewModel : ObservableObject
 
     private NavigationTreeNode? FindNodeByFile(FileClass file)
         => FindNode(TreeSource, node => ReferenceEquals(node.File, file));
+
+    /// <summary>A folder's subfolders as the tree already holds them, or <see langword="null"/> when the tree hasn't listed that folder.</summary>
+    public List<NavigationTreeNode>? LoadedSubfolders(string deviceId, string path)
+    {
+        var node = FindNode(TreeSource, n => n.Device is null
+                                          && n.OwnerDevice?.ID == deviceId
+                                          && (NavigationTreeNode.PathsEqual(n.Path, path, deviceId)
+                                              || (n.Drive is not null && NavigationTreeNode.IsDriveRootPath(path, n.Drive))));
+
+        if (node is not { ChildrenLoaded: true })
+            return null;
+
+        return [.. node.Children.Where(child => child.Drive is null && !child.IsTemp)];
+    }
 
     private static NavigationTreeNode? FindNode(IEnumerable<NavigationTreeNode> nodes, Func<NavigationTreeNode, bool> match)
     {

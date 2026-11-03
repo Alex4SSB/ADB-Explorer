@@ -46,10 +46,29 @@ public partial class LogPageContent : UserControl
             if (!IsLoaded || LogTextBox is null)
                 return;
 
-            LogTextBox.AppendText(entry.ToString() + Environment.NewLine);
+            LogTextBox.AppendText(ShowUnprintable(entry.ToString()) + Environment.NewLine);
             LogTextBox.ScrollToEnd();
         });
     }
+
+    private const char CONTROL_PICTURES = '\u2400';
+
+    private const char DELETE_PICTURE = '\u2421';
+
+    /// <summary>Swaps unprintable characters (separators etc.) for their Unicode pictures, which still copy out of the log.</summary>
+    private static string ShowUnprintable(string text) => string.Create(text.Length, text, (chars, source) =>
+    {
+        for (var i = 0; i < source.Length; i++)
+        {
+            chars[i] = source[i] switch
+            {
+                '\n' or '\r' or '\t' => source[i],
+                < ' ' => (char)(CONTROL_PICTURES + source[i]),
+                '\u007F' => DELETE_PICTURE,
+                _ => source[i],
+            };
+        }
+    });
 
     private void OnLogCleared() =>
         Dispatcher.Invoke(() =>

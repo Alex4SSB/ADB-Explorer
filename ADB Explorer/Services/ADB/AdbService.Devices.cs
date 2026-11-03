@@ -118,8 +118,16 @@ public partial class AdbService
 
     static string[] UnrootArgs => ["shell", "su", "-c", EscapeAdbShellString("resetprop ro.debuggable 0 && resetprop service.adb.root 0 && setprop ctl.restart adbd")];
 
+    private static readonly ConcurrentDictionary<string, DateTime> RootChangeRequests = new();
+
+    /// <summary>Whether root / unroot was requested for the device within <see cref="AdbExplorerConst.ROOT_CHANGE_GRACE_PERIOD"/>.</summary>
+    public static bool IsRootChangeRecent(string deviceId) =>
+        RootChangeRequests.TryGetValue(deviceId, out var requested) && DateTime.Now - requested <= AdbExplorerConst.ROOT_CHANGE_GRACE_PERIOD;
+
     public static bool Root(string deviceId)
     {
+        RootChangeRequests[deviceId] = DateTime.Now;
+
         ExecuteDeviceAdbCommand(deviceId, "", out string stdout, out string stderr, CancellationToken.None, RootArgs);
         if (stdout != "" || stderr != "")
             ExecuteDeviceAdbCommand(deviceId, "", out stdout, out _, CancellationToken.None, "root");
@@ -133,6 +141,8 @@ public partial class AdbService
 
     public static bool Unroot(string deviceId)
     {
+        RootChangeRequests[deviceId] = DateTime.Now;
+
         ExecuteDeviceAdbCommand(deviceId, "", out string stdout, out string stderr, CancellationToken.None, UnrootArgs);
         if (stdout != "" || stderr != "")
             ExecuteDeviceAdbCommand(deviceId, "", out stdout, out _, CancellationToken.None, "unroot");
@@ -149,6 +159,30 @@ public partial class AdbService
             return null;
 
         return ShellAccessHelper.ParseShellIdentity(stdout);
+    }
+
+    /// <summary>
+    /// Reads the user-facing device name (as shown in Settings > About phone).
+    /// Used when the device sets no brand name prop, as on Samsung devices.
+    /// </summary>
+    public static string? GetSettingsDeviceName(string deviceId)
+    {
+        if (ExecuteDeviceAdbShellCommand(deviceId, "settings", out string stdout, out _, CancellationToken.None, "get", "global", "device_name") != 0)
+            return null;
+
+        var name = stdout.Trim();
+
+        // settings prints "null" for an undefined key
+        return string.IsNullOrEmpty(name) || name == "null" ? null : name;
+    }
+
+    /// <summary>The device clock as Unix time, for comparing with times the device records (file and media dates).</summary>
+    public static long? GetDeviceUnixTime(string deviceId)
+    {
+        if (ExecuteDeviceAdbShellCommand(deviceId, "date", out string stdout, out _, CancellationToken.None, "+%s") != 0)
+            return null;
+
+        return long.TryParse(stdout.Trim(), out var time) ? time : null;
     }
 
     public const string GET_PROP = "getprop";

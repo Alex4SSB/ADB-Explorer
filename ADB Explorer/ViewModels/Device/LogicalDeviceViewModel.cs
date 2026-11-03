@@ -247,22 +247,44 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     private ShellIdentity? _shellIdentity;
     public ShellIdentity? ShellIdentity => _shellIdentity;
 
+    private DateTime _shellIdentityLoadedAt = DateTime.MinValue;
+
     public ShellIdentity? GetOrLoadShellIdentity()
     {
-        _shellIdentity ??= AdbService.GetShellIdentity(ID);
+        if (_shellIdentity is null)
+            StoreShellIdentity(AdbService.GetShellIdentity(ID));
+
         return _shellIdentity;
     }
 
     public void RefreshShellIdentity()
     {
-        _shellIdentity = AdbService.GetShellIdentity(ID);
+        StoreShellIdentity(AdbService.GetShellIdentity(ID));
         OnPropertyChanged(nameof(HasRootShell));
     }
 
     public void SetShellIdentity(ShellIdentity? identity)
     {
-        _shellIdentity = identity;
+        StoreShellIdentity(identity);
         OnPropertyChanged(nameof(HasRootShell));
+    }
+
+    private void StoreShellIdentity(ShellIdentity? identity)
+    {
+        _shellIdentity = identity;
+        _shellIdentityLoadedAt = DateTime.Now;
+    }
+
+    /// <summary>
+    /// Whether polling should re-read the shell user. It only changes on root / unroot (which restarts adbd),
+    /// so outside a recent root change request it's rechecked at a slow interval.
+    /// </summary>
+    public bool IsShellIdentityStale()
+    {
+        if (_shellIdentity is null || AdbService.IsRootChangeRecent(ID))
+            return true;
+
+        return DateTime.Now - _shellIdentityLoadedAt > AdbExplorerConst.SHELL_IDENTITY_RECHECK_INTERVAL;
     }
 
     public bool HasRootShell => ShellIdentity?.IsRoot == true;
@@ -366,57 +388,88 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
     #region Device properties (lazy-loaded from ADB)
 
-    /// <summary>Failures aren't cached, but retrying on every access re-runs getprop each time
-    /// (Name reads this, often on the UI thread) - so wait between attempts.</summary>
+    /// <summary>Failures aren't cached, but retrying on every read would re-run getprop each time
+    /// (Name reads it on every refresh) - so wait between attempts.</summary>
     private static readonly TimeSpan PropsRetryDelay = TimeSpan.FromSeconds(10);
 
     private readonly object _propsLock = new();
 
     private DateTime _propsFailedAt = DateTime.MinValue;
 
+    private volatile Dictionary<string, string>? _props;
+
+    private int _propsLoadStarted;
+
+    private string? _brandName;
+
+    /// <summary>The device's getprop values - empty until loaded. Never blocks: the first read starts loading them in the background.</summary>
     public Dictionary<string, string> Props
     {
         get
         {
-            if (field is not null)
-                return field;
-
-            var loadedHere = false;
-
-            // Single flight: concurrent first readers (UI thread, InitDevice, UpdateBrandNames)
-            // wait for one getprop instead of each running their own.
-            lock (_propsLock)
+            if (_props is null && Interlocked.Exchange(ref _propsLoadStarted, 1) == 0)
             {
-                if (field is null)
+                Task.Run(() =>
                 {
-                    if (DateTime.Now - _propsFailedAt < PropsRetryDelay)
-                        return [];
+                    LoadProps();
 
-                    int exitCode = AdbService.ExecuteDeviceAdbShellCommand(ID, AdbService.GET_PROP, out string stdout, out string stderr, CancellationToken.None);
-                    if (exitCode != 0)
-                    {
-                        _propsFailedAt = DateTime.Now;
-                        return [];
-                    }
-
-                    field = stdout.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries).Where(
-                        l => l[0] == '[' && l[^1] == ']').TryToDictionary(
-                            line => line.Split(':')[0].Trim('[', ']', ' '),
-                            line => line.Split(':')[1].Trim('[', ']', ' '));
-
-                    loadedHere = true;
-                }
+                    // A failed load may start again on a later read
+                    Interlocked.Exchange(ref _propsLoadStarted, 0);
+                });
             }
 
-            // Outside the lock: raising PropertyChanged may marshal to a UI thread that is itself waiting on it.
-            if (loadedHere)
-            {
-                RefreshSerialNumber();
-                OnPropertyChanged(nameof(AndroidVersion));
-            }
-
-            return field;
+            return _props ?? [];
         }
+    }
+
+    /// <summary>Loads <see cref="Props"/> and the brand name that comes from them, blocking until done - only for background threads.</summary>
+    public Dictionary<string, string> LoadProps()
+    {
+        if (_props is { } loaded)
+            return loaded;
+
+        // Single flight: concurrent first loads (InitDevice, UpdateBrandNames, a UI read) wait for one getprop.
+        lock (_propsLock)
+        {
+            if (_props is not null)
+                return _props;
+
+            if (DateTime.Now - _propsFailedAt < PropsRetryDelay)
+                return [];
+
+            int exitCode = AdbService.ExecuteDeviceAdbShellCommand(ID, AdbService.GET_PROP, out string stdout, out string stderr, CancellationToken.None);
+            if (exitCode != 0)
+            {
+                _propsFailedAt = DateTime.Now;
+                return [];
+            }
+
+            var props = stdout.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries).Where(
+                l => l[0] == '[' && l[^1] == ']').TryToDictionary(
+                    line => line.Split(':')[0].Trim('[', ']', ' '),
+                    line => line.Split(':')[1].Trim('[', ']', ' '));
+
+            var brandName = props.GetValueOrDefault(AdbService.BRAND_NAME) ?? props.GetValueOrDefault(AdbService.HOST_NAME);
+
+            // Devices without a brand name prop (e.g. Samsung) keep their name in Settings
+            if (string.IsNullOrEmpty(brandName))
+                brandName = AdbService.GetSettingsDeviceName(ID);
+
+            _brandName = brandName;
+            _props = props;
+        }
+
+        // Outside the lock: raising PropertyChanged may marshal to a UI thread that is itself waiting on it.
+        RefreshSerialNumber();
+        App.SafeBeginInvoke(() =>
+        {
+            OnPropertyChanged(nameof(BrandName));
+            OnPropertyChanged(nameof(AndroidVersionString));
+            OnPropertyChanged(nameof(AndroidVersion));
+            UpdateName();
+        });
+
+        return _props;
     }
 
     public string? BrandName
@@ -426,15 +479,11 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
             if (Device.Type is DeviceType.Emulator)
                 return Device.AvdName;
 
-            if (string.IsNullOrEmpty(field))
-            {
-                var props = Props;
-                field = props.GetValueOrDefault(AdbService.BRAND_NAME) ?? props.GetValueOrDefault(AdbService.HOST_NAME);
-            }
-
-            return field;
+            // Starts loading the props, which also resolve the brand name
+            _ = Props;
+            return _brandName;
         }
-    } = null;
+    }
 
     public string? AndroidVersionString
     {
@@ -607,8 +656,9 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         if (Device.Type is not DeviceType.Emulator)
             return null;
 
-        return Props.GetValueOrDefault(AdbService.QEMU_BOOT_AVD_NAME)
-            ?? Props.GetValueOrDefault(AdbService.QEMU_KERNEL_AVD_NAME);
+        var props = LoadProps();
+        return props.GetValueOrDefault(AdbService.QEMU_BOOT_AVD_NAME)
+            ?? props.GetValueOrDefault(AdbService.QEMU_KERNEL_AVD_NAME);
     }
 
     public void SetAvdName(string? avdName)

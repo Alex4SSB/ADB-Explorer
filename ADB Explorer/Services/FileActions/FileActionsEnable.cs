@@ -181,7 +181,37 @@ public partial class FileActionsEnable : ObservableObject
     public bool ListingInProgress
     {
         get => _listingInProgress;
-        set => SetProperty(ref _listingInProgress, value);
+        set
+        {
+            if (SetProperty(ref _listingInProgress, value))
+                _ = UpdateEmptyFolderNoticeAsync(value);
+        }
+    }
+
+    private bool _isEmptyFolderNoticeAllowed = true;
+    /// <summary>Lags behind the end of a listing, so the empty folder notice doesn't flicker while the last items are still being added.</summary>
+    public bool IsEmptyFolderNoticeAllowed
+    {
+        get => _isEmptyFolderNoticeAllowed;
+        private set => SetProperty(ref _isEmptyFolderNoticeAllowed, value);
+    }
+
+    private int _emptyFolderNoticeVersion;
+
+    private async Task UpdateEmptyFolderNoticeAsync(bool listingInProgress)
+    {
+        var version = Interlocked.Increment(ref _emptyFolderNoticeVersion);
+        if (listingInProgress)
+        {
+            IsEmptyFolderNoticeAllowed = false;
+            return;
+        }
+
+        await Task.Delay(AdbExplorerConst.EMPTY_FOLDER_NOTICE_DELAY);
+
+        // A newer listing started meanwhile
+        if (version == Volatile.Read(ref _emptyFolderNoticeVersion))
+            IsEmptyFolderNoticeAllowed = true;
     }
 
     public bool UpdateModifiedEnabled { get; set; }

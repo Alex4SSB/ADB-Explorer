@@ -92,6 +92,52 @@ public static partial class ThumbnailService
         return cache;
     }
 
+    private const string MEDIA_SYNC_FILE = "mediaSync.txt";
+
+    /// <summary>Device time read right before a media DB query - saved as the sync time once the thumbnails it found are pulled.</summary>
+    private static readonly ConcurrentDictionary<string, long> PendingMediaSync = new(StringComparer.Ordinal);
+
+    /// <summary>The device Unix time up to which the device's media DB entries and thumbnail files are all in the local cache.</summary>
+    private static long? ReadMediaSyncTime(string deviceId)
+    {
+        try
+        {
+            var path = Path.Combine(Data.AppDataPath, deviceId, MEDIA_SYNC_FILE);
+            return File.Exists(path) && long.TryParse(File.ReadAllText(path).Trim(), out var time) ? time : null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static void CommitMediaSync(string deviceId)
+    {
+        if (!PendingMediaSync.TryRemove(deviceId, out var time))
+            return;
+
+        try
+        {
+            var deviceDir = Path.Combine(Data.AppDataPath, deviceId);
+            Directory.CreateDirectory(deviceDir);
+            File.WriteAllText(Path.Combine(deviceDir, MEDIA_SYNC_FILE), time.ToString());
+        }
+        catch
+        { }
+    }
+
+    private static void ClearMediaSync(string deviceId)
+    {
+        PendingMediaSync.TryRemove(deviceId, out _);
+
+        try
+        {
+            File.Delete(Path.Combine(Data.AppDataPath, deviceId, MEDIA_SYNC_FILE));
+        }
+        catch
+        { }
+    }
+
     private static void UpdateDeviceCache(DeviceThumbnailInfo deviceInfo)
     {
         if (deviceInfo.ThumbnailPathCache is not null)
@@ -101,9 +147,17 @@ public static partial class ThumbnailService
 
         if (cache.Count == 0)
         {
-            deviceInfo.ThumbnailPathCache = deviceInfo.HasThumbnailSupport
-                ? GetThumbsCacheFromDevice(deviceInfo)
+            // Nothing cached locally, so nothing from an earlier sync can be skipped
+            ClearMediaSync(deviceInfo.DeviceId);
+
+            var fromDevice = deviceInfo.HasThumbnailSupport
+                ? GetThumbsCacheFromDevice(deviceInfo, null)
                 : [];
+
+            // An almost empty dictionary when the device has no media, to avoid repeated ADB calls
+            deviceInfo.ThumbnailPathCache = fromDevice.Count > 0 || !deviceInfo.HasThumbnailSupport
+                ? fromDevice
+                : new([new KeyValuePair<string, ThumbnailInfo>("", new())]);
 
             if (deviceInfo.HasThumbnailSupport)
                 DeviceThumbsToCsv(deviceInfo);
@@ -126,7 +180,9 @@ public static partial class ThumbnailService
         if (!deviceInfo.HasThumbnailSupport || deviceInfo.ThumbnailPathCache is not { } cache)
             return;
 
-        var deviceCache = GetThumbsCacheFromDevice(deviceInfo);
+        // Only what changed since the last sync - the rest is already in the cache read from the CSV
+        var since = ReadMediaSyncTime(deviceInfo.DeviceId);
+        var deviceCache = GetThumbsCacheFromDevice(deviceInfo, since);
 
         foreach (var kvp in deviceCache)
         {
@@ -139,7 +195,7 @@ public static partial class ThumbnailService
 
         UpdateCache(deviceInfo);
         DeviceCacheMerged?.Invoke(deviceInfo.DeviceId);
-        PullThumbnails(deviceInfo);
+        PullThumbnails(deviceInfo, since);
     }
 
     private static void UpdateCache(DeviceThumbnailInfo deviceInfo)
@@ -158,17 +214,28 @@ public static partial class ThumbnailService
             return ReadThumbsCacheFromCsvFile(deviceInfo.DeviceId);
     }
 
-    private static Dictionary<string, ThumbnailInfo> GetThumbsCacheFromDevice(DeviceThumbnailInfo deviceInfo)
+    /// <param name="since">Reads only media added or modified after this device Unix time, or all of it when <see langword="null"/>.</param>
+    private static Dictionary<string, ThumbnailInfo> GetThumbsCacheFromDevice(DeviceThumbnailInfo deviceInfo, long? since)
     {
         ThumbnailProgressChanged?.Invoke(ThumbnailStep.ReadingDatabase, true);
 
+        // Read before the query, so media added while it runs is caught by the next one
+        if (AdbService.GetDeviceUnixTime(deviceInfo.PhysicalId) is long now)
+        {
+            PendingMediaSync[deviceInfo.DeviceId] = now;
+
+            // The device clock went back - the sync time can't be trusted
+            if (since > now)
+                since = null;
+        }
+
         // Not DeviceCts: every navigation cancels it, which would cut off the video query and cache an empty result
         var ct = CancellationToken.None;
-        var picsResponse = GetThumbsFromDevice(deviceInfo, MediaType.images, ct);
+        var picsResponse = GetThumbsFromDevice(deviceInfo, MediaType.images, since, ct);
         var thumbnailMap = ParseThumbnailMap(picsResponse, MediaType.images);
 
         string moviesResponse = Data.Settings.MovieThumbsEnabled
-            ? GetThumbsFromDevice(deviceInfo, MediaType.video, ct)
+            ? GetThumbsFromDevice(deviceInfo, MediaType.video, since, ct)
             : "";
 
         var moviesThumbnailMap = ParseThumbnailMap(moviesResponse, MediaType.video);
@@ -176,12 +243,7 @@ public static partial class ThumbnailService
         ThumbnailProgressChanged?.Invoke(ThumbnailStep.ReadingDatabase, false);
 
         IEnumerable<KeyValuePair<string, ThumbnailInfo>> entries = [.. thumbnailMap, .. moviesThumbnailMap];
-        var combined = entries.ToDictionary();
-        if (combined.Count == 0)
-            // Cache an almost empty dictionary to avoid repeated ADB calls
-            return new([new KeyValuePair<string, ThumbnailInfo>("", new())]);
-
-        return combined;
+        return entries.ToDictionary();
     }
 
     private static void UpdateThumbnailInfo(string serialNumber, string id, Size? resolution = null, long? fileSize = null)
@@ -338,24 +400,36 @@ public static partial class ThumbnailService
         return deviceInfo;
     }
 
-    private static void PullThumbnails(DeviceThumbnailInfo deviceInfo)
+    /// <param name="modifiedAfter">The last sync time: thumbnails older than it are already pulled, so only newer ones are listed.</param>
+    private static void PullThumbnails(DeviceThumbnailInfo deviceInfo, long? modifiedAfter = null)
     {
         if (!deviceInfo.HasThumbnailSupport)
             return;
 
+        var device = Data.DevicesObject.LogicalDeviceViewModels.FirstOrDefault(d => d.SerialNumber == deviceInfo.DeviceId);
+        if (device is null)
+            return;
+
         ThumbnailProgressChanged?.Invoke(ThumbnailStep.CheckingUpdates, true);
 
-        IEnumerable<string> filesToReplace = [];
+        List<string> filesToReplace = [];
 
         if (Directory.Exists(deviceInfo.LocalThumbnailDir) && deviceInfo.ThumbnailPathCache is { Count: > 1 } cache)
         {
             var parent = FileHelper.GetParentPath(deviceInfo.LocalThumbnailDir);
-            filesToReplace = cache.Where(kvp => kvp.Value.LastUpdate != DateTime.MinValue && kvp.Value.IsOverdue).Select(thumb => Path.Combine(parent, thumb.Value.Id));
+            filesToReplace = [.. cache.Where(kvp => kvp.Value.LastUpdate != DateTime.MinValue && kvp.Value.IsOverdue).Select(thumb => Path.Combine(parent, thumb.Value.Id))];
         }
         else
         {
             Directory.CreateDirectory(deviceInfo.LocalThumbnailDir);
+
+            // Nothing pulled yet, whatever the sync time says
+            modifiedAfter = null;
         }
+
+        // Overdue thumbnails are older than the sync time, so only a full listing finds them
+        if (filesToReplace.Count > 0)
+            modifiedAfter = null;
 
         FileClass pics = deviceInfo.DeviceImageThumbnailDirs.Length > 0
             ? new("", deviceInfo.DeviceImageThumbnailDirs[0], AbstractFile.FileType.Folder)
@@ -370,30 +444,36 @@ public static partial class ThumbnailService
             : new("", deviceInfo.DeviceMoviesThumbnailDir, AbstractFile.FileType.Folder);
 
         var deviceDir = FileHelper.GetParentPath(deviceInfo.LocalThumbnailDir);
-        var device = Data.DevicesObject.LogicalDeviceViewModels.FirstOrDefault(d => d.SerialNumber == deviceInfo.DeviceId);
-        if (device is null)
-            return;
 
         Task.Run(() =>
         {
-            if (Data.DeviceCts.IsCancellationRequested)
+            var token = Data.DeviceCts.Token;
+            if (token.IsCancellationRequested)
             {
                 ThumbnailProgressChanged?.Invoke(ThumbnailStep.CheckingUpdates, false);
                 return;
             }
 
-            var opsList = FileActionLogic.SilentPullFiles(device, deviceDir, Data.Settings.ThumbAndIconConcurrency, filesToReplace, [.. picFolders, movies]).ToList();
+            var opsList = FileActionLogic.SilentPullFiles(device, deviceDir, Data.Settings.ThumbAndIconConcurrency, filesToReplace, modifiedAfter, [.. picFolders, movies]).ToList();
 
             ThumbnailProgressChanged?.Invoke(ThumbnailStep.CheckingUpdates, false);
 
-            if (opsList.Count == 0)
+            // A navigation cut the listing short - it may have missed thumbnails, so the sync time stays
+            if (token.IsCancellationRequested)
                 return;
+
+            if (opsList.Count == 0)
+            {
+                CommitMediaSync(deviceInfo.DeviceId);
+                return;
+            }
 
             ThumbnailProgressChanged?.Invoke(ThumbnailStep.Pulling, true);
 
             int totalFiles = opsList.Sum(op => op.FilePath.Children.Count);
             int completedFiles = 0;
             int completedOps = 0;
+            int failedOps = 0;
             int totalOps = opsList.Count;
 
             ThumbnailPullingProgressUpdated?.Invoke(0, totalFiles);
@@ -413,12 +493,21 @@ public static partial class ThumbnailService
                 operation.ProgressUpdates.CollectionChanged += collectionChangedHandler;
 
                 // Counted however each pull ends, so one failure doesn't leave the progress showing.
-                operation.WhenFinished(_ =>
+                operation.WhenFinished(status =>
                 {
                     operation.ProgressUpdates.CollectionChanged -= collectionChangedHandler;
 
-                    if (Interlocked.Increment(ref completedOps) == totalOps)
-                        ThumbnailProgressChanged?.Invoke(ThumbnailStep.Pulling, false);
+                    if (status is not FileOperation.OperationStatus.Completed)
+                        Interlocked.Increment(ref failedOps);
+
+                    if (Interlocked.Increment(ref completedOps) != totalOps)
+                        return;
+
+                    ThumbnailProgressChanged?.Invoke(ThumbnailStep.Pulling, false);
+
+                    // A failed pull would be skipped by the next listing, which starts at the sync time
+                    if (Volatile.Read(ref failedOps) == 0)
+                        CommitMediaSync(deviceInfo.DeviceId);
                 });
             }
 
@@ -464,16 +553,20 @@ public static partial class ThumbnailService
         }
     }
 
-    private static string GetThumbsFromDevice(DeviceThumbnailInfo info, MediaType media, CancellationToken cancellationToken)
+    private static string GetThumbsFromDevice(DeviceThumbnailInfo info, MediaType media, long? since, CancellationToken cancellationToken)
     {
-        AdbService.ExecuteDeviceAdbShellCommand(
-                    info.PhysicalId, "content",
-                    out string stdout, out _,
-                    cancellationToken,
-                    "query",
-                    "--uri", $"content://media/external/{media}/media",
-                    "--projection", $"_id:_data:resolution:{(media is MediaType.images ? "f_number:iso:exposure_time" : "duration:bitrate")}"
-                );
+        string[] args =
+        [
+            "query",
+            "--uri", $"content://media/external/{media}/media",
+            "--projection", $"_id:_data:resolution:{(media is MediaType.images ? "f_number:iso:exposure_time" : "duration:bitrate")}",
+        ];
+
+        // date_added too: a file pushed with its original date has an old date_modified
+        if (since is long time)
+            args = [.. args, "--where", $"'date_added>{time} OR date_modified>{time}'"];
+
+        AdbService.ExecuteDeviceAdbShellCommand(info.PhysicalId, "content", out string stdout, out _, cancellationToken, args);
 
         return stdout;
     }
