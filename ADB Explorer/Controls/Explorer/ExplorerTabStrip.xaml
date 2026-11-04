@@ -91,6 +91,8 @@
                                             x:Name="Bd"
                                             Margin="0,0,0,6"
                                             Background="Transparent"
+                                            BorderBrush="Transparent"
+                                            BorderThickness="1"
                                             CornerRadius="6"
                                             SnapsToDevicePixels="True" />
                                         <!--
@@ -116,6 +118,25 @@
                                             <Setter TargetName="TabContent" Property="TextElement.FontWeight" Value="Bold" />
                                             <Setter Property="Panel.ZIndex" Value="1" />
                                         </Trigger>
+                                        <!--  In HC, the title bar's caption-text FG would otherwise flow in; idle tabs use regular text, the active one the selection color.  -->
+                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+                                        </DataTrigger>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True" />
+                                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsSelected}" Value="True" />
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Foreground" Value="{DynamicResource SelectedBackground}" />
+                                        </MultiDataTrigger>
+                                        <!--  HC hover fill is transparent, so outline the hovered tab instead.  -->
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True" />
+                                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource MouseOverBorderBrush}" />
+                                        </MultiDataTrigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
                             </Setter.Value>
