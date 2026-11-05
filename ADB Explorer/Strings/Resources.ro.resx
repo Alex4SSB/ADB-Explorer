@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -58,4 +58,1693 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>Pictograma robotului Android</value>
+  </data>
+  <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
+    <value>Robotul Android este reprodus sau modificat după lucrări create și partajate de Google și folosite conform termenilor descriși în licența Creative Commons 3.0 de atribuire.</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>Nu s-a putut obține versiunea ADB de la calea furnizată.</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>Pictograma APK este licențiată sub Apache License, versiunea 2.0.</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>Selectează executabilul ADB</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>Resetează setările aplicației</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>Versiunea ADB de la calea furnizată este prea veche.</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>Versiune nouă a aplicației</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>Copiază numele pachetului</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>Eroare de navigare</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>Restaurează toate elementele</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>Copiază calea elementului</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Golește coșul de gunoi</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>Eroare la calea de destinație</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Eroare de conexiune</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Șterge</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>Eroare de asociere</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>Accesul root nu poate fi activat pe dispozitivul selectat.</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Eroare de deconectare</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>Șterge definitiv</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>Acces root</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Confirmă ștergerea</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>Eroare la creare</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>Confirmă dezinstalarea</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>Restaurează conflictele</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>Selectează pachetele de instalat</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>Elimină dispozitivul</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>Oprește emulatorul</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>Deconectează dispozitivul</value>
+  </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>Operații cu fișiere</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>Instalează pachete</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Eroare la citirea fișierului</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>Repornește aplicația ca schimbările să aibă efect</value>
+  </data>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>Asociază și/sau conectează un dispozitiv WiFi (fără a folosi mDNS)</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>Pornește WSA în fundal</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Eroare la scrierea fișierului</value>
+  </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>Descarcă</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>Restaurează</value>
+  </data>
+  <data name="S_LS_ERROR_TITLE" xml:space="preserve">
+    <value>Eroare la listarea directorului</value>
+  </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>Descarcă (ținta legăturii)</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>Descarcă la rădăcina unității Windows</value>
+  </data>
+  <data name="S_DRIVE_RESTRICTIONS_HEADER" xml:space="preserve">
+    <value>Restricții ale unității:</value>
+  </data>
+  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
+    <value>Bine ai venit într-o versiune nouă a ADB Explorer!
+Notele de versiune sunt disponibile pe GitHub.</value>
+  </data>
+  <data name="S_RESTRICTION_NOEXEC" xml:space="preserve">
+    <value>• Legăturile simbolice nu sunt suportate
+• Numele de fișiere nu pot conține " * / : &lt; &gt; ? \ |
+• Numele de fișiere nu disting majusculele de minuscule
+• Instalarea APK-urilor nu este suportată</value>
+  </data>
+  <data name="S_RESTRICTION_READ_ONLY" xml:space="preserve">
+    <value>• Sistem de fișiere doar în citire</value>
+  </data>
+  <data name="S_RESET_SETTINGS" xml:space="preserve">
+    <value>Toate setările aplicației vor fi resetate la închiderea aplicației.
+Acest lucru nu poate fi anulat. Ești sigur?</value>
+  </data>
+  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
+    <value>Află mai multe despre ADB</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>Selectează Lansare dacă ADB este deja autorizat în WSA.
+Pentru a aproba ADB, deschide setările avansate WSA.</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>Descarcă ADB</value>
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value>Schimbă</value>
+  </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value>Continuă</value>
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value>Activat</value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value>Dezactivat</value>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>Mai multe informații</value>
+  </data>
+  <data name="S_NEW_VERSION" xml:space="preserve">
+    <value>Este disponibil un nou {0}, versiunea {1}</value>
+  </data>
+  <data name="S_UPDATE_ON_CLOSE" xml:space="preserve">
+    <value>Actualizează la închidere</value>
+  </data>
+  <data name="S_NEW_VERSION_READY" xml:space="preserve">
+    <value>Un nou {0}, versiunea {1}, a fost descărcat și este gata de instalare.</value>
+  </data>
+  <data name="S_UPDATE_APPLY_FAILED" xml:space="preserve">
+    <value>Actualizarea nu a putut fi pregătită. Asigură-te că există un program care gestionează arhivele .7z (Windows Explorer, 7-Zip, NanaZip etc.) sau descarcă manual versiunea de pe GitHub.</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>Închide</value>
+  </data>
+  <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
+    <value>Mergi la pagina versiunii</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_MSG" xml:space="preserve">
+    <value>Această versiune a aplicației a fost lansată după o actualizare a politicii de confidențialitate.
+Vezi schimbările pe GitHub.</value>
+  </data>
+  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
+    <value>Mergi la notele de versiune</value>
+  </data>
+  <data name="S_PRIVACY_UPDATE_TITLE" xml:space="preserve">
+    <value>Politica de confidențialitate a fost actualizată</value>
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value>Ajutor despre ADB</value>
+  </data>
+  <data name="S_HELP_ON_ADB" xml:space="preserve">
+    <value>Această aplicație este o interfață grafică pentru ADB, Android Debug Bridge.
+Pentru a folosi aplicația, trebuie să ai ADB pe calculator.
+ADB este disponibil ca parte a Android SDK Platform Tools.
+Poți folosi linkul furnizat pentru a descărca SDK Platform Tools.
+Din păcate, nu putem oferi ADB împreună cu aplicația din cauza restricțiilor de licențiere.</value>
+  </data>
+  <data name="S_ADB_EXECUTABLE" xml:space="preserve">
+    <value>Executabilul ADB</value>
+  </data>
+  <data name="S_ITEM_DESTINATION" xml:space="preserve">
+    <value>Selectează destinația pentru {0}</value>
+  </data>
+  <data name="S_DELETE_PERMANENT" xml:space="preserve">
+    <value>Următoarele vor fi șterse definitiv:
+{0}</value>
+  </data>
+  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
+    <value>Selectează destinația pentru mai multe elemente</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>Dosar nou</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>Fișier nou</value>
+  </data>
+  <data name="S_NEW_ARCHIVE" xml:space="preserve">
+    <value>Arhivă nouă</value>
+  </data>
+  <data name="S_LS_ERROR" xml:space="preserve">
+    <value>A apărut o eroare la încercarea de a lista conținutul acestui dosar.
+Conținutul afișat poate fi incomplet.</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>Creative Commons</value>
+  </data>
+  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
+    <value>{0} este un strămoș al dosarului de destinație.</value>
+  </data>
+  <data name="S_KILL_EMULATOR" xml:space="preserve">
+    <value>Sigur vrei să oprești acest emulator?</value>
+  </data>
+  <data name="S_REM_DEVICE" xml:space="preserve">
+    <value>Sigur vrei să elimini acest dispozitiv?</value>
+  </data>
+  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
+    <value>Elimină {0}</value>
+  </data>
+  <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
+    <value>Oprește {0}</value>
+  </data>
+  <data name="S_REM_APK" xml:space="preserve">
+    <value>Următoarele vor fi eliminate:
+{0}</value>
+  </data>
+  <data name="S_UNINSTALL" xml:space="preserve">
+    <value>Dezinstalează</value>
+  </data>
+  <data name="S_CANCEL" xml:space="preserve">
+    <value>Anulează</value>
+  </data>
+  <data name="S_SKIP" xml:space="preserve">
+    <value>Omite</value>
+  </data>
+  <data name="S_CONFIRM" xml:space="preserve">
+    <value>Confirmă</value>
+  </data>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value>Înlocuiește</value>
+  </data>
+  <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
+    <value>Fuzionează sau înlocuiește</value>
+  </data>
+  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
+    <value>Înlocuiește fișierele din destinație</value>
+  </data>
+  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
+    <value>Lasă-mă să decid pentru fiecare fișier</value>
+  </data>
+  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
+    <value>Omite aceste fișiere</value>
+  </data>
+  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
+    <value>Rezolvă {0} conflicte</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
+    <value>Selectează dosarele de încărcat</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
+    <value>Selectează dosarele de încărcat în {0}</value>
+  </data>
+  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
+    <value>Înlocuiește sau omite fișierele</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
+    <value>Selectează fișierele de încărcat în {0}</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
+    <value>Selectează fișierele de încărcat</value>
+  </data>
+  <data name="S_BUTTON_CLEAR" xml:space="preserve">
+    <value>Curăță</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
+    <value>Interogare pentru dispozitive</value>
+  </data>
+  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
+    <value>Interogare pentru starea bateriei</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
+    <value>Activează root automat</value>
+  </data>
+  <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
+    <value>Salvează dispozitivele conectate manual</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
+    <value>Deschide automat pentru navigare</value>
+  </data>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value>Forțează rescanearea conținutului media la încărcare</value>
+  </data>
+  <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
+    <value>Număr maxim de operații simultane</value>
+  </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value>Oprește interogarea la încărcare/descărcare</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
+    <value>Interogare pentru unități</value>
+  </data>
+  <data name="S_SETTINGS_APK" xml:space="preserve">
+    <value>Suport APK</value>
+  </data>
+  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
+    <value>Arată extensiile numelui de fișier</value>
+  </data>
+  <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
+    <value>Arată aplicațiile de sistem</value>
+  </data>
+  <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
+    <value>Arată elementele ascunse</value>
+  </data>
+  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
+    <value>Suprascrie calea ADB</value>
+  </data>
+  <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
+    <value>Dosar implicit</value>
+  </data>
+  <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
+    <value>Deschis</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
+    <value>Închis</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
+    <value>Implicitul Windows</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
+    <value>Temă</value>
+  </data>
+  <data name="S_SETTINGS_CUSTOM_ACCENT" xml:space="preserve">
+    <value>Culoare de accent personalizată</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
+    <value>Dezactivează accelerarea hardware</value>
+  </data>
+  <data name="S_PICK_COLOR" xml:space="preserve">
+    <value>Alege o culoare</value>
+  </data>
+  <data name="S_SETTINGS_ACCENT_COLOR" xml:space="preserve">
+    <value>Culoare de accent</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_UPDATE" xml:space="preserve">
+    <value>Actualizează și instalează</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
+    <value>Caută și notifică</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES" xml:space="preserve">
+    <value>Caută actualizări</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
+    <value>Directoare de lucru</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
+    <value>Explorer</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
+    <value>Grafică</value>
+  </data>
+  <data name="S_DONATE" xml:space="preserve">
+    <value>Donează sau sponsorizează</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
+    <value>Unități și funcții</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
+    <value>Dispozitiv</value>
+  </data>
+  <data name="S_APP_DATA_FOLDER" xml:space="preserve">
+    <value>Dosar cu datele aplicației</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_TITLE" xml:space="preserve">
+    <value>Locația datelor aplicației</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_MESSAGE" xml:space="preserve">
+    <value>Această distribuție a aplicației salvează datele într-o locație virtualizată (și greu de accesat), care este ștearsă la dezinstalarea aplicației.
+
+Selectează Personalizat pentru a folosi o locație care nu va fi eliminată la dezinstalare. Locația personalizată nu poate fi sub C:\Users\…\AppData</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
+    <value>Alege dosarul cu datele aplicației</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
+    <value>Folosește implicitul</value>
+  </data>
+  <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
+    <value>Personalizat</value>
+  </data>
+  <data name="S_GITHUB_REPO" xml:space="preserve">
+    <value>Depozitul GitHub</value>
+  </data>
+  <data name="S_SETTINGS_CRASH_DIALOG" xml:space="preserve">
+    <value>Arată dialogul cu raportul de eroare</value>
+  </data>
+  <data name="S_PRIVACY_POLICY" xml:space="preserve">
+    <value>Politica de confidențialitate</value>
+  </data>
+  <data name="S_CRASH_REPORTING_TITLE" xml:space="preserve">
+    <value>Raportarea erorilor</value>
+  </data>
+  <data name="S_ATTRIBUTIONS" xml:space="preserve">
+    <value>Atribuiri și licențe terțe</value>
+  </data>
+  <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
+    <value>După o eroare critică, poți trimite opțional un raport de diagnosticare ca să ne ajuți să o rezolvăm. Rapoartele se trimit doar când apeși Trimite raportul și includ de obicei mesajul excepției, urma de apel, versiunea aplicației și a Windows și pagina care era deschisă. Datele sunt prelucrate de Grafana Labs (Grafana Cloud). Vezi linkul către politica de confidențialitate de mai sus.</value>
+  </data>
+  <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
+    <value>[nesetat]</value>
+  </data>
+  <data name="S_EXIT_SEARCH" xml:space="preserve">
+    <value>Închide căutarea</value>
+  </data>
+  <data name="S_SEARCH_SETTINGS" xml:space="preserve">
+    <value>Caută în setări</value>
+  </data>
+  <data name="S_SETTINGS_TITLE" xml:space="preserve">
+    <value>Setări</value>
+  </data>
+  <data name="S_SEARCH_VIEW" xml:space="preserve">
+    <value>Vizualizare de căutare</value>
+  </data>
+  <data name="S_ACTION_HIDE" xml:space="preserve">
+    <value>Ascunde</value>
+  </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
+    <value>Limbă</value>
+  </data>
+  <data name="S_FILTER_FILE_OPS" xml:space="preserve">
+    <value>Filtrează operațiile cu fișiere</value>
+  </data>
+  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
+    <value>Dezactivează redarea automată
+Anulează toate operațiile în execuție</value>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>Activează redarea automată</value>
+  </data>
+  <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
+    <value>Actualizările jurnalului sunt în pauză</value>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>Jurnalul comenzilor</value>
+  </data>
+  <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
+    <value>Pauzează actualizările jurnalului</value>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value>Înapoi</value>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value>Înainte</value>
+  </data>
+  <data name="S_BUTTON_DRIVES" xml:space="preserve">
+    <value>Unitățile dispozitivului</value>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>Mai sus</value>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>Dispozitive</value>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>Filtrează</value>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>Încarcă</value>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>Dosare</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>Fișiere</value>
+  </data>
+  <data name="S_MENU_REFRESH" xml:space="preserve">
+    <value>Reîmprospătează</value>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>Copiază</value>
+  </data>
+  <data name="S_MENU_STOP_LOADING" xml:space="preserve">
+    <value>Oprește încărcarea {0}</value>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>Editează</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>Nou</value>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>Mai mult</value>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value>Dosar</value>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value>Fișier</value>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value>Selectează tot</value>
+  </data>
+  <data name="S_MENU_COPY_LINK" xml:space="preserve">
+    <value>Copiază ca legătură</value>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value>Lipește legătura</value>
+  </data>
+  <data name="S_MENU_CUT" xml:space="preserve">
+    <value>Taie</value>
+  </data>
+  <data name="S_MENU_COMPRESS_TO" xml:space="preserve">
+    <value>Compresează în</value>
+  </data>
+  <data name="S_MENU_EXTRACT_HERE" xml:space="preserve">
+    <value>Extrage aici</value>
+  </data>
+  <data name="S_MENU_COPY_CONTENTS" xml:space="preserve">
+    <value>Copiază conținutul</value>
+  </data>
+  <data name="S_ACTION_COMPRESS" xml:space="preserve">
+    <value>Compresează</value>
+  </data>
+  <data name="S_MENU_ARCHIVE" xml:space="preserve">
+    <value>Arhivă</value>
+  </data>
+  <data name="S_ACTION_EXTRACT" xml:space="preserve">
+    <value>Extrage</value>
+  </data>
+  <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
+    <value>Actualizează ora modificării</value>
+  </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value>Pachet</value>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value>Redenumire</value>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>Instalează</value>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>Salvează schimbările</value>
+  </data>
+  <data name="S_MENU_BACKUP_PACKAGE" xml:space="preserve">
+    <value>Copie de rezervă</value>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>Golește jurnalul comenzilor</value>
+  </data>
+  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
+    <value>Deschide locația elementului</value>
+  </data>
+  <data name="S_APK_BACKUP_OBB_FAILED" xml:space="preserve">
+    <value>Aplicația a fost instalată, dar fișierele OBB nu au putut fi restaurate. Deschide aplicația o dată pe dispozitiv și încearcă din nou.</value>
+  </data>
+  <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
+    <value>Caută în browser</value>
+  </data>
+  <data name="S_ADB_DISK_USAGE" xml:space="preserve">
+    <value>Consumul de disc al ADB</value>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value>Copiază în clipboard</value>
+  </data>
+  <data name="S_DISK_USAGE_READ" xml:space="preserve">
+    <value>Citire: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
+    <value>Scriere: {0}</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
+    <value>Despre</value>
+  </data>
+  <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
+    <value>Nu s-a putut obține lista.</value>
+  </data>
+  <data name="S_EMPTY_FILTER" xml:space="preserve">
+    <value>Niciun element nu corespunde căutării.</value>
+  </data>
+  <data name="S_FOLDER_EMPTY" xml:space="preserve">
+    <value>Acest dosar este gol.</value>
+  </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value>&lt;Span&gt;Acest dosar &lt;Italic&gt;arată&lt;/Italic&gt; gol&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… la o privire atentă&lt;/Span&gt;&lt;/Span&gt;</value>
+  </data>
+  <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
+    <value>Tipul operației</value>
+  </data>
+  <data name="S_COLUMN_SOURCE" xml:space="preserve">
+    <value>Sursa</value>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>Numele fișierului</value>
+  </data>
+  <data name="S_COLUMN_PROGRESS" xml:space="preserve">
+    <value>Progres</value>
+  </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value>Destinația</value>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>Pictogramă</value>
+  </data>
+  <data name="S_COLUMN_ADDED" xml:space="preserve">
+    <value>Adăugat</value>
+  </data>
+  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
+    <value>Data modificării</value>
+  </data>
+  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
+    <value>Locația originală</value>
+  </data>
+  <data name="S_COLUMN_NAME" xml:space="preserve">
+    <value>Nume</value>
+  </data>
+  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
+    <value>Data ștergerii</value>
+  </data>
+  <data name="S_COLUMN_SIZE" xml:space="preserve">
+    <value>Dimensiune</value>
+  </data>
+  <data name="S_COLUMN_TYPE" xml:space="preserve">
+    <value>Tip</value>
+  </data>
+  <data name="S_COLUMN_USER_ID" xml:space="preserve">
+    <value>ID-ul utilizatorului</value>
+  </data>
+  <data name="S_COLUMN_VERSION" xml:space="preserve">
+    <value>Versiune</value>
+  </data>
+  <data name="S_PACKAGE_ID" xml:space="preserve">
+    <value>ID-ul pachetului</value>
+  </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value>Timpul de la ultimul răspuns al serverului</value>
+  </data>
+  <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
+    <value>Serverul ADB nu răspunde</value>
+  </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0} s</value>
+  </data>
+  <data name="S_REFRESH_DEVICES" xml:space="preserve">
+    <value>Reîmprospătează dispozitivele</value>
+  </data>
+  <data name="S_SERVER_DOWN" xml:space="preserve">
+    <value>Serverul mDNS nu funcționează</value>
+  </data>
+  <data name="S_RESTART_ADB" xml:space="preserve">
+    <value>Repornește ADB</value>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0} min</value>
+  </data>
+  <data name="S_AWAITING_RESPONSE" xml:space="preserve">
+    <value>Se așteaptă răspuns: {0}</value>
+  </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0} ms</value>
+  </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>Serverul mDNS este pornit și funcționează</value>
+  </data>
+  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
+    <value>Suport limitat</value>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value>{0} h</value>
+  </data>
+  <data name="S_ROOT_ENABLED" xml:space="preserve">
+    <value>Acces root activat</value>
+  </data>
+  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
+    <value>Root poate fi activat</value>
+  </data>
+  <data name="S_RECOVERY_MODE" xml:space="preserve">
+    <value>Modul recovery</value>
+  </data>
+  <data name="S_BAT_TEMP" xml:space="preserve">
+    <value>Temperatură: {0} °C</value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>Curent acumulator: {0} A</value>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value>Tensiune: {0} V</value>
+  </data>
+  <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
+    <value>Repornire în</value>
+  </data>
+  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
+    <value>Bootloader</value>
+  </data>
+  <data name="S_REBOOT_SYSTEM" xml:space="preserve">
+    <value>Imaginea de sistem</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
+    <value>Sideload</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
+    <value>Sideload (repornire automată)</value>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - Deconectat</value>
+  </data>
+  <data name="S_STATUS_UNAUTH" xml:space="preserve">
+    <value>{0} - Neautorizat</value>
+  </data>
+  <data name="S_TYPE_EMULATOR" xml:space="preserve">
+    <value>Emulator Android</value>
+  </data>
+  <data name="S_TYPE_SERVICE" xml:space="preserve">
+    <value>Serviciu mDNS</value>
+  </data>
+  <data name="S_TYPE_USB" xml:space="preserve">
+    <value>USB</value>
+  </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value>WiFi</value>
+  </data>
+  <data name="S_TYPE_WSA" xml:space="preserve">
+    <value>WSA</value>
+  </data>
+  <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
+    <value>Starea acumulatorului necunoscută</value>
+  </data>
+  <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
+    <value>{0}%, La priză</value>
+  </data>
+  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
+    <value>Fără fir</value>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>Priză</value>
+  </data>
+  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
+    <value>Niciuna</value>
+  </data>
+  <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
+    <value>Se descarcă</value>
+  </data>
+  <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
+    <value>Necunoscut</value>
+  </data>
+  <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
+    <value>Se încarcă</value>
+  </data>
+  <data name="S_BAT_STATE_FULL" xml:space="preserve">
+    <value>Plin</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>Stare: {0}</value>
+  </data>
+  <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
+    <value>Nu se încarcă</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
+    <value>Supraîncălzire</value>
+  </data>
+  <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
+    <value>Bună</value>
+  </data>
+  <data name="S_BAT_HEALTH" xml:space="preserve">
+    <value>Stare de sănătate: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
+    <value>Descărcat</value>
+  </data>
+  <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
+    <value>Eroare nespecificată</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
+    <value>Tensiune prea mare</value>
+  </data>
+  <data name="S_BUTTON_LAUNCH" xml:space="preserve">
+    <value>Pornește</value>
+  </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value>Lansare WSA</value>
+  </data>
+  <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
+    <value>Rece</value>
+  </data>
+  <data name="S_PASTE_CONFLICT" xml:space="preserve">
+    <value>Conflict la {0}</value>
+  </data>
+  <data name="S_BUTTON_ABORT" xml:space="preserve">
+    <value>Abandon</value>
+  </data>
+  <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
+    <value>Nu mai arăta acest mesaj.</value>
+  </data>
+  <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
+    <value>Operații</value>
+  </data>
+  <data name="S_DROP" xml:space="preserve">
+    <value>Plasează</value>
+  </data>
+  <data name="S_PASTE" xml:space="preserve">
+    <value>Lipește</value>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} (legătură)</value>
+  </data>
+  <data name="S_FILE_TYPE_APK" xml:space="preserve">
+    <value>Pachet de aplicație Android</value>
+  </data>
+  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
+    <value>Legătură</value>
+  </data>
+  <data name="S_DRIVE_TRASH" xml:space="preserve">
+    <value>Coș de gunoi</value>
+  </data>
+  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
+    <value>Executabil Windows</value>
+  </data>
+  <data name="S_BUTTON_YES" xml:space="preserve">
+    <value>Da</value>
+  </data>
+  <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
+    <value>Stocare internă</value>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>Rădăcină</value>
+  </data>
+  <data name="S_DRIVE_APPS" xml:space="preserve">
+    <value>Aplicații instalate</value>
+  </data>
+  <data name="S_DRIVE_EMULATED" xml:space="preserve">
+    <value>Unitate emulată</value>
+  </data>
+  <data name="S_DRIVE_SD" xml:space="preserve">
+    <value>Card µSD</value>
+  </data>
+  <data name="S_DRIVE_OTG" xml:space="preserve">
+    <value>Unitate OTG</value>
+  </data>
+  <data name="S_DRIVE_TEMP" xml:space="preserve">
+    <value>Temporar</value>
+  </data>
+  <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
+    <value>Conținutul nu se potrivește</value>
+  </data>
+  <data name="S_VALIDATE_MISSING" xml:space="preserve">
+    <value>Lipsește din locația țintă</value>
+  </data>
+  <data name="S_LOCATION_NA" xml:space="preserve">
+    <value>Neaplicabil</value>
+  </data>
+  <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
+    <value>Ștergere permanentă</value>
+  </data>
+  <data name="S_PATH_INVALID" xml:space="preserve">
+    <value>Argumentul trebuie să specifice calea completă a unui fișier de setări nou sau existent.</value>
+  </data>
+  <data name="S_ITEM_COPY" xml:space="preserve">
+    <value>{0} - Copiere</value>
+  </data>
+  <data name="S_MENU_EMPTY" xml:space="preserve">
+    <value>Meniul este gol</value>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>Cale personalizată pentru setările aplicației</value>
+  </data>
+  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
+    <value>Respectă regulile de denumire Windows</value>
+  </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Respectă regulile de denumire din spațiul utilizatorului</value>
+  </data>
+  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
+    <value>Respectă regulile de denumire Unix (prin ADB)</value>
+  </data>
+  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
+    <value>Respectă regulile de denumire ale rădăcinii unității Windows</value>
+  </data>
+  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
+    <value>Unic în locația curentă</value>
+  </data>
+  <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
+    <value>Un fișier selectat încalcă regulile de denumire Windows</value>
+  </data>
+  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
+    <value>Un fișier selectat încalcă regulile de denumire ale rădăcinii unității Windows</value>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>Unele fișiere selectate au nume care se suprapun fără deosebire de majuscule</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Un fișier selectat încalcă regulile de denumire din spațiul utilizatorului</value>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>Unele fișiere copiate au nume care se suprapun fără deosebire de majuscule</value>
+  </data>
+  <data name="S_POPUP_COPIED_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Un fișier copiat încalcă regulile de denumire din spațiul utilizatorului</value>
+  </data>
+  <data name="S_POPUP_NON_FILE" xml:space="preserve">
+    <value>Un element selectat nu este fișier sau dosar</value>
+  </data>
+  <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
+    <value>Locația curentă este doar în citire</value>
+  </data>
+  <data name="S_POPUP_SELECTED_ANDROID_PROTECTED" xml:space="preserve">
+    <value>Un element selectat nu poate fi modificat</value>
+  </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value>Aplicație WSA</value>
+  </data>
+  <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
+    <value>Neverificat</value>
+  </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>Starea root: {0}</value>
+  </data>
+  <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
+    <value>Interzis</value>
+  </data>
+  <data name="S_BUTTON_ENABLE" xml:space="preserve">
+    <value>Activează</value>
+  </data>
+  <data name="S_BUTTON_DISABLE" xml:space="preserve">
+    <value>Dezactivează</value>
+  </data>
+  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
+    <value>Adresa IP sau numele gazdei</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>Cod de asociere</value>
+  </data>
+  <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value>Dispozitiv salvat</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
+    <value>Portul asocierii</value>
+  </data>
+  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
+    <value>Asociază și conectează</value>
+  </data>
+  <data name="S_DEVICE_QR" xml:space="preserve">
+    <value>Asociere prin cod QR</value>
+  </data>
+  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
+    <value>Gata de asociere</value>
+  </data>
+  <data name="S_CLEAR_ALL" xml:space="preserve">
+    <value>Golește tot</value>
+  </data>
+  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
+    <value>Adaugă dispozitiv nou</value>
+  </data>
+  <data name="S_SERVICE_NONAME" xml:space="preserve">
+    <value>[Serviciu]</value>
+  </data>
+  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
+    <value>[Neautorizat]</value>
+  </data>
+  <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
+    <value>Se navighează acum</value>
+  </data>
+  <data name="S_BUTTON_BROWSE" xml:space="preserve">
+    <value>Navighează</value>
+  </data>
+  <data name="S_BUTTON_CONNECT" xml:space="preserve">
+    <value>Conectează</value>
+  </data>
+  <data name="S_FILEOP_ERROR" xml:space="preserve">
+    <value>Eroare: {0}</value>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value>{0} liberi din {1}</value>
+  </data>
+  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
+    <value>Golește</value>
+  </data>
+  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
+    <value>Element eșuat: {0}</value>
+  </data>
+  <data name="S_FILEOP_COMPLETED" xml:space="preserve">
+    <value>Finalizat</value>
+  </data>
+  <data name="S_FILEOP_VALIDATED" xml:space="preserve">
+    <value>Validat</value>
+  </data>
+  <data name="S_FILEOP_RUNNING" xml:space="preserve">
+    <value>În execuție</value>
+  </data>
+  <data name="S_FILEOP_PREV" xml:space="preserve">
+    <value>Operația anterioară</value>
+  </data>
+  <data name="S_FILEOP_TOTAL" xml:space="preserve">
+    <value>Total:</value>
+  </data>
+  <data name="S_FILEOP_WAITING" xml:space="preserve">
+    <value>În coadă</value>
+  </data>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value>Anulat</value>
+  </data>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>Eșuat</value>
+  </data>
+  <data name="S_ACTION_RECYCLE" xml:space="preserve">
+    <value>Mută în coșul de gunoi</value>
+  </data>
+  <data name="S_ACTION_MOVE" xml:space="preserve">
+    <value>Mutare</value>
+  </data>
+  <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
+    <value>Anterior</value>
+  </data>
+  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
+    <value>Derulează aici</value>
+  </data>
+  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
+    <value>{0}% folosit</value>
+  </data>
+  <data name="S_ACTION_UPDATE" xml:space="preserve">
+    <value>Actualizare</value>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>Pagina anterioară</value>
+  </data>
+  <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
+    <value>Sus</value>
+  </data>
+  <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
+    <value>Jos</value>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>Pagina următoare</value>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>Derulează în sus</value>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>Derulează în jos</value>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>Marginea din dreapta</value>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>Marginea din stânga</value>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>Derulează la stânga</value>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>Pagina din stânga</value>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>Pagina din dreapta</value>
+  </data>
+  <data name="S_MENU_UNDO" xml:space="preserve">
+    <value>Anulează</value>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>Derulează la dreapta</value>
+  </data>
+  <data name="S_MENU_REDO" xml:space="preserve">
+    <value>Refă</value>
+  </data>
+  <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
+    <value>Clic pentru mai multe informații</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
+    <value>Limba aplicației</value>
+  </data>
+  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
+    <value>Notificări</value>
+  </data>
+  <data name="S_FILE_SOCKET" xml:space="preserve">
+    <value>Socket</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION" xml:space="preserve">
+    <value>Alege limba aplicației din setări.
+Progresul traducerii este afișat pentru limba selectată.
+Te rugăm să ne ajuți să localizăm aplicația în limba ta pe Weblate.</value>
+  </data>
+  <data name="S_GOTO_WEBLATE" xml:space="preserve">
+    <value>Mergi la Weblate</value>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>Dispozitiv de caractere</value>
+  </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>Dispozitiv de bloc</value>
+  </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
+  </data>
+  <data name="S_NAV_HISTORY" xml:space="preserve">
+    <value>Istoricul navigării</value>
+  </data>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>Necunoscut</value>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>Legătură ruptă</value>
+  </data>
+  <data name="S_REMOVE" xml:space="preserve">
+    <value>Elimină</value>
+  </data>
+  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
+    <value>Adaugă locația curentă</value>
+  </data>
+  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
+    <value>Locații salvate</value>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} KB</value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} MB</value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} GB</value>
+  </data>
+  <data name="MILLI" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="NANO" xml:space="preserve">
+    <value>n</value>
+  </data>
+  <data name="MICRO" xml:space="preserve">
+    <value>u</value>
+  </data>
+  <data name="BYTES" xml:space="preserve">
+    <value>{0} B</value>
+  </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{0} din {1} ({2})</value>
+  </data>
+  <data name="S_DRAGDROP_LINK" xml:space="preserve">
+    <value>Creează legătură în {0}</value>
+  </data>
+  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
+    <value>{0} din {1}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
+    <value>Copiază {0}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
+    <value>Copiază {0} în {1}</value>
+  </data>
+  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
+    <value>Fișierul nu a fost găsit</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
+    <value>Mută {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>Mută {0} în {1}</value>
+  </data>
+  <data name="S_VALIDATION_ERROR" xml:space="preserve">
+    <value>Eroare de validare: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATING" xml:space="preserve">
+    <value>Se validează…</value>
+  </data>
+  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
+    <value>S-a finalizat fără confirmare</value>
+  </data>
+  <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
+    <value>Selectează ROM-ul pentru sideload</value>
+  </data>
+  <data name="S_TERMINAL" xml:space="preserve">
+    <value>Terminal</value>
+  </data>
+  <data name="S_ROM_FILE" xml:space="preserve">
+    <value>Fișier ROM</value>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>Instalează {0}</value>
+  </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>Păstrează data modificării a fișierului</value>
+  </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value>Pornit</value>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value>Oprit</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>Se verifică starea serverului mDNS…</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_ICON_VIEW" xml:space="preserve">
+    <value>Doar în vizualizarea cu pictograme</value>
+  </data>
+  <data name="S_SETTINGS_THUMBNAIL_MODE" xml:space="preserve">
+    <value>Descarcă și afișează miniaturile</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ICONS" xml:space="preserve">
+    <value>Pictograme</value>
+  </data>
+  <data name="S_SETTINGS_PERSIST_THUMBS" xml:space="preserve">
+    <value>Păstrează miniaturile între sesiuni</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_PHOTO_DIR" xml:space="preserve">
+    <value>Doar în dosarele cu fotografii</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_CONNECT" xml:space="preserve">
+    <value>La conectare</value>
+  </data>
+  <data name="S_SETTINGS_VIDEO_THUMBNAILS" xml:space="preserve">
+    <value>Include miniaturile video</value>
+  </data>
+  <data name="S_VIDEO_DURATION" xml:space="preserve">
+    <value>Durată</value>
+  </data>
+  <data name="S_SETTINGS_SPECIAL_DIR_ICONS" xml:space="preserve">
+    <value>Arată pictogramele pentru dosarele speciale</value>
+  </data>
+  <data name="S_ONE_MONTH" xml:space="preserve">
+    <value>O lună</value>
+  </data>
+  <data name="S_ONE_WEEK" xml:space="preserve">
+    <value>O săptămână</value>
+  </data>
+  <data name="S_PICTURE_DIMENSIONS" xml:space="preserve">
+    <value>Dimensiuni</value>
+  </data>
+  <data name="S_ONE_HOUR" xml:space="preserve">
+    <value>O oră</value>
+  </data>
+  <data name="S_SETTINGS_THUMBS_AGE" xml:space="preserve">
+    <value>Perioada de reîmprospătare a miniaturilor locale</value>
+  </data>
+  <data name="S_ONE_DAY" xml:space="preserve">
+    <value>O zi</value>
+  </data>
+  <data name="S_SETTINGS_BUSYBOX" xml:space="preserve">
+    <value>Folosește BusyBox dacă este disponibil</value>
+  </data>
+  <data name="S_SETTINGS_WSA" xml:space="preserve">
+    <value>Conectează automat la WSA dacă este disponibil</value>
+  </data>
+  <data name="S_SETTINGS_EMULATOR_DISCOVERY" xml:space="preserve">
+    <value>Detectează emulatoarele Android</value>
+  </data>
+  <data name="S_EMULATOR_SDK_NOT_FOUND" xml:space="preserve">
+    <value>Emulatorul Android SDK nu a fost găsit. Instalează pachetul emulator Android SDK sau setează ANDROID_SDK_ROOT.</value>
+  </data>
+  <data name="S_EMULATOR_DIALOG_TITLE" xml:space="preserve">
+    <value>Lansare emulator</value>
+  </data>
+  <data name="S_EMULATOR_PKG_TIP" xml:space="preserve">
+    <value>Pornește acest emulator</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
+    <value>Se încarcă pictogramele aplicațiilor</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_CHECKING" xml:space="preserve">
+    <value>Se verifică actualizările miniaturilor</value>
+  </data>
+  <data name="S_STRING_PASTE" xml:space="preserve">
+    <value>Lipește</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_PULLING" xml:space="preserve">
+    <value>Se descarcă miniaturile</value>
+  </data>
+  <data name="S_THUMBSIZE_DETAILS" xml:space="preserve">
+    <value>Detalii</value>
+  </data>
+  <data name="S_THUMB_SNACKBAR_READING" xml:space="preserve">
+    <value>Se citesc locațiile miniaturilor și baza de date cu media</value>
+  </data>
+  <data name="S_THUMBSIZE_MEDIUM" xml:space="preserve">
+    <value>Pictograme medii</value>
+  </data>
+  <data name="S_THUMBSIZE_TITLE" xml:space="preserve">
+    <value>Vizualizare</value>
+  </data>
+  <data name="S_THUMBSIZE_LARGE" xml:space="preserve">
+    <value>Pictograme mari</value>
+  </data>
+  <data name="S_THUMBSIZE_XL" xml:space="preserve">
+    <value>Pictograme foarte mari</value>
+  </data>
+  <data name="S_THUMBSIZE_TOOLTIP" xml:space="preserve">
+    <value>Opțiuni de aspect și vizualizare</value>
+  </data>
+  <data name="S_THUMBSIZE_TILES" xml:space="preserve">
+    <value>Dale</value>
+  </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value>Dimensiunea miniaturii salvată pentru fiecare locație</value>
+  </data>
+  <data name="S_SORT_ASCENDING" xml:space="preserve">
+    <value>Crescător</value>
+  </data>
+  <data name="S_SORT" xml:space="preserve">
+    <value>Ordonează</value>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>Coloana și ordinea de sortare salvate pentru fiecare locație</value>
+  </data>
+  <data name="S_SETTINGS_MAX_CUSTOM_THUMB_WEIGHT" xml:space="preserve">
+    <value>Dimensiunea maximă a imaginii folosite ca miniatură proprie (0 - dezactivat)</value>
+  </data>
+  <data name="S_SORT_DESCENDING" xml:space="preserve">
+    <value>Descrescător</value>
+  </data>
+  <data name="S_DETAILS_PANE_TOOLTIP" xml:space="preserve">
+    <value>Arată sau ascunde panoul de detalii și previzualizare.</value>
+  </data>
+  <data name="S_FILEOP_HIDDEN_ITEMS" xml:space="preserve">
+    <value>și încă {0}…</value>
+  </data>
+  <data name="S_SIDE_PANE_PREVIEW" xml:space="preserve">
+    <value>Previzualizare</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX_AUTOMATIC" xml:space="preserve">
+    <value>Automat</value>
+  </data>
+  <data name="S_SETTINGS_PREVIEW_MAX_SIZE" xml:space="preserve">
+    <value>Dimensiunea maximă a fișierului pentru previzualizare</value>
+  </data>
+  <data name="S_PREVIEW_SYNTAX" xml:space="preserve">
+    <value>Sintaxă</value>
+  </data>
+  <data name="S_SETTINGS_PULL_ON_DOUBLE_CLICK" xml:space="preserve">
+    <value>Descarcă în dosarul implicit la dublu clic pe fișier</value>
+  </data>
+  <data name="S_DETAILS_MULTI_FILE_SELECTED" xml:space="preserve">
+    <value>Selectează un singur element pentru mai multe informații.</value>
+  </data>
+  <data name="S_ITEM_LOCATION" xml:space="preserve">
+    <value>Locație</value>
+  </data>
+  <data name="S_IMAGE_F_STOP" xml:space="preserve">
+    <value>Diafragmă</value>
+  </data>
+  <data name="S_IMAGE_ISO" xml:space="preserve">
+    <value>Viteză ISO</value>
+  </data>
+  <data name="S_VIDEO_BITRATE" xml:space="preserve">
+    <value>Rata de biți</value>
+  </data>
+  <data name="S_PREVIEW_EMPTY_SELECTION" xml:space="preserve">
+    <value>Selectează un fișier pentru previzualizare.</value>
+  </data>
+  <data name="S_IMAGE_EXPOSURE" xml:space="preserve">
+    <value>Timpul de expunere</value>
+  </data>
+  <data name="S_PDF_PASSWORD_PROTECTED" xml:space="preserve">
+    <value>Acest PDF este protejat prin parolă.</value>
+  </data>
+  <data name="S_PREVIEW_INVALID" xml:space="preserve">
+    <value>Nicio previzualizare disponibilă.</value>
+  </data>
+  <data name="S_PDF_PASSWORD_WRONG" xml:space="preserve">
+    <value>Parolă incorectă.</value>
+  </data>
+  <data name="S_FILE_PERMISSIONS" xml:space="preserve">
+    <value>Permisiuni</value>
+  </data>
+  <data name="S_PDF_PASSWORD_UNLOCK" xml:space="preserve">
+    <value>Deblochează</value>
+  </data>
+  <data name="S_FILE_PERM_USER" xml:space="preserve">
+    <value>Utilizator</value>
+  </data>
+  <data name="S_DATE_ACCESSED" xml:space="preserve">
+    <value>Accesat</value>
+  </data>
+  <data name="S_FILE_PERM_GROUP" xml:space="preserve">
+    <value>Grup</value>
+  </data>
+  <data name="S_FILE_PERM_OTHER" xml:space="preserve">
+    <value>Alții</value>
+  </data>
+  <data name="S_ARCHIVE_CAN_MODIFY" xml:space="preserve">
+    <value>Conținutul arhivei poate fi modificat</value>
+  </data>
+  <data name="S_ARCHIVE_READ_ONLY" xml:space="preserve">
+    <value>Conținutul arhivei este doar în citire</value>
+  </data>
+  <data name="S_CREATION_TIME" xml:space="preserve">
+    <value>Creat</value>
+  </data>
+  <data name="S_PACKED_SIZE" xml:space="preserve">
+    <value>Dimensiunea împachetată</value>
+  </data>
+  <data name="S_COMPRESSED_SIZE" xml:space="preserve">
+    <value>Dimensiunea comprimată</value>
+  </data>
+  <data name="S_COMPRESSION_RATIO" xml:space="preserve">
+    <value>Raport</value>
+  </data>
+  <data name="S_FILE_SYSTEM" xml:space="preserve">
+    <value>Sistem de fișiere</value>
+  </data>
+  <data name="S_COMPRESSION_METHOD" xml:space="preserve">
+    <value>Metodă</value>
+  </data>
+  <data name="S_FILE_INFO_MODIFIED" xml:space="preserve">
+    <value>Modificat</value>
+  </data>
+  <data name="S_COLOR_RED" xml:space="preserve">
+    <value>Roșu</value>
+  </data>
+  <data name="S_MOUNT_OPTIONS" xml:space="preserve">
+    <value>Opțiuni de montare</value>
+  </data>
+  <data name="S_MOUNT_POINT" xml:space="preserve">
+    <value>Punct de montare</value>
+  </data>
+  <data name="S_ADB_NOT_FOUND" xml:space="preserve">
+    <value>Nu s-a putut găsi ADB în PATH-ul de sistem. Folosește "{0}" pentru a-l localiza.</value>
+  </data>
+  <data name="S_COLOR_GREEN" xml:space="preserve">
+    <value>Verde</value>
+  </data>
+  <data name="S_COLOR_BLUE" xml:space="preserve">
+    <value>Albastru</value>
+  </data>
+  <data name="S_ADB_PATH_INVALID" xml:space="preserve">
+    <value>Calea {0} furnizată este o scurtătură Windows sau o cale UNC (la distanță), ceea ce nu este permis.</value>
+  </data>
+  <data name="S_BUTTON_PAIR" xml:space="preserve">
+    <value>Asociază</value>
+  </data>
+  <data name="S_ADB_COMPROMISED" xml:space="preserve">
+    <value>Executabilul furnizat nu poate fi verificat ca fiind ADB. Asigură-te că descarci doar Android Platform Tools oficial de la Google.</value>
+  </data>
+  <data name="S_SETTINGS_KILL_ADB_ON_EXIT" xml:space="preserve">
+    <value>Oprește ADB când aplicația se închide</value>
+  </data>
+  <data name="S_CUSTOM_LOCATION_INVALID" xml:space="preserve">
+    <value>Locația personalizată nu poate fi sub C:\Users\…\AppData. Selectează altă locație</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
+    <value>Permite ADB din surse neverificate</value>
+  </data>
+  <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
+    <value>Indisponibil pe acest sistem.</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_MODE" xml:space="preserve">
+    <value>Afișarea dimensiunii fișierului</value>
+  </data>
+  <data name="S_SETTINGS_FILE_SIZE_DECIMAL" xml:space="preserve">
+    <value>Cifrele zecimale ale dimensiunii fișierului</value>
+  </data>
+  <data name="S_OPEN_FOLDER" xml:space="preserve">
+    <value>Deschide</value>
+  </data>
+  <data name="S_UPDATE_MODIFIED_INFO" xml:space="preserve">
+    <value>Încearcă să alinieze data modificării după numele fișierului.
+
+Util pentru fotografiile care au data capturii în nume și al căror moment al modificării a fost suprascris.</value>
+  </data>
+  <data name="S_RESTART" xml:space="preserve">
+    <value>Repornește acum</value>
+  </data>
+  <data name="S_PUSH_PACKAGES_INFO" xml:space="preserve">
+    <value>Instalează APK-uri direct din Windows.</value>
+  </data>
+  <data name="S_DETAILS_PANE_INFO" xml:space="preserve">
+    <value>Setează panoul lateral în modul Detalii.
+
+Detaliile pot include: miniatură, informații extinse despre fișier, metadate, permisiuni și opțiunile de montare ale unității.</value>
+  </data>
+  <data name="S_PREVIEW_PANE_INFO" xml:space="preserve">
+    <value>Setează panoul lateral în modul Previzualizare.
+
+Elementele suportate: miniatură, PDF. Alte fișiere care se încadrează în limita de dimensiune sunt afișate ca text, cu evidențiere de sintaxă opțională, și pot fi editate și salvate dacă locația permite.</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS" xml:space="preserve">
+    <value>Opțiuni de căutare</value>
+  </data>
+  <data name="S_UPDATE_SIGNATURE_INVALID" xml:space="preserve">
+    <value>Actualizarea descărcată nu este semnată cu același certificat ca această instalare. Actualizarea a fost respinsă.</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS_INFO" xml:space="preserve">
+    <value>Dezactivează verificările căii și ale executabilului ADB.
+
+Verificările încearcă să împiedice un utilizator neatent să pornească un fișier posibil malițios care se dă drept ADB și includ:
+• Calea nu poate fi o cale UNC la distanță sau o legătură simbolică
+• Executabilul trebuie să fie semnat Authenticode de Google sau să corespundă listei de amprente SHA-256 predefinite
+• Trebuie să returneze un șir de versiune lizibil când este rulat cu --version</value>
+  </data>
+  <data name="S_SEARCH_ALL_SUBFOLDERS" xml:space="preserve">
+    <value>Toate subdosarele</value>
+  </data>
+  <data name="S_SEARCH_CURRENT_FOLDER" xml:space="preserve">
+    <value>Dosarul curent</value>
+  </data>
+  <data name="S_SEARCH_RESULTS_IN" xml:space="preserve">
+    <value>Rezultatele căutării în {0}</value>
+  </data>
+  <data name="S_SEARCH" xml:space="preserve">
+    <value>Caută</value>
+  </data>
+  <data name="S_SEARCH_OPTIONS_INFO" xml:space="preserve">
+    <value>Opțiuni avansate de căutare și filtrare.</value>
+  </data>
+  <data name="S_BIGGER" xml:space="preserve">
+    <value>mai mari</value>
+  </data>
+  <data name="S_NEWER" xml:space="preserve">
+    <value>mai noi</value>
+  </data>
+  <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
+    <value>Ieși din modul cu rezultatele căutării.</value>
+  </data>
+  <data name="S_TOOLTIP_REPLACED" xml:space="preserve">
+    <value>Fișierul va fi înlocuit.</value>
+  </data>
+  <data name="S_PER_FILE_CONFLICT_TABLE_TITLE" xml:space="preserve">
+    <value>Pentru fiecare conflict, selectează destinația pentru a-l omite sau sursa pentru a-l înlocui.</value>
+  </data>
+  <data name="S_TOOLTIP_SKIPPED" xml:space="preserve">
+    <value>Fișierul va fi omis.</value>
+  </data>
+  <data name="S_NAVIGATION_PANE" xml:space="preserve">
+    <value>Panoul de navigare</value>
+  </data>
+  <data name="S_BACKUP_PACKAGE_INFO" xml:space="preserve">
+    <value>Creează un .APKBKP al instalării aplicației și al datelor OBB</value>
+  </data>
+  <data name="S_MENU_SHOW" xml:space="preserve">
+    <value>Arată</value>
+  </data>
+  <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
+    <value>A</value>
+  </data>
+  <data name="S_SCREENSHOT" xml:space="preserve">
+    <value>Captură de ecran</value>
+  </data>
+  <data name="S_THUMBSIZE_CONTENT" xml:space="preserve">
+    <value>Conținut</value>
+  </data>
+  <data name="S_MENU_COPY_AS_IMAGE" xml:space="preserve">
+    <value>Copiază ca imagine</value>
+  </data>
+  <data name="S_MENU_PASTE_IMAGE" xml:space="preserve">
+    <value>Lipește imaginea</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE" xml:space="preserve">
+    <value>Deosebire între majuscule și minuscule</value>
+  </data>
+  <data name="S_SEARCH_CONTENTS_INFO" xml:space="preserve">
+    <value>Găsește și fișierele al căror conținut conține textul căutat.</value>
+  </data>
+  <data name="S_SEARCH_CASE_SENSITIVE_INFO" xml:space="preserve">
+    <value>Respectă exact forma literelor la căutare.</value>
+  </data>
+  <data name="S_SEARCH_CONTENTS" xml:space="preserve">
+    <value>Conținutul fișierului</value>
+  </data>
+  <data name="S_SEARCH_ARCHIVES" xml:space="preserve">
+    <value>Conținutul arhivelor</value>
+  </data>
+  <data name="S_SEARCH_ARCHIVES_INFO" xml:space="preserve">
+    <value>Găsește și fișierele din interiorul arhivelor găsite la căutare.</value>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE" xml:space="preserve">
+    <value>Afișează calea relativă</value>
+  </data>
+  <data name="S_STATUS_CALCULATING_SIZE" xml:space="preserve">
+    <value>Se calculează…</value>
+  </data>
+  <data name="S_SEARCH_DISPLAY_PATH_RELATIVE_INFO" xml:space="preserve">
+    <value>Când este selectat, rezultatele căutării se afișează cu o cale relativă față de locația curentă. Altfel, calea afișată este absolută.</value>
+  </data>
+  <data name="S_BUTTON_VIEW_SIZE" xml:space="preserve">
+    <value>Afișează dimensiunea</value>
+  </data>
+  <data name="S_SETTINGS_NEW_TAB_LOCATION" xml:space="preserve">
+    <value>Fila nouă se deschide la</value>
+  </data>
+  <data name="S_VIEW_SIZE_TOOLTIP" xml:space="preserve">
+    <value>Calculează și afișează dimensiunea totală a tuturor fișierelor din acest dosar, recursiv.</value>
+  </data>
+  <data name="S_MENU_REMOVE_SAVED_LOCATION" xml:space="preserve">
+    <value>Elimină din locațiile salvate</value>
+  </data>
+  <data name="S_NEW_TAB_DUPLICATE" xml:space="preserve">
+    <value>Duplică fila curentă</value>
+  </data>
+  <data name="S_NEW_TAB_DRIVE_VIEW" xml:space="preserve">
+    <value>Vizualizarea unităților a dispozitivului curent</value>
+  </data>
+  <data name="S_NEW_TAB_NONE" xml:space="preserve">
+    <value>Fără locație</value>
+  </data>
+  <data name="S_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>Deschide în fila nouă</value>
+  </data>
+  <data name="S_NEW_TAB" xml:space="preserve">
+    <value>Filă nouă</value>
+  </data>
+  <data name="S_CLOSE_TAB" xml:space="preserve">
+    <value>Închide fila</value>
+  </data>
+  <data name="S_CLOSE_LEFT_PANE" xml:space="preserve">
+    <value>Închide panoul din stânga</value>
+  </data>
+  <data name="S_CLOSE_TOP_PANE" xml:space="preserve">
+    <value>Închide panoul de sus</value>
+  </data>
+  <data name="S_CLOSE_RIGHT_PANE" xml:space="preserve">
+    <value>Închide panoul din dreapta</value>
+  </data>
+  <data name="S_SPLIT_HORIZONTALLY" xml:space="preserve">
+    <value>Împarte orizontal</value>
+  </data>
+  <data name="S_SPLIT_VERTICALLY" xml:space="preserve">
+    <value>Împarte vertical</value>
+  </data>
+  <data name="S_CLOSE_BOTTOM_PANE" xml:space="preserve">
+    <value>Închide panoul de jos</value>
+  </data>
+  <data name="S_CLOSE_OTHER_TABS" xml:space="preserve">
+    <value>Închide celelalte file</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_RIGHT" xml:space="preserve">
+    <value>Închide filele din dreapta</value>
+  </data>
+  <data name="S_SWAP_PANES" xml:space="preserve">
+    <value>Inversează panourile</value>
+  </data>
+  <data name="S_CLOSE_TABS_TO_LEFT" xml:space="preserve">
+    <value>Închide filele din stânga</value>
+  </data>
+  <data name="S_MERGE_WITH_LEFT_TAB" xml:space="preserve">
+    <value>Unește cu fila din stânga</value>
+  </data>
+  <data name="S_MERGE_WITH_RIGHT_TAB" xml:space="preserve">
+    <value>Unește cu fila din dreapta</value>
+  </data>
+  <data name="S_MENU_INVERT_SELECTION" xml:space="preserve">
+    <value>Inversează selecția</value>
+  </data>
+  <data name="S_DUPLICATE_TAB" xml:space="preserve">
+    <value>Duplică fila</value>
+  </data>
+  <data name="S_MENU_SELECT_NONE" xml:space="preserve">
+    <value>Deselectează tot</value>
+  </data>
+  <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
+    <value>de ori</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_RETRY" xml:space="preserve">
+    <value>Reîncearcă automat elementele eșuate</value>
+  </data>
+  <data name="S_FOLDER_CONTENT_VALUE" xml:space="preserve">
+    <value>{0}, {1}</value>
+  </data>
+  <data name="S_REPORT_ISSUE" xml:space="preserve">
+    <value>Raportează o problemă</value>
+  </data>
 </root>
