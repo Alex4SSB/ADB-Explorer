@@ -184,7 +184,7 @@
     <value>永久删除</value>
   </data>
   <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
-    <value>创建文件/文件夹错误</value>
+    <value>创建项目出错</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
     <value>还原冲突</value>
@@ -235,7 +235,7 @@
     <value>恢复</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>目录列表错误</value>
+    <value>列出文件夹内容出错</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>拉取到 Windows 驱动器根目录</value>
@@ -494,7 +494,7 @@ ADB 包含在 Android SDK Platform Tools 中。
 选择自定义以使用不会在卸载时被删除的位置。自定义位置不能在 C:\Users\…\AppData 下</value>
   </data>
   <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value>使用默认</value>
+    <value>使用默认位置</value>
   </data>
   <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
     <value>自定义</value>
@@ -524,13 +524,13 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>[未设置]</value>
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
-    <value>搜索设置</value>
+    <value>寻找设置</value>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
     <value>关闭搜索</value>
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
-    <value>搜索视图</value>
+    <value>显示搜索</value>
   </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>设置</value>
@@ -1053,7 +1053,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>{0} 可用，共 {1}</value>
   </data>
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
-    <value>空</value>
+    <value>无项目</value>
   </data>
   <data name="S_FILEOP_ERROR" xml:space="preserve">
     <value>错误：{0}</value>
