@@ -20,6 +20,7 @@
     "ConflictingItemsIn_one": "קיים פריט אחד עם התנגשות ב {{destination}}",
     "ConflictingItemsIn_two": "קיימים שני פריטים עם התנגשות ב {{destination}}",
     "ConflictingItemsIn_other": "קיימים {{count}} פריטים עם התנגשות ב {{destination}}",
+    "ResolveConflicts_other": "פתור {{count}} התנגשויות",
     "PackagesToRemove_one": "הנ\"ל יוסר:\nחבילה אחת",
     "PackagesToRemove_two": "הנ\"ל יוסר:\nשתי חבילות",
     "PackagesToRemove_other": "הנ\"ל יוסר:\n{{count}} חבילות",

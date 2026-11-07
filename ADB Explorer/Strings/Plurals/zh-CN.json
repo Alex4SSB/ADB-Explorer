@@ -6,6 +6,7 @@
     "Folders_other": "{{count}} 选择文件夹",
     "ConflictingItems_other": "有 {{count}} 个冲突项",
     "ConflictingItemsIn_other": "在 {{destination}} 中有 {{count}} 个冲突项",
+    "ResolveConflicts_other": "解决 {{count}} 个冲突",
     "PackagesToRemove_other": "以下内容将被卸载：\n{{count}} 软件包",
     "InstallApks_other": "安装 {{count}} 个 APK",
     "PasteCutItems_other": "粘贴{{count}}剪切项",

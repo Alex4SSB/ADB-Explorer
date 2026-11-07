@@ -1491,9 +1491,6 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_SKIP_THESE_FILES" xml:space="preserve">
     <value>Diese Dateien überspringen</value>
   </data>
-  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
-    <value>{0} Konflikte beheben</value>
-  </data>
   <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
     <value>Prüfen und benachrichtigen</value>
   </data>

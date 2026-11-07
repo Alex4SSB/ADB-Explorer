@@ -20,6 +20,8 @@
     "ConflictingItemsIn_one": "Il y a un objet en conflit dans {{destination}}",
     "ConflictingItemsIn_many": "Il y a {{count}} objets en conflit dans {{destination}}",
     "ConflictingItemsIn_other": "Il y a {{count}} objets en conflit dans {{destination}}",
+    "ResolveConflicts_one": "Résoudre {{count}} conflit",
+    "ResolveConflicts_other": "Résoudre {{count}} conflits",
     "PackagesToRemove_one": "Ce qui suit sera supprimé :\nun seul paquetage",
     "PackagesToRemove_many": "Ce qui suit sera supprimé :\n{{count}} paquetages",
     "PackagesToRemove_other": "Ce qui suit sera supprimé :\n{{count}} paquetages",

@@ -1640,9 +1640,6 @@ Kontrollerna försöker hindra en ovetande användare från att starta en möjli
   <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
     <value>Låt mig avgöra för varje fil</value>
   </data>
-  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
-    <value>Lös {0} konflikter</value>
-  </data>
   <data name="S_NEWER" xml:space="preserve">
     <value>nyare</value>
   </data>

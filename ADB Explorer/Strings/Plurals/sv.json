@@ -13,6 +13,7 @@
     "ConflictingItems_other": "Det finns {{count}} objekt i konflikt",
     "ConflictingItemsIn_one": "Det finns ett objekt i konflikt i {{destination}}",
     "ConflictingItemsIn_other": "Det finns {{count}} objekt i konflikt i {{destination}}",
+    "ResolveConflicts_other": "Lös {{count}} konflikter",
     "PackagesToRemove_one": "Följande tas bort:\nett paket",
     "PackagesToRemove_other": "Följande tas bort:\n{{count}} paket",
     "InstallApks_one": "Installera en APK-fil",

@@ -13,6 +13,8 @@
     "ConflictingItems_other": "There are {{count}} conflicting items",
     "ConflictingItemsIn_one": "There is one conflicting item in {{destination}}",
     "ConflictingItemsIn_other": "There are {{count}} conflicting items in {{destination}}",
+    "ResolveConflicts_one": "Resolve one conflict",
+    "ResolveConflicts_other": "Resolve {{count}} conflicts",
     "PackagesToRemove_one": "The following will be removed:\none package",
     "PackagesToRemove_other": "The following will be removed:\n{{count}} packages",
     "InstallApks_one": "Install one APK",

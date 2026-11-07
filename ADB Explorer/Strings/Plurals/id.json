@@ -6,6 +6,7 @@
     "Folders_other": "{{count}} folder",
     "ConflictingItems_other": "Terdapat {{count}} item yang berkonflik",
     "ConflictingItemsIn_other": "Terdapat {{count}} item yang berkonflik di {{destination}}",
+    "ResolveConflicts_other": "Selesaikan {{count}} konflik",
     "PackagesToRemove_other": "Berikut ini akan dihapus:\n{{count}} paket",
     "InstallApks_other": "Instal {{count}} APK",
     "PasteCutItems_other": "Tempel {{count}} item yang dipotong",

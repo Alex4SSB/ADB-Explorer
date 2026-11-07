@@ -1171,15 +1171,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Resolve {0} conflicts.
-        /// </summary>
-        public static string S_CONFLICT_DECIDE_TITLE {
-            get {
-                return ResourceManager.GetString("S_CONFLICT_DECIDE_TITLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Copy Package Name.
         /// </summary>
         public static string S_COPY_APK_NAME {

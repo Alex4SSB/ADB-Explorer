@@ -1502,9 +1502,6 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
     <value>Pozwól mi zdecydować dla każdego przypadku</value>
   </data>
-  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
-    <value>Rozwiąż konflikty w {0}</value>
-  </data>
   <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
     <value>Sprawdź i powiadom</value>
   </data>

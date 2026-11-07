@@ -189,6 +189,7 @@
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
     <value>Restore Conflicts</value>
+    <comment>Title of the dialog shown when restoring Recycle Bin items collides with existing items. A noun phrase (conflicts during restore), not a command</comment>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>Confirm Uninstall</value>
@@ -427,9 +428,6 @@ Visible content may be incomplete.</value>
   <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
     <value>Let me decide for each file</value>
     <comment>Open per-file conflict resolution</comment>
-  </data>
-  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
-    <value>Resolve {0} conflicts</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
     <value>Replace or Skip Files</value>
@@ -890,7 +888,7 @@ Cancel All Running</value>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
     <value>&lt;Span&gt;This folder &lt;Italic&gt;looks&lt;/Italic&gt; empty&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… to the naked eye&lt;/Span&gt;&lt;/Span&gt;</value>
-    <comment>The sentence which is being translated here: This folder looks empty … to the naked eye</comment>
+    <comment>Shown when a folder looks empty without root access, though it may hold items the app cannot list. "To the naked eye" means "at first glance", hinting that more may be hidden. Keep the XAML tags</comment>
   </data>
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
     <value>Operation Type</value>
@@ -1142,7 +1140,7 @@ Cancel All Running</value>
   </data>
   <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
     <value>Dead</value>
-    <comment>Battery health indicator - dead</comment>
+    <comment>Battery health indicator: the battery has failed and no longer works (Android BATTERY_HEALTH_DEAD). Not the same as discharged</comment>
   </data>
   <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
     <value>Over Voltage</value>
@@ -1170,11 +1168,11 @@ Cancel All Running</value>
   </data>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Abort</value>
-    <comment>The content of the button used to abort the extraction process</comment>
+    <comment>Cancel button of the paste / drop conflict dialog (S_PASTE_CONFLICT), which aborts the whole operation</comment>
   </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
     <value>{0} Conflict</value>
-    <comment>The title of the dialog reporting a merge conflict. 0 = Paste / Drop</comment>
+    <comment>Title of the dialog shown when pasting or dropping a folder into itself. 0 = the action name, S_PASTE or S_DROP, which are verbs. ex: Paste Conflict</comment>
   </data>
   <data name="S_PASTE" xml:space="preserve">
     <value>Paste</value>
@@ -1194,7 +1192,7 @@ Cancel All Running</value>
   </data>
   <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
     <value>times</value>
-    <comment>The unit displayed next to a setting counting repetitions, e.g. "1 times"</comment>
+    <comment>The unit displayed after the number (0 to 10) of the auto retry setting, e.g. "3 times"</comment>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>Link</value>
@@ -1277,7 +1275,7 @@ Cancel All Running</value>
   </data>
   <data name="S_ITEM_COPY" xml:space="preserve">
     <value>{0} - Copy</value>
-    <comment>A copy of an item. 0 = item name</comment>
+    <comment>Suffix appended to the name of a pasted duplicate, like Windows Explorer's "file - Copy". "Copy" is a noun (a copy), not the verb. 0 = item name</comment>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Adheres to Unix naming rules (via ADB)</value>
@@ -1441,7 +1439,7 @@ Cancel All Running</value>
   </data>
   <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
     <value>{0} Failed</value>
-    <comment>File operation sub items failed status. 0 = failed items count</comment>
+    <comment>File operation sub items failed status. 0 = failed items count. ex: (2 Failed, 5 Completed)</comment>
   </data>
   <data name="S_FILEOP_TOTAL" xml:space="preserve">
     <value>Total:</value>
@@ -1541,7 +1539,7 @@ Cancel All Running</value>
   </data>
   <data name="S_MENU_UNDO" xml:space="preserve">
     <value>Undo</value>
-    <comment>TextBox ContextMenu</comment>
+    <comment>TextBox ContextMenu - undo the last text edit (not the same as Cancel)</comment>
   </data>
   <data name="S_MENU_REDO" xml:space="preserve">
     <value>Redo</value>
@@ -1643,7 +1641,7 @@ Please help us localize the app to your language on Weblate.</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} in {1} ({2})</value>
-    <comment>0 - file size, 1 - transfer time, 2 - speed. ex: 9MB in 1.2s (7.5MB/s)</comment>
+    <comment>0 - total size, 1 - elapsed time ("in" means "within", not "out of"), 2 - average speed. ex: 9MB in 1.2s (7.5MB/s)</comment>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} of {1}</value>

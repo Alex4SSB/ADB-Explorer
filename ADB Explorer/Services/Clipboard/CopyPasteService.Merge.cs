@@ -273,7 +273,7 @@ public partial class CopyPasteService
         {
             var replaceNames = await DialogService.ShowPerFileConflictResolution(
                 comparisons,
-                string.Format(Strings.Resources.S_CONFLICT_DECIDE_TITLE, comparisons.Count),
+                Strings.Plurals.ResolveConflicts(comparisons.Count),
                 sourcePath,
                 targetPath);
 

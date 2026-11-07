@@ -1851,9 +1851,6 @@ Kontroly se snaží zabránit tomu, aby nic netušící uživatel spustil potenc
   <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
     <value>Rozhodnout o každém souboru</value>
   </data>
-  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
-    <value>Vyřešit konflikty ({0})</value>
-  </data>
   <data name="S_NEWER" xml:space="preserve">
     <value>novější</value>
   </data>

@@ -1634,9 +1634,6 @@ Pemeriksaan ini berupaya mencegah pengguna yang tidak menyadari risiko menjalank
   <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
     <value>Biarkan saya memutuskan untuk setiap file</value>
   </data>
-  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
-    <value>Selesaikan {0} konflik</value>
-  </data>
   <data name="S_MENU_BACKUP_PACKAGE" xml:space="preserve">
     <value>Cadangan</value>
   </data>

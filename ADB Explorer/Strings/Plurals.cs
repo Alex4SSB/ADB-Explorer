@@ -22,6 +22,8 @@ public static class Plurals
     public static string ConflictingItemsIn(long count, string destination)
         => Format(nameof(ConflictingItemsIn), count, ("destination", destination));
 
+    public static string ResolveConflicts(long count) => Format(nameof(ResolveConflicts), count);
+
     public static string PackagesToRemove(long count) => Format(nameof(PackagesToRemove), count);
 
     public static string InstallApks(long count) => Format(nameof(InstallApks), count);

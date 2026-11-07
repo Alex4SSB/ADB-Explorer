@@ -398,9 +398,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
     <value>אַפשר לי להחליט עבור כל קובץ</value>
   </data>
-  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
-    <value>פתור {0} התנגשויות</value>
-  </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
     <value>החלף או דלג על קבצים</value>
   </data>

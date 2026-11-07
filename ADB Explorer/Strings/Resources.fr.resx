@@ -1636,9 +1636,6 @@ Séléctionnez Personnalisé pour utiliser un emplacement qui ne sera pas suppri
   <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
     <value>Me laisser décider pour chaque fichier</value>
   </data>
-  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
-    <value>Résoudre {0} conflit</value>
-  </data>
   <data name="S_NEWER" xml:space="preserve">
     <value>Plus récents</value>
   </data>

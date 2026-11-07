@@ -58,9 +58,9 @@ public class PluralsTests
 
         Assert.AreEqual(Plurals.Table("de")!["Items_one"], Plurals.Lookup(Culture("de-AT"), "Items", 1));
 
-        // ro has no Items forms, so it gets the source language's
+        // tr has no Items forms, so it gets the source language's
         var source = Plurals.Table(Plurals.SourceLanguage)!;
-        Assert.AreEqual(source["Items_one"], Plurals.Lookup(Culture("ro"), "Items", 1));
+        Assert.AreEqual(source["Items_one"], Plurals.Lookup(Culture("tr"), "Items", 1));
         Assert.AreEqual(source["Items_other"], Plurals.Lookup(Culture("en-US"), "Items", null));
     }
 

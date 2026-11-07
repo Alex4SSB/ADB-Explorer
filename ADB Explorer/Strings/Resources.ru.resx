@@ -1635,9 +1635,6 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
     <value>Позвольте мне решить для каждого файла</value>
   </data>
-  <data name="S_CONFLICT_DECIDE_TITLE" xml:space="preserve">
-    <value>Разрешить {0} конфликты</value>
-  </data>
   <data name="S_NEWER" xml:space="preserve">
     <value>более новый</value>
   </data>

@@ -13,6 +13,7 @@
     "ConflictingItems_other": "Es gibt {{count}} miteinander in Konflikt stehende Elemente",
     "ConflictingItemsIn_one": "Es gibt ein in Konflikt stehendes Element in {{destination}}",
     "ConflictingItemsIn_other": "Es gibt {{count}} miteinander in Konflikt stehende Elemente in {{destination}}",
+    "ResolveConflicts_other": "{{count}} Konflikte beheben",
     "PackagesToRemove_one": "Folgendes wird entfernt:\nein Paket",
     "PackagesToRemove_other": "Folgendes wird entfernt:\n{{count}} Pakete",
     "InstallApks_one": "Ein APK installieren",
