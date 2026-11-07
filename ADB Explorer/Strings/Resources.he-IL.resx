@@ -184,7 +184,7 @@
     <value>מחק לצמיתות</value>
   </data>
   <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
-    <value>שגיאת יצירה</value>
+    <value>שגיאה ביצירת פריט</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
     <value>התנגשויות בשחזור</value>
@@ -512,7 +512,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
 בחר מותאם אישית כדי להשתמש במיקום שלא יימחק עם הסרת התוכנה. המיקום לא יכול להיות תחת C:\Users\…\AppData</value>
   </data>
   <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value>ברירת מחדל</value>
+    <value>השתמש במיקום ברירת המחדל</value>
   </data>
   <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
     <value>מותאם אישית</value>
@@ -1098,7 +1098,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>{0} פנוי מתוך {1}</value>
   </data>
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
-    <value>ריק</value>
+    <value>אין פריטים</value>
   </data>
   <data name="S_FILEOP_ERROR" xml:space="preserve">
     <value>שגיאה: {0}</value>
