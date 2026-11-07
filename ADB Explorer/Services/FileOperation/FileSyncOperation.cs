@@ -29,7 +29,6 @@ public class FileSyncOperation : AbstractSyncFileOperation
 
     private bool _useSyncV2;
     private int _autoRetries;
-    private Mutex _progressMutex = null!;
 
     // Shell streaming: a pull per file the shell reads, keyed by device path
     private sealed class ShellPull(SyncPipe pipe, long? size, TransferLane lane, long claimed)
@@ -165,8 +164,6 @@ public class FileSyncOperation : AbstractSyncFileOperation
 
         UnixFileStatus fileMode = UnixFileStatus.AllPermissions | UnixFileStatus.Regular;
 
-        _progressMutex = new();
-
         if (IsShellStream)
             PrepareShellStream(files);
 
@@ -248,7 +245,7 @@ public class FileSyncOperation : AbstractSyncFileOperation
                             continue;
                         }
 
-                        TransferFile(item!, lane, OtherLane(lane), _progressMutex, fileMode);
+                        TransferFile(item!, lane, OtherLane(lane), fileMode);
                     }
                 }
                 finally
@@ -549,11 +546,11 @@ public class FileSyncOperation : AbstractSyncFileOperation
     /// <summary>adb sync gets roughly 60% of the Wi-Fi link rate.</summary>
     private static double NominalWifiRate(int? linkMbps) => (linkMbps ?? 150) * 1_000_000.0 / 8 * 0.6;
 
-    private void TransferFile(SyncFile item, TransferLane lane, TransferLane? other, Mutex mutex, UnixFileStatus fileMode)
+    private void TransferFile(SyncFile item, TransferLane lane, TransferLane? other, UnixFileStatus fileMode)
     {
         for (var retriesLeft = _autoRetries; ; retriesLeft--)
         {
-            var (error, failedLane, failedAt) = TryTransferFile(item, lane, other, mutex, fileMode);
+            var (error, failedLane, failedAt) = TryTransferFile(item, lane, other, fileMode);
             if (error is null)
                 return;
 
@@ -575,11 +572,11 @@ public class FileSyncOperation : AbstractSyncFileOperation
     }
 
     /// <returns>The error, the lane and the <see cref="Stopwatch"/> timestamp it happened on - or a null error once the file synced.</returns>
-    private (Exception? Error, TransferLane Lane, long FailedAt) TryTransferFile(SyncFile item, TransferLane lane, TransferLane? other, Mutex mutex, UnixFileStatus fileMode)
+    private (Exception? Error, TransferLane Lane, long FailedAt) TryTransferFile(SyncFile item, TransferLane lane, TransferLane? other, UnixFileStatus fileMode)
     {
         try
         {
-            SyncFileOver(lane, item, mutex, fileMode);
+            SyncFileOver(lane, item, fileMode);
             Interlocked.Exchange(ref lane.Strikes, 0);
 
             return (null, lane, 0);
@@ -597,7 +594,7 @@ public class FileSyncOperation : AbstractSyncFileOperation
             // The lane was lost, so the file moves to the other one
             try
             {
-                SyncFileOver(other, item, mutex, fileMode);
+                SyncFileOver(other, item, fileMode);
                 Interlocked.Increment(ref lane.Strikes);
 
                 return (null, other, 0);
@@ -613,14 +610,14 @@ public class FileSyncOperation : AbstractSyncFileOperation
         }
     }
 
-    private void SyncFileOver(TransferLane lane, SyncFile item, Mutex mutex, UnixFileStatus fileMode)
+    private void SyncFileOver(TransferLane lane, SyncFile item, UnixFileStatus fileMode)
     {
         var claimed = item.Size ?? 0;
         long synced = 0;
 
         void SyncProgressCallback(SyncProgressChangedEventArgs eventArgs)
         {
-            var delta = AddUpdates(item, eventArgs, mutex);
+            var delta = AddUpdates(item, eventArgs);
             synced += delta;
             lane.Done(delta);
         }
@@ -704,7 +701,7 @@ public class FileSyncOperation : AbstractSyncFileOperation
     }
 
     /// <returns>The bytes transferred since the previous update of this file.</returns>
-    private long AddUpdates(SyncFile item, SyncProgressChangedEventArgs eventArgs, Mutex mutex)
+    private long AddUpdates(SyncFile item, SyncProgressChangedEventArgs eventArgs)
     {
         if (item.Size is null && _useSyncV2 && eventArgs.TotalBytesToReceive > 0)
         {
@@ -751,9 +748,9 @@ public class FileSyncOperation : AbstractSyncFileOperation
 
         Interlocked.Exchange(ref _lastUiUpdateTicks, nowTicks);
 
-        mutex.WaitOne();
-        ProgressUpdates.Add(progressInfo);
-        mutex.ReleaseMutex();
+        // Queued, not invoked: a worker waiting on a busy UI thread stalls its transfer
+        var updates = ProgressUpdates;
+        App.SafeBeginInvoke(() => updates.Add(progressInfo));
 
         return Math.Max(deltaBytes, 0);
     }
@@ -1052,7 +1049,7 @@ public class FileSyncOperation : AbstractSyncFileOperation
                 reported = written;
 
                 if (item is not null && IsTracked())
-                    AddUpdates(item, args, _progressMutex);
+                    AddUpdates(item, args);
             }, _useSyncV2, in _isCanceled);
 
             // A canceled pull just stops, which would end the shell's file early instead of failing it

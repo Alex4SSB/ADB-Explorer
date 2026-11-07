@@ -4,6 +4,11 @@ public class ObservableList<T> : ObservableCollection<T> where T : INotifyProper
 {
     private bool _suppressOnCollectionChanged = false;
 
+    public ObservableList() { }
+
+    /// <summary>Copies <paramref name="items"/> without the UI dispatcher, as nothing can observe a new list yet.</summary>
+    public ObservableList(IEnumerable<T> items) : base(items) { }
+
     /// <summary>
     /// WPF <see cref="System.Windows.Data.CollectionView"/> requires mutations on the UI dispatcher.
     /// Marshal all structural changes so background callers (device poll, drive refresh) cannot crash.

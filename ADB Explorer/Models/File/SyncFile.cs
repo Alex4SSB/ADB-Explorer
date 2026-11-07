@@ -183,8 +183,12 @@ public class SyncFile : FilePath
 
         if (!IsDirectory || newUpdates.All(u => u.AndroidPath is not null && u.AndroidPath.Equals(FullPath)))
         {
-            if (ProgressUpdates.Count > 0 && ProgressUpdates.Last().GetType() == newUpdates.First().GetType())
-                ProgressUpdates = [.. newUpdates];
+            var last = ProgressUpdates.LastOrDefault();
+            var first = newUpdates.First();
+
+            // A fresh list skips the UI dispatcher; sync progress arrives per chunk, and waiting on the UI stalls transfers
+            if (last?.GetType() == first.GetType() || (last is null && first is AdbSyncProgressInfo))
+                ProgressUpdates = new(newUpdates);
             else
                 ProgressUpdates.AddRange(newUpdates);
 
