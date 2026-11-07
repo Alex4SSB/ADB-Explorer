@@ -330,23 +330,11 @@ Conținutul afișat poate fi incomplet.</value>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Fuzionează sau înlocuiește</value>
   </data>
-  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
-    <value>Înlocuiește fișierele din destinație</value>
-  </data>
-  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
-    <value>Lasă-mă să decid pentru fiecare fișier</value>
-  </data>
-  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
-    <value>Omite aceste fișiere</value>
-  </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Selectează dosarele de încărcat</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
     <value>Selectează dosarele de încărcat în {0}</value>
-  </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Înlocuiește sau omite fișierele</value>
   </data>
   <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
     <value>Selectează fișierele de încărcat în {0}</value>
@@ -870,8 +858,11 @@ Anulează toate operațiile în execuție</value>
   <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
     <value>Rece</value>
   </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>Conflict ({0})</value>
+  <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
+    <value>Conflict la lipire</value>
+  </data>
+  <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
+    <value>Conflict la plasare</value>
   </data>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Abandonează</value>
@@ -881,12 +872,6 @@ Anulează toate operațiile în execuție</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Operații</value>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>Plasează</value>
-  </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>Lipește</value>
   </data>
   <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
     <value>{0} (legătură)</value>
@@ -942,8 +927,8 @@ Anulează toate operațiile în execuție</value>
   <data name="S_PATH_INVALID" xml:space="preserve">
     <value>Argumentul trebuie să specifice calea completă a unui fișier de setări nou sau existent.</value>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - Copie</value>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>Copie</value>
   </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Meniul este gol</value>
@@ -1063,7 +1048,7 @@ Anulează toate operațiile în execuție</value>
     <value>{0} liberi din {1}</value>
   </data>
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
-    <value>Golește</value>
+    <value>Gol</value>
   </data>
   <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
     <value>{0} eșuate</value>
@@ -1222,6 +1207,9 @@ Te rugăm să ne ajuți să localizăm aplicația în limba ta pe Weblate.</valu
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} în {1} ({2})</value>
+  </data>
+  <data name="S_FILE_TRANSFER_SIZE_TIME" xml:space="preserve">
+    <value>{0} în {1}</value>
   </data>
   <data name="S_DRAGDROP_LINK" xml:space="preserve">
     <value>Creează legătură în {0}</value>

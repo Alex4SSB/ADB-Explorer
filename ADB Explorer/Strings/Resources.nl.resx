@@ -184,10 +184,10 @@
     <value>Verwijder Permanent</value>
   </data>
   <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
-    <value>Maak Error</value>
+    <value>Fout bij aanmaken</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>herstel error</value>
+    <value>Conflicten bij herstellen</value>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>Bevestig Verwijderen Programma</value>
@@ -537,14 +537,6 @@
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Abort</value>
     <comment>The content of the button used to abort the extraction process</comment>
-  </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>Paste</value>
-    <comment>As in "Paste Conflict" (a file conflict while pasting)</comment>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>Drop</value>
-    <comment>The file drop operation</comment>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Operations</value>

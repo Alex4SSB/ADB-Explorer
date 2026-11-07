@@ -238,7 +238,7 @@
     <value>Fehler beim Auflisten des Verzeichnisses</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
-    <value>Ziehen zu Windows-Drive-Wurzel</value>
+    <value>Auf Windows-Laufwerksstamm übertragen</value>
   </data>
   <data name="S_NEW_VERSION_MSG" xml:space="preserve">
     <value>Willkommen zur neuen Version von ADB Explorer!
@@ -369,9 +369,6 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Zusammenführen oder ersetzen</value>
-  </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Dateien ersetzen oder überspringen</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Ordner auswählen, um zu pushen</value>
@@ -504,7 +501,7 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
     <value>[nicht festgelegt]</value>
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
-    <value>Einstellungen suchen</value>
+    <value>Einstellung suchen</value>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
     <value>Suche schließen</value>
@@ -607,7 +604,7 @@ Alle laufenden Vorgänge abbrechen</value>
     <value>Paket</value>
   </data>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
-    <value>Aktualisierungszeit geändert</value>
+    <value>Änderungsdatum aktualisieren</value>
   </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Änderungen speichern</value>
@@ -745,7 +742,7 @@ Alle laufenden Vorgänge abbrechen</value>
     <value>Temperatur: {0} °C</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>Aktueller Ausgleich: {0} A</value>
+    <value>Akkustrom: {0} A</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>Neustart nach</value>
@@ -820,7 +817,7 @@ Alle laufenden Vorgänge abbrechen</value>
     <value>Überhitzung</value>
   </data>
   <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
-    <value>Tot</value>
+    <value>Defekt</value>
   </data>
   <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
     <value>Überspannung</value>
@@ -843,14 +840,11 @@ Alle laufenden Vorgänge abbrechen</value>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>{0} Konflikt</value>
+  <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
+    <value>Konflikt beim Einfügen</value>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>Einfügen</value>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>Ablegen</value>
+  <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
+    <value>Konflikt beim Ablegen</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Operationen</value>
@@ -915,8 +909,8 @@ Alle laufenden Vorgänge abbrechen</value>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Menü ist leer</value>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - Kopie</value>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>Kopie</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Hält sich an die Unix-Namenskonventionen (über ADB)</value>
@@ -1018,7 +1012,7 @@ Alle laufenden Vorgänge abbrechen</value>
     <value>{0} frei von {1}</value>
   </data>
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
-    <value>Leeren</value>
+    <value>Leer</value>
   </data>
   <data name="S_FILEOP_ERROR" xml:space="preserve">
     <value>Fehler: {0}</value>
@@ -1485,12 +1479,6 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_SCREENSHOT" xml:space="preserve">
     <value>Bildschirmfoto</value>
   </data>
-  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
-    <value>Dateien im Ziel ersetzen</value>
-  </data>
-  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
-    <value>Diese Dateien überspringen</value>
-  </data>
   <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
     <value>Prüfen und benachrichtigen</value>
   </data>
@@ -1511,9 +1499,6 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_NEW_VERSION_READY" xml:space="preserve">
     <value>Eine neue {0}, Version {1}, wurde heruntergeladen und ist bereit zur Installation.</value>
-  </data>
-  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
-    <value>Lass mich für jede Datei selbst entscheiden</value>
   </data>
   <data name="S_MENU_SELECT_NONE" xml:space="preserve">
     <value>Keine auswählen</value>
@@ -1580,6 +1565,9 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} in {1} ({2})</value>
+  </data>
+  <data name="S_FILE_TRANSFER_SIZE_TIME" xml:space="preserve">
+    <value>{0} in {1}</value>
   </data>
   <data name="S_THUMB_SNACKBAR_APK_ICONS" xml:space="preserve">
     <value>App-Symbole werden geladen</value>

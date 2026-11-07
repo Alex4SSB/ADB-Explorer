@@ -353,7 +353,7 @@ public partial class CopyPasteService
 
         var result = await DialogService.ShowConfirmation(
             string.Format(Strings.Resources.S_PASTE_ANCESTOR, ancestor.FullName),
-            string.Format(Strings.Resources.S_PASTE_CONFLICT, IsDrag ? Strings.Resources.S_DROP : Strings.Resources.S_PASTE),
+            IsDrag ? Strings.Resources.S_DROP_CONFLICT_TITLE : Strings.Resources.S_PASTE_CONFLICT_TITLE,
             Strings.Resources.S_SKIP,
             cancelText: Strings.Resources.S_BUTTON_ABORT,
             icon: DialogService.DialogIcon.Exclamation);

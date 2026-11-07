@@ -159,6 +159,11 @@ namespace ADB_Test
             Assert.AreEqual("New File - Copy 1", FileHelper.DuplicateFile(names3, "New File", System.Windows.DragDropEffects.Copy));
             Assert.AreEqual("New File.pdf", FileHelper.DuplicateFile(names2, "New File.pdf", System.Windows.DragDropEffects.Copy));
             Assert.AreEqual("New File - Copy 1.txt", FileHelper.DuplicateFile(names2, "New File.txt", System.Windows.DragDropEffects.Copy));
+
+            // Regex metacharacters in the name are matched literally
+            string[] names4 = ["Photo (1).jpg", "Photo (1) - Copy 1.jpg"];
+            Assert.AreEqual("Photo (1) - Copy 2.jpg", FileHelper.DuplicateFile(names4, "Photo (1).jpg", System.Windows.DragDropEffects.Copy));
+            Assert.AreEqual("a+b[1] 1.txt", FileHelper.DuplicateFile(["a+b[1].txt"], "a+b[1].txt"));
         }
 
         [TestMethod]

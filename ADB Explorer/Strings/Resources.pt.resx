@@ -381,9 +381,6 @@ O conteúdo visível pode estar incompleto.</value>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Juntar ou Substituir</value>
   </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Colar Conflitos</value>
-  </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Selecione as pastas para carregar</value>
   </data>
@@ -556,7 +553,7 @@ Selecione "Personalizado" para utilizar uma localização que não será removid
     <comment>The title of the about section listing licenses</comment>
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
-    <value>Definições de Pesquisa</value>
+    <value>Procurar uma definição</value>
     <comment>The placeholder of the textbox used to search through the settings</comment>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
@@ -946,7 +943,7 @@ Cancelar Todas a Serem Reproduzidas</value>
     <comment>Battery health indicator - overheat</comment>
   </data>
   <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
-    <value>Morto</value>
+    <value>Avariada</value>
     <comment>Battery health indicator - dead</comment>
   </data>
   <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
@@ -977,17 +974,11 @@ Cancelar Todas a Serem Reproduzidas</value>
     <value>Abortar</value>
     <comment>The content of the button used to abort the extraction process</comment>
   </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>{0} Conflito</value>
-    <comment>The title of the dialog reporting a merge conflict. 0 = Paste / Drop</comment>
+  <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
+    <value>Conflito ao colar</value>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>Colar</value>
-    <comment>As in "Paste Conflict" (a file conflict while pasting)</comment>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>Largar</value>
-    <comment>The file drop operation</comment>
+  <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
+    <value>Conflito ao largar</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Operações</value>
@@ -1068,9 +1059,8 @@ Cancelar Todas a Serem Reproduzidas</value>
     <value>O Menu está Vazio</value>
     <comment>Displayed when the context menu is empty</comment>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - Copiar</value>
-    <comment>A copy of an item. 0 = item name</comment>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>Cópia</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Adere às regras de nomenclatura Unix (através do ADB)</value>
@@ -1566,7 +1556,7 @@ Items suportados: miniaturas de imagem, PDF; outros ficheiros cujo tamanho estej
     <value>Erro: {0}</value>
   </data>
   <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
-    <value>{0} Falhou</value>
+    <value>{0} com falha</value>
   </data>
   <data name="S_FILEOP_PREV" xml:space="preserve">
     <value>Operação Anterior</value>
@@ -1647,6 +1637,9 @@ Ajude-nos a traduzir a aplicação para o seu idioma na plataforma Weblate.</val
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} em {1} ({2})</value>
+  </data>
+  <data name="S_FILE_TRANSFER_SIZE_TIME" xml:space="preserve">
+    <value>{0} em {1}</value>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} de {1}</value>

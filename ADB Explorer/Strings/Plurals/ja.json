@@ -6,6 +6,7 @@
     "Folders_other": "{{count}} フォルダー",
     "ConflictingItems_other": "競合する項目が {{count}} 件あります",
     "ConflictingItemsIn_other": "{{destination}} には競合する項目が {{count}} 件あります",
+    "ReplaceOrSkipFiles_other": "{{count}} 個のファイルを置換またはスキップ",
     "PackagesToRemove_other": "以下のパッケージが削除されます:\n{{count}} パッケージ",
     "InstallApks_other": "{{count}} 個のAPKをインストールする",
     "PasteCutItems_other": "切り取りした項目を{{count}}件貼り付ける",

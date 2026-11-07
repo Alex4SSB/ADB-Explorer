@@ -11,6 +11,8 @@
     "ConflictingItems_other": "Ci sono {{count}} elementi in conflitto",
     "ConflictingItemsIn_one": "C'è un elemento in conflitto in {{destination}}",
     "ConflictingItemsIn_other": "Ci sono {{count}} elementi in conflitto in {{destination}}",
+    "ReplaceOrSkipFiles_one": "Sostituisci o ignora il file",
+    "ReplaceOrSkipFiles_other": "Sostituisci o ignora {{count}} file",
     "PackagesToRemove_other": "I seguenti pacchetti verranno rimossi:\n{{count}}",
     "InstallApks_other": "Installa {{count}} APK",
     "PasteCutItems_one": "Incolla {{count}} elemento tagliato",

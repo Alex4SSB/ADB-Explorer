@@ -187,7 +187,7 @@
     <value>שגיאת יצירה</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>שגיאות בשיחזור</value>
+    <value>התנגשויות בשחזור</value>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>אישור הסרה</value>
@@ -388,18 +388,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>מזג או החלף</value>
-  </data>
-  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
-    <value>החלף את הקבצים ביעד</value>
-  </data>
-  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
-    <value>דלג על הקבצים האלה</value>
-  </data>
-  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
-    <value>אַפשר לי להחליט עבור כל קובץ</value>
-  </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>החלף או דלג על קבצים</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>בחר תיקיות להעלאה</value>
@@ -825,7 +813,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>טמפרטורה: ‎{0}°C</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>מאזן זרם: ‎{0}A</value>
+    <value>זרם הסוללה: ‎{0}A</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>הפעל מחדש לתוך</value>
@@ -906,7 +894,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>חמה מדי</value>
   </data>
   <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
-    <value>מתה</value>
+    <value>פגומה</value>
   </data>
   <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
     <value>מתח גבוה מדי</value>
@@ -929,14 +917,11 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>בטל</value>
   </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>התנגשות ב{0}</value>
+  <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
+    <value>התנגשות בהדבקה</value>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>הדבקה</value>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>גרירה</value>
+  <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
+    <value>התנגשות בגרירה</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>פעולות</value>
@@ -1001,8 +986,8 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>התפריט ריק</value>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - עותק</value>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>עותק</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>חוקי בתור שם קובץ יוניקס (דרך ADB)</value>
@@ -1278,6 +1263,9 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} תוך {1} ({2})</value>
+  </data>
+  <data name="S_FILE_TRANSFER_SIZE_TIME" xml:space="preserve">
+    <value>{0} תוך {1}</value>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} מתוך {1}</value>

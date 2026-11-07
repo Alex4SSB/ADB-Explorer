@@ -187,7 +187,7 @@
     <value>Błąd utworzenia</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>Przywróć konflikty</value>
+    <value>Konflikty przywracania</value>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>Potwierdź odinstalowanie</value>
@@ -235,7 +235,7 @@
     <value>Przywróć</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>Błąd listy katalogów</value>
+    <value>Błąd wyświetlania zawartości folderu</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Przenieś do katalogu głównego dysku systemu Windows</value>
@@ -377,9 +377,6 @@ Widoczna zawartość może być niekompletna.</value>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Połącz lub zamień</value>
   </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Wklej konflikty</value>
-  </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Wybierz foldery do przesłania</value>
   </data>
@@ -520,7 +517,7 @@ Wybierz niestandardową lokalizację, która nie będzie usunięta podczas dezin
     <value>[nie ustawiono]</value>
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
-    <value>Ustawienia wyszukiwania</value>
+    <value>Znajdź ustawienie</value>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
     <value>Wyjdź z wyszukiwania</value>
@@ -839,7 +836,7 @@ Anuluj wszystkie uruchomione</value>
     <value>Przegrzanie</value>
   </data>
   <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
-    <value>Martwa</value>
+    <value>Uszkodzona</value>
   </data>
   <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
     <value>Przepięcie</value>
@@ -862,14 +859,11 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Porzuć</value>
   </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>{0} Konflikt</value>
+  <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
+    <value>Konflikt podczas wklejania</value>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>Wklej</value>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>Upuść</value>
+  <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
+    <value>Konflikt podczas upuszczania</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Operacje</value>
@@ -931,8 +925,8 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Menu jest puste</value>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - Kopiuj</value>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>kopia</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Przestrzega zasad nazewnictwa systemu Unix (za pośrednictwem ADB)</value>
@@ -1199,6 +1193,9 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} w {1} ({2})</value>
+  </data>
+  <data name="S_FILE_TRANSFER_SIZE_TIME" xml:space="preserve">
+    <value>{0} w {1}</value>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} z {1}</value>
@@ -1492,15 +1489,6 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   </data>
   <data name="S_NEW_ARCHIVE" xml:space="preserve">
     <value>Nowe archiwum</value>
-  </data>
-  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
-    <value>Zastąp pliki w miejscu docelowym</value>
-  </data>
-  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
-    <value>Pomiń te pliki</value>
-  </data>
-  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
-    <value>Pozwól mi zdecydować dla każdego przypadku</value>
   </data>
   <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
     <value>Sprawdź i powiadom</value>

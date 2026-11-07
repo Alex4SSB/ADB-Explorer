@@ -13,9 +13,12 @@ public partial class ConflictResolutionPanel
         set => SetValue(MessageProperty, value);
     }
 
-    public string ReplaceText => Strings.Resources.S_REPLACE_FILES_IN_DESTINATION;
-    public string SkipText => Strings.Resources.S_SKIP_THESE_FILES;
-    public string DecideText => Strings.Resources.S_DECIDE_FOR_EACH_FILE;
+    /// <summary>Set before the panel loads; the option texts are read once by their bindings.</summary>
+    public int ConflictCount { get; init; }
+
+    public string ReplaceText => Strings.Plurals.ReplaceFilesInDestination(ConflictCount);
+    public string SkipText => Strings.Plurals.SkipFiles(ConflictCount);
+    public string DecideText => Strings.Plurals.DecideForEachFile(ConflictCount);
 
     public FileMergeHelper.ConflictResolution? Choice { get; private set; }
 

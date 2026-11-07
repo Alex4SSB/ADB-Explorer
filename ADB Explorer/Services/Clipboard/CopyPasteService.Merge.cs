@@ -267,7 +267,7 @@ public partial class CopyPasteService
 
         var message = Strings.Plurals.ConflictingItemsIn(conflictCount, destination);
 
-        var choice = await DialogService.ShowConflictResolution(message, Strings.Resources.S_PASTE_CONFLICTS_TITLE);
+        var choice = await DialogService.ShowConflictResolution(message, conflictCount);
 
         if (choice is FileMergeHelper.ConflictResolution.PerFile)
         {

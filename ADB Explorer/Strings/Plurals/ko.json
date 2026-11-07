@@ -6,6 +6,7 @@
     "Folders_other": "{{count}} 폴더",
     "ConflictingItems_other": "충돌하는 항목이 {{count}}개 있습니다",
     "ConflictingItemsIn_other": "{{destination}}에 충돌하는 항목이 {{count}}개 있습니다",
+    "ReplaceOrSkipFiles_other": "파일 {{count}}개 바꾸기 또는 건너뛰기",
     "PackagesToRemove_other": "다음 항목이 제거됩니다:\n{{count}}개의 패키지",
     "InstallApks_other": "{{count}}개 APK 설치",
     "PasteCutItems_other": "잘라낸 항목 {{count}}개 붙여넣기",

@@ -358,9 +358,6 @@ Konten yang terlihat mungkin tidak lengkap.</value>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Gabungkan atau Ganti</value>
   </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Ganti atau Lewati File</value>
-  </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Pilih folder untuk didorong</value>
   </data>
@@ -730,7 +727,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Suhu: {0}°C</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>Keseimbangan Arus: {0}A</value>
+    <value>Arus baterai: {0}A</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>Mulai Ulang ke</value>
@@ -802,7 +799,7 @@ Batalkan Semua yang Sedang Berjalan</value>
     <value>Terlalu Panas</value>
   </data>
   <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
-    <value>Mati</value>
+    <value>Rusak</value>
   </data>
   <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
     <value>Tegangan Berlebih</value>
@@ -825,14 +822,11 @@ Batalkan Semua yang Sedang Berjalan</value>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Batalkan</value>
   </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>Konflik {0}</value>
+  <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
+    <value>Konflik saat menempel</value>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>Tempel</value>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>Lepas</value>
+  <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
+    <value>Konflik saat melepas</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Operasi</value>
@@ -897,8 +891,8 @@ Batalkan Semua yang Sedang Berjalan</value>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Menu Kosong</value>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - Salinan</value>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>Salinan</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Mematuhi aturan penamaan Unix (melalui ADB)</value>
@@ -1158,7 +1152,10 @@ Bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
     <value>Buat tautan di {0}</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
-    <value>{0} di {1} ({2})</value>
+    <value>{0} dalam {1} ({2})</value>
+  </data>
+  <data name="S_FILE_TRANSFER_SIZE_TIME" xml:space="preserve">
+    <value>{0} dalam {1}</value>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} dari {1}</value>
@@ -1624,15 +1621,6 @@ Pemeriksaan ini berupaya mencegah pengguna yang tidak menyadari risiko menjalank
   </data>
   <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
     <value>Keluar dari mode hasil pencarian.</value>
-  </data>
-  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
-    <value>Ganti file di tujuan</value>
-  </data>
-  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
-    <value>Lewati file ini</value>
-  </data>
-  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
-    <value>Biarkan saya memutuskan untuk setiap file</value>
   </data>
   <data name="S_MENU_BACKUP_PACKAGE" xml:space="preserve">
     <value>Cadangan</value>

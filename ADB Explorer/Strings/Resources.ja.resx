@@ -358,9 +358,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>マージまたは置換</value>
   </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>貼り付けの競合</value>
-  </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>送信するフォルダを選択</value>
   </data>
@@ -580,7 +577,7 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
     <value>パッケージ</value>
   </data>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
-    <value>更新時間の変更</value>
+    <value>更新日時を更新</value>
   </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>変更を保存</value>
@@ -825,14 +822,11 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>中断</value>
   </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>{0} 競合</value>
+  <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
+    <value>貼り付けの競合</value>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>貼り付け</value>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>ドロップ</value>
+  <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
+    <value>ドロップの競合</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>操作</value>
@@ -897,8 +891,8 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>メニューが空です</value>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - コピー</value>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>コピー</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Unix の命名規則に準拠 (ADB 経由)</value>
@@ -1159,6 +1153,9 @@ Weblate でアプリをあなたの言語にローカライズできるよう、
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} を {1} で ({2})</value>
+  </data>
+  <data name="S_FILE_TRANSFER_SIZE_TIME" xml:space="preserve">
+    <value>{0} を {1} で</value>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} / {1}</value>

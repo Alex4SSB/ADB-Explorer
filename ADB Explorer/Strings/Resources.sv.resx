@@ -187,7 +187,7 @@
     <value>Fel vid skapande</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>Återställ konflikter</value>
+    <value>Konflikter vid återställning</value>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>Bekräfta avinstallation</value>
@@ -358,9 +358,6 @@ Synligt innehåll kan vara ofullständigt.</value>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Sammanfoga eller ersätt</value>
   </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Ersätt eller hoppa över filer</value>
-  </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Välj mappar att skicka</value>
   </data>
@@ -477,7 +474,7 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>[inte angiven]</value>
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
-    <value>Sökinställningar</value>
+    <value>Hitta en inställning</value>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
     <value>Stäng sök</value>
@@ -721,7 +718,7 @@ Avbryt alla pågående</value>
     <value>Temperatur: {0} °C</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>Aktuell balans: {0} A</value>
+    <value>Batteriström: {0} A</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>Starta om till</value>
@@ -819,14 +816,11 @@ Avbryt alla pågående</value>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Avbryt</value>
   </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>{0}-konflikt</value>
+  <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
+    <value>Konflikt vid inklistring</value>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>Klistra in</value>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>Släpp</value>
+  <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
+    <value>Konflikt vid släpp</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Åtgärder</value>
@@ -891,8 +885,8 @@ Avbryt alla pågående</value>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Menyn är tom</value>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} – kopia</value>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>kopia</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Följer Unix namngivningsregler (via ADB)</value>
@@ -1153,6 +1147,9 @@ Hjälp oss att översätta appen till ditt språk på Weblate.</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} i {1} ({2})</value>
+  </data>
+  <data name="S_FILE_TRANSFER_SIZE_TIME" xml:space="preserve">
+    <value>{0} i {1}</value>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} av {1}</value>
@@ -1630,15 +1627,6 @@ Kontrollerna försöker hindra en ovetande användare från att starta en möjli
   </data>
   <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
     <value>Inte tillgängligt på det här systemet.</value>
-  </data>
-  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
-    <value>Ersätt filerna på målet</value>
-  </data>
-  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
-    <value>Hoppa över dessa filer</value>
-  </data>
-  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
-    <value>Låt mig avgöra för varje fil</value>
   </data>
   <data name="S_NEWER" xml:space="preserve">
     <value>nyare</value>

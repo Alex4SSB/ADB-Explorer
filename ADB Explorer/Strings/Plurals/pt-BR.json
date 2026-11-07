@@ -10,6 +10,8 @@
     "ConflictingItems_other": "Tem {{count}} itens conflitando",
     "ConflictingItemsIn_one": "Tem {{count}} item conflitando em {{destination}}",
     "ConflictingItemsIn_other": "Tem {{count}} itens conflitando em {{destination}}",
+    "ReplaceOrSkipFiles_one": "Substituir ou ignorar arquivo",
+    "ReplaceOrSkipFiles_other": "Substituir ou ignorar {{count}} arquivos",
     "PackagesToRemove_other": "Os a seguir serão removidos:\n{{count}} pacotes",
     "FilesInvalidAtDriveRoot_other": "{{count}} dos arquivos selecionados não puderam ser criados na raíz do disco do Windows.",
     "Packages_one": "{{count}} Pacote",

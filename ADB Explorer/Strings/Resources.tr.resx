@@ -187,7 +187,7 @@
     <value>Oluşturma Hatası</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>Çakışmaları Geri Yükle</value>
+    <value>Geri Yükleme Çakışmaları</value>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>Kaldırmayı Onayla</value>
@@ -235,7 +235,7 @@
     <value>Geri Yükle</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>Liste Dizini Hatası</value>
+    <value>Klasör içeriği listelenirken hata</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Windows Sürücüsünün Kök Dizinine Çek</value>
@@ -357,9 +357,6 @@ Görünen içerik eksik olabilir.</value>
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Birleştir veya Değiştir</value>
-  </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Yapıştırma Çakışmaları</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Göndermek için klasörleri seçin</value>

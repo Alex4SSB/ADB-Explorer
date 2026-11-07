@@ -316,9 +316,6 @@
   <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
     <value>WSA Khởi chạy</value>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>Dán</value>
-  </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>Liên kết</value>
   </data>
@@ -331,8 +328,8 @@
   <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
     <value>Tùy chỉnh App Cài đặt Đường dẫn</value>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - Sao chép</value>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>Bản sao</value>
   </data>
   <data name="S_BUTTON_ENABLE" xml:space="preserve">
     <value>Bật</value>

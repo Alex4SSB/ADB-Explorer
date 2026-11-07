@@ -187,7 +187,7 @@
     <value>Chyba při vytváření</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>Obnovit konflikty</value>
+    <value>Konflikty při obnovení</value>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>Potvrdit odinstalaci</value>
@@ -383,9 +383,6 @@ Zobrazený obsah nemusí být úplný.</value>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Sloučit nebo nahradit</value>
   </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Nahradit nebo přeskočit soubory</value>
-  </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Vyberte složky k nahrání</value>
   </data>
@@ -561,7 +558,7 @@ Zvolte Vlastní, chcete-li použít umístění, které se při odinstalování 
     <comment>The placeholder text for a textbox whose value hasn't been set</comment>
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
-    <value>Nastavení vyhledávání</value>
+    <value>Najít nastavení</value>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
     <value>Ukončit hledání</value>
@@ -942,16 +939,11 @@ Zrušit všechny probíhající operace</value>
     <value>Přerušit</value>
     <comment>The content of the button used to abort the extraction process</comment>
   </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>Konflikt: {0}</value>
-    <comment>The title of the dialog reporting a merge conflict. 0 = Paste / Drop</comment>
+  <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
+    <value>Konflikt při vkládání</value>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>Vložit</value>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>Upustit</value>
-    <comment>The file drop operation</comment>
+  <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
+    <value>Konflikt při přetahování</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Operace</value>
@@ -1032,8 +1024,8 @@ Zrušit všechny probíhající operace</value>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Menu je prázdné</value>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - Kopírovat</value>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>kopie</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Splňuje pravidla pojmenování Unixu (přes ADB)</value>
@@ -1363,6 +1355,9 @@ Pomozte nám prosím lokalizovat aplikaci do svého jazyka na Weblate.</value>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} za {1} ({2})</value>
     <comment>0 - file size, 1 - transfer time, 2 - speed. ex: 9MB in 1.2s (7.5MB/s)</comment>
+  </data>
+  <data name="S_FILE_TRANSFER_SIZE_TIME" xml:space="preserve">
+    <value>{0} za {1}</value>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} z {1}</value>
@@ -1841,15 +1836,6 @@ Kontroly se snaží zabránit tomu, aby nic netušící uživatel spustil potenc
   </data>
   <data name="S_MENU_ARCHIVE" xml:space="preserve">
     <value>Archiv</value>
-  </data>
-  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
-    <value>Nahradit soubory v cíli</value>
-  </data>
-  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
-    <value>Přeskočit tyto soubory</value>
-  </data>
-  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
-    <value>Rozhodnout o každém souboru</value>
   </data>
   <data name="S_NEWER" xml:space="preserve">
     <value>novější</value>

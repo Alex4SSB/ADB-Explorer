@@ -358,9 +358,6 @@ Il contenuto che vedi potrebbe essere incompleto.</value>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Unisci o Sostituisci</value>
   </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Conflitti nell'incolla</value>
-  </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Seleziona le cartelle da inviare</value>
   </data>
@@ -477,7 +474,7 @@ Il contenuto che vedi potrebbe essere incompleto.</value>
     <value>[non impostato]</value>
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
-    <value>Impostazioni di ricerca</value>
+    <value>Cerca un'impostazione</value>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
     <value>Esci dalla ricerca</value>
@@ -574,7 +571,7 @@ Annulla tutte le operazioni in corso</value>
     <value>Incolla collegamento</value>
   </data>
   <data name="S_MENU_RENAME" xml:space="preserve">
-    <value>Rinominare</value>
+    <value>Rinomina</value>
   </data>
   <data name="S_MENU_PACKAGE" xml:space="preserve">
     <value>Pacchetto</value>
@@ -721,7 +718,7 @@ Annulla tutte le operazioni in corso</value>
     <value>Temperatura: {0}°C</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>Bilancio corrente: {0}A</value>
+    <value>Corrente della batteria: {0}A</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>Riavvia in</value>
@@ -802,7 +799,7 @@ Annulla tutte le operazioni in corso</value>
     <value>Surriscaldata</value>
   </data>
   <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
-    <value>Morta</value>
+    <value>Guasta</value>
   </data>
   <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
     <value>Voltaggio troppo alto</value>
@@ -825,14 +822,11 @@ Annulla tutte le operazioni in corso</value>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Annulla</value>
   </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>Conflitto durante {0}</value>
+  <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
+    <value>Conflitto durante l'incolla</value>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>Incolla</value>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>Rilascio</value>
+  <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
+    <value>Conflitto durante il rilascio</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>operazioni</value>
@@ -897,8 +891,8 @@ Annulla tutte le operazioni in corso</value>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Il menù è vuoto</value>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - Copia</value>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>Copia</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Rispetta le regole di Unix sul nome (tramite ADB)</value>

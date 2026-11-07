@@ -358,9 +358,6 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>병합 또는 바꾸기</value>
   </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>붙여넣기 충돌</value>
-  </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>푸시할 폴더 선택</value>
   </data>
@@ -730,7 +727,7 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
     <value>온도: {0}°C</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>전류 밸런스: {0}A</value>
+    <value>배터리 전류: {0}A</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>재부팅</value>
@@ -834,14 +831,11 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>중단</value>
   </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>{0} 충돌</value>
+  <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
+    <value>붙여넣기 충돌</value>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>붙여넣기</value>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>놓기</value>
+  <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
+    <value>놓기 충돌</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>작업</value>
@@ -906,8 +900,8 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>메뉴가 비어 있습니다</value>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - 복사본</value>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>복사본</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Unix 명명 규칙 준수 (ADB 통해)</value>
@@ -1167,7 +1161,10 @@ Weblate에서 앱을 해당 언어로 현지화하는 데 도움을 주세요.</
     <value>{0}에 링크 만들기</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
-    <value>{1}에서 {0} ({2})</value>
+    <value>{1} 동안 {0} ({2})</value>
+  </data>
+  <data name="S_FILE_TRANSFER_SIZE_TIME" xml:space="preserve">
+    <value>{1} 동안 {0}</value>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{1} 중 {0}</value>

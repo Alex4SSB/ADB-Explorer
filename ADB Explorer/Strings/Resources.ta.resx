@@ -184,10 +184,10 @@
     <value>நிரந்தரமாக நீக்கு</value>
   </data>
   <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
-    <value>பிழையை உருவாக்கு</value>
+    <value>உருவாக்குவதில் பிழை</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>மோதல்களை மீட்டெடுக்கவும்</value>
+    <value>மீட்டெடுப்பு மோதல்கள்</value>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>நிறுவல் நீக்குவதை உறுதிப்படுத்தவும்</value>
@@ -238,7 +238,7 @@
     <value>பட்டியல் கோப்பகப் பிழை</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
-    <value>சாளரங்கள் இயக்கி ரூட்டிற்கு இழுக்கவும்</value>
+    <value>Windows இயக்கி ரூட்டிற்கு இழுக்கவும்</value>
   </data>
   <data name="S_NEW_VERSION_MSG" xml:space="preserve">
     <value>புதிய ADB Explorer பதிப்பிற்கு வரவேற்கிறோம்! 
@@ -377,9 +377,6 @@ SDK இயங்குதளக் கருவிகளைப் பதிவ�
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>ஒன்றிணைக்கவும் அல்லது மாற்றவும்</value>
   </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>முரண்பாடுகளை ஒட்டவும்</value>
-  </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>தள்ளுவதற்கு கோப்புறைகளைத் தேர்ந்தெடுக்கவும்</value>
   </data>
@@ -447,7 +444,7 @@ SDK இயங்குதளக் கருவிகளைப் பதிவ�
     <value>இருள்</value>
   </data>
   <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
-    <value>சாளரங்கள் இயல்புநிலை</value>
+    <value>Windows இயல்புநிலை</value>
   </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>கருப்பொருள்</value>
@@ -532,7 +529,7 @@ Select Custom to use a location that will not be removed on uninstall. The custo
     <value>[அமைக்கப்படவில்லை]</value>
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
-    <value>தேடல் அமைப்புகள்</value>
+    <value>அமைப்பைத் தேடு</value>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
     <value>தேடலில் இருந்து வெளியேறு</value>
@@ -635,7 +632,7 @@ Select Custom to use a location that will not be removed on uninstall. The custo
     <value>தொகுப்பு</value>
   </data>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
-    <value>புதுப்பிப்பு நேரம் மாற்றப்பட்டது</value>
+    <value>மாற்றிய தேதியைப் புதுப்பி</value>
   </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>மாற்றங்களைச் சேமிக்கவும்</value>
@@ -677,7 +674,7 @@ Select Custom to use a location that will not be removed on uninstall. The custo
     <value>தற்போதைய வடிப்பானுடன் எந்த உருப்படிகளும் பொருந்தவில்லை.</value>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
-    <value>&lt;Span&gt;இந்தக் கோப்புறை &lt;Italic&gt;தோன்றுகிறது&lt;/Italic&gt;&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… நிர்வாணக் கண்ணுக்கு&lt;/Span&gt;&lt;/Span&gt;</value>
+    <value>&lt;Span&gt;இந்தக் கோப்புறை &lt;Italic&gt;காலியாகத் தோன்றுகிறது&lt;/Italic&gt;&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… நிர்வாணக் கண்ணுக்கு&lt;/Span&gt;&lt;/Span&gt;</value>
   </data>
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
     <value>செயல்பாட்டு வகை</value>
@@ -776,7 +773,7 @@ Select Custom to use a location that will not be removed on uninstall. The custo
     <value>வெப்பநிலை: {0}°C</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>தற்போதைய இருப்பு: {0}A</value>
+    <value>பேட்டரி மின்னோட்டம்: {0}A</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>மீண்டும் துவக்கவும்</value>
@@ -857,7 +854,7 @@ Select Custom to use a location that will not be removed on uninstall. The custo
     <value>அதிக வெப்பம்</value>
   </data>
   <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
-    <value>இறந்து போனது</value>
+    <value>பழுதடைந்தது</value>
   </data>
   <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
     <value>ஓவர் வோல்டேச்</value>
@@ -878,15 +875,6 @@ Select Custom to use a location that will not be removed on uninstall. The custo
     <value>இதை மீண்டும் காட்ட வேண்டாம்.</value>
   </data>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
-    <value>கைவிடு</value>
-  </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>{0} மோதல்</value>
-  </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>ஒட்டு</value>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
     <value>கைவிடு</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
@@ -952,8 +940,8 @@ Select Custom to use a location that will not be removed on uninstall. The custo
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>பட்டியல் காலியாக உள்ளது</value>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - நகல்</value>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>நகல்</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>யூனிக்ச் பெயரிடும் விதிகளை கடைபிடிக்கிறது (ADB வழியாக)</value>
@@ -1223,6 +1211,9 @@ Weblate இல் உங்கள் மொழியில் பயன்பா
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{1} இல் {0} ({2})</value>
+  </data>
+  <data name="S_FILE_TRANSFER_SIZE_TIME" xml:space="preserve">
+    <value>{1} இல் {0}</value>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{1} இல் {0}</value>

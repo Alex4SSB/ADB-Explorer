@@ -24,6 +24,14 @@ public static class Plurals
 
     public static string ResolveConflicts(long count) => Format(nameof(ResolveConflicts), count);
 
+    public static string ReplaceOrSkipFiles(long count) => Format(nameof(ReplaceOrSkipFiles), count);
+
+    public static string ReplaceFilesInDestination(long count) => Format(nameof(ReplaceFilesInDestination), count);
+
+    public static string SkipFiles(long count) => Format(nameof(SkipFiles), count);
+
+    public static string DecideForEachFile(long count) => Format(nameof(DecideForEachFile), count);
+
     public static string PackagesToRemove(long count) => Format(nameof(PackagesToRemove), count);
 
     public static string InstallApks(long count) => Format(nameof(InstallApks), count);

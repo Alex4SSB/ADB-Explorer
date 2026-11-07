@@ -7,15 +7,13 @@ public class CompletedStatsConverter : IValueConverter
         if (value is not CompletedSyncProgressViewModel info || string.IsNullOrEmpty(info.TotalSize))
             return "";
 
-        string format = Strings.Resources.S_FILE_PROGRESS_TRANSFER;
-
         if (string.IsNullOrEmpty(info.TotalTime))
             return info.TotalSize;
 
         if (string.IsNullOrEmpty(info.AverageRateString))
-            return string.Format(format[..(format.IndexOf("{1}") + 3)].Trim(), info.TotalSize, info.TotalTime);
+            return string.Format(Strings.Resources.S_FILE_TRANSFER_SIZE_TIME, info.TotalSize, info.TotalTime);
 
-        return string.Format(format, info.TotalSize, info.TotalTime, info.AverageRateString);
+        return string.Format(Strings.Resources.S_FILE_PROGRESS_TRANSFER, info.TotalSize, info.TotalTime, info.AverageRateString);
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

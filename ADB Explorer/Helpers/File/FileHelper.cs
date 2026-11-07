@@ -491,12 +491,12 @@ public static class FileHelper
     public static string DuplicateFile(IEnumerable<string> fileList, string fullName, DragDropEffects cutType = DragDropEffects.None)
     {
         // None - new file
-        var copySuffix = cutType is DragDropEffects.None ? "" : Strings.Resources.S_ITEM_COPY.Replace("{0}", "");
+        var copySuffix = cutType is DragDropEffects.None ? "" : $" - {Strings.Resources.S_COPY_NAME_SUFFIX}";
         var extension = GetExtension(fullName);
         var noExtName = fullName[..^extension.Length];
 
         // Has the exact same name before the suffix, optionally has the suffix which is optionally iterated, and has the exact same extension
-        Regex re = new($"^{noExtName}(?:{copySuffix}(?: (?<iter>\\d+))?)?{extension.Replace(".", "\\.")}$");
+        Regex re = new($"^{Regex.Escape(noExtName)}(?:{Regex.Escape(copySuffix)}(?: (?<iter>\\d+))?)?{Regex.Escape(extension)}$");
 
         var items = from i in fileList
                     let match = re.Match(i)

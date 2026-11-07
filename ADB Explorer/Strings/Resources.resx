@@ -185,11 +185,12 @@
     <value>Permanently Delete</value>
   </data>
   <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
-    <value>Create Error</value>
+    <value>Error creating item</value>
+    <comment>Title of the error dialog shown when creating a new file or folder fails</comment>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>Restore Conflicts</value>
-    <comment>Title of the dialog shown when restoring Recycle Bin items collides with existing items. A noun phrase (conflicts during restore), not a command</comment>
+    <value>Conflicts during restore</value>
+    <comment>Title of the dialog shown when restoring Recycle Bin items collides with existing items</comment>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>Confirm Uninstall</value>
@@ -237,7 +238,8 @@
     <value>Restore</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>List Directory Error</value>
+    <value>Error listing folder contents</value>
+    <comment>Title of the error dialog shown when the contents of a folder could not be read</comment>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Pull To Windows Drive Root</value>
@@ -413,25 +415,9 @@ Visible content may be incomplete.</value>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Merge or Replace</value>
   </data>
-  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
-    <value>Replace the files in the destination</value>
-    <comment>Primary action in the paste/pull conflict dialog</comment>
-  </data>
   <data name="S_REPORT_ISSUE" xml:space="preserve">
     <value>Report an Issue</value>
     <comment>Tooltip of the title bar button that opens a new GitHub issue in the browser</comment>
-  </data>
-  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
-    <value>Skip these files</value>
-    <comment>Skip all conflicting items in the conflict dialog</comment>
-  </data>
-  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
-    <value>Let me decide for each file</value>
-    <comment>Open per-file conflict resolution</comment>
-  </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Replace or Skip Files</value>
-    <comment>Title of the paste/pull/push name-conflict dialog (Windows Explorer phrasing)</comment>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Select folders to push</value>
@@ -591,7 +577,7 @@ Select Custom to use a location that will not be removed on uninstall. The custo
     <comment>Explains virtualized vs custom app data location for packaged installs</comment>
   </data>
   <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value>Use Default</value>
+    <value>Use default location</value>
     <comment>Button to keep the MSIX virtualized app data folder</comment>
   </data>
   <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
@@ -631,15 +617,15 @@ Select Custom to use a location that will not be removed on uninstall. The custo
     <comment>The placeholder text for a textbox whose value hasn't been set</comment>
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
-    <value>Search Settings</value>
-    <comment>The placeholder of the textbox used to search through the settings</comment>
+    <value>Find a setting</value>
+    <comment>Placeholder of the textbox used to search for a setting by name</comment>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
     <value>Close search</value>
     <comment>The tooltip of the button used to hide the settings search textbox</comment>
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
-    <value>Search View</value>
+    <value>Show search</value>
     <comment>The tooltip of the button used to show the settings search textbox</comment>
   </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
@@ -816,8 +802,8 @@ Cancel All Running</value>
     <comment>The menu item containing package actions</comment>
   </data>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
-    <value>Update Time Modified</value>
-    <comment>The menu used to update the time modified of files using their names</comment>
+    <value>Update date modified</value>
+    <comment>Menu command that sets the date modified of the selected files according to their names (see S_UPDATE_MODIFIED_INFO)</comment>
   </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Save Changes</value>
@@ -1031,8 +1017,8 @@ Cancel All Running</value>
     <comment>The battery temperature indicator</comment>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>Current Balance: {0}A</value>
-    <comment>The battery current balance indicator, in Amperes</comment>
+    <value>Battery current: {0}A</value>
+    <comment>The electric current flowing in or out of the battery, in Amperes. Positive while charging, negative while discharging</comment>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>Reboot Into</value>
@@ -1139,7 +1125,7 @@ Cancel All Running</value>
     <comment>Battery health indicator - overheat</comment>
   </data>
   <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
-    <value>Dead</value>
+    <value>Defective</value>
     <comment>Battery health indicator: the battery has failed and no longer works (Android BATTERY_HEALTH_DEAD). Not the same as discharged</comment>
   </data>
   <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
@@ -1168,19 +1154,15 @@ Cancel All Running</value>
   </data>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Abort</value>
-    <comment>Cancel button of the paste / drop conflict dialog (S_PASTE_CONFLICT), which aborts the whole operation</comment>
+    <comment>Cancel button of the dialog shown when pasting or dropping a folder into itself (S_PASTE_CONFLICT_TITLE), which aborts the whole operation</comment>
   </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>{0} Conflict</value>
-    <comment>Title of the dialog shown when pasting or dropping a folder into itself. 0 = the action name, S_PASTE or S_DROP, which are verbs. ex: Paste Conflict</comment>
+  <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
+    <value>Conflict while pasting</value>
+    <comment>Title of the dialog shown when pasting a folder into itself or one of its subfolders</comment>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>Paste</value>
-    <comment>As in "Paste Conflict" (a file conflict while pasting)</comment>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>Drop</value>
-    <comment>The file drop operation</comment>
+  <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
+    <value>Conflict while dropping</value>
+    <comment>Title of the dialog shown when dragging and dropping a folder into itself or one of its subfolders</comment>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Operations</value>
@@ -1273,9 +1255,9 @@ Cancel All Running</value>
     <value>Menu Is Empty</value>
     <comment>Displayed when the context menu is empty</comment>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - Copy</value>
-    <comment>Suffix appended to the name of a pasted duplicate, like Windows Explorer's "file - Copy". "Copy" is a noun (a copy), not the verb. 0 = item name</comment>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>Copy</value>
+    <comment>Noun (a copy), appended to the name of a duplicated item as "name - Copy", like Windows Explorer does</comment>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Adheres to Unix naming rules (via ADB)</value>
@@ -1422,8 +1404,8 @@ Cancel All Running</value>
     <comment>0 = free space on drive (in B/KB/MB/GB). 1 = total drive capacity (in B/KB/MB/GB)</comment>
   </data>
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
-    <value>Empty</value>
-    <comment>The notification displayed on the recycle bin drive when it is empty</comment>
+    <value>No items</value>
+    <comment>Displayed on the recycle bin drive card instead of the item count when the recycle bin is empty</comment>
   </data>
   <data name="S_FILEOP_ERROR" xml:space="preserve">
     <value>Error: {0}</value>
@@ -1641,7 +1623,11 @@ Please help us localize the app to your language on Weblate.</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} in {1} ({2})</value>
-    <comment>0 - total size, 1 - elapsed time ("in" means "within", not "out of"), 2 - average speed. ex: 9MB in 1.2s (7.5MB/s)</comment>
+    <comment>Completed transfer summary. 0 = total size, 1 = elapsed time, 2 = average speed. ex: 9MB in 1.2s (7.5MB/s)</comment>
+  </data>
+  <data name="S_FILE_TRANSFER_SIZE_TIME" xml:space="preserve">
+    <value>{0} in {1}</value>
+    <comment>Completed transfer summary when there is no average speed. 0 = total size, 1 = elapsed time. ex: 9MB in 1.2s</comment>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} of {1}</value>

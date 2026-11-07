@@ -187,7 +187,7 @@
     <value>Erreur de création</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>Restaurer les conflits</value>
+    <value>Conflits de restauration</value>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>Confirmer la désinstallation</value>
@@ -370,9 +370,6 @@ Le contenu visible peut être incomplet.</value>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Fusionner ou remplacer</value>
   </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Remplacer ou ignorer des fichiers</value>
-  </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Sélectionnez dossiers à pousser</value>
   </data>
@@ -507,7 +504,7 @@ Le contenu visible peut être incomplet.</value>
     <value>[non défini(e)]</value>
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
-    <value>Paramètres recherche</value>
+    <value>Rechercher un paramètre</value>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
     <value>Quitter la recherche</value>
@@ -610,7 +607,7 @@ Annuler tout en cours</value>
     <value>Paquet</value>
   </data>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
-    <value>Heure de mise à jour modifiée</value>
+    <value>Mettre à jour la date de modification</value>
   </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Enregistrer les modifications</value>
@@ -751,7 +748,7 @@ Annuler tout en cours</value>
     <value>Température : {0} °C</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>Charge actuelle : {0}A</value>
+    <value>Courant de la batterie : {0}A</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>Redémarrer en</value>
@@ -832,7 +829,7 @@ Annuler tout en cours</value>
     <value>Surchauffe</value>
   </data>
   <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
-    <value>Morte</value>
+    <value>Défectueuse</value>
   </data>
   <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
     <value>Surtension</value>
@@ -855,14 +852,11 @@ Annuler tout en cours</value>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Abandonner</value>
   </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>Conflit {0}</value>
+  <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
+    <value>Conflit lors du collage</value>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>Coller</value>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>Lâcher</value>
+  <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
+    <value>Conflit lors du dépôt</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Opérations</value>
@@ -927,8 +921,8 @@ Annuler tout en cours</value>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Menu est vide</value>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>Copie - {0}</value>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>Copie</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Adhère aux règles de nommage Unix (via ADB)</value>
@@ -1201,6 +1195,9 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} en {1} ({2})</value>
+  </data>
+  <data name="S_FILE_TRANSFER_SIZE_TIME" xml:space="preserve">
+    <value>{0} en {1}</value>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} de {1}</value>
@@ -1626,15 +1623,6 @@ Séléctionnez Personnalisé pour utiliser un emplacement qui ne sera pas suppri
   </data>
   <data name="S_CLOSE_SEARCH_INFO" xml:space="preserve">
     <value>Quitter le mode résultats de recherche.</value>
-  </data>
-  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
-    <value>Remplacer les fichiers dans la destination</value>
-  </data>
-  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
-    <value>Ignorer ces fichiers</value>
-  </data>
-  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
-    <value>Me laisser décider pour chaque fichier</value>
   </data>
   <data name="S_NEWER" xml:space="preserve">
     <value>Plus récents</value>

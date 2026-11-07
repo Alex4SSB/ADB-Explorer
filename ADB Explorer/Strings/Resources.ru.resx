@@ -235,7 +235,7 @@
     <value>Восстановить</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>Ошибка списка каталогов</value>
+    <value>Ошибка получения содержимого папки</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Вытащить в корень диска Windows</value>
@@ -376,9 +376,6 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Объединить или заменить</value>
-  </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Заменить или пропустить файлы</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Выберите папки для отправки</value>
@@ -630,7 +627,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Пакет</value>
   </data>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
-    <value>Время обновления изменено</value>
+    <value>Обновить дату изменения</value>
   </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Сохранить изменения</value>
@@ -771,7 +768,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Температура: {0}°C</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>Текущий баланс: {0}А</value>
+    <value>Ток батареи: {0}А</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>Перезагрузить в</value>
@@ -852,7 +849,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Перегрев</value>
   </data>
   <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
-    <value>Мертвая</value>
+    <value>Неисправна</value>
   </data>
   <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
     <value>Перенапряжение</value>
@@ -875,14 +872,11 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Прервать</value>
   </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>{0} конфликт</value>
+  <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
+    <value>Конфликт при вставке</value>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>Вставить</value>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>Перетащить</value>
+  <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
+    <value>Конфликт при перетаскивании</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Операции</value>
@@ -947,8 +941,8 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Меню пустое</value>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - Копировать</value>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>копия</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Соблюдение правил именования Unix (через ADB)</value>
@@ -1068,10 +1062,10 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Проверено</value>
   </data>
   <data name="S_FILEOP_COMPLETED" xml:space="preserve">
-    <value>Завершенный</value>
+    <value>завершено</value>
   </data>
   <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
-    <value>{0} Не удалось</value>
+    <value>Ошибок: {0}</value>
   </data>
   <data name="S_FILEOP_TOTAL" xml:space="preserve">
     <value>Всего:</value>
@@ -1223,7 +1217,10 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Создать ссылку в {0}</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
-    <value>{0} в {1} ({2})</value>
+    <value>{0} за {1} ({2})</value>
+  </data>
+  <data name="S_FILE_TRANSFER_SIZE_TIME" xml:space="preserve">
+    <value>{0} за {1}</value>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} из {1}</value>
@@ -1626,15 +1623,6 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
     <value>Недоступно в этой системе.</value>
   </data>
-  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
-    <value>Замените файлы в месте назначения</value>
-  </data>
-  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
-    <value>Пропустить эти файлы</value>
-  </data>
-  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
-    <value>Позвольте мне решить для каждого файла</value>
-  </data>
   <data name="S_NEWER" xml:space="preserve">
     <value>более новый</value>
   </data>
@@ -1795,7 +1783,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Автоматическое повторение неудачных элементов</value>
   </data>
   <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
-    <value>время</value>
+    <value>раз</value>
   </data>
   <data name="S_REPORT_ISSUE" xml:space="preserve">
     <value>Сообщить о проблеме</value>

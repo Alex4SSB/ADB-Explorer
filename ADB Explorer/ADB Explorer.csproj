@@ -64,6 +64,23 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <!-- Weblate creates a language's files before anything is translated. An empty resx would still produce a
+       satellite assembly (which lists the language in settings), so empty resx and plurals files are dropped. -->
+  <Target Name="DropEmptyTranslations" BeforeTargets="PrepareResourceNames">
+    <ItemGroup>
+      <_EmptyTranslation Include="@(EmbeddedResource)" Condition="'%(RelativeDir)' == 'Strings\' And '%(Extension)' == '.resx' And $([System.String]::new('%(Filename)').StartsWith('Resources.')) And !$([System.IO.File]::ReadAllText('%(FullPath)').Contains('&lt;data '))" />
+      <_EmptyTranslation Include="@(EmbeddedResource)" Condition="'%(RelativeDir)' == 'Strings\Plurals\' And '%(Extension)' == '.json' And '%(Filename)' != 'en' And !$([System.Text.RegularExpressions.Regex]::IsMatch($([System.IO.File]::ReadAllText('%(FullPath)')), '&quot;:\s*&quot;[^&quot;]'))" />
+      <EmbeddedResource Remove="@(_EmptyTranslation)" />
+      <_EmptyResxCulture Include="$([System.String]::new('%(_EmptyTranslation.Filename)').Substring(10))" Condition="'%(_EmptyTranslation.Extension)' == '.resx'" />
+    </ItemGroup>
+    <Message Importance="high" Text="Dropping empty translation: %(_EmptyTranslation.Identity)" Condition="'@(_EmptyTranslation)' != ''" />
+  </Target>
+
+  <!-- Removes a satellite assembly left over from a build made before the language's files became empty -->
+  <Target Name="DeleteEmptyTranslationSatellites" AfterTargets="CopyFilesToOutputDirectory" DependsOnTargets="DropEmptyTranslations">
+    <Delete Files="$(OutDir)%(_EmptyResxCulture.Identity)\$(AssemblyName).resources.dll" Condition="'@(_EmptyResxCulture)' != ''" />
+  </Target>
+
   <ItemGroup Condition="Exists('FaroCollector.url') And '$(Configuration)' != 'Debug'">
     <EmbeddedResource Include="FaroCollector.url">
       <LogicalName>FaroCollector.url</LogicalName>

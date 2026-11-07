@@ -235,7 +235,7 @@
     <value>Відновити</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>Помилка списку каталогів</value>
+    <value>Помилка отримання вмісту папки</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Вийняти в корінь диска Windows</value>
@@ -376,9 +376,6 @@ ADB доступний як частина Android SDK Platform Tools.
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Об'єднати чи замінити</value>
-  </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Замінити або пропустити файли</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>Виберіть папки для надсилання</value>
@@ -630,7 +627,7 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Пакет</value>
   </data>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
-    <value>Час оновлення змінено</value>
+    <value>Оновити дату зміни</value>
   </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Зберегти зміни</value>
@@ -672,7 +669,7 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Пошукових запитів не знайдено.</value>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
-    <value>&lt;Span&gt;Ця папка &lt;Italic&gt;виглядає&lt;/Italic&gt; порожнйою&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… принаймні неозброєним поглядом&lt;/Span&gt;&lt;/Span&gt;</value>
+    <value>&lt;Span&gt;Ця папка &lt;Italic&gt;виглядає&lt;/Italic&gt; порожньою&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… принаймні неозброєним поглядом&lt;/Span&gt;&lt;/Span&gt;</value>
   </data>
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
     <value>Тип операції</value>
@@ -771,7 +768,7 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Температура: {0}°C</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>Поточний баланс: {0}</value>
+    <value>Струм батареї: {0}А</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>Перезавантажити в</value>
@@ -852,7 +849,7 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Перегрів</value>
   </data>
   <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
-    <value>Мертва</value>
+    <value>Несправна</value>
   </data>
   <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
     <value>Перенапруга</value>
@@ -875,14 +872,11 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Перервати</value>
   </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>{0} конфлікт</value>
+  <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
+    <value>Конфлікт під час вставлення</value>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>Вставити</value>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>Перетягнути</value>
+  <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
+    <value>Конфлікт під час перетягування</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Операції</value>
@@ -947,8 +941,8 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Меню порожнє</value>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - Копіювати</value>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>копія</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Дотримання правил іменування Unix (через ADB)</value>
@@ -1071,7 +1065,7 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Завершено</value>
   </data>
   <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
-    <value>{0} Не вдалося</value>
+    <value>Помилок: {0}</value>
   </data>
   <data name="S_FILEOP_TOTAL" xml:space="preserve">
     <value>Всього:</value>
@@ -1223,7 +1217,10 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Створити посилання в {0}</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
-    <value>{0} у {1} ({2})</value>
+    <value>{0} за {1} ({2})</value>
+  </data>
+  <data name="S_FILE_TRANSFER_SIZE_TIME" xml:space="preserve">
+    <value>{0} за {1}</value>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} з {1}</value>
@@ -1626,15 +1623,6 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
     <value>Недоступно у цій системі.</value>
   </data>
-  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
-    <value>Замініть файли в місці призначення</value>
-  </data>
-  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
-    <value>Пропустити ці файли</value>
-  </data>
-  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
-    <value>Дозвольте мені вирішити для кожного файлу</value>
-  </data>
   <data name="S_NEWER" xml:space="preserve">
     <value>новіший</value>
   </data>
@@ -1795,7 +1783,7 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Автоматичне повторення невдалих елементів</value>
   </data>
   <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
-    <value>час</value>
+    <value>разів</value>
   </data>
   <data name="S_REPORT_ISSUE" xml:space="preserve">
     <value>Повідомити про проблему</value>

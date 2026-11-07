@@ -381,9 +381,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>合併或取代</value>
   </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>取代或略過檔案</value>
-  </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>選擇要複製過去的資料夾</value>
   </data>
@@ -786,7 +783,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>溫度: {0}°C</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>剩餘電量: {0} A</value>
+    <value>電池電流: {0} A</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>重啓到指定模式</value>
@@ -890,14 +887,11 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>中斷</value>
   </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>{0} 個衝突</value>
+  <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
+    <value>貼上衝突</value>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>貼上</value>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>拖拉</value>
+  <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
+    <value>拖放衝突</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>操作</value>
@@ -962,8 +956,8 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>功能表爲空</value>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - 複製</value>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>複本</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>請遵循 Unix 命名規則 (透過 ADB)</value>
@@ -1164,10 +1158,10 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>向右捲</value>
   </data>
   <data name="S_MENU_UNDO" xml:space="preserve">
-    <value>取消</value>
+    <value>復原</value>
   </data>
   <data name="S_MENU_REDO" xml:space="preserve">
-    <value>重複做</value>
+    <value>取消復原</value>
   </data>
   <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
     <value>通知</value>
@@ -1242,6 +1236,9 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} 費時 {1} ({2})</value>
+  </data>
+  <data name="S_FILE_TRANSFER_SIZE_TIME" xml:space="preserve">
+    <value>{0} 費時 {1}</value>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>完成 {0} 個，共 {1} 個</value>
@@ -1591,20 +1588,11 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_NEW_ARCHIVE" xml:space="preserve">
     <value>新檔案</value>
   </data>
-  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
-    <value>替換目的地中的檔案</value>
-  </data>
-  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
-    <value>跳過這些檔案</value>
-  </data>
   <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
     <value>名</value>
   </data>
   <data name="S_SCREENSHOT" xml:space="preserve">
     <value>螢幕截圖</value>
-  </data>
-  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
-    <value>每個檔都讓我決定</value>
   </data>
   <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
     <value>檢查與通知</value>

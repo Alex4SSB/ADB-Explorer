@@ -187,7 +187,7 @@
     <value>创建文件/文件夹错误</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>恢复文件/文件夹错误</value>
+    <value>还原冲突</value>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>确认卸载</value>
@@ -376,9 +376,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>合并或替换</value>
-  </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>替换或跳过文件</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>选择要推送的文件夹</value>
@@ -630,7 +627,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>软件包</value>
   </data>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
-    <value>修改日期</value>
+    <value>更新修改日期</value>
   </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>保存更改</value>
@@ -771,7 +768,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>温度：{0}°C</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>剩余电量：{0}A</value>
+    <value>电池电流：{0}A</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>重启到特定模式</value>
@@ -873,16 +870,13 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>不再显示此消息。</value>
   </data>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
-    <value>关于</value>
+    <value>中止</value>
   </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>{0} 冲突</value>
+  <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
+    <value>粘贴冲突</value>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>粘贴</value>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>拖拽</value>
+  <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
+    <value>拖放冲突</value>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>操作</value>
@@ -947,8 +941,8 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>菜单为空</value>
   </data>
-  <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>{0} - 复制</value>
+  <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
+    <value>副本</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>遵循 Unix 命名规则（通过 ADB）</value>
@@ -1223,7 +1217,10 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>在{0}处创建链接</value>
   </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
-    <value>{0}预计{1}（{2}）</value>
+    <value>{0}，用时 {1}（{2}）</value>
+  </data>
+  <data name="S_FILE_TRANSFER_SIZE_TIME" xml:space="preserve">
+    <value>{0}，用时 {1}</value>
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>完成{0}/共{1}</value>
@@ -1626,15 +1623,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SETTINGS_UNAVAILABLE_ON_SYSTEM" xml:space="preserve">
     <value>此系统上不可用。</value>
   </data>
-  <data name="S_REPLACE_FILES_IN_DESTINATION" xml:space="preserve">
-    <value>替换目标位置的文件</value>
-  </data>
-  <data name="S_SKIP_THESE_FILES" xml:space="preserve">
-    <value>跳过这些文件</value>
-  </data>
-  <data name="S_DECIDE_FOR_EACH_FILE" xml:space="preserve">
-    <value>让我决定每个文件</value>
-  </data>
   <data name="S_NEWER" xml:space="preserve">
     <value>较新的</value>
   </data>
@@ -1795,7 +1783,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>自动重试传输失败文件项目</value>
   </data>
   <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
-    <value>次数</value>
+    <value>次</value>
   </data>
   <data name="S_FOLDER_CONTENT_VALUE" xml:space="preserve">
     <value>{0}, {1}</value>

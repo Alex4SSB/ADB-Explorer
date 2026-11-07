@@ -184,10 +184,10 @@
     <value>مسح كلي</value>
   </data>
   <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
-    <value>صنع خطأ</value>
+    <value>خطأ في الإنشاء</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>اعاده الاشتباك</value>
+    <value>تعارضات الاستعادة</value>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>تأكيد إلغاء التثبيت</value>
@@ -235,7 +235,7 @@
     <value>اعاده</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>خطأ في تصنيف المكتبه</value>
+    <value>خطأ في عرض محتويات المجلد</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>­سحب الي جزور مساحه windows</value>
@@ -555,14 +555,6 @@
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Abort</value>
     <comment>The content of the button used to abort the extraction process</comment>
-  </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>Paste</value>
-    <comment>As in "Paste Conflict" (a file conflict while pasting)</comment>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>Drop</value>
-    <comment>The file drop operation</comment>
   </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Operations</value>

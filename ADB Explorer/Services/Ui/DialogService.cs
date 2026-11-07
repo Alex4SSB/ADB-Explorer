@@ -104,7 +104,7 @@ public static class DialogService
     /// </summary>
     public static async Task<Helpers.FileMergeHelper.ConflictResolution> ShowConflictResolution(
         string message,
-        string title)
+        int conflictCount)
     {
         // Native dialogs (e.g. CommonOpenFileDialog) steal activation; the host needs focus.
         if (Application.Current?.MainWindow is Window mainWindow)
@@ -113,12 +113,12 @@ public static class DialogService
             await mainWindow.Dispatcher.InvokeAsync(static () => { }, DispatcherPriority.ApplicationIdle);
         }
 
-        var panel = new ConflictResolutionPanel { Message = message };
+        var panel = new ConflictResolutionPanel { Message = message, ConflictCount = conflictCount };
         var host = AdbContentDialog.CustomContentDialog(panel, DialogIcon.None);
 
         var dialog = new ContentDialog
         {
-            Title = CreateTitle(title, null),
+            Title = CreateTitle(Strings.Plurals.ReplaceOrSkipFiles(conflictCount), null),
             Content = host,
             PrimaryButtonText = "",
             SecondaryButtonText = "",

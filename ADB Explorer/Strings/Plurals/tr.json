@@ -4,6 +4,8 @@
     "ConflictingItems_other": "{{count}} çakışan öğe var",
     "ConflictingItemsIn_one": "{{destination}} içinde {{count}} çakışan öğe var",
     "ConflictingItemsIn_other": "{{destination}} içinde {{count}} çakışan öğe var",
+    "ReplaceOrSkipFiles_one": "Dosyayı Değiştir veya Atla",
+    "ReplaceOrSkipFiles_other": "{{count}} Dosyayı Değiştir veya Atla",
     "PackagesToRemove_other": "Aşağıdakiler kaldırılacaktır:\n{{count}} paket",
     "FilesInvalidAtDriveRoot_other": "Seçilen dosyaların {{count}} tanesi Windows sürücüsünün kök dizininde oluşturulamıyor."
 }

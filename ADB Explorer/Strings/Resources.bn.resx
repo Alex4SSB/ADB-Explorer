@@ -444,14 +444,6 @@
     <value>Abort</value>
     <comment>The content of the button used to abort the extraction process</comment>
   </data>
-  <data name="S_PASTE" xml:space="preserve">
-    <value>Paste</value>
-    <comment>As in "Paste Conflict" (a file conflict while pasting)</comment>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>Drop</value>
-    <comment>The file drop operation</comment>
-  </data>
   <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
     <value>Operations</value>
     <comment>Used for file operation actions, plural</comment>
