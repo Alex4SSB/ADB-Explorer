@@ -184,7 +184,7 @@
     <value>Trvale smazat</value>
   </data>
   <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
-    <value>Chyba při vytváření</value>
+    <value>Chyba při vytváření položky</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
     <value>Konflikty při obnovení</value>
@@ -235,7 +235,7 @@
     <value>Obnova ze zálohy</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>Chyba při výpisu adresáře</value>
+    <value>Chyba při výpisu obsahu složky</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Stáhnout do kořene jednotky Windows</value>
@@ -519,7 +519,7 @@ Zvolte Vlastní, chcete-li použít umístění, které se při odinstalování 
     <comment>Explains virtualized vs custom app data location for packaged installs</comment>
   </data>
   <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value>Použít výchozí</value>
+    <value>Použít výchozí umístění</value>
     <comment>Button to keep the MSIX virtualized app data folder</comment>
   </data>
   <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
@@ -564,7 +564,7 @@ Zvolte Vlastní, chcete-li použít umístění, které se při odinstalování 
     <value>Ukončit hledání</value>
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
-    <value>Vyhledávací zobrazení</value>
+    <value>Zobrazit vyhledávání</value>
     <comment>The tooltip of the button used to show the settings search textbox</comment>
   </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
@@ -672,7 +672,7 @@ Zrušit všechny probíhající operace</value>
     <value>Balíček</value>
   </data>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
-    <value>Aktualizovat čas úpravy</value>
+    <value>Aktualizovat datum úpravy</value>
   </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Uložit změny</value>
@@ -1719,7 +1719,7 @@ Pomozte nám prosím lokalizovat aplikaci do svého jazyka na Weblate.</value>
     <value>&lt;Span&gt;Tato složka &lt;Italic&gt;vypadá&lt;/Italic&gt; prázdně&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… na první pohled&lt;/Span&gt;&lt;/Span&gt;</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>Aktuální proud: {0} A</value>
+    <value>Proud baterie: {0}A</value>
   </data>
   <data name="S_POPUP_LOCATION_READ_ONLY" xml:space="preserve">
     <value>Aktuální umístění je jen pro čtení</value>
@@ -2004,5 +2004,8 @@ Kontroly se snaží zabránit tomu, aby nic netušící uživatel spustil potenc
   </data>
   <data name="S_FOLDER_CONTENT_VALUE" xml:space="preserve">
     <value>{0}, {1}</value>
+  </data>
+  <data name="S_REPORT_ISSUE" xml:space="preserve">
+    <value>Nahlásit problém</value>
   </data>
 </root>
