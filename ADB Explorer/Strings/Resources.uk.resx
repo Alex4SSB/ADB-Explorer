@@ -235,7 +235,7 @@
     <value>Відновити</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>Помилка отримання вмісту папки</value>
+    <value>Помилка переліку змісту папки</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Вийняти в корінь диска Windows</value>
@@ -873,7 +873,7 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Перервати</value>
   </data>
   <data name="S_PASTE_CONFLICT_TITLE" xml:space="preserve">
-    <value>Конфлікт під час вставлення</value>
+    <value>Конфлікт під час вставки</value>
   </data>
   <data name="S_DROP_CONFLICT_TITLE" xml:space="preserve">
     <value>Конфлікт під час перетягування</value>
@@ -942,7 +942,7 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Меню порожнє</value>
   </data>
   <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
-    <value>копія</value>
+    <value>Копія</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Дотримання правил іменування Unix (через ADB)</value>
@@ -1065,7 +1065,7 @@ ADB доступний як частина Android SDK Platform Tools.
     <value>Завершено</value>
   </data>
   <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
-    <value>Помилок: {0}</value>
+    <value>{0} Не вдалося</value>
   </data>
   <data name="S_FILEOP_TOTAL" xml:space="preserve">
     <value>Всього:</value>
