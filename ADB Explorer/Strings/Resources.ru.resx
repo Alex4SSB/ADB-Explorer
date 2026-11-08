@@ -235,7 +235,7 @@
     <value>Восстановить</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>Ошибка получения содержимого папки</value>
+    <value>Ошибка списка содержания папки</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Вытащить в корень диска Windows</value>
@@ -627,7 +627,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Пакет</value>
   </data>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
-    <value>Обновить дату изменения</value>
+    <value>Дата обновления изменена</value>
   </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Сохранить изменения</value>
@@ -942,7 +942,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Меню пустое</value>
   </data>
   <data name="S_COPY_NAME_SUFFIX" xml:space="preserve">
-    <value>копия</value>
+    <value>Копия</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>Соблюдение правил именования Unix (через ADB)</value>
@@ -1062,10 +1062,10 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Проверено</value>
   </data>
   <data name="S_FILEOP_COMPLETED" xml:space="preserve">
-    <value>завершено</value>
+    <value>Завершено</value>
   </data>
   <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
-    <value>Ошибок: {0}</value>
+    <value>{0} Не удалось</value>
   </data>
   <data name="S_FILEOP_TOTAL" xml:space="preserve">
     <value>Всего:</value>
