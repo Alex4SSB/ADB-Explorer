@@ -184,10 +184,10 @@
     <value>Удалить навсегда</value>
   </data>
   <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
-    <value>Ошибка создания</value>
+    <value>Ошибка при создании элемента</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>Конфликт восстановления</value>
+    <value>Конфликты в период восстановления</value>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>Подтвердить деинсталляцию</value>
@@ -494,7 +494,7 @@ ADB доступен как часть Android SDK Platform Tools.
 Выберите Пользовательское местоположение для использования, которое не будет удалено при деинсталляции. Пользовательское расположение не может быть под C:\Users\…\AppData</value>
   </data>
   <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value>Использовать по умолчанию</value>
+    <value>Использовать местоположение по умолчанию</value>
   </data>
   <data name="S_APP_DATA_LOCATION_CUSTOM" xml:space="preserve">
     <value>Пользователя</value>
@@ -524,13 +524,13 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>[не установлено]</value>
   </data>
   <data name="S_SEARCH_SETTINGS" xml:space="preserve">
-    <value>Поиск настроек</value>
+    <value>Найти настройки</value>
   </data>
   <data name="S_EXIT_SEARCH" xml:space="preserve">
     <value>Закрыть поиск</value>
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
-    <value>Просмотр поиска</value>
+    <value>Показать поиск</value>
   </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>Настройки</value>
@@ -1053,7 +1053,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>{0} свободно из {1}</value>
   </data>
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
-    <value>Корзина пуста</value>
+    <value>Нет элементов</value>
   </data>
   <data name="S_FILEOP_ERROR" xml:space="preserve">
     <value>Ошибка: {0}</value>
