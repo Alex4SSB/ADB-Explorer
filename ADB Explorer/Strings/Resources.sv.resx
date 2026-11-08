@@ -184,7 +184,7 @@
     <value>Ta bort permanent</value>
   </data>
   <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
-    <value>Fel vid skapande</value>
+    <value>Fel vid skapande av objekt</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
     <value>Konflikter vid återställning</value>
@@ -235,7 +235,7 @@
     <value>Återställ</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>Fel vid listning av katalog</value>
+    <value>Fel vid listning av kataloginnehåll</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Hämta till roten på Windows-enheten</value>
@@ -480,7 +480,7 @@ Synligt innehåll kan vara ofullständigt.</value>
     <value>Stäng sök</value>
   </data>
   <data name="S_SEARCH_VIEW" xml:space="preserve">
-    <value>Sökvy</value>
+    <value>Visa sök</value>
   </data>
   <data name="S_SETTINGS_TITLE" xml:space="preserve">
     <value>Inställningar</value>
@@ -577,7 +577,7 @@ Avbryt alla pågående</value>
     <value>Paket</value>
   </data>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
-    <value>Uppdatera ändringsdatum</value>
+    <value>Uppdatera datum för ändring</value>
   </data>
   <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
     <value>Spara ändringar</value>
@@ -982,7 +982,7 @@ Avbryt alla pågående</value>
     <value>{0} ledigt av {1}</value>
   </data>
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
-    <value>Tom</value>
+    <value>Inga objekt</value>
   </data>
   <data name="S_FILEOP_ERROR" xml:space="preserve">
     <value>Fel: {0}</value>
@@ -1480,7 +1480,7 @@ Granska ändringarna på GitHub.</value>
 Välj Anpassad för att använda en plats som inte tas bort vid avinstallation. Den anpassade platsen får inte ligga under C:\Users\…\AppData</value>
   </data>
   <data name="S_APP_DATA_LOCATION_VIRTUALIZED" xml:space="preserve">
-    <value>Använd standardplatsen</value>
+    <value>Använd standardplats</value>
   </data>
   <data name="S_APP_DATA_LOCATION_BROWSE" xml:space="preserve">
     <value>Välj mapp för appdata</value>
