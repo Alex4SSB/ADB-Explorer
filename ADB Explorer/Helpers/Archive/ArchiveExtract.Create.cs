@@ -6,8 +6,8 @@ public static partial class ArchiveExtract
 {
     /// <summary>
     /// Builds the <c>sh -c</c> script used to create a tar-family archive at
-    /// <paramref name="archivePath"/>. Compression is selected by toybox from the filename
-    /// extension (e.g. <c>.tar.gz</c>). When <paramref name="sourceFullPaths"/> is empty,
+    /// <paramref name="archivePath"/>. Compression is passed explicitly from the filename
+    /// extension (e.g. <c>-z</c> for <c>.tar.gz</c>). When <paramref name="sourceFullPaths"/> is empty,
     /// creates an empty archive. All sources must share the same parent directory.
     /// </summary>
     public static string BuildCreateTarArchiveScript(
@@ -18,9 +18,10 @@ public static partial class ArchiveExtract
         var tar = ShellCommands.TranslateCommand("tar");
         var archiveEsc = AdbService.EscapeAdbShellString(archivePath);
         var verboseFlag = verbose ? " -v" : "";
+        var compression = ArchiveHelper.GetTarCreateCompressionOption(archivePath);
 
         if (sourceFullPaths.Count == 0)
-            return $"{tar} -cf {archiveEsc}{verboseFlag} -T /dev/null";
+            return $"{tar} -cf {archiveEsc}{compression}{verboseFlag} -T /dev/null";
 
         var parent = FileHelper.GetParentPath(sourceFullPaths[0]);
         foreach (var path in sourceFullPaths)
@@ -35,13 +36,13 @@ public static partial class ArchiveExtract
             sourceFullPaths.Select(p => AdbService.EscapeAdbShellString(FileHelper.GetFullName(p))));
 
         // Pack named members via -T so names with spaces survive; avoid "./name" members.
-        // -v is its own token so tests can still match `tar -cf`.
-        return $"cd {parentEsc} && printf '%s\\n' {printfArgs} | {tar} -cf {archiveEsc}{verboseFlag} -T -";
+        // -v and the compression option are their own tokens so tests can still match `tar -cf`.
+        return $"cd {parentEsc} && printf '%s\\n' {printfArgs} | {tar} -cf {archiveEsc}{compression}{verboseFlag} -T -";
     }
 
     /// <summary>
     /// Creates a new tar-family archive at <paramref name="archivePath"/>.
-    /// Compression is selected by toybox from the filename extension (e.g. <c>.tar.gz</c>).
+    /// Compression follows the filename extension (e.g. <c>.tar.gz</c>).
     /// When <paramref name="sourceFullPaths"/> is empty, creates an empty archive.
     /// All sources must share the same parent directory.
     /// </summary>

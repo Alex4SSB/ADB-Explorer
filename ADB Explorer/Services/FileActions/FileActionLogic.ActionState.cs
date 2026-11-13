@@ -538,6 +538,15 @@ internal static partial class FileActionLogic
         actions.IsCompressToContextEnabled = actions.IsCompressToEnabled
             && c.HasFileSelection;
 
+        // Compress-to commands act on Data.Active, so its device decides the shared format flags.
+        if (c.Device is not null && ReferenceEquals(c.List, Data.Active))
+        {
+            FileActionsEnable.IsTarGzSupported.Value = ShellCommands.CanCreateTar(c.Device.ID, TarCompression.Gzip);
+            FileActionsEnable.IsTarBz2Supported.Value = ShellCommands.CanCreateTar(c.Device.ID, TarCompression.Bzip2);
+            FileActionsEnable.IsTarXzSupported.Value = ShellCommands.CanCreateTar(c.Device.ID, TarCompression.Xz);
+            FileActionsEnable.IsTarZstSupported.Value = ShellCommands.CanCreateTar(c.Device.ID, TarCompression.Zstd);
+        }
+
         actions.BackupPackageEnabled = c.IsAppDrive
             && c.HasPackageSelection
             && tarAvailable

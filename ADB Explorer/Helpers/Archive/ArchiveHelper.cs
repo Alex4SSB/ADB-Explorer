@@ -7,6 +7,17 @@ public enum ArchiveFamily
     Zip,
 }
 
+public enum TarCompression
+{
+    None,
+    Gzip,
+    Bzip2,
+    Xz,
+    Zstd,
+    /// <summary>Unrecognized <c>.tar.*</c> suffix; left to the device <c>tar</c> as before.</summary>
+    Other,
+}
+
 public static class ArchiveHelper
 {
     private static readonly HashSet<string> TarExtensions = new(StringComparer.OrdinalIgnoreCase)
@@ -92,6 +103,35 @@ public static class ArchiveHelper
 
     public static bool IsZipFamily(string fileName) => GetFamily(fileName) is ArchiveFamily.Zip;
 
+    /// <summary>Compression implied by a tar-family file name (same suffixes toybox autodetects).</summary>
+    public static TarCompression GetTarCompression(string fileName) => FileHelper.GetExtension(fileName).ToUpperInvariant() switch
+    {
+        ".TAR" => TarCompression.None,
+        ".TGZ" or ".TAR.GZ" => TarCompression.Gzip,
+        ".TBZ" or ".TBZ2" or ".TAR.BZ" or ".TAR.BZ2" => TarCompression.Bzip2,
+        ".TXZ" or ".TAR.XZ" => TarCompression.Xz,
+        ".TZST" or ".TAR.ZST" => TarCompression.Zstd,
+        _ => TarCompression.Other,
+    };
+
+    /// <summary>
+    /// Explicit <c>tar -c</c> compression option (with a leading space) for <paramref name="fileName"/>,
+    /// so a <c>tar</c> that doesn't know the suffix fails instead of writing a mislabeled archive.
+    /// </summary>
+    public static string GetTarCreateCompressionOption(string fileName) => GetTarCompression(fileName) switch
+    {
+        TarCompression.Gzip => " -z",
+        TarCompression.Bzip2 => " -j",
+        TarCompression.Xz => " -J",
+        // -Z is LZW compress in GNU/busybox tar; the long form is unambiguous.
+        TarCompression.Zstd => " --zstd",
+        _ => "",
+    };
+
+    /// <summary>Whether the device can create a tar archive named <paramref name="fileName"/> (Compress to).</summary>
+    public static bool CanCreateTar(string fileName, string deviceId)
+        => ShellCommands.CanCreateTar(deviceId, GetTarCompression(fileName));
+
     public static bool IsCompressedTar(string fileName)
     {
         if (!IsTarFamily(fileName))
@@ -116,7 +156,7 @@ public static class ArchiveHelper
 
     public static bool CanBrowse(string fileName, string deviceId) => GetFamily(fileName) switch
     {
-        ArchiveFamily.Tar => ShellCommands.TarExists(deviceId),
+        ArchiveFamily.Tar => ShellCommands.CanReadTar(deviceId, GetTarCompression(fileName)),
         ArchiveFamily.Zip => ShellCommands.UnzipExists(deviceId),
         _ => false,
     };
@@ -124,8 +164,9 @@ public static class ArchiveHelper
     public static bool CanModify(string fileName, string deviceId) => GetFamily(fileName) switch
     {
         ArchiveFamily.Zip => ShellCommands.ZipExists(deviceId) && ShellCommands.UnzipExists(deviceId),
-        // Tar (including compressed) uses extract+repack; append is not required.
-        ArchiveFamily.Tar => ShellCommands.TarExists(deviceId),
+        // Tar (including compressed) uses extract+repack, so it needs both directions of its compression.
+        ArchiveFamily.Tar => ShellCommands.CanReadTar(deviceId, GetTarCompression(fileName))
+            && CanCreateTar(fileName, deviceId),
         _ => false,
     };
 

@@ -61,11 +61,12 @@ public static partial class ArchiveExtract
         if (string.IsNullOrEmpty(extension))
             extension = ".tar";
 
-        // Keep the original extension so toybox auto-selects gzip/bzip2/xz/zstd from the name.
+        // Keep the original extension so the temp name matches the compression option.
         var tempArchive = FileHelper.ConcatPaths(FileHelper.GetParentPath(contentRoot), $"repack-{Guid.NewGuid():N}{extension}");
         var tar = ShellCommands.TranslateCommand("tar");
         var rootEsc = AdbService.EscapeAdbShellString(contentRoot);
         var tempEsc = AdbService.EscapeAdbShellString(tempArchive);
+        var compression = ArchiveHelper.GetTarCreateCompressionOption(archivePath);
 
         // Pack top-level names via -T (not ".") so members are stored as "path"
         // rather than "./path". The latter breaks later extract-by-name on toybox.
@@ -73,9 +74,9 @@ public static partial class ArchiveExtract
         // -v is its own token so create/extract progress can share the same streaming path.
         string script;
         if (onVerbose is not null)
-            script = $"cd {rootEsc} && ls -A1 | {tar} -cf {tempEsc} -v -T -";
+            script = $"cd {rootEsc} && ls -A1 | {tar} -cf {tempEsc}{compression} -v -T -";
         else
-            script = $"cd {rootEsc} && ls -A1 | {tar} -cf {tempEsc} -T -";
+            script = $"cd {rootEsc} && ls -A1 | {tar} -cf {tempEsc}{compression} -T -";
 
         ExecuteTarCreateScript(deviceId, tempArchive, script, cancellationToken, onVerbose);
 

@@ -261,6 +261,16 @@ public partial class FileActionsEnable : ObservableObject
 
     public ObservableProperty<bool> IsCompressToEnabled = new();
 
+    /// <summary>Compress-to formats the acted-on device's <c>tar</c> can create.
+    /// Static: the Compress-to menus are shared or built before their tab is active.</summary>
+    public static ObservableProperty<bool> IsTarGzSupported { get; } = new() { Value = true };
+
+    public static ObservableProperty<bool> IsTarBz2Supported { get; } = new() { Value = true };
+
+    public static ObservableProperty<bool> IsTarXzSupported { get; } = new() { Value = true };
+
+    public static ObservableProperty<bool> IsTarZstSupported { get; } = new() { Value = true };
+
     public ObservableProperty<bool> IsContextNewFileVisible = new() { Value = true };
 
     public ObservableProperty<bool> IsContextNewArchiveVisible = new() { Value = true };

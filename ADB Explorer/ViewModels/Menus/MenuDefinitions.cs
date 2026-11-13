@@ -39,10 +39,10 @@ file static class CompressToMenuHelper
     public static SubMenu[] CompressToFormatMenus() =>
     [
         new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CompressToTar)),
-        new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CompressToTarGz)),
-        new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CompressToTarBz2)),
-        new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CompressToTarXz)),
-        new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CompressToTarZst)),
+        new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CompressToTarGz), isVisible: FileActionsEnable.IsTarGzSupported),
+        new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CompressToTarBz2), isVisible: FileActionsEnable.IsTarBz2Supported),
+        new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CompressToTarXz), isVisible: FileActionsEnable.IsTarXzSupported),
+        new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CompressToTarZst), isVisible: FileActionsEnable.IsTarZstSupported),
     ];
 }
 
