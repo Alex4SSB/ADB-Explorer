@@ -42,9 +42,11 @@ public class ArchiveCapabilityTests
         bool tarToCommandSupported = false,
         bool tarToStdoutSupported = false,
         bool crc32Exists = false,
-        bool md5SumExists = false) => new()
+        bool md5SumExists = false,
+        string[]? tarCompressors = null) => new()
     {
         TarExists = tarExists,
+        TarCompressors = new HashSet<string>(tarCompressors ?? []),
         UnzipExists = unzipExists,
         ZipExists = zipExists,
         TarAppendSupported = tarAppendSupported,
@@ -262,6 +264,56 @@ public class ArchiveCapabilityTests
         Assert.IsFalse(result.TarAppendSupported);
         Assert.IsFalse(result.TarToCommandSupported);
         Assert.IsTrue(result.TarToStdoutSupported);
+    }
+
+    [TestMethod]
+    public void ParseArchiveProbeOutput_ReadsCompressorsFromCommandV()
+    {
+        var us = AdbExplorerConst.ADB_UNIT_SEP;
+        var fs = AdbExplorerConst.ADB_FIELD_SEP;
+        // Pixel 9a: gzip and bzip2 in /system/bin, no xz or zstd. Unquoted $() joins lines with spaces.
+        var stdout = $"{us}TAR{us}{AndroidToyboxTarHelp}{fs}{us}UNZIP{us}{fs}{us}ZIP{us}{fs}{us}COMPRESSORS{us}/system/bin/gzip /system/bin/bzip2";
+
+        var result = ShellCommands.ParseArchiveProbeOutput(stdout);
+
+        Assert.IsNotNull(result.TarCompressors);
+        CollectionAssert.AreEquivalent(new[] { "gzip", "bzip2" }, result.TarCompressors.ToArray());
+    }
+
+    [TestMethod]
+    public void ParseArchiveProbeOutput_NoCompressorsSection_FindsNone()
+    {
+        var us = AdbExplorerConst.ADB_UNIT_SEP;
+        var fs = AdbExplorerConst.ADB_FIELD_SEP;
+        var stdout = $"{us}TAR{us}{AndroidToyboxTarHelp}{fs}{us}UNZIP{us}{fs}{us}ZIP{us}{fs}{us}COMPRESSORS{us}";
+
+        var result = ShellCommands.ParseArchiveProbeOutput(stdout);
+
+        Assert.AreEqual(0, result.TarCompressors?.Count ?? 0);
+    }
+
+    [TestMethod]
+    public void TarCanCreate_RequiresCompressorForExtension()
+    {
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(tarExists: true, tarCompressors: ["gzip", "bzip2"]);
+
+        Assert.IsTrue(ShellCommands.TarCanCreate(DeviceId, ".tar"));
+        Assert.IsTrue(ShellCommands.TarCanCreate(DeviceId, ".tar.gz"));
+        Assert.IsTrue(ShellCommands.TarCanCreate(DeviceId, "backup.TGZ"));
+        Assert.IsTrue(ShellCommands.TarCanCreate(DeviceId, ".tar.bz2"));
+        Assert.IsFalse(ShellCommands.TarCanCreate(DeviceId, ".tar.xz"));
+        Assert.IsFalse(ShellCommands.TarCanCreate(DeviceId, ".tar.zst"));
+        Assert.IsFalse(ShellCommands.TarCanCreate(DeviceId, "backup.tzst"));
+    }
+
+    [TestMethod]
+    public void TarCanCreate_FalseWithoutTar()
+    {
+        ShellCommands.DeviceCommands[DeviceId] = MakeCommands(tarExists: false, tarCompressors: ["gzip", "zstd"]);
+
+        Assert.IsFalse(ShellCommands.TarCanCreate(DeviceId, ".tar"));
+        Assert.IsFalse(ShellCommands.TarCanCreate(DeviceId, ".tar.zst"));
+        Assert.IsFalse(ShellCommands.TarCanCreate("unknown-device", ".tar"));
     }
 
     /// <summary>Android toybox 0.8.12 <c>tar --help</c> (no append / --to-command; has <c>O Extract to stdout</c>).</summary>

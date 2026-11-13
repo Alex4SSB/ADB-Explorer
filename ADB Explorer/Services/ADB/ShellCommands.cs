@@ -33,6 +33,12 @@ public sealed class DeviceShellCommands
     /// <summary>Device <c>tar</c> supports <c>-O</c> / extract-to-stdout (Android toybox; hash via pipe).</summary>
     public bool TarToStdoutSupported { get; init; }
 
+    /// <summary>
+    /// External compressors found in the device <c>PATH</c> (e.g. <c>gzip</c>, <c>zstd</c>).
+    /// Toybox <c>tar</c> runs these to create compressed archives, so a missing one makes creation fail.
+    /// </summary>
+    public IReadOnlySet<string> TarCompressors { get; init; } = new HashSet<string>();
+
     /// <summary>IEEE CRC-32 via toybox <c>cksum -HNPL</c>.</summary>
     public bool Crc32Exists { get; init; }
 
@@ -108,6 +114,45 @@ public static class ShellCommands
 
     public static bool TarToStdoutSupported(string deviceId)
         => DeviceCommands.TryGetValue(deviceId, out var commands) && commands.TarToStdoutSupported;
+
+    /// <summary>Compressors that toybox <c>tar</c> runs as external programs, probed with <c>command -v</c>.</summary>
+    internal static readonly string[] TarCompressorNames = ["gzip", "bzip2", "xz", "zstd"];
+
+    /// <summary>
+    /// The external compressor toybox <c>tar</c> needs to create <paramref name="archiveName"/>
+    /// (picked from its extension), or <see langword="null"/> when no compressor is needed.
+    /// </summary>
+    internal static string? GetTarCompressor(string archiveName)
+    {
+        var name = archiveName.ToLowerInvariant();
+
+        if (name.EndsWith(".tar.gz") || name.EndsWith(".tgz"))
+            return "gzip";
+
+        if (name.EndsWith(".tar.bz2") || name.EndsWith(".tbz2") || name.EndsWith(".tbz"))
+            return "bzip2";
+
+        if (name.EndsWith(".tar.xz") || name.EndsWith(".txz"))
+            return "xz";
+
+        if (name.EndsWith(".tar.zst") || name.EndsWith(".tzst"))
+            return "zstd";
+
+        return null;
+    }
+
+    /// <summary>
+    /// Whether <c>tar</c> can create <paramref name="archiveName"/> on the device:
+    /// <c>tar</c> exists and so does the compressor its extension requires.
+    /// </summary>
+    public static bool TarCanCreate(string deviceId, string archiveName)
+    {
+        if (!DeviceCommands.TryGetValue(deviceId, out var commands) || !commands.TarExists)
+            return false;
+
+        var compressor = GetTarCompressor(archiveName);
+        return compressor is null || commands.TarCompressors.Contains(compressor);
+    }
 
     /// <summary>Whether tar can feed member bytes to a hash tool (<c>--to-command</c> or <c>-O</c>).</summary>
     public static bool TarHashPipelineSupported(string deviceId)
@@ -306,6 +351,7 @@ public static class ShellCommands
             TarAppendSupported = archiveProbe.TarAppendSupported,
             TarToCommandSupported = archiveProbe.TarToCommandSupported,
             TarToStdoutSupported = archiveProbe.TarToStdoutSupported,
+            TarCompressors = archiveProbe.TarCompressors ?? new HashSet<string>(),
             Crc32Exists = hashProbe.Crc32Exists,
             Md5SumExists = hashProbe.Md5SumExists,
             Crc32Command = hashProbe.Crc32Command,
@@ -345,6 +391,7 @@ public static class ShellCommands
             TarAppendSupported = archiveProbe.TarAppendSupported,
             TarToCommandSupported = archiveProbe.TarToCommandSupported,
             TarToStdoutSupported = archiveProbe.TarToStdoutSupported,
+            TarCompressors = archiveProbe.TarCompressors ?? new HashSet<string>(),
             Crc32Exists = hashProbe.Crc32Exists,
             Md5SumExists = hashProbe.Md5SumExists,
             Crc32Command = hashProbe.Crc32Command,
@@ -434,6 +481,7 @@ public static class ShellCommands
     private static readonly string TAR_MARK = $"{AdbExplorerConst.ADB_UNIT_SEP}TAR{AdbExplorerConst.ADB_UNIT_SEP}";
     private static readonly string UNZIP_MARK = $"{AdbExplorerConst.ADB_UNIT_SEP}UNZIP{AdbExplorerConst.ADB_UNIT_SEP}";
     private static readonly string ZIP_MARK = $"{AdbExplorerConst.ADB_UNIT_SEP}ZIP{AdbExplorerConst.ADB_UNIT_SEP}";
+    private static readonly string COMPRESSORS_MARK = $"{AdbExplorerConst.ADB_UNIT_SEP}COMPRESSORS{AdbExplorerConst.ADB_UNIT_SEP}";
 
     private static string BuildArchiveProbeScript(bool busyBoxExists)
     {
@@ -443,13 +491,17 @@ public static class ShellCommands
         var zip = busyBoxExists ? "busybox zip" : "zip";
         var fs = AdbExplorerConst.ADB_FIELD_SEP;
 
+        // tar --help lists every compression flag (e.g. "Z  zstd compression") even when the
+        // compressor binary it runs is missing, so look the binaries up in PATH instead.
         return "echo " +
                TAR_MARK +
                "$(" + tar + " --help 2>/dev/null)" +
                fs + UNZIP_MARK +
                "$(" + unzip + " --help 2>/dev/null)" +
                fs + ZIP_MARK +
-               "$(" + zip + " --help 2>/dev/null)";
+               "$(" + zip + " --help 2>/dev/null)" +
+               fs + COMPRESSORS_MARK +
+               "$(command -v " + string.Join(' ', TarCompressorNames) + " 2>/dev/null)";
     }
 
     internal static ArchiveProbeResult ParseArchiveProbeOutput(string stdout)
@@ -460,6 +512,7 @@ public static class ShellCommands
         var tarHelp = ExtractProbeSection(stdout, TAR_MARK);
         var unzipHelp = ExtractProbeSection(stdout, UNZIP_MARK);
         var zipHelp = ExtractProbeSection(stdout, ZIP_MARK);
+        var compressors = ExtractProbeSection(stdout, COMPRESSORS_MARK);
 
         var tarExists = !string.IsNullOrWhiteSpace(tarHelp);
         return new(
@@ -468,8 +521,18 @@ public static class ShellCommands
             !string.IsNullOrWhiteSpace(zipHelp),
             tarExists && TarHelpSupportsAppend(tarHelp),
             tarExists && TarHelpSupportsToCommand(tarHelp),
-            tarExists && TarHelpSupportsToStdout(tarHelp));
+            tarExists && TarHelpSupportsToStdout(tarHelp),
+            ParseCompressors(compressors));
     }
+
+    /// <summary>
+    /// Reads <c>command -v</c> output: one path per found command (e.g. <c>/system/bin/gzip</c>),
+    /// or a bare name for a shell alias or builtin. Missing commands print nothing.
+    /// </summary>
+    private static HashSet<string> ParseCompressors(string output)
+        => [.. output.Split((char[])[' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
+                     .Select(FileHelper.GetFullName)
+                     .Where(TarCompressorNames.Contains)];
 
     private static string ExtractProbeSection(string stdout, string label)
     {
@@ -537,7 +600,8 @@ internal readonly record struct ArchiveProbeResult(
     bool ZipExists,
     bool TarAppendSupported,
     bool TarToCommandSupported,
-    bool TarToStdoutSupported);
+    bool TarToStdoutSupported,
+    IReadOnlySet<string>? TarCompressors = null);
 
 internal readonly record struct HashProbeResult(
     bool Crc32Exists,

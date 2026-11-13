@@ -10,6 +10,13 @@ internal static partial class FileActionLogic
 
     public static IReadOnlyList<string> GetPendingCompressSourcePaths() => PendingCompressSourcePaths;
 
+    /// <summary>
+    /// Whether the device can create a <paramref name="extension"/> archive
+    /// (e.g. <c>.tar.zst</c> needs a <c>zstd</c> binary, which most Android devices lack).
+    /// </summary>
+    public static bool CanCompressTo(string extension)
+        => ActionDevice is { } device && ShellCommands.TarCanCreate(device.ID, extension);
+
     public static void BeginCompressTo(string extension)
     {
         PendingCompressSourcePaths = [.. Data.SelectedFiles.Select(f => f.FullPath)];
