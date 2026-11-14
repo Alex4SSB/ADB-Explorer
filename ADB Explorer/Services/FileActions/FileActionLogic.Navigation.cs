@@ -148,6 +148,33 @@ internal static partial class FileActionLogic
             DeviceHelper.OpenDeviceInNewTab(device, new AdbLocation(path));
     }
 
+    /// <summary>The device folder to show in Windows Explorer: the one selected, or the listing when nothing is. Null where the mount can't.</summary>
+    internal static string? GetWindowsExplorerPath(FileList list, LogicalDeviceViewModel? device, bool isExplorerFolder)
+    {
+        if (device is not { Status: DeviceStatus.Ok } || !isExplorerFolder)
+            return null;
+
+        string path;
+        var selected = list.SelectedFiles?.ToList() ?? [];
+        if (selected.Count == 0)
+            path = list.DirList?.CurrentPath ?? list.Path;
+        else if (selected is [{ Type: FileType.Folder, IsLink: false } folder])
+            path = folder.FullPath;
+        else
+            return null;
+
+        return DeviceMount.CanMount(path) ? path : null;
+    }
+
+    public static void OpenInWindowsExplorer()
+    {
+        // The flag already vouches for an explorer folder
+        if (ActionFlags.IsOpenInWindowsExplorerEnabled
+            && ActionDevice is { } device
+            && GetWindowsExplorerPath(ActionList, device, isExplorerFolder: true) is { } path)
+            DeviceMount.OpenInFileExplorer(device, path);
+    }
+
     internal static bool CanEnterSelection(FileClass file)
         => file.IsDirectory
         || (ActionDevice is { } device

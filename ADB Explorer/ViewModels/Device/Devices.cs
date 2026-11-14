@@ -311,6 +311,10 @@ public partial class Devices : ObservableObject
                 {
                     gone.SetStatus(DeviceStatus.Offline);
                     gone.ClearTransportRoutes();
+
+                    var goneId = gone.ID;
+                    Task.Run(() => DeviceMount.Unmount(goneId));
+
                     self.Remove(gone);
                 }
 

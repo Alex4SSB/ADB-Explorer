@@ -2258,4 +2258,16 @@ The checks attempt to prevent an unsuspecting user from launching a possibly mal
     <value>Calculates and displays the total size of all files under this folder recursively.</value>
     <comment>Tooltip for the view size button</comment>
   </data>
+  <data name="S_MENU_OPEN_IN_WINDOWS_EXPLORER" xml:space="preserve">
+    <value>Open in Windows Explorer</value>
+    <comment>Explorer context menu action showing a device folder (the selected one, or the current one) in Windows File Explorer</comment>
+  </data>
+  <data name="S_MOUNT_FAILED_TITLE" xml:space="preserve">
+    <value>Couldn't show the device in File Explorer</value>
+    <comment>Error dialog title when the device folder can't be added to Windows File Explorer</comment>
+  </data>
+  <data name="S_MOUNT_OPENING" xml:space="preserve">
+    <value>Opening in Windows Explorer…</value>
+    <comment>Progress dialog text while the device folder is prepared and Windows File Explorer opens; closes by itself</comment>
+  </data>
 </root>

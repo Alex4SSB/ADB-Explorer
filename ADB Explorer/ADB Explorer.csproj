@@ -100,17 +100,18 @@
     <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="QRCoder.Xaml" Version="1.8.0" />
-    <PackageReference Include="SkiaSharp" Version="4.152.0" />
+    <PackageReference Include="QRCoder.Xaml" Version="1.8.1" />
+    <PackageReference Include="SkiaSharp" Version="4.156.0" />
     <!-- Runtime dependency of Emoji.Wpf (Libs\Emoji.Wpf); a raw <Reference> doesn't
          pull in its transitive package deps the way PackageReference would. -->
     <PackageReference Include="Stfu" Version="0.1.10" />
-    <PackageReference Include="System.IO.Hashing" Version="10.0.12" />
-    <PackageReference Include="System.Management" Version="10.0.12" />
-    <PackageReference Include="Vanara.Windows.Shell.Common" Version="5.0.7" />
+    <PackageReference Include="System.IO.Hashing" Version="11.0.0" />
+    <PackageReference Include="System.Management" Version="11.0.0" />
+    <PackageReference Include="Vanara.PInvoke.CldApi" Version="5.0.8" />
+    <PackageReference Include="Vanara.Windows.Shell.Common" Version="5.0.8" />
     <PackageReference Include="WPF-UI" Version="4.3.0" />
     <PackageReference Include="WPF-UI.DependencyInjection" Version="4.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="11.0.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
   </ItemGroup>
 

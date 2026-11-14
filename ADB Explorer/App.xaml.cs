@@ -175,6 +175,9 @@ public partial class App
 
         ClearFoldersInAppData();
 
+        // Device folders a crashed run left in File Explorer
+        _ = Task.Run(DeviceMount.CleanUpStaleMounts);
+
         await _host.StartAsync();
     }
 
@@ -189,6 +192,9 @@ public partial class App
         ThumbnailService.SaveAllThumbsToCsv();
 
         Data.FileOpQ?.Stop();
+
+        // Its placeholders can't be served once the app is gone
+        DeviceMount.Unmount();
 
         Services.GetService<OperationsViewModel>()?.StoreColumns();
 

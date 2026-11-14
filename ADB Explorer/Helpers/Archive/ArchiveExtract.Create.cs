@@ -311,18 +311,15 @@ public static partial class ArchiveExtract
 
         try
         {
-            foreach (var entry in AdbService.ListDirectoryRecursive(deviceId, dirPath, cancellationToken))
+            var tree = FileHelper.GetFolderTree([dirPath], out _, cancellationToken: cancellationToken, deviceId: deviceId, includeOther: true);
+            foreach (var entry in tree)
             {
-                var relative = FileHelper.ExtractRelativePath(entry.FullPath, parent, includeSelf: false);
+                var relative = FileHelper.ExtractRelativePath(entry.Name, parent, includeSelf: false);
                 var key = ArchiveVerboseProgress.NormalizeMember(relative);
                 if (string.IsNullOrEmpty(key))
                     continue;
 
-                long size = 0;
-                if (entry.Type is FileType.File)
-                    size = entry.Size ?? 0;
-
-                result[key] = size;
+                result[key] = entry.Size ?? 0;
             }
         }
         catch

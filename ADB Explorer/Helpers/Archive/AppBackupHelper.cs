@@ -148,18 +148,15 @@ public static class AppBackupHelper
             memberBytes.TryAdd(package.Name, 0);
             try
             {
-                foreach (var entry in AdbService.ListDirectoryRecursive(deviceId, obbDir, cancellationToken))
+                var tree = FileHelper.GetFolderTree([obbDir], out _, cancellationToken: cancellationToken, deviceId: deviceId, includeOther: true);
+                foreach (var entry in tree)
                 {
-                    var relative = FileHelper.ExtractRelativePath(entry.FullPath, OBB_ROOT, includeSelf: false);
+                    var relative = FileHelper.ExtractRelativePath(entry.Name, OBB_ROOT, includeSelf: false);
                     var key = NormalizeTarVerboseMember(relative);
                     if (string.IsNullOrEmpty(key))
                         continue;
 
-                    long size = 0;
-                    if (entry.Type is FileType.File)
-                        size = entry.Size ?? 0;
-
-                    memberBytes[key] = size;
+                    memberBytes[key] = entry.Size ?? 0;
                 }
             }
             catch

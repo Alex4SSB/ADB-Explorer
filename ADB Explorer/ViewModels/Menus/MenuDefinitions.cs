@@ -314,6 +314,9 @@ internal static class ExplorerContextMenu
             new BaseIcon(new OpenInNewTabIcon(), 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextOpenPackageLocation), AppActions.Icon(FileAction.FileActionType.FollowLink, 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextOpenItemLocation), AppActions.Icon(FileAction.FileActionType.FollowLink, 16)),
+        new SubMenu(
+            AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextOpenInWindowsExplorer),
+            new BaseIcon(() => new System.Windows.Controls.Image { Source = FileIconProvider.GetEnterFolderIcon(32), Width = 16, Height = 16 }, 16)),
         new SubMenuSeparator(),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPull),

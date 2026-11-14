@@ -5021,5 +5021,32 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("ScrollBar_ScrollToTopCommand", resourceCulture);
             }
         }
+            
+        /// <summary>
+        ///   Looks up a localized string similar to Open in Windows Explorer.
+        /// </summary>
+        public static string S_MENU_OPEN_IN_WINDOWS_EXPLORER {
+            get {
+                return ResourceManager.GetString("S_MENU_OPEN_IN_WINDOWS_EXPLORER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Couldn't show the device in File Explorer.
+        /// </summary>
+        public static string S_MOUNT_FAILED_TITLE {
+            get {
+                return ResourceManager.GetString("S_MOUNT_FAILED_TITLE", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Opening in Windows Explorer….
+        /// </summary>
+        public static string S_MOUNT_OPENING {
+            get {
+                return ResourceManager.GetString("S_MOUNT_OPENING", resourceCulture);
+            }
+        }
     }
 }

@@ -47,8 +47,10 @@ public partial class ShellStreamTests
 
         try
         {
+            // ADB_EXPLORER_TEST_DEVICE picks one of several connected devices by serial
+            var serial = Environment.GetEnvironmentVariable("ADB_EXPLORER_TEST_DEVICE");
             _device = new AdbClient().GetDevices()
-                .FirstOrDefault(d => d.State is DeviceState.Online && !d.Serial.Contains("._adb-tls-"));
+                .FirstOrDefault(d => d.State is DeviceState.Online && !d.Serial.Contains("._adb-tls-") && (serial is null || d.Serial == serial));
         }
         catch
         {
@@ -169,6 +171,14 @@ public partial class ShellStreamTests
                 Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, () => frame.Continue = false);
                 Dispatcher.PushFrame(frame);
                 Thread.Sleep(50);
+            }
+
+            if (!IsCopied(localRoot))
+            {
+                var present = Directory.EnumerateFiles(localRoot, "*", SearchOption.AllDirectories)
+                    .Select(f => $"{Path.GetRelativePath(localRoot, f)} ({new FileInfo(f).Length})");
+                File.AppendAllText(Path.Combine(Path.GetTempPath(), "adb-explorer-shell-copy-diag.txt"),
+                    $"Copy to {localRoot} timed out, op {op.Status}: {string.Join(", ", present)}\n");
             }
         }
 

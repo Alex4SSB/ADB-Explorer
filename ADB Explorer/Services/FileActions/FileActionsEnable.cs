@@ -83,6 +83,8 @@ public partial class FileActionsEnable : ObservableObject
 
     public bool IsOpenInNewTabEnabled { get; set; }
 
+    public bool IsOpenInWindowsExplorerEnabled { get; set; }
+
     public bool PullEnabled { get; set; }
 
     public bool ContextPushEnabled { get; set; }

@@ -295,6 +295,9 @@ internal static partial class FileActionLogic
         else
             actions.IsOpenInNewTabEnabled = false;
 
+        // A tree node's list (drives included) has the node as its one selected folder
+        actions.IsOpenInWindowsExplorerEnabled = GetWindowsExplorerPath(c.List, c.Device, c.IsExplorerFolder) is not null;
+
         if (c.IsAppDrive)
             actions.IsCopyItemPathEnabled = c.SinglePackageSelected;
         else

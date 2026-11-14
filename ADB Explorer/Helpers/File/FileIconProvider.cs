@@ -293,6 +293,9 @@ public class FileIconProvider
     public static BitmapSource GetMultipleFilesIcon(int size) =>
         GetSpecialIcon(MultipleFilesIcon, nameof(MultipleFilesIcon), size);
 
+    public static BitmapSource GetEnterFolderIcon(int size) =>
+        GetSpecialIcon(EnterFolderIcon, nameof(EnterFolderIcon), size);
+
     public static BitmapSource GetSearchIcon(int size) =>
         GetSpecialIcon(SearchIcon, nameof(SearchIcon), size);
 

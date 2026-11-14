@@ -208,7 +208,10 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     public void ClearTransportRoutes()
     {
         foreach (var id in _absorbedIds.Prepend(ID))
+        {
+            AdbService.ReleaseSyncConnections(id);
             AdbService.RemoveTransportRoute(id);
+        }
     }
 
     public bool Matches(string? id)
