@@ -8,12 +8,6 @@ namespace ADB_Explorer.Services;
 
 public sealed partial class DeviceMount
 {
-    private static readonly char[] WINDOWS_INVALID_NAME_CHARS = ['<', '>', ':', '"', '\\', '|', '?', '*'];
-
-    private static readonly string[] WINDOWS_RESERVED_NAMES =
-        ["CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
-         "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"];
-
     private readonly ConcurrentDictionary<CF_TRANSFER_KEY, FetchCancellation> _fetches = new();
 
     /// <summary>The flag a synchronous pull checks between chunks.</summary>
@@ -22,58 +16,42 @@ public sealed partial class DeviceMount
         public bool IsCancelled;
     }
 
-    private void OnFetchPlaceholders(in CF_CALLBACK_INFO info, in CF_CALLBACK_PARAMETERS parameters)
-    {
-        var opInfo = OperationInfo(info, CF_OPERATION_TYPE.CF_OPERATION_TYPE_TRANSFER_PLACEHOLDERS);
-        var devicePath = ToDevicePath(info.VolumeDosName + info.NormalizedPath);
-
-        List<FileStat> entries = [];
-        NTStatus status = NTStatus.STATUS_SUCCESS;
-        try
-        {
-            if (devicePath is null)
-                status = NTStatus.STATUS_OBJECT_PATH_NOT_FOUND;
-            else
-                entries = MountableEntries(AdbService.ListDirectoryEntries(DeviceId, devicePath, CancellationToken.None));
-        }
-        catch (Exception e)
-        {
-#if !DEPLOY
-            DebugLog.PrintLine($"Mount listing of {devicePath} failed: {e.Message}");
-#endif
-            status = NTStatus.STATUS_UNSUCCESSFUL;
-            entries = [];
-        }
-
-        TransferPlaceholders(opInfo, entries, status);
-    }
-
     /// <summary>
-    /// Folders and regular files whose names Windows can hold, without case-insensitive duplicates (first one wins).
-    /// The app's recycle bin is left out, as are links, sockets and devices for now.
+    /// Folders and regular files. Where <paramref name="mapNames"/>, under their Windows names (<see cref="FileNameEncoding"/>),
+    /// and a name differing from an earlier one only in case gets a spelling Windows tells apart; elsewhere names Windows refuses
+    /// are left out. The app's recycle bin is left out too, as are links, sockets and devices.
     /// </summary>
-    private static List<FileStat> MountableEntries(IEnumerable<FileStat> entries)
+    private sealed class MountableFilter(bool mapNames)
     {
-        var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _names = new(StringComparer.OrdinalIgnoreCase);
 
-        return [.. entries.Where(e => e.Type is FileType.Folder or FileType.File
-                                      && !e.IsLink
-                                      && !FileHelper.IsInTrash(e.FullPath)
-                                      && IsValidWindowsName(e.FullName)
-                                      && names.Add(e.FullName))];
-    }
+        public FileStat? Map(FileStat entry)
+        {
+            if (entry.Type is not (FileType.Folder or FileType.File) || entry.IsLink || FileHelper.IsInTrash(entry.FullPath))
+                return null;
 
-    private static bool IsValidWindowsName(string name)
-    {
-        if (name.IndexOfAny(WINDOWS_INVALID_NAME_CHARS) >= 0 || name.Any(char.IsControl))
-            return false;
+            if (!mapNames)
+            {
+                if (FileNameEncoding.IsValidWindowsName(entry.FullName) && _names.Add(entry.FullName))
+                    return entry;
 
-        if (name.EndsWith('.') || name.EndsWith(' '))
-            return false;
+                return null;
+            }
 
-        var stem = name.Split('.')[0];
+            if (FileNameEncoding.ToWindows(entry.FullName) is not { } name)
+                return null;
 
-        return !WINDOWS_RESERVED_NAMES.Contains(stem, StringComparer.OrdinalIgnoreCase);
+            if (_names.Add(name))
+                return entry with { FullName = name };
+
+            foreach (var variant in FileNameEncoding.CaseVariants(name))
+            {
+                if (_names.Add(variant))
+                    return entry with { FullName = variant };
+            }
+
+            return null;
+        }
     }
 
     /// <summary>
@@ -87,61 +65,72 @@ public sealed partial class DeviceMount
     ];
 
     private static void OnFetchPlaceholdersForCleanup(in CF_CALLBACK_INFO info, in CF_CALLBACK_PARAMETERS parameters)
-        => TransferPlaceholders(OperationInfo(info, CF_OPERATION_TYPE.CF_OPERATION_TYPE_TRANSFER_PLACEHOLDERS), [], NTStatus.STATUS_SUCCESS);
+        => TransferPlaceholders(OperationInfo(info, CF_OPERATION_TYPE.CF_OPERATION_TYPE_TRANSFER_PLACEHOLDERS), [], NTStatus.STATUS_SUCCESS, true);
 
-    private static void TransferPlaceholders(CF_OPERATION_INFO opInfo, List<FileStat> entries, NTStatus status)
+    /// <summary>
+    /// Files need an identity, but hydration finds the device path from the placeholder's own path.
+    /// A long identity (the device path, past ~130 bytes) corrupts the placeholders after it in the batch.
+    /// </summary>
+    private static readonly IntPtr PLACEHOLDER_IDENTITY = Marshal.StringToHGlobalAnsi(""); // a single zero byte, for the app's lifetime
+
+    private static CF_PLACEHOLDER_CREATE_INFO CreateInfo(FileStat entry) => CreateInfo(entry, 0);
+
+    private static CF_PLACEHOLDER_CREATE_INFO CreateInfo(FileStat entry, FileFlagsAndAttributes extraAttributes)
+    {
+        var time = (entry.ModifiedTime ?? DateTime.Now).ToFileTimeStruct();
+        var isFolder = entry.Type is FileType.Folder;
+        var attributes = FileFlagsAndAttributes.FILE_ATTRIBUTE_DIRECTORY | extraAttributes;
+        if (!isFolder)
+            attributes = FileFlagsAndAttributes.FILE_ATTRIBUTE_READONLY | extraAttributes;
+
+        // Dot entries, which Android (and the app, unless shown) treats as hidden
+        if (FilePath.IsHiddenName(entry.FullName))
+            attributes |= FileFlagsAndAttributes.FILE_ATTRIBUTE_HIDDEN;
+
+        return new()
+        {
+            RelativeFileName = entry.FullName,
+            FileIdentity = PLACEHOLDER_IDENTITY,
+            FileIdentityLength = 1,
+            Flags = CF_PLACEHOLDER_CREATE_FLAGS.CF_PLACEHOLDER_CREATE_FLAG_MARK_IN_SYNC,
+            FsMetadata = new CF_FS_METADATA
+            {
+                FileSize = isFolder ? 0 : entry.Size ?? 0,
+                BasicInfo = new Kernel32.FILE_BASIC_INFO
+                {
+                    FileAttributes = attributes,
+                    CreationTime = time,
+                    LastWriteTime = time,
+                    LastAccessTime = time,
+                    ChangeTime = time,
+                },
+            },
+        };
+    }
+
+    /// <param name="isComplete">Every child is in, so the folder needn't be asked for again.</param>
+    private static void TransferPlaceholders(CF_OPERATION_INFO opInfo, List<FileStat> entries, NTStatus status, bool isComplete,
+                                             FileFlagsAndAttributes extraAttributes = 0)
     {
         var size = Marshal.SizeOf<CF_PLACEHOLDER_CREATE_INFO>();
         var array = entries.Count > 0 ? Marshal.AllocHGlobal(size * entries.Count) : IntPtr.Zero;
-        List<IntPtr> identities = [];
         var written = 0;
 
         try
         {
             foreach (var entry in entries)
             {
-                // A file's identity is its device path, which hydration reads back
-                var identity = Marshal.StringToHGlobalUni(entry.FullPath);
-                identities.Add(identity);
-
-                var time = (entry.ModifiedTime ?? DateTime.Now).ToFileTimeStruct();
-                var isFolder = entry.Type is FileType.Folder;
-                var attributes = FileFlagsAndAttributes.FILE_ATTRIBUTE_DIRECTORY;
-                if (!isFolder)
-                    attributes = FileFlagsAndAttributes.FILE_ATTRIBUTE_READONLY;
-
-                // Dot entries, which Android (and the app, unless shown) treats as hidden
-                if (FilePath.IsHiddenName(entry.FullName))
-                    attributes |= FileFlagsAndAttributes.FILE_ATTRIBUTE_HIDDEN;
-
-                var create = new CF_PLACEHOLDER_CREATE_INFO
-                {
-                    RelativeFileName = entry.FullName,
-                    FileIdentity = identity,
-                    FileIdentityLength = (uint)((entry.FullPath.Length + 1) * sizeof(char)),
-                    Flags = CF_PLACEHOLDER_CREATE_FLAGS.CF_PLACEHOLDER_CREATE_FLAG_MARK_IN_SYNC,
-                    FsMetadata = new CF_FS_METADATA
-                    {
-                        FileSize = isFolder ? 0 : entry.Size ?? 0,
-                        BasicInfo = new Kernel32.FILE_BASIC_INFO
-                        {
-                            FileAttributes = attributes,
-                            CreationTime = time,
-                            LastWriteTime = time,
-                            LastAccessTime = time,
-                            ChangeTime = time,
-                        },
-                    },
-                };
-
-                Marshal.StructureToPtr(create, array + (written * size), false);
+                Marshal.StructureToPtr(CreateInfo(entry, extraAttributes), array + (written * size), false);
                 written++;
             }
 
+            var flags = CF_OPERATION_TRANSFER_PLACEHOLDERS_FLAGS.CF_OPERATION_TRANSFER_PLACEHOLDERS_FLAG_NONE;
+            if (isComplete)
+                flags = CF_OPERATION_TRANSFER_PLACEHOLDERS_FLAGS.CF_OPERATION_TRANSFER_PLACEHOLDERS_FLAG_DISABLE_ON_DEMAND_POPULATION;
+
             var opParams = CF_OPERATION_PARAMETERS.Create(new CF_OPERATION_PARAMETERS.TRANSFERPLACEHOLDERS
             {
-                // Every child is listed at once, so the folder needn't be asked for again
-                Flags = CF_OPERATION_TRANSFER_PLACEHOLDERS_FLAGS.CF_OPERATION_TRANSFER_PLACEHOLDERS_FLAG_DISABLE_ON_DEMAND_POPULATION,
+                Flags = flags,
                 CompletionStatus = status,
                 PlaceholderTotalCount = entries.Count,
                 PlaceholderArray = array,
@@ -159,9 +148,6 @@ public sealed partial class DeviceMount
             for (var i = 0; i < written; i++)
                 Marshal.DestroyStructure<CF_PLACEHOLDER_CREATE_INFO>(array + (i * size));
 
-            foreach (var identity in identities)
-                Marshal.FreeHGlobal(identity);
-
             if (array != IntPtr.Zero)
                 Marshal.FreeHGlobal(array);
         }
@@ -171,7 +157,7 @@ public sealed partial class DeviceMount
     {
         // The callback's buffers only live until it returns, so copy what the pull needs
         var opInfo = OperationInfo(info, CF_OPERATION_TYPE.CF_OPERATION_TYPE_TRANSFER_DATA);
-        var devicePath = Marshal.PtrToStringUni(info.FileIdentity);
+        var devicePath = ToDevicePath(info.VolumeDosName + info.NormalizedPath);
         var fileSize = info.FileSize;
         var fetch = parameters.FetchData;
         var cancellation = new FetchCancellation();
@@ -236,21 +222,6 @@ public sealed partial class DeviceMount
     {
         foreach (var cancellation in _fetches.Values)
             Volatile.Write(ref cancellation.IsCancelled, true);
-    }
-
-    // Read-only for now: the device keeps its files as they are
-    private void OnNotifyDelete(in CF_CALLBACK_INFO info, in CF_CALLBACK_PARAMETERS parameters)
-    {
-        var opInfo = OperationInfo(info, CF_OPERATION_TYPE.CF_OPERATION_TYPE_ACK_DELETE);
-        var opParams = CF_OPERATION_PARAMETERS.Create(new CF_OPERATION_PARAMETERS.ACKDELETE { CompletionStatus = NTStatus.STATUS_ACCESS_DENIED });
-        CfExecute(opInfo, ref opParams);
-    }
-
-    private void OnNotifyRename(in CF_CALLBACK_INFO info, in CF_CALLBACK_PARAMETERS parameters)
-    {
-        var opInfo = OperationInfo(info, CF_OPERATION_TYPE.CF_OPERATION_TYPE_ACK_RENAME);
-        var opParams = CF_OPERATION_PARAMETERS.Create(new CF_OPERATION_PARAMETERS.ACKRENAME { CompletionStatus = NTStatus.STATUS_ACCESS_DENIED });
-        CfExecute(opInfo, ref opParams);
     }
 
     private static CF_OPERATION_INFO OperationInfo(in CF_CALLBACK_INFO info, CF_OPERATION_TYPE type) => new()

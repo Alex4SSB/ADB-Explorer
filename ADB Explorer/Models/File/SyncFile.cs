@@ -248,7 +248,7 @@ public class SyncFile : FilePath
     {
         SyncFile copy = new(syncFile);
 
-        copy.UpdatePath(FileHelper.ConcatPaths(windowsPath, syncFile.FullName, '\\'));
+        copy.UpdatePath(FileHelper.ConcatPaths(windowsPath, FileHelper.WindowsTargetName(syncFile.FullName), '\\'));
         copy.PathType = FilePathType.Windows;
 
         return copy;

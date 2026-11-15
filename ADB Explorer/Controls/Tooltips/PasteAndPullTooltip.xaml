@@ -102,6 +102,30 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionRenamedOnTarget}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.SelectedItemsCount}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <local:WarningIcon />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_SELECTED_RENAMED}}"
+                        TextWrapping="Wrap" />
+                </Grid>
+                <Grid d:Visibility="Visible">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
                                 <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionIllegalOnWinRoot}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
@@ -225,6 +249,27 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsPastingRenamed}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <local:WarningIcon />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_COPIED_RENAMED}}"
+                        TextWrapping="Wrap" />
+                </Grid>
+                <Grid d:Visibility="Visible">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
                                 <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsRegularItem}" Value="True">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
@@ -268,6 +313,8 @@
                             <Condition Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionIllegalOnWinRoot}" Value="False" />
                             <Condition Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionConflictingNames}" Value="False" />
                             <Condition Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsPastingConflictingNames}" Value="False" />
+                            <Condition Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsSelectionRenamedOnTarget}" Value="False" />
+                            <Condition Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsPastingRenamed}" Value="False" />
                             <Condition Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsRegularItem}" Value="True" />
                         </MultiDataTrigger.Conditions>
                         <Setter Property="Visibility" Value="Collapsed" />
@@ -282,6 +329,9 @@
                         <Setter Property="Visibility" Value="Visible" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsPastingConflictingNames}" Value="True">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsPastingRenamed}" Value="True">
                         <Setter Property="Visibility" Value="Visible" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Source={StaticResource ActionsProxy}, Path=Data.IsExplorerVisible}" Value="False">

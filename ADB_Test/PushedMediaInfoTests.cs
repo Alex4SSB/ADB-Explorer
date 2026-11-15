@@ -16,6 +16,8 @@ namespace ADB_Test;
 [TestClass]
 public class PushedMediaInfoTests
 {
+    private static string N(string name) => TestNames.Pseudo(name);
+
     [TestMethod]
     public void PushedMedia_PerceivedTypes()
     {
@@ -32,22 +34,28 @@ public class PushedMediaInfoTests
         var local = Directory.CreateTempSubdirectory("ADB Explorer media ").FullName;
         try
         {
-            Directory.CreateDirectory(Path.Combine(local, "Trip", "Day 1"));
-            File.WriteAllBytes(Path.Combine(local, "Trip", "Day 1", "a.jpg"), []);
-            File.WriteAllBytes(Path.Combine(local, "Trip", "notes.txt"), []);
-            File.WriteAllBytes(Path.Combine(local, "Trip", "b.mp4"), []);
+            // Pseudo-accented names, with an emoji, to cover non-ASCII names end to end
+            var trip = N("Trip");
+            var day = N("Day 1");
+            var a = N("a.jpg");
+            var b = N("b.mp4");
+            var notes = N("notes.txt");
+            Directory.CreateDirectory(Path.Combine(local, trip, day));
+            File.WriteAllBytes(Path.Combine(local, trip, day, a), []);
+            File.WriteAllBytes(Path.Combine(local, trip, notes), []);
+            File.WriteAllBytes(Path.Combine(local, trip, b), []);
 
-            var files = PushedMediaFiles(Path.Combine(local, "Trip"), "/sdcard/DCIM/Trip", isDirectory: true)
+            var files = PushedMediaFiles(Path.Combine(local, trip), $"/sdcard/DCIM/{trip}", isDirectory: true)
                 .Select(file => file.Remote)
                 .Order(StringComparer.Ordinal)
                 .ToArray();
 
-            CollectionAssert.AreEqual(new[] { "/sdcard/DCIM/Trip/Day 1/a.jpg", "/sdcard/DCIM/Trip/b.mp4" }, files);
+            CollectionAssert.AreEqual(new[] { $"/sdcard/DCIM/{trip}/{day}/{a}", $"/sdcard/DCIM/{trip}/{b}" }.Order(StringComparer.Ordinal).ToArray(), files);
 
             // A single file is itself, when it's media
-            var single = Path.Combine(local, "Trip", "b.mp4");
-            Assert.AreEqual((single, "/sdcard/b.mp4"), PushedMediaFiles(single, "/sdcard/b.mp4", isDirectory: false).Single());
-            Assert.IsFalse(PushedMediaFiles(Path.Combine(local, "Trip", "notes.txt"), "/sdcard/notes.txt", isDirectory: false).Any());
+            var single = Path.Combine(local, trip, b);
+            Assert.AreEqual((single, $"/sdcard/{b}"), PushedMediaFiles(single, $"/sdcard/{b}", isDirectory: false).Single());
+            Assert.IsFalse(PushedMediaFiles(Path.Combine(local, trip, notes), $"/sdcard/{notes}", isDirectory: false).Any());
 
             // A folder in a zip or on a phone has no files here
             Assert.IsFalse(PushedMediaFiles(@"::{phone}\DCIM", "/sdcard/DCIM", isDirectory: true).Any());
@@ -64,7 +72,7 @@ public class PushedMediaInfoTests
         var local = Directory.CreateTempSubdirectory("ADB Explorer media ").FullName;
         try
         {
-            var photo = Path.Combine(local, "photo.jpg");
+            var photo = Path.Combine(local, N("photo.jpg"));
             WriteJpeg(photo, 40, 30, fNumber: (18, 10), iso: 200, exposure: (1, 125));
 
             var info = ReadMediaInfo(photo);
@@ -77,7 +85,7 @@ public class PushedMediaInfoTests
             Assert.AreEqual(1 / 125d, info.Value.ExposureTime!.Value, 0.0001);
 
             // What's not media isn't read
-            var text = Path.Combine(local, "notes.txt");
+            var text = Path.Combine(local, N("notes.txt"));
             File.WriteAllText(text, "notes");
             Assert.IsNull(ReadMediaInfo(text));
         }

@@ -29,7 +29,10 @@ namespace ADB_Test;
 [DoNotParallelize]
 public class StreamingTransferTests
 {
-    private const string RemoteDir = "/sdcard/adb-explorer-test-stream";
+    // Pseudo-accented names, with an emoji, to cover non-ASCII names end to end
+    private static string N(string name) => TestNames.Pseudo(name);
+
+    private static readonly string RemoteDir = $"/sdcard/{N("adb-explorer-test-stream")}";
 
     private static DeviceData[] _devices = [];
 
@@ -197,7 +200,7 @@ public class StreamingTransferTests
     public void StreamingTransfer_CopiesFileBetweenDevices()
     {
         var (source, target) = RequireTwoDevices();
-        var file = $"{RemoteDir}/copy.bin";
+        var file = $"{RemoteDir}/{N("copy.bin")}";
         Shell(source, $"mkdir -p {RemoteDir} && head -c 33554437 /dev/urandom > {file} && touch -d '2020-01-02 03:04:05' {file}");
         Shell(target, $"rm -rf {RemoteDir}; mkdir -p {RemoteDir}");
 
@@ -220,7 +223,7 @@ public class StreamingTransferTests
     public void StreamingTransfer_MissingSourceFailsWithoutTarget()
     {
         var (source, target) = RequireTwoDevices();
-        var file = $"{RemoteDir}/missing.bin";
+        var file = $"{RemoteDir}/{N("missing.bin")}";
         Shell(source, $"rm -rf {RemoteDir}");
         Shell(target, $"rm -rf {RemoteDir}; mkdir -p {RemoteDir}");
 
@@ -241,7 +244,7 @@ public class StreamingTransferTests
     public void StreamingTransfer_CancelLeavesNoPartialFile()
     {
         var (source, target) = RequireTwoDevices();
-        var file = $"{RemoteDir}/cancel.bin";
+        var file = $"{RemoteDir}/{N("cancel.bin")}";
         Shell(source, $"mkdir -p {RemoteDir} && head -c 536870912 /dev/urandom > {file}");
         Shell(target, $"rm -rf {RemoteDir}; mkdir -p {RemoteDir}");
 

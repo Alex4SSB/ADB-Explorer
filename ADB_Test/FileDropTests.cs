@@ -35,11 +35,14 @@ public class FileDropTests
         Data.Settings = new AppSettings { KillAdbOnExit = false };
     }
 
+    // Real files get pseudo-accented names, with an emoji, to cover non-ASCII names end to end
+    private static string N(string name) => TestNames.Pseudo(name);
+
     [TestMethod]
     public void FileDrop_AcceptedWhenFilesExist()
     {
         var local = NewDir();
-        var existing = Path.Combine(local, "attachment.pdf");
+        var existing = Path.Combine(local, N("attachment.pdf"));
         File.WriteAllBytes(existing, [1, 2, 3]);
 
         try
@@ -48,7 +51,7 @@ public class FileDropTests
             CollectionAssert.AreEqual(new[] { existing }, CopyPasteService.GetExistingDropFiles(dropped));
 
             // A target-detect source names a file it only creates once it sees the drop target
-            var targetDetect = new DataObject(DataFormats.FileDrop, new[] { existing, Path.Combine(local, "later", "file.txt") });
+            var targetDetect = new DataObject(DataFormats.FileDrop, new[] { existing, Path.Combine(local, N("later"), N("file.txt")) });
             Assert.IsNull(CopyPasteService.GetExistingDropFiles(targetDetect));
         }
         finally
@@ -62,11 +65,11 @@ public class FileDropTests
     {
         // As 7-Zip leaves them at the drop: extracted to %TEMP%\7zE*, which it deletes once the drop returns
         var sevenZipTemp = Path.Combine(Path.GetTempPath(), $"7zE{Random.Shared.Next():X8}");
-        var file = Path.Combine(sevenZipTemp, "doc.txt");
-        var folder = Path.Combine(sevenZipTemp, "dir");
-        Directory.CreateDirectory(Path.Combine(folder, "sub"));
+        var file = Path.Combine(sevenZipTemp, N("doc.txt"));
+        var folder = Path.Combine(sevenZipTemp, N("dir"));
+        Directory.CreateDirectory(Path.Combine(folder, N("sub")));
         File.WriteAllText(file, "hello");
-        File.WriteAllText(Path.Combine(folder, "sub", "a.txt"), "a");
+        File.WriteAllText(Path.Combine(folder, N("sub"), N("a.txt")), "a");
 
         string? staging = null;
         try
@@ -77,7 +80,7 @@ public class FileDropTests
             Assert.IsNotNull(staging);
             Assert.IsFalse(File.Exists(file) || Directory.Exists(folder), "Moved, not copied");
             Assert.AreEqual("hello", File.ReadAllText(dropped[0]));
-            Assert.AreEqual("a", File.ReadAllText(Path.Combine(dropped[1], "sub", "a.txt")));
+            Assert.AreEqual("a", File.ReadAllText(Path.Combine(dropped[1], N("sub"), N("a.txt"))));
             Assert.IsTrue(dropped.All(path => path.StartsWith(staging, StringComparison.OrdinalIgnoreCase)));
         }
         finally
@@ -114,11 +117,11 @@ public class FileDropTests
     {
         // At the drop WinRAR extracts to %TEMP%\Rar$DRa<pid>.<n>.rartemp and names the files there; it removes them when it closes
         var winRarTemp = Path.Combine(Path.GetTempPath(), $"Rar$DRa{Random.Shared.Next(100000)}.{Random.Shared.Next(100000)}.rartemp");
-        var file = Path.Combine(winRarTemp, "top.txt");
-        var folder = Path.Combine(winRarTemp, "folder");
-        Directory.CreateDirectory(Path.Combine(folder, "sub"));
+        var file = Path.Combine(winRarTemp, N("top.txt"));
+        var folder = Path.Combine(winRarTemp, N("folder"));
+        Directory.CreateDirectory(Path.Combine(folder, N("sub")));
         File.WriteAllText(file, "top");
-        File.WriteAllText(Path.Combine(folder, "sub", "b.txt"), "b");
+        File.WriteAllText(Path.Combine(folder, N("sub"), N("b.txt")), "b");
 
         string? staging = null;
         try
@@ -129,7 +132,7 @@ public class FileDropTests
             Assert.IsNotNull(staging);
             Assert.IsFalse(File.Exists(file) || Directory.Exists(folder), "Moved, not copied");
             Assert.AreEqual("top", File.ReadAllText(dropped[0]));
-            Assert.AreEqual("b", File.ReadAllText(Path.Combine(dropped[1], "sub", "b.txt")));
+            Assert.AreEqual("b", File.ReadAllText(Path.Combine(dropped[1], N("sub"), N("b.txt"))));
         }
         finally
         {
@@ -143,7 +146,7 @@ public class FileDropTests
     public void FileDrop_OtherSourcesKeepTheirFiles()
     {
         var local = NewDir();
-        var file = Path.Combine(local, "kept.txt");
+        var file = Path.Combine(local, N("kept.txt"));
         File.WriteAllText(file, "kept");
 
         try
@@ -162,7 +165,7 @@ public class FileDropTests
     {
         // 7-Zip offers its format for files dragged from a regular folder too, and those are the user's own
         var local = NewDir();
-        var file = Path.Combine(local, "mine.txt");
+        var file = Path.Combine(local, N("mine.txt"));
         File.WriteAllText(file, "mine");
 
         try
@@ -187,12 +190,12 @@ public class FileDropTests
     public void FileDrop_PathsSteppingUpAreRefused()
     {
         var local = NewDir();
-        var file = Path.Combine(local, "kept.txt");
-        Directory.CreateDirectory(Path.Combine(local, "sub"));
+        var file = Path.Combine(local, N("kept.txt"));
+        Directory.CreateDirectory(Path.Combine(local, N("sub")));
         File.WriteAllText(file, "kept");
 
         // Exists, but names a folder above the one it's in
-        var steppingUp = Path.Combine(local, "sub", "..", "kept.txt");
+        var steppingUp = Path.Combine(local, N("sub"), "..", N("kept.txt"));
 
         try
         {
@@ -232,7 +235,7 @@ public class FileDropTests
     public void FileDrop_ExistingFilesAreNamed()
     {
         var local = NewDir();
-        var file = Path.Combine(local, "kept.txt");
+        var file = Path.Combine(local, N("kept.txt"));
         File.WriteAllText(file, "kept");
 
         try
@@ -257,7 +260,7 @@ public class FileDropTests
 
         try
         {
-            var source = new ChromiumLikeSource(Path.Combine(local, "attachment.pdf"));
+            var source = new ChromiumLikeSource(Path.Combine(local, N("attachment.pdf")));
 
             // What WPF's drop target hands a drop handler
             var wrapped = new DataObject(source);

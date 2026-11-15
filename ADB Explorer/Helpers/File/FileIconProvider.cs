@@ -290,6 +290,22 @@ public class FileIconProvider
         return GetSpecialIcon(DriveIcon, nameof(DriveIcon), size);
     }
 
+    /// <summary>
+    /// The DLL and icon index behind <see cref="GetDriveIcon"/> for a storage drive, as a desktop.ini IconResource names it.
+    /// Without the rotation some of them get here, which a desktop.ini can't express.
+    /// </summary>
+    public static (string DllPath, int Index) GetDriveIconResource(AbstractDrive.DriveType type)
+    {
+        var icon = type switch
+        {
+            AbstractDrive.DriveType.External => ExternalStorageIcon,
+            AbstractDrive.DriveType.Expansion or AbstractDrive.DriveType.Emulated => SdCardIcon,
+            _ => DriveIcon,
+        };
+
+        return (Path.Combine(Environment.SystemDirectory, icon.DllPath!), icon.Index);
+    }
+
     public static BitmapSource GetMultipleFilesIcon(int size) =>
         GetSpecialIcon(MultipleFilesIcon, nameof(MultipleFilesIcon), size);
 

@@ -11,14 +11,12 @@ using static Vanara.PInvoke.CldApi;
 namespace ADB_Explorer.Services;
 
 /// <summary>
-/// A device's storage as a Cloud Files sync root: a folder in File Explorer (with a navigation pane entry) whose folders
-/// are listed from the device on first browse and whose files are pulled on open. Read-only: deletes and renames are refused.
+/// A device's drives as a Cloud Files sync root: a folder in File Explorer (with a navigation pane entry), holding a folder
+/// per drive, whose folders are listed from the device on first browse and whose files are pulled on open.
 /// </summary>
 public sealed partial class DeviceMount : IDisposable
 {
     private const string PROVIDER_ID = "ADBExplorer";
-
-    private const string DEVICE_ROOT = "/sdcard";
 
     // Folders: not populated yet. Files: dehydrated, or hydrated (a cloud reparse point)
     private const FileAttributes RECALL_ON_OPEN = (FileAttributes)0x40000;
@@ -42,8 +40,14 @@ public sealed partial class DeviceMount : IDisposable
     {
         Device = device;
         LocalRoot = localRoot;
-        SyncRootId = $"{PROVIDER_ID}!{WindowsIdentity.GetCurrent().User}!{SanitizeIdPart(device.ID)}";
+        SyncRootId = SyncRootIdOf(device);
+        _drives = DriveFolders(device);
     }
+
+    private readonly List<MountedDrive> _drives;
+
+    private static string SyncRootIdOf(LogicalDeviceViewModel device)
+        => $"{PROVIDER_ID}!{WindowsIdentity.GetCurrent().User}!{SanitizeIdPart(device.ID)}";
 
     /// <summary>The single mounted device, if any.</summary>
     public static DeviceMount? Current { get; private set; }
@@ -67,7 +71,7 @@ public sealed partial class DeviceMount : IDisposable
             {
                 Current?.Dispose();
                 Current = null;
-                Current = StartInFreeFolder(device);
+                Current = StartMount(device);
             }
 
             return Current.ToLocalPath(devicePath);
@@ -77,20 +81,50 @@ public sealed partial class DeviceMount : IDisposable
     private const int MAX_FOLDER_ATTEMPTS = 5;
 
     /// <summary>
-    /// Mounts in the device's folder, or the next one ("Name (2)"…) while a folder holds what can't be cleared,
-    /// such as placeholders orphaned by an earlier version: those would stand in for the device's own entries.
+    /// Mounts where the device is still registered from before, else in a free folder. A registration is never moved
+    /// to another folder while placeholders remain in its own: that would orphan them, beyond any removal.
     /// </summary>
-    private static DeviceMount StartInFreeFolder(LogicalDeviceViewModel device)
+    private static DeviceMount StartMount(LogicalDeviceViewModel device)
     {
-        var name = SanitizeFileName(device.Name);
+        var folder = RegisteredFolder(SyncRootIdOf(device)) ?? FreeFolder(device);
         for (var attempt = 1; ; attempt++)
         {
-            var folder = Path.Combine(MountsFolder, attempt == 1 ? name : $"{name} ({attempt})");
             var mount = new DeviceMount(device, folder);
-            if (mount.Start(requireEmpty: attempt < MAX_FOLDER_ATTEMPTS))
+
+            // Orphaned placeholders would stand in for the device's own entries: those leave for a free folder
+            if (mount.Start(allowOrphans: attempt == MAX_FOLDER_ATTEMPTS))
                 return mount;
 
-            mount.Dispose();
+            folder = FreeFolder(device);
+        }
+    }
+
+    private static string? RegisteredFolder(string syncRootId)
+    {
+        try
+        {
+            return StorageProviderSyncRootManager.GetCurrentSyncRoots().FirstOrDefault(root => root.Id == syncRootId)?.Path.Path;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>The device's folder, or the next "Name (2)"… that doesn't exist or is empty.</summary>
+    private static string FreeFolder(LogicalDeviceViewModel device)
+    {
+        var name = SanitizeFileName(device.Name);
+        for (var number = 1; ; number++)
+        {
+            var folder = Path.Combine(MountsFolder, number == 1 ? name : $"{name} ({number})");
+            try
+            {
+                if (!Directory.Exists(folder) || !Directory.EnumerateFileSystemEntries(folder).Any())
+                    return folder;
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            { }
         }
     }
 
@@ -109,7 +143,11 @@ public sealed partial class DeviceMount : IDisposable
             if (localPath is not null)
             {
                 Process.Start("explorer.exe", localPath);
-                await Task.Run(() => WaitForExplorerWindow(localPath, TimeSpan.FromSeconds(10)));
+                await Task.Run(() =>
+                {
+                    if (WaitForExplorerWindow(localPath, TimeSpan.FromSeconds(10)) is { } window)
+                        Current?.MoveToNamespaceNode(window, localPath);
+                });
             }
 
             dialog.Hide();
@@ -144,16 +182,18 @@ public sealed partial class DeviceMount : IDisposable
     }
 
     /// <summary>Waits until a File Explorer window shows the folder, or the timeout passes.</summary>
-    private static void WaitForExplorerWindow(string localPath, TimeSpan timeout)
+    private static object? WaitForExplorerWindow(string localPath, TimeSpan timeout)
     {
         var watch = Stopwatch.StartNew();
         while (watch.Elapsed < timeout)
         {
-            if (ExplorerWindows().Any(window => PathsEqual(LocationOf(window), localPath)))
-                return;
+            if (ExplorerWindows().FirstOrDefault(window => PathsEqual(LocationOf(window), localPath)) is { } window)
+                return window;
 
             Thread.Sleep(200);
         }
+
+        return null;
     }
 
     private static bool PathsEqual(string? a, string b)
@@ -171,44 +211,18 @@ public sealed partial class DeviceMount : IDisposable
         }
     }
 
-    /// <summary>Whether a device folder is inside the mounted storage, and not left out of it like the recycle bin.</summary>
-    public static bool CanMount(string? devicePath)
-        => devicePath is not null
-        && (devicePath == DEVICE_ROOT || devicePath.StartsWith($"{DEVICE_ROOT}/"))
-        && !FileHelper.IsInTrash(devicePath);
-
-    /// <summary>The local path for a device path under the mounted root, or the root itself for any other path.</summary>
-    public string ToLocalPath(string devicePath)
-    {
-        if (!devicePath.StartsWith($"{DEVICE_ROOT}/"))
-            return LocalRoot;
-
-        var relative = devicePath[(DEVICE_ROOT.Length + 1)..].TrimEnd('/');
-
-        return Path.Combine(LocalRoot, relative.Replace('/', '\\'));
-    }
-
-    /// <summary>The device path for a full local path under <see cref="LocalRoot"/>, or null outside it.</summary>
-    private string? ToDevicePath(string localPath)
-    {
-        var relative = Path.GetRelativePath(LocalRoot, localPath);
-        if (relative == ".")
-            return DEVICE_ROOT;
-
-        if (relative.StartsWith("..") || Path.IsPathRooted(relative))
-            return null;
-
-        return FileHelper.ConcatPaths(DEVICE_ROOT, relative.Replace('\\', '/'));
-    }
-
-    /// <returns>False, unconnected, when <paramref name="requireEmpty"/> and something in the folder couldn't be cleared.</returns>
-    private bool Start(bool requireEmpty)
+    /// <returns>False, unregistered again, when the folder holds orphaned placeholders and those aren't allowed.</returns>
+    private bool Start(bool allowOrphans)
     {
         Directory.CreateDirectory(LocalRoot);
         Register();
 
-        // Leftovers of an earlier mount: placeholders outside a registered sync root can't even have their attributes changed
-        EmptySyncRoot(LocalRoot);
+        // Leftovers of an earlier mount; any still open elsewhere are this registration's own, and harmless
+        if (EmptySyncRoot(LocalRoot).HasOrphans && !allowOrphans)
+        {
+            Unregister();
+            return false;
+        }
 
         _callbacks =
         [
@@ -220,16 +234,9 @@ public sealed partial class DeviceMount : IDisposable
             CF_CALLBACK_REGISTRATION.CF_CALLBACK_REGISTRATION_END,
         ];
 
-        CfConnectSyncRoot(LocalRoot, _callbacks, default, CF_CONNECT_FLAGS.CF_CONNECT_FLAG_NONE, out var key).ThrowIfFailed();
+        // Hydration finds the device file by the placeholder's path, which data fetches only get with this flag
+        CfConnectSyncRoot(LocalRoot, _callbacks, default, CF_CONNECT_FLAGS.CF_CONNECT_FLAG_REQUIRE_FULL_FILE_PATH, out var key).ThrowIfFailed();
         _connectionKey = key;
-
-        // Listed while connected, which the provider's own I/O never triggers a fetch for: only what's really on disk
-        if (requireEmpty && Directory.EnumerateFileSystemEntries(LocalRoot).Any())
-        {
-            CfDisconnectSyncRoot(key);
-            _connectionKey = null;
-            return false;
-        }
 
         return true;
     }
@@ -311,6 +318,7 @@ public sealed partial class DeviceMount : IDisposable
     public void Dispose()
     {
         CloseExplorerWindows();
+        StopPopulating();
         CancelAllFetches();
 
         if (_connectionKey is { } key)
@@ -321,9 +329,18 @@ public sealed partial class DeviceMount : IDisposable
 
         // Disconnected, so these deletes aren't refused by our own callback.
         // Any left (e.g. still open in an app) keep the registration, for the next startup's cleanup to finish
-        if (!EmptySyncRoot(LocalRoot))
+        if (EmptySyncRoot(LocalRoot).IsBlocked)
             return;
 
+        Unregister();
+
+        // Left in place when it holds files of the user's own
+        DeleteIfEmpty(LocalRoot);
+        DeleteIfEmpty(MountsFolder);
+    }
+
+    private void Unregister()
+    {
         try
         {
             if (_registeredWithShell)
@@ -337,10 +354,6 @@ public sealed partial class DeviceMount : IDisposable
             DebugLog.PrintLine($"Sync root unregistration failed: {e.Message}");
 #endif
         }
-
-        // Left in place when it holds files of the user's own
-        DeleteIfEmpty(LocalRoot);
-        DeleteIfEmpty(MountsFolder);
     }
 
     /// <summary>Closes the File Explorer windows showing this mount, which would otherwise be left on a removed folder.</summary>
@@ -398,8 +411,6 @@ public sealed partial class DeviceMount : IDisposable
         }
     }
 
-    private bool IsUnderRoot(string? path) => !string.IsNullOrEmpty(path) && ToDevicePath(path) is not null;
-
     /// <summary>Unregisters sync roots a previous run left behind (e.g. after a crash) and clears their placeholders.</summary>
     public static void CleanUpStaleMounts()
     {
@@ -422,7 +433,7 @@ public sealed partial class DeviceMount : IDisposable
                     continue;
 
                 // Kept registered while any placeholder is left, so a later run can still remove it
-                if (!EmptySyncRoot(path))
+                if (EmptySyncRoot(path).IsBlocked)
                     continue;
 
                 StorageProviderSyncRootManager.Unregister(root.Id);
@@ -450,15 +461,35 @@ public sealed partial class DeviceMount : IDisposable
         { }
     }
 
+    /// <summary>What a cleanup left: placeholders it couldn't delete yet (e.g. open elsewhere), or orphaned ones it never can.</summary>
+    private sealed class CleanupResult
+    {
+        /// <summary>A placeholder of the registration is left: unregistering now would orphan it.</summary>
+        public bool IsBlocked { get; set; }
+
+        /// <summary>Placeholders whose registration was gone before: no registration can remove them.</summary>
+        public bool HasOrphans { get; set; }
+
+        public void Record(Exception e)
+        {
+            if ((e.HResult & 0xFFFF) == ERROR_CLOUD_FILE_METADATA_CORRUPT)
+                HasOrphans = true;
+            else
+                IsBlocked = true;
+        }
+    }
+
+    private const int ERROR_CLOUD_FILE_METADATA_CORRUPT = 363;
+
     /// <summary>
     /// <see cref="RemovePlaceholders"/> in a registered sync root, with the cleanup provider connected:
     /// without a provider, folders that were never listed can't even be enumerated.
     /// </summary>
-    private static bool EmptySyncRoot(string folder)
+    private static CleanupResult EmptySyncRoot(string folder)
     {
         // Connected elsewhere (another instance of the app): leave it to that one
         if (CfConnectSyncRoot(folder, CleanupCallbacks, default, CF_CONNECT_FLAGS.CF_CONNECT_FLAG_NONE, out var key).Failed)
-            return false;
+            return new() { IsBlocked = true };
 
         try
         {
@@ -470,31 +501,32 @@ public sealed partial class DeviceMount : IDisposable
         }
     }
 
-    /// <summary>
-    /// Deletes placeholders (never the user's own files), and folders left empty by that. Returns whether none is left:
-    /// only then may the sync root be unregistered, as placeholders outside one can never be removed.
-    /// </summary>
-    private static bool RemovePlaceholders(string folder)
+    /// <summary>Deletes placeholders (never the user's own files), and folders left empty by that.</summary>
+    private static CleanupResult RemovePlaceholders(string folder)
     {
+        var result = new CleanupResult();
         if (!Directory.Exists(folder))
-            return true;
+            return result;
 
         // Placeholders are disguised as plain files by default, which would hide them among the user's own
         var previous = NativeMethods.RtlSetThreadPlaceholderCompatibilityMode(NativeMethods.PHCM_EXPOSE_PLACEHOLDERS);
         try
         {
-            return RemovePlaceholdersCore(folder);
+            RemovePlaceholdersCore(folder, result);
         }
         finally
         {
             if (previous >= 0)
                 NativeMethods.RtlSetThreadPlaceholderCompatibilityMode(previous);
         }
+
+        return result;
     }
 
-    private static bool RemovePlaceholdersCore(string folder)
+    /// <returns>Whether anything is left in the folder.</returns>
+    private static bool RemovePlaceholdersCore(string folder, CleanupResult result)
     {
-        var allRemoved = true;
+        var left = false;
         try
         {
             foreach (var entry in new DirectoryInfo(folder).EnumerateFileSystemInfos())
@@ -504,21 +536,36 @@ public sealed partial class DeviceMount : IDisposable
                 if (entry is DirectoryInfo dir)
                 {
                     // An unpopulated folder can't be enumerated without the provider, and has nothing of the user's
-                    if (!dir.Attributes.HasFlag(RECALL_ON_OPEN))
-                        allRemoved &= RemovePlaceholdersCore(dir.FullName);
+                    var innerLeft = !dir.Attributes.HasFlag(RECALL_ON_OPEN) && RemovePlaceholdersCore(dir.FullName, result);
 
-                    if (isPlaceholder)
-                        allRemoved &= TryDelete(() => dir.Delete(dir.Attributes.HasFlag(RECALL_ON_OPEN)));
+                    // Not emptied, its delete would only fail for what's inside, which was already accounted for
+                    if (innerLeft)
+                        left = true;
+                    else if (isPlaceholder)
+                    {
+                        // Drive folders are read-only, for their icon files to count
+                        left |= !TryDelete(() =>
+                        {
+                            dir.Attributes &= ~FileAttributes.ReadOnly;
+                            dir.Delete(dir.Attributes.HasFlag(RECALL_ON_OPEN));
+                        }, result);
+                    }
                     else if (!dir.EnumerateFileSystemInfos().Any())
-                        TryDelete(() => dir.Delete());
+                        TryDelete(() => dir.Delete(), new());
+                    else
+                        left = true;
                 }
                 else if (isPlaceholder)
                 {
-                    allRemoved &= TryDelete(() =>
+                    left |= !TryDelete(() =>
                     {
                         entry.Attributes &= ~FileAttributes.ReadOnly;
                         entry.Delete();
-                    });
+                    }, result);
+                }
+                else
+                {
+                    left = true;
                 }
             }
         }
@@ -527,17 +574,14 @@ public sealed partial class DeviceMount : IDisposable
 #if !DEPLOY
             DebugLog.PrintLine($"Placeholder cleanup of {folder} failed: {e.Message}");
 #endif
-            return (e.HResult & 0xFFFF) == ERROR_CLOUD_FILE_METADATA_CORRUPT;
+            result.Record(e);
+            return true;
         }
 
-        return allRemoved;
+        return left;
     }
 
-    // A placeholder whose sync root registration is gone: no registration can make it removable again
-    private const int ERROR_CLOUD_FILE_METADATA_CORRUPT = 363;
-
-    /// <summary>Whether the entry is gone, or can never be removed - so it needn't hold the registration back.</summary>
-    private static bool TryDelete(Action delete)
+    private static bool TryDelete(Action delete, CleanupResult result)
     {
         try
         {
@@ -549,7 +593,8 @@ public sealed partial class DeviceMount : IDisposable
 #if !DEPLOY
             DebugLog.PrintLine($"Placeholder delete failed: {e.Message}");
 #endif
-            return (e.HResult & 0xFFFF) == ERROR_CLOUD_FILE_METADATA_CORRUPT;
+            result.Record(e);
+            return false;
         }
     }
 

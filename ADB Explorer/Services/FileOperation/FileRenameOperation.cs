@@ -10,6 +10,10 @@ public class FileRenameOperation : AbstractShellFileOperation
         TargetPath = new(targetPath, FilePath.Type);
     }
 
+    private bool IsCaseOnlyRename
+        => FilePath.FullPath != TargetPath.FullPath
+        && string.Equals(FilePath.FullPath, TargetPath.FullPath, StringComparison.OrdinalIgnoreCase);
+
     public override void Start()
     {
         BeginInProgress();
@@ -42,6 +46,20 @@ public class FileRenameOperation : AbstractShellFileOperation
 
                 session.Finish();
             }, CancelTokenSource!.Token);
+        }
+        else if (IsCaseOnlyRename)
+        {
+            // Case-insensitive storage takes "a" and "A" for the same file, so mv leaves it be: go through a temporary name
+            var temporary = AdbService.EscapeAdbShellString($"{TargetPath.FullPath}.adbx-rename-{Guid.NewGuid():N}");
+            operationTask = AdbService.ExecuteVoidShellCommand(Device.ID,
+                CancelTokenSource!.Token,
+                "mv",
+                AdbService.EscapeAdbShellString(FilePath.FullPath),
+                temporary,
+                "&&",
+                "mv",
+                temporary,
+                AdbService.EscapeAdbShellString(TargetPath.FullPath));
         }
         else
         {

@@ -29,7 +29,7 @@ public class TransferSpeedTests
     private const long TotalBytes = 1024L * 1024 * 1024;
     private const long MinBytesPerFile = 4L * 1024 * 1024;
     private const long EightyKiB = 80L * 1024;
-    private const string DeviceRoot = $"{AdbExplorerConst.TEMP_PATH}/adb-explorer-speed-test";
+    private static readonly string DeviceRoot = $"{AdbExplorerConst.TEMP_PATH}/{TestNames.Pseudo("adb-explorer-speed-test")}";
     private const int WriteBufferSize = 1024 * 1024;
     private const string SyncV2Feature = "sendrecv_v2";
 
@@ -912,7 +912,8 @@ public class TransferSpeedTests
         return sizes;
     }
 
-    private static string FileName(int index) => $"bench_{index:D5}.bin";
+    // Pseudo-accented names, with an emoji, to cover non-ASCII names end to end
+    private static string FileName(int index) => TestNames.Pseudo($"bench_{index:D5}.bin");
 
     private static string FormatDop(int dop) => dop < 0 ? "∞" : dop.ToString();
 

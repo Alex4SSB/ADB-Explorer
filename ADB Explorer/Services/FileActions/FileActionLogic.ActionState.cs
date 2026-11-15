@@ -229,20 +229,36 @@ internal static partial class FileActionLogic
         actions.IsCurrentLocationReadOnly = (c.IsExplorerFolder || c.CanPasteIntoTar) && !pasteTargetWritable;
         actions.IsSelectionFuseProtectedAndroidRoot = c.HasFileSelection && c.FuseProtectedRoot;
 
-        actions.IsSelectionIllegalOnWindows = c.HasFileSelection
+        var illegalOnWindows = c.HasFileSelection
             && !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.Windows);
 
-        actions.IsSelectionIllegalNaming = !c.IsRecycleBin
+        var illegalNaming = !c.IsRecycleBin
             && !c.IsAppDrive
             && !c.IsArchive
             && c.HasFileSelection
             && !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.RestrictedNaming);
 
-        actions.IsSelectionIllegalOnWinRoot = c.HasFileSelection
-            && !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.WinRoot);
+        SetSelectionNaming(actions, selectedFiles, illegalOnWindows, illegalNaming);
 
         actions.IsSelectionConflictingNames = c.Restrictions.CaseInsensitiveNames
             && selectedFiles.Select(f => f.FullName).Distinct(StringComparer.InvariantCultureIgnoreCase).Count() != selectedFiles.Count();
+    }
+
+    /// <summary>
+    /// With names substituted, names Windows or a restricted drive refuses only rename the copies, so they don't block;
+    /// a Windows drive root still refuses its own reserved names, which nothing stands in for.
+    /// </summary>
+    internal static void SetSelectionNaming(FileActionsEnable actions, IEnumerable<FileClass> selectedFiles, bool illegalOnWindows, bool illegalNaming)
+    {
+        var substitute = FileHelper.SubstitutesIllegalNames;
+        actions.IsSelectionIllegalOnWindows = illegalOnWindows && !substitute;
+        actions.IsSelectionIllegalNaming = illegalNaming && !substitute;
+        actions.IsSelectionRenamedOnTarget = substitute && (illegalOnWindows || illegalNaming);
+
+        if (substitute)
+            actions.IsSelectionIllegalOnWinRoot = selectedFiles.Any(f => AdbExplorerConst.INVALID_WINDOWS_ROOT_PATHS.Contains(f.FullName));
+        else
+            actions.IsSelectionIllegalOnWinRoot = selectedFiles.Any() && !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.WinRoot);
     }
 
     private static void UpdatePackageActions(ActionContext c)

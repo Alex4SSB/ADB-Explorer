@@ -113,9 +113,18 @@ internal static partial class FileActionLogic
         return FileMergeHelper.FilterIdenticalPushTree(source, androidDest, deviceId);
     }
 
-    /// <summary>Where <paramref name="source"/> lands on the device, inside <paramref name="targetPath"/>.</summary>
-    private static SyncFile DestinationOf(SyncFile source, string targetPath)
-        => new(FileHelper.ConcatPaths(targetPath, source.FullName), source.IsDirectory ? FileType.Folder : FileType.File) { Size = source.Size };
+    /// <summary>
+    /// Where <paramref name="source"/> lands on the device, inside <paramref name="targetPath"/>: from another device,
+    /// under its name there (<see cref="FileHelper.DeviceTargetName"/>).
+    /// </summary>
+    private static SyncFile DestinationOf(SyncFile source, string targetPath, LogicalDeviceViewModel? targetDevice = null)
+    {
+        var name = source.FullName;
+        if (targetDevice is not null)
+            name = FileHelper.DeviceTargetName(name, DriveHelper.GetRestrictions(targetPath, targetDevice).RestrictedNaming);
+
+        return new(FileHelper.ConcatPaths(targetPath, name), source.IsDirectory ? FileType.Folder : FileType.File) { Size = source.Size };
+    }
 
     /// <summary>Items sharing a parent folder go in one op; an item alone in its folder gets its own.</summary>
     private static IEnumerable<IReadOnlyList<SyncFile>> GroupByParent(IEnumerable<SyncFile> items)
@@ -158,7 +167,7 @@ internal static partial class FileActionLogic
             if (!intoArchive && !IsArchiveMember(item.FullPath, sourceDevice.ID))
             {
                 var source = item.GetSyncFile(sourceDevice.ID);
-                if (FilterPushTree(source, FileHelper.ConcatPaths(targetPath, source.FullName), targetDevice.ID, replacePaths, conflictPaths))
+                if (FilterPushTree(source, DestinationOf(source, targetPath, targetDevice).FullPath, targetDevice.ID, replacePaths, conflictPaths))
                     plainSources.Add(source);
 
                 continue;
@@ -179,7 +188,7 @@ internal static partial class FileActionLogic
             App.SafeInvoke(() =>
             {
                 if (group.Count == 1)
-                    operation = new(group[0], DestinationOf(group[0], targetPath), sourceDevice, targetDevice, isMove, App.AppDispatcher);
+                    operation = new(group[0], DestinationOf(group[0], targetPath, targetDevice), sourceDevice, targetDevice, isMove, App.AppDispatcher);
                 else
                     operation = FileTransferOperation.TransferBatch(group, new(targetPath, FileType.Folder), sourceDevice, targetDevice, isMove, App.AppDispatcher);
             });
@@ -227,7 +236,7 @@ internal static partial class FileActionLogic
             destFolder = targetStaging;
         }
 
-        var target = DestinationOf(source, destFolder);
+        var target = DestinationOf(source, destFolder, targetDevice);
 
         if (!FilterPushTree(source, target.FullPath, targetDevice.ID, replacePaths, conflictPaths))
         {
@@ -709,7 +718,7 @@ internal static partial class FileActionLogic
         if (conflictPaths is { Count: > 0 })
             return FileMergeHelper.FilterSyncTreeByConflictResolution(item, item.FullName, replacePaths ?? EmptyPathSet, conflictPaths, '\\');
 
-        return FileMergeHelper.FilterIdenticalPullTree(item, FileHelper.ConcatPaths(targetPath, item.FullName, '\\'));
+        return FileMergeHelper.FilterIdenticalPullTree(item, FileHelper.ConcatPaths(targetPath, FileHelper.WindowsTargetName(item.FullName), '\\'));
     }
 
     private static void OnPullCompleted(FileSyncOperation op)

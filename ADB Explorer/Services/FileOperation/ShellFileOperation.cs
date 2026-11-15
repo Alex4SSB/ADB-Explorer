@@ -2,8 +2,10 @@
 
 public static partial class ShellFileOperation
 {
-    public static void DeleteItems(LogicalDeviceViewModel device, IEnumerable<FileClass> items, Dispatcher dispatcher)
+    /// <returns>The operations queued, to follow their outcome.</returns>
+    public static List<FileOperation> DeleteItems(LogicalDeviceViewModel device, IEnumerable<FileClass> items, Dispatcher dispatcher)
     {
+        List<FileOperation> queued = [];
         var archiveGroups = new Dictionary<string, List<FileClass>>(StringComparer.Ordinal);
         var regular = new List<FileClass>();
 
@@ -28,6 +30,7 @@ public static partial class ShellFileOperation
             var fileOp = FileArchiveDeleteOperation.Create(members, archivePath, device, dispatcher);
             fileOp.WhenCompleted(() => OnArchiveDeleteCompleted(fileOp));
             Data.FileOpQ.AddOperation(fileOp);
+            queued.Add(fileOp);
         }
 
         foreach (var item in regular)
@@ -36,7 +39,10 @@ public static partial class ShellFileOperation
             fileOp.WhenCompleted(() => OnDeleteCompleted(fileOp));
 
             Data.FileOpQ.AddOperation(fileOp);
+            queued.Add(fileOp);
         }
+
+        return queued;
     }
 
     private static void OnArchiveDeleteCompleted(FileArchiveDeleteOperation op)
@@ -86,12 +92,14 @@ public static partial class ShellFileOperation
             RemoveDeletedTreeFolder(op.Device.ID, op.FilePath.FullPath);
     }
 
-    public static void Rename(FileClass item, string targetPath, LogicalDeviceViewModel device)
+    public static FileRenameOperation Rename(FileClass item, string targetPath, LogicalDeviceViewModel device)
     {
         var fileOp = new FileRenameOperation(item, targetPath, device, App.AppDispatcher);
         fileOp.WhenCompleted(() => OnRenameCompleted(fileOp));
 
         Data.FileOpQ.AddOperation(fileOp);
+
+        return fileOp;
     }
 
     private static void OnRenameCompleted(FileRenameOperation op)
@@ -157,7 +165,7 @@ public static partial class ShellFileOperation
         return FileHelper.MatchesSearchQuery(FileHelper.GetFullName(file.FullPath), query);
     }
 
-    public static void MoveItems(LogicalDeviceViewModel device,
+    public static List<FileMoveOperation> MoveItems(LogicalDeviceViewModel device,
                                  IEnumerable<FileClass> items,
                                  string? targetPath,
                                  string currentPath,
@@ -174,7 +182,7 @@ public static partial class ShellFileOperation
                      dispatcher,
                      cutType);
 
-    public static void MoveItems(LogicalDeviceViewModel device,
+    public static List<FileMoveOperation> MoveItems(LogicalDeviceViewModel device,
                                  IEnumerable<FileClass> items,
                                  string? targetPath,
                                  string currentPath,
@@ -224,9 +232,12 @@ public static partial class ShellFileOperation
         // Only reached when targetPath is a real destination (see dispatch below), so never null here.
         IEnumerable<FileMoveOperation> Move()
         {
+            // A name the target refuses gets lookalikes there, when names are substituted.
+            // The device copies a folder's contents as they are, so only the item's own name can be.
+            var restrictedTarget = DriveHelper.GetRestrictions(targetPath!, device).RestrictedNaming;
             foreach (var item in items)
             {
-                var targetName = item.FullName;
+                var targetName = FileHelper.DeviceTargetName(item.FullName, restrictedTarget);
                 // Same-folder self-copy (Ctrl+C / Ctrl+V in place) gets a unique " - Copy" name.
                 // Paste from elsewhere already went through MergeFiles (replace / skip).
                 if (cutType is DragDropEffects.Copy && item.ParentPath == targetPath)
@@ -252,6 +263,8 @@ public static partial class ShellFileOperation
             fileops.ForEach(op => op.WhenCompleted(() => OnMoveCompleted(op)));
             Data.FileOpQ.AddOperations(fileops);
         });
+
+        return fileops;
     }
 
     private static void OnMoveCompleted(FileMoveOperation op)

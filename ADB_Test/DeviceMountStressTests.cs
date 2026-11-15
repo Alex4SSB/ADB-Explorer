@@ -23,7 +23,10 @@ namespace ADB_Test;
 [TestClass]
 public class DeviceMountStressTests
 {
-    private const string Root = "/sdcard/adbx-mount-stress";
+    // Pseudo-accented names, with an emoji, to cover non-ASCII names end to end
+    private static string N(string name) => TestNames.Pseudo(name);
+
+    private static readonly string Root = $"/sdcard/{N("adbx-mount-stress")}";
 
     private const int FileCount = 12;
 
@@ -59,7 +62,7 @@ public class DeviceMountStressTests
 
             try
             {
-                Shell(device, $"rm -rf {Root}; mkdir -p {Root} && cd {Root} && for i in $(seq 1 {FileCount}); do head -c $((i*400000+123)) /dev/urandom > f$i.bin; done; head -c 30000000 /dev/urandom > big.bin");
+                Shell(device, $"rm -rf {Root}; mkdir -p {Root} && cd {Root} && for i in $(seq 1 {FileCount}); do head -c $((i*400000+123)) /dev/urandom > {TestNames.Accent("f")}$i{TestNames.EMOJI}.bin; done; head -c 30000000 /dev/urandom > {N("big.bin")}");
                 var deviceHashes = Shell(device, $"cd {Root} && md5sum *.bin").Split('\n', StringSplitOptions.RemoveEmptyEntries)
                     .Select(line => line.Split("  ")).ToDictionary(p => p[1].Trim(), p => p[0]);
 
@@ -70,7 +73,7 @@ public class DeviceMountStressTests
                 var busyTime = WithBusyThreadPool(() =>
                 {
                     var readers = Enumerable.Range(1, 6)
-                        .Select(i => Process.Start(new ProcessStartInfo("cmd.exe", $"/c type \"{Path.Combine(local, $"f{i}.bin")}\" > nul") { CreateNoWindow = true, UseShellExecute = false })!)
+                        .Select(i => Process.Start(new ProcessStartInfo("cmd.exe", $"/c type \"{Path.Combine(local, N($"f{i}.bin"))}\" > nul") { CreateNoWindow = true, UseShellExecute = false })!)
                         .ToList();
 
                     foreach (var reader in readers)
@@ -80,7 +83,7 @@ public class DeviceMountStressTests
                 Assert.IsLessThan(5000L, busyTime, "downloads waited on the thread pool");
 
                 // A thumbnailer's read abandoned midway while the app's open waits on the same download
-                var bigFile = Path.Combine(local, "big.bin");
+                var bigFile = Path.Combine(local, N("big.bin"));
                 var abandoned = Process.Start(new ProcessStartInfo("cmd.exe", $"/c type \"{bigFile}\" > nul") { CreateNoWindow = true, UseShellExecute = false })!;
                 System.Threading.Thread.Sleep(150);
                 var bigCopy = Path.Combine(Path.GetTempPath(), $"adbx-stress-{Guid.NewGuid():N}.bin");
@@ -91,7 +94,7 @@ public class DeviceMountStressTests
                 var failures = new List<string>();
                 if (!File.Exists(bigCopy))
                     failures.Add("big.bin race: the waiting open failed when the other was abandoned");
-                else if (Convert.ToHexStringLower(MD5.HashData(File.ReadAllBytes(bigCopy))) != deviceHashes["big.bin"])
+                else if (Convert.ToHexStringLower(MD5.HashData(File.ReadAllBytes(bigCopy))) != deviceHashes[N("big.bin")])
                     failures.Add($"big.bin race: wrong content, {new FileInfo(bigCopy).Length} bytes");
 
                 File.Delete(bigCopy);
@@ -161,12 +164,15 @@ public class DeviceMountStressTests
         }
     }
 
+    // UTF-16 output (/u), so failure messages show the names as they are
     private static string Cmd(string command)
     {
-        using var process = Process.Start(new ProcessStartInfo("cmd.exe", $"/c {command}")
+        using var process = Process.Start(new ProcessStartInfo("cmd.exe", $"/u /c {command}")
         {
             RedirectStandardOutput = true,
             RedirectStandardError = true,
+            StandardOutputEncoding = Encoding.Unicode,
+            StandardErrorEncoding = Encoding.Unicode,
             UseShellExecute = false,
             CreateNoWindow = true,
         })!;

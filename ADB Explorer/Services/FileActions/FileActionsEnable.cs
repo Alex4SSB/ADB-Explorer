@@ -311,6 +311,22 @@ public partial class FileActionsEnable : ObservableObject
         set => SetProperty(ref _isSelectionIllegalNaming, value);
     }
 
+    private bool _isPastingRenamed = false;
+    /// <summary>Copied items have names the paste target refuses, which get lookalikes there (names are substituted).</summary>
+    public bool IsPastingRenamed
+    {
+        get => _isPastingRenamed;
+        set => SetProperty(ref _isPastingRenamed, value);
+    }
+
+    private bool _isSelectionRenamedOnTarget = false;
+    /// <summary>Selected items have names Windows or a restricted drive refuses, which get lookalikes there (names are substituted).</summary>
+    public bool IsSelectionRenamedOnTarget
+    {
+        get => _isSelectionRenamedOnTarget;
+        set => SetProperty(ref _isSelectionRenamedOnTarget, value);
+    }
+
     private bool _isSelectionIllegalOnWinRoot = false;
     public bool IsSelectionIllegalOnWinRoot
     {

@@ -397,6 +397,7 @@ internal static class DeviceContextMenu
         var items = new List<SubMenu>();
 
         AddEnabled(items, OpenInNewTabItem(device));
+        AddEnabled(items, OpenInWindowsExplorerItem(device));
         AddSeparator(items);
         AddEnabled(items, PushPackagesItem(device));
         AddSeparator(items);
@@ -442,6 +443,16 @@ internal static class DeviceContextMenu
                 () => DeviceHelper.OpenDeviceInNewTab(device),
                 Strings.Resources.S_OPEN_IN_NEW_TAB),
             new BaseIcon(new OpenInNewTabIcon(), 16));
+
+    /// <summary>The device's mount, at its root with a folder per drive.</summary>
+    private static SubMenu OpenInWindowsExplorerItem(LogicalDeviceViewModel device) =>
+        new(
+            new FileAction(
+                FileAction.FileActionType.None,
+                () => device.Status is DeviceStatus.Ok && device.Type is not (DeviceType.Sideload or DeviceType.Recovery),
+                () => DeviceMount.OpenInFileExplorer(device, ""),
+                Strings.Resources.S_MENU_OPEN_IN_WINDOWS_EXPLORER),
+            new BaseIcon(() => new System.Windows.Controls.Image { Source = FileIconProvider.GetEnterFolderIcon(32), Width = 16, Height = 16 }, 16));
 
     private static SubMenu PushPackagesItem(LogicalDeviceViewModel device) =>
         new(

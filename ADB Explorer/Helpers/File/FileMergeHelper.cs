@@ -144,7 +144,7 @@ public static class FileMergeHelper
             }
             else
             {
-                var relative = FileHelper.ExtractRelativePath(child.FullPath, androidRoot);
+                var relative = FileHelper.WindowsTargetRelativePath(FileHelper.ExtractRelativePath(child.FullPath, androidRoot));
                 var winPath = FileHelper.ConcatPaths(windowsRoot, relative, '\\');
                 if (!IsIdenticalToWindowsFile(child, winPath))
                     kept.Add(child);

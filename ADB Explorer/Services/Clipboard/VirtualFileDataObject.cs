@@ -647,10 +647,12 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
 
         var actions = source.Actions;
         var selectedFiles = source.SelectedFiles;
-        actions.IsSelectionIllegalOnWindows = !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.Windows);
-        actions.IsSelectionIllegalNaming = !actions.IsRecycleBin
+        // With names substituted, these only rename the copies, and the content is included
+        var illegalOnWindows = !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.Windows);
+        var illegalNaming = !actions.IsRecycleBin
             && !actions.IsAppDrive
             && !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.RestrictedNaming);
+        FileActionLogic.SetSelectionNaming(actions, selectedFiles, illegalOnWindows, illegalNaming);
         actions.IsSelectionConflictingNames = selectedFiles.Select(f => f.FullName)
             .Distinct(StringComparer.InvariantCultureIgnoreCase)
             .Count() != selectedFiles.Count();

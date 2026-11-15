@@ -709,7 +709,8 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
         Descriptors = items.Select((item, i) =>
         {
-            var relativeName = FileHelper.ExtractRelativePath(item.Name, descriptorParent).Replace('/', '\\');
+            // Names Windows refuses get lookalikes, when names are substituted
+            var relativeName = FileHelper.WindowsTargetRelativePath(FileHelper.ExtractRelativePath(item.Name, descriptorParent)).Replace('/', '\\');
 
             return new FileDescriptor
             {

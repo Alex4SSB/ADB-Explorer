@@ -520,6 +520,13 @@ public partial class AppSettings : ObservableObject, IJsonOnDeserialized, IJsonO
     [ObservableProperty]
     public partial bool KeepDateModified { get; set; } = true;
 
+    /// <summary>
+    /// Files whose names a target doesn't allow (Windows, or a drive with restricted naming) get lookalike characters there,
+    /// instead of being refused. Also lets the mount show them on drives that aren't FUSE.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool SubstituteIllegalNames { get; set; } = false;
+
     #endregion
 
     #region about

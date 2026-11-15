@@ -190,7 +190,8 @@ public class FileSyncOperation : AbstractSyncFileOperation
             {
                 foreach (var dir in FolderHelper.GetBottomMostFolders(Files))
                 {
-                    var targetDirPath = FileHelper.ConcatPaths(TargetPath, FileHelper.ExtractRelativePath(dir.FullPath, FilePath.FullPath, false));
+                    var relative = FileHelper.WindowsTargetRelativePath(FileHelper.ExtractRelativePath(dir.FullPath, FilePath.FullPath, false));
+                    var targetDirPath = FileHelper.ConcatPaths(TargetPath, relative);
                     Directory.CreateDirectory(targetDirPath);
 
                     if (Data.Settings.EnableLog && !Data.IsLogPaused)
@@ -644,9 +645,17 @@ public class FileSyncOperation : AbstractSyncFileOperation
 
     private void SyncFileOver(TransferLane lane, SyncFile item, Action<SyncProgressChangedEventArgs> progressCallback, UnixFileStatus fileMode)
     {
-        var targetPath = FilePath.IsDirectory
-                ? FileHelper.ConcatPaths(TargetPath, FileHelper.ExtractRelativePath(item.FullPath, FilePath.FullPath))
-                : TargetPath.FullPath;
+        var targetPath = TargetPath.FullPath;
+        if (FilePath.IsDirectory)
+        {
+            var relative = FileHelper.ExtractRelativePath(item.FullPath, FilePath.FullPath);
+
+            // Pulled names get lookalikes for what Windows refuses, when names are substituted
+            if (OperationName is OperationType.Pull)
+                relative = FileHelper.WindowsTargetRelativePath(relative);
+
+            targetPath = FileHelper.ConcatPaths(TargetPath, relative);
+        }
 
         var via = lane.Name is null ? "" : $" ({lane.Name})";
 

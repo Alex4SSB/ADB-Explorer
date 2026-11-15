@@ -533,6 +533,25 @@ public static class FileHelper
         return result;
     }
 
+    /// <summary>Whether names a target doesn't allow get lookalikes there (the app setting), rather than being refused.</summary>
+    public static bool SubstitutesIllegalNames => Data.Settings?.SubstituteIllegalNames is true;
+
+    /// <summary>The name a device item gets in Windows: lookalikes for what Windows refuses, when names are substituted.</summary>
+    public static string WindowsTargetName(string deviceName)
+        => SubstitutesIllegalNames ? FileNameEncoding.ForWindows(deviceName) : deviceName;
+
+    /// <summary>A device path relative to a pulled folder, as it lands in Windows: <see cref="WindowsTargetName"/> for each name.</summary>
+    public static string WindowsTargetRelativePath(string relativeDevicePath)
+        => SubstitutesIllegalNames ? FileNameEncoding.ForPath(relativeDevicePath, '/', FileNameEncoding.ForWindows) : relativeDevicePath;
+
+    /// <summary>The name an item gets on a device target: on one with restricted naming, lookalikes for what it refuses, when names are substituted.</summary>
+    public static string DeviceTargetName(string name, bool restrictedNaming)
+        => restrictedNaming && SubstitutesIllegalNames ? FileNameEncoding.ForRestrictedNaming(name) : name;
+
+    /// <summary>A relative device path as it lands on a device target: <see cref="DeviceTargetName"/> for each name.</summary>
+    public static string DeviceTargetRelativePath(string relativePath, bool restrictedNaming)
+        => restrictedNaming && SubstitutesIllegalNames ? FileNameEncoding.ForPath(relativePath, '/', FileNameEncoding.ForRestrictedNaming) : relativePath;
+
     public enum RenameTarget
     {
         Unix,

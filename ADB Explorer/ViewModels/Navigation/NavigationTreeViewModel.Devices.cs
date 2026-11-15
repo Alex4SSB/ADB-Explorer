@@ -285,7 +285,7 @@ public partial class NavigationTreeViewModel
         return device.Drives.Where(drive => drive.Type switch
         {
             AbstractDrive.DriveType.Trash => Data.Settings.EnableRecycle,
-            AbstractDrive.DriveType.Temp or AbstractDrive.DriveType.Package => Data.Settings.EnableApk,
+            AbstractDrive.DriveType.Package => Data.Settings.EnableApk,
             _ => true,
         });
     }

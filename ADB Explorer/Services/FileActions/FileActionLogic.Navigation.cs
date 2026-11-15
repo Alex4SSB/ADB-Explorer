@@ -163,7 +163,7 @@ internal static partial class FileActionLogic
         else
             return null;
 
-        return DeviceMount.CanMount(path) ? path : null;
+        return DeviceMount.CanMount(device, path) ? path : null;
     }
 
     public static void OpenInWindowsExplorer()

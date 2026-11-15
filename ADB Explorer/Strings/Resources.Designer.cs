@@ -169,7 +169,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Recycle.
+        ///   Looks up a localized string similar to Move to trash.
         /// </summary>
         public static string S_ACTION_RECYCLE {
             get {
@@ -2000,7 +2000,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_FOLDER_CONTENT_VALUE", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to This folder is empty..
         /// </summary>
@@ -2450,6 +2450,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open in Windows Explorer.
+        /// </summary>
+        public static string S_MENU_OPEN_IN_WINDOWS_EXPLORER {
+            get {
+                return ResourceManager.GetString("S_MENU_OPEN_IN_WINDOWS_EXPLORER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open Item Location.
         /// </summary>
         public static string S_MENU_OPEN_LOCATION {
@@ -2644,6 +2653,24 @@ namespace ADB_Explorer.Strings {
         public static string S_MISSING_ADB_OVERRIDE {
             get {
                 return ResourceManager.GetString("S_MISSING_ADB_OVERRIDE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Couldn&apos;t show the device in File Explorer.
+        /// </summary>
+        public static string S_MOUNT_FAILED_TITLE {
+            get {
+                return ResourceManager.GetString("S_MOUNT_FAILED_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opening in Windows Explorer….
+        /// </summary>
+        public static string S_MOUNT_OPENING {
+            get {
+                return ResourceManager.GetString("S_MOUNT_OPENING", resourceCulture);
             }
         }
         
@@ -3054,6 +3081,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Some of the copied files will be renamed in this location.
+        /// </summary>
+        public static string S_POPUP_COPIED_RENAMED {
+            get {
+                return ResourceManager.GetString("S_POPUP_COPIED_RENAMED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A copied file violates user space naming rules.
         /// </summary>
         public static string S_POPUP_COPIED_RESTRICTED_NAMING {
@@ -3122,6 +3158,15 @@ namespace ADB_Explorer.Strings {
         public static string S_POPUP_SELECTED_DRIVE_ROOT {
             get {
                 return ResourceManager.GetString("S_POPUP_SELECTED_DRIVE_ROOT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Some of the selected files might be renamed in the target location.
+        /// </summary>
+        public static string S_POPUP_SELECTED_RENAMED {
+            get {
+                return ResourceManager.GetString("S_POPUP_SELECTED_RENAMED", resourceCulture);
             }
         }
         
@@ -4237,6 +4282,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Substitute characters that are not allowed in file names.
+        /// </summary>
+        public static string S_SETTINGS_SUBSTITUTE_NAMES {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_SUBSTITUTE_NAMES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show System Apps.
         /// </summary>
         public static string S_SETTINGS_SYSTEM_APPS {
@@ -5019,33 +5073,6 @@ namespace ADB_Explorer.Strings {
         public static string ScrollBar_ScrollToTopCommand {
             get {
                 return ResourceManager.GetString("ScrollBar_ScrollToTopCommand", resourceCulture);
-            }
-        }
-            
-        /// <summary>
-        ///   Looks up a localized string similar to Open in Windows Explorer.
-        /// </summary>
-        public static string S_MENU_OPEN_IN_WINDOWS_EXPLORER {
-            get {
-                return ResourceManager.GetString("S_MENU_OPEN_IN_WINDOWS_EXPLORER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Couldn't show the device in File Explorer.
-        /// </summary>
-        public static string S_MOUNT_FAILED_TITLE {
-            get {
-                return ResourceManager.GetString("S_MOUNT_FAILED_TITLE", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Opening in Windows Explorer….
-        /// </summary>
-        public static string S_MOUNT_OPENING {
-            get {
-                return ResourceManager.GetString("S_MOUNT_OPENING", resourceCulture);
             }
         }
     }

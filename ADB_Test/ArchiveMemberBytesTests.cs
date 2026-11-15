@@ -20,8 +20,13 @@ namespace ADB_Test;
 [TestClass]
 public class ArchiveMemberBytesTests
 {
-    private const string Parent = "/data/local/tmp/adbx-member-bytes";
-    private const string Root = $"{Parent}/src";
+    // Pseudo-accented names, with an emoji, to cover non-ASCII names end to end
+    private static string N(string name) => TestNames.Pseudo(name);
+
+    private static string P(string relativePath) => TestNames.PseudoPath(relativePath);
+
+    private static readonly string Parent = $"/data/local/tmp/{N("adbx-member-bytes")}";
+    private static readonly string Root = $"{Parent}/{N("src")}";
 
     [ClassInitialize]
     public static void ClassInitialize(TestContext _)
@@ -54,9 +59,9 @@ public class ArchiveMemberBytesTests
 
             try
             {
-                Shell(device, $"rm -rf {Parent}; mkdir -p {Root}/sub/deeper {Root}/empty && cd {Root} "
-                    + "&& head -c 12345 /dev/urandom > a.bin && head -c 777 /dev/urandom > sub/b.bin "
-                    + "&& : > sub/deeper/zero.bin && ln -s a.bin link.bin && ln -s sub dirlink");
+                Shell(device, $"rm -rf {Parent}; mkdir -p {Root}/{P("sub/deeper")} {Root}/{N("empty")} && cd {Root} "
+                    + $"&& head -c 12345 /dev/urandom > {N("a.bin")} && head -c 777 /dev/urandom > {P("sub/b.bin")} "
+                    + $"&& : > {P("sub/deeper/zero.bin")} && ln -s {N("a.bin")} {N("link.bin")} && ln -s {N("sub")} {N("dirlink")}");
 
                 var actual = ArchiveExtract.CollectCreateMemberBytes(device.Serial, [Root], CancellationToken.None);
                 var message = $"{device.Model}: {Describe(actual)}";
@@ -79,17 +84,17 @@ public class ArchiveMemberBytesTests
 
     private static readonly Dictionary<string, long> Expected = new()
     {
-        ["src"] = 0,
-        ["src/a.bin"] = 12345,
-        ["src/empty"] = 0,
-        ["src/sub"] = 0,
-        ["src/sub/b.bin"] = 777,
-        ["src/sub/deeper"] = 0,
-        ["src/sub/deeper/zero.bin"] = 0,
+        [P("src")] = 0,
+        [P("src/a.bin")] = 12345,
+        [P("src/empty")] = 0,
+        [P("src/sub")] = 0,
+        [P("src/sub/b.bin")] = 777,
+        [P("src/sub/deeper")] = 0,
+        [P("src/sub/deeper/zero.bin")] = 0,
     };
 
     // tar -v lists links as members
-    private static readonly string[] Links = ["src/link.bin", "src/dirlink"];
+    private static readonly string[] Links = [P("src/link.bin"), P("src/dirlink")];
 
     private static string Describe(Dictionary<string, long> members)
         => string.Join(", ", members.OrderBy(p => p.Key).Select(p => $"{p.Key}={p.Value}"));
