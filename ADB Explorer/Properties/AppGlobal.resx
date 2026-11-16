@@ -131,6 +131,6 @@
     <value>1.1.26110</value>
   </data>
   <data name="DragDropLogPath" xml:space="preserve">
-    <value>E:\Log\log.txt</value>
+    <value>C:\Log\log.txt</value>
   </data>
 </root>
