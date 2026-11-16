@@ -12,7 +12,7 @@
     Version="1.1.26110.0" />
 
   <Properties>
-    <DisplayName>ADB Explorer</DisplayName>
+    <DisplayName>ms-resource:AppDisplayName</DisplayName>
     <PublisherDisplayName>AlexSSB</PublisherDisplayName>
     <Logo>Images\StoreLogo.png</Logo>
   </Properties>

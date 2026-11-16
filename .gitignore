@@ -371,6 +371,9 @@ FodyWeavers.xsd
 
 # Grafana Faro collector URL (contains app key; copy from FaroCollector.url.example)
 ADB Explorer/FaroCollector.url
+
+# Debug log location, per machine (written by non-Deploy builds on first launch)
+ADB Explorer/DebugLog.path
 scripts/.grafana-token
 crashes/
 /CLAUDE.md

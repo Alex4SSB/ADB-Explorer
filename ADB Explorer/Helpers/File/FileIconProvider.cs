@@ -663,6 +663,9 @@ public class FileIconProvider
         _ => IconSize.Jumbo,
     };
 
+    private const string APK_ICON_SMALL = "/Assets/APK_format_icon_2014-2019_.ico";
+    private const string APK_ICON_LARGE = "/Assets/APK_icon_256px_vecteezy.ico";
+
     public static IEnumerable<BitmapSource> GetImage(FilePath file, int iconSize = 16)
     {
         var size = SizeToIconSize(iconSize);
@@ -675,7 +678,8 @@ public class FileIconProvider
         {
             // Small is read at 2x its display size so it stays sharp under monitor scaling above 100%.
             var apkIconSize = size is IconSize.Small ? new System.Drawing.Size(32, 32) : IconToSize(size);
-            Icon apkIcon = new(size is IconSize.Small ? Properties.AppGlobal.APK_icon : Properties.AppGlobal.APK_icon_256px, apkIconSize);
+            using var stream = Application.GetResourceStream(new Uri(size is IconSize.Small ? APK_ICON_SMALL : APK_ICON_LARGE, UriKind.Relative)).Stream;
+            using Icon apkIcon = new(stream, apkIconSize);
 
             yield return AddToDictionary(apkIcon, size, AbstractFile.SpecialFileType.Apk);
         }

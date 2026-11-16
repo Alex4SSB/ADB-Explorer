@@ -7,7 +7,7 @@ namespace ADB_Explorer.ViewModels.Windows;
 public partial class MainWindowViewModel : ObservableObject
 {
     [ObservableProperty]
-    public partial string ApplicationTitle { get; set; } = Properties.AppGlobal.AppDisplayName;
+    public partial string ApplicationTitle { get; set; } = Data.AppDisplayName;
 
     /// <summary>Whether the active tab shows the Explorer page - the pane's bottom pages collapse into "More" then.</summary>
     public bool IsExplorerPage
@@ -186,8 +186,8 @@ public partial class MainWindowViewModel : ObservableObject
             });
         }
 
-        var appVersion = Properties.AppGlobal.AppVersion;
-        var isUpgrade = new Version(appVersion) > new Version(Data.Settings.LastVersion);
+        var appVersion = Data.AppVersion.ToString();
+        var isUpgrade = Data.AppVersion > new Version(Data.Settings.LastVersion);
 
         if (isUpgrade)
         {
@@ -294,7 +294,7 @@ public partial class MainWindowViewModel : ObservableObject
             {
                 Notifications.Add(new(async () =>
                 {
-                    var res = await DialogService.ShowConfirmation(string.Format(Strings.Resources.S_NEW_VERSION, Properties.AppGlobal.AppDisplayName, release.Version),
+                    var res = await DialogService.ShowConfirmation(string.Format(Strings.Resources.S_NEW_VERSION, Data.AppDisplayName, release.Version),
                         Strings.Resources.S_NEW_VERSION_TITLE,
                         Strings.Resources.S_GO_TO_VERSION_PAGE,
                         cancelText: Strings.Resources.S_BUTTON_CLOSE,
@@ -311,7 +311,7 @@ public partial class MainWindowViewModel : ObservableObject
     private static async Task PromptDownloadedUpdateAsync(Version latestVersion)
     {
         var result = await DialogService.ShowDialog(
-            string.Format(Strings.Resources.S_NEW_VERSION_READY, Properties.AppGlobal.AppDisplayName, latestVersion),
+            string.Format(Strings.Resources.S_NEW_VERSION_READY, Data.AppDisplayName, latestVersion),
             Strings.Resources.S_NEW_VERSION_TITLE,
             Strings.Resources.S_RESTART,
             closeText: Strings.Resources.S_UPDATE_ON_CLOSE);

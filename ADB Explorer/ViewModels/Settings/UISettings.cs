@@ -1,4 +1,3 @@
-using ADB_Explorer.Properties;
 using static ADB_Explorer.Models.Data;
 using static ADB_Explorer.ViewModels.SettingsAction;
 using ControlAppearance = Wpf.Ui.Controls.ControlAppearance;
@@ -10,8 +9,8 @@ public static class UISettings
     public static ObservableList<AbstractGroup> SettingsList { get; set; } = [];
 
     public static IEnumerable<AbstractSetting> SortSettings => SettingsList.SelectMany(group => group.Children)
-        .Where(set => set.Visibility is Visibility.Visible && set.Description != Properties.AppGlobal.AppDisplayName)
-        .OrderBy(sett => sett.Description).Prepend(SettingsList.SelectMany(group => group.Children).First(s => s.Description == Properties.AppGlobal.AppDisplayName));
+        .Where(set => set.Visibility is Visibility.Visible && set.Description != Data.AppDisplayName)
+        .OrderBy(sett => sett.Description).Prepend(SettingsList.SelectMany(group => group.Children).First(s => s.Description == Data.AppDisplayName));
 
     private static readonly Dictionary<ActionType, string> Icons = new()
     {
@@ -103,7 +102,7 @@ public static class UISettings
     {
         var settings = new List<AbstractSetting>
         {
-            new InfoSetting(AppGlobal.AppDisplayName, null, (FontFamily)App.Current.Resources["Nunito"], 18, $"v{AppGlobal.AppVersion}", TextAlignment.Center),
+            new InfoSetting(Data.AppDisplayName, null, (FontFamily)App.Current.Resources["Nunito"], 18, $"v{Data.AppVersion}", TextAlignment.Center),
             new LinkSetting(Strings.Resources.S_DONATE, Resources.Links.SPONSOR, new("\uEB51", brush: "SponsorIconBrush")),
             new LinkSetting(Strings.Resources.S_APP_DATA_FOLDER, new(AppDataPath), new(FluentPathGeometries.ItemPath), resolveFilePath: () => AppDataPath),
             new LinkSetting(Strings.Resources.S_GITHUB_REPO, Resources.Links.ADB_EXPLORER_GITHUB, new(GitHubGeometry)),

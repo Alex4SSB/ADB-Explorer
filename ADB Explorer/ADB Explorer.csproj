@@ -81,6 +81,38 @@
     <Delete Files="$(OutDir)%(_EmptyResxCulture.Identity)\$(AssemblyName).resources.dll" Condition="'@(_EmptyResxCulture)' != ''" />
   </Target>
 
+  <!-- The app's display name and version each have one source, in ADB Package:
+       - AppDisplayName in Strings\en-us\Resources.resw (the manifest's ms-resource:AppDisplayName) -> Product attribute
+       - Identity/@Version in Package.appxmanifest -> assembly, file and informational versions
+       Data.AppDisplayName and Data.AppVersion read them at runtime. -->
+  <Target Name="ReadPackageInfo" BeforeTargets="GetAssemblyVersion">
+    <PropertyGroup>
+      <_PackageDir>$(MSBuildProjectDirectory)\..\ADB Package\</_PackageDir>
+    </PropertyGroup>
+    <XmlPeek XmlInputPath="$(_PackageDir)Strings\en-us\Resources.resw" Query="/root/data[@name='AppDisplayName']/value/text()">
+      <Output TaskParameter="Result" PropertyName="_AppDisplayName" />
+    </XmlPeek>
+    <XmlPeek XmlInputPath="$(_PackageDir)Package.appxmanifest" Query="/m:Package/m:Identity/@Version"
+             Namespaces="&lt;Namespace Prefix='m' Uri='http://schemas.microsoft.com/appx/manifest/foundation/windows10' /&gt;">
+      <Output TaskParameter="Result" PropertyName="_PackageVersion" />
+    </XmlPeek>
+    <Error Condition="'$(_AppDisplayName)' == ''" Text="AppDisplayName not found in $(_PackageDir)Strings\en-us\Resources.resw" />
+    <Error Condition="'$(_PackageVersion)' == ''" Text="Identity Version not found in $(_PackageDir)Package.appxmanifest" />
+    <PropertyGroup>
+      <Product>$(_AppDisplayName)</Product>
+      <Version>$(_PackageVersion)</Version>
+      <AssemblyVersion>$(_PackageVersion)</AssemblyVersion>
+      <FileVersion>$(_PackageVersion)</FileVersion>
+      <InformationalVersion>$(_PackageVersion)</InformationalVersion>
+    </PropertyGroup>
+  </Target>
+
+  <!-- Non-Deploy builds read the debug log location from DebugLog.path (gitignored, per machine).
+       It's written on first launch, or can be created by hand with the log file's full path. -->
+  <ItemGroup Condition="'$(Configuration)' != 'Deploy'">
+    <AssemblyMetadata Include="DebugLogPathFile" Value="$(MSBuildProjectDirectory)\DebugLog.path" />
+  </ItemGroup>
+
   <ItemGroup Condition="Exists('FaroCollector.url') And '$(Configuration)' != 'Debug'">
     <EmbeddedResource Include="FaroCollector.url">
       <LogicalName>FaroCollector.url</LogicalName>
@@ -116,16 +148,12 @@
 
   <ItemGroup>
     <Resource Include="Assets\APK_format_icon_2014-2019_.ico" />
+    <Resource Include="Assets\APK_icon_256px_vecteezy.ico" />
     <Resource Include="Assets\app_icon_black_2023_256px.png" />
     <Resource Include="Resources\Fonts\Nunito-VariableFont_wght.ttf" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Properties\AppGlobal.Designer.cs">
-      <DependentUpon>AppGlobal.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
     <Compile Update="Strings\Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
@@ -134,11 +162,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Properties\AppGlobal.resx">
-      <SubType>Designer</SubType>
-      <LastGenOutput>AppGlobal.Designer.cs</LastGenOutput>
-      <Generator>PublicResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
     <EmbeddedResource Update="Strings\Resources.ar.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>

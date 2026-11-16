@@ -210,8 +210,8 @@ public static class CrashReportService
                 },
                 ["app"] = new JObject
                 {
-                    ["name"] = Properties.AppGlobal.AppDisplayName,
-                    ["version"] = Properties.AppGlobal.AppVersion,
+                    ["name"] = Data.AppDisplayName,
+                    ["version"] = Data.AppVersion.ToString(),
                     ["environment"] = Data.RuntimeSettings.IsAppPackaged ? "store" : "portable",
                 },
                 ["session"] = new JObject { ["id"] = SessionId },
@@ -225,7 +225,7 @@ public static class CrashReportService
                     ["name"] = "Windows",
                     ["version"] = Environment.OSVersion.Version.ToString(),
                     ["os"] = RuntimeInformation.OSDescription,
-                    ["userAgent"] = $"ADB-Explorer/{Properties.AppGlobal.AppVersion} ({RuntimeInformation.OSArchitecture})",
+                    ["userAgent"] = $"ADB-Explorer/{Data.AppVersion} ({RuntimeInformation.OSArchitecture})",
                 },
             },
             ["events"] = new JArray(new JObject

@@ -169,7 +169,11 @@ public static partial class Data
 
     public static ObservableList<Package> Packages { get; set; } = [];
 
-    public static Version AppVersion => new(Properties.AppGlobal.AppVersion);
+    /// <summary>The package version (see the csproj), as major.minor.build to match release tags.</summary>
+    /// <summary>The Product attribute, read at build time from the package's AppDisplayName (see the csproj).</summary>
+    public static string AppDisplayName { get; } = typeof(Data).Assembly.GetCustomAttribute<AssemblyProductAttribute>()!.Product;
+
+    public static Version AppVersion { get; } = new(typeof(Data).Assembly.GetName().Version!.ToString(3));
 
     public static FileActionsEnable FileActions => Files.Actions;
 
