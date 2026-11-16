@@ -574,7 +574,11 @@
             </ui:NavigationView.Style>
         </ui:NavigationView>
 
-        <ui:ContentDialogHost x:Name="RootContentDialog" Grid.Row="2" />
+        <!--  Disables the toolbar and the title bar's tabs and menu while a dialog is open; caption buttons stay usable.  -->
+        <ui:ContentDialogHost
+            x:Name="RootContentDialog"
+            Grid.Row="2"
+            IsDisableSiblingsEnabled="True" />
 
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>

@@ -137,6 +137,10 @@
                                             </MultiDataTrigger.Conditions>
                                             <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource MouseOverBorderBrush}" />
                                         </MultiDataTrigger>
+                                        <!--  Last, so it beats the HC colors above. Disabled while a dialog is open; the icon dims itself in the item template.  -->
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Foreground" Value="{DynamicResource TextFillColorDisabledBrush}" />
+                                        </Trigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
                             </Setter.Value>
@@ -177,7 +181,18 @@
                                 Height="16"
                                 Margin="0,0,6,0"
                                 VerticalAlignment="Center"
-                                Content="{Binding TabIcon.IconContent}" />
+                                Content="{Binding TabIcon.IconContent}">
+                                <!--  Most tab icons are full-color bitmaps, which a disabled foreground can't gray out.  -->
+                                <ContentPresenter.Style>
+                                    <Style TargetType="ContentPresenter">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter Property="Opacity" Value="0.5" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ContentPresenter.Style>
+                            </ContentPresenter>
 
                             <TextBlock
                                 Grid.Column="1"

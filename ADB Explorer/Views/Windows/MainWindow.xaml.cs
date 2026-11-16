@@ -11,6 +11,8 @@ public partial class MainWindow : INavigationWindow
 
     private readonly DragWindow _dw = new();
 
+    private bool _isDialogOpen;
+
     public MainWindowViewModel ViewModel { get; }
 
     public MainWindow(
@@ -30,6 +32,10 @@ public partial class MainWindow : INavigationWindow
         AppActions.Bindings.ForEach(binding => InputBindings.Add(binding));
         SetPageService(navigationViewPageProvider);
         contentDialogService.SetDialogHost(RootContentDialog);
+        // The host itself suspends window shortcuts and disables its siblings; the PreviewKey/Mouse handlers check this flag.
+        DependencyPropertyDescriptor
+            .FromProperty(ContentProperty, typeof(ContentDialogHost))
+            .AddValueChanged(RootContentDialog, (_, _) => _isDialogOpen = RootContentDialog.Content is not null);
         snackbarService.SetSnackbarPresenter(RootSnackbar);
 
         navigationService.SetNavigationControl(RootNavigation);
@@ -101,6 +107,7 @@ public partial class MainWindow : INavigationWindow
         };
 
         MouseUp += MainWindow_MouseUp;
+        PreviewMouseUp += MainWindow_PreviewMouseUp;
 
         RootNavigation.Loaded += (_, _) =>
         {
@@ -302,7 +309,7 @@ public partial class MainWindow : INavigationWindow
 
     private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (DiskUsagePollingService.ServerUnresponsive)
+        if (_isDialogOpen || DiskUsagePollingService.ServerUnresponsive)
             return;
 
         if (Data.CurrentPage.Value != typeof(ExplorerPage))
@@ -328,11 +335,18 @@ public partial class MainWindow : INavigationWindow
             return;
         }
 
-        if (DiskUsagePollingService.ServerUnresponsive)
+        if (_isDialogOpen || DiskUsagePollingService.ServerUnresponsive)
             return;
 
         if (Data.CurrentPage.Value == typeof(ExplorerPage))
             GetOrCreateExplorerContent(ExplorerTabs.EnsureFocusedPane()).HandlePreviewKeyUp(e);
+    }
+
+    /// <summary>Back / forward navigation is blocked here, before any page sees it, while a dialog is open.</summary>
+    private void MainWindow_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (_isDialogOpen && e.ChangedButton is MouseButton.XButton1 or MouseButton.XButton2)
+            e.Handled = true;
     }
 
     /// <summary>The mouse back / forward buttons work anywhere in the window - the explorer content handles them itself over its own area.</summary>

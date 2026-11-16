@@ -95,8 +95,17 @@
                         Margin="0,0,0,0"
                         d:Foreground="White"
                         FontSize="24"
-                        Foreground="{DynamicResource SelectedForeground}"
-                        Glyph="&#xE965;" />
+                        Glyph="&#xE965;">
+                        <ui:FontIcon.Style>
+                            <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="True">
+                                        <Setter Property="Foreground" Value="{DynamicResource SelectedForeground}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:FontIcon.Style>
+                    </ui:FontIcon>
                     <Grid Margin="0,-10,-10,0" d:Visibility="Hidden">
                         <Grid.Style>
                             <Style TargetType="Grid">
