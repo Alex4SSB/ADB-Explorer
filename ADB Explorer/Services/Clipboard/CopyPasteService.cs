@@ -1,5 +1,6 @@
 ﻿using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
+using static Vanara.PInvoke.User32;
 
 namespace ADB_Explorer.Services;
 
@@ -129,7 +130,7 @@ public partial class CopyPasteService : ObservableObject
     [ObservableProperty]
     public partial bool MouseWithinApp { get; set; } = true;
 
-    public NativeMethods.HResult DragResult { get; set; }
+    public HRESULT DragResult { get; set; }
 
     /// <summary>
     /// True from the start of an OLE drag until the next listing/tree mouse-down.
@@ -353,7 +354,7 @@ public partial class CopyPasteService : ObservableObject
     /// </summary>
     private uint? _selfCopyClipboardSequence;
 
-    public void MarkSelfClipboardWritten() => _selfCopyClipboardSequence = NativeMethods.MGetClipboardSequenceNumber();
+    public void MarkSelfClipboardWritten() => _selfCopyClipboardSequence = GetClipboardSequenceNumber();
 
     public static void ClearTempFolder()
     {

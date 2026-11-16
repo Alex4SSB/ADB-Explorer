@@ -44,19 +44,52 @@ public partial class AdbService
     {
         var lsV2 = SyncFeatures(deviceId).Contains(FEATURE_LS_V2);
 
-        // A listing leaves the library's socket needing a reopen, so each one gets its own
+        // A listing leaves the socket mid-protocol, so each one gets its own
         using var service = new SyncService(SyncDevice(deviceId));
-        IEnumerable<IFileStatistics> entries = lsV2
-            ? service.GetDirectoryListingEx(path)
-            : service.GetDirectoryListing(path);
 
-        foreach (var entry in entries)
+        if (lsV2)
+        {
+            foreach (var item in ListDirectoryV2(service, path, cancellationToken))
+                yield return item;
+
+            yield break;
+        }
+
+        foreach (var entry in service.GetDirectoryListing(path))
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var item = CreateFile(path, entry.Path, (long)entry.Size, entry.Time.ToUnixTimeSeconds(), (UnixFileMode)(uint)entry.FileMode);
+            var item = CreateFile(path, entry.Path, entry.Size, entry.Time.ToUnixTimeSeconds(), (UnixFileMode)(uint)entry.FileMode);
             if (item is not null)
                 yield return item.Value;
+        }
+    }
+
+    /// <summary>LIS2, which also gives the access and change times and owner ids the selection stat would otherwise fetch.</summary>
+    private static IEnumerable<FileStat> ListDirectoryV2(SyncService service, string path, CancellationToken cancellationToken)
+    {
+        foreach (var entry in service.GetDirectoryListingEx(path))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var item = CreateFile(path, entry.Path, (long)entry.Size, entry.ModifiedTime.ToUnixTimeSeconds(), (UnixFileMode)(uint)entry.FileMode);
+            if (item is null)
+                continue;
+
+            // An entry adbd couldn't stat has an all-zero mode and nothing else to keep
+            if (item.Value.Permissions is null)
+            {
+                yield return item.Value;
+                continue;
+            }
+
+            yield return item.Value with
+            {
+                AccessTime = entry.AccessTime,
+                ChangeTime = entry.ChangedTime,
+                OwnerUid = (int)entry.UserId,
+                OwnerGid = (int)entry.GroupId,
+            };
         }
     }
 

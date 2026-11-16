@@ -2513,6 +2513,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add to saved locations.
+        /// </summary>
+        public static string S_MENU_ADD_SAVED_LOCATION {
+            get {
+                return ResourceManager.GetString("S_MENU_ADD_SAVED_LOCATION", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Remove from saved locations.
         /// </summary>
         public static string S_MENU_REMOVE_SAVED_LOCATION {

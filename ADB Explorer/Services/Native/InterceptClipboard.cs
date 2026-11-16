@@ -1,15 +1,18 @@
 ﻿namespace ADB_Explorer.Services;
 
+using Vanara.PInvoke;
+using static Vanara.PInvoke.User32;
+
 public static partial class NativeMethods
 {
-    public sealed partial class InterceptClipboard : IDisposable
+    public sealed class InterceptClipboard : IDisposable
     {
         private static Action _externalClipAction = null!;
         private static Action<float> _externalScalingAction = null!;
         private static Action _externalCaptionClickAction = null!;
         private static HwndSource _hwndSource = null!;
 
-        public static HANDLE MainWindowHandle { get; private set; } = IntPtr.Zero;
+        public static HWND MainWindowHandle { get; private set; } = HWND.NULL;
 
         private const int HTCAPTION = 2;
 
@@ -40,7 +43,7 @@ public static partial class NativeMethods
             {
                 MainWindowHandle = new WindowInteropHelper(window).Handle;
 
-                _hwndSource = HwndSource.FromHwnd(MainWindowHandle);
+                _hwndSource = HwndSource.FromHwnd((IntPtr)MainWindowHandle);
                 _hwndSource.AddHook(WndProc);
 
                 AddClipboardFormatListener(MainWindowHandle);
@@ -56,9 +59,10 @@ public static partial class NativeMethods
             _hwndSource?.Dispose();
         }
 
-        private static HANDLE WndProc(HANDLE hwnd, int msg, HANDLE wParam, HANDLE lParam, ref bool handled)
+        private static IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            if ((ClipboardNotificationMessage)msg is ClipboardNotificationMessage.WM_CLIPBOARDUPDATE)
+            var message = (WindowMessage)msg;
+            if (message is WindowMessage.WM_CLIPBOARDUPDATE)
             {
                 _externalClipAction();
                 handled = true;
@@ -67,27 +71,19 @@ public static partial class NativeMethods
             // The LOWORD of the wParam contains the X-axis value of the new DPI of the window.
             // For example, 96, 120, 144, or 192.
             // The values of the X-axis and the Y-axis are identical for Windows apps.
-            else if ((WindowMessages)msg is WindowMessages.WM_DPICHANGED)
+            else if (message is WindowMessage.WM_DPICHANGED)
             {
                 var point = (UInt16)wParam;
                 _externalScalingAction(MonitorInfo.DpiToScalingFactor(point));
             }
             // Empty title bar space is the window's caption, so WPF never sees a mouse-down there.
-            else if ((WindowMessages)msg is WindowMessages.WM_NCLBUTTONDOWN && wParam == HTCAPTION)
+            else if (message is WindowMessage.WM_NCLBUTTONDOWN && wParam == HTCAPTION)
             {
                 _externalCaptionClickAction();
             }
 
             return IntPtr.Zero;
         }
-
-        [LibraryImport("User32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static partial bool AddClipboardFormatListener(HANDLE hwnd);
-
-        [LibraryImport("User32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static partial bool RemoveClipboardFormatListener(HANDLE hwnd);
 
         public void Dispose() => Close();
     }

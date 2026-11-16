@@ -22,6 +22,17 @@ public static class AppActions
             action();
     }
 
+    /// <summary>Key gestures act on the drive selected in the drive view, as on its tree node, else on the explorer.</summary>
+    private static FileList GestureList => FileActionLogic.SelectedDriveList ?? Data.Files;
+
+    private static FileActionsEnable Gesture => GestureList.Actions;
+
+    private static void RunOnGesture(Action action)
+    {
+        using (Data.Use(GestureList))
+            action();
+    }
+
     private static readonly Dictionary<FileActionType, KeyGesture> Gestures = new()
     {
         { FileActionType.Filter, new(Key.F, ModifierKeys.Control) },
@@ -49,6 +60,7 @@ public static class AppActions
         { FileActionType.FollowLink, "\uE838" },
         { FileActionType.Refresh, "\uE72C" },
         { FileActionType.FileOpStop, "\uE768" },
+        { FileActionType.ContextAddSavedLocation, "\uE734" },
         { FileActionType.ContextRemoveSavedLocation, "\uE8D9" },
     };
 
@@ -114,8 +126,8 @@ public static class AppActions
             Gestures[FileActionType.Filter],
             true),
         new(FileActionType.Pull,
-            () => Explorer.PullEnabled,
-            () => RunOnExplorer(() => FileActionLogic.PullFiles()),
+            () => Gesture.PullEnabled,
+            () => RunOnGesture(() => FileActionLogic.PullFiles()),
             Data.FileActions.PullDescription,
             new(Key.C, ModifierKeys.Alt),
             true,
@@ -147,8 +159,8 @@ public static class AppActions
             Strings.Resources.S_MENU_FOLDERS,
             clearClipboard: true),
         new(FileActionType.PushFiles,
-            () => Explorer.PushFilesFoldersEnabled,
-            () => RunOnExplorer(() => FileActionLogic.PushItems(false, false)),
+            () => Gesture.PushFilesFoldersEnabled,
+            () => RunOnGesture(() => FileActionLogic.PushItems(false, false)),
             Strings.Resources.S_MENU_FILES,
             new(Key.V, ModifierKeys.Alt),
             true,
@@ -260,8 +272,8 @@ public static class AppActions
             () => Data.RequestExplorer(ExplorerRequest.InvertSelection),
             Strings.Resources.S_MENU_INVERT_SELECTION),
         new(FileActionType.KeyboardCut,
-            () => Explorer.CutEnabled && !Data.FileActions.IsExplorerEditing,
-            () => RunOnExplorer(() => FileActionLogic.CutItems()),
+            () => Gesture.CutEnabled && !Data.FileActions.IsExplorerEditing,
+            () => RunOnGesture(() => FileActionLogic.CutItems()),
             Strings.Resources.S_MENU_CUT,
             Gestures[FileActionType.Cut],
             true),
@@ -276,8 +288,8 @@ public static class AppActions
             Strings.Resources.S_MENU_CUT,
             Gestures[FileActionType.Cut]),
         new(FileActionType.KeyboardCopy,
-            () => Explorer.CopyEnabled && !Data.FileActions.IsExplorerEditing,
-            () => RunOnExplorer(() => FileActionLogic.CutItems(true)),
+            () => Gesture.CopyEnabled && !Data.FileActions.IsExplorerEditing,
+            () => RunOnGesture(() => FileActionLogic.CutItems(true)),
             Strings.Resources.S_MENU_COPY,
             Gestures[FileActionType.Copy],
             true),
@@ -292,8 +304,8 @@ public static class AppActions
             Strings.Resources.S_MENU_COPY,
             Gestures[FileActionType.Copy]),
         new(FileActionType.CopyLink,
-            () => Explorer.IsCopyLinkEnabled,
-            () => RunOnExplorer(() => FileActionLogic.CopyLinkFiles(Data.SelectedFiles)),
+            () => Gesture.IsCopyLinkEnabled,
+            () => RunOnGesture(() => FileActionLogic.CopyLinkFiles(Data.SelectedFiles)),
             Strings.Resources.S_MENU_COPY_LINK,
             new(Key.L, ModifierKeys.Control | ModifierKeys.Shift),
             true),
@@ -315,8 +327,8 @@ public static class AppActions
             FileActionLogic.ExtractArchiveHere,
             Strings.Resources.S_MENU_EXTRACT_HERE),
         new(FileActionType.KeyboardPaste,
-            () => ((Explorer.IsKeyboardPasteEnabled && Data.CopyPaste.HasFiles) || FileActionLogic.CanPasteClipboardImageAtSelection(isKeyboard: true)) && !Data.FileActions.IsExplorerEditing,
-            () => RunOnExplorer(() => FileActionLogic.PasteFiles(Data.SelectedFiles)),
+            () => ((Gesture.IsKeyboardPasteEnabled && Data.CopyPaste.HasFiles) || FileActionLogic.CanPasteClipboardImageAtSelection(isKeyboard: true)) && !Data.FileActions.IsExplorerEditing,
+            () => RunOnGesture(() => FileActionLogic.PasteFiles(Data.SelectedFiles)),
             Data.FileActions.PasteDescription,
             Gestures[FileActionType.Paste],
             true),
@@ -331,8 +343,8 @@ public static class AppActions
             Data.FileActions.PasteDescription,
             Gestures[FileActionType.Paste]),
         new(FileActionType.PasteLink,
-            () => Explorer.IsPasteLinkEnabled,
-            () => RunOnExplorer(() => FileActionLogic.PasteFiles(Data.SelectedFiles, isLink: true)),
+            () => Gesture.IsPasteLinkEnabled,
+            () => RunOnGesture(() => FileActionLogic.PasteFiles(Data.SelectedFiles, isLink: true)),
             Strings.Resources.S_MENU_PASTE_LINK,
             new(Key.L, ModifierKeys.Control),
             true),
@@ -365,8 +377,8 @@ public static class AppActions
             Data.FileActions.RestoreDescription,
             clearClipboard: true),
         new(FileActionType.KeyboardDelete,
-            () => Explorer.DeleteEnabled && !Data.FileActions.IsExplorerEditing,
-            () => RunOnExplorer(() => FileActionLogic.DeleteFiles()),
+            () => Gesture.DeleteEnabled && !Data.FileActions.IsExplorerEditing,
+            () => RunOnGesture(() => FileActionLogic.DeleteFiles()),
             Data.FileActions.DeleteDescription,
             Gestures[FileActionType.Delete],
             true,
@@ -384,8 +396,8 @@ public static class AppActions
             Gestures[FileActionType.Delete],
             clearClipboard: true),
         new(FileActionType.CopyItemPath,
-            () => Explorer.IsCopyItemPathEnabled,
-            () => RunOnExplorer(FileActionLogic.CopyItemPath),
+            () => Gesture.IsCopyItemPathEnabled,
+            () => RunOnGesture(FileActionLogic.CopyItemPath),
             Data.FileActions.CopyPathDescription,
             new(Key.C, ModifierKeys.Control | ModifierKeys.Shift),
             true),
@@ -529,6 +541,10 @@ public static class AppActions
             Strings.Resources.S_CLOSE_TAB,
             new(Key.W, ModifierKeys.Control),
             true),
+        new(FileActionType.ContextAddSavedLocation,
+            () => Actions.AddSavedLocationEnabled,
+            FileActionLogic.AddSavedLocation,
+            Strings.Resources.S_MENU_ADD_SAVED_LOCATION),
         new(FileActionType.ContextRemoveSavedLocation,
             () => Actions.RemoveSavedLocationEnabled,
             FileActionLogic.RemoveSavedLocation,
@@ -638,6 +654,7 @@ public class FileAction : ObservableObject
         OpenPackageLocation,
         ContextOpenPackageLocation,
         Enter,
+        ContextAddSavedLocation,
         ContextRemoveSavedLocation,
         ContextOpenInNewTab,
         ContextOpenInWindowsExplorer,

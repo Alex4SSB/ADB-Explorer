@@ -99,15 +99,15 @@ public sealed unsafe class ShellContentStream : Stream
         // Our own streams (another instance of the app) are managed objects, not COM proxies
         if (_comStream is IPointerStream pointerStream)
         {
-            var hr = pointerStream.Read((HANDLE)destination, count, (HANDLE)(&read));
-            if (hr is not (HResult.Ok or HResult.False))
+            var hr = pointerStream.Read((IntPtr)destination, count, (IntPtr)(&read));
+            if (hr != HRESULT.S_OK && hr != HRESULT.S_FALSE)
                 throw new IOException($"Reading the shell's stream failed (0x{(int)hr:X8})", (int)hr);
 
             return read;
         }
 
         var managed = new byte[count];
-        ((IStream)_comStream!).Read(managed, count, (HANDLE)(&read));
+        ((IStream)_comStream!).Read(managed, count, (IntPtr)(&read));
         managed.AsSpan(0, read).CopyTo(new Span<byte>(destination, count));
 
         return read;

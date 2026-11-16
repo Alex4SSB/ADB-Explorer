@@ -38,6 +38,9 @@ public partial class FileActionsEnable : ObservableObject
 
     public bool IsCopyAsImageEnabled { get; set; }
 
+    /// <summary>Tree context target is a folder or drive whose path isn't saved yet.</summary>
+    public bool AddSavedLocationEnabled { get; set; }
+
     /// <summary>Tree context target is a saved-location node (<see cref="NavigationTreeNode.IsSavedLocation"/>).</summary>
     public bool RemoveSavedLocationEnabled { get; set; }
 

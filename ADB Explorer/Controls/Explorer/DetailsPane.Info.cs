@@ -133,6 +133,10 @@ public partial class DetailsPane
             && !ArchivePath.IsArchivePath(file.FullPath, deviceId)
             && !file.IsCreationTimeResolved;
 
+        // A LIS2 listing already has the dates and owner ids; the stat is only for ids not yet named
+        if (probeExtraInfo && file.TryResolveExtraInfoFromListing(Data.ActiveDevice))
+            probeExtraInfo = false;
+
         if (probeExtraInfo && _extraInfoPath != file.FullPath)
         {
             _extraInfoCts?.Cancel();

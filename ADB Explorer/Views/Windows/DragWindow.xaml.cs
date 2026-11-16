@@ -1,6 +1,8 @@
 ﻿using System.Windows.Documents;
 using Wpf.Ui.Appearance;
 using static ADB_Explorer.Services.NativeMethods;
+using HWND = Vanara.PInvoke.HWND;
+using POINT = Vanara.PInvoke.POINT;
 
 namespace ADB_Explorer.Views.Windows;
 
@@ -22,7 +24,7 @@ public partial class DragWindow : INotifyPropertyChanged
 
     private readonly DispatcherTimer DragTimer = new() { Interval = TimeSpan.FromMilliseconds(200) };
 
-    private HANDLE _dragWindowHandle;
+    private HWND _dragWindowHandle;
 
     /// <summary>
     /// The scaling factor of the primary monitor when the window is loaded. 
@@ -248,7 +250,7 @@ public partial class DragWindow : INotifyPropertyChanged
         });
     }
 
-    private HANDLE _hwndUnderMouse = IntPtr.Zero;
+    private HWND _hwndUnderMouse = HWND.NULL;
 
     private void Popup_Opened(object sender, EventArgs e)
     {

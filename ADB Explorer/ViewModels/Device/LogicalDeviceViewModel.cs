@@ -297,14 +297,54 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     private readonly HashSet<string> _knownGroups = new(StringComparer.Ordinal);
     private bool _unixIdsLoaded;
 
-    public void RecordUnixIdentity(string? user, string? group)
+    // Ids stat has named, so a listing's uid/gid (LIS2) can be shown without another stat
+    private readonly Dictionary<int, string> _userNames = [];
+    private readonly Dictionary<int, string> _groupNames = [];
+
+    public void RecordUnixIdentity(string? user, string? group, int? uid = null, int? gid = null)
     {
         lock (_unixIdLock)
         {
             if (!string.IsNullOrEmpty(user))
+            {
                 _knownUsers.Add(user);
+                if (uid is int userId)
+                    _userNames[userId] = user;
+            }
+
             if (!string.IsNullOrEmpty(group))
+            {
                 _knownGroups.Add(group);
+                if (gid is int groupId)
+                    _groupNames[groupId] = group;
+            }
+        }
+    }
+
+    public bool TryGetUnixNames(int uid, int gid, [NotNullWhen(true)] out string? user, [NotNullWhen(true)] out string? group)
+    {
+        lock (_unixIdLock)
+        {
+            group = null;
+            return _userNames.TryGetValue(uid, out user) && _groupNames.TryGetValue(gid, out group);
+        }
+    }
+
+    private TimeZoneInfo? _timeZone;
+
+    /// <summary>The device's time zone, so listed times show its UTC offset like stat does; null until props load or if unknown.</summary>
+    public TimeZoneInfo? TimeZone
+    {
+        get
+        {
+            if (_timeZone is null
+                && Props.GetValueOrDefault(AdbService.TIME_ZONE_PROP) is { Length: > 0 } id
+                && TimeZoneInfo.TryFindSystemTimeZoneById(id, out var zone))
+            {
+                _timeZone = zone;
+            }
+
+            return _timeZone;
         }
     }
 

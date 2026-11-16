@@ -78,6 +78,10 @@ public sealed partial class DeviceMount
     private static CF_PLACEHOLDER_CREATE_INFO CreateInfo(FileStat entry, FileFlagsAndAttributes extraAttributes)
     {
         var time = (entry.ModifiedTime ?? DateTime.Now).ToFileTimeStruct();
+
+        // LIST v1 has only the modified time, which then stands in for the others
+        var accessTime = entry.AccessTime?.UtcDateTime.ToFileTimeStruct() ?? time;
+        var changeTime = entry.ChangeTime?.UtcDateTime.ToFileTimeStruct() ?? time;
         var isFolder = entry.Type is FileType.Folder;
         var attributes = FileFlagsAndAttributes.FILE_ATTRIBUTE_DIRECTORY | extraAttributes;
         if (!isFolder)
@@ -101,8 +105,8 @@ public sealed partial class DeviceMount
                     FileAttributes = attributes,
                     CreationTime = time,
                     LastWriteTime = time,
-                    LastAccessTime = time,
-                    ChangeTime = time,
+                    LastAccessTime = accessTime,
+                    ChangeTime = changeTime,
                 },
             },
         };

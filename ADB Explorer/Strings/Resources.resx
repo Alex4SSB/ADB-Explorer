@@ -828,6 +828,10 @@ Cancel All Running</value>
     <value>Open Item Location</value>
     <comment>The menu used to open the (source) location to a symbolic link</comment>
   </data>
+  <data name="S_MENU_ADD_SAVED_LOCATION" xml:space="preserve">
+    <value>Add to saved locations</value>
+    <comment>Tree context menu action saving the right-clicked folder or drive as a saved location</comment>
+  </data>
   <data name="S_MENU_REMOVE_SAVED_LOCATION" xml:space="preserve">
     <value>Remove from saved locations</value>
     <comment>Tree context menu action removing a pinned saved-location node</comment>

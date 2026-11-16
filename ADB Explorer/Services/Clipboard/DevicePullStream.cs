@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices.ComTypes;
 using static ADB_Explorer.Services.NativeMethods;
+using STGTY = Vanara.PInvoke.Ole32.STGTY;
 
 namespace ADB_Explorer.Services;
 
@@ -14,12 +15,12 @@ public sealed unsafe class DevicePullStream(SyncPipe pipe, long? size, Action? f
     private Action? _firstRead = firstRead;
 
     /// <summary>A COM pointer for the shell's STGMEDIUM, which takes over its reference.</summary>
-    public HANDLE ToComPointer() => Marshal.GetComInterfaceForObject(this, typeof(IPointerStream));
+    public IntPtr ToComPointer() => Marshal.GetComInterfaceForObject(this, typeof(IPointerStream));
 
     // Runs once the shell released its last reference: a pull it stopped reading would otherwise wait forever on a full pipe
     ~DevicePullStream() => pipe.CloseReader();
 
-    public HResult Read(HANDLE pv, int cb, HANDLE pcbRead)
+    public HRESULT Read(IntPtr pv, int cb, IntPtr pcbRead)
     {
         Interlocked.Exchange(ref _firstRead, null)?.Invoke();
 
@@ -33,17 +34,17 @@ public sealed unsafe class DevicePullStream(SyncPipe pipe, long? size, Action? f
 #if !DEPLOY
             DebugLog.PrintLine($"DevicePullStream read failed: {e.Message}");
 #endif
-            return HResult.Fail;
+            return HRESULT.E_FAIL;
         }
 
         _position += read;
         if (pcbRead != 0)
             *(int*)pcbRead = read;
 
-        return read < cb ? HResult.False : HResult.Ok;
+        return read < cb ? HRESULT.S_FALSE : HRESULT.S_OK;
     }
 
-    public HResult Seek(long dlibMove, SeekOrigin dwOrigin, HANDLE plibNewPosition)
+    public HRESULT Seek(long dlibMove, SeekOrigin dwOrigin, IntPtr plibNewPosition)
     {
         var target = dwOrigin switch
         {
@@ -53,44 +54,39 @@ public sealed unsafe class DevicePullStream(SyncPipe pipe, long? size, Action? f
         };
 
         if (target != _position)
-            return HResult.StgInvalidFunction;
+            return HRESULT.STG_E_INVALIDFUNCTION;
 
         if (plibNewPosition != 0)
             *(long*)plibNewPosition = _position;
 
-        return HResult.Ok;
+        return HRESULT.S_OK;
     }
 
-    public HResult Stat(out STATSTG pstatstg, int grfStatFlag)
+    public HRESULT Stat(out STATSTG pstatstg, int grfStatFlag)
     {
         pstatstg = new() { type = (int)STGTY.STGTY_STREAM, cbSize = size ?? 0 };
 
-        return HResult.Ok;
+        return HRESULT.S_OK;
     }
 
-    public HResult Write(HANDLE pv, int cb, HANDLE pcbWritten) => HResult.NotImplemented;
+    public HRESULT Write(IntPtr pv, int cb, IntPtr pcbWritten) => HRESULT.E_NOTIMPL;
 
-    public HResult SetSize(long libNewSize) => HResult.NotImplemented;
+    public HRESULT SetSize(long libNewSize) => HRESULT.E_NOTIMPL;
 
-    public HResult CopyTo(HANDLE pstm, long cb, HANDLE pcbRead, HANDLE pcbWritten) => HResult.NotImplemented;
+    public HRESULT CopyTo(IntPtr pstm, long cb, IntPtr pcbRead, IntPtr pcbWritten) => HRESULT.E_NOTIMPL;
 
-    public HResult Commit(int grfCommitFlags) => HResult.Ok;
+    public HRESULT Commit(int grfCommitFlags) => HRESULT.S_OK;
 
-    public HResult Revert() => HResult.NotImplemented;
+    public HRESULT Revert() => HRESULT.E_NOTIMPL;
 
-    public HResult LockRegion(long libOffset, long cb, int dwLockType) => HResult.NotImplemented;
+    public HRESULT LockRegion(long libOffset, long cb, int dwLockType) => HRESULT.E_NOTIMPL;
 
-    public HResult UnlockRegion(long libOffset, long cb, int dwLockType) => HResult.NotImplemented;
+    public HRESULT UnlockRegion(long libOffset, long cb, int dwLockType) => HRESULT.E_NOTIMPL;
 
-    public HResult Clone(out HANDLE ppstm)
+    public HRESULT Clone(out IntPtr ppstm)
     {
         ppstm = 0;
 
-        return HResult.NotImplemented;
-    }
-
-    private enum STGTY
-    {
-        STGTY_STREAM = 2,
+        return HRESULT.E_NOTIMPL;
     }
 }

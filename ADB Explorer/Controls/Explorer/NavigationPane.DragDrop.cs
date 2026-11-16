@@ -177,43 +177,7 @@ public partial class NavigationPane
     }
 
     private void ApplyTreeDropEffects(DragEventArgs e, NavigationTreeNode node)
-    {
-        var allowed = Data.CopyPaste.GetAllowedTreeDropEffects(e.Data, node);
-        SetTreeDropHighlight(node, allowed);
-
-        e.Effects = CopyPasteService.ResolveDropEffect(allowed, e.KeyStates, Data.CopyPaste.IsFromDevice(node.OwnerDevice));
-
-        Data.CopyPaste.DropEffect =
-        Data.CopyPaste.CurrentDropEffect = e.Effects;
-        Data.CopyPaste.DropTarget = node.Path;
-        Data.CopyPaste.DropTargetDevice = node.OwnerDevice;
-
-        // A drag cancelled with a right click stays without its drag window
-        if (Data.CopyPaste.IsDragCanceled)
-            return;
-
-        // Foreign drags (e.g. from Windows Explorer) never set a drag image on drag start like our own
-        // drags do, so DragWindow stays hidden unless something sets one while dragging over a drop
-        // target - mirrors ExplorerGrid_DragOver's equivalent handling for the explorer grid.
-        var isAppDrive = node.Drive?.Type is AbstractDrive.DriveType.Package;
-        if (isAppDrive)
-        {
-            if (!Data.CopyPaste.IsSelf && FileHelper.AllFilesAreApks(Data.CopyPaste.DragFiles))
-                Data.CopyPaste.DragBitmap = DefaultAndroidPackageIcon.Bitmap;
-        }
-        else if (Data.CopyPaste.HasUnnamedFiles)
-        {
-            Data.CopyPaste.DragBitmap = FileIconProvider.GetMultipleFilesIcon(120);
-        }
-        else if (Data.CopyPaste.DragThumbnail is { } thumbnail)
-        {
-            Data.CopyPaste.DragBitmap = thumbnail;
-        }
-        else if (Data.CopyPaste.CurrentFiles.Any())
-        {
-            Data.CopyPaste.DragBitmap = Data.CopyPaste.CurrentFiles.First().DragImage;
-        }
-    }
+        => SetTreeDropHighlight(node, Data.CopyPaste.ApplyTreeDropEffects(e, node));
 
     private void SetTreeDropHighlight(NavigationTreeNode node, DragDropEffects allowed)
     {

@@ -193,6 +193,8 @@ public partial class AdbService
 
     public const string HOST_NAME = "net.hostname";
 
+    public const string TIME_ZONE_PROP = "persist.sys.timezone";
+
     public const string SERIAL_NO = "ro.serialno";
 
     public const string QEMU_BOOT_AVD_NAME = "ro.boot.qemu.avd_name";

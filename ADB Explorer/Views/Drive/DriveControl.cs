@@ -10,7 +10,7 @@ public class DriveControl : UserControl
 
     protected void Card_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        if (sender is FrameworkElement { DataContext: DriveViewModel drive })
+        if (e.ChangedButton is MouseButton.Left && sender is FrameworkElement { DataContext: DriveViewModel drive })
         {
             drive.BrowseCommand.Execute();
             // Navigating can synchronously swap the drive view out for the Explorer grid/icon

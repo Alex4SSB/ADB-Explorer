@@ -72,6 +72,7 @@ public class FileList
         };
 
         list.Actions.RemoveSavedLocationEnabled = node.IsSavedLocation;
+        list.Actions.AddSavedLocationEnabled = CanAddSavedLocation(node);
 
         if (drive?.Type is AbstractDrive.DriveType.Package)
         {
@@ -98,6 +99,19 @@ public class FileList
         list.Actions.IsExplorerVisible = true;
         list.CanWrite = DriveHelper.GetRestrictions(node.Path, device).ReadOnly is not true;
         return list;
+    }
+
+    /// <summary>A folder or storage drive (not a saved shortcut) whose path isn't saved for its device yet.</summary>
+    private static bool CanAddSavedLocation(NavigationTreeNode node)
+    {
+        if (node.IsSavedLocation || node.IsTemp || !(node.IsFolderNode || node.IsLogicalDriveNode))
+            return false;
+
+        if (node.OwnerDevice?.SavedLocationsKey is not { } deviceId
+            || AdbLocation.LocationFromString(node.Path) is not Navigation.SpecialLocation.None)
+            return false;
+
+        return !FileActionLogic.IsSavedLocation(deviceId, node.Path);
     }
 
     private static FileClass? FindListedFile(string path, LogicalDeviceViewModel? device)

@@ -13,7 +13,21 @@
     xmlns:views="clr-namespace:ADB_Explorer.Views"
     d:DataContext="{d:DesignInstance Type=viewmodels:LogicalDeviceViewModel}"
     mc:Ignorable="d">
-    <ui:CardControl Style="{StaticResource DeviceExpanderStyle}">
+    <ui:CardControl ContextMenuOpening="Card_ContextMenuOpening">
+        <ui:CardControl.Style>
+            <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="ui:CardControl">
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource CardBackgroundPointerOver}" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </ui:CardControl.Style>
+        <!--  Same menu as the device's navigation tree node  -->
+        <ui:CardControl.ContextMenu>
+            <controls:AdbContextMenu Style="{StaticResource DeviceContextMenuStyle}" />
+        </ui:CardControl.ContextMenu>
         <ui:CardControl.Header>
             <Grid>
                 <Grid.RowDefinitions>

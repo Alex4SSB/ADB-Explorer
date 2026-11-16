@@ -348,7 +348,7 @@ public partial class DetailsPane
                 ? await PdfDocument.LoadFromStreamAsync(rasStream)
                 : await PdfDocument.LoadFromStreamAsync(rasStream, password);
         }
-        catch (Exception ex) when (ex.HResult is (int)NativeMethods.HResult.ERROR_WRONG_PASSWORD)
+        catch (Exception ex) when (ex.HResult == (int)HRESULT.HRESULT_FROM_WIN32(Vanara.PInvoke.Win32Error.ERROR_WRONG_PASSWORD))
         {
             App.SafeInvoke(() =>
             {

@@ -114,6 +114,8 @@ public partial class App
         // A shader the GPU/driver rejects would otherwise crash the app; WPF just skips the effect when handled.
         System.Windows.Media.Effects.PixelShader.InvalidPixelShaderEncountered += (_, _) => { };
 
+        RightDoubleClickGuard.Register();
+
         if (!AppInstanceGuard.TryClaim())
         {
             AppInstanceGuard.ActivateExisting();
@@ -283,8 +285,8 @@ public partial class App
         // Stop mouse interception which causes partial mouse freeze during crashes
         NativeMethods.InterceptMouse.Close();
 
-        if (e.Exception.HResult is (int)NativeMethods.HResult.CLIPBRD_E_CANT_OPEN
-            or (int)NativeMethods.HResult.E_ACCESSDENIED)
+        if (e.Exception.HResult is HRESULT.CLIPBRD_E_CANT_OPEN
+            or HRESULT.E_ACCESSDENIED)
         {
             e.Handled = true;
             return;

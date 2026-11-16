@@ -400,6 +400,11 @@ public partial class NavigationTreeViewModel : ObservableObject
     public void SetContextTarget(NavigationTreeNode? node)
         => ContextTarget = node;
 
+    /// <summary>The tree node of a drive card, so the drive view applies the tree's rules to it.</summary>
+    public NavigationTreeNode? FindDriveNode(DriveViewModel drive)
+        => TreeSource.SelectMany(deviceNode => deviceNode.Children)
+            .FirstOrDefault(node => !node.IsSavedLocation && ReferenceEquals(node.Drive, drive));
+
     private NavigationTreeNode? FindParent(NavigationTreeNode child)
         => FindParent(TreeSource, child);
 

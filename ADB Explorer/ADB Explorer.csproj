@@ -43,7 +43,7 @@
   </ItemGroup>
 
   <!-- AdvancedSharpAdbClient, built from our fork (github.com/Alex4SSB/AdvancedSharpAdbClient,
-       branch fix/push-short-read) until the Push short-read fix is released upstream. -->
+       branch fix/stat-v2-offsets) until the stat v2 time offsets fix (upstream PR #141) is released. -->
   <ItemGroup>
     <Reference Include="AdvancedSharpAdbClient">
       <HintPath>Libs\AdvancedSharpAdbClient\AdvancedSharpAdbClient.dll</HintPath>
@@ -108,6 +108,7 @@
     <PackageReference Include="System.IO.Hashing" Version="11.0.0" />
     <PackageReference Include="System.Management" Version="11.0.0" />
     <PackageReference Include="Vanara.PInvoke.CldApi" Version="5.0.8" />
+    <PackageReference Include="Vanara.PInvoke.SHCore" Version="5.0.8" />
     <PackageReference Include="Vanara.Windows.Shell.Common" Version="5.0.8" />
     <PackageReference Include="WPF-UI" Version="4.3.0" />
     <PackageReference Include="WPF-UI.DependencyInjection" Version="4.3.0" />

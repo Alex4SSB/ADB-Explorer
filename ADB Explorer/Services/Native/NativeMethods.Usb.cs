@@ -1,6 +1,6 @@
-using Microsoft.Win32.SafeHandles;
-
 namespace ADB_Explorer.Services;
+
+using Vanara.PInvoke;
 
 public static partial class NativeMethods
 {
@@ -8,9 +8,6 @@ public static partial class NativeMethods
     private const uint CM_GETIDLIST_FILTER_ENUMERATOR = 0x1;
     private const uint CM_GETIDLIST_FILTER_PRESENT = 0x100;
     private const uint CM_DRP_ADDRESS = 0x1D;
-    private const uint GENERIC_WRITE = 0x40000000;
-    private const uint FILE_SHARE_WRITE = 0x2;
-    private const uint OPEN_EXISTING = 3;
     private const uint IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX = 0x220448;
     private const uint IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX_V2 = 0x22045C;
 
@@ -34,7 +31,7 @@ public static partial class NativeMethods
                 || GetHubPath(hubId) is not { } hubPath)
                 return null;
 
-            using var hub = CreateFileW(hubPath, GENERIC_WRITE, FILE_SHARE_WRITE, 0, OPEN_EXISTING, 0, 0);
+            using var hub = Kernel32.CreateFile(hubPath, Kernel32.FileAccess.GENERIC_WRITE, FileShare.Write, null, FileMode.Open, 0);
             if (hub.IsInvalid)
                 return null;
 
@@ -44,7 +41,7 @@ public static partial class NativeMethods
             BitConverter.GetBytes(16u).CopyTo(v2, 4);
             BitConverter.GetBytes(7u).CopyTo(v2, 8);
 
-            if (DeviceIoControl(hub, IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX_V2, v2, 16, v2, 16, out _, 0))
+            if (HubIoControl(hub, IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX_V2, v2))
             {
                 var flags = BitConverter.ToUInt32(v2, 12);
                 if ((flags & 0x4) != 0)
@@ -57,7 +54,7 @@ public static partial class NativeMethods
             // USB_NODE_CONNECTION_INFORMATION_EX: Speed is the byte after the 4-byte index, 18-byte descriptor and config value
             var ex = new byte[512];
             BitConverter.GetBytes(port).CopyTo(ex, 0);
-            if (!DeviceIoControl(hub, IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX, ex, (uint)ex.Length, ex, (uint)ex.Length, out _, 0))
+            if (!HubIoControl(hub, IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX, ex))
                 return null;
 
             return ex[23] switch
@@ -142,10 +139,10 @@ public static partial class NativeMethods
     [LibraryImport("cfgmgr32.dll", StringMarshalling = StringMarshalling.Utf16)]
     private static partial int CM_Get_Device_Interface_ListW(ref Guid interfaceClass, string deviceId, [Out] char[] buffer, uint length, uint flags);
 
-    [LibraryImport("kernel32.dll", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
-    private static partial SafeFileHandle CreateFileW(string fileName, uint access, uint share, nint security, uint disposition, uint flags, nint template);
-
-    [LibraryImport("kernel32.dll", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool DeviceIoControl(SafeFileHandle device, uint code, byte[] inBuffer, uint inLength, [Out] byte[] outBuffer, uint outLength, out uint returned, nint overlapped);
+    /// <summary>Sends a hub IOCTL whose input and output share <paramref name="buffer"/>.</summary>
+    private static unsafe bool HubIoControl(Kernel32.SafeHFILE hub, uint code, byte[] buffer)
+    {
+        fixed (byte* data = buffer)
+            return Kernel32.DeviceIoControl(hub, code, data, (uint)buffer.Length, data, (uint)buffer.Length, out _, null);
+    }
 }

@@ -23,6 +23,18 @@ public partial class LogicalDeviceControl : UserControl
         }, DispatcherPriority.Input);
     }
 
+    private void Card_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+    {
+        // The name box keeps its own text menu
+        if (HitTestHelper.FindAncestor<TextBoxBase>(e.OriginalSource as DependencyObject) is not null
+            || DataContext is not LogicalDeviceViewModel device)
+            return;
+
+        DeviceContextMenu.SetFor(device);
+        if (DeviceContextMenu.VisibleList.Count == 0)
+            e.Handled = true;
+    }
+
     private void NameTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key is not Key.Escape || DataContext is not LogicalDeviceViewModel device)

@@ -869,7 +869,7 @@ public class FileSyncOperation : AbstractSyncFileOperation
     /// The stream the shell reads <paramref name="devicePath"/> from, its pull started along with the next files' once it's read.
     /// Once the op is over (e.g. the clipboard is pasted again), the files still stream, just untracked.
     /// </summary>
-    public HANDLE OpenShellStream(string devicePath, long? size)
+    public IntPtr OpenShellStream(string devicePath, long? size)
     {
         var pull = GetShellPull(devicePath, size, startOver: true);
 

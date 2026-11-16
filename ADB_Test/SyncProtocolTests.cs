@@ -61,7 +61,9 @@ public class SyncProtocolTests
 
     private static void Setup(DeviceData device)
         => Shell(device, $"rm -rf {Root}; mkdir -p {Root}/{Sub}/{Deeper} && cd {Root} && head -c 4321 /dev/urandom > {A} "
-            + $"&& head -c 99 /dev/urandom > {Sub}/{B} && : > {Sub}/{Deeper}/{Zero} && touch -t 200001020304.05 {A}");
+            + $"&& head -c 99 /dev/urandom > {Sub}/{B} && : > {Sub}/{Deeper}/{Zero} && touch -t 200001020304.05 {A} "
+            // A distinct access time, so a listing that mixes it up with the modified time fails
+            + $"&& touch -a -t 199901020304.05 {A}");
 
     [TestMethod]
     public void ListDirectoryEntries_GivesTypesSizesAndTimes()
@@ -81,6 +83,45 @@ public class SyncProtocolTests
                 Assert.AreEqual(long.Parse(Shell(device, $"stat -c %Y {Root}/{A}")), new DateTimeOffset(entries[A].ModifiedTime!.Value).ToUnixTimeSeconds());
                 Assert.AreEqual(FileType.Folder, entries[Sub].Type);
                 Assert.IsNull(entries[Sub].Size);
+            }
+            finally
+            {
+                Shell(device, $"rm -rf {Root}");
+            }
+        }
+    }
+
+    [TestMethod]
+    public void ListDirectoryEntries_Lis2GivesAccessTimeAndOwnerIds()
+    {
+        foreach (var device in Devices())
+        {
+            try
+            {
+                Setup(device);
+
+                var entries = AdbService.ListDirectoryEntries(device.Serial, Root, CancellationToken.None).ToDictionary(e => e.FullName);
+
+                // LIST v1 has no access time or owner, so the selection stat still fills them there
+                if (!new AdbClient().GetFeatureSet(device).Contains(AdbService.FEATURE_LS_V2))
+                {
+                    Assert.IsNull(entries[A].AccessTime, device.Model);
+                    continue;
+                }
+
+                foreach (var name in new[] { A, Sub })
+                {
+                    var stat = Shell(device, $"stat -c '%X %u %g %Z' {Root}/{name}").Split(' ');
+
+                    Assert.AreEqual(long.Parse(stat[0]), entries[name].AccessTime?.ToUnixTimeSeconds(), $"{device.Model} {name}");
+                    Assert.AreEqual(int.Parse(stat[1]), entries[name].OwnerUid, $"{device.Model} {name}");
+                    Assert.AreEqual(int.Parse(stat[2]), entries[name].OwnerGid, $"{device.Model} {name}");
+                    Assert.AreEqual(long.Parse(stat[3]), entries[name].ChangeTime?.ToUnixTimeSeconds(), $"{device.Model} {name}");
+                }
+
+                // Listed times are shown in the device's zone, as stat prints them
+                var zoneId = Shell(device, $"getprop {AdbService.TIME_ZONE_PROP}");
+                Assert.IsTrue(TimeZoneInfo.TryFindSystemTimeZoneById(zoneId, out _), $"{device.Model} {zoneId}");
             }
             finally
             {

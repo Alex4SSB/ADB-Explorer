@@ -624,7 +624,7 @@ public partial class CopyPasteService
         Task.Run(() =>
         {
             var worker = takeSource();
-            var result = NativeMethods.HResult.Fail;
+            HRESULT result = HRESULT.E_FAIL;
             string? staging = null;
             string[] staged = [];
 
@@ -636,7 +636,7 @@ public partial class CopyPasteService
 
                 // Copied, as the source may clean its files up once told we're done
                 staged = [.. paths.Select(path => CopyInto(path, folder))];
-                result = NativeMethods.HResult.Ok;
+                result = HRESULT.S_OK;
             }
             catch (Exception e)
             {

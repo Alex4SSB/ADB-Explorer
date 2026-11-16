@@ -45,5 +45,6 @@ global using ADB_Explorer.ViewModels.Windows;
 global using ADB_Explorer.Views;
 global using ADB_Explorer.Views.Pages;
 global using ADB_Explorer.Views.Windows;
-global using HANDLE = nint;
+global using HANDLE = Vanara.PInvoke.HANDLE;
+global using HRESULT = Vanara.PInvoke.HRESULT;
 

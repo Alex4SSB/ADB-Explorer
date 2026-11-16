@@ -144,7 +144,19 @@
             x:Key="DriveContainerStyleNoScroll"
             BasedOn="{StaticResource DriveContainerStyle}"
             TargetType="ui:ListViewItem">
+            <!--  Menu and drop follow the drive's navigation tree node (see ExplorerListHost.Drives.cs)  -->
+            <Setter Property="AllowDrop" Value="True" />
+            <Setter Property="ContextMenu">
+                <Setter.Value>
+                    <local:AdbContextMenu Style="{StaticResource ExplorerContextMenuStyle}" />
+                </Setter.Value>
+            </Setter>
             <EventSetter Event="RequestBringIntoView" Handler="DriveScrollViewer_RequestBringIntoView" />
+            <EventSetter Event="ContextMenuOpening" Handler="DriveItem_ContextMenuOpening" />
+            <EventSetter Event="DragEnter" Handler="DriveItem_DragOver" />
+            <EventSetter Event="DragOver" Handler="DriveItem_DragOver" />
+            <EventSetter Event="DragLeave" Handler="DriveItem_DragLeave" />
+            <EventSetter Event="Drop" Handler="DriveItem_Drop" />
         </Style>
         <Style
             x:Key="DriveListViewStyle"

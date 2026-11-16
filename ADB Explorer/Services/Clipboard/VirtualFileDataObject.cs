@@ -5,6 +5,7 @@
 using System.Runtime.InteropServices.ComTypes;
 using Vanara.Extensions;
 using static ADB_Explorer.Services.FileDescriptor;
+using static Vanara.PInvoke.Kernel32;
 using static Vanara.PInvoke.Shell32;
 
 namespace ADB_Explorer.Services;
@@ -49,7 +50,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     /// <returns>HRESULT success code.</returns>
     int System.Runtime.InteropServices.ComTypes.IDataObject.DAdvise(ref FORMATETC pFormatetc, ADVF advf, IAdviseSink adviseSink, out int connection)
     {
-        NativeMethods.ThrowExceptionForHR(NativeMethods.HResult.OLE_E_ADVISENOTSUPPORTED);
+        Marshal.ThrowExceptionForHR(HRESULT.OLE_E_ADVISENOTSUPPORTED);
         throw new NotImplementedException();
     }
 
@@ -59,7 +60,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     /// <param name="connection">A DWORD token that specifies the connection to remove.</param>
     void System.Runtime.InteropServices.ComTypes.IDataObject.DUnadvise(int connection)
     {
-        NativeMethods.ThrowExceptionForHR(NativeMethods.HResult.OLE_E_ADVISENOTSUPPORTED);
+        Marshal.ThrowExceptionForHR(HRESULT.OLE_E_ADVISENOTSUPPORTED);
         throw new NotImplementedException();
     }
 
@@ -70,7 +71,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     /// <returns>HRESULT success code.</returns>
     int System.Runtime.InteropServices.ComTypes.IDataObject.EnumDAdvise(out IEnumSTATDATA enumAdvise)
     {
-        NativeMethods.ThrowExceptionForHR(NativeMethods.HResult.OLE_E_ADVISENOTSUPPORTED);
+        Marshal.ThrowExceptionForHR(HRESULT.OLE_E_ADVISENOTSUPPORTED);
         throw new NotImplementedException();
     }
 
@@ -91,14 +92,14 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         }
 
         // Create enumerator and return it
-        var res = NativeMethods.SHCreateStdEnumFmtEtc(_dataObjects.Count, _dataObjects.Select(d => d.FORMATETC), out IEnumFORMATETC enumerator);
-        if (res is NativeMethods.HResult.Ok)
+        var res = SHCreateStdEnumFmtEtc((uint)_dataObjects.Count, [.. _dataObjects.Select(d => d.FORMATETC)], out var enumerator);
+        if (res == HRESULT.S_OK && enumerator is not null)
         {
             return enumerator;
         }
 
         // Returning null here can cause an AV in the caller; throw instead
-        NativeMethods.ThrowExceptionForHR(res);
+        Marshal.ThrowExceptionForHR((int)res);
         throw new NotImplementedException();
     }
 
@@ -123,7 +124,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         var formatCopy = format;
         medium = new();
 
-        var hr = (NativeMethods.HResult)((System.Runtime.InteropServices.ComTypes.IDataObject)this).QueryGetData(ref format);
+        var hr = (HRESULT)((System.Runtime.InteropServices.ComTypes.IDataObject)this).QueryGetData(ref format);
 
 #if !DEPLOY
         AdbDataFormat adbDataFormat = AdbDataFormats.GetFormat(formatCopy.cfFormat);
@@ -133,7 +134,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             DebugLog.PrintLine($"Query: {adbDataFormat.Name}");
 #endif
 
-        if (hr is NativeMethods.HResult.Ok)
+        if (hr == HRESULT.S_OK)
         {
             // Find the best match
             var dataObject = _dataObjects.FirstOrDefault(d =>
@@ -147,7 +148,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
                 if (formatCopy.tymed.HasFlag(TYMED.TYMED_ISTREAM) && !_inOperation && Method is DataObjectMethod.DragDrop)
                 {
                     // forbid access to stream before drop operation starts
-                    hr = NativeMethods.HResult.DV_E_FORMATETC;
+                    hr = HRESULT.DV_E_FORMATETC;
                 }
                 else
                 {
@@ -166,7 +167,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
                     var result = dataObject.GetData(); // Possible call to user code
 
                     hr = result.Item2;
-                    if (hr is NativeMethods.HResult.Ok)
+                    if (hr == HRESULT.S_OK)
                     {
                         medium.unionmember = result.Item1;
                     }
@@ -175,12 +176,12 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             else
             {
                 // Couldn't find a match
-                hr = NativeMethods.HResult.DV_E_FORMATETC;
+                hr = HRESULT.DV_E_FORMATETC;
             }
         }
 
         // Not redundant; hr gets updated in the block above
-        if (hr is NativeMethods.HResult.Ok)
+        if (hr == HRESULT.S_OK)
             return;
 
         // We seem unable to send data to File Explorer in DEBUG, even when not debugging.
@@ -211,26 +212,26 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     /// <returns>HRESULT success code.</returns>
     int System.Runtime.InteropServices.ComTypes.IDataObject.QueryGetData(ref FORMATETC format)
     {
-        NativeMethods.HResult GetError(FORMATETC format)
+        HRESULT GetError(FORMATETC format)
         {
             var formatCopy = format; // Cannot use ref or out parameter inside an anonymous method, lambda expression, or query expression
             var formatMatches = _dataObjects.Where(d => d.FORMATETC.cfFormat == formatCopy.cfFormat);
             if (!formatMatches.Any())
             {
-                return NativeMethods.HResult.DV_E_FORMATETC;
+                return HRESULT.DV_E_FORMATETC;
             }
             var tymedMatches = formatMatches.Where(d => 0 != (d.FORMATETC.tymed & formatCopy.tymed));
             if (!tymedMatches.Any())
             {
-                return NativeMethods.HResult.DV_E_TYMED;
+                return HRESULT.DV_E_TYMED;
             }
             // The shell's drop target may ask with more than one aspect (e.g. content | thumbnail)
             var aspectMatches = tymedMatches.Where(d => 0 != (d.FORMATETC.dwAspect & formatCopy.dwAspect));
             if (!aspectMatches.Any())
             {
-                return NativeMethods.HResult.DV_E_DVASPECT;
+                return HRESULT.DV_E_DVASPECT;
             }
-            return NativeMethods.HResult.Ok;
+            return HRESULT.S_OK;
         }
 
         return (int)GetError(format);
@@ -252,12 +253,12 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             })
         {
             // Supported format; capture the data
-            var ptr = NativeMethods.MGlobalLock(medium.unionmember);
+            var ptr = GlobalLock(medium.unionmember);
             if (IntPtr.Zero != ptr)
             {
                 try
                 {
-                    var length = NativeMethods.MGlobalSize(ptr).ToInt32();
+                    var length = (int)GlobalSize(ptr);
                     var data = new byte[length];
                     Marshal.Copy(ptr, data, 0, length);
 
@@ -273,9 +274,9 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
 
                     if (format == AdbDataFormats.PasteSucceeded)
                     {
-                        var completionResult = PerformedDropEffect is DragDropEffects.None
-                            ? NativeMethods.HResult.Canceled
-                            : NativeMethods.HResult.Ok;
+                        HRESULT completionResult = PerformedDropEffect is DragDropEffects.None
+                            ? HRESULT.E_CANCELLED
+                            : HRESULT.S_OK;
 
 #if !DEPLOY
                         DebugLog.PrintLine($"PasteSucceeded received. PerformedDropEffect={PerformedDropEffect}, completionResult={completionResult}");
@@ -286,7 +287,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
                 }
                 finally
                 {
-                    NativeMethods.MGlobalUnlock(medium.unionmember);
+                    GlobalUnlock(medium.unionmember);
                 }
             }
 
@@ -335,7 +336,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             var dataArray = data.ToArray();
             var ptr = Marshal.AllocHGlobal(dataArray.Length);
             Marshal.Copy(dataArray, 0, ptr, dataArray.Length);
-            return (ptr, NativeMethods.HResult.Ok);
+            return (ptr, HRESULT.S_OK);
         };
     }
 
@@ -353,7 +354,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             var dataArray = data.ToArray();
             var ptr = Marshal.AllocHGlobal(dataArray.Length);
             Marshal.Copy(dataArray, 0, ptr, dataArray.Length);
-            return (ptr, NativeMethods.HResult.Ok);
+            return (ptr, HRESULT.S_OK);
         },
     });
 
@@ -389,9 +390,9 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         {
             var ptr = streamData();
             if (ptr == 0)
-                return (IntPtr.Zero, NativeMethods.HResult.DV_E_FORMATETC);
+                return (IntPtr.Zero, HRESULT.DV_E_FORMATETC);
 
-            return (ptr, NativeMethods.HResult.Ok);
+            return (ptr, HRESULT.S_OK);
         },
     });
 
@@ -480,14 +481,14 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         {
             // Read the value and return it
             var result = dataObject.GetData();
-            if (result.Item2 is NativeMethods.HResult.Ok)
+            if (result.Item2 == HRESULT.S_OK)
             {
-                var ptr = NativeMethods.MGlobalLock(result.Item1);
+                var ptr = GlobalLock(result.Item1);
                 if (IntPtr.Zero != ptr)
                 {
                     try
                     {
-                        var length = NativeMethods.MGlobalSize(ptr).ToInt32();
+                        var length = (int)GlobalSize(ptr);
                         if (4 == length)
                         {
                             var data = new byte[length];
@@ -497,7 +498,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
                     }
                     finally
                     {
-                        NativeMethods.MGlobalUnlock(result.Item1);
+                        GlobalUnlock(result.Item1);
                     }
                 }
             }
@@ -557,7 +558,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     /// <param name="dwEffects">A DROPEFFECT value that indicates the result of an optimized move. This should be the same value that would be passed to the data object as a CFSTR_PERFORMEDDROPEFFECT format with a normal data extraction operation.</param>
     void IAsyncOperation.EndOperation(int hResult, IBindCtx pbcReserved, uint dwEffects)
     {
-        var hRes = (NativeMethods.HResult)hResult;
+        var hRes = (HRESULT)hResult;
         var dwEffect = (DragDropEffects)dwEffects;
 
 #if !DEPLOY
@@ -570,7 +571,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
 
     #endregion
 
-    public event EventHandler<NativeMethods.HResult>? OperationCompleted;
+    public event EventHandler<HRESULT>? OperationCompleted;
 
     /// <summary>
     /// Class representing the result of a SetData call.
@@ -585,7 +586,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         /// <summary>
         /// Func returning the data as an IntPtr and an HRESULT success code.
         /// </summary>
-        public required Func<(HANDLE, NativeMethods.HResult)> GetData { get; set; }
+        public required Func<(IntPtr, HRESULT)> GetData { get; set; }
     }
 
     public static VirtualFileDataObject? PrepareTransfer(IEnumerable<Package> packages,
@@ -764,7 +765,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         foreach (var (op, members) in groups)
         {
             op.StreamToShell(members.SelectMany(m => m.StreamOrder));
-            vfdo.OperationCompleted += (_, hResult) => op.EndShellStream(hResult is NativeMethods.HResult.Ok);
+            vfdo.OperationCompleted += (_, hResult) => op.EndShellStream(hResult == HRESULT.S_OK);
 
             foreach (var member in members)
                 member.File.AttachShellPull(op);
@@ -858,25 +859,25 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             var escapePressed = (0 != fEscapePressed);
             vfdo.DragModifiers = (DragDropKeyStates)grfKeyState;
 
-            var res = NativeMethods.HResult.Ok;
+            HRESULT res = HRESULT.S_OK;
 
             if (escapePressed)
             {
-                res = NativeMethods.HResult.DRAGDROP_S_CANCEL;
+                res = HRESULT.DRAGDROP_S_CANCEL;
             }
             else
             {
                 if (vfdo.DragModifiers.HasFlag(DragDropKeyStates.RightMouseButton))
-                    res = NativeMethods.HResult.DRAGDROP_S_CANCEL;
+                    res = HRESULT.DRAGDROP_S_CANCEL;
                 else if (!vfdo.DragModifiers.HasFlag(DragDropKeyStates.LeftMouseButton))
                 {
                     res = vfdo.CurrentEffect is DragDropEffects.None
-                        ? NativeMethods.HResult.DRAGDROP_S_CANCEL
-                        : NativeMethods.HResult.DRAGDROP_S_DROP;
+                        ? HRESULT.DRAGDROP_S_CANCEL
+                        : HRESULT.DRAGDROP_S_DROP;
                 }
             }
 
-            if (res is not NativeMethods.HResult.Ok)
+            if (res != HRESULT.S_OK)
             {
                 Data.CopyPaste.DragBitmap = null;
                 Data.CopyPaste.DragStatus = CopyPasteService.DragState.None;
@@ -923,7 +924,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             else
                 Mouse.SetCursor(Cursors.Arrow);
 
-            return (int)NativeMethods.HResult.Ok;
+            return (int)HRESULT.S_OK;
         }
     }
 

@@ -478,6 +478,14 @@
         <Setter Property="Padding" Value="14,10" />
         <Setter Property="helpers:StyleHelper.EnableSelection" Value="True" />
         <Setter Property="helpers:StyleHelper.IsSelected" Value="{Binding IsSelected}" />
+        <Style.Triggers>
+            <!--  Mouse over doesn't update while dragging, so a drop target shows the hover look this way  -->
+            <DataTrigger Binding="{Binding IsDragOver}" Value="True">
+                <Setter Property="Background" Value="{DynamicResource CardBackgroundPointerOver}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource CardForegroundPointerOver}" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="DriveContainerStyle"

@@ -71,8 +71,40 @@ internal static partial class FileActionLogic
 
     public static void UpdateFileActions(FileList list)
     {
+        // First, so the explorer's own update leaves the shared context-menu state as its own.
+        if (ReferenceEquals(list, Data.Files))
+            UpdateSelectedDriveActions();
+
         using (Data.Use(list))
             UpdateFileActionsCore(list);
+    }
+
+    /// <summary>The drive selected in the drive view, as its tree node's list; key gestures act on it.</summary>
+    internal static FileList? SelectedDriveList { get; private set; }
+
+    /// <summary>The tree node a drive card's context menu, drop and key gestures act through, following the tree's rules.</summary>
+    internal static NavigationTreeNode? DriveTreeNode(DriveViewModel drive)
+        => ExplorerTree?.FindDriveNode(drive);
+
+    /// <summary>The tree's context target, which tree-only actions (new folder, open in new tab, saved locations) act on.</summary>
+    internal static void SetTreeContextTarget(NavigationTreeNode? node)
+        => ExplorerTree?.SetContextTarget(node);
+
+    private static void UpdateSelectedDriveActions()
+    {
+        SelectedDriveList = null;
+
+        // The trash card keeps its own delete handling (SelectedTrashDrive).
+        if (!Data.FileActions.IsDriveViewVisible
+            || Data.RuntimeSettings.SelectedDrive is not { Type: not AbstractDrive.DriveType.Trash } drive
+            || DriveTreeNode(drive) is not { } node
+            || FileList.FromTreeNode(node) is not { } list)
+            return;
+
+        using (Data.Use(list))
+            UpdateFileActionsCore(list);
+
+        SelectedDriveList = list;
     }
 
     /// <summary>
