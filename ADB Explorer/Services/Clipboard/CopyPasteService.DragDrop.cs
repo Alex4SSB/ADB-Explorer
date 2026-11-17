@@ -6,6 +6,18 @@ namespace ADB_Explorer.Services;
 public partial class CopyPasteService
 {
     /// <summary>
+    /// Starts a drag of our own. Its target is unknown until the first DragOver, so the last drag's isn't shown meanwhile.
+    /// </summary>
+    public void BeginSelfDrag()
+    {
+        DropEffect =
+        CurrentDropEffect = DragDropEffects.None;
+        DropTarget = null;
+        DragStatus = DragState.Active;
+        WasDragging = true;
+    }
+
+    /// <summary>
     /// Picks the drop effect from the allowed effects and modifier keys: move within the same source, copy otherwise.
     /// </summary>
     public static DragDropEffects ResolveDropEffect(DragDropEffects allowed, DragDropKeyStates keys, bool sameSource)

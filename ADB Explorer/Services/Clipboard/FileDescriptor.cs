@@ -214,7 +214,7 @@ struct FILEDESCRIPTOR : IByteStruct
     public FILETIME ftLastAccessTime;
     public FILETIME ftLastWriteTime;
     public FILESIZE nFileSize;
-    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_PATH)]
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Vanara.PInvoke.Kernel32.MAX_PATH)]
     public string cFileName;
 
     public readonly IEnumerable<byte> Bytes => BytesFromStructure(this);

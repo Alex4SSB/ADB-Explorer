@@ -13,8 +13,6 @@ public static partial class NativeMethods
 {
     #region Constants
 
-    public const int MAX_PATH = 260;
-
     public const int VARIANT_FALSE = 0;
     public const int VARIANT_TRUE = -1;
 

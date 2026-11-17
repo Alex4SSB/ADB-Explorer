@@ -1,6 +1,7 @@
 ﻿using System.Windows.Documents;
 using Wpf.Ui.Appearance;
 using static ADB_Explorer.Services.NativeMethods;
+using DROPIMAGETYPE = Vanara.PInvoke.Shell32.DROPIMAGETYPE;
 using HWND = Vanara.PInvoke.HWND;
 using POINT = Vanara.PInvoke.POINT;
 
@@ -116,7 +117,20 @@ public partial class DragWindow : INotifyPropertyChanged
                 return;
 
             string target = "";
-            if (Data.CopyPaste.MouseWithinApp)
+            if (!Data.CopyPaste.MouseWithinApp
+                && Data.CopyPaste.ShellDropDescription is { IsValid: true } description)
+            {
+                // The target's own wording is shown unless its verb disagrees with our effect (e.g. it's from before a key change)
+                if (description.Type is not (DROPIMAGETYPE.DROPIMAGE_COPY or DROPIMAGETYPE.DROPIMAGE_MOVE or DROPIMAGETYPE.DROPIMAGE_LINK)
+                    || (DragDropEffects)description.Type == Data.CopyPaste.CurrentDropEffect)
+                {
+                    AddShellDescription(description);
+                    return;
+                }
+
+                target = description.Insert;
+            }
+            else if (Data.CopyPaste.MouseWithinApp)
             {
                 if (Data.CopyPaste.IsFromDevice(Data.CopyPaste.DropTargetDevice)
                     && Data.CopyPaste.DropTarget == Data.CopyPaste.DragParent
@@ -140,7 +154,7 @@ public partial class DragWindow : INotifyPropertyChanged
 
             if (count == 1 && shownCount is not null)
             {
-                int sourceLength = target is null ? 30 : 45 - target.Length;
+                int sourceLength = target is null ? 30 : Math.Max(15, 45 - target.Length);
                 // Trash items are dragged by their indexer name; show the name they were deleted with
                 var sourceName = Data.CopyPaste.DragFiles[0];
                 if (Data.CopyPaste.IsFromTrash && Data.CopyPaste.CurrentFiles.FirstOrDefault() is { TrashIndex: not null } trashItem)
@@ -250,6 +264,22 @@ public partial class DragWindow : INotifyPropertyChanged
         });
     }
 
+    /// <summary>
+    /// Shows a shell drop description - its %1 is replaced by the insert, which keeps the default color like our targets.
+    /// </summary>
+    private void AddShellDescription(DropDescription description)
+    {
+        var parts = description.Message.Split("%1");
+        for (int i = 0; i < parts.Length; i++)
+        {
+            if (i > 0 && !string.IsNullOrEmpty(description.Insert))
+                DragTooltip.Inlines.Add(description.Insert);
+
+            if (parts[i].Length > 0)
+                DragTooltip.Inlines.Add(new Run(parts[i]) { Foreground = _blueBrush });
+        }
+    }
+
     private HWND _hwndUnderMouse = HWND.NULL;
 
     private void Popup_Opened(object sender, EventArgs e)
@@ -279,7 +309,8 @@ public partial class DragWindow : INotifyPropertyChanged
             if ((e.PropertyName == nameof(Data.CopyPaste.DragFiles)
                 || e.PropertyName == nameof(Data.CopyPaste.DropTarget)
                 || e.PropertyName == nameof(Data.CopyPaste.CurrentDropEffect)
-                || e.PropertyName == nameof(Data.CopyPaste.MouseWithinApp))
+                || e.PropertyName == nameof(Data.CopyPaste.MouseWithinApp)
+                || e.PropertyName == nameof(Data.CopyPaste.ShellDropDescription))
                 && Data.CopyPaste.DragBitmap is not null)
             {
                 GetPathUnderMouse();
@@ -302,6 +333,7 @@ public partial class DragWindow : INotifyPropertyChanged
     /// </summary>
     private void BeginDrag()
     {
+        Data.CopyPaste.ClearShellDropDescription();
         UpdatePosition(InterceptMouse.GetCursorPosition());
 
         // The main window may have come to the front since the drag window was last used.
@@ -314,6 +346,9 @@ public partial class DragWindow : INotifyPropertyChanged
 #endif
 
         DragTimer.Start();
+
+        // The tooltip still holds the last drag's text until it's drawn for this one
+        GetPathUnderMouse();
     }
 
     /// <summary>
@@ -323,6 +358,7 @@ public partial class DragWindow : INotifyPropertyChanged
     private void EndDrag()
     {
         DragTimer.Stop();
+        Data.CopyPaste.ClearShellDropDescription();
 
 #if !DEBUG
         InterceptMouse.Close();
@@ -407,11 +443,16 @@ public partial class DragWindow : INotifyPropertyChanged
 
         UpdatePosition(point);
 
+        var previousHwnd = _hwndUnderMouse;
         _hwndUnderMouse = InterceptMouse.GetWindowUnderMouse();
 
         // Shouldn't happen. But if it does, we don't want to do anything.
         if (_hwndUnderMouse == _dragWindowHandle)
             return;
+
+        // A description belongs to the window that wrote it; the hook runs before the next target's DragEnter
+        if (_hwndUnderMouse != previousHwnd)
+            Data.CopyPaste.ClearShellDropDescription();
 
         var wasWithinApp = Data.CopyPaste.MouseWithinApp;
         Data.CopyPaste.MouseWithinApp = _hwndUnderMouse == InterceptClipboard.MainWindowHandle;

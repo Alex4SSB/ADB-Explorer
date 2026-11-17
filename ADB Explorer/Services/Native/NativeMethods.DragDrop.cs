@@ -34,6 +34,33 @@ public static partial class NativeMethods
         return finalEffect;
     }
 
+    /// <summary>
+    /// CFSTR_DROPDESCRIPTION, written to the source data object by a shell drop target.
+    /// </summary>
+    public record DropDescription(DROPIMAGETYPE Type, string Message, string Insert)
+    {
+        /// <summary>True when the target describes the drop, rather than clearing its description.</summary>
+        public bool IsValid => Type is not DROPIMAGETYPE.DROPIMAGE_INVALID && !string.IsNullOrEmpty(Message);
+
+        public static DropDescription? FromBytes(byte[] bytes)
+        {
+            // DWORD type, then two WCHAR[MAX_PATH] strings
+            if (bytes.Length < sizeof(int) + MAX_PATH * 2 * 2)
+                return null;
+
+            static string ReadString(byte[] bytes, int offset)
+            {
+                var text = Encoding.Unicode.GetString(bytes, offset, MAX_PATH * 2);
+                var end = text.IndexOf('\0');
+                return end < 0 ? text : text[..end];
+            }
+
+            return new((DROPIMAGETYPE)BitConverter.ToInt32(bytes, 0),
+                       ReadString(bytes, sizeof(int)),
+                       ReadString(bytes, sizeof(int) + MAX_PATH * 2));
+        }
+    }
+
     public interface IByteStruct
     {
         public IEnumerable<byte> Bytes { get; }

@@ -121,6 +121,34 @@ public partial class CopyPasteService : ObservableObject
 
     public string? DragTabTooltip { get; set; }
 
+    /// <summary>What the shell target under the cursor says the drop does, when it writes one to our data object.</summary>
+    [ObservableProperty]
+    public partial NativeMethods.DropDescription? ShellDropDescription { get; private set; }
+
+    /// <summary>Counts clears of <see cref="ShellDropDescription"/>, so a description posted before one is dropped.</summary>
+    private int _shellDescriptionVersion;
+
+    /// <summary>
+    /// Sets a description a target wrote, from inside its COM call: on the UI thread without waiting,
+    /// unless it was cleared meanwhile (it then belongs to a window the cursor left).
+    /// </summary>
+    public void PostShellDropDescription(NativeMethods.DropDescription? description)
+    {
+        var version = Volatile.Read(ref _shellDescriptionVersion);
+        App.SafeBeginInvoke(() =>
+        {
+            if (version == _shellDescriptionVersion)
+                ShellDropDescription = description;
+        });
+    }
+
+    /// <summary>Clears <see cref="ShellDropDescription"/>, including one still on its way to the UI thread.</summary>
+    public void ClearShellDropDescription()
+    {
+        Interlocked.Increment(ref _shellDescriptionVersion);
+        ShellDropDescription = null;
+    }
+
     /// <summary>
     /// The drag image's bounds in pixels relative to the cursor - so its location is negative when the
     /// mouse holds it away from its top left - else null for the standard size, above the cursor.

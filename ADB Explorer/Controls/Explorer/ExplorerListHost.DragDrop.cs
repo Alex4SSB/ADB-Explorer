@@ -123,29 +123,29 @@ public partial class ExplorerListHost
     {
         IEnumerable<FileClass> selectedItems;
         VirtualFileDataObject? vfdo;
+        DragDropEffects allowedEffects;
         if (FileActions.IsAppDrive)
         {
             vfdo = VirtualFileDataObject.PrepareTransfer(ActiveSelectedItems.Cast<Package>());
             selectedItems = VirtualFileDataObject.SelfFiles!;
+            allowedEffects = DragDropEffects.Copy;
         }
         else
         {
             selectedItems = ActiveSelectedItems.Cast<FileClass>();
             // Archive extract is copy-only (no cut / symlink from inside an archive).
-            var effects = FileActions.IsArchive
+            allowedEffects = FileActions.IsArchive
                 ? DragDropEffects.Copy
                 : DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link;
 
-            vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems, effects);
-            if (FileActions.IsArchive && vfdo is not null)
-                vfdo.PreferredDropEffect = DragDropEffects.Copy;
+            // No preferred effect: Explorer then defaults to Copy, while a preferred Copy alone makes it refuse Shift's Move
+            vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems, DragDropEffects.None);
         }
 
         if (vfdo is null)
             return;
 
-        CopyPaste.DragStatus = CopyPasteService.DragState.Active;
-        CopyPaste.WasDragging = true;
+        CopyPaste.BeginSelfDrag();
         CopyPaste.UpdateSelfVFDO(true);
 
         if (FileActions.IsAppDrive)
@@ -165,7 +165,7 @@ public partial class ExplorerListHost
         DragAutoScroll.Begin();
         try
         {
-            vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, dragSource, vfdo.PreferredDropEffect ?? DragDropEffects.Copy);
+            vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, dragSource, allowedEffects);
         }
         finally
         {

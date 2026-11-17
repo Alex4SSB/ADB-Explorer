@@ -99,17 +99,15 @@ public partial class NavigationPane
         VirtualFileDataObject? vfdo;
         using (Data.Use(list))
         {
-            vfdo = VirtualFileDataObject.PrepareTransfer(
-                files,
-                DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
+            // No preferred effect: Explorer then defaults to Copy, while a preferred Copy alone makes it refuse Shift's Move
+            vfdo = VirtualFileDataObject.PrepareTransfer(files, DragDropEffects.None);
             if (vfdo is null)
                 return;
 
             Data.CopyPaste.UpdateSelfVFDO(true);
         }
 
-        Data.CopyPaste.DragStatus = CopyPasteService.DragState.Active;
-        Data.CopyPaste.WasDragging = true;
+        Data.CopyPaste.BeginSelfDrag();
         Data.CopyPaste.DragBitmap = files[0].DragImage;
         node.IsDragSource = true;
         NavigationTreeNode.SuppressUserSelectFromExpander++;
@@ -120,7 +118,7 @@ public partial class NavigationPane
             vfdo.SendObjectToShell(
                 VirtualFileDataObject.DataObjectMethod.DragDrop,
                 item,
-                vfdo.PreferredDropEffect ?? DragDropEffects.Copy);
+                DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
         }
         finally
         {
