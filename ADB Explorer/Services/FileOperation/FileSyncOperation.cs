@@ -614,9 +614,11 @@ public class FileSyncOperation : AbstractSyncFileOperation
     {
         var claimed = item.Size ?? 0;
         long synced = 0;
+        var reported = false;
 
         void SyncProgressCallback(SyncProgressChangedEventArgs eventArgs)
         {
+            reported = true;
             var delta = AddUpdates(item, eventArgs);
             synced += delta;
             lane.Done(delta);
@@ -625,6 +627,14 @@ public class FileSyncOperation : AbstractSyncFileOperation
         try
         {
             SyncFileOver(lane, item, SyncProgressCallback, fileMode);
+
+            // An empty file has no data chunks, so the sync service never reports progress for it.
+            // Report it here, or the file is never seen as complete (and fails if its size was unknown).
+            if (!reported && !_isCanceled)
+            {
+                item.Size ??= 0;
+                SyncProgressCallback(new SyncProgressChangedEventArgs(0, 0));
+            }
         }
         catch
         {
