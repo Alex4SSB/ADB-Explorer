@@ -42,6 +42,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <controls:FluentPathIcon Style="{StaticResource DeviceStatusPathIcon}" />
+                    <controls:PhoneLockIcon Style="{StaticResource DeviceLockedIconStyle}" />
                     <TextBox
                         Grid.Column="1"
                         VerticalAlignment="Center"
@@ -241,6 +242,9 @@
                                     <DataTrigger Binding="{Binding AndroidVersion}" Value="{x:Null}">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
+                                    <DataTrigger Binding="{Binding Status}" Value="Locked">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
@@ -269,6 +273,20 @@
                 BorderBrush="{DynamicResource SeparatorForeground}"
                 BorderThickness="1"
                 CornerRadius="4">
+                <!--  Same conditions as the menu items below: hidden when none of them is shown  -->
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Status}" Value="Ok">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding RemoveCommand.IsEnabled}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
                 <controls:AdbMenu>
                     <controls:AdbMenu.Resources>
                         <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">

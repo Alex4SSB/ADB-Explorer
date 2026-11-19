@@ -4561,6 +4561,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} - Locked. Unlock the device to access it.
+        /// </summary>
+        public static string S_STATUS_LOCKED {
+            get {
+                return ResourceManager.GetString("S_STATUS_LOCKED", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to {0} - Offline.
         /// </summary>
         public static string S_STATUS_OFFLINE {

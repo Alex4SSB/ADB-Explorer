@@ -4,6 +4,7 @@ public partial class NavigationTreeViewModel : ObservableObject
 {
     private readonly Func<IEnumerable<IBrowserItem>?> _currentExplorerItems;
     private readonly HashSet<ObservableList<DriveViewModel>> _subscribedDriveLists = [];
+    private readonly HashSet<LogicalDeviceViewModel> _subscribedDevices = [];
     private NavigationTreeNode? _selectedTreeNode;
     private bool _syncing;
 
@@ -66,6 +67,32 @@ public partial class NavigationTreeViewModel : ObservableObject
             if (_subscribedDriveLists.Add(list))
                 list.CollectionChanged += Drives_CollectionChanged;
         }
+
+        SubscribeDeviceStatuses();
+    }
+
+    // All listed devices, not just the shown ones - a device turning online (or locked) changes which are shown
+    private void SubscribeDeviceStatuses()
+    {
+        var devices = Data.DevicesObject?.LogicalDeviceViewModels?.ToHashSet() ?? [];
+
+        foreach (var old in _subscribedDevices.Where(device => !devices.Contains(device)).ToList())
+        {
+            old.PropertyChanged -= Device_PropertyChanged;
+            _subscribedDevices.Remove(old);
+        }
+
+        foreach (var device in devices)
+        {
+            if (_subscribedDevices.Add(device))
+                device.PropertyChanged += Device_PropertyChanged;
+        }
+    }
+
+    private void Device_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(DeviceViewModel.Status))
+            Sync();
     }
 
     private void Drives_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -281,6 +308,14 @@ public partial class NavigationTreeViewModel : ObservableObject
         if (_syncing || node.IsInEditMode || node.IsTemp || _editingNode is not null || DeviceHelper.IsSwitchingTabDevice)
             return;
 
+        // A locked device can't be opened - keep the previous selection
+        if (GetNodeDevice(node) is { Status: DeviceStatus.Locked })
+        {
+            node.SetSelected(false);
+            _selectedTreeNode?.SetSelected(true);
+            return;
+        }
+
         if (node.Device is { } device)
         {
             Data.RuntimeSettings.PendingLocationAfterDeviceOpen = null;
@@ -309,7 +344,7 @@ public partial class NavigationTreeViewModel : ObservableObject
     /// <summary>Opens a device (its drive view), drive or folder node in a new tab.</summary>
     public void OpenNodeInNewTab(NavigationTreeNode node)
     {
-        if (node.IsTemp || node.IsInEditMode || GetNodeDevice(node) is not { } device)
+        if (node.IsTemp || node.IsInEditMode || GetNodeDevice(node) is not { Status: not DeviceStatus.Locked } device)
             return;
 
         AdbLocation? location = null;

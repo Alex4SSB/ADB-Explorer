@@ -41,6 +41,10 @@
                 <Setter Property="Visibility" Value="Visible" />
                 <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_ROOT_ENABLED}}" />
             </DataTrigger>
+            <!--  A locked device shows only its connection  -->
+            <DataTrigger Binding="{Binding Status}" Value="Locked">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
         </Style.Triggers>
         <Setter Property="Visibility" Value="Collapsed" />
     </Style>
@@ -79,6 +83,19 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCriticalBrush}" />
             </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+    <!--  Locked badge beside the device name, in place of DeviceStatusPathIcon  -->
+    <Style x:Key="DeviceLockedIconStyle" TargetType="controls:PhoneLockIcon">
+        <Setter Property="Size" Value="20" />
+        <Setter Property="Margin" Value="0,-2,6,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Visibility" Value="Collapsed" />
+        <Setter Property="ToolTip" Value="{Binding Tooltip}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Status}" Value="Locked">
+                <Setter Property="Visibility" Value="Visible" />
+            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style x:Key="DeviceNameTextBlockStyle" TargetType="TextBlock">

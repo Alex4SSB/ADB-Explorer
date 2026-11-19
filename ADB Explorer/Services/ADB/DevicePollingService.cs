@@ -114,6 +114,7 @@ public class DevicePollingService : BackgroundService
 
         // A serial read late (its first read failed) regroups the devices even if the list itself is unchanged
         var serialsResolved = AdbService.ResolveRemoteSerials(list, CancellationToken.None);
+        list = AdbService.ApplyLockStates(list, CancellationToken.None);
         if (!serialsResolved && !Data.DevicesObject.DevicesChanged(list))
             return;
 

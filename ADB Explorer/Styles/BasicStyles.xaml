@@ -215,6 +215,24 @@
             </MultiDataTrigger>
         </Style.Triggers>
     </Style>
+    <Style
+        x:Key="IconCautionPathStyle"
+        BasedOn="{StaticResource MonochromeIconPathStyle}"
+        TargetType="Path">
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="True">
+                <Setter Property="Fill" Value="{DynamicResource SystemFillColorCautionBrush}" />
+            </Trigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsHighContrast}" Value="True" />
+                    <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(helpers:StyleHelper.IsMenuHighlighted)}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Fill" Value="{DynamicResource MouseOverForeground}" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
     <Style x:Key="MonochromeIconPathStrokeStyle" TargetType="Path">
         <Setter Property="Stroke" Value="{DynamicResource SelectedForeground}" />
         <Style.Triggers>

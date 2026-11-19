@@ -418,6 +418,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
                 DeviceStatus.Ok => "{0}",
                 DeviceStatus.Offline => Strings.Resources.S_STATUS_OFFLINE,
                 DeviceStatus.Unauthorized => Strings.Resources.S_STATUS_UNAUTH,
+                DeviceStatus.Locked => Strings.Resources.S_STATUS_LOCKED,
                 _ => throw new NotSupportedException(),
             };
 
@@ -569,6 +570,16 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     public DeviceAction ClearNameCommand { get; }
     public List<RebootCommand> RebootCommands { get; } = [];
 
+    /// <summary>Requeries the commands gated on <see cref="DeviceViewModel.Status"/>, which polling changes without any input.</summary>
+    internal void NotifyStatusCommands()
+    {
+        BrowseCommand?.NotifyIsEnabledChanged();
+        RemoveCommand?.NotifyIsEnabledChanged();
+        ToggleRootCommand?.NotifyIsEnabledChanged();
+        SideloadCommand?.NotifyIsEnabledChanged();
+        EditNameCommand?.NotifyIsEnabledChanged();
+    }
+
     #endregion
 
     public LogicalDeviceViewModel(LogicalDevice device) : base(device)
@@ -592,7 +603,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
         ToggleRootCommand = DeviceHelper.ToggleRootDeviceCommand(this);
 
-        EditNameCommand = new(() => true, ToggleNameEdit);
+        EditNameCommand = new(() => device.Status is not DeviceStatus.Locked, ToggleNameEdit);
         ClearNameCommand = new(() => true, ClearCustomName);
 
         App.SafeInvoke(() =>

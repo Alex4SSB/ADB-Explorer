@@ -22,7 +22,7 @@ public partial class NavigationTreeViewModel
             return [];
 
         return devices.Where(device =>
-            (device.Status is DeviceStatus.Ok || device.IsOpen || IsActiveDevice(device))
+            (device.Status is DeviceStatus.Ok or DeviceStatus.Locked || device.IsOpen || IsActiveDevice(device))
             && DeviceHelper.DevicePredicate(device));
     }
 
@@ -51,6 +51,10 @@ public partial class NavigationTreeViewModel
 
             SyncSavedLocationsForDevice(node, device);
             SyncDrivesForDevice(node, device);
+
+            if (device.Status is DeviceStatus.Locked)
+                node.IsExpanded = false;
+
             remaining.Add(node);
         }
 
@@ -141,7 +145,10 @@ public partial class NavigationTreeViewModel
     /// <summary>Saved-location nodes always occupy the front of the device node's children, ahead of drives.</summary>
     private void SyncSavedLocationsForDevice(NavigationTreeNode deviceNode, LogicalDeviceViewModel device)
     {
-        var entries = Data.Settings.SavedLocations.Where(e => e.DeviceId == device.SavedLocationsKey).ToList();
+        // A locked device shows no children, so it can't be expanded
+        var entries = Data.Settings.SavedLocations
+            .Where(e => e.DeviceId == device.SavedLocationsKey && device.Status is not DeviceStatus.Locked)
+            .ToList();
         var remaining = new HashSet<NavigationTreeNode>();
 
         for (var i = 0; i < entries.Count; i++)
@@ -282,6 +289,9 @@ public partial class NavigationTreeViewModel
 
     internal static IEnumerable<DriveViewModel> VisibleDrives(LogicalDeviceViewModel device)
     {
+        if (device.Status is DeviceStatus.Locked)
+            return [];
+
         return device.Drives.Where(drive => drive.Type switch
         {
             AbstractDrive.DriveType.Trash => Data.Settings.EnableRecycle,

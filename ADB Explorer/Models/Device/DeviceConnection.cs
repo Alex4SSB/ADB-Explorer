@@ -32,8 +32,9 @@ public class DeviceConnection
             var statusRank = Status switch
             {
                 DeviceStatus.Ok => 0,
-                DeviceStatus.Unauthorized => 1,
-                _ => 2,
+                DeviceStatus.Locked => 1,
+                DeviceStatus.Unauthorized => 2,
+                _ => 3,
             };
 
             var typeRank = Type switch

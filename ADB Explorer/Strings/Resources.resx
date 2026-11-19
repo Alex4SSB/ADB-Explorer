@@ -1052,6 +1052,10 @@ Cancel All Running</value>
     <value>{0} - Unauthorized</value>
     <comment>A device that hasn't authorized ADB yet</comment>
   </data>
+  <data name="S_STATUS_LOCKED" xml:space="preserve">
+    <value>{0} - Locked. Unlock the device to access it</value>
+    <comment>A device that wasn't unlocked since it booted, so its files are still encrypted</comment>
+  </data>
   <data name="S_TYPE_EMULATOR" xml:space="preserve">
     <value>Emulator</value>
     <comment>An emulated Android device (other than WSA)</comment>

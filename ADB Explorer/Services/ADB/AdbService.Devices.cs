@@ -81,6 +81,42 @@ public partial class AdbService
         return resolved;
     }
 
+    // Crypto type first: only file-based encryption locks user storage, and ce_available is unset without it
+    private const string STORAGE_LOCK_CHECK = "getprop ro.crypto.type; getprop sys.user.0.ce_available";
+
+    /// <summary>Transports found with unlocked storage. It stays unlocked until a reboot, which drops the transport.</summary>
+    private static readonly ConcurrentDictionary<string, byte> UnlockedTransports = new();
+
+    /// <summary>Marks online transports whose user storage is still locked as <see cref="DeviceStatus.Locked"/>.</summary>
+    public static List<DeviceSnapshot> ApplyLockStates(IReadOnlyCollection<DeviceSnapshot> snapshots, CancellationToken cancellationToken)
+    {
+        foreach (var stale in UnlockedTransports.Keys.Where(id => !snapshots.Any(s => s.ID == id && s.Status is DeviceStatus.Ok)))
+            UnlockedTransports.TryRemove(stale, out _);
+
+        return [.. snapshots.Select(s => IsStorageLocked(s, cancellationToken) ? s with { Status = DeviceStatus.Locked } : s)];
+    }
+
+    /// <remarks>A failed check counts as unlocked, and is retried on the next call.</remarks>
+    private static bool IsStorageLocked(DeviceSnapshot snapshot, CancellationToken cancellationToken)
+    {
+        if (snapshot.Status is not DeviceStatus.Ok
+            || snapshot.Type is DeviceType.Recovery or DeviceType.Sideload
+            || UnlockedTransports.ContainsKey(snapshot.ID))
+            return false;
+
+        // Straight to the transport, like the serial read
+        if (ExecuteAdbCommand("-s", out string stdout, out _, cancellationToken, snapshot.ID, "shell", STORAGE_LOCK_CHECK) != 0)
+            return false;
+
+        var lines = stdout.Split('\n').Select(line => line.Trim()).ToArray();
+        var locked = lines[0] == "file" && lines.ElementAtOrDefault(1) != "true";
+
+        if (!locked)
+            UnlockedTransports[snapshot.ID] = 0;
+
+        return locked;
+    }
+
     public static void ConnectNetworkDevice(string fullAddress, CancellationToken cancellationToken) => NetworkDeviceOperation("connect", fullAddress, cancellationToken);
 
     public static void DisconnectNetworkDevice(string fullAddress, CancellationToken cancellationToken) => NetworkDeviceOperation("disconnect", fullAddress, cancellationToken);
