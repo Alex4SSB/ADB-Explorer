@@ -1791,4 +1791,47 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_FOLDER_CONTENT_VALUE" xml:space="preserve">
     <value>{0}, {1}</value>
   </data>
+  <data name="S_MENU_ADD_SAVED_LOCATION" xml:space="preserve">
+    <value>Додати до збережених місць</value>
+  </data>
+  <data name="S_STATUS_LOCKED" xml:space="preserve">
+    <value>{0} - Заблоковано. Розблокуйте пристрій, щоб отримати доступ до нього</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RENAMED" xml:space="preserve">
+    <value>Деякі з вибраних файлів можуть бути перейменовані в цільове розташування</value>
+  </data>
+  <data name="S_POPUP_COPIED_RENAMED" xml:space="preserve">
+    <value>Деякі скопійовані файли будуть перейменовані в цьому місці</value>
+  </data>
+  <data name="S_SETTINGS_SUBSTITUTE_NAMES" xml:space="preserve">
+    <value>Замініть символи, неприпустимі в іменах файлів</value>
+  </data>
+  <data name="S_SETTINGS_SUBSTITUTE_NAMES_INFO" xml:space="preserve">
+    <value>Замість того, щоб відхиляти або приховувати файл, ім'я якого в пункті призначення не дозволяє використовувати схожі символи.
+
+Застосовується, коли:
+• Копіювання з пристрою до Windows
+• Копіювання на користувацьку пам'ять Android (внутрішню пам'ять, SD-карти, USB-накопичувачі), що не дозволяє \: * ? " &lt; &gt; |
+• Відкриття пристрою у Провіднику файлів, за межами сховища користувача
+
+Недозволені символи перетворюються на повноширинні форми (? стає ？), керуючі символи стають їхніми символами, так само як і крапка або пробіл після них. Імена, зарезервовані Windows, такі як CON або NUL, отримують першу літеру повної ширини.</value>
+  </data>
+  <data name="S_MENU_OPEN_IN_WINDOWS_EXPLORER" xml:space="preserve">
+    <value>Відкрити у Провіднику Windows</value>
+  </data>
+  <data name="S_MOUNT_FAILED_TITLE" xml:space="preserve">
+    <value>Не вдалося відобразити пристрій у Провіднику файлів</value>
+  </data>
+  <data name="S_MOUNT_OPENING" xml:space="preserve">
+    <value>Відкриття у Провіднику Windows…</value>
+  </data>
+  <data name="S_DRAG_OPEN_MOUNT" xml:space="preserve">
+    <value>Відкрити {0} у Провіднику Windows</value>
+  </data>
+  <data name="S_DRAG_OPEN_MOUNT_TAB" xml:space="preserve">
+    <value>Відкрити {0} у новій вкладці</value>
+  </data>
+  <data name="S_DRAG_OPEN_NEW_TAB" xml:space="preserve">
+    <value>Відкрити {0} у новій вкладці</value>
+  </data>
 </root>
