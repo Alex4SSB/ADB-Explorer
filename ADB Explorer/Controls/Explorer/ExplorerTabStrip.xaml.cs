@@ -171,13 +171,6 @@ public partial class ExplorerTabStrip : UserControl
 
     private void StartTabDrag(FrameworkElement item, ExplorerInstance tab, Point pressPointInItem)
     {
-        TabDragStarted?.Invoke(tab);
-
-        // The app's drag window follows the cursor, showing the tab's header where a drag image would be.
-        Data.CopyPaste.CurrentDropEffect = DragDropEffects.None;
-        Data.CopyPaste.IsTabDrag = true;
-        Data.CopyPaste.DragTab = tab;
-
         var scale = VisualTreeHelper.GetDpi(item).DpiScaleX;
 
         // Held where the header was grabbed, at the size of its body.
@@ -186,73 +179,22 @@ public partial class ExplorerTabStrip : UserControl
         if (item.FlowDirection is FlowDirection.RightToLeft)
             pressX = item.ActualWidth - pressX;
 
-        Data.CopyPaste.DragImageRectPx = new Rect(
+        var imageRect = new Rect(
             -pressX * scale,
             -pressPointInItem.Y * scale,
             item.ActualWidth * scale,
             TabBodyHeight(item) * scale);
 
-        // A drag is under way while a bitmap is set; a blank one stands in, as the header is drawn from the tab.
-        Data.CopyPaste.DragBitmap = BlankDragBitmap;
-
-        DragDrop.AddGiveFeedbackHandler(item, TabDrag_GiveFeedback);
-        Data.CopyPaste.WasDragging = true;
+        TabDragStarted?.Invoke(tab);
 
         try
         {
-            DragDrop.DoDragDrop(item, new DataObject(TabDragFormat, tab), DragDropEffects.Move);
+            ContentDrag.Run(item, tab, imageRect, new DataObject(TabDragFormat, tab), DragDropEffects.Move);
         }
         finally
         {
-            DragDrop.RemoveGiveFeedbackHandler(item, TabDrag_GiveFeedback);
-
-            Data.CopyPaste.DragBitmap = null;
-            Data.CopyPaste.DragTab = null;
-            Data.CopyPaste.DragImageRectPx = null;
-            Data.CopyPaste.DragTabTooltip = null;
-            Data.CopyPaste.IsTabDrag = false;
             TabDragEnded?.Invoke();
         }
-
-        ClearWasDraggingWhenIdle();
-    }
-
-    /// <summary>The drag window says what a drop does, so Windows' own move / copy cursor is replaced by the plain arrow.</summary>
-    private static void TabDrag_GiveFeedback(object sender, GiveFeedbackEventArgs e)
-    {
-        e.UseDefaultCursors = false;
-        Mouse.SetCursor(Cursors.Arrow);
-        e.Handled = true;
-    }
-
-    /// <summary>
-    /// A drag cancelled with a button leaves buttons held, whose releases must not act as clicks, so
-    /// the flag stays until none is down - checked after each release, once its menus had their chance.
-    /// </summary>
-    private void ClearWasDraggingWhenIdle()
-    {
-        if (Window.GetWindow(this) is not { } window)
-        {
-            Data.CopyPaste.WasDragging = false;
-            return;
-        }
-
-        MouseButtonEventHandler? released = null;
-
-        void Check()
-        {
-            if (MouseState.IsAnyButtonDown)
-                return;
-
-            window.RemoveHandler(UIElement.PreviewMouseUpEvent, released!);
-            Data.CopyPaste.WasDragging = false;
-        }
-
-        released = (_, _) => App.SafeBeginInvoke(Check, DispatcherPriority.Background);
-        window.AddHandler(UIElement.PreviewMouseUpEvent, released, true);
-
-        // A drag that ended in a drop has no release still to come.
-        App.SafeBeginInvoke(Check, DispatcherPriority.Input);
     }
 
     /// <summary>The release that cancelled a tab drag doesn't open the tab's own menu either.</summary>
@@ -260,16 +202,6 @@ public partial class ExplorerTabStrip : UserControl
     {
         if (Data.CopyPaste.WasDragging)
             e.Handled = true;
-    }
-
-    private static readonly BitmapSource BlankDragBitmap = CreateBlankDragBitmap();
-
-    private static BitmapSource CreateBlankDragBitmap()
-    {
-        var bitmap = BitmapSource.Create(1, 1, 96, 96, PixelFormats.Pbgra32, null, new byte[4], 4);
-        bitmap.Freeze();
-
-        return bitmap;
     }
 
     /// <summary>The tab's body leaves out the strip below it that the active tab fuses through.</summary>

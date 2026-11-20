@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:viewModels="clr-namespace:ADB_Explorer.ViewModels"
     x:Name="dragWin"
     d:DataContext="{d:DesignInstance local:DragWindow,
                                      IsDesignTimeCreatable=True}"
@@ -58,31 +59,36 @@
                     <Image.Style>
                         <Style TargetType="Image">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=IsTabDrag}" Value="True">
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=IsContentDrag}" Value="True">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Image.Style>
                 </Image>
-                <!--  A dragged tab shows its header, as an inactive tab in the strip, instead of an image.  -->
+                <!--  What a content drag drags, drawn from its type's template instead of an image  -->
                 <ContentPresenter
-                    x:Name="DragTabHeader"
+                    x:Name="DragContent"
                     Width="{Binding ElementName=dragWin, Path=ViewModel.DragImageWidth}"
                     Height="{Binding ElementName=dragWin, Path=ViewModel.DragImageHeight}"
-                    Content="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=DragTab}"
+                    Content="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=DragContent}"
                     IsHitTestVisible="False"
                     Opacity="{Binding ElementName=dragWin, Path=ViewModel.DragImageOpacity}">
                     <ContentPresenter.Style>
                         <Style TargetType="ContentPresenter">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=IsTabDrag}" Value="False">
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=IsContentDrag}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </ContentPresenter.Style>
-                    <ContentPresenter.ContentTemplate>
+                    <ContentPresenter.Resources>
+                        <!--  A dragged device shows its navigation tree row, whether it's dragged by that or by its card  -->
+                        <DataTemplate DataType="{x:Type viewModels:LogicalDeviceViewModel}">
+                            <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource DeviceDragRowTemplate}" />
+                        </DataTemplate>
+                        <!--  A dragged tab shows its header, as an inactive tab in the strip  -->
                         <DataTemplate DataType="{x:Type models:ExplorerInstance}">
                             <Border
                                 Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
@@ -113,7 +119,7 @@
                                 </Border>
                             </Border>
                         </DataTemplate>
-                    </ContentPresenter.ContentTemplate>
+                    </ContentPresenter.Resources>
                 </ContentPresenter>
                 <TextBlock
                     x:Name="DebugLabel"
@@ -189,6 +195,10 @@
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=IsTabDrag}" Value="True">
                                         <Setter Property="Glyph" Value="&#xE8A0;" />
+                                    </DataTrigger>
+                                    <!--  Open in new window  -->
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=IsDeviceDrag}" Value="True">
+                                        <Setter Property="Glyph" Value="&#xE8A7;" />
                                     </DataTrigger>
                                     <MultiDataTrigger>
                                         <MultiDataTrigger.Conditions>

@@ -2290,4 +2290,12 @@ The checks attempt to prevent an unsuspecting user from launching a possibly mal
     <value>Opening in Windows Explorer…</value>
     <comment>Progress dialog text while the device folder is prepared and Windows File Explorer opens; closes by itself</comment>
   </data>
+  <data name="S_DRAG_OPEN_MOUNT" xml:space="preserve">
+    <value>Open {0} in Windows Explorer</value>
+    <comment>Drag tooltip while a device is dragged over the Windows desktop; dropping it opens the device in a new Windows File Explorer window. {0} is the device name</comment>
+  </data>
+  <data name="S_DRAG_OPEN_MOUNT_TAB" xml:space="preserve">
+    <value>Open {0} in a new tab</value>
+    <comment>Drag tooltip while a device is dragged over a Windows File Explorer window; dropping it opens the device in a new tab of that window. {0} is the device name</comment>
+  </data>
 </root>

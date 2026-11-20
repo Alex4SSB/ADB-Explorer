@@ -46,6 +46,18 @@ public partial class NavigationPane
 
         var node = _treeDragNode;
         var item = _treeDragItem;
+
+        // A device node opens the device's mount where it's dropped, outside the app
+        if (node?.Device is { } device && item is not null && !node.IsInEditMode && DeviceMountDrag.CanDrag(device))
+        {
+            _treeDragPending = false;
+            _treeDidDrag = true;
+            ReleaseTreeDragCapture();
+
+            InitiateDeviceDrag(item, device);
+            return;
+        }
+
         if (node is null || item is null || !CanStartTreeDrag(node))
             return;
 
@@ -87,6 +99,16 @@ public partial class NavigationPane
 
         _treeDragItem = null;
         _treeDragNode = null;
+    }
+
+    /// <summary>Drags the device by its node's row, held where it was grabbed.</summary>
+    private void InitiateDeviceDrag(TreeViewItem item, LogicalDeviceViewModel device)
+    {
+        Point? grabPoint = null;
+        if (Window.GetWindow(item) is { } window && item.Template.FindName("Border", item) is FrameworkElement row)
+            grabPoint = window.TranslatePoint(_treeDragStart, row);
+
+        DeviceMountDrag.Start(item, device, grabPoint);
     }
 
     private void InitiateTreeDrag(TreeViewItem item, NavigationTreeNode node)

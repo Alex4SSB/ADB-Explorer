@@ -31,6 +31,9 @@ public sealed class CloudTransferStream(CF_OPERATION_INFO opInfo, long fileSize)
 
     public override void Write(ReadOnlySpan<byte> data)
     {
+        // Pulled off the device whether the placeholder takes it all or not, for the title bar's transfer rate
+        SyncTransferTracker.AddPullBytes(data.Length);
+
         // A file grown on the device since it was listed: the placeholder only holds its listed size
         var room = fileSize - Length;
         if (data.Length > room)

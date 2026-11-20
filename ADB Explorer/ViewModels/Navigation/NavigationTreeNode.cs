@@ -208,6 +208,9 @@ public partial class NavigationTreeNode : ObservableObject
 
     public static BitmapSource? DeviceIcon() => FileIconProvider.GetPhoneIcon(16);
 
+    /// <summary>A device node's icon, for drawing its row elsewhere (a dragged device).</summary>
+    public static BitmapSource? DeviceRowIcon => DeviceIcon();
+
     public static BitmapSource? FolderIcon(string path, string? deviceId = null)
     {
         deviceId ??= Data.ActiveDevice?.ID;

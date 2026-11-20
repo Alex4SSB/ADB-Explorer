@@ -2682,7 +2682,25 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_MOUNT_OPENING", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Open {0} in Windows Explorer.
+        /// </summary>
+        public static string S_DRAG_OPEN_MOUNT {
+            get {
+                return ResourceManager.GetString("S_DRAG_OPEN_MOUNT", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Open {0} in a new tab.
+        /// </summary>
+        public static string S_DRAG_OPEN_MOUNT_TAB {
+            get {
+                return ResourceManager.GetString("S_DRAG_OPEN_MOUNT_TAB", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Mount options.
         /// </summary>
@@ -4298,7 +4316,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_SETTINGS_SUBSTITUTE_NAMES", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Show System Apps.
         /// </summary>

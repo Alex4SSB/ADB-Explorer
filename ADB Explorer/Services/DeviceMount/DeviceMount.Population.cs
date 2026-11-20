@@ -33,15 +33,16 @@ public sealed partial class DeviceMount
 
         public bool Failed { get; private set; }
 
-        public FolderListing(string deviceId, string devicePath, bool mapNames, CancellationToken cancellationToken)
+        public FolderListing(string deviceId, string devicePath, bool mapNames, bool hasLargeSizes, CancellationToken cancellationToken)
         {
             _filter = new(mapNames);
             new Thread(() =>
             {
                 try
                 {
+                    var largeSizes = LargeFileSizes(deviceId, devicePath, hasLargeSizes, cancellationToken);
                     foreach (var entry in AdbService.ListDirectoryEntries(deviceId, devicePath, cancellationToken))
-                        _entries.Add(entry, cancellationToken);
+                        _entries.Add(WithLargeSize(entry, largeSizes), cancellationToken);
                 }
                 catch (OperationCanceledException)
                 { }
@@ -93,6 +94,36 @@ public sealed partial class DeviceMount
         }
     }
 
+    // A file of 4 GiB or more, in 512-byte blocks: Android 9's find can't take the count in bytes
+    private const string LARGE_FILE_BLOCKS = "+8388607";
+
+    /// <summary>
+    /// The real sizes of files of 4 GiB and more, by device name. Only for devices whose listing (LIST v1, before LIS2)
+    /// keeps 32 bits of a size: such a file would show smaller, and a pull into its placeholder would be cut short.
+    /// </summary>
+    private static Dictionary<string, long> LargeFileSizes(string deviceId, string devicePath, bool hasLargeSizes, CancellationToken cancellationToken)
+    {
+        Dictionary<string, long> result = [];
+        if (hasLargeSizes)
+            return result;
+
+        AdbService.ExecuteDeviceAdbShellCommand(deviceId, "find", out var stdout, out _, cancellationToken,
+            AdbService.EscapeAdbShellString(devicePath), "-maxdepth", "1", "-type", "f", "-size", LARGE_FILE_BLOCKS,
+            "-exec", "stat", "-c", $"'%n{AdbExplorerConst.ADB_FIELD_SEP}%s{AdbExplorerConst.ADB_UNIT_SEP}'", "{}", "+");
+
+        foreach (var record in stdout.Split(AdbExplorerConst.ADB_UNIT_SEP))
+        {
+            if (record.Trim('\r', '\n').Split(AdbExplorerConst.ADB_FIELD_SEP) is [var path, var size] && long.TryParse(size, out var bytes))
+                result[FileHelper.GetFullName(path)] = bytes;
+        }
+
+        return result;
+    }
+
+    /// <summary>By the device name, which <see cref="FileStat.FullName"/> isn't once mapped for Windows.</summary>
+    private static FileStat WithLargeSize(FileStat entry, Dictionary<string, long> largeSizes)
+        => largeSizes.TryGetValue(FileHelper.GetFullName(entry.FullPath), out var size) ? entry with { Size = size } : entry;
+
     private void OnFetchPlaceholders(in CF_CALLBACK_INFO info, in CF_CALLBACK_PARAMETERS parameters)
     {
         var opInfo = OperationInfo(info, CF_OPERATION_TYPE.CF_OPERATION_TYPE_TRANSFER_PLACEHOLDERS);
@@ -125,7 +156,8 @@ public sealed partial class DeviceMount
         }
 
         var token = _populationCancellation.Token;
-        var listing = new FolderListing(DeviceId, devicePath, DriveOf(devicePath)?.MapsNames is true, token);
+        var listing = new FolderListing(DeviceId, devicePath, DriveOf(devicePath)?.MapsNames is true, Device.SupportsLsV2, token);
+        var isReadOnly = DriveHelper.GetRestrictions(devicePath, Device).ReadOnly is true;
         List<FileStat> batch;
         bool isDone;
         try
@@ -145,23 +177,23 @@ public sealed partial class DeviceMount
             if (listing.Failed)
                 TransferPlaceholders(opInfo, [], NTStatus.STATUS_UNSUCCESSFUL, false);
             else
-                TransferPlaceholders(opInfo, batch, NTStatus.STATUS_SUCCESS, true);
+                TransferPlaceholders(opInfo, batch, NTStatus.STATUS_SUCCESS, true, isReadOnly: isReadOnly);
 
             return;
         }
 
-        var thread = new Thread(() => ContinuePopulating(localPath, listing, token))
+        var thread = new Thread(() => ContinuePopulating(localPath, listing, isReadOnly, token))
         {
             IsBackground = true,
             Name = "Mount population",
         };
         _populating[localPath] = thread;
 
-        TransferPlaceholders(opInfo, batch, NTStatus.STATUS_SUCCESS, false);
+        TransferPlaceholders(opInfo, batch, NTStatus.STATUS_SUCCESS, false, isReadOnly: isReadOnly);
         thread.Start();
     }
 
-    private void ContinuePopulating(string localPath, FolderListing listing, CancellationToken cancellationToken)
+    private void ContinuePopulating(string localPath, FolderListing listing, bool isReadOnly, CancellationToken cancellationToken)
     {
         try
         {
@@ -170,7 +202,7 @@ public sealed partial class DeviceMount
             {
                 var batch = listing.TakeBatch(BATCH_WAIT, cancellationToken, out isDone);
                 if (batch.Count > 0)
-                    CreatePlaceholders(localPath, batch);
+                    CreatePlaceholders(localPath, batch, isReadOnly);
             }
             while (!isDone);
 
@@ -192,9 +224,9 @@ public sealed partial class DeviceMount
         }
     }
 
-    private static void CreatePlaceholders(string folder, List<FileStat> entries)
+    private static void CreatePlaceholders(string folder, List<FileStat> entries, bool isReadOnly)
     {
-        var infos = entries.Select(CreateInfo).ToArray();
+        var infos = entries.Select(entry => CreateInfo(entry, 0, isReadOnly)).ToArray();
         var hr = CfCreatePlaceholders(folder, infos, (uint)infos.Length, CF_CREATE_FLAGS.CF_CREATE_FLAG_NONE, out _);
 #if !DEPLOY
         if (hr.Failed)

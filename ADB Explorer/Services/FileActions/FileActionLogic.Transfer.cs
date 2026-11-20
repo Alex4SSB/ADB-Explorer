@@ -55,7 +55,8 @@ internal static partial class FileActionLogic
         ShellItem? originalShellItem = null,
         IReadOnlySet<string>? replacePaths = null,
         IReadOnlySet<string>? conflictPaths = null,
-        LogicalDeviceViewModel? device = null)
+        LogicalDeviceViewModel? device = null,
+        string? targetName = null)
     {
         if (item is null)
             return null;
@@ -64,21 +65,23 @@ internal static partial class FileActionLogic
         if (device is null)
             return null;
 
-        var source = GetPushSource(item, targetPath, device.ID, replacePaths ?? EmptyPathSet, conflictPaths ?? EmptyPathSet);
+        var source = GetPushSource(item, targetPath, device.ID, replacePaths ?? EmptyPathSet, conflictPaths ?? EmptyPathSet, targetName);
         if (source is null)
             return null;
 
         var pushDevice = device;
-        return QueuePush(() => FileSyncOperation.PushFile(source, DestinationOf(source, targetPath), pushDevice, App.AppDispatcher), dropEffects, originalShellItem);
+        return QueuePush(() => FileSyncOperation.PushFile(source, DestinationOf(source, targetPath, targetName: targetName), pushDevice, App.AppDispatcher), dropEffects, originalShellItem);
     }
 
     /// <summary><paramref name="item"/>'s tree, less what needn't be pushed; null when nothing is left.</summary>
+    /// <param name="targetName">Its name on the device, when that isn't its name here.</param>
     private static SyncFile? GetPushSource(
         ShellItem item,
         string targetPath,
         string deviceId,
         IReadOnlySet<string> replacePaths,
-        IReadOnlySet<string> conflictPaths)
+        IReadOnlySet<string> conflictPaths,
+        string? targetName = null)
     {
         SyncFile source;
         try
@@ -93,7 +96,7 @@ internal static partial class FileActionLogic
         if (string.IsNullOrEmpty(source.FullName))
             return null;
 
-        if (!FilterPushTree(source, FileHelper.ConcatPaths(targetPath, source.FullName), deviceId, replacePaths, conflictPaths))
+        if (!FilterPushTree(source, FileHelper.ConcatPaths(targetPath, targetName ?? source.FullName), deviceId, replacePaths, conflictPaths))
             return null;
 
         return source;
@@ -115,11 +118,11 @@ internal static partial class FileActionLogic
 
     /// <summary>
     /// Where <paramref name="source"/> lands on the device, inside <paramref name="targetPath"/>: from another device,
-    /// under its name there (<see cref="FileHelper.DeviceTargetName"/>).
+    /// under its name there (<see cref="FileHelper.DeviceTargetName"/>). Under <paramref name="targetName"/> where given.
     /// </summary>
-    private static SyncFile DestinationOf(SyncFile source, string targetPath, LogicalDeviceViewModel? targetDevice = null)
+    private static SyncFile DestinationOf(SyncFile source, string targetPath, LogicalDeviceViewModel? targetDevice = null, string? targetName = null)
     {
-        var name = source.FullName;
+        var name = targetName ?? source.FullName;
         if (targetDevice is not null)
             name = FileHelper.DeviceTargetName(name, DriveHelper.GetRestrictions(targetPath, targetDevice).RestrictedNaming);
 
@@ -409,15 +412,21 @@ internal static partial class FileActionLogic
         // Every pane listing the folder (and device) the file was pushed to gets it, if not shown yet
         Data.ForEachListingAt(target.ParentPath, op.Device.ID, (instance, _) =>
         {
-            if (instance.FileList.DirList?.FileList is { } listing && listing.All(f => f.FullName != source.FullName))
+            if (instance.FileList.DirList?.FileList is { } listing && listing.All(f => f.FullName != target.FullName))
                 listing.Add(new(target) { ModifiedTime = source.DateModified });
         });
 
         if (source.IsDirectory)
             ExplorerTree?.AddCreatedFolder(op.Device.ID, target.FullPath);
 
+        // The status reaches here through the UI thread, by when the op may have released the source's shell item:
+        // a folder on disk is opened again by its path
+        using var reopened = source.IsDirectory && !source.IsVirtual && Directory.Exists(source.FullPath)
+            ? ShellItem.Open(source.FullPath) as ShellFolder
+            : null;
+
         if (source.IsDirectory
-            && source.ShellItem is ShellFolder shellFolder)
+            && (reopened ?? source.ShellItem) is ShellFolder shellFolder)
         {
             var empty = FolderHelper.GetEmptySubfoldersRecursively(shellFolder);
             var parentPath = source.FullPath;

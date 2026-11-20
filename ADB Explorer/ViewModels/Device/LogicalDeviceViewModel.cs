@@ -563,6 +563,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     #region Commands
 
     public DeviceAction BrowseCommand { get; }
+    public DeviceAction OpenInExplorerCommand { get; }
     public DeviceAction RemoveCommand { get; }
     public DeviceAction ToggleRootCommand { get; }
     public DeviceAction SideloadCommand { get; }
@@ -574,6 +575,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     internal void NotifyStatusCommands()
     {
         BrowseCommand?.NotifyIsEnabledChanged();
+        OpenInExplorerCommand?.NotifyIsEnabledChanged();
         RemoveCommand?.NotifyIsEnabledChanged();
         ToggleRootCommand?.NotifyIsEnabledChanged();
         SideloadCommand?.NotifyIsEnabledChanged();
@@ -598,6 +600,11 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         // at it again, so there's no reason to disable this then.
         BrowseCommand = new(() => device.Status is DeviceStatus.Ok && device.Type is not DeviceType.Sideload,
                             () => DeviceHelper.BrowseDeviceAction(this));
+
+        // The device's mount, at its root with a folder per drive
+        OpenInExplorerCommand = new(() => device.Status is DeviceStatus.Ok && device.Type is not (DeviceType.Sideload or DeviceType.Recovery),
+                                    () => DeviceMount.OpenInFileExplorer(this, ""),
+                                    Strings.Resources.S_MENU_OPEN_IN_WINDOWS_EXPLORER);
 
         RemoveCommand = DeviceHelper.RemoveDeviceCommand(this);
 

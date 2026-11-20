@@ -315,6 +315,9 @@ public class FileIconProvider
     public static BitmapSource GetEnterFolderIcon(int size) =>
         GetSpecialIcon(EnterFolderIcon, nameof(EnterFolderIcon), size);
 
+    /// <summary>For display at 16 px; read at 2x so it stays sharp under monitor scaling.</summary>
+    public static BitmapSource SmallEnterFolderIcon => GetEnterFolderIcon(32);
+
     public static BitmapSource GetSearchIcon(int size) =>
         GetSpecialIcon(SearchIcon, nameof(SearchIcon), size);
 

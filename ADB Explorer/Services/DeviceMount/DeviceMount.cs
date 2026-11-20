@@ -13,6 +13,7 @@ namespace ADB_Explorer.Services;
 /// <summary>
 /// A device's drives as a Cloud Files sync root: a folder in File Explorer (with a navigation pane entry), holding a folder
 /// per drive, whose folders are listed from the device on first browse and whose files are pulled on open.
+/// Files and folders made in it are pushed to the device (<see cref="StartUploads"/>).
 /// </summary>
 public sealed partial class DeviceMount : IDisposable
 {
@@ -49,8 +50,27 @@ public sealed partial class DeviceMount : IDisposable
     private static string SyncRootIdOf(LogicalDeviceViewModel device)
         => $"{PROVIDER_ID}!{WindowsIdentity.GetCurrent().User}!{SanitizeIdPart(device.ID)}";
 
-    /// <summary>The single mounted device, if any.</summary>
-    public static DeviceMount? Current { get; private set; }
+    /// <summary>The mounted devices, each in a folder (and sync root) of its own. Guarded by <see cref="_lock"/>.</summary>
+    private static readonly List<DeviceMount> _mounts = [];
+
+    public static IReadOnlyList<DeviceMount> Mounts
+    {
+        get
+        {
+            lock (_lock)
+                return [.. _mounts];
+        }
+    }
+
+    /// <summary>The device's mount, by any ID the device has had.</summary>
+    public static DeviceMount? Find(string deviceId)
+    {
+        lock (_lock)
+            return FindCore(deviceId);
+    }
+
+    private static DeviceMount? FindCore(string deviceId)
+        => _mounts.FirstOrDefault(mount => mount.DeviceId == deviceId || mount.Device.Matches(deviceId));
 
     public LogicalDeviceViewModel Device { get; }
 
@@ -62,19 +82,21 @@ public sealed partial class DeviceMount : IDisposable
 
     public static string MountsFolder => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), Properties.AppGlobal.AppDisplayName);
 
-    /// <summary>Mounts the device - replacing another mounted device - and returns its local folder for a device path.</summary>
+    /// <summary>Mounts the device, alongside any others mounted, and returns its local folder for a device path.</summary>
     public static string? MountAndMap(LogicalDeviceViewModel device, string devicePath)
+        => GetOrMount(device).ToLocalPath(devicePath);
+
+    private static DeviceMount GetOrMount(LogicalDeviceViewModel device)
     {
         lock (_lock)
         {
-            if (Current?.DeviceId != device.ID)
-            {
-                Current?.Dispose();
-                Current = null;
-                Current = StartMount(device);
-            }
+            if (FindCore(device.ID) is { } existing)
+                return existing;
 
-            return Current.ToLocalPath(devicePath);
+            var mount = StartMount(device);
+            _mounts.Add(mount);
+
+            return mount;
         }
     }
 
@@ -132,23 +154,31 @@ public sealed partial class DeviceMount : IDisposable
     /// Mounts the device in the background and opens File Explorer at the device path's local folder,
     /// behind a progress dialog that closes once the File Explorer window is up.
     /// </summary>
-    public static async void OpenInFileExplorer(LogicalDeviceViewModel device, string devicePath)
+    /// <param name="explorerWindow">A File Explorer window to open it in a new tab of, instead of a window of its own.</param>
+    public static async void OpenInFileExplorer(LogicalDeviceViewModel device, string devicePath, HWND? explorerWindow = null)
     {
         var dialog = CreateOpeningDialog();
         _ = App.Services.GetRequiredService<IContentDialogService>().ShowAsync(dialog, CancellationToken.None);
 
         try
         {
-            var localPath = await Task.Run(() => MountAndMap(device, devicePath));
-            if (localPath is not null)
+            var mount = await Task.Run(() => GetOrMount(device));
+            var localPath = mount.ToLocalPath(devicePath);
+            await Task.Run(() =>
             {
-                Process.Start("explorer.exe", localPath);
-                await Task.Run(() =>
+                object? window = null;
+                if (explorerWindow is { } target)
+                    window = OpenInNewTab(target, localPath);
+
+                if (window is null)
                 {
-                    if (WaitForExplorerWindow(localPath, TimeSpan.FromSeconds(10)) is { } window)
-                        Current?.MoveToNamespaceNode(window, localPath);
-                });
-            }
+                    Process.Start("explorer.exe", localPath);
+                    window = WaitForExplorerWindow(localPath, TimeSpan.FromSeconds(10));
+                }
+
+                if (window is not null)
+                    mount.MoveToNamespaceNode(window, localPath);
+            });
 
             dialog.Hide();
         }
@@ -199,15 +229,17 @@ public sealed partial class DeviceMount : IDisposable
     private static bool PathsEqual(string? a, string b)
         => a is not null && string.Equals(Path.TrimEndingDirectorySeparator(a), Path.TrimEndingDirectorySeparator(b), StringComparison.OrdinalIgnoreCase);
 
+    /// <summary>Unmounts the device, or every mounted device when none is given.</summary>
     public static void Unmount(string? deviceId = null)
     {
         lock (_lock)
         {
-            if (Current is null || (deviceId is not null && !Current.Device.Matches(deviceId)))
-                return;
-
-            Current.Dispose();
-            Current = null;
+            var leaving = deviceId is null ? [.. _mounts] : _mounts.Where(mount => mount.DeviceId == deviceId || mount.Device.Matches(deviceId)).ToList();
+            foreach (var mount in leaving)
+            {
+                _mounts.Remove(mount);
+                mount.Dispose();
+            }
         }
     }
 
@@ -237,6 +269,7 @@ public sealed partial class DeviceMount : IDisposable
         // Hydration finds the device file by the placeholder's path, which data fetches only get with this flag
         CfConnectSyncRoot(LocalRoot, _callbacks, default, CF_CONNECT_FLAGS.CF_CONNECT_FLAG_REQUIRE_FULL_FILE_PATH, out var key).ThrowIfFailed();
         _connectionKey = key;
+        StartUploads();
 
         return true;
     }
@@ -318,6 +351,7 @@ public sealed partial class DeviceMount : IDisposable
     public void Dispose()
     {
         CloseExplorerWindows();
+        StopUploads();
         StopPopulating();
         CancelAllFetches();
 
@@ -429,7 +463,7 @@ public sealed partial class DeviceMount : IDisposable
                     continue;
 
                 var path = root.Path.Path;
-                if (Current?.SyncRootId == root.Id)
+                if (_mounts.Any(mount => mount.SyncRootId == root.Id))
                     continue;
 
                 // Kept registered while any placeholder is left, so a later run can still remove it
@@ -531,7 +565,7 @@ public sealed partial class DeviceMount : IDisposable
         {
             foreach (var entry in new DirectoryInfo(folder).EnumerateFileSystemInfos())
             {
-                var isPlaceholder = (entry.Attributes & (FileAttributes.ReparsePoint | RECALL_ON_OPEN | RECALL_ON_DATA_ACCESS)) != 0;
+                var isPlaceholder = IsPlaceholder(entry.Attributes);
 
                 if (entry is DirectoryInfo dir)
                 {

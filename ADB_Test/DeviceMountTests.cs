@@ -89,7 +89,7 @@ public class DeviceMountTests
 
                 local = DeviceMount.MountAndMap(viewModel, Root);
                 Assert.IsNotNull(local);
-                notes.AppendLine($"{device.Model}: shell registration {DeviceMount.Current!.IsShellRegistered}, folder {local}");
+                notes.AppendLine($"{device.Model}: shell registration {DeviceMount.Find(device.Serial)!.IsShellRegistered}, folder {local}");
 
                 // The platform doesn't fetch for the provider's own process, so look through another one
                 var names = Lines(Cmd($"dir /a /b \"{local}\""));
@@ -106,7 +106,7 @@ public class DeviceMountTests
                 CollectionAssert.DoesNotContain(visible, N(".hidden-dir"));
                 CollectionAssert.Contains(visible, N("a.bin"));
 
-                var mountRoot = DeviceMount.Current.LocalRoot;
+                var mountRoot = DeviceMount.Find(device.Serial)!.LocalRoot;
                 CollectionAssert.DoesNotContain(Lines(Cmd($"dir /a /b \"{mountRoot}\"")), AdbExplorerConst.RECYCLE_FOLDER, "the recycle bin is left out");
 
                 Assert.AreEqual(3000000L, new FileInfo(Path.Combine(local, N("a.bin"))).Length);
@@ -140,7 +140,7 @@ public class DeviceMountTests
                     Shell(device, $"rmdir {AdbExplorerConst.RECYCLE_PATH}");
             }
 
-            Assert.IsNull(DeviceMount.Current);
+            Assert.AreEqual(0, DeviceMount.Mounts.Count);
             Assert.IsFalse(Directory.Exists(local), $"{local} should be removed on unmount");
             if (windowRoot is not null)
                 Assert.IsTrue(WaitFor(() => ExplorerWindowsUnder(windowRoot) == 0, 5), "the File Explorer window should close on unmount");
@@ -176,7 +176,7 @@ public class DeviceMountTests
         {
             // An app still holding a file at unmount keeps the registration, for a later cleanup to finish
             var local = DeviceMount.MountAndMap(viewModel, root)!;
-            var syncRootId = DeviceMount.Current!.SyncRootId;
+            var syncRootId = DeviceMount.Find(device.Serial)!.SyncRootId;
             Assert.AreEqual("a", ReadThroughShell(Path.Combine(local, N("a.txt"))));
             Cmd($"dir /s /b \"{local}\"");
             using (new FileStream(Path.Combine(local, N("a.txt")), FileMode.Open, FileAccess.Read, FileShare.Read))
@@ -190,11 +190,11 @@ public class DeviceMountTests
             // A crash: still registered, no longer connected
             local = DeviceMount.MountAndMap(viewModel, root)!;
             Cmd($"dir /s /b \"{local}\"");
-            var mount = DeviceMount.Current!;
+            var mount = DeviceMount.Find(device.Serial)!;
             var keyField = typeof(DeviceMount).GetField("_connectionKey", BindingFlags.NonPublic | BindingFlags.Instance)!;
             Vanara.PInvoke.CldApi.CfDisconnectSyncRoot(((Vanara.PInvoke.CldApi.CF_CONNECTION_KEY?)keyField.GetValue(mount))!.Value);
             keyField.SetValue(mount, null);
-            typeof(DeviceMount).GetProperty(nameof(DeviceMount.Current))!.SetValue(null, null);
+            ((System.Collections.IList)typeof(DeviceMount).GetField("_mounts", BindingFlags.NonPublic | BindingFlags.Static)!.GetValue(null)!).Remove(mount);
             Assert.IsTrue(File.Exists(Path.Combine(local, N("a.txt"))), "the crash state wasn't reproduced");
 
             DeviceMount.CleanUpStaleMounts();
@@ -248,7 +248,7 @@ public class DeviceMountTests
         try
         {
             var local = DeviceMount.MountAndMap(viewModel, folder)!;
-            var root = DeviceMount.Current!.LocalRoot;
+            var root = DeviceMount.Find(device.Serial)!.LocalRoot;
             Assert.AreEqual(Path.Combine(root, sdName, FileHelper.GetFullName(folder)), local);
 
             // The root holds a folder per drive, each with the app's icon for it
@@ -308,7 +308,7 @@ public class DeviceMountTests
             try
             {
                 var local = DeviceMount.MountAndMap(viewModel, folder)!;
-                var root = DeviceMount.Current!.LocalRoot;
+                var root = DeviceMount.Find(device.Serial)!.LocalRoot;
                 Assert.AreEqual(Path.Combine(root, tempName, FileHelper.GetFullName(folder)), local, device.Model);
                 CollectionAssert.Contains(Lines(Cmd($"dir /b \"{root}\"")), tempName, device.Model);
                 Assert.AreEqual("t", ReadThroughShell(Path.Combine(local, N("a.txt"))), device.Model);
@@ -379,6 +379,20 @@ public class DeviceMountTests
                 // A name typed with a lookalike reaches the device as the character it stands for
                 Cmd($"ren \"{Path.Combine(local, FileNameEncoding.ToWindows("a:b.txt")!)}\" \"x？y.txt\"");
                 CollectionAssert.Contains(Lines(Shell(device, $"ls -1 {folder}")), "x?y.txt", device.Model);
+
+                // An edit replaces the device file under its own name, not the lookalike one
+                var edit = Path.Combine(Path.GetTempPath(), $"adbx-edit-{Guid.NewGuid():N}.txt");
+                File.WriteAllText(edit, "edited");
+                try
+                {
+                    var output = Cmd($"copy /y \"{edit}\" \"{Path.Combine(local, FileNameEncoding.ToWindows("what?.txt")!)}\"");
+                    Assert.IsTrue(WaitFor(() => Shell(device, $"cat '{folder}/what?.txt' 2>/dev/null") == "edited", 10), $"{device.Model}: an edit of a mapped name. {output}");
+                    Assert.AreEqual(deviceNames.Length, Lines(Shell(device, $"ls -1 {folder}")).Count, $"{device.Model}: the edit must not add a file");
+                }
+                finally
+                {
+                    File.Delete(edit);
+                }
             }
             finally
             {
@@ -535,12 +549,16 @@ public class DeviceMountTests
                 Assert.IsFalse(Directory.Exists(Local("sub")), output);
                 Assert.IsFalse(OnDevice("sub"), $"{device.Model}: folder delete");
 
-                // Out of the mount isn't supported yet: refused, and nothing changes on either side
+                // Out of the mount: downloaded as it moves, then removed from the device; a file never opened, and a folder
                 Directory.CreateDirectory(outside);
                 output = Cmd($"move \"{Local("keep.txt")}\" \"{outside}\"");
-                Assert.IsTrue(File.Exists(Local("keep.txt")), output);
-                Assert.IsTrue(OnDevice("keep.txt"), $"{device.Model}: the device must keep a file moved out");
-                notes.AppendLine($"{device.Model} move out: {output}");
+                Assert.IsFalse(File.Exists(Local("keep.txt")), output);
+                Assert.AreEqual("k", File.ReadAllText(Path.Combine(outside, N("keep.txt"))).Trim(), $"{device.Model}: a file moved out");
+                Assert.IsTrue(WaitFor(() => !OnDevice("keep.txt"), 5), $"{device.Model}: a file moved out should leave the device");
+
+                output = Cmd($"move \"{Local("folder2")}\" \"{outside}\"");
+                Assert.AreEqual("f", File.ReadAllText(Path.Combine(outside, N("folder2"), N("f.txt"))).Trim(), $"{device.Model}: a folder moved out. {output}");
+                Assert.IsTrue(WaitFor(() => !OnDevice("folder2"), 5), $"{device.Model}: a folder moved out should leave the device");
 
                 // Into the app's recycle bin when it's on, indexed for restoring
                 Data.Settings.EnableRecycle = true;
@@ -576,6 +594,549 @@ public class DeviceMountTests
         }
 
         Console.WriteLine(notes);
+    }
+
+    [TestMethod]
+    [Timeout(60_000)]
+    public void Mount_UploadsNewItemsToDevice()
+    {
+        List<DeviceData> devices;
+        try
+        {
+            devices = [.. new AdbClient().GetDevices().Where(d => d.State is DeviceState.Online && !d.Serial.Contains("._adb-tls-"))];
+        }
+        catch
+        {
+            devices = [];
+        }
+
+        if (devices.Count == 0 || string.IsNullOrEmpty(AdbHelper.CurrentAdbState.Path))
+            Assert.Inconclusive("An online adb device is required.");
+
+        foreach (var device in devices)
+        {
+            var viewModel = new LogicalDeviceViewModel(LogicalDevice.From(
+                new DeviceSnapshot(device.Serial, device.Model, DeviceStatus.Ok, DeviceType.Local, RootStatus.Unchecked, "", device)));
+
+            var root = $"/sdcard/{N("adbx-upload")}-{Guid.NewGuid():N}";
+            Shell(device, $"mkdir -p {root}/{N("sub")} && echo e > {root}/{N("existing.txt")}");
+
+            var outside = Path.Combine(Path.GetTempPath(), $"adbx-outside-{Guid.NewGuid():N}");
+            try
+            {
+                var local = DeviceMount.MountAndMap(viewModel, root)!;
+                Cmd($"dir /s /b \"{local}\"");
+                string Local(params string[] parts) => Path.Combine([local, .. parts.Select(N)]);
+                bool OnDevice(string relative) => Shell(device, $"[ -e '{root}/{TestNames.PseudoPath(relative)}' ] && echo yes") == "yes";
+                // Quiet while it isn't there yet: the receiver throws on cat's error
+                string Cat(string relative) => Shell(device, $"cat '{root}/{TestNames.PseudoPath(relative)}' 2>/dev/null");
+
+                // Written in process (cmd /u would redirect echo as UTF-16): new files need nothing fetched
+                File.WriteAllText(Local("new.txt"), "new");
+                Assert.IsTrue(WaitFor(() => Cat("new.txt") == "new", 10), $"{device.Model}: a new file");
+
+                Directory.CreateDirectory(Local("dir", "inner"));
+                Directory.CreateDirectory(Local("dir", "empty"));
+                File.WriteAllText(Local("dir", "inner", "x.txt"), "x");
+                Assert.IsTrue(WaitFor(() => Cat("dir/inner/x.txt") == "x", 10), $"{device.Model}: a new tree");                Assert.IsTrue(WaitFor(() => OnDevice("dir/empty"), 5), $"{device.Model}: an empty folder in a new tree. On the device: {Shell(device, $"find {root}")}");
+
+                // Into a folder that was listed, copied from outside the mount
+                Directory.CreateDirectory(outside);
+                var source = Path.Combine(outside, N("copied.txt"));
+                File.WriteAllText(source, "copied");
+                var output = Cmd($"copy /y \"{source}\" \"{Local("sub")}\"");
+                Assert.IsTrue(WaitFor(() => Cat("sub/copied.txt") == "copied", 10), $"{device.Model}: a copied file. {output}");
+
+                // Placeholders now: a rename reaches the device through the rename callback
+                Assert.IsTrue(WaitFor(() => IsPlaceholder(Local("new.txt")) && IsPlaceholder(Local("dir", "inner", "x.txt")), 5),
+                    $"{device.Model}: uploaded items should become placeholders");
+
+                output = Cmd($"ren \"{Local("new.txt")}\" {N("renamed.txt")}");
+                Assert.AreEqual("new", Cat("renamed.txt"), $"{device.Model}: rename after upload. {output}");
+                Assert.IsFalse(OnDevice("new.txt"));
+
+                // Lock files beside an open document stay local
+                var lockName = $"~${N("doc.docx")}";
+                File.WriteAllText(Path.Combine(local, lockName), "lock");
+                System.Threading.Thread.Sleep(3000);
+                Assert.AreEqual("", Shell(device, $"[ -e '{root}/{lockName}' ] && echo yes"), $"{device.Model}: a lock file should stay local");
+
+                // A plain file of the user's own would keep the mount's folder after unmounting
+                File.Delete(Path.Combine(local, lockName));
+            }
+            finally
+            {
+                DeviceMount.Unmount();
+                Shell(device, $"rm -rf {root}");
+                if (Directory.Exists(outside))
+                    Directory.Delete(outside, true);
+            }
+        }
+    }
+
+    [TestMethod]
+    [Timeout(60_000)]
+    public void Mount_PushesEditsToDevice()
+    {
+        List<DeviceData> devices;
+        try
+        {
+            devices = [.. new AdbClient().GetDevices().Where(d => d.State is DeviceState.Online && !d.Serial.Contains("._adb-tls-"))];
+        }
+        catch
+        {
+            devices = [];
+        }
+
+        if (devices.Count == 0 || string.IsNullOrEmpty(AdbHelper.CurrentAdbState.Path))
+            Assert.Inconclusive("An online adb device is required.");
+
+        foreach (var device in devices)
+        {
+            var viewModel = new LogicalDeviceViewModel(LogicalDevice.From(
+                new DeviceSnapshot(device.Serial, device.Model, DeviceStatus.Ok, DeviceType.Local, RootStatus.Unchecked, "", device)));
+
+            var root = $"/sdcard/{N("adbx-edit")}-{Guid.NewGuid():N}";
+            Shell(device, $"mkdir -p {root} && cd {root} && echo cold > {N("cold.txt")} && echo read > {N("read.txt")}");
+
+            var sources = Path.Combine(Path.GetTempPath(), $"adbx-edits-{Guid.NewGuid():N}");
+            try
+            {
+                var local = DeviceMount.MountAndMap(viewModel, root)!;
+                Cmd($"dir /s /b \"{local}\"");
+                string Local(string name) => Path.Combine(local, N(name));
+                string Cat(string name) => Shell(device, $"cat '{root}/{N(name)}' 2>/dev/null");
+
+                Directory.CreateDirectory(sources);
+                string Source(string text)
+                {
+                    var path = Path.Combine(sources, $"{Guid.NewGuid():N}.txt");
+                    File.WriteAllText(path, text);
+                    return path;
+                }
+
+                Assert.IsFalse(File.GetAttributes(Local("cold.txt")).HasFlag(FileAttributes.ReadOnly), $"{device.Model}: files on writable storage shouldn't be read-only");
+
+                // Never opened: overwritten without hydrating
+                var output = Cmd($"copy /y \"{Source("cold edited")}\" \"{Local("cold.txt")}\"");
+                Assert.IsTrue(WaitFor(() => Cat("cold.txt") == "cold edited", 10), $"{device.Model}: an edit of a file never opened. {output}");
+
+                // Read first, so hydrated
+                Assert.AreEqual("read", ReadThroughShell(Local("read.txt")));
+                output = Cmd($"copy /y \"{Source("read edited")}\" \"{Local("read.txt")}\"");
+                Assert.IsTrue(WaitFor(() => Cat("read.txt") == "read edited", 10), $"{device.Model}: an edit of a hydrated file. {output}");
+
+                // In sync again after the push, so the next edit is found too
+                output = Cmd($"copy /y \"{Source("edited again")}\" \"{Local("cold.txt")}\"");
+                Assert.IsTrue(WaitFor(() => Cat("cold.txt") == "edited again", 10), $"{device.Model}: a second edit. {output}");
+
+                Assert.AreEqual(2, Lines(Shell(device, $"ls -1 {root}")).Count, $"{device.Model}: edits must replace the files, not add more");
+            }
+            finally
+            {
+                DeviceMount.Unmount();
+                Shell(device, $"rm -rf {root}");
+                if (Directory.Exists(sources))
+                    Directory.Delete(sources, true);
+            }
+        }
+    }
+
+    [TestMethod]
+    [Timeout(60_000)]
+    public void Mount_SafeSaveReplacesTheFile()
+    {
+        List<DeviceData> devices;
+        try
+        {
+            devices = [.. new AdbClient().GetDevices().Where(d => d.State is DeviceState.Online && !d.Serial.Contains("._adb-tls-"))];
+        }
+        catch
+        {
+            devices = [];
+        }
+
+        if (devices.Count == 0 || string.IsNullOrEmpty(AdbHelper.CurrentAdbState.Path))
+            Assert.Inconclusive("An online adb device is required.");
+
+        foreach (var device in devices)
+        {
+            var viewModel = new LogicalDeviceViewModel(LogicalDevice.From(
+                new DeviceSnapshot(device.Serial, device.Model, DeviceStatus.Ok, DeviceType.Local, RootStatus.Unchecked, "", device)));
+
+            var root = $"/sdcard/{N("adbx-save")}-{Guid.NewGuid():N}";
+            Shell(device, $"mkdir -p {root} && cd {root} && echo old > {N("doc.txt")} && echo other > {N("other.txt")}");
+
+            var trashExisted = Shell(device, $"[ -d {AdbExplorerConst.RECYCLE_PATH} ] && echo yes") == "yes";
+            var trashBefore = TrashEntries(device);
+            var sources = Path.Combine(Path.GetTempPath(), $"adbx-saves-{Guid.NewGuid():N}");
+            try
+            {
+                Data.Settings.EnableRecycle = true;
+                var local = DeviceMount.MountAndMap(viewModel, root)!;
+                Cmd($"dir /s /b \"{local}\"");
+                string Local(string name) => Path.Combine(local, name);
+                string Cat(string name) => Shell(device, $"cat '{root}/{name}' 2>/dev/null");
+
+                Directory.CreateDirectory(sources);
+                var source = Path.Combine(sources, "new.txt");
+                File.WriteAllText(source, "new");
+
+                // As Word saves: the new content under a temporary name, the original set aside, the new one put in its place
+                var doc = N("doc.txt");
+                var output = Cmd($"copy /y \"{source}\" \"{Local("~WRD0001.tmp")}\" && ren \"{Local(doc)}\" ~WRL0001.tmp "
+                    + $"&& ren \"{Local("~WRD0001.tmp")}\" {doc} && del /f \"{Local("~WRL0001.tmp")}\"");
+                Assert.IsTrue(WaitFor(() => Cat(doc) == "new", 10), $"{device.Model}: a safe save. {output}");
+
+                // A rename of the user's own to a temporary name reaches the device once no save turns out to be behind it
+                output = Cmd($"ren \"{Local(N("other.txt"))}\" {N("other.tmp")}");
+                Assert.IsTrue(File.Exists(Local(N("other.tmp"))), output);
+                Assert.IsTrue(WaitFor(() => Cat(N("other.tmp")) == "other", 15), $"{device.Model}: a rename to a temporary name");
+
+                // Past the save's window too: nothing renamed or deleted on the device for it
+                CollectionAssert.AreEquivalent(new[] { doc, N("other.tmp") }, Lines(Shell(device, $"ls -1 {root}")), $"{device.Model}: the device should hold just the saved file");
+                Assert.AreEqual("new", Cat(doc));
+                CollectionAssert.AreEquivalent(trashBefore, TrashEntries(device), $"{device.Model}: a save shouldn't put the old copy in the recycle bin");
+            }
+            finally
+            {
+                Data.Settings.EnableRecycle = false;
+                DeviceMount.Unmount();
+                Shell(device, $"rm -rf {root}");
+                foreach (var entry in TrashEntries(device).Except(trashBefore))
+                    Shell(device, $"rm -rf '{AdbExplorerConst.RECYCLE_PATH}/{entry}'");
+
+                if (!trashExisted)
+                    Shell(device, $"rmdir {AdbExplorerConst.RECYCLE_PATH} 2>/dev/null");
+
+                if (Directory.Exists(sources))
+                    Directory.Delete(sources, true);
+            }
+        }
+    }
+
+    [TestMethod]
+    [Timeout(60_000)]
+    public void Mount_TakesInDeviceChanges()
+    {
+        List<DeviceData> devices;
+        try
+        {
+            devices = [.. new AdbClient().GetDevices().Where(d => d.State is DeviceState.Online && !d.Serial.Contains("._adb-tls-"))];
+        }
+        catch
+        {
+            devices = [];
+        }
+
+        if (devices.Count == 0 || string.IsNullOrEmpty(AdbHelper.CurrentAdbState.Path))
+            Assert.Inconclusive("An online adb device is required.");
+
+        foreach (var device in devices)
+        {
+            var viewModel = new LogicalDeviceViewModel(LogicalDevice.From(
+                new DeviceSnapshot(device.Serial, device.Model, DeviceStatus.Ok, DeviceType.Local, RootStatus.Unchecked, "", device)));
+
+            var root = $"/sdcard/{N("adbx-refresh")}-{Guid.NewGuid():N}";
+            Shell(device, $"mkdir -p {root} && cd {root} && echo a > {N("a.txt")} && echo b > {N("b.txt")} && echo c > {N("c.txt")}");
+
+            var sources = Path.Combine(Path.GetTempPath(), $"adbx-refresh-{Guid.NewGuid():N}");
+            try
+            {
+                var local = DeviceMount.MountAndMap(viewModel, root)!;
+                Cmd($"dir /s /b \"{local}\"");
+                List<string> Listed() => Lines(Cmd($"dir /b \"{local}\""));
+                Assert.AreEqual("b", ReadThroughShell(Path.Combine(local, N("b.txt"))), $"{device.Model}: hydrating b");
+
+                // The app's own operations: a delete, and a push
+                var a = new FileClass(N("a.txt"), $"{root}/{N("a.txt")}", AbstractFile.FileType.File);
+                ADB_Explorer.App.AppDispatcher.Invoke(() => ShellFileOperation.DeleteItems(viewModel, [a], ADB_Explorer.App.AppDispatcher));
+                Directory.CreateDirectory(sources);
+                var pushed = Path.Combine(sources, N("pushed.txt"));
+                File.WriteAllText(pushed, "p");
+                FileActionLogic.PushShellObject(Vanara.Windows.Shell.ShellItem.Open(pushed), root, device: viewModel);
+
+                Assert.IsTrue(WaitFor(() => Listed().Contains(N("pushed.txt")) && !Listed().Contains(N("a.txt")), 10),
+                    $"{device.Model}: the app's operations should show. Listed: {string.Join(", ", Listed())}");
+
+                // Made on the phone, in a folder open in File Explorer
+                System.Diagnostics.Process.Start("explorer.exe", local);
+                Assert.IsTrue(WaitFor(() => ExplorerWindowsUnder(local) > 0, 10), "File Explorer didn't open the folder");
+                Shell(device, $"cd {root} && echo changed-longer > {N("b.txt")} && echo d > {N("d.txt")} && rm {N("c.txt")}");
+
+                Assert.IsTrue(WaitFor(() => Listed().Contains(N("d.txt")) && !Listed().Contains(N("c.txt")), 10),
+                    $"{device.Model}: the phone's changes should show. Listed: {string.Join(", ", Listed())}");
+                Assert.IsTrue(WaitFor(() => ReadThroughShell(Path.Combine(local, N("b.txt"))) == "changed-longer", 5),
+                    $"{device.Model}: a file changed on the phone should read anew");
+                Assert.IsTrue(OnDeviceExists(device, $"{root}/{N("d.txt")}"), $"{device.Model}: taking changes in mustn't change the device");
+            }
+            finally
+            {
+                DeviceMount.Unmount();
+                Shell(device, $"rm -rf {root}");
+                if (Directory.Exists(sources))
+                    Directory.Delete(sources, true);
+            }
+        }
+    }
+
+    [TestMethod]
+    [Timeout(60_000)]
+    public void Mount_KeepsUnpushedFilesOfAFolderGoneFromTheDevice()
+    {
+        List<DeviceData> devices;
+        try
+        {
+            devices = [.. new AdbClient().GetDevices().Where(d => d.State is DeviceState.Online && !d.Serial.Contains("._adb-tls-"))];
+        }
+        catch
+        {
+            devices = [];
+        }
+
+        if (devices.Count == 0 || string.IsNullOrEmpty(AdbHelper.CurrentAdbState.Path))
+            Assert.Inconclusive("An online adb device is required.");
+
+        foreach (var device in devices)
+        {
+            var viewModel = new LogicalDeviceViewModel(LogicalDevice.From(
+                new DeviceSnapshot(device.Serial, device.Model, DeviceStatus.Ok, DeviceType.Local, RootStatus.Unchecked, "", device)));
+
+            var root = $"/sdcard/{N("adbx-gone")}-{Guid.NewGuid():N}";
+            Shell(device, $"mkdir -p {root}/{N("sub")} && echo o > {root}/{N("sub")}/{N("old.txt")}");
+            FileStream? writer = null;
+            try
+            {
+                var local = DeviceMount.MountAndMap(viewModel, root)!;
+                var sub = Path.Combine(local, N("sub"));
+                Cmd($"dir /s /b \"{local}\"");
+
+                // Still being written, so not pushed yet
+                var created = Path.Combine(sub, N("new.txt"));
+                writer = new FileStream(created, FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite);
+                writer.Write("n"u8);
+                writer.Flush();
+
+                System.Diagnostics.Process.Start("explorer.exe", local);
+                Assert.IsTrue(WaitFor(() => ExplorerWindowsUnder(local) > 0, 10), "File Explorer didn't open the folder");
+                Shell(device, $"rm -rf {root}/{N("sub")}");
+
+                Assert.IsTrue(WaitFor(() => !Lines(Cmd($"dir /b \"{sub}\"")).Contains(N("old.txt")), 10),
+                    $"{device.Model}: what the device had should go with its folder");
+                Assert.IsTrue(File.Exists(created), $"{device.Model}: a file not pushed yet mustn't go with its folder");
+
+                // Done writing, it's pushed, which makes the folder on the device again
+                writer.Dispose();
+                writer = null;
+                Assert.IsTrue(WaitFor(() => Shell(device, $"cat '{root}/{N("sub")}/{N("new.txt")}' 2>/dev/null") == "n", 10),
+                    $"{device.Model}: the kept file should be pushed");
+            }
+            finally
+            {
+                writer?.Dispose();
+                DeviceMount.Unmount();
+                Shell(device, $"rm -rf {root}");
+            }
+        }
+    }
+
+    [TestMethod]
+    [Timeout(60_000)]
+    public void Mount_MountsSeveralDevices()
+    {
+        List<DeviceData> devices;
+        try
+        {
+            devices = [.. new AdbClient().GetDevices().Where(d => d.State is DeviceState.Online && !d.Serial.Contains("._adb-tls-"))];
+        }
+        catch
+        {
+            devices = [];
+        }
+
+        if (devices.Count < 2 || string.IsNullOrEmpty(AdbHelper.CurrentAdbState.Path))
+            Assert.Inconclusive("Two online adb devices are required.");
+
+        var (first, second) = (devices[0], devices[1]);
+        LogicalDeviceViewModel ViewModel(DeviceData device) => new(LogicalDevice.From(
+            new DeviceSnapshot(device.Serial, device.Model, DeviceStatus.Ok, DeviceType.Local, RootStatus.Unchecked, "", device)));
+
+        var firstRoot = $"/sdcard/{N("adbx-multi")}-{Guid.NewGuid():N}";
+        var secondRoot = $"/sdcard/{N("adbx-multi")}-{Guid.NewGuid():N}";
+        Shell(first, $"mkdir -p {firstRoot} && cd {firstRoot} && echo a > {N("a.txt")} && echo m > {N("m.txt")}");
+        Shell(second, $"mkdir -p {secondRoot} && echo b > {secondRoot}/{N("b.txt")}");
+        string Cat(DeviceData device, string path) => Shell(device, $"cat '{path}' 2>/dev/null");
+
+        try
+        {
+            Data.Settings.EnableRecycle = false;
+            var firstLocal = DeviceMount.MountAndMap(ViewModel(first), firstRoot)!;
+            var secondLocal = DeviceMount.MountAndMap(ViewModel(second), secondRoot)!;
+
+            // Both at once, each in a folder of its own
+            Assert.AreEqual(2, DeviceMount.Mounts.Count, "mounting the second device shouldn't unmount the first");
+            Assert.AreNotEqual(DeviceMount.Find(first.Serial)!.LocalRoot, DeviceMount.Find(second.Serial)!.LocalRoot);
+            Cmd($"dir /s /b \"{firstLocal}\" && dir /s /b \"{secondLocal}\"");
+            Assert.AreEqual("a", ReadThroughShell(Path.Combine(firstLocal, N("a.txt"))), first.Model);
+            Assert.AreEqual("b", ReadThroughShell(Path.Combine(secondLocal, N("b.txt"))), second.Model);
+
+            // From one device to the other: a copy keeps the source, a move takes it off its device once the other has it
+            var output = Cmd($"copy /y \"{Path.Combine(firstLocal, N("a.txt"))}\" \"{secondLocal}\"");
+            Assert.IsTrue(WaitFor(() => Cat(second, $"{secondRoot}/{N("a.txt")}") == "a", 10), $"a copy between devices. {output}");
+            Assert.AreEqual("a", Cat(first, $"{firstRoot}/{N("a.txt")}"));
+
+            output = Cmd($"move \"{Path.Combine(firstLocal, N("m.txt"))}\" \"{secondLocal}\"");
+            Assert.IsTrue(WaitFor(() => Cat(second, $"{secondRoot}/{N("m.txt")}") == "m", 10), $"a move between devices. {output}");
+            Assert.IsTrue(WaitFor(() => !OnDeviceExists(first, $"{firstRoot}/{N("m.txt")}"), 5), "a move should leave the source device");
+
+            // One device leaving keeps the other mounted
+            DeviceMount.Unmount(first.Serial);
+            Assert.IsNull(DeviceMount.Find(first.Serial));
+            Assert.IsNotNull(DeviceMount.Find(second.Serial));
+            CollectionAssert.Contains(Lines(Cmd($"dir /b \"{secondLocal}\"")), N("b.txt"), "the other device's mount should stay");
+        }
+        finally
+        {
+            DeviceMount.Unmount();
+            Shell(first, $"rm -rf {firstRoot}");
+            Shell(second, $"rm -rf {secondRoot}");
+        }
+    }
+
+    [TestMethod]
+    [Timeout(120_000)]
+    public void Mount_PushesWhileDownloading()
+    {
+        List<DeviceData> devices;
+        try
+        {
+            devices = [.. new AdbClient().GetDevices().Where(d => d.State is DeviceState.Online && !d.Serial.Contains("._adb-tls-"))];
+        }
+        catch
+        {
+            devices = [];
+        }
+
+        if (devices.Count == 0 || string.IsNullOrEmpty(AdbHelper.CurrentAdbState.Path))
+            Assert.Inconclusive("An online adb device is required.");
+
+        var notes = new StringBuilder();
+        foreach (var device in devices)
+        {
+            var viewModel = new LogicalDeviceViewModel(LogicalDevice.From(
+                new DeviceSnapshot(device.Serial, device.Model, DeviceStatus.Ok, DeviceType.Local, RootStatus.Unchecked, "", device)));
+
+            // Large enough that its download outlasts a small push
+            var root = $"/sdcard/{N("adbx-busy")}-{Guid.NewGuid():N}";
+            Shell(device, $"mkdir -p {root} && head -c 500000000 /dev/urandom > {root}/{N("big.bin")}");
+
+            var copy = Path.Combine(Path.GetTempPath(), $"adbx-busy-{Guid.NewGuid():N}.bin");
+            System.Diagnostics.Process? copier = null;
+            try
+            {
+                var local = DeviceMount.MountAndMap(viewModel, root)!;
+                Cmd($"dir /b \"{local}\"");
+
+                // The folder open in File Explorer, which is refreshed while the file downloads
+                System.Diagnostics.Process.Start("explorer.exe", local);
+                Assert.IsTrue(WaitFor(() => ExplorerWindowsUnder(local) > 0, 10), "File Explorer didn't open the folder");
+
+                copier = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("cmd.exe", $"/c copy /y \"{Path.Combine(local, N("big.bin"))}\" \"{copy}\"")
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                })!;
+                System.Threading.Thread.Sleep(1000);
+
+                var watch = System.Diagnostics.Stopwatch.StartNew();
+                File.WriteAllText(Path.Combine(local, N("small.txt")), "small");
+                var arrived = WaitFor(() => Shell(device, $"cat '{root}/{N("small.txt")}' 2>/dev/null") == "small", 60);
+                var downloadDone = copier.HasExited;
+                notes.AppendLine($"{device.Model}: pushed in {watch.ElapsedMilliseconds} ms, download done by then: {downloadDone}");
+
+                Assert.IsTrue(arrived, $"{device.Model}: the new file should be pushed");
+                Assert.IsFalse(downloadDone, $"{device.Model}: the new file waited for the download to finish");
+            }
+            finally
+            {
+                if (copier is { HasExited: false })
+                    copier.Kill(true);
+
+                DeviceMount.Unmount();
+                Shell(device, $"rm -rf {root}");
+                if (File.Exists(copy))
+                    File.Delete(copy);
+            }
+        }
+
+        Console.WriteLine(notes);
+    }
+
+    [TestMethod]
+    [Timeout(60_000)]
+    public void Mount_ShowsFilesOver4GiB()
+    {
+        List<DeviceData> devices;
+        try
+        {
+            devices = [.. new AdbClient().GetDevices().Where(d => d.State is DeviceState.Online && !d.Serial.Contains("._adb-tls-"))];
+        }
+        catch
+        {
+            devices = [];
+        }
+
+        // Only devices without LIS2 list 32-bit sizes
+        List<(DeviceData Device, LogicalDeviceViewModel ViewModel)> v1Devices = [.. devices
+            .Select(device => (device, new LogicalDeviceViewModel(LogicalDevice.From(
+                new DeviceSnapshot(device.Serial, device.Model, DeviceStatus.Ok, DeviceType.Local, RootStatus.Unchecked, "", device)))))
+            .Where(pair => !pair.Item2.SupportsLsV2)];
+
+        if (v1Devices.Count == 0 || string.IsNullOrEmpty(AdbHelper.CurrentAdbState.Path))
+            Assert.Inconclusive("An online adb device without ls_v2 (Android 10 or older) is required.");
+
+        const long size = 5L * 1024 * 1024 * 1024;
+        foreach (var (device, viewModel) in v1Devices)
+        {
+            // Sparse, so it takes no room on the device
+            var root = $"/sdcard/{N("adbx-large")}-{Guid.NewGuid():N}";
+            Shell(device, $"mkdir -p {root} && toybox truncate -s {size} {root}/{N("large.bin")} && echo s > {root}/{N("small.txt")}");
+            try
+            {
+                var local = DeviceMount.MountAndMap(viewModel, root)!;
+                Cmd($"dir /b \"{local}\"");
+                Assert.AreEqual(size, new FileInfo(Path.Combine(local, N("large.bin"))).Length, $"{device.Model}: a file over 4 GiB, as listed");
+                Assert.AreEqual(2L, new FileInfo(Path.Combine(local, N("small.txt"))).Length, device.Model);
+
+                // A refresh mustn't take it back to the 32-bit size
+                System.Diagnostics.Process.Start("explorer.exe", local);
+                Assert.IsTrue(WaitFor(() => ExplorerWindowsUnder(local) > 0, 10), "File Explorer didn't open the folder");
+                System.Threading.Thread.Sleep(4000);
+                Assert.AreEqual(size, new FileInfo(Path.Combine(local, N("large.bin"))).Length, $"{device.Model}: a file over 4 GiB, after a refresh");
+            }
+            finally
+            {
+                DeviceMount.Unmount();
+                Shell(device, $"rm -rf {root}");
+            }
+        }
+    }
+
+    private static bool OnDeviceExists(DeviceData device, string path) => Shell(device, $"[ -e '{path}' ] && echo yes") == "yes";
+
+    /// <summary>Through the thread's placeholder mode, as placeholders look like plain files by default.</summary>
+    private static bool IsPlaceholder(string path)
+    {
+        var previous = NativeMethods.RtlSetThreadPlaceholderCompatibilityMode(NativeMethods.PHCM_EXPOSE_PLACEHOLDERS);
+        try
+        {
+            return File.GetAttributes(path).HasFlag(FileAttributes.ReparsePoint);
+        }
+        finally
+        {
+            if (previous >= 0)
+                NativeMethods.RtlSetThreadPlaceholderCompatibilityMode(previous);
+        }
     }
 
     private static List<string> TrashEntries(DeviceData device)

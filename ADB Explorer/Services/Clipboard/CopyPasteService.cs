@@ -111,13 +111,21 @@ public partial class CopyPasteService : ObservableObject
     [ObservableProperty]
     public partial BitmapSource? DragBitmap { get; set; } = null;
 
-    /// <summary>True while a tab header is being dragged, which shows <see cref="DragTabTooltip"/> instead of a file transfer's.</summary>
+    /// <summary>
+    /// What a <see cref="ContentDrag"/> drags - a tab (<see cref="ExplorerInstance"/>) or a device - which the drag
+    /// window draws from its template in place of an image.
+    /// </summary>
     [ObservableProperty]
-    public partial bool IsTabDrag { get; set; } = false;
+    [NotifyPropertyChangedFor(nameof(IsContentDrag), nameof(IsTabDrag), nameof(IsDeviceDrag))]
+    public partial object? DragContent { get; set; }
 
-    /// <summary>The tab whose header the drag window shows in place of an image while <see cref="IsTabDrag"/>.</summary>
-    [ObservableProperty]
-    public partial ExplorerInstance? DragTab { get; set; }
+    public bool IsContentDrag => DragContent is not null;
+
+    /// <summary>A tab header is dragged, which shows <see cref="DragTabTooltip"/> instead of a file transfer's.</summary>
+    public bool IsTabDrag => DragContent is ExplorerInstance;
+
+    /// <summary>A device is dragged to open it in File Explorer; the drag window says where it opens.</summary>
+    public bool IsDeviceDrag => DragContent is LogicalDeviceViewModel;
 
     public string? DragTabTooltip { get; set; }
 
@@ -157,6 +165,9 @@ public partial class CopyPasteService : ObservableObject
 
     [ObservableProperty]
     public partial bool MouseWithinApp { get; set; } = true;
+
+    /// <summary>The top-level window under the cursor, as the drag window last followed it during a drag.</summary>
+    public Vanara.PInvoke.HWND WindowUnderMouse { get; set; }
 
     public HRESULT DragResult { get; set; }
 

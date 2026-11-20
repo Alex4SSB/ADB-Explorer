@@ -10,6 +10,35 @@ public sealed partial class DeviceMount
 {
     private readonly ConcurrentDictionary<CF_TRANSFER_KEY, FetchCancellation> _fetches = new();
 
+    /// <summary>
+    /// Files being downloaded, by local path, with how many fetches each has running. Its writes aren't edits, and an
+    /// open of the file may wait for the download, so the upload thread leaves these alone until they're done.
+    /// </summary>
+    private readonly Dictionary<string, int> _hydrating = new(StringComparer.OrdinalIgnoreCase);
+
+    private void BeginHydration(string localPath)
+    {
+        lock (_hydrating)
+            _hydrating[localPath] = _hydrating.GetValueOrDefault(localPath) + 1;
+    }
+
+    private void EndHydration(string localPath)
+    {
+        lock (_hydrating)
+        {
+            if (_hydrating.GetValueOrDefault(localPath) > 1)
+                _hydrating[localPath]--;
+            else
+                _hydrating.Remove(localPath);
+        }
+    }
+
+    private bool IsHydrating(string localPath)
+    {
+        lock (_hydrating)
+            return _hydrating.ContainsKey(localPath);
+    }
+
     /// <summary>The flag a synchronous pull checks between chunks.</summary>
     private sealed class FetchCancellation
     {
@@ -73,9 +102,9 @@ public sealed partial class DeviceMount
     /// </summary>
     private static readonly IntPtr PLACEHOLDER_IDENTITY = Marshal.StringToHGlobalAnsi(""); // a single zero byte, for the app's lifetime
 
-    private static CF_PLACEHOLDER_CREATE_INFO CreateInfo(FileStat entry) => CreateInfo(entry, 0);
-
-    private static CF_PLACEHOLDER_CREATE_INFO CreateInfo(FileStat entry, FileFlagsAndAttributes extraAttributes)
+    /// <param name="folderAttributes">Added to folders only.</param>
+    /// <param name="isReadOnly">Files are read-only, where the app doesn't change anything; elsewhere edits are pushed.</param>
+    private static CF_PLACEHOLDER_CREATE_INFO CreateInfo(FileStat entry, FileFlagsAndAttributes folderAttributes, bool isReadOnly)
     {
         var time = (entry.ModifiedTime ?? DateTime.Now).ToFileTimeStruct();
 
@@ -83,9 +112,9 @@ public sealed partial class DeviceMount
         var accessTime = entry.AccessTime?.UtcDateTime.ToFileTimeStruct() ?? time;
         var changeTime = entry.ChangeTime?.UtcDateTime.ToFileTimeStruct() ?? time;
         var isFolder = entry.Type is FileType.Folder;
-        var attributes = FileFlagsAndAttributes.FILE_ATTRIBUTE_DIRECTORY | extraAttributes;
+        var attributes = FileFlagsAndAttributes.FILE_ATTRIBUTE_DIRECTORY | folderAttributes;
         if (!isFolder)
-            attributes = FileFlagsAndAttributes.FILE_ATTRIBUTE_READONLY | extraAttributes;
+            attributes = isReadOnly ? FileFlagsAndAttributes.FILE_ATTRIBUTE_READONLY : FileFlagsAndAttributes.FILE_ATTRIBUTE_NORMAL;
 
         // Dot entries, which Android (and the app, unless shown) treats as hidden
         if (FilePath.IsHiddenName(entry.FullName))
@@ -114,7 +143,7 @@ public sealed partial class DeviceMount
 
     /// <param name="isComplete">Every child is in, so the folder needn't be asked for again.</param>
     private static void TransferPlaceholders(CF_OPERATION_INFO opInfo, List<FileStat> entries, NTStatus status, bool isComplete,
-                                             FileFlagsAndAttributes extraAttributes = 0)
+                                             FileFlagsAndAttributes folderAttributes = 0, bool isReadOnly = false)
     {
         var size = Marshal.SizeOf<CF_PLACEHOLDER_CREATE_INFO>();
         var array = entries.Count > 0 ? Marshal.AllocHGlobal(size * entries.Count) : IntPtr.Zero;
@@ -124,7 +153,7 @@ public sealed partial class DeviceMount
         {
             foreach (var entry in entries)
             {
-                Marshal.StructureToPtr(CreateInfo(entry, extraAttributes), array + (written * size), false);
+                Marshal.StructureToPtr(CreateInfo(entry, folderAttributes, isReadOnly), array + (written * size), false);
                 written++;
             }
 
@@ -161,12 +190,14 @@ public sealed partial class DeviceMount
     {
         // The callback's buffers only live until it returns, so copy what the pull needs
         var opInfo = OperationInfo(info, CF_OPERATION_TYPE.CF_OPERATION_TYPE_TRANSFER_DATA);
-        var devicePath = ToDevicePath(info.VolumeDosName + info.NormalizedPath);
+        var localPath = info.VolumeDosName + info.NormalizedPath;
+        var devicePath = ToDevicePath(localPath);
         var fileSize = info.FileSize;
         var fetch = parameters.FetchData;
         var cancellation = new FetchCancellation();
         _fetches[info.TransferKey] = cancellation;
         var transferKey = info.TransferKey;
+        BeginHydration(localPath);
 
         // A thread of its own, not the app's thread pool: when that's busy, a pull waits so long that the opening app gives up
         new Thread(() =>
@@ -178,6 +209,7 @@ public sealed partial class DeviceMount
             finally
             {
                 _fetches.TryRemove(KeyValuePair.Create(transferKey, cancellation));
+                EndHydration(localPath);
             }
         })
         {
