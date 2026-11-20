@@ -1160,18 +1160,6 @@ Bantu kami melokalkan aplikasi ke bahasa Anda di Weblate.</value>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} dari {1}</value>
   </data>
-  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
-    <value>Salin {0}</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
-    <value>Salin {0} ke {1}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
-    <value>Pindahkan {0}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
-    <value>Pindahkan {0} ke {1}</value>
-  </data>
   <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
     <value>File tidak ditemukan</value>
   </data>
@@ -1792,5 +1780,20 @@ Pemeriksaan ini berupaya mencegah pengguna yang tidak menyadari risiko menjalank
   </data>
   <data name="S_SETTINGS_UNIT_TIMES" xml:space="preserve">
     <value>kali</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Salin</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TO" xml:space="preserve">
+    <value>Salin ke {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>Pindahkan</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TO" xml:space="preserve">
+    <value>Pindahkan ke {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL" xml:space="preserve">
+    <value>Instal</value>
   </data>
 </root>

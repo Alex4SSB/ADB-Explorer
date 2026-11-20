@@ -66,64 +66,73 @@ public static partial class NativeMethods
         public IEnumerable<byte> Bytes { get; }
     }
 
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public struct ADBDRAGLIST : IByteStruct
+    /// <summary>
+    /// This app's own drag/clipboard payload: a magic number, then length-prefixed UTF-8 strings and an item count.
+    /// Every field is checked on read, so a partial, zero-filled or foreign buffer is rejected instead of throwing.
+    /// </summary>
+    public sealed record AdbDragList(string DeviceId, string ParentFolder, string[] Items) : IByteStruct
     {
-        public string deviceId;
-        public string parentFolder;
-        public string[] items;
+        private const int MAGIC = 0x31584241; // "ABX1"
 
-        public ADBDRAGLIST(LogicalDeviceViewModel device, IEnumerable<FileClass> files)
+        public static AdbDragList Create(LogicalDeviceViewModel device, IEnumerable<FileClass> files)
         {
-            deviceId = device.ID;
-            parentFolder = files.First().ParentPath;
-            
-            items = [.. parentFolder == AdbExplorerConst.RECYCLE_PATH
+            var parentFolder = files.First().ParentPath;
+            string[] items = [.. parentFolder == AdbExplorerConst.RECYCLE_PATH
                 ? files.Select(f => f.TrashIndex!.RecycleName)
                 : files.Select(f => f.FullName)];
+
+            return new(device.ID, parentFolder, items);
         }
 
-        public readonly IEnumerable<byte> Bytes
+        public IEnumerable<byte> Bytes
         {
             get
             {
-                var joinedItems = string.Join("\0", items);
-                var combined = string.Join("\0", deviceId, parentFolder, joinedItems, '\0');
+                using MemoryStream stream = new();
+                using (BinaryWriter writer = new(stream, Encoding.UTF8, leaveOpen: true))
+                {
+                    writer.Write(MAGIC);
+                    writer.Write(DeviceId);
+                    writer.Write(ParentFolder);
+                    writer.Write(Items.Length);
 
-                return [.. Encoding.Unicode.GetBytes(combined)];
+                    foreach (var item in Items)
+                        writer.Write(item);
+                }
+
+                return stream.ToArray();
             }
         }
 
-        public static ADBDRAGLIST FromStream(MemoryStream stream)
+        /// <summary>Returns null when the buffer isn't a complete payload.</summary>
+        public static AdbDragList? TryRead(MemoryStream stream)
         {
-            ADBDRAGLIST dragList = new();
-            var bytes = stream.ToArray().AsSpan();
-
-            int i = 0;
-            List<string> strings = [];
-
-            while (i < bytes.Length)
+            try
             {
-                // Index of Unicode chars must be even
-                var index = ByteHelper.PatternAt(bytes, [0, 0], i, true);
+                stream.Position = 0;
+                using BinaryReader reader = new(stream, Encoding.UTF8, leaveOpen: true);
 
-                if (index < 0)
-                    break;
+                if (reader.ReadInt32() != MAGIC)
+                    return null;
 
-                string item = Encoding.Unicode.GetString(bytes[i..index]);
-                if (string.IsNullOrEmpty(item) || bytes[i..index].Sum() == 0)
-                    break;
+                var deviceId = reader.ReadString();
+                var parentFolder = reader.ReadString();
+                var count = reader.ReadInt32();
 
-                strings.Add(item);
+                // Each item takes at least its length byte, so a larger count can't be real
+                if (string.IsNullOrEmpty(deviceId) || string.IsNullOrEmpty(parentFolder) || count < 1 || count > stream.Length - stream.Position)
+                    return null;
 
-                i = index + 2;
+                var items = new string[count];
+                for (int i = 0; i < count; i++)
+                    items[i] = reader.ReadString();
+
+                return new(deviceId, parentFolder, items);
             }
-
-            dragList.deviceId = strings[0];
-            dragList.parentFolder = strings[1];
-            dragList.items = [.. strings.Skip(2)];
-
-            return dragList;
+            catch (Exception e) when (e is EndOfStreamException or IOException or FormatException or DecoderFallbackException)
+            {
+                return null;
+            }
         }
     }
 

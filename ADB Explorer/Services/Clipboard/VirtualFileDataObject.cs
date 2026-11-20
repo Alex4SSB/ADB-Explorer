@@ -445,7 +445,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     {
         SelfFiles = [.. files];
         SelfDevice = device;
-        NativeMethods.ADBDRAGLIST adbDrag = new(device, files);
+        var adbDrag = NativeMethods.AdbDragList.Create(device, files);
         SetData(AdbDataFormats.AdbDrop, adbDrag.Bytes);
     }
 

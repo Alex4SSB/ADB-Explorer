@@ -1178,18 +1178,6 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} von {1}</value>
   </data>
-  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
-    <value>{0} kopieren</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
-    <value>{0} nach {1} kopieren</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
-    <value>{0} verschieben</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
-    <value>{0} nach {1} verschieben</value>
-  </data>
   <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
     <value>Datei nicht gefunden</value>
   </data>
@@ -1694,5 +1682,20 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_SETTINGS_NEW_TAB_LOCATION" xml:space="preserve">
     <value>Neuer Tab wird geöffnet bei</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Kopieren</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TO" xml:space="preserve">
+    <value>Nach {0} kopieren</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>Verschieben</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TO" xml:space="preserve">
+    <value>Nach {0} verschieben</value>
+  </data>
+  <data name="S_DRAG_INSTALL" xml:space="preserve">
+    <value>Installieren</value>
   </data>
 </root>

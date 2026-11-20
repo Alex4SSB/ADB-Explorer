@@ -1644,18 +1644,6 @@ Ajude-nos a traduzir a aplicação para o seu idioma na plataforma Weblate.</val
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} de {1}</value>
   </data>
-  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
-    <value>Copiar {0}</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
-    <value>Copiar {0} para {1}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
-    <value>Mover {0}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
-    <value>Mover {0} para {1}</value>
-  </data>
   <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
     <value>Ficheiro não encontrado</value>
   </data>
@@ -1823,5 +1811,20 @@ Ajude-nos a traduzir a aplicação para o seu idioma na plataforma Weblate.</val
   </data>
   <data name="S_SETTINGS_DISABLE_ADB_LIMITATIONS" xml:space="preserve">
     <value>Permitir ADB de Fontes Não Verificadas</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Copiar</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TO" xml:space="preserve">
+    <value>Copiar para {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>Mover</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TO" xml:space="preserve">
+    <value>Mover para {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL" xml:space="preserve">
+    <value>Instalar</value>
   </data>
 </root>

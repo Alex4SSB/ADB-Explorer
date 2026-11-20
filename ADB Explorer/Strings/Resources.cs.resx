@@ -1363,22 +1363,6 @@ Pomozte nám prosím lokalizovat aplikaci do svého jazyka na Weblate.</value>
     <value>{0} z {1}</value>
     <comment>0 - number of completed files, 1 - total files. ex: 2 of 3</comment>
   </data>
-  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
-    <value>Kopírovat {0}</value>
-    <comment>The drag tooltip in copy mode. 0 - the item being dragged</comment>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
-    <value>Kopírovat {0} do {1}</value>
-    <comment>The drag tooltip in copy mode when the target is known. 0 - the item being dragged, 1 - the destination under the mouse</comment>
-  </data>
-  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
-    <value>Přesunout {0}</value>
-    <comment>The drag tooltip in move mode. 0 - the item being dragged</comment>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
-    <value>Přesunout {0} do {1}</value>
-    <comment>The drag tooltip in move mode when the target is known. 0 - the item being dragged, 1 - the destination under the mouse</comment>
-  </data>
   <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
     <value>Soubor nenalezen</value>
   </data>
@@ -2007,5 +1991,20 @@ Kontroly se snaží zabránit tomu, aby nic netušící uživatel spustil potenc
   </data>
   <data name="S_REPORT_ISSUE" xml:space="preserve">
     <value>Nahlásit problém</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Kopírovat</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TO" xml:space="preserve">
+    <value>Kopírovat do {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>Přesunout</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TO" xml:space="preserve">
+    <value>Přesunout do {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL" xml:space="preserve">
+    <value>Nainstalovat</value>
   </data>
 </root>

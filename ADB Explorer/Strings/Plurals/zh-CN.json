@@ -15,10 +15,6 @@
     "InstallApks_other": "安装 {{count}} 个 APK",
     "PasteCutItems_other": "粘贴{{count}}剪切项",
     "PasteCopiedItems_other": "粘贴{{count}}复制项",
-    "CopyItems_other": "复制{{count}}项",
-    "CopyItemsTo_other": "复制{{count}}项至{{target}}",
-    "MoveItems_other": "移动{{count}}项",
-    "MoveItemsTo_other": "移动{{count}}项至{{target}}",
     "FilesInvalidAtDriveRoot_other": "无法在 Windows 驱动器根目录下创建所选文件 {{count}}。",
     "ApkInstallers_other": "{{count}} APK 安装程序",
     "Packages_other": "{{count}} 软件包"

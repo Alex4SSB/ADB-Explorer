@@ -185,6 +185,16 @@ public partial class CopyPasteService : ObservableObject
     }
 
     /// <summary>
+    /// <see cref="ClearShellDropDescription"/> from any thread. Its clear is queued before any
+    /// description the next target posts, so that one still shows.
+    /// </summary>
+    public void PostClearShellDropDescription()
+    {
+        Interlocked.Increment(ref _shellDescriptionVersion);
+        App.SafeBeginInvoke(() => ShellDropDescription = null);
+    }
+
+    /// <summary>
     /// The drag image's bounds in pixels relative to the cursor - so its location is negative when the
     /// mouse holds it away from its top left - else null for the standard size, above the cursor.
     /// </summary>

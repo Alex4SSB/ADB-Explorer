@@ -83,7 +83,7 @@ internal static class DragAutoScroll
         Point pos;
         try
         {
-            var cursor = NativeMethods.InterceptMouse.GetCursorPosition();
+            var cursor = NativeMethods.MouseHook.GetCursorPosition();
             pos = viewer.PointFromScreen(new Point(cursor.X, cursor.Y));
         }
         catch (InvalidOperationException)

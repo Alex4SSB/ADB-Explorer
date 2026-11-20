@@ -238,10 +238,7 @@ public partial class MainWindow : INavigationWindow
         App.Services.GetRequiredService<AdbSnackbarService>().SubscribeQueue(Data.FileOpQ);
         App.Services.GetRequiredService<ExplorerViewModel>().Tree.SubscribeFileOps(Data.FileOpQ);
 
-        NativeMethods.InterceptClipboard.Init(this,
-                                              Data.CopyPaste.GetClipboardPasteItems,
-                                              scale => Data.RuntimeSettings.MainWindowScalingFactor = scale,
-                                              UnfocusNavigationRow);
+        NativeMethods.ClipboardHook.Init(this, Data.CopyPaste.GetClipboardPasteItems);
 
         Data.FileOpQ.PropertyChanged += (s, e) =>
         {

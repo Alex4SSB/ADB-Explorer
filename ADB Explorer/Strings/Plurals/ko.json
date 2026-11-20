@@ -11,10 +11,6 @@
     "InstallApks_other": "{{count}}개 APK 설치",
     "PasteCutItems_other": "잘라낸 항목 {{count}}개 붙여넣기",
     "PasteCopiedItems_other": "복사한 항목 {{count}}개 붙여넣기",
-    "CopyItems_other": "{{count}}개 항목 복사",
-    "CopyItemsTo_other": "{{count}}개 항목을 {{target}}에 복사",
-    "MoveItems_other": "{{count}}개 항목 이동",
-    "MoveItemsTo_other": "{{count}}개 항목을 {{target}}(으)로 이동",
     "FilesInvalidAtDriveRoot_other": "선택한 파일 중 {{count}}개는 Windows 드라이브 루트 아래에 생성할 수 없습니다.",
     "ApkInstallers_other": "{{count}} APK 설치 프로그램",
     "Packages_other": "{{count}} 패키지"

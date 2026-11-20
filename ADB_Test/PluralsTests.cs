@@ -77,7 +77,7 @@ public class PluralsTests
             Assert.AreEqual("2 items", Plurals.Items(2));
             Assert.AreEqual("1 item", Plurals.ItemCount(1));
             Assert.AreEqual("?? items", Plurals.ItemCount(null));
-            Assert.AreEqual("Copy 3 items to Download", Plurals.CopyItemsTo(3, "Download"));
+            Assert.AreEqual("There are 3 conflicting items in Download", Plurals.ConflictingItemsIn(3, "Download"));
         }
         finally
         {

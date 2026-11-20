@@ -6,24 +6,15 @@ namespace ADB_Explorer.Services;
 
 public partial class CopyPasteService
 {
-    private bool ShouldKeepSelfAndroidClipboard(IDataObject dataObject)
+    private bool ShouldKeepSelfAndroidClipboard()
     {
         if (!CurrentSource.HasFlag(DataSource.Android) || Files.Length == 0)
             return false;
 
-        // Only tolerate a transient OLE gap while nothing has touched the clipboard since our
-        // own write - any other sequence number means a distinct, fully-formed update (an image,
-        // a text copy, another self-copy...) that must be processed normally, not preserved.
-        if (_selfCopyClipboardSequence != GetClipboardSequenceNumber())
-            return false;
-
-        if (dataObject.GetDataPresent(AdbDataFormats.AdbDrop)
-            && dataObject.GetData(AdbDataFormats.AdbDrop) is MemoryStream)
-            return false;
-
-        // A new Windows/shell copy typically includes FileDrop. OLE can omit AdbDrop
-        // on the first update while still holding our FileDescriptor payload.
-        return !dataObject.GetDataPresent(AdbDataFormats.FileDrop);
+        // Nothing touched the clipboard since our own write, which UpdateSelfVFDO already applied, so it's kept as is.
+        // Reading it back was also unreliable: OLE can omit AdbDrop on the first update.
+        // Any other sequence number is a distinct update (an image, a text copy...) and is processed normally.
+        return _selfCopyClipboardSequence == GetClipboardSequenceNumber();
     }
 
     private static bool IsAndroidAbsolutePath(string path)
@@ -37,7 +28,7 @@ public partial class CopyPasteService
         DebugLog.PrintLine($"Clipboard formats: {string.Join(", ", CPDO.GetFormats())}");
 #endif
 
-        if (ShouldKeepSelfAndroidClipboard(CPDO))
+        if (ShouldKeepSelfAndroidClipboard())
         {
             UpdateUI();
             return;

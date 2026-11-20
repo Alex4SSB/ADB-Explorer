@@ -1225,18 +1225,6 @@ Por favor, ayúdenos a localizar la app a su idioma en Weblate.</value>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} de {1}</value>
   </data>
-  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
-    <value>Copiar {0}</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
-    <value>Copiar {0} a {1}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
-    <value>Mover {0}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
-    <value>Mover {0} a {1}</value>
-  </data>
   <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
     <value>Archivo no encontrado</value>
   </data>
@@ -1545,5 +1533,20 @@ Los detalles pueden incluir: miniatura, información extendida del archivo, meta
     <value>Configura el panel lateral en modo de vista previa.
 
 Elementos compatibles: miniaturas, PDF; otros archivos que cumplan con la restricción de tamaño se muestran como texto, con resaltado de sintaxis opcional, y se pueden editar y guardar si la ubicación lo permite.</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Copiar</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TO" xml:space="preserve">
+    <value>Copiar a {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>Mover</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TO" xml:space="preserve">
+    <value>Mover a {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL" xml:space="preserve">
+    <value>Instalar</value>
   </data>
 </root>

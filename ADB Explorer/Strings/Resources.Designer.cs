@@ -1443,23 +1443,7 @@ namespace ADB_Explorer.Strings {
             }
         }
         
-        /// <summary>
-        ///   Looks up a localized string similar to Copy {0}.
-        /// </summary>
-        public static string S_DRAGDROP_COPY_SINGLE {
-            get {
-                return ResourceManager.GetString("S_DRAGDROP_COPY_SINGLE", resourceCulture);
-            }
-        }
         
-        /// <summary>
-        ///   Looks up a localized string similar to Copy {0} to {1}.
-        /// </summary>
-        public static string S_DRAGDROP_COPY_TARGET_SINGLE {
-            get {
-                return ResourceManager.GetString("S_DRAGDROP_COPY_TARGET_SINGLE", resourceCulture);
-            }
-        }
         
         /// <summary>
         ///   Looks up a localized string similar to Create link in {0}.
@@ -1470,23 +1454,7 @@ namespace ADB_Explorer.Strings {
             }
         }
         
-        /// <summary>
-        ///   Looks up a localized string similar to Move {0}.
-        /// </summary>
-        public static string S_DRAGDROP_MOVE_SINGLE {
-            get {
-                return ResourceManager.GetString("S_DRAGDROP_MOVE_SINGLE", resourceCulture);
-            }
-        }
         
-        /// <summary>
-        ///   Looks up a localized string similar to Move {0} to {1}.
-        /// </summary>
-        public static string S_DRAGDROP_MOVE_TARGET_SINGLE {
-            get {
-                return ResourceManager.GetString("S_DRAGDROP_MOVE_TARGET_SINGLE", resourceCulture);
-            }
-        }
         
         /// <summary>
         ///   Looks up a localized string similar to Installed Apps.
@@ -2683,32 +2651,8 @@ namespace ADB_Explorer.Strings {
             }
         }
 
-        /// <summary>
-        ///   Looks up a localized string similar to Open {0} in Windows Explorer.
-        /// </summary>
-        public static string S_DRAG_OPEN_MOUNT {
-            get {
-                return ResourceManager.GetString("S_DRAG_OPEN_MOUNT", resourceCulture);
-            }
-        }
 
-        /// <summary>
-        ///   Looks up a localized string similar to Open {0} in a new tab.
-        /// </summary>
-        public static string S_DRAG_OPEN_MOUNT_TAB {
-            get {
-                return ResourceManager.GetString("S_DRAG_OPEN_MOUNT_TAB", resourceCulture);
-            }
-        }
 
-        /// <summary>
-        ///   Looks up a localized string similar to Open {0} in a new tab.
-        /// </summary>
-        public static string S_DRAG_OPEN_NEW_TAB {
-            get {
-                return ResourceManager.GetString("S_DRAG_OPEN_NEW_TAB", resourceCulture);
-            }
-        }
 
         /// <summary>
         ///   Looks up a localized string similar to Mount options.
@@ -5134,6 +5078,69 @@ namespace ADB_Explorer.Strings {
         public static string ScrollBar_ScrollToTopCommand {
             get {
                 return ResourceManager.GetString("ScrollBar_ScrollToTopCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy.
+        /// </summary>
+        public static string S_DRAGDROP_COPY {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_COPY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy to {0}.
+        /// </summary>
+        public static string S_DRAGDROP_COPY_TO {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_COPY_TO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move.
+        /// </summary>
+        public static string S_DRAGDROP_MOVE {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_MOVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move to {0}.
+        /// </summary>
+        public static string S_DRAGDROP_MOVE_TO {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_MOVE_TO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install.
+        /// </summary>
+        public static string S_DRAG_INSTALL {
+            get {
+                return ResourceManager.GetString("S_DRAG_INSTALL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open in a new tab.
+        /// </summary>
+        public static string S_DRAG_OPEN_IN_NEW_TAB {
+            get {
+                return ResourceManager.GetString("S_DRAG_OPEN_IN_NEW_TAB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open in Windows Explorer.
+        /// </summary>
+        public static string S_DRAG_OPEN_IN_EXPLORER {
+            get {
+                return ResourceManager.GetString("S_DRAG_OPEN_IN_EXPLORER", resourceCulture);
             }
         }
     }

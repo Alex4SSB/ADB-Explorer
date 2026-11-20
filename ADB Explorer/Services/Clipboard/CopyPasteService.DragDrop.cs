@@ -149,10 +149,12 @@ public partial class CopyPasteService
         string[] oldFiles = [.. DragFiles];
 
         // ADB Drop - for all Android to Android transfers (including self)
-        if (dataObject.GetDataPresent(AdbDataFormats.AdbDrop) && dataObject.GetData(AdbDataFormats.AdbDrop) is MemoryStream adbStream)
+        // An incomplete payload is treated as absent, so the other formats are used instead
+        if (dataObject.GetDataPresent(AdbDataFormats.AdbDrop)
+            && dataObject.GetData(AdbDataFormats.AdbDrop) is MemoryStream adbStream
+            && NativeMethods.AdbDragList.TryRead(adbStream) is { } dragList)
         {
-            var dragList = NativeMethods.ADBDRAGLIST.FromStream(adbStream);
-            var deviceId = dragList.deviceId;
+            var deviceId = dragList.DeviceId;
 
             var device = Data.DevicesObject.UIList.OfType<LogicalDeviceViewModel>().FirstOrDefault(d => d.Matches(deviceId) && d.Status is DeviceStatus.Ok);
             if (device is null && SourceDevice?.ID == deviceId)
@@ -166,8 +168,8 @@ public partial class CopyPasteService
 
             SourceDevice = device;
 
-            DragParent = dragList.parentFolder;
-            DragFiles = [.. dragList.items.Select(f => FileHelper.ConcatPaths(DragParent, f))];
+            DragParent = dragList.ParentFolder;
+            DragFiles = [.. dragList.Items.Select(f => FileHelper.ConcatPaths(DragParent, f))];
 
             CurrentSource |= DataSource.Android;
 
@@ -511,7 +513,7 @@ public partial class CopyPasteService
                     ShellFolder tempDrag = new(Data.RuntimeSettings.TempDragPath);
                     var shItems = ShellItemArray.FromDataObject((System.Runtime.InteropServices.ComTypes.IDataObject)dataObject);
 
-                    ShellFileOperations shFileOp = new(NativeMethods.InterceptClipboard.MainWindowHandle);
+                    ShellFileOperations shFileOp = new(NativeMethods.ClipboardHook.MainWindowHandle);
                     shItems.ForEach(shia => shFileOp.QueueCopyOperation(shia, tempDrag));
 
                     ShellItem lastTopItem = null;

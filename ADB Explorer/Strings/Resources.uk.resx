@@ -1225,18 +1225,6 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} з {1}</value>
   </data>
-  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
-    <value>Копіювати {0}</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
-    <value>Копіювати {0} до {1}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
-    <value>Перемістити {0}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
-    <value>Перемістити {0} до {1}</value>
-  </data>
   <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
     <value>Файл не знайдено</value>
   </data>
@@ -1825,13 +1813,25 @@ ADB доступний як частина Android SDK Platform Tools.
   <data name="S_MOUNT_OPENING" xml:space="preserve">
     <value>Відкриття у Провіднику Windows…</value>
   </data>
-  <data name="S_DRAG_OPEN_MOUNT" xml:space="preserve">
-    <value>Відкрити {0} у Провіднику Windows</value>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Копіювати</value>
   </data>
-  <data name="S_DRAG_OPEN_MOUNT_TAB" xml:space="preserve">
-    <value>Відкрити {0} у новій вкладці</value>
+  <data name="S_DRAGDROP_COPY_TO" xml:space="preserve">
+    <value>Копіювати до {0}</value>
   </data>
-  <data name="S_DRAG_OPEN_NEW_TAB" xml:space="preserve">
-    <value>Відкрити {0} у новій вкладці</value>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>Перемістити</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TO" xml:space="preserve">
+    <value>Перемістити до {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL" xml:space="preserve">
+    <value>Встановити</value>
+  </data>
+  <data name="S_DRAG_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>Відкрити у новій вкладці</value>
+  </data>
+  <data name="S_DRAG_OPEN_IN_EXPLORER" xml:space="preserve">
+    <value>Відкрити у Провіднику Windows</value>
   </data>
 </root>

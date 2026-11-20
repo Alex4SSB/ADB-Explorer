@@ -280,7 +280,7 @@ public partial class App
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         // Stop mouse interception which causes partial mouse freeze during crashes
-        NativeMethods.InterceptMouse.Close();
+        NativeMethods.MouseHook.Close();
 
         if (e.Exception.HResult is HRESULT.CLIPBRD_E_CANT_OPEN
             or HRESULT.E_ACCESSDENIED)

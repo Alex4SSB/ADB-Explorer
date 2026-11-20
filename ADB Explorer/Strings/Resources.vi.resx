@@ -391,9 +391,6 @@
   <data name="BYTES" xml:space="preserve">
     <value>{0} B</value>
   </data>
-  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
-    <value>Sao chép {0}</value>
-  </data>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
     <value>Cài đặt {0}</value>
   </data>
@@ -469,5 +466,11 @@
   <data name="ScrollBar_LineRightCommand" xml:space="preserve">
     <value>Cuộn sang phải</value>
     <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Sao chép</value>
+  </data>
+  <data name="S_DRAG_INSTALL" xml:space="preserve">
+    <value>Cài đặt</value>
   </data>
 </root>

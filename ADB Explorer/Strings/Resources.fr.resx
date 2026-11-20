@@ -1202,18 +1202,6 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} de {1}</value>
   </data>
-  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
-    <value>Copier {0}</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
-    <value>Copier {0} vers {1}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
-    <value>Déplacer {0}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
-    <value>Déplacer {0} vers {1}</value>
-  </data>
   <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
     <value>Fichier non trouvé</value>
   </data>
@@ -1686,5 +1674,20 @@ Séléctionnez Personnalisé pour utiliser un emplacement qui ne sera pas suppri
   </data>
   <data name="S_MENU_INVERT_SELECTION" xml:space="preserve">
     <value>Inverser la sélection</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Copier</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TO" xml:space="preserve">
+    <value>Copier vers {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>Déplacer</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TO" xml:space="preserve">
+    <value>Déplacer vers {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL" xml:space="preserve">
+    <value>Installer</value>
   </data>
 </root>

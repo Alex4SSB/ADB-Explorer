@@ -1649,22 +1649,6 @@ Please help us localize the app to your language on Weblate.</value>
     <value>{0} of {1}</value>
     <comment>0 - number of completed files, 1 - total files. ex: 2 of 3</comment>
   </data>
-  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
-    <value>Copy {0}</value>
-    <comment>The drag tooltip in copy mode. 0 - the item being dragged</comment>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
-    <value>Copy {0} to {1}</value>
-    <comment>The drag tooltip in copy mode when the target is known. 0 - the item being dragged, 1 - the destination under the mouse</comment>
-  </data>
-  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
-    <value>Move {0}</value>
-    <comment>The drag tooltip in move mode. 0 - the item being dragged</comment>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
-    <value>Move {0} to {1}</value>
-    <comment>The drag tooltip in move mode when the target is known. 0 - the item being dragged, 1 - the destination under the mouse</comment>
-  </data>
   <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
     <value>File not found</value>
     <comment>The error message displayed when a sync operation is about to start but the source file is missing</comment>
@@ -2301,16 +2285,32 @@ The checks attempt to prevent an unsuspecting user from launching a possibly mal
     <value>Opening in Windows Explorer…</value>
     <comment>Progress dialog text while the device folder is prepared and Windows File Explorer opens; closes by itself</comment>
   </data>
-  <data name="S_DRAG_OPEN_MOUNT" xml:space="preserve">
-    <value>Open {0} in Windows Explorer</value>
-    <comment>Drag tooltip while a device is dragged over the Windows desktop; dropping it opens the device in a new Windows File Explorer window. {0} is the device name</comment>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Copy</value>
+    <comment>The drag tooltip in copy mode, when the destination isn't known. Matches File Explorer's wording</comment>
   </data>
-  <data name="S_DRAG_OPEN_MOUNT_TAB" xml:space="preserve">
-    <value>Open {0} in a new tab</value>
-    <comment>Drag tooltip while a device is dragged over a Windows File Explorer window; dropping it opens the device in a new tab of that window. {0} is the device name</comment>
+  <data name="S_DRAGDROP_COPY_TO" xml:space="preserve">
+    <value>Copy to {0}</value>
+    <comment>The drag tooltip in copy mode. 0 - the destination under the mouse. Matches File Explorer's wording</comment>
   </data>
-  <data name="S_DRAG_OPEN_NEW_TAB" xml:space="preserve">
-    <value>Open {0} in a new tab</value>
-    <comment>Drag tooltip while a folder or drive is dragged over the app's tab strip; dropping it opens it in a new tab of the app. {0} is the folder or drive name</comment>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>Move</value>
+    <comment>The drag tooltip in move mode, when the destination isn't known. Matches File Explorer's wording</comment>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TO" xml:space="preserve">
+    <value>Move to {0}</value>
+    <comment>The drag tooltip in move mode. 0 - the destination under the mouse. Matches File Explorer's wording</comment>
+  </data>
+  <data name="S_DRAG_INSTALL" xml:space="preserve">
+    <value>Install</value>
+    <comment>The drag tooltip while APK files are dragged over the installed apps view; dropping them installs them</comment>
+  </data>
+  <data name="S_DRAG_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>Open in a new tab</value>
+    <comment>The drag tooltip while a folder, drive or device is dragged over a tab strip (the app's, or a File Explorer window's); dropping it opens it in a new tab there</comment>
+  </data>
+  <data name="S_DRAG_OPEN_IN_EXPLORER" xml:space="preserve">
+    <value>Open in Windows Explorer</value>
+    <comment>The drag tooltip while a device is dragged over the Windows desktop; dropping it opens the device in a new Windows File Explorer window</comment>
   </data>
 </root>

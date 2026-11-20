@@ -1154,18 +1154,6 @@ Aiutaci a localizzare l'app nella vostra lingua su Weblate.</value>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} di {1}</value>
   </data>
-  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
-    <value>Copia {0}</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
-    <value>Copia {0} in {1}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
-    <value>Sposta {0}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
-    <value>Sposta {0} in {1}</value>
-  </data>
   <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
     <value>File non trovato</value>
   </data>
@@ -1334,5 +1322,20 @@ Aiutaci a localizzare l'app nella vostra lingua su Weblate.</value>
   <data name="S_BUTTON_PAIR" xml:space="preserve">
     <value>Pair</value>
     <comment>The button for pairing a device</comment>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Copia</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TO" xml:space="preserve">
+    <value>Copia in {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>Sposta</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TO" xml:space="preserve">
+    <value>Sposta in {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL" xml:space="preserve">
+    <value>Installa</value>
   </data>
 </root>

@@ -1243,18 +1243,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>完成 {0} 個，共 {1} 個</value>
   </data>
-  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
-    <value>複製 {0} 項</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
-    <value>複製 {0} 項到 {1}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
-    <value>移動 {0} 項</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
-    <value>移動 {0} 項到 {1}</value>
-  </data>
   <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
     <value>未找到檔案</value>
   </data>
@@ -1856,5 +1844,20 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_VIEW_SIZE_TOOLTIP" xml:space="preserve">
     <value>遞迴計算與顯示此資料夾下所又檔案的總大小。</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>複製</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TO" xml:space="preserve">
+    <value>複製到 {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>移動</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TO" xml:space="preserve">
+    <value>移動到 {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL" xml:space="preserve">
+    <value>安裝</value>
   </data>
 </root>

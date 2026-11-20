@@ -1160,18 +1160,6 @@ Weblate でアプリをあなたの言語にローカライズできるよう、
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} / {1}</value>
   </data>
-  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
-    <value>{0} をコピー</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
-    <value>{0} を {1} にコピー</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
-    <value>{0} を移動</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
-    <value>{0} を {1} に移動</value>
-  </data>
   <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
     <value>ファイルが見つかりません</value>
   </data>
@@ -1309,5 +1297,20 @@ Weblate でアプリをあなたの言語にローカライズできるよう、
   </data>
   <data name="S_RENAME_ICON_LETTER" xml:space="preserve">
     <value>あ</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>コピー</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TO" xml:space="preserve">
+    <value>{0} にコピー</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>移動</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TO" xml:space="preserve">
+    <value>{0} に移動</value>
+  </data>
+  <data name="S_DRAG_INSTALL" xml:space="preserve">
+    <value>インストール</value>
   </data>
 </root>

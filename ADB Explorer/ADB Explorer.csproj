@@ -29,7 +29,8 @@
   </ItemGroup>
 
   <!-- Emoji.Wpf, built from our fork (github.com/Alex4SSB/emoji.wpf) instead of the
-       stock NuGet package, so it can highlight search matches (HighlightRanges). -->
+       stock NuGet package, so it can highlight search matches (HighlightRanges)
+       and color parts of a text (ForegroundRanges). -->
   <ItemGroup>
     <Reference Include="Emoji.Wpf">
       <HintPath>Libs\Emoji.Wpf\Emoji.Wpf.dll</HintPath>
