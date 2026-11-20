@@ -88,6 +88,28 @@ public partial class MainWindow
             TabStrip.DropReorderTarget(dragged, e);
     }
 
+    private void TitleBar_DragOver(object sender, DragEventArgs e)
+    {
+        e.Effects = TabStrip.ShowNewTabTarget(e);
+        e.Handled = true;
+    }
+
+    private void TitleBar_DragLeave(object sender, DragEventArgs e)
+    {
+        // Leaving a tab bubbles up here too, while still over the title bar
+        if (new Rect(TitleBar.RenderSize).Contains(e.GetPosition(TitleBar)))
+            return;
+
+        TabStrip.HideNewTabTarget();
+        Data.CopyPaste.DropEffect = Data.CopyPaste.CurrentDropEffect = DragDropEffects.None;
+    }
+
+    private void TitleBar_Drop(object sender, DragEventArgs e)
+    {
+        TabStrip.DropNewTab(e);
+        e.Handled = true;
+    }
+
     /// <summary>The zone last hinted, kept while the pointer is in the region's center.</summary>
     private SplitSide? _lastDropSide;
 

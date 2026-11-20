@@ -29,6 +29,15 @@ public partial class ExplorerTabStrip : UserControl
     /// <summary>Where the dragged tab lands if dropped now, as last marked; -1 when nothing is marked.</summary>
     private int _reorderIndex = -1;
 
+    /// <summary>
+    /// What the drag over the title bar last offered to open, for the drop: by then a file drag no longer
+    /// counts as active, as the button's release ends it before the drop is delivered.
+    /// </summary>
+    private NewTabDrop? _newTabDrop;
+
+    /// <summary>Something dragged over the title bar that opens in a new tab, by its name, at the index it's dropped at.</summary>
+    private sealed record NewTabDrop(string Name, Action<int> Open);
+
     public ExplorerTabStrip()
     {
         DataContext = App.Services.GetService<ExplorerTabsViewModel>();
@@ -110,15 +119,19 @@ public partial class ExplorerTabStrip : UserControl
     /// Marks where <paramref name="tab"/> lands if dropped at <paramref name="e"/>'s position: the gap between tabs nearest
     /// the pointer, as a DataGrid picks for a dragged column header. The pill goes on the left side of that place.
     /// </summary>
-    public void ShowReorderTarget(ExplorerInstance tab, DragEventArgs e)
+    /// <param name="tab">The dragged tab, or null for a new tab opened by the drop.</param>
+    public void ShowReorderTarget(ExplorerInstance? tab, DragEventArgs e)
     {
         var tabs = ((ExplorerTabsViewModel)DataContext).Tabs;
-        var from = tabs.IndexOf(tab);
+        var from = -1;
+        if (tab is not null)
+            from = tabs.IndexOf(tab);
+
         var containers = Enumerable.Range(0, tabs.Count)
             .Select(i => TabsList.ItemContainerGenerator.ContainerFromIndex(i) as FrameworkElement)
             .ToList();
 
-        if (from < 0 || containers.Any(c => c is null))
+        if ((tab is not null && from < 0) || containers.Count == 0 || containers.Any(c => c is null))
         {
             HideReorderTarget();
             return;
@@ -127,12 +140,15 @@ public partial class ExplorerTabStrip : UserControl
         var x = e.GetPosition(TabsList).X;
         var gap = containers.Count(c => c!.TranslatePoint(new Point(c.ActualWidth / 2, 0), TabsList).X < x);
 
-        // The gap after the tab leaves it in place too, so the pill stays on its own left side.
-        if (gap == from + 1)
-            gap = from;
-
+        // A new tab is inserted at the gap. A moved one leaves its own place, so the gap after it
+        // leaves it in place too, and the pill stays on its own left side.
         _reorderIndex = gap;
-        if (gap > from)
+        if (tab is not null && gap == from + 1)
+        {
+            gap = from;
+            _reorderIndex = from;
+        }
+        else if (tab is not null && gap > from)
             _reorderIndex = gap - 1;
 
         // Centered between the tabs' margins, and on their bodies.
@@ -167,6 +183,106 @@ public partial class ExplorerTabStrip : UserControl
             tabs.Tabs.Move(from, target);
 
         tabs.ActiveTab = tab;
+    }
+
+    /// <summary>
+    /// Over the title bar, a dragged folder or drive of our own, device or page opens in a new tab, which the pill
+    /// places as it does a dragged tab. Returns the drag's effect there.
+    /// </summary>
+    public DragDropEffects ShowNewTabTarget(DragEventArgs e)
+    {
+        var effect = DragDropEffects.None;
+        var drop = DraggedNewTab();
+        if (drop is not null && e.AllowedEffects.HasFlag(DragDropEffects.Link))
+            effect = DragDropEffects.Link;
+        else if (drop is not null && e.AllowedEffects.HasFlag(DragDropEffects.Copy))
+            effect = DragDropEffects.Copy;
+
+        if (drop is null || effect is DragDropEffects.None)
+        {
+            HideNewTabTarget();
+            return DragDropEffects.None;
+        }
+
+        _newTabDrop = drop;
+
+        // Named before the effect is set, which redraws the drag window's tooltip
+        Data.CopyPaste.NewTabDropName = drop.Name;
+        Data.CopyPaste.DropEffect = Data.CopyPaste.CurrentDropEffect = effect;
+        ShowReorderTarget(null, e);
+
+        return effect;
+    }
+
+    public void HideNewTabTarget()
+    {
+        HideReorderTarget();
+        _newTabDrop = null;
+        Data.CopyPaste.NewTabDropName = null;
+    }
+
+    /// <summary>Opens what was dragged in a new tab, where the pill marked, and switches to it.</summary>
+    public void DropNewTab(DragEventArgs e)
+    {
+        ShowReorderTarget(null, e);
+
+        var target = _reorderIndex;
+        var dropped = _newTabDrop;
+        HideNewTabTarget();
+
+        if (dropped is null)
+            return;
+
+        if (target < 0)
+            target = ((ExplorerTabsViewModel)DataContext).Tabs.Count;
+
+        dropped.Open(target);
+    }
+
+    /// <summary>What the drag holds that opens in a new tab: one folder or drive of our own, a device, or a page.</summary>
+    private NewTabDrop? DraggedNewTab()
+    {
+        switch (Data.CopyPaste.DragContent)
+        {
+            case AdbLocation { PageType: { } pageType } page:
+                return new(page.DisplayName, index => ((ExplorerTabsViewModel)DataContext).OpenPageInNewTab(pageType, index));
+
+            case LogicalDeviceViewModel { Status: DeviceStatus.Ok } device:
+                return new(device.Name, index => DeviceHelper.OpenDeviceInNewTab(device, dropIndex: index));
+
+            case not null:
+                return null;
+        }
+
+        if (DraggedFolder() is not { } folder)
+            return null;
+
+        return new(folder.Name, index => DeviceHelper.OpenDeviceInNewTab(folder.Device, new AdbLocation(folder.Path), index));
+    }
+
+    /// <summary>The single folder or drive our own drag holds, as the menu's Open in new tab takes one.</summary>
+    private static (LogicalDeviceViewModel Device, string Path, string Name)? DraggedFolder()
+    {
+        if (Data.CopyPaste.DragStatus is not CopyPasteService.DragState.Active
+            || VirtualFileDataObject.SelfDevice is not { Status: DeviceStatus.Ok } device
+            || VirtualFileDataObject.SelfFiles?.ToList() is not [{ Type: AbstractFile.FileType.Folder } folder])
+            return null;
+
+        var path = folder.FullPath;
+        if (!string.IsNullOrEmpty(folder.LinkTarget))
+            path = folder.LinkTarget;
+
+        if (FileHelper.IsInTrash(path))
+            return null;
+
+        // A drive goes by the drive's name, whether dragged as a drive or found by its root folder
+        var name = folder.FullName;
+        if (Data.CopyPaste.SelfDragDrive is { } draggedDrive)
+            name = draggedDrive.DisplayName;
+        else if (DriveHelper.GetCurrentDrive(path, device) is { } drive && NavigationTreeNode.IsDriveRootPath(path, drive))
+            name = drive.DisplayName;
+
+        return (device, path, name);
     }
 
     private void StartTabDrag(FrameworkElement item, ExplorerInstance tab, Point pressPointInItem)
@@ -228,7 +344,10 @@ public partial class ExplorerTabStrip : UserControl
         e.Handled = true;
     }
 
-    /// <summary>Dropping onto a tab isn't supported, but hovering a drag over it brings that tab forward.</summary>
+    /// <summary>
+    /// Hovering a drag over a tab brings that tab forward. The drag goes on to the title bar,
+    /// where a dragged folder opens in a new tab (<see cref="ShowNewTabTarget"/>).
+    /// </summary>
     private void TabItem_DragOver(object sender, DragEventArgs e)
     {
         // A dragged tab header is only meant for the page area.
@@ -245,20 +364,11 @@ public partial class ExplorerTabStrip : UserControl
             _dragHoverTimer.Stop();
             _dragHoverTimer.Start();
         }
-
-        e.Effects = DragDropEffects.None;
-        Data.CopyPaste.DropEffect = Data.CopyPaste.CurrentDropEffect = DragDropEffects.None;
-        e.Handled = true;
     }
 
     private void TabItem_DragLeave(object sender, DragEventArgs e) => StopDragHover();
 
-    private void TabItem_Drop(object sender, DragEventArgs e)
-    {
-        StopDragHover();
-        e.Effects = DragDropEffects.None;
-        e.Handled = true;
-    }
+    private void TabItem_Drop(object sender, DragEventArgs e) => StopDragHover();
 
     private void StopDragHover()
     {

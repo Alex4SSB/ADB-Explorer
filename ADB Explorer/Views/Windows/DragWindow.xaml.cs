@@ -113,6 +113,15 @@ public partial class DragWindow : INotifyPropertyChanged
                 return;
             }
 
+            // A folder over the tab strip opens in a new tab
+            if (Data.CopyPaste.NewTabDropName is { } folderName)
+            {
+                if (Data.CopyPaste.CurrentDropEffect is not DragDropEffects.None)
+                    AddWithInsert(Strings.Resources.S_DRAG_OPEN_NEW_TAB, folderName);
+
+                return;
+            }
+
             // A dragged device says where it opens, over File Explorer or the desktop
             if (Data.CopyPaste.DragContent is LogicalDeviceViewModel dragDevice)
             {
@@ -185,10 +194,13 @@ public partial class DragWindow : INotifyPropertyChanged
             if (count == 1 && shownCount is not null)
             {
                 int sourceLength = target is null ? 30 : Math.Max(15, 45 - target.Length);
-                // Trash items are dragged by their indexer name; show the name they were deleted with
+                // Trash items are dragged by their indexer name; show the name they were deleted with,
+                // and a dragged drive by its own name, not its root folder's
                 var sourceName = Data.CopyPaste.DragFiles[0];
                 if (Data.CopyPaste.IsFromTrash && Data.CopyPaste.CurrentFiles.FirstOrDefault() is { TrashIndex: not null } trashItem)
                     sourceName = trashItem.FullName;
+                else if (Data.CopyPaste.SelfDragDrive is { } drive)
+                    sourceName = drive.DisplayName;
 
                 var source = FileHelper.GetShortFileName(sourceName, sourceLength);
 
@@ -352,7 +364,8 @@ public partial class DragWindow : INotifyPropertyChanged
                 || e.PropertyName == nameof(Data.CopyPaste.DropTarget)
                 || e.PropertyName == nameof(Data.CopyPaste.CurrentDropEffect)
                 || e.PropertyName == nameof(Data.CopyPaste.MouseWithinApp)
-                || e.PropertyName == nameof(Data.CopyPaste.ShellDropDescription))
+                || e.PropertyName == nameof(Data.CopyPaste.ShellDropDescription)
+                || e.PropertyName == nameof(Data.CopyPaste.NewTabDropName))
                 && Data.CopyPaste.DragBitmap is not null)
             {
                 GetPathUnderMouse();
@@ -402,6 +415,7 @@ public partial class DragWindow : INotifyPropertyChanged
     {
         DragTimer.Stop();
         Data.CopyPaste.ClearShellDropDescription();
+        Data.CopyPaste.NewTabDropName = null;
 
 #if !DEBUG
         InterceptMouse.Close();

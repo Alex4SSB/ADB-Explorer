@@ -396,8 +396,24 @@ public partial class ExplorerTabsViewModel : ObservableObject
         return ActiveTab;
     }
 
-    /// <summary>Adds and activates a tab pinned to <paramref name="device"/>; the caller opens the device in it.</summary>
-    public ExplorerInstance AddDeviceTab(LogicalDeviceViewModel device)
+    /// <summary>Where a tab opened from an item goes: at <paramref name="index"/> when dropped there, otherwise right after the active tab.</summary>
+    private int NewTabIndex(int? index)
+    {
+        if (index is { } at)
+            return Math.Clamp(at, 0, Tabs.Count);
+
+        var active = ActiveTab is null ? -1 : Tabs.IndexOf(ActiveTab);
+        if (active < 0)
+            return Tabs.Count;
+
+        return active + 1;
+    }
+
+    /// <summary>
+    /// Adds a tab pinned to <paramref name="device"/>, activated unless it's opened in the background; the caller opens the device in it.
+    /// It goes at <paramref name="index"/>, or right after the active tab.
+    /// </summary>
+    public ExplorerInstance AddDeviceTab(LogicalDeviceViewModel device, bool activate = true, int? index = null)
     {
         var instance = new ExplorerInstance
         {
@@ -405,16 +421,31 @@ public partial class ExplorerTabsViewModel : ObservableObject
             TracksAppWideCurrentDevice = false,
         };
 
-        Tabs.Add(instance);
-        ActiveTab = instance;
+        Tabs.Insert(NewTabIndex(index), instance);
+        if (activate)
+            ActiveTab = instance;
+
         return instance;
+    }
+
+    /// <summary>
+    /// A tab opened in the background opens its device once switched to - after everything following the
+    /// active tab has, so the window shows its content first, as when a tab is opened in front.
+    /// </summary>
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+
+        if (e.PropertyName is nameof(ActiveTab) && ActiveTab is { DeferredLocation: not null } tab)
+            DeviceHelper.OpenDeferredTab(tab);
     }
 
     public string NewTabTooltip => AppActions.Tooltip(FileAction.FileActionType.NewTab);
 
     public string CloseTabTooltip => AppActions.Tooltip(FileAction.FileActionType.CloseTab);
 
-    public ExplorerInstance AddTab()
+    /// <summary>Adds and activates an explorer tab, last in the strip unless <paramref name="index"/> places it.</summary>
+    public ExplorerInstance AddTab(int? index = null)
     {
         var mode = Data.Settings.NewTabLocation;
         var device = ActiveTab?.Device ?? Data.DevicesObject?.Current;
@@ -428,7 +459,7 @@ public partial class ExplorerTabsViewModel : ObservableObject
         if (mode is AppSettings.NewTabLocationMode.DuplicateCurrentTab && ActiveTab is not null)
             instance.FileList.Path = ActiveTab.FileList.Path;
 
-        Tabs.Add(instance);
+        Tabs.Insert(index ?? Tabs.Count, instance);
         ActiveTab = instance;
 
         // ActiveTab is now this instance, so these (guarded) app-wide signals reach its explorer content.
@@ -442,12 +473,18 @@ public partial class ExplorerTabsViewModel : ObservableObject
         return instance;
     }
 
-    /// <summary>Opens an app page (Settings, Devices...) in a tab of its own, or a new explorer tab for the Explorer page.</summary>
-    public void OpenPageInNewTab(Type pageType)
+    /// <summary>
+    /// Opens an app page (Settings, Devices...) in a tab of its own, or a new explorer tab for the Explorer page. As a
+    /// folder does, it opens in the background right after the active tab, unless it's dropped at <paramref name="index"/>.
+    /// </summary>
+    public void OpenPageInNewTab(Type pageType, int? index = null)
     {
+        var activate = index is not null;
+
+        // An explorer tab browses through the active tab's signals, so it can't open in the background
         if (pageType == typeof(Views.Pages.ExplorerPage))
         {
-            AddTab();
+            AddTab(NewTabIndex(index));
             return;
         }
 
@@ -460,8 +497,9 @@ public partial class ExplorerTabsViewModel : ObservableObject
             TracksAppWideCurrentDevice = ActiveTab?.TracksAppWideCurrentDevice ?? true,
         };
 
-        Tabs.Add(instance);
-        ActiveTab = instance;
+        Tabs.Insert(NewTabIndex(index), instance);
+        if (activate)
+            ActiveTab = instance;
 
         instance.History.Navigate(location);
         instance.NotifyTabChanged();

@@ -116,7 +116,7 @@ public partial class CopyPasteService : ObservableObject
     /// window draws from its template in place of an image.
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsContentDrag), nameof(IsTabDrag), nameof(IsDeviceDrag))]
+    [NotifyPropertyChangedFor(nameof(IsContentDrag), nameof(IsTabDrag), nameof(IsDeviceDrag), nameof(IsPageDrag))]
     public partial object? DragContent { get; set; }
 
     public bool IsContentDrag => DragContent is not null;
@@ -127,7 +127,34 @@ public partial class CopyPasteService : ObservableObject
     /// <summary>A device is dragged to open it in File Explorer; the drag window says where it opens.</summary>
     public bool IsDeviceDrag => DragContent is LogicalDeviceViewModel;
 
+    /// <summary>An app page (Settings, Devices...) is dragged by its navigation item, to open in a new tab.</summary>
+    public bool IsPageDrag => DragContent is AdbLocation;
+
     public string? DragTabTooltip { get; set; }
+
+    /// <summary>The name of the folder a drag over the tab strip would open in a new tab; null anywhere else.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNewTabDrop))]
+    public partial string? NewTabDropName { get; set; }
+
+    public bool IsNewTabDrop => NewTabDropName is not null;
+
+    /// <summary>
+    /// The drive our own drag holds the root of, from the tree or the drive view; null otherwise.
+    /// It's shown by the drive's icon and name, and isn't a drop target for itself.
+    /// </summary>
+    public DriveViewModel? SelfDragDrive
+    {
+        get;
+        set
+        {
+            field = value;
+            SelfDragDriveImage = value?.DragImage;
+        }
+    }
+
+    /// <summary>Taken once, as drop targets ask for the drag's image on every move.</summary>
+    private BitmapSource? SelfDragDriveImage { get; set; }
 
     /// <summary>What the shell target under the cursor says the drop does, when it writes one to our data object.</summary>
     [ObservableProperty]

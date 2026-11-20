@@ -30,6 +30,7 @@ public partial class ExplorerListHost : UserControl
     {
         InitializeComponent();
 
+        PreviewMouseDown += ExplorerListHost_PreviewMouseDown;
         PreviewMouseUp += ExplorerListHost_PreviewMouseUp;
         SelectionTimer.Tick += SelectionTimer_Tick;
         _apkPriorityTimer.Tick += (_, _) =>

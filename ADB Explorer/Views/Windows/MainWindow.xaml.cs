@@ -362,17 +362,59 @@ public partial class MainWindow : INavigationWindow
         e.Handled = NavHistory.NavigateBF(direction);
     }
 
+    /// <summary>The page item pressed on, which a move far enough drags; null when no drag can start.</summary>
+    private (NavigationViewItem Item, AdbLocation Page)? _pressedPage;
+
+    private Point _pagePressPoint;
+
     private void RootNavigation_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
+        _pressedPage = null;
+
         if (e.ChangedButton is MouseButton.XButton1 or MouseButton.XButton2)
         {
             e.Handled = true;
+            return;
         }
+
+        // An app page's item can be dragged onto the title bar, to open in a new tab there
+        if (e.ChangedButton is MouseButton.Left
+            && Data.DevicesObject is not null
+            && HitTestHelper.FindAncestor<NavigationViewItem>(e.OriginalSource as DependencyObject) is { TargetPageType: { } pageType } item
+            && AdbLocation.ForPage(pageType) is { } page)
+        {
+            _pressedPage = (item, page);
+            _pagePressPoint = e.GetPosition(this);
+        }
+    }
+
+    private void RootNavigation_PreviewMouseMove(object sender, MouseEventArgs e)
+    {
+        if (_pressedPage is not { } pressed)
+            return;
+
+        if (e.LeftButton is not MouseButtonState.Pressed)
+        {
+            _pressedPage = null;
+            return;
+        }
+
+        if ((e.GetPosition(this) - _pagePressPoint).LengthSquared < AdbExplorerConst.DRAG_START_DISTANCE_SQUARED)
+            return;
+
+        _pressedPage = null;
+
+        // The item holds the mouse while pressed; once the drag takes it, the release doesn't click the item
+        Mouse.Capture(null);
+        PageDrag.Start(pressed.Item, pressed.Page);
+        e.Handled = true;
     }
 
     /// <summary>A middle click on a page's item opens that page in a new tab.</summary>
     private void RootNavigation_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
+        _pressedPage = null;
+
         if (e.ChangedButton is not MouseButton.Middle
             || Data.DevicesObject is null
             || HitTestHelper.FindAncestor<NavigationViewItem>(e.OriginalSource as DependencyObject) is not { TargetPageType: { } pageType })

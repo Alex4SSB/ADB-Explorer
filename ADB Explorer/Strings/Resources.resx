@@ -1701,6 +1701,17 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Substitute characters that are not allowed in file names</value>
     <comment>The name of the setting that gives files whose names the target doesn't allow (Windows, or Android user storage) lookalike characters instead of refusing them</comment>
   </data>
+  <data name="S_SETTINGS_SUBSTITUTE_NAMES_INFO" xml:space="preserve">
+    <value>Gives a file whose name the destination doesn't allow lookalike characters, instead of refusing or hiding it.
+
+Applies when:
+• Copying from the device to Windows
+• Copying to Android user storage (internal storage, SD cards, USB drives), which doesn't allow \ : * ? " &lt; &gt; |
+• Opening the device in File Explorer, outside user storage
+
+Not allowed characters become their fullwidth forms (? becomes ？), control characters become their symbols, and so does a trailing dot or space. Names reserved by Windows, such as CON or NUL, get a fullwidth first letter.</value>
+    <comment>The tooltip of S_SETTINGS_SUBSTITUTE_NAMES. "User storage" is the part of the device's storage apps and users see, as opposed to system folders</comment>
+  </data>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
     <value>Install {0}</value>
     <comment>The drag tooltip when dragging a single APK file over the installed apps view. 0 - the name of the APK</comment>
@@ -2297,5 +2308,9 @@ The checks attempt to prevent an unsuspecting user from launching a possibly mal
   <data name="S_DRAG_OPEN_MOUNT_TAB" xml:space="preserve">
     <value>Open {0} in a new tab</value>
     <comment>Drag tooltip while a device is dragged over a Windows File Explorer window; dropping it opens the device in a new tab of that window. {0} is the device name</comment>
+  </data>
+  <data name="S_DRAG_OPEN_NEW_TAB" xml:space="preserve">
+    <value>Open {0} in a new tab</value>
+    <comment>Drag tooltip while a folder or drive is dragged over the app's tab strip; dropping it opens it in a new tab of the app. {0} is the folder or drive name</comment>
   </data>
 </root>

@@ -15,8 +15,8 @@ public partial class ExplorerListHost
 
     private void Row_PreviewDragEnter(object sender, DragEventArgs e)
     {
-        // Nothing in the recycle bin is a drop target
-        if (((FrameworkElement)sender).DataContext is FileClass file && !FileHelper.IsInTrash(file.FullPath))
+        // Nothing in the recycle bin is a drop target, nor is a folder for a dragged device, tab or page
+        if (((FrameworkElement)sender).DataContext is FileClass file && !FileHelper.IsInTrash(file.FullPath) && !CopyPaste.IsContentDrag)
             file.FolderViewModel.IsDragOver = true;
     }
 
@@ -82,17 +82,9 @@ public partial class ExplorerListHost
                     CopyPaste.DragBitmap = packageIcon;
             }
         }
-        else if (CopyPaste.HasUnnamedFiles)
+        else if (CopyPaste.FilesDragImage() is { } image)
         {
-            CopyPaste.DragBitmap = FileIconProvider.GetMultipleFilesIcon(120);
-        }
-        else if (CopyPaste.DragThumbnail is { } thumbnail)
-        {
-            CopyPaste.DragBitmap = thumbnail;
-        }
-        else if (CopyPaste.CurrentFiles.Any())
-        {
-            CopyPaste.DragBitmap = CopyPaste.CurrentFiles.First().DragImage;
+            CopyPaste.DragBitmap = image;
         }
 
         e.Handled = true;

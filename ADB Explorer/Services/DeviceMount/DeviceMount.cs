@@ -80,7 +80,7 @@ public sealed partial class DeviceMount : IDisposable
 
     public string SyncRootId { get; }
 
-    public static string MountsFolder => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), Properties.AppGlobal.AppDisplayName);
+    public static string MountsFolder => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), Data.AppDisplayName);
 
     /// <summary>Mounts the device, alongside any others mounted, and returns its local folder for a device path.</summary>
     public static string? MountAndMap(LogicalDeviceViewModel device, string devicePath)

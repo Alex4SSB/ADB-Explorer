@@ -254,6 +254,9 @@ internal static partial class FileActionLogic
         var deviceId = Data.ActiveDevice?.ID ?? "";
         targetPath = ArchiveHelper.ResolvePasteTargetPath(targetPath, deviceId);
 
+        if (IsDraggedDrive(DriveHelper.GetCurrentDrive(targetPath, Data.ActiveDevice), Data.ActiveDevice))
+            return DragDropEffects.None;
+
         if (!DriveHelper.IsModificationAllowedAt(targetPath, deviceId))
             return DragDropEffects.None;
 
@@ -302,6 +305,16 @@ internal static partial class FileActionLogic
         return fromArchive ? result : result | DragDropEffects.Move;
     }
 
+    /// <summary>
+    /// Whether <paramref name="drive"/> on <paramref name="device"/> is the drive being dragged: like a dragged folder,
+    /// neither it nor its folders take the drop. Its root's path may not match the drive's (a linked one), so it goes by the drive.
+    /// </summary>
+    private static bool IsDraggedDrive(DriveViewModel? drive, LogicalDeviceViewModel? device)
+        => Data.CopyPaste.SelfDragDrive is { } dragged
+        && drive is not null
+        && dragged.Path == drive.Path
+        && Data.CopyPaste.IsFromDevice(device);
+
     public static DragDropEffects EnableTreeDropPaste(NavigationTreeNode target)
     {
         var isUnnamed = Data.CopyPaste.HasUnnamedFiles;
@@ -315,7 +328,7 @@ internal static partial class FileActionLogic
         if (drive is null)
             return DragDropEffects.None;
 
-        if (drive.Type is AbstractDrive.DriveType.Trash)
+        if (drive.Type is AbstractDrive.DriveType.Trash || IsDraggedDrive(drive, target.OwnerDevice))
             return DragDropEffects.None;
 
         if (target.Drive?.Type is AbstractDrive.DriveType.Root)

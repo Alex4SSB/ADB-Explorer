@@ -354,20 +354,27 @@ public partial class CopyPasteService
             if (!IsSelf && FileHelper.AllFilesAreApks(DragFiles))
                 DragBitmap = DefaultAndroidPackageIcon.Bitmap;
         }
-        else if (HasUnnamedFiles)
+        else if (FilesDragImage() is { } image)
         {
-            DragBitmap = FileIconProvider.GetMultipleFilesIcon(120);
-        }
-        else if (DragThumbnail is { } thumbnail)
-        {
-            DragBitmap = thumbnail;
-        }
-        else if (CurrentFiles.Any())
-        {
-            DragBitmap = CurrentFiles.First().DragImage;
+            DragBitmap = image;
         }
 
         return allowed;
+    }
+
+    /// <summary>The image a drag of files shows over a drop target, or null when there's nothing to show.</summary>
+    public BitmapSource? FilesDragImage()
+    {
+        if (DragStatus is DragState.Active && SelfDragDriveImage is { } driveImage)
+            return driveImage;
+
+        if (HasUnnamedFiles)
+            return FileIconProvider.GetMultipleFilesIcon(120);
+
+        if (DragThumbnail is { } thumbnail)
+            return thumbnail;
+
+        return CurrentFiles.FirstOrDefault()?.DragImage;
     }
 
     public void AcceptTreeDrop(System.Windows.DragEventArgs e, NavigationTreeNode node)

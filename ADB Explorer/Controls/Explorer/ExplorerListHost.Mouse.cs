@@ -6,10 +6,19 @@ namespace ADB_Explorer.Controls;
 
 public partial class ExplorerListHost
 {
-    /// <summary>
-    /// Links this control back to its owning <see cref="ExplorerPageContent"/>. Must be called
-    /// once, immediately after construction, before any user interaction can reach this control.
-    /// </summary>
+    /// <summary>A middle press selects the file or drive under it, as a left one does, so its release opens what's selected.</summary>
+    private void ExplorerListHost_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton is not MouseButton.Middle || e.OriginalSource is not DependencyObject source || FileActions.ListingInProgress)
+            return;
+
+        var item = FindItemUnder(source);
+        if (item is DriveViewModel drive)
+            drive.IsSelected = true;
+        else if (item is FilePath or Package && !ActiveSelectedItems.Contains(item))
+            SelectOnlyItem(item);
+    }
+
     /// <summary>Middle-click on a folder, archive or drive opens it in a new tab - and in search mode, any item's folder.</summary>
     private void ExplorerListHost_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {

@@ -88,6 +88,10 @@
                         <DataTemplate DataType="{x:Type viewModels:LogicalDeviceViewModel}">
                             <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource DeviceDragRowTemplate}" />
                         </DataTemplate>
+                        <!--  A dragged page shows its icon and name  -->
+                        <DataTemplate DataType="{x:Type models:AdbLocation}">
+                            <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource PageDragTemplate}" />
+                        </DataTemplate>
                         <!--  A dragged tab shows its header, as an inactive tab in the strip  -->
                         <DataTemplate DataType="{x:Type models:ExplorerInstance}">
                             <Border
@@ -207,6 +211,10 @@
                                         </MultiDataTrigger.Conditions>
                                         <Setter Property="Glyph" Value="&#xE896;" />
                                     </MultiDataTrigger>
+                                    <!--  A folder over the tab strip, which opens it in a new tab, shows a tab drag's glyph  -->
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=IsNewTabDrop}" Value="True">
+                                        <Setter Property="Glyph" Value="&#xE8A0;" />
+                                    </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </ui:FontIcon.Style>

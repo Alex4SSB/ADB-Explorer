@@ -302,18 +302,50 @@ public static partial class DeviceHelper
         }
     }
 
-    /// <summary>Opens <paramref name="device"/> in a new tab, at <paramref name="location"/> (or its drive view).</summary>
-    public static void OpenDeviceInNewTab(LogicalDeviceViewModel device, AdbLocation? location = null)
+    /// <summary>
+    /// Opens <paramref name="device"/> in a new tab, at <paramref name="location"/> (or its drive view). As in a browser,
+    /// the tab opens in the background right after the active one, its device only once it's switched to. A tab dropped
+    /// onto the strip at <paramref name="dropIndex"/> opens there instead, switched to.
+    /// </summary>
+    public static void OpenDeviceInNewTab(LogicalDeviceViewModel device, AdbLocation? location = null, int? dropIndex = null)
     {
         var tabs = App.Services.GetService<ExplorerTabsViewModel>();
         if (tabs is null)
             return;
 
+        if (dropIndex is null)
+        {
+            tabs.AddDeviceTab(device, activate: false).DeferredLocation = location ?? new(Navigation.SpecialLocation.DriveView);
+            return;
+        }
+
         IsSwitchingTabDevice = true;
 
         try
         {
-            var instance = tabs.AddDeviceTab(device);
+            var instance = tabs.AddDeviceTab(device, index: dropIndex);
+            Data.RuntimeSettings.PendingLocationAfterDeviceOpen = location;
+
+            OpenDeviceCore(instance, device);
+        }
+        finally
+        {
+            IsSwitchingTabDevice = false;
+        }
+    }
+
+    /// <summary>Opens the device of a tab opened in the background, now that it's shown, where it was opened to.</summary>
+    public static void OpenDeferredTab(ExplorerInstance instance)
+    {
+        // A device gone meanwhile leaves the tab as it is, to open when switched to again once the device is back
+        if (instance.DeferredLocation is not { } location || instance.Device is not { Status: DeviceStatus.Ok } device)
+            return;
+
+        instance.DeferredLocation = null;
+        IsSwitchingTabDevice = true;
+
+        try
+        {
             Data.RuntimeSettings.PendingLocationAfterDeviceOpen = location;
 
             OpenDeviceCore(instance, device);

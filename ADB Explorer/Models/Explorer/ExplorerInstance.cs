@@ -32,6 +32,23 @@ public partial class ExplorerInstance : ObservableObject
     /// <summary>True while this tab's current history entry is an app page (Settings, Devices...) rather than a folder / drive.</summary>
     public bool IsShowingPage => History.Current?.IsPage is true;
 
+    /// <summary>
+    /// For a tab opened in the background, where its device opens once the tab is first switched to; null otherwise.
+    /// Until then the tab strip shows it by this location.
+    /// </summary>
+    public AdbLocation? DeferredLocation
+    {
+        get;
+        set
+        {
+            field = value;
+            NotifyTabChanged();
+        }
+    }
+
+    /// <summary>The location the tab strip shows: where the tab is, or where it will open.</summary>
+    private AdbLocation? ShownLocation => History.Current ?? DeferredLocation;
+
     public LogicalDeviceViewModel? Device
     {
         get;
@@ -96,7 +113,7 @@ public partial class ExplorerInstance : ObservableObject
     {
         get
         {
-            if (History.Current is not { } location)
+            if (ShownLocation is not { } location)
                 return EffectiveDevice?.Name ?? Strings.Resources.S_NEW_TAB;
 
             if (location.IsPage)
@@ -162,7 +179,7 @@ public partial class ExplorerInstance : ObservableObject
                 return label;
             }
 
-            var path = History.Current?.Path ?? "";
+            var path = ShownLocation?.Path ?? "";
             if (path == AdbExplorerConst.RECYCLE_PATH)
                 path = AbstractDrive.GetDriveDisplayName(AbstractDrive.DriveType.Trash);
 
@@ -203,7 +220,7 @@ public partial class ExplorerInstance : ObservableObject
     {
         get
         {
-            if (History.Current is not { } location)
+            if (ShownLocation is not { } location)
                 return new BaseIcon(FileIconProvider.GetPhoneIcon(16), 16);
 
             return location.GetIconOrFolderIcon(EffectiveDevice);

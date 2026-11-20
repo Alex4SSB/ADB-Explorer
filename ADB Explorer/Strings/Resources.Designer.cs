@@ -2702,6 +2702,15 @@ namespace ADB_Explorer.Strings {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Open {0} in a new tab.
+        /// </summary>
+        public static string S_DRAG_OPEN_NEW_TAB {
+            get {
+                return ResourceManager.GetString("S_DRAG_OPEN_NEW_TAB", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Mount options.
         /// </summary>
         public static string S_MOUNT_OPTIONS {
@@ -4314,6 +4323,22 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_SUBSTITUTE_NAMES {
             get {
                 return ResourceManager.GetString("S_SETTINGS_SUBSTITUTE_NAMES", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Gives a file whose name the destination doesn&apos;t allow lookalike characters, instead of refusing or hiding it.
+        ///
+        ///Applies when:
+        ///• Copying from the device to Windows
+        ///• Copying to Android user storage (internal storage, SD cards, USB drives), which doesn&apos;t allow \ : * ? &quot; &lt; &gt; |
+        ///• Opening the device in File Explorer, outside user storage
+        ///
+        ///Not allowed characters become [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string S_SETTINGS_SUBSTITUTE_NAMES_INFO {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_SUBSTITUTE_NAMES_INFO", resourceCulture);
             }
         }
 

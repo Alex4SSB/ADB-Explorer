@@ -190,7 +190,10 @@ public static class UISettings
                                    icon: new("\uE72C")),
                 new BoolSetting(() => Settings.RescanOnPush, Strings.Resources.S_SETTINGS_MEDIA_RESCAN, icon: new("\uE7C5")),
                 new BoolSetting(() => Settings.KeepDateModified, Strings.Resources.S_SETTINGS_KEEP_MODIFIED_DATE, icon: new("\uEC92")),
-                new BoolSetting(() => Settings.SubstituteIllegalNames, Strings.Resources.S_SETTINGS_SUBSTITUTE_NAMES, icon: new("\uE8AC")),
+                new BoolSetting(() => Settings.SubstituteIllegalNames, Strings.Resources.S_SETTINGS_SUBSTITUTE_NAMES, icon: new("\uE8AC"))
+                {
+                    Info = Strings.Resources.S_SETTINGS_SUBSTITUTE_NAMES_INFO,
+                },
             ], new("\uEADF")),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_DRIVES,
             [

@@ -525,6 +525,7 @@
             OpenPaneLength="{Binding Source={x:Static Member=models:Data.Settings}, Path=NavigationPaneWidth, Mode=OneWay}"
             PaneDisplayMode="Left"
             PreviewMouseDown="RootNavigation_PreviewMouseDown"
+            PreviewMouseMove="RootNavigation_PreviewMouseMove"
             PreviewMouseUp="RootNavigation_PreviewMouseUp"
             Template="{StaticResource AdbLeftNavigationViewTemplate}"
             TransitionDuration="0">
@@ -622,7 +623,15 @@
             </Canvas>
         </Grid>
 
-        <ui:TitleBar x:Name="TitleBar" Grid.Row="0">
+        <!--  A folder dragged onto the title bar opens in a new tab  -->
+        <ui:TitleBar
+            x:Name="TitleBar"
+            Grid.Row="0"
+            AllowDrop="True"
+            DragEnter="TitleBar_DragOver"
+            DragLeave="TitleBar_DragLeave"
+            DragOver="TitleBar_DragOver"
+            Drop="TitleBar_Drop">
             <ui:TitleBar.CenterContent>
                 <controls:ExplorerTabStrip x:Name="TabStrip" Margin="8,10,0,0" />
             </ui:TitleBar.CenterContent>

@@ -18,17 +18,6 @@ public partial class NavigationPane
 
     private NavigationTreeNode? _treeDropHighlight;
 
-    private bool CanStartTreeDrag(NavigationTreeNode node)
-    {
-        if (TreeVm?.IsTreeDragBlocked != false)
-            return false;
-
-        if (node.IsTemp || node.IsInEditMode)
-            return false;
-
-        return node.IsLogicalDriveNode || node.IsFolderNode;
-    }
-
     private void Tree_PreviewMouseMove(object sender, MouseEventArgs e)
         => TryStartTreeDrag(e);
 
@@ -58,7 +47,7 @@ public partial class NavigationPane
             return;
         }
 
-        if (node is null || item is null || !CanStartTreeDrag(node))
+        if (node is null || item is null || !NodeDrag.CanDrag(node))
             return;
 
         _treeDragPending = false;
@@ -113,41 +102,17 @@ public partial class NavigationPane
 
     private void InitiateTreeDrag(TreeViewItem item, NavigationTreeNode node)
     {
-        var list = FileList.FromTreeNode(node);
-        if (list?.SelectedFiles.Any() != true)
-            return;
-
-        var files = list.SelectedFiles.ToList();
-        VirtualFileDataObject? vfdo;
-        using (Data.Use(list))
-        {
-            // No preferred effect: Explorer then defaults to Copy, while a preferred Copy alone makes it refuse Shift's Move
-            vfdo = VirtualFileDataObject.PrepareTransfer(files, DragDropEffects.None);
-            if (vfdo is null)
-                return;
-
-            Data.CopyPaste.UpdateSelfVFDO(true);
-        }
-
-        Data.CopyPaste.BeginSelfDrag();
-        Data.CopyPaste.DragBitmap = files[0].DragImage;
         node.IsDragSource = true;
         NavigationTreeNode.SuppressUserSelectFromExpander++;
         DragAutoScroll.Register(TreeScrollViewer);
         DragAutoScroll.Begin();
         try
         {
-            vfdo.SendObjectToShell(
-                VirtualFileDataObject.DataObjectMethod.DragDrop,
-                item,
-                DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
+            NodeDrag.Run(item, node);
         }
         finally
         {
             node.IsDragSource = false;
-            Data.CopyPaste.DragStatus = CopyPasteService.DragState.None;
-            if (Data.CopyPaste.IsDrag)
-                Data.CopyPaste.ClearDrag();
             ClearTreeDropHighlight();
             if (NavigationTreeNode.SuppressUserSelectFromExpander > 0)
                 NavigationTreeNode.SuppressUserSelectFromExpander--;

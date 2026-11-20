@@ -17,6 +17,9 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
 {
     public static FileGroup? SelfFileGroup { get; private set; }
     public static IEnumerable<FileClass>? SelfFiles { get; private set; }
+
+    /// <summary>The device <see cref="SelfFiles"/> are on.</summary>
+    public static LogicalDeviceViewModel? SelfDevice { get; private set; }
     public bool IsContentIncluded { get; private set; } = true;
 
     /// <summary>
@@ -441,6 +444,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     public void SetAdbDrag(IEnumerable<FileClass> files, LogicalDeviceViewModel device)
     {
         SelfFiles = [.. files];
+        SelfDevice = device;
         NativeMethods.ADBDRAGLIST adbDrag = new(device, files);
         SetData(AdbDataFormats.AdbDrop, adbDrag.Bytes);
     }

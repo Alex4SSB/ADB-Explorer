@@ -67,6 +67,51 @@ public partial class ExplorerListHost
         FileActionLogic.SetTreeContextTarget(null);
     }
 
+    /// <summary>The drive pressed on, which a move far enough drags; null when no drag can start.</summary>
+    private DriveViewModel? _pressedDrive;
+
+    private Point _drivePressPoint;
+
+    private void DriveItem_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        _pressedDrive = null;
+
+        // A double click opens the drive instead
+        if (e.ClickCount > 1 || sender is not FrameworkElement { DataContext: DriveViewModel drive })
+            return;
+
+        _pressedDrive = drive;
+        _drivePressPoint = e.GetPosition(this);
+    }
+
+    private void DriveItem_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e) => _pressedDrive = null;
+
+    /// <summary>A drive card drags as its tree node does: as its root folder, shown by the drive's icon and name.</summary>
+    private void DriveItem_PreviewMouseMove(object sender, MouseEventArgs e)
+    {
+        if (_pressedDrive is not { } drive || sender is not UIElement item)
+            return;
+
+        if (e.LeftButton is not MouseButtonState.Pressed)
+        {
+            _pressedDrive = null;
+            return;
+        }
+
+        if ((e.GetPosition(this) - _drivePressPoint).LengthSquared < AdbExplorerConst.DRAG_START_DISTANCE_SQUARED)
+            return;
+
+        _pressedDrive = null;
+
+        if (FileActionLogic.DriveTreeNode(drive) is not { } node || !NodeDrag.CanDrag(node))
+            return;
+
+        // The card holds the mouse while pressed, which the drag takes over
+        Mouse.Capture(null);
+        NodeDrag.Run(item, node);
+        e.Handled = true;
+    }
+
     private void DriveItem_DragOver(object sender, DragEventArgs e)
     {
         e.Handled = true;

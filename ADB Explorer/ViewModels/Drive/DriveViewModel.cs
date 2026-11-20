@@ -58,10 +58,12 @@ public partial class DriveViewModel : AbstractDrive, IBrowserItem
     /// so it can be supersampled for crisp rendering under monitor DPI scaling.
     /// </summary>
     public BaseIcon? GetIcon(double size = 32, int? pixelSize = null)
-    {
-        var trashEmpty = this is VirtualDriveViewModel { ItemsCount: null or <= 0 };
-        return GetDriveIcon(Type, size, trashEmpty, pixelSize);
-    }
+        => GetDriveIcon(Type, size, IsTrashEmpty, pixelSize);
+
+    /// <summary>The drive's icon at the size a dragged file's image is.</summary>
+    public BitmapSource DragImage => FileIconProvider.GetDriveIcon(Type, 120, IsTrashEmpty);
+
+    private bool IsTrashEmpty => this is VirtualDriveViewModel { ItemsCount: null or <= 0 };
 
     public static BaseIcon? GetDriveIcon(DriveType type, double size = 32, bool trashEmpty = false, int? pixelSize = null)
     {

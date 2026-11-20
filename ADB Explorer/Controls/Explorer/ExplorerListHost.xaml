@@ -157,6 +157,9 @@
             <EventSetter Event="DragOver" Handler="DriveItem_DragOver" />
             <EventSetter Event="DragLeave" Handler="DriveItem_DragLeave" />
             <EventSetter Event="Drop" Handler="DriveItem_Drop" />
+            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="DriveItem_PreviewMouseLeftButtonDown" />
+            <EventSetter Event="PreviewMouseMove" Handler="DriveItem_PreviewMouseMove" />
+            <EventSetter Event="PreviewMouseLeftButtonUp" Handler="DriveItem_PreviewMouseLeftButtonUp" />
         </Style>
         <Style
             x:Key="DriveListViewStyle"

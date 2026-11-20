@@ -551,4 +551,34 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <!--  An app page dragged by its navigation item, to open in a new tab: its icon and name, as a hovered row  -->
+    <DataTemplate x:Key="PageDragTemplate" DataType="{x:Type models:AdbLocation}">
+        <Border Background="{DynamicResource SolidBackgroundFillColorBaseBrush}" CornerRadius="4">
+            <Border
+                Padding="8,6"
+                Background="{DynamicResource TreeViewItemBackgroundPointerOver}"
+                BorderBrush="{DynamicResource MouseOverBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="4"
+                TextElement.FontSize="{DynamicResource ControlContentThemeFontSize}"
+                TextElement.Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ContentPresenter
+                        Width="16"
+                        Height="16"
+                        Margin="0,0,8,0"
+                        VerticalAlignment="Center"
+                        Content="{Binding Icon.IconContent}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{Binding DisplayName}" />
+                </Grid>
+            </Border>
+        </Border>
+    </DataTemplate>
 </ResourceDictionary>
