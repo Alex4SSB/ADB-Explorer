@@ -71,8 +71,40 @@ internal static partial class FileActionLogic
 
     public static void UpdateFileActions(FileList list)
     {
+        // First, so the explorer's own update leaves the shared context-menu state as its own.
+        if (ReferenceEquals(list, Data.Files))
+            UpdateSelectedDriveActions();
+
         using (Data.Use(list))
             UpdateFileActionsCore(list);
+    }
+
+    /// <summary>The drive selected in the drive view, as its tree node's list; key gestures act on it.</summary>
+    internal static FileList? SelectedDriveList { get; private set; }
+
+    /// <summary>The tree node a drive card's context menu, drop and key gestures act through, following the tree's rules.</summary>
+    internal static NavigationTreeNode? DriveTreeNode(DriveViewModel drive)
+        => ExplorerTree?.FindDriveNode(drive);
+
+    /// <summary>The tree's context target, which tree-only actions (new folder, open in new tab, saved locations) act on.</summary>
+    internal static void SetTreeContextTarget(NavigationTreeNode? node)
+        => ExplorerTree?.SetContextTarget(node);
+
+    private static void UpdateSelectedDriveActions()
+    {
+        SelectedDriveList = null;
+
+        // The trash card keeps its own delete handling (SelectedTrashDrive).
+        if (!Data.FileActions.IsDriveViewVisible
+            || Data.RuntimeSettings.SelectedDrive is not { Type: not AbstractDrive.DriveType.Trash } drive
+            || DriveTreeNode(drive) is not { } node
+            || FileList.FromTreeNode(node) is not { } list)
+            return;
+
+        using (Data.Use(list))
+            UpdateFileActionsCore(list);
+
+        SelectedDriveList = list;
     }
 
     /// <summary>
@@ -229,20 +261,36 @@ internal static partial class FileActionLogic
         actions.IsCurrentLocationReadOnly = (c.IsExplorerFolder || c.CanPasteIntoTar) && !pasteTargetWritable;
         actions.IsSelectionFuseProtectedAndroidRoot = c.HasFileSelection && c.FuseProtectedRoot;
 
-        actions.IsSelectionIllegalOnWindows = c.HasFileSelection
+        var illegalOnWindows = c.HasFileSelection
             && !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.Windows);
 
-        actions.IsSelectionIllegalNaming = !c.IsRecycleBin
+        var illegalNaming = !c.IsRecycleBin
             && !c.IsAppDrive
             && !c.IsArchive
             && c.HasFileSelection
             && !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.RestrictedNaming);
 
-        actions.IsSelectionIllegalOnWinRoot = c.HasFileSelection
-            && !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.WinRoot);
+        SetSelectionNaming(actions, selectedFiles, illegalOnWindows, illegalNaming);
 
         actions.IsSelectionConflictingNames = c.Restrictions.CaseInsensitiveNames
             && selectedFiles.Select(f => f.FullName).Distinct(StringComparer.InvariantCultureIgnoreCase).Count() != selectedFiles.Count();
+    }
+
+    /// <summary>
+    /// With names substituted, names Windows or a restricted drive refuses only rename the copies, so they don't block;
+    /// a Windows drive root still refuses its own reserved names, which nothing stands in for.
+    /// </summary>
+    internal static void SetSelectionNaming(FileActionsEnable actions, IEnumerable<FileClass> selectedFiles, bool illegalOnWindows, bool illegalNaming)
+    {
+        var substitute = FileHelper.SubstitutesIllegalNames;
+        actions.IsSelectionIllegalOnWindows = illegalOnWindows && !substitute;
+        actions.IsSelectionIllegalNaming = illegalNaming && !substitute;
+        actions.IsSelectionRenamedOnTarget = substitute && (illegalOnWindows || illegalNaming);
+
+        if (substitute)
+            actions.IsSelectionIllegalOnWinRoot = selectedFiles.Any(f => AdbExplorerConst.INVALID_WINDOWS_ROOT_PATHS.Contains(f.FullName));
+        else
+            actions.IsSelectionIllegalOnWinRoot = selectedFiles.Any() && !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.WinRoot);
     }
 
     private static void UpdatePackageActions(ActionContext c)
@@ -294,6 +342,9 @@ internal static partial class FileActionLogic
             actions.IsOpenInNewTabEnabled = GetNewTabPath(GetNewTabItem(c.List), c.Device, c.IsAppDrive, c.IsArchive, c.IsSearchMode) is not null;
         else
             actions.IsOpenInNewTabEnabled = false;
+
+        // A tree node's list (drives included) has the node as its one selected folder
+        actions.IsOpenInWindowsExplorerEnabled = GetWindowsExplorerPath(c.List, c.Device, c.IsExplorerFolder) is not null;
 
         if (c.IsAppDrive)
             actions.IsCopyItemPathEnabled = c.SinglePackageSelected;

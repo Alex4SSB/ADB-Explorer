@@ -523,9 +523,22 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
         switch (e.PropertyName)
         {
             case nameof(AppSettings.EnableApk):
+                // The temp drive stays, with or without its installer count
+                foreach (var temp in Data.DevicesObject?.Current?.Drives.OfType<VirtualDriveViewModel>().Where(d => d.Type is AbstractDrive.DriveType.Temp) ?? [])
+                    temp.NotifyItemsCountText();
+
+                UpdateDriveView();
+                Tree.Sync();
+                break;
+
             case nameof(AppSettings.EnableRecycle):
                 UpdateDriveView();
                 Tree.Sync();
+                break;
+
+            // Illegal names turn from blocking into renaming the copies, or back
+            case nameof(AppSettings.SubstituteIllegalNames):
+                FileActionLogic.UpdateFileActions();
                 break;
 
             case nameof(AppSettings.ShowHiddenItems):
@@ -838,7 +851,7 @@ public partial class ExplorerViewModel : ObservableObject, INavigationAware
                 return drive.Type switch
                 {
                     AbstractDrive.DriveType.Trash => Data.Settings.EnableRecycle,
-                    AbstractDrive.DriveType.Temp or AbstractDrive.DriveType.Package => Data.Settings.EnableApk,
+                    AbstractDrive.DriveType.Package => Data.Settings.EnableApk,
                     _ => true,
                 };
             };

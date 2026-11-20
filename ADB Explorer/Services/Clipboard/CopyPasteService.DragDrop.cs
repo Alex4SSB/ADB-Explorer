@@ -6,6 +6,18 @@ namespace ADB_Explorer.Services;
 public partial class CopyPasteService
 {
     /// <summary>
+    /// Starts a drag of our own. Its target is unknown until the first DragOver, so the last drag's isn't shown meanwhile.
+    /// </summary>
+    public void BeginSelfDrag()
+    {
+        DropEffect =
+        CurrentDropEffect = DragDropEffects.None;
+        DropTarget = null;
+        DragStatus = DragState.Active;
+        WasDragging = true;
+    }
+
+    /// <summary>
     /// Picks the drop effect from the allowed effects and modifier keys: move within the same source, copy otherwise.
     /// </summary>
     public static DragDropEffects ResolveDropEffect(DragDropEffects allowed, DragDropKeyStates keys, bool sameSource)
@@ -312,6 +324,50 @@ public partial class CopyPasteService
             return DragDropEffects.None;
 
         return FileActionLogic.EnableTreeDropPaste(node);
+    }
+
+    /// <summary>
+    /// Sets the drag's effect and drop target for dragging over a tree node (or the drive card standing for one),
+    /// and returns the allowed effects.
+    /// </summary>
+    public DragDropEffects ApplyTreeDropEffects(System.Windows.DragEventArgs e, NavigationTreeNode node)
+    {
+        var allowed = GetAllowedTreeDropEffects(e.Data, node);
+
+        e.Effects = ResolveDropEffect(allowed, e.KeyStates, IsFromDevice(node.OwnerDevice));
+
+        DropEffect =
+        CurrentDropEffect = e.Effects;
+        DropTarget = node.Path;
+        DropTargetDevice = node.OwnerDevice;
+
+        // A drag cancelled with a right click stays without its drag window
+        if (IsDragCanceled)
+            return allowed;
+
+        // Foreign drags (e.g. from Windows Explorer) never set a drag image on drag start like our own
+        // drags do, so DragWindow stays hidden unless something sets one while dragging over a drop
+        // target - mirrors ExplorerGrid_DragOver's equivalent handling for the explorer grid.
+        var isAppDrive = node.Drive?.Type is AbstractDrive.DriveType.Package;
+        if (isAppDrive)
+        {
+            if (!IsSelf && FileHelper.AllFilesAreApks(DragFiles))
+                DragBitmap = DefaultAndroidPackageIcon.Bitmap;
+        }
+        else if (HasUnnamedFiles)
+        {
+            DragBitmap = FileIconProvider.GetMultipleFilesIcon(120);
+        }
+        else if (DragThumbnail is { } thumbnail)
+        {
+            DragBitmap = thumbnail;
+        }
+        else if (CurrentFiles.Any())
+        {
+            DragBitmap = CurrentFiles.First().DragImage;
+        }
+
+        return allowed;
     }
 
     public void AcceptTreeDrop(System.Windows.DragEventArgs e, NavigationTreeNode node)

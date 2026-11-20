@@ -97,6 +97,16 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
     [ObservableProperty]
     public partial bool IsCreationTimeResolved { get; set; }
 
+    /// <summary>The listing (LIS2) gave this item's access time and owner ids, so the selection stat may be skipped.</summary>
+    public bool HasListingStat { get; private set; }
+
+    // A reset means the item changed since it was listed
+    partial void OnIsCreationTimeResolvedChanged(bool value)
+    {
+        if (!value)
+            HasListingStat = false;
+    }
+
     public long? CompressedSize { get; set; }
 
     public string? CompressionMethod { get; set; }
@@ -423,7 +433,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
     public static FileClass GenerateAndroidFile(FileStat fileStat)
     {
-        return new(
+        var file = new FileClass(
             fileName: fileStat.FullName,
             path: fileStat.FullPath,
             type: fileStat.Type,
@@ -437,6 +447,59 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             CompressionRatio = fileStat.CompressionRatio,
             Crc32 = fileStat.Crc32
         };
+
+        if (fileStat.AccessTime is { } accessTime && fileStat.OwnerUid is int uid && fileStat.OwnerGid is int gid)
+        {
+            file.LastAccessTime = accessTime.ToLocalTime();
+            file.OwnerUid = uid;
+            file.OwnerGid = gid;
+            file.HasListingStat = true;
+        }
+
+        return file;
+    }
+
+    /// <summary>
+    /// Fills what the selection stat would from the listing, once the owner ids have known names.
+    /// Returns false when the stat is still needed.
+    /// </summary>
+    public bool TryResolveExtraInfoFromListing(LogicalDeviceViewModel? device)
+    {
+        if (!HasListingStat
+            || device is null
+            || OwnerUid is not int uid
+            || OwnerGid is not int gid
+            || !device.TryGetUnixNames(uid, gid, out var user, out var group))
+            return false;
+
+        var zone = device.TimeZone;
+
+        User = user;
+        Group = group;
+
+        if (LastAccessTime is { } accessTime)
+            LastAccessTime = InTimeZone(accessTime, zone);
+
+        // With noatime the access time is never updated, so it stays the time the file was created.
+        if (DriveHelper.HasNoAccessTime(FullPath))
+            CreationTime = LastAccessTime;
+
+        if (ModifiedTime is DateTime modified)
+            ModifiedTimeWithOffset = InTimeZone(new DateTimeOffset(modified), zone);
+
+        if (!IsDirectory && Size is long size && size >= 0)
+            ShellLsSize ??= size;
+
+        IsCreationTimeResolved = true;
+        return true;
+    }
+
+    private static DateTimeOffset InTimeZone(DateTimeOffset time, TimeZoneInfo? zone)
+    {
+        if (zone is null)
+            return time.ToLocalTime();
+
+        return TimeZoneInfo.ConvertTime(time, zone);
     }
 
     public static FileClass BuildCurrentLocation(
@@ -524,7 +587,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         location.ModifiedTimeWithOffset = info.Value.ModifiedTime ?? location.ModifiedTimeWithOffset;
         location.ModifiedTime = info.Value.ModifiedTime?.LocalDateTime ?? location.ModifiedTime;
         location.EffectiveAccess = ShellAccessHelper.ResolveLocationAccess(location.FullPath, info, identity, restrictions);
-        Data.ActiveDevice?.RecordUnixIdentity(location.User, location.Group);
+        Data.ActiveDevice?.RecordUnixIdentity(location.User, location.Group, location.OwnerUid, location.OwnerGid);
     }
 
     private void OnSettingsPropertyChanged(object? sender, PropertyChangedEventArgs args)
@@ -607,7 +670,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             ModifiedTimeWithOffset = info.Value.ModifiedTime;
             ModifiedTime = info.Value.ModifiedTime.LocalDateTime;
             Permissions = info.Value.Permissions;
-            deviceId?.RecordUnixIdentity(info.Value.User, info.Value.Group);
+            deviceId?.RecordUnixIdentity(info.Value.User, info.Value.Group, info.Value.OwnerUid, info.Value.OwnerGid);
 
             if (!IsDirectory && info.Value.Size is long size && size >= 0)
             {
@@ -709,7 +772,8 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
 
         Descriptors = items.Select((item, i) =>
         {
-            var relativeName = FileHelper.ExtractRelativePath(item.Name, descriptorParent).Replace('/', '\\');
+            // Names Windows refuses get lookalikes, when names are substituted
+            var relativeName = FileHelper.WindowsTargetRelativePath(FileHelper.ExtractRelativePath(item.Name, descriptorParent)).Replace('/', '\\');
 
             return new FileDescriptor
             {
@@ -725,7 +789,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         return new(this, pullSource, [.. devicePaths.Where((_, i) => !items[i].IsFolder)], archivePath, internalPath, stagingRoot);
     }
 
-    private static HANDLE CreateDescriptorStream(VirtualFileDataObject vfdo, FileSyncOperation? fileOp, string devicePath, FolderTree item, bool includeContent)
+    private static IntPtr CreateDescriptorStream(VirtualFileDataObject vfdo, FileSyncOperation? fileOp, string devicePath, FolderTree item, bool includeContent)
     {
         if (fileOp is null || !includeContent || item.IsFolder)
             return 0;
@@ -779,7 +843,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
         return fileOp.OpenShellStream(devicePath, item.Size);
     }
 
-    private void VFDO_OperationCompleted(object? sender, NativeMethods.HResult hResult)
+    private void VFDO_OperationCompleted(object? sender, HRESULT hResult)
     {
         if (sender is not VirtualFileDataObject vfdo)
             return;
@@ -792,7 +856,7 @@ public partial class FileClass : FilePath, IFileStat, IBrowserItem
             Task.Run(() => ArchiveExtract.CleanupStaging(stagingDevice.ID, root));
         }
 
-        if (hResult is NativeMethods.HResult.Ok)
+        if (hResult == HRESULT.S_OK)
         {
             if (vfdo.CurrentEffect.HasFlag(DragDropEffects.Move)
                 && !ArchivePath.IsArchivePath(FullPath, Data.ActiveDevice?.ID))
@@ -889,6 +953,6 @@ public class FileNameSort(string name) : IComparable
         if (obj is not FileNameSort other)
             return 0;
 
-        return NativeMethods.StringCompareLogical(Name, other.Name);
+        return ShlwApi.StrCmpLogicalW(Name, other.Name);
     }
 }

@@ -108,7 +108,10 @@ public class FilePath : AbstractFile, IBaseFile
     // Only set for FilePaths constructed from a Windows-side ShellItem; absent for Android paths.
     public ShellItem? ShellItem { get; set; }
 
-    public bool IsHidden => FullName.StartsWith('.');
+    public bool IsHidden => IsHiddenName(FullName);
+
+    /// <summary>A dot file or folder, hidden on Android by convention.</summary>
+    public static bool IsHiddenName(string name) => name.StartsWith('.');
 
     private bool _isSelected;
     public bool IsSelected

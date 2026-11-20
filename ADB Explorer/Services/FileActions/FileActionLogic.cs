@@ -260,6 +260,19 @@ internal static partial class FileActionLogic
         Data.RequestExplorer(ExplorerRequest.Rename);
     }
 
+    public static void AddSavedLocation()
+    {
+        if (ExplorerTree?.ContextTarget is not { IsSavedLocation: false } node
+            || node.OwnerDevice?.SavedLocationsKey is not { } deviceId
+            || IsSavedLocation(deviceId, node.Path))
+            return;
+
+        Data.Settings.SavedLocations.Add(new(deviceId, node.Path));
+    }
+
+    internal static bool IsSavedLocation(string deviceId, string path)
+        => Data.Settings.SavedLocations?.Any(e => e.DeviceId == deviceId && NavigationTreeNode.PathsEqual(e.Path, path)) is true;
+
     public static void RemoveSavedLocation()
     {
         if (ExplorerTree?.ContextTarget is not { IsSavedLocation: true } node)

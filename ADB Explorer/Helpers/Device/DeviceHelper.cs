@@ -265,7 +265,7 @@ public static partial class DeviceHelper
             var snapshots = AdbService.GetDevices(CancellationToken.None).ToList();
             AdbService.ResolveRemoteSerials(snapshots, CancellationToken.None);
 
-            return snapshots;
+            return AdbService.ApplyLockStates(snapshots, CancellationToken.None);
         }).ContinueWith((t) => App.SafeInvoke(() => DeviceListSetup(t.Result.Select(s => new LogicalDeviceViewModel(LogicalDevice.From(s))), selectedAddress)));
     }
 

@@ -127,6 +127,7 @@ public abstract class DeviceViewModel : ObservableObject
         Device.Status = status;
 
         OnPropertyChanged(nameof(Status));
+        OnPropertyChanged(nameof(Tooltip));
 
         if (this is LogicalDeviceViewModel logical)
         {
@@ -141,6 +142,7 @@ public abstract class DeviceViewModel : ObservableObject
                 AdbService.Unroot(ID);
 
             logical.InvalidateRootStatus();
+            logical.NotifyStatusCommands();
         }
 
         if (status is DeviceStatus.Offline)

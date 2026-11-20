@@ -11,6 +11,8 @@ namespace ADB_Test;
 [TestClass]
 public class FileMergeHelperTests
 {
+    private static string N(string name) => TestNames.Pseudo(name);
+
     [TestMethod]
     public void AreIdenticalForMerge_MatchingSizeAndMtime_ReturnsTrue()
     {
@@ -53,32 +55,35 @@ public class FileMergeHelperTests
     public void ExpandConflicts_MatchingFolders_ListsOnlyNestedFileConflicts()
     {
         var root = Path.Combine(Path.GetTempPath(), "AdbExplorerMergeRecursive", Guid.NewGuid().ToString("N"));
-        var sourceFolder = Path.Combine(root, "src", "Photos");
-        var destRoot = Path.Combine(root, "dest");
-        var destFolder = Path.Combine(destRoot, "Photos");
+        // Real files get pseudo-accented names, with an emoji, to cover non-ASCII names end to end
+        var photos = N("Photos");
+        var sub = N("sub");
+        var sourceFolder = Path.Combine(root, N("src"), photos);
+        var destRoot = Path.Combine(root, N("dest"));
+        var destFolder = Path.Combine(destRoot, photos);
 
         try
         {
-            Directory.CreateDirectory(Path.Combine(sourceFolder, "sub"));
-            Directory.CreateDirectory(Path.Combine(destFolder, "sub"));
+            Directory.CreateDirectory(Path.Combine(sourceFolder, sub));
+            Directory.CreateDirectory(Path.Combine(destFolder, sub));
 
-            File.WriteAllBytes(Path.Combine(sourceFolder, "new.bin"), new byte[5]);
-            File.WriteAllBytes(Path.Combine(sourceFolder, "diff.bin"), new byte[10]);
-            File.WriteAllBytes(Path.Combine(sourceFolder, "sub", "nested.bin"), new byte[7]);
+            File.WriteAllBytes(Path.Combine(sourceFolder, N("new.bin")), new byte[5]);
+            File.WriteAllBytes(Path.Combine(sourceFolder, N("diff.bin")), new byte[10]);
+            File.WriteAllBytes(Path.Combine(sourceFolder, sub, N("nested.bin")), new byte[7]);
 
-            File.WriteAllBytes(Path.Combine(destFolder, "diff.bin"), new byte[20]);
-            File.WriteAllBytes(Path.Combine(destFolder, "sub", "nested.bin"), new byte[7]);
+            File.WriteAllBytes(Path.Combine(destFolder, N("diff.bin")), new byte[20]);
+            File.WriteAllBytes(Path.Combine(destFolder, sub, N("nested.bin")), new byte[7]);
             // Match nested size+mtime roughly by copying
             File.SetLastWriteTimeUtc(
-                Path.Combine(destFolder, "sub", "nested.bin"),
-                File.GetLastWriteTimeUtc(Path.Combine(sourceFolder, "sub", "nested.bin")));
+                Path.Combine(destFolder, sub, N("nested.bin")),
+                File.GetLastWriteTimeUtc(Path.Combine(sourceFolder, sub, N("nested.bin"))));
 
             var candidates = new FileMergeHelper.ConflictCandidate[]
             {
-                new(sourceFolder, "Photos", true, null, null),
+                new(sourceFolder, photos, true, null, null),
             };
 
-            FileMergeHelper.DestEntry GetDest(string name) => name == "Photos"
+            FileMergeHelper.DestEntry GetDest(string name) => name == photos
                 ? new(true, true, null, null)
                 : new(false, false, null, null);
 
@@ -94,10 +99,10 @@ public class FileMergeHelperTests
             // diff.bin + nested.bin are conflicts.
             Assert.AreEqual(2, rows.Count);
             CollectionAssert.AreEquivalent(
-                new[] { @"Photos\diff.bin", @"Photos\sub\nested.bin" },
+                new[] { TestNames.PseudoPath(@"Photos\diff.bin", '\\'), TestNames.PseudoPath(@"Photos\sub\nested.bin", '\\') },
                 rows.Select(r => r.Name).ToArray());
-            Assert.IsFalse(rows.First(r => r.Name.EndsWith("diff.bin")).IsIdentical);
-            Assert.IsTrue(rows.First(r => r.Name.EndsWith("nested.bin")).IsIdentical);
+            Assert.IsFalse(rows.First(r => r.Name.EndsWith(N("diff.bin"))).IsIdentical);
+            Assert.IsTrue(rows.First(r => r.Name.EndsWith(N("nested.bin"))).IsIdentical);
         }
         finally
         {
@@ -142,8 +147,8 @@ public class FileMergeHelperTests
 
         try
         {
-            var matchPath = Path.Combine(dir, "match.bin");
-            var diffPath = Path.Combine(dir, "diff.bin");
+            var matchPath = Path.Combine(dir, N("match.bin"));
+            var diffPath = Path.Combine(dir, N("diff.bin"));
             File.WriteAllBytes(matchPath, new byte[32]);
             File.WriteAllBytes(diffPath, new byte[16]);
 
@@ -151,12 +156,12 @@ public class FileMergeHelperTests
             var mtimeUtc = matchInfo.LastWriteTimeUtc;
 
             var root = new SyncFile("/sdcard/bench", AbstractFile.FileType.Folder);
-            var match = new SyncFile("/sdcard/bench/match.bin")
+            var match = new SyncFile($"/sdcard/bench/{N("match.bin")}")
             {
                 Size = matchInfo.Length,
                 UnixTime = (mtimeUtc - DateTime.UnixEpoch).TotalSeconds,
             };
-            var diff = new SyncFile("/sdcard/bench/diff.bin")
+            var diff = new SyncFile($"/sdcard/bench/{N("diff.bin")}")
             {
                 Size = 99,
                 UnixTime = (mtimeUtc - DateTime.UnixEpoch).TotalSeconds,
@@ -166,7 +171,7 @@ public class FileMergeHelperTests
 
             Assert.IsTrue(FileMergeHelper.FilterIdenticalPullTree(root, dir));
             Assert.AreEqual(1, root.Children.Count);
-            Assert.AreEqual("diff.bin", root.Children[0].FullName);
+            Assert.AreEqual(N("diff.bin"), root.Children[0].FullName);
         }
         finally
         {
@@ -182,11 +187,11 @@ public class FileMergeHelperTests
 
         try
         {
-            var path = Path.Combine(dir, "only.bin");
+            var path = Path.Combine(dir, N("only.bin"));
             File.WriteAllBytes(path, new byte[8]);
             var info = new FileInfo(path);
 
-            var file = new SyncFile("/sdcard/only.bin")
+            var file = new SyncFile($"/sdcard/{N("only.bin")}")
             {
                 Size = info.Length,
                 UnixTime = (info.LastWriteTimeUtc - DateTime.UnixEpoch).TotalSeconds,

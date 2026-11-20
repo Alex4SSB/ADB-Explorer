@@ -1,5 +1,9 @@
 ﻿using Vanara.Windows.Shell;
 using static ADB_Explorer.Services.NativeMethods;
+using FD_FLAGS = Vanara.PInvoke.Shell32.FD_FLAGS;
+using FileFlagsAndAttributes = Vanara.PInvoke.FileFlagsAndAttributes;
+using POINT = Vanara.PInvoke.POINT;
+using SIZE = Vanara.PInvoke.SIZE;
 
 namespace ADB_Explorer.Services;
 
@@ -40,7 +44,7 @@ public class FileDescriptor
     public string? SourcePath { get; set; }
 
     /// <summary>A COM IStream pointer whose reference the caller takes over, or 0 when there's no data to give.</summary>
-    public delegate HANDLE StreamContents();
+    public delegate IntPtr StreamContents();
 
     // Only set for descriptors we offer as drag/clipboard data; unset for inbound descriptors.
     public StreamContents? Stream { get; set; }
@@ -112,7 +116,7 @@ public class FileDescriptor
         }
         catch (COMException)
         {
-            // Usually HResult.DV_E_FORMATETC
+            // Usually HRESULT.DV_E_FORMATETC
             // This happens when GetData in our own VFDO isn't ready yet
         }
 
@@ -210,7 +214,7 @@ struct FILEDESCRIPTOR : IByteStruct
     public FILETIME ftLastAccessTime;
     public FILETIME ftLastWriteTime;
     public FILESIZE nFileSize;
-    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_PATH)]
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Vanara.PInvoke.Kernel32.MAX_PATH)]
     public string cFileName;
 
     public readonly IEnumerable<byte> Bytes => BytesFromStructure(this);

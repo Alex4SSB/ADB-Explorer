@@ -46,6 +46,18 @@ public partial class NavigationPane
 
         var node = _treeDragNode;
         var item = _treeDragItem;
+
+        // A device node opens the device's mount where it's dropped, outside the app
+        if (node?.Device is { } device && item is not null && !node.IsInEditMode && DeviceMountDrag.CanDrag(device))
+        {
+            _treeDragPending = false;
+            _treeDidDrag = true;
+            ReleaseTreeDragCapture();
+
+            InitiateDeviceDrag(item, device);
+            return;
+        }
+
         if (node is null || item is null || !CanStartTreeDrag(node))
             return;
 
@@ -89,6 +101,16 @@ public partial class NavigationPane
         _treeDragNode = null;
     }
 
+    /// <summary>Drags the device by its node's row, held where it was grabbed.</summary>
+    private void InitiateDeviceDrag(TreeViewItem item, LogicalDeviceViewModel device)
+    {
+        Point? grabPoint = null;
+        if (Window.GetWindow(item) is { } window && item.Template.FindName("Border", item) is FrameworkElement row)
+            grabPoint = window.TranslatePoint(_treeDragStart, row);
+
+        DeviceMountDrag.Start(item, device, grabPoint);
+    }
+
     private void InitiateTreeDrag(TreeViewItem item, NavigationTreeNode node)
     {
         var list = FileList.FromTreeNode(node);
@@ -99,17 +121,15 @@ public partial class NavigationPane
         VirtualFileDataObject? vfdo;
         using (Data.Use(list))
         {
-            vfdo = VirtualFileDataObject.PrepareTransfer(
-                files,
-                DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
+            // No preferred effect: Explorer then defaults to Copy, while a preferred Copy alone makes it refuse Shift's Move
+            vfdo = VirtualFileDataObject.PrepareTransfer(files, DragDropEffects.None);
             if (vfdo is null)
                 return;
 
             Data.CopyPaste.UpdateSelfVFDO(true);
         }
 
-        Data.CopyPaste.DragStatus = CopyPasteService.DragState.Active;
-        Data.CopyPaste.WasDragging = true;
+        Data.CopyPaste.BeginSelfDrag();
         Data.CopyPaste.DragBitmap = files[0].DragImage;
         node.IsDragSource = true;
         NavigationTreeNode.SuppressUserSelectFromExpander++;
@@ -120,7 +140,7 @@ public partial class NavigationPane
             vfdo.SendObjectToShell(
                 VirtualFileDataObject.DataObjectMethod.DragDrop,
                 item,
-                vfdo.PreferredDropEffect ?? DragDropEffects.Copy);
+                DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
         }
         finally
         {
@@ -177,43 +197,7 @@ public partial class NavigationPane
     }
 
     private void ApplyTreeDropEffects(DragEventArgs e, NavigationTreeNode node)
-    {
-        var allowed = Data.CopyPaste.GetAllowedTreeDropEffects(e.Data, node);
-        SetTreeDropHighlight(node, allowed);
-
-        e.Effects = CopyPasteService.ResolveDropEffect(allowed, e.KeyStates, Data.CopyPaste.IsFromDevice(node.OwnerDevice));
-
-        Data.CopyPaste.DropEffect =
-        Data.CopyPaste.CurrentDropEffect = e.Effects;
-        Data.CopyPaste.DropTarget = node.Path;
-        Data.CopyPaste.DropTargetDevice = node.OwnerDevice;
-
-        // A drag cancelled with a right click stays without its drag window
-        if (Data.CopyPaste.IsDragCanceled)
-            return;
-
-        // Foreign drags (e.g. from Windows Explorer) never set a drag image on drag start like our own
-        // drags do, so DragWindow stays hidden unless something sets one while dragging over a drop
-        // target - mirrors ExplorerGrid_DragOver's equivalent handling for the explorer grid.
-        var isAppDrive = node.Drive?.Type is AbstractDrive.DriveType.Package;
-        if (isAppDrive)
-        {
-            if (!Data.CopyPaste.IsSelf && FileHelper.AllFilesAreApks(Data.CopyPaste.DragFiles))
-                Data.CopyPaste.DragBitmap = DefaultAndroidPackageIcon.Bitmap;
-        }
-        else if (Data.CopyPaste.HasUnnamedFiles)
-        {
-            Data.CopyPaste.DragBitmap = FileIconProvider.GetMultipleFilesIcon(120);
-        }
-        else if (Data.CopyPaste.DragThumbnail is { } thumbnail)
-        {
-            Data.CopyPaste.DragBitmap = thumbnail;
-        }
-        else if (Data.CopyPaste.CurrentFiles.Any())
-        {
-            Data.CopyPaste.DragBitmap = Data.CopyPaste.CurrentFiles.First().DragImage;
-        }
-    }
+        => SetTreeDropHighlight(node, Data.CopyPaste.ApplyTreeDropEffects(e, node));
 
     private void SetTreeDropHighlight(NavigationTreeNode node, DragDropEffects allowed)
     {

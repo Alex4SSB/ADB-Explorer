@@ -1,5 +1,6 @@
 ﻿using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
+using static Vanara.PInvoke.User32;
 
 namespace ADB_Explorer.Services;
 
@@ -13,7 +14,7 @@ public partial class CopyPasteService
         // Only tolerate a transient OLE gap while nothing has touched the clipboard since our
         // own write - any other sequence number means a distinct, fully-formed update (an image,
         // a text copy, another self-copy...) that must be processed normally, not preserved.
-        if (_selfCopyClipboardSequence != NativeMethods.MGetClipboardSequenceNumber())
+        if (_selfCopyClipboardSequence != GetClipboardSequenceNumber())
             return false;
 
         if (dataObject.GetDataPresent(AdbDataFormats.AdbDrop)

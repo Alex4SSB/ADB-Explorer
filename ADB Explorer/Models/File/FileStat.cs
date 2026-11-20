@@ -10,4 +10,8 @@ public record struct FileStat(string FullName,
                        long? CompressedSize = null,
                        string? CompressionMethod = null,
                        string? CompressionRatio = null,
-                       string? Crc32 = null) : IBaseFile, IFileStat;
+                       string? Crc32 = null,
+                       DateTimeOffset? AccessTime = null,
+                       DateTimeOffset? ChangeTime = null,
+                       int? OwnerUid = null,
+                       int? OwnerGid = null) : IBaseFile, IFileStat;

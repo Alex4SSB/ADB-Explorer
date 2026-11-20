@@ -38,6 +38,9 @@ public partial class FileActionsEnable : ObservableObject
 
     public bool IsCopyAsImageEnabled { get; set; }
 
+    /// <summary>Tree context target is a folder or drive whose path isn't saved yet.</summary>
+    public bool AddSavedLocationEnabled { get; set; }
+
     /// <summary>Tree context target is a saved-location node (<see cref="NavigationTreeNode.IsSavedLocation"/>).</summary>
     public bool RemoveSavedLocationEnabled { get; set; }
 
@@ -82,6 +85,8 @@ public partial class FileActionsEnable : ObservableObject
     public bool IsSingleFolder { get; set; }
 
     public bool IsOpenInNewTabEnabled { get; set; }
+
+    public bool IsOpenInWindowsExplorerEnabled { get; set; }
 
     public bool PullEnabled { get; set; }
 
@@ -307,6 +312,22 @@ public partial class FileActionsEnable : ObservableObject
     {
         get => _isSelectionIllegalNaming;
         set => SetProperty(ref _isSelectionIllegalNaming, value);
+    }
+
+    private bool _isPastingRenamed = false;
+    /// <summary>Copied items have names the paste target refuses, which get lookalikes there (names are substituted).</summary>
+    public bool IsPastingRenamed
+    {
+        get => _isPastingRenamed;
+        set => SetProperty(ref _isPastingRenamed, value);
+    }
+
+    private bool _isSelectionRenamedOnTarget = false;
+    /// <summary>Selected items have names Windows or a restricted drive refuses, which get lookalikes there (names are substituted).</summary>
+    public bool IsSelectionRenamedOnTarget
+    {
+        get => _isSelectionRenamedOnTarget;
+        set => SetProperty(ref _isSelectionRenamedOnTarget, value);
     }
 
     private bool _isSelectionIllegalOnWinRoot = false;

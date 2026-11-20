@@ -28,10 +28,27 @@ public class CommandHandler : ICommand
         _canExecute = canExecute;
     }
 
+    private EventHandler? _ownCanExecuteChanged;
+
     public event EventHandler? CanExecuteChanged
     {
-        add => CommandManager.RequerySuggested += value;
-        remove => CommandManager.RequerySuggested -= value;
+        add
+        {
+            CommandManager.RequerySuggested += value;
+            _ownCanExecuteChanged += value;
+        }
+        remove
+        {
+            CommandManager.RequerySuggested -= value;
+            _ownCanExecuteChanged -= value;
+        }
+    }
+
+    /// <summary>Requeries this command only, for state that changes without input (e.g. polling).</summary>
+    public void RaiseCanExecuteChanged()
+    {
+        if (_ownCanExecuteChanged is not null)
+            App.SafeInvoke(() => _ownCanExecuteChanged?.Invoke(this, EventArgs.Empty));
     }
 
 }
@@ -60,5 +77,9 @@ public class BaseAction : ObservableObject
 
     public void Execute() => Command.Execute(null);
 
-    public void NotifyIsEnabledChanged() => OnPropertyChanged(nameof(IsEnabled));
+    public void NotifyIsEnabledChanged()
+    {
+        OnPropertyChanged(nameof(IsEnabled));
+        (_command as CommandHandler)?.RaiseCanExecuteChanged();
+    }
 }

@@ -82,6 +82,7 @@ public class FileOperationQueue : ObservableObject
             _mutex.WaitOne();
 
             Operations.Add(fileOp);
+            NotifyMountWhenFinished(fileOp);
 
             Start();
         } 
@@ -97,7 +98,9 @@ public class FileOperationQueue : ObservableObject
         {
             _mutex.WaitOne();
 
-            Operations.AddRange(operations);
+            var added = operations.ToList();
+            Operations.AddRange(added);
+            added.ForEach(NotifyMountWhenFinished);
 
             Start();
         }
@@ -106,6 +109,10 @@ public class FileOperationQueue : ObservableObject
             _mutex.ReleaseMutex();
         }
     }
+
+    /// <summary>The mounted device's folder in File Explorer takes in what the operation changed on it.</summary>
+    private static void NotifyMountWhenFinished(FileOperation fileOp)
+        => fileOp.WhenFinished(_ => DeviceMount.OnOperationFinished(fileOp));
 
     public void RemoveOperation(FileOperation fileOp)
     {

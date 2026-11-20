@@ -11,6 +11,7 @@ public static class AdbDataFormats
     public static AdbDataFormat PerformedDropEffect { get; } = new("Performed DropEffect");
     public static AdbDataFormat PreferredDropEffect { get; } = new("Preferred DropEffect");
     public static AdbDataFormat DragLoop { get; } = new("InShellDragLoop");
+    public static AdbDataFormat DropDescription { get; } = new("DropDescription");
     public static AdbDataFormat CanIncludeInClipboardHistory { get; } = new("CanIncludeInClipboardHistory");
     public static AdbDataFormat CanUploadToCloudClipboard { get; } = new("CanUploadToCloudClipboard");
     public static AdbDataFormat FileName { get; } = new("FileName");
@@ -23,61 +24,12 @@ public static class AdbDataFormats
     /// CF_DIBV5 (Format17), used for clipboard images
     /// </summary>
     public static AdbDataFormat Format17 { get; } = new(17);
-
-    private static Dictionary<short, string> DataFormatKeys => new()
-    {
-        { DragImage, nameof(DragImage) },
-        { FileContents, nameof(FileContents) },
-        { FileDescriptor, nameof(FileDescriptor) },
-        { PasteSucceeded, nameof(PasteSucceeded) },
-        { PerformedDropEffect, nameof(PerformedDropEffect) },
-        { PreferredDropEffect, nameof(PreferredDropEffect) },
-        { DragLoop, nameof(DragLoop) },
-        { CanIncludeInClipboardHistory, nameof(CanIncludeInClipboardHistory) },
-        { CanUploadToCloudClipboard, nameof(CanUploadToCloudClipboard) },
-        { FileName, nameof(FileName) },
-        { FileNameW, nameof(FileNameW) },
-        { ShellidList, nameof(ShellidList) },
-        { FileDrop, nameof(FileDrop) },
-        { AdbDrop, nameof(AdbDrop) },
-        { DeviceIndependentBitmap, nameof(DeviceIndependentBitmap) },
-        { Format17, nameof(Format17) },
-    };
-
-    private static Dictionary<short, AdbDataFormat> FormatObjects => new()
-    {
-        { DragImage, DragImage },
-        { FileContents, FileContents },
-        { FileDescriptor, FileDescriptor },
-        { PasteSucceeded, PasteSucceeded },
-        { PerformedDropEffect, PerformedDropEffect },
-        { PreferredDropEffect, PreferredDropEffect },
-        { DragLoop, DragLoop },
-        { CanIncludeInClipboardHistory, CanIncludeInClipboardHistory },
-        { CanUploadToCloudClipboard, CanUploadToCloudClipboard },
-        { FileName, FileName },
-        { FileNameW, FileNameW },
-        { ShellidList, ShellidList },
-        { FileDrop, FileDrop },
-        { AdbDrop, AdbDrop },
-        { DeviceIndependentBitmap, DeviceIndependentBitmap },
-        { Format17, Format17 },
-    };
-
-    public static AdbDataFormat GetFormat(short id) =>
-        FormatObjects.TryGetValue(id, out var format) ? format : null;
-
-    public static string GetFormatName(short id) =>
-        DataFormatKeys.TryGetValue(id, out var format) ? format : null;
-
-    public static short? GetFormatId(string name)
-    {
-        var format = DataFormatKeys.Where(kv => kv.Value == name);
-        return format.Any() ? format.First().Key : null;
-    }
 }
 
-public class AdbDataFormat
+/// <summary>
+/// A registered clipboard format. Equal by its id, so one made from a target's cfFormat matches ours.
+/// </summary>
+public sealed class AdbDataFormat : IEquatable<AdbDataFormat>
 {
     public AdbDataFormat(string name)
     {
@@ -107,4 +59,14 @@ public class AdbDataFormat
     public TYMED tymed => this == AdbDataFormats.FileContents
         ? TYMED.TYMED_ISTREAM
         : TYMED.TYMED_HGLOBAL;
+
+    public bool Equals(AdbDataFormat? other) => other is not null && Id == other.Id;
+
+    public override bool Equals(object? obj) => Equals(obj as AdbDataFormat);
+
+    public override int GetHashCode() => Id;
+
+    public static bool operator ==(AdbDataFormat? left, AdbDataFormat? right) => left?.Equals(right) ?? right is null;
+
+    public static bool operator !=(AdbDataFormat? left, AdbDataFormat? right) => !(left == right);
 }

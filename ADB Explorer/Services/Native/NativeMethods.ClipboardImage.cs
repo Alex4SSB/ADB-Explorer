@@ -1,82 +1,11 @@
 namespace ADB_Explorer.Services;
 
+using static Vanara.PInvoke.Gdi32;
+using static Vanara.PInvoke.Kernel32;
+using static Vanara.PInvoke.User32;
+
 public static partial class NativeMethods
 {
-    [StructLayout(LayoutKind.Sequential)]
-    private struct BITMAPINFOHEADER
-    {
-        public uint biSize;
-        public int biWidth;
-        public int biHeight;
-        public ushort biPlanes;
-        public ushort biBitCount;
-        public uint biCompression;
-        public uint biSizeImage;
-        public int biXPelsPerMeter;
-        public int biYPelsPerMeter;
-        public uint biClrUsed;
-        public uint biClrImportant;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct BITMAPV5HEADER
-    {
-        public uint bV5Size;
-        public int bV5Width;
-        public int bV5Height;
-        public ushort bV5Planes;
-        public ushort bV5BitCount;
-        public uint bV5Compression;
-        public uint bV5SizeImage;
-        public int bV5XPelsPerMeter;
-        public int bV5YPelsPerMeter;
-        public uint bV5ClrUsed;
-        public uint bV5ClrImportant;
-        public uint bV5RedMask;
-        public uint bV5GreenMask;
-        public uint bV5BlueMask;
-        public uint bV5AlphaMask;
-        public uint bV5CSType;
-        private readonly int _cieE1, _cieE2, _cieE3, _cieE4, _cieE5, _cieE6, _cieE7, _cieE8, _cieE9; // CIEXYZTRIPLE
-        public uint bV5GammaRed;
-        public uint bV5GammaGreen;
-        public uint bV5GammaBlue;
-        public uint bV5Intent;
-        public uint bV5ProfileData;
-        public uint bV5ProfileSize;
-        public uint bV5Reserved;
-    }
-
-    private const uint GMEM_MOVEABLE = 0x0002;
-
-    [LibraryImport("User32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool OpenClipboard(HANDLE hWndNewOwner);
-
-    [LibraryImport("User32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool CloseClipboard();
-
-    [LibraryImport("User32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool EmptyClipboard();
-
-    [LibraryImport("User32.dll")]
-    private static partial HANDLE SetClipboardData(uint uFormat, HANDLE hMem);
-
-    [LibraryImport("Kernel32.dll")]
-    private static partial HANDLE GlobalAlloc(uint uFlags, nuint dwBytes);
-
-    [LibraryImport("User32.dll")]
-    private static partial uint GetClipboardSequenceNumber();
-
-    /// <summary>
-    /// Increments on every OS clipboard content change, regardless of format - a reliable way
-    /// to tell "still the same write, formats still settling" apart from "something else changed
-    /// the clipboard since", which per-format presence checks alone cannot distinguish.
-    /// </summary>
-    public static uint MGetClipboardSequenceNumber() => GetClipboardSequenceNumber();
-
     /// <summary>
     /// Puts a BGRA image on the clipboard as DeviceIndependentBitmap then Format17, in the same
     /// order Windows uses - minus CF_BITMAP, since a hand-built handle for it made some readers
@@ -105,8 +34,8 @@ public static partial class NativeMethods
                 {
                     EmptyClipboard();
 
-                    var okDib = SetClipboardData(AdbDataFormats.DeviceIndependentBitmap, CopyToHGlobal(dib)) != 0;
-                    var okDibV5 = SetClipboardData(AdbDataFormats.Format17, CopyToHGlobal(dibV5)) != 0;
+                    var okDib = SetClipboardData(AdbDataFormats.DeviceIndependentBitmap, (IntPtr)CopyToHGlobal(dib)) != 0;
+                    var okDibV5 = SetClipboardData(AdbDataFormats.Format17, (IntPtr)CopyToHGlobal(dibV5)) != 0;
 
                     return okDib || okDibV5;
                 }
@@ -171,12 +100,12 @@ public static partial class NativeMethods
         return result;
     }
 
-    private static HANDLE CopyToHGlobal(byte[] bytes)
+    private static HGLOBAL CopyToHGlobal(byte[] bytes)
     {
-        var hMem = GlobalAlloc(GMEM_MOVEABLE, (nuint)bytes.Length);
-        var ptr = MGlobalLock(hMem);
+        var hMem = GlobalAlloc(GMEM.GMEM_MOVEABLE, bytes.Length);
+        var ptr = GlobalLock(hMem);
         Marshal.Copy(bytes, 0, ptr, bytes.Length);
-        MGlobalUnlock(hMem);
+        GlobalUnlock(hMem);
 
         return hMem;
     }

@@ -1,4 +1,5 @@
 ﻿using System.Windows.Media.Animation;
+using static Vanara.PInvoke.ShlwApi;
 
 namespace ADB_Explorer.Controls;
 
@@ -723,7 +724,7 @@ public partial class NavigationBox : UserControl
         }
 
         return [.. folders
-            .OrderBy(folder => folder.Name, Comparer<string>.Create(NativeMethods.StringCompareLogical))
+            .OrderBy(folder => folder.Name, Comparer<string>.Create(StrCmpLogicalW))
             .Select(folder => DropDownItem(
                 new(folder.Path),
                 folder.Name,

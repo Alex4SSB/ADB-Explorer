@@ -208,7 +208,10 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     public void ClearTransportRoutes()
     {
         foreach (var id in _absorbedIds.Prepend(ID))
+        {
+            AdbService.ReleaseSyncConnections(id);
             AdbService.RemoveTransportRoute(id);
+        }
     }
 
     public bool Matches(string? id)
@@ -294,14 +297,54 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     private readonly HashSet<string> _knownGroups = new(StringComparer.Ordinal);
     private bool _unixIdsLoaded;
 
-    public void RecordUnixIdentity(string? user, string? group)
+    // Ids stat has named, so a listing's uid/gid (LIS2) can be shown without another stat
+    private readonly Dictionary<int, string> _userNames = [];
+    private readonly Dictionary<int, string> _groupNames = [];
+
+    public void RecordUnixIdentity(string? user, string? group, int? uid = null, int? gid = null)
     {
         lock (_unixIdLock)
         {
             if (!string.IsNullOrEmpty(user))
+            {
                 _knownUsers.Add(user);
+                if (uid is int userId)
+                    _userNames[userId] = user;
+            }
+
             if (!string.IsNullOrEmpty(group))
+            {
                 _knownGroups.Add(group);
+                if (gid is int groupId)
+                    _groupNames[groupId] = group;
+            }
+        }
+    }
+
+    public bool TryGetUnixNames(int uid, int gid, [NotNullWhen(true)] out string? user, [NotNullWhen(true)] out string? group)
+    {
+        lock (_unixIdLock)
+        {
+            group = null;
+            return _userNames.TryGetValue(uid, out user) && _groupNames.TryGetValue(gid, out group);
+        }
+    }
+
+    private TimeZoneInfo? _timeZone;
+
+    /// <summary>The device's time zone, so listed times show its UTC offset like stat does; null until props load or if unknown.</summary>
+    public TimeZoneInfo? TimeZone
+    {
+        get
+        {
+            if (_timeZone is null
+                && Props.GetValueOrDefault(AdbService.TIME_ZONE_PROP) is { Length: > 0 } id
+                && TimeZoneInfo.TryFindSystemTimeZoneById(id, out var zone))
+            {
+                _timeZone = zone;
+            }
+
+            return _timeZone;
         }
     }
 
@@ -375,6 +418,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
                 DeviceStatus.Ok => "{0}",
                 DeviceStatus.Offline => Strings.Resources.S_STATUS_OFFLINE,
                 DeviceStatus.Unauthorized => Strings.Resources.S_STATUS_UNAUTH,
+                DeviceStatus.Locked => Strings.Resources.S_STATUS_LOCKED,
                 _ => throw new NotSupportedException(),
             };
 
@@ -519,12 +563,24 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
     #region Commands
 
     public DeviceAction BrowseCommand { get; }
+    public DeviceAction OpenInExplorerCommand { get; }
     public DeviceAction RemoveCommand { get; }
     public DeviceAction ToggleRootCommand { get; }
     public DeviceAction SideloadCommand { get; }
     public DeviceAction EditNameCommand { get; }
     public DeviceAction ClearNameCommand { get; }
     public List<RebootCommand> RebootCommands { get; } = [];
+
+    /// <summary>Requeries the commands gated on <see cref="DeviceViewModel.Status"/>, which polling changes without any input.</summary>
+    internal void NotifyStatusCommands()
+    {
+        BrowseCommand?.NotifyIsEnabledChanged();
+        OpenInExplorerCommand?.NotifyIsEnabledChanged();
+        RemoveCommand?.NotifyIsEnabledChanged();
+        ToggleRootCommand?.NotifyIsEnabledChanged();
+        SideloadCommand?.NotifyIsEnabledChanged();
+        EditNameCommand?.NotifyIsEnabledChanged();
+    }
 
     #endregion
 
@@ -545,11 +601,16 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         BrowseCommand = new(() => device.Status is DeviceStatus.Ok && device.Type is not DeviceType.Sideload,
                             () => DeviceHelper.BrowseDeviceAction(this));
 
+        // The device's mount, at its root with a folder per drive
+        OpenInExplorerCommand = new(() => device.Status is DeviceStatus.Ok && device.Type is not (DeviceType.Sideload or DeviceType.Recovery),
+                                    () => DeviceMount.OpenInFileExplorer(this, ""),
+                                    Strings.Resources.S_MENU_OPEN_IN_WINDOWS_EXPLORER);
+
         RemoveCommand = DeviceHelper.RemoveDeviceCommand(this);
 
         ToggleRootCommand = DeviceHelper.ToggleRootDeviceCommand(this);
 
-        EditNameCommand = new(() => true, ToggleNameEdit);
+        EditNameCommand = new(() => device.Status is not DeviceStatus.Locked, ToggleNameEdit);
         ClearNameCommand = new(() => true, ClearCustomName);
 
         App.SafeInvoke(() =>

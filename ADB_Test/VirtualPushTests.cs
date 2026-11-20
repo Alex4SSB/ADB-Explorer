@@ -33,7 +33,10 @@ namespace ADB_Test;
 [DoNotParallelize]
 public class VirtualPushTests
 {
-    private const string RemoteDir = "/sdcard/adb-explorer-test-virtual";
+    // Pseudo-accented names, with an emoji, to cover non-ASCII names end to end
+    private static string N(string name) => TestNames.Pseudo(name);
+
+    private static readonly string RemoteDir = $"/sdcard/{N("adb-explorer-test-virtual")}";
 
     private static DeviceData? _device;
 
@@ -67,8 +70,8 @@ public class VirtualPushTests
         {
             RunSta(() =>
             {
-                using var folder = ShellItem.Open(Path.Combine(zip, "folder"));
-                using var file = ShellItem.Open(Path.Combine(zip, "top.bin"));
+                using var folder = ShellItem.Open(Path.Combine(zip, N("folder")));
+                using var file = ShellItem.Open(Path.Combine(zip, N("top.bin")));
                 List<SyncFile> items = [new(folder, includeContent: true), new(file)];
 
                 Assert.IsTrue(items.All(i => i.IsVirtual), "Zip members aren't on the file system");
@@ -79,7 +82,7 @@ public class VirtualPushTests
                 Run(op);
             });
 
-            AssertSameContent(device, Path.Combine(local, "content"), RemoteDir);
+            AssertSameContent(device, Path.Combine(local, N("content")), RemoteDir);
         }
         finally
         {
@@ -96,14 +99,14 @@ public class VirtualPushTests
         var zip = MakeZip(local);
 
         // The device already has the folder, with a different sub/a.bin
-        Shell(device, $"rm -rf {RemoteDir}; mkdir -p {RemoteDir}/folder/sub && echo different > {RemoteDir}/folder/sub/a.bin");
+        Shell(device, $"rm -rf {RemoteDir}; mkdir -p {RemoteDir}/{TestNames.PseudoPath("folder/sub")} && echo different > {RemoteDir}/{TestNames.PseudoPath("folder/sub/a.bin")}");
 
         try
         {
             IReadOnlyList<FileMergeHelper.ConflictComparisonInfo> conflicts = [];
             RunSta(() =>
             {
-                var candidate = new FileMergeHelper.ConflictCandidate(Path.Combine(zip, "folder"), "folder", true, null, null);
+                var candidate = new FileMergeHelper.ConflictCandidate(Path.Combine(zip, N("folder")), N("folder"), true, null, null);
                 var listing = FileMergeHelper.TryListAndroidDirByName(device.Serial, RemoteDir, StringComparer.InvariantCulture);
                 conflicts = FileMergeHelper.ExpandConflicts(
                     [candidate],
@@ -114,7 +117,7 @@ public class VirtualPushTests
                     StringComparer.InvariantCulture);
             });
 
-            CollectionAssert.AreEqual(new[] { "folder/sub/a.bin" }, conflicts.Select(c => c.Name).ToArray());
+            CollectionAssert.AreEqual(new[] { TestNames.PseudoPath("folder/sub/a.bin") }, conflicts.Select(c => c.Name).ToArray());
         }
         finally
         {
@@ -132,9 +135,9 @@ public class VirtualPushTests
         // dir\nested.bin comes before its folder, and orphan\file.bin has no folder entry at all
         Dictionary<string, byte[]> files = new()
         {
-            [@"dir\nested.bin"] = RandomNumberGenerator.GetBytes(700_001),
-            [@"top.bin"] = RandomNumberGenerator.GetBytes(3),
-            [@"orphan\file.bin"] = RandomNumberGenerator.GetBytes(65_536 * 3 + 5),
+            [TestNames.PseudoPath(@"dir\nested.bin", '\\')] = RandomNumberGenerator.GetBytes(700_001),
+            [N("top.bin")] = RandomNumberGenerator.GetBytes(3),
+            [TestNames.PseudoPath(@"orphan\file.bin", '\\')] = RandomNumberGenerator.GetBytes(65_536 * 3 + 5),
         };
 
         List<FileDescriptor> descriptors = [];
@@ -149,7 +152,7 @@ public class VirtualPushTests
             });
         }
 
-        descriptors.Add(new() { Name = "dir", IsDirectory = true });
+        descriptors.Add(new() { Name = N("dir"), IsDirectory = true });
 
         try
         {
@@ -159,7 +162,7 @@ public class VirtualPushTests
                 vfdo.SetFileDescriptors(descriptors);
 
                 var roots = CopyPasteService.GetContentTrees(vfdo, [.. descriptors]);
-                CollectionAssert.AreEquivalent(new[] { "dir", "top.bin", "orphan" }, roots.Select(r => r.FullName).ToArray());
+                CollectionAssert.AreEquivalent(new[] { N("dir"), N("top.bin"), N("orphan") }, roots.Select(r => r.FullName).ToArray());
 
                 var op = FileSyncOperation.SyncBatch(FileOperation.OperationType.Push, roots, new(RemoteDir, FileType.Folder), ViewModel(device), Dispatcher.CurrentDispatcher);
                 
@@ -175,7 +178,7 @@ public class VirtualPushTests
                 Assert.AreEqual(Convert.ToHexStringLower(SHA256.HashData(content)), Shell(device, $"sha256sum {remote}").Split(' ')[0], name);
             }
 
-            Assert.AreEqual(new DateTimeOffset(2021, 5, 6, 7, 8, 9, TimeSpan.Zero).ToUnixTimeSeconds().ToString(), Shell(device, $"stat -c %Y {RemoteDir}/top.bin"));
+            Assert.AreEqual(new DateTimeOffset(2021, 5, 6, 7, 8, 9, TimeSpan.Zero).ToUnixTimeSeconds().ToString(), Shell(device, $"stat -c %Y {RemoteDir}/{N("top.bin")}"));
         }
         finally
         {
@@ -191,13 +194,13 @@ public class VirtualPushTests
             var vfdo = new VirtualFileDataObject(DragDropEffects.Copy, VirtualFileDataObject.DataObjectMethod.Clipboard);
             FileDescriptor[] descriptors =
             [
-                new() { Name = @"..\escape.bin", Length = 1 },
-                new() { Name = "../escape.bin", Length = 1 },
-                new() { Name = "kept.bin", Length = 1 },
+                new() { Name = $@"..\{N("escape.bin")}", Length = 1 },
+                new() { Name = $"../{N("escape.bin")}", Length = 1 },
+                new() { Name = N("kept.bin"), Length = 1 },
             ];
 
             var first = CopyPasteService.GetContentTrees(vfdo, descriptors);
-            CollectionAssert.AreEqual(new[] { "kept.bin" }, first.Select(r => r.FullName).ToArray());
+            CollectionAssert.AreEqual(new[] { N("kept.bin") }, first.Select(r => r.FullName).ToArray());
 
             // Two pastes of the same names are registered side by side while their conflicts are checked
             var second = CopyPasteService.GetContentTrees(vfdo, descriptors);
@@ -222,13 +225,13 @@ public class VirtualPushTests
     /// <summary>A zip of folder/sub/a.bin, folder/b.bin and top.bin; the same files are left unzipped under content.</summary>
     private static string MakeZip(string local)
     {
-        var content = Path.Combine(local, "content");
-        Directory.CreateDirectory(Path.Combine(content, "folder", "sub"));
-        File.WriteAllBytes(Path.Combine(content, "folder", "sub", "a.bin"), RandomNumberGenerator.GetBytes(1_048_583));
-        File.WriteAllBytes(Path.Combine(content, "folder", "b.bin"), RandomNumberGenerator.GetBytes(4_099));
-        File.WriteAllBytes(Path.Combine(content, "top.bin"), RandomNumberGenerator.GetBytes(300_007));
+        var content = Path.Combine(local, N("content"));
+        Directory.CreateDirectory(Path.Combine(content, N("folder"), N("sub")));
+        File.WriteAllBytes(Path.Combine(content, N("folder"), N("sub"), N("a.bin")), RandomNumberGenerator.GetBytes(1_048_583));
+        File.WriteAllBytes(Path.Combine(content, N("folder"), N("b.bin")), RandomNumberGenerator.GetBytes(4_099));
+        File.WriteAllBytes(Path.Combine(content, N("top.bin")), RandomNumberGenerator.GetBytes(300_007));
 
-        var zip = Path.Combine(local, "archive.zip");
+        var zip = Path.Combine(local, N("archive.zip"));
         ZipFile.CreateFromDirectory(content, zip);
 
         return zip;

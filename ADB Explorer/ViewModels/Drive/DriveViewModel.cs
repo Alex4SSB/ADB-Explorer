@@ -10,6 +10,10 @@ public partial class DriveViewModel : AbstractDrive, IBrowserItem
     [ObservableProperty]
     public partial bool IsSelected { get; set; } = false;
 
+    /// <summary>A drag that may drop onto this drive is over its card.</summary>
+    [ObservableProperty]
+    public partial bool IsDragOver { get; set; }
+
     #endregion
 
     #region Read only properties

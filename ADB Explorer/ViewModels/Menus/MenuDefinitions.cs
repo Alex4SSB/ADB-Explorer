@@ -314,6 +314,9 @@ internal static class ExplorerContextMenu
             new BaseIcon(new OpenInNewTabIcon(), 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextOpenPackageLocation), AppActions.Icon(FileAction.FileActionType.FollowLink, 16)),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextOpenItemLocation), AppActions.Icon(FileAction.FileActionType.FollowLink, 16)),
+        new SubMenu(
+            AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextOpenInWindowsExplorer),
+            new BaseIcon(() => new System.Windows.Controls.Image { Source = FileIconProvider.GetEnterFolderIcon(32), Width = 16, Height = 16 }, 16)),
         new SubMenuSeparator(),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPull),
@@ -363,6 +366,9 @@ internal static class ExplorerContextMenu
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextFollowLink), AppActions.Icon(FileAction.FileActionType.FollowLink, 16)),
         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextCopyItemPath), AppActions.Icon(FileAction.FileActionType.CopyItemPath, 16)),
         new SubMenu(
+            AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextAddSavedLocation),
+            AppActions.Icon(FileAction.FileActionType.ContextAddSavedLocation, 16)),
+        new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextRemoveSavedLocation),
             AppActions.Icon(FileAction.FileActionType.ContextRemoveSavedLocation, 16)),
         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), AppActions.Icon(FileAction.FileActionType.UpdateModified, 16)),
@@ -394,6 +400,7 @@ internal static class DeviceContextMenu
         var items = new List<SubMenu>();
 
         AddEnabled(items, OpenInNewTabItem(device));
+        AddEnabled(items, OpenInWindowsExplorerItem(device));
         AddSeparator(items);
         AddEnabled(items, PushPackagesItem(device));
         AddSeparator(items);
@@ -439,6 +446,15 @@ internal static class DeviceContextMenu
                 () => DeviceHelper.OpenDeviceInNewTab(device),
                 Strings.Resources.S_OPEN_IN_NEW_TAB),
             new BaseIcon(new OpenInNewTabIcon(), 16));
+
+    private static SubMenu OpenInWindowsExplorerItem(LogicalDeviceViewModel device) =>
+        new(
+            new FileAction(
+                FileAction.FileActionType.None,
+                () => device.OpenInExplorerCommand.IsEnabled,
+                device.OpenInExplorerCommand.Execute,
+                device.OpenInExplorerCommand.Description),
+            new BaseIcon(() => new System.Windows.Controls.Image { Source = FileIconProvider.SmallEnterFolderIcon, Width = 16, Height = 16 }, 16));
 
     private static SubMenu PushPackagesItem(LogicalDeviceViewModel device) =>
         new(

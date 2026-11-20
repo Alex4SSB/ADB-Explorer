@@ -7,12 +7,16 @@ public partial class VirtualDriveViewModel : DriveViewModel
 
     public long? ItemsCount => Drive.ItemsCount;
 
+    /// <summary>The temp drive's installers are only counted with APK features on: without them, it has no count to show.</summary>
     public string ItemsCountText => Type switch
     {
+        AbstractDrive.DriveType.Temp when !Data.Settings.EnableApk => "",
         AbstractDrive.DriveType.Temp => Strings.Plurals.ApkInstallers(ItemsCount),
         AbstractDrive.DriveType.Package => Strings.Plurals.Packages(ItemsCount),
         _ => Strings.Plurals.ItemCount(ItemsCount),
     };
+
+    public void NotifyItemsCountText() => OnPropertyChanged(nameof(ItemsCountText));
 
     public string? DfMountPoint => Drive.MountPoint;
 

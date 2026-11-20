@@ -2,6 +2,11 @@ namespace ADB_Explorer.Services;
 
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.InteropServices.Marshalling;
+using Vanara.PInvoke;
+using static Vanara.PInvoke.Kernel32;
+using static Vanara.PInvoke.Ole32;
+using static Vanara.PInvoke.Shell32;
+using static Vanara.PInvoke.User32;
 
 #pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
 
@@ -18,21 +23,9 @@ public static partial class NativeMethods
         int GiveFeedback(uint dwEffect);
     }
 
-    [DllImport("Shell32.dll")]
-    private static extern HResult SHCreateStdEnumFmtEtc(uint cfmt, FORMATETC[] afmt, out IEnumFORMATETC ppenumFormatEtc);
-
-    public static HResult SHCreateStdEnumFmtEtc(int cfmt, IEnumerable<FORMATETC> afmt, out IEnumFORMATETC ppenumFormatEtc)
-        => SHCreateStdEnumFmtEtc((uint)cfmt, [.. afmt], out ppenumFormatEtc);
-
-    [return: MarshalAs(UnmanagedType.Interface)]
-    [DllImport("Ole32.dll", PreserveSig = false)]
-    private static extern IStream CreateStreamOnHGlobal(HANDLE hGlobal, [MarshalAs(UnmanagedType.Bool)] bool fDeleteOnRelease);
-
-    public static IStream MCreateStreamOnHGlobal(HANDLE hGlobal, bool fDeleteOnRelease)
-        => CreateStreamOnHGlobal(hGlobal, fDeleteOnRelease);
-
-    [DllImport("Ole32.dll", CharSet = CharSet.Auto, ExactSpelling = true, PreserveSig = false)]
-    private static extern HResult DoDragDrop(IDataObject dataObject, IDropSource dropSource, DragDropEffects allowedEffects, out DragDropEffects finalEffect);
+    // PreserveSig = false throws on failure; a return type would become an extra [out, retval] argument
+    [DllImport("Ole32.dll", ExactSpelling = true, PreserveSig = false)]
+    private static extern void DoDragDrop(IDataObject dataObject, IDropSource dropSource, DragDropEffects allowedEffects, out DragDropEffects finalEffect);
 
     public static DragDropEffects MDoDragDrop(IDataObject dataObject, IDropSource dropSource, DragDropEffects allowedEffects)
     {
@@ -41,24 +34,32 @@ public static partial class NativeMethods
         return finalEffect;
     }
 
-    [LibraryImport("Kernel32.dll")]
-    private static partial HANDLE GlobalLock(HANDLE hMem);
+    /// <summary>
+    /// CFSTR_DROPDESCRIPTION, written to the source data object by a shell drop target.
+    /// </summary>
+    public record DropDescription(DROPIMAGETYPE Type, string Message, string Insert)
+    {
+        /// <summary>True when the target describes the drop, rather than clearing its description.</summary>
+        public bool IsValid => Type is not DROPIMAGETYPE.DROPIMAGE_INVALID && !string.IsNullOrEmpty(Message);
 
-    public static HANDLE MGlobalLock(HANDLE hMem)
-        => GlobalLock(hMem);
+        public static DropDescription? FromBytes(byte[] bytes)
+        {
+            // DWORD type, then two WCHAR[MAX_PATH] strings
+            if (bytes.Length < sizeof(int) + MAX_PATH * 2 * 2)
+                return null;
 
-    [return: MarshalAs(UnmanagedType.Bool)]
-    [LibraryImport("Kernel32.dll")]
-    private static partial bool GlobalUnlock(HANDLE hMem);
+            static string ReadString(byte[] bytes, int offset)
+            {
+                var text = Encoding.Unicode.GetString(bytes, offset, MAX_PATH * 2);
+                var end = text.IndexOf('\0');
+                return end < 0 ? text : text[..end];
+            }
 
-    public static void MGlobalUnlock(HANDLE hMem)
-        => GlobalUnlock(hMem);
-
-    [LibraryImport("Kernel32.dll")]
-    private static partial HANDLE GlobalSize(HANDLE handle);
-
-    public static HANDLE MGlobalSize(HANDLE handle)
-        => GlobalSize(handle);
+            return new((DROPIMAGETYPE)BitConverter.ToInt32(bytes, 0),
+                       ReadString(bytes, sizeof(int)),
+                       ReadString(bytes, sizeof(int) + MAX_PATH * 2));
+        }
+    }
 
     public interface IByteStruct
     {
@@ -155,15 +156,6 @@ public static partial class NativeMethods
         }
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct DROPFILES
-    {
-        public uint pFiles; // Offset to the file list
-        public POINT pt;    // Drop point (usually (0, 0))
-        public bool fNC;    // Non-client area flag (usually FALSE)
-        public bool fWide;  // Unicode flag (usually TRUE)
-    }
-
     /// <summary>
     /// IStream with its buffers as pointers, so a stream we serve doesn't get a managed array
     /// allocated and copied for every Read the shell makes.
@@ -173,24 +165,21 @@ public static partial class NativeMethods
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface IPointerStream
     {
-        [PreserveSig] HResult Read(HANDLE pv, int cb, HANDLE pcbRead);
-        [PreserveSig] HResult Write(HANDLE pv, int cb, HANDLE pcbWritten);
-        [PreserveSig] HResult Seek(long dlibMove, SeekOrigin dwOrigin, HANDLE plibNewPosition);
-        [PreserveSig] HResult SetSize(long libNewSize);
-        [PreserveSig] HResult CopyTo(HANDLE pstm, long cb, HANDLE pcbRead, HANDLE pcbWritten);
-        [PreserveSig] HResult Commit(int grfCommitFlags);
-        [PreserveSig] HResult Revert();
-        [PreserveSig] HResult LockRegion(long libOffset, long cb, int dwLockType);
-        [PreserveSig] HResult UnlockRegion(long libOffset, long cb, int dwLockType);
-        [PreserveSig] HResult Stat(out STATSTG pstatstg, int grfStatFlag);
-        [PreserveSig] HResult Clone(out HANDLE ppstm);
+        [PreserveSig] HRESULT Read(IntPtr pv, int cb, IntPtr pcbRead);
+        [PreserveSig] HRESULT Write(IntPtr pv, int cb, IntPtr pcbWritten);
+        [PreserveSig] HRESULT Seek(long dlibMove, SeekOrigin dwOrigin, IntPtr plibNewPosition);
+        [PreserveSig] HRESULT SetSize(long libNewSize);
+        [PreserveSig] HRESULT CopyTo(IntPtr pstm, long cb, IntPtr pcbRead, IntPtr pcbWritten);
+        [PreserveSig] HRESULT Commit(int grfCommitFlags);
+        [PreserveSig] HRESULT Revert();
+        [PreserveSig] HRESULT LockRegion(long libOffset, long cb, int dwLockType);
+        [PreserveSig] HRESULT UnlockRegion(long libOffset, long cb, int dwLockType);
+        [PreserveSig] HRESULT Stat(out STATSTG pstatstg, int grfStatFlag);
+        [PreserveSig] HRESULT Clone(out IntPtr ppstm);
     }
 
     [DllImport("Shell32.dll", CharSet = CharSet.Unicode)]
     private static extern uint DragQueryFile(HANDLE hDrop, uint iFile, StringBuilder? lpszFile, uint cch);
-
-    [DllImport("Ole32.dll")]
-    private static extern void ReleaseStgMedium(ref STGMEDIUM pmedium);
 
     /// <summary>
     /// A stream over a copy of <paramref name="medium"/>'s memory, which is then released.
@@ -213,10 +202,10 @@ public static partial class NativeMethods
         }
         finally
         {
-            ReleaseStgMedium(ref medium);
+            ReleaseStgMedium(medium);
         }
 
-        var stream = CreateStreamOnHGlobal(0, true);
+        CreateStreamOnHGlobal(IntPtr.Zero, true, out var stream).ThrowIfFailed();
         stream.Write(content, content.Length, 0);
         stream.Seek(0, 0, 0);
 
@@ -250,16 +239,9 @@ public static partial class NativeMethods
         }
         finally
         {
-            ReleaseStgMedium(ref medium);
+            ReleaseStgMedium(medium);
         }
     }
-
-    [DllImport("Ole32.dll", PreserveSig = false)]
-    private static extern HANDLE CoMarshalInterThreadInterfaceInStream(in Guid riid, [MarshalAs(UnmanagedType.Interface)] object pUnk);
-
-    [DllImport("Ole32.dll", PreserveSig = false)]
-    [return: MarshalAs(UnmanagedType.Interface)]
-    private static extern object CoGetInterfaceAndReleaseStream(HANDLE pStm, in Guid iid);
 
     /// <summary>
     /// Hands a COM object to another thread: <paramref name="dataObject"/> is marshaled here, and the returned
@@ -268,22 +250,15 @@ public static partial class NativeMethods
     public static Func<IDataObject> MarshalToThread(IDataObject dataObject)
     {
         var iid = typeof(IDataObject).GUID;
-        var stream = CoMarshalInterThreadInterfaceInStream(iid, dataObject);
+        CoMarshalInterThreadInterfaceInStream(iid, dataObject, out var stream).ThrowIfFailed();
 
-        return () => (IDataObject)CoGetInterfaceAndReleaseStream(stream, iid);
+        return () =>
+        {
+            CoGetInterfaceAndReleaseStream(stream, iid, out var unmarshaled).ThrowIfFailed();
+
+            return (IDataObject)unmarshaled;
+        };
     }
-
-    [LibraryImport("User32.dll")]
-    private static partial HANDLE GetForegroundWindow();
-
-    [LibraryImport("User32.dll")]
-    private static partial uint GetWindowThreadProcessId(HANDLE hWnd, out uint lpdwProcessId);
-
-    [LibraryImport("User32.dll")]
-    private static partial void keybd_event(byte bVk, byte bScan, uint dwFlags, HANDLE dwExtraInfo);
-
-    private const byte VK_ESCAPE = 0x1B;
-    private const uint KEYEVENTF_KEYUP = 0x2;
 
     /// <summary>
     /// Presses Esc for the app in the foreground, the source of an external drag, whose drag loop takes it as a cancel.
@@ -295,20 +270,20 @@ public static partial class NativeMethods
         if (processId == Environment.ProcessId)
             return;
 
-        keybd_event(VK_ESCAPE, 0, 0, IntPtr.Zero);
-        keybd_event(VK_ESCAPE, 0, KEYEVENTF_KEYUP, IntPtr.Zero);
+        keybd_event(VK.VK_ESCAPE, 0, 0);
+        keybd_event(VK.VK_ESCAPE, 0, KEYEVENTF.KEYEVENTF_KEYUP);
     }
 
     public static unsafe void SaveComStreamToFile(IStream source, string filePath)
     {
         // Read, not IStream.CopyTo, which some sources don't implement (Firefox)
-        using var file = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
+        using var file = new FileStream(filePath, FileMode.Create, System.IO.FileAccess.Write, FileShare.None);
         var buffer = new byte[81920];
         int read;
         do
         {
             read = 0;
-            source.Read(buffer, buffer.Length, (HANDLE)(&read));
+            source.Read(buffer, buffer.Length, (IntPtr)(&read));
             file.Write(buffer, 0, read);
         }
         while (read > 0);

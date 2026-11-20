@@ -49,6 +49,7 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <Grid
                                     Width="16"
@@ -58,6 +59,9 @@
                                         <Style TargetType="Grid">
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding CutState}" Value="Move">
+                                                    <Setter Property="Opacity" Value="0.5" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Device.Status}" Value="Locked">
                                                     <Setter Property="Opacity" Value="0.5" />
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -115,10 +119,18 @@
                                                 <DataTrigger Binding="{Binding CutState}" Value="Copy">
                                                     <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
                                                 </DataTrigger>
+                                                <DataTrigger Binding="{Binding Device.Status}" Value="Locked">
+                                                    <Setter Property="Opacity" Value="0.5" />
+                                                </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </emoji:TextBlock.Style>
                                 </emoji:TextBlock>
+                                <!--  Device nodes only; non-device nodes have no Device, so the badge stays collapsed  -->
+                                <Grid Grid.Column="2" DataContext="{Binding Device}">
+                                    <controls:FluentPathIcon Margin="6,0,0,0" Style="{StaticResource DeviceStatusPathIcon}" />
+                                    <controls:PhoneLockIcon Margin="6,0,0,0" Style="{StaticResource DeviceLockedIconStyle}" />
+                                </Grid>
                                 <ui:TextBox
                                     Grid.Column="1"
                                     MinWidth="80"
@@ -263,6 +275,10 @@
                                             </Trigger>
                                             <DataTrigger Binding="{Binding CanExpand}" Value="True">
                                                 <Setter TargetName="Expander" Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                            <!--  A locked device can't be opened  -->
+                                            <DataTrigger Binding="{Binding Device.Status}" Value="Locked">
+                                                <Setter TargetName="PART_Header" Property="Cursor" Value="Arrow" />
                                             </DataTrigger>
                                             <!--  Expanding an unlisted folder lists it on the device first  -->
                                             <DataTrigger Binding="{Binding ChildrenLoading}" Value="True">

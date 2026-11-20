@@ -169,7 +169,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Recycle.
+        ///   Looks up a localized string similar to Move to trash.
         /// </summary>
         public static string S_ACTION_RECYCLE {
             get {
@@ -2000,7 +2000,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_FOLDER_CONTENT_VALUE", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to This folder is empty..
         /// </summary>
@@ -2450,6 +2450,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Open in Windows Explorer.
+        /// </summary>
+        public static string S_MENU_OPEN_IN_WINDOWS_EXPLORER {
+            get {
+                return ResourceManager.GetString("S_MENU_OPEN_IN_WINDOWS_EXPLORER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open Item Location.
         /// </summary>
         public static string S_MENU_OPEN_LOCATION {
@@ -2503,6 +2512,15 @@ namespace ADB_Explorer.Strings {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Add to saved locations.
+        /// </summary>
+        public static string S_MENU_ADD_SAVED_LOCATION {
+            get {
+                return ResourceManager.GetString("S_MENU_ADD_SAVED_LOCATION", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Remove from saved locations.
         /// </summary>
@@ -2647,6 +2665,42 @@ namespace ADB_Explorer.Strings {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Couldn&apos;t show the device in File Explorer.
+        /// </summary>
+        public static string S_MOUNT_FAILED_TITLE {
+            get {
+                return ResourceManager.GetString("S_MOUNT_FAILED_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Opening in Windows Explorer….
+        /// </summary>
+        public static string S_MOUNT_OPENING {
+            get {
+                return ResourceManager.GetString("S_MOUNT_OPENING", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Open {0} in Windows Explorer.
+        /// </summary>
+        public static string S_DRAG_OPEN_MOUNT {
+            get {
+                return ResourceManager.GetString("S_DRAG_OPEN_MOUNT", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Open {0} in a new tab.
+        /// </summary>
+        public static string S_DRAG_OPEN_MOUNT_TAB {
+            get {
+                return ResourceManager.GetString("S_DRAG_OPEN_MOUNT_TAB", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Mount options.
         /// </summary>
@@ -3054,6 +3108,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Some of the copied files will be renamed in this location.
+        /// </summary>
+        public static string S_POPUP_COPIED_RENAMED {
+            get {
+                return ResourceManager.GetString("S_POPUP_COPIED_RENAMED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A copied file violates user space naming rules.
         /// </summary>
         public static string S_POPUP_COPIED_RESTRICTED_NAMING {
@@ -3122,6 +3185,15 @@ namespace ADB_Explorer.Strings {
         public static string S_POPUP_SELECTED_DRIVE_ROOT {
             get {
                 return ResourceManager.GetString("S_POPUP_SELECTED_DRIVE_ROOT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Some of the selected files might be renamed in the target location.
+        /// </summary>
+        public static string S_POPUP_SELECTED_RENAMED {
+            get {
+                return ResourceManager.GetString("S_POPUP_SELECTED_RENAMED", resourceCulture);
             }
         }
         
@@ -4237,6 +4309,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Substitute characters that are not allowed in file names.
+        /// </summary>
+        public static string S_SETTINGS_SUBSTITUTE_NAMES {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_SUBSTITUTE_NAMES", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Show System Apps.
         /// </summary>
         public static string S_SETTINGS_SYSTEM_APPS {
@@ -4497,6 +4578,15 @@ namespace ADB_Explorer.Strings {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to {0} - Locked. Unlock the device to access it.
+        /// </summary>
+        public static string S_STATUS_LOCKED {
+            get {
+                return ResourceManager.GetString("S_STATUS_LOCKED", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to {0} - Offline.
         /// </summary>

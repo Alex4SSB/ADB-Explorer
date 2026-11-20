@@ -1,25 +1,19 @@
 ﻿namespace ADB_Explorer.Services;
 
+using Vanara.PInvoke;
+using static Vanara.PInvoke.Kernel32;
+using static Vanara.PInvoke.User32;
+
 public static partial class NativeMethods
 {
     public sealed partial class InterceptMouse : IDisposable
     {
         // https://learn.microsoft.com/en-us/archive/blogs/toub/low-level-mouse-hook-in-c
 
-        [StructLayout(LayoutKind.Sequential)]
-        private struct MSLLHOOKSTRUCT
-        {
-            public POINT pt;
-            public uint mouseData;
-            public uint flags;
-            public uint time;
-            public HANDLE dwExtraInfo;
-        }
-
-        private static readonly LowLevelMouseProc _mouseProc = HookCallback;
-        private static readonly LowLevelKeyboardProc _keyboardProc = KeyboardHookCallback;
-        private static HANDLE _mouseHookID = IntPtr.Zero;
-        private static HANDLE _keyboardHookID = IntPtr.Zero;
+        private static readonly HookProc _mouseProc = HookCallback;
+        private static readonly HookProc _keyboardProc = KeyboardHookCallback;
+        private static SafeHHOOK? _mouseHook;
+        private static SafeHHOOK? _keyboardHook;
         private static bool _isHooked;
         private static Action<POINT>? _mouseMoveAction;
         private static Action? _rButtonAction;
@@ -27,18 +21,12 @@ public static partial class NativeMethods
         private static Action? _escapeAction;
         public static POINT MousePosition { get; private set; }
 
-        public static HANDLE WindowUnderMouse { get; private set; }
+        public static HWND WindowUnderMouse { get; private set; }
 
-        private delegate HANDLE LowLevelMouseProc(int nCode, MouseMessages wParam, HANDLE lParam);
-
-        private delegate HANDLE LowLevelKeyboardProc(int nCode, HANDLE wParam, HANDLE lParam);
-
-        private const int WM_KEYDOWN = 0x0100;
-        private const int VK_ESCAPE = 0x1B;
 
         /// <summary>
         /// Installs the low-level mouse hook. The hook is only needed while a drag is in progress,
-        /// since a system-wide <see cref="WinHooks.WH_MOUSE_LL"/> hook adds latency to every mouse
+        /// since a system-wide <see cref="HookType.WH_MOUSE_LL"/> hook adds latency to every mouse
         /// message and causes stutter while the UI thread is busy. Safe to call repeatedly.
         /// <paramref name="escapeAction"/> adds a keyboard hook, for an Esc pressed while another app has the focus.
         /// </summary>
@@ -52,9 +40,9 @@ public static partial class NativeMethods
             if (_isHooked)
                 return;
 
-            _mouseHookID = SetHook(WinHooks.WH_MOUSE_LL, Marshal.GetFunctionPointerForDelegate(_mouseProc));
+            _mouseHook = SetHook(HookType.WH_MOUSE_LL, _mouseProc);
             if (escapeAction is not null)
-                _keyboardHookID = SetHook(WinHooks.WH_KEYBOARD_LL, Marshal.GetFunctionPointerForDelegate(_keyboardProc));
+                _keyboardHook = SetHook(HookType.WH_KEYBOARD_LL, _keyboardProc);
 
             _isHooked = true;
         }
@@ -64,14 +52,11 @@ public static partial class NativeMethods
             if (!_isHooked)
                 return;
 
-            UnhookWindowsHookEx(_mouseHookID);
-            _mouseHookID = IntPtr.Zero;
-
-            if (_keyboardHookID != IntPtr.Zero)
-            {
-                UnhookWindowsHookEx(_keyboardHookID);
-                _keyboardHookID = IntPtr.Zero;
-            }
+            // Disposing a SafeHHOOK unhooks it
+            _mouseHook?.Dispose();
+            _mouseHook = null;
+            _keyboardHook?.Dispose();
+            _keyboardHook = null;
 
             _isHooked = false;
         }
@@ -90,40 +75,47 @@ public static partial class NativeMethods
 
         public void Dispose() => Close();
 
-        private static HANDLE SetHook(WinHooks hook, HANDLE proc)
+        private static SafeHHOOK SetHook(HookType hook, HookProc proc)
         {
             using Process curProcess = Process.GetCurrentProcess();
             using ProcessModule curModule = curProcess.MainModule;
+            var module = GetModuleHandle(curModule.ModuleName);
+            var safeHook = SetWindowsHookEx(hook, proc, module);
 
-            return SetWindowsHookEx(hook, proc, GetModuleHandle(curModule.ModuleName), 0);
+            // GetModuleHandle doesn't add a reference, so the module must not be freed with it
+            module.SetHandleAsInvalid();
+
+            return safeHook;
         }
 
-        private static HANDLE KeyboardHookCallback(int nCode, HANDLE wParam, HANDLE lParam)
+        // CallNextHookEx ignores its hook handle
+        private static IntPtr KeyboardHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
             // KBDLLHOOKSTRUCT starts with the virtual key code
-            if (nCode >= 0 && wParam == WM_KEYDOWN && Marshal.ReadInt32(lParam) == VK_ESCAPE)
+            if (nCode >= 0 && (WindowMessage)wParam is WindowMessage.WM_KEYDOWN && (VK)Marshal.ReadInt32(lParam) is VK.VK_ESCAPE)
                 _escapeAction?.Invoke();
 
-            return CallNextHookEx(_keyboardHookID, nCode, wParam, lParam);
+            return CallNextHookEx(HHOOK.NULL, nCode, wParam, lParam);
         }
 
-        private static HANDLE HookCallback(int nCode, MouseMessages wParam, HANDLE lParam)
+        private static IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
+            var message = (WindowMessage)wParam;
             if (nCode < 0
-                || wParam is not MouseMessages.WM_MOUSEMOVE
-                    and not MouseMessages.WM_RBUTTONDOWN
-                    and not MouseMessages.WM_MOUSEWHEEL)
+                || message is not WindowMessage.WM_MOUSEMOVE
+                    and not WindowMessage.WM_RBUTTONDOWN
+                    and not WindowMessage.WM_MOUSEWHEEL)
             {
-                return CallNextHookEx(_mouseHookID, nCode, (HANDLE)wParam, lParam);
+                return CallNextHookEx(HHOOK.NULL, nCode, wParam, lParam);
             }
 
             var hookStruct = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
 
-            if (wParam is MouseMessages.WM_RBUTTONDOWN)
+            if (message is WindowMessage.WM_RBUTTONDOWN)
             {
                 _rButtonAction?.Invoke();
             }
-            else if (wParam is MouseMessages.WM_MOUSEWHEEL)
+            else if (message is WindowMessage.WM_MOUSEWHEEL)
             {
                 _mouseWheelAction?.Invoke((short)(hookStruct.mouseData >> 16));
             }
@@ -139,38 +131,13 @@ public static partial class NativeMethods
                 }
             }
 
-            return CallNextHookEx(_mouseHookID, nCode, (HANDLE)wParam, lParam);
+            return CallNextHookEx(HHOOK.NULL, nCode, wParam, lParam);
         }
 
-        public static HANDLE GetWindowUnderMouse()
+        public static HWND GetWindowUnderMouse()
         {
-            WindowUnderMouse = GetAncestor(WindowFromPoint(MousePosition), GaFlags.GA_ROOT);
+            WindowUnderMouse = GetAncestor(WindowFromPoint(MousePosition), GetAncestorFlag.GA_ROOT);
             return WindowUnderMouse;
         }
-
-        [LibraryImport("User32.dll", EntryPoint = "SetWindowsHookExW", SetLastError = true)]
-        private static partial HANDLE SetWindowsHookEx(WinHooks idHook,
-            HANDLE lpfn, HANDLE hMod, uint dwThreadId);
-
-        [LibraryImport("User32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static partial bool UnhookWindowsHookEx(HANDLE hhk);
-
-        [LibraryImport("User32.dll", SetLastError = true)]
-        private static partial HANDLE CallNextHookEx(HANDLE hhk, int nCode,
-            HANDLE wParam, HANDLE lParam);
-
-        [LibraryImport("Kernel32.dll", EntryPoint = "GetModuleHandleW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
-        private static partial HANDLE GetModuleHandle(string lpModuleName);
-
-        [LibraryImport("User32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static partial bool GetCursorPos(out POINT lpPoint);
-
-        [LibraryImport("User32.dll")]
-        private static partial HANDLE WindowFromPoint(POINT Point);
-
-        [LibraryImport("User32.dll")]
-        private static partial HANDLE GetAncestor(HANDLE hwnd, GaFlags gaFlags);
     }
 }

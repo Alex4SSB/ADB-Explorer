@@ -19,6 +19,7 @@ public enum DeviceStatus
     Ok, // online \ does not require attention
     Offline,
     Unauthorized,
+    Locked, // online, but user storage is encrypted until the first unlock since boot
 }
 
 public enum RootStatus

@@ -118,14 +118,21 @@ public class FileTransferOperation : AbstractSyncFileOperation
         Task.Run(() => RunTransfer(token));
     }
 
+    private bool _restrictedTarget;
+
+    private string TargetRelativePath(string relativePath) => FileHelper.DeviceTargetRelativePath(relativePath, _restrictedTarget);
+
     private void RunTransfer(CancellationToken token)
     {
         try
         {
             TransferStart = DateTime.Now;
 
+            // Names the target refuses get lookalikes there, when names are substituted
+            _restrictedTarget = DriveHelper.GetRestrictions(TargetPath.FullPath, TargetDevice).RestrictedNaming;
+
             var folders = FolderHelper.GetBottomMostFolders(Files)
-                .Select(f => FileHelper.ConcatPaths(TargetPath.FullPath, FileHelper.ExtractRelativePath(f.FullPath, FilePath.FullPath, false)));
+                .Select(f => FileHelper.ConcatPaths(TargetPath.FullPath, TargetRelativePath(FileHelper.ExtractRelativePath(f.FullPath, FilePath.FullPath, false))));
 
             if (folders.Any())
                 ShellFileOperation.MakeDirs(TargetDevice!, folders).GetAwaiter().GetResult();
@@ -186,7 +193,7 @@ public class FileTransferOperation : AbstractSyncFileOperation
         _progress[item.FullPath] = progress;
 
         var targetPath = FilePath.IsDirectory
-            ? FileHelper.ConcatPaths(TargetPath, FileHelper.ExtractRelativePath(item.FullPath, FilePath.FullPath))
+            ? FileHelper.ConcatPaths(TargetPath, TargetRelativePath(FileHelper.ExtractRelativePath(item.FullPath, FilePath.FullPath)))
             : TargetPath.FullPath;
 
         Interlocked.Increment(ref _activeFiles);

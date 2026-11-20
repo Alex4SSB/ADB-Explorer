@@ -399,11 +399,15 @@ internal static partial class FileActionLogic
         {
             ActionFlags.IsPastingIllegalNaming = Data.CopyPaste.IsSelf
                 && DriveHelper.GetRestrictions(files[0]).RestrictedNaming;
+            ActionFlags.IsPastingRenamed = false;
             return;
         }
 
-        ActionFlags.IsPastingIllegalNaming = restrictions.RestrictedNaming
+        // With names substituted, names the target refuses only rename the copies there
+        var illegalNaming = restrictions.RestrictedNaming
             && !FileHelper.FileNameLegal(files.Select(FileHelper.GetFullName), FileHelper.RenameTarget.RestrictedNaming);
+        ActionFlags.IsPastingIllegalNaming = illegalNaming && !FileHelper.SubstitutesIllegalNames;
+        ActionFlags.IsPastingRenamed = illegalNaming && FileHelper.SubstitutesIllegalNames;
 
         ActionFlags.IsPastingConflictingNames = restrictions.CaseInsensitiveNames
             && files.Distinct(StringComparer.InvariantCultureIgnoreCase).Count() != files.Length;

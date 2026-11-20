@@ -159,10 +159,14 @@ public partial class CopyPasteService
         public Dictionary<string, FileStat>? AndroidListing { get; init; }
         public bool AndroidListingFailed { get; init; }
 
+        /// <summary>A device target with restricted naming, where names it refuses may arrive with lookalikes.</summary>
+        public bool RestrictedNaming { get; init; }
+
         public static MergeTarget Create(string targetPath, LogicalDeviceViewModel? device)
         {
             var sep = FileHelper.GetSeparator(targetPath);
-            var caseSensitive = sep is '/' && DriveHelper.GetRestrictions(targetPath, device).CaseInsensitiveNames is not true;
+            var restrictions = DriveHelper.GetRestrictions(targetPath, device);
+            var caseSensitive = sep is '/' && restrictions.CaseInsensitiveNames is not true;
             StringComparer comparer = caseSensitive
                 ? StringComparer.InvariantCulture
                 : StringComparer.InvariantCultureIgnoreCase;
@@ -179,12 +183,14 @@ public partial class CopyPasteService
                 Comparer = comparer,
                 AndroidListing = androidListing,
                 AndroidListingFailed = listAndroid && androidListing is null,
+                RestrictedNaming = sep is '/' && restrictions.RestrictedNaming,
             };
         }
 
+        /// <summary>What exists at the target under the name the item would get there.</summary>
         public FileMergeHelper.DestEntry GetDest(string name) => Separator is '/'
-            ? FileMergeHelper.GetAndroidDestEntry(Path, name, AndroidListing)
-            : FileMergeHelper.GetWindowsDestEntry(Path, name);
+            ? FileMergeHelper.GetAndroidDestEntry(Path, FileHelper.DeviceTargetName(name, RestrictedNaming), AndroidListing)
+            : FileMergeHelper.GetWindowsDestEntry(Path, FileHelper.WindowsTargetName(name));
     }
 
     /// <summary>Finds candidates that collide with the target and prompts for a resolution; null when nothing collides.</summary>

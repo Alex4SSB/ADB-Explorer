@@ -33,8 +33,11 @@ namespace ADB_Test;
 [DoNotParallelize]
 public partial class ShellStreamTests
 {
-    private const string RemoteParent = "/sdcard/adb-explorer-test-shell";
-    private const string RemoteRoot = $"{RemoteParent}/folder";
+    // Pseudo-accented names, with an emoji, to cover non-ASCII names end to end
+    private static string N(string name) => TestNames.Pseudo(name);
+
+    private static readonly string RemoteParent = $"/sdcard/{N("adb-explorer-test-shell")}";
+    private static readonly string RemoteRoot = $"{RemoteParent}/{N("folder")}";
 
     private static DeviceData? _device;
 
@@ -47,8 +50,10 @@ public partial class ShellStreamTests
 
         try
         {
+            // ADB_EXPLORER_TEST_DEVICE picks one of several connected devices by serial
+            var serial = Environment.GetEnvironmentVariable("ADB_EXPLORER_TEST_DEVICE");
             _device = new AdbClient().GetDevices()
-                .FirstOrDefault(d => d.State is DeviceState.Online && !d.Serial.Contains("._adb-tls-"));
+                .FirstOrDefault(d => d.State is DeviceState.Online && !d.Serial.Contains("._adb-tls-") && (serial is null || d.Serial == serial));
         }
         catch
         {
@@ -63,11 +68,13 @@ public partial class ShellStreamTests
             Assert.Inconclusive("An online adb device is required.");
 
         var device = _device!;
-        Shell(device, $"rm -rf {RemoteParent}; mkdir -p {RemoteRoot}/sub/deeper && cd {RemoteRoot} "
-            + "&& head -c 41943049 /dev/urandom > big.bin "
-            + "&& for i in 1 2 3 4 5 6 7 8 9 10 11 12; do head -c $((i*7919)) /dev/urandom > sub/s$i.bin; done "
-            + "&& echo hello > sub/deeper/tiny.txt && : > sub/deeper/empty.bin "
-            + $"&& head -c 123457 /dev/urandom > {RemoteParent}/loose.bin");
+        var sub = N("sub");
+        var deeper = N("deeper");
+        Shell(device, $"rm -rf {RemoteParent}; mkdir -p {RemoteRoot}/{sub}/{deeper} && cd {RemoteRoot} "
+            + $"&& head -c 41943049 /dev/urandom > {N("big.bin")} "
+            + $"&& for i in 1 2 3 4 5 6 7 8 9 10 11 12; do head -c $((i*7919)) /dev/urandom > {sub}/{TestNames.Accent("s")}$i{TestNames.EMOJI}.bin; done "
+            + $"&& echo hello > {sub}/{deeper}/{N("tiny.txt")} && : > {sub}/{deeper}/{N("empty.bin")} "
+            + $"&& head -c 123457 /dev/urandom > {RemoteParent}/{N("loose.bin")}");
 
         // The second copy is like pasting the clipboard again, after the op is over
         string[] localRoots = [.. Enumerable.Range(0, 2).Select(_ => Path.Combine(Path.GetTempPath(), $"adb-explorer-test-shell-{Guid.NewGuid():N}"))];
@@ -83,7 +90,7 @@ public partial class ShellStreamTests
             Assert.IsEmpty(op.FailedFiles);
             Assert.IsFalse(op.ValidationAllowed, "There are no files of ours to validate");
 
-            var deviceHashes = Shell(device, $"cd {RemoteParent} && find folder loose.bin -type f | xargs sha256sum")
+            var deviceHashes = Shell(device, $"cd {RemoteParent} && find {N("folder")} {N("loose.bin")} -type f | xargs sha256sum")
                 .Split('\n', StringSplitOptions.RemoveEmptyEntries)
                 .Select(line => line.Split("  "))
                 .ToDictionary(parts => parts[1].Trim(), parts => parts[0]);
@@ -118,11 +125,11 @@ public partial class ShellStreamTests
         var tree = FileHelper.GetFolderTree([RemoteRoot], deviceId: device.Serial);
         FolderTree[] folderItems = [new(RemoteRoot, null, null), .. tree];
 
-        var loosePath = $"{RemoteParent}/loose.bin";
+        var loosePath = $"{RemoteParent}/{N("loose.bin")}";
         FolderTree loose = new(loosePath, long.Parse(Shell(device, $"stat -c %s {loosePath}")), null);
 
-        var folderClass = new FileClass("folder", RemoteRoot, FileType.Folder);
-        var looseClass = new FileClass("loose.bin", loosePath, FileType.File, size: loose.Size);
+        var folderClass = new FileClass(N("folder"), RemoteRoot, FileType.Folder);
+        var looseClass = new FileClass(N("loose.bin"), loosePath, FileType.File, size: loose.Size);
         List<FileClass.ShellPullItem> pullItems =
         [
             new(folderClass, new SyncFile(folderClass, tree), [.. folderItems.Where(i => !i.IsFolder).Select(i => i.Name)], null, null, null),
@@ -169,6 +176,14 @@ public partial class ShellStreamTests
                 Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, () => frame.Continue = false);
                 Dispatcher.PushFrame(frame);
                 Thread.Sleep(50);
+            }
+
+            if (!IsCopied(localRoot))
+            {
+                var present = Directory.EnumerateFiles(localRoot, "*", SearchOption.AllDirectories)
+                    .Select(f => $"{Path.GetRelativePath(localRoot, f)} ({new FileInfo(f).Length})");
+                File.AppendAllText(Path.Combine(Path.GetTempPath(), "adb-explorer-shell-copy-diag.txt"),
+                    $"Copy to {localRoot} timed out, op {op.Status}: {string.Join(", ", present)}\n");
             }
         }
 

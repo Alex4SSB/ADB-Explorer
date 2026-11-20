@@ -5,6 +5,7 @@
 using System.Runtime.InteropServices.ComTypes;
 using Vanara.Extensions;
 using static ADB_Explorer.Services.FileDescriptor;
+using static Vanara.PInvoke.Kernel32;
 using static Vanara.PInvoke.Shell32;
 
 namespace ADB_Explorer.Services;
@@ -22,6 +23,12 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     /// In-order list of registered data objects.
     /// </summary>
     private readonly List<DataObject> _dataObjects = [];
+
+    /// <summary>
+    /// Guards <see cref="_dataObjects"/>: targets read it on COM threads while we fill it in on the UI thread
+    /// (e.g. the descriptors, which are prepared once the drag has begun).
+    /// </summary>
+    private readonly Lock _dataLock = new();
 
     /// <summary>
     /// Tracks whether an asynchronous operation is ongoing.
@@ -49,7 +56,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     /// <returns>HRESULT success code.</returns>
     int System.Runtime.InteropServices.ComTypes.IDataObject.DAdvise(ref FORMATETC pFormatetc, ADVF advf, IAdviseSink adviseSink, out int connection)
     {
-        NativeMethods.ThrowExceptionForHR(NativeMethods.HResult.OLE_E_ADVISENOTSUPPORTED);
+        Marshal.ThrowExceptionForHR(HRESULT.OLE_E_ADVISENOTSUPPORTED);
         throw new NotImplementedException();
     }
 
@@ -59,7 +66,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     /// <param name="connection">A DWORD token that specifies the connection to remove.</param>
     void System.Runtime.InteropServices.ComTypes.IDataObject.DUnadvise(int connection)
     {
-        NativeMethods.ThrowExceptionForHR(NativeMethods.HResult.OLE_E_ADVISENOTSUPPORTED);
+        Marshal.ThrowExceptionForHR(HRESULT.OLE_E_ADVISENOTSUPPORTED);
         throw new NotImplementedException();
     }
 
@@ -70,7 +77,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     /// <returns>HRESULT success code.</returns>
     int System.Runtime.InteropServices.ComTypes.IDataObject.EnumDAdvise(out IEnumSTATDATA enumAdvise)
     {
-        NativeMethods.ThrowExceptionForHR(NativeMethods.HResult.OLE_E_ADVISENOTSUPPORTED);
+        Marshal.ThrowExceptionForHR(HRESULT.OLE_E_ADVISENOTSUPPORTED);
         throw new NotImplementedException();
     }
 
@@ -84,21 +91,25 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         if (direction != DATADIR.DATADIR_GET)
             throw new NotImplementedException();
 
-        if (0 == _dataObjects.Count)
+        FORMATETC[] formats;
+        lock (_dataLock)
+            formats = [.. _dataObjects.Select(d => d.FORMATETC)];
+
+        if (0 == formats.Length)
         {
             // Note: SHCreateStdEnumFmtEtc fails for a count of 0; throw helpful exception
             throw new InvalidOperationException("VirtualFileDataObject requires at least one data object to enumerate.");
         }
 
         // Create enumerator and return it
-        var res = NativeMethods.SHCreateStdEnumFmtEtc(_dataObjects.Count, _dataObjects.Select(d => d.FORMATETC), out IEnumFORMATETC enumerator);
-        if (res is NativeMethods.HResult.Ok)
+        var res = SHCreateStdEnumFmtEtc((uint)formats.Length, formats, out var enumerator);
+        if (res == HRESULT.S_OK && enumerator is not null)
         {
             return enumerator;
         }
 
         // Returning null here can cause an AV in the caller; throw instead
-        NativeMethods.ThrowExceptionForHR(res);
+        Marshal.ThrowExceptionForHR((int)res);
         throw new NotImplementedException();
     }
 
@@ -123,31 +134,35 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         var formatCopy = format;
         medium = new();
 
-        var hr = (NativeMethods.HResult)((System.Runtime.InteropServices.ComTypes.IDataObject)this).QueryGetData(ref format);
+        var hr = (HRESULT)((System.Runtime.InteropServices.ComTypes.IDataObject)this).QueryGetData(ref format);
 
 #if !DEPLOY
-        AdbDataFormat adbDataFormat = AdbDataFormats.GetFormat(formatCopy.cfFormat);
+        AdbDataFormat adbDataFormat = new(formatCopy.cfFormat);
 
-        // Unknown formats are not printed
-        if (adbDataFormat is not null)
+        // Formats we don't hold are polled on every move (e.g. the shell's drag image helper's), so they're not logged
+        if (hr != HRESULT.DV_E_FORMATETC)
             DebugLog.PrintLine($"Query: {adbDataFormat.Name}");
 #endif
 
-        if (hr is NativeMethods.HResult.Ok)
+        if (hr == HRESULT.S_OK)
         {
             // Find the best match
-            var dataObject = _dataObjects.FirstOrDefault(d =>
+            DataObject? dataObject;
+            lock (_dataLock)
+            {
+                dataObject = _dataObjects.FirstOrDefault(d =>
                     d.FORMATETC.cfFormat == formatCopy.cfFormat
                     && 0 != (d.FORMATETC.dwAspect & formatCopy.dwAspect)
                     && 0 != (d.FORMATETC.tymed & formatCopy.tymed)
                     && d.FORMATETC.lindex == formatCopy.lindex);
+            }
 
             if (dataObject is not null)
             {
                 if (formatCopy.tymed.HasFlag(TYMED.TYMED_ISTREAM) && !_inOperation && Method is DataObjectMethod.DragDrop)
                 {
                     // forbid access to stream before drop operation starts
-                    hr = NativeMethods.HResult.DV_E_FORMATETC;
+                    hr = HRESULT.DV_E_FORMATETC;
                 }
                 else
                 {
@@ -156,9 +171,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
                             ? $"[{dataObject.FORMATETC.lindex}]"
                             : "";
 
-                    // Unknown formats are not printed
-                    if (adbDataFormat is not null)
-                        DebugLog.PrintLine($"Get data: {adbDataFormat.Name}{index} (isUIThread={App.AppDispatcher?.CheckAccess()}, method={Method}, inOperation={_inOperation})");
+                    DebugLog.PrintLine($"Get data: {adbDataFormat.Name}{index} (isUIThread={App.AppDispatcher?.CheckAccess()}, method={Method}, inOperation={_inOperation})");
 #endif
 
                     // Populate the STGMEDIUM
@@ -166,7 +179,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
                     var result = dataObject.GetData(); // Possible call to user code
 
                     hr = result.Item2;
-                    if (hr is NativeMethods.HResult.Ok)
+                    if (hr == HRESULT.S_OK)
                     {
                         medium.unionmember = result.Item1;
                     }
@@ -175,12 +188,12 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             else
             {
                 // Couldn't find a match
-                hr = NativeMethods.HResult.DV_E_FORMATETC;
+                hr = HRESULT.DV_E_FORMATETC;
             }
         }
 
         // Not redundant; hr gets updated in the block above
-        if (hr is NativeMethods.HResult.Ok)
+        if (hr == HRESULT.S_OK)
             return;
 
         // We seem unable to send data to File Explorer in DEBUG, even when not debugging.
@@ -211,26 +224,29 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     /// <returns>HRESULT success code.</returns>
     int System.Runtime.InteropServices.ComTypes.IDataObject.QueryGetData(ref FORMATETC format)
     {
-        NativeMethods.HResult GetError(FORMATETC format)
+        HRESULT GetError(FORMATETC format)
         {
             var formatCopy = format; // Cannot use ref or out parameter inside an anonymous method, lambda expression, or query expression
-            var formatMatches = _dataObjects.Where(d => d.FORMATETC.cfFormat == formatCopy.cfFormat);
+            FORMATETC[] formatMatches;
+            lock (_dataLock)
+                formatMatches = [.. _dataObjects.Select(d => d.FORMATETC).Where(f => f.cfFormat == formatCopy.cfFormat)];
+
             if (!formatMatches.Any())
             {
-                return NativeMethods.HResult.DV_E_FORMATETC;
+                return HRESULT.DV_E_FORMATETC;
             }
-            var tymedMatches = formatMatches.Where(d => 0 != (d.FORMATETC.tymed & formatCopy.tymed));
+            var tymedMatches = formatMatches.Where(f => 0 != (f.tymed & formatCopy.tymed));
             if (!tymedMatches.Any())
             {
-                return NativeMethods.HResult.DV_E_TYMED;
+                return HRESULT.DV_E_TYMED;
             }
             // The shell's drop target may ask with more than one aspect (e.g. content | thumbnail)
-            var aspectMatches = tymedMatches.Where(d => 0 != (d.FORMATETC.dwAspect & formatCopy.dwAspect));
+            var aspectMatches = tymedMatches.Where(f => 0 != (f.dwAspect & formatCopy.dwAspect));
             if (!aspectMatches.Any())
             {
-                return NativeMethods.HResult.DV_E_DVASPECT;
+                return HRESULT.DV_E_DVASPECT;
             }
-            return NativeMethods.HResult.Ok;
+            return HRESULT.S_OK;
         }
 
         return (int)GetError(format);
@@ -244,49 +260,31 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     /// <param name="release">true to specify that the data object called, which implements SetData, owns the storage medium after the call returns.</param>
     void System.Runtime.InteropServices.ComTypes.IDataObject.SetData(ref FORMATETC formatIn, ref STGMEDIUM medium, bool release)
     {
-        var handled = false;
+        AdbDataFormat? format = null;
+        byte[]? data = null;
         if (medium.tymed == formatIn.tymed
             && formatIn is {
-                dwAspect: DVASPECT.DVASPECT_CONTENT, 
+                dwAspect: DVASPECT.DVASPECT_CONTENT,
                 tymed: TYMED.TYMED_HGLOBAL
             })
         {
             // Supported format; capture the data
-            var ptr = NativeMethods.MGlobalLock(medium.unionmember);
+            var ptr = GlobalLock(medium.unionmember);
             if (IntPtr.Zero != ptr)
             {
                 try
                 {
-                    var length = NativeMethods.MGlobalSize(ptr).ToInt32();
-                    var data = new byte[length];
+                    var length = (int)GlobalSize(ptr);
+                    data = new byte[length];
                     Marshal.Copy(ptr, data, 0, length);
 
-                    // Store it in our own format
-                    var format = AdbDataFormats.GetFormat(formatIn.cfFormat) ?? new AdbDataFormat(formatIn.cfFormat);
-                    SetData(format, data);
-                    handled = true;
-
-                    // IAsyncOperation.EndOperation is never called for clipboard paste operations —
-                    // it is a drag-and-drop-only protocol. For clipboard, Explorer instead sets
-                    // CFSTR_PERFORMEDDROPEFFECT with the actually applied effect, then
-                    // CFSTR_PASTESUCCEEDED (always None, so its value is unreliable).
-
-                    if (format == AdbDataFormats.PasteSucceeded)
-                    {
-                        var completionResult = PerformedDropEffect is DragDropEffects.None
-                            ? NativeMethods.HResult.Canceled
-                            : NativeMethods.HResult.Ok;
-
-#if !DEPLOY
-                        DebugLog.PrintLine($"PasteSucceeded received. PerformedDropEffect={PerformedDropEffect}, completionResult={completionResult}");
-#endif
-
-                        OperationCompleted?.Invoke(this, completionResult);
-                    }
+                    // Store it in our own format, replacing any earlier value so GetData returns the latest
+                    format = new AdbDataFormat(formatIn.cfFormat);
+                    UpdateData(format, data);
                 }
                 finally
                 {
-                    NativeMethods.MGlobalUnlock(medium.unionmember);
+                    GlobalUnlock(medium.unionmember);
                 }
             }
 
@@ -298,16 +296,49 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         }
 
         // Throw if unhandled
-        if (!handled)
+        if (format is null || data is null)
         {
             throw new NotImplementedException();
+        }
+
+#if !DEPLOY
+        DebugLog.PrintLine($"Set data: {format.Name} ({data.Length} bytes, isUIThread={App.AppDispatcher?.CheckAccess()})");
+#endif
+
+        OnTargetDataSet(format, data);
+    }
+
+    /// <summary>
+    /// Reacts to data a target wrote. It runs inside the target's COM call (e.g. its DragOver, while our UI thread
+    /// waits on it), so it only hands work off and never waits.
+    /// </summary>
+    private void OnTargetDataSet(AdbDataFormat format, byte[] data)
+    {
+        if (format == AdbDataFormats.DropDescription)
+        {
+            var description = NativeMethods.DropDescription.FromBytes(data);
+#if !DEPLOY
+            DebugLog.PrintLine($"  {description}");
+#endif
+            Data.CopyPaste.PostShellDropDescription(description);
+        }
+        else if (format == AdbDataFormats.PasteSucceeded)
+        {
+            // Paste has no EndOperation (drag only). Explorer sets PerformedDropEffect with the applied effect,
+            // then PasteSucceeded, whose own value is always None.
+            HRESULT completionResult = PerformedDropEffect is DragDropEffects.None
+                ? HRESULT.E_CANCELLED
+                : HRESULT.S_OK;
+
+#if !DEPLOY
+            DebugLog.PrintLine($"PasteSucceeded received. PerformedDropEffect={PerformedDropEffect}, completionResult={completionResult}");
+#endif
+
+            RaiseOperationCompleted(completionResult);
         }
     }
 
 #endregion
-
-    public string[] GetFormats()
-        => [.. _dataObjects.Select(o => AdbDataFormats.GetFormatName(o.FORMATETC.cfFormat))];
 
     public static FORMATETC CreateFormat(AdbDataFormat dataFormat, int index = -1) => new()
     {
@@ -320,23 +351,14 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
 
     public void UpdateData(AdbDataFormat dataFormat, IEnumerable<byte> data)
     {
-        var query = _dataObjects.Where(dataObject => dataObject.FORMATETC.cfFormat == dataFormat);
-        if (!query.Any())
+        lock (_dataLock)
         {
-            SetData(dataFormat, data);
-            return;
+            var dataObject = _dataObjects.FirstOrDefault(d => d.FORMATETC.cfFormat == dataFormat);
+            if (dataObject is null)
+                _dataObjects.Add(CreateDataObject(dataFormat, data));
+            else
+                dataObject.GetData = CreateDataObject(dataFormat, data).GetData;
         }
-
-        var dataObject = query.First();
-        Marshal.FreeHGlobal(dataObject.GetData().Item1);
-
-        dataObject.GetData = () =>
-        {
-            var dataArray = data.ToArray();
-            var ptr = Marshal.AllocHGlobal(dataArray.Length);
-            Marshal.Copy(dataArray, 0, ptr, dataArray.Length);
-            return (ptr, NativeMethods.HResult.Ok);
-        };
     }
 
     /// <summary>
@@ -345,7 +367,12 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     /// <param name="dataFormat">Data format.</param>
     /// <param name="data">Sequence of data.</param>
     public void SetData(AdbDataFormat dataFormat, IEnumerable<byte> data)
-        => _dataObjects.Add(new()
+    {
+        lock (_dataLock)
+            _dataObjects.Add(CreateDataObject(dataFormat, data));
+    }
+
+    private static DataObject CreateDataObject(AdbDataFormat dataFormat, IEnumerable<byte> data) => new()
     {
         FORMATETC = CreateFormat(dataFormat),
         GetData = () =>
@@ -353,21 +380,20 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             var dataArray = data.ToArray();
             var ptr = Marshal.AllocHGlobal(dataArray.Length);
             Marshal.Copy(dataArray, 0, ptr, dataArray.Length);
-            return (ptr, NativeMethods.HResult.Ok);
+            return (ptr, HRESULT.S_OK);
         },
-    });
+    };
 
     public void UpdateData(AdbDataFormat dataFormat, IEnumerable<StreamContents> dataStreams)
     {
-        // Remove all previous streams
-        _dataObjects.RemoveAll(d => d.FORMATETC.cfFormat == dataFormat);
+        // Built first, so the swap below is atomic and a target never sees the streams missing
+        List<DataObject> streams = [.. dataStreams.Select((stream, index) => CreateDataObject(dataFormat, index, stream))];
 
-        // Set n CFSTR_FILECONTENTS
-        var index = 0;
-        foreach (var stream in dataStreams)
+        lock (_dataLock)
         {
-            SetData(dataFormat, index, stream);
-            index++;
+            // Remove all previous streams, then set n CFSTR_FILECONTENTS
+            _dataObjects.RemoveAll(d => d.FORMATETC.cfFormat == dataFormat);
+            _dataObjects.AddRange(streams);
         }
     }
 
@@ -382,18 +408,23 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     /// to be natural for the expected scenarios.
     /// </remarks>
     public void SetData(AdbDataFormat dataFormat, int index, StreamContents streamData)
-        => _dataObjects.Add(new()
+    {
+        lock (_dataLock)
+            _dataObjects.Add(CreateDataObject(dataFormat, index, streamData));
+    }
+
+    private static DataObject CreateDataObject(AdbDataFormat dataFormat, int index, StreamContents streamData) => new()
     {
         FORMATETC = CreateFormat(dataFormat, index),
         GetData = () =>
         {
             var ptr = streamData();
             if (ptr == 0)
-                return (IntPtr.Zero, NativeMethods.HResult.DV_E_FORMATETC);
+                return (IntPtr.Zero, HRESULT.DV_E_FORMATETC);
 
-            return (ptr, NativeMethods.HResult.Ok);
+            return (ptr, HRESULT.S_OK);
         },
-    });
+    };
 
     public void SetFileDescriptors(IEnumerable<FileDescriptor> fileDescriptors, bool includeContent = true)
     {
@@ -434,13 +465,13 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     public DragDropEffects? PasteSucceeded
     {
         get => GetDropEffect(AdbDataFormats.PasteSucceeded);
-        set => SetData(AdbDataFormats.PasteSucceeded, BitConverter.GetBytes((UInt32)(value ?? DragDropEffects.None)));
+        set => UpdateData(AdbDataFormats.PasteSucceeded, BitConverter.GetBytes((UInt32)(value ?? DragDropEffects.None)));
     }
 
     public DragDropEffects? PerformedDropEffect
     {
         get => GetDropEffect(AdbDataFormats.PerformedDropEffect);
-        set => SetData(AdbDataFormats.PerformedDropEffect, BitConverter.GetBytes((UInt32)(value ?? DragDropEffects.None)));
+        set => UpdateData(AdbDataFormats.PerformedDropEffect, BitConverter.GetBytes((UInt32)(value ?? DragDropEffects.None)));
     }
 
     public DragDropEffects? PreferredDropEffect
@@ -469,25 +500,29 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     private DragDropEffects? GetDropEffect(short format)
     {
         // Get the most recent setting
-        var dataObject = _dataObjects.LastOrDefault(d =>
-            format == d.FORMATETC.cfFormat
-            && d.FORMATETC is {
-                dwAspect: DVASPECT.DVASPECT_CONTENT,
-                tymed: TYMED.TYMED_HGLOBAL
-            });
+        DataObject? dataObject;
+        lock (_dataLock)
+        {
+            dataObject = _dataObjects.LastOrDefault(d =>
+                format == d.FORMATETC.cfFormat
+                && d.FORMATETC is {
+                    dwAspect: DVASPECT.DVASPECT_CONTENT,
+                    tymed: TYMED.TYMED_HGLOBAL
+                });
+        }
 
         if (dataObject is not null)
         {
             // Read the value and return it
             var result = dataObject.GetData();
-            if (result.Item2 is NativeMethods.HResult.Ok)
+            if (result.Item2 == HRESULT.S_OK)
             {
-                var ptr = NativeMethods.MGlobalLock(result.Item1);
+                var ptr = GlobalLock(result.Item1);
                 if (IntPtr.Zero != ptr)
                 {
                     try
                     {
-                        var length = NativeMethods.MGlobalSize(ptr).ToInt32();
+                        var length = (int)GlobalSize(ptr);
                         if (4 == length)
                         {
                             var data = new byte[length];
@@ -497,7 +532,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
                     }
                     finally
                     {
-                        NativeMethods.MGlobalUnlock(result.Item1);
+                        GlobalUnlock(result.Item1);
                     }
                 }
             }
@@ -557,7 +592,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
     /// <param name="dwEffects">A DROPEFFECT value that indicates the result of an optimized move. This should be the same value that would be passed to the data object as a CFSTR_PERFORMEDDROPEFFECT format with a normal data extraction operation.</param>
     void IAsyncOperation.EndOperation(int hResult, IBindCtx pbcReserved, uint dwEffects)
     {
-        var hRes = (NativeMethods.HResult)hResult;
+        var hRes = (HRESULT)hResult;
         var dwEffect = (DragDropEffects)dwEffects;
 
 #if !DEPLOY
@@ -565,12 +600,45 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
 #endif
 
         _inOperation = false;
-        OperationCompleted?.Invoke(this, hRes);
+
+        // What the target actually did, which replaces the effect last seen in the drag (subscribers delete the source on Move)
+        if (hRes == HRESULT.S_OK)
+            CurrentEffect = dwEffect & ~DragDropEffects.Scroll;
+
+        RaiseOperationCompleted(hRes);
     }
 
     #endregion
 
-    public event EventHandler<NativeMethods.HResult>? OperationCompleted;
+    /// <summary>
+    /// Raised on a pool thread rather than inside the target's COM call, so subscribers can block (e.g. delete on the device).
+    /// Raises run one after another, as they did inside the COM calls.
+    /// </summary>
+    public event EventHandler<HRESULT>? OperationCompleted;
+
+    private readonly Lock _completionLock = new();
+    private Task _completions = Task.CompletedTask;
+
+    private void RaiseOperationCompleted(HRESULT hResult)
+    {
+        lock (_completionLock)
+            _completions = _completions.ContinueWith(_ => InvokeOperationCompleted(hResult), TaskScheduler.Default);
+    }
+
+    private void InvokeOperationCompleted(HRESULT hResult)
+    {
+        try
+        {
+            // Read when it runs, so a subscriber that unsubscribed in an earlier raise isn't called again
+            OperationCompleted?.Invoke(this, hResult);
+        }
+        catch (Exception e)
+        {
+#if !DEPLOY
+            DebugLog.PrintLine($"OperationCompleted handler failed: {e.Message}");
+#endif
+        }
+    }
 
     /// <summary>
     /// Class representing the result of a SetData call.
@@ -585,7 +653,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         /// <summary>
         /// Func returning the data as an IntPtr and an HRESULT success code.
         /// </summary>
-        public required Func<(HANDLE, NativeMethods.HResult)> GetData { get; set; }
+        public required Func<(IntPtr, HRESULT)> GetData { get; set; }
     }
 
     public static VirtualFileDataObject? PrepareTransfer(IEnumerable<Package> packages,
@@ -647,10 +715,12 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
 
         var actions = source.Actions;
         var selectedFiles = source.SelectedFiles;
-        actions.IsSelectionIllegalOnWindows = !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.Windows);
-        actions.IsSelectionIllegalNaming = !actions.IsRecycleBin
+        // With names substituted, these only rename the copies, and the content is included
+        var illegalOnWindows = !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.Windows);
+        var illegalNaming = !actions.IsRecycleBin
             && !actions.IsAppDrive
             && !FileHelper.FileNameLegal(selectedFiles, FileHelper.RenameTarget.RestrictedNaming);
+        FileActionLogic.SetSelectionNaming(actions, selectedFiles, illegalOnWindows, illegalNaming);
         actions.IsSelectionConflictingNames = selectedFiles.Select(f => f.FullName)
             .Distinct(StringComparer.InvariantCultureIgnoreCase)
             .Count() != selectedFiles.Count();
@@ -762,7 +832,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         foreach (var (op, members) in groups)
         {
             op.StreamToShell(members.SelectMany(m => m.StreamOrder));
-            vfdo.OperationCompleted += (_, hResult) => op.EndShellStream(hResult is NativeMethods.HResult.Ok);
+            vfdo.OperationCompleted += (_, hResult) => op.EndShellStream(hResult == HRESULT.S_OK);
 
             foreach (var member in members)
                 member.File.AttachShellPull(op);
@@ -856,25 +926,25 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             var escapePressed = (0 != fEscapePressed);
             vfdo.DragModifiers = (DragDropKeyStates)grfKeyState;
 
-            var res = NativeMethods.HResult.Ok;
+            HRESULT res = HRESULT.S_OK;
 
             if (escapePressed)
             {
-                res = NativeMethods.HResult.DRAGDROP_S_CANCEL;
+                res = HRESULT.DRAGDROP_S_CANCEL;
             }
             else
             {
                 if (vfdo.DragModifiers.HasFlag(DragDropKeyStates.RightMouseButton))
-                    res = NativeMethods.HResult.DRAGDROP_S_CANCEL;
+                    res = HRESULT.DRAGDROP_S_CANCEL;
                 else if (!vfdo.DragModifiers.HasFlag(DragDropKeyStates.LeftMouseButton))
                 {
                     res = vfdo.CurrentEffect is DragDropEffects.None
-                        ? NativeMethods.HResult.DRAGDROP_S_CANCEL
-                        : NativeMethods.HResult.DRAGDROP_S_DROP;
+                        ? HRESULT.DRAGDROP_S_CANCEL
+                        : HRESULT.DRAGDROP_S_DROP;
                 }
             }
 
-            if (res is not NativeMethods.HResult.Ok)
+            if (res != HRESULT.S_OK)
             {
                 Data.CopyPaste.DragBitmap = null;
                 Data.CopyPaste.DragStatus = CopyPasteService.DragState.None;
@@ -895,12 +965,12 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
         public int GiveFeedback(uint dwEffect)
         {
             var dragDropEffects = (DragDropEffects)dwEffect & ~DragDropEffects.Scroll;
-            if (dragDropEffects.HasFlag(DragDropEffects.Move)
-                && !vfdo.DragModifiers.HasFlag(DragDropKeyStates.ShiftKey))
-            {
-                // Override default since Windows gives Move as default
+
+            // A shell target's DragEnter reports every effect it allows; keep one, preferring Copy, as Move deletes the source
+            if (dragDropEffects.HasFlag(DragDropEffects.Copy))
                 dragDropEffects = DragDropEffects.Copy;
-            }
+            else if (dragDropEffects.HasFlag(DragDropEffects.Move))
+                dragDropEffects = DragDropEffects.Move;
 
             if (!Data.CopyPaste.MouseWithinApp)
             {
@@ -921,7 +991,7 @@ public partial class VirtualFileDataObject : ObservableObject, System.Runtime.In
             else
                 Mouse.SetCursor(Cursors.Arrow);
 
-            return (int)NativeMethods.HResult.Ok;
+            return (int)HRESULT.S_OK;
         }
     }
 

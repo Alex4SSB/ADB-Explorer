@@ -7,12 +7,15 @@ namespace ADB_Explorer.Services;
 public partial class AdbService
 {
     /// <summary>
-    /// Returns the size of a device path via <c>stat -c%s</c>, or <see langword="null"/> if it cannot be read.
+    /// Returns the size of a device path (its lstat size), or <see langword="null"/> if it cannot be read.
     /// </summary>
     public static long? TryGetFileSize(string deviceId, string path, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(path))
             return null;
+
+        if (TrySync(() => SyncLstat(deviceId, path), out var stat))
+            return stat.Exists ? stat.Size : null;
 
         var exit = ExecuteDeviceAdbShellCommand(
             deviceId,
@@ -49,8 +52,45 @@ public partial class AdbService
         return ShellAccessHelper.ParseLocationInfo(stdout);
     }
 
+    /// <summary>A single path's entry, as its folder's listing would give it (links not followed), or null if it can't be stat'ed.</summary>
+    public static FileStat? TryGetFileStat(string deviceId, string path)
+    {
+        var parent = FileHelper.GetParentPath(path);
+        var name = FileHelper.GetFullName(path);
+
+        if (TrySync(() => SyncLstat(deviceId, path), out var stat))
+        {
+            if (!stat.Exists)
+                return null;
+
+            return CreateFile(parent, name, stat.Size, stat.ModifiedTime, stat.Mode);
+        }
+
+        foreach (var entry in ListDirectoryEntries(deviceId, parent, CancellationToken.None))
+        {
+            if (entry.FullName == name)
+                return entry;
+        }
+
+        return null;
+    }
+
     public static DevicePathKind? TryGetPathKind(string deviceId, string path, CancellationToken cancellationToken = default)
     {
+        if (TrySync(() => SyncLstat(deviceId, path), out var lstat))
+        {
+            if (!lstat.Exists)
+                return null;
+
+            if (lstat.IsDirectory)
+                return DevicePathKind.Directory;
+
+            if (lstat.IsRegularFile)
+                return DevicePathKind.RegularFile;
+
+            return DevicePathKind.Unknown;
+        }
+
         if (!ShellCommands.StatExists(deviceId))
             return null;
 
@@ -140,11 +180,15 @@ public partial class AdbService
             throw new Exception($"Invalid output for adb ls command: {stdoutLine}");
         }
 
-        var name = match.Groups["Name"].Value;
-        long? size = long.Parse(match.Groups["Size"].Value, NumberStyles.HexNumber);
-        var time = long.Parse(match.Groups["Time"].Value, NumberStyles.HexNumber);
-        var mode = (UnixFileMode)UInt32.Parse(match.Groups["Mode"].Value, NumberStyles.HexNumber);
+        return CreateFile(path,
+                          match.Groups["Name"].Value,
+                          long.Parse(match.Groups["Size"].Value, NumberStyles.HexNumber),
+                          long.Parse(match.Groups["Time"].Value, NumberStyles.HexNumber),
+                          (UnixFileMode)UInt32.Parse(match.Groups["Mode"].Value, NumberStyles.HexNumber));
+    }
 
+    private static FileStat? CreateFile(string path, string name, long? size, long time, UnixFileMode mode)
+    {
         if (SPECIAL_DIRS.Contains(name))
             return null;
 
@@ -326,17 +370,29 @@ public partial class AdbService
             linkDict[parts[0]] = parts[1];
         }
 
-        var uniqueLinks = linkDict.Values.Where(l => !string.IsNullOrWhiteSpace(l)).Distinct().Select(l => EscapeAdbShellString(l));
+        var uniqueLinks = linkDict.Values.Where(l => !string.IsNullOrWhiteSpace(l)).Distinct().ToList();
 
-        // Get file mode of all unique link targets
-        ExecuteDeviceAdbShellCommand(deviceId, "stat", out string statStdout, out string statStderr, cancellationToken, [.. uniqueLinks, .. STAT_LINKMODE_ARGS]);
+        // Get file mode of all unique link targets - fully resolved already, so lstat is enough
+        if (!TrySync(() => uniqueLinks.Select(l => (l, SyncLstat(deviceId, l))).ToList(), out var targetStats))
+            targetStats = [];
 
         var linkTypes = new Dictionary<string, FileType>();
-        foreach (var line in statStdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries))
+        foreach (var (target, stat) in targetStats)
         {
-            var parts = line.Split(ADB_FIELD_SEP);
-            if (parts.Length >= 2 && UInt32.TryParse(parts[1].Trim(), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var modeValue))
-                linkTypes[parts[0]] = ParseFileMode((UnixFileMode)modeValue);
+            if (stat.Exists)
+                linkTypes[target] = ParseFileMode(stat.Mode);
+        }
+
+        if (targetStats.Count == 0 && uniqueLinks.Count > 0)
+        {
+            ExecuteDeviceAdbShellCommand(deviceId, "stat", out string statStdout, out _, cancellationToken, [.. uniqueLinks.Select(l => EscapeAdbShellString(l)), .. STAT_LINKMODE_ARGS]);
+
+            foreach (var line in statStdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries))
+            {
+                var parts = line.Split(ADB_FIELD_SEP);
+                if (parts.Length >= 2 && UInt32.TryParse(parts[1].Trim(), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var modeValue))
+                    linkTypes[parts[0]] = ParseFileMode((UnixFileMode)modeValue);
+            }
         }
 
         // Iterate over input files using the dictionaries
@@ -392,16 +448,42 @@ public partial class AdbService
 
     public static IEnumerable<FileStat> ListDirectoryEntries(string deviceId, string path, CancellationToken cancellationToken)
     {
-        foreach (string stdoutLine in ExecuteDeviceAdbCommandAsync(deviceId, "ls", cancellationToken, EscapeAdbString(path)))
+        IEnumerator<FileStat>? sync = null;
+        var started = TrySync(() =>
         {
-            var item = CreateFile(path, stdoutLine);
+            sync = SyncListDirectory(deviceId, path, cancellationToken).GetEnumerator();
 
-            if (item is not null)
-                yield return item.Value;
+            return sync.MoveNext();
+        }, out var hasFirst);
+
+        // Only a failure before any entry falls back - after that, falling back would list entries twice
+        if (!started || sync is null)
+        {
+            sync?.Dispose();
+            foreach (var item in ListDirectoryEntriesViaAdbExe(deviceId, path, cancellationToken))
+                yield return item;
+
+            yield break;
+        }
+
+        using (sync)
+        {
+            if (!hasFirst)
+                yield break;
+
+            do
+            {
+                yield return sync.Current;
+            }
+            while (sync.MoveNext());
         }
     }
 
-    public static IEnumerable<FileStat> ListDirectoryRecursive(string deviceId, string path, CancellationToken cancellationToken)
+    /// <summary>
+    /// Every entry below <paramref name="path"/> (not the path itself), one listing per folder. Links aren't followed.
+    /// Entries the device listed but couldn't stat are skipped and reported to <paramref name="unstatable"/>.
+    /// </summary>
+    public static IEnumerable<FileStat> ListDirectoryRecursive(string deviceId, string path, CancellationToken cancellationToken, Action? unstatable = null)
     {
         var queue = new Queue<string>();
         queue.Enqueue(path);
@@ -410,23 +492,41 @@ public partial class AdbService
         {
             var current = queue.Dequeue();
 
-            IEnumerable<FileStat> entries;
+            List<FileStat> entries;
             try
             {
-                entries = ListDirectoryEntries(deviceId, current, cancellationToken);
+                entries = [.. ListDirectoryEntries(deviceId, current, cancellationToken)];
             }
-            catch (ProcessFailedException)
+            catch (Exception e) when (e is ProcessFailedException or AdvancedSharpAdbClient.Exceptions.AdbException)
             {
                 continue;
             }
 
             foreach (var entry in entries)
             {
+                // LIS2 reports an entry adbd couldn't stat with an all-zero mode, which leaves no permissions
+                if (entry.Permissions is null)
+                {
+                    unstatable?.Invoke();
+                    continue;
+                }
+
                 yield return entry;
 
                 if (entry.Type is FileType.Folder)
                     queue.Enqueue(entry.FullPath);
             }
+        }
+    }
+
+    private static IEnumerable<FileStat> ListDirectoryEntriesViaAdbExe(string deviceId, string path, CancellationToken cancellationToken)
+    {
+        foreach (string stdoutLine in ExecuteDeviceAdbCommandAsync(deviceId, "ls", cancellationToken, EscapeAdbString(path)))
+        {
+            var item = CreateFile(path, stdoutLine);
+
+            if (item is not null)
+                yield return item.Value;
         }
     }
 

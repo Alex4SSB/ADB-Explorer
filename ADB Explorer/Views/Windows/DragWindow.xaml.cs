@@ -1,6 +1,9 @@
 ﻿using System.Windows.Documents;
 using Wpf.Ui.Appearance;
 using static ADB_Explorer.Services.NativeMethods;
+using DROPIMAGETYPE = Vanara.PInvoke.Shell32.DROPIMAGETYPE;
+using HWND = Vanara.PInvoke.HWND;
+using POINT = Vanara.PInvoke.POINT;
 
 namespace ADB_Explorer.Views.Windows;
 
@@ -22,7 +25,7 @@ public partial class DragWindow : INotifyPropertyChanged
 
     private readonly DispatcherTimer DragTimer = new() { Interval = TimeSpan.FromMilliseconds(200) };
 
-    private HANDLE _dragWindowHandle;
+    private HWND _dragWindowHandle;
 
     /// <summary>
     /// The scaling factor of the primary monitor when the window is loaded. 
@@ -70,6 +73,12 @@ public partial class DragWindow : INotifyPropertyChanged
 
     private void DragTimer_Tick(object? sender, EventArgs e)
     {
+#if DEBUG
+        // No mouse hook in debug builds to follow the window under the cursor
+        InterceptMouse.GetCursorPosition();
+        Data.CopyPaste.WindowUnderMouse = InterceptMouse.GetWindowUnderMouse();
+#endif
+
         if (Data.CopyPaste.DragBitmap is not null)
             GetPathUnderMouse();
     }
@@ -104,17 +113,54 @@ public partial class DragWindow : INotifyPropertyChanged
                 return;
             }
 
+            // A dragged device says where it opens, over File Explorer or the desktop
+            if (Data.CopyPaste.DragContent is LogicalDeviceViewModel dragDevice)
+            {
+                var openFormat = DeviceMountDrag.TargetOf(Data.CopyPaste.WindowUnderMouse) switch
+                {
+                    DeviceMountDrag.DropTarget.ExplorerWindow => Strings.Resources.S_DRAG_OPEN_MOUNT_TAB,
+                    DeviceMountDrag.DropTarget.Desktop => Strings.Resources.S_DRAG_OPEN_MOUNT,
+                    _ => null,
+                };
+
+                // The tooltip only shows with an effect; a change of it draws the tooltip anew
+                var effect = openFormat is null ? DragDropEffects.None : DragDropEffects.Link;
+                if (Data.CopyPaste.CurrentDropEffect != effect)
+                {
+                    Data.CopyPaste.CurrentDropEffect = effect;
+                    return;
+                }
+
+                if (openFormat is not null)
+                    AddWithInsert(openFormat, dragDevice.Name);
+
+                return;
+            }
+
             if (Data.CopyPaste.DragFiles.Length == 0 || Data.CopyPaste.CurrentDropEffect is DragDropEffects.None)
             {
                 return;
             }
 
             // Shouldn't happen. But if it does, we don't want to do anything.
-            if (_hwndUnderMouse == _dragWindowHandle)
+            if (Data.CopyPaste.WindowUnderMouse == _dragWindowHandle)
                 return;
 
             string target = "";
-            if (Data.CopyPaste.MouseWithinApp)
+            if (!Data.CopyPaste.MouseWithinApp
+                && Data.CopyPaste.ShellDropDescription is { IsValid: true } description)
+            {
+                // The target's own wording is shown unless its verb disagrees with our effect (e.g. it's from before a key change)
+                if (description.Type is not (DROPIMAGETYPE.DROPIMAGE_COPY or DROPIMAGETYPE.DROPIMAGE_MOVE or DROPIMAGETYPE.DROPIMAGE_LINK)
+                    || (DragDropEffects)description.Type == Data.CopyPaste.CurrentDropEffect)
+                {
+                    AddShellDescription(description);
+                    return;
+                }
+
+                target = description.Insert;
+            }
+            else if (Data.CopyPaste.MouseWithinApp)
             {
                 if (Data.CopyPaste.IsFromDevice(Data.CopyPaste.DropTargetDevice)
                     && Data.CopyPaste.DropTarget == Data.CopyPaste.DragParent
@@ -138,7 +184,7 @@ public partial class DragWindow : INotifyPropertyChanged
 
             if (count == 1 && shownCount is not null)
             {
-                int sourceLength = target is null ? 30 : 45 - target.Length;
+                int sourceLength = target is null ? 30 : Math.Max(15, 45 - target.Length);
                 // Trash items are dragged by their indexer name; show the name they were deleted with
                 var sourceName = Data.CopyPaste.DragFiles[0];
                 if (Data.CopyPaste.IsFromTrash && Data.CopyPaste.CurrentFiles.FirstOrDefault() is { TrashIndex: not null } trashItem)
@@ -248,7 +294,35 @@ public partial class DragWindow : INotifyPropertyChanged
         });
     }
 
-    private HANDLE _hwndUnderMouse = IntPtr.Zero;
+    /// <summary>
+    /// Shows a shell drop description - its %1 is replaced by the insert, which keeps the default color like our targets.
+    /// </summary>
+    private void AddShellDescription(DropDescription description)
+    {
+        var parts = description.Message.Split("%1");
+        for (int i = 0; i < parts.Length; i++)
+        {
+            if (i > 0 && !string.IsNullOrEmpty(description.Insert))
+                DragTooltip.Inlines.Add(description.Insert);
+
+            if (parts[i].Length > 0)
+                DragTooltip.Inlines.Add(new Run(parts[i]) { Foreground = _blueBrush });
+        }
+    }
+
+    /// <summary>A tooltip whose {0} is replaced by <paramref name="insert"/>, which keeps the default color like our targets.</summary>
+    private void AddWithInsert(string format, string insert)
+    {
+        var parts = format.Split("{0}");
+        for (int i = 0; i < parts.Length; i++)
+        {
+            if (i > 0)
+                DragTooltip.Inlines.Add(insert);
+
+            if (parts[i].Length > 0)
+                DragTooltip.Inlines.Add(new Run(parts[i]) { Foreground = _blueBrush });
+        }
+    }
 
     private void Popup_Opened(object sender, EventArgs e)
     {
@@ -277,7 +351,8 @@ public partial class DragWindow : INotifyPropertyChanged
             if ((e.PropertyName == nameof(Data.CopyPaste.DragFiles)
                 || e.PropertyName == nameof(Data.CopyPaste.DropTarget)
                 || e.PropertyName == nameof(Data.CopyPaste.CurrentDropEffect)
-                || e.PropertyName == nameof(Data.CopyPaste.MouseWithinApp))
+                || e.PropertyName == nameof(Data.CopyPaste.MouseWithinApp)
+                || e.PropertyName == nameof(Data.CopyPaste.ShellDropDescription))
                 && Data.CopyPaste.DragBitmap is not null)
             {
                 GetPathUnderMouse();
@@ -300,6 +375,8 @@ public partial class DragWindow : INotifyPropertyChanged
     /// </summary>
     private void BeginDrag()
     {
+        Data.CopyPaste.ClearShellDropDescription();
+        Data.CopyPaste.WindowUnderMouse = HWND.NULL;
         UpdatePosition(InterceptMouse.GetCursorPosition());
 
         // The main window may have come to the front since the drag window was last used.
@@ -312,6 +389,9 @@ public partial class DragWindow : INotifyPropertyChanged
 #endif
 
         DragTimer.Start();
+
+        // The tooltip still holds the last drag's text until it's drawn for this one
+        GetPathUnderMouse();
     }
 
     /// <summary>
@@ -321,6 +401,7 @@ public partial class DragWindow : INotifyPropertyChanged
     private void EndDrag()
     {
         DragTimer.Stop();
+        Data.CopyPaste.ClearShellDropDescription();
 
 #if !DEBUG
         InterceptMouse.Close();
@@ -356,8 +437,8 @@ public partial class DragWindow : INotifyPropertyChanged
             ViewModel.DragImageHeight = imageRect.Height * windowScaling;
             ViewModel.DragImageWidth = imageRect.Width * windowScaling;
 
-            // A tab header is drawn partly see-through, as the drag image of anything else isn't.
-            ViewModel.DragImageOpacity = Data.CopyPaste.IsTabDrag ? 0.9 : 1;
+            // A tab header or device is drawn partly see-through, as the drag image of anything else isn't.
+            ViewModel.DragImageOpacity = Data.CopyPaste.IsContentDrag ? 0.9 : 1;
         }
         else
         {
@@ -405,16 +486,25 @@ public partial class DragWindow : INotifyPropertyChanged
 
         UpdatePosition(point);
 
-        _hwndUnderMouse = InterceptMouse.GetWindowUnderMouse();
+        var previousHwnd = Data.CopyPaste.WindowUnderMouse;
+        Data.CopyPaste.WindowUnderMouse = InterceptMouse.GetWindowUnderMouse();
 
         // Shouldn't happen. But if it does, we don't want to do anything.
-        if (_hwndUnderMouse == _dragWindowHandle)
+        if (Data.CopyPaste.WindowUnderMouse == _dragWindowHandle)
             return;
 
-        var wasWithinApp = Data.CopyPaste.MouseWithinApp;
-        Data.CopyPaste.MouseWithinApp = _hwndUnderMouse == InterceptClipboard.MainWindowHandle;
+        // A description belongs to the window that wrote it; the hook runs before the next target's DragEnter
+        if (Data.CopyPaste.WindowUnderMouse != previousHwnd)
+            Data.CopyPaste.ClearShellDropDescription();
 
-        if (!Data.CopyPaste.MouseWithinApp && Data.CopyPaste.DragStatus is CopyPasteService.DragState.None)
+        var wasWithinApp = Data.CopyPaste.MouseWithinApp;
+        Data.CopyPaste.MouseWithinApp = Data.CopyPaste.WindowUnderMouse == InterceptClipboard.MainWindowHandle;
+
+        // Only a foreign drag's image goes outside the app, where its source draws its own.
+        // A dragged device is dropped out there, and a dragged tab keeps its header until the drag ends.
+        if (!Data.CopyPaste.MouseWithinApp
+            && Data.CopyPaste.DragStatus is CopyPasteService.DragState.None
+            && !Data.CopyPaste.IsContentDrag)
             Data.CopyPaste.DragBitmap = null;
 
         if (!Data.CopyPaste.MouseWithinApp && wasWithinApp)

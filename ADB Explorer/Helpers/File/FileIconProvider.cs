@@ -4,6 +4,9 @@
 
 using System.Drawing;
 using static ADB_Explorer.Services.NativeMethods;
+using Gdi32 = Vanara.PInvoke.Gdi32;
+using SHGFI = Vanara.PInvoke.Shell32.SHGFI;
+using SHIL = Vanara.PInvoke.Shell32.SHIL;
 
 namespace ADB_Explorer.Helpers;
 
@@ -55,20 +58,20 @@ public class FileIconProvider
     private readonly record struct IconCacheKey(string IconId, IconSize Size, int DesiredSize);
     private static readonly Dictionary<IconCacheKey, BitmapSource> _iconDic = [];
     private static readonly Dictionary<string, Rectangle> _contentBoundsCache = [];
-    private static readonly SysImageList _imgList = new(SysImageListSize.SHIL_JUMBO);
+    private static readonly SysImageList _imgList = new(SHIL.SHIL_JUMBO);
 
     // <summary>
     /// Return large file icon of the specified file.
     /// </summary>
     private static Icon GetFileIcon(string fileName, IconSize size)
     {
-        var flags = NativeMethods.FileInfoFlags.SHGFI_SYSICONINDEX;
+        var flags = SHGFI.SHGFI_SYSICONINDEX;
         
         if (!fileName.Contains(':'))
-            flags |= NativeMethods.FileInfoFlags.SHGFI_USEFILEATTRIBUTES;
+            flags |= SHGFI.SHGFI_USEFILEATTRIBUTES;
 
         if (size == IconSize.Small)
-            flags |= NativeMethods.FileInfoFlags.SHGFI_SMALLICON;
+            flags |= SHGFI.SHGFI_SMALLICON;
         
         return NativeMethods.GetIcon(fileName, flags);
     }
@@ -169,7 +172,7 @@ public class FileIconProvider
         }
         finally
         {
-            NativeMethods.MDeleteObject(hBitmap);
+            Gdi32.DeleteObject(hBitmap);
         }
     }
 
@@ -290,8 +293,30 @@ public class FileIconProvider
         return GetSpecialIcon(DriveIcon, nameof(DriveIcon), size);
     }
 
+    /// <summary>
+    /// The DLL and icon index behind <see cref="GetDriveIcon"/> for a storage drive, as a desktop.ini IconResource names it.
+    /// Without the rotation some of them get here, which a desktop.ini can't express.
+    /// </summary>
+    public static (string DllPath, int Index) GetDriveIconResource(AbstractDrive.DriveType type)
+    {
+        var icon = type switch
+        {
+            AbstractDrive.DriveType.External => ExternalStorageIcon,
+            AbstractDrive.DriveType.Expansion or AbstractDrive.DriveType.Emulated => SdCardIcon,
+            _ => DriveIcon,
+        };
+
+        return (Path.Combine(Environment.SystemDirectory, icon.DllPath!), icon.Index);
+    }
+
     public static BitmapSource GetMultipleFilesIcon(int size) =>
         GetSpecialIcon(MultipleFilesIcon, nameof(MultipleFilesIcon), size);
+
+    public static BitmapSource GetEnterFolderIcon(int size) =>
+        GetSpecialIcon(EnterFolderIcon, nameof(EnterFolderIcon), size);
+
+    /// <summary>For display at 16 px; read at 2x so it stays sharp under monitor scaling.</summary>
+    public static BitmapSource SmallEnterFolderIcon => GetEnterFolderIcon(32);
 
     public static BitmapSource GetSearchIcon(int size) =>
         GetSpecialIcon(SearchIcon, nameof(SearchIcon), size);
@@ -347,7 +372,7 @@ public class FileIconProvider
         Icon icon;
         if (specialIcon.DllPath is null)
         {
-            _imgList.ImageListSize = SysImageListSize.SHIL_JUMBO;
+            _imgList.ImageListSize = SHIL.SHIL_JUMBO;
             icon = _imgList.Icon(specialIcon.Index);
         }
         else
@@ -369,7 +394,7 @@ public class FileIconProvider
 
     private static Bitmap LoadJumbo(string lookup, string iconId, int desiredSize)
     {
-        _imgList.ImageListSize = SysImageListSize.SHIL_JUMBO;
+        _imgList.ImageListSize = SHIL.SHIL_JUMBO;
         return LoadJumbo(new SpecialIcon(null, _imgList.IconIndex(lookup)), iconId, desiredSize);
     }
 
@@ -556,7 +581,7 @@ public class FileIconProvider
                 }
                 else
                 {
-                    _imgList.ImageListSize = SysImageListSize.SHIL_EXTRALARGE;
+                    _imgList.ImageListSize = SHIL.SHIL_EXTRALARGE;
                     icon = _imgList.Icon(_imgList.IconIndex(lookup));
                 }
 
