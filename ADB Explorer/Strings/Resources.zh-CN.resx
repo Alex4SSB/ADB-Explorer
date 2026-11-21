@@ -1794,4 +1794,44 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_DRAG_INSTALL" xml:space="preserve">
     <value>安装</value>
   </data>
+  <data name="S_MENU_ADD_SAVED_LOCATION" xml:space="preserve">
+    <value>添加到已保存的位置</value>
+  </data>
+  <data name="S_STATUS_LOCKED" xml:space="preserve">
+    <value>{0} - 已锁定。解锁设备来访问它</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RENAMED" xml:space="preserve">
+    <value>一些选中的文件可能在目标位置被重命名</value>
+  </data>
+  <data name="S_POPUP_COPIED_RENAMED" xml:space="preserve">
+    <value>一些已复制的文件可能在这个位置被重命名</value>
+  </data>
+  <data name="S_SETTINGS_SUBSTITUTE_NAMES" xml:space="preserve">
+    <value>替换文件名中不允许的字符</value>
+  </data>
+  <data name="S_SETTINGS_SUBSTITUTE_NAMES_INFO" xml:space="preserve">
+    <value>给文件一个不含相像字符的名称来满足目标位置要求, 而不是拒绝或隐藏它。
+
+何时应用：
+• 从设备复制到 Windows
+• 复制到 Android 用户存储 (内部存储、SD 卡、 USB 盘)，此处不允许名称中含 \ : * ? " &lt; &gt; |
+•在用户存储外面用文件资源管理器打开设备
+
+不允许的字符变成全角形式（例如，? 变成 ？），控制字符会变成相应的符号，末尾的点或空格也会变成全角形式。Windows 保留的名称，例如 CON 或 NUL，会以全角字母开头。</value>
+  </data>
+  <data name="S_MENU_OPEN_IN_WINDOWS_EXPLORER" xml:space="preserve">
+    <value>在 Windows 资源管理器中打开</value>
+  </data>
+  <data name="S_MOUNT_FAILED_TITLE" xml:space="preserve">
+    <value>无法在文件资源管理器中显示该设备</value>
+  </data>
+  <data name="S_MOUNT_OPENING" xml:space="preserve">
+    <value>正在 Windows 资源管理器中打开…</value>
+  </data>
+  <data name="S_DRAG_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>在新选项卡中打开</value>
+  </data>
+  <data name="S_DRAG_OPEN_IN_EXPLORER" xml:space="preserve">
+    <value>在 Windows 资源管理器中打开</value>
+  </data>
 </root>
