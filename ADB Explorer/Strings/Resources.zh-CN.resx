@@ -1817,7 +1817,7 @@ ADB 包含在 Android SDK Platform Tools 中。
 • 复制到 Android 用户存储 (内部存储、SD 卡、 USB 盘)，此处不允许名称中含 \ : * ? " &lt; &gt; |
 •在用户存储外面用文件资源管理器打开设备
 
-不允许的字符变成全角形式（例如，? 变成 ？），控制字符会变成相应的符号，末尾的点或空格也会变成全角形式。Windows 保留的名称，例如 CON 或 NUL，会以全角字母开头。</value>
+不允许的字符变成全角形式（例如，? 变成 ？），控制字符会变成相应的符号，末尾的点或空格也会变成全角形式。Windows 保留的名称，例如 CON 或 NUL，会获得全角首字母。</value>
   </data>
   <data name="S_MENU_OPEN_IN_WINDOWS_EXPLORER" xml:space="preserve">
     <value>在 Windows 资源管理器中打开</value>
