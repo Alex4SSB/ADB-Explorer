@@ -2007,4 +2007,44 @@ Kontroly se snaží zabránit tomu, aby nic netušící uživatel spustil potenc
   <data name="S_DRAG_INSTALL" xml:space="preserve">
     <value>Nainstalovat</value>
   </data>
+  <data name="S_MENU_ADD_SAVED_LOCATION" xml:space="preserve">
+    <value>Přidat do uložených umístění</value>
+  </data>
+  <data name="S_STATUS_LOCKED" xml:space="preserve">
+    <value>{0} – zamčeno. Pro přístup zařízení odemkněte</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RENAMED" xml:space="preserve">
+    <value>Některé vybrané soubory mohou být v cílovém umístění přejmenovány</value>
+  </data>
+  <data name="S_POPUP_COPIED_RENAMED" xml:space="preserve">
+    <value>Některé kopírované soubory budou v tomto umístění přejmenovány</value>
+  </data>
+  <data name="S_SETTINGS_SUBSTITUTE_NAMES" xml:space="preserve">
+    <value>Nahrazovat znaky, které nejsou povolené v názvech souborů</value>
+  </data>
+  <data name="S_MENU_OPEN_IN_WINDOWS_EXPLORER" xml:space="preserve">
+    <value>Otevřít v Průzkumníku Windows</value>
+  </data>
+  <data name="S_MOUNT_FAILED_TITLE" xml:space="preserve">
+    <value>Zařízení se nepodařilo zobrazit v Průzkumníku souborů</value>
+  </data>
+  <data name="S_MOUNT_OPENING" xml:space="preserve">
+    <value>Otevírání v Průzkumníku Windows…</value>
+  </data>
+  <data name="S_DRAG_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>Otevřít v nové záložce</value>
+  </data>
+  <data name="S_DRAG_OPEN_IN_EXPLORER" xml:space="preserve">
+    <value>Otevřít v Průzkumníku Windows</value>
+  </data>
+  <data name="S_SETTINGS_SUBSTITUTE_NAMES_INFO" xml:space="preserve">
+    <value>U souboru s názvem, který cílové umístění nepovoluje, nahradí nepovolené znaky vzhledově podobnými, místo aby soubor odmítlo nebo skrylo.
+
+Platí při:
+• Kopírování ze zařízení do Windows
+• Kopírování do uživatelského úložiště Androidu (interní úložiště, karty SD, jednotky USB), které nepovoluje \ : * ? " &lt; &gt; |
+• Otevření zařízení v Průzkumníku souborů mimo uživatelské úložiště
+
+Nepovolené znaky se nahradí svými variantami o plné šířce (? se změní na ？), řídicí znaky svými symboly a stejně tak i tečka nebo mezera na konci názvu. U názvů vyhrazených systémem Windows, jako jsou CON nebo NUL, se první písmeno nahradí variantou o plné šířce.</value>
+  </data>
 </root>
