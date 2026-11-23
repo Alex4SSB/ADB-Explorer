@@ -462,7 +462,7 @@ Zobrazený obsah nemusí být úplný.</value>
     <value>Tmavý</value>
   </data>
   <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
-    <value>Výchozí téma Windows</value>
+    <value>Výchozí téma systému</value>
   </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>Vzhled</value>
@@ -546,7 +546,7 @@ Zvolte Vlastní, chcete-li použít umístění, které se při odinstalování 
     <comment>Title of the About settings notice describing optional crash reporting</comment>
   </data>
   <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
-    <value>Po pádu můžete volitelně odeslat diagnostické hlášení, které nám pomůže problém opravit. Hlášení se odesílají pouze po kliknutí na Odeslat hlášení a obvykle zahrnují zprávu výjimky, trasování zásobníku, verzi aplikace a Windows a otevřenou stránku. Data zpracovává Grafana Labs (Grafana Cloud). Viz odkaz na zásady ochrany osobních údajů výše.</value>
+    <value>Po pádu můžete volitelně odeslat diagnostické hlášení, které nám pomůže problém opravit. Hlášení se odesílají pouze po kliknutí na Odeslat hlášení a obvykle zahrnují zprávu výjimky, trasování zásobníku, verzi aplikace a systému a otevřenou stránku. Data zpracovává Grafana Labs (Grafana Cloud). Viz odkaz na zásady ochrany osobních údajů výše.</value>
     <comment>About settings notice describing optional crash reporting and Grafana as processor</comment>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
@@ -1688,7 +1688,7 @@ Pomozte nám prosím lokalizovat aplikaci do svého jazyka na Weblate.</value>
     <value>Aktualizovat při zavření</value>
   </data>
   <data name="S_UPDATE_APPLY_FAILED" xml:space="preserve">
-    <value>Aktualizaci se nepodařilo připravit. Ujistěte se, že je k dispozici obslužný program pro .7z (Průzkumník Windows, 7-Zip, NanaZip apod.), nebo si vydání stáhněte ručně z GitHubu.</value>
+    <value>Aktualizaci se nepodařilo připravit. Ujistěte se, že je k dispozici program pro práci se soubory .7z ({0}, 7-Zip, NanaZip apod.), nebo si vydání stáhněte ručně z GitHubu.</value>
   </data>
   <data name="S_SETTINGS_UPDATES_CHECK" xml:space="preserve">
     <value>Kontrolovat a upozorňovat</value>
@@ -1753,7 +1753,7 @@ Pomozte nám prosím lokalizovat aplikaci do svého jazyka na Weblate.</value>
 Užitečné pro fotografie, které obsahují datum pořízení v názvu a jejichž datum změny bylo přepsáno.</value>
   </data>
   <data name="S_PUSH_PACKAGES_INFO" xml:space="preserve">
-    <value>Instaluje soubory APK přímo z Windows.</value>
+    <value>Instaluje soubory APK přímo z tohoto počítače.</value>
   </data>
   <data name="S_DETAILS_PANE_INFO" xml:space="preserve">
     <value>Nastaví boční podokno do režimu podrobností.
