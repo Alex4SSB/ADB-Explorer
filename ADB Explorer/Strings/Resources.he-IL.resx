@@ -1792,6 +1792,46 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>העבר ל-{0}</value>
   </data>
   <data name="S_DRAG_INSTALL" xml:space="preserve">
-    <value>התקן</value>
+    <value>הַתקן</value>
+  </data>
+  <data name="S_MENU_ADD_SAVED_LOCATION" xml:space="preserve">
+    <value>הוסף למיקומים שמורים</value>
+  </data>
+  <data name="S_STATUS_LOCKED" xml:space="preserve">
+    <value>{0} - נעול. פתח את נעילת המכשיר כדי לאפשר גישה</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RENAMED" xml:space="preserve">
+    <value>חלק משמות הקבצים שנבחרו עשויים להשתנות ביעד</value>
+  </data>
+  <data name="S_POPUP_COPIED_RENAMED" xml:space="preserve">
+    <value>חלק משמות הקבצים המועתקים יישתנו במיקום הנוכחי</value>
+  </data>
+  <data name="S_SETTINGS_SUBSTITUTE_NAMES" xml:space="preserve">
+    <value>החלף תווים לא חוקיים בשמות קבצים</value>
+  </data>
+  <data name="S_SETTINGS_SUBSTITUTE_NAMES_INFO" xml:space="preserve">
+    <value>נותן לקובץ ששמו אינו חוקי ביעד תווים דומים, במקום לסרב או להחביא אותו.
+
+נכון במקרים הבאים:
+• העתקה מהמכשיר לוינדוס
+• העתקה לאחסון משתמש של אנדרואיד (אחסון פנימי, כרטיסי SD, כונן USB), שאינו מאפשר \ : * ? " &lt; &gt; |
+• פתיחת המכשיר בסייר הקבצים של וינדוס, מחוץ לאחסון המשתמש של אנדרואיד
+
+תווים לא חוקיים הופכים לצורות הרחבות שלהם (? הופך להיות ？), תווי שליטה הופכים לייצוג הסמלי שלהם, וכך גם נקודה או רווח בסוף השם. שמות השמורים על ידי וינדוס, כמו CON או NUL, מקבלים אות ראשונה ברוחב מלא.</value>
+  </data>
+  <data name="S_MENU_OPEN_IN_WINDOWS_EXPLORER" xml:space="preserve">
+    <value>פתח בסייר הקבצים</value>
+  </data>
+  <data name="S_MOUNT_FAILED_TITLE" xml:space="preserve">
+    <value>לא ניתן להציג את המכשיר בסייר הקבצים</value>
+  </data>
+  <data name="S_MOUNT_OPENING" xml:space="preserve">
+    <value>פותח בסייר הקבצים…</value>
+  </data>
+  <data name="S_DRAG_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>פתח בכרטיסיה חדשה</value>
+  </data>
+  <data name="S_DRAG_OPEN_IN_EXPLORER" xml:space="preserve">
+    <value>פתח בסייר הקבצים</value>
   </data>
 </root>
