@@ -631,7 +631,7 @@ public class FileIconProvider
         if (drive is not null)
             return drive.Type is AbstractDrive.DriveType.Internal;
 
-        return AdbExplorerConst.IsInternalStoragePath(path);
+        return AppConst.IsInternalStoragePath(path);
     }
 
     private static SpecialIcon SpecialTypeIndex(AbstractFile.SpecialFileType specialType, string? fileName = null, string? filePath = null)

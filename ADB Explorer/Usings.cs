@@ -38,6 +38,8 @@ global using ADB_Explorer.Controls;
 global using ADB_Explorer.Converters;
 global using ADB_Explorer.Helpers;
 global using ADB_Explorer.Models;
+global using static ADB_Explorer.Models.AppConst;
+global using ADB_Explorer.Platform;
 global using ADB_Explorer.Services;
 global using ADB_Explorer.ViewModels;
 global using ADB_Explorer.ViewModels.Pages;

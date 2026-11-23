@@ -36,7 +36,7 @@ public static class AppUpdateHelper
 
         if (!PrepareStaging())
         {
-            LastFailureReason ??= Strings.Resources.S_UPDATE_APPLY_FAILED;
+            LastFailureReason ??= Strings.Formatted.S_UPDATE_APPLY_FAILED;
             return false;
         }
 
@@ -44,7 +44,7 @@ public static class AppUpdateHelper
         {
             if (!ScheduleSwap(restartAfter: true))
             {
-                LastFailureReason = Strings.Resources.S_UPDATE_APPLY_FAILED;
+                LastFailureReason = Strings.Formatted.S_UPDATE_APPLY_FAILED;
                 return false;
             }
 

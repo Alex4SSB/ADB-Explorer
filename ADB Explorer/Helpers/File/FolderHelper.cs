@@ -30,12 +30,12 @@ public static class FolderHelper
             Data.CurrentDisplayNames[(deviceId, drive.Path)] = drive.DisplayName;
         }
 
-        foreach (var item in AdbExplorerConst.DRIVE_TYPES.Where(d => d.Value is AbstractDrive.DriveType.Root or AbstractDrive.DriveType.Internal))
+        foreach (var item in AppConst.DRIVE_TYPES.Where(d => d.Value is AbstractDrive.DriveType.Root or AbstractDrive.DriveType.Internal))
         {
             Data.CurrentDisplayNames.TryAdd((deviceId, item.Key), AbstractDrive.GetDriveDisplayName(item.Value));
         }
 
-        foreach (var item in AdbExplorerConst.DRIVE_TYPES)
+        foreach (var item in AppConst.DRIVE_TYPES)
         {
             var names = Enum.GetValues<AbstractDrive.DriveType>().Where(n => n == item.Value && item.Value
                 is not AbstractDrive.DriveType.Root

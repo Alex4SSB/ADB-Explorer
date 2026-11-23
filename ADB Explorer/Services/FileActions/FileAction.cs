@@ -528,7 +528,7 @@ public static class AppActions
         new(FileActionType.ContextOpenInWindowsExplorer,
             () => Actions.IsOpenInWindowsExplorerEnabled,
             FileActionLogic.OpenInWindowsExplorer,
-            Strings.Resources.S_MENU_OPEN_IN_WINDOWS_EXPLORER),
+            Strings.Formatted.S_MENU_OPEN_IN_WINDOWS_EXPLORER),
         new(FileActionType.NewTab,
             () => Tabs is not null && AdbHelper.CurrentAdbState.Status is AdbHelper.AdbStatus.Valid,
             () => Tabs?.AddTab(),

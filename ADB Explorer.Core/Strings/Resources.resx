@@ -307,8 +307,8 @@ To approve ADB, open WSA advanced settings.</value>
     <comment>Dialog button: keep using the app and apply the downloaded update when the app closes</comment>
   </data>
   <data name="S_UPDATE_APPLY_FAILED" xml:space="preserve">
-    <value>The update could not be prepared. Ensure a .7z handler is available (Windows Explorer, 7-Zip, NanaZip, etc.), or download the release manually from GitHub.</value>
-    <comment>Shown when the shell cannot browse/extract update.7z or scheduling the file swap fails</comment>
+    <value>The update could not be prepared. Ensure a .7z handler is available ({0}, 7-Zip, NanaZip, etc.), or download the release manually from GitHub.</value>
+    <comment>Shown when the shell cannot browse/extract update.7z or scheduling the file swap fails. {0} is the file manager's name as Windows shows it, in its basic (nominative) form, e.g. File Explorer. If your language changes the name's form here (Russian: в Проводнике), write the name into your translation instead of using {0}.</comment>
   </data>
   <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
     <value>Go To Version Page</value>
@@ -504,7 +504,7 @@ Visible content may be incomplete.</value>
     <comment>The setting used to force dark theme in the app</comment>
   </data>
   <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
-    <value>Windows Default</value>
+    <value>System Default</value>
     <comment>The setting to use the default theme set by Windows</comment>
   </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
@@ -605,7 +605,7 @@ Select Custom to use a location that will not be removed on uninstall. The custo
     <comment>Title of the About settings notice describing optional crash reporting</comment>
   </data>
   <data name="S_CRASH_REPORTING_NOTICE" xml:space="preserve">
-    <value>After a crash, you may optionally send a diagnostic report to help us fix it. Reports are sent only when you click Send Report and usually include the exception message, stack trace, app and Windows version, and the page that was open. The data is processed by Grafana Labs (Grafana Cloud). See the Privacy Policy link above.</value>
+    <value>After a crash, you may optionally send a diagnostic report to help us fix it. Reports are sent only when you click Send Report and usually include the exception message, stack trace, app and system version, and the page that was open. The data is processed by Grafana Labs (Grafana Cloud). See the Privacy Policy link above.</value>
     <comment>About settings notice describing optional crash reporting and Grafana as processor</comment>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
@@ -2145,7 +2145,7 @@ Not allowed characters become their fullwidth forms (? becomes ？), control cha
 Useful for photos that include the date taken in the name and had their date modified overwritten.</value>
   </data>
   <data name="S_PUSH_PACKAGES_INFO" xml:space="preserve">
-    <value>Installs APK(s) directly from Windows.</value>
+    <value>Installs APK(s) directly from this computer.</value>
   </data>
   <data name="S_DETAILS_PANE_INFO" xml:space="preserve">
     <value>Sets the side pane to details mode.
@@ -2274,16 +2274,16 @@ The checks attempt to prevent an unsuspecting user from launching a possibly mal
     <comment>Tooltip for the view size button</comment>
   </data>
   <data name="S_MENU_OPEN_IN_WINDOWS_EXPLORER" xml:space="preserve">
-    <value>Open in Windows Explorer</value>
-    <comment>Explorer context menu action showing a device folder (the selected one, or the current one) in Windows File Explorer</comment>
+    <value>Open in {0}</value>
+    <comment>Explorer context menu action showing a device folder (the selected one, or the current one) in Windows File Explorer. {0} is the file manager's name as Windows shows it, in its basic (nominative) form, e.g. File Explorer. If your language changes the name's form here (Russian: в Проводнике), write the name into your translation instead of using {0}.</comment>
   </data>
   <data name="S_MOUNT_FAILED_TITLE" xml:space="preserve">
-    <value>Couldn't show the device in File Explorer</value>
-    <comment>Error dialog title when the device folder can't be added to Windows File Explorer</comment>
+    <value>Couldn't show the device in {0}</value>
+    <comment>Error dialog title when the device folder can't be added to Windows File Explorer. {0} is the file manager's name as Windows shows it, in its basic (nominative) form, e.g. File Explorer. If your language changes the name's form here (Russian: в Проводнике), write the name into your translation instead of using {0}.</comment>
   </data>
   <data name="S_MOUNT_OPENING" xml:space="preserve">
-    <value>Opening in Windows Explorer…</value>
-    <comment>Progress dialog text while the device folder is prepared and Windows File Explorer opens; closes by itself</comment>
+    <value>Opening in {0}…</value>
+    <comment>Progress dialog text while the device folder is prepared and Windows File Explorer opens; closes by itself. {0} is the file manager's name as Windows shows it, in its basic (nominative) form, e.g. File Explorer. If your language changes the name's form here (Russian: в Проводнике), write the name into your translation instead of using {0}.</comment>
   </data>
   <data name="S_DRAGDROP_COPY" xml:space="preserve">
     <value>Copy</value>
@@ -2310,7 +2310,11 @@ The checks attempt to prevent an unsuspecting user from launching a possibly mal
     <comment>The drag tooltip while a folder, drive or device is dragged over a tab strip (the app's, or a File Explorer window's); dropping it opens it in a new tab there</comment>
   </data>
   <data name="S_DRAG_OPEN_IN_EXPLORER" xml:space="preserve">
-    <value>Open in Windows Explorer</value>
-    <comment>The drag tooltip while a device is dragged over the Windows desktop; dropping it opens the device in a new Windows File Explorer window</comment>
+    <value>Open in {0}</value>
+    <comment>The drag tooltip while a device is dragged over the Windows desktop; dropping it opens the device in a new Windows File Explorer window. {0} is the file manager's name as Windows shows it, in its basic (nominative) form, e.g. File Explorer. If your language changes the name's form here (Russian: в Проводнике), write the name into your translation instead of using {0}.</comment>
+  </data>
+  <data name="S_FILE_EXPLORER" xml:space="preserve">
+    <value>File Explorer</value>
+    <comment>Fallback for the OS file manager's name, used only when the OS doesn't provide its own localized name</comment>
   </data>
 </root>

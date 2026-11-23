@@ -14,8 +14,6 @@
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<Platforms>x64;ARM64</Platforms>
 	<Configurations>Debug;Release;Deploy</Configurations>
-	<!-- Use Roslyn (csc) instead of legacy al.exe for satellite assemblies; al.exe rejects /platform:arm64 (AL1012) -->
-	<GenerateSatelliteAssembliesForCore>true</GenerateSatelliteAssembliesForCore>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Deploy'">
@@ -26,6 +24,10 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="ADB_Test" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ADB Explorer.Core\ADB Explorer.Core.csproj" />
   </ItemGroup>
 
   <!-- Emoji.Wpf, built from our fork (github.com/Alex4SSB/emoji.wpf) instead of the
@@ -54,33 +56,6 @@
   <ItemGroup>
     <Content Include="Assets\app_icon_2023_combined.ico" />
   </ItemGroup>
-
-  <!-- Count-dependent strings (Strings.Plurals), translated in Weblate as i18next v4 JSON.
-       Embedded in the main assembly - no satellite assemblies, so the culture isn't inferred from the name. -->
-  <ItemGroup>
-    <None Remove="Strings\Plurals\*.json" />
-    <EmbeddedResource Include="Strings\Plurals\*.json">
-      <LogicalName>ADB_Explorer.Strings.Plurals.%(Filename).json</LogicalName>
-      <WithCulture>false</WithCulture>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <!-- Weblate creates a language's files before anything is translated. An empty resx would still produce a
-       satellite assembly (which lists the language in settings), so empty resx and plurals files are dropped. -->
-  <Target Name="DropEmptyTranslations" BeforeTargets="PrepareResourceNames">
-    <ItemGroup>
-      <_EmptyTranslation Include="@(EmbeddedResource)" Condition="'%(RelativeDir)' == 'Strings\' And '%(Extension)' == '.resx' And $([System.String]::new('%(Filename)').StartsWith('Resources.')) And !$([System.IO.File]::ReadAllText('%(FullPath)').Contains('&lt;data '))" />
-      <_EmptyTranslation Include="@(EmbeddedResource)" Condition="'%(RelativeDir)' == 'Strings\Plurals\' And '%(Extension)' == '.json' And '%(Filename)' != 'en' And !$([System.Text.RegularExpressions.Regex]::IsMatch($([System.IO.File]::ReadAllText('%(FullPath)')), '&quot;:\s*&quot;[^&quot;]'))" />
-      <EmbeddedResource Remove="@(_EmptyTranslation)" />
-      <_EmptyResxCulture Include="$([System.String]::new('%(_EmptyTranslation.Filename)').Substring(10))" Condition="'%(_EmptyTranslation.Extension)' == '.resx'" />
-    </ItemGroup>
-    <Message Importance="high" Text="Dropping empty translation: %(_EmptyTranslation.Identity)" Condition="'@(_EmptyTranslation)' != ''" />
-  </Target>
-
-  <!-- Removes a satellite assembly left over from a build made before the language's files became empty -->
-  <Target Name="DeleteEmptyTranslationSatellites" AfterTargets="CopyFilesToOutputDirectory" DependsOnTargets="DropEmptyTranslations">
-    <Delete Files="$(OutDir)%(_EmptyResxCulture.Identity)\$(AssemblyName).resources.dll" Condition="'@(_EmptyResxCulture)' != ''" />
-  </Target>
 
   <!-- The app's display name and version each have one source, in ADB Package:
        - AppDisplayName in Strings\en-us\Resources.resw (the manifest's ms-resource:AppDisplayName) -> Product attribute
@@ -154,46 +129,6 @@
     <Resource Include="Assets\APK_icon_256px_vecteezy.ico" />
     <Resource Include="Assets\app_icon_black_2023_256px.png" />
     <Resource Include="Resources\Fonts\Nunito-VariableFont_wght.ttf" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Strings\Resources.Designer.cs">
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Strings\Resources.ar.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Strings\Resources.cs.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Strings\Resources.de.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Strings\Resources.es.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Strings\Resources.fr.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Strings\Resources.resx">
-      <SubType>Designer</SubType>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <Generator>PublicResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Strings\Resources.ru.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Strings\Resources.tr.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Strings\Resources.zh-CN.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
 
   <!--

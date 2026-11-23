@@ -67,7 +67,7 @@ public partial class LogicalDrive : Drive
         {
             Type = DriveType.Root;
         }
-        else if (AdbExplorerConst.DRIVE_TYPES.Where(kv => kv.Value is DriveType.Internal).Any(kv => kv.Key.Contains(path)))
+        else if (AppConst.DRIVE_TYPES.Where(kv => kv.Value is DriveType.Internal).Any(kv => kv.Key.Contains(path)))
         {
             Type = DriveType.Internal;
         }
@@ -118,7 +118,7 @@ public partial class LogicalDrive : Drive
                     path = items[1].Trim();
                 }
                 else
-                    path = AdbExplorerConst.DRIVE_TYPES.First(d => d.Value is DriveType.Internal).Key;
+                    path = AppConst.DRIVE_TYPES.First(d => d.Value is DriveType.Internal).Key;
             }
         });
 

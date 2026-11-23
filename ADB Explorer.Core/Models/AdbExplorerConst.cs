@@ -13,46 +13,6 @@ public static class AdbExplorerConst
     public const string RECYCLE_PATH = $"/sdcard/{RECYCLE_FOLDER}";
     public const string RECYCLE_INDEX_SUFFIX = ".index";
 
-    public static readonly Dictionary<string, AbstractDrive.DriveType> DRIVE_TYPES = new()
-    {
-        { "/sdcard", AbstractDrive.DriveType.Internal },
-        { "/storage/emulated/0", AbstractDrive.DriveType.Internal },
-        { "/storage/self/primary", AbstractDrive.DriveType.Internal },
-        { "/mnt/sdcard", AbstractDrive.DriveType.Internal },
-        { "/storage/emulated", AbstractDrive.DriveType.Internal },
-        { "/mnt/runtime/write/emulated/0", AbstractDrive.DriveType.Internal }, // for emulators
-        { RECYCLE_PATH, AbstractDrive.DriveType.Trash },
-        { $"/storage/emulated/0/{RECYCLE_FOLDER}", AbstractDrive.DriveType.Trash },
-        { $"/storage/self/primary/{RECYCLE_FOLDER}", AbstractDrive.DriveType.Trash },
-        { $"/mnt/sdcard/{RECYCLE_FOLDER}", AbstractDrive.DriveType.Trash },
-        { $"/mnt/runtime/write/emulated/0/{RECYCLE_FOLDER}", AbstractDrive.DriveType.Trash },
-        { AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin), AbstractDrive.DriveType.Trash },
-        { TEMP_PATH, AbstractDrive.DriveType.Temp },
-        { AdbLocation.StringFromLocation(Navigation.SpecialLocation.PackageDrive), AbstractDrive.DriveType.Package },
-        { "/", AbstractDrive.DriveType.Root },
-    };
-
-    private static readonly Dictionary<string, AbstractDrive.DriveType> _inetrnalDrivePaths 
-        = DRIVE_TYPES.Where(kv => kv.Value is AbstractDrive.DriveType.Internal).ToDictionary();
-
-    public static bool IsInternalStoragePath(string path)
-    {
-        if (string.IsNullOrEmpty(path))
-            return false;
-
-        return _inetrnalDrivePaths.Any(kv => path == kv.Key || path.StartsWith($"{kv.Key}/", StringComparison.Ordinal));
-    }
-
-    public static List<string> POSSIBLE_RECYCLE_PATHS =>
-        [.. _inetrnalDrivePaths.Select(kv => $"{kv.Key}/{RECYCLE_FOLDER}")];
-
-    /// <summary>
-    /// Per-device <c>{internal storage}/Android</c> paths whose directory entry FUSE forbids renaming or deleting.
-    /// Contents under these paths remain writable.
-    /// </summary>
-    public static readonly string[] FUSE_PROTECTED_ANDROID_ROOT_PATHS =
-        [.. _inetrnalDrivePaths.Select(kv => $"{kv.Key.TrimEnd('/')}/Android")];
-
     public const int DIR_LIST_START_COUNT = 100;
     public const int DIR_LIST_UPDATE_THRESHOLD_MIN = 100;
     public const int DIR_LIST_UPDATE_START_THRESHOLD_MIN = 10;
@@ -92,7 +52,7 @@ public static class AdbExplorerConst
     public const string PAIRING_SERVICE_PREFIX = "adbexplorer-";
 
     /// <summary>
-    /// Characters escaped inside <see cref="Services.AdbService.EscapeAdbShellString"/>'s double quotes.
+    /// Characters escaped inside <c>AdbService.EscapeAdbShellString</c>'s double quotes.
     /// Do not include <c>~</c>: tilde is not special in double quotes, and <c>\~</c> is a literal
     /// backslash (breaks <c>/data/app/~~…</c> install dirs used with <c>tar -C</c>).
     /// </summary>
@@ -148,8 +108,6 @@ public static class AdbExplorerConst
     public const long DISK_WRITE_THRESHOLD = 500000;
     public const long MAX_DISK_DISPLAY_RATE = 1000000000;
 
-    public static readonly Point DRAG_OFFSET_DEFAULT = new(48, 89);
-
     /// <summary>Windows Explorer-style distance before a drag or marquee starts, in DIPs.</summary>
     public const double DRAG_START_DISTANCE = 5;
     public const double DRAG_START_DISTANCE_SQUARED = DRAG_START_DISTANCE * DRAG_START_DISTANCE;
@@ -157,8 +115,6 @@ public static class AdbExplorerConst
     /// <summary>Vertical band at the top/bottom of a scrollable view that auto-scrolls during drag.</summary>
     public const double DRAG_AUTO_SCROLL_EDGE = 40;
     public const double DRAG_AUTO_SCROLL_MAX_STEP = 24;
-
-    public static readonly Key[] NAVIGATION_KEYS = [Key.Enter, Key.Up, Key.Down, Key.Left, Key.Right, Key.Escape, Key.Home, Key.End];
 
     public static readonly string[] COMMON_PHOTO_EXT = [".jpg", ".jpeg", ".png", ".bmp", ".gif", ".webp"];
     public const float PHOTO_DIR_THRESHOLD = 0.8f;

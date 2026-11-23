@@ -164,7 +164,7 @@ public partial class TrashIndexer : ObservableObject
     }
 
     private static bool IsTrashPath(string path)
-        => AdbExplorerConst.POSSIBLE_RECYCLE_PATHS.Any(recycle =>
+        => AppConst.POSSIBLE_RECYCLE_PATHS.Any(recycle =>
             path == recycle || path.StartsWith($"{recycle}/", StringComparison.Ordinal));
 
     public override string ToString()

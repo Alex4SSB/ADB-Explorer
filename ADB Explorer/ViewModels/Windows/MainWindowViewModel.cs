@@ -320,7 +320,7 @@ public partial class MainWindowViewModel : ObservableObject
         if (!AppUpdateHelper.ApplyPendingUpdate(restartNow))
         {
             DialogService.ShowMessage(
-                AppUpdateHelper.LastFailureReason ?? Strings.Resources.S_UPDATE_APPLY_FAILED,
+                AppUpdateHelper.LastFailureReason ?? Strings.Formatted.S_UPDATE_APPLY_FAILED,
                 Strings.Resources.S_NEW_VERSION_TITLE,
                 DialogService.DialogIcon.Exclamation);
         }

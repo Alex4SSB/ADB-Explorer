@@ -68,7 +68,7 @@ public static class Plurals
 
     // Weblate has no "other" form for one/few/many languages (ru, uk, pl).
     // zero/one/two may spell out their number, so they never stand in for another count.
-    private static readonly string[] _fallbackCategories = [NativeMethods.PluralRules.Other, "many", "few"];
+    private static readonly string[] _fallbackCategories = [PluralRules.Other, "many", "few"];
 
     private const string ResourcePrefix = "ADB_Explorer.Strings.Plurals.";
 
@@ -99,9 +99,9 @@ public static class Plurals
             if (Table(language.Name) is not { } table)
                 continue;
 
-            var category = NativeMethods.PluralRules.Other;
+            var category = PluralRules.Other;
             if (count is { } n)
-                category = NativeMethods.PluralRules.Select(language, n);
+                category = PluralRules.Select(language, n);
 
             if (table.TryGetValue($"{key}_{category}", out var text) && text != "")
                 return text;
@@ -127,7 +127,7 @@ public static class Plurals
         if (table is null)
             return (0, keys.Count);
 
-        var categories = NativeMethods.PluralRules.WholeNumberCategories(culture);
+        var categories = PluralRules.WholeNumberCategories(culture);
         var translated = keys.Count(key => categories.All(category =>
             table.TryGetValue($"{key}_{category}", out var text) && text != ""));
 

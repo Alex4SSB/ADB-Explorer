@@ -19,25 +19,25 @@ public class PluralsTests
     [TestMethod]
     public void PluralRules_SelectsCldrCategories()
     {
-        Assert.AreEqual("one", NativeMethods.PluralRules.Select(Culture("ru"), 21));
-        Assert.AreEqual("few", NativeMethods.PluralRules.Select(Culture("ru"), 22));
-        Assert.AreEqual("many", NativeMethods.PluralRules.Select(Culture("ru"), 11));
-        Assert.AreEqual("few", NativeMethods.PluralRules.Select(Culture("pl"), 3));
-        Assert.AreEqual("many", NativeMethods.PluralRules.Select(Culture("pl"), 21));
-        Assert.AreEqual("zero", NativeMethods.PluralRules.Select(Culture("ar"), 0));
-        Assert.AreEqual("two", NativeMethods.PluralRules.Select(Culture("ar"), 2));
-        Assert.AreEqual("one", NativeMethods.PluralRules.Select(Culture("fr"), 0));
-        Assert.AreEqual("one", NativeMethods.PluralRules.Select(Culture("pt-BR"), 0));
-        Assert.AreEqual("other", NativeMethods.PluralRules.Select(Culture("en"), 0));
-        Assert.AreEqual("other", NativeMethods.PluralRules.Select(Culture("ja"), 1));
+        Assert.AreEqual("one", PluralRules.Select(Culture("ru"), 21));
+        Assert.AreEqual("few", PluralRules.Select(Culture("ru"), 22));
+        Assert.AreEqual("many", PluralRules.Select(Culture("ru"), 11));
+        Assert.AreEqual("few", PluralRules.Select(Culture("pl"), 3));
+        Assert.AreEqual("many", PluralRules.Select(Culture("pl"), 21));
+        Assert.AreEqual("zero", PluralRules.Select(Culture("ar"), 0));
+        Assert.AreEqual("two", PluralRules.Select(Culture("ar"), 2));
+        Assert.AreEqual("one", PluralRules.Select(Culture("fr"), 0));
+        Assert.AreEqual("one", PluralRules.Select(Culture("pt-BR"), 0));
+        Assert.AreEqual("other", PluralRules.Select(Culture("en"), 0));
+        Assert.AreEqual("other", PluralRules.Select(Culture("ja"), 1));
     }
 
     [TestMethod]
     public void PluralRules_ListsLanguageCategories()
     {
-        CollectionAssert.AreEquivalent(new[] { "one", "few", "many", "other" }, NativeMethods.PluralRules.Categories(Culture("ru")).ToArray());
-        CollectionAssert.AreEquivalent(new[] { "zero", "one", "two", "few", "many", "other" }, NativeMethods.PluralRules.Categories(Culture("ar")).ToArray());
-        CollectionAssert.AreEquivalent(new[] { "other" }, NativeMethods.PluralRules.Categories(Culture("ja")).ToArray());
+        CollectionAssert.AreEquivalent(new[] { "one", "few", "many", "other" }, PluralRules.Categories(Culture("ru")).ToArray());
+        CollectionAssert.AreEquivalent(new[] { "zero", "one", "two", "few", "many", "other" }, PluralRules.Categories(Culture("ar")).ToArray());
+        CollectionAssert.AreEquivalent(new[] { "other" }, PluralRules.Categories(Culture("ja")).ToArray());
     }
 
     [TestMethod]
@@ -114,7 +114,7 @@ public class PluralsTests
             var table = Plurals.Table(language);
             Assert.IsNotNull(table, language);
 
-            var categories = NativeMethods.PluralRules.Categories(Culture(language));
+            var categories = PluralRules.Categories(Culture(language));
             var spellable = categories.Where(category => MayOmitCount(Culture(language), category)).ToHashSet();
 
             foreach (var (key, text) in table)
@@ -145,10 +145,10 @@ public class PluralsTests
     [TestMethod]
     public void WholeNumberCategories_MatchWeblateForms()
     {
-        CollectionAssert.AreEquivalent(new[] { "one", "few", "many" }, NativeMethods.PluralRules.WholeNumberCategories(Culture("ru")).ToArray());
-        CollectionAssert.AreEquivalent(new[] { "one", "few", "many" }, NativeMethods.PluralRules.WholeNumberCategories(Culture("pl")).ToArray());
-        CollectionAssert.AreEquivalent(new[] { "one", "two", "other" }, NativeMethods.PluralRules.WholeNumberCategories(Culture("he-IL")).ToArray());
-        CollectionAssert.AreEquivalent(new[] { "one", "few", "other" }, NativeMethods.PluralRules.WholeNumberCategories(Culture("cs")).ToArray());
+        CollectionAssert.AreEquivalent(new[] { "one", "few", "many" }, PluralRules.WholeNumberCategories(Culture("ru")).ToArray());
+        CollectionAssert.AreEquivalent(new[] { "one", "few", "many" }, PluralRules.WholeNumberCategories(Culture("pl")).ToArray());
+        CollectionAssert.AreEquivalent(new[] { "one", "two", "other" }, PluralRules.WholeNumberCategories(Culture("he-IL")).ToArray());
+        CollectionAssert.AreEquivalent(new[] { "one", "few", "other" }, PluralRules.WholeNumberCategories(Culture("cs")).ToArray());
     }
 
     [TestMethod]
@@ -175,7 +175,7 @@ public class PluralsTests
     /// </summary>
     private static bool MayOmitCount(CultureInfo culture, string category)
     {
-        var numbers = Enumerable.Range(0, 1000).Where(n => NativeMethods.PluralRules.Select(culture, n) == category).ToList();
+        var numbers = Enumerable.Range(0, 1000).Where(n => PluralRules.Select(culture, n) == category).ToList();
 
         return numbers.Count == 1 || numbers.SequenceEqual([0, 1]);
     }

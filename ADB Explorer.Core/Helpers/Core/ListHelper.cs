@@ -1,6 +1,6 @@
 ﻿namespace ADB_Explorer.Helpers;
 
-internal static class ListHelper
+public static class ListHelper
 {
     public static ListSortDirection Invert(ListSortDirection? value)
     {

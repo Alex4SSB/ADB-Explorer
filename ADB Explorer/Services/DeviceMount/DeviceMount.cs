@@ -186,7 +186,7 @@ public sealed partial class DeviceMount : IDisposable
         {
             dialog.Hide();
             DialogService.ShowMessage(e.Message,
-                                      Strings.Resources.S_MOUNT_FAILED_TITLE,
+                                      Strings.Formatted.S_MOUNT_FAILED_TITLE,
                                       DialogService.DialogIcon.Critical,
                                       copyToClipboard: true);
         }
@@ -198,7 +198,7 @@ public sealed partial class DeviceMount : IDisposable
         content.Children.Add(new ProgressRing { IsIndeterminate = true, Width = 24, Height = 24, Margin = new(0, 0, 12, 0) });
         content.Children.Add(new System.Windows.Controls.TextBlock
         {
-            Text = Strings.Resources.S_MOUNT_OPENING,
+            Text = Strings.Formatted.S_MOUNT_OPENING,
             VerticalAlignment = VerticalAlignment.Center,
             TextWrapping = TextWrapping.Wrap,
         });

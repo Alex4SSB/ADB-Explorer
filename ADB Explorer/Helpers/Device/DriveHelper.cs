@@ -35,7 +35,7 @@ internal class DriveHelper
         if (path == drive.Path || path.StartsWith($"{drive.Path.TrimEnd('/')}/", StringComparison.Ordinal))
             return true;
 
-        return drive.Type is AbstractDrive.DriveType.Internal && AdbExplorerConst.IsInternalStoragePath(path);
+        return drive.Type is AbstractDrive.DriveType.Internal && AppConst.IsInternalStoragePath(path);
     }
 
     public static DriveRestrictions GetRestrictions(string path, LogicalDeviceViewModel? device = null)

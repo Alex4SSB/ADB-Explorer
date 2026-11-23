@@ -236,7 +236,7 @@ Pentru a aproba ADB, deschide setările avansate WSA.</value>
     <value>Un nou {0}, versiunea {1}, a fost descărcat și este gata de instalare.</value>
   </data>
   <data name="S_UPDATE_APPLY_FAILED" xml:space="preserve">
-    <value>Actualizarea nu a putut fi pregătită. Asigură-te că există un program care gestionează arhivele .7z (Windows Explorer, 7-Zip, NanaZip etc.) sau descarcă manual versiunea de pe GitHub.</value>
+    <value>Actualizarea nu a putut fi pregătită. Asigură-te că există un program care gestionează arhivele .7z ({0}, 7-Zip, NanaZip etc.) sau descarcă manual versiunea de pe GitHub.</value>
   </data>
   <data name="S_BUTTON_CLOSE" xml:space="preserve">
     <value>Închide</value>

@@ -284,7 +284,7 @@ public partial class NavigationTreeViewModel
         => ActiveDevice?.Drives.FirstOrDefault(d => d.Type == type);
 
     private static bool IsRecycleLocation(string path)
-        => AdbExplorerConst.POSSIBLE_RECYCLE_PATHS.Any(recycle =>
+        => AppConst.POSSIBLE_RECYCLE_PATHS.Any(recycle =>
             path == recycle || path.StartsWith($"{recycle}/", StringComparison.Ordinal));
 
     internal static IEnumerable<DriveViewModel> VisibleDrives(LogicalDeviceViewModel device)

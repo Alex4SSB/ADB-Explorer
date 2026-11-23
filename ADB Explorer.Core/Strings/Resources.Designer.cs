@@ -1435,6 +1435,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Install.
+        /// </summary>
+        public static string S_DRAG_INSTALL {
+            get {
+                return ResourceManager.GetString("S_DRAG_INSTALL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Install {0}.
         /// </summary>
         public static string S_DRAG_INSTALL_SINGLE {
@@ -1443,7 +1452,41 @@ namespace ADB_Explorer.Strings {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Open in Windows Explorer.
+        /// </summary>
+        public static string S_DRAG_OPEN_IN_EXPLORER {
+            get {
+                return ResourceManager.GetString("S_DRAG_OPEN_IN_EXPLORER", resourceCulture);
+            }
+        }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Open in a new tab.
+        /// </summary>
+        public static string S_DRAG_OPEN_IN_NEW_TAB {
+            get {
+                return ResourceManager.GetString("S_DRAG_OPEN_IN_NEW_TAB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy.
+        /// </summary>
+        public static string S_DRAGDROP_COPY {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_COPY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy to {0}.
+        /// </summary>
+        public static string S_DRAGDROP_COPY_TO {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_COPY_TO", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Create link in {0}.
@@ -1454,7 +1497,23 @@ namespace ADB_Explorer.Strings {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Move.
+        /// </summary>
+        public static string S_DRAGDROP_MOVE {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_MOVE", resourceCulture);
+            }
+        }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Move to {0}.
+        /// </summary>
+        public static string S_DRAGDROP_MOVE_TO {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_MOVE_TO", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Installed Apps.
@@ -2238,6 +2297,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add to saved locations.
+        /// </summary>
+        public static string S_MENU_ADD_SAVED_LOCATION {
+            get {
+                return ResourceManager.GetString("S_MENU_ADD_SAVED_LOCATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Archive.
         /// </summary>
         public static string S_MENU_ARCHIVE {
@@ -2481,15 +2549,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Add to saved locations.
-        /// </summary>
-        public static string S_MENU_ADD_SAVED_LOCATION {
-            get {
-                return ResourceManager.GetString("S_MENU_ADD_SAVED_LOCATION", resourceCulture);
-            }
-        }
-
-        /// <summary>
         ///   Looks up a localized string similar to Remove from saved locations.
         /// </summary>
         public static string S_MENU_REMOVE_SAVED_LOCATION {
@@ -2650,10 +2709,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_MOUNT_OPENING", resourceCulture);
             }
         }
-
-
-
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Mount options.
         /// </summary>
@@ -4269,7 +4325,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_SETTINGS_SUBSTITUTE_NAMES", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Gives a file whose name the destination doesn&apos;t allow lookalike characters, instead of refusing or hiding it.
         ///
@@ -4278,14 +4334,14 @@ namespace ADB_Explorer.Strings {
         ///• Copying to Android user storage (internal storage, SD cards, USB drives), which doesn&apos;t allow \ : * ? &quot; &lt; &gt; |
         ///• Opening the device in File Explorer, outside user storage
         ///
-        ///Not allowed characters become [rest of string was truncated]&quot;;.
+        ///Not allowed characters become their fullwidth forms (? becomes ？), control characters become their symbols, and so does a trailing dot or space. Names reserved by Windows [rest of string was truncated]&quot;;.
         /// </summary>
         public static string S_SETTINGS_SUBSTITUTE_NAMES_INFO {
             get {
                 return ResourceManager.GetString("S_SETTINGS_SUBSTITUTE_NAMES_INFO", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Show System Apps.
         /// </summary>
@@ -4555,7 +4611,7 @@ namespace ADB_Explorer.Strings {
                 return ResourceManager.GetString("S_STATUS_LOCKED", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to {0} - Offline.
         /// </summary>
@@ -5082,65 +5138,11 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copy.
+        ///   Looks up a localized string similar to File Explorer.
         /// </summary>
-        public static string S_DRAGDROP_COPY {
+        public static string S_FILE_EXPLORER {
             get {
-                return ResourceManager.GetString("S_DRAGDROP_COPY", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Copy to {0}.
-        /// </summary>
-        public static string S_DRAGDROP_COPY_TO {
-            get {
-                return ResourceManager.GetString("S_DRAGDROP_COPY_TO", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Move.
-        /// </summary>
-        public static string S_DRAGDROP_MOVE {
-            get {
-                return ResourceManager.GetString("S_DRAGDROP_MOVE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Move to {0}.
-        /// </summary>
-        public static string S_DRAGDROP_MOVE_TO {
-            get {
-                return ResourceManager.GetString("S_DRAGDROP_MOVE_TO", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Install.
-        /// </summary>
-        public static string S_DRAG_INSTALL {
-            get {
-                return ResourceManager.GetString("S_DRAG_INSTALL", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Open in a new tab.
-        /// </summary>
-        public static string S_DRAG_OPEN_IN_NEW_TAB {
-            get {
-                return ResourceManager.GetString("S_DRAG_OPEN_IN_NEW_TAB", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Open in Windows Explorer.
-        /// </summary>
-        public static string S_DRAG_OPEN_IN_EXPLORER {
-            get {
-                return ResourceManager.GetString("S_DRAG_OPEN_IN_EXPLORER", resourceCulture);
+                return ResourceManager.GetString("S_FILE_EXPLORER", resourceCulture);
             }
         }
     }

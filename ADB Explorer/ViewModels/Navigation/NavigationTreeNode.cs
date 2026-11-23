@@ -284,7 +284,7 @@ public partial class NavigationTreeNode : ObservableObject
 
         if (drive.Type is AbstractDrive.DriveType.Internal)
         {
-            return AdbExplorerConst.DRIVE_TYPES.Any(kv =>
+            return AppConst.DRIVE_TYPES.Any(kv =>
                 kv.Value is AbstractDrive.DriveType.Internal && path == kv.Key);
         }
 
@@ -323,10 +323,10 @@ public partial class NavigationTreeNode : ObservableObject
 
     private static string? RelativeToInternalRoot(string path)
     {
-        if (!AdbExplorerConst.IsInternalStoragePath(path))
+        if (!AppConst.IsInternalStoragePath(path))
             return null;
 
-        var roots = AdbExplorerConst.DRIVE_TYPES
+        var roots = AppConst.DRIVE_TYPES
             .Where(kv => kv.Value is AbstractDrive.DriveType.Internal)
             .Select(kv => kv.Key)
             .OrderByDescending(key => key.Length);

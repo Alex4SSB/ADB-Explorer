@@ -110,6 +110,7 @@ public partial class App
     private async void OnStartup(object sender, StartupEventArgs e)
     {
         AppDispatcher = Current.Dispatcher;
+        PlatformServices.Shell = new WindowsPlatformShell();
 
         // A shader the GPU/driver rejects would otherwise crash the app; WPF just skips the effect when handled.
         System.Windows.Media.Effects.PixelShader.InvalidPixelShaderEncountered += (_, _) => { };

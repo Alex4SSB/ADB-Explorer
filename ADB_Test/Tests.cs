@@ -895,10 +895,10 @@ namespace ADB_Test
         [TestMethod]
         public void IsInternalStoragePath_RecognizesEmulatedAliases()
         {
-            Assert.IsTrue(AdbExplorerConst.IsInternalStoragePath("/storage/emulated/0"));
-            Assert.IsTrue(AdbExplorerConst.IsInternalStoragePath("/storage/emulated/0/Download"));
-            Assert.IsTrue(AdbExplorerConst.IsInternalStoragePath("/sdcard/Music"));
-            Assert.IsFalse(AdbExplorerConst.IsInternalStoragePath("/storage/ABCD-1234"));
+            Assert.IsTrue(AppConst.IsInternalStoragePath("/storage/emulated/0"));
+            Assert.IsTrue(AppConst.IsInternalStoragePath("/storage/emulated/0/Download"));
+            Assert.IsTrue(AppConst.IsInternalStoragePath("/sdcard/Music"));
+            Assert.IsFalse(AppConst.IsInternalStoragePath("/storage/ABCD-1234"));
         }
 
         [TestMethod]

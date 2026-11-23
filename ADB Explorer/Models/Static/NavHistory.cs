@@ -277,7 +277,7 @@ public class AdbLocation : Navigation
                 ? StringFromLocation(Location)
                 : null;
 
-        if (lookupKey is not null && AdbExplorerConst.DRIVE_TYPES.TryGetValue(lookupKey, out var driveType))
+        if (lookupKey is not null && AppConst.DRIVE_TYPES.TryGetValue(lookupKey, out var driveType))
         {
             var trashEmpty = driveType is AbstractDrive.DriveType.Trash
                 && TrashHelper.GetTrashDrive(device)?.ItemsCount is null or <= 0;

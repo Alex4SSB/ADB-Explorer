@@ -93,7 +93,7 @@ public static class SettingsHelper
 
     public static IEnumerable<CultureInfo> GetAvailableLanguages()
     {
-        string assemblyName = Assembly.GetEntryAssembly()?.GetName().Name;
+        string assemblyName = typeof(Strings.Resources).Assembly.GetName().Name;
         yield return CultureInfo.InvariantCulture;
         yield return new CultureInfo("en-US");
 

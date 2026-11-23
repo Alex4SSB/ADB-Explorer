@@ -270,7 +270,7 @@ public partial class DragWindow : INotifyPropertyChanged
             var openText = DeviceMountDrag.TargetOf(Data.CopyPaste.WindowUnderMouse) switch
             {
                 DeviceMountDrag.DropTarget.ExplorerWindow => Strings.Resources.S_DRAG_OPEN_IN_NEW_TAB,
-                DeviceMountDrag.DropTarget.Desktop => Strings.Resources.S_DRAG_OPEN_IN_EXPLORER,
+                DeviceMountDrag.DropTarget.Desktop => Strings.Formatted.S_DRAG_OPEN_IN_EXPLORER,
                 _ => null,
             };
 

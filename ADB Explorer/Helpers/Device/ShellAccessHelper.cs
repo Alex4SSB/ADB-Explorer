@@ -174,7 +174,7 @@ public static partial class ShellAccessHelper
         if (string.IsNullOrEmpty(path))
             return false;
 
-        return AdbExplorerConst.FUSE_PROTECTED_ANDROID_ROOT_PATHS.Contains(path.TrimEnd('/'));
+        return AppConst.FUSE_PROTECTED_ANDROID_ROOT_PATHS.Contains(path.TrimEnd('/'));
     }
 
     public static AccessMask ResolveLocationAccess(

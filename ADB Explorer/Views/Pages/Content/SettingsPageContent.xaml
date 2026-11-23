@@ -11,7 +11,7 @@
     xmlns:pages="clr-namespace:ADB_Explorer.ViewModels.Pages"
     xmlns:resources="clr-namespace:ADB_Explorer.Resources"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
-    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings;assembly=ADB_Explorer.Core"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     d:DataContext="{d:DesignInstance Type=pages:SettingsViewModel}"
     d:DesignHeight="50"

@@ -604,7 +604,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         // The device's mount, at its root with a folder per drive
         OpenInExplorerCommand = new(() => device.Status is DeviceStatus.Ok && device.Type is not (DeviceType.Sideload or DeviceType.Recovery),
                                     () => DeviceMount.OpenInFileExplorer(this, ""),
-                                    Strings.Resources.S_MENU_OPEN_IN_WINDOWS_EXPLORER);
+                                    Strings.Formatted.S_MENU_OPEN_IN_WINDOWS_EXPLORER);
 
         RemoveCommand = DeviceHelper.RemoveDeviceCommand(this);
 
@@ -868,8 +868,8 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
 
     private void InitDeviceDrivesCore()
     {
-        Drives.Add(new LogicalDriveViewModel(new(path: AdbExplorerConst.DRIVE_TYPES.First(d => d.Value is AbstractDrive.DriveType.Root).Key)));
-        Drives.Add(new LogicalDriveViewModel(new(path: AdbExplorerConst.DRIVE_TYPES.First(d => d.Value is AbstractDrive.DriveType.Internal).Key)));
+        Drives.Add(new LogicalDriveViewModel(new(path: AppConst.DRIVE_TYPES.First(d => d.Value is AbstractDrive.DriveType.Root).Key)));
+        Drives.Add(new LogicalDriveViewModel(new(path: AppConst.DRIVE_TYPES.First(d => d.Value is AbstractDrive.DriveType.Internal).Key)));
 
         Drives.Add(new VirtualDriveViewModel(new(path: AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin), itemsCount: null)));
         Drives.Add(new VirtualDriveViewModel(new(path: AdbExplorerConst.TEMP_PATH)));
@@ -886,7 +886,7 @@ public partial class LogicalDeviceViewModel : DeviceViewModel
         if (Drives.Count == 0)
             InitDeviceDrivesCore();
         else
-            Drives.Add(new LogicalDriveViewModel(new(path: AdbExplorerConst.DRIVE_TYPES.First(d => d.Value is AbstractDrive.DriveType.Internal).Key)));
+            Drives.Add(new LogicalDriveViewModel(new(path: AppConst.DRIVE_TYPES.First(d => d.Value is AbstractDrive.DriveType.Internal).Key)));
     }
 
     public async Task<bool> UpdateDrives(IEnumerable<DriveSnapshot> snapshots, Dispatcher dispatcher, bool asyncClassify = false)
