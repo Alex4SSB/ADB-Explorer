@@ -183,7 +183,7 @@ namespace ADB_Test
         [TestMethod]
         public void HashTest()
         {
-            var Adb_33_0_3_path = @"E:\Android_SDK\platform-tools_r33.0.3\adb.exe";
+            var Adb_33_0_3_path = TestPaths.Adb("platform-tools_r33.0.3");
             var Adb_33_0_3_hash = "3B0C0331799D69225E1BA24E6CB0DFAB";
 
             var result = Security.CalculateWindowsFileHash(Adb_33_0_3_path);
@@ -288,7 +288,7 @@ namespace ADB_Test
         [TestMethod]
         public void GetFullNameTest()
         {
-            Assert.AreEqual("adb.exe", FileHelper.GetFullName(@"E:\Android_SDK\platform-tools_r33.0.3\adb.exe"));
+            Assert.AreEqual("adb.exe", FileHelper.GetFullName(@"C:\platform-tools\adb.exe"));
 
             Assert.AreEqual("root-checker-6-5-0.apk", FileHelper.GetFullName(@"/sdcard/ASUS/root-checker-6-5-0.apk"));
 

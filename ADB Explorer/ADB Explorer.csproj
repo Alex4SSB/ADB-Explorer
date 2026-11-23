@@ -222,4 +222,27 @@
     <Exec Command="&quot;$(SignToolExe)&quot; sign /a /fd SHA256 /td SHA256 /tr $(SignToolTimestampUrl) &quot;$(_SignTarget)&quot;" />
   </Target>
 
+  <!-- ClickOnce profiles set a RID, so they build into a separate bin\...\win-x64\ folder.
+       Once published, that build output is no longer needed. -->
+  <Target Name="RemoveClickOnceBuildOutput" AfterTargets="Publish"
+          Condition="'$(PublishProtocol)' == 'ClickOnce' and '$(RuntimeIdentifier)' != '' and $(OutDir.TrimEnd('\').EndsWith('\$(RuntimeIdentifier)'))">
+    <Message Importance="high" Text="Removing ClickOnce build output $(OutDir)" />
+    <RemoveDir Directories="$(OutDir)" ContinueOnError="WarnAndContinue" />
+  </Target>
+
+  <!-- Keeps only the current version's folder under the ClickOnce PublishUrl's Application Files. -->
+  <Target Name="RemoveOldClickOnceVersions" AfterTargets="Publish"
+          Condition="'$(PublishProtocol)' == 'ClickOnce' and '$(PublishUrl)' != '' and '$(ApplicationVersion)' != '' and !$(ApplicationVersion.Contains('*'))">
+    <PropertyGroup>
+      <_AppFilesDir>$([MSBuild]::NormalizeDirectory($(MSBuildProjectDirectory), $(PublishUrl), 'Application Files'))</_AppFilesDir>
+      <_CurrentVersionDir>$(_AppFilesDir)$(AssemblyName)_$(ApplicationVersion.Replace('.', '_'))</_CurrentVersionDir>
+      <_VersionDirs Condition="Exists('$(_AppFilesDir)')">$([System.IO.Directory]::GetDirectories('$(_AppFilesDir)', '$(AssemblyName)_*'))</_VersionDirs>
+    </PropertyGroup>
+    <ItemGroup Condition="Exists('$(_CurrentVersionDir)')">
+      <_OldVersionDir Include="$(_VersionDirs)" Exclude="$(_CurrentVersionDir)" />
+    </ItemGroup>
+    <Message Importance="high" Text="Removing old ClickOnce version %(_OldVersionDir.Identity)" Condition="'@(_OldVersionDir)' != ''" />
+    <RemoveDir Directories="@(_OldVersionDir)" ContinueOnError="WarnAndContinue" />
+  </Target>
+
 </Project>

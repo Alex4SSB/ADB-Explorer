@@ -49,6 +49,7 @@ public static partial class DeviceHelper
             await Task.Run(() => AdbService.PairNetworkDevice(service.ID, code, cancellationToken), cancellationToken);
             success = true;
         }
+        catch (OperationCanceledException) { } // Not paired, and no error to show
         catch (Exception ex)
         {
             error = ex.Message;

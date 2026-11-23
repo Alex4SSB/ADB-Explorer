@@ -42,4 +42,10 @@
     <Content Include="..\ADB Explorer\FaroCollector.url" Link="FaroCollector.url" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <!-- Tests read the Android SDK folder from AndroidSdk.path (gitignored, per machine).
+       Create it by hand with the path of the folder that holds platform-tools_<version>. -->
+  <ItemGroup>
+    <AssemblyMetadata Include="AndroidSdkPathFile" Value="$(MSBuildProjectDirectory)\AndroidSdk.path" />
+  </ItemGroup>
+
 </Project>

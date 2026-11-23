@@ -374,6 +374,8 @@ ADB Explorer/FaroCollector.url
 
 # Debug log location, per machine (written by non-Deploy builds on first launch)
 ADB Explorer/DebugLog.path
+# Folder with the platform-tools_<version> folders for the tests, per machine (create by hand)
+ADB_Test/AndroidSdk.path
 scripts/.grafana-token
 crashes/
 /CLAUDE.md

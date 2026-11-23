@@ -130,13 +130,30 @@ public partial class AdbService
     /// <exception cref="ConnectionTimeoutException"></exception>
     private static void NetworkDeviceOperation(string cmd, string fullAddress, CancellationToken cancellationToken, string pairingCode = "")
     {
-        ExecuteAdbCommand(cmd, out string stdout, out _, cancellationToken, fullAddress, pairingCode);
-        if (stdout.ToLower() is string lower
-            && (lower.Contains("cannot connect") || lower.Contains("error") || lower.Contains("failed")))
-        {
+        var exitCode = ExecuteAdbCommand(cmd, out string stdout, out string stderr, cancellationToken, fullAddress, pairingCode);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        // Disconnecting a device that's already gone has nothing left to do
+        if (cmd is "disconnect" && stderr.Contains("no such device", StringComparison.OrdinalIgnoreCase))
+            return;
+
+        var lower = stdout.ToLower();
+        // "cannot connect" and "cannot resolve host" both exit 0
+        var failedInStdout = lower.Contains("cannot ") || lower.Contains("error") || lower.Contains("failed");
+
+        // Transport errors (e.g. "error: protocol fault") exit 1 with only stderr
+        if (!failedInStdout && exitCode == 0)
+            return;
+
+        if (!string.IsNullOrWhiteSpace(stdout))
             throw new Exception(stdout);
-        }
+
+        throw new Exception(StripDaemonStartup(stderr));
     }
+
+    /// <summary>Removes the "* daemon not running; starting now" lines adb prints when it starts the server.</summary>
+    private static string StripDaemonStartup(string stderr)
+        => string.Join(Environment.NewLine, stderr.Split('\n').Select(l => l.TrimEnd('\r')).Where(l => !l.StartsWith('*') && l.Length > 0));
 
     const string magiskRootArgs = """
                 magiskpolicy --live 'allow adbd adbd process setcurrent'
