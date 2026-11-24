@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Platform;
 using ADB_Explorer.Services;
 using ADB_Explorer.Strings;
@@ -28,7 +29,7 @@ public class FormattedStringsTests
                     var text = (string)property.GetValue(null)!;
 
                     Assert.IsFalse(string.IsNullOrEmpty(text), $"{language}: {property.Name} is empty");
-                    Assert.IsFalse(text.Contains("{0}"), $"{language}: {property.Name} has an unfilled placeholder");
+                    Assert.DoesNotContain("{0}", text, $"{language}: {property.Name} has an unfilled placeholder");
                 }
             }
 
@@ -83,7 +84,7 @@ public class FormattedStringsTests
     public void IsSameOrParent_MatchesParentsNotSiblings()
     {
         static bool Match(string app, string name)
-            => Formatted.IsSameOrParent(CultureInfo.GetCultureInfo(app), CultureInfo.GetCultureInfo(name));
+            => CultureHelper.IsSameOrParent(CultureInfo.GetCultureInfo(app), CultureInfo.GetCultureInfo(name));
 
         Assert.IsTrue(Match("en-US", "en-US"));
         Assert.IsTrue(Match("en", "en-GB"));
@@ -94,11 +95,11 @@ public class FormattedStringsTests
         Assert.IsFalse(Match("en", "ru-RU"));
     }
 
+    /// <summary>Like Windows: knows the name in one language only.</summary>
     private sealed class FakeShell(string fileManagerName, string culture) : IPlatformShell
     {
-        public string? FileManagerName => fileManagerName;
-
-        public CultureInfo? FileManagerNameCulture => CultureInfo.GetCultureInfo(culture);
+        public string GetFileManagerName(CultureInfo wanted)
+            => CultureHelper.IsSameOrParent(wanted, CultureInfo.GetCultureInfo(culture)) ? fileManagerName : null;
 
         public string AdbExecutableName => "adb";
 

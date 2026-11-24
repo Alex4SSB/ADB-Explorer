@@ -21,11 +21,8 @@ public interface IPlatformShell
     string AdbExecutableName { get; }
 
     /// <summary>
-    /// The OS file manager's name in the OS display language (File Explorer, Files, Dolphin),
-    /// or <see langword="null"/> if the OS can't provide it.
+    /// The OS file manager's name (File Explorer, Files, Dolphin) in <paramref name="culture"/>,
+    /// or <see langword="null"/> if the OS can't provide it in that language.
     /// </summary>
-    string? FileManagerName { get; }
-
-    /// <summary>The language <see cref="FileManagerName"/> is in, or <see langword="null"/> if unknown.</summary>
-    CultureInfo? FileManagerNameCulture { get; }
+    string? GetFileManagerName(CultureInfo culture);
 }

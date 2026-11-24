@@ -13,10 +13,17 @@ public sealed partial class WindowsPlatformShell : IPlatformShell
 
     public string AdbExecutableName => "adb.exe";
 
-    public string? FileManagerName => _fileManagerName.Value;
+    /// <summary>
+    /// The shell names its items only in the Windows display language,
+    /// so another language gets <see langword="null"/>.
+    /// </summary>
+    public string? GetFileManagerName(CultureInfo culture)
+    {
+        if (_displayCulture.Value is not { } displayCulture || !CultureHelper.IsSameOrParent(culture, displayCulture))
+            return null;
 
-    /// <summary>The Windows display language, which the shell names its items in.</summary>
-    public CultureInfo? FileManagerNameCulture => _displayCulture.Value;
+        return _fileManagerName.Value;
+    }
 
     public void OpenFolder(string folderPath) => Process.Start("explorer.exe", $"\"{folderPath}\"");
 
