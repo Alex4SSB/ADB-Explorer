@@ -783,7 +783,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Sideload</value>
   </data>
   <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
-    <value>Sideload (Auto Reboot)</value>
+    <value>Sideload (Авто Reboot)</value>
   </data>
   <data name="S_STATUS_OFFLINE" xml:space="preserve">
     <value>{0} - Оффлайн</value>
@@ -1833,5 +1833,8 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_DRAG_OPEN_IN_EXPLORER" xml:space="preserve">
     <value>Открыть в Проводнике Windows</value>
+  </data>
+  <data name="S_FILE_EXPLORER" xml:space="preserve">
+    <value>File Explorer</value>
   </data>
 </root>
