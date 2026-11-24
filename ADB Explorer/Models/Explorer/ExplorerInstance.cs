@@ -96,11 +96,16 @@ public partial class ExplorerInstance : ObservableObject
         get
         {
             if (SplitInstance is not { } split)
+            {
+                if (Data.RuntimeSettings.IsRTL)
+                    return TextHelper.GuardLtrInRtl(OwnDisplayName);
+
                 return OwnDisplayName;
+            }
 
             // In right-to-left the first pane is on the right; the marks make even left-to-right names read from there.
             if (Data.RuntimeSettings.IsRTL)
-                return $"{OwnDisplayName}{TextHelper.RTL_MARK} | {TextHelper.RTL_MARK}{split.OwnDisplayName}";
+                return $"{TextHelper.GuardLtrInRtl(OwnDisplayName)}{TextHelper.RTL_MARK} | {TextHelper.RTL_MARK}{TextHelper.GuardLtrInRtl(split.OwnDisplayName)}";
 
             return $"{OwnDisplayName} | {split.OwnDisplayName}";
         }

@@ -266,6 +266,16 @@ public static class TextHelper
     public const char LTR_MARK = '\u200E';
     public const char RTL_MARK = '\u200F';
 
+    /// <summary>Wraps text with no RTL characters in LTR marks, so its edge punctuation
+    /// (e.g. a closing parenthesis) stays with it inside right-to-left text.</summary>
+    public static string GuardLtrInRtl(string text)
+    {
+        if (string.IsNullOrEmpty(text) || ContainsRtl(text))
+            return text;
+
+        return $"{LTR_MARK}{text}{LTR_MARK}";
+    }
+
     public static void BuildLocalizedInlines(object sender, RoutedEventArgs e)
     {
         var textBlock = sender as TextBlock;
