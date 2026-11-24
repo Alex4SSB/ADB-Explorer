@@ -1,5 +1,5 @@
 {
-    "Items_one": "{{count}} елемент",
+    "Items_one": "один елемент",
     "Items_few": "{{count}} елемента",
     "Items_many": "{{count}} елементів",
     "ItemCount_one": "{{count}} елемент",
@@ -11,7 +11,7 @@
     "ConflictingItems_one": "Є {{count}} конфліктуючий елемент",
     "ConflictingItems_few": "Є {{count}} конфліктуючі елементи",
     "ConflictingItems_many": "Є {{count}} конфліктуючих елементів",
-    "ConflictingItemsIn_one": "Є {{count}} конфліктуючий елемент у {{destination}}",
+    "ConflictingItemsIn_one": "Є один конфліктний елемент у {{destination}}",
     "ConflictingItemsIn_few": "Є {{count}} конфліктуючі елементи у {{destination}}",
     "ConflictingItemsIn_many": "Є {{count}} конфліктуючих елементів у {{destination}}",
     "ResolveConflicts_one": "Дозволити один конфлікт",
