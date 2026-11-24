@@ -11,7 +11,7 @@
     "ConflictingItems_one": "Есть {{count}} конфликтующий элемент",
     "ConflictingItems_few": "Есть {{count}} конфликтующие элемента",
     "ConflictingItems_many": "Есть {{count}} конфликтующих элементов",
-    "ConflictingItemsIn_one": "Есть {{count}} конфликтующий элемент в {{destination}}",
+    "ConflictingItemsIn_one": "В одном из пунктов содержится противоречие {{destination}}",
     "ConflictingItemsIn_few": "Есть {{count}} конфликтующие элемента в {{destination}}",
     "ConflictingItemsIn_many": "Есть {{count}} конфликтующих элементов в {{destination}}",
     "ResolveConflicts_one": "Разрешить один конфликт",
