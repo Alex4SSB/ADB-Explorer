@@ -1798,4 +1798,47 @@ Sprawdzanie ma na celu zapobieżenie uruchomieniu przez niczego niespodziewając
   <data name="S_DRAG_INSTALL" xml:space="preserve">
     <value>Zainstaluj</value>
   </data>
+  <data name="S_MENU_ADD_SAVED_LOCATION" xml:space="preserve">
+    <value>Dodaj do zapisanych lokalizacji</value>
+  </data>
+  <data name="S_STATUS_LOCKED" xml:space="preserve">
+    <value>{0} – Zablokowane. Odblokuj urządzenie, aby uzyskać do niego dostęp</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RENAMED" xml:space="preserve">
+    <value>Niektóre z wybranych plików mogą zostać przemianowane w lokalizacji docelowej</value>
+  </data>
+  <data name="S_POPUP_COPIED_RENAMED" xml:space="preserve">
+    <value>Niektóre ze skopiowanych plików zostaną w tej lokalizacji przemianowane</value>
+  </data>
+  <data name="S_SETTINGS_SUBSTITUTE_NAMES" xml:space="preserve">
+    <value>Zastąp znaki, których nie wolno używać w nazwach plików</value>
+  </data>
+  <data name="S_SETTINGS_SUBSTITUTE_NAMES_INFO" xml:space="preserve">
+    <value>Zamiast odrzucać lub ukrywać plik, którego nazwa zawiera znaki niedozwolone w lokalizacji docelowej, wyświetla ten plik.
+
+Działa w następujących przypadkach:
+• Kopiowanie z urządzenia do systemu Windows
+• Kopiowanie do pamięci użytkownika systemu Android (pamięć wewnętrzna, karty SD, pamięci USB), która nie dopuszcza znaków \ : * ? " &lt; &gt; |
+• Otwieranie urządzenia w Eksploratorze plików poza pamięcią użytkownika
+
+Znaki niedozwolone są zamieniane na ich formy o pełnej szerokości (? staje się ？), znaki sterujące stają się symbolami, podobnie jak końcowa kropka lub spacja. Nazwy zarezerwowane przez system Windows, takie jak CON lub NUL, otrzymują pierwszą literę o pełnej szerokości.</value>
+  </data>
+  <data name="S_MENU_OPEN_IN_WINDOWS_EXPLORER" xml:space="preserve">
+    <value>Otwórz w {0}</value>
+  </data>
+  <data name="S_MOUNT_FAILED_TITLE" xml:space="preserve">
+    <value>Nie udało się wyświetlić urządzenia w {0}</value>
+  </data>
+  <data name="S_MOUNT_OPENING" xml:space="preserve">
+    <value>Otwieranie w {0}…</value>
+  </data>
+  <data name="S_DRAG_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>Otwórz w nowej karcie</value>
+  </data>
+  <data name="S_DRAG_OPEN_IN_EXPLORER" xml:space="preserve">
+    <value>Otwórz w {0}</value>
+  </data>
+  <data name="S_FILE_EXPLORER" xml:space="preserve">
+    <value>Eksplorator plików</value>
+  </data>
 </root>
