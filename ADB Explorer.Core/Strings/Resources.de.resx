@@ -1698,4 +1698,49 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_DRAG_INSTALL" xml:space="preserve">
     <value>Installieren</value>
   </data>
+  <data name="S_REPORT_ISSUE" xml:space="preserve">
+    <value>Problem melden</value>
+  </data>
+  <data name="S_MENU_ADD_SAVED_LOCATION" xml:space="preserve">
+    <value>Zu den gespeicherten Orten hinzufügen</value>
+  </data>
+  <data name="S_FOLDER_CONTENT_VALUE" xml:space="preserve">
+    <value>{0}, {1}</value>
+  </data>
+  <data name="S_STATUS_LOCKED" xml:space="preserve">
+    <value>{0} – Gesperrt. Gerät entsperren, um darauf zugreifen zu können</value>
+  </data>
+  <data name="S_POPUP_RESTRICTED_NAMING" xml:space="preserve">
+    <value>Hält sich an die Namenskonventionen des Benutzerbereichs</value>
+  </data>
+  <data name="S_POPUP_SELECTED_RENAMED" xml:space="preserve">
+    <value>Einige der ausgewählten Dateien werden möglicherweise am Zielort umbenannt</value>
+  </data>
+  <data name="S_POPUP_COPIED_RENAMED" xml:space="preserve">
+    <value>Einige der kopierten Dateien werden an diesem Speicherort umbenannt</value>
+  </data>
+  <data name="S_SETTINGS_SUBSTITUTE_NAMES" xml:space="preserve">
+    <value>Zeichen ersetzen, die in Dateinamen nicht zulässig sind</value>
+  </data>
+  <data name="S_SETTINGS_THUMB_SIZE_PER_LOCATION" xml:space="preserve">
+    <value>Größe der Miniaturansicht wird für jeden Speicherort gespeichert</value>
+  </data>
+  <data name="S_SETTINGS_SORTING_PER_LOCATION" xml:space="preserve">
+    <value>Sortierspalte und Reihenfolge werden für jeden Speicherort gespeichert</value>
+  </data>
+  <data name="S_MENU_OPEN_IN_WINDOWS_EXPLORER" xml:space="preserve">
+    <value>In {0} öffnen</value>
+  </data>
+  <data name="S_MOUNT_FAILED_TITLE" xml:space="preserve">
+    <value>Gerät konnte in {0} nicht angezeigt werden</value>
+  </data>
+  <data name="S_MOUNT_OPENING" xml:space="preserve">
+    <value>Wird in {0} geöffnet …</value>
+  </data>
+  <data name="S_DRAG_OPEN_IN_NEW_TAB" xml:space="preserve">
+    <value>In einem neuen Tab öffnen</value>
+  </data>
+  <data name="S_DRAG_OPEN_IN_EXPLORER" xml:space="preserve">
+    <value>In {0} öffnen</value>
+  </data>
 </root>
